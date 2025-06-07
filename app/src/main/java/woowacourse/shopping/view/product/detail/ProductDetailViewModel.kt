@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
@@ -54,35 +56,53 @@ class ProductDetailViewModel(
 
     override fun onAddToCartClick() {
         val quantityToAdd = quantity.value ?: INITIAL_QUANTITY
-        cartProductRepository.getCartProductByProductId(product.id) { result ->
+        viewModelScope.launch {
+            val result = cartProductRepository.getCartProductByProductId(product.id)
+
             result
                 .onSuccess { cartProduct ->
                     if (cartProduct == null) {
-                        cartProductRepository.insert(product.id, quantityToAdd) {
-                            updateQuantity(INITIAL_QUANTITY)
-                        }
+                        val insertResult = cartProductRepository.insert(product.id, quantityToAdd)
+                        insertResult
+                            .onSuccess {
+                                updateQuantity(INITIAL_QUANTITY)
+                                _addToCartEvent.setValue(Unit)
+                            }.onFailure {
+                                Log.e("error", it.message.toString())
+                            }
                     } else {
-                        cartProductRepository.updateQuantity(cartProduct, quantityToAdd) {
-                            updateQuantity(INITIAL_QUANTITY)
-                        }
+                        val updateResult =
+                            cartProductRepository.updateQuantity(
+                                cartProduct,
+                                cartProduct.quantity + quantityToAdd,
+                            )
+
+                        updateResult
+                            .onSuccess {
+                                updateQuantity(INITIAL_QUANTITY)
+                                _addToCartEvent.setValue(Unit)
+                            }.onFailure {
+                                Log.e("error", it.message.toString())
+                            }
                     }
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
         }
-        _addToCartEvent.setValue(Unit)
     }
 
     private fun updateQuantity(newQuantity: Int) {
-        _quantity.postValue(newQuantity)
-        _totalPrice.postValue(newQuantity * product.price)
+        _quantity.value = newQuantity
+        _totalPrice.value = newQuantity * product.price
     }
 
     private fun loadLastViewedProduct() {
-        recentProductRepository.getLastViewedProduct { result ->
+        viewModelScope.launch {
+            val result = recentProductRepository.getLastViewedProduct()
+
             result
                 .onSuccess {
-                    _lastViewedProduct.postValue(it)
+                    _lastViewedProduct.value = it
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
@@ -91,8 +111,11 @@ class ProductDetailViewModel(
 
     private fun updateRecentProduct() {
         val recentProduct = RecentProduct(product = product)
-        recentProductRepository.replaceRecentProduct(recentProduct) {
-            it.onFailure { Log.e("error", it.message.toString()) }
+        viewModelScope.launch {
+            val result = recentProductRepository.replaceRecentProduct(recentProduct)
+
+            result
+                .onFailure { Log.e("error", it.message.toString()) }
         }
     }
 

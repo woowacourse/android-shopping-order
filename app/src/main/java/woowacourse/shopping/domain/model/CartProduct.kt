@@ -1,10 +1,12 @@
 package woowacourse.shopping.domain.model
 
+import java.io.Serializable
+
 data class CartProduct(
     val id: Int = 0,
     val product: Product,
     val quantity: Int = MINIMUM_PRODUCT_QUANTITY,
-) {
+) : Serializable {
     val totalPrice: Int = product.price * quantity
 
     companion object {

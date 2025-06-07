@@ -1,5 +1,6 @@
 package woowacourse.shopping.viewmodel.product
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -7,12 +8,15 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.fixture.CoroutinesTestExtension
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.view.product.detail.ProductDetailViewModel
 import woowacourse.shopping.viewmodel.InstantTaskExecutorExtension
 import woowacourse.shopping.viewmodel.getOrAwaitValue
 
+@ExperimentalCoroutinesApi
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ProductDetailViewModelTest {
     private lateinit var viewModel: ProductDetailViewModel

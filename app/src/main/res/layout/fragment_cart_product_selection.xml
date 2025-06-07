@@ -126,6 +126,7 @@
             android:layout_height="78dp"
             android:background="@color/primary_color"
             android:text="@{@string/order(viewmodel.totalCount)}"
+            android:enabled="@{viewmodel.canOrder}"
             android:textColor="@color/white"
             android:textSize="21sp"
             android:textStyle="bold"
