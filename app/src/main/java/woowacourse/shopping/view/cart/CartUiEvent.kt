@@ -1,6 +1,7 @@
 package woowacourse.shopping.view.cart
 
 import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.exception.NetworkError
 
 sealed interface CartUiEvent {
     data class ShowCannotIncrease(val quantity: Int) : CartUiEvent
@@ -9,5 +10,5 @@ sealed interface CartUiEvent {
 
     data class ChangeScreen(val orders: List<ShoppingCart>?) : CartUiEvent
 
-    data class ShowErrorMessage(val throwable: Throwable) : CartUiEvent
+    data class ShowErrorMessage(val throwable: NetworkError) : CartUiEvent
 }
