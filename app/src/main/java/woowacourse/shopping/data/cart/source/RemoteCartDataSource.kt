@@ -21,10 +21,21 @@ class RemoteCartDataSource(
             cartItems =
                 response?.content?.mapNotNull { it.toCartItemEntityOrNull() }
                     ?: emptyList(),
-            hasPrevious = response?.hasPrevious ?: false,
-            hasNext = response?.hasNext ?: false,
+            hasPrevious = response?.hasPrevious == true,
+            hasNext = response?.hasNext == true,
         )
     }
+
+    private val CartResponse.hasPrevious: Boolean
+        get() = if (pageable?.pageNumber == null) false else pageable.pageNumber > 0
+
+    private val CartResponse.hasNext: Boolean
+        get() {
+            val pageNumber = pageable?.pageNumber ?: return false
+            val totalPages = totalPages ?: return false
+
+            return pageNumber + 1 < totalPages
+        }
 
     override suspend fun cart(): List<CartItemEntity> {
         val response: CartResponse? = cartService.getAllCart()

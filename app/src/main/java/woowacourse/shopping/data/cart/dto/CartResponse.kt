@@ -77,14 +77,4 @@ data class CartResponse(
         @SerialName("unsorted")
         val unsorted: Boolean?,
     )
-
-    val hasPrevious: Boolean = if (pageable?.pageNumber == null) false else pageable.pageNumber > 0
-
-    val hasNext: Boolean =
-        run {
-            val pageNumber = pageable?.pageNumber ?: return@run false
-            val totalPages = this.totalPages ?: return@run false
-
-            pageNumber + 1 < totalPages
-        }
 }
