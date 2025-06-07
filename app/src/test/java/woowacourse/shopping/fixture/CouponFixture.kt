@@ -56,4 +56,12 @@ object CouponFixture {
             minimumAmount = null,
             availableTime = null,
         )
+
+    val couponList: List<Coupon> =
+        listOf(
+            fixedDummyCoupon,
+            percentDummyCoupon,
+            freeShippingDummyCoupon,
+            buyXgetYDummyCoupon,
+        )
 }
