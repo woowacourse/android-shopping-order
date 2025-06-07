@@ -7,10 +7,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.feature.cart.adapter.CartAdapter
 import woowacourse.shopping.feature.cart.adapter.RecommendAdapter
 import woowacourse.shopping.feature.goods.adapter.GoodsAdapter
 import woowacourse.shopping.feature.model.GoodsItem
+import woowacourse.shopping.feature.payment.adapter.PaymentCouponAdapter
 
 @BindingAdapter("imgUrl")
 fun ImageView.loadImageFromUrl(url: String?) {
@@ -38,6 +40,13 @@ fun RecyclerView.bindCartItems(items: List<CartProduct>?) {
 fun RecyclerView.bindItems(items: List<GoodsItem>?) {
     if (adapter is GoodsAdapter && items != null) {
         (adapter as GoodsAdapter).setItems(items)
+    }
+}
+
+@BindingAdapter("couponItems")
+fun RecyclerView.bindCouponItems(items: List<Coupon>?) {
+    if (adapter is PaymentCouponAdapter && items != null) {
+        (adapter as PaymentCouponAdapter).submitList(items)
     }
 }
 

@@ -12,6 +12,8 @@ abstract class ShoppingDatabase : RoomDatabase() {
     abstract fun historyDao(): HistoryDao
 
     companion object {
+        private const val DATABASE_NAME = "app_database"
+
         @Volatile
         private var instance: ShoppingDatabase? = null
 
@@ -21,7 +23,7 @@ abstract class ShoppingDatabase : RoomDatabase() {
                     .databaseBuilder(
                         context.applicationContext,
                         ShoppingDatabase::class.java,
-                        "app_database",
+                        DATABASE_NAME,
                     ).build()
                     .also { instance = it }
             }

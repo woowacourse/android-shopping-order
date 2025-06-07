@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
@@ -43,37 +45,24 @@ class GoodsDetailsViewModel(
         _shouldShowLastViewed.addSource(cartProduct) { updateLastViewedVisibility() }
     }
 
-    fun setInitialCart(id: Long) {
+    suspend fun setInitialCart(id: Long) {
         loadProductDetails(productId = id)
         loadLastViewed()
     }
 
-    fun loadProductDetails(productId: Long) {
-        productRepository.requestProductDetails(
-            productId = productId,
-            onSuccess = { productContent ->
-                cartRepository.findCartByProductId(
-                    productId = productContent.id,
-                    onResult = { matchedCart ->
-                        val cartProduct =
-                            CartProduct(
-                                id = matchedCart?.id ?: 0,
-                                product = productContent.toDomain(),
-                                quantity = matchedCart?.quantity ?: 1,
-                            )
-
-                        _cartProduct.value = cartProduct
-                        insertToHistory(cartProduct)
-                    },
-                    onError = {
-                        _insertState.value = Event(State.Failure)
-                    },
+    suspend fun loadProductDetails(productId: Long) {
+        val productContent = productRepository.requestProductDetails(productId = productId)
+        viewModelScope.launch {
+            val matchedCart = cartRepository.findCartByProductId(productContent.id)
+            val cartProduct =
+                CartProduct(
+                    id = matchedCart?.id ?: 0,
+                    product = productContent.toDomain(),
+                    quantity = matchedCart?.quantity ?: 1,
                 )
-            },
-            onError = {
-                _insertState.value = Event(State.Failure)
-            },
-        )
+            _cartProduct.value = cartProduct
+            insertToHistory(cartProduct)
+        }
     }
 
     fun increaseQuantity() {
@@ -97,38 +86,35 @@ class GoodsDetailsViewModel(
             val currentCart = cartProduct.value ?: EMPTY_CART_PRODUCT
             val newQuantity = currentCart.quantity
 
-            if (currentCart.quantity == 1) {
-                val cartRequest =
-                    CartRequest(
-                        productId = currentCart.product.id,
-                        quantity = newQuantity,
-                    )
+            viewModelScope.launch {
+                if (currentCart.quantity == 1) {
+                    val cartRequest =
+                        CartRequest(
+                            productId = currentCart.product.id,
+                            quantity = newQuantity,
+                        )
 
-                cartRepository.addToCart(cartRequest) { result ->
-                    result
+                    cartRepository
+                        .addToCart(cartRequest)
                         .onSuccess { newCartId ->
                             val updatedCart = cartProduct.value?.copy(id = newCartId, quantity = newQuantity)
-
                             insertToHistory(cartProduct.value as CartProduct)
                             updateCart(updatedCart)
                             _insertState.value = Event(State.Success)
                         }.onFailure {
                             _insertState.value = Event(State.Failure)
                         }
-                }
-            } else {
-                cartRepository.updateCart(
-                    id = currentCart.id,
-                    cartQuantity = CartQuantity(newQuantity),
-                ) { result ->
-                    result
-                        .onSuccess {
+                } else {
+                    cartRepository
+                        .updateCart(
+                            id = currentCart.id,
+                            cartQuantity = CartQuantity(newQuantity),
+                        ).onSuccess {
                             val updatedCart = cartProduct.value?.copy(quantity = newQuantity)
-
                             insertToHistory(cartProduct.value as CartProduct)
                             updateCart(updatedCart)
                             _insertState.value = Event(State.Success)
-                        }.onFailure { error ->
+                        }.onFailure {
                             _insertState.value = Event(State.Failure)
                         }
                 }
@@ -137,8 +123,9 @@ class GoodsDetailsViewModel(
     }
 
     fun loadLastViewed() {
-        historyRepository.findLatest { lastViewed ->
-            _lastViewed.postValue(lastViewed)
+        viewModelScope.launch {
+            val latestHistory = historyRepository.findLatest()
+            _lastViewed.postValue(latestHistory)
         }
     }
 
@@ -158,8 +145,10 @@ class GoodsDetailsViewModel(
     }
 
     private fun insertToHistory(cart: CartProduct) {
-        historyRepository.insert(
-            History(id = cart.product.id, name = cart.product.name, thumbnailUrl = cart.product.imageUrl),
-        )
+        viewModelScope.launch {
+            historyRepository.insert(
+                History(id = cart.product.id, name = cart.product.name, thumbnailUrl = cart.product.imageUrl),
+            )
+        }
     }
 }

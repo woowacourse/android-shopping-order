@@ -62,7 +62,7 @@ class CartProductFragment : Fragment() {
             CartAdapter(
                 object : CartViewHolder.CartClickListener {
                     override fun onClickDeleteButton(cart: CartProduct) {
-                        viewModel.delete(cart)
+                        viewModel.deleteFromCart(cart)
                         sendCartResult(cart, 0)
                     }
 

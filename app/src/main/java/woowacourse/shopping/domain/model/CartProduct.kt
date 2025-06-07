@@ -6,7 +6,7 @@ data class CartProduct(
     val quantity: Int,
     val isChecked: Boolean = false,
 ) {
-    val totalPrice: Int get() = product.price * quantity
+    val totalPrice: Long get() = product.price.toLong() * quantity
 
     companion object {
         val EMPTY_CART_PRODUCT =
