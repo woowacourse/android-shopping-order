@@ -8,47 +8,21 @@ import woowacourse.shopping.domain.repository.ProductRepository
 class DefaultProductRepository(
     private val productDataSource: ProductsDataSource,
 ) : ProductRepository {
-    override fun loadSinglePage(
+    override suspend fun loadSinglePage(
         category: String?,
         page: Int?,
         pageSize: Int?,
-        callback: (Result<ProductSinglePage>) -> Unit,
-    ) {
-        productDataSource.singlePage(category, page, pageSize) { result ->
-            result.fold(
-                onSuccess = { response ->
-                    if (response != null) {
-                        val productSinglePage = response.toDomain()
-                        callback(Result.success(productSinglePage))
-                    } else {
-                        callback(Result.failure(NullPointerException()))
-                    }
-                },
-                onFailure = { throwable ->
-                    callback(Result.failure(throwable))
-                },
-            )
+    ): Result<ProductSinglePage> {
+        return runCatching {
+            val response = productDataSource.singlePage(category, page, pageSize)
+            response.toDomain()
         }
     }
 
-    override fun loadProduct(
-        productId: Long,
-        callback: (Result<Product>) -> Unit,
-    ) {
-        productDataSource.getProduct(productId) { result ->
-            result.fold(
-                onSuccess = { response ->
-                    if (response != null) {
-                        val productSinglePage = response.toDomain()
-                        callback(Result.success(productSinglePage))
-                    } else {
-                        callback(Result.failure(NullPointerException()))
-                    }
-                },
-                onFailure = { throwable ->
-                    callback(Result.failure(throwable))
-                },
-            )
+    override suspend fun loadProduct(productId: Long): Result<Product> {
+       return runCatching {
+            val response = productDataSource.getProduct(productId)
+            response.toDomain()
         }
     }
 }
