@@ -96,6 +96,13 @@ class OrderActivity :
             couponAdapter.submitList(coupons)
         }
 
+        viewModel.orderSuccessEvent.observe(this) {
+            val intent = Intent(this, ProductActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            startActivity(intent)
+            finish()
+        }
+
         viewModel.toastMessage.observe(this) { resId ->
             showToast(resId)
         }
