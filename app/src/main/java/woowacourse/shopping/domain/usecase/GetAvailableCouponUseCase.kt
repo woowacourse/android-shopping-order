@@ -15,5 +15,5 @@ class GetAvailableCouponUseCase(
             .fetchAll()
             .mapCatching { coupons ->
                 coupons.filter { coupon -> coupon.isValidForOrder(orderPrice, items) }
-            }.onFailure { throwable -> throw throwable }
+            }
 }

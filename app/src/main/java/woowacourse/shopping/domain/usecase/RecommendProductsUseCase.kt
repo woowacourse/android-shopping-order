@@ -18,5 +18,5 @@ class RecommendProductsUseCase(
                     .filter { it.quantity == 0 }
                     .take(10)
                     .toList()
-            }.onFailure { throwable -> throw throwable }
+            }
 }
