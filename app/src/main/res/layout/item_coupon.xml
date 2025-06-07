@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="vm"
+            type="woowacourse.shopping.view.payment.vm.PaymentViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <CheckBox
+            android:id="@+id/cb_select_coupon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="6dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_coupon_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{vm.uiState.couponTitle}"
+            android:textColor="@color/gray"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toBottomOf="@+id/cb_select_coupon"
+            app:layout_constraintStart_toEndOf="@id/cb_select_coupon"
+            app:layout_constraintTop_toTopOf="@+id/cb_select_coupon"
+            tools:text="5,000원 할인 쿠폰" />
+
+        <TextView
+            android:id="@+id/tv_expiration_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{String.format(@string/text_expiration_date, vm.year, vm.month, vm.day)}"
+            android:textColor="@color/gray"
+            android:textSize="12dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_coupon_title" />
+
+
+        <TextView
+            android:id="@+id/tv_minimum_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="@{vm.minimumAmount != null ? View.VISIBLE : View.GONE}"
+            android:text="@{String.format(@string/text_order_minimum, vm.minimumAmount)}"
+            android:textColor="@color/gray"
+            android:textSize="12dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="18dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_expiration_date" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
