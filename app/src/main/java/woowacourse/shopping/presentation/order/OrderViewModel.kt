@@ -28,8 +28,8 @@ class OrderViewModel(
     private val _orderSummary: MutableLiveData<OrderPriceSummary> = MutableLiveData()
     val orderSummary: LiveData<OrderPriceSummary> = _orderSummary
 
-    private val _orderSuccessEvent = SingleLiveData<Unit>()
-    val orderSuccessEvent: LiveData<Unit> = _orderSuccessEvent
+    private val _orderSuccessEvent = SingleLiveData<Boolean>()
+    val orderSuccessEvent: LiveData<Boolean> = _orderSuccessEvent
 
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
@@ -62,8 +62,11 @@ class OrderViewModel(
                 .order(orderIds)
                 .onSuccess {
                     _toastMessage.value = R.string.order_toast_coupon_order_success
-                    _orderSuccessEvent.value = Unit
-                }.onFailure { _toastMessage.value = R.string.order_toast_coupon_order_fail }
+                    _orderSuccessEvent.value = true
+                }.onFailure {
+                    _toastMessage.value = R.string.order_toast_coupon_order_fail
+                    _orderSuccessEvent.value = false
+                }
         }
     }
 
