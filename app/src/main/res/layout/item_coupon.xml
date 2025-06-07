@@ -1,53 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/style_product_edge">
+<layout>
 
-    <CheckBox
-        android:id="@+id/cb_select_coupon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="18dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <data>
 
-    <TextView
-        android:id="@+id/tv_coupon_name"
-        android:layout_width="wrap_content"
+        <variable
+            name="coupon"
+            type="woowacourse.shopping.domain.model.coupon.Coupon" />
+
+        <variable
+            name="minimumAmount"
+            type="int" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/cb_select_coupon"
-        app:layout_constraintStart_toEndOf="@id/cb_select_coupon"
-        app:layout_constraintTop_toTopOf="@id/cb_select_coupon"
-        tools:text="5,000원 할인 쿠폰" />
+        android:layout_margin="10dp"
+        android:background="@drawable/style_product_edge">
 
-    <TextView
-        android:id="@+id/tv_end_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/dark_gray"
-        android:textSize="12sp"
-        app:layout_constraintStart_toStartOf="@id/cb_select_coupon"
-        app:layout_constraintTop_toBottomOf="@id/cb_select_coupon"
-        tools:text="만료일: 2024년 11월 30일" />
+        <CheckBox
+            android:id="@+id/cb_select_coupon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="18dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tv_min_order_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/dark_gray"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="18dp"
-        app:layout_constraintStart_toStartOf="@id/tv_end_date"
-        app:layout_constraintTop_toBottomOf="@id/tv_end_date"
-        tools:text="최소 주문 금액: 100,000원" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/tv_coupon_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@{coupon.description}"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/cb_select_coupon"
+            app:layout_constraintStart_toEndOf="@id/cb_select_coupon"
+            app:layout_constraintTop_toTopOf="@id/cb_select_coupon"
+            tools:text="5,000원 할인 쿠폰" />
+
+        <TextView
+            android:id="@+id/tv_end_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/dark_gray"
+            android:textSize="12sp"
+            app:expirationDate="@{coupon.expirationDate}"
+            app:layout_constraintStart_toStartOf="@id/cb_select_coupon"
+            app:layout_constraintTop_toBottomOf="@id/cb_select_coupon"
+            tools:text="만료일: 2024년 11월 30일" />
+
+        <TextView
+            android:id="@+id/tv_min_order_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            android:textColor="@color/dark_gray"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/tv_end_date"
+            app:layout_constraintTop_toBottomOf="@id/tv_end_date"
+            app:minimumAmount="@{minimumAmount}"
+            tools:text="최소 주문 금액: 100,000원" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

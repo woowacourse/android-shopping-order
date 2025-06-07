@@ -3,6 +3,7 @@ package woowacourse.shopping.view.payment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -12,6 +13,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityPaymentBinding
 import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.view.payment.adapter.PaymentAdapter
 
 class PaymentActivity : AppCompatActivity() {
     private val binding by lazy { ActivityPaymentBinding.inflate(layoutInflater) }
@@ -25,11 +27,13 @@ class PaymentActivity : AppCompatActivity() {
             ),
         )[PaymentViewModel::class.java]
     }
+    private val adapter by lazy { PaymentAdapter() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpView()
         initBindings()
+        initObservers()
 
         viewModel.initSelectedProducts(intent.getSerializableExtra(KEY_SELECTED_PRODUCTS) as List<CartProduct>)
     }
@@ -47,6 +51,14 @@ class PaymentActivity : AppCompatActivity() {
     private fun initBindings() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
+        binding.rvCoupons.adapter = adapter
+    }
+
+    private fun initObservers() {
+        viewModel.coupons.observe(this) {
+            Log.d("hwannow_log", "$it")
+            adapter.submitList(it)
+        }
     }
 
     companion object {
