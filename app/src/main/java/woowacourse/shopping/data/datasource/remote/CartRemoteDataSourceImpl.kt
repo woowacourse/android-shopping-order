@@ -26,7 +26,7 @@ class CartRemoteDataSourceImpl(
         runCatching {
             val response = cartService.addCartItem(addCartItemCommand)
             val cartId = response.extractCartItemId()
-            requireNotNull(cartId) { ADD_CART_PRODUCT_FAILURE_MESSAGE.format(addCartItemCommand.productId) }
+            requireNotNull(cartId)
         }
 
     override suspend fun deleteCartItem(cartId: Long): Result<Unit> =
@@ -58,7 +58,6 @@ class CartRemoteDataSourceImpl(
     }
 
     companion object {
-        private const val ADD_CART_PRODUCT_FAILURE_MESSAGE = "%s 상품을 장바구니에 상품을 추가하지 못했습니다."
         private const val HEADER_LOCATION = "Location"
         private const val HEADER_CART_ID_PREFIX = "/cart-items/"
     }
