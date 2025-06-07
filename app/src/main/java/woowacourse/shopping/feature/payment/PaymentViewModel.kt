@@ -9,9 +9,10 @@ import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.coupon.CouponRepository
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.CouponContract
+import woowacourse.shopping.domain.model.DiscountType
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.util.toDomain
-import java.time.LocalTime
 
 class PaymentViewModel(
     private val couponRepository: CouponRepository,
@@ -51,6 +52,18 @@ class PaymentViewModel(
                 }
             }
         _coupons.value = updated ?: emptyList()
+
+        applyCoupon()
+    }
+
+    fun applyCoupon() {
+        val checkedCoupon = _coupons.value?.find { it.isChecked }
+        val discountPrice = checkedCoupon?.couponDetail?.discount ?: 0
+        val newDiscountedPrice = _price.value?.orderPrice?.minus(discountPrice) ?: 0
+        val newPrice =
+            _price.value?.copy(discountPrice = discountPrice, totalPrice = newDiscountedPrice)
+                ?: Price(discountPrice = discountPrice, totalPrice = newDiscountedPrice)
+        _price.value = newPrice
     }
 
     private fun getAvailableCoupons() {
@@ -58,29 +71,19 @@ class PaymentViewModel(
             val allCoupons = couponRepository.fetchAllCoupons().map { it.toDomain() }
             val orderedPrice = _price.value?.orderPrice ?: 0
 
-            val result = mutableListOf<Coupon>()
+            val availableCoupons =
+                allCoupons
+                    .filter { coupon ->
+                        when (coupon.discountType) {
+                            DiscountType.FREE_SHIPPING.code -> CouponContract.FreeShippingCoupon.isAvailable(orderedPrice, orderedCarts)
+                            DiscountType.FIXED.code -> CouponContract.FixedCoupon.isAvailable(orderedPrice, orderedCarts)
+                            DiscountType.BUY_X_GET_Y.code -> CouponContract.BuyTwoGetOneCoupon.isAvailable(orderedPrice, orderedCarts)
+                            DiscountType.PERCENTAGE.code -> CouponContract.MiracleSaleCoupon.isAvailable(orderedPrice, orderedCarts)
+                            else -> false
+                        }
+                    }.map { Coupon(couponDetail = it) }
 
-            if (orderedPrice > 50_000) {
-                allCoupons.find { it.code == "FREESHIPPING" }?.let { result.add(Coupon(couponDetail = it)) }
-            }
-
-            if (orderedPrice > 100_000) {
-                allCoupons.find { it.code == "FIXED5000" }?.let { result.add(Coupon(couponDetail = it)) }
-            }
-
-            val hasBulkItem = orderedCarts.any { it.quantity >= 3 }
-            if (hasBulkItem) {
-                allCoupons.find { it.code == "BOGO" }?.let { result.add(Coupon(couponDetail = it)) }
-            }
-
-            val isDawnTime =
-                LocalTime.now().isAfter(LocalTime.of(4, 0)) &&
-                    LocalTime.now().isBefore(LocalTime.of(7, 0))
-            if (isDawnTime) {
-                allCoupons.find { it.code == "MIRACLESALE" }?.let { result.add(Coupon(couponDetail = it)) }
-            }
-
-            _coupons.postValue(result)
+            _coupons.postValue(availableCoupons)
         }
     }
 }
