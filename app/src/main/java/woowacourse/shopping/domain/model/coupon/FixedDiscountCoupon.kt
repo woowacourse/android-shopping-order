@@ -17,8 +17,16 @@ data class FixedDiscountCoupon(
         dateTime: LocalDateTime,
     ): PaymentSummary {
         if (!isAvailable(dateTime, paymentSummary)) return paymentSummary
+        return paymentSummary.copy(discountPrice = discount)
+    }
+
+    override fun isAvailable(
+        dateTime: LocalDateTime,
+        paymentSummary: PaymentSummary,
+    ): Boolean {
         val totalAmount = paymentSummary.products.sumOf { it.totalPrice }
-        val discountAmount = if (totalAmount >= minimumAmount) discount else 0
-        return paymentSummary.copy(discountPrice = discountAmount)
+        val isAvailable = totalAmount >= minimumAmount
+
+        return super.isAvailable(dateTime, paymentSummary) && isAvailable
     }
 }
