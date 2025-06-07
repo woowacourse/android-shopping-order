@@ -25,21 +25,22 @@ class PaymentViewModel(
 
     private var selectedCouponId: Int? = null
 
-    init {
-        viewModelScope.launch {
-            val result = couponRepository.getCoupons()
-            result
-                .onSuccess { coupons ->
-                    _coupons.value = coupons.map { CouponItem(it) }
-                }
-                .onFailure {
-                    Log.e("error", it.message.toString())
-                }
-        }
-    }
-
     fun initSelectedProducts(selectedCartProducts: List<CartProduct>) {
         selectedProducts = selectedCartProducts
+        initCoupon()
+    }
+
+    private fun initCoupon() {
+        viewModelScope.launch {
+            val result = couponRepository.getCoupons()
+            result.onSuccess { coupons ->
+                _coupons.value =
+                    coupons.map { CouponItem(it) }
+                        .filter { it.coupon.isValid(selectedProducts) }
+            }.onFailure {
+                Log.e("error", it.message.toString())
+            }
+        }
     }
 
     fun selectCoupon(coupon: Coupon) {

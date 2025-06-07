@@ -12,10 +12,7 @@ class BuyXGetYCoupon(
 ) : Coupon {
     override fun isValid(items: List<CartProduct>): Boolean {
         val requireQuantity = buyQuantity + getQuantity
-        val productQuantityMap =
-            items.groupingBy { it.product.id }
-                .eachCount()
 
-        return productQuantityMap.any { (_, quantity) -> quantity >= requireQuantity }
+        return items.any { it.quantity >= requireQuantity }
     }
 }
