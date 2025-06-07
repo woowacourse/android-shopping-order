@@ -7,16 +7,30 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityPaymentBinding
 import woowacourse.shopping.domain.model.CartProduct
 
 class PaymentActivity : AppCompatActivity() {
     private val binding by lazy { ActivityPaymentBinding.inflate(layoutInflater) }
+    private val viewModel by lazy {
+        val app = application as ShoppingApplication
+        ViewModelProvider(
+            this,
+            PaymentViewModelFactory(
+                app.cartProductRepository,
+            ),
+        )[PaymentViewModel::class.java]
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpView()
+        initBindings()
+
+        viewModel.initSelectedProducts(intent.getSerializableExtra(KEY_SELECTED_PRODUCTS) as List<CartProduct>)
     }
 
     private fun setUpView() {
@@ -27,6 +41,11 @@ class PaymentActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    private fun initBindings() {
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
     }
 
     companion object {
