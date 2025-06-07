@@ -16,6 +16,7 @@ data class PercentageCoupon(
     }
 
     fun calculateDiscountAmount(totalPrice: Int): Int {
-        return -1 * totalPrice * (discount / 100)
+        val discountRate = discount / 100.0
+        return -(totalPrice * discountRate).toInt()
     }
 }
