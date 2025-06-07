@@ -3,6 +3,9 @@ package woowacourse.shopping.view.detail.vm
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.repository.CartRepository
@@ -31,40 +34,21 @@ class DetailViewModel(
         productId: Long,
         lastSeenProductId: Long,
     ) {
-        defaultProductRepository.loadProduct(productId) { product ->
-            product.fold(
-                onSuccess = { productValue ->
+        viewModelScope.launch(Dispatchers.IO) {
+            val productResult = defaultProductRepository.loadProduct(productId)
+            productResult.onSuccess { productValue ->
+                val lastSeenProduct =
                     if (lastSeenProductId != NO_LAST_SEEN_PRODUCT && lastSeenProductId != productId) {
-                        defaultProductRepository.loadProduct(lastSeenProductId) { lastSeenProduct ->
-                            lastSeenProduct.fold(
-                                onSuccess = { lastSeenProductValue ->
-                                    _uiState.value =
-                                        DetailUiState(
-                                            ProductState(
-                                                item = productValue,
-                                                cartQuantity = Quantity(1),
-                                            ),
-                                            lastSeenProduct = lastSeenProductValue,
-                                        )
-                                },
-                                onFailure = {},
-                            )
-                        }
-                    } else {
-                        _uiState.postValue(
-                            DetailUiState(
-                                product =
-                                    ProductState(
-                                        item = productValue,
-                                        cartQuantity = Quantity(1),
-                                    ),
-                                lastSeenProduct = null,
-                            ),
-                        )
-                    }
-                },
-                onFailure = {},
-            )
+                        defaultProductRepository.loadProduct(lastSeenProductId).getOrNull()
+                    } else null
+
+                _uiState.postValue(
+                    DetailUiState(
+                        product = ProductState(item = productValue, cartQuantity = Quantity(1)),
+                        lastSeenProduct = lastSeenProduct,
+                    )
+                )
+            }
         }
         saveHistory(productId)
     }
@@ -94,54 +78,46 @@ class DetailViewModel(
     }
 
     fun saveCart(productId: Long) {
-        withState(_uiState.value) { state ->
-            defaultCartRepository.loadSinglePage(null, null) { result ->
-                result.fold(
-                    onSuccess = { value ->
-                        val savedCart = value.carts.find { it.productId == productId }
-
-                        savedCart?.let {
-                            defaultCartRepository.updateQuantity(
-                                it.id,
-                                state.addQuantity(it.quantity),
-                            ) { result ->
-                                result.fold(
-                                    onSuccess = { sendEvent(DetailUiEvent.NavigateToCart(state.category)) },
-                                    onFailure = {},
-                                )
-                            }
-                        } ?: run {
-                            defaultCartRepository.addCart(
-                                Cart(
-                                    state.cartQuantity,
-                                    productId,
-                                ),
-                            ) { result ->
-                                result.fold(
-                                    onSuccess = { sendEvent(DetailUiEvent.NavigateToCart(state.category)) },
-                                    onFailure = {},
-                                )
-                            }
-                        }
-                    },
-                    onFailure = {},
-                )
+        viewModelScope.launch(Dispatchers.IO) {
+            val state = _uiState.value ?: return@launch
+            val products = defaultCartRepository.loadSinglePage(null, null)
+            products.onSuccess { value ->
+                val savedCart = value.carts.find { it.productId == productId }
+                if (savedCart != null) {
+                    defaultCartRepository.updateQuantity(
+                        savedCart.id,
+                        state.addQuantity(savedCart.quantity)
+                    )
+                    sendEvent(DetailUiEvent.NavigateToCart(state.category))
+                } else {
+                    defaultCartRepository.addCart(
+                        Cart(state.cartQuantity, productId)
+                    )
+                    sendEvent(DetailUiEvent.NavigateToCart(state.category))
+                }
             }
         }
     }
 
     fun loadLastSeenProduct(lastSeenProductId: Long) {
-        historyRepository.saveHistory(lastSeenProductId) {
-            _event.postValue(DetailUiEvent.NavigateToLastSeenProduct(lastSeenProductId))
+        viewModelScope.launch(Dispatchers.IO) {
+            historyRepository.saveHistory(lastSeenProductId)
+            _event.postValue(
+                DetailUiEvent.NavigateToLastSeenProduct(
+                    lastSeenProductId
+                )
+            )
         }
     }
 
     private fun saveHistory(productId: Long) {
-        historyRepository.saveHistory(productId) {}
+        viewModelScope.launch(Dispatchers.IO) {
+            historyRepository.saveHistory(productId)
+        }
     }
 
     private fun sendEvent(event: DetailUiEvent) {
-        _event.setValue(event)
+        _event.postValue(event)
     }
 
     val cartQuantityEventHandler =

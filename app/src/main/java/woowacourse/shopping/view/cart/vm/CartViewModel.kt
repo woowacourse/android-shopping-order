@@ -4,8 +4,13 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
+import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.view.cart.CartUiEvent
@@ -51,26 +56,27 @@ class CartViewModel(
     }
 
     fun loadRecommendProduct() {
-        withState(_cartUiState.value) { state ->
-            productRepository.loadSinglePage(lastSeenCategory, null, null) { products ->
-                products.fold(
-                    onSuccess = { result ->
-
-                        val recommendProduct =
-                            result
-                                .products
-                                .asSequence()
-                                .filter { it.id !in state.cartIds }
-                                .shuffled()
-                                .take(RECOMMEND_SIZE)
-                                .map { ProductState(item = it, cartQuantity = Quantity(0)) }
-                                .toList()
-                        _recommendUiState.value = RecommendUiState(recommendProduct)
-                    },
-                    onFailure = {},
-                )
+        viewModelScope.launch(Dispatchers.IO) {
+            productRepository.loadSinglePage(lastSeenCategory, null, null)
+            .onSuccess { result ->
+                val recommendProduct = generateRecommendedProducts(result.products, _cartUiState.value?.cartIds ?: emptyList(), RECOMMEND_SIZE)
+                _recommendUiState.postValue(RecommendUiState(recommendProduct))
             }
         }
+    }
+
+    fun generateRecommendedProducts(
+        allProducts: List<Product>,
+        cartIds: List<Long>,
+        recommendSize: Int,
+    ): List<ProductState> {
+        return allProducts
+            .asSequence()
+            .filter { it.id !in cartIds }
+            .shuffled()
+            .take(recommendSize)
+            .map { ProductState(item = it, cartQuantity = Quantity(0)) }
+            .toList()
     }
 
     fun increaseRecommendProductQuantity(productId: Long) =
@@ -79,29 +85,24 @@ class CartViewModel(
 
             when (val cartId = updated.cartId) {
                 null -> {
-                    cartRepository.addCart(Cart(updated.cartQuantity, productId)) {
-                        it.fold(
-                            onSuccess = { value ->
-                                val cartId = value?.toLong() ?: 0L
-                                _recommendUiState.value =
-                                    state.modifyUiState(updated.copy(cartId = cartId))
-                                _cartUiState.value = _cartUiState.value?.addCart(cartId, updated)
-                                Log.d("TAG", "afterAdd: ${_cartUiState.value?.items}")
-                            },
-                            onFailure = { },
-                        )
+                    viewModelScope.launch(Dispatchers.IO) {
+                        cartRepository.addCart(Cart(updated.cartQuantity, productId))
+                        .onSuccess {
+                            val cartId = cartId ?: 0L
+                            _recommendUiState.postValue(state.modifyUiState(updated.copy(cartId = cartId)))
+                            _cartUiState.postValue(_cartUiState.value?.addCart(cartId, updated))
+                            Log.d("TAG", "afterAdd: ${_cartUiState.value?.items}")
+                        }
                     }
                 }
 
                 else -> {
-                    cartRepository.updateQuantity(cartId, updated.cartQuantity) { value ->
-                        value.fold(
-                            onSuccess = {
-                                _recommendUiState.value = state.modifyUiState(updated)
-                                increaseCartQuantity(cartId)
-                            },
-                            onFailure = { },
-                        )
+                    viewModelScope.launch(Dispatchers.IO) {
+                        cartRepository.updateQuantity(cartId, updated.cartQuantity)
+                        .onSuccess {
+                            _recommendUiState.postValue(state.modifyUiState(updated))
+                            increaseCartQuantity(cartId)
+                        }
                     }
                 }
             }
@@ -113,25 +114,21 @@ class CartViewModel(
             val cartId = updated.cartId ?: return
 
             if (updated.hasCartQuantity) {
-                cartRepository.updateQuantity(cartId, updated.cartQuantity) {
-                    it.fold(
-                        onSuccess = {
-                            _recommendUiState.value = state.modifyUiState(updated)
-                            decreaseCartQuantity(cartId)
-                        },
-                        onFailure = { },
-                    )
+                viewModelScope.launch(Dispatchers.IO) {
+                    cartRepository.updateQuantity(cartId, updated.cartQuantity)
+                    .onSuccess {
+                        _recommendUiState.postValue(state.modifyUiState(updated))
+                        decreaseCartQuantity(cartId)
+                    }
                 }
             } else {
-                cartRepository.deleteCart(cartId) {
-                    it.fold(
-                        onSuccess = {
-                            val result = updated.copy(cartId = null)
-                            _recommendUiState.value = state.modifyUiState(result)
-                            _cartUiState.value = _cartUiState.value?.deleteCart(cartId)
-                        },
-                        onFailure = { },
-                    )
+                viewModelScope.launch(Dispatchers.IO) {
+                    cartRepository.deleteCart(cartId)
+                    .onSuccess {
+                        val result = updated.copy(cartId = null)
+                        _recommendUiState.postValue(state.modifyUiState(result))
+                        _cartUiState.postValue(_cartUiState.value?.deleteCart(cartId))
+                    }
                 }
             }
         }
@@ -141,13 +138,11 @@ class CartViewModel(
             val updatedState = state.decreaseCartQuantity(cartId)
             val updatedItem = updatedState.items.first { it.cartId == cartId }
 
-            cartRepository.updateQuantity(cartId, updatedItem.cart.quantity) { result ->
-                result.fold(
-                    onSuccess = {
-                        _cartUiState.value = updatedState
-                    },
-                    onFailure = {},
-                )
+            viewModelScope.launch(Dispatchers.IO) {
+                cartRepository.updateQuantity(cartId, updatedItem.cart.quantity)
+                .onSuccess {
+                    _cartUiState.postValue(updatedState)
+                }
             }
         }
     }
@@ -157,13 +152,9 @@ class CartViewModel(
             val updatedState = state.increaseCartQuantity(cartId)
             val updatedItem = updatedState.findCart(cartId)
 
-            cartRepository.updateQuantity(cartId, updatedItem.cart.quantity) { result ->
-                result.fold(
-                    onSuccess = {
-                        _cartUiState.value = updatedState
-                    },
-                    onFailure = {},
-                )
+            viewModelScope.launch(Dispatchers.IO) {
+                cartRepository.updateQuantity(cartId, updatedItem.cart.quantity)
+                .onSuccess { _cartUiState.postValue(updatedState) }
             }
         }
     }
@@ -171,27 +162,26 @@ class CartViewModel(
     fun loadCarts() {
         setLoading(true)
         val nextPage = paging.getPageNo() - 1
-        cartRepository.loadSinglePage(
-            nextPage,
-            PAGE_SIZE,
-        ) { result ->
+        viewModelScope.launch(Dispatchers.IO) {
+            cartRepository.loadSinglePage(
+                    nextPage,
+                    PAGE_SIZE,
+                )
+            .onSuccess { value ->
+                        val pageState = paging.createPageState(!value.hasNextPage)
+                        val newItems =
+                            value
+                                .carts
+                                .map { CartState(it, _cartUiState.value?.allChecked ?: false) }
 
-            result.fold(
-                onSuccess = { value ->
-                    val pageState = paging.createPageState(!value.hasNextPage)
-                    val newItems =
-                        value
-                            .carts
-                            .map { CartState(it, _cartUiState.value?.allChecked ?: false) }
+                        val currentItems = _cartUiState.value?.items ?: emptyList()
+                        val combinedItems = currentItems + newItems
 
-                    val currentItems = _cartUiState.value?.items ?: emptyList()
-                    val combinedItems = currentItems + newItems
-
-                    _cartUiState.value = CartUiState(items = combinedItems, pageState = pageState)
-                },
-                onFailure = {},
-            )
-            setLoading(false)
+                        _cartUiState.postValue(CartUiState(items = combinedItems, pageState = pageState))
+                withContext(Dispatchers.Main) {
+                    setLoading(false)
+                }
+            }
         }
     }
 
@@ -206,8 +196,9 @@ class CartViewModel(
     }
 
     fun deleteProduct(productId: Long) {
-        cartRepository.deleteCart(productId) {
-            refresh()
+        viewModelScope.launch(Dispatchers.IO) {
+            cartRepository.deleteCart(productId)
+                .onSuccess { refresh() }
         }
     }
 
@@ -216,33 +207,35 @@ class CartViewModel(
         isChecked: Boolean,
     ) {
         withState(_cartUiState.value) { state ->
-            _cartUiState.value = state.modifyCheckedState(cartId, isChecked)
+            _cartUiState.postValue(state.modifyCheckedState(cartId, isChecked))
         }
     }
 
     fun changeAllStateChecked(isChecked: Boolean) {
         withState(_cartUiState.value) { state ->
-            _cartUiState.value = state.setAllItemsChecked(isChecked)
+            _cartUiState.postValue(state.setAllItemsChecked(isChecked))
         }
     }
 
     private fun refresh() {
         withState(_cartUiState.value) { state ->
-            cartRepository.loadSinglePage(paging.getPageNo() - 1, PAGE_SIZE) { result ->
-                result.fold(
-                    onSuccess = { value ->
-                        if (paging.resetToLastPageIfEmpty(value.carts)) {
-                            refresh()
-                            return@loadSinglePage
-                        }
+            viewModelScope.launch(Dispatchers.IO) {
+                cartRepository.loadSinglePage(paging.getPageNo() - 1, PAGE_SIZE)
+                .onSuccess { value ->
+                            if (paging.resetToLastPageIfEmpty(value.carts)) {
+                                refresh()
+                            } else {
+                                val pageState = paging.createPageState(!value.hasNextPage)
+                                val carts = value.carts.map { CartState(it, state.allChecked) }
 
-                        val pageState = paging.createPageState(!value.hasNextPage)
-                        val carts = value.carts.map { CartState(it, state.allChecked) }
-
-                        _cartUiState.postValue(CartUiState(items = carts, pageState = pageState))
-                    },
-                    onFailure = {},
-                )
+                                _cartUiState.postValue(
+                                    CartUiState(
+                                        items = carts,
+                                        pageState = pageState
+                                    )
+                                )
+                            }
+                }
             }
         }
     }
