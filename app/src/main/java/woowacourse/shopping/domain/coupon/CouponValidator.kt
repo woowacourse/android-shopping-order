@@ -9,8 +9,8 @@ class CouponValidator : CouponValidate {
         coupons: List<Coupon>,
         orders: List<ShoppingCart>,
     ): List<Coupon> {
-        val today = LocalDate.now()
         val now = LocalDateTime.now()
+        val today = now.toLocalDate()
         val totalPayment = orders.sumOf { it.payment }
 
         return coupons.filter { coupon ->
