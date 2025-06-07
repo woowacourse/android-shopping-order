@@ -43,15 +43,16 @@ class OrderViewModel(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
-    private val orderProducts = MutableLiveData<List<CartProductUiModel>>(emptyList())
+    private val _orderProducts = MutableLiveData<List<CartProductUiModel>>(emptyList())
+    val orderProducts get() = _orderProducts.value.orEmpty()
 
     val totalOrderPrice: LiveData<Int> =
-        orderProducts.map { it.sumOf { product -> product.totalPrice } }
+        _orderProducts.map { it.sumOf { product -> product.totalPrice } }
 
     val totalOrderCount: LiveData<Int> =
-        orderProducts.map { it.sumOf { product -> product.quantity } }
+        _orderProducts.map { it.sumOf { product -> product.quantity } }
 
-    val isAllSelected: LiveData<Boolean> = orderProducts.map { isCheckedAll(it) }
+    val isAllSelected: LiveData<Boolean> = _orderProducts.map { isCheckedAll(it) }
 
     init {
         fetchCartItems(FetchPageDirection.CURRENT)
@@ -108,12 +109,12 @@ class OrderViewModel(
         setSelectedCurrentCartProducts(!isCheckedAll)
 
         if (isCheckedAll) {
-            orderProducts.postValue(emptyList())
+            _orderProducts.postValue(emptyList())
             return
         }
 
         val cartProducts = getAllCartProducts().map { it.toCartItemUiModel() }
-        orderProducts.postValue(cartProducts)
+        _orderProducts.postValue(cartProducts)
     }
 
     private fun addOrderProductFromSuggestion(productId: Long) {
@@ -209,13 +210,13 @@ class OrderViewModel(
         if (deletedProductIds.isEmpty()) return
         val filteredProducts =
             getCurrentOrderProducts().filter { it.productId !in deletedProductIds }
-        orderProducts.postValue(filteredProducts)
+        _orderProducts.postValue(filteredProducts)
     }
 
     private fun removeProductFromOrderList(cartId: Long) {
         val updatedProducts = getCurrentOrderProducts().toMutableList()
         updatedProducts.removeIf { it.cartId == cartId }
-        orderProducts.postValue(updatedProducts)
+        _orderProducts.postValue(updatedProducts)
     }
 
     private fun setSelectedCurrentCartProducts(isSelected: Boolean) {
@@ -225,7 +226,7 @@ class OrderViewModel(
 
     private fun toggleOrderProductSelection(productId: Long) {
         val updatedProducts = toggleProductInOrderList(getCurrentOrderProducts(), productId)
-        orderProducts.postValue(updatedProducts)
+        _orderProducts.postValue(updatedProducts)
     }
 
     private fun toggleProductInOrderList(
@@ -236,7 +237,8 @@ class OrderViewModel(
         val wasRemoved = mutableProducts.removeIf { it.productId == productId }
 
         if (!wasRemoved) {
-            val cartProduct = runBlocking { cartRepository.findCartProductByProductId(productId).getOrNull() }
+            val cartProduct =
+                runBlocking { cartRepository.findCartProductByProductId(productId).getOrNull() }
             cartProduct?.let { mutableProducts.add(it.toCartItemUiModel()) }
         }
 
@@ -284,7 +286,7 @@ class OrderViewModel(
         targetProductId: Long,
     ) {
         currentOrderProducts.removeIf { it.productId == targetProductId }
-        orderProducts.postValue(currentOrderProducts)
+        _orderProducts.postValue(currentOrderProducts)
     }
 
     private fun replaceOrderProductWithLatest(
@@ -296,7 +298,7 @@ class OrderViewModel(
                 if (it.productId != updatedOrderProduct.product.id) return@map it
                 updatedOrderProduct.toCartItemUiModel()
             }
-        orderProducts.postValue(updatedProducts)
+        _orderProducts.postValue(updatedProducts)
     }
 
     private fun determineFetchDirectionAfterDeletion(deletedCartId: Long): FetchPageDirection {
@@ -310,7 +312,7 @@ class OrderViewModel(
 
     private fun getCurrentCartItems(): List<CartProductUiModel> = _cartProducts.value.orEmpty()
 
-    private fun getCurrentOrderProducts(): List<CartProductUiModel> = orderProducts.value.orEmpty()
+    private fun getCurrentOrderProducts(): List<CartProductUiModel> = _orderProducts.value.orEmpty()
 
     private fun getCurrentPage(): Int = _page.value ?: DEFAULT_PAGE
 
