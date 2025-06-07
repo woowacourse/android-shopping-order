@@ -64,5 +64,15 @@ class PaymentViewModel(
                     else -> item
                 }
             }
+
+        updatePaymentDetail(coupon)
+    }
+
+    private fun updatePaymentDetail(coupon: Coupon) {
+        if (selectedCouponId != null) {
+            _paymentDetail.value = _paymentDetail.value?.discountByCoupon(coupon)
+        } else {
+            initPaymentDetail(selectedProducts)
+        }
     }
 }

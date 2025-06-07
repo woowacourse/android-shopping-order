@@ -2,7 +2,7 @@ package woowacourse.shopping.domain.model.coupon
 
 import woowacourse.shopping.domain.model.CartProduct
 
-class BuyXGetYCoupon(
+data class BuyXGetYCoupon(
     override val id: Int,
     override val code: String,
     override val description: String,
@@ -14,5 +14,12 @@ class BuyXGetYCoupon(
         val requireQuantity = buyQuantity + getQuantity
 
         return items.any { it.quantity >= requireQuantity }
+    }
+
+    fun calculateDiscountAmount(items: List<CartProduct>): Int {
+        val requireQuantity = buyQuantity + getQuantity
+        val filteredItems = items.filter { it.quantity >= requireQuantity }
+        val mostExpensiveItem = filteredItems.maxByOrNull { it.product.price } ?: return 0
+        return -1 * mostExpensiveItem.product.price * getQuantity
     }
 }

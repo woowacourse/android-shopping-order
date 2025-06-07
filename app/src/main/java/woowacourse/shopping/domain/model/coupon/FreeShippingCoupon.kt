@@ -2,7 +2,7 @@ package woowacourse.shopping.domain.model.coupon
 
 import woowacourse.shopping.domain.model.CartProduct
 
-class FreeShippingCoupon(
+data class FreeShippingCoupon(
     override val id: Int,
     override val code: String,
     override val description: String,

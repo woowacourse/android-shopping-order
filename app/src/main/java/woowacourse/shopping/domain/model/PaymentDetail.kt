@@ -1,12 +1,35 @@
 package woowacourse.shopping.domain.model
 
-class PaymentDetail(
+import woowacourse.shopping.domain.model.coupon.BuyXGetYCoupon
+import woowacourse.shopping.domain.model.coupon.Coupon
+import woowacourse.shopping.domain.model.coupon.FixedCoupon
+import woowacourse.shopping.domain.model.coupon.FreeShippingCoupon
+import woowacourse.shopping.domain.model.coupon.PercentageCoupon
+
+data class PaymentDetail(
     private val selectedProducts: List<CartProduct>,
     val couponDiscount: Int = DEFAULT_COUPON_DISCOUNT,
     val deliveryFee: Int = DEFAULT_DELIVERY_FEE,
 ) {
     val orderAmount: Int get() = selectedProducts.sumOf { it.totalPrice }
-    val totalPayment: Int get() = orderAmount - couponDiscount + deliveryFee
+    val totalPayment: Int get() = orderAmount + couponDiscount + deliveryFee
+
+    fun discountByCoupon(coupon: Coupon): PaymentDetail {
+        val discountAmount =
+            when (coupon) {
+                is FixedCoupon -> coupon.calculateDiscountAmount()
+                is PercentageCoupon -> coupon.calculateDiscountAmount(orderAmount)
+                is BuyXGetYCoupon -> coupon.calculateDiscountAmount(selectedProducts)
+                is FreeShippingCoupon -> 0
+            }
+
+        val newDeliveryFee = if (coupon is FreeShippingCoupon) 0 else DEFAULT_DELIVERY_FEE
+
+        return copy(
+            couponDiscount = discountAmount,
+            deliveryFee = newDeliveryFee,
+        )
+    }
 
     companion object {
         private const val DEFAULT_COUPON_DISCOUNT = 0
