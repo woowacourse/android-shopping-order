@@ -8,13 +8,13 @@ sealed class ProductRvItems(val viewType: ViewType) {
         val items: List<HistoryState>,
     ) : ProductRvItems(ViewType.VIEW_TYPE_RECENT_PRODUCT)
 
-    object DividerItem : ProductRvItems(ViewType.VIEW_TYPE_DIVIDER)
+    data object DividerItem : ProductRvItems(ViewType.VIEW_TYPE_DIVIDER)
 
     data class ProductItem(
         val data: ProductState,
     ) : ProductRvItems(ViewType.VIEW_TYPE_PRODUCT)
 
-    object LoadItem : ProductRvItems(ViewType.VIEW_TYPE_LOAD)
+    data object LoadItem : ProductRvItems(ViewType.VIEW_TYPE_LOAD)
 
     enum class ViewType {
         VIEW_TYPE_RECENT_PRODUCT,

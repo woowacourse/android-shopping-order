@@ -109,10 +109,9 @@ class DetailViewModel(
         val newQuantity = state.addQuantity(cart.quantity)
 
         viewModelScope.launch {
-            val result = cartRepository.updateQuantity(cart.id, newQuantity)
-            result.onSuccess {
-                navigateToCart(state.category)
-            }.onFailure(::handleFailure)
+            cartRepository.updateQuantity(cart.id, newQuantity)
+                .onSuccess { navigateToCart(state.category) }
+                .onFailure(::handleFailure)
         }
     }
 
@@ -121,10 +120,10 @@ class DetailViewModel(
         val cart = Cart(state.cartQuantity, productId)
 
         viewModelScope.launch {
-            val result = cartRepository.addCart(cart)
-            result.onSuccess {
-                navigateToCart(state.category)
-            }.onFailure(::handleFailure)
+            cartRepository.addCart(cart)
+                .onSuccess {
+                    navigateToCart(state.category)
+                }.onFailure(::handleFailure)
         }
     }
 

@@ -89,21 +89,6 @@ class MainActivity : AppCompatActivity() {
             itemAnimator = null
         }
 
-    private fun setSpanSizeLookup() =
-        object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return when (productsAdapter.getItemViewType(position)) {
-                    ProductRvItems.ViewType.VIEW_TYPE_PRODUCT.ordinal -> 1
-                    ProductRvItems.ViewType.VIEW_TYPE_RECENT_PRODUCT.ordinal,
-                    ProductRvItems.ViewType.VIEW_TYPE_DIVIDER.ordinal,
-                    ProductRvItems.ViewType.VIEW_TYPE_LOAD.ordinal,
-                    -> 2
-
-                    else -> throw IllegalArgumentException()
-                }
-            }
-        }
-
     private fun observeViewModel() {
         viewModel.uiState.observe(this) { value ->
             productsAdapter.submitList(value)
@@ -129,10 +114,7 @@ class MainActivity : AppCompatActivity() {
                         event.lastSeenProductId,
                     )
 
-                is MainUiEvent.NavigateToCart -> {
-                    val category = event.lastSeenProductCategory
-                    activityResultLauncher.launch(CartActivity.newIntent(this, category))
-                }
+                is MainUiEvent.NavigateToCart -> moveToCart(event.lastSeenProductCategory)
 
                 is MainUiEvent.ShowErrorMessage -> {
                     networkExceptionDelegator.showErrorMessage(event.throwable)
@@ -148,6 +130,25 @@ class MainActivity : AppCompatActivity() {
         val intent = DetailActivity.newIntent(this, productId, lastSeenProductId)
         activityResultLauncher.launch(intent)
     }
+
+    private fun moveToCart(category: String?) {
+        activityResultLauncher.launch(CartActivity.newIntent(this, category))
+    }
+
+    private fun setSpanSizeLookup() =
+        object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when (productsAdapter.getItemViewType(position)) {
+                    ProductRvItems.ViewType.VIEW_TYPE_PRODUCT.ordinal -> 1
+                    ProductRvItems.ViewType.VIEW_TYPE_RECENT_PRODUCT.ordinal,
+                    ProductRvItems.ViewType.VIEW_TYPE_DIVIDER.ordinal,
+                    ProductRvItems.ViewType.VIEW_TYPE_LOAD.ordinal,
+                    -> 2
+
+                    else -> throw IllegalArgumentException()
+                }
+            }
+        }
 
     companion object {
         fun newIntent(context: Context): Intent {
