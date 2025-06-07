@@ -15,6 +15,9 @@ data class OrderUiState(
     val originPayment: Payment,
     val payment: Payment,
 ) {
+    val orderCartIds: List<Long>
+        get() = order.map { it.id }
+
     fun changeCouponCheckState(
         couponId: Int,
         couponFactory: CouponApplierFactory,

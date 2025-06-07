@@ -22,6 +22,7 @@ import woowacourse.shopping.view.order.state.OrderUiState
 
 class OrderViewModel(
     private val couponRepository: CouponRepository,
+    private val orderRepository: OrderRepository,
     private val couponValidator: CouponValidate,
     private val couponFactory: CouponApplierFactory,
 ) : ViewModel() {
@@ -39,6 +40,16 @@ class OrderViewModel(
                     _uiState.value = OrderUiState.of(order, coupons, DEFAULT_DELIVERY_FEE)
                 }
                 .onFailure(::handleFailure)
+        }
+    }
+
+    fun sendOrder() {
+        viewModelScope.launch {
+            withState(_uiState.value) { state ->
+                orderRepository.createOrder(state.orderCartIds)
+                    .onSuccess { _uiEvent.setValue(OrderUiEvent.OrderComplete) }
+                    .onFailure(::handleFailure)
+            }
         }
     }
 

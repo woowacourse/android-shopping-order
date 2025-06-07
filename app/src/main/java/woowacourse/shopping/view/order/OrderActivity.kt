@@ -16,6 +16,7 @@ import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.domain.cart.ShoppingCart
 import woowacourse.shopping.view.NetworkExceptionDelegator
 import woowacourse.shopping.view.core.ext.getSerializableArrayList
+import woowacourse.shopping.view.core.ext.showToast
 import woowacourse.shopping.view.main.MainActivity
 import woowacourse.shopping.view.order.adapter.OrderAdapter
 import woowacourse.shopping.view.order.vm.OrderViewModel
@@ -28,6 +29,7 @@ class OrderActivity : AppCompatActivity() {
         val container = (application as App).container
         OrderViewModelFactory(
             couponRepository = container.couponRepository,
+            orderRepository = container.orderRepository,
             couponValidator = container.couponValidator,
             couponApplierFactory = container.couponApplierFactory,
         )
@@ -53,30 +55,11 @@ class OrderActivity : AppCompatActivity() {
         observeViewModel()
     }
 
-    private fun observeViewModel() {
-        viewModel.uiState.observe(this) { value ->
-            orderAdapter.submitItems(value)
-        }
-
-        viewModel.uiEvent.observe(this) { event ->
-            when (event) {
-                is OrderUiEvent.ShowErrorMessage -> networkExceptionDelegator.showErrorMessage(event.throwable)
-                is OrderUiEvent.NavigateToMain -> navigateToMain()
-            }
-        }
-    }
-
-    private fun setUpRecyclerView()  {
-        with(binding.recyclerViewOrder) {
-            itemAnimator = null
-            setHasFixedSize(true)
-        }
-    }
-
     private fun setUpBinding(binding: ActivityOrderBinding) {
         with(binding) {
             lifecycleOwner = this@OrderActivity
             adapter = orderAdapter
+            vm = viewModel
         }
     }
 
@@ -91,7 +74,29 @@ class OrderActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.text_payment)
     }
 
+    private fun setUpRecyclerView() {
+        with(binding.recyclerViewOrder) {
+            itemAnimator = null
+            setHasFixedSize(true)
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.uiState.observe(this) { value ->
+            orderAdapter.submitItems(value)
+        }
+
         viewModel.uiEvent.observe(this) { event ->
+            when (event) {
+                is OrderUiEvent.ShowErrorMessage -> networkExceptionDelegator.showErrorMessage(event.throwable)
+                is OrderUiEvent.OrderComplete -> {
+                    showToast(getString(R.string.text_order_complete))
+                    navigateToMain()
+                }
+            }
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {

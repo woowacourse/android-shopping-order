@@ -8,6 +8,9 @@
             name="adapter"
             type="woowacourse.shopping.view.order.adapter.OrderAdapter" />
 
+        <variable
+            name="vm"
+            type="woowacourse.shopping.view.order.vm.OrderViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -34,6 +37,7 @@
             android:text="@string/text_payment"
             android:textStyle="bold"
             android:textSize="24sp"
+            android:onClick="@{() -> vm.sendOrder()}"
             app:layout_constraintTop_toBottomOf="@id/recycler_view_order"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
