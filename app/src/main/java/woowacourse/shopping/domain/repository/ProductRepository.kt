@@ -4,20 +4,15 @@ import woowacourse.shopping.domain.model.PageableItem
 import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
-    fun fetchProduct(
-        id: Long,
-        onResult: (Result<Product>) -> Unit,
-    )
+    suspend fun fetchProduct(id: Long): Result<Product>
 
-    fun fetchProducts(
+    suspend fun fetchProducts(
         page: Int,
         size: Int,
-        onResult: (Result<PageableItem<Product>>) -> Unit,
-    )
+    ): Result<PageableItem<Product>>
 
-    fun fetchSuggestionProducts(
+    suspend fun fetchSuggestionProducts(
         limit: Int,
         excludedProductIds: List<Long>,
-        onResult: (Result<List<Product>>) -> Unit,
-    )
+    ): Result<List<Product>>
 }

@@ -5,7 +5,7 @@ import android.view.View
 import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
-import woowacourse.shopping.presentation.base.BaseFragment
+import woowacourse.shopping.presentation.common.base.BaseFragment
 import woowacourse.shopping.presentation.view.order.OrderViewModel
 import woowacourse.shopping.presentation.view.order.cart.adapter.CartAdapter
 import woowacourse.shopping.presentation.view.order.cart.event.CartMessageEvent

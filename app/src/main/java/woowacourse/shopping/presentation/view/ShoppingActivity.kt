@@ -1,5 +1,7 @@
 package woowacourse.shopping.presentation.view
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.activity.enableEdgeToEdge
@@ -40,5 +42,9 @@ class ShoppingActivity : AppCompatActivity() {
             setReorderingAllowed(true)
             add(R.id.shopping_fragment_container, CatalogFragment::class.java, null)
         }
+    }
+
+    companion object {
+        fun newIntent(context: Context): Intent = Intent(context, ShoppingActivity::class.java)
     }
 }
