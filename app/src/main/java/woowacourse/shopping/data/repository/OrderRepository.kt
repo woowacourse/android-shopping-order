@@ -1,8 +1,7 @@
 package woowacourse.shopping.data.repository
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.api.OrderApi
 import woowacourse.shopping.data.model.request.OrderProductsRequest
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -10,26 +9,10 @@ import woowacourse.shopping.domain.repository.OrderRepository
 class OrderRepository(
     private val api: OrderApi,
 ) : OrderRepository {
-    override fun postOrderProducts(
-        cartIds: List<Long>,
-        callback: (Result<Unit>) -> Unit,
-    ) {
-        api.postOrderProducts(OrderProductsRequest(cartIds)).enqueue(
-            object : Callback<Unit> {
-                override fun onResponse(
-                    call: Call<Unit>,
-                    response: Response<Unit>,
-                ) {
-                    callback(Result.success(Unit))
-                }
-
-                override fun onFailure(
-                    call: Call<Unit>,
-                    t: Throwable,
-                ) {
-                    callback(Result.failure(t))
-                }
-            },
-        )
-    }
+    override suspend fun postOrderProducts(cartIds: List<Long>): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                api.postOrderProducts(OrderProductsRequest(cartIds))
+            }
+        }
 }

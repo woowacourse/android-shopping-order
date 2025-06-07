@@ -4,21 +4,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import woowacourse.shopping.di.UseCaseModule.addSearchHistoryUseCase
-import woowacourse.shopping.di.UseCaseModule.getCatalogProductUseCase
-import woowacourse.shopping.di.UseCaseModule.getRecentSearchHistoryUseCase
-import woowacourse.shopping.di.UseCaseModule.updateCartProductUseCase
-import woowacourse.shopping.domain.model.HistoryProduct
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.Product.Companion.EMPTY_PRODUCT
+import kotlinx.coroutines.launch
+import woowacourse.shopping.di.UseCaseInjection.addSearchHistoryUseCase
+import woowacourse.shopping.di.UseCaseInjection.getCatalogProductUseCase
+import woowacourse.shopping.di.UseCaseInjection.getRecentSearchHistoryUseCase
+import woowacourse.shopping.di.UseCaseInjection.updateCartProductUseCase
 import woowacourse.shopping.domain.model.ProductDetail
 import woowacourse.shopping.domain.usecase.AddSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
 import woowacourse.shopping.domain.usecase.GetRecentSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.UpdateCartProductUseCase
-import woowacourse.shopping.util.MutableSingleLiveData
-import woowacourse.shopping.util.SingleLiveData
+import woowacourse.shopping.ui.model.ProductDetailUiState
 
 class ProductDetailViewModel(
     private val getCatalogProductUseCase: GetCatalogProductUseCase,
@@ -26,63 +24,62 @@ class ProductDetailViewModel(
     private val addSearchHistoryUseCase: AddSearchHistoryUseCase,
     private val updateCartProductUseCase: UpdateCartProductUseCase,
 ) : ViewModel() {
-    private val _product: MutableLiveData<Product> =
-        MutableLiveData(EMPTY_PRODUCT)
-    val product: LiveData<Product> get() = _product
+    private val _uiState: MutableLiveData<ProductDetailUiState> = MutableLiveData(ProductDetailUiState())
+    val uiState: LiveData<ProductDetailUiState> get() = _uiState
 
-    private val _lastHistoryProduct: MutableLiveData<HistoryProduct?> = MutableLiveData(null)
-    val lastHistoryProduct: LiveData<HistoryProduct?> get() = _lastHistoryProduct
-
-    private val _onCartProductAddSuccess: MutableSingleLiveData<Boolean?> =
-        MutableSingleLiveData(null)
-    val onCartProductAddSuccess: SingleLiveData<Boolean?> get() = _onCartProductAddSuccess
-
-    private val _isError: MutableLiveData<String> = MutableLiveData()
-    val isError: LiveData<String> get() = _isError
-
-    fun loadProductDetail(id: Long) {
-        getCatalogProductUseCase(id) { result ->
-            result
+    fun loadProductDetail(productId: Long) {
+        viewModelScope.launch {
+            getCatalogProductUseCase(productId)
                 .onSuccess { catalogProduct ->
-                    _product.postValue(catalogProduct ?: EMPTY_PRODUCT)
+                    updateUiState { current -> current.copy(product = catalogProduct) }
                 }.onFailure {
-                    _isError.postValue(it.message)
+                    updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
                 }
         }
     }
 
     fun loadLastHistoryProduct() {
-        getRecentSearchHistoryUseCase { historyProduct ->
-            _lastHistoryProduct.postValue(historyProduct)
+        viewModelScope.launch {
+            getRecentSearchHistoryUseCase().onSuccess {
+                updateUiState { current -> current.copy(lastHistoryProduct = it) }
+            }
         }
     }
 
     fun addHistoryProduct(productDetail: ProductDetail) {
-        addSearchHistoryUseCase(productDetail)
+        viewModelScope.launch {
+            addSearchHistoryUseCase(productDetail)
+        }
     }
 
     fun decreaseCartProductQuantity() {
-        _product.value = product.value?.decreaseQuantity()
+        val uiState = uiState.value ?: return
+        updateUiState { current -> current.copy(product = uiState.product.decreaseQuantity()) }
     }
 
     fun increaseCartProductQuantity() {
-        _product.value = product.value?.increaseQuantity()
+        val uiState = uiState.value ?: return
+        updateUiState { current -> current.copy(product = uiState.product.increaseQuantity()) }
     }
 
     fun updateCartProduct() {
-        val product: Product = product.value ?: return
-        updateCartProductUseCase(
-            productId = product.productDetail.id,
-            cartId = product.cartId,
-            quantity = product.quantity,
-        ) { result ->
-            result
-                .onSuccess {
-                    _onCartProductAddSuccess.postValue(true)
-                }.onFailure {
-                    _isError.postValue(it.message)
-                }
+        val uiState = uiState.value ?: return
+        viewModelScope.launch {
+            updateCartProductUseCase(
+                productId = uiState.product.productDetail.id,
+                cartId = uiState.product.cartId,
+                quantity = uiState.product.quantity,
+            ).onSuccess {
+                updateUiState { current -> current.copy(isCartProductUpdateSuccess = true) }
+            }.onFailure {
+                updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
+            }
         }
+    }
+
+    private fun updateUiState(update: (ProductDetailUiState) -> ProductDetailUiState) {
+        val current = _uiState.value ?: return
+        _uiState.value = update(current)
     }
 
     companion object {

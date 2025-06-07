@@ -2,6 +2,7 @@ package woowacourse.shopping.data.model.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import woowacourse.shopping.domain.model.ProductDetail
 
 @Serializable
 data class ProductDetailResponse(
@@ -15,4 +16,15 @@ data class ProductDetailResponse(
     val imageUrl: String,
     @SerialName("category")
     val category: String,
-)
+) {
+    companion object {
+        fun ProductDetailResponse.toDomain(): ProductDetail =
+            ProductDetail(
+                id = id,
+                name = name,
+                category = category,
+                imageUrl = imageUrl,
+                price = price,
+            )
+    }
+}

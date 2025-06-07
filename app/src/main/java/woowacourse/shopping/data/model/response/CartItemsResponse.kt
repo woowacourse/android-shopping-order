@@ -18,9 +18,9 @@ data class CartItemsResponse(
     @SerialName("number")
     val number: Int,
     @SerialName("sort")
-    val sort: Sort,
+    val sort: SortResponse,
     @SerialName("pageable")
-    val pageable: Pageable,
+    val pageable: PageableResponse,
     @SerialName("first")
     val first: Boolean,
     @SerialName("last")
@@ -68,41 +68,5 @@ data class CartItemsResponse(
                     quantity = quantity,
                 )
         }
-    }
-
-    @Serializable
-    data class Sort(
-        @SerialName("empty")
-        val empty: Boolean,
-        @SerialName("sorted")
-        val sorted: Boolean,
-        @SerialName("unsorted")
-        val unsorted: Boolean,
-    )
-
-    @Serializable
-    data class Pageable(
-        @SerialName("offset")
-        val offset: Long,
-        @SerialName("sort")
-        val sort: Sort,
-        @SerialName("paged")
-        val paged: Boolean,
-        @SerialName("pageNumber")
-        val pageNumber: Int,
-        @SerialName("pageSize")
-        val pageSize: Int,
-        @SerialName("unpaged")
-        val unpaged: Boolean,
-    ) {
-        @Serializable
-        data class Sort(
-            @SerialName("empty")
-            val empty: Boolean,
-            @SerialName("sorted")
-            val sorted: Boolean,
-            @SerialName("unsorted")
-            val unsorted: Boolean,
-        )
     }
 }

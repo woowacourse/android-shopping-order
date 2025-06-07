@@ -13,16 +13,16 @@ class CartProductViewHolder(
         binding.onClickHandler = onClickHandler
     }
 
-    fun bind(product: Product) {
-        binding.product = product
+    fun bind(item: Product) {
+        binding.product = item
         binding.cartProductCount.setOnClickHandler(
             object : CartCountView.OnClickHandler {
                 override fun onIncreaseClick() {
-                    onClickHandler.onIncreaseClick(product.productDetail.id)
+                    onClickHandler.onIncreaseClick(item.productDetail.id)
                 }
 
                 override fun onDecreaseClick() {
-                    onClickHandler.onDecreaseClick(product.productDetail.id)
+                    onClickHandler.onDecreaseClick(item.productDetail.id)
                 }
             },
         )
