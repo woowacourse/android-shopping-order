@@ -18,13 +18,29 @@
 
     <!--    CartActivity-->
     <string name="cart_action_bar_name">Cart</string>
-    <string name="order_fragment_appbar_name">결제하기</string>
+
+    <!--    CartFragment-->
     <string name="nav_cart_icon_title">카트 아이콘</string>
     <string name="cart_item_delete_button_description">장바구니 아이템 삭제 버튼</string>
     <string name="cart_item_image_description">장바구니 아이템 이미지</string>
     <string name="cart_left_page_button"><![CDATA[<]]></string>
     <string name="cart_right_page_button"><![CDATA[>]]></string>
     <string name="recently_viewed_goods_header">최근 본 상품</string>
+
+    <!--    RecommendFragment-->
+    <string name="recommend_item_title">이런 상품은 어떠세요?</string>
+    <string name="recommend_item_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
+
+    <!--    OrderFragment-->
+    <string name="order_fragment_appbar_name">결제하기</string>
+    <string name="order_coupon_selection_title">적용 가능한 쿠폰</string>
+    <string name="order_coupon_section_description">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="order_price">%,d원</string>
+    <string name="order_price_title">주문 금액</string>
+    <string name="order_coupon_discount_price_title">쿠폰 할인 금액</string>
+    <string name="order_shipping_fee_title">배송비</string>
+    <string name="order_total_price_title">총 결제 금액</string>
+    <string name="order_payment_submit_button">결제하기</string>
 
     <!--    LoginActivity-->
     <string name="login_form_head">환영합니다</string>
@@ -35,7 +51,6 @@
     <string name="login_alert_network_error">네트워크 오류입니다.</string>
     <string name="login_alert_wrong_account">아이디 또는 비밀번호 오류입니다.</string>
     <string name="login_alert_save_basic_key_failed">로그인 정보 저장에 실패했습니다.</string>
-    <string name="recommend_item_title">이런 상품은 어떠세요?</string>
-    <string name="recommend_item_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
+
 
 </resources>

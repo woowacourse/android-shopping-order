@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="viewModel"
             type="woowacourse.shopping.feature.cart.CartViewModel" />
@@ -11,19 +12,194 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".feature.cart.OrderFragment">
+        android:layout_height="match_parent">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".feature.cart.OrderFragment">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="24dp">
+
+                <TextView
+                    android:id="@+id/tv_coupon_section_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginTop="30dp"
+                    android:text="@string/order_coupon_selection_title"
+                    android:textColor="@color/gray_800"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_coupon_section_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/order_coupon_section_description"
+                    android:textColor="@color/gray_800"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toStartOf="@+id/tv_coupon_section_title"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_coupon_section_title" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_coupon_items"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="18dp"
+                    android:nestedScrollingEnabled="false"
+                    android:paddingHorizontal="18dp"
+                    app:cartItems="@{viewModel.currentPageCarts}"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_coupon_section_description"
+                    tools:itemCount="3"
+                    tools:layout_height="200dp"
+                    tools:listitem="@layout/item_coupon"
+                    tools:orientation="vertical" />
+
+                <View
+                    android:id="@+id/coupon_divider_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="6dp"
+                    android:layout_marginTop="31dp"
+                    android:background="@color/gray_200"
+                    app:layout_constraintTop_toBottomOf="@id/rv_coupon_items" />
+
+
+                <TextView
+                    android:id="@+id/tv_order_price_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginTop="23dp"
+                    android:text="@string/order_price_title"
+                    android:textColor="@color/gray_800"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/coupon_divider_view" />
+
+                <TextView
+                    android:id="@+id/tv_order_price_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="23dp"
+                    android:layout_marginEnd="18dp"
+                    android:textColor="@color/gray_800"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/coupon_divider_view"
+                    tools:text="204,200원" />
+
+                <TextView
+                    android:id="@+id/tv_coupon_discount_price_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginTop="23dp"
+                    android:text="@string/order_coupon_discount_price_title"
+                    android:textColor="@color/gray_800"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_order_price_value" />
+
+                <TextView
+                    android:id="@+id/tv_coupon_discount_price_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="23dp"
+                    android:layout_marginEnd="18dp"
+                    android:textColor="@color/gray_800"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_order_price_value"
+                    tools:text="-5,000원" />
+
+                <TextView
+                    android:id="@+id/tv_shipping_fee_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginTop="23dp"
+                    android:text="@string/order_shipping_fee_title"
+                    android:textColor="@color/gray_800"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_coupon_discount_price_value" />
+
+                <TextView
+                    android:id="@+id/tv_shipping_fee_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="23dp"
+                    android:layout_marginEnd="18dp"
+                    android:textColor="@color/gray_800"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_coupon_discount_price_value"
+                    tools:text="3,000원" />
+
+                <View
+                    android:id="@+id/payment_divider_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="6dp"
+                    android:layout_marginTop="23dp"
+                    android:background="@color/gray_200"
+                    app:layout_constraintTop_toBottomOf="@id/tv_shipping_fee_value" />
+
+
+                <TextView
+                    android:id="@+id/tv_total_order_price_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginTop="23dp"
+                    android:text="@string/order_total_price_title"
+                    android:textColor="@color/gray_800"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/payment_divider_view" />
+
+                <TextView
+                    android:id="@+id/tv_total_order_price_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="23dp"
+                    android:layout_marginEnd="18dp"
+                    android:textColor="@color/gray_800"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/payment_divider_view"
+                    tools:text="202,200원" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
 
         <TextView
-            android:id="@+id/tempTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="order 프래그먼트"
-            android:textSize="30sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
+            android:id="@+id/tv_payment_submit_button"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@color/cyan"
+            android:clickable="true"
+            android:gravity="center"
+            android:text="@string/order_payment_submit_button"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
