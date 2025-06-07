@@ -197,7 +197,6 @@
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:background="@color/baemin"
-            android:elevation="2dp"
             android:gravity="center"
             android:onClick="@{() -> clickListener.onClickOrder()}"
             android:text="@string/order_btn_order_text"

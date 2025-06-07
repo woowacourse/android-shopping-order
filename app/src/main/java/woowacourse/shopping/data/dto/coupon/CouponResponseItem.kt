@@ -21,7 +21,7 @@ data class CouponResponseItem(
     @SerialName("discountType")
     val discountType: String,
     @SerialName("expirationDate")
-    val expirationDate: String?,
+    val expirationDate: String,
     @SerialName("getQuantity")
     val getQuantity: Int? = 0,
     @SerialName("id")
