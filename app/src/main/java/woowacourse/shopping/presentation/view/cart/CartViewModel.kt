@@ -231,17 +231,20 @@ class CartViewModel(
         viewModelScope.launch {
             productRepository
                 .getMostRecentProduct()
-                .onSuccess { product ->
-                    val recommendedCategory = product.category
+                .onSuccess { recentProduct ->
+                    val category = recentProduct.category
+
+                    val cartItems = cartRepository.getAllCartItems().getOrNull().orEmpty()
+                    val cartProductIds = cartItems.map { it.product.id }.toSet()
+
                     productRepository
-                        .loadProductsByCategory(recommendedCategory)
-                        .onSuccess {
-                            cartRepository
-                                .getAllCartItems()
-                                .onSuccess { cartItems ->
-                                    val products = cartItems.map { it.product }
-                                    _recommendedProducts.postValue(products.map { it.toUiModel() })
-                                }
+                        .loadProductsByCategory(category)
+                        .onSuccess { allProducts ->
+                            val filtered =
+                                allProducts
+                                    .filterNot { it.id in cartProductIds }
+                                    .take(10)
+                            _recommendedProducts.postValue(filtered.map { it.toUiModel() })
                         }
                 }
         }
