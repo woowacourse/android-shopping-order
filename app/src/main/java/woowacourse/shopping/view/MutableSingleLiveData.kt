@@ -9,7 +9,9 @@ class MutableSingleLiveData<T> : SingleLiveData<T> {
         super.postValue(value)
     }
 
-    public override fun setValue(value: T) {
-        super.setValue(value)
-    }
+    public override var value: T?
+        get() = super.value
+        set(value) {
+            super.value = value
+        }
 }

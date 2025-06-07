@@ -4,28 +4,18 @@ import woowacourse.shopping.domain.Pageable
 import woowacourse.shopping.domain.product.Product
 
 interface ProductsRepository {
-    fun loadPageableProducts(
+    suspend fun loadPageableProducts(
         page: Int,
         size: Int,
-        onLoad: (Result<Pageable<Product>>) -> Unit,
-    )
+    ): Result<Pageable<Product>>
 
-    fun getProductById(
-        id: Long,
-        onLoad: (Result<Product?>) -> Unit,
-    )
+    suspend fun getProductById(id: Long): Result<Product?>
 
-    fun loadLatestViewedProduct(onLoad: (productId: Result<Product?>) -> Unit)
+    suspend fun loadLatestViewedProduct(): Result<Product?>
 
-    fun loadRecentViewedProducts(onLoad: (Result<List<Product>>) -> Unit)
+    suspend fun loadRecentViewedProducts(): Result<List<Product>>
 
-    fun addViewedProduct(
-        product: Product,
-        onLoad: (Result<Unit>) -> Unit,
-    )
+    suspend fun addViewedProduct(product: Product): Result<Unit>
 
-    fun loadRecommendedProducts(
-        size: Int,
-        onLoad: (Result<List<Product>>) -> Unit,
-    )
+    suspend fun loadRecommendedProducts(size: Int): Result<List<Product>>
 }

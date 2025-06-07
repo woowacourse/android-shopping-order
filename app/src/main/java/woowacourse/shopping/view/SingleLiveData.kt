@@ -12,15 +12,15 @@ abstract class SingleLiveData<T> {
         liveData.value = Event(value)
     }
 
-    protected open fun setValue(value: T) {
-        liveData.value = Event(value)
-    }
+    open var value: T?
+        get() = liveData.value?.content
+        protected set(value) {
+            liveData.value = value?.let { Event(it) }
+        }
 
     protected open fun postValue(value: T) {
         liveData.postValue(Event(value))
     }
-
-    val value: T? get() = liveData.value?.content
 
     fun observe(
         owner: LifecycleOwner,
