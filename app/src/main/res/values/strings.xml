@@ -11,6 +11,7 @@
     <string name="product_toast_decrease_fail">수량을 감소시키는 데 실패했습니다</string>
     <string name="product_toast_delete_fail">상품을 삭제시키는 데 실패했습니다</string>
     <string name="product_toast_load_total_cart_quantity_fail">장바구니 상품의 총합을 불러오는 데 실패했습니다</string>
+    <string name="product_toast_most_recent_load_fail">최근 본 상품을 불러오는 데 실패했습니다</string>
     <string name="product_toast_load_failure">상품을 불러오는 데 실패했습니다</string>
     <string name="product_toast_terminate_server_fail">서버를 종료하는 데 실패하였습니다</string>
 

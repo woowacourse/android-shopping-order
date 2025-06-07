@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.CartItem
@@ -21,14 +22,19 @@ class ProductViewModel(
 ) : ViewModel() {
     private val _uiState: MutableLiveData<ResultState<Unit>> = MutableLiveData()
     val uiState: LiveData<ResultState<Unit>> = _uiState
+
     private val _products: MutableLiveData<List<CartItem>> = MutableLiveData()
     val products: LiveData<List<CartItem>> = _products
+
     private val _recentProducts: MutableLiveData<List<Product>> = MutableLiveData()
     val recentProducts: LiveData<List<Product>> = _recentProducts
+
     private val _cartItemCount = MutableLiveData<Int>()
     val cartItemCount: LiveData<Int> = _cartItemCount
+
     private val _showLoadMore: MutableLiveData<Boolean> = MutableLiveData(true)
     val showLoadMore: LiveData<Boolean> = _showLoadMore
+
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
 
@@ -36,41 +42,54 @@ class ProductViewModel(
 
     init {
         viewModelScope.launch {
-            cartRepository.fetchAllCartItems()
-            fetchData()
-            fetchCartItemCount()
+            cartRepository
+                .fetchAllCartItems()
+                .onSuccess {
+                    val fetchDataDeferred = async { fetchData() }
+                    val fetchCountDeferred = async { fetchCartItemCount() }
+                    fetchDataDeferred.await()
+                    fetchCountDeferred.await()
+                }.onFailure { _toastMessage.value = R.string.cart_toast_load_fail }
         }
     }
 
-    suspend fun fetchData(currentPage: Int = FIRST_PAGE) {
-        _uiState.value = ResultState.Loading
+    fun fetchData(currentPage: Int = FIRST_PAGE) {
+        viewModelScope.launch {
+            _uiState.value = ResultState.Loading
 
-        productRepository
-            .fetchPagingProducts(currentPage, PAGE_SIZE)
-            .onSuccess { cartItems ->
-                _products.value = cartItems
-                _uiState.value = ResultState.Success(Unit)
-            }.onFailure { throwable ->
-                _uiState.value = ResultState.Failure(throwable)
-            }
+            val productsResult =
+                async { productRepository.fetchPagingProducts(currentPage, PAGE_SIZE) }
+            val recentProductsResult = async { recentProductRepository.getRecentProducts() }
 
-        recentProductRepository
-            .getRecentProducts()
-            .onSuccess { recentProducts ->
-                _recentProducts.value = recentProducts
-            }.onFailure {
-                _toastMessage.value = R.string.recommend_toast_recent_load_fail
-            }
+            productsResult
+                .await()
+                .onSuccess { cartItems ->
+                    _products.value = cartItems
+                    _uiState.value = ResultState.Success(Unit)
+                }.onFailure { throwable ->
+                    _uiState.value = ResultState.Failure(throwable)
+                }
+
+            recentProductsResult
+                .await()
+                .onSuccess { recentProducts ->
+                    _recentProducts.value = recentProducts
+                }.onFailure {
+                    _toastMessage.value = R.string.product_toast_most_recent_load_fail
+                }
+        }
     }
 
-    suspend fun fetchCartItemCount() {
-        cartRepository
-            .fetchTotalCount()
-            .onSuccess { count ->
-                _cartItemCount.value = count
-            }.onFailure {
-                _toastMessage.value = R.string.product_toast_load_total_cart_quantity_fail
-            }
+    fun fetchCartItemCount() {
+        viewModelScope.launch {
+            cartRepository
+                .fetchTotalCount()
+                .onSuccess { count ->
+                    _cartItemCount.value = count
+                }.onFailure {
+                    _toastMessage.value = R.string.product_toast_load_total_cart_quantity_fail
+                }
+        }
     }
 
     fun loadMore() {
@@ -110,7 +129,7 @@ class ProductViewModel(
                     updateQuantity(productId, -1)
                     fetchCartItemCount()
                 }.onFailure {
-                    _toastMessage.value = R.string.product_toast_increase_fail
+                    _toastMessage.value = R.string.product_toast_decrease_fail
                 }
         }
     }
