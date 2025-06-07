@@ -91,7 +91,16 @@ class CartViewModel(
         viewModelScope.launch {
             when (buttonEvent) {
                 ButtonEvent.DECREASE -> {
-                    if (product.quantity != 1 && product.cartItemId != null) {
+                    if (product.cartItemId == null) return@launch
+
+                    if (product.quantity == 1) {
+                        val result: Boolean =
+                            cartProductRepository.deleteCartProduct(product.cartItemId)
+                        if (result) {
+                            _updatedProduct.postValue(product.copy(quantity = 0))
+                            loadCartProducts()
+                        }
+                    } else {
                         val result: Boolean =
                             cartProductRepository.updateProduct(
                                 product.cartItemId,

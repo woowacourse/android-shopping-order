@@ -1,5 +1,6 @@
 package woowacourse.shopping.product.catalog
 
+import android.util.Log
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
@@ -55,6 +56,7 @@ class ProductAdapter(
         val index: Int =
             products.indexOfFirst { (it as CatalogItem.ProductItem).productItem.id == product.id }
         products[index] = CatalogItem.ProductItem(product)
+        Log.d("업데이트", "어댑터에서 $product")
         notifyItemChanged(index)
     }
 
