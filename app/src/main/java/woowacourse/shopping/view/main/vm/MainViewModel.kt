@@ -175,16 +175,16 @@ class MainViewModel(
 
     private fun navigateToDetail(productId: Long) =
         withState(_uiState.value) { state ->
-            _uiEvent.postValue(MainUiEvent.NavigateToDetail(productId, state.lastSeenProductId))
+            _uiEvent.setValue(MainUiEvent.NavigateToDetail(productId, state.lastSeenProductId))
         }
 
     fun handleNavigateToCart() =
         withState(_uiState.value) { state ->
-            _uiEvent.postValue(MainUiEvent.NavigateToCart(state.lastSeenProductCategory))
+            _uiEvent.setValue(MainUiEvent.NavigateToCart(state.lastSeenProductCategory))
         }
 
     private fun toggleFetching() {
-        _uiState.postValue(_uiState.value?.fetchToggleState())
+        _uiState.value = _uiState.value?.fetchToggleState()
     }
 
     private fun updateUiState(transform: ProductUiState.() -> ProductUiState) {
