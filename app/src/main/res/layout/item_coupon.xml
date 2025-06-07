@@ -9,7 +9,15 @@
 
         <variable
             name="minimumAmount"
-            type="int" />
+            type="java.lang.Integer" />
+
+        <variable
+            name="isSelected"
+            type="boolean" />
+
+        <variable
+            name="couponSelectListener"
+            type="woowacourse.shopping.view.payment.adapter.CouponSelectListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -26,6 +34,8 @@
             android:layout_height="24dp"
             android:layout_marginStart="12dp"
             android:layout_marginTop="18dp"
+            android:checked="@{isSelected}"
+            android:onClick="@{() -> couponSelectListener.onSelectCoupon(coupon)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

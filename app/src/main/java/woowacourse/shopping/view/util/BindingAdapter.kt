@@ -30,6 +30,7 @@ fun TextView.setExpirationDate(date: String) {
 
 @BindingAdapter("minimumAmount")
 fun TextView.setMinimumAmount(amount: Int?) {
-    if (amount == null) return
-    text = context.getString(R.string.coupon_minimum_amount, amount)
+    text = amount?.let {
+        context.getString(R.string.coupon_minimum_amount, it)
+    } ?: ""
 }

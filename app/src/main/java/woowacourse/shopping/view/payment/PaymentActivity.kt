@@ -3,7 +3,6 @@ package woowacourse.shopping.view.payment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -27,7 +26,11 @@ class PaymentActivity : AppCompatActivity() {
             ),
         )[PaymentViewModel::class.java]
     }
-    private val adapter by lazy { PaymentAdapter() }
+    private val adapter by lazy {
+        PaymentAdapter {
+            viewModel.selectCoupon(it)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +59,6 @@ class PaymentActivity : AppCompatActivity() {
 
     private fun initObservers() {
         viewModel.coupons.observe(this) {
-            Log.d("hwannow_log", "$it")
             adapter.submitList(it)
         }
     }

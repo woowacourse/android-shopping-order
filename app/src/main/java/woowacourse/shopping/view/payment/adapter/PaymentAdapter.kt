@@ -1,38 +1,37 @@
 package woowacourse.shopping.view.payment.adapter
 
-import android.util.Log
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import woowacourse.shopping.domain.model.coupon.Coupon
 
-class PaymentAdapter() : ListAdapter<Coupon, PaymentViewHolder>(
-    object : DiffUtil.ItemCallback<Coupon>() {
-        override fun areItemsTheSame(
-            oldItem: Coupon,
-            newItem: Coupon,
-        ): Boolean {
-            return oldItem.id == newItem.id
-        }
+class PaymentAdapter(
+    private val couponSelectListener: CouponSelectListener,
+) : ListAdapter<CouponItem, PaymentViewHolder>(
+        object : DiffUtil.ItemCallback<CouponItem>() {
+            override fun areItemsTheSame(
+                oldItem: CouponItem,
+                newItem: CouponItem,
+            ): Boolean {
+                return oldItem.coupon.id == newItem.coupon.id
+            }
 
-        override fun areContentsTheSame(
-            oldItem: Coupon,
-            newItem: Coupon,
-        ): Boolean {
-            return oldItem == newItem
-        }
-    },
-) {
+            override fun areContentsTheSame(
+                oldItem: CouponItem,
+                newItem: CouponItem,
+            ): Boolean {
+                return oldItem == newItem
+            }
+        },
+    ) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): PaymentViewHolder = PaymentViewHolder.from(parent)
+    ): PaymentViewHolder = PaymentViewHolder.from(parent, couponSelectListener)
 
     override fun onBindViewHolder(
         holder: PaymentViewHolder,
         position: Int,
     ) {
-        Log.d("hwannow_log", "onBindViewHolder: ")
         holder.bind(getItem(position))
     }
 }
