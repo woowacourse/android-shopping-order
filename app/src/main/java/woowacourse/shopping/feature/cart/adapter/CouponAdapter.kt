@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature.cart.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
@@ -8,8 +7,11 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCouponBinding
 import woowacourse.shopping.databinding.ItemCouponSkeletonBinding
 import woowacourse.shopping.domain.model.coupon.Coupon
+import woowacourse.shopping.feature.cart.CartViewModel
 
-class CouponAdapter : ListAdapter<CouponListItem, RecyclerView.ViewHolder>(CouponDiffCallback()) {
+class CouponAdapter(
+    private val viewModel: CartViewModel,
+) : ListAdapter<CouponListItem, RecyclerView.ViewHolder>(CouponDiffCallback()) {
     fun showSkeleton(count: Int = 2) {
         val skeletonItems = List(count) { CouponListItem.Skeleton }
         submitList(skeletonItems)
@@ -17,7 +19,6 @@ class CouponAdapter : ListAdapter<CouponListItem, RecyclerView.ViewHolder>(Coupo
 
     fun setCouponItem(couponItem: List<Coupon>) {
         val newItems = couponItem.map { CouponListItem.CouponData(it) }
-        Log.d("리스트", "$newItems")
         submitList(newItems)
     }
 
@@ -40,6 +41,7 @@ class CouponAdapter : ListAdapter<CouponListItem, RecyclerView.ViewHolder>(Coupo
             }
             TYPE_COUPON -> {
                 val binding = ItemCouponBinding.inflate(inflater, parent, false)
+                binding.viewModel = viewModel
                 CouponViewHolder(binding)
             }
 

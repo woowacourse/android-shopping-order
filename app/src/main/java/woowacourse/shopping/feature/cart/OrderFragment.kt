@@ -21,7 +21,7 @@ class OrderFragment : Fragment() {
     }
 
     private val couponAdapter: CouponAdapter by lazy {
-        CouponAdapter().apply {
+        CouponAdapter(viewModel).apply {
             showSkeleton()
         }
     }

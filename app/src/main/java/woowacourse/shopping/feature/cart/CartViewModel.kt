@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature.cart
 
-import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -147,6 +146,15 @@ class CartViewModel(
             addSource(selectedCartsList) { update() }
         }
 
+    val selectedCoupon: LiveData<Coupon?> =
+        MediatorLiveData<Coupon?>().apply {
+            fun update() {
+                val coupons = validCoupons.value ?: emptyList()
+                value = coupons.find { it.isSelected }
+            }
+            addSource(validCoupons) { update() }
+        }
+
     init {
         updateWholeCarts()
     }
@@ -171,7 +179,6 @@ class CartViewModel(
                 is CouponFetchResult.Success -> {
                     val allItems = result.data.toCouponItems()
                     _coupons.value = allItems
-                    Log.d("쿠폰 목록", "$allItems")
                 }
 
                 is CouponFetchResult.Error -> { // todo 에러 구현 필요
@@ -179,6 +186,30 @@ class CartViewModel(
             }
         }
     }
+
+    fun toggleCouponCheck(targetCoupon: Coupon) {
+        val currentCoupons = _coupons.value ?: return
+
+        val newCoupons =
+            currentCoupons.map { coupon ->
+                createCouponWithSelection(
+                    coupon = coupon,
+                    isSelected = coupon.id == targetCoupon.id && !targetCoupon.isSelected,
+                )
+            }
+        _coupons.value = newCoupons
+    }
+
+    private fun createCouponWithSelection(
+        coupon: Coupon,
+        isSelected: Boolean,
+    ): Coupon =
+        when (coupon) {
+            is Coupon.Fixed -> coupon.copy().apply { this.isSelected = isSelected }
+            is Coupon.BonusGoods -> coupon.copy().apply { this.isSelected = isSelected }
+            is Coupon.FreeShipping -> coupon.copy().apply { this.isSelected = isSelected }
+            is Coupon.Percentage -> coupon.copy().apply { this.isSelected = isSelected }
+        }
 
     fun updateAppBarTitle(newTitle: String) {
         _appBarTitle.value = newTitle
