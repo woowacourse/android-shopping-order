@@ -1,171 +1,146 @@
 package woowacourse.shopping
 
-import androidx.lifecycle.Observer
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
-import woowacourse.shopping.data.local.cart.repository.LocalCartRepository
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
+import woowacourse.shopping.data.remote.cart.CartQuantity
+import woowacourse.shopping.data.remote.cart.CartRepository
+import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.feature.goods.GoodsViewModel
-import woowacourse.shopping.fixture.FakeCartRepository
-import woowacourse.shopping.server.TestCartServiceImpl
+import woowacourse.shopping.feature.model.GoodsItem
+import woowacourse.shopping.feature.model.State
+import woowacourse.shopping.fixture.CartResponseFixture
+import woowacourse.shopping.fixture.ProductResponseFixture
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 import woowacourse.shopping.util.getOrAwaitValue
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 
 @ExtendWith(InstantTaskExecutorExtension::class)
-@Suppress("ktlint:standard:function-naming")
-@ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
 class GoodsViewModelTest {
-    private val testScheduler = TestCoroutineScheduler()
-    private val testDispatcher = StandardTestDispatcher(testScheduler)
-
-    private lateinit var cartService: TestCartServiceImpl
-    private lateinit var cartRepository: LocalCartRepository
-    private lateinit var historyRepository: HistoryRepository
+    private val testDispatcher = StandardTestDispatcher()
     private lateinit var viewModel: GoodsViewModel
 
-    @BeforeEach
+    private lateinit var cartRepo: CartRepository
+    private lateinit var productRepo: ProductRepository
+    private lateinit var historyRepo: HistoryRepository
+
+    private val dummyProductDto =
+        Product(
+            id = 1L,
+            name = "Mock 상품",
+            price = 1000,
+            imageUrl = "https://example.com/image.jpg",
+            category = "mockCategory",
+        )
+
+    private val dummyCartProduct =
+        CartProduct(
+            id = 1L,
+            product = dummyProductDto,
+            quantity = 2,
+        )
+
+    @BeforeTest
     fun setup() {
-        kotlinx.coroutines.Dispatchers.setMain(testDispatcher)
+        Dispatchers.setMain(testDispatcher)
 
-        cartService = TestCartServiceImpl()
+        // Mock 초기화
+        cartRepo = mock()
+        productRepo = mock()
+        historyRepo = mock()
 
-        cartRepository = FakeCartRepository()
+        runTest {
+            stubDefaultResponses()
+        }
 
-        historyRepository =
-            object : HistoryRepository {
-                override fun getAll(callback: (List<CartProduct>) -> Unit) {
-                    callback(
-                        listOf(
-                            CartProduct(goods = Goods(1, "Test", 1000, "url"), quantity = 1),
-                        ),
-                    )
-                }
-
-                override fun insert(history: CartProduct) {
-                    // 테스트용 빈 구현
-                }
-
-                override fun findLatest(callback: (CartProduct?) -> Unit) {
-                }
-            }
-
-        viewModel = GoodsViewModel(cartRepository, historyRepository)
+        viewModel = GoodsViewModel(historyRepo, productRepo, cartRepo)
     }
 
-    @AfterEach
+    @AfterTest
     fun tearDown() {
-        cartService.server.shutdown()
-        kotlinx.coroutines.Dispatchers.resetMain()
+        Dispatchers.resetMain()
+    }
+
+    private suspend fun stubDefaultResponses() {
+        whenever(cartRepo.fetchAllCart()).thenReturn(
+            CartResponseFixture.createCartResponse(),
+        )
+        whenever(cartRepo.getCartCounts()).thenReturn(Result.success(2))
+        whenever(productRepo.fetchProducts(any())).thenReturn(
+            ProductResponseFixture.createProductResponse(),
+        )
+        whenever(historyRepo.getAll()).thenReturn(emptyList())
     }
 
     @Test
-    fun `초기 로딩 시 히스토리와 장바구니 아이템이 로드된다`() =
-        runTest(testDispatcher) {
-            testScheduler.advanceUntilIdle()
+    fun `초기 로딩시 장바구니 아이템과 총 수량이 LiveData로 반영된다`() =
+        runTest {
+            advanceUntilIdle()
 
             val items = viewModel.items.getOrAwaitValue()
-            assert(items.isNotEmpty())
-            assert(items.first() is List<*>)
-            assert(items.drop(1).all { it is CartProduct })
-        }
+            val total = viewModel.totalQuantity.getOrAwaitValue()
 
-    @Test
-    fun `장바구니 총 수량이 올바르게 계산된다`() =
-        runTest(testDispatcher) {
-            testScheduler.advanceUntilIdle()
-
-            val totalQuantity = viewModel.totalQuantity.getOrAwaitValue()
-            assertEquals(0, totalQuantity)
-        }
-
-    @Test
-    fun `초기 로드 후 items, totalQuantity, hasNextPage 값을 검증한다`() =
-        runTest(testDispatcher) {
-            val itemsObserver = mock<Observer<List<Any>>>()
-            val totalQuantityObserver = mock<Observer<Int>>()
-            val hasNextPageObserver = mock<Observer<Boolean>>()
-
-            viewModel.items.observeForever(itemsObserver)
-            viewModel.totalQuantity.observeForever(totalQuantityObserver)
-            viewModel.hasNextPage.observeForever(hasNextPageObserver)
-
-            testScheduler.advanceUntilIdle()
-
-            verify(itemsObserver).onChanged(viewModel.items.value ?: emptyList())
-            verify(totalQuantityObserver).onChanged(viewModel.totalQuantity.value ?: 0)
-            verify(hasNextPageObserver).onChanged(viewModel.hasNextPage.value != false)
-
-            val items = viewModel.items.value!!
             assertTrue(items.isNotEmpty())
-            assertTrue(viewModel.totalQuantity.value!! >= 0)
-            assertTrue(viewModel.hasNextPage.value == true || viewModel.hasNextPage.value == false)
-
-            viewModel.items.removeObserver(itemsObserver)
-            viewModel.totalQuantity.removeObserver(totalQuantityObserver)
-            viewModel.hasNextPage.removeObserver(hasNextPageObserver)
+            assertEquals(2, total)
         }
 
     @Test
-    fun `addPage 호출시 페이지를 증가하고 데이터를 로딩한다`() =
-        runTest(testDispatcher) {
-            val oldPage = 0
-            val newPage = oldPage + 1
+    fun `addToCart 호출 시 insertState가 Success 상태로 설정된다`() =
+        runTest {
+            advanceUntilIdle()
 
-            viewModel.addPage()
-            val pageField = viewModel.javaClass.getDeclaredField("page")
-            pageField.isAccessible = true
-            val currentPage = pageField.getInt(viewModel)
-            assertEquals(newPage, currentPage)
+            val newCart = dummyCartProduct.copy(id = 0L, quantity = 0)
 
-            testScheduler.advanceUntilIdle()
+            whenever(cartRepo.addToCart(any())).thenReturn(Result.success(99L))
+            whenever(cartRepo.getCartCounts()).thenReturn(Result.success(1))
 
-            val items = viewModel.items.value!!
-            assertTrue(items.isNotEmpty())
+            viewModel.addToCart(newCart)
+
+            advanceUntilIdle()
+
+            val state = viewModel.insertState.getOrAwaitValue().peekContent()
+            assertTrue(state is State.Success)
         }
 
     @Test
-    fun `insertToCart 호출시 isSuccess LiveData를 호출한다`() =
-        runTest(testDispatcher) {
-            val cart = CartProduct(goods = Goods(1, "Test", 1000, "url"), quantity = 1)
+    fun `removeFromCart 호출 시 수량이 감소한다`() =
+        runTest {
+            advanceUntilIdle()
 
-            viewModel.insertToCart(cart)
+            val target = dummyCartProduct.copy(quantity = 2)
 
-            testScheduler.advanceUntilIdle()
+            whenever(cartRepo.updateCart(id = target.id, cartQuantity = CartQuantity(1)))
+                .thenReturn(Result.success(Result.success(Unit)))
+            whenever(cartRepo.getCartCounts()).thenReturn(Result.success(1))
 
-            val isSuccessValue = viewModel.isSuccess.getValue()
-            assertNotNull(isSuccessValue)
-        }
+            viewModel.removeFromCart(target)
 
-    @Test
-    fun `removeFromCart 호출시 quantity 감소 및 LiveData를 변경한다`() =
-        runTest(testDispatcher) {
-            val cart = CartProduct(goods = Goods(1, "Test", 1000, "url"), quantity = 2)
+            advanceUntilIdle()
 
-            viewModel.insertToCart(cart)
-            testScheduler.advanceUntilIdle()
+            val updated =
+                viewModel.items
+                    .getOrAwaitValue()
+                    .filterIsInstance<GoodsItem.Product>()
+                    .find { it.cart.product.id == target.product.id }
 
-            viewModel.removeFromCart(cart)
-            testScheduler.advanceUntilIdle()
-
-            val updatedCart =
-                viewModel.items.value
-                    ?.filterIsInstance<CartProduct>()
-                    ?.find { it.goods.id == cart.goods.id }
-            assertNotNull(updatedCart)
-            assertTrue(updatedCart.quantity < cart.quantity)
+            assertNotNull(updated)
+            assertEquals(1, updated.cart.quantity)
         }
 }
