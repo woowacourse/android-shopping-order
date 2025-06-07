@@ -45,8 +45,8 @@ class PaymentViewModel(
                 val orderedPrice = _orderedCarts.sumOf { it.product.price * it.quantity }
 
                 val newPrice =
-                    _price.value?.copy(orderPrice = orderedPrice, totalPrice = orderedPrice + 3_000)
-                        ?: Price(orderPrice = orderedPrice, totalPrice = orderedPrice + 3_000)
+                    _price.value?.copy(orderPrice = orderedPrice, totalPrice = orderedPrice + DEFAULT_SHIPPING_FEE)
+                        ?: Price(orderPrice = orderedPrice, totalPrice = orderedPrice + DEFAULT_SHIPPING_FEE)
                 _price.postValue(newPrice)
 
                 getAvailableCoupons()
@@ -73,9 +73,9 @@ class PaymentViewModel(
         if (currentCoupon?.couponDetail?.code == selectedCoupon.couponDetail.code) {
             _price.value =
                 currentPrice.copy(
-                    discountPrice = 0,
-                    shippingFee = 3000,
-                    totalPrice = currentPrice.orderPrice + 3000,
+                    discountPrice = DEFAULT_DISCOUNT,
+                    shippingFee = DEFAULT_SHIPPING_FEE,
+                    totalPrice = currentPrice.orderPrice + DEFAULT_SHIPPING_FEE,
                 )
             currentCoupon = null
             return
@@ -112,5 +112,10 @@ class PaymentViewModel(
 
             _coupons.postValue(availableCoupons)
         }
+    }
+
+    companion object {
+        private const val DEFAULT_SHIPPING_FEE: Int = 3_000
+        private const val DEFAULT_DISCOUNT: Int = 0
     }
 }
