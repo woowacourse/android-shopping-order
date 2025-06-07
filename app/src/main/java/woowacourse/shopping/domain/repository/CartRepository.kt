@@ -4,46 +4,28 @@ import woowacourse.shopping.data.model.response.Quantity
 import woowacourse.shopping.domain.model.CartItem
 
 interface CartRepository {
-    fun getCartItems(
+    suspend fun getCartItems(
         page: Int,
         limit: Int,
-        callback: (List<CartItem>, Boolean) -> Unit,
-    )
+    ): Result<Pair<List<CartItem>, Boolean>>
 
-    fun getAllCartItems(callback: (List<CartItem>?) -> Unit)
+    suspend fun getAllCartItems(): Result<List<CartItem>>
 
-    fun getAllCartItemsCount(callBack: (Quantity?) -> Unit)
+    suspend fun getAllCartItemsCount(): Result<Quantity>
 
-    fun deleteCartItem(
-        id: Long,
-        callback: (Long) -> Unit,
-    )
+    suspend fun deleteCartItem(productId: Long): Result<Long>
 
-    fun upsertCartItemQuantity(
+    suspend fun upsertCartItemQuantity(
         productId: Long,
         cartId: Long? = null,
         quantity: Int,
-        callback: (Long) -> Unit,
-    )
+    ): Result<Long>
 
-    fun addCartItem(
-        cartItem: CartItem,
-        callback: (Long) -> Unit,
-    )
+    suspend fun addOrIncreaseCartItem(productId: Long): Result<Long>
 
-    fun increaseCartItem(
-        cartItem: CartItem,
-        callback: (Long) -> Unit,
-    )
+    suspend fun addCartItem(cartItem: CartItem): Result<Long>
 
-    fun decreaseCartItem(
-        cartItem: CartItem,
-        callback: (Long) -> Unit,
-    )
+    suspend fun increaseCartItem(cartItem: CartItem): Result<Long>
 
-    fun updateCartItemQuantity(
-        cartId: Long,
-        quantity: Int,
-        callback: (Long) -> Unit,
-    )
+    suspend fun decreaseCartItem(cartItem: CartItem): Result<Long>
 }

@@ -47,7 +47,6 @@ object RepositoryProvider {
             ProductRepositoryImpl(
                 recentProductDao,
                 productDataSource,
-                cartItemDataSource,
             )
 
         isInitialized = true

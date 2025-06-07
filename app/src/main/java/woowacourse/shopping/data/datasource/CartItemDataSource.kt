@@ -5,27 +5,19 @@ import woowacourse.shopping.data.model.response.CartItemResponse
 import woowacourse.shopping.data.model.response.Quantity
 
 interface CartItemDataSource {
-    fun fetchCartItems(
+    suspend fun fetchCartItems(
         page: Int,
         size: Int,
-        onResult: (CartItemResponse?) -> Unit,
-    )
+    ): Result<CartItemResponse>
 
-    fun submitCartItem(
-        cartItem: CartItemRequest,
-        callback: (Long) -> Unit,
-    )
+    suspend fun submitCartItem(cartItem: CartItemRequest): Result<Long>
 
-    fun removeCartItem(
-        cartId: Long,
-        callback: (Long) -> Unit,
-    )
+    suspend fun removeCartItem(cartId: Long): Result<Unit>
 
-    fun updateCartItem(
+    suspend fun updateCartItem(
         cartId: Long,
         quantity: Quantity,
-        onResult: (Long) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun fetchCartItemsCount(onResult: (Quantity?) -> Unit)
+    suspend fun fetchCartItemsCount(): Result<Quantity>
 }

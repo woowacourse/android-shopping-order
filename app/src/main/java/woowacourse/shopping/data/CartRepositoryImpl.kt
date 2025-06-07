@@ -10,100 +10,85 @@ import woowacourse.shopping.domain.repository.CartRepository
 class CartRepositoryImpl(
     private val cartItemDataSource: CartItemDataSource,
 ) : CartRepository {
-    override fun getCartItems(
+    override suspend fun getCartItems(
         page: Int,
         limit: Int,
-        callback: (List<CartItem>, Boolean) -> Unit,
-    ) {
-        cartItemDataSource.fetchCartItems(page, limit) { response ->
-            if (response != null) {
-                val cartItems = response.content.map { it.toCartItem() }
-                callback(cartItems, !response.last)
-            }
+    ): Result<Pair<List<CartItem>, Boolean>> =
+        runCatching {
+            val response = cartItemDataSource.fetchCartItems(page, limit).getOrThrow()
+            val cartItems = response.content.map { it.toCartItem() }
+            val hasMore = !response.last
+            cartItems to hasMore
         }
-    }
 
-    override fun getAllCartItems(callback: (List<CartItem>?) -> Unit) {
-        cartItemDataSource.fetchCartItems(
-            page = 0,
-            size = Int.MAX_VALUE,
-        ) { it ->
-            callback(it?.content?.map { it.toCartItem() }.orEmpty())
+    override suspend fun getAllCartItems(): Result<List<CartItem>> =
+        runCatching {
+            val response = cartItemDataSource.fetchCartItems(0, Int.MAX_VALUE).getOrThrow()
+            response.content.map { it.toCartItem() }
         }
-    }
 
-    override fun getAllCartItemsCount(callBack: (Quantity?) -> Unit) {
-        cartItemDataSource.fetchCartItemsCount {
-            callBack(it)
+    override suspend fun getAllCartItemsCount(): Result<Quantity> =
+        runCatching {
+            cartItemDataSource.fetchCartItemsCount().getOrThrow()
         }
-    }
 
-    override fun deleteCartItem(
-        id: Long,
-        callback: (Long) -> Unit,
-    ) {
-        cartItemDataSource.removeCartItem(id) {
-            callback(id)
+    override suspend fun deleteCartItem(productId: Long): Result<Long> =
+        runCatching {
+            cartItemDataSource.removeCartItem(productId).getOrThrow()
+            productId
         }
-    }
 
-    override fun upsertCartItemQuantity(
+    override suspend fun upsertCartItemQuantity(
         productId: Long,
         cartId: Long?,
         quantity: Int,
-        callback: (Long) -> Unit,
-    ) {
-        if (cartId != null) {
-            cartItemDataSource.updateCartItem(cartId, Quantity(quantity)) {
-                callback(cartId)
-            }
-        } else {
-            val request = CartItemRequest(productId, quantity)
-            cartItemDataSource.submitCartItem(request) { cartId ->
-                callback(cartId)
+    ): Result<Long> =
+        runCatching {
+            if (cartId != null) {
+                cartItemDataSource.updateCartItem(cartId, Quantity(quantity)).getOrThrow()
+                cartId
+            } else {
+                val request = CartItemRequest(productId, quantity)
+                cartItemDataSource.submitCartItem(request).getOrThrow()
             }
         }
-    }
 
-    override fun addCartItem(
-        cartItem: CartItem,
-        callback: (Long) -> Unit,
-    ) {
-        val item =
-            CartItemRequest(
-                productId = cartItem.product.id,
-                quantity = cartItem.amount,
-            )
-        cartItemDataSource.submitCartItem(item) { cartId ->
-            callback(cartId)
-        }
-    }
+    override suspend fun addOrIncreaseCartItem(productId: Long): Result<Long> =
+        runCatching {
+            val allItems = getAllCartItems().getOrThrow()
+            val existing = allItems.find { it.product.id == productId }
 
-    override fun increaseCartItem(
-        cartItem: CartItem,
-        callback: (Long) -> Unit,
-    ) {
-        cartItemDataSource.updateCartItem(cartId = cartItem.cartId, quantity = Quantity(cartItem.amount + 1)) {
-            callback(it)
+            if (existing != null) {
+                increaseCartItem(existing).getOrThrow()
+            } else {
+                val request = CartItemRequest(productId, 1)
+                cartItemDataSource.submitCartItem(request).getOrThrow()
+            }
         }
-    }
 
-    override fun updateCartItemQuantity(
-        cartId: Long,
-        quantity: Int,
-        callback: (Long) -> Unit,
-    ) {
-        cartItemDataSource.updateCartItem(cartId, Quantity(quantity)) {
-            callback(cartId)
+    override suspend fun addCartItem(cartItem: CartItem): Result<Long> =
+        runCatching {
+            val request = CartItemRequest(cartItem.product.id, cartItem.amount)
+            cartItemDataSource.submitCartItem(request).getOrThrow()
         }
-    }
 
-    override fun decreaseCartItem(
-        cartItem: CartItem,
-        callback: (Long) -> Unit,
-    ) {
-        cartItemDataSource.updateCartItem(cartId = cartItem.cartId, quantity = Quantity(cartItem.amount - 1)) {
-            callback(it)
+    override suspend fun increaseCartItem(cartItem: CartItem): Result<Long> =
+        runCatching {
+            cartItemDataSource
+                .updateCartItem(
+                    cartId = cartItem.cartId,
+                    quantity = Quantity(cartItem.amount + 1),
+                ).getOrThrow()
+            cartItem.cartId
         }
-    }
+
+    override suspend fun decreaseCartItem(cartItem: CartItem): Result<Long> =
+        runCatching {
+            cartItemDataSource
+                .updateCartItem(
+                    cartId = cartItem.cartId,
+                    quantity = Quantity(cartItem.amount - 1),
+                ).getOrThrow()
+            cartItem.cartId
+        }
 }
