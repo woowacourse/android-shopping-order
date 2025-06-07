@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.view
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -8,9 +9,12 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.FakeProductRepository
 import woowacourse.shopping.presentation.view.order.suggestion.SuggestionViewModel
+import woowacourse.shopping.presentation.view.util.CoroutinesTestExtension
 import woowacourse.shopping.presentation.view.util.InstantTaskExecutorExtension
 import woowacourse.shopping.presentation.view.util.getOrAwaitValue
 
+@OptIn(ExperimentalCoroutinesApi::class)
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class SuggestionViewModelTest {
     private lateinit var viewModel: SuggestionViewModel

@@ -107,7 +107,7 @@ class CatalogFragmentTest {
         increaseProductQuantity(2)
 
         // Then
-        nthProductInRecyclerView(R.id.view_quantity_selector).check(matches(isDisplayed()))
+        nthProductInRecyclerView(R.id.view_quantity_selector, 2).check(matches(isDisplayed()))
     }
 
     @Test
@@ -116,7 +116,6 @@ class CatalogFragmentTest {
         decreaseProductQuantity()
 
         // Then
-        Thread.sleep(100)
         nthProductInRecyclerView(R.id.view_quantity_selector).check(matches(not(isDisplayed())))
     }
 
