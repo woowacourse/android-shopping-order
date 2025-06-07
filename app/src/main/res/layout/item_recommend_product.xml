@@ -11,7 +11,7 @@
 
         <variable
             name="itemClickListener"
-            type="woowacourse.shopping.presentation.recommend.RecommendItemClickListener" />
+            type="woowacourse.shopping.presentation.recommend.RecommendClickListener" />
 
         <variable
             name="counterClickListener"

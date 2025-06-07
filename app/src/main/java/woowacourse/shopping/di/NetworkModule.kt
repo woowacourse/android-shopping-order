@@ -5,7 +5,9 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import woowacourse.shopping.data.service.CartItemService
+import woowacourse.shopping.data.service.CouponService
 import woowacourse.shopping.data.service.OkHttpClientProvider
+import woowacourse.shopping.data.service.OrderService
 import woowacourse.shopping.data.service.ProductService
 
 object NetworkModule {
@@ -27,5 +29,13 @@ object NetworkModule {
 
     val cartItemService: CartItemService by lazy {
         retrofit.create(CartItemService::class.java)
+    }
+
+    val couponService: CouponService by lazy {
+        retrofit.create(CouponService::class.java)
+    }
+
+    val orderService: OrderService by lazy {
+        retrofit.create(OrderService::class.java)
     }
 }

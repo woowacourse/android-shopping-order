@@ -141,12 +141,9 @@ class CartActivity :
     }
 
     override fun onClickRecommend() {
-        val intent =
-            RecommendActivity.newIntent(
-                this,
-                viewModel.selectedTotalPrice.value ?: 0,
-                viewModel.selectedTotalCount.value ?: 0,
-            )
+        val cartItems = viewModel.cartItems.value ?: return
+        val selectedCartItem = cartItems.filter { it.isSelected }
+        val intent = RecommendActivity.newIntent(this, selectedCartItem)
         activityResultLauncher.launch(intent)
     }
 

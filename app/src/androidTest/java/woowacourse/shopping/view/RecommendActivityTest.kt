@@ -49,7 +49,7 @@ class RecommendActivityTest {
 
     @Test
     fun 선택한_상품의_수량이_표시된다() {
-        onView(withId(R.id.layout_cart_recommend)).checkIsDisplayed()
+        onView(withId(R.id.btn_cart_order)).checkIsDisplayed()
     }
 
     @After

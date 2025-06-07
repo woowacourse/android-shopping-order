@@ -12,8 +12,8 @@ import woowacourse.shopping.domain.usecase.RecommendProductsUseCase
 import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.FakeProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
-import woowacourse.shopping.presentation.Extra.KEY_SELECT_COUNT
-import woowacourse.shopping.presentation.Extra.KEY_SELECT_PRICE
+import woowacourse.shopping.fixture.ProductsFixture
+import woowacourse.shopping.presentation.Extra.KEY_SELECT_ITEMS
 import woowacourse.shopping.presentation.recommend.RecommendViewModel
 
 @ExtendWith(InstantTaskExecutorExtension::class)
@@ -27,12 +27,7 @@ class RecommendViewModelTest {
     @BeforeEach
     fun setUp() {
         val savedStateHandle =
-            SavedStateHandle(
-                mapOf(
-                    KEY_SELECT_PRICE to 10000,
-                    KEY_SELECT_COUNT to 10,
-                ),
-            )
+            SavedStateHandle(mapOf(KEY_SELECT_ITEMS to ProductsFixture.dummyCartItems))
         cartRepository = FakeCartRepository()
         productRepository = FakeProductRepository()
         recentProductRepository = FakeRecentProductRepository()

@@ -10,36 +10,36 @@ class ProductRepositoryImpl(
     private val productRemoteDataSource: ProductRemoteDataSource,
     private val cartRepository: CartRepository,
 ) : ProductRepository {
-    override fun fetchPagingProducts(
+    override suspend fun fetchPagingProducts(
         page: Int?,
         pageSize: Int?,
         category: String?,
-        onResult: (Result<List<CartItem>>) -> Unit,
-    ) {
-        productRemoteDataSource.fetchPagingProducts(page, pageSize, category) { result ->
-            result.fold(
-                onSuccess = { products ->
-                    val cartItems =
-                        products.map { product ->
-                            cartRepository.getCartItemById(product.productId)
-                                ?: CartItem(product = product, quantity = 0)
-                        }
-                    onResult(Result.success(cartItems))
-                },
-                onFailure = { throwable -> onResult(Result.failure(throwable)) },
-            )
-        }
+    ): Result<List<CartItem>> {
+        val result = productRemoteDataSource.fetchPagingProducts(page, pageSize, category)
+        return result.fold(
+            onSuccess = { products ->
+                Result.success(
+                    products.map { product ->
+                        cartRepository.getCartItemById(product.productId)
+                            ?: CartItem(product = product, quantity = 0)
+                    },
+                )
+            },
+            onFailure = { throwable ->
+                Result.failure(throwable)
+            },
+        )
     }
 
-    override fun fetchProductById(
-        productId: Long,
-        onResult: (Result<Product>) -> Unit,
-    ) {
-        productRemoteDataSource.fetchProductById(productId) { result ->
-            result.fold(
-                onSuccess = { product -> onResult(Result.success(product)) },
-                onFailure = { throwable -> onResult(Result.failure(throwable)) },
-            )
-        }
+    override suspend fun fetchProductById(productId: Long): Result<Product> {
+        val result = productRemoteDataSource.fetchProductById(productId)
+        return result.fold(
+            onSuccess = { product ->
+                Result.success(product)
+            },
+            onFailure = { throwable ->
+                Result.failure(throwable)
+            },
+        )
     }
 }
