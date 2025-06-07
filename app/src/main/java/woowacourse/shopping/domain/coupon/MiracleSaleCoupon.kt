@@ -19,7 +19,15 @@ data class MiracleSaleCoupon(
         return true
     }
 
-    private fun timeElapsed(standardTime: LocalDateTime): Boolean = standardTime.toLocalTime() !in availableTime.start..availableTime.end
+    private fun timeElapsed(standardTime: LocalDateTime): Boolean {
+        val current = standardTime.toLocalTime()
+        val within = if (availableTime.start <= availableTime.end) {
+            current in availableTime.start..availableTime.end
+        } else {
+            current >= availableTime.start || current <= availableTime.end
+        }
+        return !within
+    }
 
     data class AvailableTime(
         val start: LocalTime,
