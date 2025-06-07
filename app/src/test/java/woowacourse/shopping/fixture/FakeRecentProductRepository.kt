@@ -10,22 +10,19 @@ class FakeRecentProductRepository(
 ) : RecentProductRepository {
     private val recentProductIds = initialRecentProductIds.toMutableList()
 
-    override fun getRecentProducts(
-        limit: Int,
-        onResult: (Result<List<Product>>) -> Unit,
-    ) {
+    override suspend fun getRecentProducts(limit: Int): Result<List<Product>> {
         val products =
             recentProductIds
                 .take(limit)
                 .mapNotNull { id -> productsFixture.find { it.id == id }?.toDomain() }
-        onResult(Result.success(products))
+        return Result.success(products)
     }
 
-    override fun insertAndTrimToLimit(
+    override suspend fun insertAndTrimToLimit(
         productId: Long,
         category: String,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
+        recentProductLimit: Int,
+    ): Result<Unit> {
         recentProductIds.remove(productId)
         recentProductIds.add(0, productId)
 
@@ -33,6 +30,6 @@ class FakeRecentProductRepository(
             recentProductIds.subList(recentProductSavedLimit, recentProductIds.size).clear()
         }
 
-        onResult(Result.success(Unit))
+        return Result.success(Unit)
     }
 }

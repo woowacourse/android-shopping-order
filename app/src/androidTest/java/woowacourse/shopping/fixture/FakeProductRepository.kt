@@ -6,36 +6,30 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class FakeProductRepository : ProductRepository {
-    override fun fetchProduct(
-        id: Long,
-        onResult: (Result<Product>) -> Unit,
-    ) {
+    override suspend fun fetchProduct(id: Long): Result<Product> {
         val product = productsFixture.find { it.id == id }?.toDomain()
         if (product != null) {
-            onResult(Result.success(product))
-            return
+            return Result.success(product)
         }
 
-        onResult(Result.failure(NoSuchElementException("Product not found: $id")))
+        return Result.failure(NoSuchElementException("Product not found: $id"))
     }
 
-    override fun fetchProducts(
+    override suspend fun fetchProducts(
         page: Int,
         size: Int,
-        onResult: (Result<PageableItem<Product>>) -> Unit,
-    ) {
+    ): Result<PageableItem<Product>> {
         val offset = page * size
         val pagedItems = productsFixture.drop(offset).take(size).map { it.toDomain() }
         val hasMore = (offset + size) < productsFixture.size
         val pageableItem = PageableItem(pagedItems, hasMore)
-        onResult(Result.success(pageableItem))
+        return Result.success(pageableItem)
     }
 
-    override fun fetchSuggestionProducts(
+    override suspend fun fetchSuggestionProducts(
         limit: Int,
         excludedProductIds: List<Long>,
-        onResult: (Result<List<Product>>) -> Unit,
-    ) {
+    ): Result<List<Product>> {
         val additionalCount = limit + excludedProductIds.size
         val category = productsFixture.first().category
         val products =
@@ -44,6 +38,6 @@ class FakeProductRepository : ProductRepository {
                 .take(additionalCount)
                 .map { it.toDomain() }
 
-        onResult(Result.success(products))
+        return Result.success(products)
     }
 }

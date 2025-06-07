@@ -1,103 +1,102 @@
 package woowacourse.shopping.fixture
 
-import woowacourse.shopping.data.model.product.ProductResponse
 import woowacourse.shopping.data.model.product.toDomain
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PageableItem
 import woowacourse.shopping.domain.repository.CartRepository
-import kotlin.random.Random
 
 class FakeCartRepository(
     initialCartProducts: List<CartProduct> = emptyList(),
-    private val products: List<ProductResponse> = productsFixture,
 ) : CartRepository {
     private val cartItems: MutableMap<Long, CartProduct> =
         initialCartProducts.associateBy { it.product.id }.toMutableMap()
 
-    override fun fetchCartProducts(
+    override suspend fun fetchCart(): Result<Unit> = Result.success(Unit)
+
+    override suspend fun fetchCartProducts(
         page: Int,
         size: Int,
-        onResult: (Result<PageableItem<CartProduct>>) -> Unit,
-    ) {
+    ): Result<PageableItem<CartProduct>> {
         val sortedItems = cartItems.values.sortedBy { it.cartId }
         val offset = page * size
         val pagedItems = sortedItems.drop(offset).take(size)
         val hasMore = (offset + size) < sortedItems.size
-        onResult(Result.success(PageableItem(pagedItems, hasMore)))
+        return Result.success(PageableItem(pagedItems, hasMore))
     }
 
-    override fun deleteCartProduct(
-        cartId: Long,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        val keyToRemove = cartItems.entries.find { it.value.cartId == cartId }?.key
-        if (keyToRemove != null) {
-            cartItems.remove(keyToRemove)
+    override suspend fun deleteCartProduct(cartId: Long): Result<Unit> {
+        if (cartItems.remove(cartId) != null) {
+            return Result.success(Unit)
         }
-        onResult(Result.success(Unit))
+        return Result.failure(NoSuchElementException(ERROR_CART_PRODUCT_NOT_FOUND.format(cartId)))
     }
 
-    override fun increaseQuantity(
+    override suspend fun increaseQuantity(
         productId: Long,
         increaseCount: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        val existingItem = cartItems[productId]
-        if (existingItem != null) {
-            cartItems[productId] =
-                existingItem.copy(quantity = existingItem.quantity + increaseCount)
-        } else {
-            val product = products.find { it.id == productId }?.toDomain()
-            if (product != null) {
-                cartItems[productId] =
-                    CartProduct(
-                        cartId = Random.nextLong(),
-                        product = product,
-                        quantity = increaseCount,
-                    )
-            }
+    ): Result<Unit> {
+        val cartProduct = cartItems[productId]
+        val product = productsFixture.find { it.id == productId }?.toDomain()
+        product ?: return Result.failure(NoSuchElementException("Product not found: $productId"))
+
+        if (cartProduct == null) {
+            cartItems[productId] = CartProduct(0, product, increaseCount)
+            return Result.success(Unit)
         }
-        onResult(Result.success(Unit))
+
+        cartItems[productId] = cartProduct.copy(quantity = cartProduct.quantity + increaseCount)
+        return Result.success(Unit)
     }
 
-    override fun decreaseQuantity(
+    override suspend fun decreaseQuantity(
         productId: Long,
         decreaseCount: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
+    ): Result<Unit> {
         val existingItem = cartItems[productId]
+
         if (existingItem != null) {
             val newQuantity = existingItem.quantity - decreaseCount
-            if (newQuantity > 0) {
-                cartItems[productId] = existingItem.copy(quantity = newQuantity)
-            } else {
+            if (newQuantity <= 0) {
                 cartItems.remove(productId)
+                return Result.success(Unit)
             }
-        }
-        onResult(Result.success(Unit))
-    }
 
-    override fun fetchCartProductCount(onResult: (Result<Int>) -> Unit) {
-        onResult(Result.success(cartItems.size))
-    }
-
-    override fun findCartProductByProductId(productId: Long): Result<CartProduct> =
-        runCatching {
-            cartItems[productId] ?: throw NoSuchElementException("Cart product not found")
+            cartItems[productId] = existingItem.copy(quantity = newQuantity)
+            return Result.success(Unit)
         }
 
-    override fun getAllCartProducts(): Result<List<CartProduct>> =
-        runCatching {
-            cartItems.values.toList()
-        }
-
-    override fun findQuantityByProductId(productId: Long): Result<Int> {
-        val quantity = cartItems[productId]?.quantity ?: 0
-        return Result.success(quantity)
+        return Result.failure(NoSuchElementException(ERROR_QUANTITY_NOT_FOUND.format(productId)))
     }
 
-    override fun findCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>> {
-        val foundCartProducts = cartItems.filterKeys { it in productIds }.values.toList()
-        return Result.success(foundCartProducts)
+    override suspend fun fetchCartProductCount(): Result<Int> = Result.success(cartItems.size)
+
+    override suspend fun findQuantityByProductId(productId: Long): Result<Int> {
+        val cartProduct = cartItems[productId]
+        return Result.success(cartProduct?.quantity ?: 0)
+    }
+
+    override suspend fun findCartProductByProductId(productId: Long): Result<CartProduct> {
+        val cartProduct =
+            cartItems[productId]
+                ?: return Result.failure(
+                    NoSuchElementException(
+                        ERROR_CART_PRODUCT_NOT_FOUND.format(
+                            productId,
+                        ),
+                    ),
+                )
+        return Result.success(cartProduct)
+    }
+
+    override suspend fun findCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>> {
+        val result = productIds.mapNotNull { cartItems[it] }
+        return Result.success(result)
+    }
+
+    override suspend fun getAllCartProducts(): Result<List<CartProduct>> = Result.success(cartItems.values.toList())
+
+    companion object {
+        private const val ERROR_CART_PRODUCT_NOT_FOUND = "해당 ID(%d)의 장바구니 상품이 존재하지 않습니다."
+        private const val ERROR_QUANTITY_NOT_FOUND = "해당 상품 ID(%d)의 수량을 찾을 수 없습니다."
     }
 }
