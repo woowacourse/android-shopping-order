@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
@@ -16,6 +15,7 @@ import woowacourse.shopping.databinding.FragmentCartProductRecommendationBinding
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.view.cart.recommendation.adapter.RecommendationAdapter
 import woowacourse.shopping.view.cart.selection.CartProductSelectionFragment
+import woowacourse.shopping.view.payment.PaymentActivity
 import woowacourse.shopping.view.product.detail.ProductDetailActivity
 
 class CartProductRecommendationFragment() : Fragment() {
@@ -80,11 +80,6 @@ class CartProductRecommendationFragment() : Fragment() {
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
         binding.rvRecommendedProducts.adapter = adapter
-        binding.btnOrder.setOnClickListener {
-            Toast.makeText(requireContext(), R.string.finish_order, Toast.LENGTH_SHORT).show()
-            viewModel.finishOrder()
-            requireActivity().finish()
-        }
     }
 
     private fun initObservers() {
@@ -94,6 +89,11 @@ class CartProductRecommendationFragment() : Fragment() {
 
         viewModel.onSelectedProduct.observe(viewLifecycleOwner) { value ->
             val intent = ProductDetailActivity.newIntent(requireContext(), value)
+            startActivity(intent)
+        }
+
+        viewModel.onFinishOrder.observe(viewLifecycleOwner) { value ->
+            val intent = PaymentActivity.newIntent(requireContext(), ArrayList(value))
             startActivity(intent)
         }
     }

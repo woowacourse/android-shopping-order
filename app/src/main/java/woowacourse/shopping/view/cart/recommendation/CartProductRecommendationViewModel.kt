@@ -41,6 +41,9 @@ class CartProductRecommendationViewModel(
     private val _onSelectedProduct = MutableSingleLiveData<Product>()
     val onSelectedProduct: SingleLiveData<Product> get() = _onSelectedProduct
 
+    private val _onFinishOrder = MutableSingleLiveData<List<CartProduct>>()
+    val onFinishOrder: SingleLiveData<List<CartProduct>> get() = _onFinishOrder
+
     init {
         viewModelScope.launch {
             val result = cartProductRepository.getPagedProducts()
@@ -206,17 +209,18 @@ class CartProductRecommendationViewModel(
     }
 
     fun finishOrder() {
-        viewModelScope.launch {
-            val result =
-                cartProductRepository.deleteProductsByIds(
-                    _selectedProducts.value.orEmpty().map { it.id }
-                        .toSet(),
-                )
-
-            result.onFailure {
-                Log.e("error", it.message.toString())
-            }
-        }
+        _onFinishOrder.setValue(_selectedProducts.value.orEmpty())
+//        viewModelScope.launch {
+//            val result =
+//                cartProductRepository.deleteProductsByIds(
+//                    _selectedProducts.value.orEmpty().map { it.id }
+//                        .toSet(),
+//                )
+//
+//            result.onFailure {
+//                Log.e("error", it.message.toString())
+//            }
+//        }
     }
 
     companion object {
