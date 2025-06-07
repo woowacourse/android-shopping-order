@@ -34,27 +34,15 @@ class OrderViewModel(
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
 
-    private val initialItems =
-        savedStateHandle.get<ArrayList<CartItemUiModel>>(KEY_SELECT_ITEMS) ?: emptyList()
-
     init {
-        _orderSummary.value =
-            OrderPriceSummary(
-                productTotalPrice = initialItems.sumOf { it.totalPrice },
-                cartItems = initialItems.map { it.toDomain() },
-            )
+        val initialItems =
+            savedStateHandle.get<ArrayList<CartItemUiModel>>(KEY_SELECT_ITEMS) ?: emptyList()
+        _orderSummary.value = createOrderSummary(initialItems)
         fetchData()
     }
 
     fun selectCoupon(selectedCoupon: CouponUiModel) {
-        val currentCoupons = _coupons.value.orEmpty()
-        val isCurrentlySelected =
-            currentCoupons.any { it.code == selectedCoupon.code && it.isSelected }
-
-        val updatedCoupons =
-            currentCoupons.map { coupon ->
-                coupon.copy(isSelected = if (isCurrentlySelected) false else coupon.code == selectedCoupon.code)
-            }
+        val updatedCoupons = toggleCouponSelection(_coupons.value.orEmpty(), selectedCoupon)
         _coupons.value = updatedCoupons
 
         val order = orderSummary.value ?: return
@@ -66,7 +54,9 @@ class OrderViewModel(
     }
 
     fun order() {
-        val orderIds = orderSummary.value?.cartItems?.map { it.cartId } ?: return
+        val summary = orderSummary.value ?: return
+        val orderIds = summary.cartItems.map { it.cartId }
+
         viewModelScope.launch {
             orderRepository
                 .order(orderIds)
@@ -78,8 +68,10 @@ class OrderViewModel(
     }
 
     private fun fetchData() {
-        val orderPrice = orderSummary.value?.productTotalPrice ?: return
-        val selectedItems = orderSummary.value?.cartItems ?: return
+        val summary = orderSummary.value ?: return
+        val orderPrice = summary.productTotalPrice
+        val selectedItems = summary.cartItems
+
         viewModelScope.launch {
             getAvailableCouponUseCase(orderPrice, selectedItems)
                 .onSuccess { coupons ->
@@ -89,4 +81,22 @@ class OrderViewModel(
                 }
         }
     }
+
+    private fun toggleCouponSelection(
+        currentCoupons: List<CouponUiModel>,
+        selectedCoupon: CouponUiModel,
+    ): List<CouponUiModel> {
+        val isCurrentlySelected =
+            currentCoupons.any { it.code == selectedCoupon.code && it.isSelected }
+
+        return currentCoupons.map { coupon ->
+            coupon.copy(isSelected = if (isCurrentlySelected) false else coupon.code == selectedCoupon.code)
+        }
+    }
+
+    private fun createOrderSummary(initialItems: List<CartItemUiModel>): OrderPriceSummary =
+        OrderPriceSummary(
+            productTotalPrice = initialItems.sumOf { it.totalPrice },
+            cartItems = initialItems.map { it.toDomain() },
+        )
 }

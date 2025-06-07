@@ -108,22 +108,7 @@ class RecommendViewModel(
         productId: Long,
         delta: Int,
     ) {
-        val updatedItems =
-            _recommendProducts.value.orEmpty().map { item ->
-                if (item.product.id == productId) {
-                    val newQuantity = item.quantity + delta
-                    item.copy(
-                        id = cartId,
-                        isSelected = true,
-                        quantity = newQuantity,
-                        totalPrice = item.product.price * newQuantity,
-                    )
-                } else {
-                    item
-                }
-            }
-        _recommendProducts.value = updatedItems
-
+        val updatedItems = updateRecommendProducts(cartId, productId, delta)
         val changedItem = updatedItems.first { it.product.id == productId }
         updateSelectedItem(changedItem)
         setupPriceCount()
@@ -148,5 +133,28 @@ class RecommendViewModel(
         val selectedItems = this.selectedItems.value ?: return
         _selectedTotalPrice.value = selectedItems.sumOf { it.totalPrice }
         _selectedTotalCount.value = selectedItems.sumOf { it.quantity }
+    }
+
+    private fun updateRecommendProducts(
+        cartId: Long,
+        productId: Long,
+        delta: Int,
+    ): List<CartItemUiModel> {
+        val updated =
+            _recommendProducts.value.orEmpty().map { item ->
+                if (item.product.id == productId) {
+                    val newQuantity = item.quantity + delta
+                    item.copy(
+                        id = cartId,
+                        isSelected = true,
+                        quantity = newQuantity,
+                        totalPrice = item.product.price * newQuantity,
+                    )
+                } else {
+                    item
+                }
+            }
+        _recommendProducts.value = updated
+        return updated
     }
 }
