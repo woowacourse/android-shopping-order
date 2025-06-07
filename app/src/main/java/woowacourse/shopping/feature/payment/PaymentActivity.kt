@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import woowacourse.shopping.R
 import woowacourse.shopping.application.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityPaymentBinding
 import woowacourse.shopping.domain.model.Coupon
@@ -35,7 +36,9 @@ class PaymentActivity : AppCompatActivity() {
         viewModel.setOrderDetails(orderIds)
 
         viewModel.orderCompletedEvent.observe(this) {
-            Toast.makeText(this, "주문이 완료되었습니다!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this,
+                getString(R.string.payment_complete_order_message),
+                Toast.LENGTH_SHORT).show()
             navigate()
         }
     }
@@ -52,7 +55,8 @@ class PaymentActivity : AppCompatActivity() {
     }
 
     private fun navigate() {
-        val intent = GoodsActivity.newIntent(this)
+        val orderedIds = viewModel.orderedCarts.map { it.product.id }
+        val intent = GoodsActivity.newIntent(this, orderedIds)
         startActivity(intent)
         finish()
     }

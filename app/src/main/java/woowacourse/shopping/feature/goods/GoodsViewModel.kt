@@ -152,33 +152,54 @@ class GoodsViewModel(
         goodsId: Long,
         quantity: Int,
     ) {
-        val currentItems = _items.value.orEmpty().toMutableList()
+        replaceItem(
+            isTargetItem = { it.cart.product.id == goodsId },
+            transform = {
+                it.copy(cart = it.cart.copy(id = cartId, quantity = quantity))
+            },
+        )
+    }
 
-        val index = currentItems.indexOfFirst { it is GoodsItem.Product && it.cart.product.id == goodsId }
-
-        if (index != -1) {
-            val oldItem = currentItems[index] as GoodsItem.Product
-            val updatedItem = oldItem.copy(cart = oldItem.cart.copy(id = cartId, quantity = quantity))
-
-            currentItems[index] = updatedItem
-            _items.value = currentItems
-
-            val total = currentItems.filterIsInstance<GoodsItem.Product>().sumOf { it.cart.quantity }
-            _totalQuantity.value = total
+    fun updateItemsAfterOrder(goodsIds: List<Long>) {
+        goodsIds.forEach { goodsId ->
+            replaceItem(
+                isTargetItem = { it.cart.product.id == goodsId },
+                transform = {
+                    it.copy(cart = it.cart.copy(quantity = 0))
+                },
+            )
         }
     }
 
     private fun updateItems(updatedCart: CartProduct) {
-        val currentItems = _items.value.orEmpty().toMutableList()
-        val index =
-            currentItems.indexOfFirst {
-                it is GoodsItem.Product && it.cart.product.id == updatedCart.product.id
-            }
+        replaceItem(
+            isTargetItem = { it.cart.product.id == updatedCart.product.id },
+            transform = {
+                GoodsItem.Product(updatedCart)
+            },
+        )
+    }
 
-        if (index != -1) {
-            val updatedItem = GoodsItem.Product(updatedCart)
-            currentItems[index] = updatedItem
+    private fun replaceItem(
+        isTargetItem: (GoodsItem.Product) -> Boolean,
+        transform: (GoodsItem.Product) -> GoodsItem.Product,
+    ) {
+        val currentItems = _items.value.orEmpty().toMutableList()
+        var updated = false
+
+        currentItems.forEachIndexed { index, item ->
+            if (item is GoodsItem.Product && isTargetItem(item)) {
+                currentItems[index] = transform(item)
+                updated = true
+            }
+        }
+
+        if (updated) {
             _items.value = currentItems
+            _totalQuantity.value =
+                currentItems
+                    .filterIsInstance<GoodsItem.Product>()
+                    .sumOf { it.cart.quantity }
         }
     }
 

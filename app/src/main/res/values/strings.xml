@@ -46,4 +46,5 @@
     <string name="payment_expiration_date">만료일: %s</string>
     <string name="payment_price">%,d원</string>
     <string name="payment_discount_price">-%,d원</string>
+    <string name="payment_complete_order_message">주문이 완료되었습니다!</string>
 </resources>

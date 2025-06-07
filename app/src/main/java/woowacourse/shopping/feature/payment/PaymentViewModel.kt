@@ -31,15 +31,18 @@ class PaymentViewModel(
     private val _orderCompletedEvent = MutableSingleLiveData<Unit>()
     val orderCompletedEvent: SingleLiveData<Unit> = _orderCompletedEvent
 
-    private var orderedCarts: List<CartProduct> = emptyList()
+    private var _orderedCarts: List<CartProduct> = emptyList()
+    val orderedCarts: List<CartProduct> get() = _orderedCarts
+
     private var currentCoupon: Coupon? = null
 
     fun setOrderDetails(orderIds: LongArray) {
         viewModelScope
             .launch {
                 val allCarts = cartRepository.fetchAllCart().content
-                orderedCarts = allCarts.filter { it.id in orderIds }.map { it.toDomain() }
-                val orderedPrice = orderedCarts.sumOf { it.product.price * it.quantity }
+                _orderedCarts = allCarts.filter { it.id in orderIds }.map { it.toDomain() }
+
+                val orderedPrice = _orderedCarts.sumOf { it.product.price * it.quantity }
 
                 val newPrice =
                     _price.value?.copy(orderPrice = orderedPrice, totalPrice = orderedPrice)
@@ -87,9 +90,11 @@ class PaymentViewModel(
 
     fun order() {
         viewModelScope.launch {
-            orderRepository.order(OrderRequest(orderedCarts.map { it.id })).onSuccess {
-                _orderCompletedEvent.setValue(Unit)
-            }
+            orderRepository
+                .order(OrderRequest(_orderedCarts.map { it.id }))
+                .onSuccess {
+                    _orderCompletedEvent.setValue(Unit)
+                }
         }
     }
 
