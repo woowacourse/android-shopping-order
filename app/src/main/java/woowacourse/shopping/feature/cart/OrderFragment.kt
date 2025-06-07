@@ -35,6 +35,7 @@ class OrderFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.updateAppBarTitle(getString(R.string.order_fragment_appbar_name))
+        viewModel.updateWholeCoupons()
         setupBinding()
     }
 

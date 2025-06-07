@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.cart
 
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -15,9 +16,14 @@ import woowacourse.shopping.data.carts.CartUpdateResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
+import woowacourse.shopping.data.payment.CouponFetchResult
+import woowacourse.shopping.data.payment.repository.PaymentRepository
 import woowacourse.shopping.data.util.mapper.toCartItems
+import woowacourse.shopping.data.util.mapper.toCouponItems
 import woowacourse.shopping.data.util.mapper.toDomain
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.coupon.Coupon
+import woowacourse.shopping.domain.model.coupon.CouponService
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 import kotlin.Int
@@ -28,6 +34,8 @@ import kotlin.math.min
 class CartViewModel(
     private val cartRepository: CartRepository,
     private val goodsRepository: GoodsRepository,
+    private val paymentRepository: PaymentRepository,
+    private val couponService: CouponService,
 ) : ViewModel() {
     @VisibleForTesting
     internal fun setTestPage(page: Int) {
@@ -47,9 +55,27 @@ class CartViewModel(
     private val _recommendedGoods = MutableLiveData<List<CartItem>>()
     val recommendedGoods: LiveData<List<CartItem>> = _recommendedGoods
 
+    private val _coupons = MutableLiveData<List<Coupon>>()
+    val coupons: LiveData<List<Coupon>> = _coupons
+
+    val validCoupons: LiveData<List<Coupon>> =
+        _coupons.map { coupons ->
+            coupons.filter { coupon ->
+                couponService.isValid(coupon, selectedCartsList.value ?: emptyList())
+            }
+        }
+
     val cartsList: LiveData<List<CartItem>> =
         _carts.map { map ->
             map.values.toList()
+        }
+
+    val selectedCartsList: LiveData<List<CartItem>> =
+        _carts.map { map ->
+            map.values
+                .filter {
+                    it.isSelected
+                }.toList()
         }
 
     val isMultiplePages: LiveData<Boolean> =
@@ -114,10 +140,6 @@ class CartViewModel(
     private val _appBarTitle = MutableLiveData<String>()
     val appBarTitle: LiveData<String> = _appBarTitle
 
-    fun updateAppBarTitle(newTitle: String) {
-        _appBarTitle.value = newTitle
-    }
-
     init {
         updateWholeCarts()
     }
@@ -129,10 +151,30 @@ class CartViewModel(
                     val allItems = result.data.toCartItems()
                     _carts.value = allItems.associateBy { it.id }
                 }
+
                 is CartFetchResult.Error -> { // todo 에러 구현 필요
                 }
             }
         }
+    }
+
+    fun updateWholeCoupons() {
+        viewModelScope.launch {
+            when (val result = paymentRepository.fetchAllCoupons()) {
+                is CouponFetchResult.Success -> {
+                    val allItems = result.data.toCouponItems()
+                    _coupons.value = allItems
+                    Log.d("쿠폰 목록", "$allItems")
+                }
+
+                is CouponFetchResult.Error -> { // todo 에러 구현 필요
+                }
+            }
+        }
+    }
+
+    fun updateAppBarTitle(newTitle: String) {
+        _appBarTitle.value = newTitle
     }
 
     fun loadRecommendedGoods() {
@@ -175,6 +217,7 @@ class CartViewModel(
                         loadDefaultRecommendedGoods(pageOffset + 1)
                     }
                 }
+
                 is CartFetchResult.Error -> {
                     // todo 에러 처리 필요
                 }
@@ -200,6 +243,7 @@ class CartViewModel(
                 updateRecommendItem(cartItem.copy(quantity = cartItem.quantity + 1))
                 increaseCartItemQuantity(cartItem)
             }
+
             else -> {
                 addCartItemFromRecommend(cartItem)
             }
@@ -276,13 +320,15 @@ class CartViewModel(
 
     fun increaseCartItemQuantity(cartItem: CartItem) {
         viewModelScope.launch {
-            val result = cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1))
+            val result =
+                cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1))
             when (result) {
                 is CartUpdateResult.Success -> {
                     updateCartItem(cartItem.id) { item ->
                         item.copy(quantity = item.quantity + 1)
                     }
                 }
+
                 is CartUpdateResult.Error -> TODO()
             }
         }
@@ -325,6 +371,7 @@ class CartViewModel(
                         _page.value = newEndPage
                     }
                 }
+
                 is CartFetchResult.Error -> TODO()
             }
         }

@@ -14,7 +14,11 @@ import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
 import woowacourse.shopping.data.goods.repository.GoodsLocalDataSourceImpl
 import woowacourse.shopping.data.goods.repository.GoodsRemoteDataSourceImpl
 import woowacourse.shopping.data.goods.repository.GoodsRepositoryImpl
+import woowacourse.shopping.data.payment.repository.CouponsRemoteDataSourceImpl
+import woowacourse.shopping.data.payment.repository.OrderRemoteDataSourceImpl
+import woowacourse.shopping.data.payment.repository.PaymentRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.domain.model.coupon.CouponServiceImpl
 import woowacourse.shopping.feature.cart.recommend.RecommendFragment
 import kotlin.getValue
 
@@ -28,6 +32,8 @@ class CartActivity : AppCompatActivity() {
                 GoodsRemoteDataSourceImpl(),
                 GoodsLocalDataSourceImpl(ShoppingDatabase.getDatabase(this)),
             ),
+            PaymentRepositoryImpl(CouponsRemoteDataSourceImpl(), OrderRemoteDataSourceImpl()),
+            CouponServiceImpl(),
         )
     }
 

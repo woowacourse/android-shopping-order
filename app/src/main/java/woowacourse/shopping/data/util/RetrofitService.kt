@@ -11,6 +11,7 @@ import retrofit2.http.Query
 import woowacourse.shopping.data.carts.dto.CartItemRequest
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
+import woowacourse.shopping.data.coupon.dto.CouponResponse
 import woowacourse.shopping.data.goods.dto.Content
 import woowacourse.shopping.data.goods.dto.GoodsResponse
 
@@ -52,4 +53,7 @@ interface RetrofitService {
     suspend fun addCartItem(
         @Body cartItem: CartItemRequest,
     ): Response<Unit>
+
+    @GET("/coupons")
+    suspend fun requestCoupons(): CouponResponse
 }

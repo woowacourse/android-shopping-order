@@ -1,6 +1,8 @@
 package woowacourse.shopping.domain.model.coupon
 
 sealed class Coupon : BaseCoupon {
+    var isSelected: Boolean = false
+
     data class Fixed(
         override val id: Int,
         override val code: String,
