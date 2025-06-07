@@ -7,7 +7,7 @@ import woowacourse.shopping.view.main.state.ProductState
 
 data class DetailUiState(
     val product: ProductState,
-    val lastSeenProduct: Product?,
+    val lastSeenProduct: Product? = null,
 ) {
     val category: String
         get() = product.item.category

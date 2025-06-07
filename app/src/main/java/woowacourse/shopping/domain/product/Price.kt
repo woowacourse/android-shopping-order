@@ -1,7 +1,9 @@
 package woowacourse.shopping.domain.product
 
+import java.io.Serializable
+
 @JvmInline
-value class Price(val value: Int) {
+value class Price(val value: Int) : Serializable {
     init {
         require(value >= 0) { INVALID_VALUE }
     }

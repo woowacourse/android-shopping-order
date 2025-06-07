@@ -15,19 +15,21 @@ import retrofit2.HttpException
 import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.domain.cart.ShoppingCart
 import woowacourse.shopping.view.cart.carts.CartListFragment
 import woowacourse.shopping.view.cart.recommend.RecommendFragment
 import woowacourse.shopping.view.cart.vm.CartViewModel
 import woowacourse.shopping.view.cart.vm.CartViewModelFactory
 import woowacourse.shopping.view.core.ext.showToast
+import woowacourse.shopping.view.order.OrderActivity
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
     private val viewModel: CartViewModel by viewModels {
         val container = (application as App).container
         CartViewModelFactory(
-            container.cartRepository,
-            container.productRepository,
+            container.repositoryModule.defaultCartRepository,
+            container.repositoryModule.defaultProductRepository,
         )
     }
 
@@ -67,10 +69,15 @@ class CartActivity : AppCompatActivity() {
                 is CartUiEvent.ShowCannotIncrease -> {
                     showToast(getString(R.string.text_over_quantity).format(event.quantity))
                 }
-                CartUiEvent.ChangeScreen -> changeFragment()
+
+                is CartUiEvent.ChangeScreen -> changeFragment(event.orders)
                 is CartUiEvent.ShowErrorMessage -> {
                     val messageResId = getErrorMessage(event.throwable)
                     showToast(getString(messageResId))
+                }
+
+                CartUiEvent.ShowNotHasPurchaseCart -> {
+                    showToast(getString(R.string.text_not_has_purchase_cart))
                 }
             }
         }
@@ -84,7 +91,7 @@ class CartActivity : AppCompatActivity() {
         }
     }
 
-    private fun changeFragment() {
+    private fun changeFragment(orders: List<ShoppingCart>?) {
         when (supportFragmentManager.findFragmentById(R.id.fragment_container_view)) {
             is CartListFragment -> {
                 supportFragmentManager.commit {
@@ -92,7 +99,9 @@ class CartActivity : AppCompatActivity() {
                 }
             }
 
-            is RecommendFragment -> {}
+            is RecommendFragment -> {
+                orders?.let { startActivity(OrderActivity.newIntent(this, it)) }
+            }
         }
     }
 

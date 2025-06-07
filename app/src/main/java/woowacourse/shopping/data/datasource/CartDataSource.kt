@@ -1,33 +1,43 @@
 package woowacourse.shopping.data.datasource
 
-import woowacourse.shopping.data.ApiCallbackHandler
+import retrofit2.HttpException
+import woowacourse.shopping.data.NetworkResultHandler
 import woowacourse.shopping.data.network.request.CartItemRequest
 import woowacourse.shopping.data.network.service.CartService
 import woowacourse.shopping.domain.cart.CartsSinglePage
+import woowacourse.shopping.domain.exception.NetworkError
+import woowacourse.shopping.domain.exception.NetworkResult
 
 class CartDataSource(
     private val service: CartService,
-    private val handler: ApiCallbackHandler,
+    private val handler: NetworkResultHandler = NetworkResultHandler(),
 ) {
-    fun addCart(
-        request: CartItemRequest,
-        callback: (Result<String>) -> Unit,
-    ) = handler.enqueueWithExtractHeaderLocationResult(service.addCart(request), callback)
+    suspend fun addCart(request: CartItemRequest): NetworkResult<Long> =
+        handler.execute {
+            val response = service.addCart(request)
+            if (!response.isSuccessful) throw HttpException(response)
 
-    fun singlePage(
+            val location =
+                response
+                    .headers()["Location"]
+                    ?.split("/")
+                    ?.last()
+                    ?.toLongOrNull()
+
+            if (location == null) throw NetworkError.MissingLocationHeaderError
+
+            location
+        }
+
+    suspend fun singlePage(
         page: Int?,
         size: Int?,
-        callback: (Result<CartsSinglePage>) -> Unit,
-    ) = handler.enqueueWithDomainTransform(service.getCartSinglePage(page, size), callback)
+    ): NetworkResult<CartsSinglePage> = handler.execute { service.getCartSinglePage(page, size).toDomain() }
 
-    fun updateCartQuantity(
+    suspend fun updateCartQuantity(
         cartId: Long,
         quantity: Int,
-        callback: (Result<Unit>) -> Unit,
-    ) = handler.enqueueWithResult(service.updateCart(cartId, quantity), callback)
+    ): NetworkResult<Unit> = handler.execute { service.updateCart(cartId, quantity) }
 
-    fun deleteCart(
-        cartId: Long,
-        callback: (Result<Unit>) -> Unit,
-    ) = handler.enqueueWithResult(service.deleteCart(cartId), callback)
+    suspend fun deleteCart(cartId: Long): NetworkResult<Unit> = handler.execute { service.deleteCart(cartId) }
 }

@@ -16,8 +16,8 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
     private val viewModel: CartViewModel by activityViewModels {
         val container = (requireActivity().application as App).container
         CartViewModelFactory(
-            container.cartRepository,
-            container.productRepository,
+            container.repositoryModule.defaultCartRepository,
+            container.repositoryModule.defaultProductRepository,
         )
     }
 

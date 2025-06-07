@@ -9,8 +9,8 @@ import woowacourse.shopping.data.db.entity.HistoryEntity
 @Dao
 interface HistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(history: HistoryEntity)
+    suspend fun insert(history: HistoryEntity)
 
     @Query("SELECT * FROM history_table ORDER BY createdAt DESC LIMIT 10")
-    fun getLatestHistories(): List<HistoryEntity>
+    suspend fun getLatestHistories(): List<HistoryEntity>
 }
