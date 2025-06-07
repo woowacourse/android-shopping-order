@@ -14,6 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Shopping">
         <activity
+            android:name=".view.payment.CouponApplyActivity"
+            android:exported="true" />
+        <activity
             android:name=".view.recommend.RecommendActivity"
             android:exported="false" />
         <activity

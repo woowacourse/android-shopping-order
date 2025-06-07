@@ -37,4 +37,10 @@
     <string name="product_quantity_minus">-</string>
     <string name="product_quantity_plus">+</string>
 
+    <!-- 쿠폰 적용 -->
+    <string name="coupon_apply_title">결제하기</string>
+    <string name="coupon_apply_pay">결제하기</string>
+    <string name="coupon_apply_applicable">적용 가능한 쿠폰</string>
+    <string name="coupon_apply_applicable_description">* 쿠폰은 1개만 적용 가능합니다.</string>
+
 </resources>
