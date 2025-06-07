@@ -45,8 +45,8 @@ class PaymentViewModel(
                 val orderedPrice = _orderedCarts.sumOf { it.product.price * it.quantity }
 
                 val newPrice =
-                    _price.value?.copy(orderPrice = orderedPrice, totalPrice = orderedPrice)
-                        ?: Price(orderPrice = orderedPrice, totalPrice = orderedPrice)
+                    _price.value?.copy(orderPrice = orderedPrice, totalPrice = orderedPrice + 3_000)
+                        ?: Price(orderPrice = orderedPrice, totalPrice = orderedPrice + 3_000)
                 _price.postValue(newPrice)
 
                 getAvailableCoupons()
