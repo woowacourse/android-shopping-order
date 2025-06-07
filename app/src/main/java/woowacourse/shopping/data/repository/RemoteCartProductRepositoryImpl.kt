@@ -19,6 +19,7 @@ class RemoteCartProductRepositoryImpl(
 
     override suspend fun deleteCartProduct(cartItemId: Long): Boolean =
         try {
+            cartRemoteDataSource.deleteProduct(cartItemId)
             true
         } catch (e: Exception) {
             false
@@ -44,6 +45,7 @@ class RemoteCartProductRepositoryImpl(
         quantity: Int,
     ): Boolean =
         try {
+            cartRemoteDataSource.updateProduct(cartItemId, quantity)
             true
         } catch (e: Exception) {
             false

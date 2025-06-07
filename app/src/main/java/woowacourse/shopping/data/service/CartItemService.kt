@@ -14,28 +14,28 @@ import woowacourse.shopping.data.dto.cartitem.UpdateCartItemRequest
 
 interface CartItemService {
     @GET("/cart-items")
-    fun requestCartItems(
+    suspend fun requestCartItems(
         @Query("page") page: Int? = 0,
         @Query("size") size: Int? = 1,
         @Query("sort") sort: List<String> = listOf(),
     ): Response<ProductResponse>
 
     @POST("/cart-items")
-    fun postCartItem(
+    suspend fun postCartItem(
         @Body request: UpdateCartItemRequest,
     ): Response<Void>
 
     @DELETE("/cart-items/{id}")
-    fun deleteCartItem(
+    suspend fun deleteCartItem(
         @Path("id") cartItemId: Long,
     ): Response<Void>
 
     @PATCH("/cart-items/{id}")
-    fun patchCartItemQuantity(
+    suspend fun patchCartItemQuantity(
         @Path("id") cartItemId: Long,
         @Body quantity: Quantity,
     ): Response<Void>
 
     @GET("/cart-items/counts")
-    fun getCartItemsCount(): Response<Quantity>
+    suspend fun getCartItemsCount(): Response<Quantity>
 }
