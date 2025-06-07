@@ -23,7 +23,7 @@ class DefaultCouponRepositoryTest {
     }
 
     @Test
-    fun `getCoupons returns success result`() =
+    fun `쿠폰 목록을 가져온다`() =
         runTest {
             // given
             val expectedCoupons =
