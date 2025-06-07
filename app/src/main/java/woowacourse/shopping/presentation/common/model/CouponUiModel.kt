@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.common.model
 
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.FixedDiscountCoupon
+import woowacourse.shopping.domain.model.coupon.FreeShippingCoupon
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -28,4 +29,9 @@ fun Coupon.toUiModel(): CouponUiModel =
         minimumAmount = minimumAmountIfExists(),
     )
 
-private fun Coupon.minimumAmountIfExists(): Int? = if (this is FixedDiscountCoupon) minimumAmount else null
+private fun Coupon.minimumAmountIfExists(): Int? =
+    when (this) {
+        is FixedDiscountCoupon -> minimumAmount
+        is FreeShippingCoupon -> minimumAmount
+        else -> null
+    }
