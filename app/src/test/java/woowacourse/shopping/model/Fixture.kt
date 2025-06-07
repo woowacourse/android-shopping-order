@@ -60,6 +60,7 @@ val DUMMY_PRODUCT_1 = Product(DUMMY_PRODUCT_DETAIL_1, 1, 5)
 val DUMMY_PRODUCT_2 = Product(DUMMY_PRODUCT_DETAIL_2, 2, 6)
 val DUMMY_PRODUCT_3 = Product(DUMMY_PRODUCT_DETAIL_3, 3, 7)
 val DUMMY_PRODUCT_4 = Product(DUMMY_PRODUCT_DETAIL_4, 4, 8, true)
+val DUMMY_PRODUCT_5 = Product(DUMMY_PRODUCT_DETAIL_1, 1, 1, true)
 
 val DUMMY_HISTORY_PRODUCT_1 =
     HistoryProduct(
@@ -88,6 +89,11 @@ val DUMMY_PRODUCTS_2 =
 val DUMMY_PRODUCTS_3 =
     Products(
         products = listOf(DUMMY_PRODUCT_4),
+    )
+
+val DUMMY_PRODUCTS_4 =
+    Products(
+        products = listOf(DUMMY_PRODUCT_5),
     )
 
 val DUMMY_COUPON_1: Coupon =
@@ -169,3 +175,5 @@ val DUMMY_COUPON_4: Coupon =
 val DUMMY_COUPONS_1: Coupons = Coupons(listOf(DUMMY_COUPON_1, DUMMY_COUPON_2, DUMMY_COUPON_3, DUMMY_COUPON_4))
 
 val DUMMY_LOCAL_DATE_TIME_1: LocalDateTime = LocalDateTime.of(2025, 6, 15, 6, 30)
+
+val DUMMY_LOCAL_DATE_TIME_2: LocalDateTime = LocalDateTime.of(2025, 6, 15, 18, 30)
