@@ -109,12 +109,12 @@ class OrderViewModel(
         setSelectedCurrentCartProducts(!isCheckedAll)
 
         if (isCheckedAll) {
-            _orderProducts.postValue(emptyList())
+            _orderProducts.value = emptyList()
             return
         }
 
         val cartProducts = getAllCartProducts().map { it.toCartItemUiModel() }
-        _orderProducts.postValue(cartProducts)
+        _orderProducts.value = cartProducts
     }
 
     private fun addOrderProductFromSuggestion(productId: Long) {
@@ -210,23 +210,23 @@ class OrderViewModel(
         if (deletedProductIds.isEmpty()) return
         val filteredProducts =
             getCurrentOrderProducts().filter { it.productId !in deletedProductIds }
-        _orderProducts.postValue(filteredProducts)
+        _orderProducts.value = filteredProducts
     }
 
     private fun removeProductFromOrderList(cartId: Long) {
         val updatedProducts = getCurrentOrderProducts().toMutableList()
         updatedProducts.removeIf { it.cartId == cartId }
-        _orderProducts.postValue(updatedProducts)
+        _orderProducts.value = updatedProducts
     }
 
     private fun setSelectedCurrentCartProducts(isSelected: Boolean) {
         val updatedCartProducts = getCurrentCartItems().map { it.copy(isSelected = isSelected) }
-        _cartProducts.postValue(updatedCartProducts)
+        _cartProducts.value = updatedCartProducts
     }
 
     private fun toggleOrderProductSelection(productId: Long) {
         val updatedProducts = toggleProductInOrderList(getCurrentOrderProducts(), productId)
-        _orderProducts.postValue(updatedProducts)
+        _orderProducts.value = (updatedProducts)
     }
 
     private fun toggleProductInOrderList(
@@ -254,8 +254,8 @@ class OrderViewModel(
             return
         }
 
-        _cartProducts.postValue(items)
-        _hasMore.postValue(hasMore)
+        _cartProducts.value = items
+        _hasMore.value = hasMore
     }
 
     private fun updateCartItemsState(
@@ -263,9 +263,9 @@ class OrderViewModel(
         hasMore: Boolean,
         page: Int,
     ) {
-        _cartProducts.postValue(items)
-        _hasMore.postValue(hasMore)
-        _page.postValue(page)
+        _cartProducts.value = items
+        _hasMore.value = hasMore
+        _page.value = page
     }
 
     private fun updateOrderProductsWithLatestData(targetProductId: Long) {
@@ -286,7 +286,7 @@ class OrderViewModel(
         targetProductId: Long,
     ) {
         currentOrderProducts.removeIf { it.productId == targetProductId }
-        _orderProducts.postValue(currentOrderProducts)
+        _orderProducts.value = (currentOrderProducts)
     }
 
     private fun replaceOrderProductWithLatest(
@@ -298,7 +298,7 @@ class OrderViewModel(
                 if (it.productId != updatedOrderProduct.product.id) return@map it
                 updatedOrderProduct.toCartItemUiModel()
             }
-        _orderProducts.postValue(updatedProducts)
+        _orderProducts.value = updatedProducts
     }
 
     private fun determineFetchDirectionAfterDeletion(deletedCartId: Long): FetchPageDirection {
@@ -317,15 +317,15 @@ class OrderViewModel(
     private fun getCurrentPage(): Int = _page.value ?: DEFAULT_PAGE
 
     private fun startLoading() {
-        _isLoading.postValue(true)
+        _isLoading.value = true
     }
 
     private fun stopLoading() {
-        _isLoading.postValue(false)
+        _isLoading.value = false
     }
 
     private fun postToastEvent(event: CartMessageEvent) {
-        _toastEvent.postValue(event)
+        _toastEvent.setValue(event)
     }
 
     companion object {

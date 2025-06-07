@@ -128,11 +128,11 @@ class CatalogViewModel(
             .onSuccess {
                 val updatedItems = applyCartQuantities(it, currentItems)
                 val finalCatalog = prependRecentProducts(recentProductsItem, updatedItems)
-                _products.postValue(finalCatalog)
+                _products.value = finalCatalog
                 updateCartItemCount()
             }
 
-        _isLoading.postValue(false)
+        _isLoading.value = false
     }
 
     private fun updateProductQuantityInList(productId: Long) {
@@ -155,7 +155,7 @@ class CatalogViewModel(
                 if (item.productId != productId) return@map item
                 item.copy(quantity = quantity)
             }
-        _products.postValue(updatedProducts)
+        _products.value = updatedProducts
         updateCartItemCount()
     }
 
@@ -163,7 +163,7 @@ class CatalogViewModel(
         viewModelScope.launch {
             cartRepository
                 .fetchCartProductCount()
-                .onSuccess { _cartItemCount.postValue(it) }
+                .onSuccess { _cartItemCount.value = it }
                 .onFailure { emitToastMessage(CatalogMessageEvent.FETCH_CART_ITEM_COUNT_FAILURE) }
         }
     }
@@ -205,7 +205,7 @@ class CatalogViewModel(
     }
 
     private fun emitToastMessage(event: CatalogMessageEvent) {
-        _toastEvent.postValue(event)
+        _toastEvent.setValue(event)
     }
 
     companion object {

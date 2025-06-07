@@ -40,7 +40,7 @@ class SuggestionViewModel(
             productRepository
                 .fetchSuggestionProducts(SUGGESTION_LIMIT, excludeCartProductIds)
                 .onSuccess { fetchSuggestionProductsSuccessHandle(it) }
-                .onFailure { _toastEvent.postValue(SuggestionMessageEvent.FETCH_SUGGESTION_PRODUCT_FAILURE) }
+                .onFailure { _toastEvent.setValue(SuggestionMessageEvent.FETCH_SUGGESTION_PRODUCT_FAILURE) }
         }
     }
 
@@ -60,10 +60,10 @@ class SuggestionViewModel(
         viewModelScope.launch {
             cartRepository
                 .findCartProductsByProductIds(ids)
-                .onFailure { _toastEvent.postValue(SuggestionMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
+                .onFailure { _toastEvent.setValue(SuggestionMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
                 .onSuccess {
                     val updatedItems = applyCartQuantities(it, suggestionProducts)
-                    _suggestionProducts.postValue(updatedItems)
+                    _suggestionProducts.value = updatedItems
                 }
         }
     }

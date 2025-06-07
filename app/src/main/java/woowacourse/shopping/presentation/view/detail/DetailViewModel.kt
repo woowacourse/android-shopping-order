@@ -55,9 +55,9 @@ class DetailViewModel(
             productRepository
                 .fetchProduct(productId)
                 .onSuccess {
-                    _product.postValue(it.toUiModel())
+                    _product.value = it.toUiModel()
                     updateRecentProduct(productId, it.category)
-                }.onFailure { _toastEvent.postValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
+                }.onFailure { _toastEvent.setValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
         }
     }
 
@@ -78,8 +78,8 @@ class DetailViewModel(
         viewModelScope.launch {
             cartRepository
                 .increaseQuantity(product.id, quantity)
-                .onSuccess { _addToCartSuccessEvent.postValue(Unit) }
-                .onFailure { _toastEvent.postValue(DetailMessageEvent.ADD_PRODUCT_FAILURE) }
+                .onSuccess { _addToCartSuccessEvent.setValue(Unit) }
+                .onFailure { _toastEvent.setValue(DetailMessageEvent.ADD_PRODUCT_FAILURE) }
         }
     }
 
@@ -87,8 +87,8 @@ class DetailViewModel(
         viewModelScope.launch {
             recentProductRepository
                 .getRecentProducts(1)
-                .onSuccess { _recentProduct.postValue(it.firstOrNull()?.toUiModel()) }
-                .onFailure { _toastEvent.postValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
+                .onSuccess { _recentProduct.value = it.firstOrNull()?.toUiModel() }
+                .onFailure { _toastEvent.setValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
         }
     }
 
@@ -99,7 +99,7 @@ class DetailViewModel(
         viewModelScope.launch {
             recentProductRepository
                 .insertAndTrimToLimit(productId, category, RECENT_PRODUCT_LIMIT)
-                .onFailure { _toastEvent.postValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
+                .onFailure { _toastEvent.setValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
         }
     }
 
