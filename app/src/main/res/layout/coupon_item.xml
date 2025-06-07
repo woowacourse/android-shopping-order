@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="8dp"
+    android:background="@drawable/cart_item_background">
+
+    <CheckBox
+        android:id="@+id/checkbox_coupon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:buttonTint="@color/mint_blue"
+        android:checked="@{vm.isAllSelected}"
+        android:foregroundTint="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/gray_5"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/checkbox_coupon"
+        app:layout_constraintStart_toEndOf="@id/checkbox_coupon"
+        app:layout_constraintTop_toTopOf="@id/checkbox_coupon"
+        tools:text="5,000원 할인 쿠폰" />
+
+    <TextView
+        android:id="@+id/textView_expired_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="만료일 :"
+        android:textColor="@color/gray_5"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@id/checkbox_coupon"
+        app:layout_constraintTop_toBottomOf="@+id/checkbox_coupon" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:paddingBottom="18dp"
+        android:text="최소 주문 금액 :"
+        android:textColor="@color/gray_5"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@id/checkbox_coupon"
+        app:layout_constraintTop_toBottomOf="@id/textView_expired_date" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
