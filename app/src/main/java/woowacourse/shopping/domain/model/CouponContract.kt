@@ -1,41 +1,25 @@
 package woowacourse.shopping.domain.model
 
-import java.time.LocalTime
-
 sealed class CouponContract {
     abstract fun isAvailable(
         orderedPrice: Int,
         orderedCarts: List<CartProduct>,
     ): Boolean
 
-    data object FixedCoupon : CouponContract() {
-        override fun isAvailable(
-            orderedPrice: Int,
-            orderedCarts: List<CartProduct>,
-        ): Boolean = orderedPrice >= 100_000
-    }
+    abstract fun apply(
+        currentPrice: Price,
+        selectedCoupon: Coupon,
+        orderedCarts: List<CartProduct>,
+    ): Price
 
-    data object BuyTwoGetOneCoupon : CouponContract() {
-        override fun isAvailable(
-            orderedPrice: Int,
-            orderedCarts: List<CartProduct>,
-        ): Boolean = orderedCarts.any { it.quantity >= 3 }
-    }
-
-    data object FreeShippingCoupon : CouponContract() {
-        override fun isAvailable(
-            orderedPrice: Int,
-            orderedCarts: List<CartProduct>,
-        ): Boolean = orderedPrice >= 50_000
-    }
-
-    data object MiracleSaleCoupon : CouponContract() {
-        override fun isAvailable(
-            orderedPrice: Int,
-            orderedCarts: List<CartProduct>,
-        ): Boolean {
-            val currentTime = LocalTime.now()
-            return currentTime.isAfter(LocalTime.of(4, 0)) && currentTime.isBefore(LocalTime.of(7, 0))
-        }
+    companion object {
+        fun getContract(discountType: String): CouponContract =
+            when (discountType) {
+                DiscountType.FIXED.code -> FixedCoupon
+                DiscountType.BUY_X_GET_Y.code -> BuyTwoGetOneCoupon
+                DiscountType.FREE_SHIPPING.code -> FreeShippingCoupon
+                DiscountType.PERCENTAGE.code -> MiracleSaleCoupon
+                else -> throw IllegalArgumentException("알 수 없는 할인 타입입니다: $discountType")
+            }
     }
 }

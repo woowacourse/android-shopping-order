@@ -10,7 +10,6 @@ import woowacourse.shopping.data.remote.coupon.CouponRepository
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.CouponContract
-import woowacourse.shopping.domain.model.DiscountType
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.util.toDomain
 
@@ -25,6 +24,7 @@ class PaymentViewModel(
     val price: LiveData<Price> = _price
 
     private var orderedCarts: List<CartProduct> = emptyList()
+    private var currentCoupon: Coupon? = null
 
     fun setOrderDetails(orderIds: LongArray) {
         viewModelScope
@@ -53,17 +53,28 @@ class PaymentViewModel(
             }
         _coupons.value = updated ?: emptyList()
 
-        applyCoupon()
+        applyCoupon(selectedCoupon)
     }
 
-    fun applyCoupon() {
-        val checkedCoupon = _coupons.value?.find { it.isChecked }
-        val discountPrice = checkedCoupon?.couponDetail?.discount ?: 0
-        val newDiscountedPrice = _price.value?.orderPrice?.minus(discountPrice) ?: 0
-        val newPrice =
-            _price.value?.copy(discountPrice = discountPrice, totalPrice = newDiscountedPrice)
-                ?: Price(discountPrice = discountPrice, totalPrice = newDiscountedPrice)
+    fun applyCoupon(selectedCoupon: Coupon) {
+        val currentPrice = _price.value ?: Price()
+
+        if (currentCoupon?.couponDetail?.code == selectedCoupon.couponDetail.code) {
+            _price.value =
+                currentPrice.copy(
+                    discountPrice = 0,
+                    shippingFee = 3000,
+                    totalPrice = currentPrice.orderPrice + 3000,
+                )
+            currentCoupon = null
+            return
+        }
+
+        val contract = CouponContract.getContract(selectedCoupon.couponDetail.discountType)
+        val newPrice = contract.apply(currentPrice, selectedCoupon, orderedCarts)
+
         _price.value = newPrice
+        currentCoupon = selectedCoupon
     }
 
     private fun getAvailableCoupons() {
@@ -73,14 +84,9 @@ class PaymentViewModel(
 
             val availableCoupons =
                 allCoupons
-                    .filter { coupon ->
-                        when (coupon.discountType) {
-                            DiscountType.FREE_SHIPPING.code -> CouponContract.FreeShippingCoupon.isAvailable(orderedPrice, orderedCarts)
-                            DiscountType.FIXED.code -> CouponContract.FixedCoupon.isAvailable(orderedPrice, orderedCarts)
-                            DiscountType.BUY_X_GET_Y.code -> CouponContract.BuyTwoGetOneCoupon.isAvailable(orderedPrice, orderedCarts)
-                            DiscountType.PERCENTAGE.code -> CouponContract.MiracleSaleCoupon.isAvailable(orderedPrice, orderedCarts)
-                            else -> false
-                        }
+                    .filter { couponDetail ->
+                        val contract = CouponContract.getContract(couponDetail.discountType)
+                        contract.isAvailable(orderedPrice, orderedCarts) == true
                     }.map { Coupon(couponDetail = it) }
 
             _coupons.postValue(availableCoupons)
