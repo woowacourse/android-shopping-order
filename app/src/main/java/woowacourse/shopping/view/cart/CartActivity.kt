@@ -28,8 +28,8 @@ class CartActivity : AppCompatActivity() {
     private val viewModel: CartViewModel by viewModels {
         val container = (application as App).container
         CartViewModelFactory(
-            container.cartRepository,
-            container.productRepository,
+            container.repositoryModule.defaultCartRepository,
+            container.repositoryModule.defaultProductRepository,
         )
     }
 

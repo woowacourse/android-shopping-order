@@ -39,9 +39,9 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels {
         val container = (application as App).container
         MainViewModelFactory(
-            container.historyRepository,
-            container.cartRepository,
-            container.productRepository,
+            container.repositoryModule.defaultHistoryRepository,
+            container.repositoryModule.defaultCartRepository,
+            container.repositoryModule.defaultProductRepository,
         )
     }
 

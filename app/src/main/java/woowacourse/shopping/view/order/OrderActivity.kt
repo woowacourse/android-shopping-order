@@ -28,8 +28,8 @@ class OrderActivity : AppCompatActivity() {
     private val viewModel: OrderViewModel by viewModels {
         val container = (application as App).container
         OrderViewModelFactory(
-            couponRepository = container.couponRepository,
-            orderRepository = container.orderRepository,
+            couponRepository = container.repositoryModule.defaultCouponRepository,
+            orderRepository = container.repositoryModule.defaultOrderRepository,
             couponValidator = container.couponValidator,
             couponApplierFactory = container.couponApplierFactory,
         )
