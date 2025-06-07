@@ -15,6 +15,7 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.order.OrderActivity
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
@@ -92,6 +93,8 @@ class CartActivity : AppCompatActivity() {
     private fun processOrderClick() {
         if (fragmentState == FRAGMENT_SELECTION) {
             replaceCartRecommendationFragment()
+        } else if (fragmentState == FRAGMENT_RECOMMENDATION) {
+            startActivity(OrderActivity.newIntent(this))
         }
     }
 

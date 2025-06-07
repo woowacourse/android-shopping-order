@@ -3,16 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/textView_available_coupons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingStart="18dp"
@@ -20,37 +26,54 @@
                 android:text="적용 가능한 쿠폰"
                 android:textColor="@color/black"
                 android:textSize="24sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
+                android:id="@+id/textView_coupon_explanation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingStart="18dp"
                 android:paddingTop="4dp"
                 android:paddingBottom="12dp"
                 android:text="* 쿠폰은 1개만 적용 가능합니다."
-                android:textColor="@color/gray_5" />
+                android:textColor="@color/gray_5"
+                app:layout_constraintStart_toStartOf="@id/textView_available_coupons"
+                app:layout_constraintTop_toBottomOf="@id/textView_available_coupons" />
 
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView_order"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:paddingHorizontal="10dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textView_coupon_explanation"
                 tools:itemCount="3"
-                tools:listitem="@layout/coupon_item">
-
-            </androidx.recyclerview.widget.RecyclerView>
+                tools:listitem="@layout/coupon_item" />
 
             <View
+                android:id="@+id/view_divider_first"
                 android:layout_width="match_parent"
                 android:layout_height="12dp"
-                android:background="@color/gray" />
+
+                android:background="#EBEBEB"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/recyclerView_order" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_amount_sum"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="18dp">
+                android:padding="18dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_divider_first">
 
                 <TextView
                     android:id="@+id/textView_order_price_amount"
@@ -131,13 +154,19 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <View
+                android:id="@+id/view_divider_second"
                 android:layout_width="match_parent"
                 android:layout_height="12dp"
-                android:background="@color/gray" />
+                android:background="#EBEBEB"
+                app:layout_constraintTop_toBottomOf="@id/layout_amount_sum" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_divider_second">
 
                 <TextView
                     android:id="@+id/textView_total_paying_amount"
@@ -179,6 +208,6 @@
                     app:layout_constraintTop_toBottomOf="@id/textView_total_paying_amount" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 </layout>

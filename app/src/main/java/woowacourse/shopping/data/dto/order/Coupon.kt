@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class Coupon(
     @SerializedName("availableTime")
-    val availableTime: AvailableTime,
+    val availableTime: AvailableTime?,
     @SerializedName("buyQuantity")
     val buyQuantity: Int,
     @SerializedName("code")
@@ -27,7 +27,7 @@ data class Coupon(
 
 fun Coupon.toDomain(): woowacourse.shopping.order.Coupon =
     woowacourse.shopping.order.Coupon(
-        availableTime = availableTime.toDomain(),
+        availableTime = availableTime?.toDomain(),
         buyQuantity = buyQuantity,
         code = code,
         description = description,

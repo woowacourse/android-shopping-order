@@ -9,8 +9,10 @@ data class AvailableTime(
     val start: String,
 )
 
-fun AvailableTime.toDomain(): woowacourse.shopping.order.AvailableTime =
-    woowacourse.shopping.order.AvailableTime(
+fun AvailableTime?.toDomain(): woowacourse.shopping.order.AvailableTime? {
+    if (this == null) return null
+    return woowacourse.shopping.order.AvailableTime(
         start = start,
         end = end,
     )
+}

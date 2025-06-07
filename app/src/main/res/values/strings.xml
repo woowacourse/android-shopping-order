@@ -16,4 +16,6 @@
     <string name="text_order">주문하기(%d)</string>
     <string name="text_no_product_error">상품 정보가 없습니다.</string>
     <string name="text_order_action_bar">결제하기</string>
+    <string name="text_coupon_expired_date">만료일 : %s</string>
+    <string name="text_coupon_minimum_amount">최소 주문 금액 : %,d원</string>
 </resources>

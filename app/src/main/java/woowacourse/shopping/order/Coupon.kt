@@ -1,7 +1,7 @@
 package woowacourse.shopping.order
 
 data class Coupon(
-    val availableTime: AvailableTime,
+    val availableTime: AvailableTime?,
     val buyQuantity: Int,
     val code: String,
     val description: String,
