@@ -34,16 +34,35 @@ class OrderViewModel(
         _orderSummary.value =
             OrderPriceSummary(
                 productTotalPrice = initialItems.sumOf { it.totalPrice },
-                cartItems = initialItems,
+                cartItems = initialItems.map { it.toDomain() },
             )
         fetchData()
+    }
+
+    fun selectCoupon(selectedCoupon: CouponUiModel) {
+        val currentCoupons = _coupons.value.orEmpty()
+        val isCurrentlySelected =
+            currentCoupons.any { it.code == selectedCoupon.code && it.isSelected }
+
+        val updatedCoupons =
+            currentCoupons.map { coupon ->
+                coupon.copy(isSelected = if (isCurrentlySelected) false else coupon.code == selectedCoupon.code)
+            }
+        _coupons.value = updatedCoupons
+
+        val order = orderSummary.value ?: return
+        val removedCouponOrder = order.removeCoupon()
+        val selected = updatedCoupons.find { it.isSelected }
+        _orderSummary.value = selected
+            ?.let { removedCouponOrder.applyCoupon(it.toDomain()) }
+            ?: removedCouponOrder
     }
 
     private fun fetchData() {
         val orderPrice = orderSummary.value?.productTotalPrice ?: return
         val selectedItems = orderSummary.value?.cartItems ?: return
         viewModelScope.launch {
-            getAvailableCouponUseCase(orderPrice, selectedItems.map { it.toDomain() })
+            getAvailableCouponUseCase(orderPrice, selectedItems)
                 .onSuccess { coupons ->
                     _coupons.value = coupons.map { it.toPresentation() }
                 }.onFailure {

@@ -1,12 +1,10 @@
 package woowacourse.shopping.domain.model
 
-import woowacourse.shopping.presentation.model.CartItemUiModel
-
 data class OrderPriceSummary(
     val productTotalPrice: Int,
     val discountAmount: Int = 0,
     val deliveryFee: Int = 3_000,
-    val cartItems: List<CartItemUiModel>,
+    val cartItems: List<CartItem>,
 ) {
     val finalPrice: Int
         get() = productTotalPrice - discountAmount + deliveryFee
@@ -31,6 +29,12 @@ data class OrderPriceSummary(
                 this.copy(discountAmount = bogoDiscount)
             }
         }
+
+    fun removeCoupon(): OrderPriceSummary =
+        this.copy(
+            discountAmount = 0,
+            deliveryFee = 3_000,
+        )
 
     private fun calculateBogoDiscount(
         buyQuantity: Int,
