@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
 import woowacourse.shopping.data.ShoppingDatabase
 import woowacourse.shopping.data.account.AccountLocalDataSourceImpl
@@ -15,6 +16,7 @@ import woowacourse.shopping.data.goods.repository.GoodsRemoteDataSourceImpl
 import woowacourse.shopping.data.goods.repository.GoodsRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.feature.cart.recommend.RecommendFragment
+import kotlin.getValue
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
@@ -43,6 +45,12 @@ class CartActivity : AppCompatActivity() {
                 .replace(R.id.fragment_container, CartFragment())
                 .commit()
         }
+
+        val viewModel = ViewModelProvider(this, sharedViewModelFactory)[CartViewModel::class.java]
+
+        viewModel.appBarTitle.observe(this) { title ->
+            supportActionBar?.title = title
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -57,6 +65,14 @@ class CartActivity : AppCompatActivity() {
             .beginTransaction()
             .replace(R.id.fragment_container, RecommendFragment())
             .addToBackStack("CartFragment")
+            .commit()
+    }
+
+    fun navigateToOrder() {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_container, OrderFragment())
+            .addToBackStack("OrderFragment")
             .commit()
     }
 

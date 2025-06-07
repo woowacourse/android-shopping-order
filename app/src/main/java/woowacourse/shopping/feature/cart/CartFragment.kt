@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import woowacourse.shopping.R
 import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.domain.model.CartItem
@@ -55,6 +56,7 @@ class CartFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.updateAppBarTitle(getString(R.string.cart_action_bar_name))
         setupBinding()
         setupRecyclerView()
         observeViewModel()

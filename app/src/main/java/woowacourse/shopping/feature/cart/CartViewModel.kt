@@ -111,6 +111,13 @@ class CartViewModel(
     private val _loginErrorEvent = MutableSingleLiveData<CartFetchError>()
     val loginErrorEvent: SingleLiveData<CartFetchError> get() = _loginErrorEvent
 
+    private val _appBarTitle = MutableLiveData<String>()
+    val appBarTitle: LiveData<String> = _appBarTitle
+
+    fun updateAppBarTitle(newTitle: String) {
+        _appBarTitle.value = newTitle
+    }
+
     init {
         updateWholeCarts()
     }
