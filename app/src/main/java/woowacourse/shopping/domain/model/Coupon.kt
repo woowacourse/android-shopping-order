@@ -7,7 +7,10 @@ sealed interface Coupon {
 
     val isSelected: Boolean
 
-    fun apply(products: Products): Price
+    fun apply(
+        products: Products,
+        nowDateTime: LocalDateTime = LocalDateTime.now(),
+    ): Price
 
     fun getIsAvailable(
         products: Products,
