@@ -1,7 +1,6 @@
 package woowacourse.shopping.domain.coupon
 
 import woowacourse.shopping.domain.cart.ShoppingCart
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 class CouponValidator : CouponValidate {
