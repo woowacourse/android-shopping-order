@@ -40,11 +40,11 @@ data class OrderPriceSummary(
         buyQuantity: Int,
         getQuantity: Int,
     ): Int {
-        val eligibleItems = cartItems.filter { it.quantity >= buyQuantity + getQuantity }
-        if (eligibleItems.isEmpty()) return 0
+        val discountItem =
+            cartItems
+                .filter { it.quantity >= buyQuantity + getQuantity }
+                .maxByOrNull { it.product.price } ?: return 0
 
-        val maxPricedItem = eligibleItems.maxByOrNull { it.product.price } ?: return 0
-
-        return maxPricedItem.product.price * getQuantity
+        return discountItem.product.price * getQuantity
     }
 }
