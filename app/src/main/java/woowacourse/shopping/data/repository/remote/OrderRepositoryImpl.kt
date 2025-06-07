@@ -6,13 +6,5 @@ import woowacourse.shopping.domain.repository.OrderRepository
 class OrderRepositoryImpl(
     private val orderRemoteDataSource: OrderRemoteDataSource,
 ) : OrderRepository {
-    override suspend fun order(cartIds: List<Long>): Result<Unit> =
-        orderRemoteDataSource.order(cartIds).fold(
-            onSuccess = {
-                Result.success(Unit)
-            },
-            onFailure = { throwable ->
-                Result.failure(throwable)
-            },
-        )
+    override suspend fun order(cartIds: List<Long>): Result<Unit> = orderRemoteDataSource.order(cartIds)
 }
