@@ -14,7 +14,7 @@ class CouponServiceImpl : CouponService {
 
             is Coupon.BonusGoods ->
                 isValidPeriod(coupon) &&
-                    cartItems.any { it.quantity >= coupon.calculateBonusGoods.buyQuantity }
+                    cartItems.any { it.quantity >= coupon.calculateBonusGoods.buyQuantity + coupon.calculateBonusGoods.getQuantity }
 
             is Coupon.FreeShipping ->
                 isValidPeriod(coupon) && isOverMinimumAmount(cartItems, coupon)

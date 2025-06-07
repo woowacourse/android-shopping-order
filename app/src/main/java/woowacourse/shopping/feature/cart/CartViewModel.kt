@@ -55,16 +55,6 @@ class CartViewModel(
     private val _recommendedGoods = MutableLiveData<List<CartItem>>()
     val recommendedGoods: LiveData<List<CartItem>> = _recommendedGoods
 
-    private val _coupons = MutableLiveData<List<Coupon>>()
-    val coupons: LiveData<List<Coupon>> = _coupons
-
-    val validCoupons: LiveData<List<Coupon>> =
-        _coupons.map { coupons ->
-            coupons.filter { coupon ->
-                couponService.isValid(coupon, selectedCartsList.value ?: emptyList())
-            }
-        }
-
     val cartsList: LiveData<List<CartItem>> =
         _carts.map { map ->
             map.values.toList()
@@ -139,6 +129,23 @@ class CartViewModel(
 
     private val _appBarTitle = MutableLiveData<String>()
     val appBarTitle: LiveData<String> = _appBarTitle
+
+    private val _coupons = MutableLiveData<List<Coupon>>()
+
+    val validCoupons: LiveData<List<Coupon>> =
+        MediatorLiveData<List<Coupon>>().apply {
+            fun update() {
+                val coupons = _coupons.value ?: emptyList()
+                val selectedCarts = selectedCartsList.value ?: emptyList()
+                value =
+                    coupons.filter { coupon ->
+                        couponService.isValid(coupon, selectedCarts)
+                    }
+            }
+
+            addSource(_coupons) { update() }
+            addSource(selectedCartsList) { update() }
+        }
 
     init {
         updateWholeCarts()

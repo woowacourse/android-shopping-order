@@ -35,12 +35,16 @@
     <string name="order_fragment_appbar_name">결제하기</string>
     <string name="order_coupon_selection_title">적용 가능한 쿠폰</string>
     <string name="order_coupon_section_description">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="order_coupon_item_expire_date">만료일: %d년 %d월 %d일</string>
+    <string name="order_coupon_item_minimum_price">최소 주문 금액: %,d원</string>
     <string name="order_price">%,d원</string>
     <string name="order_price_title">주문 금액</string>
     <string name="order_coupon_discount_price_title">쿠폰 할인 금액</string>
     <string name="order_shipping_fee_title">배송비</string>
     <string name="order_total_price_title">총 결제 금액</string>
     <string name="order_payment_submit_button">결제하기</string>
+
+
 
     <!--    LoginActivity-->
     <string name="login_form_head">환영합니다</string>

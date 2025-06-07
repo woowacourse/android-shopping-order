@@ -2,6 +2,8 @@ package woowacourse.shopping.domain.model.coupon
 
 sealed class Coupon : BaseCoupon {
     var isSelected: Boolean = false
+    val hasMinimumAmount: Boolean
+        get() = minimumAmount.amount > 0
 
     data class Fixed(
         override val id: Int,

@@ -3,6 +3,7 @@ package woowacourse.shopping.feature
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ConcatAdapter
@@ -10,7 +11,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.feature.cart.adapter.CartAdapter
+import woowacourse.shopping.feature.cart.adapter.CouponAdapter
 import woowacourse.shopping.feature.goods.adapter.vertical.GoodsAdapter
 import woowacourse.shopping.feature.goods.adapter.vertical.MoreButtonAdapter
 
@@ -53,6 +56,48 @@ fun RecyclerView.bindCartItems(cartItems: List<CartItem>?) {
                 }
             }
         }
+    }
+}
+
+@BindingAdapter("couponItems")
+fun RecyclerView.bindCouponItems(coupons: List<Coupon>?) {
+    when (val adapter = this.adapter) {
+        is CouponAdapter -> {
+            if (coupons != null) adapter.setCouponItem(coupons)
+        }
+    }
+}
+
+@BindingAdapter("couponExpireDateText")
+fun bindCouponExpireDate(
+    textView: TextView,
+    coupon: Coupon?,
+) {
+    coupon?.let {
+        val date = it.expirationPeriod.endDate
+        textView.text =
+            textView.context.getString(
+                R.string.order_coupon_item_expire_date,
+                date.year,
+                date.monthValue,
+                date.dayOfMonth,
+            )
+    }
+}
+
+@BindingAdapter("couponMinimumAmountText")
+fun bindCouponMinimumPrice(
+    textView: TextView,
+    coupon: Coupon?,
+) {
+    coupon?.let {
+        val minimumAmount = it.minimumAmount.amount
+        textView.text =
+            textView.context.getString(
+                R.string.order_coupon_item_minimum_price,
+                minimumAmount,
+            )
+        textView.visibility = if (it.hasMinimumAmount) View.VISIBLE else View.GONE
     }
 }
 

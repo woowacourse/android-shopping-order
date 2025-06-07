@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentOrderBinding
+import woowacourse.shopping.feature.cart.adapter.CouponAdapter
 import kotlin.getValue
 
 class OrderFragment : Fragment() {
@@ -17,6 +18,12 @@ class OrderFragment : Fragment() {
 
     private val viewModel: CartViewModel by activityViewModels {
         (requireActivity() as CartActivity).sharedViewModelFactory
+    }
+
+    private val couponAdapter: CouponAdapter by lazy {
+        CouponAdapter().apply {
+            showSkeleton()
+        }
     }
 
     override fun onCreateView(
@@ -37,10 +44,15 @@ class OrderFragment : Fragment() {
         viewModel.updateAppBarTitle(getString(R.string.order_fragment_appbar_name))
         viewModel.updateWholeCoupons()
         setupBinding()
+        setupRecyclerView()
     }
 
     private fun setupBinding() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
+    }
+
+    private fun setupRecyclerView() {
+        binding.rvCouponItems.adapter = couponAdapter
     }
 }
