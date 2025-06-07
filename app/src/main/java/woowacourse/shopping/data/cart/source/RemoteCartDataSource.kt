@@ -69,7 +69,10 @@ class RemoteCartDataSource(
     ): Long? {
         val response: Response<Unit> = cartService.postCartItem(CartRequest(productId, quantity))
         val cartItemId: Long? =
-            response.headers()["Location"]?.substringAfter("/cart-items/", "")?.toLongOrNull()
+            response
+                .headers()[HEADER_KEY_CART_ITEM_ID]
+                ?.substringAfter(CART_ITEM_ID_PREFIX)
+                ?.toLongOrNull()
         return cartItemId
     }
 
@@ -91,5 +94,10 @@ class RemoteCartDataSource(
     override suspend fun cartItemsSize(): Int {
         val response = cartService.getCartItemQuantity()
         return response.quantity ?: 0
+    }
+
+    companion object {
+        private const val HEADER_KEY_CART_ITEM_ID = "Location"
+        private const val CART_ITEM_ID_PREFIX = "/cart-items/"
     }
 }
