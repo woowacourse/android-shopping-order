@@ -1,6 +1,8 @@
 package woowacourse.shopping.domain.model
 
 data object BuyTwoGetOneCoupon : CouponContract() {
+    private const val DEFAULT_SHIPPING_FEE = 3_000
+
     override fun isAvailable(
         orderedPrice: Int,
         orderedCarts: List<CartProduct>,
@@ -13,6 +15,11 @@ data object BuyTwoGetOneCoupon : CouponContract() {
     ): Price {
         val bulkItems = orderedCarts.filter { it.quantity >= 3 }
         val discountPrice = bulkItems.maxByOrNull { it.product.price }?.product?.price ?: 0
-        return currentPrice.copy(discountPrice = discountPrice, totalPrice = currentPrice.totalPrice - discountPrice)
+        return currentPrice.copy(
+            discountPrice = discountPrice,
+            shippingFee = DEFAULT_SHIPPING_FEE,
+            totalPrice =
+                currentPrice.totalPrice - discountPrice,
+        )
     }
 }
