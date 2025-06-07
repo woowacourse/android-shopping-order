@@ -23,7 +23,6 @@ class PaymentActivity : AppCompatActivity() {
         ViewModelProvider(
             this,
             PaymentViewModelFactory(
-                app.cartProductRepository,
                 app.couponRepository,
                 app.orderRepository,
             ),

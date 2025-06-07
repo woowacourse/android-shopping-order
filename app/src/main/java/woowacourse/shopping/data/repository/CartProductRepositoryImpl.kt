@@ -61,9 +61,4 @@ class CartProductRepositoryImpl(
         withContext(Dispatchers.IO) {
             remoteDataSource.delete(id)
         }
-
-    override suspend fun deleteProductsByIds(ids: Set<Int>): Result<Unit> =
-        withContext(Dispatchers.IO) {
-            remoteDataSource.deleteProductsByIds(ids)
-        }
 }

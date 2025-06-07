@@ -2,12 +2,10 @@ package woowacourse.shopping.view.payment
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 
 class PaymentViewModelFactory(
-    private val cartProductRepository: CartProductRepository,
     private val couponRepository: CouponRepository,
     private val orderRepository: OrderRepository,
 ) : ViewModelProvider.Factory {
@@ -15,7 +13,6 @@ class PaymentViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PaymentViewModel::class.java)) {
             return PaymentViewModel(
-                cartProductRepository,
                 couponRepository,
                 orderRepository,
             ) as T

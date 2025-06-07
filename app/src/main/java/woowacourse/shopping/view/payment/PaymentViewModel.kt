@@ -9,7 +9,6 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PaymentDetail
 import woowacourse.shopping.domain.model.coupon.Coupon
-import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.view.payment.adapter.CouponItem
@@ -17,7 +16,6 @@ import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
 class PaymentViewModel(
-    private val cartProductRepository: CartProductRepository,
     private val couponRepository: CouponRepository,
     private val orderRepository: OrderRepository,
 ) : ViewModel() {

@@ -41,8 +41,8 @@ class CartProductRecommendationViewModel(
     private val _onSelectedProduct = MutableSingleLiveData<Product>()
     val onSelectedProduct: SingleLiveData<Product> get() = _onSelectedProduct
 
-    private val _onFinishOrder = MutableSingleLiveData<List<CartProduct>>()
-    val onFinishOrder: SingleLiveData<List<CartProduct>> get() = _onFinishOrder
+    private val _onStartOrder = MutableSingleLiveData<List<CartProduct>>()
+    val onStartOrder: SingleLiveData<List<CartProduct>> get() = _onStartOrder
 
     init {
         viewModelScope.launch {
@@ -122,7 +122,7 @@ class CartProductRecommendationViewModel(
                 .onSuccess { cartProductId ->
                     cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
                     _selectedProducts.value =
-                        _selectedProducts.value.orEmpty().plus(
+                        selectedProducts.value.orEmpty().plus(
                             CartProduct(
                                 cartProductId,
                                 item,
@@ -151,7 +151,7 @@ class CartProductRecommendationViewModel(
                     cartProducts.remove(cartProduct)
                     cartProducts.add(cartProduct.copy(quantity = newQuantity))
                     _selectedProducts.value =
-                        _selectedProducts.value.orEmpty().minus(cartProduct).plus(
+                        selectedProducts.value.orEmpty().minus(cartProduct).plus(
                             cartProduct.copy(quantity = newQuantity),
                         )
                     updateQuantity(item, newQuantity)
@@ -178,11 +178,11 @@ class CartProductRecommendationViewModel(
                     if (newQuantity > DEFAULT_COUNT) {
                         cartProducts.add(cartProduct.copy(quantity = newQuantity))
                         _selectedProducts.value =
-                            _selectedProducts.value.orEmpty().minus(cartProduct).plus(
+                            selectedProducts.value.orEmpty().minus(cartProduct).plus(
                                 cartProduct.copy(quantity = newQuantity),
                             )
                     } else {
-                        _selectedProducts.value = _selectedProducts.value?.minus(cartProduct)
+                        _selectedProducts.value = selectedProducts.value?.minus(cartProduct)
                     }
                     updateQuantity(item, newQuantity)
                 }
@@ -208,19 +208,8 @@ class CartProductRecommendationViewModel(
         _recommendedProducts.value = updatedList
     }
 
-    fun finishOrder() {
-        _onFinishOrder.setValue(_selectedProducts.value.orEmpty())
-//        viewModelScope.launch {
-//            val result =
-//                cartProductRepository.deleteProductsByIds(
-//                    _selectedProducts.value.orEmpty().map { it.id }
-//                        .toSet(),
-//                )
-//
-//            result.onFailure {
-//                Log.e("error", it.message.toString())
-//            }
-//        }
+    fun startOrder() {
+        _onStartOrder.setValue(selectedProducts.value.orEmpty())
     }
 
     companion object {

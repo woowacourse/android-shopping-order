@@ -69,7 +69,7 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_order"
             android:layout_width="140dp"
-            android:onClick="@{() -> viewmodel.finishOrder()}"
+            android:onClick="@{() -> viewmodel.startOrder()}"
             android:layout_height="78dp"
             android:background="@color/primary_color"
             android:text="@{@string/order(viewmodel.totalCount)}"

@@ -24,6 +24,4 @@ interface CartProductRepository {
     ): Result<Unit>
 
     suspend fun delete(id: Int): Result<Unit>
-
-    suspend fun deleteProductsByIds(ids: Set<Int>): Result<Unit>
 }
