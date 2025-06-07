@@ -7,21 +7,29 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.coupon.CouponRepository
+import woowacourse.shopping.data.remote.order.OrderRepository
+import woowacourse.shopping.data.remote.order.OrderRequest
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.CouponContract
 import woowacourse.shopping.domain.model.Price
+import woowacourse.shopping.util.MutableSingleLiveData
+import woowacourse.shopping.util.SingleLiveData
 import woowacourse.shopping.util.toDomain
 
 class PaymentViewModel(
     private val couponRepository: CouponRepository,
     private val cartRepository: CartRepository,
+    private val orderRepository: OrderRepository,
 ) : ViewModel() {
     private val _coupons = MutableLiveData<List<Coupon>>()
     val coupons: LiveData<List<Coupon>> = _coupons
 
     private val _price = MutableLiveData<Price>(Price())
     val price: LiveData<Price> = _price
+
+    private val _orderCompletedEvent = MutableSingleLiveData<Unit>()
+    val orderCompletedEvent: SingleLiveData<Unit> = _orderCompletedEvent
 
     private var orderedCarts: List<CartProduct> = emptyList()
     private var currentCoupon: Coupon? = null
@@ -75,6 +83,14 @@ class PaymentViewModel(
 
         _price.value = newPrice
         currentCoupon = selectedCoupon
+    }
+
+    fun order() {
+        viewModelScope.launch {
+            orderRepository.order(OrderRequest(orderedCarts.map { it.id })).onSuccess {
+                _orderCompletedEvent.setValue(Unit)
+            }
+        }
     }
 
     private fun getAvailableCoupons() {

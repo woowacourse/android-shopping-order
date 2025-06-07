@@ -3,11 +3,13 @@ package woowacourse.shopping.feature.payment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.application.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityPaymentBinding
 import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.feature.goods.GoodsActivity
 import woowacourse.shopping.feature.payment.adapter.PaymentCouponAdapter
 import woowacourse.shopping.feature.payment.adapter.PaymentCouponViewHolder.CouponClickListener
 
@@ -31,6 +33,11 @@ class PaymentActivity : AppCompatActivity() {
 
         val orderIds = intent.getLongArrayExtra(ORDER_IDS) ?: longArrayOf()
         viewModel.setOrderDetails(orderIds)
+
+        viewModel.orderCompletedEvent.observe(this) {
+            Toast.makeText(this, "주문이 완료되었습니다!", Toast.LENGTH_SHORT).show()
+            navigate()
+        }
     }
 
     private fun setupAdapter() {
@@ -42,6 +49,12 @@ class PaymentActivity : AppCompatActivity() {
                     }
                 },
             )
+    }
+
+    private fun navigate() {
+        val intent = GoodsActivity.newIntent(this)
+        startActivity(intent)
+        finish()
     }
 
     companion object {

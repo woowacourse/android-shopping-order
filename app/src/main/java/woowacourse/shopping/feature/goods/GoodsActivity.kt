@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.goods
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -170,5 +171,10 @@ class GoodsActivity : AppCompatActivity() {
         private const val CART_ID = "CART_ID"
         private const val GOODS_ID = "GOODS_ID"
         private const val GOODS_QUANTITY = "GOODS_QUANTITY"
+
+        fun newIntent(context: Context): Intent =
+            Intent(context, GoodsActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
     }
 }

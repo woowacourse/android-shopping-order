@@ -195,6 +195,7 @@
             android:textStyle="bold"
             android:textColor="@color/white"
             android:textSize="20sp"
+            android:onClick="@{() -> viewModel.order()}"
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

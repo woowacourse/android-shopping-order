@@ -5,6 +5,7 @@ import woowacourse.shopping.data.local.ShoppingDatabase
 import woowacourse.shopping.data.local.history.repository.HistoryRepositoryImpl
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.coupon.CouponRepository
+import woowacourse.shopping.data.remote.order.OrderRepository
 import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.feature.cart.CartViewModel
 import woowacourse.shopping.feature.goods.GoodsViewModel
@@ -50,6 +51,7 @@ class ShoppingApplication : Application() {
             PaymentViewModel(
                 CouponRepository(),
                 CartRepository(),
+                OrderRepository(),
             )
         }
     }
