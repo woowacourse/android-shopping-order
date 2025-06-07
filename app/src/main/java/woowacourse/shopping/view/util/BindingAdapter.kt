@@ -34,3 +34,13 @@ fun TextView.setMinimumAmount(amount: Int?) {
         context.getString(R.string.coupon_minimum_amount, it)
     } ?: ""
 }
+
+@BindingAdapter("deliveryFee")
+fun TextView.setDeliveryFee(fee: Int) {
+    text =
+        if (fee == 0) {
+            context.getString(R.string.free_delivery_fee)
+        } else {
+            context.getString(R.string.product_price, fee)
+        }
+}

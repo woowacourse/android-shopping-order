@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.domain.model.PaymentDetail
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.CouponRepository
@@ -18,7 +19,8 @@ class PaymentViewModel(
 ) : ViewModel() {
     private var selectedProducts: List<CartProduct> = listOf()
 
-    val totalPrice: Int get() = selectedProducts.sumOf { it.totalPrice }
+    private val _paymentDetail = MutableLiveData<PaymentDetail>()
+    val paymentDetail: LiveData<PaymentDetail> get() = _paymentDetail
 
     private val _coupons = MutableLiveData<List<CouponItem>>()
     val coupons: LiveData<List<CouponItem>> get() = _coupons
@@ -27,6 +29,7 @@ class PaymentViewModel(
 
     fun initSelectedProducts(selectedCartProducts: List<CartProduct>) {
         selectedProducts = selectedCartProducts
+        initPaymentDetail(selectedCartProducts)
         initCoupon()
     }
 
@@ -41,6 +44,10 @@ class PaymentViewModel(
                 Log.e("error", it.message.toString())
             }
         }
+    }
+
+    private fun initPaymentDetail(selectedCartProducts: List<CartProduct>) {
+        _paymentDetail.value = PaymentDetail(selectedCartProducts)
     }
 
     fun selectCoupon(coupon: Coupon) {

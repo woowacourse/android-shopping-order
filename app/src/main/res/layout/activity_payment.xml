@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -8,9 +10,7 @@
             type="woowacourse.shopping.view.payment.PaymentViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -90,7 +90,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="18dp"
-                    android:text="@{String.format(@string/product_price, viewModel.totalPrice)}"
+                    android:text="@{String.format(@string/product_price, viewModel.paymentDetail.orderAmount)}"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -117,6 +117,7 @@
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
+                    android:text="@{String.format(@string/product_price, viewModel.paymentDetail.couponDiscount)}"
                     app:layout_constraintEnd_toEndOf="@id/tv_order_amount"
                     app:layout_constraintTop_toTopOf="@id/tv_coupon_discount_label"
                     tools:text="-5,000원" />
@@ -137,6 +138,7 @@
                     android:id="@+id/tv_delivery_fee"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    app:deliveryFee="@{viewModel.paymentDetail.deliveryFee}"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -171,6 +173,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
+                    android:text="@{String.format(@string/product_price, viewModel.paymentDetail.totalPayment)}"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="@id/tv_delivery_fee"

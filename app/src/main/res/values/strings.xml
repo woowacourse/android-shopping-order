@@ -29,4 +29,5 @@
 
     <string name="coupon_expiration_date">만료일: %s</string>
     <string name="coupon_minimum_amount">최소 주문 금액: %,d원</string>
+    <string name="free_delivery_fee">무료</string>
 </resources>
