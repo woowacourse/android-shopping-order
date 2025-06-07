@@ -3,8 +3,14 @@ package woowacourse.shopping.di.provider
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.datasource.local.CartLocalDataSource
 import woowacourse.shopping.data.datasource.local.CartLocalDataSourceImpl
+import woowacourse.shopping.data.datasource.local.CouponLocalDataSource
+import woowacourse.shopping.data.datasource.local.CouponLocalDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.CartRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.CouponRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.CouponRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.OrderRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.RecentProductLocalDataSource
@@ -16,6 +22,9 @@ object DataSourceProvider {
     val cartRemoteDataSource: CartRemoteDataSource by lazy { initCartRemoteDataSource() }
     val cartLocalDataSource: CartLocalDataSource by lazy { initCartLocalDataSource() }
     val recentProductLocalDataSource: RecentProductLocalDataSource by lazy { initRecentProductLocalDataSource() }
+    val couponRemoteDataSource: CouponRemoteDataSource by lazy { initCouponRemoteDataSource() }
+    val couponLocalDataSource: CouponLocalDataSource by lazy { initCouponLocalDataSource() }
+    val orderRemoteDataSource: OrderRemoteDataSource by lazy { initOrderRemoteDataSource() }
 
     private fun initProductDataSource(): ProductRemoteDataSource {
         val productService = ServiceProvider.provideProduceService()
@@ -31,4 +40,10 @@ object DataSourceProvider {
         val recentProductDao = database.recentProductDao()
         return RecentProductLocalDataSourceImpl(recentProductDao)
     }
+
+    private fun initCouponRemoteDataSource(): CouponRemoteDataSource = CouponRemoteDataSourceImpl(ServiceProvider.provideCouponService())
+
+    private fun initCouponLocalDataSource(): CouponLocalDataSource = CouponLocalDataSourceImpl()
+
+    private fun initOrderRemoteDataSource(): OrderRemoteDataSource = OrderRemoteDataSourceImpl(ServiceProvider.provideOrderService())
 }

@@ -9,6 +9,8 @@ interface CartLocalDataSource {
 
     fun removeCartProductByCartId(cartId: Long)
 
+    fun removeCartProductsByCartIds(cartIds: List<Long>)
+
     fun updateQuantity(
         productId: Long,
         quantity: Int,

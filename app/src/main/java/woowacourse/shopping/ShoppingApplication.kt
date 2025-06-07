@@ -2,6 +2,8 @@ package woowacourse.shopping
 
 import android.app.Application
 import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.CouponRepositoryImpl
+import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.di.provider.DataSourceProvider
@@ -19,6 +21,8 @@ class ShoppingApplication : Application() {
         initProductRepository()
         initCartRepository()
         initRecentProductRepository()
+        initCouponRepository()
+        initOrderRepository()
     }
 
     private fun initProductRepository() {
@@ -32,7 +36,8 @@ class ShoppingApplication : Application() {
         val cartRemoteDataSource = DataSourceProvider.cartRemoteDataSource
         val cartLocalDataSource = DataSourceProvider.cartLocalDataSource
         val productDataSource = DataSourceProvider.productRemoteDataSource
-        val repository = CartRepositoryImpl(cartRemoteDataSource, cartLocalDataSource, productDataSource)
+        val repository =
+            CartRepositoryImpl(cartRemoteDataSource, cartLocalDataSource, productDataSource)
         RepositoryProvider.initCartRepository(repository)
     }
 
@@ -42,6 +47,22 @@ class ShoppingApplication : Application() {
         val repository =
             RecentProductRepositoryImpl(productDataSource, recentProductLocalDataSource)
         RepositoryProvider.initRecentProductRepository(repository)
+    }
+
+    private fun initCouponRepository() {
+        val couponRemoteDataSource = DataSourceProvider.couponRemoteDataSource
+        val couponLocalDataSource = DataSourceProvider.couponLocalDataSource
+        val repository = CouponRepositoryImpl(couponRemoteDataSource, couponLocalDataSource)
+        RepositoryProvider.initCouponRepository(repository)
+    }
+
+    private fun initOrderRepository() {
+        val orderRemoteDataSource = DataSourceProvider.orderRemoteDataSource
+        val cartLocalDataSource = DataSourceProvider.cartLocalDataSource
+        val couponLocalDataSource = DataSourceProvider.couponLocalDataSource
+        val repository =
+            OrderRepositoryImpl(orderRemoteDataSource, cartLocalDataSource, couponLocalDataSource)
+        RepositoryProvider.initOrderRepository(repository)
     }
 
     companion object {

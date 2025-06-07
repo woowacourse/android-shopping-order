@@ -17,6 +17,10 @@ class CartLocalDataSourceImpl : CartLocalDataSource {
         cartProductMap.values.removeIf { it.cartId == cartId }
     }
 
+    override fun removeCartProductsByCartIds(cartIds: List<Long>) {
+        cartProductMap.values.removeIf { cartIds.contains(it.cartId) }
+    }
+
     override fun updateQuantity(
         productId: Long,
         quantity: Int,
