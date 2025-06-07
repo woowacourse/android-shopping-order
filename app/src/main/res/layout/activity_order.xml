@@ -117,7 +117,7 @@
             android:id="@+id/tv_discount_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{@string/order_price(vm.orderSummary.discountAmount)}"
+            android:text='@{"-" + @string/order_price(vm.orderSummary.discountAmount)}'
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/tv_discount_price_text"

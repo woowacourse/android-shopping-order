@@ -19,6 +19,7 @@ import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.Extra
 import woowacourse.shopping.presentation.getParcelableArrayListExtraCompat
 import woowacourse.shopping.presentation.model.CartItemUiModel
+import woowacourse.shopping.presentation.model.CouponUiModel
 
 class OrderActivity :
     AppCompatActivity(),
@@ -104,8 +105,8 @@ class OrderActivity :
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onClickSelect(cartId: Long) {
-        TODO("Not yet implemented")
+    override fun onClickSelect(coupon: CouponUiModel) {
+        viewModel.selectCoupon(coupon)
     }
 
     companion object {
