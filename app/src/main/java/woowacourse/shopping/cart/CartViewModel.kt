@@ -67,7 +67,12 @@ class CartViewModel(
             val recommendProducts: List<ProductUiModel> =
                 catalogProductRepository
                     .getRecommendedProducts(categorizedProduct.category ?: "", 0, 10)
-            _recommendedProducts.postValue(recommendProducts)
+
+            val cartProductIds = cartProducts.value?.map { it.productItem.id }?.toSet() ?: emptySet()
+
+            val filteredProducts = recommendProducts.filterNot { it.id in cartProductIds }
+
+            _recommendedProducts.postValue(filteredProducts)
         }
     }
 
