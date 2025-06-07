@@ -9,6 +9,7 @@ import retrofit2.create
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.service.CartProductApiService
 import woowacourse.shopping.data.service.CouponApiService
+import woowacourse.shopping.data.service.OrderApiService
 import woowacourse.shopping.data.service.ProductApiService
 import woowacourse.shopping.data.token.TokenProvider
 
@@ -42,6 +43,15 @@ class RetrofitInstance(tokenProvider: TokenProvider) {
             .addConverterFactory(Json.asConverterFactory(contentType))
             .build()
             .create(CouponApiService::class.java)
+
+    val orderService: OrderApiService =
+        Retrofit
+            .Builder()
+            .client(interceptorClient)
+            .baseUrl(BuildConfig.BASE_URL)
+            .addConverterFactory(Json.asConverterFactory(contentType))
+            .build()
+            .create(OrderApiService::class.java)
 
     companion object {
         private val contentType = "application/json".toMediaType()

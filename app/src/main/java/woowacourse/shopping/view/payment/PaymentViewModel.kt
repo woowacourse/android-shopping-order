@@ -11,11 +11,15 @@ import woowacourse.shopping.domain.model.PaymentDetail
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.view.payment.adapter.CouponItem
+import woowacourse.shopping.view.util.MutableSingleLiveData
+import woowacourse.shopping.view.util.SingleLiveData
 
 class PaymentViewModel(
     private val cartProductRepository: CartProductRepository,
     private val couponRepository: CouponRepository,
+    private val orderRepository: OrderRepository,
 ) : ViewModel() {
     private var selectedProducts: List<CartProduct> = listOf()
 
@@ -24,6 +28,9 @@ class PaymentViewModel(
 
     private val _coupons = MutableLiveData<List<CouponItem>>()
     val coupons: LiveData<List<CouponItem>> get() = _coupons
+
+    private val _onFinishOrder = MutableSingleLiveData<Unit>()
+    val onFinishOrder: SingleLiveData<Unit> get() = _onFinishOrder
 
     private var selectedCouponId: Int? = null
 
@@ -73,6 +80,19 @@ class PaymentViewModel(
             _paymentDetail.value = _paymentDetail.value?.discountByCoupon(coupon)
         } else {
             initPaymentDetail(selectedProducts)
+        }
+    }
+
+    fun submitOrder() {
+        viewModelScope.launch {
+            val result = orderRepository.submitOrder(selectedProducts.map { it.id })
+
+            result
+                .onFailure {
+                    Log.e("error", it.message.toString())
+                }
+
+            _onFinishOrder.setValue(Unit)
         }
     }
 }

@@ -190,6 +190,7 @@
             android:layout_height="wrap_content"
             android:background="@color/primary_color"
             android:text="@string/pay"
+            android:onClick="@{() -> viewModel.submitOrder()}"
             android:textColor="@color/white"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"

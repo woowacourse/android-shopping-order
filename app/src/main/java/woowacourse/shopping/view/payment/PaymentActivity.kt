@@ -3,6 +3,7 @@ package woowacourse.shopping.view.payment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -13,6 +14,7 @@ import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityPaymentBinding
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.view.payment.adapter.PaymentAdapter
+import woowacourse.shopping.view.product.catalog.ProductCatalogActivity
 
 class PaymentActivity : AppCompatActivity() {
     private val binding by lazy { ActivityPaymentBinding.inflate(layoutInflater) }
@@ -23,6 +25,7 @@ class PaymentActivity : AppCompatActivity() {
             PaymentViewModelFactory(
                 app.cartProductRepository,
                 app.couponRepository,
+                app.orderRepository,
             ),
         )[PaymentViewModel::class.java]
     }
@@ -60,6 +63,13 @@ class PaymentActivity : AppCompatActivity() {
     private fun initObservers() {
         viewModel.coupons.observe(this) {
             adapter.submitList(it)
+        }
+
+        viewModel.onFinishOrder.observe(this) {
+            Toast.makeText(this, R.string.finish_order, Toast.LENGTH_SHORT).show()
+            val intent = ProductCatalogActivity.newIntent(this)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
         }
     }
 

@@ -1,5 +1,7 @@
 package woowacourse.shopping.view.product.catalog
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -127,5 +129,11 @@ class ProductCatalogActivity : AppCompatActivity() {
 
     companion object {
         private const val GRID_SPAN_COUNT = 2
+
+        fun newIntent(context: Context): Intent =
+            Intent(
+                context,
+                ProductCatalogActivity::class.java,
+            )
     }
 }
