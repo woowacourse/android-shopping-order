@@ -9,6 +9,7 @@ import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.remote.cart.CartService
 import woowacourse.shopping.data.remote.cart.HeaderInterceptor
 import woowacourse.shopping.data.remote.coupon.CouponService
+import woowacourse.shopping.data.remote.order.OrderService
 import woowacourse.shopping.data.remote.product.ProductService
 
 object NetworkClient {
@@ -34,4 +35,6 @@ object NetworkClient {
     fun getProductService(): ProductService = retrofitService.create(ProductService::class.java)
 
     fun getCouponService(): CouponService = retrofitService.create(CouponService::class.java)
+
+    fun getOrderService(): OrderService = retrofitService.create(OrderService::class.java)
 }
