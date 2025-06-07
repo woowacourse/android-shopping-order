@@ -82,8 +82,12 @@ class CartViewModel(
             targetList.value?.map {
                 if (it.id == cart.id) it.copy(isChecked = !it.isChecked) else it
             } ?: return
+
         targetList.value = updatedList
-        updateCheckedSummary(updatedList)
+
+        val carts = if (isRecommend) _carts.value ?: emptyList() else updatedList
+        val recommends = if (isRecommend) updatedList else _recommendItems.value ?: emptyList()
+        updateCheckedSummary(carts, recommends)
     }
 
     fun selectAllCarts() = setCartChecked(true)
@@ -211,8 +215,13 @@ class CartViewModel(
         }
     }
 
-    private fun updateCheckedSummary(updatedList: List<CartProduct>) {
-        val checked = updatedList.filter { it.isChecked }
+    private fun updateCheckedSummary(
+        carts: List<CartProduct>,
+        recommends: List<CartProduct>,
+    ) {
+        val combined = carts + recommends
+        val checked = combined.filter { it.isChecked }
+
         _totalCheckedItemsCount.value = checked.sumOf { it.quantity }
         _checkedItemsPrice.value = checked.sumOf { it.product.price * it.quantity }
     }
@@ -242,9 +251,11 @@ class CartViewModel(
     }
 
     private fun setCartChecked(checked: Boolean) {
-        val updatedList = _carts.value?.map { it.copy(isChecked = checked) } ?: return
-        _carts.value = updatedList
-        updateCheckedSummary(updatedList)
+        val updatedCartList = _carts.value?.map { it.copy(isChecked = checked) } ?: return
+        _carts.value = updatedCartList
+
+        val currentRecommendList = _recommendItems.value ?: emptyList()
+        updateCheckedSummary(updatedCartList, currentRecommendList)
     }
 
     companion object {
