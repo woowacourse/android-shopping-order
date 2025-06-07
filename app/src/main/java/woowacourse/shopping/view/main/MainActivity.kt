@@ -1,5 +1,7 @@
 package woowacourse.shopping.view.main
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
@@ -145,5 +147,15 @@ class MainActivity : AppCompatActivity() {
     ) {
         val intent = DetailActivity.newIntent(this, productId, lastSeenProductId)
         activityResultLauncher.launch(intent)
+    }
+
+    companion object {
+        fun newIntent(context: Context): Intent {
+            val intent =
+                Intent(context, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                }
+            return intent
+        }
     }
 }

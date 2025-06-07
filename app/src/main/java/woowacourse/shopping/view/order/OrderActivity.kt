@@ -14,12 +14,16 @@ import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.view.NetworkExceptionDelegator
 import woowacourse.shopping.view.core.ext.getSerializableArrayList
+import woowacourse.shopping.view.main.MainActivity
 import woowacourse.shopping.view.order.adapter.OrderAdapter
 import woowacourse.shopping.view.order.vm.OrderViewModel
 import woowacourse.shopping.view.order.vm.OrderViewModelFactory
 
 class OrderActivity : AppCompatActivity() {
+    private lateinit var networkExceptionDelegator: NetworkExceptionDelegator
+
     private val viewModel: OrderViewModel by viewModels {
         val container = (application as App).container
         OrderViewModelFactory(
@@ -38,15 +42,34 @@ class OrderActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order)
+        networkExceptionDelegator = NetworkExceptionDelegator(this)
+
         val order = intent.getSerializableArrayList<ShoppingCart>(KEY_ORDER)
         viewModel.loadCoupons(order)
 
         setUpBinding(binding)
         setUpSystemBar()
+        setUpRecyclerView()
+        observeViewModel()
+    }
 
-        binding.recyclerViewOrder.itemAnimator = null
+    private fun observeViewModel() {
         viewModel.uiState.observe(this) { value ->
             orderAdapter.submitItems(value)
+        }
+
+        viewModel.uiEvent.observe(this) { event ->
+            when (event) {
+                is OrderUiEvent.ShowErrorMessage -> networkExceptionDelegator.showErrorMessage(event.throwable)
+                is OrderUiEvent.NavigateToMain -> navigateToMain()
+            }
+        }
+    }
+
+    private fun setUpRecyclerView()  {
+        with(binding.recyclerViewOrder) {
+            itemAnimator = null
+            setHasFixedSize(true)
         }
     }
 
@@ -68,6 +91,7 @@ class OrderActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.text_payment)
     }
 
+        viewModel.uiEvent.observe(this) { event ->
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
@@ -77,6 +101,11 @@ class OrderActivity : AppCompatActivity() {
 
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun navigateToMain() {
+        startActivity(MainActivity.newIntent(this))
+        finish()
     }
 
     companion object {

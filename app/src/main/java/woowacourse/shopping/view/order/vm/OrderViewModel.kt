@@ -8,13 +8,15 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.cart.ShoppingCart
 import woowacourse.shopping.domain.coupon.CouponApplierFactory
 import woowacourse.shopping.domain.coupon.CouponValidate
+import woowacourse.shopping.domain.exception.NetworkError
 import woowacourse.shopping.domain.exception.onFailure
 import woowacourse.shopping.domain.exception.onSuccess
 import woowacourse.shopping.domain.repository.CouponRepository
-import woowacourse.shopping.view.cart.CartUiEvent
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.view.core.common.withState
 import woowacourse.shopping.view.core.event.MutableSingleLiveData
 import woowacourse.shopping.view.core.event.SingleLiveData
+import woowacourse.shopping.view.order.OrderUiEvent
 import woowacourse.shopping.view.order.adapter.OrderAdapter
 import woowacourse.shopping.view.order.state.OrderUiState
 
@@ -26,8 +28,8 @@ class OrderViewModel(
     private val _uiState = MutableLiveData<OrderUiState>()
     val uiState: LiveData<OrderUiState> get() = _uiState
 
-    private val _uiEvent = MutableSingleLiveData<CartUiEvent>()
-    val uiEvent: SingleLiveData<CartUiEvent> get() = _uiEvent
+    private val _uiEvent = MutableSingleLiveData<OrderUiEvent>()
+    val uiEvent: SingleLiveData<OrderUiEvent> get() = _uiEvent
 
     fun loadCoupons(order: List<ShoppingCart>) {
         viewModelScope.launch {
@@ -46,8 +48,8 @@ class OrderViewModel(
         }
     }
 
-    private fun handleFailure(throwable: Throwable) {
-        _uiEvent.setValue(CartUiEvent.ShowErrorMessage(throwable))
+    private fun handleFailure(throwable: NetworkError) {
+        _uiEvent.setValue(OrderUiEvent.ShowErrorMessage(throwable))
     }
 
     val couponHandler =
