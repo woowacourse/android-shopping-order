@@ -20,10 +20,11 @@ import woowacourse.shopping.presentation.Extra
 import woowacourse.shopping.presentation.getParcelableArrayListExtraCompat
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.CouponUiModel
+import woowacourse.shopping.presentation.product.ProductActivity
 
 class OrderActivity :
     AppCompatActivity(),
-    CouponClickListener {
+    OrderPageClickListener {
     private lateinit var binding: ActivityOrderBinding
     private lateinit var viewModel: OrderViewModel
     private val couponAdapter: CouponAdapter by lazy {
@@ -43,6 +44,7 @@ class OrderActivity :
 
     private fun setupBinding() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order)
+        binding.clickListener = this
         binding.lifecycleOwner = this
     }
 
@@ -105,8 +107,12 @@ class OrderActivity :
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onClickSelect(coupon: CouponUiModel) {
+    override fun onSelectCoupon(coupon: CouponUiModel) {
         viewModel.selectCoupon(coupon)
+    }
+
+    override fun onClickOrder() {
+        viewModel.order()
     }
 
     companion object {

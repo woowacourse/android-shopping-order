@@ -8,7 +8,7 @@ import woowacourse.shopping.presentation.model.CouponUiModel
 
 class CouponViewHolder(
     private val binding: ItemCouponBinding,
-    itemClickListener: CouponClickListener,
+    itemClickListener: OrderPageClickListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.itemClickListener = itemClickListener
@@ -21,7 +21,7 @@ class CouponViewHolder(
     companion object {
         fun create(
             parent: ViewGroup,
-            itemClickListener: CouponClickListener,
+            itemClickListener: OrderPageClickListener,
         ): CouponViewHolder =
             CouponViewHolder(
                 binding =

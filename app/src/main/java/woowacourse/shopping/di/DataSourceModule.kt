@@ -6,6 +6,8 @@ import woowacourse.shopping.data.datasource.remote.CartRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.CouponRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.CouponRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.OrderRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSourceImpl
 
@@ -25,5 +27,9 @@ object DataSourceModule {
 
     val couponRemoteDataSource: CouponRemoteDataSource by lazy {
         CouponRemoteDataSourceImpl(NetworkModule.couponService)
+    }
+
+    val orderRemoteDataSource: OrderRemoteDataSource by lazy {
+        OrderRemoteDataSourceImpl(NetworkModule.orderService)
     }
 }

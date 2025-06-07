@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.presentation.model.CouponUiModel
 
 class CouponAdapter(
-    private val itemClickListener: CouponClickListener,
+    private val itemClickListener: OrderPageClickListener,
 ) : ListAdapter<CouponUiModel, CouponViewHolder>(CouponDiffCallback()) {
     override fun onCreateViewHolder(
         parent: ViewGroup,

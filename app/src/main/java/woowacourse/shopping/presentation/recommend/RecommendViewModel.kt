@@ -71,8 +71,8 @@ class RecommendViewModel(
         viewModelScope.launch {
             cartRepository
                 .insertProduct(cartItem.product.toDomain(), 1)
-                .onSuccess {
-                    updateQuantity(cartItem.product.id, 1)
+                .onSuccess { cartId ->
+                    updateQuantity(cartId = cartId, productId = cartItem.product.id, delta = 1)
                 }.onFailure {
                     _toastMessage.value = R.string.product_toast_add_cart_fail
                 }
@@ -84,7 +84,7 @@ class RecommendViewModel(
             cartRepository
                 .increaseQuantity(id)
                 .onSuccess {
-                    updateQuantity(id, 1)
+                    updateQuantity(productId = id, delta = 1)
                 }.onFailure {
                     _toastMessage.value = R.string.product_toast_increase_fail
                 }
@@ -96,7 +96,7 @@ class RecommendViewModel(
             cartRepository
                 .decreaseQuantity(id)
                 .onSuccess {
-                    updateQuantity(id, -1)
+                    updateQuantity(productId = id, delta = -1)
                 }.onFailure {
                     _toastMessage.value = R.string.product_toast_decrease_fail
                 }
@@ -104,6 +104,7 @@ class RecommendViewModel(
     }
 
     private fun updateQuantity(
+        cartId: Long = 0,
         productId: Long,
         delta: Int,
     ) {
@@ -112,6 +113,7 @@ class RecommendViewModel(
                 if (item.product.id == productId) {
                     val newQuantity = item.quantity + delta
                     item.copy(
+                        id = cartId,
                         isSelected = true,
                         quantity = newQuantity,
                         totalPrice = item.product.price * newQuantity,

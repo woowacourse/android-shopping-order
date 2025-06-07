@@ -7,6 +7,7 @@ import retrofit2.Retrofit
 import woowacourse.shopping.data.service.CartItemService
 import woowacourse.shopping.data.service.CouponService
 import woowacourse.shopping.data.service.OkHttpClientProvider
+import woowacourse.shopping.data.service.OrderService
 import woowacourse.shopping.data.service.ProductService
 
 object NetworkModule {
@@ -32,5 +33,9 @@ object NetworkModule {
 
     val couponService: CouponService by lazy {
         retrofit.create(CouponService::class.java)
+    }
+
+    val orderService: OrderService by lazy {
+        retrofit.create(OrderService::class.java)
     }
 }

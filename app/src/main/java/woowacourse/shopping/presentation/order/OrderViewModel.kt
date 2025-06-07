@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.OrderPriceSummary
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.usecase.GetAvailableCouponUseCase
 import woowacourse.shopping.presentation.Extra.KEY_SELECT_ITEMS
 import woowacourse.shopping.presentation.SingleLiveData
@@ -19,11 +20,14 @@ import woowacourse.shopping.presentation.model.toPresentation
 class OrderViewModel(
     savedStateHandle: SavedStateHandle,
     private val getAvailableCouponUseCase: GetAvailableCouponUseCase,
+    private val orderRepository: OrderRepository,
 ) : ViewModel() {
     private val _coupons: MutableLiveData<List<CouponUiModel>> = MutableLiveData()
     val coupons: LiveData<List<CouponUiModel>> = _coupons
+
     private val _orderSummary: MutableLiveData<OrderPriceSummary> = MutableLiveData()
     val orderSummary: LiveData<OrderPriceSummary> = _orderSummary
+
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
 
@@ -56,6 +60,17 @@ class OrderViewModel(
         _orderSummary.value = selected
             ?.let { removedCouponOrder.applyCoupon(it.toDomain()) }
             ?: removedCouponOrder
+    }
+
+    fun order() {
+        val orderIds = orderSummary.value?.cartItems?.map { it.cartId } ?: return
+        viewModelScope.launch {
+            orderRepository
+                .order(orderIds)
+                .onSuccess {
+                    _toastMessage.value = R.string.order_toast_coupon_order_success
+                }.onFailure { _toastMessage.value = R.string.order_toast_coupon_order_fail }
+        }
     }
 
     private fun fetchData() {

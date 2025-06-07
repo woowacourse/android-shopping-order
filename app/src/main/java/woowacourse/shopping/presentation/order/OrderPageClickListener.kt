@@ -2,6 +2,8 @@ package woowacourse.shopping.presentation.order
 
 import woowacourse.shopping.presentation.model.CouponUiModel
 
-interface CouponClickListener {
-    fun onClickSelect(coupon: CouponUiModel)
+interface OrderPageClickListener {
+    fun onSelectCoupon(coupon: CouponUiModel)
+
+    fun onClickOrder()
 }

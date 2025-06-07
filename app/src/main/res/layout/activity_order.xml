@@ -8,6 +8,10 @@
         <variable
             name="vm"
             type="woowacourse.shopping.presentation.order.OrderViewModel" />
+
+        <variable
+            name="clickListener"
+            type="woowacourse.shopping.presentation.order.OrderPageClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -195,6 +199,7 @@
             android:background="@color/baemin"
             android:elevation="2dp"
             android:gravity="center"
+            android:onClick="@{() -> clickListener.onClickOrder()}"
             android:text="@string/order_btn_order_text"
             android:textColor="@color/white"
             android:textSize="20sp"

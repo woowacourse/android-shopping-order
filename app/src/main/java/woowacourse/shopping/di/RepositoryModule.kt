@@ -4,9 +4,11 @@ import woowacourse.shopping.data.datasource.local.CartLocalDataSourceImpl
 import woowacourse.shopping.data.repository.local.RecentProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.CartRepositoryImpl
 import woowacourse.shopping.data.repository.remote.CouponRepositoryImpl
+import woowacourse.shopping.data.repository.remote.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.remote.ProductRepositoryImpl
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
@@ -30,5 +32,10 @@ object RepositoryModule {
     val couponRepository: CouponRepository by lazy {
         val couponRemoteDataSource = DataSourceModule.couponRemoteDataSource
         CouponRepositoryImpl(couponRemoteDataSource)
+    }
+
+    val orderRepository: OrderRepository by lazy {
+        val orderRemoteDataSource = DataSourceModule.orderRemoteDataSource
+        OrderRepositoryImpl(orderRemoteDataSource)
     }
 }
