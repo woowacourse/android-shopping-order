@@ -5,25 +5,17 @@ import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.CartsSinglePage
 
 interface CartRepository {
-    fun addCart(
-        cart: Cart,
-        callback: (Result<String?>) -> Unit,
-    )
+    suspend fun addCart(cart: Cart): Result<Long>
 
-    fun updateQuantity(
+    suspend fun updateQuantity(
         cartId: Long,
         quantity: Quantity,
-        callback: (Result<Unit>) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun deleteCart(
-        cartId: Long,
-        callback: (Result<Unit>) -> Unit,
-    )
+    suspend fun deleteCart(cartId: Long): Result<Unit>
 
-    fun loadSinglePage(
+    suspend fun loadSinglePage(
         page: Int?,
         pageSize: Int?,
-        callback: (Result<CartsSinglePage>) -> Unit,
-    )
+    ): Result<CartsSinglePage>
 }
