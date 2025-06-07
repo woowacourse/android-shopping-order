@@ -13,6 +13,7 @@ data object FreeShippingCoupon : CouponContract() {
     ): Price =
         currentPrice.copy(
             shippingFee = 0,
-            totalPrice = currentPrice.totalPrice - currentPrice.shippingFee,
+            discountPrice = 0,
+            totalPrice = currentPrice.orderPrice - currentPrice.shippingFee,
         )
 }
