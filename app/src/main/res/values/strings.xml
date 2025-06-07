@@ -1,11 +1,18 @@
 <resources>
     <string name="app_name">Shopping</string>
 
+    <!-- Common -->
+    <string name="price_format_krw">%,d원</string>
+
     <!-- Product Item -->
     <string name="product_price_format">%,d원</string>
 
     <!-- Cart Item -->
     <string name="cart_item_price_format">%,d원</string>
+
+    <!-- Coupon Item -->
+    <string name="coupon_expired_date_format">만료일: yyyy년 M월 d일</string>
+    <string name="coupon_minimum_amount_format">최소 주문 금액: %,d원</string>
 
     <!-- Detail Screen -->
     <string name="detail_add_cart_button_text">장바구니 담기</string>
@@ -42,4 +49,18 @@
     <string name="suggestion_screen_event_message_fetch_suggestion_product_failure">추천 상품 조회 실패</string>
     <string name="suggestion_screen_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
     <string name="suggestion_screen_title">이런 상품은 어떠세요?</string>
+
+    <!-- Payment Screen -->
+    <string name="toolbar_payment_title">결제하기</string>
+    <string name="payment_screen_event_message_payment_summary_failure">결제 정보 생성 실패</string>
+    <string name="payment_screen_event_message_fetch_coupon_failure">쿠폰 조회 실패</string>
+    <string name="payment_screen_event_message_calculation_payment_summary_failure">결제 정보 계산 실패</string>
+    <string name="payment_screen_coupons_title">적용 가능한 쿠폰</string>
+    <string name="payment_screen_coupons_description">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="payment_screen_order_price">주문 금액</string>
+    <string name="payment_screen_coupon_discount_amount">쿠폰 할인 금액</string>
+    <string name="payment_screen_delivery_fee">배송비</string>
+    <string name="payment_screen_total_payment_price">총 결제 금액</string>
+    <string name="payment_screen_payment_btn">결제하기</string>
+
 </resources>
