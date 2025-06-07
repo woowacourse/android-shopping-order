@@ -22,7 +22,9 @@ class CartRemoteDataSourceImpl(
                     )
 
             if (response.isSuccessful) {
-                productId
+                val locationHeader = response.headers()["location"]
+                val id = locationHeader?.substringAfterLast("/")?.toLongOrNull()
+                id ?: throw Exception("cartItemId 가져오기에 실패했습니다.")
             } else {
                 throw Exception("서버 응답 실패 : ${response.code()}")
             }
