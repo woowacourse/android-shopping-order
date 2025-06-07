@@ -20,6 +20,7 @@ class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
     val viewModel: CartViewModel by viewModels { CartViewModelFactory() }
     private var hasHandledTotalCount = false
+    private var fragmentState: Int = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +49,7 @@ class CartActivity : AppCompatActivity() {
         viewModel.cartProducts.observe(this) { viewModel.refreshProductsInfo() }
         viewModel.selectedEvent.observe(this) { viewModel.refreshProductsInfo() }
         viewModel.totalCount.observe(this) { replaceFragmentByTotalCount(it) }
+        viewModel.orderClicked.observe(this) { processOrderClick() }
     }
 
     private fun replaceFragmentByTotalCount(totalCount: Int) {
@@ -61,6 +63,7 @@ class CartActivity : AppCompatActivity() {
     }
 
     private fun replaceCartRecommendationFragment() {
+        fragmentState = FRAGMENT_RECOMMENDATION
         binding.checkboxAllSelection.visibility = View.GONE
         binding.textViewAllSelection.visibility = View.GONE
 
@@ -75,6 +78,7 @@ class CartActivity : AppCompatActivity() {
     }
 
     private fun replaceCartSelectionFragment() {
+        fragmentState = FRAGMENT_SELECTION
         supportFragmentManager.commit {
             setReorderingAllowed(true)
             replace(
@@ -82,6 +86,12 @@ class CartActivity : AppCompatActivity() {
                 CartSelectionFragment::class.java,
                 null,
             )
+        }
+    }
+
+    private fun processOrderClick() {
+        if (fragmentState == FRAGMENT_SELECTION) {
+            replaceCartRecommendationFragment()
         }
     }
 
@@ -95,5 +105,8 @@ class CartActivity : AppCompatActivity() {
 
     companion object {
         fun newIntent(context: Context): Intent = Intent(context, CartActivity::class.java)
+
+        private const val FRAGMENT_SELECTION = 1
+        private const val FRAGMENT_RECOMMENDATION = 2
     }
 }

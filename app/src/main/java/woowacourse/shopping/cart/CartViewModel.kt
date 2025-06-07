@@ -47,6 +47,9 @@ class CartViewModel(
     private val _updatedProduct = MutableLiveData<ProductUiModel>()
     val updatedProduct: LiveData<ProductUiModel> = _updatedProduct
 
+    private val _orderClicked = MutableLiveData<Unit>()
+    val orderClicked: LiveData<Unit> = _orderClicked
+
     init {
         loadCartProducts()
         loadRecommendProducts()
@@ -165,6 +168,10 @@ class CartViewModel(
 
     fun loadSelectAllState() {
         _isAllSelected.postValue(isAllProductsSelected())
+    }
+
+    fun order() {
+        _orderClicked.postValue(Unit)
     }
 
     private fun isAllProductsSelected(): Boolean {
