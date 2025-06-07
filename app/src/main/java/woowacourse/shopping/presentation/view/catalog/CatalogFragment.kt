@@ -141,6 +141,9 @@ class CatalogFragment :
             CatalogMessageEvent.FETCH_CART_ITEM_COUNT_FAILURE ->
                 R.string.catalog_screen_event_message_fetch_cart_item_count_failure
 
+            CatalogMessageEvent.FETCH_CART_FAILURE ->
+                R.string.catalog_screen_event_message_fetch_cart_failure
+
             CatalogMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE ->
                 R.string.catalog_screen_event_message_patch_cart_product_quantity_failure
 

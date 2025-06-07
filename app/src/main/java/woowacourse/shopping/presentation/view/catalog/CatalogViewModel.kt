@@ -42,7 +42,7 @@ class CatalogViewModel(
     private var page = 0
 
     init {
-        loadProducts()
+        fetchCart()
     }
 
     fun loadProducts() {
@@ -92,6 +92,15 @@ class CatalogViewModel(
 
         loadRecentProducts { recentProducts ->
             rebuildCatalogItems(recentProducts, catalogWithLoadMore)
+        }
+    }
+
+    private fun fetchCart() {
+        viewModelScope.launch {
+            cartRepository
+                .fetchCart()
+                .onSuccess { loadProducts() }
+                .onFailure { emitToastMessage(CatalogMessageEvent.FETCH_CART_FAILURE) }
         }
     }
 

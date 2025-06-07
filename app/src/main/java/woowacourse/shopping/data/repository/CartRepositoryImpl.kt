@@ -1,8 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import woowacourse.shopping.data.datasource.local.CartLocalDataSource
 import woowacourse.shopping.data.datasource.remote.CartRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
@@ -20,9 +17,14 @@ class CartRepositoryImpl(
     private val cartLocalDataSource: CartLocalDataSource,
     private val productDataSource: ProductRemoteDataSource,
 ) : CartRepository {
-    init {
-        fetchCart()
-    }
+    override suspend fun fetchCart(): Result<Unit> =
+        runCatchingDebugLog {
+            val totalElements =
+                cartRemoteDataSource.fetchCartItems(0, 1).getOrThrow().totalElements
+            val result =
+                cartRemoteDataSource.fetchCartItems(0, totalElements).getOrThrow().content
+            cartLocalDataSource.addAllCartProducts(result.map { it.toDomain() })
+        }
 
     override suspend fun fetchCartProducts(
         page: Int,
@@ -89,17 +91,6 @@ class CartRepositoryImpl(
         cartRemoteDataSource.patchCartItemQuantity(cartId, updatedQuantity).getOrThrow()
         cartLocalDataSource.updateQuantity(productId, quantity)
     }
-
-    private fun fetchCart() =
-        runCatchingDebugLog {
-            CoroutineScope(Dispatchers.IO).launch {
-                val totalElements =
-                    cartRemoteDataSource.fetchCartItems(0, 1).getOrThrow().totalElements
-                val result =
-                    cartRemoteDataSource.fetchCartItems(0, totalElements).getOrThrow().content
-                cartLocalDataSource.addAllCartProducts(result.map { it.toDomain() })
-            }
-        }
 
     private fun CartItemResponse.toDomain() = CartProduct(cartId, product.toDomain(), quantity)
 
