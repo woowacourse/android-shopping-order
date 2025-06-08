@@ -11,10 +11,12 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentCartProductRecommendBinding
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.view.cart.recommend.adapter.RecommendedProductAdapter
 import woowacourse.shopping.view.cart.select.CartProductSelectFragment
 import woowacourse.shopping.view.payment.PaymentActivity
 import woowacourse.shopping.view.product.detail.ProductDetailActivity
+import woowacourse.shopping.view.util.getSerializableCompat
 
 class CartProductRecommendFragment : Fragment() {
     private var _binding: FragmentCartProductRecommendBinding? = null
@@ -68,10 +70,14 @@ class CartProductRecommendFragment : Fragment() {
     }
 
     private fun initInformation() {
-        val selectedIds = arguments?.getIntArray(KEY_SELECTED_IDS)?.toSet() ?: emptySet()
+        val selectedCartProducts =
+            arguments
+                ?.getSerializableCompat<ArrayList<CartProduct>>(KEY_SELECTED_PRODUCTS)
+                .orEmpty()
+                .toSet()
         val totalPrice = arguments?.getInt(KEY_TOTAL_PRICE)
         val totalCount = arguments?.getInt(KEY_TOTAL_COUNT)
-        viewModel.initShoppingCartInfo(selectedIds, totalPrice, totalCount)
+        viewModel.initShoppingCartInfo(selectedCartProducts, totalPrice, totalCount)
     }
 
     private fun initBindings() {
@@ -103,17 +109,17 @@ class CartProductRecommendFragment : Fragment() {
     }
 
     companion object {
-        private const val KEY_SELECTED_IDS = "selectedIds"
+        private const val KEY_SELECTED_PRODUCTS = "selectedCartProducts"
         private const val KEY_TOTAL_PRICE = "totalPrice"
         private const val KEY_TOTAL_COUNT = "totalCount"
 
         fun newBundle(
-            selectedIds: Set<Int>,
+            selectedCartProducts: Set<CartProduct>,
             totalPrice: Int?,
             totalCount: Int?,
         ): Bundle =
             Bundle().apply {
-                putIntArray(KEY_SELECTED_IDS, selectedIds.toIntArray())
+                putSerializable(KEY_SELECTED_PRODUCTS, ArrayList(selectedCartProducts))
                 putSerializable(KEY_TOTAL_PRICE, totalPrice)
                 putSerializable(KEY_TOTAL_COUNT, totalCount)
             }

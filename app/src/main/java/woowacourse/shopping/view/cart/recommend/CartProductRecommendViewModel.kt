@@ -21,12 +21,10 @@ class CartProductRecommendViewModel(
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel(),
     CartProductRecommendEventHandler {
-    private val cartProducts: MutableSet<CartProduct> = mutableSetOf()
+    private val cartProducts = mutableSetOf<CartProduct>()
 
     private val _recommendedProducts = MutableLiveData<List<RecommendedProductItem>>()
     val recommendedProducts: LiveData<List<RecommendedProductItem>> get() = _recommendedProducts
-
-    private val selectedCartIds: MutableSet<Int> = mutableSetOf()
 
     private val _totalPrice = MutableLiveData<Int>()
     val totalPrice: LiveData<Int> get() = _totalPrice
@@ -42,8 +40,7 @@ class CartProductRecommendViewModel(
             cartProductRepository
                 .getPagedProducts()
                 .onSuccess {
-                    cartProducts.addAll(it.items)
-                    loadRecommendedProducts()
+                    loadRecommendedProducts(it.items)
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
@@ -51,16 +48,16 @@ class CartProductRecommendViewModel(
     }
 
     fun initShoppingCartInfo(
-        selectedIds: Set<Int>,
+        cartProducts: Set<CartProduct>,
         totalPrice: Int?,
         totalCount: Int?,
     ) {
-        selectedCartIds.addAll(selectedIds)
+        this.cartProducts.addAll(cartProducts)
         _totalPrice.value = totalPrice ?: DEFAULT_PRICE
         _totalCount.value = totalCount ?: DEFAULT_COUNT
     }
 
-    private fun loadRecommendedProducts() {
+    private fun loadRecommendedProducts(cartProducts: List<CartProduct>) {
         viewModelScope.launch {
             recentProductRepository
                 .getLastViewedProduct()
@@ -100,8 +97,7 @@ class CartProductRecommendViewModel(
                 .insert(item.id, QUANTITY_TO_ADD)
                 .onSuccess { cartProductId ->
                     cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
-                    selectedCartIds.add(cartProductId)
-                    updateQuantity(item, QUANTITY_TO_ADD)
+                    updateProductQuantity(item, QUANTITY_TO_ADD)
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
@@ -109,51 +105,40 @@ class CartProductRecommendViewModel(
     }
 
     override fun onQuantityIncreaseClick(item: Product) {
-        viewModelScope.launch {
-            val cartProduct = cartProducts.first { it.product.id == item.id }
-            cartProductRepository
-                .updateQuantity(cartProduct, QUANTITY_TO_ADD)
-                .onSuccess {
-                    cartProducts.remove(cartProduct)
-                    cartProducts.add(cartProduct.copy(quantity = cartProduct.quantity + QUANTITY_TO_ADD))
-                    updateQuantity(item, QUANTITY_TO_ADD)
-                }.onFailure {
-                    Log.e("error", it.message.toString())
-                }
-        }
+        updateCartProduct(item, QUANTITY_TO_ADD)
     }
 
     override fun onQuantityDecreaseClick(item: Product) {
+        updateCartProduct(item, -QUANTITY_TO_ADD)
+    }
+
+    private fun updateCartProduct(
+        item: Product,
+        quantityDelta: Int,
+    ) {
         viewModelScope.launch {
-            val cartProduct = cartProducts.first { it.product.id == item.id }
+            val existing = cartProducts.firstOrNull { it.product.id == item.id } ?: return@launch
+            val newQuantity = existing.quantity + quantityDelta
+
             cartProductRepository
-                .updateQuantity(cartProduct, -QUANTITY_TO_ADD)
+                .updateQuantity(existing, quantityDelta)
                 .onSuccess {
-                    cartProducts.remove(cartProduct)
-                    val newQuantity = cartProduct.quantity - QUANTITY_TO_ADD
+                    cartProducts.removeIf { it.product.id == item.id }
                     if (newQuantity > DEFAULT_COUNT) {
-                        cartProducts.add(cartProduct.copy(quantity = newQuantity))
-                    } else {
-                        selectedCartIds.remove(cartProduct.id)
+                        cartProducts.add(existing.copy(quantity = newQuantity))
                     }
-                    updateQuantity(item, -QUANTITY_TO_ADD)
-                }.onFailure {
-                    Log.e("error", it.message.toString())
-                }
+                    updateProductQuantity(item, quantityDelta)
+                }.onFailure { Log.e("error", it.message.toString()) }
         }
     }
 
-    private fun updateQuantity(
+    private fun updateProductQuantity(
         item: Product,
         quantityToAdd: Int,
     ) {
         val updatedList =
-            _recommendedProducts.value.orEmpty().map { recommendedProduct ->
-                if (recommendedProduct.product.id == item.id) {
-                    recommendedProduct.copy(quantity = recommendedProduct.quantity + quantityToAdd)
-                } else {
-                    recommendedProduct
-                }
+            recommendedProducts.value.orEmpty().map {
+                if (it.product.id == item.id) it.copy(quantity = it.quantity + quantityToAdd) else it
             }
 
         _recommendedProducts.postValue(updatedList)

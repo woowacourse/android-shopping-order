@@ -62,10 +62,7 @@ class CartProductSelectFragment : Fragment() {
                     R.id.fragment,
                     CartProductRecommendFragment::class.java,
                     CartProductRecommendFragment.newBundle(
-                        viewModel.selectedCartProducts.value
-                            .orEmpty()
-                            .map { it.id }
-                            .toSet(),
+                        viewModel.selectedCartProducts.value.orEmpty(),
                         viewModel.totalPrice.value,
                         viewModel.totalCount.value,
                     ),
