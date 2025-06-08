@@ -7,6 +7,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.service.CartItemService
+import woowacourse.shopping.data.service.CouponService
 import woowacourse.shopping.data.service.OrderService
 import woowacourse.shopping.data.service.ProductService
 
@@ -40,4 +41,5 @@ object ApiClient {
     val productService: ProductService = retrofit.create(ProductService::class.java)
     val cartItemService: CartItemService = retrofit.create(CartItemService::class.java)
     val orderService: OrderService = retrofit.create(OrderService::class.java)
+    val couponService: CouponService = retrofit.create(CouponService::class.java)
 }
