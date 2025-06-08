@@ -3,6 +3,8 @@ package woowacourse.shopping.view.productDetail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.repository.CartRepository
 import woowacourse.shopping.data.cart.repository.DefaultCartRepository
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
@@ -38,85 +40,78 @@ class ProductDetailViewModel(
     }
 
     private fun loadCartItems() {
-        cartRepository.loadCart { result ->
-            result
-                .onSuccess { cartItems: List<CartItem> ->
-                    this.cartItems = cartItems
-                }.onFailure {
-                    _event.postValue(ProductDetailEvent.LOAD_SHOPPING_CART_FAILURE)
-                }
+        viewModelScope.launch {
+            runCatching {
+                cartRepository.loadCart()
+            }.onSuccess { cartItems: List<CartItem> ->
+                this@ProductDetailViewModel.cartItems = cartItems
+            }.onFailure {
+                _event.postValue(ProductDetailEvent.LOAD_SHOPPING_CART_FAILURE)
+            }
         }
     }
 
     private fun loadLatestViewedProduct() {
-        productsRepository.loadLatestViewedProduct { result ->
-            _latestViewedProduct.postValue(result.getOrNull())
+        viewModelScope.launch {
+            val product =
+                runCatching {
+                    productsRepository.loadLatestViewedProduct()
+                }.getOrNull()
+
+            _latestViewedProduct.postValue(product)
         }
     }
 
     fun loadProduct(productId: Long) {
-        productsRepository.getProductById(productId) { result ->
-            result
-                .onSuccess { product ->
-                    _product.postValue(product)
-                    if (product != null) addViewedProduct(product)
-                    Thread.sleep(1000)
-                    loading.postValue(false)
-                }.onFailure {
-                    _event.postValue(ProductDetailEvent.LOAD_PRODUCT_FAILURE)
-                }
+        viewModelScope.launch {
+            runCatching {
+                productsRepository.getProductById(productId)
+            }.onSuccess { product ->
+                _product.postValue(product)
+                if (product != null) addViewedProduct(product)
+                loading.postValue(false)
+            }.onFailure {
+                _event.postValue(ProductDetailEvent.LOAD_PRODUCT_FAILURE)
+            }
         }
     }
 
     private fun addViewedProduct(product: Product) {
-        productsRepository.addViewedProduct(product) { result ->
-            result.onFailure {
+        viewModelScope.launch {
+            runCatching {
+                productsRepository.addViewedProduct(product)
+            }.onFailure {
                 _event.postValue(ProductDetailEvent.RECORD_RECENT_PRODUCT_FAILURE)
             }
         }
     }
 
     fun addToShoppingCart() {
-        val productId: Long = product.value?.id ?: error("")
-        val cartItem: CartItem? =
-            cartItems
-                .find { cartItem: CartItem ->
-                    cartItem.productId == productId
-                }
+        val productId: Long = product.value?.id ?: return
+        val currentQuantity = quantity.value ?: QUANTITY_MIN
+        val existingItem = cartItems.find { it.productId == productId }
 
-        if (cartItem == null) {
-            cartRepository.addCartItem(
-                productId = productId,
-                quantity = quantity.value ?: 1,
-            ) { result ->
-                result
-                    .onSuccess {
-                        _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS)
-                    }.onFailure {
-                        _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_FAILURE)
-                    }
-            }
-        } else {
-            cartRepository.updateCartItemQuantity(
-                cartItemId = cartItem.id,
-                quantity = quantity.value ?: 1,
-            ) { result ->
-                result
-                    .onSuccess {
-                        _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS)
-                    }.onFailure {
-                        _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_FAILURE)
-                    }
+        viewModelScope.launch {
+            runCatching {
+                if (existingItem == null) {
+                    cartRepository.addCartItem(productId, currentQuantity)
+                } else {
+                    cartRepository.updateCartItemQuantity(existingItem.id, currentQuantity)
+                }
+            }.onSuccess {
+                _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS)
+            }.onFailure {
+                _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_FAILURE)
             }
         }
     }
 
     fun plusProductQuantity() {
-        _quantity.value = quantity.value?.plus(1) ?: 2
+        _quantity.value = (quantity.value ?: QUANTITY_MIN) + 1
     }
 
     fun minusProductQuantity() {
-        _quantity.value = quantity.value?.minus(1)?.coerceAtLeast(1) ?: QUANTITY_MIN
+        _quantity.value = ((quantity.value ?: (QUANTITY_MIN - 1))).coerceAtLeast(QUANTITY_MIN)
     }
 
     companion object {
