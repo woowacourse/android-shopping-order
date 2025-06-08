@@ -5,6 +5,8 @@ import woowacourse.shopping.domain.model.PagingData
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 interface CartItemRepository {
+    suspend fun initializeCartItems(): Result<List<CachedCartItem>>
+
     suspend fun getInitialCartItems(
         page: Int?,
         size: Int?,
@@ -16,6 +18,7 @@ interface CartItemRepository {
     ): Result<PagingData>
 
     suspend fun deleteCartItem(id: Long): Result<Unit>
+    suspend fun deleteCartItemByCartId(cartId: Long): Result<Unit>
 
     suspend fun addCartItem(
         id: Long,

@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import kotlinx.coroutines.runBlocking
 import woowacourse.shopping.data.model.CachedCartItem
 import woowacourse.shopping.data.model.CartItemResponse.Content
 import woowacourse.shopping.data.source.local.cart.CartItemsLocalDataSource
@@ -13,20 +12,16 @@ class CartItemsRepositoryImpl(
     private val cartItemsRemoteDataSource: CartItemsRemoteDataSource,
     private val cartItemsLocalDataSource: CartItemsLocalDataSource,
 ) : CartItemRepository {
-    init {
-        initializeCartItems()
-    }
+    override suspend fun initializeCartItems(): Result<List<CachedCartItem>> {
+        val result = getInitialCartItems(null, null)
 
-    fun initializeCartItems(): Result<List<CachedCartItem>> {
-        val runBlocking = runBlocking {
-            val result = getInitialCartItems(null, null)
-
-            result.onSuccess { cachedCartItems ->
-                cartItemsLocalDataSource.getCachedCartItem(cachedCartItems)
-            }
+        result.onSuccess { cachedCartItems ->
+            cartItemsLocalDataSource.getCachedCartItem(cachedCartItems)
         }
-        return runBlocking
+
+        return result
     }
+
 
     override fun getQuantity(pagingData: PagingData): PagingData {
         val updatedProducts =
@@ -94,6 +89,16 @@ class CartItemsRepositoryImpl(
         } else {
             Result.failure(Exception(CART_ID_ERROR_MESSAGE))
         }
+    }
+
+    override suspend fun deleteCartItemByCartId(cartId: Long): Result<Unit> {
+        val result = cartItemsRemoteDataSource.deleteCartItem(cartId)
+
+        result.onSuccess {
+            cartItemsLocalDataSource.remove(cartId)
+        }
+
+        return result
     }
 
     override suspend fun addCartItem(
