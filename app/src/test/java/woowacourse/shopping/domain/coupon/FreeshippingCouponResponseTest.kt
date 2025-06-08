@@ -1,10 +1,11 @@
 package woowacourse.shopping.domain.coupon
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class FreeshippingCouponTest {
+class FreeshippingCouponResponseTest {
     @Test
     fun `쿠폰이 만료되었으면 false를 반환한다`() {
         // given

@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.datasource.remote
 
 import woowacourse.shopping.data.NetworkResultHandler
+import woowacourse.shopping.data.network.response.coupons.toDomain
 import woowacourse.shopping.data.network.service.CouponService
 import woowacourse.shopping.domain.coupon.Coupon
 

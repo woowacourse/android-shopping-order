@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class FixedCouponTest {
+class FixedCouponResponseTest {
     @Test
     fun `쿠폰이 만료되었으면 false를 반환한다`() {
         // given
