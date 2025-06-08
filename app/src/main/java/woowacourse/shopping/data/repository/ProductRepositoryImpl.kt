@@ -1,4 +1,4 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.ProductDataSource
 import woowacourse.shopping.data.db.RecentProductDao

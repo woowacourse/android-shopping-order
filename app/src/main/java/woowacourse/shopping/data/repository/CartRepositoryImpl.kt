@@ -1,4 +1,4 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.CartItemDataSource
 import woowacourse.shopping.data.mapper.toCartItem
