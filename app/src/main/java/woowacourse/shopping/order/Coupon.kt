@@ -1,5 +1,7 @@
 package woowacourse.shopping.order
 
+import woowacourse.shopping.product.catalog.ProductUiModel
+
 data class Coupon(
     val availableTime: AvailableTime?,
     val buyQuantity: Int,
@@ -11,4 +13,16 @@ data class Coupon(
     val getQuantity: Int,
     val id: Long,
     val minimumAmount: Int,
-)
+) {
+    private val couponType
+        get() =
+            when (discountType) {
+                "fixed" -> CouponType.Fixed
+                "buyXgetY" -> CouponType.BuyAndGet
+                "freeShipping" -> CouponType.FreeShipping
+                "percentage" -> CouponType.Percentage
+                else -> CouponType.Fixed
+            }
+
+    fun isConditionMet(products: List<ProductUiModel>) = couponType.isConditionMet(this, products)
+}
