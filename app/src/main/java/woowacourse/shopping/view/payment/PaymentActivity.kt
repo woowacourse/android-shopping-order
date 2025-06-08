@@ -7,16 +7,17 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityPaymentBinding
-import woowacourse.shopping.view.payment.adapter.CouponAdapter
+import woowacourse.shopping.view.payment.adapter.PaymentAdapter
 
 class PaymentActivity : AppCompatActivity() {
     private val binding by lazy { ActivityPaymentBinding.inflate(layoutInflater) }
 
-    private lateinit var couponAdapter: CouponAdapter
+    private lateinit var paymentAdapter: PaymentAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpView()
+        initRecyclerView()
     }
 
     private fun setUpView() {
@@ -27,5 +28,10 @@ class PaymentActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    private fun initRecyclerView() {
+        paymentAdapter = PaymentAdapter()
+        binding.rvPayment.adapter = paymentAdapter
     }
 }
