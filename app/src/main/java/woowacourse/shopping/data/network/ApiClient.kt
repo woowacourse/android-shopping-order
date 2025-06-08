@@ -16,6 +16,7 @@ object ApiClient {
         Retrofit
             .Builder()
             .baseUrl(BuildConfig.BASE_URL)
+            .client(provideOkHttpClient())
             .addConverterFactory(
                 Json.asConverterFactory(MEDIA_TYPE_JSON.toMediaType()),
             ).build()
@@ -29,7 +30,7 @@ object ApiClient {
                 Json.asConverterFactory(MEDIA_TYPE_JSON.toMediaType()),
             ).build()
 
-    private fun provideOkHttpClient(interceptor: AuthenticationInterceptor): OkHttpClient {
+    private fun provideOkHttpClient(interceptor: AuthenticationInterceptor? = null): OkHttpClient {
         val loggingInterceptor =
             HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
@@ -37,7 +38,9 @@ object ApiClient {
 
         return OkHttpClient.Builder().run {
             addInterceptor(loggingInterceptor)
-            addInterceptor(interceptor)
+            if (interceptor != null) {
+                addInterceptor(interceptor)
+            }
             build()
         }
     }
