@@ -9,5 +9,5 @@ sealed interface Coupon {
     val expirationDate: LocalDate
     val discountType: String
 
-    fun isExpired(standardDate: LocalDate) = standardDate > expirationDate
+    fun isExpired(standardDate: LocalDate) = expirationDate.isBefore(standardDate)
 }
