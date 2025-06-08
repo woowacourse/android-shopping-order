@@ -5,8 +5,8 @@ import retrofit2.http.Header
 import woowacourse.shopping.data.model.response.coupon.CouponResponse
 
 interface CouponService {
-    @GET("/cart-items")
+    @GET("/coupons")
     suspend fun getCoupons(
         @Header("accept") accept: String = "*/*",
-    ): CouponResponse
+    ): List<CouponResponse>
 }

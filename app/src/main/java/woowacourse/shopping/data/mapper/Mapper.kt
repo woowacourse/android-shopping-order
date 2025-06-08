@@ -66,4 +66,10 @@ fun CouponResponse.toCoupon() =
         code = code,
         description = description,
         expirationDate = expirationDate,
+        discount = discount,
+        minimumAmount = minimumAmount,
+        buyQuantity = buyQuantity,
+        getQuantity = getQuantity,
+        availableTimeStart = availableTime?.start,
+        availableTimeEnd = availableTime?.end,
     )
