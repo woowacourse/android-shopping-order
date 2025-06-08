@@ -17,8 +17,8 @@ data class Coupon(
     fun isValidForOrder(
         orderPrice: Int,
         items: List<CartItem>,
-        now: LocalDateTime = LocalDateTime.now(),
     ): Boolean {
+        val now = LocalDateTime.now()
         val isNotExpired = expirationDate >= now.toLocalDate()
 
         val isAvailableTime =
