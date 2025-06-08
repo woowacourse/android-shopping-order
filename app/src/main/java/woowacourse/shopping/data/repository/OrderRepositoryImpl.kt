@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.repository.OrderRepository
 
 class OrderRepositoryImpl(
     private val orderDataSource: OrderDataSource,
-    private val cartItemRepository: CartItemsRepositoryImpl
+    private val cartItemRepository: CartItemsRepositoryImpl,
 ) : OrderRepository {
     override suspend fun orderItems(cartIds: List<Long>): Result<Unit> {
         val result = orderDataSource.orderCheckedItems(cartIds)
@@ -14,7 +14,7 @@ class OrderRepositoryImpl(
             cartItemRepository.deleteCartItemByCartId(id)
         }
 
-        if(result.isSuccess) {
+        if (result.isSuccess) {
             cartItemRepository.initializeCartItems()
         }
         return result

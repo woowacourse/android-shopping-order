@@ -111,7 +111,10 @@ class CatalogViewModel(
         currentPage++
     }
 
-    private fun loadCatalogProducts(page: Int, pageSize: Int = PAGE_SIZE) {
+    private fun loadCatalogProducts(
+        page: Int,
+        pageSize: Int = PAGE_SIZE,
+    ) {
         viewModelScope.launch {
             val result = productsRepository.getProducts(page, pageSize)
 
@@ -119,12 +122,13 @@ class CatalogViewModel(
                 val newPagingData = cartRepository.getQuantity(pagingData)
                 val updatedProducts = newPagingData.products.map { it.copy() }
 
-                val finalProducts = if (page == 0) {
-                    updatedProducts
-                } else {
-                    val currentProducts = _pagingData.value?.products.orEmpty()
-                    currentProducts + updatedProducts
-                }
+                val finalProducts =
+                    if (page == 0) {
+                        updatedProducts
+                    } else {
+                        val currentProducts = _pagingData.value?.products.orEmpty()
+                        currentProducts + updatedProducts
+                    }
 
                 _pagingData.postValue(newPagingData.copy(products = finalProducts))
             }

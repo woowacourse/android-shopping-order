@@ -7,32 +7,37 @@ import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 class FakeCatalogItemRepository(
     private val size: Int,
 ) : ProductsRepository {
+    private val fakeProducts: List<ProductUiModel> =
+        List(size) { index ->
+            ProductUiModel(
+                id = (index + 1).toLong(),
+                name = "${index + 1} 아이스 카페 아메리카노",
+                imageUrl = "https://image.istarbucks.co.kr/upload/store/skuimg/2021/04/[110563]_20210426095937947.jpg",
+                price = 1000 * (index + 1),
+            )
+        }
 
-    private val fakeProducts: List<ProductUiModel> = List(size) { index ->
-        ProductUiModel(
-            id = (index + 1).toLong(),
-            name = "${index + 1} 아이스 카페 아메리카노",
-            imageUrl = "https://image.istarbucks.co.kr/upload/store/skuimg/2021/04/[110563]_20210426095937947.jpg",
-            price = 1000 * (index + 1),
-        )
-    }
-
-    override suspend fun getProducts(page: Int, size: Int): Result<PagingData> {
+    override suspend fun getProducts(
+        page: Int,
+        size: Int,
+    ): Result<PagingData> {
         val startIndex = page * size
         val endIndex = (startIndex + size).coerceAtMost(fakeProducts.size)
 
-        val pageItems = if (startIndex < fakeProducts.size) {
-            fakeProducts.subList(startIndex, endIndex)
-        } else {
-            emptyList()
-        }
+        val pageItems =
+            if (startIndex < fakeProducts.size) {
+                fakeProducts.subList(startIndex, endIndex)
+            } else {
+                emptyList()
+            }
 
-        val pagingData = PagingData(
-            products = pageItems,
-            page = page,
-            hasNext = endIndex < fakeProducts.size,
-            hasPrevious = page > 0,
-        )
+        val pagingData =
+            PagingData(
+                products = pageItems,
+                page = page,
+                hasNext = endIndex < fakeProducts.size,
+                hasPrevious = page > 0,
+            )
 
         return Result.success(pagingData)
     }

@@ -3,7 +3,6 @@ package woowacourse.shopping.presentation.recommend
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -33,10 +32,11 @@ class RecommendActivity : AppCompatActivity() {
     private val recommendLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
-                val checkedProducts = IntentCompat.getParcelableArrayListExtra<ProductUiModel>(
-                    result.data ?: return@registerForActivityResult,
-                    "checked_products"
-                ) ?: emptyList()
+                val checkedProducts =
+                    IntentCompat.getParcelableArrayListExtra<ProductUiModel>(
+                        result.data ?: return@registerForActivityResult,
+                        "checked_products",
+                    ) ?: emptyList()
 
                 recommendViewModel.restoreCheckedProducts(checkedProducts)
             }
@@ -63,9 +63,10 @@ class RecommendActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                val resultIntent = Intent().apply {
-                    putExtra("checked_product_ids", checkedItems.map { it.id }.toLongArray())
-                }
+                val resultIntent =
+                    Intent().apply {
+                        putExtra("checked_product_ids", checkedItems.map { it.id }.toLongArray())
+                    }
                 setResult(RESULT_OK, resultIntent)
                 finish()
                 true

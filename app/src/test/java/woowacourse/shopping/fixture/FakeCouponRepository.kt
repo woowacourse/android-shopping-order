@@ -10,22 +10,23 @@ import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class FakeCouponRepository(
     private val coupons: List<Coupon>,
-    private val timeProvider: TimeProvider
+    private val timeProvider: TimeProvider,
 ) : CouponRepository {
-
     override suspend fun getCoupons(
         totalAmount: Long,
         orderProducts: List<ProductUiModel>,
     ): Result<List<Coupon>> {
-        val filteredCoupons = coupons.filter { coupon ->
-            val policy = CouponType.from(coupon.code).getPolicy()
-            val policyContext = CouponPolicyContext(
-                totalAmount = totalAmount,
-                orderProducts = orderProducts,
-                currentDateTime = timeProvider.currentTime()
-            )
-            policy.isApplicable(coupon.toResponse(), policyContext)
-        }
+        val filteredCoupons =
+            coupons.filter { coupon ->
+                val policy = CouponType.from(coupon.code).getPolicy()
+                val policyContext =
+                    CouponPolicyContext(
+                        totalAmount = totalAmount,
+                        orderProducts = orderProducts,
+                        currentDateTime = timeProvider.currentTime(),
+                    )
+                policy.isApplicable(coupon.toResponse(), policyContext)
+            }
 
         return Result.success(filteredCoupons)
     }
@@ -41,12 +42,13 @@ class FakeCouponRepository(
             discountType = this.discountType,
             buyQuantity = this.buyQuantity,
             getQuantity = this.getQuantity,
-            availableTime = this.availableTime?.let {
-                CouponResponse.AvailableTime(
-                    start = it.start,
-                    end = it.end
-                )
-            }
+            availableTime =
+                this.availableTime?.let {
+                    CouponResponse.AvailableTime(
+                        start = it.start,
+                        end = it.end,
+                    )
+                },
         )
     }
 }

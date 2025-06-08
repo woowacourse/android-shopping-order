@@ -4,7 +4,6 @@ import woowacourse.shopping.data.model.Coupon
 import woowacourse.shopping.data.model.CouponType
 
 object CouponFixture {
-
     fun fixed5000Coupon(
         id: Long = 1L,
         expirationDate: String = "2025-10-11",
@@ -20,7 +19,7 @@ object CouponFixture {
         discountType = "fixed",
         buyQuantity = null,
         getQuantity = null,
-        availableTime = null
+        availableTime = null,
     )
 
     fun freeShippingCoupon(
@@ -37,7 +36,7 @@ object CouponFixture {
         discountType = "freeShipping",
         buyQuantity = null,
         getQuantity = null,
-        availableTime = null
+        availableTime = null,
     )
 
     fun miracleSaleCoupon(
@@ -56,10 +55,11 @@ object CouponFixture {
         discountType = "percentage",
         buyQuantity = null,
         getQuantity = null,
-        availableTime = Coupon.AvailableTime(
-            start = availableStart,
-            end = availableEnd
-        )
+        availableTime =
+            Coupon.AvailableTime(
+                start = availableStart,
+                end = availableEnd,
+            ),
     )
 
     fun bogoCoupon(
@@ -77,7 +77,7 @@ object CouponFixture {
         discountType = "buyXgetY",
         buyQuantity = buyQuantity,
         getQuantity = getQuantity,
-        availableTime = null
+        availableTime = null,
     )
 
     fun defaultCoupon(
@@ -93,6 +93,6 @@ object CouponFixture {
         discountType = "",
         buyQuantity = 0L,
         getQuantity = 0L,
-        availableTime = null
+        availableTime = null,
     )
 }

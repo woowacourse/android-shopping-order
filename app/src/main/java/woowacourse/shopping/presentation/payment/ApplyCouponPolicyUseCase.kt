@@ -17,9 +17,10 @@ class ApplyCouponPolicyUseCase {
 
         return when (policy) {
             CouponPolicy.Fixed5000 -> OrderAdjustment(discount = discount)
-            CouponPolicy.MiracleSale -> OrderAdjustment(
-                discount = (initialOrderPrice * discountPercentage).toLong()
-            )
+            CouponPolicy.MiracleSale ->
+                OrderAdjustment(
+                    discount = (initialOrderPrice * discountPercentage).toLong(),
+                )
             CouponPolicy.FreeShipping -> OrderAdjustment(deliveryCharge = 0)
             CouponPolicy.Bogo -> {
                 val discount = calculateBogoDiscount(coupon, checkedItems)
@@ -35,7 +36,7 @@ class ApplyCouponPolicyUseCase {
     ): Long {
         val targetProduct =
             checkedItems
-                .filter { it.quantity >= (coupon.buyQuantity ?: 0)}
+                .filter { it.quantity >= (coupon.buyQuantity ?: 0) }
                 .maxByOrNull { it.price }
 
         val buyQuantity = coupon.buyQuantity ?: 0

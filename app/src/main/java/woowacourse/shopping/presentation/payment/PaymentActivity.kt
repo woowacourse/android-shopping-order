@@ -3,7 +3,6 @@ package woowacourse.shopping.presentation.payment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -117,9 +116,10 @@ class PaymentActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                val resultIntent = Intent().apply {
-                    putParcelableArrayListExtra("checked_products", ArrayList(orderItems))
-                }
+                val resultIntent =
+                    Intent().apply {
+                        putParcelableArrayListExtra("checked_products", ArrayList(orderItems))
+                    }
                 setResult(RESULT_OK, resultIntent)
                 finish()
                 true
@@ -127,7 +127,6 @@ class PaymentActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-
 
     companion object {
         private const val ORDER_ITEMS_KEY = "OrderItems"

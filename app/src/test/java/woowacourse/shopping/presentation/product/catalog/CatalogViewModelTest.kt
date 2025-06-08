@@ -21,95 +21,100 @@ class CatalogViewModelTest {
     private lateinit var viewModel: CatalogViewModel
 
     @Test
-    fun `초기 상태 테스트`() = runTest {
-        viewModel =
-            CatalogViewModel(
-                FakeCatalogItemRepository(20),
-                FakeCartItemRepository(0),
-                FakeViewedItemRepository(0),
-            )
+    fun `초기 상태 테스트`() =
+        runTest {
+            viewModel =
+                CatalogViewModel(
+                    FakeCatalogItemRepository(20),
+                    FakeCartItemRepository(0),
+                    FakeViewedItemRepository(0),
+                )
 
-        viewModel.loadInitialCatalogProducts(10)
+            viewModel.loadInitialCatalogProducts(10)
 
-        val hasNext = viewModel.pagingData.value?.hasNext
-        val products = viewModel.pagingData.value?.products ?: emptyList()
-        val page = viewModel.pagingData.value?.page ?: 0
+            val hasNext = viewModel.pagingData.value?.hasNext
+            val products = viewModel.pagingData.value?.products ?: emptyList()
+            val page = viewModel.pagingData.value?.page ?: 0
 
-        assertThat(page).isEqualTo(0)
-        assertThat(hasNext).isTrue
-        assertThat(products).hasSize(10)
-    }
-
-    @Test
-    fun `더보기 버튼을 눌렀을 때 페이지가 증가되고 상품이 로드된다`() = runTest {
-        // given
-        viewModel =
-            CatalogViewModel(
-                FakeCatalogItemRepository(30),
-                FakeCartItemRepository(0),
-                FakeViewedItemRepository(0),
-            )
-
-        viewModel.loadInitialCatalogProducts(20)
-        val page = viewModel.pagingData.value?.page ?: 0
-        assertThat(page).isEqualTo(0)
-
-        viewModel.loadNextCatalogProducts()
-        val products = viewModel.pagingData.value?.products ?: emptyList()
-        val afterPage = viewModel.pagingData.value?.page ?: 0
-
-        assertThat(afterPage).isEqualTo(1)
-        assertThat(products.size).isEqualTo(30)
-    }
+            assertThat(page).isEqualTo(0)
+            assertThat(hasNext).isTrue
+            assertThat(products).hasSize(10)
+        }
 
     @Test
-    fun `상품 목록이 20개 이상이면 더보기 버튼이 활성화된다`() = runTest {
-        // given
-        viewModel =
-            CatalogViewModel(
-                FakeCatalogItemRepository(30),
-                FakeCartItemRepository(0),
-                FakeViewedItemRepository(0),
-            )
+    fun `더보기 버튼을 눌렀을 때 페이지가 증가되고 상품이 로드된다`() =
+        runTest {
+            // given
+            viewModel =
+                CatalogViewModel(
+                    FakeCatalogItemRepository(30),
+                    FakeCartItemRepository(0),
+                    FakeViewedItemRepository(0),
+                )
 
-        viewModel.loadInitialCatalogProducts()
-        val hasNext = viewModel.pagingData.value?.hasNext
+            viewModel.loadInitialCatalogProducts(20)
+            val page = viewModel.pagingData.value?.page ?: 0
+            assertThat(page).isEqualTo(0)
 
-        assertThat(hasNext).isEqualTo(true)
-    }
+            viewModel.loadNextCatalogProducts()
+            val products = viewModel.pagingData.value?.products ?: emptyList()
+            val afterPage = viewModel.pagingData.value?.page ?: 0
 
-    @Test
-    fun `최근 본 상품이 있는 경우에 10개 이하이면 모든 데이터를 불러온다`() = runTest {
-        viewModel =
-            CatalogViewModel(
-                FakeCatalogItemRepository(30),
-                FakeCartItemRepository(0),
-                FakeViewedItemRepository(9),
-            )
-
-        viewModel.loadRecentViewedItems()
-
-        val viewedSize = viewModel.recentViewedItems.value?.size
-        val hasViewed = viewModel.hasRecentViewedItems.value
-
-        assertThat(viewedSize).isEqualTo(9)
-        assertThat(hasViewed).isEqualTo(true)
-    }
+            assertThat(afterPage).isEqualTo(1)
+            assertThat(products.size).isEqualTo(30)
+        }
 
     @Test
-    fun `최근 본 상품이 있는 경우에 10개 이상이면 10개의 데이터만 불러온다`() = runTest {
-        viewModel =
-            CatalogViewModel(
-                FakeCatalogItemRepository(30),
-                FakeCartItemRepository(0),
-                FakeViewedItemRepository(20),
-            )
-        viewModel.loadRecentViewedItems()
+    fun `상품 목록이 20개 이상이면 더보기 버튼이 활성화된다`() =
+        runTest {
+            // given
+            viewModel =
+                CatalogViewModel(
+                    FakeCatalogItemRepository(30),
+                    FakeCartItemRepository(0),
+                    FakeViewedItemRepository(0),
+                )
 
-        val viewedSize = viewModel.recentViewedItems.value?.size
-        val hasViewed = viewModel.hasRecentViewedItems.value
+            viewModel.loadInitialCatalogProducts()
+            val hasNext = viewModel.pagingData.value?.hasNext
 
-        assertThat(viewedSize).isEqualTo(10)
-        assertThat(hasViewed).isEqualTo(true)
-    }
+            assertThat(hasNext).isEqualTo(true)
+        }
+
+    @Test
+    fun `최근 본 상품이 있는 경우에 10개 이하이면 모든 데이터를 불러온다`() =
+        runTest {
+            viewModel =
+                CatalogViewModel(
+                    FakeCatalogItemRepository(30),
+                    FakeCartItemRepository(0),
+                    FakeViewedItemRepository(9),
+                )
+
+            viewModel.loadRecentViewedItems()
+
+            val viewedSize = viewModel.recentViewedItems.value?.size
+            val hasViewed = viewModel.hasRecentViewedItems.value
+
+            assertThat(viewedSize).isEqualTo(9)
+            assertThat(hasViewed).isEqualTo(true)
+        }
+
+    @Test
+    fun `최근 본 상품이 있는 경우에 10개 이상이면 10개의 데이터만 불러온다`() =
+        runTest {
+            viewModel =
+                CatalogViewModel(
+                    FakeCatalogItemRepository(30),
+                    FakeCartItemRepository(0),
+                    FakeViewedItemRepository(20),
+                )
+            viewModel.loadRecentViewedItems()
+
+            val viewedSize = viewModel.recentViewedItems.value?.size
+            val hasViewed = viewModel.hasRecentViewedItems.value
+
+            assertThat(viewedSize).isEqualTo(10)
+            assertThat(hasViewed).isEqualTo(true)
+        }
 }

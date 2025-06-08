@@ -64,7 +64,7 @@ sealed class CouponPolicy {
             val isValid = context.currentDateTime.toLocalDate().isBefore(date)
 
             val buyQuantity = coupon.buyQuantity ?: 0
-            val applicableProducts = context.orderProducts.filter { it.quantity >=  buyQuantity }
+            val applicableProducts = context.orderProducts.filter { it.quantity >= buyQuantity }
             return applicableProducts.isNotEmpty() && isValid
         }
     }

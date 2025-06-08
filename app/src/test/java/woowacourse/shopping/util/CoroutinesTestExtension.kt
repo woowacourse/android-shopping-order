@@ -14,7 +14,6 @@ import org.junit.jupiter.api.extension.ExtensionContext
 class CoroutinesTestExtension(
     private val dispatcher: TestDispatcher = UnconfinedTestDispatcher(),
 ) : BeforeEachCallback, AfterEachCallback {
-
     override fun beforeEach(context: ExtensionContext?) {
         Dispatchers.setMain(dispatcher)
     }

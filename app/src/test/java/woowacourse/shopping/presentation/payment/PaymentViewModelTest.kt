@@ -22,7 +22,6 @@ import kotlin.test.Test
 @ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class PaymentViewModelTest {
-
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
@@ -35,19 +34,105 @@ class PaymentViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        initialCheckedItems = listOf(
-            ProductUiModel(
-                id = 1L,
-                name = "아이스 카페 아메리카노",
-                imageUrl = "",
-                price = 10000,
-                quantity = 2
+        initialCheckedItems =
+            listOf(
+                ProductUiModel(
+                    id = 1L,
+                    name = "아이스 카페 아메리카노",
+                    imageUrl = "",
+                    price = 10000,
+                    quantity = 2,
+                ),
             )
-        )
 
         testTimeProvider = TestTimeProvider(LocalDateTime.of(2025, 6, 10, 5, 0)) // 새벽 5시
 
-        val coupons = listOf(
+        val coupons =
+            listOf(
+                Coupon(
+                    id = 1L,
+                    description = "5,000원 할인 쿠폰",
+                    expirationDate = "2025-10-11",
+                    code = CouponType.FIXED5000.name,
+                    discount = 5000,
+                    minimumAmount = 10000,
+                    discountType = "fixed",
+                    buyQuantity = null,
+                    getQuantity = null,
+                    availableTime = null,
+                ),
+                Coupon(
+                    id = 2L,
+                    description = "무료배송 쿠폰",
+                    expirationDate = "2025-08-31",
+                    code = CouponType.FREESHIPPING.name,
+                    discount = null,
+                    minimumAmount = 50000,
+                    discountType = "freeShipping",
+                    buyQuantity = null,
+                    getQuantity = null,
+                    availableTime = null,
+                ),
+                Coupon(
+                    id = 3L,
+                    description = "미라클모닝 30%",
+                    expirationDate = "2025-07-31",
+                    code = CouponType.MIRACLESALE.name,
+                    discount = 30,
+                    minimumAmount = null,
+                    discountType = "percentage",
+                    buyQuantity = null,
+                    getQuantity = null,
+                    availableTime = Coupon.AvailableTime(start = "04:00:00", end = "07:00:00"),
+                ),
+                Coupon(
+                    id = 4L,
+                    description = "BOGO 쿠폰",
+                    expirationDate = "2025-06-30",
+                    code = CouponType.BOGO.name,
+                    discount = null,
+                    minimumAmount = null,
+                    discountType = "buyXgetY",
+                    buyQuantity = 2,
+                    getQuantity = 1,
+                    availableTime = null,
+                ),
+            )
+
+        fakeCouponRepository =
+            FakeCouponRepository(
+                coupons = coupons,
+                timeProvider = testTimeProvider,
+            )
+
+        fakeOrderRepository = FakeOrderRepository(0)
+
+        viewModel =
+            PaymentViewModel(
+                couponRepository = fakeCouponRepository,
+                orderRepository = fakeOrderRepository,
+                initialCheckedItems = initialCheckedItems,
+                applyCouponPolicyUseCase = ApplyCouponPolicyUseCase(),
+            )
+    }
+
+    @Test
+    fun `getCoupons 호출 시 유효한 쿠폰들만 필터링 되어 업데이트 된다`() =
+        runTest {
+            viewModel.getCoupons()
+
+            val coupons = viewModel.coupons.getOrAwaitValue()
+
+            assertThat(coupons.map { it.code }).containsExactlyInAnyOrder(
+                CouponType.FIXED5000.name,
+                CouponType.MIRACLESALE.name,
+                CouponType.BOGO.name,
+            )
+        }
+
+    @Test
+    fun `onCheckCoupon 호출 시 할인금액과 배송비가 정확히 계산된다`() {
+        val coupon =
             Coupon(
                 id = 1L,
                 description = "5,000원 할인 쿠폰",
@@ -58,88 +143,8 @@ class PaymentViewModelTest {
                 discountType = "fixed",
                 buyQuantity = null,
                 getQuantity = null,
-                availableTime = null
-            ),
-            Coupon(
-                id = 2L,
-                description = "무료배송 쿠폰",
-                expirationDate = "2025-08-31",
-                code = CouponType.FREESHIPPING.name,
-                discount = null,
-                minimumAmount = 50000,
-                discountType = "freeShipping",
-                buyQuantity = null,
-                getQuantity = null,
-                availableTime = null
-            ),
-            Coupon(
-                id = 3L,
-                description = "미라클모닝 30%",
-                expirationDate = "2025-07-31",
-                code = CouponType.MIRACLESALE.name,
-                discount = 30,
-                minimumAmount = null,
-                discountType = "percentage",
-                buyQuantity = null,
-                getQuantity = null,
-                availableTime = Coupon.AvailableTime(start = "04:00:00", end = "07:00:00")
-            ),
-            Coupon(
-                id = 4L,
-                description = "BOGO 쿠폰",
-                expirationDate = "2025-06-30",
-                code = CouponType.BOGO.name,
-                discount = null,
-                minimumAmount = null,
-                discountType = "buyXgetY",
-                buyQuantity = 2,
-                getQuantity = 1,
-                availableTime = null
+                availableTime = null,
             )
-        )
-
-        fakeCouponRepository = FakeCouponRepository(
-            coupons = coupons,
-            timeProvider = testTimeProvider
-        )
-
-        fakeOrderRepository = FakeOrderRepository(0)
-
-        viewModel = PaymentViewModel(
-            couponRepository = fakeCouponRepository,
-            orderRepository = fakeOrderRepository,
-            initialCheckedItems = initialCheckedItems,
-            applyCouponPolicyUseCase = ApplyCouponPolicyUseCase()
-        )
-    }
-
-    @Test
-    fun `getCoupons 호출 시 유효한 쿠폰들만 필터링 되어 업데이트 된다`() = runTest {
-        viewModel.getCoupons()
-
-        val coupons = viewModel.coupons.getOrAwaitValue()
-
-        assertThat(coupons.map { it.code }).containsExactlyInAnyOrder(
-            CouponType.FIXED5000.name,
-            CouponType.MIRACLESALE.name,
-            CouponType.BOGO.name,
-        )
-    }
-
-    @Test
-    fun `onCheckCoupon 호출 시 할인금액과 배송비가 정확히 계산된다`() {
-        val coupon = Coupon(
-            id = 1L,
-            description = "5,000원 할인 쿠폰",
-            expirationDate = "2025-10-11",
-            code = CouponType.FIXED5000.name,
-            discount = 5000,
-            minimumAmount = 10000,
-            discountType = "fixed",
-            buyQuantity = null,
-            getQuantity = null,
-            availableTime = null
-        )
 
         viewModel.onCheckCoupon(coupon)
 
@@ -154,38 +159,42 @@ class PaymentViewModelTest {
     }
 
     @Test
-    fun `만료된 쿠폰은 getCoupons 결과에 포함되지 않는다`() = runTest {
-        val expiredCoupon = Coupon(
-            id = 99L,
-            description = "ExpiredCoupon",
-            expirationDate = "2020-01-01",
-            code = CouponType.FIXED5000.name,
-            discount = 5000,
-            minimumAmount = 5000,
-            discountType = "fixed",
-            buyQuantity = 0L,
-            getQuantity = 0L,
-            availableTime = null
-        )
+    fun `만료된 쿠폰은 getCoupons 결과에 포함되지 않는다`() =
+        runTest {
+            val expiredCoupon =
+                Coupon(
+                    id = 99L,
+                    description = "ExpiredCoupon",
+                    expirationDate = "2020-01-01",
+                    code = CouponType.FIXED5000.name,
+                    discount = 5000,
+                    minimumAmount = 5000,
+                    discountType = "fixed",
+                    buyQuantity = 0L,
+                    getQuantity = 0L,
+                    availableTime = null,
+                )
 
-        val couponRepository = FakeCouponRepository(
-            coupons = listOf(expiredCoupon),
-            timeProvider = testTimeProvider
-        )
+            val couponRepository =
+                FakeCouponRepository(
+                    coupons = listOf(expiredCoupon),
+                    timeProvider = testTimeProvider,
+                )
 
-        viewModel = PaymentViewModel(
-            couponRepository = couponRepository,
-            orderRepository = fakeOrderRepository,
-            initialCheckedItems = initialCheckedItems,
-            applyCouponPolicyUseCase = ApplyCouponPolicyUseCase()
-        )
+            viewModel =
+                PaymentViewModel(
+                    couponRepository = couponRepository,
+                    orderRepository = fakeOrderRepository,
+                    initialCheckedItems = initialCheckedItems,
+                    applyCouponPolicyUseCase = ApplyCouponPolicyUseCase(),
+                )
 
-        viewModel.getCoupons()
+            viewModel.getCoupons()
 
-        val coupons = viewModel.coupons.getOrAwaitValue()
+            val coupons = viewModel.coupons.getOrAwaitValue()
 
-        assertThat(coupons).isEmpty()
-    }
+            assertThat(coupons).isEmpty()
+        }
 
     @Test
     fun `resetOrderInfo 호출 시 할인금액과 배송비는 초기값으로`() {
@@ -200,18 +209,19 @@ class PaymentViewModelTest {
 
     @Test
     fun `updateOrderInfo 호출 시 totalAmount도 갱신된다`() {
-        val coupon = Coupon(
-            id = 1L,
-            description = "5,000원 할인 쿠폰",
-            expirationDate = "2025-10-11",
-            code = CouponType.FIXED5000.name,
-            discount = 5000,
-            minimumAmount = 10000,
-            discountType = "fixed",
-            buyQuantity = null,
-            getQuantity = null,
-            availableTime = null
-        )
+        val coupon =
+            Coupon(
+                id = 1L,
+                description = "5,000원 할인 쿠폰",
+                expirationDate = "2025-10-11",
+                code = CouponType.FIXED5000.name,
+                discount = 5000,
+                minimumAmount = 10000,
+                discountType = "fixed",
+                buyQuantity = null,
+                getQuantity = null,
+                availableTime = null,
+            )
 
         viewModel.updateOrderInfo(coupon)
 
@@ -220,7 +230,7 @@ class PaymentViewModelTest {
 
         val expected =
             (viewModel.initialOrderPrice - discount + viewModel.deliverCharge.getOrAwaitValue()).coerceAtLeast(
-                0
+                0,
             )
         assertThat(totalAmount).isEqualTo(expected)
     }
@@ -236,7 +246,7 @@ class PaymentViewModelTest {
 
         val expected =
             (viewModel.initialOrderPrice - discount + viewModel.deliverCharge.getOrAwaitValue()).coerceAtLeast(
-                0
+                0,
             )
         assertThat(discount).isEqualTo(5000L)
         assertThat(totalAmount).isEqualTo(expected)

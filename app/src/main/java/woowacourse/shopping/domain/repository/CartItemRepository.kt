@@ -18,6 +18,7 @@ interface CartItemRepository {
     ): Result<PagingData>
 
     suspend fun deleteCartItem(id: Long): Result<Unit>
+
     suspend fun deleteCartItemByCartId(cartId: Long): Result<Unit>
 
     suspend fun addCartItem(

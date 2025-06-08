@@ -116,8 +116,7 @@ class CartViewModel(
 
     override fun hasPrevPage(): Boolean = _pagingData.value?.hasPrevious == true
 
-    override fun isPaginationEnabled(): Boolean =
-        (_isNextButtonEnabled.value == true) || (_isPrevButtonEnabled.value == true)
+    override fun isPaginationEnabled(): Boolean = (_isNextButtonEnabled.value == true) || (_isPrevButtonEnabled.value == true)
 
     override fun getPage(): Int = pagingData.value?.page ?: 0
 
@@ -216,9 +215,10 @@ class CartViewModel(
 
     fun restoreCheckedProducts(checkedIds: List<Long>) {
         pagingData.value?.let { currentPagingData ->
-            val updatedProducts = currentPagingData.products.map {
-                it.copy(isChecked = it.id in checkedIds)
-            }
+            val updatedProducts =
+                currentPagingData.products.map {
+                    it.copy(isChecked = it.id in checkedIds)
+                }
             _pagingData.value = currentPagingData.copy(products = updatedProducts)
             setOrderData()
         }

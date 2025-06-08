@@ -8,26 +8,28 @@ import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 class FakeCartItemRepository(
     private val size: Int,
 ) : CartItemRepository {
-    private val fakeCartItems = mutableListOf<ProductUiModel>(
-        *List(size) { index ->
-            ProductUiModel(
-                id = (index + 1).toLong(),
-                name = "${index + 1} 아이스 카페 아메리카노",
-                imageUrl = "https://image.istarbucks.co.kr/upload/store/skuimg/2021/04/[110563]_20210426095937947.jpg",
-                price = 1000 * (index + 1),
-                quantity = (index + 1),
-            )
-        }.toTypedArray(),
-    )
+    private val fakeCartItems =
+        mutableListOf<ProductUiModel>(
+            *List(size) { index ->
+                ProductUiModel(
+                    id = (index + 1).toLong(),
+                    name = "${index + 1} 아이스 카페 아메리카노",
+                    imageUrl = "https://image.istarbucks.co.kr/upload/store/skuimg/2021/04/[110563]_20210426095937947.jpg",
+                    price = 1000 * (index + 1),
+                    quantity = (index + 1),
+                )
+            }.toTypedArray(),
+        )
 
     override suspend fun initializeCartItems(): Result<List<CachedCartItem>> {
-        val cachedItems = fakeCartItems.map { product ->
-            CachedCartItem(
-                cartId = product.id,
-                productId = product.id,
-                quantity = product.quantity,
-            )
-        }
+        val cachedItems =
+            fakeCartItems.map { product ->
+                CachedCartItem(
+                    cartId = product.id,
+                    productId = product.id,
+                    quantity = product.quantity,
+                )
+            }
         return Result.success(cachedItems)
     }
 
@@ -35,13 +37,14 @@ class FakeCartItemRepository(
         page: Int?,
         size: Int?,
     ): Result<List<CachedCartItem>> {
-        val cachedItems = fakeCartItems.map { product ->
-            CachedCartItem(
-                cartId = product.id,
-                productId = product.id,
-                quantity = product.quantity,
-            )
-        }
+        val cachedItems =
+            fakeCartItems.map { product ->
+                CachedCartItem(
+                    cartId = product.id,
+                    productId = product.id,
+                    quantity = product.quantity,
+                )
+            }
         return Result.success(cachedItems)
     }
 
@@ -52,18 +55,20 @@ class FakeCartItemRepository(
         val startIndex = (page ?: 0) * (size ?: 20)
         val endIndex = (startIndex + (size ?: 20)).coerceAtMost(fakeCartItems.size)
 
-        val pageItems = if (startIndex < fakeCartItems.size) {
-            fakeCartItems.subList(startIndex, endIndex)
-        } else {
-            emptyList()
-        }
+        val pageItems =
+            if (startIndex < fakeCartItems.size) {
+                fakeCartItems.subList(startIndex, endIndex)
+            } else {
+                emptyList()
+            }
 
-        val pagingData = PagingData(
-            products = pageItems,
-            page = page ?: 0,
-            hasNext = endIndex < fakeCartItems.size,
-            hasPrevious = (page ?: 0) > 0,
-        )
+        val pagingData =
+            PagingData(
+                products = pageItems,
+                page = page ?: 0,
+                hasNext = endIndex < fakeCartItems.size,
+                hasPrevious = (page ?: 0) > 0,
+            )
 
         return Result.success(pagingData)
     }
@@ -78,7 +83,10 @@ class FakeCartItemRepository(
         return Result.success(Unit)
     }
 
-    override suspend fun addCartItem(id: Long, quantity: Int): Result<Unit> {
+    override suspend fun addCartItem(
+        id: Long,
+        quantity: Int,
+    ): Result<Unit> {
         val existing = fakeCartItems.find { it.id == id }
         if (existing == null) {
             fakeCartItems.add(
@@ -94,7 +102,10 @@ class FakeCartItemRepository(
         return Result.success(Unit)
     }
 
-    override suspend fun updateCartItemQuantity(id: Long, quantity: Int): Result<Unit> {
+    override suspend fun updateCartItemQuantity(
+        id: Long,
+        quantity: Int,
+    ): Result<Unit> {
         val index = fakeCartItems.indexOfFirst { it.id == id }
         if (index != -1) {
             val existing = fakeCartItems[index]
@@ -104,7 +115,10 @@ class FakeCartItemRepository(
         return Result.success(Unit)
     }
 
-    override suspend fun addCartItemQuantity(id: Long, quantity: Int): Result<Unit> {
+    override suspend fun addCartItemQuantity(
+        id: Long,
+        quantity: Int,
+    ): Result<Unit> {
         val index = fakeCartItems.indexOfFirst { it.id == id }
         if (index != -1) {
             val existing = fakeCartItems[index]
@@ -130,10 +144,11 @@ class FakeCartItemRepository(
     }
 
     override fun getQuantity(pagingData: PagingData): PagingData {
-        val updatedProducts = pagingData.products.map { product ->
-            val cartItem = fakeCartItems.find { it.id == product.id }
-            product.copy(quantity = cartItem?.quantity ?: 0)
-        }
+        val updatedProducts =
+            pagingData.products.map { product ->
+                val cartItem = fakeCartItems.find { it.id == product.id }
+                product.copy(quantity = cartItem?.quantity ?: 0)
+            }
         return pagingData.copy(products = updatedProducts)
     }
 

@@ -22,7 +22,6 @@ class CartItemsRepositoryImpl(
         return result
     }
 
-
     override fun getQuantity(pagingData: PagingData): PagingData {
         val updatedProducts =
             pagingData.products.map { product ->

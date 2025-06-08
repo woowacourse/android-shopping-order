@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.recommend
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -146,20 +145,20 @@ class RecommendViewModel(
 
         val currentItems = _items.value ?: return
 
-        val updatedItems = currentItems.map { product ->
-            val matching = checkedProducts.find { it.id == product.id }
-            if (matching != null) {
-                product.copy(
-                    quantity = matching.quantity,
-                    isChecked = true
-                )
-            } else {
-                product.copy(isChecked = false)
+        val updatedItems =
+            currentItems.map { product ->
+                val matching = checkedProducts.find { it.id == product.id }
+                if (matching != null) {
+                    product.copy(
+                        quantity = matching.quantity,
+                        isChecked = true,
+                    )
+                } else {
+                    product.copy(isChecked = false)
+                }
             }
-        }
 
         _items.postValue(updatedItems)
-
     }
 
     companion object {
