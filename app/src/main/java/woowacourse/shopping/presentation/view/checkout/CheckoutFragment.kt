@@ -3,7 +3,9 @@ package woowacourse.shopping.presentation.view.checkout
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
+import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCheckoutBinding
@@ -14,6 +16,13 @@ import woowacourse.shopping.presentation.view.common.BaseFragment
 class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment_checkout) {
     private val viewModel: CheckoutViewModel by viewModels { CheckoutViewModel.Factory }
     private val adapter: CouponAdapter by lazy { CouponAdapter(checkoutEventHandler) }
+
+    private val backCallback =
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                navigateBack()
+            }
+        }
 
     private val checkoutEventHandler =
         object : CheckoutEventHandler {
@@ -33,16 +42,25 @@ class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment
 
         initBinding()
         initObserver()
+        requireActivity().onBackPressedDispatcher.addCallback(backCallback)
 
         val selectedProductIds = arguments?.getLongArray(SELECTED_PRODUCT_IDS)
         viewModel.loadSelectedCartItems(selectedProductIds?.toList().orEmpty())
         viewModel.loadCoupons()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        backCallback.remove()
+    }
+
     private fun initBinding() {
         binding.vm = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
         binding.recyclerViewCoupon.adapter = adapter
+        binding.btnBack.setOnClickListener {
+            navigateBack()
+        }
     }
 
     private fun initObserver() {
@@ -52,6 +70,13 @@ class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment
 
         viewModel.cartItems.observe(viewLifecycleOwner) { cartItems ->
             cartItems.forEach { Log.d("cartItems", "$it") }
+        }
+    }
+
+    private fun navigateBack() {
+        parentFragmentManager.popBackStack()
+        parentFragmentManager.commit {
+            remove(this@CheckoutFragment)
         }
     }
 
