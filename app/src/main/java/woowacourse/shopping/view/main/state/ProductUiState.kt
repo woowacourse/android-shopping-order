@@ -7,6 +7,7 @@ import woowacourse.shopping.domain.product.Product
 data class ProductUiState(
     val productItems: List<ProductState> = emptyList(),
     val historyItems: List<Product> = emptyList(),
+    val sumOfCartQuantity: Int = 0,
     val load: LoadState = LoadState.CannotLoad,
     val isFetching: Boolean = true,
 ) {
@@ -19,8 +20,9 @@ data class ProductUiState(
     val lastSeenProductCategory
         get() = historyItems.firstOrNull()?.category
 
-    val sumOfCartQuantity
-        get() = productItems.sumOf { it.cartQuantity.value }
+    fun modifySumOfCartQuantity(quantity: Int): ProductUiState {
+        return copy(sumOfCartQuantity = quantity)
+    }
 
     fun modifyUiState(newState: ProductState): ProductUiState {
         val targetIndex = targetIndex(newState.item.id)

@@ -79,6 +79,6 @@ class MainViewModelTest {
             // then
             val state = viewModel.uiState.value
             assertEquals(1, state?.historyItems?.size)
-            assertEquals(productId, state?.historyItems?.first()?.productId)
+            assertEquals(productId, state?.historyItems?.first()?.id)
         }
 }

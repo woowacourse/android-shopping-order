@@ -25,6 +25,7 @@ import woowacourse.shopping.view.core.event.MutableSingleLiveData
 import woowacourse.shopping.view.core.event.SingleLiveData
 import woowacourse.shopping.view.core.handler.CartQuantityHandler
 import woowacourse.shopping.view.main.state.ProductState
+import woowacourse.shopping.view.main.state.ProductState.Companion.NOT_IN_CART
 
 class CartViewModel(
     private val cartRepository: CartRepository,
@@ -114,7 +115,7 @@ class CartViewModel(
                         }.onFailure(::handleFailure)
                 } else {
                     cartRepository.deleteCart(cartId).onSuccess {
-                        val result = updated.copy(cartId = null)
+                        val result = updated.copy(cartId = NOT_IN_CART)
                         _recommendUiState.value = state.modifyUiState(result)
                         _cartUiState.value = _cartUiState.value?.deleteCart(cartId)
                     }.onFailure(::handleFailure)
