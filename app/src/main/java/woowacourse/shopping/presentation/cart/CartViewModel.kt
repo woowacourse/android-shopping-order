@@ -35,6 +35,7 @@ class CartViewModel(
 
     init {
         loadItems()
+        fetchSelectedInfo()
     }
 
     fun loadItems(currentPage: Int = 0) {

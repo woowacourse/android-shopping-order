@@ -45,6 +45,7 @@ class ProductActivity :
         enableEdgeToEdge()
         binding = DataBindingUtil.setContentView(this, R.layout.activity_product)
         binding.lifecycleOwner = this
+        binding.vm = viewModel
 
         initInsets()
         setupToolbar()
@@ -141,10 +142,6 @@ class ProductActivity :
             val showLoadMore = viewModel.showLoadMore.value == true
             val list = products.toProductListItems(showLoadMore)
             productAdapter.submitList(list)
-        }
-
-        viewModel.recentProducts.observe(this) { recentProducts ->
-            recentAdapter.submitList(recentProducts)
         }
 
         viewModel.cartItemCount.observe(this) { count ->

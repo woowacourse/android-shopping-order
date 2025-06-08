@@ -97,11 +97,6 @@ class CartActivity :
             }
         }
 
-        viewModel.cartItems.observe(this) { cartItems ->
-            cartAdapter.submitList(cartItems)
-            viewModel.fetchSelectedInfo()
-        }
-
         viewModel.toastMessage.observe(this) { resId ->
             showToast(getString(resId))
         }
