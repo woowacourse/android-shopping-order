@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="java.time.format.DateTimeFormatter" />
+
         <import type="android.view.View" />
 
         <import type="android.widget.CheckBox" />
@@ -29,8 +31,8 @@
             android:id="@+id/checkbox"
             android:layout_width="20dp"
             android:layout_height="0dp"
-            android:gravity="center"
             android:checked="@{coupon.selected}"
+            android:gravity="center"
             android:onClick="@{(view) -> eventHandler.onToggleSelection(coupon, ((CheckBox) view).isChecked)}"
             app:layout_constraintBottom_toBottomOf="@id/coupon_title"
             app:layout_constraintStart_toStartOf="parent"
@@ -66,6 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
+            android:text="@{coupon.coupon.info.expirationDate.format(DateTimeFormatter.ofPattern(@string/date_formatter_pattern))}"
             android:textSize="12sp"
             app:layout_constraintStart_toEndOf="@id/expiration_date_description"
             app:layout_constraintTop_toBottomOf="@id/coupon_title"
@@ -76,9 +79,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:visibility="@{coupon.coupon.info.minimumAmount == null ? View.GONE : View.VISIBLE}"
             android:text="@string/minimum_price_description"
             android:textSize="12sp"
+            android:visibility="@{coupon.coupon.info.minimumAmount == null ? View.GONE : View.VISIBLE}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/expiration_date_description" />
 
@@ -86,10 +89,10 @@
             android:id="@+id/minimum_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="@{coupon.coupon.info.minimumAmount == null ? View.GONE : View.VISIBLE}"
-            android:text="@{String.valueOf(coupon.coupon.info.minimumAmount)}"
             android:layout_marginTop="5dp"
+            android:text="@{String.format(@string/product_price_format, coupon.coupon.info.minimumAmount)}"
             android:textSize="12sp"
+            android:visibility="@{coupon.coupon.info.minimumAmount == null ? View.GONE : View.VISIBLE}"
             app:layout_constraintStart_toEndOf="@id/minimum_price_description"
             app:layout_constraintTop_toBottomOf="@id/expiration_date_description"
             tools:text="100,000원" />

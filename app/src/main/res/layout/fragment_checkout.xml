@@ -210,7 +210,6 @@
             android:layout_height="wrap_content"
             android:background="@color/mint"
             android:text="@string/place_order"
-            android:textAlignment="textEnd"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"

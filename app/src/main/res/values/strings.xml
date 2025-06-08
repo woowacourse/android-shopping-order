@@ -3,7 +3,6 @@
 
     <!-- Product Item -->
     <string name="product_price_format">%,d원</string>
-    <string name="product_discount_format">-%,d원</string>
 
     <!-- Detail Screen -->
     <string name="detail_add_cart_button_text">장바구니 담기</string>
@@ -35,6 +34,8 @@
     <string name="shipping_fee">배송비</string>
     <string name="total_price">총 결제 금액</string>
     <string name="place_order">결제하기</string>
-    <string name="expiration_date_description">만료일:</string>
-    <string name="minimum_price_description">최소 주문 금액:</string>
+    <string name="expiration_date_description">"만료일: "</string>
+    <string name="minimum_price_description">"최소 주문 금액: "</string>
+    <string name="product_discount_format">-%,d원</string>
+    <string name="date_formatter_pattern">yyyy년 MM월 dd일</string>
 </resources>
