@@ -14,7 +14,10 @@ class CouponRepositoryImpl(
     private val timeProvider: TimeProvider,
     val paymentDataSource: PaymentDataSource,
 ) : CouponRepository {
-    override suspend fun getCoupons(totalAmount: Long, orderProducts: List<ProductUiModel>): Result<List<Coupon>> {
+    override suspend fun getCoupons(
+        totalAmount: Long,
+        orderProducts: List<ProductUiModel>,
+    ): Result<List<Coupon>> {
         val result = paymentDataSource.getCoupons()
 
         return result.mapCatching { responseList ->
@@ -26,15 +29,20 @@ class CouponRepositoryImpl(
         }
     }
 
-    private fun isCouponApplicable(coupon: CouponResponse, totalAmount: Long, orderProducts: List<ProductUiModel>): Boolean {
+    private fun isCouponApplicable(
+        coupon: CouponResponse,
+        totalAmount: Long,
+        orderProducts: List<ProductUiModel>,
+    ): Boolean {
         val currentDateTime = timeProvider.currentTime()
         val policy = CouponType.from(coupon.code).getPolicy()
 
-        val policyContext = CouponPolicyContext(
-            totalAmount = totalAmount,
-            orderProducts = orderProducts,
-            currentDateTime = currentDateTime
-        )
+        val policyContext =
+            CouponPolicyContext(
+                totalAmount = totalAmount,
+                orderProducts = orderProducts,
+                currentDateTime = currentDateTime,
+            )
         return policy.isApplicable(coupon, policyContext)
     }
 }

@@ -5,8 +5,8 @@ import woowacourse.shopping.presentation.payment.PaymentViewModel
 
 class CouponEventHandlerImpl(
     private val viewModel: PaymentViewModel,
-)
-    : CouponEventHandler{
+) :
+    CouponEventHandler {
     override fun onCouponCheck(coupon: Coupon) {
         viewModel.onCheckCoupon(coupon)
     }

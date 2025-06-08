@@ -10,10 +10,9 @@ class OrderRemoteDataSource(
         val request = OrderRequest(cartItemIds = cartIds)
         val response = api.postOrders(request = request)
 
-        return if (response.isSuccessful)
-            {
-                Result.success(Unit)
-            } else {
+        return if (response.isSuccessful) {
+            Result.success(Unit)
+        } else {
             Result.failure(Exception(POST_ERROR_MESSAGE))
         }
     }

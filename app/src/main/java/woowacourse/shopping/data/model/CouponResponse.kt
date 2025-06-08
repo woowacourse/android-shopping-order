@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.model
 
-data class CouponResponse (
+data class CouponResponse(
     val id: Long,
     val code: String,
     val description: String,
@@ -10,8 +10,8 @@ data class CouponResponse (
     val buyQuantity: Long?,
     val getQuantity: Long?,
     val availableTime: AvailableTime?,
-    val minimumAmount: Long?
-){
+    val minimumAmount: Long?,
+) {
     data class AvailableTime(
         val start: String,
         val end: String,

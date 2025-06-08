@@ -40,16 +40,17 @@ class PaymentViewModel(
     private val _deliverCharge = MutableLiveData(INITIAL_DELIVERY_CHARGE)
     val deliverCharge: LiveData<Long> = _deliverCharge
 
-    private val _totalAmount = MediatorLiveData<Long>().apply {
-        fun update() {
-            val discount = _discountAmount.value ?: 0L
-            val delivery: Long = _deliverCharge.value ?: INITIAL_DELIVERY_CHARGE
-            value = (initialOrderPrice - discount + delivery).coerceAtLeast(0)
-        }
+    private val _totalAmount =
+        MediatorLiveData<Long>().apply {
+            fun update() {
+                val discount = _discountAmount.value ?: 0L
+                val delivery: Long = _deliverCharge.value ?: INITIAL_DELIVERY_CHARGE
+                value = (initialOrderPrice - discount + delivery).coerceAtLeast(0)
+            }
 
-        addSource(_discountAmount) { update() }
-        addSource(_deliverCharge) { update() }
-    }
+            addSource(_discountAmount) { update() }
+            addSource(_deliverCharge) { update() }
+        }
     val totalAmount: LiveData<Long> = _totalAmount
 
     private val _selectedCouponId = MutableLiveData<Long?>()

@@ -10,15 +10,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
-import kotlinx.coroutines.selects.select
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityPaymentBinding
-import woowacourse.shopping.mapper.toUiModel
 import woowacourse.shopping.presentation.payment.event.CouponEventHandlerImpl
 import woowacourse.shopping.presentation.product.catalog.CatalogActivity
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
-import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandlerImpl
-import woowacourse.shopping.presentation.product.detail.DetailActivity
 import woowacourse.shopping.presentation.recommend.OrderEvent
 import woowacourse.shopping.presentation.recommend.OrderEvent.OrderItemSuccess
 import woowacourse.shopping.presentation.util.IntentCompat

@@ -52,7 +52,7 @@ object Client {
     }
     val getCartRetrofitService: CartApiService by lazy { cartApiService.create(CartApiService::class.java) }
     val getOrderRetrofitService: OrderApiService by lazy { orderApiService.create(OrderApiService::class.java) }
-    val getCouponApiService: CouponApiService by lazy { couponApiService.create(CouponApiService::class.java)}
+    val getCouponApiService: CouponApiService by lazy { couponApiService.create(CouponApiService::class.java) }
 
     private const val BASE_URL =
         "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com"

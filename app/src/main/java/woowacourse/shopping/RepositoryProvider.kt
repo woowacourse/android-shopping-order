@@ -50,7 +50,7 @@ object RepositoryProvider {
         couponRepository =
             CouponRepositoryImpl(
                 SystemTimeProvider(),
-                PaymentRemoteDataSource(getCouponApiService)
+                PaymentRemoteDataSource(getCouponApiService),
             )
     }
 }

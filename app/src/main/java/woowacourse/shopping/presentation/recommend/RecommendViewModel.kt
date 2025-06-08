@@ -11,7 +11,6 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.domain.repository.CartItemRepository
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
 import woowacourse.shopping.presentation.cart.OrderInfo
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel

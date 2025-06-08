@@ -7,7 +7,8 @@ enum class CouponType(val code: String) {
     FREESHIPPING("FREESHIPPING"),
     MIRACLESALE("MIRACLESALE"),
     BOGO("BOGO"),
-    DEFAULT("DEFAULT");
+    DEFAULT("DEFAULT"),
+    ;
 
     companion object {
         fun from(code: String): CouponType {

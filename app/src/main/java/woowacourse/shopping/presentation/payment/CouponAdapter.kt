@@ -10,7 +10,6 @@ import woowacourse.shopping.presentation.util.CouponDiffCallback
 class CouponAdapter(
     private val couponHandler: CouponEventHandler,
 ) : ListAdapter<Coupon, RecyclerView.ViewHolder>(CouponDiffCallback()) {
-
     var selectedCouponId: Long? = null
 
     override fun onCreateViewHolder(
@@ -43,7 +42,6 @@ class CouponAdapter(
             notifyItemChanged(newPosition)
         }
     }
-
 
     override fun getItemCount(): Int = currentList.size
 }

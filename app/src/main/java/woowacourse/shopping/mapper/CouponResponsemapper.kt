@@ -15,10 +15,11 @@ fun CouponResponse.toDomain() =
         buyQuantity = this.buyQuantity,
         getQuantity = this.getQuantity,
         minimumAmount = this.minimumAmount,
-        availableTime = this.availableTime?.let {
-            AvailableTime(
-                start = it.start,
-                end = it.end
-            )
-        }
+        availableTime =
+            this.availableTime?.let {
+                AvailableTime(
+                    start = it.start,
+                    end = it.end,
+                )
+            },
     )
