@@ -47,7 +47,10 @@ class OrderActivity : AppCompatActivity() {
     }
 
     private fun setCouponAdapter() {
-        val adapter = CouponAdapter()
+        val adapter =
+            CouponAdapter(
+                checkClickListener = { viewModel.applyCoupon(it) },
+            )
         binding.recyclerViewOrder.adapter = adapter
     }
 

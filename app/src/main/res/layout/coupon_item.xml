@@ -8,13 +8,18 @@
         <variable
             name="coupon"
             type="woowacourse.shopping.order.Coupon" />
+
+        <variable
+            name="checkClickListener"
+            type="woowacourse.shopping.order.CheckClickListener" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="8dp"
         android:layout_marginHorizontal="10dp"
+        android:layout_marginVertical="8dp"
         android:background="@drawable/cart_item_background">
 
         <CheckBox
@@ -24,6 +29,7 @@
             android:layout_marginTop="6dp"
             android:buttonTint="@color/mint_blue"
             android:foregroundTint="@color/white"
+            android:onClick="@{() -> checkClickListener.onCheck(coupon)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

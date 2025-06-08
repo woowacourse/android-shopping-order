@@ -4,8 +4,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 
-class CouponAdapter :
-    ListAdapter<Coupon, CouponViewHolder>(
+class CouponAdapter(
+    private val checkClickListener: CheckClickListener,
+) : ListAdapter<Coupon, CouponViewHolder>(
         object : DiffUtil.ItemCallback<Coupon>() {
             override fun areItemsTheSame(
                 oldItem: Coupon,
@@ -21,7 +22,7 @@ class CouponAdapter :
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): CouponViewHolder = CouponViewHolder.from(parent)
+    ): CouponViewHolder = CouponViewHolder.from(parent, checkClickListener)
 
     override fun onBindViewHolder(
         holder: CouponViewHolder,

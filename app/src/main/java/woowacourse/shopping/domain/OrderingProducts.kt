@@ -10,6 +10,15 @@ data class OrderingProducts(
 ) {
     private var currentCoupon: Coupon? = null
 
+    fun applyCoupon(coupon: Coupon) {
+        currentCoupon =
+            if (currentCoupon == coupon) {
+                null
+            } else {
+                coupon
+            }
+    }
+
     fun availableCoupons(coupons: List<Coupon>): List<Coupon> = coupons.filter { it.isConditionMet(products) == true }
 
     fun discountAmount(): Int {

@@ -39,6 +39,11 @@ class OrderViewModel(
         Log.d("쿠폰", "products : $orderingProducts")
     }
 
+    fun applyCoupon(coupon: Coupon) {
+        orderingProducts.applyCoupon(coupon)
+        setAmountsByOrderingProducts()
+    }
+
     private fun loadCoupons() {
         viewModelScope.launch {
             val allCoupons: List<Coupon> = couponRepository.getCoupons()

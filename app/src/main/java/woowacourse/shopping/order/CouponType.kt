@@ -63,7 +63,7 @@ sealed class CouponType {
         override fun discount(
             coupon: Coupon,
             products: List<ProductUiModel>,
-        ): Int = products.sumOf { it.price * it.quantity } * coupon.discount.toInt()
+        ): Int = (products.sumOf { it.price * it.quantity } * coupon.discount / 100).toInt()
     }
 
     companion object {
