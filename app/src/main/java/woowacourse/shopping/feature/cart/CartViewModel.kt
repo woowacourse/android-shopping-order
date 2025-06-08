@@ -3,20 +3,20 @@ package woowacourse.shopping.feature.cart
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.carts.dto.CartQuantity
-import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
 import woowacourse.shopping.data.util.mapper.toCartItems
-import woowacourse.shopping.data.util.mapper.toDomain
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
-import kotlin.math.max
 
 sealed class CartUiEvent {
     data class ShowToast(val key: ToastMessageKey) : CartUiEvent()
 }
+
 enum class ToastMessageKey {
     FAIL_INCREASE,
     FAIL_DECREASE,
@@ -24,7 +24,6 @@ enum class ToastMessageKey {
     FAIL_SELECT_ALL,
     FAIL_LOGIN
 }
-
 
 class CartViewModel(
     private val cartRepository: CartRepository,
@@ -84,51 +83,27 @@ class CartViewModel(
     }
 
     fun loadRecommendedGoods() {
-        goodsRepository.fetchMostRecentGoods { goods ->
-            if (goods != null) {
-                goodsRepository.fetchCategoryGoods(
-                    10,
-                    goods.category,
-                    { goodsResponse ->
-                        val allGoodsList = goodsResponse.content.map { CartItem(it.toDomain(), 0) }
-                        filterRecommendedGoods(allGoodsList)
-                    },
-                    {
-                        loadDefaultRecommendedGoods()
-                    },
-                )
-            } else {
-                loadDefaultRecommendedGoods()
+        viewModelScope.launch {
+            val goods = goodsRepository.fetchMostRecentGoods()
+            val allGoods = try {
+                if (goods != null) {
+                    goodsRepository.fetchCategoryGoods(10, goods.category)
+                } else {
+                    goodsRepository.fetchPageGoods(10, 1)
+                }
+            } catch (e: Exception) {
+                _recommendedGoods.value = emptyList()
+                return@launch
+            }.map { CartItem(it, 0) }
+
+            try {
+                val cartItems = cartRepository.fetchAllCartItems().toCartItems()
+                val cartIds = cartItems.map { it.goods.id }.toSet()
+                _recommendedGoods.value = allGoods.filter { it.goods.id !in cartIds }
+            } catch (e: Exception) {
+                _recommendedGoods.value = allGoods
             }
         }
-    }
-
-    private fun filterRecommendedGoods(allGoodsList: List<CartItem>) {
-        cartRepository.fetchAllCartItems(
-            { cartResponse: CartResponse ->
-                val cartItems = cartResponse.toCartItems()
-                val cartGoodsIds = cartItems.map { it.goods.id }.toSet()
-                val filteredGoodsList = allGoodsList.filter { !cartGoodsIds.contains(it.goods.id) }
-                _recommendedGoods.value = filteredGoodsList
-            },
-            {
-                _recommendedGoods.value = allGoodsList
-            },
-        )
-    }
-
-    private fun loadDefaultRecommendedGoods() {
-        goodsRepository.fetchPageGoods(
-            10,
-            1,
-            { response ->
-                val allGoodsList = response.content.map { CartItem(it.toDomain(), 0) }
-                filterRecommendedGoods(allGoodsList)
-            },
-            {
-                _recommendedGoods.value = emptyList()
-            },
-        )
     }
 
     fun addCartItemOrIncreaseQuantity(cartItem: CartItem) {
@@ -136,25 +111,14 @@ class CartViewModel(
         if (existing != null) {
             existing.quantity += 1
         } else {
-            val toAdd = cartItem.copy(quantity = 1)
-            selectedCartMap[toAdd.id] = toAdd
+            selectedCartMap[cartItem.id] = cartItem.copy(quantity = 1)
         }
         updateAllSelected()
         updateTotalPriceAndCount()
     }
 
-    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> =
-        cartResponse.toCartItems()
-
     fun getPosition(cartItem: CartItem): Int? =
         _visibleCart.value?.indexOf(cartItem)?.takeIf { it >= 0 }
-
-
-
-    private fun updateCartDataSize(response: CartResponse) {
-        totalCartSizeData = response.totalElements
-        _isMultiplePages.postValue(totalCartSizeData > PAGE_SIZE)
-    }
 
     fun plusPage() {
         currentPage++
@@ -166,27 +130,15 @@ class CartViewModel(
         updateCartQuantity()
     }
 
-    private fun updatePageMoveAvailability(response: CartResponse) {
-        _isLeftPageEnable.value = !response.first
-        _isRightPageEnable.value = !response.last
-    }
-
     fun setItemSelection(cartItem: CartItem, isSelected: Boolean) {
-        val foundItem = _visibleCart.value?.find { it.id == cartItem.id }
-        foundItem?.let {
-            if (isSelected) {
-                selectedCartMap[cartItem.id] = it
-            } else {
-                selectedCartMap.remove(cartItem.id)
-            }
+        _visibleCart.value?.find { it.id == cartItem.id }?.let {
+            if (isSelected) selectedCartMap[cartItem.id] = it else selectedCartMap.remove(cartItem.id)
             updateAllSelected()
             updateTotalPriceAndCount()
         }
     }
 
     fun isItemSelected(cartItem: CartItem): Boolean = selectedCartMap.containsKey(cartItem.id)
-
-
 
     fun selectAllItems(isSelected: Boolean) {
         if (!isSelected) {
@@ -208,73 +160,85 @@ class CartViewModel(
         _totalPrice.value = total
         _selectedItemCount.value = selectedCartMap.size
     }
+
     fun increaseQuantity(cartItem: CartItem) {
-        cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1), {
-            updateCartQuantity()
-            selectedCartMap[cartItem.id]?.quantity = (selectedCartMap[cartItem.id]?.quantity ?: 0) + 1
-        }, {
-            _event.postValue(CartUiEvent.ShowToast(ToastMessageKey.FAIL_INCREASE))
-        })
+        viewModelScope.launch {
+            try {
+                cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1))
+                updateCartQuantity()
+                selectedCartMap[cartItem.id]?.quantity = (selectedCartMap[cartItem.id]?.quantity ?: 0) + 1
+            } catch (e: Exception) {
+                _event.postValue(CartUiEvent.ShowToast(ToastMessageKey.FAIL_INCREASE))
+            }
+        }
     }
 
     fun removeCartItemOrDecreaseQuantity(cartItem: CartItem) {
         if (cartItem.quantity <= 1) {
             _removeItemEvent.setValue(cartItem)
         } else {
-            cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity - 1), {
-                updateCartQuantity()
-                selectedCartMap[cartItem.id]?.quantity = (selectedCartMap[cartItem.id]?.quantity ?: 0) - 1
-            }, {
-                _event.postValue(CartUiEvent.ShowToast(ToastMessageKey.FAIL_DECREASE))
-            })
+            viewModelScope.launch {
+                try {
+                    cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity - 1))
+                    updateCartQuantity()
+                    selectedCartMap[cartItem.id]?.quantity = (selectedCartMap[cartItem.id]?.quantity ?: 0) - 1
+                } catch (e: Exception) {
+                    _event.postValue(CartUiEvent.ShowToast(ToastMessageKey.FAIL_DECREASE))
+                }
+            }
         }
     }
 
     fun delete(cartItem: CartItem) {
         selectedCartMap.remove(cartItem.id)
-        cartRepository.delete(cartItem.id, {
-            updateCartQuantity()
-        }, {
-            _event.postValue(CartUiEvent.ShowToast(ToastMessageKey.FAIL_DELETE))
-        })
+        viewModelScope.launch {
+            try {
+                cartRepository.delete(cartItem.id)
+                updateCartQuantity()
+            } catch (e: Exception) {
+                _event.postValue(CartUiEvent.ShowToast(ToastMessageKey.FAIL_DELETE))
+            }
+        }
     }
 
     fun selectAllItemsFromServer() {
-        cartRepository.fetchAllCartItems({ allItems ->
-            selectedCartMap.clear()
-            allItems.toCartItems().forEach { selectedCartMap[it.id] = it }
-            _isAllSelected.value = true
-            updateTotalPriceAndCount()
-        }, {
-            _event.postValue(CartUiEvent.ShowToast(ToastMessageKey.FAIL_SELECT_ALL))
-        })
+        viewModelScope.launch {
+            try {
+                val allItems = cartRepository.fetchAllCartItems().toCartItems()
+                selectedCartMap.clear()
+                allItems.forEach { selectedCartMap[it.id] = it }
+                _isAllSelected.value = true
+                updateTotalPriceAndCount()
+            } catch (e: Exception) {
+                _event.postValue(CartUiEvent.ShowToast(ToastMessageKey.FAIL_SELECT_ALL))
+            }
+        }
     }
 
     fun updateCartQuantity() {
-        cartRepository.fetchCartItemsByPage(
-            currentPage - 1,
-            PAGE_SIZE,
-            { cartResponse ->
-                updateCartDataSize(cartResponse)
-                val pageItems = getCartItemByCartResponse(cartResponse)
+        viewModelScope.launch {
+            try {
+                val cartResponse = cartRepository.fetchCartItemsByPage(currentPage - 1, PAGE_SIZE)
+                totalCartSizeData = cartResponse.totalElements
+                _isMultiplePages.postValue(totalCartSizeData > PAGE_SIZE)
+                val pageItems = cartResponse.toCartItems()
                 _visibleCart.value = pageItems
-                updatePageMoveAvailability(cartResponse)
+                _isLeftPageEnable.value = !cartResponse.first
+                _isRightPageEnable.value = !cartResponse.last
                 _isLoading.value = false
                 updateTotalPriceAndCount()
                 if (cartResponse.totalPages >= MINIMUM_PAGE && cartResponse.totalPages < currentPage) {
                     currentPage = cartResponse.totalPages
                     updateCartQuantity()
                 }
-            },
-            {
+            } catch (e: Exception) {
                 _event.postValue(CartUiEvent.ShowToast(ToastMessageKey.FAIL_LOGIN))
-            },
-        )
+            }
+        }
     }
 
     companion object {
         private const val MINIMUM_PAGE = 1
         private const val PAGE_SIZE = 5
-
     }
 }

@@ -1,235 +1,111 @@
 package woowacourse.shopping.data.carts.repository
 
 import okhttp3.OkHttpClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.BuildConfig
-import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.dto.CartItemRequest
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.util.AppInterceptor
 import woowacourse.shopping.data.util.RetrofitService
 import woowacourse.shopping.domain.model.Authorization
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import woowacourse.shopping.data.carts.CartFetchError
 
 class CartRemoteDataSourceImpl(
     baseUrl: String = BuildConfig.BASE_URL,
 ) : CartRemoteDataSource {
+
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(AppInterceptor())
         .build()
 
-
     private val retrofitService: RetrofitService =
-        Retrofit
-            .Builder()
+        Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()
             .create(RetrofitService::class.java)
 
-    override fun fetchCartItemSize(onComplete: (Int) -> Unit) {
-        // Todo
-    }
-
-    override fun fetchCartItemByPage(
+    override suspend fun fetchCartItemByPage(
         page: Int,
-        size: Int,
-        onSuccess: (CartResponse) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        retrofitService
-            .requestCartProduct(
+        size: Int
+    ): CartResponse = withContext(Dispatchers.IO) {
+        try {
+            retrofitService.requestCartProduct(
                 page = page,
                 size = size,
-                authorization = "Basic " + Authorization.basicKey
+                authorization = "Basic ${Authorization.basicKey}"
             )
-            .enqueue(
-                object : Callback<CartResponse> {
-                    override fun onResponse(
-                        call: Call<CartResponse>,
-                        response: Response<CartResponse>,
-                    ) {
-                        if (response.isSuccessful && response.body() != null) {
-                            onSuccess(response.body()!!)
-                        } else {
-                            onFailure(CartFetchError.Server(response.code(), response.message()))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<CartResponse>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartFetchError.Network)
-                    }
-                },
-            )
+        } catch (e: Exception) {
+            throw CartFetchError.Network
+        }
     }
 
-    override fun fetchCartItemByOffset(
+    override suspend fun fetchCartItemByOffset(
         limit: Int,
-        offset: Int,
-        onSuccess: (CartResponse) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        fetchCartItemByPage(offset / limit, limit, onSuccess, onFailure)
+        offset: Int
+    ): CartResponse = fetchCartItemByPage(offset / limit, limit)
+
+    override suspend fun fetchCartCount(): Int = withContext(Dispatchers.IO) {
+        try {
+            retrofitService
+                .requestCartCounts(authorization = "Basic ${Authorization.basicKey}")
+                .quantity
+        } catch (e: Exception) {
+            throw CartFetchError.Network
+        }
     }
 
-    override fun fetchCartCount(
-        onSuccess: (Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        retrofitService
-            .requestCartCounts(authorization = "Basic " + Authorization.basicKey)
-            .enqueue(
-                object : Callback<CartQuantity> {
-                    override fun onResponse(
-                        call: Call<CartQuantity>,
-                        response: Response<CartQuantity>,
-                    ) {
-                        if (response.isSuccessful && response.body() != null) {
-                            onSuccess(response.body()!!.quantity)
-                        } else {
-                            onFailure(CartFetchError.Server(response.code(), response.message()))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<CartQuantity>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartFetchError.Network)
-                    }
-                },
-            )
+    override suspend fun fetchAuthCode(validKey: String): Int = withContext(Dispatchers.IO) {
+        try {
+            retrofitService
+            .requestCartCounts(authorization = "Basic $validKey").quantity
+        } catch (e: Exception) {
+            throw CartFetchError.Network
+        }
     }
 
-    override fun fetchAuthCode(
-        validKey: String,
-        onResponse: (Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        retrofitService
-            .requestCartCounts(authorization = "Basic $validKey")
-            .enqueue(
-                object : Callback<CartQuantity> {
-                    override fun onResponse(
-                        call: Call<CartQuantity>,
-                        response: Response<CartQuantity>,
-                    ) {
-                        onResponse(response.code())
-                    }
-
-                    override fun onFailure(
-                        call: Call<CartQuantity>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartFetchError.Network)
-                    }
-                },
-            )
-    }
-
-    override fun updateCartItemCount(
+    override suspend fun updateCartItemCount(
         cartId: Int,
-        cartQuantity: CartQuantity,
-        onSuccess: (resultCode: Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        retrofitService
-            .updateCartCounts(
+        cartQuantity: CartQuantity
+    ) = withContext(Dispatchers.IO) {
+        try {
+            retrofitService.updateCartCounts(
                 cartId = cartId,
                 requestBody = cartQuantity,
-                authorization = "Basic " + Authorization.basicKey,
-            ).enqueue(
-                object : Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
-                        if (response.isSuccessful) {
-                            onSuccess(response.code())
-                        } else {
-                            onFailure(CartFetchError.Server(response.code(), response.message()))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<Unit>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartFetchError.Network)
-                    }
-                },
+                authorization = "Basic ${Authorization.basicKey}"
             )
+        } catch (e: Exception) {
+            throw CartFetchError.Network
+        }
     }
 
-    override fun deleteItem(
-        cartId: Int,
-        onSuccess: (resultCode: Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit
-    ) {
-        retrofitService
-            .deleteCartItem(
+    override suspend fun deleteItem(cartId: Int) = withContext(Dispatchers.IO) {
+        try {
+            retrofitService.deleteCartItem(
                 cartId = cartId,
-                authorization = "Basic " + Authorization.basicKey,
-            ).enqueue(
-                object : Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
-                        if (response.isSuccessful) {
-                            onSuccess(response.code())
-                        } else {
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<Unit>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartFetchError.Network)
-                    }
-                },
+                authorization = "Basic ${Authorization.basicKey}"
             )
+        } catch (e: Exception) {
+            throw CartFetchError.Network
+        }
     }
 
-    override fun addItem(
+    override suspend fun addItem(
         itemId: Int,
-        itemCount: Int,
-        onSuccess: (resultCode: Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        retrofitService
-            .addCartItem(
+        itemCount: Int
+    ) = withContext(Dispatchers.IO) {
+        try {
+            retrofitService.addCartItem(
                 cartItem = CartItemRequest(itemId, itemCount),
-                authorization = "Basic " + Authorization.basicKey,
-            ).enqueue(
-                object : Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
-                        if (response.isSuccessful) {
-                            onSuccess(response.code())
-                        } else {
-                            onFailure(CartFetchError.Server(response.code(), response.message()))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<Unit>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartFetchError.Network)
-                    }
-                },
+                authorization = "Basic ${Authorization.basicKey}"
             )
+        } catch (e: Exception) {
+            throw CartFetchError.Network
+        }
     }
 }

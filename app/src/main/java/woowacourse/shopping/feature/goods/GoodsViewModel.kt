@@ -3,13 +3,13 @@ package woowacourse.shopping.feature.goods
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.carts.repository.CartRepository
-import woowacourse.shopping.data.goods.dto.GoodsResponse
 import woowacourse.shopping.data.goods.repository.GoodsRepository
 import woowacourse.shopping.data.util.mapper.toCartItems
-import woowacourse.shopping.data.util.mapper.toDomain
 import woowacourse.shopping.domain.model.Authorization
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Goods
@@ -59,8 +59,10 @@ class GoodsViewModel(
     private var cachedCartItems = mutableMapOf<Int, CartItem>()
 
     init {
-        appendCartItemsWithZeroQuantity()
-        updateRecentlyViewedGoods()
+        viewModelScope.launch {
+            appendCartItemsWithZeroQuantity()
+            updateRecentlyViewedGoods()
+        }
     }
 
     fun findCart(goods: Goods): CartItem? = cachedCartItems[goods.id]
@@ -70,11 +72,16 @@ class GoodsViewModel(
 
     fun login(basicKey: String) {
         Authorization.setBasicKey(basicKey)
-        cartRepository.checkValidBasicKey(basicKey, { response ->
-            Authorization.setLoginStatus(response == 200)
-        }, {
-            _uiEvent.postValue(GoodsUiEvent.ShowToast(ToastMessageKey.FAIL_LOGIN))
-        })
+        viewModelScope.launch {
+            try {
+                cartRepository.checkValidBasicKey(basicKey)
+                Authorization.setLoginStatus(true)
+            } catch (e: Exception) {
+                _uiEvent.postValue(GoodsUiEvent.ShowToast(ToastMessageKey.FAIL_LOGIN))
+                Authorization.setLoginStatus(false)
+
+            }
+        }
     }
 
     fun onCartClicked() {
@@ -85,41 +92,39 @@ class GoodsViewModel(
         }
     }
 
-    private fun appendCartItemsWithZeroQuantity() {
-        val offset = (page - 1) * PAGE_SIZE
-        goodsRepository.fetchPageGoods(
-            limit = PAGE_SIZE,
-            offset = offset,
-            onComplete = { goodsResponse ->
-                val fetchedGoods =
-                    goodsResponse.content.map { it.toDomain() }
-                goods.addAll(fetchedGoods)
-                _isFullLoaded.postValue(goodsResponse.last)
-                _goodsWithCartQuantity.postValue(goods.map { CartItem(goods = it, quantity = 0) })
-                _isLoading.postValue(false)
-            },
-            onFail = {
-                _uiEvent.postValue(GoodsUiEvent.ShowToast(ToastMessageKey.FAIL_CART_LOAD))
-                _isLoading.postValue(false)
-            },
-        )
+    private suspend fun appendCartItemsWithZeroQuantity() {
+        try {
+            val offset = (page - 1) * PAGE_SIZE
+            val fetchedGoods = goodsRepository.fetchPageGoods(PAGE_SIZE, offset)
+            goods.addAll(fetchedGoods)
+            _isFullLoaded.postValue(fetchedGoods.size < PAGE_SIZE)
+            _goodsWithCartQuantity.postValue(goods.map { CartItem(it, 0) })
+        } catch (e: Exception) {
+            _uiEvent.postValue(GoodsUiEvent.ShowToast(ToastMessageKey.FAIL_CART_LOAD))
+        } finally {
+            _isLoading.postValue(false)
+        }
     }
 
     fun updateRecentlyViewedGoods() {
-        goodsRepository.fetchRecentGoods { goods ->
-            _recentlyViewedGoods.postValue(goods)
+        viewModelScope.launch {
+            val result = goodsRepository.fetchRecentGoods()
+            _recentlyViewedGoods.postValue(result)
         }
     }
 
     fun fetchAndSetCartCache() {
-        cartRepository.fetchAllCartItems({ cartResponse ->
-            val cartItems = getCartItemByCartResponse(cartResponse)
-            cachedCartItems = cartItems.associateBy { it.goods.id }.toMutableMap()
-            setTotalCartItemSize(cartItems.sumOf { it.quantity })
-            bindCartCache()
-        }, {
-            _uiEvent.postValue(GoodsUiEvent.ShowToast(ToastMessageKey.FAIL_CART_LOAD))
-        })
+        viewModelScope.launch {
+            try {
+                val cartResponse = cartRepository.fetchAllCartItems()
+                val cartItems = getCartItemByCartResponse(cartResponse)
+                cachedCartItems = cartItems.associateBy { it.goods.id }.toMutableMap()
+                setTotalCartItemSize(cartItems.sumOf { it.quantity })
+                bindCartCache()
+            } catch (e: Exception) {
+                _uiEvent.postValue(GoodsUiEvent.ShowToast(ToastMessageKey.FAIL_CART_LOAD))
+            }
+        }
     }
 
     private fun bindCartCache() {
@@ -138,7 +143,7 @@ class GoodsViewModel(
 
     fun addPage() {
         page++
-        appendCartItemsWithZeroQuantity()
+        viewModelScope.launch { appendCartItemsWithZeroQuantity() }
     }
 
     fun addCartItemOrIncreaseQuantity(cartItem: CartItem) {
@@ -147,9 +152,11 @@ class GoodsViewModel(
         } else {
             val cached = cachedCartItems[cartItem.goods.id]
             if (cached == null) {
-                addCartItem(cartItem)
+                viewModelScope.launch { addCartItem(cartItem) }
             } else {
-                updateCartItemQuantity(cached.id, cartItem.copy(quantity = cached.quantity + 1))
+                viewModelScope.launch {
+                    updateCartItemQuantity(cached.id, cartItem.copy(quantity = cached.quantity + 1))
+                }
             }
         }
     }
@@ -158,14 +165,16 @@ class GoodsViewModel(
         if (!Authorization.isLogin) {
             _uiEvent.setValue(GoodsUiEvent.NavigateToLogin)
         } else {
-            cachedCartItems[cartItem.goods.id]?.let { existing ->
+            viewModelScope.launch {
+                val existing = cachedCartItems[cartItem.goods.id] ?: return@launch
                 if (existing.quantity <= 1) {
-                    cartRepository.delete(existing.id, {
+                    try {
+                        cartRepository.delete(existing.id)
                         cachedCartItems.remove(existing.goods.id)
                         bindCartCache()
-                    }, {
+                    } catch (e: Exception) {
                         _uiEvent.setValue(GoodsUiEvent.ShowToast(ToastMessageKey.FAIL_CART_DELETE))
-                    })
+                    }
                 } else {
                     updateCartItemQuantity(
                         existing.id,
@@ -176,24 +185,25 @@ class GoodsViewModel(
         }
     }
 
-    private fun addCartItem(cartItem: CartItem) {
-        cartRepository.addCartItem(cartItem.goods, 1, {
+    private suspend fun addCartItem(cartItem: CartItem) {
+        try {
+            cartRepository.addCartItem(cartItem.goods, 1)
             cachedCartItems[cartItem.goods.id] = cartItem.copy(quantity = 1)
             bindCartCache()
-        }, {
+        } catch (e: Exception) {
             _uiEvent.setValue(GoodsUiEvent.ShowToast(ToastMessageKey.FAIL_CART_ADD))
-        })
+        }
     }
 
-    private fun updateCartItemQuantity(cartId: Int, cartItem: CartItem) {
-        cartRepository.updateQuantity(cartId, CartQuantity(cartItem.quantity), {
+    private suspend fun updateCartItemQuantity(cartId: Int, cartItem: CartItem) {
+        try {
+            cartRepository.updateQuantity(cartId, CartQuantity(cartItem.quantity))
             cachedCartItems[cartItem.goods.id] = cartItem
             bindCartCache()
-        }, {
+        } catch (e: Exception) {
             _uiEvent.setValue(GoodsUiEvent.ShowToast(ToastMessageKey.FAIL_CART_UPDATE))
-        })
+        }
     }
-
 
     companion object {
         private const val PAGE_SIZE = 20

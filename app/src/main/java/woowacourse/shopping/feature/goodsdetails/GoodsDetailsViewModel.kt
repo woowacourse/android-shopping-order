@@ -3,6 +3,8 @@ package woowacourse.shopping.feature.goodsdetails
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
@@ -44,13 +46,14 @@ class GoodsDetailsViewModel(
     val mostRecentlyViewedGoods: LiveData<Goods> get() = _mostRecentlyViewedGoods
 
     fun initMostRecentlyViewedGoods() {
-        goodsRepository.fetchMostRecentGoods { goods ->
-            goods?.let {
-                if (goodsUiModel.id != goods.id) {
+        viewModelScope.launch {
+            val recent = goodsRepository.fetchMostRecentGoods()
+            recent?.let {
+                if (goodsUiModel.id != it.id) {
                     _event.setValue(UiEvent.ShowMostRecentlyViewed(it))
                 }
             }
-            loggingRecentViewedGoods(goodsUiModel.toDomain())
+            goodsRepository.loggingRecentGoods(goodsUiModel.toDomain())
         }
     }
 
@@ -70,20 +73,21 @@ class GoodsDetailsViewModel(
 
     fun addToCart() {
         cartItem.value?.let { item ->
-            if (cartUiModel != null) {
-                cartRepository.updateQuantity(
-                    cartUiModel.cartId,
-                    CartQuantity(cartUiModel.cartQuantity + item.quantity),
-                    { handleCartAdded(item.quantity) },
-                    { _event.setValue(UiEvent.ShowToast(ToastMessageKey.FAIL_CART_UPDATE)) },
-                )
-            } else {
-                cartRepository.addCartItem(
-                    item.goods,
-                    item.quantity,
-                    { handleCartAdded(item.quantity) },
-                    { _event.setValue(UiEvent.ShowToast(ToastMessageKey.FAIL_CART_ADD)) },
-                )
+            viewModelScope.launch {
+                try {
+                    if (cartUiModel != null) {
+                        cartRepository.updateQuantity(
+                            cartUiModel.cartId,
+                            CartQuantity(cartUiModel.cartQuantity + item.quantity)
+                        )
+                    } else {
+                        cartRepository.addCartItem(item.goods, item.quantity)
+                    }
+                    handleCartAdded(item.quantity)
+                } catch (e: Exception) {
+                    val key = if (cartUiModel != null) ToastMessageKey.FAIL_CART_UPDATE else ToastMessageKey.FAIL_CART_ADD
+                    _event.setValue(UiEvent.ShowToast(key))
+                }
             }
         }
     }
@@ -95,9 +99,5 @@ class GoodsDetailsViewModel(
 
     fun handleClickMostRecentlyGoodsSection() {
         _event.setValue(UiEvent.ClickMostRecentlyViewed)
-    }
-
-    fun loggingRecentViewedGoods(goods: Goods) {
-        goodsRepository.loggingRecentGoods(goods) {}
     }
 }
