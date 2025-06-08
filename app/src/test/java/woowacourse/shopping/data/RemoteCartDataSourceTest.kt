@@ -9,16 +9,16 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.data.datasource.CartDataSource
+import woowacourse.shopping.data.datasource.remote.RemoteCartDataSource
 import woowacourse.shopping.data.network.request.CartItemRequest
 import woowacourse.shopping.data.network.service.CartService
 import woowacourse.shopping.domain.exception.NetworkError
 import woowacourse.shopping.domain.exception.NetworkResult
 
-class CartDataSourceTest {
+class RemoteCartDataSourceTest {
     private lateinit var mockWebServer: MockWebServer
     private lateinit var cartService: CartService
-    private lateinit var cartDataSource: CartDataSource
+    private lateinit var remoteCartDataSource: RemoteCartDataSource
 
     @BeforeEach
     fun setUp() {
@@ -31,7 +31,7 @@ class CartDataSourceTest {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
         cartService = retrofit.create(CartService::class.java)
-        cartDataSource = CartDataSource(cartService, NetworkResultHandler())
+        remoteCartDataSource = RemoteCartDataSource(cartService, NetworkResultHandler())
     }
 
     @Test
@@ -46,7 +46,7 @@ class CartDataSourceTest {
             mockWebServer.enqueue(mockResponse)
 
             // When
-            val result = cartDataSource.addCart(CartItemRequest(1, 1))
+            val result = remoteCartDataSource.addCart(CartItemRequest(1, 1))
 
             // then
             assertTrue(result is NetworkResult.Error)

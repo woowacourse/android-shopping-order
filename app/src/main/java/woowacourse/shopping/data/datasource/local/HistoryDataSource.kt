@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.datasource.history
+package woowacourse.shopping.data.datasource.local
 
 import woowacourse.shopping.data.db.entity.HistoryEntity
 

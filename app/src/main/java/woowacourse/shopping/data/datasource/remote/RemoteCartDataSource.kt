@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.datasource
+package woowacourse.shopping.data.datasource.remote
 
 import retrofit2.HttpException
 import woowacourse.shopping.data.NetworkResultHandler
@@ -8,7 +8,7 @@ import woowacourse.shopping.domain.cart.CartsSinglePage
 import woowacourse.shopping.domain.exception.NetworkError
 import woowacourse.shopping.domain.exception.NetworkResult
 
-class CartDataSource(
+class RemoteCartDataSource(
     private val service: CartService,
     private val handler: NetworkResultHandler = NetworkResultHandler(),
 ) {

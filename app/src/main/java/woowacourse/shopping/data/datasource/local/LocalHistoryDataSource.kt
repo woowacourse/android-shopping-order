@@ -1,9 +1,9 @@
-package woowacourse.shopping.data.datasource.history
+package woowacourse.shopping.data.datasource.local
 
 import woowacourse.shopping.data.db.dao.HistoryDao
 import woowacourse.shopping.data.db.entity.HistoryEntity
 
-class DefaultHistoryDataSource(
+class LocalHistoryDataSource(
     private val dao: HistoryDao,
 ) : HistoryDataSource {
     override suspend fun latestHistory(): List<HistoryEntity> = dao.getLatestHistories()

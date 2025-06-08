@@ -2,7 +2,7 @@ package woowacourse.shopping.data.repository
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import woowacourse.shopping.data.datasource.history.HistoryDataSource
+import woowacourse.shopping.data.datasource.local.HistoryDataSource
 import woowacourse.shopping.data.db.entity.HistoryEntity
 import woowacourse.shopping.domain.repository.HistoryRepository
 

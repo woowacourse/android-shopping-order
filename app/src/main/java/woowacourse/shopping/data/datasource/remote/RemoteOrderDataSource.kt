@@ -1,11 +1,11 @@
-package woowacourse.shopping.data.datasource
+package woowacourse.shopping.data.datasource.remote
 
 import woowacourse.shopping.data.NetworkResultHandler
 import woowacourse.shopping.data.network.request.OrderRequest
 import woowacourse.shopping.data.network.service.OrderService
 import woowacourse.shopping.domain.exception.NetworkResult
 
-class OrderDataSource(
+class RemoteOrderDataSource(
     private val service: OrderService,
     private val handler: NetworkResultHandler,
 ) {

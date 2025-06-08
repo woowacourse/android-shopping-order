@@ -7,19 +7,19 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.data.datasource.CouponDataSource
+import woowacourse.shopping.data.datasource.remote.RemoteCouponDataSource
 import woowacourse.shopping.domain.coupon.FixedCoupon
 import woowacourse.shopping.domain.coupon.FreeshippingCoupon
 import woowacourse.shopping.domain.exception.NetworkResult
 import java.time.LocalDate
 
 class DefaultCouponRepositoryTest {
-    private val couponDataSource = mockk<CouponDataSource>()
+    private val remoteCouponDataSource = mockk<RemoteCouponDataSource>()
     private lateinit var repository: DefaultCouponRepository
 
     @BeforeEach
     fun setUp() {
-        repository = DefaultCouponRepository(couponDataSource)
+        repository = DefaultCouponRepository(remoteCouponDataSource)
     }
 
     @Test
@@ -46,7 +46,7 @@ class DefaultCouponRepositoryTest {
                         expirationDate = LocalDate.now(),
                     ),
                 )
-            coEvery { couponDataSource.getCoupons() } returns NetworkResult.Success(expectedCoupons)
+            coEvery { remoteCouponDataSource.getCoupons() } returns NetworkResult.Success(expectedCoupons)
 
             // when
             val result = repository.getCoupons()

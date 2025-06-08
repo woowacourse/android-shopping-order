@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.data.datasource.ProductsDataSource
+import woowacourse.shopping.data.datasource.remote.RemoteProductsDataSource
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.exception.NetworkResult
 import woowacourse.shopping.domain.product.Price
@@ -16,7 +16,7 @@ import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class DefaultProductRepositoryTest {
-    private val productDateSource = mockk<ProductsDataSource>()
+    private val productDateSource = mockk<RemoteProductsDataSource>()
     private lateinit var repository: ProductRepository
 
     @BeforeEach

@@ -7,7 +7,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.data.datasource.CartDataSource
+import woowacourse.shopping.data.datasource.remote.RemoteCartDataSource
 import woowacourse.shopping.data.network.request.toRequest
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
@@ -16,12 +16,12 @@ import woowacourse.shopping.domain.exception.NetworkResult
 import woowacourse.shopping.domain.repository.CartRepository
 
 class DefaultCartRepositoryTest {
-    private val cartDataSource: CartDataSource = mockk()
+    private val remoteCartDataSource: RemoteCartDataSource = mockk()
     private lateinit var repository: CartRepository
 
     @BeforeEach
     fun setUp() {
-        repository = DefaultCartRepository(cartDataSource)
+        repository = DefaultCartRepository(remoteCartDataSource)
     }
 
     @Test
@@ -31,7 +31,7 @@ class DefaultCartRepositoryTest {
             val cart = Cart(quantity = Quantity(2), productId = 1L)
             val expectedId = 10L
 
-            coEvery { cartDataSource.addCart(cart.toRequest()) } returns
+            coEvery { remoteCartDataSource.addCart(cart.toRequest()) } returns
                 NetworkResult.Success(
                     expectedId,
                 )
@@ -41,7 +41,7 @@ class DefaultCartRepositoryTest {
 
             // then
             assertEquals(NetworkResult.Success(expectedId), result)
-            coVerify(exactly = 1) { cartDataSource.addCart(cart.toRequest()) }
+            coVerify(exactly = 1) { remoteCartDataSource.addCart(cart.toRequest()) }
         }
 
     @Test
@@ -50,12 +50,12 @@ class DefaultCartRepositoryTest {
             val expectedPage = mockk<CartsSinglePage>()
             val expectedResult = NetworkResult.Success(expectedPage)
 
-            coEvery { cartDataSource.singlePage(1, 10) } returns expectedResult
+            coEvery { remoteCartDataSource.singlePage(1, 10) } returns expectedResult
 
             val result = repository.loadSinglePage(1, 10)
 
             assertEquals(expectedResult, result)
-            coVerify(exactly = 1) { cartDataSource.singlePage(1, 10) }
+            coVerify(exactly = 1) { remoteCartDataSource.singlePage(1, 10) }
         }
 
     @Test
@@ -66,13 +66,13 @@ class DefaultCartRepositoryTest {
 
             val expectedResult = NetworkResult.Success(Unit)
 
-            coEvery { cartDataSource.updateCartQuantity(cartId, quantity.value) } returns expectedResult
+            coEvery { remoteCartDataSource.updateCartQuantity(cartId, quantity.value) } returns expectedResult
 
             // when
             val result = repository.updateQuantity(cartId, quantity)
 
             // then
             assertEquals(expectedResult, result)
-            coVerify { cartDataSource.updateCartQuantity(cartId, quantity.value) }
+            coVerify { remoteCartDataSource.updateCartQuantity(cartId, quantity.value) }
         }
 }

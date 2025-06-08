@@ -2,14 +2,14 @@ package woowacourse.shopping.data.repository
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import woowacourse.shopping.data.datasource.ProductsDataSource
+import woowacourse.shopping.data.datasource.remote.RemoteProductsDataSource
 import woowacourse.shopping.domain.exception.NetworkResult
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class DefaultProductRepository(
-    private val productDataSource: ProductsDataSource,
+    private val productDataSource: RemoteProductsDataSource,
 ) : ProductRepository {
     override suspend fun loadSinglePage(
         category: String?,

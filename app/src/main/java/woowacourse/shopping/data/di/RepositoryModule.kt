@@ -14,11 +14,11 @@ class RepositoryModule(
     dataSourceModule: DataSourceModule,
 ) {
     val defaultCouponRepository: DefaultCouponRepository by lazy {
-        DefaultCouponRepository(dataSourceModule.couponDataSource)
+        DefaultCouponRepository(dataSourceModule.remoteCouponDataSource)
     }
 
     val defaultProductRepository: ProductRepository by lazy {
-        DefaultProductRepository(dataSourceModule.productsDataSource)
+        DefaultProductRepository(dataSourceModule.remoteProductsDataSource)
     }
 
     val defaultHistoryRepository: HistoryRepository by lazy {
@@ -26,10 +26,10 @@ class RepositoryModule(
     }
 
     val defaultCartRepository: CartRepository by lazy {
-        DefaultCartRepository(dataSourceModule.cartDataSource)
+        DefaultCartRepository(dataSourceModule.remoteCartDataSource)
     }
 
     val defaultOrderRepository: OrderRepository by lazy {
-        DefaultOrderRepository(dataSourceModule.orderDataSource)
+        DefaultOrderRepository(dataSourceModule.remoteOrderDataSource)
     }
 }
