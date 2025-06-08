@@ -108,10 +108,6 @@ class ProductDetailActivity :
         private const val EXTRA_SHOPPING_CART_QUANTITY =
             "woowacourse.shopping.EXTRA_SHOPPING_CART_QUANTITY"
 
-        fun a() {
-            Intent().extras
-        }
-
         fun newIntent(
             context: Context,
             productId: Long,
