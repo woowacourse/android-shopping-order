@@ -9,4 +9,5 @@ interface Coupon {
     val expirationDate: LocalDate
 
     fun isAvailable(cart: Cart, current: LocalDateTime): Boolean
+    fun discountPrice(cart: Cart): Int
 }

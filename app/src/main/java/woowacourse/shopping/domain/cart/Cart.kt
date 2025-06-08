@@ -9,4 +9,14 @@ value class Cart(
     fun hasEnoughItems(thresholdQuantity: Int): Boolean {
         return items.any { it.quantity >= thresholdQuantity }
     }
+
+    fun findMostExpensiveItemPrice(thresholdQuantity: Int): Int {
+        return items
+            .asSequence()
+            .filter { cartItem: CartItem ->
+                cartItem.quantity >= thresholdQuantity
+            }.maxBy {
+                it.price
+            }.productPrice
+    }
 }

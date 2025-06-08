@@ -13,5 +13,9 @@ class BoGoCoupon(
 
     override fun isAvailable(cart: Cart, current: LocalDateTime): Boolean =
         current.toLocalDate() <= expirationDate && cart.hasEnoughItems(buyQuantity + getQuantity)
+
+    override fun discountPrice(cart: Cart): Int {
+        return cart.findMostExpensiveItemPrice(buyQuantity + getQuantity) * getQuantity
+    }
 }
 

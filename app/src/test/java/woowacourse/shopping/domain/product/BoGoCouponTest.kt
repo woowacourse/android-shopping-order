@@ -99,4 +99,37 @@ class BoGoCouponTest {
 
         assertThat(actual).isEqualTo(expected)
     }
+
+    @Test
+    fun `쿠폰을 적용하면 가장 높은 금액을 가진 상품만 적용이 된다`() {
+        val cart = Cart(
+            listOf(
+                CartItem(
+                    id = 1,
+                    product = Product(
+                        id = 1,
+                        name = "밥",
+                        price = 100_001,
+                        category = "식료품",
+                    ),
+                    quantity = 3
+                ),
+                CartItem(
+                    id = 2,
+                    product = Product(
+                        id = 2,
+                        name = "국",
+                        price = 200,
+                        category = "식료품",
+                    ),
+                    quantity = 3
+                )
+            )
+        )
+
+        val actual = boGoCoupon.discountPrice(cart)
+        val expected = 100_001
+
+        assertThat(actual).isEqualTo(expected)
+    }
 }
