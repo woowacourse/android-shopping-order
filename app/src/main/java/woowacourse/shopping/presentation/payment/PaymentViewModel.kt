@@ -68,8 +68,9 @@ class PaymentViewModel(
 
     fun orderItems() {
         viewModelScope.launch {
-            val cartIds = cartItemRepository.getCartItemCartIds()
+            val cartIds = cartItemRepository.getCartIdsByProducts(initialCheckedItems)
             val result = orderRepository.orderItems(cartIds)
+
             result
                 .onSuccess {
                     _orderEvent.postValue(OrderItemSuccess)

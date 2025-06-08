@@ -59,16 +59,10 @@ class CatalogActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.loadCatalogProducts()
-    }
-
     private fun setViewModel() {
         viewModel.loadCatalogProducts()
         viewModel.loadRecentViewedItems()
         viewModel.updateCartCount()
-        viewModel.updateProductQuantities()
     }
 
     private fun initRecyclerView() {

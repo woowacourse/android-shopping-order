@@ -2,6 +2,7 @@ package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.data.model.CachedCartItem
 import woowacourse.shopping.domain.model.PagingData
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 interface CartItemRepository {
     suspend fun getInitialCartItems(
@@ -37,5 +38,5 @@ interface CartItemRepository {
 
     fun getCartItemProductIds(): List<Long>
 
-    fun getCartItemCartIds(): List<Long>
+    fun getCartIdsByProducts(products: List<ProductUiModel>): List<Long>
 }

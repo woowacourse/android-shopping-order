@@ -41,8 +41,10 @@ class CartItemsRepositoryImpl(
         return cartItemsLocalDataSource.getCartItemProductIds()
     }
 
-    override fun getCartItemCartIds(): List<Long> {
-        return cartItemsLocalDataSource.getCartItemCartIds()
+    override fun getCartIdsByProducts(products: List<ProductUiModel>): List<Long> {
+        return products.mapNotNull { product ->
+            cartItemsLocalDataSource.findCachedCartId(product.id)
+        }
     }
 
     override suspend fun getInitialCartItems(
