@@ -6,12 +6,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CouponRepository
+import woowacourse.shopping.domain.OrderingProducts
+import woowacourse.shopping.product.catalog.ProductUiModel
 
 class OrderViewModel(
+    products: Array<ProductUiModel>,
     private val couponRepository: CouponRepository,
 ) : ViewModel() {
-    private val _coupons = MutableLiveData<List<Coupon>>()
-    val coupons: LiveData<List<Coupon>> = _coupons
+    val orderingProducts: OrderingProducts = OrderingProducts(products.toList())
+
+    private val _availableCoupons = MutableLiveData<List<Coupon>>()
+    val availableCoupons: LiveData<List<Coupon>> = _availableCoupons
 
     init {
         loadCoupons()
@@ -19,7 +24,9 @@ class OrderViewModel(
 
     private fun loadCoupons() {
         viewModelScope.launch {
-            _coupons.postValue(couponRepository.getCoupons())
+            val allCoupons: List<Coupon> = couponRepository.getCoupons()
+            val availableCoupons: List<Coupon> = orderingProducts.availableCoupons(allCoupons)
+            _availableCoupons.postValue(availableCoupons)
         }
     }
 }
