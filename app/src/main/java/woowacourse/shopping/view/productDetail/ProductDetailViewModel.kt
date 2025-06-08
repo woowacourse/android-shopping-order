@@ -114,29 +114,27 @@ class ProductDetailViewModel(
     fun addToShoppingCart() {
         val product = requireNotNull(product.value) { "product.value가 null입니다." }
         val totalQuantity = quantity.value?.plus(product.selectedQuantity) ?: 0
-        if (product.shoppingCartId == null) {
-            shoppingCartRepository.add(
-                product.product,
-                totalQuantity,
-            ) { result ->
-                result
-                    .onSuccess {
-                        _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS)
+        viewModelScope.launch {
+            if (product.shoppingCartId == null) {
+                shoppingCartRepository
+                    .add(
+                        product.product,
+                        totalQuantity,
+                    ).onSuccess {
+                        _event.setValue(ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS)
                     }.onFailure {
-                        _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_FAILURE)
+                        _event.setValue(ProductDetailEvent.ADD_SHOPPING_CART_FAILURE)
                     }
+                return@launch
             }
-            return
-        }
-        shoppingCartRepository.increaseQuantity(
-            product.shoppingCartId,
-            totalQuantity,
-        ) { result ->
-            result
-                .onSuccess {
-                    _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS)
+            shoppingCartRepository
+                .increaseQuantity(
+                    product.shoppingCartId,
+                    totalQuantity,
+                ).onSuccess {
+                    _event.setValue(ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS)
                 }.onFailure {
-                    _event.postValue(ProductDetailEvent.ADD_SHOPPING_CART_FAILURE)
+                    _event.setValue(ProductDetailEvent.ADD_SHOPPING_CART_FAILURE)
                 }
         }
     }

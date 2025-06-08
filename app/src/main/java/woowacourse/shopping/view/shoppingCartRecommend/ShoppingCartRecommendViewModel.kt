@@ -59,11 +59,13 @@ class ShoppingCartRecommendViewModel(
     }
 
     private fun initShoppingCartProducts() {
-        shoppingCartRepository.load(0, MAX_RECENT_PRODUCT_LOAD_SIZE) { result ->
-            result.onSuccess { shoppingCarts ->
-                shoppingCartProducts = shoppingCarts.shoppingCartItems
-                getRecommendProducts()
-            }
+        viewModelScope.launch {
+            shoppingCartRepository
+                .load(0, MAX_RECENT_PRODUCT_LOAD_SIZE)
+                .onSuccess { shoppingCarts ->
+                    shoppingCartProducts = shoppingCarts.shoppingCartItems
+                    getRecommendProducts()
+                }
         }
     }
 
@@ -85,77 +87,78 @@ class ShoppingCartRecommendViewModel(
         item: ProductsItem.ProductItem,
         selectedQuantity: Int,
     ) {
-        when (item.shoppingCartId == null) {
-            true -> {
-                shoppingCartRepository.add(item.product, selectedQuantity + 1) { result ->
-                    result.onSuccess {
+        viewModelScope.launch {
+            when (item.shoppingCartId == null) {
+                true -> {
+                    shoppingCartRepository.add(item.product, selectedQuantity + 1).onSuccess {
                         loadShoppingCartProducts(item)
                     }
                 }
-            }
 
-            false -> {
-                shoppingCartRepository.increaseQuantity(
-                    item.shoppingCartId,
-                    selectedQuantity + 1,
-                ) { result ->
-                    result.onSuccess {
-                        loadShoppingCartProducts(item)
-                    }
+                false -> {
+                    shoppingCartRepository
+                        .increaseQuantity(
+                            item.shoppingCartId,
+                            selectedQuantity + 1,
+                        ).onSuccess {
+                            loadShoppingCartProducts(item)
+                        }
                 }
             }
         }
     }
 
     private fun loadShoppingCartProducts(item: ProductsItem.ProductItem) {
-        shoppingCartRepository.load(0, MAX_RECENT_PRODUCT_LOAD_SIZE) { result ->
-            result.onSuccess { shoppingCarts ->
-                val uploaded =
-                    shoppingCarts.shoppingCartItems.find {
-                        it.product.id == item.product.id
-                    } ?: return@onSuccess removeShoppingCartToOrder(
-                        item.shoppingCartId ?: return@onSuccess,
-                    )
+        viewModelScope.launch {
+            shoppingCartRepository
+                .load(0, MAX_RECENT_PRODUCT_LOAD_SIZE)
+                .onSuccess { shoppingCarts ->
+                    val uploaded =
+                        shoppingCarts.shoppingCartItems.find {
+                            it.product.id == item.product.id
+                        } ?: return@onSuccess removeShoppingCartToOrder(
+                            item.shoppingCartId ?: return@onSuccess,
+                        )
 
-                val productToOrder =
-                    ShoppingCartProduct(
-                        id = uploaded.id,
-                        product = item.product,
-                        quantity = uploaded.quantity,
-                    )
+                    val productToOrder =
+                        ShoppingCartProduct(
+                            id = uploaded.id,
+                            product = item.product,
+                            quantity = uploaded.quantity,
+                        )
 
-                val currentList = _shoppingCartProductsToOrder.value.orEmpty().toMutableList()
+                    val currentList = _shoppingCartProductsToOrder.value.orEmpty().toMutableList()
 
-                val existingIndex =
-                    currentList.indexOfFirst { it.product.id == productToOrder.product.id }
+                    val existingIndex =
+                        currentList.indexOfFirst { it.product.id == productToOrder.product.id }
 
-                if (existingIndex >= 0) {
-                    currentList[existingIndex] = productToOrder
-                } else {
-                    currentList.add(productToOrder)
-                }
-
-                _shoppingCartProductsToOrder.value = currentList
-
-                _recommendProducts.value
-                    ?.indexOfFirst {
-                        it.product.id == item.product.id
-                    }?.let { index ->
-                        val productItem =
-                            _recommendProducts.value?.get(index) as ProductsItem.ProductItem
-                        val updatedItem =
-                            productItem.copy(
-                                shoppingCartId = productToOrder.id,
-                                selectedQuantity = productToOrder.quantity,
-                            )
-                        _recommendProducts.value =
-                            _recommendProducts.value?.toMutableList()?.apply {
-                                set(index, updatedItem)
-                            }
+                    if (existingIndex >= 0) {
+                        currentList[existingIndex] = productToOrder
+                    } else {
+                        currentList.add(productToOrder)
                     }
 
-                shoppingCartProducts = shoppingCarts.shoppingCartItems
-            }
+                    _shoppingCartProductsToOrder.value = currentList
+
+                    _recommendProducts.value
+                        ?.indexOfFirst {
+                            it.product.id == item.product.id
+                        }?.let { index ->
+                            val productItem =
+                                _recommendProducts.value?.get(index) as ProductsItem.ProductItem
+                            val updatedItem =
+                                productItem.copy(
+                                    shoppingCartId = productToOrder.id,
+                                    selectedQuantity = productToOrder.quantity,
+                                )
+                            _recommendProducts.value =
+                                _recommendProducts.value?.toMutableList()?.apply {
+                                    set(index, updatedItem)
+                                }
+                        }
+
+                    shoppingCartProducts = shoppingCarts.shoppingCartItems
+                }
         }
     }
 
@@ -168,20 +171,21 @@ class ShoppingCartRecommendViewModel(
         item: ProductsItem.ProductItem,
         selectedQuantity: Int,
     ) {
-        shoppingCartRepository.decreaseQuantity(
-            item.shoppingCartId ?: return,
-            selectedQuantity - 1,
-        ) { result ->
-            result.onSuccess {
-                val recommendProducts = item.copy(selectedQuantity = selectedQuantity - 1)
-                val targetIndex: Int? =
-                    _recommendProducts.value?.indexOfFirst { it.product.id == item.product.id }
-                _recommendProducts.value =
-                    _recommendProducts.value?.toMutableList()?.apply {
-                        set(targetIndex ?: return@apply, recommendProducts)
-                    }
-                loadShoppingCartProducts(item)
-            }
+        viewModelScope.launch {
+            shoppingCartRepository
+                .decreaseQuantity(
+                    item.shoppingCartId ?: return@launch,
+                    selectedQuantity - 1,
+                ).onSuccess {
+                    val recommendProducts = item.copy(selectedQuantity = selectedQuantity - 1)
+                    val targetIndex: Int? =
+                        _recommendProducts.value?.indexOfFirst { it.product.id == item.product.id }
+                    _recommendProducts.value =
+                        _recommendProducts.value?.toMutableList()?.apply {
+                            set(targetIndex ?: return@apply, recommendProducts)
+                        }
+                    loadShoppingCartProducts(item)
+                }
         }
     }
 

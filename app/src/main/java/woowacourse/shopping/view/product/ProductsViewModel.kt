@@ -56,7 +56,7 @@ class ProductsViewModel(
                     updateProductsShoppingCartQuantity(productsToShow, currentProducts)
                     _isLoading.value = false
                 }.onFailure {
-                    _event.postValue(ProductsEvent.UPDATE_PRODUCT_FAILURE)
+                    _event.setValue(ProductsEvent.UPDATE_PRODUCT_FAILURE)
                     _isLoading.value = false
                 }
         }
@@ -66,10 +66,13 @@ class ProductsViewModel(
         productsToShow: List<Product>,
         currentProducts: List<ProductsItem>,
     ) {
-        var shoppingCartProducts = emptyList<ShoppingCartProduct>()
-        shoppingCartRepository.load(LOAD_SHOPPING_CART_PAGE, LOAD_SHOPPING_CART_SIZE) { result ->
-            result
-                .onSuccess {
+        viewModelScope.launch {
+            var shoppingCartProducts = emptyList<ShoppingCartProduct>()
+            shoppingCartRepository
+                .load(
+                    LOAD_SHOPPING_CART_PAGE,
+                    LOAD_SHOPPING_CART_SIZE,
+                ).onSuccess {
                     shoppingCartProducts = it.shoppingCartItems
                     handleShoppingCartQuantitySuccess(
                         currentProducts,
@@ -202,9 +205,9 @@ class ProductsViewModel(
     }
 
     fun updateShoppingCartQuantity() {
-        shoppingCartRepository.fetchAllQuantity { result ->
-            result.onSuccess { quantity: Int ->
-                _shoppingCartQuantity.postValue(quantity)
+        viewModelScope.launch {
+            shoppingCartRepository.fetchAllQuantity().onSuccess { quantity: Int ->
+                _shoppingCartQuantity.value = quantity
             }
         }
     }
@@ -218,8 +221,7 @@ class ProductsViewModel(
                         if (recentWatchingProducts.isEmpty()) {
                             null
                         } else {
-                            val items =
-                                recentWatchingProducts.map { ProductItem(product = it) }
+                            val items = recentWatchingProducts.map { ProductItem(product = it) }
                             RecentWatchingItem(items)
                         }
 
@@ -244,17 +246,19 @@ class ProductsViewModel(
         productItem: ProductItem,
         quantity: Int,
     ) {
-        if (productItem.shoppingCartId == null) {
-            shoppingCartRepository.add(productItem.product, quantity + 1) { result ->
-                result
+        viewModelScope.launch {
+            if (productItem.shoppingCartId == null) {
+                shoppingCartRepository
+                    .add(productItem.product, quantity + 1)
                     .onSuccess {
-                        val currentProducts = products.value?.toMutableList() ?: return@add
+                        val currentProducts = products.value?.toMutableList() ?: return@launch
                         val index: Int =
                             currentProducts.indexOfFirst { it is ProductItem && it.product == productItem.product }
 
                         if (index != -1) {
-                            shoppingCartRepository.load(page - 1, LOAD_PRODUCTS_SIZE) { result ->
-                                result.onSuccess { shoppingCartProducts ->
+                            shoppingCartRepository
+                                .load(page - 1, LOAD_PRODUCTS_SIZE)
+                                .onSuccess { shoppingCartProducts ->
                                     val newShoppingCartId =
                                         shoppingCartProducts.shoppingCartItems
                                             .find {
@@ -271,21 +275,18 @@ class ProductsViewModel(
                                     currentProducts[index] = updatedItem
                                     _products.value = currentProducts
                                 }
-                            }
                         }
                         _shoppingCartQuantity.value = shoppingCartQuantity.value?.plus(1)
                     }.onFailure {
-                        _event.postValue(ProductsEvent.NOT_ADD_TO_SHOPPING_CART)
+                        _event.setValue(ProductsEvent.NOT_ADD_TO_SHOPPING_CART)
                     }
+                return@launch
             }
-            return
-        }
-        shoppingCartRepository.increaseQuantity(
-            productItem.shoppingCartId,
-            quantity + 1,
-        ) { result ->
-            result
-                .onSuccess {
+            shoppingCartRepository
+                .increaseQuantity(
+                    productItem.shoppingCartId,
+                    quantity + 1,
+                ).onSuccess {
                     val currentProducts = products.value?.toMutableList() ?: return@onSuccess
                     val index: Int =
                         currentProducts.indexOfFirst { it is ProductItem && it.product == productItem.product }
@@ -299,7 +300,7 @@ class ProductsViewModel(
                     }
                     _shoppingCartQuantity.value = shoppingCartQuantity.value?.plus(1)
                 }.onFailure {
-                    _event.postValue(ProductsEvent.NOT_ADD_TO_SHOPPING_CART)
+                    _event.setValue(ProductsEvent.NOT_ADD_TO_SHOPPING_CART)
                 }
         }
     }
@@ -308,13 +309,13 @@ class ProductsViewModel(
         productItem: ProductItem,
         quantity: Int,
     ) {
-        shoppingCartRepository.decreaseQuantity(
-            productItem.shoppingCartId ?: return,
-            quantity - 1,
-        ) { result ->
-            result
-                .onSuccess {
-                    val currentProducts = products.value?.toMutableList() ?: return@decreaseQuantity
+        viewModelScope.launch {
+            shoppingCartRepository
+                .decreaseQuantity(
+                    productItem.shoppingCartId ?: return@launch,
+                    quantity - 1,
+                ).onSuccess {
+                    val currentProducts = products.value?.toMutableList() ?: return@onSuccess
                     val index: Int =
                         currentProducts.indexOfFirst { it is ProductItem && it.product == productItem.product }
 
@@ -323,11 +324,11 @@ class ProductsViewModel(
                         val updatedItem =
                             productItem.copy(selectedQuantity = productItem.selectedQuantity - 1)
                         currentProducts[index] = updatedItem
-                        _products.postValue(currentProducts)
+                        _products.value = currentProducts
                     }
-                    _shoppingCartQuantity.postValue(shoppingCartQuantity.value?.minus(1))
+                    _shoppingCartQuantity.value = shoppingCartQuantity.value?.minus(1)
                 }.onFailure {
-                    _event.postValue(ProductsEvent.NOT_MINUS_TO_SHOPPING_CART)
+                    _event.setValue(ProductsEvent.NOT_MINUS_TO_SHOPPING_CART)
                 }
         }
     }

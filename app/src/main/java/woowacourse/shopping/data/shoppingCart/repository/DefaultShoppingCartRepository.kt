@@ -10,73 +10,61 @@ import woowacourse.shopping.domain.shoppingCart.ShoppingCarts
 class DefaultShoppingCartRepository(
     private val shoppingCartRemoteDataSource: ShoppingCartRemoteDataSource,
 ) : ShoppingCartRepository {
-    override fun load(
+    override suspend fun load(
         page: Int,
         size: Int,
-        onResult: (Result<ShoppingCarts>) -> Unit,
-    ) {
-        shoppingCartRemoteDataSource.getCartItems(page, size) { result ->
-            onResult(result.mapCatching { it?.toDomain() ?: ShoppingCarts(false, emptyList()) })
+    ): Result<ShoppingCarts> =
+        runCatching {
+            shoppingCartRemoteDataSource.getCartItems(page, size).toDomain()
         }
-    }
 
-    override fun add(
+    override suspend fun add(
         product: Product,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        shoppingCartRemoteDataSource.saveCartItem(
-            CartItemRequestDto(
-                productId = product.id,
-                quantity = quantity,
-            ),
-        ) { result ->
-            onResult(result.mapCatching { it })
+    ): Result<Unit> =
+        runCatching {
+            shoppingCartRemoteDataSource.saveCartItem(
+                CartItemRequestDto(
+                    productId = product.id,
+                    quantity = quantity,
+                ),
+            )
         }
-    }
 
-    override fun increaseQuantity(
+    override suspend fun increaseQuantity(
         shoppingCartId: Long,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        updateShoppingCartQuantity(quantity, shoppingCartId, onResult)
-    }
+    ): Result<Unit> = updateShoppingCartQuantity(quantity, shoppingCartId)
 
-    override fun decreaseQuantity(
+    override suspend fun decreaseQuantity(
         shoppingCartId: Long,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        if (quantity == 0) return remove(shoppingCartId, onResult)
-        updateShoppingCartQuantity(quantity, shoppingCartId, onResult)
+    ): Result<Unit> {
+        if (quantity == 0) return remove(shoppingCartId)
+        return updateShoppingCartQuantity(quantity, shoppingCartId)
     }
 
-    private fun updateShoppingCartQuantity(
+    private suspend fun updateShoppingCartQuantity(
         quantity: Int,
         shoppingCartId: Long,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        val requestDto = CartItemQuantityRequestDto(quantity = quantity)
-        shoppingCartRemoteDataSource.updateCartItemQuantity(shoppingCartId, requestDto) { result ->
-            onResult(result.mapCatching { it })
+    ): Result<Unit> =
+        runCatching {
+            val requestDto = CartItemQuantityRequestDto(quantity = quantity)
+            shoppingCartRemoteDataSource.updateCartItemQuantity(
+                shoppingCartId,
+                requestDto,
+            )
         }
-    }
 
-    override fun remove(
-        shoppingCartId: Long,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        shoppingCartRemoteDataSource.deleteCartItem(shoppingCartId) { result ->
-            onResult(result.mapCatching { it })
+    override suspend fun remove(shoppingCartId: Long): Result<Unit> =
+        runCatching {
+            shoppingCartRemoteDataSource.deleteCartItem(shoppingCartId)
         }
-    }
 
-    override fun fetchAllQuantity(onResult: (Result<Int>) -> Unit) {
-        shoppingCartRemoteDataSource.getCartCounts { result ->
-            onResult(result.mapCatching { it?.quantity ?: 0 })
+    override suspend fun fetchAllQuantity(): Result<Int> =
+        runCatching {
+            shoppingCartRemoteDataSource.getCartCounts().quantity
         }
-    }
 
     companion object {
         private var instance: ShoppingCartRepository? = null
