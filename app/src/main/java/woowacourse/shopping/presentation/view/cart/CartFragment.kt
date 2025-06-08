@@ -34,7 +34,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                 } else {
                     parentFragmentManager.commit {
                         setReorderingAllowed(true)
-                        replace(R.id.shopping_fragment_container, CheckoutFragment(), null)
+                        replace(R.id.shopping_fragment_container, CheckoutFragment::class.java, null)
                         addToBackStack(null)
                     }
                 }
