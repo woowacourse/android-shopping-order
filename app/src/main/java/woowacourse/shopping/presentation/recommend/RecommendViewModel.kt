@@ -4,20 +4,22 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.launch
 import woowacourse.shopping.RepositoryProvider
-import woowacourse.shopping.domain.repository.CartItemRepository
+import woowacourse.shopping.domain.repository.CartItemsRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
 import woowacourse.shopping.domain.repository.ViewedItemRepository
-import woowacourse.shopping.mapper.toUiModel
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.product.catalog.toUiModel
 import woowacourse.shopping.presentation.product.detail.CartEvent
 import woowacourse.shopping.presentation.util.SingleLiveEvent
 
 class RecommendViewModel(
     private val productsRepository: ProductsRepository,
-    private val cartItemRepository: CartItemRepository,
+    private val cartItemRepository: CartItemsRepository,
     private val viewedItemRepository: ViewedItemRepository,
 ) : ViewModel() {
     private val _recommendedProducts: MutableLiveData<List<ProductUiModel>> =
@@ -52,22 +54,21 @@ class RecommendViewModel(
     }
 
     fun addProduct(productUiModel: ProductUiModel) {
-        val updated = productUiModel.copy(quantity = productUiModel.quantity + 1, isExpanded = true)
-        _recommendedProducts.value =
-            _recommendedProducts.value?.map {
-                if (it.id == updated.id) {
-                    updated
-                } else {
-                    it
+        viewModelScope.launch {
+            val updated =
+                productUiModel.copy(quantity = productUiModel.quantity + 1, isExpanded = true)
+            _recommendedProducts.value =
+                _recommendedProducts.value?.map {
+                    if (it.id == updated.id) {
+                        updated
+                    } else {
+                        it
+                    }
                 }
-            }
-        cartItemRepository.addCartItem(updated.id, updated.quantity) { result ->
-            result
-                .onFailure {
-                    emitFailEvent()
-                }
+            cartItemRepository.addCartItem(updated.id, updated.quantity)
+                .onFailure { emitFailEvent() }
+            updateOrderInfo(productUiModel.price, 1)
         }
-        updateOrderInfo(productUiModel.price, 1)
     }
 
     fun increaseQuantity(productUiModel: ProductUiModel) {
@@ -90,29 +91,28 @@ class RecommendViewModel(
     }
 
     private fun deleteProduct(productUiModel: ProductUiModel) {
-        cartItemRepository.deleteCartItem(productUiModel.id) { result ->
-            result
-                .onFailure {
-                    emitFailEvent()
-                }
+        viewModelScope.launch {
+            cartItemRepository.deleteCartItem(productUiModel.id)
+                .onFailure { emitFailEvent() }
         }
     }
 
     private fun loadRecommendProducts() {
-        viewedItemRepository.getLastViewedItem { item ->
-            item?.let { loadProductsByCategory(it.category) }
+        viewModelScope.launch {
+            val lastViewedItem = viewedItemRepository.getLastViewedItem()
+                .mapCatching { it?.toUiModel() }
+                .getOrNull()
+            lastViewedItem?.let { loadProductsByCategory(it.category) }
         }
     }
 
     private fun loadProductsByCategory(category: String) {
-        productsRepository.getRecommendProducts(category) { result ->
-            result
+        viewModelScope.launch {
+            productsRepository.getRecommendProducts(category)
                 .onSuccess { products ->
                     _recommendedProducts.value = products.map { it.toUiModel() }
                 }
-                .onFailure {
-                    emitFailEvent()
-                }
+                .onFailure { emitFailEvent() }
         }
     }
 
@@ -133,16 +133,11 @@ class RecommendViewModel(
     }
 
     private fun updateQuantity(productUiModel: ProductUiModel) {
-        if (productUiModel.quantity <= 0) return
+        viewModelScope.launch {
+            if (productUiModel.quantity <= 0) return@launch
 
-        cartItemRepository.updateCartItemQuantity(
-            productUiModel.id,
-            productUiModel.quantity,
-        ) { result ->
-            result
-                .onFailure {
-                    emitFailEvent()
-                }
+            cartItemRepository.updateCartItemQuantity(productUiModel.id, productUiModel.quantity)
+                .onFailure { emitFailEvent() }
         }
     }
 
@@ -159,8 +154,6 @@ class RecommendViewModel(
     }
 
     companion object {
-        private const val RECOMMENDED_COUNT = 10
-
         val FACTORY: ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
