@@ -7,6 +7,10 @@ import woowacourse.shopping.data.authentication.dataSource.AuthenticationLocalDa
 import woowacourse.shopping.data.authentication.dataSource.DefaultAuthenticationLocalDataSource
 import woowacourse.shopping.data.authentication.model.UserAuthentication
 import woowacourse.shopping.data.authentication.repository.DefaultAuthenticationRepository
+import woowacourse.shopping.data.coupon.dataSource.CouponRemoteDataSource
+import woowacourse.shopping.data.coupon.dataSource.DefaultCouponRemoteDataSource
+import woowacourse.shopping.data.coupon.remote.service.CouponService
+import woowacourse.shopping.data.coupon.repository.DefaultCouponRepository
 import woowacourse.shopping.data.network.ApiClient
 import woowacourse.shopping.data.product.dataSource.DefaultProductLocalDataSource
 import woowacourse.shopping.data.product.dataSource.DefaultProductRemoteDataSource
@@ -50,6 +54,10 @@ class ShoppingApplication : Application() {
             .create(ShoppingCartService::class.java)
     }
 
+    private val couponService: CouponService by lazy {
+        ApiClient.getApiClient().create(CouponService::class.java)
+    }
+
     private val authLocalDataSource: AuthenticationLocalDataSource by lazy {
         DefaultAuthenticationLocalDataSource(authSharedPreferences)
     }
@@ -66,6 +74,10 @@ class ShoppingApplication : Application() {
         DefaultShoppingCartRemoteDataSource(shoppingCartService)
     }
 
+    private val couponRemoteDataSource: CouponRemoteDataSource by lazy {
+        DefaultCouponRemoteDataSource(couponService)
+    }
+
     override fun onCreate() {
         super.onCreate()
         DefaultAuthenticationRepository.initialize(authLocalDataSource)
@@ -74,6 +86,7 @@ class ShoppingApplication : Application() {
             productRemoteDataSource,
             productLocalDataSource,
         )
+        DefaultCouponRepository.initialize(couponRemoteDataSource)
 
         DefaultAuthenticationRepository.get().updateUserAuthentication(
             UserAuthentication(
