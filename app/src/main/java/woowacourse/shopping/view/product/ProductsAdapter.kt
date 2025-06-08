@@ -1,7 +1,8 @@
 package woowacourse.shopping.view.product
 
-import android.annotation.SuppressLint
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.domain.product.Product
 
@@ -10,21 +11,20 @@ class ProductsAdapter(
     private val onLoad: () -> Unit,
     private val onPlusQuantity: (
         productId: Long,
-        quantity: Int,
-    ) -> Unit,
+        quantity: Int
+            ) -> Unit,
     private val onMinusQuantity: (
         productId: Long,
         quantity: Int,
-    ) -> Unit,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var items: List<ProductsItem> = emptyList()
+            ) -> Unit,
+) : ListAdapter<ProductsItem, RecyclerView.ViewHolder>(ProductsItemDiffCallback()) {
 
-    override fun getItemViewType(position: Int): Int = items[position].viewType.ordinal
+    override fun getItemViewType(position: Int): Int = getItem(position).viewType.ordinal
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): RecyclerView.ViewHolder =
+        ): RecyclerView.ViewHolder =
         when (ProductsItem.ItemType.from(viewType)) {
             ProductsItem.ItemType.RECENT_VIEWED_PRODUCT ->
                 RecentViewedProductsViewHolder.of(parent, onSelectProduct)
@@ -39,19 +39,33 @@ class ProductsAdapter(
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
         position: Int,
-    ) {
+        ) {
         when (holder) {
-            is RecentViewedProductsViewHolder -> holder.bind(items[position] as ProductsItem.RecentViewedProductsItem)
-            is ProductViewHolder -> holder.bind(items[position] as ProductsItem.ProductItem)
-            is ProductMoreViewHolder -> holder.bind(items[position] as ProductsItem.LoadItem)
+            is RecentViewedProductsViewHolder -> holder.bind(getItem(position) as ProductsItem.RecentViewedProductsItem)
+            is ProductViewHolder -> holder.bind(getItem(position) as ProductsItem.ProductItem)
+            is ProductMoreViewHolder -> holder.bind(getItem(position) as ProductsItem.LoadItem)
+        }
+    }
+}
+
+private class ProductsItemDiffCallback : DiffUtil.ItemCallback<ProductsItem>() {
+
+    override fun areItemsTheSame(oldItem: ProductsItem, newItem: ProductsItem): Boolean {
+        return when {
+            oldItem is ProductsItem.ProductItem && newItem is ProductsItem.ProductItem ->
+                oldItem.product.id == newItem.product.id
+
+            oldItem is ProductsItem.RecentViewedProductsItem && newItem is ProductsItem.RecentViewedProductsItem ->
+                true
+
+            oldItem is ProductsItem.LoadItem && newItem is ProductsItem.LoadItem ->
+                true
+
+            else -> false
         }
     }
 
-    override fun getItemCount(): Int = items.size
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun submitList(items: List<ProductsItem>) {
-        this.items = items
-        notifyDataSetChanged()
+    override fun areContentsTheSame(oldItem: ProductsItem, newItem: ProductsItem): Boolean {
+        return oldItem == newItem
     }
 }

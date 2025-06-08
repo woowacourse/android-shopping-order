@@ -1,13 +1,12 @@
 package woowacourse.shopping.view.recommend
 
-import android.annotation.SuppressLint
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 
 class RecommendProductsAdapter(
     private val recommendProductItemActions: RecommendProductItemActions,
-) : RecyclerView.Adapter<RecommendProductsViewHolder>() {
-    private var items: List<RecommendProduct> = emptyList()
+) : ListAdapter<RecommendProduct, RecommendProductsViewHolder>(RecommendProductDiffCallback()) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -18,18 +17,26 @@ class RecommendProductsAdapter(
             recommendProductItemActions = recommendProductItemActions,
         )
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun submitList(newItems: List<RecommendProduct>) {
-        items = newItems
-        notifyDataSetChanged()
-    }
-
     override fun onBindViewHolder(
         holder: RecommendProductsViewHolder,
         position: Int,
     ) {
-        holder.bind(items[position])
+        holder.bind(getItem(position))
+    }
+}
+
+private class RecommendProductDiffCallback : DiffUtil.ItemCallback<RecommendProduct>() {
+    override fun areItemsTheSame(
+        oldItem: RecommendProduct,
+        newItem: RecommendProduct
+    ): Boolean {
+        return oldItem.productId == newItem.productId
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun areContentsTheSame(
+        oldItem: RecommendProduct,
+        newItem: RecommendProduct
+    ): Boolean {
+        return oldItem == newItem
+    }
 }

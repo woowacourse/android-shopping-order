@@ -1,6 +1,8 @@
 package woowacourse.shopping.view.cart
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
 class CartProductAdapter(
@@ -10,18 +12,15 @@ class CartProductAdapter(
     private val onUnselect: (productItem: CartItemType.ProductItem) -> Unit,
     private val onPlusQuantity: (productItem: CartItemType.ProductItem) -> Unit,
     private val onMinusQuantity: (productItem: CartItemType.ProductItem) -> Unit,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var items: List<CartItemType> = emptyList()
+) : ListAdapter<CartItemType, RecyclerView.ViewHolder>(CartItemDiffCallback()) {
 
-    override fun getItemViewType(position: Int): Int = items[position].viewType.ordinal
+    override fun getItemViewType(position: Int): Int = getItem(position).viewType.ordinal
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int,
+        viewType: Int
     ): RecyclerView.ViewHolder {
-        val viewType: CartItemType.ItemType =
-            CartItemType.ItemType.from(viewType)
-        return when (viewType) {
+        return when (CartItemType.ItemType.from(viewType)) {
             CartItemType.ItemType.PRODUCT ->
                 CartProductViewHolder.of(
                     parent,
@@ -45,15 +44,27 @@ class CartProductAdapter(
         position: Int,
     ) {
         when (holder) {
-            is CartProductViewHolder -> holder.bind(items[position] as CartItemType.ProductItem)
-            is CartPaginationViewHolder -> holder.bind(items[position] as CartItemType.PaginationItem)
+            is CartProductViewHolder -> holder.bind(getItem(position) as CartItemType.ProductItem)
+            is CartPaginationViewHolder -> holder.bind(getItem(position) as CartItemType.PaginationItem)
+        }
+    }
+}
+
+private class CartItemDiffCallback : DiffUtil.ItemCallback<CartItemType>() {
+
+    override fun areItemsTheSame(oldItem: CartItemType, newItem: CartItemType): Boolean {
+        return when {
+            oldItem is CartItemType.ProductItem && newItem is CartItemType.ProductItem ->
+                oldItem.cartItemId == newItem.cartItemId
+
+            oldItem is CartItemType.PaginationItem && newItem is CartItemType.PaginationItem ->
+                true
+
+            else -> false
         }
     }
 
-    override fun getItemCount(): Int = items.size
-
-    fun submitList(items: List<CartItemType>) {
-        this.items = items
-        notifyDataSetChanged()
+    override fun areContentsTheSame(oldItem: CartItemType, newItem: CartItemType): Boolean {
+        return oldItem == newItem
     }
 }
