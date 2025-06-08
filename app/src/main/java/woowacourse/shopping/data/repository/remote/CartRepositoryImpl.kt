@@ -1,7 +1,5 @@
 package woowacourse.shopping.data.repository.remote
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.datasource.local.CartLocalDataSource
 import woowacourse.shopping.data.datasource.remote.CartRemoteDataSource
 import woowacourse.shopping.domain.model.CartItem
@@ -12,12 +10,12 @@ class CartRepositoryImpl(
     private val cartLocalDataSource: CartLocalDataSource,
     private val cartRemoteDataSource: CartRemoteDataSource,
 ) : CartRepository {
-    override suspend fun fetchTotalCount(): Result<Int> = withContext(Dispatchers.IO) { cartRemoteDataSource.fetchTotalCount() }
+    override suspend fun fetchTotalCount(): Result<Int> = cartRemoteDataSource.fetchTotalCount()
 
     override suspend fun fetchPagedCartItems(
         page: Int,
         pageSize: Int?,
-    ): Result<List<CartItem>> = withContext(Dispatchers.IO) { cartRemoteDataSource.fetchPagedCartItems(page, pageSize) }
+    ): Result<List<CartItem>> = cartRemoteDataSource.fetchPagedCartItems(page, pageSize)
 
     override suspend fun fetchAllCartItems(): Result<List<CartItem>> =
         cartRemoteDataSource.fetchTotalCount().fold(
