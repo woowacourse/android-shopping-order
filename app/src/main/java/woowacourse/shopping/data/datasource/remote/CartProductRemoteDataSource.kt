@@ -5,6 +5,7 @@ import woowacourse.shopping.data.dto.request.CartProductRequestDto
 import woowacourse.shopping.data.dto.response.CartProductDto
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.data.service.CartProductApiService
+import java.net.HttpURLConnection
 
 class CartProductRemoteDataSource(
     private val cartProductService: CartProductApiService,
@@ -35,7 +36,7 @@ class CartProductRemoteDataSource(
     ): Result<Int> {
         val response = cartProductService.insert(body = CartProductRequestDto(id, quantity))
 
-        return if (response.code() == SUCCESS_POST) {
+        return if (response.code() == HttpURLConnection.HTTP_CREATED) {
             val cartProductId =
                 response.headers()[HEADER_LOCATION]?.removePrefix(PREFIX_CART_ITEM)?.toInt()
                     ?: throw IllegalArgumentException()
@@ -48,7 +49,7 @@ class CartProductRemoteDataSource(
     suspend fun delete(id: Int): Result<Unit> {
         val response = cartProductService.delete(id = id)
 
-        return if (response.code() == SUCCESS_DELETE) {
+        return if (response.code() == HttpURLConnection.HTTP_NO_CONTENT) {
             Result.success(Unit)
         } else {
             Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
@@ -75,7 +76,7 @@ class CartProductRemoteDataSource(
         quantity: Int,
     ): Result<Unit> {
         val response = cartProductService.updateQuantity(id = id, body = CartProductQuantityRequestDto(quantity))
-        return if (response.code() == SUCCESS_PATCH) {
+        return if (response.code() == HttpURLConnection.HTTP_OK) {
             Result.success(Unit)
         } else {
             Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
@@ -83,9 +84,6 @@ class CartProductRemoteDataSource(
     }
 
     companion object {
-        private const val SUCCESS_PATCH = 200
-        private const val SUCCESS_POST = 201
-        private const val SUCCESS_DELETE = 204
         private const val HEADER_LOCATION = "location"
         private const val PREFIX_CART_ITEM = "/cart-items/"
     }
