@@ -13,7 +13,6 @@ import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.CartsSinglePage
 import woowacourse.shopping.domain.cart.ShoppingCart
-import woowacourse.shopping.domain.exception.NetworkResult
 import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
@@ -50,8 +49,8 @@ class MainViewModelTest {
                 )
             val cartPage = CartsSinglePage(carts = carts, hasNextPage = false)
 
-            coEvery { productRepository.loadSinglePage(page = 0, pageSize = 20) } returns NetworkResult.Success(productPage)
-            coEvery { cartRepository.loadSinglePage(0, 20) } returns NetworkResult.Success(cartPage)
+            coEvery { productRepository.loadSinglePage(page = 0, pageSize = 20) } returns Result.success(productPage)
+            coEvery { cartRepository.loadSinglePage(0, 20) } returns Result.success(cartPage)
             coEvery { historyRepository.getHistories() } returns emptyList()
 
             // when
@@ -71,7 +70,7 @@ class MainViewModelTest {
             val product = productFixture1
 
             coEvery { historyRepository.getHistories() } returns histories
-            coEvery { productRepository.loadProduct(productId) } returns NetworkResult.Success(product)
+            coEvery { productRepository.loadProduct(productId) } returns Result.success(product)
 
             // when
             viewModel.syncHistory()

@@ -3,7 +3,6 @@ package woowacourse.shopping.data.repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.datasource.remote.RemoteProductsDataSource
-import woowacourse.shopping.domain.exception.NetworkResult
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -15,12 +14,12 @@ class DefaultProductRepository(
         category: String?,
         page: Int?,
         pageSize: Int?,
-    ): NetworkResult<ProductSinglePage> =
+    ): Result<ProductSinglePage> =
         withContext(Dispatchers.IO) {
             productDataSource.singlePage(category, page, pageSize)
         }
 
-    override suspend fun loadProduct(productId: Long): NetworkResult<Product> =
+    override suspend fun loadProduct(productId: Long): Result<Product> =
         withContext(Dispatchers.IO) {
             productDataSource.getProduct(productId)
         }

@@ -8,9 +8,6 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.cart.ShoppingCart
 import woowacourse.shopping.domain.coupon.CouponApplierFactory
 import woowacourse.shopping.domain.coupon.CouponValidate
-import woowacourse.shopping.domain.exception.NetworkError
-import woowacourse.shopping.domain.exception.onFailure
-import woowacourse.shopping.domain.exception.onSuccess
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.view.core.common.withState
@@ -59,7 +56,7 @@ class OrderViewModel(
         }
     }
 
-    private fun handleFailure(throwable: NetworkError) {
+    private fun handleFailure(throwable: Throwable) {
         _uiEvent.setValue(OrderUiEvent.ShowErrorMessage(throwable))
     }
 

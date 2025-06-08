@@ -7,9 +7,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
-import woowacourse.shopping.domain.exception.NetworkError
-import woowacourse.shopping.domain.exception.onFailure
-import woowacourse.shopping.domain.exception.onSuccess
 import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -246,7 +243,7 @@ class CartViewModel(
         }
     }
 
-    private fun handleFailure(throwable: NetworkError) {
+    private fun handleFailure(throwable: Throwable) {
         _uiEvent.setValue(CartUiEvent.ShowErrorMessage(throwable))
     }
 

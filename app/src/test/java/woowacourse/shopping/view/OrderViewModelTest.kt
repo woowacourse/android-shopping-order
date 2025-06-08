@@ -16,7 +16,6 @@ import woowacourse.shopping.domain.coupon.CouponApplierFactory
 import woowacourse.shopping.domain.coupon.CouponValidate
 import woowacourse.shopping.domain.coupon.CouponValidator
 import woowacourse.shopping.domain.coupon.FixedCoupon
-import woowacourse.shopping.domain.exception.NetworkResult
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.ext.getOrAwaitValue
@@ -66,7 +65,7 @@ class OrderViewModelTest {
                 )
             val coupons = listOf(fixedCoupon)
 
-            coEvery { couponRepository.getCoupons() } returns NetworkResult.Success(coupons)
+            coEvery { couponRepository.getCoupons() } returns Result.success(coupons)
 
             // when
             viewModel.loadCoupons(carts)
@@ -88,7 +87,7 @@ class OrderViewModelTest {
             val orderCartIds = listOf(1L)
 
             viewModel.setFakeUiState(OrderUiState.of(carts, coupons, 3000))
-            coEvery { orderRepository.createOrder(orderCartIds) } returns NetworkResult.Success(Unit)
+            coEvery { orderRepository.createOrder(orderCartIds) } returns Result.success(Unit)
 
             // when
             viewModel.sendOrder()

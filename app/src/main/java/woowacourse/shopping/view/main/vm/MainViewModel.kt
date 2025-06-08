@@ -7,9 +7,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.ShoppingCart
-import woowacourse.shopping.domain.exception.NetworkError
-import woowacourse.shopping.domain.exception.onFailure
-import woowacourse.shopping.domain.exception.onSuccess
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.CartRepository
@@ -57,7 +54,7 @@ class MainViewModel(
                 cartResult.onSuccess { cartPage ->
                     applyMergedUiState(productPage, cartPage.carts)
                 }.onFailure(::handleFailure)
-            }.onFailure(::handleFailure)
+            }
         }
     }
 
@@ -191,7 +188,7 @@ class MainViewModel(
         _uiState.value = _uiState.value?.let(transform)
     }
 
-    private fun handleFailure(throwable: NetworkError) {
+    private fun handleFailure(throwable: Throwable) {
         _uiEvent.setValue(MainUiEvent.ShowErrorMessage(throwable))
     }
 

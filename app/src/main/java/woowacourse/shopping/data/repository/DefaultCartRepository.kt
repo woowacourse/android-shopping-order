@@ -7,13 +7,12 @@ import woowacourse.shopping.data.network.request.toRequest
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.CartsSinglePage
-import woowacourse.shopping.domain.exception.NetworkResult
 import woowacourse.shopping.domain.repository.CartRepository
 
 class DefaultCartRepository(
     private val remoteCartDataSource: RemoteCartDataSource,
 ) : CartRepository {
-    override suspend fun addCart(cart: Cart): NetworkResult<Long> =
+    override suspend fun addCart(cart: Cart): Result<Long> =
         withContext(Dispatchers.IO) {
             remoteCartDataSource.addCart(cart.toRequest())
         }
@@ -21,7 +20,7 @@ class DefaultCartRepository(
     override suspend fun loadSinglePage(
         page: Int?,
         pageSize: Int?,
-    ): NetworkResult<CartsSinglePage> =
+    ): Result<CartsSinglePage> =
         withContext(Dispatchers.IO) {
             remoteCartDataSource.singlePage(page, pageSize)
         }
@@ -29,17 +28,17 @@ class DefaultCartRepository(
     override suspend fun updateQuantity(
         cartId: Long,
         quantity: Quantity,
-    ): NetworkResult<Unit> =
+    ): Result<Unit> =
         withContext(Dispatchers.IO) {
             remoteCartDataSource.updateCartQuantity(cartId, quantity.value)
         }
 
-    override suspend fun deleteCart(cartId: Long): NetworkResult<Unit> =
+    override suspend fun deleteCart(cartId: Long): Result<Unit> =
         withContext(Dispatchers.IO) {
             remoteCartDataSource.deleteCart(cartId)
         }
 
-    override suspend fun cartQuantity(): NetworkResult<Int> =
+    override suspend fun cartQuantity(): Result<Int> =
         withContext(Dispatchers.IO) {
             remoteCartDataSource.cartQuantity()
         }

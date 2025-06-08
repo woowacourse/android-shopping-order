@@ -1,26 +1,27 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.db.datasource
 
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import org.junit.Before
+import org.junit.Test
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNotNull
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.data.NetworkResultHandler
 import woowacourse.shopping.data.datasource.remote.RemoteCartDataSource
 import woowacourse.shopping.data.network.request.CartItemRequest
 import woowacourse.shopping.data.network.service.CartService
 import woowacourse.shopping.domain.exception.NetworkError
-import woowacourse.shopping.domain.exception.NetworkResult
 
 class RemoteCartDataSourceTest {
     private lateinit var mockWebServer: MockWebServer
     private lateinit var cartService: CartService
     private lateinit var remoteCartDataSource: RemoteCartDataSource
 
-    @BeforeEach
+    @Before
     fun setUp() {
         mockWebServer = MockWebServer()
         mockWebServer.start()
@@ -35,7 +36,7 @@ class RemoteCartDataSourceTest {
     }
 
     @Test
-    fun `장바구니 상품을 추가 후 헤더에 Location이 비어있으면 MissingLocationHeaderError이 발생한다`() =
+    fun `장바구니_상품을_추가_후_헤더에_Location이_비어있으면_MissingLocationHeaderError이_발생한다`() =
         runTest {
             // given
             val mockResponse =
@@ -49,8 +50,10 @@ class RemoteCartDataSourceTest {
             val result = remoteCartDataSource.addCart(CartItemRequest(1, 1))
 
             // then
-            assertTrue(result is NetworkResult.Error)
-            val error = (result as NetworkResult.Error).exception
+            assertTrue(result.isFailure)
+
+            val error = result.exceptionOrNull()
+            assertNotNull(result)
             assertTrue(error is NetworkError.MissingLocationHeaderError)
         }
 

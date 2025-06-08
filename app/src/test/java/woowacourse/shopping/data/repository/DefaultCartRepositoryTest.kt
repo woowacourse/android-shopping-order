@@ -12,7 +12,6 @@ import woowacourse.shopping.data.network.request.toRequest
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.CartsSinglePage
-import woowacourse.shopping.domain.exception.NetworkResult
 import woowacourse.shopping.domain.repository.CartRepository
 
 class DefaultCartRepositoryTest {
@@ -32,15 +31,13 @@ class DefaultCartRepositoryTest {
             val expectedId = 10L
 
             coEvery { remoteCartDataSource.addCart(cart.toRequest()) } returns
-                NetworkResult.Success(
-                    expectedId,
-                )
+                Result.success(expectedId)
 
             // when
             val result = repository.addCart(cart)
 
             // then
-            assertEquals(NetworkResult.Success(expectedId), result)
+            assertEquals(Result.success(expectedId), result)
             coVerify(exactly = 1) { remoteCartDataSource.addCart(cart.toRequest()) }
         }
 
@@ -48,7 +45,7 @@ class DefaultCartRepositoryTest {
     fun `loadPage - 첫 번째 페이지의 장바구니 상품 목록을 불러온다`() =
         runTest {
             val expectedPage = mockk<CartsSinglePage>()
-            val expectedResult = NetworkResult.Success(expectedPage)
+            val expectedResult = Result.success(expectedPage)
 
             coEvery { remoteCartDataSource.singlePage(1, 10) } returns expectedResult
 
@@ -64,7 +61,7 @@ class DefaultCartRepositoryTest {
             val cartId = 1L
             val quantity = Quantity(3)
 
-            val expectedResult = NetworkResult.Success(Unit)
+            val expectedResult = Result.success(Unit)
 
             coEvery { remoteCartDataSource.updateCartQuantity(cartId, quantity.value) } returns expectedResult
 

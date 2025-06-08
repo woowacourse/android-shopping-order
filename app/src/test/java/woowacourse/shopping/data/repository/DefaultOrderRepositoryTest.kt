@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.data.datasource.remote.RemoteOrderDataSource
 import woowacourse.shopping.data.network.request.OrderRequest
-import woowacourse.shopping.domain.exception.NetworkResult
 
 class DefaultOrderRepositoryTest {
     private val remoteOrderDataSource = mockk<RemoteOrderDataSource>()
@@ -26,7 +25,7 @@ class DefaultOrderRepositoryTest {
             // given
             val cartItemIds = listOf(1L, 2L, 3L)
             val request = OrderRequest(cartItemIds)
-            val expected = NetworkResult.Success(Unit)
+            val expected = Result.success(Unit)
 
             coEvery { remoteOrderDataSource.createOrder(request) } returns expected
 

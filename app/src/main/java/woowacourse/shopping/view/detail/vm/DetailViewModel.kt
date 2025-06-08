@@ -8,9 +8,6 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.ShoppingCart
-import woowacourse.shopping.domain.exception.NetworkError
-import woowacourse.shopping.domain.exception.onFailure
-import woowacourse.shopping.domain.exception.onSuccess
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
@@ -123,7 +120,8 @@ class DetailViewModel(
             cartRepository.addCart(cart)
                 .onSuccess {
                     navigateToCart(state.category)
-                }.onFailure(::handleFailure)
+                }
+            // .onFailure(::handleFailure)
         }
     }
 
@@ -138,7 +136,7 @@ class DetailViewModel(
         _uiEvent.setValue(DetailUiEvent.NavigateToCart(category))
     }
 
-    private fun handleFailure(throwable: NetworkError) {
+    private fun handleFailure(throwable: Throwable) {
         _uiEvent.setValue(DetailUiEvent.ShowErrorMessage(throwable))
     }
 

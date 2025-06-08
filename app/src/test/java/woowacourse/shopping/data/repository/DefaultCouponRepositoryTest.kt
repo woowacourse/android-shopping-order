@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
 import woowacourse.shopping.data.datasource.remote.RemoteCouponDataSource
 import woowacourse.shopping.domain.coupon.FixedCoupon
 import woowacourse.shopping.domain.coupon.FreeshippingCoupon
-import woowacourse.shopping.domain.exception.NetworkResult
 import java.time.LocalDate
 
 class DefaultCouponRepositoryTest {
@@ -46,13 +45,13 @@ class DefaultCouponRepositoryTest {
                         expirationDate = LocalDate.now(),
                     ),
                 )
-            coEvery { remoteCouponDataSource.getCoupons() } returns NetworkResult.Success(expectedCoupons)
+            coEvery { remoteCouponDataSource.getCoupons() } returns Result.success(expectedCoupons)
 
             // when
             val result = repository.getCoupons()
 
             // then
-            assertTrue(result is NetworkResult.Success)
-            assertEquals(expectedCoupons, (result as NetworkResult.Success).value)
+            assertTrue(result.isSuccess)
+            assertEquals(expectedCoupons, result.getOrNull())
         }
 }

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.data.datasource.remote.RemoteProductsDataSource
 import woowacourse.shopping.domain.Quantity
-import woowacourse.shopping.domain.exception.NetworkResult
+import woowacourse.shopping.domain.exception.NetworkError
 import woowacourse.shopping.domain.product.Price
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.ProductSinglePage
@@ -32,11 +32,29 @@ class DefaultProductRepositoryTest {
 
             coEvery {
                 productDateSource.singlePage(null, page = 1, size = 20)
-            } returns NetworkResult.Success(expected)
+            } returns Result.success(expected)
 
             val result = productDateSource.singlePage(null, page = 1, size = 20)
-            assertTrue(result is NetworkResult.Success)
-            assertEquals(expected, (result as NetworkResult.Success).value)
+            assertTrue(result.isSuccess)
+            assertEquals(expected, result.getOrNull())
+        }
+
+    @Test
+    fun `요청 중 예외가 발생하면 실패 결과를 반환한다`() =
+        runTest {
+            // given
+            val exception = NetworkError.UnknownError
+
+            coEvery {
+                productDateSource.singlePage(null, page = 1, size = 20)
+            } returns Result.failure(exception)
+
+            // when
+            val result = productDateSource.singlePage(null, page = 1, size = 20)
+
+            // then
+            assertTrue(result.isFailure)
+            assertEquals(exception, result.exceptionOrNull())
         }
 
     @Test
@@ -47,11 +65,11 @@ class DefaultProductRepositoryTest {
             val expected = Product(productId, "짜파게티", "", "", Price(1), Quantity(1))
             coEvery {
                 productDateSource.getProduct(productId)
-            } returns NetworkResult.Success(expected)
+            } returns Result.success(expected)
 
             // when
             val result = repository.loadProduct(productId)
-            assertTrue(result is NetworkResult.Success)
-            assertEquals(expected, (result as NetworkResult.Success).value)
+            assertTrue(result.isFailure)
+            assertEquals(expected, result.getOrNull())
         }
 }

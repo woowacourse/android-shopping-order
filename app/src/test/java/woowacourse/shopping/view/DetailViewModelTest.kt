@@ -11,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.domain.Quantity
-import woowacourse.shopping.domain.exception.NetworkResult
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
@@ -44,7 +43,7 @@ class DetailViewModelTest {
             val productId = 1L
             val product = mockk<Product>()
 
-            coEvery { productRepository.loadProduct(productId) } returns NetworkResult.Success(product)
+            coEvery { productRepository.loadProduct(productId) } returns Result.success(product)
 
             // when
             viewModel.load(productId, NO_LAST_SEEN_PRODUCT)
@@ -63,9 +62,9 @@ class DetailViewModelTest {
             val product = mockk<Product>(relaxed = true, name = "product")
             val lastSeenProduct = mockk<Product>(relaxed = true, name = "lastSeenProduct")
 
-            coEvery { productRepository.loadProduct(productId) } returns NetworkResult.Success(product)
+            coEvery { productRepository.loadProduct(productId) } returns Result.success(product)
             coEvery { productRepository.loadProduct(lastSeenId) } returns
-                NetworkResult.Success(
+                Result.success(
                     lastSeenProduct,
                 )
 

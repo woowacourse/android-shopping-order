@@ -1,45 +1,49 @@
 package woowacourse.shopping.data.datasource.remote
 
-import retrofit2.HttpException
 import woowacourse.shopping.data.NetworkResultHandler
 import woowacourse.shopping.data.network.request.CartItemRequest
 import woowacourse.shopping.data.network.service.CartService
 import woowacourse.shopping.domain.cart.CartsSinglePage
 import woowacourse.shopping.domain.exception.NetworkError
-import woowacourse.shopping.domain.exception.NetworkResult
 
 class RemoteCartDataSource(
     private val service: CartService,
-    private val handler: NetworkResultHandler = NetworkResultHandler(),
+    private val handler: NetworkResultHandler,
 ) {
-    suspend fun addCart(request: CartItemRequest): NetworkResult<Long> =
-        handler.execute {
+    suspend fun addCart(request: CartItemRequest): Result<Long> =
+        handler.handleResult {
             val response = service.addCart(request)
-            if (!response.isSuccessful) throw HttpException(response)
-
             val location =
-                response
-                    .headers()["Location"]
-                    ?.split("/")
-                    ?.last()
+                response.headers()["Location"]
+                    ?.substringAfterLast("/")
                     ?.toLongOrNull()
-
-            if (location == null) throw NetworkError.MissingLocationHeaderError
-
+            requireNotNull(location) { throw NetworkError.MissingLocationHeaderError }
             location
         }
 
     suspend fun singlePage(
         page: Int?,
         size: Int?,
-    ): NetworkResult<CartsSinglePage> = handler.execute { service.getCartSinglePage(page, size).toDomain() }
+    ): Result<CartsSinglePage> =
+        handler.handleResult {
+            service.getCartSinglePage(page, size).toDomain()
+        }
 
     suspend fun updateCartQuantity(
         cartId: Long,
         quantity: Int,
-    ): NetworkResult<Unit> = handler.execute { service.updateCart(cartId, quantity) }
+    ): Result<Unit> =
+        handler.handleResult {
+            service.updateCart(cartId, quantity)
+        }
 
-    suspend fun deleteCart(cartId: Long): NetworkResult<Unit> = handler.execute { service.deleteCart(cartId) }
+    suspend fun deleteCart(cartId: Long): Result<Unit> =
+        handler.handleResult {
+            service.deleteCart(cartId)
+        }
 
-    suspend fun cartQuantity(): NetworkResult<Int> = handler.execute { service.getCartQuantity().quantity }
+    suspend fun cartQuantity(): Result<Int> =
+        handler.handleResult {
+            service.getCartQuantity().quantity
+        }
 }
