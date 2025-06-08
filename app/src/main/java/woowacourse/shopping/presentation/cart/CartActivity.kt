@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.cart
 
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -52,6 +53,18 @@ class CartActivity : AppCompatActivity() {
                 handler = handler,
             )
         binding.recyclerViewCart.adapter = cartAdapter
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                setResult(RESULT_OK)
+                finish()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun observeCartViewModel() {

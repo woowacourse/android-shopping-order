@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.coroutines.runBlocking
 import woowacourse.shopping.data.model.CachedCartItem
 import woowacourse.shopping.data.model.CartItemResponse.Content
 import woowacourse.shopping.data.source.local.cart.CartItemsLocalDataSource
@@ -12,13 +13,20 @@ class CartItemsRepositoryImpl(
     private val cartItemsRemoteDataSource: CartItemsRemoteDataSource,
     private val cartItemsLocalDataSource: CartItemsLocalDataSource,
 ) : CartItemRepository {
-//    init {
-//        getInitialCartItems(null, null) {
-//                .onSuccess { cachedCartItems ->
-//                    cartItemsLocalDataSource.getCachedCartItem(cachedCartItems)
-//                }
-//        }
-//    }
+    init {
+        initializeCartItems()
+    }
+
+    fun initializeCartItems(): Result<List<CachedCartItem>> {
+        val runBlocking = runBlocking {
+            val result = getInitialCartItems(null, null)
+
+            result.onSuccess { cachedCartItems ->
+                cartItemsLocalDataSource.getCachedCartItem(cachedCartItems)
+            }
+        }
+        return runBlocking
+    }
 
     override fun getQuantity(pagingData: PagingData): PagingData {
         val updatedProducts =

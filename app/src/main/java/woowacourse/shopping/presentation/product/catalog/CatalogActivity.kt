@@ -1,7 +1,6 @@
 package woowacourse.shopping.presentation.product.catalog
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,12 +42,14 @@ class CatalogActivity : AppCompatActivity() {
         enableEdgeToEdge()
         applyWindowInsets()
 
-        setupRecyclerViews()
-        setBinding()
+        initRecyclerView()
+        binding.lifecycleOwner = this
+        binding.viewModel = viewModel
 
-        initializeCatalogData()
         observeViewModel()
+        setViewModel()
     }
+
 
     private fun applyWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
@@ -58,24 +59,23 @@ class CatalogActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupRecyclerViews() {
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadCatalogProducts()
+    }
+
+    private fun setViewModel() {
+        viewModel.loadCatalogProducts()
+        viewModel.loadRecentViewedItems()
+        viewModel.updateCartCount()
+        viewModel.updateProductQuantities()
+    }
+
+    private fun initRecyclerView() {
         val handler = createHandler()
 
         setupProductRecyclerView(handler)
         setupRecentViewedRecyclerView(handler)
-    }
-
-    private fun initializeCatalogData() {
-        viewModel.loadCatalogProducts()
-        viewModel.loadRecentViewedItems()
-        viewModel.updateCartCount()
-    }
-
-    private fun setBinding() {
-        binding.apply {
-            lifecycleOwner = this@CatalogActivity
-            viewModel = viewModel
-        }
     }
 
     private fun setupProductRecyclerView(handler: CatalogEventHandlerImpl) {
@@ -131,7 +131,7 @@ class CatalogActivity : AppCompatActivity() {
 
     private fun setupCartActionView(menu: Menu?) {
         val menuItem = menu?.findItem(R.id.menu_cart) ?: return
-        val holder = CartActionViewHolder(this, this, viewModel)
+        val holder = CartActionViewHolder(this, this, viewModel, resultLauncher)
         menuItem.actionView = holder.rootView
     }
 

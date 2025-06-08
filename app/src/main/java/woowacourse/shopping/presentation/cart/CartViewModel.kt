@@ -42,7 +42,7 @@ class CartViewModel(
 
     val checkedProductCount: LiveData<Int> =
         checkedProducts.map { checkedProducts ->
-            checkedProducts.count()
+            checkedProducts.sumOf { it.quantity }
         }
 
     private val _navigateToRecommendEvent = SingleLiveEvent<OrderInfo>()
@@ -117,7 +117,8 @@ class CartViewModel(
 
     override fun hasPrevPage(): Boolean = _pagingData.value?.hasPrevious == true
 
-    override fun isPaginationEnabled(): Boolean = (_isNextButtonEnabled.value == true) || (_isPrevButtonEnabled.value == true)
+    override fun isPaginationEnabled(): Boolean =
+        (_isNextButtonEnabled.value == true) || (_isPrevButtonEnabled.value == true)
 
     override fun getPage(): Int = pagingData.value?.page ?: 0
 
