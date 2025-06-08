@@ -41,7 +41,6 @@ class CatalogViewModel(
         viewModelScope.launch {
             _isLoadingData.value = true
             calculateTotalCartCount()
-
             val productsCount = _items.value?.filterIsInstance<CatalogItem.ProductItem>()?.size ?: 0
             val pageIndex =
                 ((productsCount - 1) / PAGE_SIZE)
@@ -49,20 +48,19 @@ class CatalogViewModel(
                     .let { if (nextPage) it + 1 else it }
             val pageOfProducts = productRepository.loadProductsUpToPage(pageIndex, PAGE_SIZE)
             val cartItems = productRepository.loadAllCartItems()
-            productRepository.loadRecentProducts(RECENTLY_VIEWED_PRODUCTS_COUNT) { recentProducts ->
-                val productUiModels = matchProductsToCartItems(pageOfProducts.items, cartItems)
-                val items =
-                    buildList {
-                        if (recentProducts.isNotEmpty()) {
-                            val recentProductsItem =
-                                CatalogItem.RecentProductsItem(recentProducts.map(Product::toProductUiModel))
-                            add(recentProductsItem)
-                        }
-                        addAll(productUiModels.map { uiModel -> CatalogItem.ProductItem(uiModel) })
-                        if (!pageOfProducts.isLast) add(CatalogItem.LoadMoreItem)
+            val recentProducts = productRepository.loadRecentProducts(RECENTLY_VIEWED_PRODUCTS_COUNT)
+            val productUiModels = matchProductsToCartItems(pageOfProducts.items, cartItems)
+            val items =
+                buildList {
+                    if (recentProducts.isNotEmpty()) {
+                        val recentProductsItem =
+                            CatalogItem.RecentProductsItem(recentProducts.map(Product::toProductUiModel))
+                        add(recentProductsItem)
                     }
-                _items.postValue(items)
-            }
+                    addAll(productUiModels.map { uiModel -> CatalogItem.ProductItem(uiModel) })
+                    if (!pageOfProducts.isLast) add(CatalogItem.LoadMoreItem)
+                }
+            _items.postValue(items)
             _isLoadingData.value = false
         }
     }

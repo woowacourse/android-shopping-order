@@ -18,10 +18,10 @@ interface RecentProductDao {
     LIMIT :limit
     """,
     )
-    fun getRecentProducts(limit: Int): List<RecentProductEntity>
+    suspend fun getRecentProducts(limit: Int): List<RecentProductEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(entity: RecentProductEntity)
+    suspend fun insert(entity: RecentProductEntity)
 
     @Query(
         """
@@ -31,8 +31,8 @@ interface RecentProductDao {
     LIMIT 1
     """,
     )
-    fun getLastViewedProduct(currentProductId: Long): RecentProductEntity?
+    suspend fun getLastViewedProduct(currentProductId: Long): RecentProductEntity?
 
     @Query("SELECT * FROM RecentProductEntity ORDER BY viewedAt DESC LIMIT 1")
-    fun getMostRecentProduct(): RecentProductEntity?
+    suspend fun getMostRecentProduct(): RecentProductEntity?
 }

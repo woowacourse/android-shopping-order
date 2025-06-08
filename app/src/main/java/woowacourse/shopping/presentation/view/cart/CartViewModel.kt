@@ -183,17 +183,17 @@ class CartViewModel(
         }
     }
 
-     fun selectAllCartItems(selectAll: Boolean) {
-         viewModelScope.launch {
-             val cartItems = cartRepository.loadAllCartItems()
-             _cartItems.postValue(
-                 cartItems.map { cartItem ->
-                     selectionStatus[cartItem.cartId] = selectAll
-                     cartItem.toCartItemUiModel().copy(isSelected = selectAll)
-                 },
-             )
-             loadPageOfShoppingCart()
-         }
+    fun selectAllCartItems(selectAll: Boolean) {
+        viewModelScope.launch {
+            val cartItems = cartRepository.loadAllCartItems()
+            _cartItems.postValue(
+                cartItems.map { cartItem ->
+                    selectionStatus[cartItem.cartId] = selectAll
+                    cartItem.toCartItemUiModel().copy(isSelected = selectAll)
+                },
+            )
+            loadPageOfShoppingCart()
+        }
     }
 
     fun disableSelection() {
@@ -216,8 +216,9 @@ class CartViewModel(
 
     fun fetchRecommendedProducts() {
         viewModelScope.launch {
-        val recommendedProducts = productRepository.loadRecommendedProducts(RECOMMENDED_PRODUCTS_SIZE)
-        _recommendedProducts.postValue(recommendedProducts.map(Product::toProductUiModel))
+            val recommendedProducts =
+                productRepository.loadRecommendedProducts(RECOMMENDED_PRODUCTS_SIZE)
+            _recommendedProducts.postValue(recommendedProducts.map(Product::toProductUiModel))
         }
     }
 

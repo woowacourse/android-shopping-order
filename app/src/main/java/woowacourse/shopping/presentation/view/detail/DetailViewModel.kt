@@ -36,7 +36,7 @@ class DetailViewModel(
             } else {
                 _product.postValue(cartItem.toProductUiModel().copy(quantity = MIN_QUANTITY))
             }
-            val recentProduct=  productRepository.getMostRecentProduct()
+            val recentProduct = productRepository.getMostRecentProduct()
             _lastViewedProduct.postValue(recentProduct?.toProductUiModel())
             if (product != null) productRepository.addRecentProduct(product)
         }

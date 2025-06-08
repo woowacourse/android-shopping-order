@@ -3,6 +3,7 @@ package woowacourse.shopping.data
 import woowacourse.shopping.data.datasource.CartItemDataSource
 import woowacourse.shopping.data.datasource.ProductDataSource
 import woowacourse.shopping.data.db.RecentProductDao
+import woowacourse.shopping.data.db.RecentProductEntity
 import woowacourse.shopping.data.mapper.toCartItem
 import woowacourse.shopping.data.mapper.toProduct
 import woowacourse.shopping.data.mapper.toRecentEntity
@@ -11,7 +12,6 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
-import kotlin.concurrent.thread
 
 class ProductRepositoryImpl(
     private val recentProductDao: RecentProductDao,
@@ -46,21 +46,12 @@ class ProductRepositoryImpl(
         return response.content.map { content -> content.toCartItem() }
     }
 
-    override fun addRecentProduct(product: Product) {
-        thread {
-            recentProductDao.insert(product.toRecentEntity())
-        }
+    override suspend fun addRecentProduct(product: Product) {
+        recentProductDao.insert(product.toRecentEntity())
     }
 
-    override fun loadRecentProducts(
-        count: Int,
-        callback: (List<Product>) -> Unit,
-    ) {
-        thread {
-            val recentEntities = recentProductDao.getRecentProducts(count)
-            val recentProducts = recentEntities.map { entity -> entity.toProduct() }
-            callback(recentProducts)
-        }
+    override suspend fun loadRecentProducts(count: Int): List<Product> {
+        return recentProductDao.getRecentProducts(count).map(RecentProductEntity::toProduct)
     }
 
     override suspend fun getMostRecentProduct(): Product? {

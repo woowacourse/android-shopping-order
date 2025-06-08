@@ -10,10 +10,7 @@ interface ProductRepository {
         pageSize: Int,
     ): Page<Product>
 
-    fun loadRecentProducts(
-        count: Int,
-        callback: (List<Product>) -> Unit,
-    )
+    suspend fun loadRecentProducts(count: Int): List<Product>
 
     suspend fun getMostRecentProduct(): Product?
 
@@ -23,7 +20,7 @@ interface ProductRepository {
 
     suspend fun loadAllCartItems(): List<CartItem>
 
-    suspend fun findProductById(id: Long):Product?
+    suspend fun findProductById(id: Long): Product?
 
-    fun addRecentProduct(product: Product)
+    suspend fun addRecentProduct(product: Product)
 }
