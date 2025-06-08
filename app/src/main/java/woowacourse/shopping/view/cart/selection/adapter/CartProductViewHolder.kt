@@ -15,12 +15,7 @@ class CartProductViewHolder(
 
     init {
         binding.handler = eventHandler
-        binding.itemQuantityControl.tvIncrease.setOnClickListener {
-            eventHandler.onQuantityIncreaseClick(currentItem)
-        }
-        binding.itemQuantityControl.tvDecrease.setOnClickListener {
-            eventHandler.onQuantityDecreaseClick(currentItem)
-        }
+        binding.quantityController = eventHandler
     }
 
     fun bind(cartProductItem: CartProductItem) {
@@ -29,7 +24,7 @@ class CartProductViewHolder(
         binding.isSelected = cartProductItem.isSelected
     }
 
-    interface EventHandler : QuantityControlEventHandler<CartProduct> {
+    interface EventHandler : QuantityControlEventHandler {
         fun onProductRemoveClick(item: CartProduct)
 
         fun onSelectItem(item: CartProduct)

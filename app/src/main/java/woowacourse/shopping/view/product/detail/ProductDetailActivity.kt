@@ -33,7 +33,7 @@ class ProductDetailActivity : AppCompatActivity() {
                     app.recentProductRepository,
                 ),
             )[ProductDetailViewModel::class.java]
-        initBindings(product)
+        initBindings()
         initObservers()
 
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -49,16 +49,11 @@ class ProductDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun initBindings(product: Product) {
+    private fun initBindings() {
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
         binding.handler = viewModel
-        binding.itemQuantityControl.tvIncrease.setOnClickListener {
-            viewModel.onQuantityIncreaseClick(product)
-        }
-        binding.itemQuantityControl.tvDecrease.setOnClickListener {
-            viewModel.onQuantityDecreaseClick(product)
-        }
+        binding.quantityController = viewModel
     }
 
     private fun initObservers() {

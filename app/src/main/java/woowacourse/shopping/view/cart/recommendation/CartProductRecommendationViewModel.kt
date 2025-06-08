@@ -136,8 +136,8 @@ class CartProductRecommendationViewModel(
         }
     }
 
-    override fun onQuantityIncreaseClick(item: Product) {
-        val cartProduct = cartProducts.firstOrNull { it.product.id == item.id } ?: return
+    override fun onQuantityIncreaseClick(id: Int) {
+        val cartProduct = cartProducts.firstOrNull { it.product.id == id } ?: return
         viewModelScope.launch {
             val newQuantity = cartProduct.quantity + QUANTITY_TO_ADD
             val result =
@@ -154,7 +154,7 @@ class CartProductRecommendationViewModel(
                         selectedProducts.value.orEmpty().minus(cartProduct).plus(
                             cartProduct.copy(quantity = newQuantity),
                         )
-                    updateQuantity(item, newQuantity)
+                    updateQuantity(cartProduct.product, newQuantity)
                 }
                 .onFailure {
                     Log.e("error", it.message.toString())
@@ -162,8 +162,8 @@ class CartProductRecommendationViewModel(
         }
     }
 
-    override fun onQuantityDecreaseClick(item: Product) {
-        val cartProduct = cartProducts.firstOrNull { it.product.id == item.id } ?: return
+    override fun onQuantityDecreaseClick(id: Int) {
+        val cartProduct = cartProducts.firstOrNull { it.product.id == id } ?: return
         viewModelScope.launch {
             val newQuantity = cartProduct.quantity - QUANTITY_TO_ADD
             val result =
@@ -184,7 +184,7 @@ class CartProductRecommendationViewModel(
                     } else {
                         _selectedProducts.value = selectedProducts.value?.minus(cartProduct)
                     }
-                    updateQuantity(item, newQuantity)
+                    updateQuantity(cartProduct.product, newQuantity)
                 }
                 .onFailure {
                     Log.e("error", it.message.toString())

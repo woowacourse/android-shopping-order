@@ -18,6 +18,10 @@
         <variable
             name="handler"
             type="woowacourse.shopping.view.util.product.ProductViewHolder.EventHandler" />
+
+        <variable
+            name="quantityController"
+            type="woowacourse.shopping.view.util.product.QuantityControlEventHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -75,6 +79,8 @@
             app:layout_constraintBottom_toBottomOf="@id/iv_product_image"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:id="@{product.id}"
+            app:quantityController="@{quantityController}"
             app:quantity="@{quantity}" />
 
         <ImageView

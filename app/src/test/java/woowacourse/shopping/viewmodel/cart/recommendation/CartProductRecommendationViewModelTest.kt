@@ -165,7 +165,7 @@ class CartProductRecommendationViewModelTest {
         val beforeCount = viewModel.totalCount.getOrAwaitValue()
 
         // when
-        viewModel.onQuantityIncreaseClick(mockProduct.copy(id = 2))
+        viewModel.onQuantityIncreaseClick(id = 2)
         val actual =
             viewModel.recommendedProducts.getOrAwaitValue()
                 .first { it.product.id == 2 }.quantity
@@ -188,13 +188,13 @@ class CartProductRecommendationViewModelTest {
             Result.success(
                 Unit,
             )
-        viewModel.onQuantityIncreaseClick(mockProduct.copy(id = 2))
+        viewModel.onQuantityIncreaseClick(id = 2)
 
         val beforePrice = viewModel.totalPrice.getOrAwaitValue()
         val beforeCount = viewModel.totalCount.getOrAwaitValue()
 
         // when
-        viewModel.onQuantityDecreaseClick(mockProduct.copy(id = 2))
+        viewModel.onQuantityDecreaseClick(id = 2)
         val actual =
             viewModel.recommendedProducts.getOrAwaitValue()
                 .first { it.product.id == 2 }.quantity

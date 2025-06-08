@@ -16,6 +16,10 @@
         <variable
             name="handler"
             type="woowacourse.shopping.view.cart.selection.adapter.CartProductViewHolder.EventHandler" />
+
+        <variable
+            name="quantityController"
+            type="woowacourse.shopping.view.util.product.QuantityControlEventHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -73,10 +77,12 @@
             layout="@layout/item_quantity_control"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:id="@{cartProduct.id}"
             app:layout_constraintBottom_toTopOf="@id/tv_product_price"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/iv_product_image"
-            app:quantity="@{cartProduct.quantity}" />
+            app:quantity="@{cartProduct.quantity}"
+            app:quantityController="@{quantityController}" />
 
         <TextView
             android:id="@+id/tv_product_price"

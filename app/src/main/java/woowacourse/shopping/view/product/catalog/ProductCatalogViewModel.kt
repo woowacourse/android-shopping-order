@@ -63,8 +63,9 @@ class ProductCatalogViewModel(
         }
     }
 
-    override fun onQuantityIncreaseClick(item: Product) {
-        val cartProduct = cartProducts.firstOrNull { it.product.id == item.id } ?: return
+    override fun onQuantityIncreaseClick(id: Int) {
+        val cartProduct = cartProducts.firstOrNull { it.product.id == id } ?: return
+        val product = productItems.firstOrNull { it.product.id == id }?.product ?: return
         viewModelScope.launch {
             val result =
                 cartProductRepository.updateQuantity(
@@ -74,17 +75,18 @@ class ProductCatalogViewModel(
 
             result
                 .onSuccess {
-                    cartProducts.removeIf { it.product.id == item.id }
+                    cartProducts.removeIf { it.product.id == id }
                     cartProducts.add(cartProduct.copy(quantity = cartProduct.quantity + QUANTITY_TO_ADD))
-                    updateQuantity(item, QUANTITY_TO_ADD)
+                    updateQuantity(product, QUANTITY_TO_ADD)
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
         }
     }
 
-    override fun onQuantityDecreaseClick(item: Product) {
-        val cartProduct = cartProducts.firstOrNull { it.product.id == item.id } ?: return
+    override fun onQuantityDecreaseClick(id: Int) {
+        val cartProduct = cartProducts.firstOrNull { it.product.id == id } ?: return
+        val product = productItems.firstOrNull { it.product.id == id }?.product ?: return
         viewModelScope.launch {
             val result =
                 cartProductRepository.updateQuantity(
@@ -94,7 +96,7 @@ class ProductCatalogViewModel(
 
             result
                 .onSuccess {
-                    cartProducts.removeIf { it.product.id == item.id }
+                    cartProducts.removeIf { it.product.id == id }
                     val newQuantity = cartProduct.quantity - QUANTITY_TO_ADD
                     if (newQuantity > MINIMUM_QUANTITY) {
                         cartProducts.add(
@@ -103,7 +105,7 @@ class ProductCatalogViewModel(
                             ),
                         )
                     }
-                    updateQuantity(item, -QUANTITY_TO_ADD)
+                    updateQuantity(product, -QUANTITY_TO_ADD)
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }

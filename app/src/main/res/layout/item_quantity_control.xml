@@ -6,8 +6,16 @@
     <data>
 
         <variable
+            name="id"
+            type="int" />
+
+        <variable
             name="quantity"
             type="java.lang.Integer" />
+
+        <variable
+            name="quantityController"
+            type="woowacourse.shopping.view.util.product.QuantityControlEventHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -15,6 +23,7 @@
         android:layout_height="wrap_content">
 
         <TextView
+            android:onClick="@{() -> quantityController.onQuantityDecreaseClick(id)}"
             android:id="@+id/tv_decrease"
             android:layout_width="42dp"
             android:layout_height="42dp"
@@ -45,6 +54,7 @@
 
 
         <TextView
+            android:onClick="@{() -> quantityController.onQuantityIncreaseClick(id)}"
             android:id="@+id/tv_increase"
             android:layout_width="42dp"
             android:layout_height="42dp"

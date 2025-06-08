@@ -89,9 +89,9 @@ class CartProductSelectionViewModel(
         }
     }
 
-    override fun onQuantityIncreaseClick(item: CartProduct) {
+    override fun onQuantityIncreaseClick(id: Int) {
         val cartProductItem =
-            products.value.orEmpty().firstOrNull { it.cartProduct.product.id == item.product.id }
+            products.value.orEmpty().firstOrNull { it.cartProduct.id == id }
                 ?: return
 
         viewModelScope.launch {
@@ -105,17 +105,17 @@ class CartProductSelectionViewModel(
             result
                 .onSuccess {
                     loadPage(_page.value ?: FIRST_PAGE_NUMBER)
-                    updateSelectedProducts(item, newQuantity)
+                    updateSelectedProducts(cartProductItem.cartProduct, newQuantity)
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
         }
     }
 
-    override fun onQuantityDecreaseClick(item: CartProduct) {
+    override fun onQuantityDecreaseClick(id: Int) {
         val cartProductItem =
             products.value.orEmpty()
-                .firstOrNull { it.cartProduct.product.id == item.product.id }
+                .firstOrNull { it.cartProduct.id == id }
                 ?: return
         if (cartProductItem.cartProduct.quantity == 1) return
 
@@ -130,7 +130,7 @@ class CartProductSelectionViewModel(
             result
                 .onSuccess {
                     loadPage(_page.value ?: FIRST_PAGE_NUMBER)
-                    updateSelectedProducts(item, newQuantity)
+                    updateSelectedProducts(cartProductItem.cartProduct, newQuantity)
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }

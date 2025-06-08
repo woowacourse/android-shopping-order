@@ -138,7 +138,7 @@ class CartProductSelectionViewModelTest {
                 .first()
                 .cartProduct
         // when
-        viewModel.onQuantityIncreaseClick(cartProductItem)
+        viewModel.onQuantityIncreaseClick(cartProductItem.id)
 
         // then
         val updatedItem =
@@ -157,10 +157,10 @@ class CartProductSelectionViewModelTest {
                 .getOrAwaitValue()
                 .first()
                 .cartProduct
-        viewModel.onQuantityIncreaseClick(cartProduct)
+        viewModel.onQuantityIncreaseClick(cartProduct.id)
 
         // when
-        viewModel.onQuantityDecreaseClick(cartProduct)
+        viewModel.onQuantityDecreaseClick(cartProduct.id)
 
         // then
         val updatedItem =

@@ -39,11 +39,11 @@ class ProductDetailViewModel(
         updateRecentProduct()
     }
 
-    override fun onQuantityIncreaseClick(item: Product) {
+    override fun onQuantityIncreaseClick(id: Int) {
         updateQuantity((quantity.value ?: INITIAL_QUANTITY) + 1)
     }
 
-    override fun onQuantityDecreaseClick(item: Product) {
+    override fun onQuantityDecreaseClick(id: Int) {
         val quantity = (quantity.value ?: INITIAL_QUANTITY) - 1
         if (quantity > 0) {
             updateQuantity(quantity)

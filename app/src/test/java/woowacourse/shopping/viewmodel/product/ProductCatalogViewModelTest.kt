@@ -101,7 +101,7 @@ class ProductCatalogViewModelTest {
                 .product
 
         // when
-        viewModel.onQuantityIncreaseClick(product)
+        viewModel.onQuantityIncreaseClick(product.id)
 
         // then
         val updatedItem =
@@ -122,10 +122,10 @@ class ProductCatalogViewModelTest {
                 .filterIsInstance<ProductCatalogItem.ProductItem>()
                 .first()
                 .product
-        viewModel.onQuantityIncreaseClick(product)
+        viewModel.onQuantityIncreaseClick(product.id)
 
         // when
-        viewModel.onQuantityDecreaseClick(product)
+        viewModel.onQuantityDecreaseClick(product.id)
 
         // then
         val updatedItem =
@@ -149,7 +149,7 @@ class ProductCatalogViewModelTest {
         val totalQuantity = viewModel.totalQuantity.getOrAwaitValue()
 
         // when
-        viewModel.onQuantityIncreaseClick(product)
+        viewModel.onQuantityIncreaseClick(product.id)
         val actual = viewModel.totalQuantity.getOrAwaitValue() - totalQuantity
 
         // then

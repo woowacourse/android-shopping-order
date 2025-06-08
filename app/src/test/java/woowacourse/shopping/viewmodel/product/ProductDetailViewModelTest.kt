@@ -35,7 +35,7 @@ class ProductDetailViewModelTest {
     @Test
     fun `수량 증가 버튼 클릭 시 수량이 증가한다`() {
         // when
-        viewModel.onQuantityIncreaseClick(product)
+        viewModel.onQuantityIncreaseClick(product.id)
 
         // then
         assertEquals(2, viewModel.quantity.getOrAwaitValue())
@@ -44,8 +44,8 @@ class ProductDetailViewModelTest {
     @Test
     fun `수량 감소 버튼 클릭 시 수량이 감소한다`() {
         // when
-        viewModel.onQuantityIncreaseClick(product)
-        viewModel.onQuantityDecreaseClick(product)
+        viewModel.onQuantityIncreaseClick(product.id)
+        viewModel.onQuantityDecreaseClick(product.id)
 
         // then
         assertEquals(1, viewModel.quantity.getOrAwaitValue())
@@ -53,7 +53,7 @@ class ProductDetailViewModelTest {
 
     @Test
     fun `수량이 1일 때 수량 감소 버튼 클릭 시 수량이 감소하지 않는다`() {
-        viewModel.onQuantityDecreaseClick(product)
+        viewModel.onQuantityDecreaseClick(product.id)
         assertEquals(1, viewModel.quantity.getOrAwaitValue())
     }
 
