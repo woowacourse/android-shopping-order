@@ -18,8 +18,8 @@ class OrderViewModel(
     private val _couponList = MutableLiveData<List<CouponUiModel>>()
     val couponList: LiveData<List<CouponUiModel>> = _couponList
 
-    private val _selectedCoupon = MutableLiveData<CouponUiModel>()
-    val selectedCoupon: LiveData<CouponUiModel> = _selectedCoupon
+    private val _selectedCoupon = MutableLiveData<CouponUiModel?>()
+    val selectedCoupon: LiveData<CouponUiModel?> = _selectedCoupon
 
     fun loadCoupons() {
         viewModelScope.launch {
@@ -34,11 +34,19 @@ class OrderViewModel(
     }
 
     fun selectCoupon(coupon: CouponUiModel) {
-        _selectedCoupon.value = coupon
-        _couponList.value =
-            _couponList.value?.map {
-                it.copy(isSelected = it.id == coupon.id)
-            }
+        if (_selectedCoupon.value?.id == coupon.id) {
+            _selectedCoupon.value = null
+            _couponList.value =
+                _couponList.value?.map {
+                    it.copy(isSelected = false)
+                }
+        } else {
+            _selectedCoupon.value = coupon
+            _couponList.value =
+                _couponList.value?.map {
+                    it.copy(isSelected = it.id == coupon.id)
+                }
+        }
     }
 
     companion object {
