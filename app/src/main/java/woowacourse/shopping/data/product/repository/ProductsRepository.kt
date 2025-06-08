@@ -4,28 +4,18 @@ import woowacourse.shopping.domain.product.PagedProducts
 import woowacourse.shopping.domain.product.Product
 
 interface ProductsRepository {
-    fun loadPagedProducts(
+    suspend fun loadPagedProducts(
         page: Int,
         size: Int,
-        onLoad: (Result<PagedProducts>) -> Unit,
-    )
+    ): PagedProducts
 
-    fun loadProductsByCategory(
-        category: String,
-        onLoad: (Result<List<Product>>) -> Unit,
-    )
+    suspend fun loadProductsByCategory(category: String): List<Product>
 
-    fun getProductById(
-        id: Long,
-        onLoad: (Result<Product?>) -> Unit,
-    )
+    suspend fun getProductById(id: Long): Product?
 
-    fun loadLatestViewedProduct(onLoad: (productId: Result<Product?>) -> Unit)
+    suspend fun loadLatestViewedProduct(): Product?
 
-    fun loadRecentViewedProducts(onLoad: (Result<List<Product>>) -> Unit)
+    suspend fun loadRecentViewedProducts(): List<Product>
 
-    fun addViewedProduct(
-        product: Product,
-        onLoad: (Result<Unit>) -> Unit,
-    )
+    suspend fun addViewedProduct(product: Product)
 }
