@@ -4,7 +4,7 @@ import java.time.LocalTime
 
 sealed class Discount {
     abstract fun calculateDiscount(
-        products: List<CartProduct>,
+        products: CartProducts,
         shippingFee: Int,
         now: LocalTime = LocalTime.now(),
     ): Int
@@ -14,13 +14,15 @@ sealed class Discount {
         val minimumAmount: Int,
     ) : Discount() {
         override fun calculateDiscount(
-            products: List<CartProduct>,
+            products: CartProducts,
             shippingFee: Int,
             now: LocalTime,
-        ): Int {
-            val totalPrice = products.sumOf { it.totalPrice }
-            return if (totalPrice >= minimumAmount) discountAmount else 0
-        }
+        ): Int =
+            if (products.totalPrice >= minimumAmount) {
+                discountAmount
+            } else {
+                MINIMUM_AMOUNT
+            }
     }
 
     data class BuyXGetYFree(
@@ -28,16 +30,19 @@ sealed class Discount {
         val getQuantity: Int,
     ) : Discount() {
         override fun calculateDiscount(
-            products: List<CartProduct>,
+            products: CartProducts,
             shippingFee: Int,
             now: LocalTime,
         ): Int {
             val freeProduct =
-                products
+                products.value
                     .filter { it.quantity >= buyQuantity + getQuantity }
                     .maxByOrNull { it.product.price }
-            if (freeProduct == null) return 0
-            return freeProduct.product.price * getQuantity
+            return if (freeProduct != null) {
+                freeProduct.product.price * getQuantity
+            } else {
+                MINIMUM_AMOUNT
+            }
         }
     }
 
@@ -45,13 +50,15 @@ sealed class Discount {
         val minimumAmount: Int,
     ) : Discount() {
         override fun calculateDiscount(
-            products: List<CartProduct>,
+            products: CartProducts,
             shippingFee: Int,
             now: LocalTime,
-        ): Int {
-            val totalPrice = products.sumOf { it.totalPrice }
-            return if (totalPrice >= minimumAmount) shippingFee else 0
-        }
+        ): Int =
+            if (products.totalPrice >= minimumAmount) {
+                shippingFee
+            } else {
+                MINIMUM_AMOUNT
+            }
     }
 
     data class Percentage(
@@ -60,13 +67,18 @@ sealed class Discount {
         val endTime: LocalTime,
     ) : Discount() {
         override fun calculateDiscount(
-            products: List<CartProduct>,
+            products: CartProducts,
             shippingFee: Int,
             now: LocalTime,
-        ): Int {
-            if (now !in startTime..endTime) return 0
-            val totalPrice = products.sumOf { it.totalPrice }
-            return (totalPrice * discountPercentage) / 100
-        }
+        ): Int =
+            if (now in startTime..endTime) {
+                (products.totalPrice * discountPercentage) / 100
+            } else {
+                MINIMUM_AMOUNT
+            }
+    }
+
+    companion object {
+        private const val MINIMUM_AMOUNT = 0
     }
 }

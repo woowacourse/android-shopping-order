@@ -1,10 +1,10 @@
 package woowacourse.shopping.domain.model
 
 data class Order(
-    val cartProducts: List<CartProduct>,
+    val cartProducts: CartProducts,
     private val coupon: Coupon? = null,
 ) {
-    val orderAmount: Int = cartProducts.sumOf { it.totalPrice }
+    val orderAmount: Int = cartProducts.totalPrice
 
     val discountAmount: Int = coupon?.discountType?.calculateDiscount(cartProducts, SHIPPING_FEE) ?: 0
 

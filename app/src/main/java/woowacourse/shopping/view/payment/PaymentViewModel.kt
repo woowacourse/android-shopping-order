@@ -9,6 +9,7 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.repository.CouponRepository
@@ -28,7 +29,7 @@ class PaymentViewModel(
     val order: LiveData<Order> =
         couponItems.map { couponItems ->
             Order(
-                selectedProducts,
+                CartProducts(selectedProducts),
                 couponItems.firstOrNull { it.isSelected }?.coupon,
             )
         }
@@ -74,7 +75,7 @@ class PaymentViewModel(
         viewModelScope.launch {
             order.value?.let { order ->
                 orderRepository
-                    .createOrder(order.cartProducts.map { it.id })
+                    .createOrder(order.cartProducts.ids)
                     .onSuccess {
                         _finishOrderEvent.postValue(Unit)
                     }.onFailure { Log.e("error", it.message.toString()) }
