@@ -9,7 +9,7 @@ class CalculateBonusGoods(
     fun getDiscountedPrice(cartItems: List<CartItem>): DiscountedAmount {
         val bonusPrice =
             cartItems
-                .filter { it.quantity >= buyQuantity }
+                .filter { it.quantity >= (buyQuantity + getQuantity) }
                 .takeIf { it.isNotEmpty() }
                 ?.maxBy {
                     it.goods.price

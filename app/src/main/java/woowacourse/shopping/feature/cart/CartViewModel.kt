@@ -155,6 +155,32 @@ class CartViewModel(
             addSource(validCoupons) { update() }
         }
 
+    val discountAmount: LiveData<Int> =
+        MediatorLiveData<Int>().apply {
+            fun update() {
+                val coupon = selectedCoupon.value
+                value = -getDiscountAmount(coupon)
+            }
+            addSource(selectedCoupon) { update() }
+            addSource(selectedCartsList) { update() }
+            addSource(totalPrice) { update() }
+        }
+
+    private fun getDiscountAmount(coupon: Coupon?): Int =
+        when (coupon) {
+            is Coupon.BonusGoods -> {
+                val discountedAmount =
+                    coupon.calculateBonusGoods.getDiscountedPrice(
+                        selectedCartsList.value ?: emptyList(),
+                    )
+                discountedAmount.discountPrice
+            }
+            is Coupon.Fixed -> coupon.discountedAmount.discountPrice
+            is Coupon.FreeShipping -> 0
+            is Coupon.Percentage -> coupon.discountedAmount.rateDiscountAmount(totalPrice.value ?: 0)
+            null -> 0
+        }
+
     init {
         updateWholeCarts()
     }
