@@ -60,6 +60,7 @@
             android:layout_height="0dp"
             android:layout_marginHorizontal="16dp"
             android:layout_marginVertical="16dp"
+            app:coupons="@{vm.coupons}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@id/divider1"
             app:layout_constraintTop_toBottomOf="@id/tv_coupon_limit"

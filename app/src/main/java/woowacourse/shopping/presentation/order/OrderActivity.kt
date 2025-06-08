@@ -92,10 +92,6 @@ class OrderActivity :
     }
 
     private fun observeViewModel() {
-        viewModel.coupons.observe(this) { coupons ->
-            couponAdapter.submitList(coupons)
-        }
-
         viewModel.orderSuccessEvent.observe(this) { result ->
             if (result) {
                 val intent = Intent(this, ProductActivity::class.java)
