@@ -5,7 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.RepositoryProvider
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
@@ -68,56 +70,60 @@ class CartViewModel(
     private var isProcessingRequest = false
 
     fun loadPageOfShoppingCart(indexOffset: Int = 0) {
-        val newPageIndex = ((_pageIndex.value ?: 0) + indexOffset).coerceAtLeast(0)
-        cartRepository.loadPageOfCartItems(
-            pageIndex = newPageIndex,
-            pageSize = PAGE_SIZE,
-        ) { products, isFirstPage, isLastPage ->
+        viewModelScope.launch {
+            val newPageIndex = ((_pageIndex.value ?: 0) + indexOffset).coerceAtLeast(0)
+            val page =
+                cartRepository.loadPageOfCartItems(
+                    pageIndex = newPageIndex,
+                    pageSize = PAGE_SIZE,
+                )
             val updatedItems =
-                products.map { product ->
+                page.items.map { product ->
                     product
                         .toCartItemUiModel()
                         .copy(isSelected = selectionStatus[product.cartId] ?: false)
                 }
             _cartItems.postValue(updatedItems)
             _pageIndex.postValue(newPageIndex)
-            _isFirstPage.postValue(isFirstPage)
-            _isLastPage.postValue(isLastPage)
+            _isFirstPage.postValue(page.isFirst)
+            _isLastPage.postValue(page.isLast)
         }
     }
 
     fun increaseQuantity(product: ProductUiModel) {
-        if (isProcessingRequest) return
+        viewModelScope.launch {
+            if (isProcessingRequest) return@launch
 
-        isProcessingRequest = true
-        val cartItem = product.toCartItem()
-        if (product.quantity == 0) {
-            addToCart(cartItem.toCartItemUiModel())
-            isProcessingRequest = false
-            return
-        }
-
-        cartRepository.increaseQuantity(cartItem) {
+            isProcessingRequest = true
+            val cartItem = product.toCartItem()
+            if (product.quantity == 0) {
+                addToCart(cartItem.toCartItemUiModel())
+                isProcessingRequest = false
+                return@launch
+            }
+            cartRepository.increaseQuantity(cartItem)
             val updatedItem =
                 CartItemUiModel(
                     cartItem.copy(quantity = cartItem.quantity + 1),
                     isSelected = selectionStatus[cartItem.cartId] ?: false,
                 )
             updateCartItems(updatedItem)
+
             isProcessingRequest = false
         }
     }
 
     fun decreaseQuantity(product: ProductUiModel) {
-        val cartItem = product.toCartItem()
-        if (cartItem.quantity == 1) {
-            removeFromCart(cartItem.toCartItemUiModel())
-            return
-        }
+        viewModelScope.launch {
+            val cartItem = product.toCartItem()
+            if (cartItem.quantity == 1) {
+                removeFromCart(cartItem.toCartItemUiModel())
+                return@launch
+            }
 
-        if (isProcessingRequest) return
-        isProcessingRequest = true
-        cartRepository.decreaseQuantity(cartItem) {
+            if (isProcessingRequest) return@launch
+            isProcessingRequest = true
+            cartRepository.decreaseQuantity(cartItem)
             val updatedItem =
                 CartItemUiModel(
                     cartItem.copy(quantity = cartItem.quantity - 1),
@@ -128,23 +134,24 @@ class CartViewModel(
         }
     }
 
-    private fun addToCart(cartItem: CartItemUiModel) {
+    private suspend fun addToCart(cartItem: CartItemUiModel) {
         val newItem = cartItem.cartItem.copy(quantity = 1)
-        cartRepository.addCartItem(newItem) { addedItem ->
-            if (addedItem != null) {
-                _cartItems.postValue(_cartItems.value?.plus(cartItem.copy(cartItem = newItem)))
-                _itemUpdateEvent.postValue(addedItem.toCartItemUiModel().copy(isSelected = true))
-                setCartItemSelection(addedItem.toCartItemUiModel(), true)
-            }
+        cartRepository.addCartItem(newItem)
+        val addedItem = cartRepository.loadCartItemByProductId(cartItem.cartItem.product.id)
+        if (addedItem != null) {
+            _cartItems.postValue(_cartItems.value?.plus(cartItem.copy(cartItem = newItem)))
+            _itemUpdateEvent.postValue(addedItem.toCartItemUiModel().copy(isSelected = true))
+            setCartItemSelection(addedItem.toCartItemUiModel(), true)
         }
     }
 
     fun removeFromCart(cartItem: CartItemUiModel) {
-        val removedItem = cartItem.cartItem.copy(quantity = 0)
-        cartRepository.deleteCartItem(removedItem.cartId) {
+        viewModelScope.launch {
+            val removedItem = cartItem.cartItem.copy(quantity = 0)
+            cartRepository.deleteCartItem(removedItem.cartId)
             _cartItems.postValue(
-                _cartItems.value?.filterNot { cartItem ->
-                    cartItem.cartItem.cartId == removedItem.cartId
+                _cartItems.value?.filterNot { item ->
+                    item.cartItem.cartId == removedItem.cartId
                 },
             )
             _itemDeleteEvent.postValue(removedItem.cartId)
@@ -170,44 +177,47 @@ class CartViewModel(
         cartItem: CartItemUiModel,
         isSelected: Boolean,
     ) {
-        selectionStatus[cartItem.cartItem.cartId] = isSelected
-        updateSelectionInfo()
+        viewModelScope.launch {
+            selectionStatus[cartItem.cartItem.cartId] = isSelected
+            updateSelectionInfo()
+        }
     }
 
-    fun selectAllCartItems(selectAll: Boolean) {
-        cartRepository.loadAllCartItems { allItems ->
-            _cartItems.postValue(
-                allItems.map { cartItem ->
-                    selectionStatus[cartItem.cartId] = selectAll
-                    cartItem.toCartItemUiModel().copy(isSelected = selectAll)
-                },
-            )
-            loadPageOfShoppingCart()
-        }
+     fun selectAllCartItems(selectAll: Boolean) {
+         viewModelScope.launch {
+             val cartItems = cartRepository.loadAllCartItems()
+             _cartItems.postValue(
+                 cartItems.map { cartItem ->
+                     selectionStatus[cartItem.cartId] = selectAll
+                     cartItem.toCartItemUiModel().copy(isSelected = selectAll)
+                 },
+             )
+             loadPageOfShoppingCart()
+         }
     }
 
     fun disableSelection() {
         _canSelectItems.value = false
     }
 
-    private fun updateSelectionInfo() {
-        cartRepository.loadAllCartItems { cartItems ->
-            val selectedItemIds = selectionStatus.filter { it.value }.map { it.key }.toSet()
-            _cartItems.postValue(
-                cartItems.map { cartItem ->
-                    if (cartItem.cartId in selectedItemIds) {
-                        cartItem.toCartItemUiModel().copy(isSelected = true)
-                    } else {
-                        cartItem.toCartItemUiModel()
-                    }
-                },
-            )
-        }
+    private suspend fun updateSelectionInfo() {
+        val cartItems = cartRepository.loadAllCartItems()
+        val selectedItemIds = selectionStatus.filter { it.value }.map { it.key }.toSet()
+        _cartItems.postValue(
+            cartItems.map { cartItem ->
+                if (cartItem.cartId in selectedItemIds) {
+                    cartItem.toCartItemUiModel().copy(isSelected = true)
+                } else {
+                    cartItem.toCartItemUiModel()
+                }
+            },
+        )
     }
 
     fun fetchRecommendedProducts() {
-        productRepository.loadRecommendedProducts(RECOMMENDED_PRODUCTS_SIZE) { recommendedProducts ->
-            _recommendedProducts.postValue(recommendedProducts.map(Product::toProductUiModel))
+        viewModelScope.launch {
+        val recommendedProducts = productRepository.loadRecommendedProducts(RECOMMENDED_PRODUCTS_SIZE)
+        _recommendedProducts.postValue(recommendedProducts.map(Product::toProductUiModel))
         }
     }
 

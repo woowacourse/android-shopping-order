@@ -1,50 +1,30 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Page
 
 interface CartRepository {
-    fun loadPageOfCartItems(
+    suspend fun loadCartItemByProductId(id: Long): CartItem?
+
+    suspend fun loadPageOfCartItems(
         pageIndex: Int,
         pageSize: Int,
-        callback: (
-            cartItems: List<CartItem>,
-            isFirstPage: Boolean,
-            isLastPage: Boolean,
-        ) -> Unit,
-    )
+    ): Page<CartItem>
 
-    fun loadAllCartItems(callback: (cartItems: List<CartItem>) -> Unit)
+    suspend fun loadAllCartItems(): List<CartItem>
 
-    fun findCartItemByProductId(
-        id: Long,
-        callback: (cartItem: CartItem?) -> Unit,
-    )
+    suspend fun loadTotalCartCount(): Int
 
-    fun getAllCartItemsCount(callback: (totalCount: Int) -> Unit)
+    suspend fun increaseQuantity(cartItem: CartItem)
 
-    fun increaseQuantity(
-        cartItem: CartItem,
-        callback: () -> Unit,
-    )
+    suspend fun decreaseQuantity(cartItem: CartItem)
 
-    fun decreaseQuantity(
-        cartItem: CartItem,
-        callback: () -> Unit,
-    )
+    suspend fun addCartItem(cartItem: CartItem)
 
-    fun addCartItem(
-        cartItem: CartItem,
-        callback: (addedCartItem: CartItem?) -> Unit,
-    )
+    suspend fun deleteCartItem(cartId: Long)
 
-    fun deleteCartItem(
-        cartId: Long,
-        callback: () -> Unit,
-    )
-
-    fun updateCartItemQuantity(
+    suspend fun updateCartItemQuantity(
         cartId: Long,
         quantity: Int,
-        callback: () -> Unit,
     )
 }

@@ -6,104 +6,65 @@ import woowacourse.shopping.data.model.request.CartItemRequest
 import woowacourse.shopping.data.model.response.CartItemContent
 import woowacourse.shopping.data.model.response.Quantity
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.repository.CartRepository
 
 class CartRepositoryImpl(
     private val cartItemDataSource: CartItemDataSource,
 ) : CartRepository {
-    override fun loadPageOfCartItems(
+    override suspend fun loadCartItemByProductId(id: Long): CartItem? {
+        val response = cartItemDataSource.fetchPageOfCartItems(0, Int.MAX_VALUE)
+        return response.content.find { content -> content.product.id == id }?.toCartItem()
+    }
+
+    override suspend fun loadPageOfCartItems(
         pageIndex: Int,
         pageSize: Int,
-        callback: (
-            cartItems: List<CartItem>,
-            isFirstPage: Boolean,
-            isLastPage: Boolean,
-        ) -> Unit,
-    ) {
-        cartItemDataSource.fetchPageOfCartItems(pageIndex, pageSize) { response ->
-            if (response != null) {
-                val cartItems = response.content.map(CartItemContent::toCartItem)
-                callback(cartItems, response.first, response.last)
-            }
-        }
+    ): Page<CartItem> {
+        val response = cartItemDataSource.fetchPageOfCartItems(pageIndex, pageSize)
+        return Page(
+            response.content.map(CartItemContent::toCartItem),
+            response.first,
+            response.last,
+        )
     }
 
-    override fun loadAllCartItems(callback: (cartItems: List<CartItem>) -> Unit) {
-        cartItemDataSource.fetchPageOfCartItems(
-            pageIndex = 0,
-            pageSize = Int.MAX_VALUE,
-        ) { response ->
-            callback(response?.content?.map(CartItemContent::toCartItem).orEmpty())
-        }
+    override suspend fun loadAllCartItems(): List<CartItem> {
+        val response = cartItemDataSource.fetchPageOfCartItems(0, Int.MAX_VALUE)
+        return response.content.map(CartItemContent::toCartItem)
     }
 
-    override fun findCartItemByProductId(
-        id: Long,
-        callback: (cartItem: CartItem?) -> Unit,
-    ) {
-        cartItemDataSource.fetchPageOfCartItems(0, Int.MAX_VALUE) { response ->
-            callback(response?.content?.find { it.product.id == id }?.toCartItem())
-        }
+    override suspend fun loadTotalCartCount(): Int {
+        return cartItemDataSource.fetchCartItemsCount().quantity
     }
 
-    override fun getAllCartItemsCount(callback: (totalCount: Int) -> Unit) {
-        cartItemDataSource.fetchCartItemsCount { quantity ->
-            callback(quantity?.quantity ?: 0)
-        }
-    }
-
-    override fun increaseQuantity(
-        cartItem: CartItem,
-        callback: () -> Unit,
-    ) {
+    override suspend fun increaseQuantity(cartItem: CartItem) {
         cartItemDataSource.updateCartItem(
             cartId = cartItem.cartId,
             quantity = Quantity(cartItem.quantity + 1),
-        ) {
-            callback()
-        }
+        )
     }
 
-    override fun decreaseQuantity(
-        cartItem: CartItem,
-        callback: () -> Unit,
-    ) {
+    override suspend fun decreaseQuantity(cartItem: CartItem) {
         cartItemDataSource.updateCartItem(
             cartId = cartItem.cartId,
             quantity = Quantity(cartItem.quantity - 1),
-        ) {
-            callback()
-        }
+        )
     }
 
-    override fun addCartItem(
-        cartItem: CartItem,
-        callback: (addedCartItem: CartItem?) -> Unit,
-    ) {
-        val item = CartItemRequest(cartItem.product.id, cartItem.quantity)
-        cartItemDataSource.submitCartItem(item) {
-            findCartItemByProductId(cartItem.product.id) { addedCartItem ->
-                callback(addedCartItem)
-            }
-        }
+    override suspend fun addCartItem(cartItem: CartItem) {
+        val request = CartItemRequest(cartItem.product.id, cartItem.quantity)
+        cartItemDataSource.submitCartItem(request)
     }
 
-    override fun deleteCartItem(
-        cartId: Long,
-        callback: () -> Unit,
-    ) {
-        cartItemDataSource.removeCartItem(cartId) {
-            callback()
-        }
+    override suspend fun deleteCartItem(cartId: Long) {
+        cartItemDataSource.removeCartItem(cartId)
     }
 
-    override fun updateCartItemQuantity(
+    override suspend fun updateCartItemQuantity(
         cartId: Long,
         quantity: Int,
-        callback: () -> Unit,
     ) {
-        cartItemDataSource.updateCartItem(cartId, Quantity(quantity)) {
-            callback()
-        }
+        cartItemDataSource.updateCartItem(cartId, Quantity(quantity))
     }
 }

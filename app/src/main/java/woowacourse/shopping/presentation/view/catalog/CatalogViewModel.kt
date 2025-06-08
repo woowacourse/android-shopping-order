@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.RepositoryProvider
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
@@ -36,32 +38,32 @@ class CatalogViewModel(
     private var isProcessingRequest = false
 
     fun loadCatalog(nextPage: Boolean) {
-        _isLoadingData.value = true
-        calculateTotalCartCount()
+        viewModelScope.launch {
+            _isLoadingData.value = true
+            calculateTotalCartCount()
 
-        val productsCount = _items.value?.filterIsInstance<CatalogItem.ProductItem>()?.size ?: 0
-        val pageIndex =
-            ((productsCount - 1) / PAGE_SIZE)
-                .coerceAtLeast(0)
-                .let { if (nextPage) it + 1 else it }
-        productRepository.loadProductsUpToPage(pageIndex, PAGE_SIZE) { products, isLastPage ->
-            productRepository.loadAllCartItems { cartItems ->
-                productRepository.loadRecentProducts(RECENTLY_VIEWED_PRODUCTS_COUNT) { recentProducts ->
-                    val productUiModels = matchProductsToCartItems(products, cartItems)
-                    val items =
-                        buildList {
-                            if (recentProducts.isNotEmpty()) {
-                                val recentProductsItem =
-                                    CatalogItem.RecentProductsItem(recentProducts.map(Product::toProductUiModel))
-                                add(recentProductsItem)
-                            }
-                            addAll(productUiModels.map { uiModel -> CatalogItem.ProductItem(uiModel) })
-                            if (!isLastPage) add(CatalogItem.LoadMoreItem)
+            val productsCount = _items.value?.filterIsInstance<CatalogItem.ProductItem>()?.size ?: 0
+            val pageIndex =
+                ((productsCount - 1) / PAGE_SIZE)
+                    .coerceAtLeast(0)
+                    .let { if (nextPage) it + 1 else it }
+            val pageOfProducts = productRepository.loadProductsUpToPage(pageIndex, PAGE_SIZE)
+            val cartItems = productRepository.loadAllCartItems()
+            productRepository.loadRecentProducts(RECENTLY_VIEWED_PRODUCTS_COUNT) { recentProducts ->
+                val productUiModels = matchProductsToCartItems(pageOfProducts.items, cartItems)
+                val items =
+                    buildList {
+                        if (recentProducts.isNotEmpty()) {
+                            val recentProductsItem =
+                                CatalogItem.RecentProductsItem(recentProducts.map(Product::toProductUiModel))
+                            add(recentProductsItem)
                         }
-                    _items.postValue(items)
-                }
-                _isLoadingData.value = false
+                        addAll(productUiModels.map { uiModel -> CatalogItem.ProductItem(uiModel) })
+                        if (!pageOfProducts.isLast) add(CatalogItem.LoadMoreItem)
+                    }
+                _items.postValue(items)
             }
+            _isLoadingData.value = false
         }
     }
 
@@ -84,15 +86,16 @@ class CatalogViewModel(
     }
 
     fun increaseQuantity(product: ProductUiModel) {
-        if (isProcessingRequest) return
-        isProcessingRequest = true
-        val cartItem = product.toCartItem()
-        if (product.quantity == 0) {
-            addToCart(cartItem.toCartItemUiModel())
-            isProcessingRequest = false
-            return
-        }
-        cartRepository.increaseQuantity(cartItem) {
+        viewModelScope.launch {
+            if (isProcessingRequest) return@launch
+            isProcessingRequest = true
+            val cartItem = product.toCartItem()
+            if (product.quantity == 0) {
+                addToCart(cartItem.toCartItemUiModel())
+                isProcessingRequest = false
+                return@launch
+            }
+            cartRepository.increaseQuantity(cartItem)
             _itemUpdateEvent.postValue(
                 cartItem.copy(quantity = cartItem.quantity + 1).toProductUiModel(),
             )
@@ -102,38 +105,35 @@ class CatalogViewModel(
     }
 
     fun decreaseQuantity(product: ProductUiModel) {
-        val cartItem = product.toCartItem()
-        if (cartItem.quantity == 1) {
-            cartRepository.deleteCartItem(cartItem.cartId) {
+        viewModelScope.launch {
+            val cartItem = product.toCartItem()
+            if (cartItem.quantity == 1) {
+                cartRepository.deleteCartItem(cartItem.cartId)
                 _itemUpdateEvent.postValue(product.copy(quantity = 0))
                 calculateTotalCartCount()
-                isProcessingRequest = false
-            }
-        } else {
-            if (isProcessingRequest) return
-            isProcessingRequest = true
-            cartRepository.decreaseQuantity(cartItem) {
+            } else {
+                if (isProcessingRequest) return@launch
+                isProcessingRequest = true
+                cartRepository.decreaseQuantity(cartItem)
                 _itemUpdateEvent.postValue(
                     cartItem.copy(quantity = cartItem.quantity - 1).toProductUiModel(),
                 )
-                calculateTotalCartCount()
-                isProcessingRequest = false
             }
-        }
-    }
-
-    private fun addToCart(cartItem: CartItemUiModel) {
-        val newItem = cartItem.cartItem.copy(quantity = 1)
-        cartRepository.addCartItem(newItem) { addedCartItem ->
-            _itemUpdateEvent.postValue(addedCartItem?.toProductUiModel())
             calculateTotalCartCount()
+            isProcessingRequest = false
         }
     }
 
-    private fun calculateTotalCartCount() {
-        cartRepository.getAllCartItemsCount { count ->
-            _totalCartCount.postValue(count)
-        }
+    private suspend fun addToCart(cartItem: CartItemUiModel) {
+        val newItem = cartItem.cartItem.copy(quantity = 1)
+        cartRepository.addCartItem(newItem)
+        val addedItem = cartRepository.loadCartItemByProductId(cartItem.cartItem.product.id)
+        _itemUpdateEvent.postValue(addedItem?.toProductUiModel())
+        calculateTotalCartCount()
+    }
+
+    private suspend fun calculateTotalCartCount() {
+        _totalCartCount.postValue(cartRepository.loadTotalCartCount())
     }
 
     companion object {

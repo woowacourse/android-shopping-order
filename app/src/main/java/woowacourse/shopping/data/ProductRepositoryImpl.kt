@@ -8,6 +8,7 @@ import woowacourse.shopping.data.mapper.toProduct
 import woowacourse.shopping.data.mapper.toRecentEntity
 import woowacourse.shopping.data.model.response.ProductContent
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import kotlin.concurrent.thread
@@ -17,39 +18,32 @@ class ProductRepositoryImpl(
     private val productDataSource: ProductDataSource,
     private val cartItemDataSource: CartItemDataSource,
 ) : ProductRepository {
-    override fun loadProductsUpToPage(
+    override suspend fun loadProductsUpToPage(
         pageIndex: Int,
         pageSize: Int,
-        callback: (List<Product>, Boolean) -> Unit,
-    ) {
+    ): Page<Product> {
         val sizeToLoad = pageSize * (pageIndex + 1)
-        productDataSource.fetchPageOfProducts(
-            pageIndex = 0,
-            pageSize = sizeToLoad,
-        ) { response ->
-            val products: List<Product> = response.productContent.map(ProductContent::toProduct)
-            val isLastPage = products.size < sizeToLoad
-            callback(products, isLastPage)
-        }
+        val response =
+            productDataSource.fetchPageOfProducts(
+                pageIndex = 0,
+                pageSize = sizeToLoad,
+            )
+        val products = response.productContent.map(ProductContent::toProduct)
+        val isLast = products.size < sizeToLoad
+        return Page(products, response.first, isLast)
     }
 
-    override fun findProductById(
-        id: Long,
-        callback: (Product?) -> Unit,
-    ) {
-        productDataSource.fetchProduct(id) { response ->
-            val product = response.toProduct()
-            callback(product)
-        }
+    override suspend fun findProductById(id: Long): Product {
+        return productDataSource.fetchProduct(id).toProduct()
     }
 
-    override fun loadAllCartItems(callback: (List<CartItem>) -> Unit) {
-        cartItemDataSource.fetchPageOfCartItems(
-            pageIndex = 0,
-            pageSize = Int.MAX_VALUE,
-        ) { cartItems ->
-            callback(cartItems?.content?.map { content -> content.toCartItem() }.orEmpty())
-        }
+    override suspend fun loadAllCartItems(): List<CartItem> {
+        val response =
+            cartItemDataSource.fetchPageOfCartItems(
+                pageIndex = 0,
+                pageSize = Int.MAX_VALUE,
+            )
+        return response.content.map { content -> content.toCartItem() }
     }
 
     override fun addRecentProduct(product: Product) {
@@ -69,45 +63,26 @@ class ProductRepositoryImpl(
         }
     }
 
-    override fun getMostRecentProduct(callback: (Product?) -> Unit) {
-        thread {
-            val entity = recentProductDao.getMostRecentProduct()
-            val product = entity?.toProduct()
-            callback(product)
-        }
+    override suspend fun getMostRecentProduct(): Product? {
+        return recentProductDao.getMostRecentProduct()?.toProduct()
     }
 
-    override fun loadRecommendedProducts(
-        count: Int,
-        callback: (List<Product>) -> Unit,
-    ) {
-        getMostRecentProduct { mostRecentProduct ->
-            val recommendedCategory = mostRecentProduct?.category
-            if (recommendedCategory != null) {
-                loadAllCartItems { cartItems ->
-                    loadProductsByCategory(recommendedCategory) { productsInCategory ->
-                        val productsInCart = cartItems.map(CartItem::product).toSet()
-                        val recommendedProducts =
-                            productsInCategory.filterNot { product -> product in productsInCart }
-                        callback(recommendedProducts.take(count))
-                    }
-                }
-            }
+    override suspend fun loadRecommendedProducts(count: Int): List<Product> {
+        getMostRecentProduct()?.category?.let { category ->
+            val cart = loadAllCartItems().map(CartItem::product).toSet()
+            return loadProductsByCategory(category)
+                .filterNot { product -> product in cart }
+                .take(count)
         }
+        return emptyList()
     }
 
-    override fun loadProductsByCategory(
-        category: String,
-        callback: (List<Product>) -> Unit,
-    ) {
-        productDataSource.fetchPageOfProducts(
-            pageIndex = 0,
-            pageSize = Int.MAX_VALUE,
-        ) { response ->
-            val products: List<Product> =
-                response.productContent.map { content -> content.toProduct() }
-            val filteredProducts = products.filter { product -> product.category == category }
-            callback(filteredProducts)
-        }
+    override suspend fun loadProductsByCategory(category: String): List<Product> {
+        val products =
+            productDataSource.fetchPageOfProducts(
+                pageIndex = 0,
+                pageSize = Int.MAX_VALUE,
+            ).productContent.map(ProductContent::toProduct)
+        return products.filter { product -> product.category == category }
     }
 }

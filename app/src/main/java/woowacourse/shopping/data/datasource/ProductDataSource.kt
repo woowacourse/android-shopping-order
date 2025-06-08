@@ -4,14 +4,10 @@ import woowacourse.shopping.data.model.response.ProductResponse
 import woowacourse.shopping.data.model.response.ProductsResponse
 
 interface ProductDataSource {
-    fun fetchProduct(
-        id: Long,
-        callback: (ProductResponse) -> Unit,
-    )
+    suspend fun fetchProduct(id: Long ):ProductResponse
 
-    fun fetchPageOfProducts(
+    suspend fun fetchPageOfProducts(
         pageIndex: Int,
         pageSize: Int,
-        callback: (ProductsResponse) -> Unit,
-    )
+    ): ProductsResponse
 }

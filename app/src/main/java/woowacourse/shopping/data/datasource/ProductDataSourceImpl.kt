@@ -10,62 +10,14 @@ import woowacourse.shopping.data.service.ProductService
 class ProductDataSourceImpl(
     private val productService: ProductService,
 ) : ProductDataSource {
-    override fun fetchProduct(
-        id: Long,
-        callback: (ProductResponse) -> Unit,
-    ) {
-        productService.getProduct(id).enqueue(
-            object : Callback<ProductResponse> {
-                override fun onResponse(
-                    call: Call<ProductResponse>,
-                    response: Response<ProductResponse>,
-                ) {
-                    if (response.isSuccessful) {
-                        val body = response.body()
-                        println("body : $body")
-                        if (body != null) {
-                            callback(body)
-                        }
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<ProductResponse>,
-                    t: Throwable,
-                ) {
-                    println("error : $t")
-                }
-            },
-        )
+    override suspend fun fetchProduct(id: Long):ProductResponse {
+        return productService.getProduct(id)
     }
 
-    override fun fetchPageOfProducts(
+    override suspend fun fetchPageOfProducts(
         pageIndex: Int,
         pageSize: Int,
-        callback: (ProductsResponse) -> Unit,
-    ) {
-        productService.getProducts(page = pageIndex, size = pageSize).enqueue(
-            object : Callback<ProductsResponse> {
-                override fun onResponse(
-                    call: Call<ProductsResponse>,
-                    response: Response<ProductsResponse>,
-                ) {
-                    if (response.isSuccessful) {
-                        val body = response.body()
-                        println("body : $body")
-                        if (body != null) {
-                            callback(body)
-                        }
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<ProductsResponse>,
-                    t: Throwable,
-                ) {
-                    println("error : $t")
-                }
-            },
-        )
+    ): ProductsResponse {
+        return productService.getProducts(page = pageIndex, size = pageSize)
     }
 }

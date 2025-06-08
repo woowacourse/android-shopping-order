@@ -3,6 +3,8 @@ package woowacourse.shopping.presentation.view.cart.cartItem
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartItemBinding
 import woowacourse.shopping.presentation.model.CartItemUiModel
@@ -54,7 +56,9 @@ class CartItemFragment : BaseFragment<FragmentCartItemBinding>(R.layout.fragment
         super.onViewCreated(view, savedInstanceState)
         initBinding()
         initObserver()
-        viewModel.loadPageOfShoppingCart()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.loadPageOfShoppingCart()
+        }
     }
 
     private fun initBinding() {
@@ -73,8 +77,10 @@ class CartItemFragment : BaseFragment<FragmentCartItemBinding>(R.layout.fragment
 
             itemDeleteEvent.observe(viewLifecycleOwner) {
                 cartItemAdapter.removeProduct(it)
-                loadPageOfShoppingCart()
-                fetchRecommendedProducts()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    loadPageOfShoppingCart()
+                    fetchRecommendedProducts()
+                }
             }
 
             itemUpdateEvent.observe(viewLifecycleOwner) {

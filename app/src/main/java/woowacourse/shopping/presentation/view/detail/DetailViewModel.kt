@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.RepositoryProvider
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -26,18 +28,17 @@ class DetailViewModel(
     val lastViewedProduct: LiveData<ProductUiModel> = _lastViewedProduct
 
     fun loadProduct(id: Long) {
-        productRepository.findProductById(id) { product ->
-            cartRepository.findCartItemByProductId(id) { cartItem ->
-                if (cartItem == null) {
-                    _product.postValue(product?.toProductUiModel()?.copy(quantity = MIN_QUANTITY))
-                } else {
-                    _product.postValue(cartItem.toProductUiModel().copy(quantity = MIN_QUANTITY))
-                }
-                productRepository.getMostRecentProduct { recentProduct ->
-                    _lastViewedProduct.postValue(recentProduct?.toProductUiModel())
-                    if (product != null) productRepository.addRecentProduct(product)
-                }
+        viewModelScope.launch {
+            val product = productRepository.findProductById(id)
+            val cartItem = cartRepository.loadCartItemByProductId(id)
+            if (cartItem == null) {
+                _product.postValue(product?.toProductUiModel()?.copy(quantity = MIN_QUANTITY))
+            } else {
+                _product.postValue(cartItem.toProductUiModel().copy(quantity = MIN_QUANTITY))
             }
+            val recentProduct=  productRepository.getMostRecentProduct()
+            _lastViewedProduct.postValue(recentProduct?.toProductUiModel())
+            if (product != null) productRepository.addRecentProduct(product)
         }
     }
 
@@ -52,19 +53,18 @@ class DetailViewModel(
     }
 
     fun addToCart() {
-        val product = _product.value ?: return
-        cartRepository.findCartItemByProductId(product.id) { cartItem ->
+        viewModelScope.launch {
+            val product = _product.value ?: return@launch
+            val cartItem = cartRepository.loadCartItemByProductId(product.id)
             if (cartItem == null) {
-                cartRepository.addCartItem(product.toCartItem()) {
-                    _saveEvent.postValue(Unit)
-                }
+                cartRepository.addCartItem(product.toCartItem())
+                _saveEvent.postValue(Unit)
             } else {
                 cartRepository.updateCartItemQuantity(
                     cartId = product.cartId,
                     quantity = cartItem.quantity + product.quantity,
-                ) {
-                    _saveEvent.postValue(Unit)
-                }
+                )
+                _saveEvent.postValue(Unit)
             }
         }
     }

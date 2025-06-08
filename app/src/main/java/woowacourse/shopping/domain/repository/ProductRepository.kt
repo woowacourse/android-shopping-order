@@ -1,38 +1,29 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
-    fun loadProductsUpToPage(
+    suspend fun loadProductsUpToPage(
         pageIndex: Int,
         pageSize: Int,
-        callback: (List<Product>, Boolean) -> Unit,
-    )
+    ): Page<Product>
 
     fun loadRecentProducts(
         count: Int,
         callback: (List<Product>) -> Unit,
     )
 
-    fun getMostRecentProduct(callback: (Product?) -> Unit)
+    suspend fun getMostRecentProduct(): Product?
 
-    fun loadProductsByCategory(
-        category: String,
-        callback: (List<Product>) -> Unit,
-    )
+    suspend fun loadProductsByCategory(category: String): List<Product>
 
-    fun loadRecommendedProducts(
-        count: Int,
-        callback: (List<Product>) -> Unit,
-    )
+    suspend fun loadRecommendedProducts(count: Int): List<Product>
 
-    fun loadAllCartItems(callback: (List<CartItem>) -> Unit)
+    suspend fun loadAllCartItems(): List<CartItem>
 
-    fun findProductById(
-        id: Long,
-        callback: (Product?) -> Unit,
-    )
+    suspend fun findProductById(id: Long):Product?
 
     fun addRecentProduct(product: Product)
 }
