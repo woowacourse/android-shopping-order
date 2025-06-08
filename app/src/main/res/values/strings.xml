@@ -35,4 +35,8 @@
     <string name="order_total_amount_title">총 결제 금액</string>
     <string name="order_pay_btn_text">결제하기</string>
 
+    <!-- Coupon Item Screen -->
+    <string name="coupon_expiration_date_text">만료일: %s</string>
+    <string name="coupon_minimum_order_amount_text">최소 주문 금액: %d원</string>
+
 </resources>
