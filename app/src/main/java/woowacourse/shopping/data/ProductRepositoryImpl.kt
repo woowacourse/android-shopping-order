@@ -7,7 +7,7 @@ import woowacourse.shopping.data.db.RecentProductEntity
 import woowacourse.shopping.data.mapper.toCartItem
 import woowacourse.shopping.data.mapper.toProduct
 import woowacourse.shopping.data.mapper.toRecentEntity
-import woowacourse.shopping.data.model.response.ProductContent
+import woowacourse.shopping.data.model.response.product.ProductContent
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.Product

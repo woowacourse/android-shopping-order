@@ -3,7 +3,7 @@ package woowacourse.shopping.data
 import woowacourse.shopping.data.datasource.CartItemDataSource
 import woowacourse.shopping.data.mapper.toCartItem
 import woowacourse.shopping.data.model.request.CartItemRequest
-import woowacourse.shopping.data.model.response.CartItemContent
+import woowacourse.shopping.data.model.response.cartitem.CartItemContent
 import woowacourse.shopping.data.model.response.Quantity
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Page

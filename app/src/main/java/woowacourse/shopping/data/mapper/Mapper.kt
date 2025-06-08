@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.mapper
 
 import woowacourse.shopping.data.db.RecentProductEntity
-import woowacourse.shopping.data.model.response.CartItemContent
-import woowacourse.shopping.data.model.response.ProductContent
-import woowacourse.shopping.data.model.response.ProductResponse
+import woowacourse.shopping.data.model.response.cartitem.CartItemContent
+import woowacourse.shopping.data.model.response.product.ProductContent
+import woowacourse.shopping.data.model.response.product.ProductResponse
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product

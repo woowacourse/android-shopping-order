@@ -1,11 +1,11 @@
-package woowacourse.shopping.data.model.response
+package woowacourse.shopping.data.model.response.product
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CartItemResponse(
-    @SerialName("content") val content: List<CartItemContent>,
+data class ProductsResponse(
+    @SerialName("content") val productContent: List<ProductContent>,
     @SerialName("first") val first: Boolean,
     @SerialName("last") val last: Boolean,
 )

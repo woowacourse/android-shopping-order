@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.model.response
+package woowacourse.shopping.data.model.response.product
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

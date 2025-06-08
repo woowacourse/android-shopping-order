@@ -9,7 +9,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.model.request.CartItemRequest
-import woowacourse.shopping.data.model.response.CartItemResponse
+import woowacourse.shopping.data.model.response.cartitem.CartItemResponse
 import woowacourse.shopping.data.model.response.Quantity
 
 interface CartItemService {

@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.datasource
 
-import woowacourse.shopping.data.model.response.ProductResponse
-import woowacourse.shopping.data.model.response.ProductsResponse
+import woowacourse.shopping.data.model.response.product.ProductResponse
+import woowacourse.shopping.data.model.response.product.ProductsResponse
 import woowacourse.shopping.data.service.ProductService
 
 class ProductDataSourceImpl(
