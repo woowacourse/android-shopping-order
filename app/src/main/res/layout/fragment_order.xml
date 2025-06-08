@@ -69,7 +69,8 @@
             app:layout_constraintBottom_toTopOf="@id/coupon_divider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/coupon_description">
+            app:layout_constraintTop_toBottomOf="@id/coupon_description"
+            tools:listitem="@layout/item_coupon">
 
         </androidx.recyclerview.widget.RecyclerView>
 
