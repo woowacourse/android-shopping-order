@@ -17,13 +17,6 @@ class CartRecommendationFragment : BaseFragment<FragmentCartRecommendationBindin
         factoryProducer = { CartViewModel.Factory },
     )
 
-    private val recommendEventHandler =
-        object : RecommendEventHandler {
-            override fun onInitialAddToCart(product: ProductUiModel) {
-                viewModel.increaseQuantity(product)
-            }
-        }
-
     private val itemCounterEventHandler =
         object : ItemCounterEventHandler {
             override fun increaseQuantity(product: ProductUiModel) {
@@ -36,7 +29,7 @@ class CartRecommendationFragment : BaseFragment<FragmentCartRecommendationBindin
         }
 
     private val recommendationAdapter: RecommendationAdapter by lazy {
-        RecommendationAdapter(recommendEventHandler, itemCounterEventHandler)
+        RecommendationAdapter(itemCounterEventHandler)
     }
 
     override fun onViewCreated(
