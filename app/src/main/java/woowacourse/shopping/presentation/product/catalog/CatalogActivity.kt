@@ -37,12 +37,14 @@ class CatalogActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
 
+        viewModel.loadCatalogProducts()
         observeViewModel()
     }
 
     override fun onStart() {
         super.onStart()
-        viewModel.initCatalog()
+        viewModel.loadRecentViewedItems()
+        viewModel.updateCartCount()
     }
 
     private fun applyWindowInsets() {
@@ -55,13 +57,12 @@ class CatalogActivity : AppCompatActivity() {
 
     private fun initRecyclerView() {
         val handler = createHandler()
-
         setupProductRecyclerView(handler)
         setupRecentViewedRecyclerView(handler)
     }
 
     private fun setupProductRecyclerView(handler: CatalogEventHandlerImpl) {
-        productAdapter = ProductAdapter(emptyList(), handler, handler)
+        productAdapter = ProductAdapter(handler, handler)
         binding.recyclerViewProducts.apply {
             this.adapter = productAdapter
             layoutManager =
@@ -73,7 +74,8 @@ class CatalogActivity : AppCompatActivity() {
         GridLayoutManager(this, 2).apply {
             spanSizeLookup =
                 object : GridLayoutManager.SpanSizeLookup() {
-                    override fun getSpanSize(position: Int): Int = if (adapter.isLoadMoreButtonPosition(position)) 2 else 1
+                    override fun getSpanSize(position: Int): Int =
+                        if (adapter.isLoadMoreButtonPosition(position)) 2 else 1
                 }
         }
 
@@ -93,16 +95,12 @@ class CatalogActivity : AppCompatActivity() {
             binding.recyclerViewProducts.visibility = View.VISIBLE
 
             productAdapter.apply {
-                setData(paging.products)
+                submitList(paging.products)
                 setLoadButtonVisible(paging.hasNext)
             }
         }
         viewModel.recentViewedItems.observe(this) { recentItems ->
             viewedAdapter.setData(recentItems)
-        }
-
-        viewModel.updatedProduct.observe(this) { updatedItem ->
-            productAdapter.updateProduct(updatedItem)
         }
     }
 
