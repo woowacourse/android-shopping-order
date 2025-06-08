@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.view.cart
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
@@ -25,6 +26,11 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
     private val cartEventHandler =
         object : CartEventHandler {
             override fun onPlaceOrder() {
+                if (viewModel.canPlaceOrder.value != true) {
+                    Toast.makeText(activity, "선택된 상품이 없습니다.", Toast.LENGTH_LONG).show()
+                    return
+                }
+
                 if (viewModel.canSelectItems.value == true) {
                     childFragmentManager.commit {
                         replace(R.id.cart_fragment_container, CartRecommendationFragment())
@@ -89,8 +95,9 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
             binding.canSelectItems = it
         }
 
-        viewModel.selectedProductIds.observe(viewLifecycleOwner) {
-        }
+        viewModel.selectedProductIds.observe(viewLifecycleOwner) {}
+
+        viewModel.canPlaceOrder.observe(viewLifecycleOwner) {}
     }
 
     private fun navigateBack() {

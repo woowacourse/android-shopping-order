@@ -69,6 +69,9 @@ class CartViewModel(
                 .map { cartItem -> cartItem.cartItem.product.id }
         }
 
+    val canPlaceOrder: LiveData<Boolean> =
+        selectedProductIds.map { selectedProductIds -> selectedProductIds.isNotEmpty() }
+
     private val _canSelectItems = MutableLiveData(true)
     val canSelectItems: LiveData<Boolean> = _canSelectItems
 
