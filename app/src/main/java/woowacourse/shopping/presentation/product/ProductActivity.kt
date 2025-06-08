@@ -11,9 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductBinding
 import woowacourse.shopping.databinding.ViewCartActionBinding
@@ -56,10 +54,8 @@ class ProductActivity :
 
     override fun onRestart() {
         super.onRestart()
-        lifecycleScope.launch {
-            viewModel.fetchData()
-            viewModel.fetchCartItemCount()
-        }
+        viewModel.fetchData()
+        viewModel.fetchCartItemCount()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
