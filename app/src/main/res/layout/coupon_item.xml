@@ -7,7 +7,7 @@
 
         <variable
             name="coupon"
-            type="woowacourse.shopping.order.Coupon" />
+            type="woowacourse.shopping.order.CouponUiModel" />
 
         <variable
             name="checkClickListener"
@@ -29,7 +29,8 @@
             android:layout_marginTop="6dp"
             android:buttonTint="@color/mint_blue"
             android:foregroundTint="@color/white"
-            android:onClick="@{() -> checkClickListener.onCheck(coupon)}"
+            android:checked="@{coupon.selected}"
+            android:onClick="@{() -> checkClickListener.onCheck(coupon.id)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

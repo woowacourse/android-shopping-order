@@ -8,7 +8,7 @@ import woowacourse.shopping.databinding.CouponItemBinding
 class CouponViewHolder(
     val binding: CouponItemBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(coupon: Coupon) {
+    fun bind(coupon: CouponUiModel) {
         binding.coupon = coupon
     }
 

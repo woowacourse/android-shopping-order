@@ -29,8 +29,8 @@ class OrderActivity : AppCompatActivity() {
         applyWindowInsets()
         setSupportActionBar()
         setViewModel()
-        observeOrderViewModel()
         setCouponAdapter()
+        observeOrderViewModel()
     }
 
     private fun setViewModel() {
@@ -55,8 +55,13 @@ class OrderActivity : AppCompatActivity() {
     }
 
     private fun observeOrderViewModel() {
-        viewModel.availableCoupons.observe(this) {
-            (binding.recyclerViewOrder.adapter as CouponAdapter).submitList(it)
+        val couponAdapter: CouponAdapter = binding.recyclerViewOrder.adapter as CouponAdapter
+
+        viewModel.availableDisplayingCoupons.observe(this) {
+            couponAdapter.submitList(it)
+        }
+        viewModel.checkSelected.observe(this) {
+            couponAdapter.applyCoupon(it)
         }
     }
 

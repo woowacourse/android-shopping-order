@@ -1,6 +1,5 @@
 package woowacourse.shopping.order
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,8 +15,10 @@ class OrderViewModel(
 ) : ViewModel() {
     val orderingProducts: OrderingProducts = OrderingProducts(products.toList())
 
-    private val _availableCoupons = MutableLiveData<List<Coupon>>(emptyList())
-    val availableCoupons: LiveData<List<Coupon>> = _availableCoupons
+    private val _availableDisplayingCoupons = MutableLiveData<List<CouponUiModel>>(emptyList())
+    val availableDisplayingCoupons: LiveData<List<CouponUiModel>> = _availableDisplayingCoupons
+
+    private lateinit var availableCoupons: List<Coupon>
 
     private val _currentOrderPriceAmount = MutableLiveData<Int>(0)
     val currentOrderPriceAmount: LiveData<Int> = _currentOrderPriceAmount
@@ -33,32 +34,32 @@ class OrderViewModel(
     private val _totalPayingAmount = MutableLiveData<Int>(0)
     val totalPayingAmount: LiveData<Int> = _totalPayingAmount
 
+    private val _checkSelected = MutableLiveData<Coupon>()
+    val checkSelected: LiveData<Coupon> = _checkSelected
+
     init {
         loadCoupons()
         setAmountsByOrderingProducts()
-        Log.d("쿠폰", "products : $orderingProducts")
     }
 
-    fun applyCoupon(coupon: Coupon) {
-        orderingProducts.applyCoupon(coupon)
+    fun applyCoupon(couponId: Long) {
+        val selectedCoupon: Coupon = availableCoupons.first { it.id == couponId }
+        orderingProducts.applyCoupon(selectedCoupon)
+        _checkSelected.postValue(selectedCoupon)
         setAmountsByOrderingProducts()
     }
 
     private fun loadCoupons() {
         viewModelScope.launch {
             val allCoupons: List<Coupon> = couponRepository.getCoupons()
-            val availableCoupons: List<Coupon> = orderingProducts.availableCoupons(allCoupons)
-            _availableCoupons.postValue(availableCoupons)
-            Log.d("쿠폰", "$availableCoupons")
+            val filteredAvailableCoupons: List<Coupon> =
+                orderingProducts.availableCoupons(allCoupons)
+            availableCoupons = filteredAvailableCoupons
+            _availableDisplayingCoupons.postValue(filteredAvailableCoupons.map { it.toUiModel() })
         }
     }
 
     private fun setAmountsByOrderingProducts() {
-        Log.d(
-            "products",
-            "${orderingProducts.originalTotalPrice()}, ${orderingProducts.discountAmount()}, ${orderingProducts.totalPrice()} ",
-        )
-
         _currentOrderPriceAmount.postValue(orderingProducts.originalTotalPrice())
         _couponDiscountAmount.postValue(orderingProducts.discountAmount())
         if (orderingProducts.isFreeShipping()) {
