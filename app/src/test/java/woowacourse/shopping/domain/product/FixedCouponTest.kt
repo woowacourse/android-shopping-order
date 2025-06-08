@@ -3,8 +3,8 @@ package woowacourse.shopping.domain.product
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.CartItem
+import woowacourse.shopping.domain.cart.Receipt
 import woowacourse.shopping.domain.coupon.FixedCoupon
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -27,7 +27,7 @@ class FixedCouponTest {
 
         val currentDateTime = LocalDateTime.of(2025, 6, 8, 20, 47)
 
-        val cart = Cart(
+        val receipt = Receipt(
             listOf(
                 CartItem(
                     id = 1,
@@ -42,7 +42,7 @@ class FixedCouponTest {
             )
         )
 
-        val actual = fixedCoupon.isAvailable(cart, currentDateTime)
+        val actual = fixedCoupon.isAvailable(receipt, currentDateTime)
         val expected = true
 
         assertThat(actual).isEqualTo(expected)
@@ -53,7 +53,7 @@ class FixedCouponTest {
 
         val currentDateTime = LocalDateTime.of(2025, 12, 1, 20, 47)
 
-        val cart = Cart(
+        val receipt = Receipt(
             listOf(
                 CartItem(
                     id = 1,
@@ -68,7 +68,7 @@ class FixedCouponTest {
             )
         )
 
-        val actual = fixedCoupon.isAvailable(cart, currentDateTime)
+        val actual = fixedCoupon.isAvailable(receipt, currentDateTime)
         val expected = false
 
         assertThat(actual).isEqualTo(expected)
@@ -79,7 +79,7 @@ class FixedCouponTest {
 
         val currentDateTime = LocalDateTime.of(2025, 6, 8, 20, 47)
 
-        val cart = Cart(
+        val receipt = Receipt(
             listOf(
                 CartItem(
                     id = 1,
@@ -94,7 +94,7 @@ class FixedCouponTest {
             )
         )
 
-        val actual = fixedCoupon.isAvailable(cart, currentDateTime)
+        val actual = fixedCoupon.isAvailable(receipt, currentDateTime)
         val expected = false
 
         assertThat(actual).isEqualTo(expected)
@@ -102,7 +102,7 @@ class FixedCouponTest {
 
     @Test
     fun `쿠폰을 적용하게 되면 할인된 금액이 나온다`() {
-        val cart = Cart(
+        val receipt = Receipt(
             listOf(
                 CartItem(
                     id = 1,
@@ -117,7 +117,7 @@ class FixedCouponTest {
             )
         )
 
-        val actual = fixedCoupon.discountPrice(cart)
+        val actual = fixedCoupon.discountPrice(receipt)
         val expected = 5_000
 
         assertThat(actual).isEqualTo(expected)

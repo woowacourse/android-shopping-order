@@ -3,8 +3,8 @@ package woowacourse.shopping.domain.product
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.CartItem
+import woowacourse.shopping.domain.cart.Receipt
 import woowacourse.shopping.domain.coupon.BoGoCoupon
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -27,7 +27,7 @@ class BoGoCouponTest {
 
         val currentDateTime = LocalDateTime.of(2025, 6, 8, 20, 47)
 
-        val cart = Cart(
+        val receipt = Receipt(
             listOf(
                 CartItem(
                     id = 1,
@@ -42,7 +42,7 @@ class BoGoCouponTest {
             )
         )
 
-        val actual = boGoCoupon.isAvailable(cart, currentDateTime)
+        val actual = boGoCoupon.isAvailable(receipt, currentDateTime)
         val expected = true
 
         assertThat(actual).isEqualTo(expected)
@@ -53,7 +53,7 @@ class BoGoCouponTest {
 
         val currentDateTime = LocalDateTime.of(2025, 6, 8, 20, 47)
 
-        val cart = Cart(
+        val receipt = Receipt(
             listOf(
                 CartItem(
                     id = 1,
@@ -68,7 +68,7 @@ class BoGoCouponTest {
             )
         )
 
-        val actual = boGoCoupon.isAvailable(cart, currentDateTime)
+        val actual = boGoCoupon.isAvailable(receipt, currentDateTime)
         val expected = false
 
         assertThat(actual).isEqualTo(expected)
@@ -79,7 +79,7 @@ class BoGoCouponTest {
 
         val currentDateTime = LocalDateTime.of(2025, 11, 8, 20, 47)
 
-        val cart = Cart(
+        val receipt = Receipt(
             listOf(
                 CartItem(
                     id = 1,
@@ -94,7 +94,7 @@ class BoGoCouponTest {
             )
         )
 
-        val actual = boGoCoupon.isAvailable(cart, currentDateTime)
+        val actual = boGoCoupon.isAvailable(receipt, currentDateTime)
         val expected = false
 
         assertThat(actual).isEqualTo(expected)
@@ -102,7 +102,7 @@ class BoGoCouponTest {
 
     @Test
     fun `쿠폰을 적용하면 가장 높은 금액을 가진 상품만 적용이 된다`() {
-        val cart = Cart(
+        val receipt = Receipt(
             listOf(
                 CartItem(
                     id = 1,
@@ -127,7 +127,7 @@ class BoGoCouponTest {
             )
         )
 
-        val actual = boGoCoupon.discountPrice(cart)
+        val actual = boGoCoupon.discountPrice(receipt)
         val expected = 100_001
 
         assertThat(actual).isEqualTo(expected)

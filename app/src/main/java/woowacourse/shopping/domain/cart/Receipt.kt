@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.cart
 
-data class Cart(
+data class Receipt(
     private val items: List<CartItem>,
     val shippingPrice: Int = DEFAULT_SHIPPING_PRICE,
 ) {

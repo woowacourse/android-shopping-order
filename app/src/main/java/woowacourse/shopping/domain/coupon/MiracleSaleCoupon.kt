@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.coupon
 
-import woowacourse.shopping.domain.cart.Cart
+import woowacourse.shopping.domain.cart.Receipt
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -12,11 +12,11 @@ class MiracleSaleCoupon(
     private val endHour: LocalTime,
     private val discountRate: Double,
 ) : Coupon {
-    override fun isAvailable(cart: Cart, current: LocalDateTime): Boolean =
+    override fun isAvailable(receipt: Receipt, current: LocalDateTime): Boolean =
         current.toLocalDate() <= expirationDate &&
                 current.toLocalTime() in startHour..<endHour
 
-    override fun discountPrice(cart: Cart): Int {
-        return (cart.totalPrice * (discountRate / 100)).toInt()
+    override fun discountPrice(receipt: Receipt): Int {
+        return (receipt.totalPrice * (discountRate / 100)).toInt()
     }
 }

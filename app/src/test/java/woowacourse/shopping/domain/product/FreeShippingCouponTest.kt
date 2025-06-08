@@ -3,8 +3,8 @@ package woowacourse.shopping.domain.product
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.CartItem
+import woowacourse.shopping.domain.cart.Receipt
 import woowacourse.shopping.domain.coupon.FreeShippingCoupon
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -26,7 +26,7 @@ class FreeShippingCouponTest {
 
         val currentDateTime = LocalDateTime.of(2025, 6, 8, 20, 47)
 
-        val cart = Cart(
+        val receipt = Receipt(
             listOf(
                 CartItem(
                     id = 1,
@@ -41,7 +41,7 @@ class FreeShippingCouponTest {
             )
         )
 
-        val actual = freeShippingCoupon.isAvailable(cart, currentDateTime)
+        val actual = freeShippingCoupon.isAvailable(receipt, currentDateTime)
         val expected = true
 
         assertThat(actual).isEqualTo(expected)
@@ -52,7 +52,7 @@ class FreeShippingCouponTest {
 
         val currentDateTime = LocalDateTime.of(2025, 12, 1, 20, 47)
 
-        val cart = Cart(
+        val receipt = Receipt(
             listOf(
                 CartItem(
                     id = 1,
@@ -67,7 +67,7 @@ class FreeShippingCouponTest {
             )
         )
 
-        val actual = freeShippingCoupon.isAvailable(cart, currentDateTime)
+        val actual = freeShippingCoupon.isAvailable(receipt, currentDateTime)
         val expected = false
 
         assertThat(actual).isEqualTo(expected)
@@ -78,7 +78,7 @@ class FreeShippingCouponTest {
 
         val currentDateTime = LocalDateTime.of(2025, 6, 8, 20, 47)
 
-        val cart = Cart(
+        val receipt = Receipt(
             listOf(
                 CartItem(
                     id = 1,
@@ -93,7 +93,7 @@ class FreeShippingCouponTest {
             )
         )
 
-        val actual = freeShippingCoupon.isAvailable(cart, currentDateTime)
+        val actual = freeShippingCoupon.isAvailable(receipt, currentDateTime)
         val expected = false
 
         assertThat(actual).isEqualTo(expected)
@@ -101,7 +101,7 @@ class FreeShippingCouponTest {
 
     @Test
     fun `쿠폰을 적용하게 되면 배달비 만큼 할인된 금액이 나온다`() {
-        val cart = Cart(
+        val receipt = Receipt(
             listOf(
                 CartItem(
                     id = 1,
@@ -117,7 +117,7 @@ class FreeShippingCouponTest {
             5000,
         )
 
-        val actual = freeShippingCoupon.discountPrice(cart)
+        val actual = freeShippingCoupon.discountPrice(receipt)
         val expected = 5000
 
         assertThat(actual).isEqualTo(expected)

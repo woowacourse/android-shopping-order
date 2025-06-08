@@ -3,8 +3,8 @@ package woowacourse.shopping.domain.product
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.CartItem
+import woowacourse.shopping.domain.cart.Receipt
 import woowacourse.shopping.domain.coupon.MiracleSaleCoupon
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -12,7 +12,7 @@ import java.time.LocalTime
 
 class MiracleSaleCouponTest {
     private lateinit var miracleSaleCoupon: MiracleSaleCoupon
-    private var cart: Cart = Cart(emptyList())
+    private var receipt: Receipt = Receipt(emptyList())
 
     @BeforeEach
     fun setUp() {
@@ -23,7 +23,7 @@ class MiracleSaleCouponTest {
             endHour = LocalTime.of(7, 0),
             discountRate = 30.0,
         )
-        cart = Cart(
+        receipt = Receipt(
             listOf(
                 CartItem(
                     id = 1,
@@ -44,7 +44,7 @@ class MiracleSaleCouponTest {
 
         val currentDateTime = LocalDateTime.of(2025, 6, 8, 5, 47)
 
-        val actual = miracleSaleCoupon.isAvailable(cart, currentDateTime)
+        val actual = miracleSaleCoupon.isAvailable(receipt, currentDateTime)
         val expected = true
 
         assertThat(actual).isEqualTo(expected)
@@ -55,7 +55,7 @@ class MiracleSaleCouponTest {
 
         val currentDateTime = LocalDateTime.of(2025, 6, 8, 20, 47)
 
-        val actual = miracleSaleCoupon.isAvailable(cart, currentDateTime)
+        val actual = miracleSaleCoupon.isAvailable(receipt, currentDateTime)
         val expected = false
 
         assertThat(actual).isEqualTo(expected)
@@ -67,7 +67,7 @@ class MiracleSaleCouponTest {
         val currentDateTime = LocalDateTime.of(2025, 11, 8, 5, 47)
 
 
-        val actual = miracleSaleCoupon.isAvailable(cart, currentDateTime)
+        val actual = miracleSaleCoupon.isAvailable(receipt, currentDateTime)
         val expected = false
 
         assertThat(actual).isEqualTo(expected)
@@ -75,7 +75,7 @@ class MiracleSaleCouponTest {
 
     @Test
     fun `쿠폰을 적용하게 되면 할인율 만큼 할인된 금액이 나온다`() {
-        val cart = Cart(
+        val receipt = Receipt(
             listOf(
                 CartItem(
                     id = 1,
@@ -90,7 +90,7 @@ class MiracleSaleCouponTest {
             ),
         )
 
-        val actual = miracleSaleCoupon.discountPrice(cart)
+        val actual = miracleSaleCoupon.discountPrice(receipt)
         val expected = 3000
 
         assertThat(actual).isEqualTo(expected)

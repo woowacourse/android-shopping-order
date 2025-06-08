@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.coupon
 
-import woowacourse.shopping.domain.cart.Cart
+import woowacourse.shopping.domain.cart.Receipt
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -10,11 +10,11 @@ class FixedCoupon(
     private val disCountPrice: Int,
     private val minimumOrderPrice: Int,
 ) : Coupon {
-    override fun isAvailable(cart: Cart, current: LocalDateTime): Boolean {
-        return cart.totalPrice >= minimumOrderPrice && current.toLocalDate() <= expirationDate
+    override fun isAvailable(receipt: Receipt, current: LocalDateTime): Boolean {
+        return receipt.totalPrice >= minimumOrderPrice && current.toLocalDate() <= expirationDate
     }
 
-    override fun discountPrice(cart: Cart): Int {
-        return disCountPrice.coerceAtMost(cart.totalPrice)
+    override fun discountPrice(receipt: Receipt): Int {
+        return disCountPrice.coerceAtMost(receipt.totalPrice)
     }
 }
