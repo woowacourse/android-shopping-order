@@ -13,7 +13,7 @@ class ProductRemoteDataSource(
         return if (response.isSuccessful) {
             val body = response.body()
             if (body != null) {
-                return Result.success(body)
+                Result.success(body)
             } else {
                 Result.success(null)
             }

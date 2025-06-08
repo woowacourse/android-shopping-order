@@ -48,7 +48,7 @@ class FakeCartProductRepository : CartProductRepository {
         newQuantity: Int,
     ): Result<Unit> {
         return when {
-            newQuantity == 0 -> return delete(cartProduct.id)
+            newQuantity == 0 -> delete(cartProduct.id)
             else -> {
                 cartProducts.replaceAll {
                     if (it.product.id == cartProduct.product.id) it.copy(quantity = newQuantity) else it
