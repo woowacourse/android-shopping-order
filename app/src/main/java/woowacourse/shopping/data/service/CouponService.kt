@@ -5,6 +5,6 @@ import retrofit2.http.GET
 import woowacourse.shopping.data.model.coupon.CouponResponse
 
 interface CouponService {
-    @GET
-    fun fetchCoupons(): Response<List<CouponResponse>>
+    @GET("/coupons")
+    suspend fun fetchCoupons(): Response<List<CouponResponse>>
 }

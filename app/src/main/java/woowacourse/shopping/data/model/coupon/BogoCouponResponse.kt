@@ -5,9 +5,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import woowacourse.shopping.domain.model.coupon.BogoCoupon
+import java.time.LocalDate
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
+@SerialName("buyXgetY")
 @JsonClassDiscriminator("discountType")
 data class BogoCouponResponse(
     @SerialName("buyQuantity")
@@ -16,8 +18,6 @@ data class BogoCouponResponse(
     override val code: String,
     @SerialName("description")
     override val description: String,
-    @SerialName("discountType")
-    override val discountType: String,
     @SerialName("expirationDate")
     override val expirationDate: String,
     @SerialName("getQuantity")
@@ -26,4 +26,12 @@ data class BogoCouponResponse(
     override val id: Long,
 ) : CouponResponse()
 
-fun BogoCouponResponse.toDomain() = BogoCoupon(buyQuantity, code, description, discountType, expirationDate, getQuantity, id)
+fun BogoCouponResponse.toDomain() =
+    BogoCoupon(
+        buyQuantity,
+        code,
+        description,
+        LocalDate.parse(expirationDate),
+        getQuantity,
+        id,
+    )

@@ -4,8 +4,8 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import woowacourse.shopping.domain.model.AvailableTime
+import java.time.LocalTime
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
@@ -17,7 +17,4 @@ data class AvailableTimeResponse(
     val start: String,
 )
 
-fun AvailableTimeResponse.toLocalDate(): LocalDate {
-    val dateString = "2025-06-30"
-    return LocalDate.parse(dateString, DateTimeFormatter.ISO_DATE)
-}
+fun AvailableTimeResponse.toDomain(): AvailableTime = AvailableTime(start = LocalTime.parse(start), end = LocalTime.parse(end))

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".presentation.view.order.payment.PaymentFragment">
+
+        <TextView
+            android:id="@+id/text_view_coupons_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="30dp"
+            android:text="@string/payment_coupons_title"
+            android:textColor="@color/black_33"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/text_view_coupons_sub_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/payment_coupon_rule"
+            android:textColor="@color/gray_55"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_coupons_title" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_coupons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="20dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintTop_toBottomOf="@id/text_view_coupons_sub_title" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider_coupons_to_payment_price"
+            android:layout_width="match_parent"
+            android:layout_height="7dp"
+            android:layout_marginTop="31dp"
+            android:background="@color/gray_eb"
+            app:layout_constraintTop_toBottomOf="@id/recycler_view_coupons" />
+
+        <TextView
+            android:id="@+id/text_view_order_price_label"
+            style="@style/PaymentLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="21dp"
+            android:text="@string/payment_order_price_label"
+            app:layout_constraintEnd_toStartOf="@id/text_view_order_price"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider_coupons_to_payment_price" />
+
+
+        <TextView
+            android:id="@+id/text_view_order_price"
+            style="@style/PaymentPrice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="21dp"
+            android:textAlignment="textEnd"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/text_view_order_price_label"
+            app:layout_constraintTop_toBottomOf="@id/divider_coupons_to_payment_price"
+            tools:text="204,200원" />
+
+        <TextView
+            android:id="@+id/text_view_coupon_discount_label"
+            style="@style/PaymentLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/payment_coupon_discount_label"
+            app:layout_constraintEnd_toStartOf="@id/text_view_coupon_discount"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_view_order_price_label" />
+
+        <TextView
+            android:id="@+id/text_view_coupon_discount"
+            style="@style/PaymentPrice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/text_view_coupon_discount_label"
+            app:layout_constraintTop_toBottomOf="@id/text_view_order_price"
+            tools:text="-5,000원" />
+
+        <TextView
+            android:id="@+id/text_view_delivery_price_label"
+            style="@style/PaymentLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/payment_delivery_price_label"
+            app:layout_constraintEnd_toStartOf="@id/text_view_delivery_price"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_view_coupon_discount_label" />
+
+        <TextView
+            android:id="@+id/text_view_delivery_price"
+            style="@style/PaymentPrice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="21dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/text_view_delivery_price_label"
+            app:layout_constraintTop_toBottomOf="@id/text_view_coupon_discount"
+            tools:text="3,000원" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider_order_content_to_payment_total_price"
+            android:layout_width="match_parent"
+            android:layout_height="7dp"
+            android:layout_marginTop="21dp"
+            android:background="@color/gray_eb"
+            app:layout_constraintTop_toBottomOf="@id/text_view_delivery_price" />
+
+        <TextView
+            android:id="@+id/text_view_total_payment_label"
+            style="@style/PaymentLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="21dp"
+            android:text="@string/payment_total_price_label"
+            app:layout_constraintEnd_toStartOf="@id/text_view_delivery_price"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider_order_content_to_payment_total_price" />
+
+        <TextView
+            android:id="@+id/text_view_total_payment"
+            style="@style/PaymentPrice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="21dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/text_view_delivery_price_label"
+            app:layout_constraintTop_toBottomOf="@id/divider_order_content_to_payment_total_price"
+            tools:text="3,000원" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@color/mint"
+            android:gravity="center"
+            android:text="@string/payment"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:layout_editor_absoluteX="0dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

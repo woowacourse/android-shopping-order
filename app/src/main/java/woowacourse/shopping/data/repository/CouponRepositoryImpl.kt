@@ -13,7 +13,7 @@ import woowacourse.shopping.domain.repository.CouponRepository
 class CouponRepositoryImpl(
     private val couponRemoteDataSource: CouponRemoteDataSource,
 ) : CouponRepository {
-    override fun fetchCoupons(): Result<List<Coupon>> =
+    override suspend fun fetchCoupons(): Result<List<Coupon>> =
         couponRemoteDataSource.fetchCoupons().map { coupons ->
             coupons.map { coupon -> coupon.toTypedDomain() }
         }

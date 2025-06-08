@@ -1,13 +1,13 @@
 package woowacourse.shopping.domain.model.coupon
 
+import java.time.LocalDate
+
 sealed class Coupon {
     abstract val code: String
 
     abstract val description: String
 
-    abstract val discountType: String
-
-    abstract val expirationDate: String
+    abstract val expirationDate: LocalDate
 
     abstract val id: Long
 }

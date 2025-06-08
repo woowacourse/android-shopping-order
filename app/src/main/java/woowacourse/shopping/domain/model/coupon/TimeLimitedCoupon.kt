@@ -1,13 +1,13 @@
 package woowacourse.shopping.domain.model.coupon
 
+import woowacourse.shopping.domain.model.AvailableTime
 import java.time.LocalDate
 
 data class TimeLimitedCoupon(
-    val availableTime: LocalDate,
+    val availableTime: AvailableTime,
     override val code: String,
     override val description: String,
     val discount: Int,
-    override val discountType: String,
-    override val expirationDate: String,
+    override val expirationDate: LocalDate,
     override val id: Long,
 ) : Coupon()

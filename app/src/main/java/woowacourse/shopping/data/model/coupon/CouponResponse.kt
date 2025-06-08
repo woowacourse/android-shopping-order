@@ -15,9 +15,6 @@ sealed class CouponResponse {
     @SerialName("description")
     abstract val description: String
 
-    @SerialName("discountType")
-    abstract val discountType: String
-
     @SerialName("expirationDate")
     abstract val expirationDate: String
 

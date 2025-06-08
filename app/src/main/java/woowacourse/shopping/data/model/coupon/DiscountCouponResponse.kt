@@ -5,9 +5,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import woowacourse.shopping.domain.model.coupon.DiscountCoupon
+import java.time.LocalDate
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
+@SerialName("fixed")
 @JsonClassDiscriminator("discountType")
 data class DiscountCouponResponse(
     @SerialName("code")
@@ -16,8 +18,6 @@ data class DiscountCouponResponse(
     override val description: String,
     @SerialName("discount")
     val discount: Int,
-    @SerialName("discountType")
-    override val discountType: String,
     @SerialName("expirationDate")
     override val expirationDate: String,
     @SerialName("id")
@@ -26,4 +26,12 @@ data class DiscountCouponResponse(
     val minimumAmount: Int,
 ) : CouponResponse()
 
-fun DiscountCouponResponse.toDomain() = DiscountCoupon(code, description, discount, discountType, expirationDate, id, minimumAmount)
+fun DiscountCouponResponse.toDomain() =
+    DiscountCoupon(
+        code,
+        description,
+        discount,
+        LocalDate.parse(expirationDate),
+        id,
+        minimumAmount,
+    )
