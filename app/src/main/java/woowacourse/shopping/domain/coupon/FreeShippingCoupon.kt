@@ -11,4 +11,8 @@ class FreeShippingCoupon(
 ) : Coupon {
     override fun isAvailable(cart: Cart, current: LocalDateTime): Boolean =
         cart.totalPrice >= minimumOrderPrice && current.toLocalDate() <= expirationDate
+
+    override fun discountPrice(cart: Cart): Int {
+        return cart.shippingPrice
+    }
 }

@@ -1,8 +1,8 @@
 package woowacourse.shopping.domain.cart
 
-@JvmInline
-value class Cart(
-    private val items: List<CartItem>
+data class Cart(
+    private val items: List<CartItem>,
+    val shippingPrice: Int = DEFAULT_SHIPPING_PRICE,
 ) {
     val totalPrice: Int get() = items.sumOf { it.price }
 
@@ -18,5 +18,9 @@ value class Cart(
             }.maxBy {
                 it.price
             }.productPrice
+    }
+
+    companion object {
+        private const val DEFAULT_SHIPPING_PRICE = 3000
     }
 }

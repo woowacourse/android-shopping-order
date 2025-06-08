@@ -98,4 +98,28 @@ class FreeShippingCouponTest {
 
         assertThat(actual).isEqualTo(expected)
     }
+
+    @Test
+    fun `쿠폰을 적용하게 되면 배달비 만큼 할인된 금액이 나온다`() {
+        val cart = Cart(
+            listOf(
+                CartItem(
+                    id = 1,
+                    product = Product(
+                        id = 1,
+                        name = "밥",
+                        price = 9_999,
+                        category = "식료품",
+                    ),
+                    quantity = 1
+                )
+            ),
+            5000,
+        )
+
+        val actual = freeShippingCoupon.discountPrice(cart)
+        val expected = 5000
+
+        assertThat(actual).isEqualTo(expected)
+    }
 }
