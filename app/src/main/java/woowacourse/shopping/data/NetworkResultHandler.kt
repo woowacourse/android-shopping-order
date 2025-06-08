@@ -3,18 +3,21 @@ package woowacourse.shopping.data
 import android.util.Log
 import retrofit2.HttpException
 import woowacourse.shopping.domain.exception.NetworkError
-import woowacourse.shopping.domain.exception.NetworkResult
 
 class NetworkResultHandler {
-    inline fun <T> execute(block: () -> T): NetworkResult<T> =
-        runCatching {
-            NetworkResult.Success(block())
-        }.getOrElse {
-            logErrorDetails(it)
-            NetworkResult.Error(handleNetworkError(it))
-        }
+    suspend fun <T> handleResult(block: suspend() -> T): Result<T> =
+        runCatching { block() }
+            .fold(
+                onSuccess = { Result.success(it) },
+                onFailure = { handleException(it) },
+            )
 
-    fun logErrorDetails(throwable: Throwable) {
+    private fun <T> handleException(error: Throwable): Result<T> {
+        logErrorDetails(error)
+        return Result.failure(handleNetworkError(error))
+    }
+
+    private fun logErrorDetails(throwable: Throwable) {
         when (throwable) {
             is HttpException -> {
                 val code = throwable.code()
@@ -30,7 +33,7 @@ class NetworkResultHandler {
         }
     }
 
-    fun handleNetworkError(e: Throwable): NetworkError {
+    private fun handleNetworkError(e: Throwable): NetworkError {
         return when (e) {
             is NetworkError.MissingLocationHeaderError -> e
             is HttpException -> {
