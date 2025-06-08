@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.view.checkout
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCheckoutBinding
@@ -18,6 +19,8 @@ class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        val selectedProductIds = arguments?.getLongArray(SELECTED_PRODUCT_IDS)
+
         initBinding()
         initObserver()
         viewModel.loadCoupons()
@@ -32,5 +35,11 @@ class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment
         viewModel.coupons.observe(viewLifecycleOwner) { coupons ->
             adapter.submitList(coupons)
         }
+    }
+
+    companion object {
+        private const val SELECTED_PRODUCT_IDS = "selected_product_ids"
+
+        fun newBundle(ids: LongArray) = bundleOf(SELECTED_PRODUCT_IDS to ids)
     }
 }
