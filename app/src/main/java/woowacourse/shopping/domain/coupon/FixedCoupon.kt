@@ -18,6 +18,6 @@ data class FixedCoupon(
         if (now.toLocalDate().isAfter(expirationDate)) {
             return false
         }
-        return minimumAmount <= cartItems.sumOf { it.product.priceValue }
+        return minimumAmount <= cartItems.sumOf { it.product.priceValue * it.quantity.value }
     }
 }
