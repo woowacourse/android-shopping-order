@@ -6,15 +6,19 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Coupon
 import woowacourse.shopping.databinding.CouponItemBinding
+import woowacourse.shopping.presentation.payment.event.CouponEventHandler
 
 class CouponViewHolder(
     parent: ViewGroup,
-): RecyclerView.ViewHolder(
+    private val handler: CouponEventHandler,
+) : RecyclerView.ViewHolder(
     LayoutInflater.from(parent.context).inflate(R.layout.coupon_item, parent, false)
 ) {
     private val binding = CouponItemBinding.bind(itemView)
 
-    fun bind(coupon: Coupon) {
+    fun bind(coupon: Coupon, isChecked: Boolean) {
         binding.coupon = coupon
+        binding.isChecked = isChecked
+        binding.handler = handler
     }
 }
