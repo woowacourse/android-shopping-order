@@ -6,6 +6,7 @@ import woowacourse.shopping.data.repository.DefaultHistoryRepository
 import woowacourse.shopping.data.repository.DefaultOrderRepository
 import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -13,7 +14,7 @@ import woowacourse.shopping.domain.repository.ProductRepository
 class RepositoryModule(
     dataSourceModule: DataSourceModule,
 ) {
-    val defaultCouponRepository: DefaultCouponRepository by lazy {
+    val defaultCouponRepository: CouponRepository by lazy {
         DefaultCouponRepository(dataSourceModule.remoteCouponDataSource)
     }
 
