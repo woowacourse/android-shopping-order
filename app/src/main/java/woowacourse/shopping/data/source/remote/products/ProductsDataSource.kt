@@ -4,19 +4,12 @@ import woowacourse.shopping.data.model.ProductResponse
 import woowacourse.shopping.data.model.ProductsResponse
 
 interface ProductsDataSource {
-    fun getProducts(
+    suspend fun getProducts(
         page: Int?,
         size: Int?,
-        onResult: (Result<ProductsResponse>) -> Unit,
-    )
+    ): Result<ProductsResponse>
 
-    fun getProductById(
-        id: Long,
-        onResult: (Result<ProductResponse>) -> Unit,
-    )
+    suspend fun getProductById(id: Long): Result<ProductResponse>
 
-    fun getProductsByCategory(
-        category: String,
-        onResult: (Result<ProductsResponse>) -> Unit,
-    )
+    suspend fun getProductsByCategory(category: String): Result<ProductsResponse>
 }
