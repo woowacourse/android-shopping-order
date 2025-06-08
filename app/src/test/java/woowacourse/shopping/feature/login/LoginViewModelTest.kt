@@ -1,17 +1,27 @@
 package woowacourse.shopping.feature.login
 
 import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import woowacourse.shopping.data.carts.CartFetchError
+import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.domain.model.Authorization
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class LoginViewModelTest {
     @MockK
@@ -19,17 +29,27 @@ class LoginViewModelTest {
 
     private lateinit var viewModel: LoginViewModel
 
+    private val testDispatcher = UnconfinedTestDispatcher()
+
     @BeforeEach
-    fun setUp() {
-        MockKAnnotations.init(this)
-        setupRepositoryMocks()
-        viewModel = LoginViewModel(cartRepository)
+    fun setUp() =
+        runTest {
+            Dispatchers.setMain(testDispatcher)
+            MockKAnnotations.init(this@LoginViewModelTest)
+            setupRepositoryMocks()
+            viewModel = LoginViewModel(cartRepository)
+        }
+
+    @AfterEach
+    fun tearDown() {
+        runTest { }
+        Dispatchers.resetMain()
     }
 
     private fun setupRepositoryMocks() {
-        every { cartRepository.checkValidLocalSavedBasicKey(any(), any()) } answers {
-            secondArg<(Int) -> Unit>()(200)
-        }
+        coEvery { cartRepository.checkValidLocalSavedBasicKey() } returns CartFetchResult.Success(200)
+        coEvery { cartRepository.checkValidBasicKey(any()) } returns CartFetchResult.Success(200)
+        coEvery { cartRepository.saveBasicKey() } returns Result.success(Unit)
     }
 
     @Test
@@ -51,47 +71,45 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `login 호출 시 id와 pw 문자열로 생성한 BasicKey로 checkValidBasicKey가 호출된다`() {
-        val testId = "testuser"
-        val testPw = "testpass"
-        Authorization.setBasicKeyByIdPw(testId, testPw)
-        val expectedBasicKey = Authorization.basicKey
+    fun `login 호출 시 id와 pw 문자열로 생성한 BasicKey로 checkValidBasicKey가 호출된다`() =
+        runTest {
+            val testId = "testuser"
+            val testPw = "testpass"
+            Authorization.setBasicKeyByIdPw(testId, testPw)
+            val expectedBasicKey = Authorization.basicKey
 
-        every { cartRepository.saveBasicKey(any(), any()) } answers {}
+            coEvery { cartRepository.saveBasicKey() } returns Result.success(Unit)
+            coEvery { cartRepository.checkValidBasicKey(any()) } returns CartFetchResult.Success(200)
 
-        every { cartRepository.checkValidBasicKey(any(), any(), any()) } answers {}
+            viewModel.id.set(testId)
+            viewModel.pw.set(testPw)
 
-        viewModel.id.set(testId)
-        viewModel.pw.set(testPw)
+            viewModel.login()
 
-        viewModel.login()
-
-        verify { cartRepository.checkValidBasicKey(expectedBasicKey, any(), any()) }
-    }
-
-    @Test
-    fun `정확한 게정으로 로그인 성공시(200) saveBasicKey가 발생한다`() {
-        every { cartRepository.checkValidBasicKey(any(), any(), any()) } answers {
-            secondArg<(Int) -> Unit>()(200)
+            coVerify { cartRepository.checkValidBasicKey(expectedBasicKey) }
         }
 
-        every { cartRepository.saveBasicKey(any(), any()) } answers {}
+    @Test
+    fun `로그인 성공 시 saveBasicKey가 호출된다`() =
+        runTest {
+            coEvery { cartRepository.checkValidBasicKey(any()) } returns CartFetchResult.Success(200)
+            coEvery { cartRepository.saveBasicKey() } returns Result.success(Unit)
 
-        viewModel.login()
+            viewModel.login()
 
-        verify { cartRepository.saveBasicKey(any(), any()) }
-    }
+            coVerify { cartRepository.saveBasicKey() }
+        }
 
     @Test
-    fun `잘못된 게정으로 로그인 실패시(401) loginErrorEvent가 NotFound로 발생한다`() {
-        every { cartRepository.checkValidBasicKey(any(), any(), any()) } answers {
-            secondArg<(Int) -> Unit>()(401)
+    fun `잘못된 계정으로 로그인 실패시 loginErrorEvent가 NotFound로 발생한다`() =
+        runTest {
+            coEvery { cartRepository.checkValidBasicKey(any()) } returns CartFetchResult.Error(CartFetchError.Network)
+
+            viewModel.id.set("wronguser")
+            viewModel.pw.set("wrongpass")
+
+            viewModel.login()
+
+            assertThat(viewModel.loginErrorEvent.getValue()).isEqualTo(LoginError.NotFound)
         }
-        viewModel.id.set("wronguser")
-        viewModel.pw.set("wrongpass")
-
-        viewModel.login()
-
-        assertThat(viewModel.loginErrorEvent.getValue()).isEqualTo(LoginError.NotFound)
-    }
 }
