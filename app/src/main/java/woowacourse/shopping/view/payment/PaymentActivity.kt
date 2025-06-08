@@ -35,7 +35,11 @@ class PaymentActivity : AppCompatActivity() {
         viewModel =
             ViewModelProvider(
                 this,
-                PaymentViewModelFactory(selectedProducts, app.couponRepository),
+                PaymentViewModelFactory(
+                    selectedProducts,
+                    app.couponRepository,
+                    app.orderRepository,
+                ),
             )[PaymentViewModel::class.java]
 
         initBindings()

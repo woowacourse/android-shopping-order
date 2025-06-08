@@ -8,6 +8,7 @@ import retrofit2.Retrofit
 import woowacourse.shopping.data.TokenProvider
 import woowacourse.shopping.data.service.CartProductApiService
 import woowacourse.shopping.data.service.CouponApiService
+import woowacourse.shopping.data.service.OrderApiService
 import woowacourse.shopping.data.service.ProductApiService
 
 class RetrofitInstance(
@@ -43,6 +44,15 @@ class RetrofitInstance(
             .addConverterFactory(Json.asConverterFactory(contentType))
             .build()
             .create(CouponApiService::class.java)
+
+    val orderService: OrderApiService =
+        Retrofit
+            .Builder()
+            .client(interceptorClient)
+            .baseUrl(BASE_URL)
+            .addConverterFactory(Json.asConverterFactory(contentType))
+            .build()
+            .create(OrderApiService::class.java)
 
     companion object {
         private const val BASE_URL =

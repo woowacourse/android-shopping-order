@@ -12,6 +12,7 @@ import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.Order
 import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.view.payment.adapter.PaymentItem
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
@@ -19,6 +20,7 @@ import woowacourse.shopping.view.util.SingleLiveData
 class PaymentViewModel(
     selectedProducts: List<CartProduct>,
     private val couponRepository: CouponRepository,
+    private val orderRepository: OrderRepository,
 ) : ViewModel(),
     PaymentEventHandler {
     private val couponItems = MutableLiveData<List<PaymentItem.CouponItem>>(emptyList())
@@ -69,7 +71,15 @@ class PaymentViewModel(
     }
 
     override fun onPayClick() {
-        _finishOrderEvent.postValue(Unit)
+        viewModelScope.launch {
+            order.value?.let { order ->
+                orderRepository
+                    .createOrder(order.cartProducts.map { it.id })
+                    .onSuccess {
+                        _finishOrderEvent.postValue(Unit)
+                    }.onFailure { Log.e("error", it.message.toString()) }
+            }
+        }
     }
 
     private fun buildPaymentItems(): List<PaymentItem> =
