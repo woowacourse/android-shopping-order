@@ -58,3 +58,9 @@ fun TextView.setExpirationDateFormatted(expirationDate: String?) {
         }
     }
 }
+
+@BindingAdapter("formattedPrice")
+fun setFormattedPrice(view: TextView, amount: Long?) {
+    val formatted = if (amount != null) String.format("%,d원", amount) else ""
+    view.text = formatted
+}
