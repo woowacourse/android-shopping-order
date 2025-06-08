@@ -7,6 +7,7 @@ value class Price(val value: Int) {
     }
 
     companion object {
+        const val SHIPPING_FEE = 3_000
         private const val MIN_PRICE = 0
         private const val INVALID_PRICE_MESSAGE = "최소 금액은 $MIN_PRICE 입니다."
     }

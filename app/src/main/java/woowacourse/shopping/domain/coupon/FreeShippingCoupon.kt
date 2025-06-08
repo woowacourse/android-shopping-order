@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain.coupon
 
 import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.Price
 import java.time.LocalDateTime
 
 class FreeShippingCoupon(
@@ -20,9 +21,5 @@ class FreeShippingCoupon(
         return true
     }
 
-    override fun discount(cartItems: List<CartItem>): Int = SHIPPING_COST
-
-    companion object {
-        const val SHIPPING_COST = 3_000
-    }
+    override fun discount(cartItems: List<CartItem>): Int = Price.SHIPPING_FEE
 }

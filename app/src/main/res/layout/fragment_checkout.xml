@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="woowacourse.shopping.domain.Price"/>
         <variable
             name="vm"
             type="woowacourse.shopping.presentation.view.checkout.CheckoutViewModel" />
@@ -157,6 +158,7 @@
             android:layout_margin="20dp"
             android:textColor="@color/black"
             android:textSize="18sp"
+            android:text="@{String.format(@string/product_price_format, Price.SHIPPING_FEE)}"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/fee_divider"
             app:layout_constraintEnd_toEndOf="parent"
