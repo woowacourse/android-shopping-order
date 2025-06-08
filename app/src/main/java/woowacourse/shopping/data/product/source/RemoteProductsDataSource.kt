@@ -9,7 +9,7 @@ import woowacourse.shopping.data.product.service.ProductService
 class RemoteProductsDataSource(
     private val productService: ProductService,
 ) : ProductsDataSource {
-    override fun pagedProducts(
+    override suspend fun pagedProducts(
         page: Int,
         size: Int,
     ): ProductsResponse? {
@@ -17,12 +17,12 @@ class RemoteProductsDataSource(
         return response
     }
 
-    override fun getProductById(id: Long): ProductEntity? {
+    override suspend fun getProductById(id: Long): ProductEntity? {
         val response: ProductResponse? = productService.getProductById(id).execute().body()
         return response.toEntityOrNull()
     }
 
-    override fun getProductsByCategory(category: String): List<ProductEntity> {
+    override suspend fun getProductsByCategory(category: String): List<ProductEntity> {
         val response: ProductsResponse? =
             productService.getProductsByCategory(category).execute().body()
 
