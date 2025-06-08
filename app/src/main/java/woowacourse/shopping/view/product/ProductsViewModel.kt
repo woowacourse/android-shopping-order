@@ -88,12 +88,8 @@ class ProductsViewModel(
         productsToShow: List<Product>,
         shoppingCartProducts: List<ShoppingCartProduct>,
     ) {
-        val productsWithoutLoadItem =
-            if (currentProducts.lastOrNull() is LoadItem) {
-                currentProducts.dropLast(1)
-            } else {
-                currentProducts
-            }
+        val productsWithoutLoadItem: List<ProductsItem> =
+            currentProducts.filterNot { it is LoadItem }
 
         val updatedProductItems =
             productsToShow.map { product ->
