@@ -202,6 +202,7 @@
             android:background="@color/cyan"
             android:clickable="true"
             android:gravity="center"
+            android:onClick="@{() -> viewModel.paymentSubmit()}"
             android:text="@string/order_payment_submit_button"
             android:textColor="@color/white"
             android:textSize="24sp"

@@ -9,13 +9,13 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.carts.AddItemResult
-import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.CartUpdateResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
 import woowacourse.shopping.data.payment.CouponFetchResult
+import woowacourse.shopping.data.payment.OrderRequestResult
 import woowacourse.shopping.data.payment.repository.PaymentRepository
 import woowacourse.shopping.data.util.mapper.toCartItems
 import woowacourse.shopping.data.util.mapper.toCouponItems
@@ -123,8 +123,30 @@ class CartViewModel(
             cartList.filter { it.isSelected }.sumOf { it.quantity }
         }
 
-    private val _loginErrorEvent = MutableSingleLiveData<CartFetchError>()
-    val loginErrorEvent: SingleLiveData<CartFetchError> get() = _loginErrorEvent
+    private val _orderSuccessEvent = MutableSingleLiveData<Unit>()
+    val orderSuccessEvent: SingleLiveData<Unit> get() = _orderSuccessEvent
+
+    fun paymentSubmit() {
+        viewModelScope.launch {
+            val selectedCartIds = getSelectedCartIds()
+            val result = paymentRepository.requestOrder(selectedCartIds)
+            when (result) {
+                is OrderRequestResult.Success -> _orderSuccessEvent.setValue(Unit)
+                is OrderRequestResult.Error -> {
+                    // todo
+                }
+            }
+        }
+    }
+
+    private fun getSelectedCartIds(): List<Int> =
+        cartsList.value
+            ?.filter { it.isSelected }
+            ?.map { it.id }
+            ?: emptyList()
+
+    private val _loginErrorEvent = MutableSingleLiveData<Unit>()
+    val loginErrorEvent: SingleLiveData<Unit> get() = _loginErrorEvent
 
     private val _appBarTitle = MutableLiveData<String>()
     val appBarTitle: LiveData<String> = _appBarTitle

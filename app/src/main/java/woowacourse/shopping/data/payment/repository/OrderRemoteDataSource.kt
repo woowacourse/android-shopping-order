@@ -1,3 +1,7 @@
 package woowacourse.shopping.data.payment.repository
 
-interface OrderRemoteDataSource
+import woowacourse.shopping.data.payment.OrderRequestResult
+
+interface OrderRemoteDataSource {
+    suspend fun requestOrder(orderCartIds: List<Int>): OrderRequestResult<Int>
+}

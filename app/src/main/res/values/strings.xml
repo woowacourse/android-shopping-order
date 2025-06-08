@@ -43,6 +43,7 @@
     <string name="order_shipping_fee_title">배송비</string>
     <string name="order_total_price_title">총 결제 금액</string>
     <string name="order_payment_submit_button">결제하기</string>
+    <string name="order_payment_success_alert">주문에 성공했습니다.</string>
 
 
 

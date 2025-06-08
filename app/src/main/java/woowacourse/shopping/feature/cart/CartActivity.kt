@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
@@ -57,6 +58,14 @@ class CartActivity : AppCompatActivity() {
         viewModel.appBarTitle.observe(this) { title ->
             supportActionBar?.title = title
         }
+        viewModel.orderSuccessEvent.observe(this) {
+            showToastMessage(getString(R.string.order_payment_success_alert))
+            finish()
+        }
+    }
+
+    private fun showToastMessage(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
