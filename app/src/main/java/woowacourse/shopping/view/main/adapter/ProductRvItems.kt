@@ -1,11 +1,11 @@
 package woowacourse.shopping.view.main.adapter
 
-import woowacourse.shopping.view.main.state.HistoryState
+import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.main.state.ProductState
 
 sealed class ProductRvItems(val viewType: ViewType) {
     data class RecentProductItem(
-        val items: List<HistoryState>,
+        val items: List<Product>,
     ) : ProductRvItems(ViewType.VIEW_TYPE_RECENT_PRODUCT)
 
     data object DividerItem : ProductRvItems(ViewType.VIEW_TYPE_DIVIDER)

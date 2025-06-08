@@ -2,11 +2,11 @@ package woowacourse.shopping.view.main.adapter.recent
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.main.adapter.HistoryViewHolder
-import woowacourse.shopping.view.main.state.HistoryState
 
 class RecentProductAdapter(
-    private val items: List<HistoryState>,
+    private val items: List<Product>,
     private val handler: HistoryViewHolder.Handler,
 ) : RecyclerView.Adapter<HistoryViewHolder>() {
     override fun onCreateViewHolder(

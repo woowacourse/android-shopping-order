@@ -4,13 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemHistoryBinding
-import woowacourse.shopping.view.main.state.HistoryState
+import woowacourse.shopping.domain.product.Product
 
 class HistoryViewHolder(
     private val binding: ItemHistoryBinding,
     private val handler: Handler,
 ) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(item: HistoryState) {
+    fun bind(item: Product) {
         with(binding) {
             model = item
             eventHandler = handler

@@ -84,8 +84,8 @@ class MainViewModel(
         }
     }
 
-    private suspend fun generateHistoryProductStates(): List<HistoryState> {
-        val historyProducts = mutableListOf<HistoryState>()
+    private suspend fun generateHistoryProductStates(): List<Product> {
+        val historyProducts = mutableListOf<Product>()
         val histories = historyRepository.getHistories()
         if (histories.isEmpty()) return emptyList()
 
