@@ -5,16 +5,16 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.cart.CartItem
-import woowacourse.shopping.domain.coupon.Fixed5000Coupon
+import woowacourse.shopping.domain.coupon.FixedCoupon
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-class Fixed5000CouponTest {
-    private lateinit var fixed5000Coupon: Fixed5000Coupon
+class FixedCouponTest {
+    private lateinit var fixedCoupon: FixedCoupon
 
     @BeforeEach
     fun setUp() {
-        fixed5000Coupon = Fixed5000Coupon(
+        fixedCoupon = FixedCoupon(
             couponId = 1L,
             expirationDate = LocalDate.of(2025, 11, 30),
             minimumOrderPrice = 100_000,
@@ -42,7 +42,7 @@ class Fixed5000CouponTest {
             )
         )
 
-        val actual = fixed5000Coupon.isAvailable(cart, currentDateTime)
+        val actual = fixedCoupon.isAvailable(cart, currentDateTime)
         val expected = true
 
         assertThat(actual).isEqualTo(expected)
@@ -68,7 +68,7 @@ class Fixed5000CouponTest {
             )
         )
 
-        val actual = fixed5000Coupon.isAvailable(cart, currentDateTime)
+        val actual = fixedCoupon.isAvailable(cart, currentDateTime)
         val expected = false
 
         assertThat(actual).isEqualTo(expected)
@@ -94,7 +94,7 @@ class Fixed5000CouponTest {
             )
         )
 
-        val actual = fixed5000Coupon.isAvailable(cart, currentDateTime)
+        val actual = fixedCoupon.isAvailable(cart, currentDateTime)
         val expected = false
 
         assertThat(actual).isEqualTo(expected)
@@ -117,7 +117,7 @@ class Fixed5000CouponTest {
             )
         )
 
-        val actual = fixed5000Coupon.discountPrice(cart)
+        val actual = fixedCoupon.discountPrice(cart)
         val expected = 5_000
 
         assertThat(actual).isEqualTo(expected)

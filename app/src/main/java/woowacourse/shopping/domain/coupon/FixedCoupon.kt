@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.cart.Cart
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-class Fixed5000Coupon(
+class FixedCoupon(
     override val couponId: Long,
     override val expirationDate: LocalDate,
     private val disCountPrice: Int,
