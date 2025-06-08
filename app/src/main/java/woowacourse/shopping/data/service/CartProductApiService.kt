@@ -18,7 +18,7 @@ interface CartProductApiService {
     suspend fun getPagedProducts(
         @Query("page") page: Int?,
         @Query("size") size: Int?,
-    ): Response<CartProductResponseDto>
+    ): Result<CartProductResponseDto?>
 
     @POST("/cart-items")
     suspend fun insert(
@@ -28,14 +28,14 @@ interface CartProductApiService {
     @DELETE("/cart-items/{id}")
     suspend fun delete(
         @Path("id") id: Int,
-    ): Response<Unit>
+    ): Result<Unit>
 
     @GET("/cart-items/counts")
-    suspend fun getTotalQuantity(): Response<CartProductQuantityResponseDto>
+    suspend fun getTotalQuantity(): Result<CartProductQuantityResponseDto>
 
     @PATCH("/cart-items/{id}")
     suspend fun updateQuantity(
         @Path("id") id: Int,
         @Body body: CartProductQuantityRequestDto,
-    ): Response<Unit>
+    ): Result<Unit>
 }

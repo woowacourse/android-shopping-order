@@ -8,18 +8,7 @@ class ProductRemoteDataSource(
     private val productService: ProductApiService,
 ) {
     suspend fun getProductById(id: Int): Result<ProductDto?> {
-        val response = productService.getProductById(id = id)
-
-        return if (response.isSuccessful) {
-            val body = response.body()
-            if (body != null) {
-                Result.success(body)
-            } else {
-                Result.success(null)
-            }
-        } else {
-            Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
-        }
+        return productService.getProductById(id = id)
     }
 
     suspend fun getProductsByIds(ids: List<Int>): Result<List<ProductDto>?> {
@@ -46,19 +35,12 @@ class ProductRemoteDataSource(
         page: Int?,
         size: Int?,
     ): Result<PagedResult<ProductDto>> {
-        val response = productService.getPagedProducts(page = page, size = size)
+        val result = productService.getPagedProducts(page = page, size = size)
 
-        return if (response.isSuccessful) {
-            val body = response.body()
-            if (body != null) {
-                val products = body.content
-                val hasNext = body.last.not()
-                Result.success(PagedResult(products, hasNext))
-            } else {
-                Result.success(PagedResult(emptyList(), false))
-            }
-        } else {
-            Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
+        return result.mapCatching { dto ->
+            val products = dto.content
+            val hasNext = !dto.last
+            PagedResult(products, hasNext)
         }
     }
 }

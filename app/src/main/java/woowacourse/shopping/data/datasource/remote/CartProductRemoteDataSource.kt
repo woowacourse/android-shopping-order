@@ -14,19 +14,13 @@ class CartProductRemoteDataSource(
         page: Int?,
         size: Int?,
     ): Result<PagedResult<CartProductDto>> {
-        val response = cartProductService.getPagedProducts(page = page, size = size)
+        val result = cartProductService.getPagedProducts(page = page, size = size)
 
-        return if (response.isSuccessful) {
-            val body = response.body()
-            if (body != null) {
-                val products = body.content
-                val hasNext = !body.last
-                Result.success(PagedResult(products, hasNext))
-            } else {
-                Result.success(PagedResult(emptyList(), false))
-            }
-        } else {
-            Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
+        return result.mapCatching { dto ->
+            if (dto == null) return@mapCatching PagedResult(emptyList(), false)
+            val products = dto.content
+            val hasNext = !dto.last
+            PagedResult(products, hasNext)
         }
     }
 
@@ -47,27 +41,14 @@ class CartProductRemoteDataSource(
     }
 
     suspend fun delete(id: Int): Result<Unit> {
-        val response = cartProductService.delete(id = id)
-
-        return if (response.code() == HttpURLConnection.HTTP_NO_CONTENT) {
-            Result.success(Unit)
-        } else {
-            Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
-        }
+        return cartProductService.delete(id = id)
     }
 
     suspend fun getTotalQuantity(): Result<Int> {
-        val response = cartProductService.getTotalQuantity()
+        val result = cartProductService.getTotalQuantity()
 
-        return if (response.isSuccessful) {
-            val body = response.body()
-            if (body != null) {
-                Result.success(body.quantity)
-            } else {
-                Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
-            }
-        } else {
-            Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
+        return result.mapCatching { dto ->
+            dto.quantity
         }
     }
 
@@ -75,12 +56,7 @@ class CartProductRemoteDataSource(
         id: Int,
         quantity: Int,
     ): Result<Unit> {
-        val response = cartProductService.updateQuantity(id = id, body = CartProductQuantityRequestDto(quantity))
-        return if (response.code() == HttpURLConnection.HTTP_OK) {
-            Result.success(Unit)
-        } else {
-            Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
-        }
+        return cartProductService.updateQuantity(id = id, body = CartProductQuantityRequestDto(quantity))
     }
 
     companion object {

@@ -22,6 +22,7 @@ class RetrofitInstance(tokenProvider: TokenProvider) {
     val productService: ProductApiService =
         Retrofit
             .Builder()
+            .addCallAdapterFactory(ResponseAdapterFactory())
             .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(Json.asConverterFactory(contentType))
             .build()
@@ -30,6 +31,7 @@ class RetrofitInstance(tokenProvider: TokenProvider) {
     val cartProductService: CartProductApiService =
         Retrofit
             .Builder()
+            .addCallAdapterFactory(ResponseAdapterFactory())
             .client(interceptorClient)
             .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(Json.asConverterFactory(contentType))
@@ -39,6 +41,7 @@ class RetrofitInstance(tokenProvider: TokenProvider) {
     val couponService: CouponApiService =
         Retrofit
             .Builder()
+            .addCallAdapterFactory(ResponseAdapterFactory())
             .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(Json.asConverterFactory(contentType))
             .build()
@@ -47,6 +50,7 @@ class RetrofitInstance(tokenProvider: TokenProvider) {
     val orderService: OrderApiService =
         Retrofit
             .Builder()
+            .addCallAdapterFactory(ResponseAdapterFactory())
             .client(interceptorClient)
             .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(Json.asConverterFactory(contentType))
