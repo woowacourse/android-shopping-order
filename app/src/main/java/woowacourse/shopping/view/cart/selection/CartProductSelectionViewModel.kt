@@ -21,6 +21,15 @@ class CartProductSelectionViewModel(
     private val _products = MutableLiveData<List<CartProductItem>>()
     val products: LiveData<List<CartProductItem>> get() = _products
 
+    private val _page = MutableLiveData(FIRST_PAGE_NUMBER)
+    val page: LiveData<Int> get() = _page
+
+    private val _hasNext = MutableLiveData(false)
+    val hasNext: LiveData<Boolean> get() = _hasNext
+
+    private val _isFinishedLoading = MutableLiveData(false)
+    val isFinishedLoading: LiveData<Boolean> get() = _isFinishedLoading
+
     val totalPrice: LiveData<Int> =
         _selectedProducts.map { products ->
             products.sumOf { it.totalPrice }
@@ -41,20 +50,15 @@ class CartProductSelectionViewModel(
             products.isNotEmpty()
         }
 
-    private val _page = MutableLiveData(FIRST_PAGE_NUMBER)
-    val page: LiveData<Int> get() = _page
+    val hasPrevious: LiveData<Boolean> =
+        _page.map { page ->
+            page > FIRST_PAGE_NUMBER
+        }
 
-    private val _hasNext = MutableLiveData(false)
-    val hasNext: LiveData<Boolean> get() = _hasNext
-
-    private val _hasPrevious = MutableLiveData(false)
-    val hasPrevious: LiveData<Boolean> get() = _hasPrevious
-
-    private val _isSinglePage = MutableLiveData(true)
-    val isSinglePage: LiveData<Boolean> get() = _isSinglePage
-
-    private val _isFinishedLoading = MutableLiveData(false)
-    val isFinishedLoading: LiveData<Boolean> get() = _isFinishedLoading
+    val isSinglePage: LiveData<Boolean> =
+        _hasNext.map { hasNext ->
+            hasNext == false && hasPrevious.value == false
+        }
 
     override fun loadNextProducts() {
         val nextPage = page.value?.plus(1) ?: FIRST_PAGE_NUMBER
@@ -63,7 +67,7 @@ class CartProductSelectionViewModel(
 
     override fun loadPreviousProducts() {
         val prevPage = page.value?.minus(1) ?: FIRST_PAGE_NUMBER
-        if (_hasPrevious.value == true) loadPage(prevPage)
+        if (hasPrevious.value == true) loadPage(prevPage)
     }
 
     override fun onProductRemoveClick(item: CartProduct) {
@@ -211,10 +215,7 @@ class CartProductSelectionViewModel(
         hasNext: Boolean,
     ) {
         _page.value = page
-        val hasPrevious = page > FIRST_PAGE_NUMBER
-        _hasPrevious.value = page > FIRST_PAGE_NUMBER
         _hasNext.value = hasNext
-        _isSinglePage.value = !hasNext && !hasPrevious
     }
 
     companion object {
