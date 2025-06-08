@@ -86,6 +86,7 @@ dependencies {
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.androidx.core.testing)
     testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestRuntimeOnly(libs.mannodermaus.junit5.runner)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.test.ext.junit)

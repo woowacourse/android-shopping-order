@@ -231,11 +231,7 @@ class CartViewModel(
             addSource(shippingFee) { update() }
         }
 
-    init {
-        updateWholeCarts()
-    }
-
-    private fun updateWholeCarts() {
+    internal fun updateWholeCarts() {
         viewModelScope.launch {
             when (val result = cartRepository.fetchAllCartItems()) {
                 is CartFetchResult.Success -> {

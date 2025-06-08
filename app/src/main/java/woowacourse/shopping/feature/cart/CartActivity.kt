@@ -55,6 +55,8 @@ class CartActivity : AppCompatActivity() {
 
         val viewModel = ViewModelProvider(this, sharedViewModelFactory)[CartViewModel::class.java]
 
+        viewModel.updateWholeCarts()
+
         viewModel.appBarTitle.observe(this) { title ->
             supportActionBar?.title = title
         }
