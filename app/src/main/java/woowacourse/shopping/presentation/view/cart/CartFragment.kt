@@ -9,6 +9,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.presentation.view.cart.cartItem.CartItemFragment
 import woowacourse.shopping.presentation.view.cart.recommendation.CartRecommendationFragment
+import woowacourse.shopping.presentation.view.checkout.CheckoutFragment
 import woowacourse.shopping.presentation.view.common.BaseFragment
 
 class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
@@ -24,11 +25,19 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
     private val cartEventHandler =
         object : CartEventHandler {
             override fun onPlaceOrder() {
-                childFragmentManager.commit {
-                    replace(R.id.cart_fragment_container, CartRecommendationFragment())
+                if (viewModel.canSelectItems.value == true) {
+                    childFragmentManager.commit {
+                        replace(R.id.cart_fragment_container, CartRecommendationFragment())
+                    }
+                    viewModel.disableSelection()
+                    viewModel.fetchRecommendedProducts()
+                } else {
+                    parentFragmentManager.commit {
+                        setReorderingAllowed(true)
+                        replace(R.id.shopping_fragment_container, CheckoutFragment(), null)
+                        addToBackStack(null)
+                    }
                 }
-                viewModel.disableSelection()
-                viewModel.fetchRecommendedProducts()
             }
 
             override fun onBatchSelect(isChecked: Boolean) {
