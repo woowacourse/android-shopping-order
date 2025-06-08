@@ -31,7 +31,7 @@ class PaymentAdapter(
                     item.isSelected,
                 )
 
-            PaymentItem.PaymentInformationItem -> {}
+            is PaymentItem.PaymentInformationItem -> (holder as PaymentInformationViewHolder).bind(item.order)
         }
     }
 

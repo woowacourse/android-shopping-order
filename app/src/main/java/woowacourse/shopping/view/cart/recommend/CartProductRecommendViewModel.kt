@@ -23,7 +23,7 @@ class CartProductRecommendViewModel(
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel(),
     CartProductRecommendEventHandler {
-    private val cartProducts = MutableLiveData(selectedProducts)
+    val cartProducts = MutableLiveData(selectedProducts)
 
     private val _recommendedProducts = MutableLiveData<List<RecommendedProductItem>>()
     val recommendedProducts: LiveData<List<RecommendedProductItem>> get() = _recommendedProducts

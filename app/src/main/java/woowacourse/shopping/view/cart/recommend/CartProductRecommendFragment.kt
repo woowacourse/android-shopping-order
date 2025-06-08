@@ -53,12 +53,12 @@ class CartProductRecommendFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        val app = requireActivity().application as ShoppingApplication
         val selectedProducts =
             arguments
                 ?.getSerializableCompat<ArrayList<CartProduct>>(KEY_SELECTED_PRODUCTS)
                 .orEmpty()
                 .toSet()
-        val app = requireActivity().application as ShoppingApplication
         viewModel =
             ViewModelProvider(
                 this,
@@ -79,7 +79,8 @@ class CartProductRecommendFragment : Fragment() {
         binding.rvRecommendedProducts.adapter = adapter
 
         binding.btnOrder.setOnClickListener {
-            val intent = PaymentActivity.newIntent(requireContext())
+            val intent =
+                PaymentActivity.newIntent(requireContext(), viewModel.cartProducts.value.orEmpty())
             startActivity(intent)
             requireActivity().finish()
         }

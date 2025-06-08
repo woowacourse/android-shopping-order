@@ -1,8 +1,8 @@
 package woowacourse.shopping.domain.model
 
-class Order(
-    products: List<CartProduct>,
-    coupon: Coupon? = null,
+data class Order(
+    private val products: List<CartProduct>,
+    private val coupon: Coupon? = null,
 ) {
     val orderPrice: Int = products.sumOf { it.totalPrice }
 

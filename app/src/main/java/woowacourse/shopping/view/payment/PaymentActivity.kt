@@ -13,23 +13,31 @@ import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityPaymentBinding
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.view.payment.adapter.PaymentAdapter
+import woowacourse.shopping.view.util.getSerializableExtraCompat
 
 class PaymentActivity : AppCompatActivity() {
     private val binding by lazy { ActivityPaymentBinding.inflate(layoutInflater) }
-    private val viewModel by lazy {
-        val app = application as ShoppingApplication
-        ViewModelProvider(
-            this,
-            PaymentViewModelFactory(app.couponRepository),
-        )[PaymentViewModel::class.java]
-    }
+
+    private lateinit var viewModel: PaymentViewModel
 
     private val paymentAdapter: PaymentAdapter by lazy { PaymentAdapter(viewModel) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpView()
+        val app = application as ShoppingApplication
+        val selectedProducts =
+            intent
+                .getSerializableExtraCompat<ArrayList<CartProduct>>(KEY_SELECTED_PRODUCTS)
+                .orEmpty()
+        viewModel =
+            ViewModelProvider(
+                this,
+                PaymentViewModelFactory(selectedProducts, app.couponRepository),
+            )[PaymentViewModel::class.java]
+
         initBindings()
         initObservers()
         supportActionBar?.title = getString(R.string.pay)
@@ -72,6 +80,14 @@ class PaymentActivity : AppCompatActivity() {
     }
 
     companion object {
-        fun newIntent(context: Context): Intent = Intent(context, PaymentActivity::class.java)
+        private const val KEY_SELECTED_PRODUCTS = "selectedProducts"
+
+        fun newIntent(
+            context: Context,
+            selectedProducts: Set<CartProduct>,
+        ): Intent =
+            Intent(context, PaymentActivity::class.java).apply {
+                putExtra(KEY_SELECTED_PRODUCTS, ArrayList(selectedProducts))
+            }
     }
 }

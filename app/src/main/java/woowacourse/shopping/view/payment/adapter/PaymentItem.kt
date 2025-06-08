@@ -1,6 +1,7 @@
 package woowacourse.shopping.view.payment.adapter
 
 import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.Order
 
 sealed class PaymentItem(
     val type: ViewType,
@@ -12,7 +13,9 @@ sealed class PaymentItem(
         val isSelected: Boolean = false,
     ) : PaymentItem(ViewType.COUPON)
 
-    data object PaymentInformationItem : PaymentItem(ViewType.PAYMENT_INFORMATION)
+    data class PaymentInformationItem(
+        val order: Order,
+    ) : PaymentItem(ViewType.PAYMENT_INFORMATION)
 
     enum class ViewType {
         COUPON_HEADER,
