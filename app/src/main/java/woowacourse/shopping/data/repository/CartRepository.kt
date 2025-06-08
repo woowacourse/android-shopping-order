@@ -1,7 +1,7 @@
-package woowacourse.shopping.domain.repository
+package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.Page
+import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.Page
 
 interface CartRepository {
     suspend fun loadCartItemByProductId(id: Long): CartItem?

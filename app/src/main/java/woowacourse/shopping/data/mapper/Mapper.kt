@@ -2,11 +2,13 @@ package woowacourse.shopping.data.mapper
 
 import woowacourse.shopping.data.db.RecentProductEntity
 import woowacourse.shopping.data.model.response.cartitem.CartItemContent
+import woowacourse.shopping.data.model.response.coupon.CouponResponse
 import woowacourse.shopping.data.model.response.product.ProductContent
 import woowacourse.shopping.data.model.response.product.ProductResponse
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.Price
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.Coupon
+import woowacourse.shopping.domain.Price
+import woowacourse.shopping.domain.Product
 
 fun RecentProductEntity.toProduct() =
     Product(
@@ -56,4 +58,12 @@ fun ProductResponse.toProduct() =
         name = name,
         imageUrl = imageUrl,
         price = Price(price),
+    )
+
+fun CouponResponse.toCoupon() =
+    Coupon(
+        id = id,
+        code = code,
+        description = description,
+        expirationDate = expirationDate,
     )

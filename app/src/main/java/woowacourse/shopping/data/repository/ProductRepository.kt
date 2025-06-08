@@ -1,8 +1,8 @@
-package woowacourse.shopping.domain.repository
+package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.Page
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.Page
+import woowacourse.shopping.domain.Product
 
 interface ProductRepository {
     suspend fun loadProductsUpToPage(

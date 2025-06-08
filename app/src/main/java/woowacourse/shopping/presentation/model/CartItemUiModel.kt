@@ -1,6 +1,6 @@
 package woowacourse.shopping.presentation.model
 
-import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.CartItem
 
 data class CartItemUiModel(
     val cartItem: CartItem,

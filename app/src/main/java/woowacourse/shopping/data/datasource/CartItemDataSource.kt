@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.datasource
 
 import woowacourse.shopping.data.model.request.CartItemRequest
-import woowacourse.shopping.data.model.response.cartitem.CartItemResponse
 import woowacourse.shopping.data.model.response.Quantity
+import woowacourse.shopping.data.model.response.cartitem.CartItemResponse
 
 interface CartItemDataSource {
     suspend fun fetchPageOfCartItems(

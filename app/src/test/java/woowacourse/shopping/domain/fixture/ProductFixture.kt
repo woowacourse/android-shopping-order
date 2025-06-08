@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.fixture
 
-import woowacourse.shopping.domain.model.Price
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.Price
+import woowacourse.shopping.domain.Product
 import woowacourse.shopping.presentation.model.toProductUiModel
 
 val dummyProductUiModelFixture =

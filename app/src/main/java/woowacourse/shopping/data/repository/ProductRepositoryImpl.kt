@@ -1,4 +1,4 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.CartItemDataSource
 import woowacourse.shopping.data.datasource.ProductDataSource
@@ -8,10 +8,9 @@ import woowacourse.shopping.data.mapper.toCartItem
 import woowacourse.shopping.data.mapper.toProduct
 import woowacourse.shopping.data.mapper.toRecentEntity
 import woowacourse.shopping.data.model.response.product.ProductContent
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.Page
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.Page
+import woowacourse.shopping.domain.Product
 
 class ProductRepositoryImpl(
     private val recentProductDao: RecentProductDao,

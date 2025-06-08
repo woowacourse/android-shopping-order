@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.domain.CartItem
 
 class FakeCartRepository : CartRepository {
     private val cartItems = mutableListOf<CartItem>()

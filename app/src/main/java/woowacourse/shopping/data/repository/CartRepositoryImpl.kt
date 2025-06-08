@@ -1,13 +1,12 @@
-package woowacourse.shopping.data
+package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.CartItemDataSource
 import woowacourse.shopping.data.mapper.toCartItem
 import woowacourse.shopping.data.model.request.CartItemRequest
-import woowacourse.shopping.data.model.response.cartitem.CartItemContent
 import woowacourse.shopping.data.model.response.Quantity
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.Page
-import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.data.model.response.cartitem.CartItemContent
+import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.Page
 
 class CartRepositoryImpl(
     private val cartItemDataSource: CartItemDataSource,
