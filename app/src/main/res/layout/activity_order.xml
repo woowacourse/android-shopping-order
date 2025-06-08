@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="vm"
+            type="woowacourse.shopping.order.OrderViewModel" />
+    </data>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -92,13 +98,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="16dp"
-                    android:text="200,000원"
+                    android:text="@{@string/format_price(vm.currentOrderPriceAmount)}"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="@id/textView_order_price_amount"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/textView_order_price_amount" />
+                    app:layout_constraintTop_toTopOf="@id/textView_order_price_amount"
+                    tools:text="200,000원" />
 
                 <TextView
                     android:id="@+id/textView_coupon_discount_amount"
@@ -118,14 +125,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="16dp"
-                    android:text="-5000원"
+                    android:text="@{@string/format_price(vm.couponDiscountAmount)}"
                     android:textColor="@color/black"
-
                     android:textSize="18sp"
+
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/textView_coupon_discount_amount"
-                    app:layout_constraintTop_toTopOf="@id/textView_coupon_discount_amount" />
+                    app:layout_constraintTop_toTopOf="@id/textView_coupon_discount_amount"
+                    tools:text="-5,000원" />
 
 
                 <TextView
@@ -143,13 +151,14 @@
                     android:id="@+id/textView_shipping_fee_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="3,000원"
+                    android:text="@{@string/format_price(vm.shippingFee)}"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="@id/textView_shipping_fee"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/textView_shipping_fee" />
+                    app:layout_constraintTop_toTopOf="@id/textView_shipping_fee"
+                    tools:text="3,000원" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -186,13 +195,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingEnd="18dp"
-                    android:text="202,000원"
+                    android:text="@{@string/format_price(vm.totalPayingAmount)}"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="@id/textView_total_paying_amount"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/textView_total_paying_amount" />
+                    app:layout_constraintTop_toTopOf="@id/textView_total_paying_amount"
+                    tools:text="202,000원" />
 
                 <Button
                     android:layout_width="match_parent"

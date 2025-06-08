@@ -42,6 +42,8 @@ class OrderActivity : AppCompatActivity() {
                 this,
                 OrderViewModelFactory(products),
             )[OrderViewModel::class.java]
+
+        binding.vm = viewModel
     }
 
     private fun setCouponAdapter() {

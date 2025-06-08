@@ -14,7 +14,7 @@ data class Coupon(
     val id: Long,
     val minimumAmount: Int,
 ) {
-    private val couponType
+    val couponType
         get() =
             when (discountType) {
                 "fixed" -> CouponType.Fixed
