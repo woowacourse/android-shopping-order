@@ -5,16 +5,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentCartProductRecommendBinding
 import woowacourse.shopping.view.cart.recommend.adapter.RecommendedProductAdapter
 import woowacourse.shopping.view.cart.select.CartProductSelectFragment
+import woowacourse.shopping.view.payment.PaymentActivity
 import woowacourse.shopping.view.product.detail.ProductDetailActivity
 
 class CartProductRecommendFragment : Fragment() {
@@ -95,8 +94,10 @@ class CartProductRecommendFragment : Fragment() {
         }
 
         viewModel.finishOrderEvent.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), R.string.finish_order, Toast.LENGTH_SHORT).show()
+            val intent = PaymentActivity.newIntent(requireContext())
+            startActivity(intent)
             requireActivity().finish()
+//            Toast.makeText(requireContext(), R.string.finish_order, Toast.LENGTH_SHORT).show()
         }
     }
 

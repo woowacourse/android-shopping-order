@@ -1,6 +1,9 @@
 package woowacourse.shopping.view.payment
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -18,7 +21,17 @@ class PaymentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setUpView()
         initRecyclerView()
+        supportActionBar?.title = getString(R.string.pay)
     }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean =
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
 
     private fun setUpView() {
         enableEdgeToEdge()
@@ -33,5 +46,9 @@ class PaymentActivity : AppCompatActivity() {
     private fun initRecyclerView() {
         paymentAdapter = PaymentAdapter()
         binding.rvPayment.adapter = paymentAdapter
+    }
+
+    companion object {
+        fun newIntent(context: Context): Intent = Intent(context, PaymentActivity::class.java)
     }
 }

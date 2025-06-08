@@ -24,4 +24,5 @@
     <string name="delivery_fee">배송비</string>
     <string name="total_amount">총 결제 금액</string>
     <string name="minimum_amount">최소 주문 금액: %,d원</string>
+    <string name="pay">결제하기</string>
 </resources>
