@@ -10,14 +10,14 @@ import woowacourse.shopping.data.source.remote.Client.getCartApiService
 import woowacourse.shopping.data.source.remote.Client.getProductsApiService
 import woowacourse.shopping.data.source.remote.cart.CartItemsRemoteDataSource
 import woowacourse.shopping.data.source.remote.products.ProductsRemoteDataSource
-import woowacourse.shopping.domain.repository.CartItemRepository
+import woowacourse.shopping.domain.repository.CartItemsRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
 import woowacourse.shopping.domain.repository.ViewedItemRepository
 
 object RepositoryProvider {
     lateinit var productsRepository: ProductsRepository
         private set
-    lateinit var cartItemRepository: CartItemRepository
+    lateinit var cartItemRepository: CartItemsRepository
         private set
     lateinit var viewedItemRepository: ViewedItemRepository
         private set
