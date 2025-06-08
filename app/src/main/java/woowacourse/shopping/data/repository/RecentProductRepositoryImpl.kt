@@ -5,7 +5,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSource
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
-import woowacourse.shopping.data.dto.response.toProduct
 import woowacourse.shopping.data.entity.toEntity
 import woowacourse.shopping.data.util.toLocalDateTime
 import woowacourse.shopping.domain.model.Product

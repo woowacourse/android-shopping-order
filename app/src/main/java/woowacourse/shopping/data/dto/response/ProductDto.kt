@@ -16,13 +16,13 @@ data class ProductDto(
     val imageUrl: String,
     @SerialName("category")
     val category: String,
-)
-
-fun ProductDto.toProduct(): Product =
-    Product(
-        id = id,
-        name = name,
-        price = price,
-        imageUrl = imageUrl,
-        category = category,
-    )
+) {
+    fun toProduct(): Product =
+        Product(
+            id = id,
+            name = name,
+            price = price,
+            imageUrl = imageUrl,
+            category = category,
+        )
+}

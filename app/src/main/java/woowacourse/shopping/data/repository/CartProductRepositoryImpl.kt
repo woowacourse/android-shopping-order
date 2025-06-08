@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.remote.CartProductRemoteDataSource
-import woowacourse.shopping.data.dto.response.toCartProduct
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
