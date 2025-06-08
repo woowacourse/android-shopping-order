@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityRecommnedBinding
 import woowacourse.shopping.view.productDetail.ProductDetailActivity
+import woowacourse.shopping.view.receipt.ReceiptActivity
 import woowacourse.shopping.view.showToast
 
 class RecommendActivity :
@@ -75,6 +76,10 @@ class RecommendActivity :
         binding.onClickBackButton = {
             setResult(RESULT_OK)
             finish()
+        }
+        binding.onClickOrderButton = {
+            val intent = ReceiptActivity.newIntent(this)
+            startActivity(intent)
         }
         onBackPressedDispatcher.addCallback {
             setResult(RESULT_OK)

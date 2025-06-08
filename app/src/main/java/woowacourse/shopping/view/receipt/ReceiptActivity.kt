@@ -1,5 +1,7 @@
 package woowacourse.shopping.view.receipt
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -23,9 +25,19 @@ class ReceiptActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        initBinding()
     }
 
     private fun initBinding() {
         binding.lifecycleOwner = this
+        viewModel
+    }
+
+    companion object {
+        fun newIntent(context: Context): Intent {
+            val intent =
+                Intent(context, ReceiptActivity::class.java)
+            return intent
+        }
     }
 }
