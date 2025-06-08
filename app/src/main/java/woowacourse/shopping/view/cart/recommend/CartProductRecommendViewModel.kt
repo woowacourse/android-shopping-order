@@ -8,6 +8,7 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -17,7 +18,7 @@ import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
 class CartProductRecommendViewModel(
-    selectedProducts: Set<CartProduct>,
+    selectedProducts: CartProducts,
     private val productRepository: ProductRepository,
     private val cartProductRepository: CartProductRepository,
     private val recentProductRepository: RecentProductRepository,
@@ -28,15 +29,8 @@ class CartProductRecommendViewModel(
     private val _recommendedProducts = MutableLiveData<List<RecommendedProductItem>>()
     val recommendedProducts: LiveData<List<RecommendedProductItem>> get() = _recommendedProducts
 
-    val totalPrice: LiveData<Int> =
-        cartProducts.map { products ->
-            products.sumOf { it.totalPrice }
-        }
-
-    val totalCount: LiveData<Int> =
-        cartProducts.map { products ->
-            products.sumOf { it.quantity }
-        }
+    val totalPrice: LiveData<Int> = cartProducts.map { it.totalPrice }
+    val totalCount: LiveData<Int> = cartProducts.map { it.totalQuantity }
 
     private val _selectedProduct = MutableSingleLiveData<Product>()
     val selectedProduct: SingleLiveData<Product> get() = _selectedProduct
@@ -92,9 +86,8 @@ class CartProductRecommendViewModel(
             cartProductRepository
                 .insert(item.id, QUANTITY_TO_ADD)
                 .onSuccess { cartProductId ->
-                    val currentProducts = cartProducts.value.orEmpty()
                     val newItem = CartProduct(cartProductId, item, QUANTITY_TO_ADD)
-                    cartProducts.postValue(currentProducts + newItem)
+                    cartProducts.postValue(cartProducts.value?.plus(newItem))
                     updateProductQuantity(item, QUANTITY_TO_ADD)
                 }.onFailure {
                     Log.e("error", it.message.toString())
@@ -116,19 +109,18 @@ class CartProductRecommendViewModel(
     ) {
         viewModelScope.launch {
             val existing =
-                cartProducts.value.orEmpty().firstOrNull { it.product.id == item.id }
+                cartProducts.value?.value?.firstOrNull { it.product.id == item.id }
                     ?: return@launch
             val newQuantity = existing.quantity + quantityDelta
 
             cartProductRepository
                 .updateQuantity(existing, quantityDelta)
                 .onSuccess {
-                    val updatedList = cartProducts.value.orEmpty().toMutableSet()
-                    updatedList.removeIf { it.product.id == item.id }
+                    var updatedList = cartProducts.value?.minus(existing)
                     if (newQuantity > DEFAULT_COUNT) {
-                        updatedList.add(existing.copy(quantity = newQuantity))
+                        updatedList = updatedList?.plus(existing.copy(quantity = newQuantity))
                     }
-                    cartProducts.postValue(updatedList)
+                    cartProducts.postValue(updatedList ?: CartProducts(emptyList()))
                     updateProductQuantity(item, quantityDelta)
                 }.onFailure { Log.e("error", it.message.toString()) }
         }

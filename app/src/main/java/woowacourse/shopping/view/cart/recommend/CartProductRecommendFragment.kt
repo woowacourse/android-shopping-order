@@ -11,7 +11,7 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentCartProductRecommendBinding
-import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.view.cart.recommend.adapter.RecommendedProductAdapter
 import woowacourse.shopping.view.cart.select.CartProductSelectFragment
 import woowacourse.shopping.view.payment.PaymentActivity
@@ -55,10 +55,7 @@ class CartProductRecommendFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val app = requireActivity().application as ShoppingApplication
         val selectedProducts =
-            arguments
-                ?.getSerializableCompat<ArrayList<CartProduct>>(KEY_SELECTED_PRODUCTS)
-                .orEmpty()
-                .toSet()
+            arguments?.getSerializableCompat<CartProducts>(KEY_SELECTED_PRODUCTS) ?: return
         viewModel =
             ViewModelProvider(
                 this,
@@ -80,7 +77,7 @@ class CartProductRecommendFragment : Fragment() {
 
         binding.btnOrder.setOnClickListener {
             val intent =
-                PaymentActivity.newIntent(requireContext(), viewModel.cartProducts.value.orEmpty())
+                PaymentActivity.newIntent(requireContext(), viewModel.cartProducts.value)
             startActivity(intent)
             requireActivity().finish()
         }
@@ -105,9 +102,9 @@ class CartProductRecommendFragment : Fragment() {
     companion object {
         private const val KEY_SELECTED_PRODUCTS = "selectedProducts"
 
-        fun newBundle(selectedProducts: Set<CartProduct>): Bundle =
+        fun newBundle(selectedProducts: CartProducts?): Bundle =
             Bundle().apply {
-                putSerializable(KEY_SELECTED_PRODUCTS, ArrayList(selectedProducts))
+                putSerializable(KEY_SELECTED_PRODUCTS, selectedProducts)
             }
     }
 }

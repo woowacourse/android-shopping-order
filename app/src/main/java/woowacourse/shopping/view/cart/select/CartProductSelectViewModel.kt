@@ -8,6 +8,7 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.view.cart.select.adapter.CartProductItem
 
@@ -33,18 +34,11 @@ class CartProductSelectViewModel(
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    private val _selectedCartProducts = MutableLiveData<Set<CartProduct>>(emptySet())
-    val selectedCartProducts: LiveData<Set<CartProduct>> get() = _selectedCartProducts
+    private val _selectedCartProducts = MutableLiveData(CartProducts(emptyList()))
+    val selectedCartProducts: LiveData<CartProducts> get() = _selectedCartProducts
 
-    val totalPrice: LiveData<Int> =
-        _selectedCartProducts.map { products ->
-            products.sumOf { it.totalPrice }
-        }
-
-    val totalCount: LiveData<Int> =
-        _selectedCartProducts.map { products ->
-            products.sumOf { it.quantity }
-        }
+    val totalPrice: LiveData<Int> = _selectedCartProducts.map { it.totalPrice }
+    val totalQuantity: LiveData<Int> = _selectedCartProducts.map { it.totalQuantity }
 
     val isSelectedAll: LiveData<Boolean> =
         _cartProductItems.map { products ->
@@ -61,7 +55,7 @@ class CartProductSelectViewModel(
                     _isLoading.value = false
                     _cartProductItems.value =
                         pagedResult.items.map {
-                            CartProductItem(it, it in selectedCartProducts.value.orEmpty())
+                            CartProductItem(it, selectedCartProducts.value?.contains(it) ?: false)
                         }
                     updatePageState(page, pagedResult.hasNext)
                 }.onFailure {
@@ -92,8 +86,8 @@ class CartProductSelectViewModel(
                         loadPage(currentPage)
                     }
 
-                    val currentSelected = selectedCartProducts.value.orEmpty()
-                    if (item in currentSelected) {
+                    val currentSelected = selectedCartProducts.value
+                    if (currentSelected?.contains(item) == true) {
                         _selectedCartProducts.postValue(currentSelected - item)
                     }
                 }.onFailure {
@@ -111,12 +105,12 @@ class CartProductSelectViewModel(
     }
 
     override fun onSelectItem(item: CartProduct) {
-        val currentSelected = selectedCartProducts.value.orEmpty()
-        val isSelected = item in currentSelected
+        val currentSelected = selectedCartProducts.value
+        val isSelected = currentSelected?.contains(item) == true
         if (isSelected) {
-            _selectedCartProducts.postValue(currentSelected - item)
+            _selectedCartProducts.postValue(currentSelected?.minus(item))
         } else {
-            _selectedCartProducts.postValue(currentSelected + item)
+            _selectedCartProducts.postValue(currentSelected?.plus(item))
         }
         _cartProductItems.value =
             cartProductItems.value.orEmpty().map {
@@ -130,16 +124,12 @@ class CartProductSelectViewModel(
 
     override fun onSelectAllClick() {
         val currentProducts = cartProductItems.value.orEmpty()
-        val currentSelected = selectedCartProducts.value.orEmpty()
+        val currentSelected = selectedCartProducts.value
         val isSelectedAll = isSelectedAll.value ?: false
         if (isSelectedAll) {
-            _selectedCartProducts.postValue(
-                currentSelected - currentProducts.map { it.cartProduct }.toSet(),
-            )
+            _selectedCartProducts.postValue(currentSelected?.minus(currentProducts.map { it.cartProduct }))
         } else {
-            _selectedCartProducts.postValue(
-                currentSelected + currentProducts.map { it.cartProduct }.toSet(),
-            )
+            _selectedCartProducts.postValue(currentSelected?.plus(currentProducts.map { it.cartProduct }))
         }
         val updatedProducts = currentProducts.map { it.copy(isSelected = !isSelectedAll) }
         _cartProductItems.value = updatedProducts
@@ -163,8 +153,8 @@ class CartProductSelectViewModel(
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
-            val currentSelected = selectedCartProducts.value.orEmpty()
-            if (item in currentSelected) {
+            val currentSelected = selectedCartProducts.value
+            if (currentSelected?.contains(item) == true) {
                 val newItem = item.copy(quantity = newQuantity)
                 _selectedCartProducts.postValue(currentSelected - item + newItem)
             }

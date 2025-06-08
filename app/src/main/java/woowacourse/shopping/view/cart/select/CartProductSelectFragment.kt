@@ -61,7 +61,7 @@ class CartProductSelectFragment : Fragment() {
                 replace(
                     R.id.fragment,
                     CartProductRecommendFragment::class.java,
-                    CartProductRecommendFragment.newBundle(viewModel.selectedCartProducts.value.orEmpty()),
+                    CartProductRecommendFragment.newBundle(viewModel.selectedCartProducts.value),
                 )
             }
         }

@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityPaymentBinding
-import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.view.payment.adapter.PaymentAdapter
 import woowacourse.shopping.view.util.getSerializableExtraCompat
 
@@ -28,15 +28,13 @@ class PaymentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setUpView()
         val app = application as ShoppingApplication
-        val selectedProducts =
-            intent
-                .getSerializableExtraCompat<ArrayList<CartProduct>>(KEY_SELECTED_PRODUCTS)
-                .orEmpty()
+        val cartProducts =
+            intent.getSerializableExtraCompat<CartProducts>(KEY_CART_PRODUCTS) ?: return
         viewModel =
             ViewModelProvider(
                 this,
                 PaymentViewModelFactory(
-                    selectedProducts,
+                    cartProducts,
                     app.couponRepository,
                     app.orderRepository,
                 ),
@@ -84,14 +82,14 @@ class PaymentActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val KEY_SELECTED_PRODUCTS = "selectedProducts"
+        private const val KEY_CART_PRODUCTS = "cartProducts"
 
         fun newIntent(
             context: Context,
-            selectedProducts: Set<CartProduct>,
+            cartProducts: CartProducts?,
         ): Intent =
             Intent(context, PaymentActivity::class.java).apply {
-                putExtra(KEY_SELECTED_PRODUCTS, ArrayList(selectedProducts))
+                putExtra(KEY_CART_PRODUCTS, cartProducts)
             }
     }
 }
