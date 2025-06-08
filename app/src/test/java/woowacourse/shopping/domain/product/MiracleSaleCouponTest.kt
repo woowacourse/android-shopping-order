@@ -21,6 +21,7 @@ class MiracleSaleCouponTest {
             expirationDate = LocalDate.of(2025, 8, 31),
             startHour = LocalTime.of(4, 0),
             endHour = LocalTime.of(7, 0),
+            discountRate = 30.0,
         )
         cart = Cart(
             listOf(
@@ -68,6 +69,29 @@ class MiracleSaleCouponTest {
 
         val actual = miracleSaleCoupon.isAvailable(cart, currentDateTime)
         val expected = false
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `쿠폰을 적용하게 되면 할인율 만큼 할인된 금액이 나온다`() {
+        val cart = Cart(
+            listOf(
+                CartItem(
+                    id = 1,
+                    product = Product(
+                        id = 1,
+                        name = "밥",
+                        price = 10_000,
+                        category = "식료품",
+                    ),
+                    quantity = 1
+                )
+            ),
+        )
+
+        val actual = miracleSaleCoupon.discountPrice(cart)
+        val expected = 3000
 
         assertThat(actual).isEqualTo(expected)
     }

@@ -10,8 +10,13 @@ class MiracleSaleCoupon(
     override val expirationDate: LocalDate,
     private val startHour: LocalTime,
     private val endHour: LocalTime,
+    private val discountRate: Double,
 ) : Coupon {
     override fun isAvailable(cart: Cart, current: LocalDateTime): Boolean =
         current.toLocalDate() <= expirationDate &&
                 current.toLocalTime() in startHour..<endHour
+
+    override fun discountPrice(cart: Cart): Int {
+        return (cart.totalPrice * (discountRate / 100)).toInt()
+    }
 }
