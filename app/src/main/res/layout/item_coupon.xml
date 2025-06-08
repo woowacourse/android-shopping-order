@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="coupon"
             type="woowacourse.shopping.presentation.model.CouponUiModel" />
@@ -71,9 +73,9 @@
             android:text="@{@string/item_coupon_minimum_amount(coupon.minimumAmount)}"
             android:textColor="@color/gray5"
             android:textSize="14sp"
+            android:visibility="@{coupon.minimumAmount == 0 ? View.GONE : View.VISIBLE}"
             app:layout_constraintStart_toStartOf="@id/checkbox_coupon"
             app:layout_constraintTop_toBottomOf="@id/tv_expiration_date"
-            app:visibleIfNotNull="@{coupon.minimumAmount}"
             tools:text="최소 주문 금액: 100,000원" />
 
         <TextView
@@ -85,10 +87,10 @@
             android:text="@{@string/item_coupon_available_time(coupon.availableTime.timeRange)}"
             android:textColor="@color/gray5"
             android:textSize="14sp"
+            android:visibility="@{coupon.availableTime != null ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/checkbox_coupon"
             app:layout_constraintTop_toBottomOf="@id/tv_minimum_amount"
-            app:visibleIfNotNull="@{coupon.availableTime}"
             tools:text="사용 가능 시간: 04시 ~ 07시" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
