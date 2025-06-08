@@ -20,7 +20,6 @@ import woowacourse.shopping.view.cart.state.CartState
 import woowacourse.shopping.view.cart.state.CartUiState
 import woowacourse.shopping.view.cart.state.RecommendUiState
 import woowacourse.shopping.view.cart.vm.Paging.Companion.INITIAL_PAGE_NO
-import woowacourse.shopping.view.cart.vm.Paging.Companion.PAGE_SIZE
 import woowacourse.shopping.view.core.common.withState
 import woowacourse.shopping.view.core.event.MutableSingleLiveData
 import woowacourse.shopping.view.core.event.SingleLiveData
@@ -54,7 +53,7 @@ class CartViewModel(
 
     fun loadRecommendProduct() {
         viewModelScope.launch {
-            productRepository.loadSinglePage(lastSeenCategory, null, null)
+            productRepository.loadSinglePage(lastSeenCategory, ALL_PAGE_INDEX, ALL_PAGE_SIZE)
                 .onSuccess { result ->
                     val products = extractRecommendProduct(result)
                     _recommendUiState.value = RecommendUiState(products)
@@ -295,5 +294,8 @@ class CartViewModel(
 
     companion object {
         private const val RECOMMEND_SIZE = 10
+        private const val PAGE_SIZE = 20
+        private val ALL_PAGE_INDEX = null
+        private val ALL_PAGE_SIZE = null
     }
 }

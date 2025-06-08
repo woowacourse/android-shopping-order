@@ -58,7 +58,7 @@ class MainViewModel(
         viewModelScope.launch {
             val productResult =
                 productRepository.loadSinglePage(page = pageIndex, pageSize = PAGE_SIZE)
-            val cartResult = cartRepository.loadSinglePage(pageIndex, PAGE_SIZE)
+            val cartResult = cartRepository.loadSinglePage(ALL_PAGE_INDEX, ALL_PAGE_SIZE)
 
             productResult.onSuccess { productPage ->
                 cartResult.onSuccess { cartPage ->
@@ -113,6 +113,7 @@ class MainViewModel(
         val newStates =
             productPage.products.map { product ->
                 val cart = carts.find { it.productId == product.id }
+
                 ProductState.of(cart, product)
             }
         return _uiState.value?.productItems.orEmpty() + newStates
@@ -166,7 +167,7 @@ class MainViewModel(
     fun syncCartQuantities() =
         withState(_uiState.value) {
             viewModelScope.launch {
-                cartRepository.loadSinglePage(null, null)
+                cartRepository.loadSinglePage(ALL_PAGE_INDEX, ALL_PAGE_SIZE)
                     .onSuccess { result ->
                         updateUiState { modifyQuantity(result.carts) }
                     }.onFailure(::handleFailure)
@@ -226,5 +227,7 @@ class MainViewModel(
     companion object {
         private const val INITIAL_PAGE = 0
         private const val PAGE_SIZE = 20
+        private val ALL_PAGE_INDEX = null
+        private val ALL_PAGE_SIZE = null
     }
 }

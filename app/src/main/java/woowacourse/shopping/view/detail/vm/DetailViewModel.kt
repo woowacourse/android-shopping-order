@@ -92,7 +92,7 @@ class DetailViewModel(
 
     fun saveCart(productId: Long) {
         viewModelScope.launch {
-            val result = cartRepository.loadSinglePage(null, null)
+            val result = cartRepository.loadSinglePage(ALL_PAGE_INDEX, ALL_PAGE_SIZE)
             result.onSuccess { carts ->
                 val savedCart = carts.isSavedInCart(productId)
                 if (savedCart != null) {
@@ -148,4 +148,9 @@ class DetailViewModel(
 
             override fun onClickDecrease(cartId: Long) = decreaseCartQuantity()
         }
+
+    companion object {
+        private val ALL_PAGE_INDEX = null
+        private val ALL_PAGE_SIZE = null
+    }
 }
