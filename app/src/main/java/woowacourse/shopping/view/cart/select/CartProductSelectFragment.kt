@@ -25,9 +25,7 @@ class CartProductSelectFragment : Fragment() {
         )[CartProductSelectViewModel::class.java]
     }
 
-    private val adapter: CartProductAdapter by lazy {
-        CartProductAdapter(eventHandler = viewModel)
-    }
+    private val adapter: CartProductAdapter by lazy { CartProductAdapter(viewModel) }
 
     override fun onCreateView(
         inflater: LayoutInflater,

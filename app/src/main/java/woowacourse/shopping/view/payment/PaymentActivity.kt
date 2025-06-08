@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -24,12 +25,12 @@ class PaymentActivity : AppCompatActivity() {
         )[PaymentViewModel::class.java]
     }
 
-    private lateinit var paymentAdapter: PaymentAdapter
+    private val paymentAdapter: PaymentAdapter by lazy { PaymentAdapter(viewModel) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpView()
-        initRecyclerView()
+        initBindings()
         initObservers()
         supportActionBar?.title = getString(R.string.pay)
     }
@@ -54,14 +55,19 @@ class PaymentActivity : AppCompatActivity() {
         }
     }
 
-    private fun initRecyclerView() {
-        paymentAdapter = PaymentAdapter(viewModel)
+    private fun initBindings() {
+        binding.handler = viewModel
         binding.rvPayment.adapter = paymentAdapter
     }
 
     private fun initObservers() {
         viewModel.paymentItems.observe(this) { value ->
             paymentAdapter.submitList(value)
+        }
+
+        viewModel.finishOrderEvent.observe(this) {
+            finish()
+            Toast.makeText(this, R.string.finish_order, Toast.LENGTH_SHORT).show()
         }
     }
 

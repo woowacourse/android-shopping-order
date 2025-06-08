@@ -32,9 +32,7 @@ class CartProductRecommendFragment : Fragment() {
         )[CartProductRecommendViewModel::class.java]
     }
 
-    private val adapter: RecommendedProductAdapter by lazy {
-        RecommendedProductAdapter(eventHandler = viewModel)
-    }
+    private val adapter: RecommendedProductAdapter by lazy { RecommendedProductAdapter(viewModel) }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -79,8 +77,13 @@ class CartProductRecommendFragment : Fragment() {
     private fun initBindings() {
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
-        binding.handler = viewModel
         binding.rvRecommendedProducts.adapter = adapter
+
+        binding.btnOrder.setOnClickListener {
+            val intent = PaymentActivity.newIntent(requireContext())
+            startActivity(intent)
+            requireActivity().finish()
+        }
     }
 
     private fun initObservers() {
@@ -91,13 +94,6 @@ class CartProductRecommendFragment : Fragment() {
         viewModel.selectedProduct.observe(viewLifecycleOwner) { value ->
             val intent = ProductDetailActivity.newIntent(requireContext(), value)
             startActivity(intent)
-        }
-
-        viewModel.finishOrderEvent.observe(viewLifecycleOwner) {
-            val intent = PaymentActivity.newIntent(requireContext())
-            startActivity(intent)
-            requireActivity().finish()
-//            Toast.makeText(requireContext(), R.string.finish_order, Toast.LENGTH_SHORT).show()
         }
     }
 

@@ -10,6 +10,8 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.view.payment.adapter.PaymentItem
+import woowacourse.shopping.view.util.MutableSingleLiveData
+import woowacourse.shopping.view.util.SingleLiveData
 
 class PaymentViewModel(
     private val couponRepository: CouponRepository,
@@ -22,6 +24,9 @@ class PaymentViewModel(
             addSource(couponItems) { value = buildPaymentItems() }
         }
     val paymentItems: LiveData<List<PaymentItem>> get() = _paymentItems
+
+    private val _finishOrderEvent = MutableSingleLiveData<Unit>()
+    val finishOrderEvent: SingleLiveData<Unit> get() = _finishOrderEvent
 
     init {
         loadCoupons()
@@ -46,6 +51,10 @@ class PaymentViewModel(
                     it.copy(isSelected = false)
                 }
             }
+    }
+
+    override fun onPayClick() {
+        _finishOrderEvent.postValue(Unit)
     }
 
     private fun buildPaymentItems(): List<PaymentItem> =
