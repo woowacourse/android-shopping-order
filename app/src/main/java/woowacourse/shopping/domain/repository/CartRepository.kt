@@ -19,4 +19,6 @@ interface CartRepository {
         page: Int?,
         pageSize: Int?,
     ): NetworkResult<CartsSinglePage>
+
+    suspend fun cartQuantity(): NetworkResult<Int>
 }

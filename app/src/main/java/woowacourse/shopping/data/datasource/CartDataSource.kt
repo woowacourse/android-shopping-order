@@ -40,4 +40,6 @@ class CartDataSource(
     ): NetworkResult<Unit> = handler.execute { service.updateCart(cartId, quantity) }
 
     suspend fun deleteCart(cartId: Long): NetworkResult<Unit> = handler.execute { service.deleteCart(cartId) }
+
+    suspend fun cartQuantity(): NetworkResult<Int> = handler.execute { service.getCartQuantity().quantity }
 }

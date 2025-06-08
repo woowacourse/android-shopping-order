@@ -38,4 +38,9 @@ class DefaultCartRepository(
         withContext(Dispatchers.IO) {
             cartDataSource.deleteCart(cartId)
         }
+
+    override suspend fun cartQuantity(): NetworkResult<Int> =
+        withContext(Dispatchers.IO) {
+            cartDataSource.cartQuantity()
+        }
 }

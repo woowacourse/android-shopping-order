@@ -9,6 +9,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.network.request.CartItemRequest
+import woowacourse.shopping.data.network.response.carts.CartCountResponse
 import woowacourse.shopping.data.network.response.carts.CartsResponse
 
 interface CartService {
@@ -33,4 +34,7 @@ interface CartService {
     suspend fun deleteCart(
         @Path("id") id: Long,
     )
+
+    @GET("/cart-items/counts")
+    suspend fun getCartQuantity(): CartCountResponse
 }
