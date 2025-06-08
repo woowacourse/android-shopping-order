@@ -181,6 +181,34 @@ class CartViewModel(
             null -> 0
         }
 
+    val shippingFee: LiveData<Int> =
+        MediatorLiveData<Int>().apply {
+            fun update() {
+                val coupon = selectedCoupon.value
+                value = getShippingFee(coupon)
+            }
+            addSource(selectedCoupon) { update() }
+        }
+
+    private fun getShippingFee(coupon: Coupon?): Int =
+        when (coupon) {
+            is Coupon.FreeShipping -> 0
+            else -> SHIPPING_FEE
+        }
+
+    val totalOrderPrice: LiveData<Int> =
+        MediatorLiveData<Int>().apply {
+            fun update() {
+                val totalPrice = totalPrice.value ?: 0
+                val discountedAmount = discountAmount.value ?: 0
+                val shippingFee = shippingFee.value ?: 0
+                value = (totalPrice + discountedAmount + shippingFee)
+            }
+            addSource(totalPrice) { update() }
+            addSource(discountAmount) { update() }
+            addSource(shippingFee) { update() }
+        }
+
     init {
         updateWholeCarts()
     }
@@ -480,5 +508,6 @@ class CartViewModel(
     companion object {
         private const val MINIMUM_PAGE = 1
         private const val PAGE_SIZE = 5
+        private const val SHIPPING_FEE = 3000
     }
 }
