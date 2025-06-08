@@ -14,6 +14,7 @@ import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toCartItem
 import woowacourse.shopping.presentation.model.toCartItemUiModel
+import woowacourse.shopping.presentation.model.toProductUiModel
 import woowacourse.shopping.presentation.model.toUiModel
 import kotlin.math.max
 
@@ -86,13 +87,9 @@ class CartViewModel(
                 .addOrIncreaseCartItem(product.id)
                 .onSuccess { cartId ->
                     selectedStates[cartId] = true
-                    val updatedCartItem =
-                        CartItemUiModel(
-                            cartItem = product.toCartItem().copy(cartId = cartId, amount = 1),
-                            isSelected = true,
-                        )
+                    val updatedCartItem = product.toCartItem().toCartItemUiModel().copy(cartId = cartId, amount = 1, isSelected = true)
                     updateProductAmountInLists(cartId, 1)
-                    _itemUpdateEvent.postValue(updatedCartItem.cartItem.toUiModel())
+                    _itemUpdateEvent.postValue(updatedCartItem.toProductUiModel())
                     updateProducts(updatedCartItem)
                     fetchShoppingCart(isNextPage = false, isRefresh = true)
                 }
@@ -100,12 +97,12 @@ class CartViewModel(
     }
 
     fun deleteProduct(cartItem: CartItemUiModel) {
-        val cartId = cartItem.cartItem.cartId
+        val cartId = cartItem.cartId
 
         selectedStates.remove(cartId)
         _cartItems.postValue(
             _cartItems.value?.filterNot {
-                it.cartItem.cartId == cartId
+                it.cartId == cartId
             },
         )
 
@@ -139,8 +136,8 @@ class CartViewModel(
         _cartItems.postValue(
             _cartItems.value
                 ?.map {
-                    if (it.cartItem.cartId == cartId) {
-                        it.copy(cartItem = it.cartItem.copy(amount = newAmount))
+                    if (it.cartId == cartId) {
+                        it.copy(amount = newAmount)
                     } else {
                         it
                     }
@@ -159,8 +156,8 @@ class CartViewModel(
                         it.toCartItemUiModel().copy(
                             isSelected = selectedStates[it.cartId] ?: false,
                         )
-                    updateProductAmountInLists(it.cartId, updatedItem.cartItem.amount)
-                    _itemUpdateEvent.postValue(updatedItem.cartItem.toUiModel())
+                    updateProductAmountInLists(it.cartId, updatedItem.amount)
+                    _itemUpdateEvent.postValue(updatedItem.toProductUiModel())
                     updateProducts(updatedItem)
                 }
             }
@@ -182,8 +179,8 @@ class CartViewModel(
                             it.toCartItemUiModel().copy(
                                 isSelected = selectedStates[it.cartId] ?: false,
                             )
-                        updateProductAmountInLists(it.cartId, updatedItem.cartItem.amount)
-                        _itemUpdateEvent.postValue(updatedItem.cartItem.toUiModel())
+                        updateProductAmountInLists(it.cartId, updatedItem.amount)
+                        _itemUpdateEvent.postValue(updatedItem.toProductUiModel())
                         updateProducts(updatedItem)
                     }
                 }
@@ -195,10 +192,10 @@ class CartViewModel(
         cartItem: CartItemUiModel,
         isSelected: Boolean,
     ) {
-        selectedStates[cartItem.cartItem.cartId] = isSelected
+        selectedStates[cartItem.cartId] = isSelected
         _cartItems.postValue(
             _cartItems.value?.map {
-                if (it.cartItem.cartId == cartItem.cartItem.cartId) {
+                if (it.cartId == cartItem.cartId) {
                     it.copy(isSelected = isSelected)
                 } else {
                     it
@@ -250,6 +247,11 @@ class CartViewModel(
         }
     }
 
+    fun getSelectedCartItems(): List<CartItemUiModel> =
+        _cartItems.value
+            .orEmpty()
+            .filter { selectedStates[it.cartId] == true }
+
     private fun calculatePage(
         isNextPage: Boolean,
         currentPage: Int,
@@ -266,7 +268,7 @@ class CartViewModel(
     private fun updateProducts(updatedItem: CartItemUiModel) {
         _cartItems.value =
             _cartItems.value?.map { cartItem ->
-                if (cartItem.cartItem.cartId == updatedItem.cartItem.cartId) {
+                if (cartItem.cartId == updatedItem.cartId) {
                     updatedItem
                 } else {
                     cartItem
