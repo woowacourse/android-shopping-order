@@ -17,7 +17,8 @@ class Fixed5000CouponTest {
         fixed5000Coupon = Fixed5000Coupon(
             couponId = 1L,
             expirationDate = LocalDate.of(2025, 11, 30),
-            minimumOrderPrice = 100_000
+            minimumOrderPrice = 100_000,
+            disCountPrice = 5_000
         )
     }
 
@@ -95,6 +96,29 @@ class Fixed5000CouponTest {
 
         val actual = fixed5000Coupon.isAvailable(cart, currentDateTime)
         val expected = false
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `쿠폰을 적용하게 되면 할인된 금액이 나온다`() {
+        val cart = Cart(
+            listOf(
+                CartItem(
+                    id = 1,
+                    product = Product(
+                        id = 1,
+                        name = "밥",
+                        price = 100_001,
+                        category = "식료품",
+                    ),
+                    quantity = 1
+                )
+            )
+        )
+
+        val actual = fixed5000Coupon.discountPrice(cart)
+        val expected = 5_000
 
         assertThat(actual).isEqualTo(expected)
     }
