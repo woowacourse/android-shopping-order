@@ -10,10 +10,10 @@ import woowacourse.shopping.R
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.usecase.DecreaseProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.IncreaseProductQuantityUseCase
-import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.SingleLiveData
-import woowacourse.shopping.presentation.toPresentation
+import woowacourse.shopping.presentation.uimodel.CartItemUiModel
+import woowacourse.shopping.presentation.uimodel.toPresentation
 
 class CartViewModel(
     private val cartRepository: CartRepository,
@@ -54,7 +54,7 @@ class CartViewModel(
 
     private var initCartItemStatus: List<CartItemUiModel>? = null
     val isUpdated: Boolean
-        get() = cartItems.value?.containsAll(initCartItemStatus ?: emptyList())?.not() ?: true
+        get() = hasChanges()
 
     init {
         loadItems()
@@ -77,6 +77,28 @@ class CartViewModel(
                         }
 
                     if (initCartItemStatus == null) initCartItemStatus = newItems
+                    _cartItems.value = newItems
+                    _uiState.value = ResultState.Success(Unit)
+                }.onFailure { _toastMessage.postValue(R.string.cart_toast_load_fail) }
+        }
+    }
+
+    fun updateItems() {
+        viewModelScope.launch {
+            val fetchedCartItems = cartRepository.fetchPagedCartItems(0)
+            fetchedCartItems
+                .onSuccess {
+                    val oldItemsMapper =
+                        cartItems.value
+                            .orEmpty()
+                            .associateBy { cartItemUiModel -> cartItemUiModel.id }
+
+                    val newItems =
+                        it.map { newItem ->
+                            oldItemsMapper[newItem.cartId]
+                                ?: newItem.toPresentation(isSelected = true)
+                        }
+
                     _cartItems.value = newItems
                     _uiState.value = ResultState.Success(Unit)
                 }.onFailure { _toastMessage.postValue(R.string.cart_toast_load_fail) }
@@ -155,4 +177,6 @@ class CartViewModel(
             }
         _cartItems.value = updatedItem
     }
+
+    private fun hasChanges(): Boolean = cartItems.value?.containsAll(initCartItemStatus ?: emptyList())?.not() ?: true
 }

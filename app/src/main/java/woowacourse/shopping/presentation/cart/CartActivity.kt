@@ -137,7 +137,7 @@ class CartActivity : AppCompatActivity() {
                 val isUpdated =
                     result.data?.getBooleanExtra(Extra.KEY_RECOMMEND_IS_UPDATE, true) ?: true
                 if (isUpdated) {
-                    viewModel.loadItems()
+                    viewModel.updateItems()
                 }
             }
         }
