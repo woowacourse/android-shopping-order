@@ -9,6 +9,9 @@ import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.Coupon
 import woowacourse.shopping.domain.Price
 import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.TimeRange
+import java.time.LocalDate
+import java.time.LocalTime
 
 fun RecentProductEntity.toProduct() =
     Product(
@@ -60,16 +63,25 @@ fun ProductResponse.toProduct() =
         price = Price(price),
     )
 
-fun CouponResponse.toCoupon() =
-    Coupon(
+fun CouponResponse.toCoupon(): Coupon {
+    val timeRange =
+        if (availableTime == null) {
+            null
+        } else {
+            TimeRange(
+                LocalTime.parse(availableTime.start),
+                LocalTime.parse(availableTime.end),
+            )
+        }
+    return Coupon(
         id = id,
         code = code,
         description = description,
-        expirationDate = expirationDate,
+        expirationDate = LocalDate.parse(expirationDate),
         discount = discount,
         minimumAmount = minimumAmount,
         buyQuantity = buyQuantity,
         getQuantity = getQuantity,
-        availableTimeStart = availableTime?.start,
-        availableTimeEnd = availableTime?.end,
+        availableTime = timeRange,
     )
+}
