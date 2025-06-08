@@ -143,7 +143,6 @@ class RecommendViewModel(
 
     fun restoreCheckedProducts(checkedProducts: List<ProductUiModel>) {
         _checkedItems.postValue(checkedProducts)
-        Log.d("price", totalOrderPrice.toString() + totalOrderCount.toString())
 
         val currentItems = _items.value ?: return
 
