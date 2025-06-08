@@ -46,6 +46,10 @@ object RepositoryProvider {
         orderRepository =
             OrderRepositoryImpl(
                 OrderRemoteDataSource(getOrderRetrofitService),
+                CartItemsRepositoryImpl(
+                    CartItemsRemoteDataSource(getCartRetrofitService),
+                    CartItemsLocalDataSource()
+                ),
             )
         couponRepository =
             CouponRepositoryImpl(
