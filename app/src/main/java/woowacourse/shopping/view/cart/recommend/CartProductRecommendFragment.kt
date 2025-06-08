@@ -22,23 +22,12 @@ class CartProductRecommendFragment : Fragment() {
     private var _binding: FragmentCartProductRecommendBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel by lazy {
-        val application = requireActivity().application as ShoppingApplication
-        ViewModelProvider(
-            this,
-            CartProductRecommendViewModelFactory(
-                application.productRepository,
-                application.cartProductRepository,
-                application.recentProductRepository,
-            ),
-        )[CartProductRecommendViewModel::class.java]
-    }
+    private lateinit var viewModel: CartProductRecommendViewModel
 
     private val adapter: RecommendedProductAdapter by lazy { RecommendedProductAdapter(viewModel) }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
         requireActivity().onBackPressedDispatcher.addCallback(this) {
             parentFragmentManager.commit {
                 replace(
@@ -64,20 +53,24 @@ class CartProductRecommendFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        initInformation()
-        initBindings()
-        initObservers()
-    }
-
-    private fun initInformation() {
-        val selectedCartProducts =
+        val selectedProducts =
             arguments
                 ?.getSerializableCompat<ArrayList<CartProduct>>(KEY_SELECTED_PRODUCTS)
                 .orEmpty()
                 .toSet()
-        val totalPrice = arguments?.getInt(KEY_TOTAL_PRICE)
-        val totalCount = arguments?.getInt(KEY_TOTAL_COUNT)
-        viewModel.initShoppingCartInfo(selectedCartProducts, totalPrice, totalCount)
+        val app = requireActivity().application as ShoppingApplication
+        viewModel =
+            ViewModelProvider(
+                this,
+                CartProductRecommendViewModelFactory(
+                    selectedProducts,
+                    app.productRepository,
+                    app.cartProductRepository,
+                    app.recentProductRepository,
+                ),
+            )[CartProductRecommendViewModel::class.java]
+        initBindings()
+        initObservers()
     }
 
     private fun initBindings() {
@@ -109,19 +102,11 @@ class CartProductRecommendFragment : Fragment() {
     }
 
     companion object {
-        private const val KEY_SELECTED_PRODUCTS = "selectedCartProducts"
-        private const val KEY_TOTAL_PRICE = "totalPrice"
-        private const val KEY_TOTAL_COUNT = "totalCount"
+        private const val KEY_SELECTED_PRODUCTS = "selectedProducts"
 
-        fun newBundle(
-            selectedCartProducts: Set<CartProduct>,
-            totalPrice: Int?,
-            totalCount: Int?,
-        ): Bundle =
+        fun newBundle(selectedProducts: Set<CartProduct>): Bundle =
             Bundle().apply {
-                putSerializable(KEY_SELECTED_PRODUCTS, ArrayList(selectedCartProducts))
-                putSerializable(KEY_TOTAL_PRICE, totalPrice)
-                putSerializable(KEY_TOTAL_COUNT, totalCount)
+                putSerializable(KEY_SELECTED_PRODUCTS, ArrayList(selectedProducts))
             }
     }
 }

@@ -18,10 +18,10 @@ class CartProductSelectFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel by lazy {
-        val application = requireActivity().application as ShoppingApplication
+        val app = requireActivity().application as ShoppingApplication
         ViewModelProvider(
             this,
-            CartProductSelectViewModelFactory(application.cartProductRepository),
+            CartProductSelectViewModelFactory(app.cartProductRepository),
         )[CartProductSelectViewModel::class.java]
     }
 
@@ -61,11 +61,7 @@ class CartProductSelectFragment : Fragment() {
                 replace(
                     R.id.fragment,
                     CartProductRecommendFragment::class.java,
-                    CartProductRecommendFragment.newBundle(
-                        viewModel.selectedCartProducts.value.orEmpty(),
-                        viewModel.totalPrice.value,
-                        viewModel.totalCount.value,
-                    ),
+                    CartProductRecommendFragment.newBundle(viewModel.selectedCartProducts.value.orEmpty()),
                 )
             }
         }
