@@ -93,15 +93,17 @@ class ProductViewModel(
     }
 
     fun loadMore() {
-        this.currentPage++
+        val nextPage = currentPage + 1
+
         viewModelScope.launch {
             productRepository
-                .fetchPagingProducts(currentPage, PAGE_SIZE)
+                .fetchPagingProducts(nextPage, PAGE_SIZE)
                 .onSuccess { newItems ->
                     val currentList = _products.value.orEmpty()
                     val updatedList = currentList + newItems
                     _products.value = updatedList
                     _showLoadMore.value = updatedList.size < 100
+                    currentPage = nextPage
                 }.onFailure {
                     _toastMessage.value = R.string.product_toast_load_failure
                 }
