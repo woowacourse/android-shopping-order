@@ -12,6 +12,10 @@
         <variable
             name="isSelected"
             type="Boolean" />
+
+        <variable
+            name="handler"
+            type="woowacourse.shopping.view.payment.adapter.CouponViewHolder.EventHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -27,6 +31,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:checked="@{isSelected}"
+            android:onClick="@{() -> handler.onSelectItem(coupon)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

@@ -4,15 +4,18 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.view.payment.PaymentEventHandler
 
-class PaymentAdapter : ListAdapter<PaymentItem, RecyclerView.ViewHolder>(diffCallback) {
+class PaymentAdapter(
+    private val eventHandler: PaymentEventHandler,
+) : ListAdapter<PaymentItem, RecyclerView.ViewHolder>(diffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
     ): RecyclerView.ViewHolder =
         when (PaymentItem.ViewType.entries[viewType]) {
             PaymentItem.ViewType.COUPON_HEADER -> CouponHeaderViewHolder.from(parent)
-            PaymentItem.ViewType.COUPON -> CouponViewHolder.from(parent)
+            PaymentItem.ViewType.COUPON -> CouponViewHolder.from(parent, eventHandler)
             PaymentItem.ViewType.PAYMENT_INFORMATION -> PaymentInformationViewHolder.from(parent)
         }
 

@@ -38,11 +38,11 @@ class CartProductViewHolder(
     companion object {
         fun from(
             parent: ViewGroup,
-            eventListener: EventHandler,
+            eventHandler: EventHandler,
         ): CartProductViewHolder {
             val inflater = LayoutInflater.from(parent.context)
             val binding = ItemCartProductBinding.inflate(inflater, parent, false)
-            return CartProductViewHolder(binding, eventListener)
+            return CartProductViewHolder(binding, eventHandler)
         }
     }
 }

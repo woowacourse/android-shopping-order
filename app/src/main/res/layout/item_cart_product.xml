@@ -26,6 +26,15 @@
         android:background="@drawable/style_product_edge"
         android:padding="18dp">
 
+        <CheckBox
+            android:id="@+id/cb_select_product"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:checked="@{isSelected}"
+            android:onClick="@{() -> handler.onSelectItem(cartProduct)}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <ImageButton
             android:id="@+id/btn_remove"
             android:layout_width="40dp"
@@ -34,15 +43,6 @@
             android:onClick="@{() -> handler.onProductRemoveClick(cartProduct)}"
             android:src="@drawable/ic_cancel"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <CheckBox
-            android:id="@+id/cb_select_product"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:checked="@{isSelected}"
-            android:onClick="@{() -> handler.onSelectItem(cartProduct)}"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView

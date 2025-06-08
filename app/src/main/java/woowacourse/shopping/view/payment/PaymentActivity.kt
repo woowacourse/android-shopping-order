@@ -55,7 +55,7 @@ class PaymentActivity : AppCompatActivity() {
     }
 
     private fun initRecyclerView() {
-        paymentAdapter = PaymentAdapter()
+        paymentAdapter = PaymentAdapter(viewModel)
         binding.rvPayment.adapter = paymentAdapter
     }
 
