@@ -101,7 +101,7 @@ class ShoppingCartViewModel(
             result
                 .onSuccess { shoppingCarts: ShoppingCarts ->
                     _isLoading.value = false
-                    if (isEmptyPage(shoppingCarts.shoppingCartItems)) return@load
+                    if (isEmptyPage(shoppingCarts.shoppingCartItems)) return@load minusPage()
 
                     loadable = !shoppingCarts.last
 
@@ -116,13 +116,7 @@ class ShoppingCartViewModel(
         }
     }
 
-    private fun isEmptyPage(products: List<ShoppingCartProduct>): Boolean =
-        if (products.isEmpty() && page != MINIMUM_PAGE) {
-            minusPage()
-            true
-        } else {
-            false
-        }
+    private fun isEmptyPage(products: List<ShoppingCartProduct>): Boolean = products.isEmpty() && page != MINIMUM_PAGE
 
     private fun updateShoppingCartItems(
         products: List<ShoppingCartProduct>,
