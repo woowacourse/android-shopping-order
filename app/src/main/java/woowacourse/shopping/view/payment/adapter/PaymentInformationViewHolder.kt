@@ -4,10 +4,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemPaymentInformationBinding
+import woowacourse.shopping.domain.model.Order
 
 class PaymentInformationViewHolder(
-    binding: ItemPaymentInformationBinding,
+    private val binding: ItemPaymentInformationBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
+    fun bind(order: Order) {
+        binding.order = order
+    }
+
     companion object {
         fun from(parent: ViewGroup): PaymentInformationViewHolder {
             val inflater = LayoutInflater.from(parent.context)
