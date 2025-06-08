@@ -2,9 +2,7 @@ package woowacourse.shopping.order
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
-import android.os.Parcelable
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -14,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.util.parcelableArray
 
 class OrderActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOrderBinding
@@ -35,7 +34,7 @@ class OrderActivity : AppCompatActivity() {
 
     private fun setViewModel() {
         val products: Array<ProductUiModel> =
-            intent.parcelableArray<ProductUiModel>("PRODUCTS") ?: emptyArray()
+            intent.parcelableArray<ProductUiModel>(KEY_PRODUCTS) ?: emptyArray()
 
         viewModel =
             ViewModelProvider(
@@ -57,12 +56,8 @@ class OrderActivity : AppCompatActivity() {
     private fun observeOrderViewModel() {
         val couponAdapter: CouponAdapter = binding.recyclerViewOrder.adapter as CouponAdapter
 
-        viewModel.availableDisplayingCoupons.observe(this) {
-            couponAdapter.submitList(it)
-        }
-        viewModel.checkSelected.observe(this) {
-            couponAdapter.applyCoupon(it)
-        }
+        viewModel.availableDisplayingCoupons.observe(this, couponAdapter::submitList)
+        viewModel.checkSelected.observe(this, couponAdapter::applyCoupon)
     }
 
     private fun setSupportActionBar() {
@@ -83,26 +78,15 @@ class OrderActivity : AppCompatActivity() {
         }
     }
 
-    inline fun <reified T : Parcelable> Intent.parcelableArray(key: String): Array<T>? =
-        when {
-            SDK_INT >= 33 -> {
-                @Suppress("DEPRECATION")
-                getParcelableArrayExtra(key)?.filterIsInstance<T>()?.toTypedArray()
-            }
-
-            else -> {
-                @Suppress("DEPRECATION")
-                getParcelableArrayExtra(key)?.filterIsInstance<T>()?.toTypedArray()
-            }
-        }
-
     companion object {
         fun newIntent(
             context: Context,
             products: Array<ProductUiModel>,
         ): Intent =
             Intent(context, OrderActivity::class.java).apply {
-                putExtra("PRODUCTS", products)
+                putExtra(KEY_PRODUCTS, products)
             }
+
+        private const val KEY_PRODUCTS = "PRODUCTS"
     }
 }
