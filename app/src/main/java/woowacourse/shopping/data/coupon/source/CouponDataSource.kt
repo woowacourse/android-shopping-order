@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.coupon.source
 
-import woowacourse.shopping.data.coupon.dto.CouponResponse
+import woowacourse.shopping.data.coupon.dto.CouponResponseItem
 
 interface CouponDataSource {
-    suspend fun coupons(): CouponResponse?
+    suspend fun coupons(): List<CouponResponseItem>?
 }
