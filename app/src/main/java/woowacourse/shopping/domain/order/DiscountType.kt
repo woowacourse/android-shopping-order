@@ -1,6 +1,6 @@
-package woowacourse.shopping.domain.coupon
+package woowacourse.shopping.domain.order
 
-import woowacourse.shopping.domain.coupon.DiscountType.entries
+import woowacourse.shopping.domain.order.DiscountType.entries
 
 enum class DiscountType(
     private val title: String,
