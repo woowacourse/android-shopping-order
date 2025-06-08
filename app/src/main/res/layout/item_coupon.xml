@@ -5,9 +5,17 @@
 
     <data>
 
+        <import type="android.view.View" />
+
+        <import type="android.widget.CheckBox" />
+
         <variable
             name="coupon"
-            type="woowacourse.shopping.domain.Coupon" />
+            type="woowacourse.shopping.presentation.view.checkout.adapter.CouponUiModel" />
+
+        <variable
+            name="eventHandler"
+            type="woowacourse.shopping.presentation.view.checkout.CheckoutEventHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,6 +30,8 @@
             android:layout_width="20dp"
             android:layout_height="0dp"
             android:gravity="center"
+            android:checked="@{coupon.selected}"
+            android:onClick="@{(view) -> eventHandler.onToggleSelection(coupon, ((CheckBox) view).isChecked)}"
             app:layout_constraintBottom_toBottomOf="@id/coupon_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/coupon_title" />
@@ -33,7 +43,7 @@
             android:layout_marginStart="10dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{coupon.description}"
+            android:text="@{coupon.coupon.description}"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"

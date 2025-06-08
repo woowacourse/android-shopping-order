@@ -8,11 +8,22 @@ import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCheckoutBinding
 import woowacourse.shopping.presentation.view.checkout.adapter.CouponAdapter
+import woowacourse.shopping.presentation.view.checkout.adapter.CouponUiModel
 import woowacourse.shopping.presentation.view.common.BaseFragment
 
 class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment_checkout) {
     private val viewModel: CheckoutViewModel by viewModels { CheckoutViewModel.Factory }
-    private val adapter = CouponAdapter()
+    private val adapter: CouponAdapter by lazy { CouponAdapter(checkoutEventHandler) }
+
+    private val checkoutEventHandler =
+        object : CheckoutEventHandler {
+            override fun onToggleSelection(
+                coupon: CouponUiModel,
+                isSelected: Boolean,
+            ) {
+                viewModel.setCouponSelection(coupon, isSelected)
+            }
+        }
 
     override fun onViewCreated(
         view: View,

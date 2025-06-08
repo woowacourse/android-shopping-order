@@ -13,13 +13,15 @@ import woowacourse.shopping.data.repository.CouponRepository
 import woowacourse.shopping.data.repository.RepositoryProvider
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.Coupon
+import woowacourse.shopping.presentation.view.checkout.adapter.CouponUiModel
+import woowacourse.shopping.presentation.view.checkout.adapter.toUiModel
 
 class CheckoutViewModel(
     private val cartRepository: CartRepository,
     private val couponRepository: CouponRepository,
 ) : ViewModel() {
-    private val _coupons = MutableLiveData<List<Coupon>>()
-    val coupons: LiveData<List<Coupon>> = _coupons
+    private val _coupons = MutableLiveData<List<CouponUiModel>>()
+    val coupons: LiveData<List<CouponUiModel>> = _coupons
 
     private val _cartItems = MutableLiveData<List<CartItem>>()
     val cartItems: LiveData<List<CartItem>> = _cartItems
@@ -31,7 +33,7 @@ class CheckoutViewModel(
 
     fun loadCoupons() {
         viewModelScope.launch {
-            _coupons.value = couponRepository.loadCoupons()
+            _coupons.value = couponRepository.loadCoupons().map(Coupon::toUiModel)
         }
     }
 
@@ -47,6 +49,20 @@ class CheckoutViewModel(
                 }
             _cartItems.postValue(selectedCartItems)
         }
+    }
+
+    fun setCouponSelection(
+        target: CouponUiModel,
+        isSelected: Boolean,
+    ) {
+        _coupons.value =
+            _coupons.value?.map { coupon ->
+                if (coupon.coupon.id == target.coupon.id) {
+                    coupon.copy(isSelected = isSelected)
+                } else {
+                    coupon.copy(isSelected = false)
+                }
+            }
     }
 
     companion object {

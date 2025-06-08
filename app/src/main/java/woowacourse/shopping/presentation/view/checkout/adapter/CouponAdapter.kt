@@ -3,25 +3,27 @@ package woowacourse.shopping.presentation.view.checkout.adapter
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import woowacourse.shopping.domain.Coupon
+import woowacourse.shopping.presentation.view.checkout.CheckoutEventHandler
 
-class CouponAdapter : ListAdapter<Coupon, CouponViewHolder>(
-    object : DiffUtil.ItemCallback<Coupon>() {
-        override fun areItemsTheSame(
-            oldItem: Coupon,
-            newItem: Coupon,
-        ): Boolean = oldItem.id == newItem.id
+class CouponAdapter(
+    private val checkoutEventHandler: CheckoutEventHandler,
+) : ListAdapter<CouponUiModel, CouponViewHolder>(
+        object : DiffUtil.ItemCallback<CouponUiModel>() {
+            override fun areItemsTheSame(
+                oldItem: CouponUiModel,
+                newItem: CouponUiModel,
+            ): Boolean = oldItem.coupon.id == newItem.coupon.id
 
-        override fun areContentsTheSame(
-            oldItem: Coupon,
-            newItem: Coupon,
-        ): Boolean = oldItem == newItem
-    },
-) {
+            override fun areContentsTheSame(
+                oldItem: CouponUiModel,
+                newItem: CouponUiModel,
+            ): Boolean = oldItem == newItem
+        },
+    ) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): CouponViewHolder = CouponViewHolder.from(parent)
+    ): CouponViewHolder = CouponViewHolder.from(parent, checkoutEventHandler)
 
     override fun onBindViewHolder(
         holder: CouponViewHolder,
