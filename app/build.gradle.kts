@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.google.material)
     implementation(libs.androidx.activity)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.shimmer)
