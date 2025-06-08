@@ -133,7 +133,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
-            android:text="@{String.format(@string/product_price_format, vm.discountAmount)}"
+            android:text="@{String.format(@string/product_discount_format, vm.discountAmount)}"
             android:textAlignment="textEnd"
             android:textColor="@color/black"
             android:textSize="18sp"
