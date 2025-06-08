@@ -14,5 +14,5 @@ data class FixedCoupon(
         return items.sumOf { it.totalPrice } >= minimumAmount
     }
 
-    override fun calculateDiscountAmount(items: List<CartProduct>): Int = -discount
+    override fun calculateDiscountAmount(items: List<CartProduct>): Int = discount
 }

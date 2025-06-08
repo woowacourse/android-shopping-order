@@ -83,7 +83,7 @@ class FixedCouponTest {
 
         // when
         val actual = coupon.calculateDiscountAmount(items)
-        val expected = coupon.discount * -1
+        val expected = coupon.discount
 
         // then
         actual shouldBe expected

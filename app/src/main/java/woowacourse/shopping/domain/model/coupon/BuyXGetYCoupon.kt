@@ -20,6 +20,6 @@ data class BuyXGetYCoupon(
         val requireQuantity = buyQuantity + getQuantity
         val filteredItems = items.filter { it.quantity >= requireQuantity }
         val mostExpensiveItem = filteredItems.maxByOrNull { it.product.price } ?: return 0
-        return -1 * mostExpensiveItem.product.price * getQuantity
+        return mostExpensiveItem.product.price * getQuantity
     }
 }

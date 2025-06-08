@@ -18,6 +18,6 @@ data class PercentageCoupon(
     override fun calculateDiscountAmount(items: List<CartProduct>): Int {
         val totalPrice = items.sumOf { it.totalPrice }
         val discountRate = discount / 100.0
-        return -(totalPrice * discountRate).toInt()
+        return (totalPrice * discountRate).toInt()
     }
 }

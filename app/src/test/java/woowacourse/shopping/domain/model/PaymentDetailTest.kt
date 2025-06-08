@@ -52,7 +52,7 @@ class PaymentDetailTest {
         val actual = paymentDetail.discountByCoupon(coupon)
 
         // then
-        actual.couponDiscount shouldBe -5000
+        actual.couponDiscount shouldBe 5000
     }
 
     @Test
@@ -75,7 +75,7 @@ class PaymentDetailTest {
         val actual = paymentDetail.discountByCoupon(coupon)
 
         // then
-        actual.couponDiscount shouldBe -918000
+        actual.couponDiscount shouldBe 918000
     }
 
     @Test
@@ -95,7 +95,7 @@ class PaymentDetailTest {
         val actual = paymentDetail.discountByCoupon(coupon)
 
         // then
-        actual.couponDiscount shouldBe -1000000
+        actual.couponDiscount shouldBe 1000000
     }
 
     @Test

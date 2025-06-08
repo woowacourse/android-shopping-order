@@ -94,6 +94,6 @@ class BuyXGetYCouponTest {
         // when
         val actual = coupon.calculateDiscountAmount(validItems)
 
-        actual shouldBe -40000
+        actual shouldBe 40000
     }
 }

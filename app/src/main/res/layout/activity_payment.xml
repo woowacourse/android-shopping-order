@@ -117,7 +117,7 @@
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:text="@{String.format(@string/product_price, viewModel.paymentDetail.couponDiscount)}"
+                    android:text="@{String.format(@string/product_price, -1 * viewModel.paymentDetail.couponDiscount)}"
                     app:layout_constraintEnd_toEndOf="@id/tv_order_amount"
                     app:layout_constraintTop_toTopOf="@id/tv_coupon_discount_label"
                     tools:text="-5,000원" />
