@@ -5,6 +5,7 @@
     <string name="goods_image_description">상품 이미지</string>
     <string name="goods_price">%,d원</string>
     <string name="goods_more_button">더보기</string>
+    <string name="goods_auto_login_error_toast_message">자동 로그인에 실패했습니다.</string>
 
     <!--    GoodsDetailsActivity-->
     <string name="goods_detail_action_bar_name" />
@@ -13,7 +14,10 @@
     <string name="goods_details_cart_button">장바구니 담기</string>
     <string name="goods_detail_price">가격</string>
     <string name="goods_detail_cart_update_complete_toast_message">장바구니 상품 수량을 %d개로 변경하였습니다!</string>
+    <string name="goods_detail_cart_update_error_toast_message">장바구니 상품 수량 업데이트에 실패했습니다.</string>
     <string name="goods_detail_cart_insert_complete_toast_message">상품 %d개가 장바구니에 추가되었습니다!</string>
+    <string name="goods_detail_cart_insert_error_toast_message">장바구니 상품 추가에 실패했습니다.</string>
+    <string name="goods_detail_">최근 본 항목</string>
     <string name="recently_viewed_header">마지막으로 본 상품</string>
 
     <!--    CartActivity-->
@@ -44,6 +48,8 @@
     <string name="order_total_price_title">총 결제 금액</string>
     <string name="order_payment_submit_button">결제하기</string>
     <string name="order_payment_success_alert">주문에 성공했습니다.</string>
+    <string name="order_payment_network_error_alert">네트워크 오류로 주문에 실패했습니다.</string>
+    <string name="order_payment_server_error_alert">서버 오류로 주문에 실패했습니다.</string>
 
 
 

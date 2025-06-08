@@ -62,6 +62,10 @@ class CartActivity : AppCompatActivity() {
         viewModel.appBarTitle.observe(this) { title ->
             supportActionBar?.title = title
         }
+        viewModel.orderFailedEvent.observe(this) { messageId ->
+            showToastMessage(getString(messageId))
+        }
+
         viewModel.orderSuccessEvent.observe(this) {
             showToastMessage(getString(R.string.order_payment_success_alert))
             finish()

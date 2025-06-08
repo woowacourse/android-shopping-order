@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.goodsdetails
 
+import io.kotest.assertions.failure
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -167,9 +168,14 @@ class GoodsDetailsViewModelTest {
 
         viewModel.addOrUpdateQuantityToCart()
 
-        assertThat(
-            viewModel.alertEvent.getValue()?.resourceId ?: -99,
-        ).isEqualTo(R.string.goods_detail_cart_update_complete_toast_message)
+        val goodsDetailsAlertMessage = viewModel.alertEvent.getValue()
+        when (goodsDetailsAlertMessage) {
+            is GoodsDetailsAlertMessage.ResourceId ->
+                assertThat(
+                    goodsDetailsAlertMessage.resourceId,
+                ).isEqualTo(R.string.goods_detail_cart_update_complete_toast_message)
+            else -> failure("알림 이벤트 발생 안함")
+        }
     }
 
     @Test
@@ -190,9 +196,14 @@ class GoodsDetailsViewModelTest {
                 )
 
             viewModelWithNullCartId.addOrUpdateQuantityToCart()
-
-            assertThat(viewModelWithNullCartId.alertEvent.getValue()?.resourceId ?: -99)
-                .isEqualTo(R.string.goods_detail_cart_insert_complete_toast_message)
+            val goodsDetailsAlertMessage = viewModelWithNullCartId.alertEvent.getValue()
+            when (goodsDetailsAlertMessage) {
+                is GoodsDetailsAlertMessage.ResourceId ->
+                    assertThat(
+                        goodsDetailsAlertMessage.resourceId,
+                    ).isEqualTo(R.string.goods_detail_cart_insert_complete_toast_message)
+                else -> failure("알림 이벤트 발생 안함")
+            }
         }
 
     @Test

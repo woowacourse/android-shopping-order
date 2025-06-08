@@ -73,12 +73,19 @@ class GoodsDetailsActivity : AppCompatActivity() {
             }
 
         viewModel.alertEvent.observe(this) { goodsDetailsAlertMessage ->
-            showMessage(
-                getString(
-                    goodsDetailsAlertMessage.resourceId,
-                    goodsDetailsAlertMessage.quantity,
-                ),
-            )
+            val message =
+                when (goodsDetailsAlertMessage) {
+                    is GoodsDetailsAlertMessage.ResourceId -> {
+                        getString(goodsDetailsAlertMessage.resourceId)
+                    }
+                    is GoodsDetailsAlertMessage.ResourceIdWithQuantity -> {
+                        getString(
+                            goodsDetailsAlertMessage.resourceId,
+                            goodsDetailsAlertMessage.quantity,
+                        )
+                    }
+                }
+            showMessage(message)
         }
 
         viewModel.clickMostRecentlyGoodsEvent.observe(this) { mostRecentGoods ->

@@ -3,6 +3,7 @@ package woowacourse.shopping.feature.goods
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.util.component1
@@ -117,6 +118,14 @@ class GoodsActivity : AppCompatActivity() {
         viewModel.navigateToLogin.observe(this) {
             navigateGoodsLogin()
         }
+
+        viewModel.alertEvent.observe(this) { messageId ->
+            showToastMessage(getString(messageId))
+        }
+    }
+
+    private fun showToastMessage(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun getLayoutManager(): GridLayoutManager {

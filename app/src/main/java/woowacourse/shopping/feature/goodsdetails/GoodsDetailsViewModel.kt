@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.goodsdetails
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -82,7 +83,11 @@ class GoodsDetailsViewModel(
             }
 
             is CartUpdateResult.Error -> {
-                // todo
+                _alertEvent.setValue(
+                    GoodsDetailsAlertMessage.ResourceId(
+                        R.string.goods_detail_cart_update_error_toast_message,
+                    ),
+                )
             }
         }
     }
@@ -91,7 +96,12 @@ class GoodsDetailsViewModel(
         viewModelScope.launch {
             val result = cartRepository.addCartItem(item.goods, item.quantity)
             when (result) {
-                is CartFetchResult.Error -> TODO()
+                is CartFetchResult.Error ->
+                    _alertEvent.setValue(
+                        GoodsDetailsAlertMessage.ResourceId(
+                            R.string.goods_detail_cart_insert_error_toast_message,
+                        ),
+                    )
                 is CartFetchResult.Success -> {
                     alertMessageEvent(R.string.goods_detail_cart_insert_complete_toast_message, item.quantity)
                     cartId = result.data.cartId
@@ -106,7 +116,7 @@ class GoodsDetailsViewModel(
         quantity: Int,
     ) {
         _alertEvent.setValue(
-            GoodsDetailsAlertMessage(
+            GoodsDetailsAlertMessage.ResourceIdWithQuantity(
                 messageId,
                 quantity,
             ),
@@ -124,12 +134,13 @@ class GoodsDetailsViewModel(
             try {
                 goodsRepository.loggingRecentGoods(goods)
             } catch (e: Exception) {
-                // todo(최근 본 항목 로깅 실패 처리)
+                Log.w(TAG, "최근 본 항목 기록 실패 ${goods.name}", e)
             }
         }
     }
 
     companion object {
         const val NULL_CART_ID = -1
+        private val TAG: String = GoodsDetailsViewModel::class.java.simpleName
     }
 }

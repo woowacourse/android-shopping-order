@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.cart
 
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -8,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import woowacourse.shopping.R
 import woowacourse.shopping.data.carts.AddItemResult
 import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.CartUpdateResult
@@ -15,6 +17,7 @@ import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
 import woowacourse.shopping.data.payment.CouponFetchResult
+import woowacourse.shopping.data.payment.OrderRequestError
 import woowacourse.shopping.data.payment.OrderRequestResult
 import woowacourse.shopping.data.payment.repository.PaymentRepository
 import woowacourse.shopping.data.util.mapper.toCartItems
@@ -126,6 +129,9 @@ class CartViewModel(
     private val _orderSuccessEvent = MutableSingleLiveData<Unit>()
     val orderSuccessEvent: SingleLiveData<Unit> get() = _orderSuccessEvent
 
+    private val _orderFailedEvent = MutableSingleLiveData<Int>()
+    val orderFailedEvent: SingleLiveData<Int> get() = _orderFailedEvent
+
     fun paymentSubmit() {
         viewModelScope.launch {
             val selectedCartIds = getSelectedCartIds()
@@ -133,7 +139,10 @@ class CartViewModel(
             when (result) {
                 is OrderRequestResult.Success -> _orderSuccessEvent.setValue(Unit)
                 is OrderRequestResult.Error -> {
-                    // todo
+                    when (result.error) {
+                        OrderRequestError.Network -> _orderFailedEvent.setValue(R.string.order_payment_network_error_alert)
+                        is OrderRequestError.Server -> _orderFailedEvent.setValue(R.string.order_payment_server_error_alert)
+                    }
                 }
             }
         }
@@ -239,8 +248,7 @@ class CartViewModel(
                     _carts.value = allItems.associateBy { it.id }
                 }
 
-                is CartFetchResult.Error -> { // todo 에러 구현 필요
-                }
+                is CartFetchResult.Error -> Log.w(TAG, "전체 장바구니 아이템 로드 실패")
             }
         }
     }
@@ -253,8 +261,7 @@ class CartViewModel(
                     _coupons.value = allItems
                 }
 
-                is CouponFetchResult.Error -> { // todo 에러 구현 필요
-                }
+                is CouponFetchResult.Error -> Log.w(TAG, "보유 쿠폰 로드 실패")
             }
         }
     }
@@ -328,9 +335,7 @@ class CartViewModel(
                     }
                 }
 
-                is CartFetchResult.Error -> {
-                    // todo 에러 처리 필요
-                }
+                is CartFetchResult.Error -> Log.w(TAG, "추천 아이템 필터링을 위한 장바구니 전체 조회 실패")
             }
         }
     }
@@ -364,7 +369,7 @@ class CartViewModel(
         viewModelScope.launch {
             val result = cartRepository.addCartItem(cartItem.goods, quantity = 1)
             when (result) {
-                is CartFetchResult.Error -> TODO()
+                is CartFetchResult.Error -> Log.w(TAG, "장바구니 아이템 추가 실패")
                 is CartFetchResult.Success -> {
                     addRecommendItemToLocalVariables(cartItem, result)
                 }
@@ -439,7 +444,7 @@ class CartViewModel(
                     }
                 }
 
-                is CartUpdateResult.Error -> TODO()
+                is CartUpdateResult.Error -> Log.w(TAG, "장바구니 수량 증가 실패")
             }
         }
     }
@@ -482,7 +487,7 @@ class CartViewModel(
                     }
                 }
 
-                is CartFetchResult.Error -> TODO()
+                is CartFetchResult.Error -> Log.w(TAG, "장바구니 아이템 삭제 실패")
             }
         }
     }
@@ -498,7 +503,7 @@ class CartViewModel(
                     }
                 }
 
-                is CartUpdateResult.Error -> TODO()
+                is CartUpdateResult.Error -> Log.w(TAG, "장바구니 수량 감소 실패")
             }
         }
     }
@@ -527,5 +532,7 @@ class CartViewModel(
         private const val MINIMUM_PAGE = 1
         private const val PAGE_SIZE = 5
         private const val SHIPPING_FEE = 3000
+
+        private val TAG: String = CartViewModel::class.java.simpleName
     }
 }

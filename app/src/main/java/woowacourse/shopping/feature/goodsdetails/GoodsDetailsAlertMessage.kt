@@ -2,8 +2,15 @@ package woowacourse.shopping.feature.goodsdetails
 
 import androidx.annotation.StringRes
 
-data class GoodsDetailsAlertMessage(
-    @StringRes
-    val resourceId: Int,
-    val quantity: Int,
-)
+sealed class GoodsDetailsAlertMessage {
+    data class ResourceId(
+        @StringRes
+        val resourceId: Int,
+    ) : GoodsDetailsAlertMessage()
+
+    data class ResourceIdWithQuantity(
+        @StringRes
+        val resourceId: Int,
+        val quantity: Int,
+    ) : GoodsDetailsAlertMessage()
+}

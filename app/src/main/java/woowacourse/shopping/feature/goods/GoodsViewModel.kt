@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.goods
 
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -8,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import woowacourse.shopping.R
 import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.CartUpdateResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
@@ -57,6 +59,9 @@ class GoodsViewModel(
             addSource(_goods) { update() }
             addSource(_cartCache) { update() }
         }
+
+    private val _alertEvent = MutableSingleLiveData<Int>()
+    val alertEvent: SingleLiveData<Int> = _alertEvent
 
     val totalCartItemSize: LiveData<String> =
         _cartCache.map { cartCache ->
@@ -108,7 +113,7 @@ class GoodsViewModel(
             val result = cartRepository.checkValidLocalSavedBasicKey()
             when (result) {
                 is CartFetchResult.Error -> {
-                    // todo
+                    _alertEvent.setValue(R.string.goods_auto_login_error_toast_message)
                 }
                 is CartFetchResult.Success -> {
                     when {
@@ -149,7 +154,7 @@ class GoodsViewModel(
                 }
 
                 is CartFetchResult.Error -> {
-                    // todo 에러 처리 필요
+                    Log.w(TAG, "장바구니 전체 로드후 캐싱 실패")
                 }
             }
         }
@@ -186,7 +191,7 @@ class GoodsViewModel(
                         is CartFetchResult.Success -> {
                             removeFromCartCache(existingItem.goods.id)
                         }
-                        is CartFetchResult.Error -> TODO()
+                        is CartFetchResult.Error -> Log.w(TAG, "장바구니 아이템 삭제 실패")
                     }
                 }
             } else {
@@ -207,15 +212,21 @@ class GoodsViewModel(
     private fun appendCartItemsWithZeroQuantity() {
         val goodsLoadOffset = (currentPage - 1) * PAGE_SIZE
         viewModelScope.launch {
-            val goodsResponse =
-                goodsRepository.fetchPageGoods(
-                    limit = PAGE_SIZE,
-                    offset = goodsLoadOffset,
-                )
-            val loadedGoods = _goods.value ?: emptyList()
-            val fetchedGoods = getGoodsByGoodsResponse(goodsResponse)
-            _goods.value = (loadedGoods + fetchedGoods).toMutableList()
-            _isFullLoaded.postValue(goodsResponse.last)
+            var updateGoods = listOf<Goods>()
+            try {
+                val goodsResponse =
+                    goodsRepository.fetchPageGoods(
+                        limit = PAGE_SIZE,
+                        offset = goodsLoadOffset,
+                    )
+                val loadedGoods = _goods.value ?: emptyList()
+                val fetchedGoods = getGoodsByGoodsResponse(goodsResponse)
+                updateGoods = (loadedGoods + fetchedGoods)
+                _isFullLoaded.postValue(goodsResponse.last)
+            } catch (e: Exception) {
+                Log.w(TAG, "상품 로딩 실패, (추후 Result객체로 에러 처리 필요)", e)
+            }
+            _goods.value = updateGoods.toMutableList()
         }
     }
 
@@ -225,7 +236,7 @@ class GoodsViewModel(
         viewModelScope.launch {
             val result = cartRepository.addCartItem(cartItem.goods, 1)
             when (result) {
-                is CartFetchResult.Error -> TODO()
+                is CartFetchResult.Error -> Log.w(TAG, "장바구니 추가 실패")
                 is CartFetchResult.Success -> updateCartCacheItem(cartItem.copy(quantity = 1, id = result.data.cartId))
             }
         }
@@ -238,7 +249,7 @@ class GoodsViewModel(
         viewModelScope.launch {
             val result = cartRepository.updateQuantity(cartId, CartQuantity(cartItem.quantity))
             when (result) {
-                is CartUpdateResult.Error -> TODO()
+                is CartUpdateResult.Error -> Log.w(TAG, "장바구니 ${cartItem}아이템 수량 갱신실패")
                 is CartUpdateResult.Success -> updateCartCacheItem(cartItem)
             }
         }
@@ -252,5 +263,7 @@ class GoodsViewModel(
 
     companion object {
         private const val PAGE_SIZE = 20
+
+        private val TAG: String = GoodsViewModel::class.java.simpleName
     }
 }
