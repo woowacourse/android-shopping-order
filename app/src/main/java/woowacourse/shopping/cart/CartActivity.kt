@@ -94,7 +94,8 @@ class CartActivity : AppCompatActivity() {
         if (fragmentState == FRAGMENT_SELECTION) {
             replaceCartRecommendationFragment()
         } else if (fragmentState == FRAGMENT_RECOMMENDATION) {
-            startActivity(OrderActivity.newIntent(this))
+            val products = viewModel.cartProducts.value
+            startActivity(OrderActivity.newIntent(this, viewModel.products))
         }
     }
 

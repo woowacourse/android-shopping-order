@@ -21,6 +21,9 @@ class CartViewModel(
     private val _cartProducts = MutableLiveData<TreeSet<ProductItem>>()
     val cartProducts: LiveData<TreeSet<ProductItem>> = _cartProducts
 
+    val products: Array<ProductUiModel>
+        get() = cartProducts.value?.map { it.productItem }?.toTypedArray() ?: emptyArray()
+
     private val _loadingState: MutableLiveData<LoadingState> =
         MutableLiveData(LoadingState.loading())
     val loadingState: LiveData<LoadingState> get() = _loadingState
@@ -68,7 +71,8 @@ class CartViewModel(
                 catalogProductRepository
                     .getRecommendedProducts(categorizedProduct.category ?: "", 0, 10)
 
-            val cartProductIds = cartProducts.value?.map { it.productItem.id }?.toSet() ?: emptySet()
+            val cartProductIds =
+                cartProducts.value?.map { it.productItem.id }?.toSet() ?: emptySet()
 
             val filteredProducts = recommendProducts.filterNot { it.id in cartProductIds }
 
