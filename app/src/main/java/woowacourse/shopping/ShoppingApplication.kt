@@ -5,9 +5,11 @@ import woowacourse.shopping.data.ShoppingCartDatabase
 import woowacourse.shopping.data.TokenProvider
 import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSource
 import woowacourse.shopping.data.datasource.remote.CartProductRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.CouponRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.network.RetrofitInstance
 import woowacourse.shopping.data.repository.CartProductRepositoryImpl
+import woowacourse.shopping.data.repository.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 
@@ -30,4 +32,6 @@ class ShoppingApplication : Application() {
                 ProductRemoteDataSource(retrofitInstance.productService),
             )
         }
+    val couponRepository
+        by lazy { CouponRepositoryImpl(CouponRemoteDataSource(retrofitInstance.couponService)) }
 }

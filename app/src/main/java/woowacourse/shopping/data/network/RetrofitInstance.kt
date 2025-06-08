@@ -7,11 +7,15 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import woowacourse.shopping.data.TokenProvider
 import woowacourse.shopping.data.service.CartProductApiService
+import woowacourse.shopping.data.service.CouponApiService
 import woowacourse.shopping.data.service.ProductApiService
 
-class RetrofitInstance(repo: TokenProvider) {
+class RetrofitInstance(
+    repo: TokenProvider,
+) {
     private val interceptorClient =
-        OkHttpClient().newBuilder()
+        OkHttpClient()
+            .newBuilder()
             .addInterceptor(RequestInterceptor(repo))
             .build()
 
@@ -31,6 +35,14 @@ class RetrofitInstance(repo: TokenProvider) {
             .addConverterFactory(Json.asConverterFactory(contentType))
             .build()
             .create(CartProductApiService::class.java)
+
+    val couponService: CouponApiService =
+        Retrofit
+            .Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(Json.asConverterFactory(contentType))
+            .build()
+            .create(CouponApiService::class.java)
 
     companion object {
         private const val BASE_URL =

@@ -8,12 +8,21 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityPaymentBinding
 import woowacourse.shopping.view.payment.adapter.PaymentAdapter
 
 class PaymentActivity : AppCompatActivity() {
     private val binding by lazy { ActivityPaymentBinding.inflate(layoutInflater) }
+    private val viewModel by lazy {
+        val app = application as ShoppingApplication
+        ViewModelProvider(
+            this,
+            PaymentViewModelFactory(app.couponRepository),
+        )[PaymentViewModel::class.java]
+    }
 
     private lateinit var paymentAdapter: PaymentAdapter
 
@@ -21,6 +30,7 @@ class PaymentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setUpView()
         initRecyclerView()
+        initObservers()
         supportActionBar?.title = getString(R.string.pay)
     }
 
@@ -30,6 +40,7 @@ class PaymentActivity : AppCompatActivity() {
                 finish()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
 
@@ -46,6 +57,12 @@ class PaymentActivity : AppCompatActivity() {
     private fun initRecyclerView() {
         paymentAdapter = PaymentAdapter()
         binding.rvPayment.adapter = paymentAdapter
+    }
+
+    private fun initObservers() {
+        viewModel.paymentItems.observe(this) { value ->
+            paymentAdapter.submitList(value)
+        }
     }
 
     companion object {

@@ -7,7 +7,7 @@
         android:layout_height="wrap_content"
         android:paddingHorizontal="18dp"
         android:paddingTop="30dp"
-        android:paddingBottom="6dp">
+        android:paddingBottom="16dp">
 
         <TextView
             android:id="@+id/tv_coupon_header"
