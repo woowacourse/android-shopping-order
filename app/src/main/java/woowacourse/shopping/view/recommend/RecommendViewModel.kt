@@ -71,11 +71,10 @@ class RecommendViewModel(
     }
 
     fun loadTotal(
-        totalQuantity: Int,
-        totalPrice: Int,
+        cartItems: List<CartItem>
     ) {
-        _totalQuantity.postValue(totalQuantity)
-        _totalPrice.postValue(totalPrice)
+        _totalQuantity.postValue(cartItems.sumOf { it.quantity })
+        _totalPrice.postValue(cartItems.sumOf { it.price })
     }
 
     fun plusCartItemQuantity(

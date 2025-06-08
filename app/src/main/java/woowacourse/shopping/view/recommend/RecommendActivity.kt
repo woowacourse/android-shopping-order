@@ -11,6 +11,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityRecommnedBinding
+import woowacourse.shopping.domain.cart.CartItem
+import woowacourse.shopping.util.getSerializableExtraCompat
 import woowacourse.shopping.view.productDetail.ProductDetailActivity
 import woowacourse.shopping.view.receipt.ReceiptActivity
 import woowacourse.shopping.view.showToast
@@ -37,8 +39,8 @@ class RecommendActivity :
         initBinding()
         initObserve()
         viewModel.loadTotal(
-            intent.getIntExtra(EXTRA_TOTAL_QUANTITY_ID, 0),
-            intent.getIntExtra(EXTRA_TOTAL_PRICE_ID, 0),
+            intent.getSerializableExtraCompat<ArrayList<CartItem>>(EXTRA_CART_ITEMS_ID)?.toList()
+                ?: emptyList()
         )
     }
 
@@ -107,18 +109,16 @@ class RecommendActivity :
     }
 
     companion object {
-        private const val EXTRA_TOTAL_QUANTITY_ID = "woowacourse.shopping.EXTRA_TOTAL_QUANTITY_ID"
-        private const val EXTRA_TOTAL_PRICE_ID = "woowacourse.shopping.EXTRA_TOTAL_PRICE_ID"
+        private const val EXTRA_CART_ITEMS_ID = "woowacourse.shopping.EXTRA_CART_ITEMS_ID"
 
         fun newIntent(
             context: Context,
-            totalQuantity: Int,
-            totalPrice: Int,
+            cartItems: List<CartItem>
         ): Intent {
             val intent =
                 Intent(context, RecommendActivity::class.java)
-                    .putExtra(EXTRA_TOTAL_QUANTITY_ID, totalQuantity)
-                    .putExtra(EXTRA_TOTAL_PRICE_ID, totalPrice)
+                    .putExtra(EXTRA_CART_ITEMS_ID, ArrayList(cartItems))
+
             return intent
         }
     }
