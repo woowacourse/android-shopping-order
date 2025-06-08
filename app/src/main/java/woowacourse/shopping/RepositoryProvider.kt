@@ -16,6 +16,7 @@ import woowacourse.shopping.data.source.remote.cart.CartItemsRemoteDataSource
 import woowacourse.shopping.data.source.remote.order.OrderRemoteDataSource
 import woowacourse.shopping.data.source.remote.payment.PaymentRemoteDataSource
 import woowacourse.shopping.data.source.remote.products.ProductsRemoteDataSource
+import woowacourse.shopping.data.util.SystemTimeProvider
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -48,6 +49,7 @@ object RepositoryProvider {
             )
         couponRepository =
             CouponRepositoryImpl(
+                SystemTimeProvider(),
                 PaymentRemoteDataSource(getCouponApiService)
             )
     }

@@ -1,9 +1,11 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.data.model.CachedCartItem
 import woowacourse.shopping.data.model.Coupon
-import woowacourse.shopping.domain.model.PagingData
+import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 interface CouponRepository {
-    suspend fun getCoupons(): Result<List<Coupon>>
+    suspend fun getCoupons(
+        totalAmount: Long,
+        orderProducts: List<ProductUiModel>,
+    ): Result<List<Coupon>>
 }
