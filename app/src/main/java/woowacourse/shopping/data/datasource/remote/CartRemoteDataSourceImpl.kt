@@ -13,14 +13,12 @@ class CartRemoteDataSourceImpl(
     override suspend fun fetchTotalCount(): Result<Int> =
         handleApiCall(
             errorMessage = "장바구니 전체 수량 조회 실패",
-        ) {
-            val response = cartItemService.requestCartItemCount()
-            if (!response.isSuccessful) {
-                throw Exception("API 호출 실패: ${response.code()} ${response.message()}")
-            }
-
-            response.body()?.quantity ?: throw IllegalStateException("응답 바디가 null입니다.")
-        }
+            apiCall = { cartItemService.requestCartItemCount() },
+            transform = { response ->
+                response.body()?.quantity
+                    ?: throw IllegalStateException("응답 바디가 null입니다.")
+            },
+        )
 
     override suspend fun fetchPagedCartItems(
         page: Int,
@@ -28,15 +26,12 @@ class CartRemoteDataSourceImpl(
     ): Result<List<CartItem>> =
         handleApiCall(
             errorMessage = "장바구니 조회 실패",
-        ) {
-            val response = cartItemService.requestCartItems(page = page, size = size)
-            if (!response.isSuccessful) {
-                throw Exception("API 호출 실패: ${response.code()} ${response.message()}")
-            }
-
-            response.body()?.cartContent?.map { it.toDomain() }
-                ?: throw IllegalStateException("응답 바디가 null입니다.")
-        }
+            apiCall = { cartItemService.requestCartItems(page = page, size = size) },
+            transform = { response ->
+                response.body()?.cartContent?.map { content -> content.toDomain() }
+                    ?: throw IllegalStateException("응답 바디가 null입니다.")
+            },
+        )
 
     override suspend fun insertCartItem(
         productId: Long,
@@ -44,16 +39,12 @@ class CartRemoteDataSourceImpl(
     ): Result<Long> =
         handleApiCall(
             errorMessage = "장바구니 추가 실패",
-        ) {
-            val request = CartItemRequest(productId, quantity)
-            val response = cartItemService.addCartItem(request)
-            if (!response.isSuccessful) {
-                throw Exception("API 호출 실패: ${response.code()} ${response.message()}")
-            }
-
-            response.toIdOrNull()
-                ?: throw IllegalStateException("응답 헤더에 cartId가 없습니다.")
-        }
+            apiCall = { cartItemService.addCartItem(CartItemRequest(productId, quantity)) },
+            transform = { response ->
+                response.toIdOrNull()
+                    ?: throw IllegalStateException("응답 헤더에 cartId가 없습니다.")
+            },
+        )
 
     override suspend fun updateQuantity(
         cartId: Long,
@@ -61,23 +52,23 @@ class CartRemoteDataSourceImpl(
     ): Result<Unit> =
         handleApiCall(
             errorMessage = "장바구니 수량 업데이트 실패",
-        ) {
-            val request = UpdateCartRequest(quantity)
-            val response = cartItemService.updateCartItem(cartId, request)
-            if (!response.isSuccessful) {
-                throw Exception("API 호출 실패: ${response.code()} ${response.message()}")
-            }
-        }
+            apiCall = {
+                val request = UpdateCartRequest(quantity)
+                cartItemService.updateCartItem(cartId, request)
+            },
+            transform = { response ->
+                response.body() ?: throw IllegalStateException("응답 바디가 null입니다.")
+            },
+        )
 
     override suspend fun deleteCartItemById(cartId: Long): Result<Unit> =
         handleApiCall(
             errorMessage = "아이템 삭제 실패",
-        ) {
-            val response = cartItemService.deleteCartItem(cartId)
-            if (!response.isSuccessful) {
-                throw Exception("API 호출 실패: ${response.code()} ${response.message()}")
-            }
-        }
+            apiCall = { cartItemService.deleteCartItem(cartId) },
+            transform = { response ->
+                response.body() ?: throw IllegalStateException("응답 바디가 null입니다.")
+            },
+        )
 
     private fun <T> Response<T>.toIdOrNull(): Long? = headers()["LOCATION"]?.substringAfterLast("/")?.toLongOrNull()
 }

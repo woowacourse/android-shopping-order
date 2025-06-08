@@ -10,12 +10,10 @@ class CouponRemoteDataSourceImpl(
     override suspend fun fetchAll(): Result<List<Coupon>> =
         handleApiCall(
             errorMessage = "쿠폰 목록 조회 실패",
-        ) {
-            val response = couponService.requestCoupons()
-            if (!response.isSuccessful) {
-                throw Exception("API 호출 실패: ${response.code()} ${response.message()}")
-            }
-
-            response.body()?.map { it.toDomain() } ?: throw IllegalStateException("응답 바디가 null입니다.")
-        }
+            apiCall = { couponService.requestCoupons() },
+            transform = { response ->
+                response.body()?.map { it.toDomain() }
+                    ?: throw IllegalStateException("응답 바디가 null입니다.")
+            },
+        )
 }
