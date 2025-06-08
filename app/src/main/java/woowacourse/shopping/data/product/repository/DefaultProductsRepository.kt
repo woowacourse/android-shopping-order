@@ -3,6 +3,7 @@ package woowacourse.shopping.data.product.repository
 import woowacourse.shopping.data.product.dataSource.ProductLocalDataSource
 import woowacourse.shopping.data.product.dataSource.ProductRemoteDataSource
 import woowacourse.shopping.data.product.local.entity.RecentWatchingEntity
+import woowacourse.shopping.data.product.mapper.toDomain
 import woowacourse.shopping.domain.product.Product
 
 class DefaultProductsRepository(
