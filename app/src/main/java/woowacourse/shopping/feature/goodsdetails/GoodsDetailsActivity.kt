@@ -21,7 +21,12 @@ class GoodsDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGoodsDetailsBinding
     private var id: Long = 0
     private val viewModel: GoodsDetailsViewModel by viewModels {
-        (application as ShoppingApplication).goodsDetailsFactory
+        val app = (application as ShoppingApplication)
+        GoodsDetailsViewModelFactory(
+            app.cartRepository,
+            app.historyRepository,
+            app.productRepository,
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

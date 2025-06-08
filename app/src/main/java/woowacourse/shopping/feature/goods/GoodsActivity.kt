@@ -26,7 +26,12 @@ class GoodsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGoodsBinding
     private lateinit var adapter: GoodsAdapter
     private val viewModel: GoodsViewModel by viewModels {
-        (application as ShoppingApplication).goodsFactory
+        val app = (application as ShoppingApplication)
+        GoodsViewModelFactory(
+            app.historyRepository,
+            app.productRepository,
+            app.cartRepository,
+        )
     }
     private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
 

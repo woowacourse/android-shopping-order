@@ -11,7 +11,12 @@ import woowacourse.shopping.databinding.ActivityCartBinding
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
     private val viewModel: CartViewModel by viewModels {
-        (application as ShoppingApplication).cartFactory
+        val app = (application as ShoppingApplication)
+        CartViewModelFactory(
+            app.cartRepository,
+            app.productRepository,
+            app.historyRepository,
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
