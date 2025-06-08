@@ -33,12 +33,6 @@ class CheckoutViewModel(
             cartItems.sumOf { cartItem -> cartItem.totalPrice }
         }
 
-    fun loadCoupons() {
-        viewModelScope.launch {
-            _coupons.value = couponRepository.loadCoupons().map(Coupon::toUiModel)
-        }
-    }
-
     fun loadSelectedCartItems(ids: List<Long>) {
         viewModelScope.launch {
             val selectedCartItems =
@@ -56,6 +50,18 @@ class CheckoutViewModel(
                 Log.d("Coupon", "${it.info.description}: $isAvailable, $discount")
                 it.isAvailable(_cartItems.value.orEmpty(), LocalDateTime.now())
             }
+        }
+    }
+
+    fun loadCoupons() {
+        viewModelScope.launch {
+            val availableCoupons =
+                couponRepository.loadCoupons()
+                    .filter { coupon ->
+                        coupon.isAvailable(_cartItems.value.orEmpty(), LocalDateTime.now())
+                    }
+                    .map(Coupon::toUiModel)
+            _coupons.value = availableCoupons
         }
     }
 

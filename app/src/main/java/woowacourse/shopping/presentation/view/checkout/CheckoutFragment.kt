@@ -31,12 +31,12 @@ class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        val selectedProductIds = arguments?.getLongArray(SELECTED_PRODUCT_IDS)
-
         initBinding()
         initObserver()
-        viewModel.loadCoupons()
+
+        val selectedProductIds = arguments?.getLongArray(SELECTED_PRODUCT_IDS)
         viewModel.loadSelectedCartItems(selectedProductIds?.toList().orEmpty())
+        viewModel.loadCoupons()
     }
 
     private fun initBinding() {
