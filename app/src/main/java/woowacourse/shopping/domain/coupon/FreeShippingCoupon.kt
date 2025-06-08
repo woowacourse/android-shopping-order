@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.Price
 import java.time.LocalDateTime
 
-class FreeShippingCoupon(
+data class FreeShippingCoupon(
     override val info: CouponInfo,
     override val type: CouponType,
 ) : Coupon {
