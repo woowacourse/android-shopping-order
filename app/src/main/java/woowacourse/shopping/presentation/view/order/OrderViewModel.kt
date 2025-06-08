@@ -8,13 +8,17 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.CouponUiModel
+import woowacourse.shopping.presentation.model.toDomain
 import woowacourse.shopping.presentation.model.toUiModel
 
 class OrderViewModel(
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
 ) : ViewModel() {
+    private var selectedItems = emptyList<CartItemUiModel>() ?: emptyList()
+
     private val _couponList = MutableLiveData<List<CouponUiModel>>()
     val couponList: LiveData<List<CouponUiModel>> = _couponList
 
@@ -24,7 +28,7 @@ class OrderViewModel(
     fun loadCoupons() {
         viewModelScope.launch {
             couponRepository
-                .getCoupons()
+                .getAvailableCoupons(selectedItems.map { it.toDomain() })
                 .onSuccess { coupon ->
                     _couponList.value = coupon.map { it.toUiModel() }
                 }.onFailure {
@@ -47,6 +51,10 @@ class OrderViewModel(
                     it.copy(isSelected = it.id == coupon.id)
                 }
         }
+    }
+
+    fun setSelectedItems(items: List<CartItemUiModel>) {
+        selectedItems = items.toList()
     }
 
     companion object {

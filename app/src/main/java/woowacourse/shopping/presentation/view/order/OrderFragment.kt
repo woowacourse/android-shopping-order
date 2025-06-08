@@ -48,6 +48,7 @@ class OrderFragment :
 
         val selectedItems =
             arguments?.getParcelableArrayListCompat<CartItemUiModel>(ARG_SELECTED_CART_ITEM)
+        selectedItems?.let { viewModel.setSelectedItems(it) }
 
         initObserver()
     }
