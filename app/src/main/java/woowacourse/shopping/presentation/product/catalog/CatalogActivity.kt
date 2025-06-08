@@ -31,6 +31,7 @@ class CatalogActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 viewModel.loadInitialCatalogProducts()
+                viewModel.loadRecentViewedItems()
                 viewModel.updateProductQuantities()
                 viewModel.updateCartCount()
             }

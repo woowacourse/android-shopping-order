@@ -14,15 +14,12 @@ class FakeOrderRepository(private val size: Int) : OrderRepository {
             )
         }
 
-    // "주문한 아이템 id" 를 기록용으로 남기고 싶으면 아래처럼 List 로 저장 가능
     val orderedItems = mutableListOf<Long>()
 
     override suspend fun orderItems(checkedItems: List<Long>): Result<Unit> {
-        // 테스트용: 전달받은 checkedItems 를 기록
         orderedItems.clear()
         orderedItems.addAll(checkedItems)
 
-        // 성공 결과 반환
         return Result.success(Unit)
     }
 }
