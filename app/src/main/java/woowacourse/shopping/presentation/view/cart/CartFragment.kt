@@ -34,7 +34,8 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                 } else {
                     parentFragmentManager.commit {
                         setReorderingAllowed(true)
-                        replace(R.id.shopping_fragment_container, CheckoutFragment::class.java, null)
+                        val bundle = CheckoutFragment.newBundle(viewModel.selectedProductIds.value.orEmpty().toLongArray())
+                        replace(R.id.shopping_fragment_container, CheckoutFragment::class.java, bundle)
                         addToBackStack(null)
                     }
                 }
@@ -86,6 +87,9 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
 
         viewModel.canSelectItems.observe(viewLifecycleOwner) {
             binding.canSelectItems = it
+        }
+
+        viewModel.selectedProductIds.observe(viewLifecycleOwner) {
         }
     }
 

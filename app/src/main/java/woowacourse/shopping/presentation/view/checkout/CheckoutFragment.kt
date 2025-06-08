@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.view.checkout
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
@@ -24,9 +25,11 @@ class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment
         initBinding()
         initObserver()
         viewModel.loadCoupons()
+        viewModel.loadSelectedCartItems(selectedProductIds?.toList().orEmpty())
     }
 
     private fun initBinding() {
+        binding.vm = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
         binding.recyclerViewCoupon.adapter = adapter
     }
@@ -34,6 +37,10 @@ class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment
     private fun initObserver() {
         viewModel.coupons.observe(viewLifecycleOwner) { coupons ->
             adapter.submitList(coupons)
+        }
+
+        viewModel.cartItems.observe(viewLifecycleOwner) { cartItems ->
+            cartItems.forEach { Log.d("cartItems", "$it") }
         }
     }
 

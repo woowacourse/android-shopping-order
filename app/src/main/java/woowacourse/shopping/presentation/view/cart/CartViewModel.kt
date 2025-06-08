@@ -62,6 +62,13 @@ class CartViewModel(
             cartItems.all { cartItem -> cartItem.isSelected }
         }
 
+    val selectedProductIds: LiveData<List<Long>> =
+        _cartItems.map { cartItems ->
+            cartItems
+                .filter { cartItem -> cartItem.isSelected }
+                .map { cartItem -> cartItem.cartItem.product.id }
+        }
+
     private val _canSelectItems = MutableLiveData(true)
     val canSelectItems: LiveData<Boolean> = _canSelectItems
 
