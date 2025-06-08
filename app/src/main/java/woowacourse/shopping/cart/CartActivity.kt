@@ -3,7 +3,6 @@ package woowacourse.shopping.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.TextUtils.replace
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -12,7 +11,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
-import androidx.lifecycle.observe
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.order.OrderActivity
@@ -95,7 +93,7 @@ class CartActivity : AppCompatActivity() {
             replaceCartRecommendationFragment()
         } else if (fragmentState == FRAGMENT_RECOMMENDATION) {
             val products = viewModel.cartProducts.value
-            startActivity(OrderActivity.newIntent(this, viewModel.products))
+            startActivity(OrderActivity.newIntent(this, viewModel.orderedProducts))
         }
     }
 

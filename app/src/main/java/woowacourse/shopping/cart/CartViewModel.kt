@@ -21,8 +21,13 @@ class CartViewModel(
     private val _cartProducts = MutableLiveData<TreeSet<ProductItem>>()
     val cartProducts: LiveData<TreeSet<ProductItem>> = _cartProducts
 
-    val products: Array<ProductUiModel>
-        get() = cartProducts.value?.map { it.productItem }?.toTypedArray() ?: emptyArray()
+    val orderedProducts: Array<ProductUiModel>
+        get() =
+            cartProducts.value
+                ?.map { it.productItem }
+                ?.filter { it.isChecked }
+                ?.toTypedArray()
+                ?: emptyArray()
 
     private val _loadingState: MutableLiveData<LoadingState> =
         MutableLiveData(LoadingState.loading())
