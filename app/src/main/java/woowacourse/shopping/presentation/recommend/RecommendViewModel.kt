@@ -13,15 +13,13 @@ import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
+import woowacourse.shopping.presentation.cart.OrderInfo
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
-import woowacourse.shopping.presentation.recommend.OrderEvent.OrderItemFailure
-import woowacourse.shopping.presentation.recommend.OrderEvent.OrderItemSuccess
 import woowacourse.shopping.presentation.util.SingleLiveEvent
 
 class RecommendViewModel(
     private val productsRepository: ProductsRepository,
     private val cartItemRepository: CartItemRepository,
-    private val orderRepository: OrderRepository,
     initialCheckedItems: List<ProductUiModel>,
 ) : ViewModel() {
     private val _items: MutableLiveData<List<ProductUiModel>> = MutableLiveData(emptyList())
@@ -45,8 +43,8 @@ class RecommendViewModel(
             checkedProducts.sumOf { it.quantity }
         }
 
-    private val _orderEvent = SingleLiveEvent<OrderEvent>()
-    val orderEvent: LiveData<OrderEvent> = _orderEvent
+    private val _navigateToPaymentEvent = SingleLiveEvent<OrderInfo>()
+    val navigateToPaymentEvent: LiveData<OrderInfo> = _navigateToPaymentEvent
 
     init {
         loadRecommendedProductsFromLastViewed()
@@ -138,18 +136,9 @@ class RecommendViewModel(
         _checkedItems.postValue(currentChecked)
     }
 
-    fun orderCheckedItems() {
-        viewModelScope.launch {
-            val cartIds = cartItemRepository.getCartItemCartIds()
-            val result = orderRepository.orderItems(cartIds)
-            result
-                .onSuccess {
-                    _orderEvent.postValue(OrderItemSuccess)
-                }
-                .onFailure {
-                    _orderEvent.postValue(OrderItemFailure)
-                }
-        }
+    fun onOrderClick() {
+        val orderItems = _checkedItems.value ?: emptyList()
+        _navigateToPaymentEvent.value = OrderInfo(orderItems)
     }
 
     companion object {
@@ -159,7 +148,6 @@ class RecommendViewModel(
                     RecommendViewModel(
                         productsRepository = RepositoryProvider.productsRepository,
                         cartItemRepository = RepositoryProvider.cartItemRepository,
-                        orderRepository = RepositoryProvider.orderRepository,
                         initialCheckedItems = initialCheckedItems,
                     )
                 }

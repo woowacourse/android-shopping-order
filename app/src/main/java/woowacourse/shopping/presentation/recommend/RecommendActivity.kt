@@ -3,7 +3,6 @@ package woowacourse.shopping.presentation.recommend
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -12,9 +11,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityRecommendBinding
-import woowacourse.shopping.presentation.product.catalog.CatalogActivity
+import woowacourse.shopping.presentation.payment.PaymentActivity
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
-import woowacourse.shopping.presentation.recommend.OrderEvent.OrderItemSuccess
 import woowacourse.shopping.presentation.util.IntentCompat
 
 class RecommendActivity : AppCompatActivity() {
@@ -84,33 +82,18 @@ class RecommendActivity : AppCompatActivity() {
             recommendAdapter.updateProduct(product)
         }
 
-        recommendViewModel.orderEvent.observe(this) { state ->
-            when (state) {
-                is OrderItemSuccess -> {
-                    navigateToMain()
-                    showToast(R.string.message_order_success)
-                }
-
-                is OrderEvent.OrderItemFailure -> {
-                    showToast(R.string.message_order_fail)
-                }
-            }
+        recommendViewModel.navigateToPaymentEvent.observe(this) { orderInfo ->
+            val intent =
+                PaymentActivity.newIntent(
+                    this@RecommendActivity,
+                    ArrayList(orderInfo.checkedItems),
+                )
+            startActivity(intent)
         }
 
         recommendViewModel.items.observe(this) { items ->
             recommendAdapter.submitList(items)
         }
-    }
-
-    private fun showToast(messageResId: Int) {
-        Toast.makeText(this, getString(messageResId), Toast.LENGTH_SHORT).show()
-    }
-
-    private fun navigateToMain() {
-        val intent = Intent(this, CatalogActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        startActivity(intent)
-        finish()
     }
 
     companion object {

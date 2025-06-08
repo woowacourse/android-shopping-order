@@ -74,7 +74,7 @@
                 tools:text="184,200원" />
 
             <TextView
-                android:onClick="@{() -> viewModel.orderCheckedItems()}"
+                android:onClick="@{() -> viewModel.onOrderClick()}"
                 android:id="@+id/button_order"
                 android:layout_width="122dp"
                 android:layout_height="match_parent"
