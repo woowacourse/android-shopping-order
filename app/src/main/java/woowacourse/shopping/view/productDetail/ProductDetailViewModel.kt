@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
@@ -55,8 +57,9 @@ class ProductDetailViewModel(
         shoppingCartQuantity: Int,
         shoppingCartId: Long?,
     ) {
-        productsRepository.getProduct(productId) { result ->
-            result
+        viewModelScope.launch {
+            productsRepository
+                .getProduct(productId)
                 .onSuccess { product ->
                     if (product == null) {
                         _event.setValue(ProductDetailEvent.GET_PRODUCT_FAILURE)
@@ -77,30 +80,34 @@ class ProductDetailViewModel(
     }
 
     private fun updateRecentWatchingProduct() {
-        productsRepository.getRecentWatchingProducts(1) { result ->
-            result
+        viewModelScope.launch {
+            productsRepository
+                .getRecentWatchingProducts(1)
                 .onSuccess { recentProducts: List<Product> ->
-                    if (recentProducts.isEmpty()) return@getRecentWatchingProducts updateRecentWatching()
+                    if (recentProducts.isEmpty()) return@launch updateRecentWatching()
                     val isLastWatchingProduct =
-                        recentProducts.first() == this.product.value?.product
+                        recentProducts.first() == this@ProductDetailViewModel.product.value?.product
                     if (isLastWatchingProduct) {
-                        _recentProductBoxVisible.postValue(false)
-                        return@getRecentWatchingProducts
+                        _recentProductBoxVisible.value = false
+                        return@launch
                     }
-                    _recentWatchingProduct.postValue(recentProducts[0])
-                    _recentProductBoxVisible.postValue(true)
+                    _recentWatchingProduct.value = recentProducts[0]
+                    _recentProductBoxVisible.value = true
                     updateRecentWatching()
                 }.onFailure {
-                    _event.postValue(ProductDetailEvent.GET_RECENT_WATCHING_FAILURE)
+                    _event.setValue(ProductDetailEvent.GET_RECENT_WATCHING_FAILURE)
                 }
         }
     }
 
     private fun updateRecentWatching() {
-        productsRepository.updateRecentWatchingProduct(product.value?.product ?: return) { result ->
-            result.onFailure {
-                _event.setValue(ProductDetailEvent.ADD_RECENT_WATCHING_FAILURE)
-            }
+        viewModelScope.launch {
+            productsRepository
+                .updateRecentWatchingProduct(
+                    product.value?.product ?: return@launch,
+                ).onFailure {
+                    _event.setValue(ProductDetailEvent.ADD_RECENT_WATCHING_FAILURE)
+                }
         }
     }
 

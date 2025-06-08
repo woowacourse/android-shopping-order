@@ -3,6 +3,8 @@ package woowacourse.shopping.view.product
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
@@ -44,8 +46,9 @@ class ProductsViewModel(
         val limit = LOAD_PRODUCTS_SIZE + 1
         val currentProducts: List<ProductsItem> = _products.value ?: emptyList()
 
-        productsRepository.getProducts(offset, limit) { result ->
-            result
+        viewModelScope.launch {
+            productsRepository
+                .getProducts(offset, limit)
                 .onSuccess { newProducts ->
                     loadable = newProducts.size == LOAD_PRODUCTS_SIZE + 1
                     val productsToShow = newProducts.take(LOAD_PRODUCTS_SIZE)
@@ -116,8 +119,9 @@ class ProductsViewModel(
         updatedProductItems: List<ProductItem>,
         hasRecentWatching: Boolean,
     ) {
-        productsRepository.getRecentWatchingProducts(LOAD_RECENT_WATCHING_PRODUCT_SIZE) { result ->
-            result
+        viewModelScope.launch {
+            productsRepository
+                .getRecentWatchingProducts(LOAD_RECENT_WATCHING_PRODUCT_SIZE)
                 .onSuccess { recentWatchingProducts ->
                     var updatedProducts = productsWithoutLoadItem
                     if (hasRecentWatching) {
@@ -135,7 +139,7 @@ class ProductsViewModel(
                         productsWithoutLoadItem,
                         updatedProductItems,
                     )
-                    _event.postValue(ProductsEvent.UPDATE_RECENT_WATCHING_PRODUCTS_FAILURE)
+                    _event.setValue(ProductsEvent.UPDATE_RECENT_WATCHING_PRODUCTS_FAILURE)
                 }
         }
     }
@@ -169,14 +173,13 @@ class ProductsViewModel(
         recentWatchingItem: ProductsItem?,
     ) {
         if (productsWithoutLoadItem.isEmpty() || page != 1) {
-            _products.postValue(
+            _products.value =
                 buildList {
                     recentWatchingItem?.let { add(it) }
                     addAll(productsWithoutLoadItem)
                     addAll(updatedProductItems)
                     if (loadable) add(LoadItem)
-                },
-            )
+                }
             return
         }
 
@@ -190,13 +193,12 @@ class ProductsViewModel(
                 }
             }
 
-        _products.postValue(
+        _products.value =
             buildList {
                 recentWatchingItem?.let { add(it) }
                 addAll(mergedProducts)
                 if (loadable) add(LoadItem)
-            },
-        )
+            }
     }
 
     fun updateShoppingCartQuantity() {
@@ -208,8 +210,9 @@ class ProductsViewModel(
     }
 
     fun updateRecentWatching() {
-        productsRepository.getRecentWatchingProducts(LOAD_RECENT_WATCHING_PRODUCT_SIZE) { result ->
-            result
+        viewModelScope.launch {
+            productsRepository
+                .getRecentWatchingProducts(LOAD_RECENT_WATCHING_PRODUCT_SIZE)
                 .onSuccess { recentWatchingProducts: List<Product> ->
                     val recentWatchingItem =
                         if (recentWatchingProducts.isEmpty()) {
@@ -230,9 +233,9 @@ class ProductsViewModel(
                             addAll(withoutOldRecentWatching)
                         }
 
-                    _products.postValue(updatedProducts)
+                    _products.value = updatedProducts
                 }.onFailure {
-                    _event.postValue(ProductsEvent.UPDATE_RECENT_WATCHING_PRODUCTS_FAILURE)
+                    _event.setValue(ProductsEvent.UPDATE_RECENT_WATCHING_PRODUCTS_FAILURE)
                 }
         }
     }

@@ -6,12 +6,13 @@ import woowacourse.shopping.data.product.local.entity.RecentWatchingEntity
 class DefaultProductLocalDataSource(
     private val recentWatchingDao: RecentWatchingDao,
 ) : ProductLocalDataSource {
-    override fun insertRecentWatching(recentWatchingEntity: RecentWatchingEntity) {
+    override suspend fun insertRecentWatching(recentWatchingEntity: RecentWatchingEntity) {
         recentWatchingDao.insertRecentWatching(recentWatchingEntity)
     }
 
-    override fun getRecentRecommendWatchingProducts(size: Int): List<RecentWatchingEntity> =
+    override suspend fun getRecentRecommendWatchingProducts(size: Int): List<RecentWatchingEntity> =
         recentWatchingDao.getRecentRecommendWatchingProducts(size)
 
-    override fun getRecentWatchingProducts(size: Int): List<RecentWatchingEntity> = recentWatchingDao.getRecentWatchingProducts(size)
+    override suspend fun getRecentWatchingProducts(size: Int): List<RecentWatchingEntity> =
+        recentWatchingDao.getRecentWatchingProducts(size)
 }

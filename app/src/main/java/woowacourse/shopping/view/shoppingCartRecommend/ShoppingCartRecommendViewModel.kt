@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
@@ -46,11 +48,13 @@ class ShoppingCartRecommendViewModel(
     }
 
     private fun initRecentWatchingProducts() {
-        productsRepository.getRecentRecommendWatchingProducts(MAX_RECENT_PRODUCT_LOAD_SIZE) { result ->
-            result.onSuccess { products ->
-                recentWatchingProducts = products
-                initShoppingCartProducts()
-            }
+        viewModelScope.launch {
+            productsRepository
+                .getRecentRecommendWatchingProducts(MAX_RECENT_PRODUCT_LOAD_SIZE)
+                .onSuccess { products ->
+                    recentWatchingProducts = products
+                    initShoppingCartProducts()
+                }
         }
     }
 

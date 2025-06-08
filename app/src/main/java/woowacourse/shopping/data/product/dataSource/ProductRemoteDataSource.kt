@@ -4,14 +4,10 @@ import woowacourse.shopping.data.product.remote.dto.ProductResponseDto
 import woowacourse.shopping.data.product.remote.dto.ProductsResponseDto
 
 interface ProductRemoteDataSource {
-    fun getProducts(
+    suspend fun getProducts(
         page: Int,
         size: Int,
-        onCallback: (Result<ProductsResponseDto?>) -> Unit,
-    )
+    ): ProductsResponseDto
 
-    fun getProductDetail(
-        productId: Long,
-        onCallback: (Result<ProductResponseDto?>) -> Unit,
-    )
+    suspend fun getProductDetail(productId: Long): ProductResponseDto
 }

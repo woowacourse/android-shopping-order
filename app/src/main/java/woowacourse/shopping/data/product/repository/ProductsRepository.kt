@@ -3,29 +3,16 @@ package woowacourse.shopping.data.product.repository
 import woowacourse.shopping.domain.product.Product
 
 interface ProductsRepository {
-    fun getProducts(
+    suspend fun getProducts(
         page: Int,
         size: Int,
-        onResult: (Result<List<Product>>) -> Unit,
-    )
+    ): Result<List<Product>>
 
-    fun getRecentWatchingProducts(
-        size: Int,
-        onResult: (Result<List<Product>>) -> Unit,
-    )
+    suspend fun getRecentWatchingProducts(size: Int): Result<List<Product>>
 
-    fun getRecentRecommendWatchingProducts(
-        size: Int,
-        onResult: (Result<List<Product>>) -> Unit,
-    )
+    suspend fun getRecentRecommendWatchingProducts(size: Int): Result<List<Product>>
 
-    fun updateRecentWatchingProduct(
-        product: Product,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    suspend fun updateRecentWatchingProduct(product: Product): Result<Unit>
 
-    fun getProduct(
-        productId: Long,
-        onResult: (Result<Product?>) -> Unit,
-    )
+    suspend fun getProduct(productId: Long): Result<Product?>
 }
