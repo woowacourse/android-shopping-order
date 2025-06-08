@@ -40,7 +40,8 @@ class CartProductRemoteDataSource(
     suspend fun delete(id: Int): Result<Unit> =
         withContext(Dispatchers.IO) {
             runCatching {
-                cartProductService.delete(id = id).requireBody()
+                cartProductService.delete(id = id)
+                Unit
             }
         }
 
@@ -61,7 +62,8 @@ class CartProductRemoteDataSource(
                     .updateQuantity(
                         id = id,
                         body = CartProductQuantityRequestDto(quantity),
-                    ).requireBody()
+                    )
+                Unit
             }
         }
 
