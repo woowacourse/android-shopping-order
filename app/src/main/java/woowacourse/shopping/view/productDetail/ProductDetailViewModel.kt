@@ -1,6 +1,7 @@
 package woowacourse.shopping.view.productDetail
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
@@ -26,14 +27,28 @@ class ProductDetailViewModel(
     private val _quantity: MutableLiveData<Int> = MutableLiveData(1)
     val quantity: LiveData<Int> get() = _quantity
 
-    private val _price: MutableLiveData<Int> = MutableLiveData()
-    val price: LiveData<Int> get() = _price
-
+    val price =
+        MediatorLiveData<Int>().apply { product.value?.product?.price }
     private val _recentWatchingProduct: MutableLiveData<Product> = MutableLiveData()
     val recentWatchingProduct: LiveData<Product> get() = _recentWatchingProduct
 
     private val _recentProductBoxVisible: MutableLiveData<Boolean> = MutableLiveData(false)
     val recentProductBoxVisible: LiveData<Boolean> get() = _recentProductBoxVisible
+
+    init {
+        price.apply {
+            addSource(product) { updatePrice() }
+            addSource(quantity) { updatePrice() }
+        }
+    }
+
+    fun updatePrice() {
+        price.value =
+            product.value
+                ?.product
+                ?.price
+                ?.times(quantity.value ?: 1)
+    }
 
     fun updateProduct(
         productId: Long,
@@ -52,7 +67,6 @@ class ProductDetailViewModel(
                                 selectedQuantity = shoppingCartQuantity,
                                 shoppingCartId = shoppingCartId,
                             )
-                        _price.value = product.price
 
                         updateRecentWatchingProduct()
                     }
@@ -122,11 +136,9 @@ class ProductDetailViewModel(
 
     fun plusQuantity() {
         _quantity.value = (_quantity.value ?: 0) + 1
-        _price.value = quantity.value?.times(product.value?.product?.price ?: 0)
     }
 
     fun minusQuantity() {
         _quantity.value = (_quantity.value)?.minus(1)?.coerceAtLeast(1)
-        _price.value = quantity.value?.times(product.value?.product?.price ?: 0)
     }
 }
