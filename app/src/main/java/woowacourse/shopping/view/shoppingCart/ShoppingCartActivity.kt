@@ -152,7 +152,7 @@ class ShoppingCartActivity :
     override fun onBackButtonClick() {
         val intent =
             Intent().apply {
-                putExtra("updateProducts", viewModel.hasUpdatedProducts.value)
+                putExtra("updateProducts", viewModel.hasUpdatedProducts)
             }
         setResult(ResultFrom.SHOPPING_CART_BACK.RESULT_OK, intent)
         finish()

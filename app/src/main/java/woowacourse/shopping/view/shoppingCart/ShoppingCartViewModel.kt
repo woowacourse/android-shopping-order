@@ -18,9 +18,8 @@ class ShoppingCartViewModel(
     private val _shoppingCart: MutableLiveData<List<ShoppingCartItem>> = MutableLiveData()
     val shoppingCart: LiveData<List<ShoppingCartItem>> get() = _shoppingCart
 
-    private val _hasUpdatedProducts: MutableLiveData<Boolean> =
-        MutableLiveData(false)
-    val hasUpdatedProducts: LiveData<Boolean> get() = _hasUpdatedProducts
+    var hasUpdatedProducts: Boolean = false
+        private set
 
     private val _event: MutableSingleLiveData<ShoppingCartEvent> = MutableSingleLiveData()
     val event: SingleLiveData<ShoppingCartEvent> get() = _event
@@ -185,7 +184,7 @@ class ShoppingCartViewModel(
             result
                 .onSuccess {
                     updateShoppingCart()
-                    _hasUpdatedProducts.postValue(true)
+                    hasUpdatedProducts = true
                 }.onFailure {
                     _event.postValue(ShoppingCartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE)
                 }
@@ -200,7 +199,7 @@ class ShoppingCartViewModel(
             result
                 .onSuccess {
                     updateShoppingCart()
-                    _hasUpdatedProducts.value = true
+                    hasUpdatedProducts = true
                 }.onFailure {
                     _event.postValue(ShoppingCartEvent.DECREASE_SHOPPING_CART_PRODUCT_FAILURE)
                 }
@@ -215,7 +214,7 @@ class ShoppingCartViewModel(
             result
                 .onSuccess {
                     updateShoppingCart()
-                    _hasUpdatedProducts.value = true
+                    hasUpdatedProducts = true
                 }.onFailure {
                     _event.postValue(ShoppingCartEvent.ADD_SHOPPING_CART_PRODUCT_FAILURE)
                 }
