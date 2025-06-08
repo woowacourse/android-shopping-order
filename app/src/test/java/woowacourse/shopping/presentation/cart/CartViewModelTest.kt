@@ -1,15 +1,18 @@
 package woowacourse.shopping.presentation.cart
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.fixture.FakeCartItemRepository
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
+import woowacourse.shopping.util.CoroutinesTestExtension
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 import woowacourse.shopping.util.getOrAwaitValue
 
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class CartViewModelTest {
     @get:Rule
@@ -57,7 +60,7 @@ class CartViewModelTest {
     }
 
     @Test
-    fun `상품의 수량을 증가시킬 수 있다`() {
+    fun `상품의 수량을 증가시킬 수 있다`() = runTest {
         val cartRepository = FakeCartItemRepository(1)
         val product =
             ProductUiModel(
@@ -68,7 +71,7 @@ class CartViewModelTest {
                 quantity = 2,
             )
 
-        cartRepository.addCartItem(product.id, product.quantity) {}
+        cartRepository.addCartItem(product.id, product.quantity)
 
         viewModel = CartViewModel(cartRepository)
 
@@ -78,8 +81,9 @@ class CartViewModelTest {
         assertThat(updated?.quantity).isEqualTo(3)
     }
 
+
     @Test
-    fun `상품의 수량을 감소시킬 수 있다`() {
+    fun `상품의 수량을 감소시킬 수 있다`() = runTest {
         val cartRepository = FakeCartItemRepository(1)
         val product =
             ProductUiModel(
@@ -90,7 +94,7 @@ class CartViewModelTest {
                 quantity = 3,
             )
 
-        cartRepository.addCartItem(product.id, product.quantity) {}
+        cartRepository.addCartItem(product.id, product.quantity)
 
         viewModel = CartViewModel(cartRepository)
 
@@ -101,7 +105,7 @@ class CartViewModelTest {
     }
 
     @Test
-    fun `상품 수량은 최소 1까지 감소 가능하다`() {
+    fun `상품 수량은 최소 1까지 감소 가능하다`() = runTest {
         val cartRepository = FakeCartItemRepository(1)
         val product =
             ProductUiModel(
@@ -112,7 +116,7 @@ class CartViewModelTest {
                 quantity = 1,
             )
 
-        cartRepository.addCartItem(product.id, product.quantity) {}
+        cartRepository.addCartItem(product.id, product.quantity)
 
         viewModel = CartViewModel(cartRepository)
 

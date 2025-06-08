@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.product.catalog
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,7 +9,6 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import woowacourse.shopping.RepositoryProvider
-import woowacourse.shopping.data.repository.CartItemsRepositoryImpl
 import woowacourse.shopping.domain.model.PagingData
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
@@ -102,21 +100,20 @@ class CatalogViewModel(
         updateCartCount()
     }
 
-
-    fun loadInitialCatalogProducts() {
+    fun loadInitialCatalogProducts(pageSize: Int = PAGE_SIZE) {
         currentPage = 0
-        loadCatalogProducts(currentPage)
+        loadCatalogProducts(currentPage, pageSize)
         currentPage++
     }
 
-    fun loadNextCatalogProducts() {
-        loadCatalogProducts(currentPage)
+    fun loadNextCatalogProducts(pageSize: Int = PAGE_SIZE) {
+        loadCatalogProducts(currentPage, pageSize)
         currentPage++
     }
 
-    private fun loadCatalogProducts(page: Int) {
+    private fun loadCatalogProducts(page: Int, pageSize: Int = PAGE_SIZE) {
         viewModelScope.launch {
-            val result = productsRepository.getProducts(page, PAGE_SIZE)
+            val result = productsRepository.getProducts(page, pageSize)
 
             result.onSuccess { pagingData ->
                 val newPagingData = cartRepository.getQuantity(pagingData)

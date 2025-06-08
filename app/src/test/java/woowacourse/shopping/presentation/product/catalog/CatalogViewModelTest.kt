@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.product.catalog
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.jupiter.api.Test
@@ -8,8 +9,10 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.fixture.FakeCartItemRepository
 import woowacourse.shopping.fixture.FakeCatalogItemRepository
 import woowacourse.shopping.fixture.FakeViewedItemRepository
+import woowacourse.shopping.util.CoroutinesTestExtension
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class CatalogViewModelTest {
     @get:Rule
@@ -18,7 +21,7 @@ class CatalogViewModelTest {
     private lateinit var viewModel: CatalogViewModel
 
     @Test
-    fun `초기 상태 테스트`() {
+    fun `초기 상태 테스트`() = runTest {
         viewModel =
             CatalogViewModel(
                 FakeCatalogItemRepository(20),
@@ -26,7 +29,7 @@ class CatalogViewModelTest {
                 FakeViewedItemRepository(0),
             )
 
-        viewModel.loadCatalogProducts(10)
+        viewModel.loadInitialCatalogProducts(10)
 
         val hasNext = viewModel.pagingData.value?.hasNext
         val products = viewModel.pagingData.value?.products ?: emptyList()
@@ -38,7 +41,7 @@ class CatalogViewModelTest {
     }
 
     @Test
-    fun `더보기 버튼을 눌렀을 때 페이지가 증가되고 상품이 로드된다`() {
+    fun `더보기 버튼을 눌렀을 때 페이지가 증가되고 상품이 로드된다`() = runTest {
         // given
         viewModel =
             CatalogViewModel(
@@ -47,7 +50,7 @@ class CatalogViewModelTest {
                 FakeViewedItemRepository(0),
             )
 
-        viewModel.loadCatalogProducts(20)
+        viewModel.loadInitialCatalogProducts(20)
         val page = viewModel.pagingData.value?.page ?: 0
         assertThat(page).isEqualTo(0)
 
@@ -60,7 +63,7 @@ class CatalogViewModelTest {
     }
 
     @Test
-    fun `상품 목록이 20개 이상이면 더보기 버튼이 활성화된다`() {
+    fun `상품 목록이 20개 이상이면 더보기 버튼이 활성화된다`() = runTest {
         // given
         viewModel =
             CatalogViewModel(
@@ -69,14 +72,14 @@ class CatalogViewModelTest {
                 FakeViewedItemRepository(0),
             )
 
-        viewModel.loadCatalogProducts()
+        viewModel.loadInitialCatalogProducts()
         val hasNext = viewModel.pagingData.value?.hasNext
 
         assertThat(hasNext).isEqualTo(true)
     }
 
     @Test
-    fun `최근 본 상품이 있는 경우에 10개 이하이면 모든 데이터를 불러온다`() {
+    fun `최근 본 상품이 있는 경우에 10개 이하이면 모든 데이터를 불러온다`() = runTest {
         viewModel =
             CatalogViewModel(
                 FakeCatalogItemRepository(30),
@@ -94,7 +97,7 @@ class CatalogViewModelTest {
     }
 
     @Test
-    fun `최근 본 상품이 있는 경우에 10개 이상이면 10개의 데이터만 불러온다`() {
+    fun `최근 본 상품이 있는 경우에 10개 이상이면 10개의 데이터만 불러온다`() = runTest {
         viewModel =
             CatalogViewModel(
                 FakeCatalogItemRepository(30),
