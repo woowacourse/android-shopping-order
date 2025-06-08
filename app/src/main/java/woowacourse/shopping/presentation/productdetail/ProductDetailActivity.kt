@@ -16,10 +16,10 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityDetailProductBinding
-import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.Extra
 import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.product.ItemClickListener
+import woowacourse.shopping.presentation.uimodel.CartItemUiModel
 
 class ProductDetailActivity :
     AppCompatActivity(),

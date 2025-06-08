@@ -14,12 +14,12 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.AddToCartUseCase
 import woowacourse.shopping.domain.usecase.DecreaseProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.IncreaseProductQuantityUseCase
-import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.SingleLiveData
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
-import woowacourse.shopping.presentation.toDomain
-import woowacourse.shopping.presentation.toPresentation
+import woowacourse.shopping.presentation.uimodel.CartItemUiModel
+import woowacourse.shopping.presentation.uimodel.toDomain
+import woowacourse.shopping.presentation.uimodel.toPresentation
 
 class ProductViewModel(
     private val cartRepository: CartRepository,
@@ -136,7 +136,8 @@ class ProductViewModel(
 
     fun loadMore() {
         viewModelScope.launch {
-            _uiState.value = ResultState.Loading
+            _uiState.value = ResultState.Success(Unit)
+//            _uiState.value = ResultState.Loading
 
             productRepository
                 .fetchPagingProducts(loadMorePage++, FETCH_PAGE_SIZE)
@@ -147,7 +148,6 @@ class ProductViewModel(
                     val updatedList = currentList + updatedItems
 
                     _products.value = updatedList
-                    _uiState.value = ResultState.Success(Unit)
                 }.onFailure {
                     _toastMessage.value = R.string.product_toast_load_failure
                 }
