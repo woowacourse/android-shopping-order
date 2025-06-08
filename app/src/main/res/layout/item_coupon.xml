@@ -42,7 +42,7 @@
             android:layout_marginStart="8dp"
             android:text="@{coupon.description}"
             android:textColor="@color/dark_gray"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/cb_select_coupon"
             app:layout_constraintStart_toEndOf="@id/cb_select_coupon"
@@ -54,7 +54,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textSize="12sp"
+            android:textSize="14sp"
+            app:expirationDate="@{coupon.expirationDate}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_coupon_name"
             tools:text="만료일: 2024년 11월 30일" />
@@ -63,7 +64,7 @@
             android:id="@+id/tv_minimum_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
+            android:textSize="14sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_expiration_date"
             tools:text="최소 주문 금액: 100,000원" />
