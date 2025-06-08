@@ -116,20 +116,20 @@ class CartProductRecommendationViewModel(
 
     override fun onAddClick(item: Product) {
         viewModelScope.launch {
-            val result = cartProductRepository.insert(item.id, QUANTITY_TO_ADD)
+            val result = cartProductRepository.insert(item.id, QUANTITY_STEP)
 
             result
                 .onSuccess { cartProductId ->
-                    cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
+                    cartProducts.add(CartProduct(cartProductId, item, QUANTITY_STEP))
                     _selectedProducts.value =
                         selectedProducts.value.orEmpty().plus(
                             CartProduct(
                                 cartProductId,
                                 item,
-                                QUANTITY_TO_ADD,
+                                QUANTITY_STEP,
                             ),
                         )
-                    updateQuantity(item, QUANTITY_TO_ADD)
+                    updateQuantity(item, QUANTITY_STEP)
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
@@ -139,7 +139,7 @@ class CartProductRecommendationViewModel(
     override fun onQuantityIncreaseClick(id: Int) {
         val cartProduct = cartProducts.firstOrNull { it.product.id == id } ?: return
         viewModelScope.launch {
-            val newQuantity = cartProduct.quantity + QUANTITY_TO_ADD
+            val newQuantity = cartProduct.quantity + QUANTITY_STEP
             val result =
                 cartProductRepository.updateQuantity(
                     cartProduct,
@@ -165,7 +165,7 @@ class CartProductRecommendationViewModel(
     override fun onQuantityDecreaseClick(id: Int) {
         val cartProduct = cartProducts.firstOrNull { it.product.id == id } ?: return
         viewModelScope.launch {
-            val newQuantity = cartProduct.quantity - QUANTITY_TO_ADD
+            val newQuantity = cartProduct.quantity - QUANTITY_STEP
             val result =
                 cartProductRepository.updateQuantity(
                     cartProduct,
@@ -214,7 +214,7 @@ class CartProductRecommendationViewModel(
 
     companion object {
         private const val RECOMMEND_SIZE = 10
-        private const val QUANTITY_TO_ADD = 1
+        private const val QUANTITY_STEP = 1
         private const val DEFAULT_COUNT = 0
     }
 }

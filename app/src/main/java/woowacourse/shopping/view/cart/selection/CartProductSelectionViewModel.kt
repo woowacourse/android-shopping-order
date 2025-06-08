@@ -95,7 +95,7 @@ class CartProductSelectionViewModel(
                 ?: return
 
         viewModelScope.launch {
-            val newQuantity = cartProductItem.cartProduct.quantity + QUANTITY_TO_ADD
+            val newQuantity = cartProductItem.cartProduct.quantity + QUANTITY_STEP
             val result =
                 repository.updateQuantity(
                     cartProductItem.cartProduct,
@@ -120,7 +120,7 @@ class CartProductSelectionViewModel(
         if (cartProductItem.cartProduct.quantity == 1) return
 
         viewModelScope.launch {
-            val newQuantity = cartProductItem.cartProduct.quantity - QUANTITY_TO_ADD
+            val newQuantity = cartProductItem.cartProduct.quantity - QUANTITY_STEP
             val result =
                 repository.updateQuantity(
                     cartProductItem.cartProduct,
@@ -218,7 +218,7 @@ class CartProductSelectionViewModel(
     }
 
     companion object {
-        private const val QUANTITY_TO_ADD = 1
+        private const val QUANTITY_STEP = 1
         private const val FIRST_PAGE_NUMBER = 1
         private const val PAGE_SIZE = 5
     }

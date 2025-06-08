@@ -51,12 +51,12 @@ class ProductCatalogViewModel(
 
     override fun onAddClick(item: Product) {
         viewModelScope.launch {
-            val result = cartProductRepository.insert(item.id, QUANTITY_TO_ADD)
+            val result = cartProductRepository.insert(item.id, QUANTITY_STEP)
 
             result
                 .onSuccess { cartProductId ->
-                    cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
-                    updateQuantity(item, QUANTITY_TO_ADD)
+                    cartProducts.add(CartProduct(cartProductId, item, QUANTITY_STEP))
+                    updateQuantity(item, QUANTITY_STEP)
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
@@ -70,14 +70,14 @@ class ProductCatalogViewModel(
             val result =
                 cartProductRepository.updateQuantity(
                     cartProduct,
-                    cartProduct.quantity + QUANTITY_TO_ADD,
+                    cartProduct.quantity + QUANTITY_STEP,
                 )
 
             result
                 .onSuccess {
                     cartProducts.removeIf { it.product.id == id }
-                    cartProducts.add(cartProduct.copy(quantity = cartProduct.quantity + QUANTITY_TO_ADD))
-                    updateQuantity(product, QUANTITY_TO_ADD)
+                    cartProducts.add(cartProduct.copy(quantity = cartProduct.quantity + QUANTITY_STEP))
+                    updateQuantity(product, QUANTITY_STEP)
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
@@ -91,13 +91,13 @@ class ProductCatalogViewModel(
             val result =
                 cartProductRepository.updateQuantity(
                     cartProduct,
-                    cartProduct.quantity - QUANTITY_TO_ADD,
+                    cartProduct.quantity - QUANTITY_STEP,
                 )
 
             result
                 .onSuccess {
                     cartProducts.removeIf { it.product.id == id }
-                    val newQuantity = cartProduct.quantity - QUANTITY_TO_ADD
+                    val newQuantity = cartProduct.quantity - QUANTITY_STEP
                     if (newQuantity > MINIMUM_QUANTITY) {
                         cartProducts.add(
                             cartProduct.copy(
@@ -105,7 +105,7 @@ class ProductCatalogViewModel(
                             ),
                         )
                     }
-                    updateQuantity(product, -QUANTITY_TO_ADD)
+                    updateQuantity(product, -QUANTITY_STEP)
                 }.onFailure {
                     Log.e("error", it.message.toString())
                 }
@@ -228,7 +228,7 @@ class ProductCatalogViewModel(
         private const val FIRST_PAGE = 0
         private const val PRODUCT_SIZE_LIMIT = 20
         private const val RECENT_PRODUCT_SIZE_LIMIT = 10
-        private const val QUANTITY_TO_ADD = 1
+        private const val QUANTITY_STEP = 1
         private const val MINIMUM_QUANTITY = 0
     }
 }
