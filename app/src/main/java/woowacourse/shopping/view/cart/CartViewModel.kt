@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.repository.CartRepository
 import woowacourse.shopping.data.cart.repository.DefaultCartRepository
 import woowacourse.shopping.domain.cart.CartItem
@@ -54,13 +56,14 @@ class CartViewModel(
     }
 
     private fun loadAllProducts() {
-        cartRepository.loadCart { result: Result<List<CartItem>> ->
-            result
-                .onSuccess { cartItems: List<CartItem> ->
-                    cartProducts = cartItems
-                }.onFailure {
-                    _event.postValue(CartEvent.LOAD_SHOPPING_CART_FAILURE)
-                }
+        viewModelScope.launch {
+            runCatching {
+                cartRepository.loadCart()
+            }.onSuccess { cartItems: List<CartItem> ->
+                cartProducts = cartItems
+            }.onFailure {
+                _event.postValue(CartEvent.LOAD_SHOPPING_CART_FAILURE)
+            }
         }
     }
 
@@ -98,108 +101,111 @@ class CartViewModel(
     }
 
     fun plusCartItemQuantity(cartItem: CartItemType.ProductItem) {
-        cartRepository.updateCartItemQuantity(
-            cartItem.cartItem.id,
-            cartItem.quantity + 1,
-        ) { result ->
-            result
-                .onSuccess {
-                    loadCartItems()
-                }.onFailure {
-                    _event.postValue(CartEvent.PLUS_CART_ITEM_QUANTITY_FAILURE)
-                }
+        viewModelScope.launch {
+            runCatching {
+                cartRepository.updateCartItemQuantity(
+                    cartItem.cartItem.id,
+                    cartItem.quantity + 1,
+                )
+            }.onSuccess {
+                loadCartItems()
+            }.onFailure {
+                _event.postValue(CartEvent.PLUS_CART_ITEM_QUANTITY_FAILURE)
+            }
         }
     }
 
     fun minusCartItemQuantity(cartItem: CartItemType.ProductItem) {
         val cartItemId = cartItem.cartItem.id
-        if (cartItem.quantity == 1) {
-            cartRepository.remove(cartItemId) { result ->
-                result
-                    .onSuccess {
-                        _selectedCartItems.postValue(
-                            run {
-                                selectedCartItems.value
-                                    ?.filterOutById(cartItem.cartItemId)
-                                    ?.toSet()
-                            },
-                        )
-                        loadCartItems()
-                    }.onFailure {
-                        _event.postValue(CartEvent.MINUS_CART_ITEM_QUANTITY_FAILURE)
-                    }
-            }
-        } else {
-            cartRepository.updateCartItemQuantity(cartItemId, cartItem.quantity - 1) { result ->
-                result
-                    .onSuccess {
-                        loadCartItems()
-                    }.onFailure {
-                        _event.postValue(CartEvent.MINUS_CART_ITEM_QUANTITY_FAILURE)
-                    }
+
+        viewModelScope.launch {
+            if (cartItem.quantity == 1) {
+                runCatching {
+                    cartRepository.remove(cartItemId)
+                }.onSuccess {
+                    _selectedCartItems.postValue(
+                        run {
+                            selectedCartItems.value
+                                ?.filterOutById(cartItem.cartItemId)
+                                ?.toSet()
+                        },
+                    )
+                    loadCartItems()
+                }.onFailure {
+                    _event.postValue(CartEvent.MINUS_CART_ITEM_QUANTITY_FAILURE)
+                }
+            } else {
+                runCatching {
+                    cartRepository.updateCartItemQuantity(cartItemId, cartItem.quantity - 1)
+                }.onSuccess {
+                    loadCartItems()
+                }.onFailure {
+                    _event.postValue(CartEvent.MINUS_CART_ITEM_QUANTITY_FAILURE)
+                }
             }
         }
     }
 
     fun loadCartItems() {
-        cartRepository.loadPagedCartItems(page - 1, COUNT_PER_PAGE) { result ->
-            result
-                .onSuccess { pagedCartItems: PagedCartItems ->
-                    val cartItems: List<CartItemType.ProductItem> =
-                        pagedCartItems.cartItems.map { newCartItem: CartItem ->
-                            val selectedItem =
+        viewModelScope.launch {
+            runCatching {
+                cartRepository.loadPagedCartItems(page - 1, COUNT_PER_PAGE)
+            }.onSuccess { pagedCartItems: PagedCartItems ->
+                val cartItems: List<CartItemType.ProductItem> =
+                    pagedCartItems.cartItems.map { newCartItem: CartItem ->
+                        val selectedItem =
+                            selectedCartItems.value
+                                .orEmpty()
+                                .find { it.cartItem.id == newCartItem.id }
+
+                        val checked = selectedItem != null
+
+                        val newProductItem = CartItemType.ProductItem(newCartItem, checked)
+
+                        if (checked) {
+                            val updated =
                                 selectedCartItems.value
                                     .orEmpty()
-                                    .find { it.cartItem.id == newCartItem.id }
-
-                            val checked = selectedItem != null
-
-                            val newProductItem = CartItemType.ProductItem(newCartItem, checked)
-
-                            if (checked) {
-                                val updated =
-                                    selectedCartItems.value
-                                        .orEmpty()
-                                        .filterOutById(newCartItem.id)
-                                        .toSet() + newProductItem
-                                _selectedCartItems.postValue(updated)
-                            }
-
-                            newProductItem
+                                    .filterOutById(newCartItem.id)
+                                    .toSet() + newProductItem
+                            _selectedCartItems.postValue(updated)
                         }
-                    val paginationItem: CartItemType.PaginationItem =
-                        CartItemType.PaginationItem(
-                            page = page,
-                            previousEnabled = pagedCartItems.hasPrevious,
-                            nextEnabled = pagedCartItems.hasNext,
-                        )
 
-                    _cartItems.postValue(cartItems + paginationItem)
-                }.onFailure {
-                    _event.postValue(CartEvent.LOAD_SHOPPING_CART_FAILURE)
-                }
-            Thread.sleep(1000)
+                        newProductItem
+                    }
+                val paginationItem: CartItemType.PaginationItem =
+                    CartItemType.PaginationItem(
+                        page = page,
+                        previousEnabled = pagedCartItems.hasPrevious,
+                        nextEnabled = pagedCartItems.hasNext,
+                    )
+
+                _cartItems.postValue(cartItems + paginationItem)
+            }.onFailure {
+                _event.postValue(CartEvent.LOAD_SHOPPING_CART_FAILURE)
+            }
             loading.postValue(false)
         }
     }
 
     fun removeCartItem(cartItem: CartItemType.ProductItem) {
-        cartRepository.remove(cartItem.cartItemId) { result ->
-            result
-                .onSuccess {
-                    if (_cartItems.value?.size == 1) {
-                        minusPage()
-                    } else {
-                        loadCartItems()
-                    }
-                    val oldSelectedCartItems: Set<CartItemType.ProductItem> =
-                        selectedCartItems.value.orEmpty()
-                    val newSelectedCartItems: Set<CartItemType.ProductItem> =
-                        (oldSelectedCartItems - cartItem)
-                    _selectedCartItems.postValue(newSelectedCartItems)
-                }.onFailure {
-                    _event.postValue(CartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE)
+        viewModelScope.launch {
+            runCatching {
+                cartRepository.remove(cartItem.cartItemId)
+            }.onSuccess {
+                if (_cartItems.value?.size == 1) {
+                    minusPage()
+                } else {
+                    loadCartItems()
                 }
+                val oldSelectedCartItems: Set<CartItemType.ProductItem> =
+                    selectedCartItems.value.orEmpty()
+                val newSelectedCartItems: Set<CartItemType.ProductItem> =
+                    (oldSelectedCartItems - cartItem)
+                _selectedCartItems.postValue(newSelectedCartItems)
+            }.onFailure {
+                _event.postValue(CartEvent.REMOVE_SHOPPING_CART_PRODUCT_FAILURE)
+            }
         }
     }
 
