@@ -68,7 +68,7 @@ data class CouponsResponse(
 
             "MIRACLESALE" -> {
                 requireNotNull(discount) { ERROR_FIXED_DISCOUNT_NULL }
-                val time = requireNotNull(availableTime) { ERROR_MIRACLESALE_AVAILABLE_TIME_NULL }
+                requireNotNull(availableTime) { ERROR_MIRACLESALE_AVAILABLE_TIME_NULL }
 
                 MiracleSaleCoupon(
                     id = id.toInt(),
@@ -77,7 +77,7 @@ data class CouponsResponse(
                     discountType = discountType,
                     expirationDate = LocalDate.parse(expirationDate),
                     discount = discount,
-                    availableTime = time.toDomain(),
+                    availableTime = availableTime.toDomain(),
                 )
             }
 
@@ -96,6 +96,6 @@ data class CouponsResponse(
         private const val ERROR_BOGO_BUY_QUANTITY_NULL = "필수 구매 수량이 필요합니다."
         private const val ERROR_BOGO_GET_QUANTITY_NULL = "무료 제공 수량이 필요합니다."
 
-        private const val ERROR_MIRACLESALE_AVAILABLE_TIME_NULL = "사용 가능 시간이이 필요합니다."
+        private const val ERROR_MIRACLESALE_AVAILABLE_TIME_NULL = "사용 가능 시간이 필요합니다."
     }
 }
