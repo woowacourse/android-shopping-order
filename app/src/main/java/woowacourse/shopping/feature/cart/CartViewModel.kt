@@ -162,6 +162,11 @@ class CartViewModel(
 
     private val _coupons = MutableLiveData<List<Coupon>>()
 
+    @VisibleForTesting
+    internal fun setTestCoupons(coupons: List<Coupon>) {
+        _coupons.value = coupons
+    }
+
     val validCoupons: LiveData<List<Coupon>> =
         MediatorLiveData<List<Coupon>>().apply {
             fun update() {
