@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.coupon.repository
 
 import woowacourse.shopping.data.coupon.dataSource.CouponRemoteDataSource
-import woowacourse.shopping.domain.coupon.Coupon
-import woowacourse.shopping.domain.coupon.DiscountType
+import woowacourse.shopping.domain.order.Coupon
+import woowacourse.shopping.domain.order.DiscountType
 import java.time.LocalDate
 import java.time.LocalTime
 
