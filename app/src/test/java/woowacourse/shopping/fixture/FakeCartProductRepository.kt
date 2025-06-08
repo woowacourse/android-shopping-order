@@ -20,6 +20,7 @@ class FakeCartProductRepository : CartProductRepository {
                     imageUrl = "",
                     name = "Product $productId",
                     price = 1000,
+                    category = "",
                 )
             val cartProduct =
                 CartProduct(

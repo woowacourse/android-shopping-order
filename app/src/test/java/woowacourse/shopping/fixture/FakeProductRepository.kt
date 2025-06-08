@@ -12,6 +12,7 @@ class FakeProductRepository : ProductRepository {
                 imageUrl = "",
                 name = "Product $index",
                 price = (index + 1) * 1000,
+                category = "",
             )
         }
 

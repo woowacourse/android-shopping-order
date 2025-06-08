@@ -28,7 +28,7 @@ class ProductDetailViewModelTest {
     fun setup() {
         cartProductRepository = FakeCartProductRepository()
         recentProductRepository = FakeRecentProductRepository()
-        product = Product(id = 0, imageUrl = "", name = "Product 0", price = 1000)
+        product = Product(id = 0, imageUrl = "", name = "Product 0", price = 1000, category = "")
         viewModel = ProductDetailViewModel(product, cartProductRepository, recentProductRepository)
     }
 
