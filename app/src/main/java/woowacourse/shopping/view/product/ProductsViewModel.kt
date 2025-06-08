@@ -64,7 +64,7 @@ class ProductsViewModel(
         currentProducts: List<ProductsItem>,
     ) {
         var shoppingCartProducts = emptyList<ShoppingCartProduct>()
-        shoppingCartRepository.load(0, 20) { result ->
+        shoppingCartRepository.load(LOAD_SHOPPING_CART_PAGE, LOAD_SHOPPING_CART_SIZE) { result ->
             result
                 .onSuccess {
                     shoppingCartProducts = it.shoppingCartItems
@@ -120,7 +120,7 @@ class ProductsViewModel(
         updatedProductItems: List<ProductItem>,
         hasRecentWatching: Boolean,
     ) {
-        productsRepository.getRecentWatchingProducts(10) { result ->
+        productsRepository.getRecentWatchingProducts(LOAD_RECENT_WATCHING_PRODUCT_SIZE) { result ->
             result
                 .onSuccess { recentWatchingProducts ->
                     var updatedProducts = productsWithoutLoadItem
@@ -212,7 +212,7 @@ class ProductsViewModel(
     }
 
     fun updateRecentWatching() {
-        productsRepository.getRecentWatchingProducts(10) { result ->
+        productsRepository.getRecentWatchingProducts(LOAD_RECENT_WATCHING_PRODUCT_SIZE) { result ->
             result
                 .onSuccess { recentWatchingProducts: List<Product> ->
                     val recentWatchingItem =
@@ -341,5 +341,8 @@ class ProductsViewModel(
     companion object {
         private const val MINIMUM_PAGE = 1
         private const val LOAD_PRODUCTS_SIZE = 20
+        private const val LOAD_SHOPPING_CART_PAGE = 0
+        private const val LOAD_SHOPPING_CART_SIZE = 20
+        private const val LOAD_RECENT_WATCHING_PRODUCT_SIZE = 10
     }
 }
