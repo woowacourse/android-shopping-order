@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.cart.adapter
+package woowacourse.shopping.feature.cart.order.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

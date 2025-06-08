@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.cart.adapter
+package woowacourse.shopping.feature.cart.cartdetail.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -39,7 +39,7 @@ class CartAdapter(
         return when (viewType) {
             TYPE_SKELETON -> {
                 val binding = ItemCartSkeletonBinding.inflate(inflater, parent, false)
-                SkeletonViewHolder(binding)
+                CartItemSkeletonViewHolder(binding)
             }
             TYPE_CART_ITEM -> {
                 val binding = ItemCartBinding.inflate(inflater, parent, false)

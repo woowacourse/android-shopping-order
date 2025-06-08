@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.cart
+package woowacourse.shopping.feature.cart.order
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,8 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentOrderBinding
-import woowacourse.shopping.feature.cart.adapter.CouponAdapter
-import kotlin.getValue
+import woowacourse.shopping.feature.cart.CartActivity
+import woowacourse.shopping.feature.cart.CartViewModel
+import woowacourse.shopping.feature.cart.order.adapter.CouponAdapter
 
 class OrderFragment : Fragment() {
     @Suppress("ktlint:standard:backing-property-naming")

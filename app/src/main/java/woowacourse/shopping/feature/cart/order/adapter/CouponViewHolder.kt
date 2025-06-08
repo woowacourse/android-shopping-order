@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.cart.adapter
+package woowacourse.shopping.feature.cart.order.adapter
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCouponBinding

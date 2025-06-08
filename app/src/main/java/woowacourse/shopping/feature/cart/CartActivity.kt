@@ -20,6 +20,8 @@ import woowacourse.shopping.data.payment.repository.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.payment.repository.PaymentRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.domain.model.coupon.CouponServiceImpl
+import woowacourse.shopping.feature.cart.cartdetail.CartFragment
+import woowacourse.shopping.feature.cart.order.OrderFragment
 import woowacourse.shopping.feature.cart.recommend.RecommendFragment
 import kotlin.getValue
 

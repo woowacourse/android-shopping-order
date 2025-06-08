@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.cart
+package woowacourse.shopping.feature.cart.cartdetail
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,7 +12,9 @@ import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.feature.QuantityChangeListener
-import woowacourse.shopping.feature.cart.adapter.CartAdapter
+import woowacourse.shopping.feature.cart.CartActivity
+import woowacourse.shopping.feature.cart.CartViewModel
+import woowacourse.shopping.feature.cart.cartdetail.adapter.CartAdapter
 
 class CartFragment : Fragment() {
     @Suppress("ktlint:standard:backing-property-naming")

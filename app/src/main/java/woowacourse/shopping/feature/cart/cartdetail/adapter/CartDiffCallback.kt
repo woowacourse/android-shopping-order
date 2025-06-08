@@ -1,7 +1,6 @@
-package woowacourse.shopping.feature.cart.adapter
+package woowacourse.shopping.feature.cart.cartdetail.adapter
 
 import androidx.recyclerview.widget.DiffUtil
-import woowacourse.shopping.feature.cart.adapter.CartAdapter.Companion.QUANTITY_CHANGED_PAYLOAD
 
 class CartDiffCallback : DiffUtil.ItemCallback<CartListItem>() {
     override fun areItemsTheSame(
@@ -28,7 +27,7 @@ class CartDiffCallback : DiffUtil.ItemCallback<CartListItem>() {
             val oldCart = oldItem.cartItem
             val newCart = newItem.cartItem
             if (oldCart.goods == newCart.goods && oldCart.quantity != newCart.quantity) {
-                return QUANTITY_CHANGED_PAYLOAD
+                return CartAdapter.Companion.QUANTITY_CHANGED_PAYLOAD
             }
         }
         return null

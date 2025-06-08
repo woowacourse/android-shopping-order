@@ -13,7 +13,7 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.feature.QuantityChangeListener
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.cart.CartViewModel
-import woowacourse.shopping.feature.cart.adapter.RecommendAdapter
+import woowacourse.shopping.feature.cart.recommend.adapter.RecommendAdapter
 
 class RecommendFragment : Fragment() {
     private var _binding: FragmentRecommendBinding? = null

@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.util.mapper
 
 import woowacourse.shopping.data.carts.dto.CartResponse
-import woowacourse.shopping.data.coupon.dto.CouponResponse
+import woowacourse.shopping.data.payment.dto.CouponResponse
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.coupon.CalculateBonusGoods
 import woowacourse.shopping.domain.model.coupon.Coupon

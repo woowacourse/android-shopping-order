@@ -12,8 +12,8 @@ import com.bumptech.glide.Glide
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.coupon.Coupon
-import woowacourse.shopping.feature.cart.adapter.CartAdapter
-import woowacourse.shopping.feature.cart.adapter.CouponAdapter
+import woowacourse.shopping.feature.cart.cartdetail.adapter.CartAdapter
+import woowacourse.shopping.feature.cart.order.adapter.CouponAdapter
 import woowacourse.shopping.feature.goods.adapter.vertical.GoodsAdapter
 import woowacourse.shopping.feature.goods.adapter.vertical.MoreButtonAdapter
 

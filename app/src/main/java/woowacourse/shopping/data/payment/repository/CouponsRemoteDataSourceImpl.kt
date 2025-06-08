@@ -6,9 +6,9 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
-import woowacourse.shopping.data.coupon.dto.CouponResponse
 import woowacourse.shopping.data.payment.CouponFetchError
 import woowacourse.shopping.data.payment.CouponFetchResult
+import woowacourse.shopping.data.payment.dto.CouponResponse
 import woowacourse.shopping.data.util.HeaderInterceptor
 import woowacourse.shopping.data.util.RetrofitService
 
