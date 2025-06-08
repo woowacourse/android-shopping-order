@@ -3,12 +3,15 @@ package woowacourse.shopping.presentation.view.order
 import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.databinding.FragmentOrderBinding
 import woowacourse.shopping.presentation.base.BaseFragment
+import woowacourse.shopping.presentation.extension.getParcelableArrayListCompat
+import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.CouponUiModel
 import woowacourse.shopping.presentation.view.order.coupon.CouponAdapter
 
@@ -43,6 +46,9 @@ class OrderFragment :
 
         requireActivity().onBackPressedDispatcher.addCallback(backCallback)
 
+        val selectedItems =
+            arguments?.getParcelableArrayListCompat<CartItemUiModel>(ARG_SELECTED_CART_ITEM)
+
         initObserver()
     }
 
@@ -71,5 +77,14 @@ class OrderFragment :
 
     override fun onSelectCoupon(coupon: CouponUiModel) {
         viewModel.selectCoupon(coupon)
+    }
+
+    companion object {
+        private const val ARG_SELECTED_CART_ITEM = "selected_cart_item"
+
+        fun newInstance(items: List<CartItemUiModel>): OrderFragment =
+            OrderFragment().apply {
+                arguments = bundleOf(ARG_SELECTED_CART_ITEM to ArrayList(items))
+            }
     }
 }

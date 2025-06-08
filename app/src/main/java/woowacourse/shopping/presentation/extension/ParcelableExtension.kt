@@ -21,3 +21,21 @@ inline fun <T : Parcelable> Any?.getParcelableCompatInternal(
     requireNotNull(this) { "Intent 또는 Bundle이 null입니다." }
     return requireNotNull(getter(key)) { "$key 키에 해당하는 Parcelable 값이 존재하지 않습니다." }
 }
+
+inline fun <reified T : Parcelable> Bundle?.getParcelableArrayListCompat(key: String): ArrayList<T> =
+    this.getParcelableArrayListCompatInternal(key) { k ->
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            this?.getParcelableArrayList(k, T::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            this?.getParcelableArrayList<T>(k)
+        }
+    }
+
+inline fun <T : Parcelable> Any?.getParcelableArrayListCompatInternal(
+    key: String,
+    getter: (String) -> ArrayList<T>?,
+): ArrayList<T> {
+    requireNotNull(this) { "Intent 또는 Bundle이 null입니다." }
+    return requireNotNull(getter(key)) { "$key 키에 해당하는 ParcelableArrayList 값이 존재하지 않습니다." }
+}

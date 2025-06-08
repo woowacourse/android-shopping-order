@@ -89,8 +89,13 @@ class CartFragment :
                 viewModel.fetchRecommendedProducts()
             }
             is CartRecommendationFragment -> {
+                val selectedCartItems = viewModel.getSelectedCartItems()
+                val fragment = OrderFragment.newInstance(selectedCartItems)
                 parentFragmentManager.commit {
-                    replace(R.id.shopping_fragment_container, OrderFragment())
+                    replace(
+                        R.id.shopping_fragment_container,
+                        fragment,
+                    )
                     addToBackStack(null)
                 }
             }
