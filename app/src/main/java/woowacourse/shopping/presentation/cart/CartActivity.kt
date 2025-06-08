@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.cart
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -20,6 +21,14 @@ class CartActivity : AppCompatActivity() {
     }
 
     private lateinit var cartAdapter: CartAdapter
+
+    private val cartLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val checkedIds = result.data?.getLongArrayExtra("checked_product_ids")?.toList() ?: emptyList()
+                viewModel.restoreCheckedProducts(checkedIds)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,7 +104,7 @@ class CartActivity : AppCompatActivity() {
                     this@CartActivity,
                     ArrayList(orderInfo.checkedItems),
                 )
-            startActivity(intent)
+            cartLauncher.launch(intent)
         }
     }
 

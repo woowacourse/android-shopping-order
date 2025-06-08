@@ -10,7 +10,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import woowacourse.shopping.RepositoryProvider
-import woowacourse.shopping.RepositoryProvider.viewedItemRepository
+import woowacourse.shopping.data.repository.CartItemsRepositoryImpl
 import woowacourse.shopping.domain.model.PagingData
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
@@ -50,6 +50,12 @@ class CatalogViewModel(
                 _updatedProduct.postValue(toggled)
                 applyProductChange(toggled)
             }
+        }
+    }
+
+    fun initializeCart() {
+        viewModelScope.launch {
+            cartRepository.initializeCartItems()
         }
     }
 
@@ -96,21 +102,34 @@ class CatalogViewModel(
         updateCartCount()
     }
 
-    fun loadNextCatalogProducts() {
-        loadCatalogProducts()
+
+    fun loadInitialCatalogProducts() {
+        currentPage = 0
+        loadCatalogProducts(currentPage)
+        currentPage++
     }
 
-    fun loadCatalogProducts(pageSize: Int = PAGE_SIZE) {
+    fun loadNextCatalogProducts() {
+        loadCatalogProducts(currentPage)
+        currentPage++
+    }
+
+    private fun loadCatalogProducts(page: Int) {
         viewModelScope.launch {
-            val result = productsRepository.getProducts(currentPage, pageSize)
+            val result = productsRepository.getProducts(page, PAGE_SIZE)
 
             result.onSuccess { pagingData ->
-                val newPagingData: PagingData = cartRepository.getQuantity(pagingData)
-                val currentProducts = _pagingData.value?.products ?: emptyList()
-                _pagingData.postValue(
-                    newPagingData.copy(products = currentProducts + newPagingData.products),
-                )
-                currentPage++
+                val newPagingData = cartRepository.getQuantity(pagingData)
+                val updatedProducts = newPagingData.products.map { it.copy() }
+
+                val finalProducts = if (page == 0) {
+                    updatedProducts
+                } else {
+                    val currentProducts = _pagingData.value?.products.orEmpty()
+                    currentProducts + updatedProducts
+                }
+
+                _pagingData.postValue(newPagingData.copy(products = finalProducts))
             }
         }
     }

@@ -62,7 +62,6 @@ class CartViewModel(
                 val currentPage = pagingData.value?.page ?: INITIAL_PAGE
                 loadCartProducts(currentPage)
                 setCheckedProducts(cartProduct)
-            }.onFailure { e ->
             }
         }
     }
@@ -212,6 +211,16 @@ class CartViewModel(
         val checkedItems = checkedProducts.value ?: emptyList()
         if (count > 0) {
             _navigateToRecommendEvent.value = OrderInfo(checkedItems)
+        }
+    }
+
+    fun restoreCheckedProducts(checkedIds: List<Long>) {
+        pagingData.value?.let { currentPagingData ->
+            val updatedProducts = currentPagingData.products.map {
+                it.copy(isChecked = it.id in checkedIds)
+            }
+            _pagingData.value = currentPagingData.copy(products = updatedProducts)
+            setOrderData()
         }
     }
 

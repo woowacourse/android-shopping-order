@@ -1,6 +1,8 @@
 package woowacourse.shopping.presentation.product.catalog
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,7 +32,7 @@ class CatalogActivity : AppCompatActivity() {
     private val resultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
-                viewModel.loadRecentViewedItems()
+                viewModel.loadInitialCatalogProducts()
                 viewModel.updateProductQuantities()
                 viewModel.updateCartCount()
             }
@@ -50,7 +52,6 @@ class CatalogActivity : AppCompatActivity() {
         setViewModel()
     }
 
-
     private fun applyWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -60,7 +61,8 @@ class CatalogActivity : AppCompatActivity() {
     }
 
     private fun setViewModel() {
-        viewModel.loadCatalogProducts()
+        viewModel.initializeCart()
+        viewModel.loadInitialCatalogProducts()
         viewModel.loadRecentViewedItems()
         viewModel.updateCartCount()
     }

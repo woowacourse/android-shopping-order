@@ -3,6 +3,8 @@ package woowacourse.shopping.presentation.payment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -98,7 +100,7 @@ class PaymentActivity : AppCompatActivity() {
 
     private fun navigateToMain() {
         val intent = Intent(this, CatalogActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
         finish()
     }
@@ -111,6 +113,21 @@ class PaymentActivity : AppCompatActivity() {
     }
 
     private fun createHandler(): CouponEventHandlerImpl = CouponEventHandlerImpl(paymentViewModel)
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                val resultIntent = Intent().apply {
+                    putParcelableArrayListExtra("checked_products", ArrayList(orderItems))
+                }
+                setResult(RESULT_OK, resultIntent)
+                finish()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
 
     companion object {
         private const val ORDER_ITEMS_KEY = "OrderItems"

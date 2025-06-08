@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.recommend
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -138,6 +139,28 @@ class RecommendViewModel(
     fun onOrderClick() {
         val orderItems = _checkedItems.value ?: emptyList()
         _navigateToPaymentEvent.value = OrderInfo(orderItems)
+    }
+
+    fun restoreCheckedProducts(checkedProducts: List<ProductUiModel>) {
+        _checkedItems.postValue(checkedProducts)
+        Log.d("price", totalOrderPrice.toString() + totalOrderCount.toString())
+
+        val currentItems = _items.value ?: return
+
+        val updatedItems = currentItems.map { product ->
+            val matching = checkedProducts.find { it.id == product.id }
+            if (matching != null) {
+                product.copy(
+                    quantity = matching.quantity,
+                    isChecked = true
+                )
+            } else {
+                product.copy(isChecked = false)
+            }
+        }
+
+        _items.postValue(updatedItems)
+
     }
 
     companion object {
