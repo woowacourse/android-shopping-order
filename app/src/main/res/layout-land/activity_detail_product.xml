@@ -61,8 +61,8 @@
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divider"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/divider_height"
-                    android:layout_marginTop="@dimen/divider_margin_top"
+                    android:layout_height="@dimen/detail_divider_height"
+                    android:layout_marginTop="@dimen/detail_divider_margin_top"
                     app:dividerColor="@color/gray1"
                     app:layout_constraintTop_toBottomOf="@id/tv_product_detail_name" />
 
