@@ -5,7 +5,8 @@ inline fun <T> handleApiCall(
     action: () -> T,
 ): Result<T> =
     runCatching { action() }
-        .onFailure { e ->
-            e.printStackTrace()
-            throw Exception("$errorMessage\n인터넷 연결을 확인해주세요.")
-        }
+        .onFailure { it.printStackTrace() }
+        .fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { Result.failure(Exception("$errorMessage\n인터넷 연결을 확인해주세요.", it)) },
+        )
