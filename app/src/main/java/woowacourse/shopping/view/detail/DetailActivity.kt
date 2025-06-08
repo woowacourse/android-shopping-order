@@ -14,14 +14,14 @@ import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityDetailBinding
-import woowacourse.shopping.view.NetworkExceptionDelegator
+import woowacourse.shopping.view.NetworkExceptionHandler
 import woowacourse.shopping.view.cart.CartActivity
 import woowacourse.shopping.view.core.ext.showToast
 import woowacourse.shopping.view.detail.vm.DetailViewModel
 import woowacourse.shopping.view.detail.vm.DetailViewModelFactory
 
 class DetailActivity : AppCompatActivity() {
-    private lateinit var networkDelegator: NetworkExceptionDelegator
+    private lateinit var networkDelegator: NetworkExceptionHandler
     private lateinit var binding: ActivityDetailBinding
     private val viewModel: DetailViewModel by viewModels {
         val container = (application as App).container
@@ -36,7 +36,7 @@ class DetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail)
-        networkDelegator = NetworkExceptionDelegator(this)
+        networkDelegator = NetworkExceptionHandler(this)
 
         val productId = intent.getLongExtra(EXTRA_PRODUCT_ID, 0L)
         val lastSeenProductId =

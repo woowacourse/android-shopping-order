@@ -14,7 +14,7 @@ import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.domain.cart.ShoppingCart
-import woowacourse.shopping.view.NetworkExceptionDelegator
+import woowacourse.shopping.view.NetworkExceptionHandler
 import woowacourse.shopping.view.core.ext.getSerializableArrayList
 import woowacourse.shopping.view.core.ext.showToast
 import woowacourse.shopping.view.main.MainActivity
@@ -23,7 +23,7 @@ import woowacourse.shopping.view.order.vm.OrderViewModel
 import woowacourse.shopping.view.order.vm.OrderViewModelFactory
 
 class OrderActivity : AppCompatActivity() {
-    private lateinit var networkExceptionDelegator: NetworkExceptionDelegator
+    private lateinit var networkExceptionDelegator: NetworkExceptionHandler
 
     private val viewModel: OrderViewModel by viewModels {
         val container = (application as App).container
@@ -44,7 +44,7 @@ class OrderActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order)
-        networkExceptionDelegator = NetworkExceptionDelegator(this)
+        networkExceptionDelegator = NetworkExceptionHandler(this)
 
         val order = intent.getSerializableArrayList<ShoppingCart>(KEY_ORDER)
         viewModel.loadCoupons(order)

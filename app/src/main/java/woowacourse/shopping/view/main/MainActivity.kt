@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityMainBinding
-import woowacourse.shopping.view.NetworkExceptionDelegator
+import woowacourse.shopping.view.NetworkExceptionHandler
 import woowacourse.shopping.view.cart.CartActivity
 import woowacourse.shopping.view.core.ext.showToast
 import woowacourse.shopping.view.detail.DetailActivity
@@ -25,7 +25,8 @@ import woowacourse.shopping.view.main.vm.MainViewModel
 import woowacourse.shopping.view.main.vm.MainViewModelFactory
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var networkExceptionDelegator: NetworkExceptionDelegator
+    private lateinit var networkExceptionHandler: NetworkExceptionHandler
+
     private val activityResultLauncher =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
@@ -54,7 +55,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        networkExceptionDelegator = NetworkExceptionDelegator(this)
+        networkExceptionHandler = NetworkExceptionHandler(this)
+
         setUpBinding()
         setUpSystemBar()
         setupRecyclerView()
@@ -117,7 +119,7 @@ class MainActivity : AppCompatActivity() {
                 is MainUiEvent.NavigateToCart -> moveToCart(event.lastSeenProductCategory)
 
                 is MainUiEvent.ShowErrorMessage -> {
-                    networkExceptionDelegator.showErrorMessage(event.throwable)
+                    networkExceptionHandler.showErrorMessage(event.throwable)
                 }
             }
         }

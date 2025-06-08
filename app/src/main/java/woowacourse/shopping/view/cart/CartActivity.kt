@@ -16,7 +16,7 @@ import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.domain.cart.ShoppingCart
-import woowacourse.shopping.view.NetworkExceptionDelegator
+import woowacourse.shopping.view.NetworkExceptionHandler
 import woowacourse.shopping.view.cart.carts.CartListFragment
 import woowacourse.shopping.view.cart.recommend.RecommendFragment
 import woowacourse.shopping.view.cart.vm.CartViewModel
@@ -25,7 +25,7 @@ import woowacourse.shopping.view.core.ext.showToast
 import woowacourse.shopping.view.order.OrderActivity
 
 class CartActivity : AppCompatActivity() {
-    private lateinit var networkDelegator: NetworkExceptionDelegator
+    private lateinit var networkDelegator: NetworkExceptionHandler
 
     private lateinit var binding: ActivityCartBinding
     private val viewModel: CartViewModel by viewModels {
@@ -39,7 +39,7 @@ class CartActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
-        networkDelegator = NetworkExceptionDelegator(this)
+        networkDelegator = NetworkExceptionHandler(this)
         val category = intent.getStringExtra(EXTRA_CATEGORY)
         viewModel.setCategory(category)
 
