@@ -3,6 +3,7 @@ package woowacourse.shopping
 import android.app.Application
 import woowacourse.shopping.data.database.ShoppingDatabase
 import woowacourse.shopping.data.di.NetworkModule.cartApi
+import woowacourse.shopping.data.di.NetworkModule.couponApi
 import woowacourse.shopping.data.di.NetworkModule.orderApi
 import woowacourse.shopping.data.di.NetworkModule.productApi
 import woowacourse.shopping.domain.usecase.AddSearchHistoryUseCase
@@ -13,6 +14,7 @@ import woowacourse.shopping.domain.usecase.GetCartRecommendProductsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsByIdsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsUseCase
+import woowacourse.shopping.domain.usecase.GetCouponsUseCase
 import woowacourse.shopping.domain.usecase.GetRecentSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.GetSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
@@ -41,6 +43,11 @@ class ShoppingApp : Application() {
     private val orderRepository: woowacourse.shopping.domain.repository.OrderRepository by lazy {
         woowacourse.shopping.data.repository
             .OrderRepository(orderApi)
+    }
+
+    private val couponRepository: woowacourse.shopping.domain.repository.CouponRepository by lazy {
+        woowacourse.shopping.data.repository
+            .CouponRepository(couponApi)
     }
 
     val getCartProductsUseCase by lazy {
@@ -97,5 +104,8 @@ class ShoppingApp : Application() {
 
     val orderProductsUseCase by lazy {
         OrderProductsUseCase(productRepository, cartRepository, orderRepository)
+    }
+    val getCouponsUseCase by lazy {
+        GetCouponsUseCase(couponRepository)
     }
 }

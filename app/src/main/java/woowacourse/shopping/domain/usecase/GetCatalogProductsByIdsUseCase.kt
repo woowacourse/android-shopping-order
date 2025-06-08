@@ -32,6 +32,7 @@ class GetCatalogProductsByIdsUseCase(
                 }
             val updatedCartProducts =
                 getUpdatedCartProducts(filteredCatalogProducts, cartProductsByProductId)
+
             Result.success(updatedCartProducts)
         } else {
             Result.failure(result.exceptionOrNull()!!)
