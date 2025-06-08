@@ -39,18 +39,6 @@ class DetailViewModel(
         _showLastViewedProduct.addSource(_lastViewedProduct) { updateShowLastViewedProduct() }
     }
 
-    private fun updateShowLastViewedProduct() {
-        val currentProduct = _product.value
-        val lastViewedProduct = _lastViewedProduct.value
-
-        val canShow =
-            currentProduct != null &&
-                lastViewedProduct != null &&
-                currentProduct.id != lastViewedProduct.id
-
-        _showLastViewedProduct.value = canShow
-    }
-
     fun decreaseAmount() {
         val current = _amount.value ?: 1
         if (current > 1) {
@@ -112,6 +100,18 @@ class DetailViewModel(
 
     override fun decrease(product: ProductUiModel) {
         decreaseAmount()
+    }
+
+    private fun updateShowLastViewedProduct() {
+        val currentProduct = _product.value
+        val lastViewedProduct = _lastViewedProduct.value
+
+        val canShow =
+            currentProduct != null &&
+                lastViewedProduct != null &&
+                currentProduct.id != lastViewedProduct.id
+
+        _showLastViewedProduct.value = canShow
     }
 
     companion object {

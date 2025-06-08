@@ -14,6 +14,7 @@ import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.cartItem.CartItemFragment
 import woowacourse.shopping.presentation.view.cart.recommendation.CartRecommendationFragment
+import woowacourse.shopping.presentation.view.order.OrderFragment
 
 class CartFragment :
     BaseFragment<FragmentCartBinding>(R.layout.fragment_cart),
@@ -76,13 +77,24 @@ class CartFragment :
         }
     }
 
-    private fun navigateToRecommendation() {
-        childFragmentManager.commit {
-            replace(R.id.cart_fragment_container, CartRecommendationFragment())
+    private fun navigateTo() {
+        val currentChild = childFragmentManager.findFragmentById(R.id.cart_fragment_container)
+        when (currentChild) {
+            is CartItemFragment -> {
+                childFragmentManager.commit {
+                    replace(R.id.cart_fragment_container, CartRecommendationFragment())
+                }
+                binding.selectAll.isVisible = false
+                binding.tvSelectAllDescription.isVisible = false
+                viewModel.fetchRecommendedProducts()
+            }
+            is CartRecommendationFragment -> {
+                parentFragmentManager.commit {
+                    replace(R.id.shopping_fragment_container, OrderFragment())
+                    addToBackStack(null)
+                }
+            }
         }
-        binding.selectAll.isVisible = false
-        binding.tvSelectAllDescription.isVisible = false
-        viewModel.fetchRecommendedProducts()
     }
 
     override fun onDestroyView() {
@@ -95,7 +107,7 @@ class CartFragment :
     }
 
     override fun onPlaceOrderClick() {
-        navigateToRecommendation()
+        navigateTo()
     }
 
     override fun increase(product: ProductUiModel) {
