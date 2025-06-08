@@ -12,4 +12,6 @@ data class FreeShippingCoupon(
     override fun isValid(items: List<CartProduct>): Boolean {
         return items.sumOf { it.totalPrice } >= minimumAmount
     }
+
+    override fun calculateDiscountAmount(items: List<CartProduct>): Int = 0
 }

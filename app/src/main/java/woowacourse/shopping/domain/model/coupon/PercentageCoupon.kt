@@ -15,7 +15,8 @@ data class PercentageCoupon(
         return availableTime.isInRange(LocalTime.now())
     }
 
-    fun calculateDiscountAmount(totalPrice: Int): Int {
+    override fun calculateDiscountAmount(items: List<CartProduct>): Int {
+        val totalPrice = items.sumOf { it.totalPrice }
         val discountRate = discount / 100.0
         return -(totalPrice * discountRate).toInt()
     }

@@ -66,8 +66,23 @@ class FixedCouponTest {
 
     @Test
     fun `할인 가격을 계산한다`() {
+        // given
+        val items =
+            listOf(
+                CartProduct(
+                    product =
+                        Product(
+                            id = 1,
+                            imageUrl = "",
+                            name = "hwannow",
+                            price = 40000,
+                        ),
+                    quantity = 3,
+                ),
+            )
+
         // when
-        val actual = coupon.calculateDiscountAmount()
+        val actual = coupon.calculateDiscountAmount(items)
         val expected = coupon.discount * -1
 
         // then

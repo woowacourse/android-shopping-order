@@ -9,4 +9,6 @@ sealed interface Coupon {
     val expirationDate: String
 
     fun isValid(items: List<CartProduct>): Boolean
+
+    fun calculateDiscountAmount(items: List<CartProduct>): Int
 }

@@ -16,7 +16,7 @@ data class BuyXGetYCoupon(
         return items.any { it.quantity >= requireQuantity }
     }
 
-    fun calculateDiscountAmount(items: List<CartProduct>): Int {
+    override fun calculateDiscountAmount(items: List<CartProduct>): Int {
         val requireQuantity = buyQuantity + getQuantity
         val filteredItems = items.filter { it.quantity >= requireQuantity }
         val mostExpensiveItem = filteredItems.maxByOrNull { it.product.price } ?: return 0
