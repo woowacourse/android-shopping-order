@@ -16,15 +16,15 @@ data class CouponResponseItem(
     @SerialName("discountType")
     val discountType: String,
     @SerialName("discount")
-    val discount: Int?,
+    val discount: Int? = null,
     @SerialName("minimumAmount")
-    val minimumAmount: Int?,
+    val minimumAmount: Int? = null,
     @SerialName("buyQuantity")
-    val buyQuantity: Int?,
+    val buyQuantity: Int? = null,
     @SerialName("getQuantity")
-    val getQuantity: Int?,
+    val getQuantity: Int? = null,
     @SerialName("availableTime")
-    val availableTime: AvailableTime?,
+    val availableTime: AvailableTime? = null,
 ) {
     @Serializable
     data class AvailableTime(
