@@ -19,7 +19,7 @@ import woowacourse.shopping.presentation.util.SingleLiveEvent
 class CatalogViewModel(
     private val productsRepository: ProductsRepository,
     private val cartRepository: CartItemRepository,
-    private val viewedRepository: ViewedItemRepository,
+    private val viewedItemRepository: ViewedItemRepository,
 ) : ViewModel() {
     private val _pagingData = MutableLiveData<PagingData>()
     val pagingData: LiveData<PagingData> = _pagingData
@@ -132,6 +132,14 @@ class CatalogViewModel(
         }
     }
 
+    fun updateProductQuantities() {
+        viewModelScope.launch {
+            val currentPagingData = _pagingData.value ?: return@launch
+            val updatedPagingData = cartRepository.getQuantity(currentPagingData)
+            _pagingData.postValue(updatedPagingData)
+        }
+    }
+
     companion object {
         private const val PAGE_SIZE = 20
 
@@ -141,7 +149,7 @@ class CatalogViewModel(
                     CatalogViewModel(
                         productsRepository = RepositoryProvider.productsRepository,
                         cartRepository = RepositoryProvider.cartItemRepository,
-                        viewedRepository = RepositoryProvider.viewedItemRepository,
+                        viewedItemRepository = RepositoryProvider.viewedItemRepository,
                     )
                 }
             }

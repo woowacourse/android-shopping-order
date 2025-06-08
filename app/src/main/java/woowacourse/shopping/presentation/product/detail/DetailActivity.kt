@@ -49,6 +49,7 @@ class DetailActivity : AppCompatActivity() {
             when (state) {
                 is AddItemSuccess -> {
                     showToast(R.string.text_add_to_cart_success)
+                    setResult(RESULT_OK)
                     finish()
                 }
 

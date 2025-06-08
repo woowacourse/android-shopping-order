@@ -1,8 +1,10 @@
 package woowacourse.shopping.presentation.product.catalog
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -14,7 +16,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCatalogBinding
 import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandlerImpl
 import woowacourse.shopping.presentation.product.catalog.viewHolder.CartActionViewHolder
-import woowacourse.shopping.presentation.product.detail.DetailActivity.Companion.newIntent
+import woowacourse.shopping.presentation.product.detail.DetailActivity
 import woowacourse.shopping.presentation.product.recent.ViewedItemAdapter
 
 class CatalogActivity : AppCompatActivity() {
@@ -26,18 +28,26 @@ class CatalogActivity : AppCompatActivity() {
         CatalogViewModel.FACTORY
     }
 
+    private val resultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                viewModel.loadRecentViewedItems()
+                viewModel.updateProductQuantities()
+                viewModel.updateCartCount()
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_catalog)
         enableEdgeToEdge()
         applyWindowInsets()
 
-        initRecyclerView()
-        binding.lifecycleOwner = this
-        binding.viewModel = viewModel
+        setupRecyclerViews()
+        setBinding()
 
+        initializeCatalogData()
         observeViewModel()
-        viewModel.loadCatalogProducts()
     }
 
     private fun applyWindowInsets() {
@@ -48,17 +58,24 @@ class CatalogActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.loadRecentViewedItems()
-        viewModel.updateCartCount()
-    }
-
-    private fun initRecyclerView() {
+    private fun setupRecyclerViews() {
         val handler = createHandler()
 
         setupProductRecyclerView(handler)
         setupRecentViewedRecyclerView(handler)
+    }
+
+    private fun initializeCatalogData() {
+        viewModel.loadCatalogProducts()
+        viewModel.loadRecentViewedItems()
+        viewModel.updateCartCount()
+    }
+
+    private fun setBinding() {
+        binding.apply {
+            lifecycleOwner = this@CatalogActivity
+            viewModel = viewModel
+        }
     }
 
     private fun setupProductRecyclerView(handler: CatalogEventHandlerImpl) {
@@ -77,7 +94,8 @@ class CatalogActivity : AppCompatActivity() {
         GridLayoutManager(this, 2).apply {
             spanSizeLookup =
                 object : GridLayoutManager.SpanSizeLookup() {
-                    override fun getSpanSize(position: Int): Int = if (adapter.isLoadMoreButtonPosition(position)) 2 else 1
+                    override fun getSpanSize(position: Int): Int =
+                        if (adapter.isLoadMoreButtonPosition(position)) 2 else 1
                 }
         }
 
@@ -119,6 +137,7 @@ class CatalogActivity : AppCompatActivity() {
 
     private fun createHandler(): CatalogEventHandlerImpl =
         CatalogEventHandlerImpl(viewModel) { product ->
-            startActivity(newIntent(this, product.id))
+            val intent = DetailActivity.newIntent(this, product.id)
+            resultLauncher.launch(intent)
         }
 }
