@@ -542,8 +542,8 @@ class CartViewModelTest {
     @Test
     fun `Fixed 쿠폰 선택 시 고정 할인 금액이 적용된다`() =
         runTest {
-            // Given: 선택된 장바구니 아이템과 Fixed 쿠폰
-            val selectedItems = listOf(sampleCartItem1.copy(isSelected = true)) // 200000원
+            // Given: 선택된 장바구니 아이템과 Fixed 쿠폰 (200000원)
+            val selectedItems = listOf(sampleCartItem1.copy(isSelected = true))
             viewModel.setTestCarts(selectedItems)
             viewModel.setTestCoupons(listOf(fixedCoupon))
 
@@ -552,33 +552,39 @@ class CartViewModelTest {
 
             // Then: 5000원 할인 적용
             assertThat(viewModel.discountAmount.value).isEqualTo(-5000)
-            assertThat(viewModel.totalOrderPrice.value).isEqualTo(198000) // 200000 - 5000 + 3000(배송비)
+            // 200000 - 5000 + 3000(배송비)
+            assertThat(viewModel.totalOrderPrice.value).isEqualTo(198000)
         }
 
     @Test
     fun `Percentage 쿠폰 선택 시 비율 할인이 적용된다`() =
         runTest {
-            val selectedItems = listOf(sampleCartItem1.copy(isSelected = true)) // 200000원
+            // 200000원
+            val selectedItems = listOf(sampleCartItem1.copy(isSelected = true))
             viewModel.setTestCarts(selectedItems)
             viewModel.setTestCoupons(listOf(percentageCoupon))
 
             viewModel.toggleCouponCheck(percentageCoupon)
 
-            assertThat(viewModel.discountAmount.value).isEqualTo(-20000) // 10% 할인
-            assertThat(viewModel.totalOrderPrice.value).isEqualTo(183000) // 200000 - 20000 + 3000
+            // 10% 할인
+            assertThat(viewModel.discountAmount.value).isEqualTo(-20000)
+            // 200000 - 20000 + 3000
+            assertThat(viewModel.totalOrderPrice.value).isEqualTo(183000)
         }
 
     @Test
     fun `FreeShipping 쿠폰 선택 시 배송비가 0이 된다`() =
         runTest {
-            val selectedItems = listOf(sampleCartItem1.copy(isSelected = true)) // 200000원
+            // 200000원
+            val selectedItems = listOf(sampleCartItem1.copy(isSelected = true))
             viewModel.setTestCarts(selectedItems)
             viewModel.setTestCoupons(listOf(freeShippingCoupon))
 
             viewModel.toggleCouponCheck(freeShippingCoupon)
 
             assertThat(viewModel.shippingFee.value).isEqualTo(0)
-            assertThat(viewModel.totalOrderPrice.value).isEqualTo(200000) // 배송비 없음
+            // 배송비 없음
+            assertThat(viewModel.totalOrderPrice.value).isEqualTo(200000)
         }
 
     @Test
@@ -586,7 +592,8 @@ class CartViewModelTest {
         runTest {
             val cartItems =
                 listOf(
-                    sampleCartItem1.copy(quantity = 3, isSelected = true), // 3개 구매
+                    // 3개 구매
+                    sampleCartItem1.copy(quantity = 3, isSelected = true),
                 )
             viewModel.setTestCarts(cartItems)
             viewModel.setTestCoupons(listOf(bonusGoodsCoupon))
@@ -594,7 +601,8 @@ class CartViewModelTest {
             viewModel.toggleCouponCheck(bonusGoodsCoupon)
 
             assertThat(viewModel.selectedCoupon.value?.id).isEqualTo(4)
-            assertThat(viewModel.totalOrderPrice.value).isEqualTo(sampleGoods1.price * 2 + 3000) // 2개 + 배송비
+            // 2개 + 배송비
+            assertThat(viewModel.totalOrderPrice.value).isEqualTo(sampleGoods1.price * 2 + 3000)
         }
 
     @Test
@@ -602,7 +610,8 @@ class CartViewModelTest {
         runTest {
             val smallAmountItems =
                 listOf(
-                    CartItem(sampleGoods1, 1, 1, true), // 100000원 (최소금액 30000원 미달)
+                    // 100000원 (최소금액 30000원 미달)
+                    CartItem(sampleGoods1, 1, 1, true),
                 )
             viewModel.setTestCarts(smallAmountItems)
 

@@ -13,7 +13,6 @@ import woowacourse.shopping.feature.cart.CartViewModel
 import woowacourse.shopping.feature.cart.order.adapter.CouponAdapter
 
 class OrderFragment : Fragment() {
-    @Suppress("ktlint:standard:backing-property-naming")
     private var _binding: FragmentOrderBinding? = null
     private val binding get() = _binding!!
 

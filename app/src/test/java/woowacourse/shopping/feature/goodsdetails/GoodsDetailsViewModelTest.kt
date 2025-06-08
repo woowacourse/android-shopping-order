@@ -144,7 +144,8 @@ class GoodsDetailsViewModelTest {
 
     @Test
     fun `addOrIncreaseToCart 호출 시 repository updateQuantity가 호출된다`() {
-        viewModel.increaseSelectorQuantity() // 수량 2
+        // 수량 2
+        viewModel.increaseSelectorQuantity()
 
         viewModel.addOrUpdateQuantityToCart()
 
@@ -164,7 +165,9 @@ class GoodsDetailsViewModelTest {
                 any(),
             )
         } returns CartUpdateResult.Success(200)
-        viewModel.increaseSelectorQuantity() // 수량 2
+
+        // 수량 2
+        viewModel.increaseSelectorQuantity()
 
         viewModel.addOrUpdateQuantityToCart()
 
