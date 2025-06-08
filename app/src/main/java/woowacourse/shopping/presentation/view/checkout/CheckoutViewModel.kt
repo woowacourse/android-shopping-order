@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.launch
@@ -13,6 +14,7 @@ import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.CouponRepository
 import woowacourse.shopping.data.repository.RepositoryProvider
 import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.Price
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.presentation.view.checkout.adapter.CouponUiModel
 import woowacourse.shopping.presentation.view.checkout.adapter.toUiModel
@@ -31,6 +33,21 @@ class CheckoutViewModel(
     val totalPrice: LiveData<Int> =
         _cartItems.map { cartItems ->
             cartItems.sumOf { cartItem -> cartItem.totalPrice }
+        }
+
+    val shippingFee = Price.SHIPPING_FEE
+
+    val discountAmount: LiveData<Int> =
+        _coupons.switchMap { coupons ->
+            _cartItems.map { cartItems ->
+                val selectedCoupon = coupons.firstOrNull { coupon -> coupon.isSelected }
+                selectedCoupon?.coupon?.discount(cartItems) ?: 0
+            }
+        }
+
+    val grandTotal: LiveData<Int> =
+        totalPrice.switchMap { totalPrice ->
+            discountAmount.map { discountAmount -> (totalPrice - discountAmount + shippingFee).coerceAtLeast(0) }
         }
 
     fun loadSelectedCartItems(ids: List<Long>) {
