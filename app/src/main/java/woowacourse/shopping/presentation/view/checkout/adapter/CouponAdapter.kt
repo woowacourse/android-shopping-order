@@ -12,7 +12,7 @@ class CouponAdapter(
             override fun areItemsTheSame(
                 oldItem: CouponUiModel,
                 newItem: CouponUiModel,
-            ): Boolean = oldItem.coupon.id == newItem.coupon.id
+            ): Boolean = oldItem.coupon.info.id == newItem.coupon.info.id
 
             override fun areContentsTheSame(
                 oldItem: CouponUiModel,

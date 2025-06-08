@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.view.checkout
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,9 +13,10 @@ import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.CouponRepository
 import woowacourse.shopping.data.repository.RepositoryProvider
 import woowacourse.shopping.domain.CartItem
-import woowacourse.shopping.domain.Coupon
+import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.presentation.view.checkout.adapter.CouponUiModel
 import woowacourse.shopping.presentation.view.checkout.adapter.toUiModel
+import java.time.LocalDateTime
 
 class CheckoutViewModel(
     private val cartRepository: CartRepository,
@@ -48,6 +50,12 @@ class CheckoutViewModel(
                     }
                 }
             _cartItems.postValue(selectedCartItems)
+            couponRepository.loadCoupons().forEach {
+                val isAvailable = it.isAvailable(_cartItems.value.orEmpty(), LocalDateTime.now())
+                val discount = if (isAvailable) it.discount(_cartItems.value.orEmpty()) else -1
+                Log.d("Coupon", "${it.info.description}: $isAvailable, $discount")
+                it.isAvailable(_cartItems.value.orEmpty(), LocalDateTime.now())
+            }
         }
     }
 
@@ -57,7 +65,7 @@ class CheckoutViewModel(
     ) {
         _coupons.value =
             _coupons.value?.map { coupon ->
-                if (coupon.coupon.id == target.coupon.id) {
+                if (coupon.coupon.info.id == target.coupon.info.id) {
                     coupon.copy(isSelected = isSelected)
                 } else {
                     coupon.copy(isSelected = false)

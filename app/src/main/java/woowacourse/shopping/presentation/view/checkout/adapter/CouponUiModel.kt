@@ -1,6 +1,6 @@
 package woowacourse.shopping.presentation.view.checkout.adapter
 
-import woowacourse.shopping.domain.Coupon
+import woowacourse.shopping.domain.coupon.Coupon
 
 data class CouponUiModel(
     val coupon: Coupon,
