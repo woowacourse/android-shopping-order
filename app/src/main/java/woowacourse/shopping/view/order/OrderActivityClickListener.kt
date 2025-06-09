@@ -1,5 +1,5 @@
 package woowacourse.shopping.view.order
 
-interface OrderClickListener {
+interface OrderActivityClickListener {
     fun onBackButtonClick()
 }

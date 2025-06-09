@@ -36,7 +36,7 @@
         </activity>
 
         <activity
-            android:name=".view.order.OrderActivity"
+            android:name=".view.order.OrderActivityActivity"
             android:exported="false" />
 
     </application>
