@@ -39,25 +39,26 @@ class CouponApplyViewModel(
                             coupons =
                                 listOf(CouponsItem.Header) +
                                     coupons.map { coupon: Coupon ->
-                                        CouponsItem.Coupon(coupon, false)
+                                        CouponsItem.CouponItem(coupon, false)
                                     },
                             selectedCoupon = null,
                             cartItems = cartItems,
                             deliveryFee = deliveryFee.value,
                         )
                 }.onFailure {
-                    _event.value = CouponEvent.FETCH_COUPONS_FAILURE
+                    throw it
+                    _event.value = CouponEvent.LOAD_COUPONS_FAILURE
                 }
         }
     }
 
-    fun selectCoupon(coupon: CouponsItem.Coupon) {
+    fun selectCoupon(coupon: CouponsItem.CouponItem) {
         val oldCoupons = state.value?.coupons ?: emptyList()
         val newCoupons: List<CouponsItem>
         if (coupon.selected) {
             newCoupons =
                 oldCoupons.map { couponItem: CouponsItem ->
-                    if (couponItem is CouponsItem.Coupon) {
+                    if (couponItem is CouponsItem.CouponItem) {
                         couponItem.copy(selected = false)
                     } else {
                         couponItem
@@ -66,7 +67,7 @@ class CouponApplyViewModel(
         } else {
             newCoupons =
                 oldCoupons.map { couponItem: CouponsItem ->
-                    if (couponItem is CouponsItem.Coupon) {
+                    if (couponItem is CouponsItem.CouponItem) {
                         couponItem.copy(selected = couponItem.value == coupon)
                     } else {
                         couponItem

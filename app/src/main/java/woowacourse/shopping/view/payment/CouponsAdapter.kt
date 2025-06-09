@@ -30,8 +30,10 @@ class CouponsAdapter : ListAdapter<CouponsItem, CouponsItemViewHolder<CouponsIte
                     newItem: CouponsItem,
                 ): Boolean =
                     when (oldItem) {
-                        is CouponsItem.Coupon -> TODO()
-                        CouponsItem.Header -> TODO()
+                        is CouponsItem.CouponItem ->
+                            oldItem.value.id == (newItem as? CouponsItem.CouponItem)?.value?.id
+
+                        CouponsItem.Header -> oldItem.viewType == newItem.viewType
                     }
 
                 override fun areContentsTheSame(

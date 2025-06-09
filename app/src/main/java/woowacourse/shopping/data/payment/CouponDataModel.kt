@@ -1,7 +1,5 @@
 package woowacourse.shopping.data.payment
 
-import woowacourse.shopping.data.payment.CouponResponse.Coupon
-
 class CouponDataModel(
     val id: Long,
     val code: String,
@@ -20,7 +18,16 @@ class CouponDataModel(
     )
 
     companion object {
-        fun Coupon.toDataModel(): CouponDataModel? {
+        fun CouponResponse.toDataModel(): CouponDataModel? {
+            val availableTime: AvailableTime? =
+                if (availableTime == null && availableTime?.start == null && availableTime?.end == null) {
+                    null
+                } else {
+                    AvailableTime(
+                        availableTime.start!!,
+                        availableTime.end!!,
+                    )
+                }
             return CouponDataModel(
                 id ?: return null,
                 code ?: return null,
@@ -31,10 +38,7 @@ class CouponDataModel(
                 minimumAmount,
                 buyQuantity,
                 getQuantity,
-                AvailableTime(
-                    availableTime?.start ?: return null,
-                    availableTime.end ?: return null,
-                ),
+                availableTime,
             )
         }
     }

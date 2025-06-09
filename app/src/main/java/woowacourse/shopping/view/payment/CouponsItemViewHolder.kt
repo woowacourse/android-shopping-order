@@ -20,9 +20,10 @@ sealed class CouponsItemViewHolder<I>(
     }
 
     class CouponViewHolder(
-        binding: ItemCouponBinding,
-    ) : CouponsItemViewHolder<CouponsItem.Coupon>(binding) {
-        override fun bind(item: CouponsItem.Coupon) {
+        private val binding: ItemCouponBinding,
+    ) : CouponsItemViewHolder<CouponsItem.CouponItem>(binding) {
+        override fun bind(item: CouponsItem.CouponItem) {
+            binding.coupon = item
         }
     }
 

@@ -25,8 +25,9 @@ object API {
             .Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(client)
-            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-            .build()
+            .addConverterFactory(
+                Json.asConverterFactory("application/json".toMediaType()),
+            ).build()
     }
 
     val productService: ProductService = retrofit.create(ProductService::class.java)
