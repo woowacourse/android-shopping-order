@@ -9,9 +9,11 @@ import androidx.activity.viewModels
 import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.domain.model.Products.Companion.EMPTY_PRODUCTS
 import woowacourse.shopping.ui.cart.CartActivity.OnClickHandler
 import woowacourse.shopping.ui.common.DataBindingActivity
 import woowacourse.shopping.ui.model.ActivityResult
+import woowacourse.shopping.ui.payment.PaymentActivity
 
 class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_cart) {
     private val viewModel: CartViewModel by viewModels { CartViewModel.Factory }
@@ -79,6 +81,18 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
         }
         viewModel.isOrdered.observe(this) {
             finish()
+            val intent =
+                PaymentActivity.newIntent(
+                    this,
+                    (
+                        viewModel.cartProducts.value
+                            ?: EMPTY_PRODUCTS
+                    ) + (
+                        viewModel.recommendedProducts.value
+                            ?: EMPTY_PRODUCTS
+                    ),
+                )
+            startActivity(intent)
         }
     }
 

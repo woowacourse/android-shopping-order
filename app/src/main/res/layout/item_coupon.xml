@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="coupon"
+            type="woowacourse.shopping.ui.payment.adapter.CouponUiModel" />
+
+        <variable
+            name="onclickHandler"
+            type="woowacourse.shopping.ui.payment.adapter.CouponViewHolder.OnclickHandler" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="104dp"
+        android:layout_marginVertical="5dp"
+        android:background="@drawable/bg_cart_white_radius_4dp_stroke_gray_4">
+
+        <CheckBox
+            android:id="@+id/couponCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:checked="@{coupon.selected}"
+            android:onClick="@{()->onclickHandler.onCouponClick(coupon.id)}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/couponTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="@{coupon.description}"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/couponCheckBox"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="5,000원 할인 쿠폰" />
+
+        <TextView
+            android:id="@+id/couponExpirationDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:textSize="12sp"
+            app:formattedExpirationDateText="@{coupon.expirationDate}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/couponCheckBox"
+            tools:text="만료일: 2024년 11월 30일" />
+
+        <TextView
+            android:id="@+id/couponMinimumAmount"
+            app:couponMinimumAmountVisibility="@{coupon.minimumOrderAmount}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:textSize="12sp"
+            app:layout_constraintTop_toBottomOf="@id/couponExpirationDate"
+            tools:text="최소 주문 금액: 100,000원" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

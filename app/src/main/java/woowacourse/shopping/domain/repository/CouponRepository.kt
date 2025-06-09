@@ -4,4 +4,6 @@ import woowacourse.shopping.domain.model.CouponDetailInfo
 
 interface CouponRepository {
     suspend fun fetchAllCoupons(): Result<List<CouponDetailInfo>>
+
+    fun fetchCoupon(couponId: Long): CouponDetailInfo?
 }
