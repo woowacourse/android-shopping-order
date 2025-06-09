@@ -9,6 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.data.BasicAuthInterceptor
 import woowacourse.shopping.data.source.remote.api.CartApiService
 import woowacourse.shopping.data.source.remote.api.CouponApiService
+import woowacourse.shopping.data.source.remote.api.OrderApiService
 import woowacourse.shopping.data.source.remote.api.ProductsApiService
 
 object Client {
@@ -26,6 +27,15 @@ object Client {
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(CouponApiService::class.java)
+    }
+
+    val getOrderApiService: OrderApiService by lazy {
+        Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(BASE_URL)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+            .create(OrderApiService::class.java)
     }
 
     private val okHttpClient =
