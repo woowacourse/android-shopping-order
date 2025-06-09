@@ -130,6 +130,11 @@ class CartViewModel(
     }
 
     override fun onClickRecommend() {
+        if (selectedTotalCount.value == null || selectedTotalCount.value == 0) {
+            _toastMessage.value = R.string.cart_toast_invalid_order_quantity
+            return
+        }
+
         val selectedProductIds: LongArray =
             cartItems.value
                 ?.filter { it.isSelected }
