@@ -102,7 +102,7 @@
                 android:layout_marginStart="18dp"
                 android:layout_marginTop="18dp"
                 android:layout_marginEnd="18dp"
-                android:text="@{@string/product_price_format(viewModel.product.price * viewModel.quantity)}"
+                android:text="@{@string/price_format(viewModel.product.price * viewModel.quantity)}"
                 android:textColor="@color/black"
                 android:textSize="20sp"
                 app:layout_constraintEnd_toStartOf="@id/productDetailQuantityStepper"
