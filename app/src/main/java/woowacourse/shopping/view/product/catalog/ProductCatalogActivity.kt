@@ -118,7 +118,7 @@ class ProductCatalogActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        viewModel.onFinishLoading.observe(this) { value ->
+        viewModel.isFinishedLoading.observe(this) { value ->
             if (value == true) {
                 binding.sfLoading.visibility = View.GONE
             } else {

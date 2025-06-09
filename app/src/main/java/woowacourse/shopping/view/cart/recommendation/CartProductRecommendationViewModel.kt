@@ -39,11 +39,11 @@ class CartProductRecommendationViewModel(
     private val _totalCount = MediatorLiveData<Int>()
     val totalCount: LiveData<Int> get() = _totalCount
 
+    private val _startOrder = MutableLiveData<List<CartProduct>>()
+    val startOrder: LiveData<List<CartProduct>> get() = _startOrder
+
     private val _onSelectedProduct = MutableSingleLiveData<Product>()
     val onSelectedProduct: SingleLiveData<Product> get() = _onSelectedProduct
-
-    private val _onStartOrder = MutableSingleLiveData<List<CartProduct>>()
-    val onStartOrder: SingleLiveData<List<CartProduct>> get() = _onStartOrder
 
     private val _onError = MutableSingleLiveData<Error>()
     val onError: SingleLiveData<Error> get() = _onError
@@ -219,7 +219,7 @@ class CartProductRecommendationViewModel(
     }
 
     fun startOrder() {
-        _onStartOrder.setValue(selectedProducts.value.orEmpty())
+        _startOrder.value = selectedProducts.value.orEmpty()
     }
 
     companion object {

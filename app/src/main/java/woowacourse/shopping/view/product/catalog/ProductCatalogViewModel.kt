@@ -39,8 +39,8 @@ class ProductCatalogViewModel(
     private val _totalQuantity = MutableLiveData(MINIMUM_QUANTITY)
     val totalQuantity: LiveData<Int> get() = _totalQuantity
 
-    private val _onFinishLoading = MutableLiveData(false)
-    val onFinishLoading: LiveData<Boolean> get() = _onFinishLoading
+    private val _isFinishedLoading = MutableLiveData(false)
+    val isFinishedLoading: LiveData<Boolean> get() = _isFinishedLoading
 
     private val _onError = MutableSingleLiveData<Error>()
     val onError: SingleLiveData<Error> get() = _onError
@@ -125,7 +125,7 @@ class ProductCatalogViewModel(
     }
 
     fun loadCatalog() {
-        _onFinishLoading.value = false
+        _isFinishedLoading.value = false
 
         viewModelScope.launch {
             loadRecentProducts()
@@ -206,7 +206,7 @@ class ProductCatalogViewModel(
             },
         )
         hasNext = pagedResult.hasNext
-        _onFinishLoading.value = true
+        _isFinishedLoading.value = true
         _productCatalogItems.value = buildCatalogItems()
     }
 

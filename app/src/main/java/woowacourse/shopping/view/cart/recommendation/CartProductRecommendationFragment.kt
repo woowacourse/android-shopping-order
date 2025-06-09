@@ -94,7 +94,7 @@ class CartProductRecommendationFragment() : Fragment() {
             startActivity(intent)
         }
 
-        viewModel.onStartOrder.observe(viewLifecycleOwner) { value ->
+        viewModel.startOrder.observe(viewLifecycleOwner) { value ->
             val intent = PaymentActivity.newIntent(requireContext(), ArrayList(value))
             startActivity(intent)
         }
