@@ -1,6 +1,7 @@
 package woowacourse.shopping.view.order
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -23,12 +24,30 @@ class OrderViewModel(
     private val _applyingCoupon: MutableLiveData<CouponItem> = MutableLiveData()
     val applyingCoupon: LiveData<CouponItem> get() = _applyingCoupon
 
-    val price: Int get() = productsToOrder.sumOf { it.price }
+    private val _price: MutableLiveData<Int> = MutableLiveData(productsToOrder.sumOf { it.price })
+    val price: LiveData<Int> get() = _price
 
     private val _shippingFee: MutableLiveData<ShippingFee> = MutableLiveData(ShippingFee())
     val shippingFee: LiveData<ShippingFee> get() = _shippingFee
 
+    private val _couponDiscount: MutableLiveData<Int> = MutableLiveData(0)
+    val couponDiscount: LiveData<Int> get() = _couponDiscount
+
+    private val _totalPrice: MediatorLiveData<Int> = MediatorLiveData(0)
+    val totalPrice: LiveData<Int> get() = _totalPrice
+
     init {
+        _totalPrice.apply {
+            addSource(price) { price ->
+                _totalPrice.value = _totalPrice.value?.plus(price)
+            }
+            addSource(shippingFee) { shippingFee ->
+                _totalPrice.value = _totalPrice.value?.plus(shippingFee.amount)
+            }
+            addSource(couponDiscount) { couponDiscount ->
+                _totalPrice.value = _totalPrice.value?.minus(couponDiscount)
+            }
+        }
         getCoupons()
     }
 
@@ -48,8 +67,8 @@ class OrderViewModel(
                 if (coupon.isExpiration) return@filter false
 
                 when (coupon) {
-                    is Coupon.PriceDiscount -> price >= coupon.minimumAmount
-                    is Coupon.FreeShipping -> price >= coupon.minimumAmount
+                    is Coupon.PriceDiscount -> (price.value ?: return) >= coupon.minimumAmount
+                    is Coupon.FreeShipping -> (price.value ?: return) >= coupon.minimumAmount
                     is Coupon.PercentageDiscount -> {
                         val now = LocalTime.now()
                         now in coupon.availableStartTime..coupon.availableEndTime
