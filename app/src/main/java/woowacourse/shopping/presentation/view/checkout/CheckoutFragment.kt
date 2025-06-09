@@ -16,9 +16,7 @@ import woowacourse.shopping.presentation.view.common.BaseFragment
 
 class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment_checkout) {
     private val selectedProductIds: List<Long> by lazy {
-        arguments?.getLongArray(
-            SELECTED_PRODUCT_IDS,
-        )?.toList().orEmpty()
+        arguments?.getLongArray(SELECTED_PRODUCT_IDS)?.toList().orEmpty()
     }
     private val viewModel: CheckoutViewModel by viewModels {
         CheckoutViewModel.factory(
@@ -62,10 +60,6 @@ class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment
         initBinding()
         initObserver()
         requireActivity().onBackPressedDispatcher.addCallback(backCallback)
-
-        val selectedProductIds = arguments?.getLongArray(SELECTED_PRODUCT_IDS)
-        viewModel.loadSelectedCartItems()
-        viewModel.loadCoupons()
     }
 
     override fun onDestroyView() {

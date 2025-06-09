@@ -52,30 +52,33 @@ class CheckoutViewModel(
             }
         }
 
-    fun loadSelectedCartItems() {
+    init {
         viewModelScope.launch {
-            val selectedCartItems =
-                buildList {
-                    selectedProductIds.forEach { id ->
-                        cartRepository.loadCartItemByProductId(id)?.let { cartItem ->
-                            add(cartItem)
-                        }
-                    }
-                }
-            _cartItems.postValue(selectedCartItems)
+            loadSelectedCartItems()
+            loadCoupons()
         }
     }
 
-    fun loadCoupons() {
-        viewModelScope.launch {
-            val availableCoupons =
-                couponRepository.loadCoupons()
-                    .filter { coupon ->
-                        coupon.isAvailable(_cartItems.value.orEmpty(), LocalDateTime.now())
+    private suspend fun loadSelectedCartItems() {
+        val selectedCartItems =
+            buildList {
+                selectedProductIds.forEach { id ->
+                    cartRepository.loadCartItemByProductId(id)?.let { cartItem ->
+                        add(cartItem)
                     }
-                    .map(Coupon::toUiModel)
-            _coupons.value = availableCoupons
-        }
+                }
+            }
+        _cartItems.postValue(selectedCartItems)
+    }
+
+    private suspend fun loadCoupons() {
+        val availableCoupons =
+            couponRepository.loadCoupons()
+                .filter { coupon ->
+                    coupon.isAvailable(_cartItems.value.orEmpty(), LocalDateTime.now())
+                }
+                .map(Coupon::toUiModel)
+        _coupons.value = availableCoupons
     }
 
     fun setCouponSelection(
