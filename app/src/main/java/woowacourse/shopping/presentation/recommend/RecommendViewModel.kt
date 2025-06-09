@@ -22,8 +22,6 @@ class RecommendViewModel(
     private val recentProductRepository: RecentProductRepository,
     private val recommendProductsUseCase: RecommendProductsUseCase,
 ) : ViewModel() {
-    private lateinit var recentCategory: String
-
     private val _recommendProducts: MutableLiveData<List<CartItemUiModel>> = MutableLiveData()
     val recommendProducts: LiveData<List<CartItemUiModel>> = _recommendProducts
 
@@ -52,7 +50,7 @@ class RecommendViewModel(
             recentProductRepository
                 .getMostRecentProduct()
                 .onSuccess { recentProduct ->
-                    recentCategory = recentProduct?.category ?: ""
+                    val recentCategory = recentProduct?.category ?: ""
 
                     recommendProductsUseCase(recentCategory)
                         .onSuccess { products ->

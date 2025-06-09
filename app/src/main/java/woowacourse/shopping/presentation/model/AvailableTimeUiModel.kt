@@ -8,18 +8,15 @@ data class AvailableTimeUiModel(
     val timeRange: String,
 )
 
-fun AvailableTime.toPresentation(): AvailableTimeUiModel {
-    val timeRange = "${start.format(DateTimeFormatter.ofPattern("HH:mm"))} ~ ${
-        end.format(
-            DateTimeFormatter.ofPattern("HH:mm"),
-        )
-    }"
+fun AvailableTime.toPresentation(pattern: String = "HH시 mm분"): AvailableTimeUiModel {
+    val formatter = DateTimeFormatter.ofPattern(pattern)
+    val timeRange = "${start.format(formatter)} ~ ${end.format(formatter)}"
     return AvailableTimeUiModel(timeRange)
 }
 
-fun AvailableTimeUiModel.toDomain(): AvailableTime {
+fun AvailableTimeUiModel.toDomain(pattern: String = "HH시 mm분"): AvailableTime {
+    val formatter = DateTimeFormatter.ofPattern(pattern)
     val (startStr, endStr) = timeRange.split(" ~ ")
-    val formatter = DateTimeFormatter.ofPattern("HH:mm")
     return AvailableTime(
         start = LocalTime.parse(startStr, formatter),
         end = LocalTime.parse(endStr, formatter),

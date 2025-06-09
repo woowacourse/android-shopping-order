@@ -3,12 +3,11 @@ package woowacourse.shopping.presentation.model
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.DiscountType
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 data class CouponUiModel(
     val code: String,
     val description: String,
-    val expirationDate: String,
+    val expirationDate: LocalDate,
     val discount: Int?,
     val buyQuantity: Int?,
     val getQuantity: Int?,
@@ -22,11 +21,7 @@ fun CouponUiModel.toDomain(): Coupon =
     Coupon(
         code = code,
         description = description,
-        expirationDate =
-            LocalDate.parse(
-                expirationDate,
-                DateTimeFormatter.ofPattern("yyyy년 M월 d일"),
-            ),
+        expirationDate = expirationDate,
         discount = discount,
         discountType = discountType.toDomain(discount, buyQuantity, getQuantity),
         minimumAmount = minimumAmount,
@@ -39,7 +34,7 @@ fun Coupon.toPresentation(): CouponUiModel =
     CouponUiModel(
         code = code,
         description = description,
-        expirationDate = expirationDate.format(DateTimeFormatter.ofPattern("yyyy년 M월 d일")),
+        expirationDate = expirationDate,
         discount = discount,
         buyQuantity = buyQuantity,
         getQuantity = getQuantity,
