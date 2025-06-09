@@ -161,21 +161,21 @@ class MainViewModel(
     }
 
     fun syncCartQuantities() {
-    val state = _uiState.value ?: return
-            viewModelScope.launch(Dispatchers.IO) {
-                val result = cartRepository.loadSinglePage(null, null)
-                result.fold(
-                    onSuccess = { value ->
-                        _uiState.postValue(state.modifyQuantity(value.carts))
-                    },
-                    onFailure = {},
-                )
-            }
+        val state = _uiState.value ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = cartRepository.loadSinglePage(null, null)
+            result.fold(
+                onSuccess = { value ->
+                    _uiState.postValue(state.modifyQuantity(value.carts))
+                },
+                onFailure = {},
+            )
         }
+    }
 
     fun handleNavigateDetailEvent(productId: Long) {
         val state = _uiState.value ?: return
-            _uiEvent.postValue(MainUiEvent.NavigateToDetail(productId, state.lastSeenProductId))
+        _uiEvent.postValue(MainUiEvent.NavigateToDetail(productId, state.lastSeenProductId))
     }
 
     fun handleNavigateToCart() {

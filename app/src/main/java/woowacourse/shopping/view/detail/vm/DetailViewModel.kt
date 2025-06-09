@@ -58,7 +58,6 @@ class DetailViewModel(
         val state = uiState.value ?: return
         val result = state.product.increaseCartQuantity()
         _uiState.value = state.copy(product = result)
-
     }
 
     fun decreaseCartQuantity() {

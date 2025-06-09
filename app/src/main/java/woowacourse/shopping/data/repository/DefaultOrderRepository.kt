@@ -6,7 +6,7 @@ import woowacourse.shopping.domain.repository.OrderRepository
 
 class DefaultOrderRepository(
     private val dataSource: OrderDataSource,
-): OrderRepository {
+) : OrderRepository {
     override suspend fun createOrder(ids: List<Long>) {
         return dataSource.createOrder(OrderRequest(ids))
     }

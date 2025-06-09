@@ -62,7 +62,7 @@ class CartViewModel(
                         generateRecommendedProducts(
                             result.products,
                             _cartUiState.value?.cartIds ?: emptyList(),
-                            RECOMMEND_SIZE
+                            RECOMMEND_SIZE,
                         )
                     _recommendUiState.postValue(RecommendUiState(recommendProduct))
                 }
@@ -160,7 +160,6 @@ class CartViewModel(
         }
     }
 
-
     fun loadCarts() {
         setLoading(true)
         val nextPage = paging.getPageNo() - 1
@@ -182,8 +181,8 @@ class CartViewModel(
                     _cartUiState.postValue(
                         CartUiState(
                             items = combinedItems,
-                            pageState = pageState
-                        )
+                            pageState = pageState,
+                        ),
                     )
                     withContext(Dispatchers.Main) {
                         setLoading(false)
