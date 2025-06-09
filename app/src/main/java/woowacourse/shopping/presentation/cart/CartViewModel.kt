@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,16 +8,16 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.SingleLiveData
+import woowacourse.shopping.presentation.UiState
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.toPresentation
 
 class CartViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel() {
-    private val _uiState: MutableLiveData<ResultState<Unit>> = MutableLiveData()
-    val uiState: LiveData<ResultState<Unit>> = _uiState
+    private val _uiState: MutableLiveData<UiState<Unit>> = MutableLiveData()
+    val uiState: LiveData<UiState<Unit>> = _uiState
 
     private val _cartItems: MutableLiveData<List<CartItemUiModel>> = MutableLiveData(emptyList())
     val cartItems: LiveData<List<CartItemUiModel>> = _cartItems
@@ -40,7 +41,7 @@ class CartViewModel(
 
     fun loadItems(currentPage: Int = 0) {
         viewModelScope.launch {
-            _uiState.value = ResultState.Loading
+            _uiState.value = UiState.Loading
 
             cartRepository
                 .fetchPagedCartItems(currentPage)
@@ -56,9 +57,9 @@ class CartViewModel(
                         }
 
                     _cartItems.value = newItems
-                    _uiState.value = ResultState.Success(Unit)
+                    _uiState.value = UiState.Success(Unit)
                 }.onFailure {
-                    _uiState.value = ResultState.Failure(it)
+                    _uiState.value = UiState.Failure(it)
                 }
         }
     }
@@ -75,6 +76,7 @@ class CartViewModel(
             cartRepository
                 .deleteProduct(cartItem.product.id)
                 .onSuccess {
+                    Log.d("meeple_log", "suceess")
                     _toastMessage.value = R.string.cart_toast_delete_success
                     loadItems()
                 }.onFailure {

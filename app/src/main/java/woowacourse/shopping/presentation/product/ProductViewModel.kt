@@ -12,16 +12,16 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.SingleLiveData
+import woowacourse.shopping.presentation.UiState
 
 class ProductViewModel(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel() {
-    private val _uiState: MutableLiveData<ResultState<Unit>> = MutableLiveData()
-    val uiState: LiveData<ResultState<Unit>> = _uiState
+    private val _uiState: MutableLiveData<UiState<Unit>> = MutableLiveData()
+    val uiState: LiveData<UiState<Unit>> = _uiState
 
     private val _products: MutableLiveData<List<CartItem>> = MutableLiveData()
     val products: LiveData<List<CartItem>> = _products
@@ -55,7 +55,7 @@ class ProductViewModel(
 
     fun fetchData(currentPage: Int = FIRST_PAGE) {
         viewModelScope.launch {
-            _uiState.value = ResultState.Loading
+            _uiState.value = UiState.Loading
 
             val productsResult =
                 async { productRepository.fetchPagingProducts(currentPage, PAGE_SIZE) }
@@ -65,9 +65,9 @@ class ProductViewModel(
                 .await()
                 .onSuccess { cartItems ->
                     _products.value = cartItems
-                    _uiState.value = ResultState.Success(Unit)
+                    _uiState.value = UiState.Success(Unit)
                 }.onFailure { throwable ->
-                    _uiState.value = ResultState.Failure(throwable)
+                    _uiState.value = UiState.Failure(throwable)
                 }
 
             recentProductsResult

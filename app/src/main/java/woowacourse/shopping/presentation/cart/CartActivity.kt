@@ -15,7 +15,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.presentation.ResultState
+import woowacourse.shopping.presentation.UiState
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.recommend.RecommendActivity
 
@@ -82,15 +82,15 @@ class CartActivity :
     private fun observeViewModel() {
         viewModel.uiState.observe(this) { state ->
             when (state) {
-                is ResultState.Loading -> {
+                is UiState.Loading -> {
                     showSkeleton(true)
                 }
 
-                is ResultState.Success -> {
+                is UiState.Success -> {
                     showSkeleton(false)
                 }
 
-                is ResultState.Failure -> {
+                is UiState.Failure -> {
                     showSkeleton(true)
                     showToast(state.throwable?.message)
                 }

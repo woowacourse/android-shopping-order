@@ -1,13 +1,13 @@
 package woowacourse.shopping.presentation
 
-sealed class ResultState<out T> {
+sealed class UiState<out T> {
     data class Success<out T>(
         val data: T,
-    ) : ResultState<T>()
+    ) : UiState<T>()
 
     data class Failure(
         val throwable: Throwable? = null,
-    ) : ResultState<Nothing>()
+    ) : UiState<Nothing>()
 
-    data object Loading : ResultState<Nothing>()
+    data object Loading : UiState<Nothing>()
 }

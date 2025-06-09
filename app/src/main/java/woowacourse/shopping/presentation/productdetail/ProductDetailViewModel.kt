@@ -10,7 +10,6 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.SingleLiveData
 
 class ProductDetailViewModel(
@@ -20,14 +19,16 @@ class ProductDetailViewModel(
 ) : ViewModel() {
     private val _product: MutableLiveData<Product> = MutableLiveData()
     val product: LiveData<Product> = _product
+
     private val _productCount: MutableLiveData<Int> = MutableLiveData(1)
     val productCount: LiveData<Int> = _productCount
+
     private val _recentProduct: MutableLiveData<Product?> = MutableLiveData()
     val recentProduct: LiveData<Product?> = _recentProduct
+
     private val _isRecentProduct: MutableLiveData<Boolean> = MutableLiveData()
     val isRecentProduct: LiveData<Boolean> = _isRecentProduct
-    private val _insertProductResult: MutableLiveData<ResultState<Unit>> = MutableLiveData()
-    val insertProductResult: LiveData<ResultState<Unit>> = _insertProductResult
+
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
 
