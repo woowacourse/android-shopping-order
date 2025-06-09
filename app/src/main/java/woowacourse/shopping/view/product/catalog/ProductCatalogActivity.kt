@@ -30,9 +30,9 @@ class ProductCatalogActivity : AppCompatActivity() {
             this,
             ProductCatalogViewModelFactory(
                 app.productRepository,
-                app.cartProductRepository,
                 app.recentProductRepository,
                 app.getPagedCartProductsUseCase,
+                app.getTotalCartProductQuantityUseCase,
                 app.addToCartUseCase,
                 app.updateQuantityUseCase,
             ),

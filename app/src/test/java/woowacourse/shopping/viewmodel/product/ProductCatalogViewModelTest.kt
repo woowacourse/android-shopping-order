@@ -11,6 +11,7 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.AddToCartUseCase
 import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.GetTotalCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.RemoveFromCartUseCase
 import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
@@ -31,6 +32,7 @@ class ProductCatalogViewModelTest {
     private lateinit var cartProductRepository: CartProductRepository
     private lateinit var recentProductRepository: RecentProductRepository
     private lateinit var getPagedCartProductsUseCase: GetPagedCartProductsUseCase
+    private lateinit var getTotalCartProductQuantityUseCase: GetTotalCartProductQuantityUseCase
     private lateinit var addToCartUseCase: AddToCartUseCase
     private lateinit var removeFromCartUseCase: RemoveFromCartUseCase
     private lateinit var updateQuantityUseCase: UpdateQuantityUseCase
@@ -42,6 +44,7 @@ class ProductCatalogViewModelTest {
             cartProductRepository = FakeCartProductRepository()
             recentProductRepository = FakeRecentProductRepository()
             getPagedCartProductsUseCase = GetPagedCartProductsUseCase(cartProductRepository)
+            getTotalCartProductQuantityUseCase = GetTotalCartProductQuantityUseCase(cartProductRepository)
             addToCartUseCase = AddToCartUseCase(cartProductRepository)
             removeFromCartUseCase = RemoveFromCartUseCase(cartProductRepository)
             updateQuantityUseCase = UpdateQuantityUseCase(cartProductRepository, removeFromCartUseCase)
@@ -50,9 +53,9 @@ class ProductCatalogViewModelTest {
             viewModel =
                 ProductCatalogViewModel(
                     productRepository,
-                    cartProductRepository,
                     recentProductRepository,
                     getPagedCartProductsUseCase,
+                    getTotalCartProductQuantityUseCase,
                     addToCartUseCase,
                     updateQuantityUseCase,
                 )
