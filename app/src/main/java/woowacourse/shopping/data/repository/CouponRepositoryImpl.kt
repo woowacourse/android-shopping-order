@@ -17,7 +17,7 @@ class CouponRepositoryImpl(
         isFilterAvailable: Boolean,
     ): Result<List<Coupon>> =
         runCatchingDebugLog {
-            val response = couponRemoteDataSource.fetchCoupons().getOrDefault(emptyList())
+            val response = couponRemoteDataSource.fetchCoupons()
             val coupons = response.map { it.toDomain() }
             couponLocalDataSource.saveCoupons(coupons)
 

@@ -18,7 +18,7 @@ class ProductRepositoryImpl(
 ) : ProductRepository {
     override suspend fun fetchProduct(id: Long): Result<Product> =
         runCatchingDebugLog {
-            productRemoteDataSource.fetchProduct(id).getOrThrow().toDomain()
+            productRemoteDataSource.fetchProduct(id).toDomain()
         }
 
     override suspend fun fetchProducts(
@@ -26,7 +26,7 @@ class ProductRepositoryImpl(
         size: Int,
     ): Result<PageableItem<Product>> =
         runCatchingDebugLog {
-            val response = productRemoteDataSource.fetchProducts(null, page, size).getOrThrow()
+            val response = productRemoteDataSource.fetchProducts(null, page, size)
             val products = response.content.map { it.toDomain() }
             val hasMore = !response.last
             PageableItem(products, hasMore)
@@ -40,9 +40,8 @@ class ProductRepositoryImpl(
             val category = productLocalDataSource.getRecentViewedProductCategory().getOrNull()
 
             val fetchLimit = limit + excludedProductIds.size
-            val response =
-                productRemoteDataSource.fetchProducts(category, 0, fetchLimit).getOrNull()
-            val allProducts = response?.content ?: emptyList()
+            val response = productRemoteDataSource.fetchProducts(category, 0, fetchLimit)
+            val allProducts = response.content
             val filteredProducts = allProducts.filterSuggestionProducts(excludedProductIds, limit)
             filteredProducts.map { it.toDomain() }
         }
@@ -84,6 +83,5 @@ class ProductRepositoryImpl(
     private suspend fun fetchAndConvertToDomain(productId: Long): Product? =
         productRemoteDataSource
             .fetchProduct(productId)
-            .getOrNull()
-            ?.toDomain()
+            .toDomain()
 }

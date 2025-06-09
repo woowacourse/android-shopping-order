@@ -35,7 +35,7 @@ class OrderRepositoryImpl(
     override suspend fun postOrder(cartProductIds: List<Long>): Result<Unit> =
         runCatchingDebugLog {
             val orderRequest = OrderRequest(cartProductIds)
-            orderRemoteDataSource.postOrder(orderRequest).getOrThrow()
+            orderRemoteDataSource.postOrder(orderRequest)
             cartLocalDataSource.removeCartProductsByCartIds(cartProductIds)
         }
 

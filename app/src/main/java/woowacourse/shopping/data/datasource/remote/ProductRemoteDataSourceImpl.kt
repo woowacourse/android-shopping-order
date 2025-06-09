@@ -12,10 +12,10 @@ class ProductRemoteDataSourceImpl(
         category: String?,
         page: Int,
         size: Int,
-    ): Result<PageableResponse<ProductResponse>> =
+    ): PageableResponse<ProductResponse> =
         safeApiCall {
             productService.fetchProducts(category, page, size)
         }
 
-    override suspend fun fetchProduct(productId: Long): Result<ProductResponse> = safeApiCall { productService.fetchProduct(productId) }
+    override suspend fun fetchProduct(productId: Long): ProductResponse = safeApiCall { productService.fetchProduct(productId) }
 }

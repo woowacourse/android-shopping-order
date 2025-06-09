@@ -7,7 +7,7 @@ import woowacourse.shopping.data.util.safeApiCall
 class OrderRemoteDataSourceImpl(
     private val orderService: OrderService,
 ) : OrderRemoteDataSource {
-    override suspend fun postOrder(cartProductIds: OrderRequest): Result<Unit> =
+    override suspend fun postOrder(cartProductIds: OrderRequest) =
         safeApiCall {
             orderService.postOrder(cartProductIds)
         }

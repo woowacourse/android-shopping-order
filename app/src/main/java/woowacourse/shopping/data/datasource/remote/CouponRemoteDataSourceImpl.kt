@@ -7,7 +7,7 @@ import woowacourse.shopping.data.util.safeApiCall
 class CouponRemoteDataSourceImpl(
     private val couponService: CouponService,
 ) : CouponRemoteDataSource {
-    override suspend fun fetchCoupons(): Result<List<CouponResponse>> =
+    override suspend fun fetchCoupons(): List<CouponResponse> =
         safeApiCall {
             couponService.fetchCoupons()
         }

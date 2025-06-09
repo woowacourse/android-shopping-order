@@ -14,7 +14,7 @@ class CartRemoteDataSourceImpl(
     override suspend fun fetchCartItems(
         page: Int,
         size: Int,
-    ): Result<PageableResponse<CartItemResponse>> =
+    ): PageableResponse<CartItemResponse> =
         safeApiCall {
             cartService.fetchCartItems(
                 page,
@@ -22,14 +22,13 @@ class CartRemoteDataSourceImpl(
             )
         }
 
-    override suspend fun addCartItem(addCartItemCommand: AddCartItemCommand): Result<Long> =
-        runCatching {
-            val response = cartService.addCartItem(addCartItemCommand)
-            val cartId = response.extractCartItemId()
-            requireNotNull(cartId)
-        }
+    override suspend fun addCartItem(addCartItemCommand: AddCartItemCommand): Long {
+        val response = cartService.addCartItem(addCartItemCommand)
+        val cartId = response.extractCartItemId()
+        return requireNotNull(cartId)
+    }
 
-    override suspend fun deleteCartItem(cartId: Long): Result<Unit> =
+    override suspend fun deleteCartItem(cartId: Long) =
         safeApiCall {
             cartService.deleteCartItem(
                 cartId,
@@ -39,12 +38,11 @@ class CartRemoteDataSourceImpl(
     override suspend fun patchCartItemQuantity(
         cartId: Long,
         quantity: Quantity,
-    ): Result<Unit> =
-        safeApiCall {
-            cartService.patchCartItemQuantity(cartId, quantity)
-        }
+    ) = safeApiCall {
+        cartService.patchCartItemQuantity(cartId, quantity)
+    }
 
-    override suspend fun fetchCartItemCount(): Result<Quantity> =
+    override suspend fun fetchCartItemCount(): Quantity =
         safeApiCall {
             cartService.fetchCartItem()
         }
