@@ -5,6 +5,8 @@ import woowacourse.shopping.data.datasource.local.CartLocalDataSource
 import woowacourse.shopping.data.datasource.local.CartLocalDataSourceImpl
 import woowacourse.shopping.data.datasource.local.CouponLocalDataSource
 import woowacourse.shopping.data.datasource.local.CouponLocalDataSourceImpl
+import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSource
+import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.CartRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.CouponRemoteDataSource
@@ -13,8 +15,6 @@ import woowacourse.shopping.data.datasource.remote.OrderRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSourceImpl
-import woowacourse.shopping.data.datasource.remote.RecentProductLocalDataSource
-import woowacourse.shopping.data.datasource.remote.RecentProductLocalDataSourceImpl
 import woowacourse.shopping.data.db.ShoppingDatabase
 
 object DataSourceProvider {

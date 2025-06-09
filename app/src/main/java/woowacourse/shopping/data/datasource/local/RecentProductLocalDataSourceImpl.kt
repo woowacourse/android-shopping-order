@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.datasource.remote
+package woowacourse.shopping.data.datasource.local
 
 import woowacourse.shopping.data.db.RecentProductDao
 import woowacourse.shopping.data.db.RecentProductEntity
