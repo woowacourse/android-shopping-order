@@ -8,23 +8,10 @@ data class CouponApplyState(
     val coupons: List<CouponsItem>,
     val selectedCoupon: Coupon?,
     val cartItems: List<CartItem>,
-    val deliveryFee: Int,
+    val anInt: Int,
 ) {
     val orderAmount: Int = cartItems.sumOf(CartItem::price)
-    val discountAmount: Int =
-        when (selectedCoupon) {
-            is Coupon.BuyNGetNCoupon ->
-                cartItems
-                    .filter { it.quantity >= 3 }
-                    .maxByOrNull { cartItem: CartItem ->
-                        cartItem.productPrice
-                    }?.productPrice ?: 0
-
-            is Coupon.FixedDiscountCoupon -> selectedCoupon.discount
-            is Coupon.FreeShippingCoupon -> deliveryFee
-            is Coupon.PercentageCoupon -> (orderAmount * selectedCoupon.discountRate).toInt()
-            null -> 0
-        }
+    val discountAmount: Int = selectedCoupon?.discountAmount(cartItems, anInt) ?: 0
     val totalPaymentAmount: Int = orderAmount - discountAmount
 
     companion object {
@@ -34,7 +21,7 @@ data class CouponApplyState(
                 coupons = emptyList(),
                 selectedCoupon = null,
                 cartItems = emptyList(),
-                deliveryFee = 0,
+                anInt = 0,
             )
     }
 }

@@ -49,7 +49,7 @@ class CouponApplyActivity : AppCompatActivity() {
             adapter.submitList(state.coupons)
             binding.couponApplyOrderAmount.text = state.orderAmount.toString()
             binding.couponApplyCouponDiscountAmount.text = state.discountAmount.toString()
-            binding.couponApplyDeliveryFee.text = state.deliveryFee.toString()
+            binding.couponApplyDeliveryFee.text = state.anInt.toString()
             binding.couponApplyTotalPaymentAmount.text = state.totalPaymentAmount.toString()
         }
     }

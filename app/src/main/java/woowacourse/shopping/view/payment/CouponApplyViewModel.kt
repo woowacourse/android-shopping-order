@@ -17,7 +17,7 @@ import woowacourse.shopping.view.SingleLiveData
 
 class CouponApplyViewModel(
     private val repository: CouponRepository = DefaultCouponRepository(),
-    private val deliveryFee: DeliveryFee = DefaultDeliveryFee(),
+    private val anDeliveryFee: DeliveryFee = DefaultDeliveryFee(),
 ) : ViewModel() {
     private val _event: MutableSingleLiveData<CouponEvent> = MutableSingleLiveData()
     val event: SingleLiveData<CouponEvent> get() = _event
@@ -43,7 +43,7 @@ class CouponApplyViewModel(
                                     },
                             selectedCoupon = null,
                             cartItems = cartItems,
-                            deliveryFee = deliveryFee.value,
+                            anInt = anDeliveryFee.value,
                         )
                 }.onFailure {
                     throw it
