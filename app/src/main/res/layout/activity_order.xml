@@ -58,13 +58,6 @@
             app:layout_constraintTop_toBottomOf="@id/tv_available_coupon_message"
             tools:text="* 쿠폰은 1개만 적용 가능합니다." />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_horizontal_25"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.25" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_coupon"
             android:layout_width="match_parent"
@@ -73,7 +66,7 @@
             app:layout_constraintBottom_toTopOf="@id/guideline_horizontal_60"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_25"
+            app:layout_constraintTop_toBottomOf="@id/tv_available_coupon_info_message"
             tools:listitem="@layout/item_coupon" />
 
 
@@ -110,6 +103,7 @@
             android:id="@+id/tv_order_price_data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{@string/order_price_format(vm.paymentSummaryUiState.orderPrice)}"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -136,6 +130,7 @@
             android:id="@+id/tv_coupon_discount_data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{@string/order_price_format(vm.paymentSummaryUiState.couponDiscountPrice)}"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -162,9 +157,9 @@
             android:id="@+id/tv_delivery_price_data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{@string/order_price_format(vm.paymentSummaryUiState.shippingFee)}"
             android:textColor="@color/black"
             android:textSize="18sp"
-
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/tv_delivery_price_message"
             app:layout_constraintEnd_toEndOf="parent"
@@ -197,9 +192,9 @@
             android:id="@+id/tv_total_price_data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{@string/order_price_format(vm.paymentSummaryUiState.totalPaymentAmount)}"
             android:textColor="@color/black"
             android:textSize="18sp"
-
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/tv_total_price_message"
             app:layout_constraintEnd_toEndOf="parent"
