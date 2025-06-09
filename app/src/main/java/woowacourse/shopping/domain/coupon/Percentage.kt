@@ -15,7 +15,9 @@ data class Percentage(
     override val availableEndTime: LocalTime? = null,
 ) : Coupon() {
     override fun discountAmount(shoppingCartProductToOrder: List<ShoppingCartProduct>): Int {
-        val totalPrice = shoppingCartProductToOrder.sumOf { it.price }
-        return totalPrice * (discount / 100)
+        val totalPrice = shoppingCartProductToOrder.sumOf { it.price }.toBigDecimal()
+        val discount = discount.toBigDecimal()
+        val discountRate = discount.divide(100.toBigDecimal())
+        return (totalPrice.multiply(discountRate)).toInt()
     }
 }

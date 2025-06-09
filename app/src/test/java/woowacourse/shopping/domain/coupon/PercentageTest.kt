@@ -10,16 +10,15 @@ class PercentageTest {
     @Test
     fun `퍼센트 쿠폰은 구매 금액의 해당 퍼센트만큼 할인된다`() {
         // given
-        val expected =
-            SHOPPING_CART_PRODUCTS_TO_ORDER.sumOf { it.price } * (PERCENTAGE.discount / 100)
-
+        // 쇼핑카드의 총 금액 : 300,000원, 할인율 30%, 예상 할인액 : 90,000원
+        val expected = 90_000
         // when
         val actual =
             PERCENTAGE.discountAmount(
                 SHOPPING_CART_PRODUCTS_TO_ORDER,
             )
         // then
-        assertThat(expected).isEqualTo(actual)
+        assertThat(actual).isEqualTo(expected)
     }
 
     @Test
