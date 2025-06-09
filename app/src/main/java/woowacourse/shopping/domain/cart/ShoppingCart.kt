@@ -1,13 +1,16 @@
 package woowacourse.shopping.domain.cart
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.product.Product
 
+@Parcelize
 data class ShoppingCart(
     val id: Long,
     val product: Product,
     val quantity: Quantity,
-) {
+): Parcelable {
     val productId: Long
         get() = product.id
 
