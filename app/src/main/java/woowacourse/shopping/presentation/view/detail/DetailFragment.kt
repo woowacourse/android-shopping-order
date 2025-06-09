@@ -12,6 +12,7 @@ import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.extension.getParcelableCompat
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.cart.CartFragment
+import woowacourse.shopping.presentation.view.catalog.CatalogFragment.Companion.CART_UPDATE_REQUEST_KEY
 
 class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_detail) {
     private val viewModel: DetailViewModel by viewModels {
@@ -56,13 +57,13 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
 
     private fun initListener() {
         binding.btnClose.setOnClickListener {
-            parentFragmentManager.setFragmentResult("cart_update_result", Bundle())
+            parentFragmentManager.setFragmentResult(CART_UPDATE_REQUEST_KEY, Bundle())
             parentFragmentManager.popBackStack()
         }
     }
 
     private fun navigateToCatalog() {
-        parentFragmentManager.setFragmentResult("cart_update_result", Bundle())
+        parentFragmentManager.setFragmentResult(CART_UPDATE_REQUEST_KEY, Bundle())
 
         parentFragmentManager.commit {
             setReorderingAllowed(true)

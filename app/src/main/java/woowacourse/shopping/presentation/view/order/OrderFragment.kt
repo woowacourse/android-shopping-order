@@ -15,6 +15,7 @@ import woowacourse.shopping.presentation.extension.getParcelableArrayListCompat
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.CouponUiModel
 import woowacourse.shopping.presentation.view.catalog.CatalogFragment
+import woowacourse.shopping.presentation.view.catalog.CatalogFragment.Companion.CART_UPDATE_REQUEST_KEY
 import woowacourse.shopping.presentation.view.order.coupon.CouponAdapter
 
 class OrderFragment :
@@ -87,7 +88,7 @@ class OrderFragment :
     }
 
     private fun navigateToScreen() {
-        parentFragmentManager.setFragmentResult("cart_update_result", Bundle())
+        parentFragmentManager.setFragmentResult(CART_UPDATE_REQUEST_KEY, Bundle())
 
         parentFragmentManager.popBackStack()
         parentFragmentManager.commit {
@@ -96,7 +97,7 @@ class OrderFragment :
     }
 
     private fun navigateToCatalog() {
-        parentFragmentManager.setFragmentResult("cart_update_result", Bundle())
+        parentFragmentManager.setFragmentResult(CART_UPDATE_REQUEST_KEY, Bundle())
         parentFragmentManager.popBackStack()
         parentFragmentManager.commit {
             setReorderingAllowed(true)

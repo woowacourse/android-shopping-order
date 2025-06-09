@@ -14,6 +14,7 @@ import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.cartItem.CartItemFragment
 import woowacourse.shopping.presentation.view.cart.recommendation.CartRecommendationFragment
+import woowacourse.shopping.presentation.view.catalog.CatalogFragment.Companion.CART_UPDATE_REQUEST_KEY
 import woowacourse.shopping.presentation.view.order.OrderFragment
 
 class CartFragment :
@@ -63,7 +64,7 @@ class CartFragment :
     }
 
     private fun navigateBack() {
-        parentFragmentManager.setFragmentResult("cart_update_result", Bundle())
+        parentFragmentManager.setFragmentResult(CART_UPDATE_REQUEST_KEY, Bundle())
 
         parentFragmentManager.popBackStack()
         parentFragmentManager.commit {

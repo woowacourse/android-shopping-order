@@ -40,7 +40,7 @@ class CatalogFragment :
         super.onViewCreated(view, savedInstanceState)
 
         parentFragmentManager.setFragmentResultListener(
-            "cart_update_result",
+            CART_UPDATE_REQUEST_KEY,
             viewLifecycleOwner,
         ) { _, _ ->
             viewModel.refreshCartState()
@@ -122,6 +122,7 @@ class CatalogFragment :
     }
 
     companion object {
+        const val CART_UPDATE_REQUEST_KEY = "cart_update_result"
         private const val SPAN_COUNT = 2
         private const val SINGLE_SPAN_COUNT = 1
         private const val ITEM_SPACING = 12f
