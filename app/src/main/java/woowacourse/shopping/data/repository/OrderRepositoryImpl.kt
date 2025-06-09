@@ -1,7 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import woowacourse.shopping.data.datasource.local.CartLocalDataSource
 import woowacourse.shopping.data.datasource.local.CouponLocalDataSource
 import woowacourse.shopping.data.datasource.remote.OrderRemoteDataSource
@@ -41,10 +39,6 @@ class OrderRepositoryImpl(
             cartLocalDataSource.removeCartProductsByCartIds(cartProductIds)
         }
 
-    private suspend fun findCartProducts(productIds: List<Long>): List<CartProduct> =
-        coroutineScope {
-            val deferredProducts =
-                productIds.map { productId -> async { cartLocalDataSource.getCartProduct(productId) } }
-            deferredProducts.mapNotNull { it.await() }
-        }
+    private fun findCartProducts(productIds: List<Long>): List<CartProduct> =
+        productIds.mapNotNull { productId -> cartLocalDataSource.getCartProduct(productId) }
 }
