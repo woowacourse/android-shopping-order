@@ -49,8 +49,8 @@ class CartViewModel(
     val isCheckAll: LiveData<Boolean> = _isCheckAll
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
-    private val _navigateTo = SingleLiveData<Pair<Int, Int>>()
-    val navigateTo: LiveData<Pair<Int, Int>> = _navigateTo
+    private val _navigateTo = SingleLiveData<LongArray>()
+    val navigateTo: LiveData<LongArray> = _navigateTo
 
     private var initCartItemStatus: List<CartItemUiModel>? = null
     val isUpdated: Boolean
@@ -79,7 +79,7 @@ class CartViewModel(
                     if (initCartItemStatus == null) initCartItemStatus = newItems
                     _cartItems.value = newItems
                     _uiState.value = ResultState.Success(Unit)
-                }.onFailure { _toastMessage.postValue(R.string.cart_toast_load_fail) }
+                }.onFailure { _toastMessage.value = R.string.cart_toast_load_fail }
         }
     }
 
@@ -101,7 +101,7 @@ class CartViewModel(
 
                     _cartItems.value = newItems
                     _uiState.value = ResultState.Success(Unit)
-                }.onFailure { _toastMessage.postValue(R.string.cart_toast_load_fail) }
+                }.onFailure { _toastMessage.value = R.string.cart_toast_load_fail }
         }
     }
 
@@ -130,7 +130,13 @@ class CartViewModel(
     }
 
     override fun onClickRecommend() {
-        _navigateTo.value = Pair(selectedTotalPrice.value ?: 0, selectedTotalCount.value ?: 0)
+        val selectedProductIds: LongArray =
+            cartItems.value
+                ?.filter { it.isSelected }
+                ?.map { it.product.id }
+                ?.toLongArray()
+                ?: longArrayOf()
+        _navigateTo.value = selectedProductIds
     }
 
     override fun onClickMinus(id: Long) {

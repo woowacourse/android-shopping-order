@@ -18,6 +18,7 @@ class RecommendViewModelFactory : ViewModelProvider.Factory {
         return RecommendViewModel(
             productRepository,
             recentProductRepository,
+            cartRepository,
             increaseProductQuantityUseCase,
             decreaseProductQuantityUseCase,
             addToCartUseCase,

@@ -122,9 +122,8 @@ class CartActivity : AppCompatActivity() {
             showToast(resId)
         }
 
-        viewModel.navigateTo.observe(this) { (totalPrice, totalCount) ->
-            val intent =
-                RecommendActivity.newIntent(this, totalPrice, totalCount)
+        viewModel.navigateTo.observe(this) { productIds ->
+            val intent = RecommendActivity.newIntent(this, productIds)
             recommendLauncher.launch(intent)
         }
     }
