@@ -13,12 +13,12 @@ class CalculatePaymentAmountByCouponUseCase(
         couponId: Long,
         products: Products,
         now: LocalTime = LocalTime.now(),
-    ): Int? {
+    ): Int {
         val orderAmount: Int =
             products.getSelectedCartProductsPrice()
         val totalPaymentAmount = orderAmount + DEFAULT_SHIPPING_FEE
-        val selectedCoupon = couponRepository.fetchCoupon(couponId) ?: return null
-        if (!selectedCoupon.isAvailable(products, now)) return null
+        val selectedCoupon = couponRepository.fetchCoupon(couponId) ?: return totalPaymentAmount
+        if (!selectedCoupon.isAvailable(products, now)) return totalPaymentAmount
 
         return when (selectedCoupon) {
             is CouponDetailInfo.FixedDiscount -> {

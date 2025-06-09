@@ -42,20 +42,51 @@ class PaymentViewModel(
     }
 
     fun selectCoupon(selectedCouponId: Long) {
+        val currentSelectedCouponId =
+            _uiState.value
+                ?.coupons
+                ?.find { it.isSelected }
+                ?.id
+
+        val newSelectedCouponId =
+            if (currentSelectedCouponId == selectedCouponId) {
+                NO_SELECTED_COUPON_ID
+            } else {
+                selectedCouponId
+            }
+
         val updatedCoupons =
-            _uiState.value?.coupons?.map { it.copy(isSelected = it.id == selectedCouponId) }
-                ?: return
+            _uiState.value?.coupons?.map {
+                it.copy(isSelected = newSelectedCouponId != NO_SELECTED_COUPON_ID && it.id == newSelectedCouponId)
+            } ?: return
         updateUiState { it.copy(coupons = updatedCoupons) }
+
+        val selectedProducts = _uiState.value?.selectedProducts ?: EMPTY_PRODUCTS
+        if (newSelectedCouponId == NO_SELECTED_COUPON_ID) {
+            updateUiState {
+                it.copy(
+                    totalPaymentAmount = selectedProducts.getSelectedCartProductsPrice() + DEFAULT_SHIPPING_FEE,
+                    deliveryPrice = DEFAULT_SHIPPING_FEE,
+                    couponDiscount = NO_FIXED_DISCOUNT,
+                )
+            }
+        } else {
+            loadTotalPaymentAmount(newSelectedCouponId, selectedProducts)
+            loadDeliveryPrice(newSelectedCouponId)
+            loadCouponDiscount(newSelectedCouponId, selectedProducts)
+        }
+    }
+
+    private fun loadTotalPaymentAmount(
+        selectedCouponId: Long,
+        selectedProducts: Products,
+    ) {
         val totalPaymentAmount =
             calculatePaymentAmountByCouponUseCase(
                 selectedCouponId,
-                _uiState.value?.selectedProducts ?: EMPTY_PRODUCTS,
+                selectedProducts,
             )
-                ?: return
         updateUiState { it.copy(totalPaymentAmount = totalPaymentAmount) }
-
-        loadDeliveryPrice(selectedCouponId)
-        loadCouponDiscount(selectedCouponId, _uiState.value?.selectedProducts ?: EMPTY_PRODUCTS)
     }
 
     private fun loadCouponDiscount(
@@ -97,6 +128,7 @@ class PaymentViewModel(
         private const val FREE_SHIPPING_FEE: Int = 0
         private const val FIXED_DISCOUNT_AMOUNT = -5000
         private const val NO_FIXED_DISCOUNT = 0
+        private const val NO_SELECTED_COUPON_ID = -1L
 
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
