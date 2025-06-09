@@ -18,6 +18,7 @@ import woowacourse.shopping.domain.usecase.CalculatePaymentAmountByCouponUseCase
 import woowacourse.shopping.domain.usecase.GetCouponsUseCase
 import woowacourse.shopping.domain.usecase.IsFreeShippingCouponUseCase
 import woowacourse.shopping.ui.payment.adapter.CouponUiModel.Companion.toUiModel
+import woowacourse.shopping.util.Event
 
 class PaymentViewModel(
     private val getCouponsUseCase: GetCouponsUseCase,
@@ -28,6 +29,9 @@ class PaymentViewModel(
     private val _uiState: MutableLiveData<PaymentUiState> =
         MutableLiveData<PaymentUiState>(PaymentUiState())
     val uiState: LiveData<PaymentUiState> get() = _uiState
+
+    private val _onPayClick: MutableLiveData<Event<Unit>> = MutableLiveData<Event<Unit>>()
+    val onPayClick: LiveData<Event<Unit>> get() = _onPayClick
 
     fun loadProductsInfo(products: Products) {
         updateUiState {
@@ -75,6 +79,10 @@ class PaymentViewModel(
             loadDeliveryPrice(newSelectedCouponId)
             loadCouponDiscount(newSelectedCouponId, selectedProducts)
         }
+    }
+
+    fun onPayClick() {
+        _onPayClick.value = Event(Unit)
     }
 
     private fun loadTotalPaymentAmount(
@@ -126,7 +134,6 @@ class PaymentViewModel(
 
     companion object {
         private const val FREE_SHIPPING_FEE: Int = 0
-        private const val FIXED_DISCOUNT_AMOUNT = -5000
         private const val NO_FIXED_DISCOUNT = 0
         private const val NO_SELECTED_COUPON_ID = -1L
 

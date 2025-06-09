@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.payment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityPaymentBinding
@@ -48,10 +49,18 @@ class PaymentActivity : DataBindingActivity<ActivityPaymentBinding>(R.layout.act
         viewModel.uiState.observe(this) { uiState ->
             adapter.submitList(uiState.coupons)
         }
+
+        viewModel.onPayClick.observe(this) { event ->
+            event.getContentIfNotHandled()?.let {
+                Toast.makeText(this, PAY_COMPLETE_MESSAGE, Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
     }
 
     companion object {
         private const val KEY_SELECTED_PRODUCTS_ID = "selectedProductIds"
+        private const val PAY_COMPLETE_MESSAGE = "결제가 완료되었습니다."
 
         fun newIntent(
             context: Context,

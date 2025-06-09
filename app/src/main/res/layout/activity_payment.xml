@@ -225,6 +225,7 @@
             android:layout_marginTop="76dp"
             android:background="@color/mint_1"
             android:paddingVertical="12dp"
+            android:onClick="@{() -> viewModel.onPayClick()}"
             android:text="@string/pay_button"
             android:textAlignment="center"
             android:textColor="@color/white"

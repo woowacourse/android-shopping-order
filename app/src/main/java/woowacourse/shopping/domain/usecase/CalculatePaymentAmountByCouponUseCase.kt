@@ -35,7 +35,7 @@ class CalculatePaymentAmountByCouponUseCase(
             }
 
             is CouponDetailInfo.PercentDiscount -> {
-                val discount = orderAmount * selectedCoupon.discount / 100
+                val discount = orderAmount * selectedCoupon.discount / ONE_HUNDRED_PERCENT
                 totalPaymentAmount - discount
             }
         }
@@ -43,5 +43,6 @@ class CalculatePaymentAmountByCouponUseCase(
 
     companion object {
         const val DEFAULT_SHIPPING_FEE: Int = 3000
+        private const val ONE_HUNDRED_PERCENT: Int = 100
     }
 }
