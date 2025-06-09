@@ -36,7 +36,7 @@ class PaymentViewModel(
     fun loadProductsInfo(products: Products) {
         setupAmountsBeforeCoupon(products)
         loadCoupons()
-        val orderPrice = products.getSelectedCartProductsPrice()
+        val orderPrice = products.getSelectedCartRecommendProductsPrice()
         loadInitOrderPrice(orderPrice)
     }
 
@@ -74,7 +74,7 @@ class PaymentViewModel(
         updateUiState {
             it.copy(
                 selectedProducts = products.getOrderedProducts(),
-                totalPaymentAmount = products.getSelectedCartProductsPrice() + DEFAULT_SHIPPING_FEE,
+                totalPaymentAmount = products.getSelectedCartRecommendProductsPrice() + DEFAULT_SHIPPING_FEE,
                 deliveryPrice = DEFAULT_SHIPPING_FEE,
                 couponDiscount = NO_FIXED_DISCOUNT,
             )
