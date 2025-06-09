@@ -15,6 +15,7 @@ import woowacourse.shopping.presentation.model.toCartItem
 import woowacourse.shopping.presentation.model.toProductUiModel
 
 class DetailViewModel(
+    private val productId: Long,
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
 ) : ViewModel() {
@@ -27,10 +28,14 @@ class DetailViewModel(
     private val _lastViewedProduct = MutableLiveData<ProductUiModel>()
     val lastViewedProduct: LiveData<ProductUiModel> = _lastViewedProduct
 
-    fun loadProduct(id: Long) {
+    init {
+        loadProduct()
+    }
+
+    fun loadProduct() {
         viewModelScope.launch {
-            val product = productRepository.findProductById(id)
-            val cartItem = cartRepository.loadCartItemByProductId(id)
+            val product = productRepository.findProductById(productId)
+            val cartItem = cartRepository.loadCartItemByProductId(productId)
             if (cartItem == null) {
                 _product.postValue(product?.toProductUiModel()?.copy(quantity = MIN_QUANTITY))
             } else {
@@ -73,16 +78,15 @@ class DetailViewModel(
         private const val MIN_QUANTITY = 1
 
         @Suppress("UNCHECKED_CAST")
-        val Factory: ViewModelProvider.Factory =
-            object : ViewModelProvider.Factory {
-                override fun <T : ViewModel> create(
-                    modelClass: Class<T>,
-                    extras: CreationExtras,
-                ): T {
-                    val cartRepository = RepositoryProvider.cartRepository
-                    val productRepository = RepositoryProvider.productRepository
-                    return DetailViewModel(cartRepository, productRepository) as T
-                }
+        fun factory(productId: Long): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(
+                modelClass: Class<T>,
+                extras: CreationExtras,
+            ): T {
+                val cartRepository = RepositoryProvider.cartRepository
+                val productRepository = RepositoryProvider.productRepository
+                return DetailViewModel(productId, cartRepository, productRepository) as T
             }
+        }
     }
 }
