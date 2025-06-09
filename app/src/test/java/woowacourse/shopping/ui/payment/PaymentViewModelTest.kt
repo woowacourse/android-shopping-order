@@ -8,6 +8,7 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -59,7 +60,10 @@ class PaymentViewModelTest {
             coEvery { getCouponsUseCase() } returns Result.success(DUMMY_COUPONS_1)
 
             viewModel.loadProducts(DUMMY_PRODUCTS_3.products.map { it.productDetail.id })
+            advanceUntilIdle()
+
             viewModel.loadCoupons(DUMMY_PRODUCTS_3, DUMMY_LOCAL_DATE_TIME_1)
+            advanceUntilIdle()
 
             val state = viewModel.uiModel.getOrAwaitValue()
 
@@ -77,7 +81,10 @@ class PaymentViewModelTest {
             coEvery { getCouponsUseCase() } returns Result.success(DUMMY_COUPONS_1)
 
             viewModel.loadProducts(DUMMY_PRODUCTS_3.products.map { it.productDetail.id })
+            advanceUntilIdle()
+
             viewModel.loadCoupons(DUMMY_PRODUCTS_3, DUMMY_LOCAL_DATE_TIME_1)
+            advanceUntilIdle()
 
             viewModel.selectCoupon(
                 DUMMY_COUPONS_1.value
@@ -100,8 +107,10 @@ class PaymentViewModelTest {
             coEvery { orderProductsUseCase(any()) } returns Result.success(Unit)
 
             viewModel.loadProducts(DUMMY_PRODUCTS_1.products.map { it.productDetail.id })
+            advanceUntilIdle()
 
             viewModel.orderProducts()
+            advanceUntilIdle()
 
             val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.isOrderSuccess).isTrue()
@@ -116,8 +125,10 @@ class PaymentViewModelTest {
             coEvery { orderProductsUseCase(any()) } returns Result.failure(exception)
 
             viewModel.loadProducts(DUMMY_PRODUCTS_1.products.map { it.productDetail.id })
+            advanceUntilIdle()
 
             viewModel.orderProducts()
+            advanceUntilIdle()
 
             val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.isOrderSuccess).isFalse()

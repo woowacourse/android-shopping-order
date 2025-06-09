@@ -5,6 +5,7 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.unmockkAll
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -74,6 +75,7 @@ class CartViewModelTest {
             setUpTestLiveData(CartProductUiModel(cartProducts = DUMMY_PRODUCTS_1), "_uiModel", viewModel)
 
             viewModel.removeCartProduct(DUMMY_PRODUCT_1.cartId!!, DUMMY_PRODUCT_1.productDetail.id)
+            advanceUntilIdle()
 
             val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.editedProductIds).contains(DUMMY_PRODUCT_1.productDetail.id)
@@ -87,6 +89,7 @@ class CartViewModelTest {
             setUpTestLiveData(CartProductUiModel(cartProducts = DUMMY_PRODUCTS_1), "_uiModel", viewModel)
 
             viewModel.increaseCartProductQuantity(DUMMY_PRODUCT_1.productDetail.id)
+            advanceUntilIdle()
 
             val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.cartProducts.getProductByProductId(DUMMY_PRODUCT_1.productDetail.id)?.quantity).isEqualTo(10)
@@ -100,6 +103,7 @@ class CartViewModelTest {
             setUpTestLiveData(CartProductUiModel(cartProducts = DUMMY_PRODUCTS_1), "_uiModel", viewModel)
 
             viewModel.decreaseCartProductQuantity(DUMMY_PRODUCT_1.productDetail.id)
+            advanceUntilIdle()
 
             val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.cartProducts.getProductByProductId(DUMMY_PRODUCT_1.productDetail.id)?.quantity).isEqualTo(3)
@@ -149,6 +153,7 @@ class CartViewModelTest {
             setUpTestLiveData(CartProductUiModel(recommendedProducts = DUMMY_PRODUCTS_1), "_uiModel", viewModel)
 
             viewModel.increaseRecommendedProductQuantity(DUMMY_PRODUCT_1.productDetail.id)
+            advanceUntilIdle()
 
             val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.recommendedProducts.getProductByProductId(updated.productDetail.id)?.quantity).isEqualTo(updatedQuantity)
@@ -165,6 +170,7 @@ class CartViewModelTest {
             setUpTestLiveData(CartProductUiModel(recommendedProducts = DUMMY_PRODUCTS_1), "_uiModel", viewModel)
 
             viewModel.decreaseRecommendedProductQuantity(DUMMY_PRODUCT_1.productDetail.id)
+            advanceUntilIdle()
 
             val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.recommendedProducts.getProductByProductId(updated.productDetail.id)?.quantity).isEqualTo(updatedQuantity)

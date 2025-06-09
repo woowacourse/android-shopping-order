@@ -8,6 +8,7 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -91,6 +92,7 @@ class CatalogViewModelTest {
             )
 
             viewModel.loadMoreCatalogProducts()
+            advanceUntilIdle()
 
             val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.catalogProducts.products).containsExactlyElementsIn(
@@ -113,6 +115,7 @@ class CatalogViewModelTest {
             )
 
             viewModel.increaseCartProduct(DUMMY_PRODUCT_1.productDetail.id)
+            advanceUntilIdle()
 
             val result = viewModel.uiModel.getOrAwaitValue()
             assertThat(result.catalogProducts.getProductByProductId(updatedProduct.productDetail.id)?.quantity).isEqualTo(10)
@@ -133,6 +136,7 @@ class CatalogViewModelTest {
             )
 
             viewModel.decreaseCartProduct(DUMMY_PRODUCT_1.productDetail.id)
+            advanceUntilIdle()
 
             val result = viewModel.uiModel.getOrAwaitValue()
             assertThat(result.catalogProducts.getProductByProductId(updatedProduct.productDetail.id)?.quantity).isEqualTo(3)
@@ -152,6 +156,7 @@ class CatalogViewModelTest {
             )
 
             viewModel.loadCartProduct(DUMMY_PRODUCT_1.productDetail.id)
+            advanceUntilIdle()
 
             val result = viewModel.uiModel.getOrAwaitValue()
             assertThat(result.catalogProducts.getProductByProductId(updatedProduct.productDetail.id)?.quantity).isEqualTo(1234)
@@ -171,6 +176,7 @@ class CatalogViewModelTest {
             )
 
             viewModel.loadCartProductsByProductIds(listOf(DUMMY_PRODUCT_1.productDetail.id))
+            advanceUntilIdle()
 
             val result = viewModel.uiModel.getOrAwaitValue()
             assertThat(result.catalogProducts.products).containsExactlyElementsIn(updated)
@@ -182,6 +188,7 @@ class CatalogViewModelTest {
             coEvery { getSearchHistoryUseCase() } returns Result.success(listOf(DUMMY_HISTORY_PRODUCT_1))
 
             viewModel.loadHistoryProducts()
+            advanceUntilIdle()
 
             val result = viewModel.uiModel.getOrAwaitValue()
             assertThat(result.historyProducts).containsExactly(DUMMY_HISTORY_PRODUCT_1)
@@ -193,6 +200,7 @@ class CatalogViewModelTest {
             coEvery { getCartProductsQuantityUseCase() } returns Result.success(10)
 
             viewModel.loadCartProductsQuantity()
+            advanceUntilIdle()
 
             val result = viewModel.uiModel.getOrAwaitValue()
             assertThat(result.cartProductsQuantity).isEqualTo(10)
@@ -205,6 +213,7 @@ class CatalogViewModelTest {
             coEvery { getCatalogProductsUseCase(any(), any()) } returns Result.failure(exception)
 
             viewModel.loadMoreCatalogProducts()
+            advanceUntilIdle()
 
             val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.connectionErrorMessage).contains("ERROR")

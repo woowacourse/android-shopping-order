@@ -5,6 +5,7 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.unmockkAll
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -58,6 +59,7 @@ class ProductDetailViewModelTest {
 
             // when
             viewModel.loadProductDetail(expected.productDetail.id)
+            advanceUntilIdle()
 
             // then
             val state = viewModel.uiModel.getOrAwaitValue()
@@ -74,6 +76,7 @@ class ProductDetailViewModelTest {
 
             // when
             viewModel.loadProductDetail(999)
+            advanceUntilIdle()
 
             // then
             val state = viewModel.uiModel.getOrAwaitValue()
@@ -89,6 +92,7 @@ class ProductDetailViewModelTest {
 
             // when
             viewModel.loadLastHistoryProduct()
+            advanceUntilIdle()
 
             // then
             val state = viewModel.uiModel.getOrAwaitValue()
@@ -136,6 +140,7 @@ class ProductDetailViewModelTest {
 
             // when
             viewModel.updateCartProduct()
+            advanceUntilIdle()
 
             // then
             val state = viewModel.uiModel.getOrAwaitValue()
