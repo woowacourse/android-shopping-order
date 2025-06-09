@@ -4,7 +4,10 @@ import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.setMain
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -34,6 +37,11 @@ class OrderViewModelTest {
 
     @BeforeEach
     fun setUp() {
+        coEvery { couponRepository.getAllCoupons() } returns
+            Result.success(
+                COUPONS,
+            )
+
         viewModel =
             OrderViewModel(
                 couponRepository,
@@ -54,6 +62,10 @@ class OrderViewModelTest {
             Result.success(
                 COUPONS,
             )
+
+        val dispatcher = StandardTestDispatcher()
+        Dispatchers.setMain(dispatcher)
+
         val couponState =
             CouponState(
                 id = 0,
@@ -64,12 +76,9 @@ class OrderViewModelTest {
             )
 
         // when
-        viewModel =
-            OrderViewModel(
-                couponRepository,
-                shoppingCartRepository,
-                SHOPPING_CART_PRODUCTS_TO_ORDER,
-            )
+        viewModel.couponState.observeForever {}
+        dispatcher.scheduler.advanceUntilIdle()
+
         viewModel.toggleCoupon(couponState)
 
         // then
@@ -84,6 +93,8 @@ class OrderViewModelTest {
             Result.success(
                 COUPONS,
             )
+        val dispatcher = StandardTestDispatcher()
+        Dispatchers.setMain(dispatcher)
 
         val couponState =
             CouponState(
@@ -95,12 +106,9 @@ class OrderViewModelTest {
             )
 
         // when
-        viewModel =
-            OrderViewModel(
-                couponRepository,
-                shoppingCartRepository,
-                SHOPPING_CART_PRODUCTS_TO_ORDER,
-            )
+        viewModel.couponState.observeForever {}
+        dispatcher.scheduler.advanceUntilIdle()
+
         viewModel.toggleCoupon(couponState)
 
         // then

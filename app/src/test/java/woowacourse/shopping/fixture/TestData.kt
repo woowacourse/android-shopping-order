@@ -1,6 +1,7 @@
 package woowacourse.shopping.fixture
 
 import woowacourse.shopping.domain.coupon.BuyXGetY
+import woowacourse.shopping.domain.coupon.Fixed
 import woowacourse.shopping.domain.coupon.FreeShipping
 import woowacourse.shopping.view.product.ProductsItem
 import woowacourse.shopping.view.shoppingCart.ShoppingCartItem
@@ -87,5 +88,32 @@ val COUPONS =
             code = "adsf",
             buyQuantity = 2,
             getQuantity = 1,
+        ),
+    )
+
+val COUPONS2 =
+    listOf(
+        FreeShipping(
+            id = 0,
+            description = "무료배송",
+            explanationDate = LocalDate.of(2099, 1, 1),
+            code = "adsf",
+            minimumAmount = 0,
+        ),
+        Fixed(
+            id = 1,
+            description = "10000원 쿠폰",
+            explanationDate = LocalDate.of(2000, 1, 1),
+            code = "adsf",
+            discount = 10000,
+            minimumAmount = 0,
+        ),
+        Fixed(
+            id = 1,
+            description = "10000원 쿠폰",
+            explanationDate = LocalDate.of(2000, 1, 1),
+            code = "adsf",
+            discount = 10000,
+            minimumAmount = 0,
         ),
     )
