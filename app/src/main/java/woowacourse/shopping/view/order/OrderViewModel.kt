@@ -25,7 +25,7 @@ class OrderViewModel(
 
     val price: Int get() = productsToOrder.sumOf { it.price }
 
-    private val _shippingFee: MutableLiveData<ShippingFee> = MutableLiveData()
+    private val _shippingFee: MutableLiveData<ShippingFee> = MutableLiveData(ShippingFee())
     val shippingFee: LiveData<ShippingFee> get() = _shippingFee
 
     init {

@@ -166,6 +166,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="end"
+            android:text="@{@string/product_price_format(viewModel.shippingFee.amount)}"
             android:textColor="@color/gray_3"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="@id/orderShippingFeeTitle"
