@@ -91,12 +91,13 @@ class PaymentViewModel(
             val result = orderRepository.submitOrder(selectedProducts.map { it.id })
 
             result
+                .onSuccess {
+                    _onFinishOrder.setValue(Unit)
+                }
                 .onFailure {
                     Log.e("error", it.message.toString())
                     _onError.setValue(Error.FailToOrder)
                 }
-
-            _onFinishOrder.setValue(Unit)
         }
     }
 }
