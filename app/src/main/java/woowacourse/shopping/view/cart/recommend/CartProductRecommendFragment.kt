@@ -61,6 +61,7 @@ class CartProductRecommendFragment : Fragment() {
                     app.productRepository,
                     app.cartProductRepository,
                     app.recentProductRepository,
+                    app.addToCartUseCase,
                 ),
             )[CartProductRecommendViewModel::class.java]
         initBindings()

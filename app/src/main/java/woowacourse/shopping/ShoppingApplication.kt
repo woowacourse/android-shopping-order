@@ -14,6 +14,7 @@ import woowacourse.shopping.data.repository.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
 
 class ShoppingApplication : Application() {
     private val database by lazy { ShoppingCartDatabase.getDataBase(this) }
@@ -34,4 +35,6 @@ class ShoppingApplication : Application() {
         by lazy { CouponRepositoryImpl(CouponRemoteDataSource(retrofitInstance.couponService)) }
     val orderRepository
         by lazy { OrderRepositoryImpl(OrderRemoteDataSource(retrofitInstance.orderService)) }
+
+    val addToCartUseCase by lazy { AddToCartUseCase(cartProductRepository) }
 }

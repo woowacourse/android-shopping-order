@@ -14,6 +14,7 @@ import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
 import woowacourse.shopping.view.product.catalog.adapter.ProductCatalogItem
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
@@ -22,6 +23,7 @@ class ProductCatalogViewModel(
     private val productRepository: ProductRepository,
     private val cartProductRepository: CartProductRepository,
     private val recentProductRepository: RecentProductRepository,
+    private val addToCartUseCase: AddToCartUseCase,
 ) : ViewModel(),
     ProductCatalogEventHandler {
     private var page = FIRST_PAGE
@@ -67,10 +69,9 @@ class ProductCatalogViewModel(
 
     override fun onPlusClick(item: Product) {
         viewModelScope.launch {
-            cartProductRepository
-                .insert(item.id, QUANTITY_TO_ADD)
-                .onSuccess { cartProductId ->
-                    cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
+            addToCartUseCase(item, QUANTITY_TO_ADD)
+                .onSuccess { cartProduct ->
+                    cartProducts.add(cartProduct)
                     updateProductQuantity(item, QUANTITY_TO_ADD)
                 }.onFailure { Log.e("error", it.message.toString()) }
         }

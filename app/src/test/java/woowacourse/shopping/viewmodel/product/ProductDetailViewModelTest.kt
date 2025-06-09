@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.view.product.detail.ProductDetailViewModel
@@ -22,14 +23,22 @@ class ProductDetailViewModelTest {
     private lateinit var viewModel: ProductDetailViewModel
     private lateinit var cartProductRepository: CartProductRepository
     private lateinit var recentProductRepository: RecentProductRepository
+    private lateinit var addToCartUseCase: AddToCartUseCase
     private lateinit var product: Product
 
     @BeforeEach
     fun setup() {
         cartProductRepository = FakeCartProductRepository()
         recentProductRepository = FakeRecentProductRepository()
+        addToCartUseCase = AddToCartUseCase(cartProductRepository)
         product = Product(id = 0, imageUrl = "", name = "Product 0", price = 1000, category = "")
-        viewModel = ProductDetailViewModel(product, cartProductRepository, recentProductRepository)
+        viewModel =
+            ProductDetailViewModel(
+                product,
+                cartProductRepository,
+                recentProductRepository,
+                addToCartUseCase,
+            )
     }
 
     @Test

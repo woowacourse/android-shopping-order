@@ -6,12 +6,14 @@ import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
 
 class CartProductRecommendViewModelFactory(
     private val selectedProducts: CartProducts,
     private val productRepository: ProductRepository,
     private val cartProductRepository: CartProductRepository,
     private val recentProductRepository: RecentProductRepository,
+    private val addToCartUseCase: AddToCartUseCase,
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -21,6 +23,7 @@ class CartProductRecommendViewModelFactory(
                 productRepository,
                 cartProductRepository,
                 recentProductRepository,
+                addToCartUseCase,
             ) as T
         }
         throw IllegalArgumentException()
