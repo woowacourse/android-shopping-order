@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
+import woowacourse.shopping.domain.cart.ShoppingCarts
 import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -159,9 +160,10 @@ class CartViewModel(
                     val newItems =
                         value
                             .carts
+                            .shoppingCarts
                             .map { CartState(it, _cartUiState.value?.allChecked ?: false) }
 
-                    val currentItems = _cartUiState.value?.items ?: emptyList()
+                    val currentItems = _cartUiState.value?.items.orEmpty()
                     val combinedItems = currentItems + newItems
 
                     _cartUiState.value =
@@ -211,13 +213,14 @@ class CartViewModel(
                 cartRepository.loadSinglePage(paging.getPageNo() - 1, PAGE_SIZE)
                     .onSuccess { value ->
 
-                        if (paging.resetToLastPageIfEmpty(value.carts)) {
+                        if (paging.resetToLastPageIfEmpty(value.carts.shoppingCarts)) {
                             refresh()
                             return@onSuccess
                         }
 
                         val pageState = paging.createPageState(!value.hasNextPage)
-                        val carts = value.carts.map { CartState(it, state.allChecked) }
+                        val carts =
+                            value.carts.shoppingCarts.map { CartState(it, state.allChecked) }
 
                         _cartUiState.value =
                             CartUiState(items = carts, pageState = pageState)
@@ -238,7 +241,7 @@ class CartViewModel(
             if (!state.hasPurchaseCart) {
                 _uiEvent.setValue(CartUiEvent.ShowNotHasPurchaseCart)
             } else {
-                _uiEvent.setValue(CartUiEvent.ChangeScreen(state.purchaseCart))
+                _uiEvent.setValue(CartUiEvent.ChangeScreen(ShoppingCarts(state.purchaseCart)))
             }
         }
     }

@@ -13,9 +13,9 @@ import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
-import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.cart.ShoppingCarts
 import woowacourse.shopping.view.NetworkExceptionHandler
-import woowacourse.shopping.view.core.ext.getSerializableArrayList
+import woowacourse.shopping.view.core.ext.getSerializableObject
 import woowacourse.shopping.view.core.ext.showToast
 import woowacourse.shopping.view.main.MainActivity
 import woowacourse.shopping.view.order.adapter.OrderAdapter
@@ -31,7 +31,6 @@ class OrderActivity : AppCompatActivity() {
             couponRepository = container.repositoryModule.defaultCouponRepository,
             orderRepository = container.repositoryModule.defaultOrderRepository,
             couponValidator = container.couponValidator,
-            couponApplierFactory = container.couponApplierFactory,
         )
     }
 
@@ -46,7 +45,7 @@ class OrderActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_order)
         networkExceptionDelegator = NetworkExceptionHandler(this)
 
-        val order = intent.getSerializableArrayList<ShoppingCart>(KEY_ORDER)
+        val order = intent.getSerializableObject<ShoppingCarts>(KEY_ORDER)
         viewModel.loadCoupons(order)
 
         setUpBinding(binding)
@@ -116,10 +115,10 @@ class OrderActivity : AppCompatActivity() {
     companion object {
         fun newIntent(
             context: Context,
-            order: List<ShoppingCart>,
+            order: ShoppingCarts,
         ): Intent {
             return Intent(context, OrderActivity::class.java).apply {
-                putExtra(KEY_ORDER, ArrayList(order))
+                putExtra(KEY_ORDER, order)
             }
         }
 

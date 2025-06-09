@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.cart.Cart
-import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.cart.ShoppingCarts
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.CartRepository
@@ -60,7 +60,7 @@ class MainViewModel(
 
     private fun applyMergedUiState(
         productPage: ProductSinglePage,
-        carts: List<ShoppingCart>,
+        carts: ShoppingCarts,
     ) = withState(_uiState.value) { state ->
         val newProducts = generateProductStates(productPage, carts)
         viewModelScope.launch {
@@ -100,11 +100,11 @@ class MainViewModel(
 
     private fun generateProductStates(
         productPage: ProductSinglePage,
-        carts: List<ShoppingCart>,
+        carts: ShoppingCarts,
     ): List<ProductState> {
         val newStates =
             productPage.products.map { product ->
-                val cart = carts.find { it.productId == product.id }
+                val cart = carts.findProduct(product.id)
 
                 ProductState.of(cart, product)
             }

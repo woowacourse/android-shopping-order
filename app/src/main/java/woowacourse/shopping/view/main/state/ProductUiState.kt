@@ -1,7 +1,7 @@
 package woowacourse.shopping.view.main.state
 
 import woowacourse.shopping.domain.Quantity
-import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.cart.ShoppingCarts
 import woowacourse.shopping.domain.product.Product
 
 data class ProductUiState(
@@ -32,12 +32,12 @@ data class ProductUiState(
         return copy(productItems = mutableItems)
     }
 
-    fun modifyQuantity(carts: List<ShoppingCart>): ProductUiState {
+    fun modifyQuantity(carts: ShoppingCarts): ProductUiState {
         val result =
             productItems.map { product ->
                 val productId = product.productId
 
-                carts.find { it.productId == productId }?.let { cart ->
+                carts.shoppingCarts.find { it.productId == productId }?.let { cart ->
                     product.modifyQuantity(cart.quantity)
                 } ?: run {
                     product.copy(cartQuantity = Quantity(0))

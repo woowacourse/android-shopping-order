@@ -1,7 +1,7 @@
 package woowacourse.shopping.view.order.state
 
 import woowacourse.shopping.domain.Payment
-import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.cart.ShoppingCarts
 import woowacourse.shopping.domain.coupon.BogoCoupon
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.CouponApplierFactory
@@ -10,13 +10,13 @@ import woowacourse.shopping.domain.coupon.FreeshippingCoupon
 import woowacourse.shopping.domain.coupon.MiracleSaleCoupon
 
 data class OrderUiState(
-    val order: List<ShoppingCart>,
+    val order: ShoppingCarts,
     val coupons: List<CouponState>,
     val originPayment: Payment,
     val payment: Payment,
 ) {
     val orderCartIds: List<Long>
-        get() = order.map { it.id }
+        get() = order.cartIds
 
     fun changeCouponCheckState(
         couponId: Int,
@@ -63,11 +63,11 @@ data class OrderUiState(
 
     companion object {
         fun of(
-            order: List<ShoppingCart>,
+            order: ShoppingCarts,
             coupons: List<Coupon>,
             deliveryFee: Int,
         ): OrderUiState {
-            val orderPrice = order.sumOf { it.payment }
+            val orderPrice = order.totalPayment
             val originPayment = Payment(orderPrice, deliveryFee)
             return OrderUiState(
                 order = order,

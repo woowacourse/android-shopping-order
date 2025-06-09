@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.cart.ShoppingCarts
 import woowacourse.shopping.fixture.productFixture1
 import java.time.LocalDate
 
@@ -25,8 +26,10 @@ class BogoCouponTest {
             )
 
         val order =
-            listOf(
-                ShoppingCart(id = 1, quantity = Quantity(2), product = productFixture1),
+            ShoppingCarts(
+                listOf(
+                    ShoppingCart(id = 1, quantity = Quantity(2), product = productFixture1),
+                ),
             )
 
         val result = coupon.isUsable(today, order)
@@ -48,8 +51,10 @@ class BogoCouponTest {
             )
 
         val order =
-            listOf(
-                ShoppingCart(id = 1, quantity = Quantity(2), product = productFixture1),
+            ShoppingCarts(
+                listOf(
+                    ShoppingCart(id = 1, quantity = Quantity(2), product = productFixture1),
+                ),
             )
 
         val result = coupon.isUsable(today, order)
@@ -71,9 +76,11 @@ class BogoCouponTest {
             )
 
         val order =
-            listOf(
-                ShoppingCart(id = 1, quantity = Quantity(2), product = productFixture1),
-                ShoppingCart(id = 1, quantity = Quantity(3), product = productFixture1),
+            ShoppingCarts(
+                listOf(
+                    ShoppingCart(id = 1, quantity = Quantity(2), product = productFixture1),
+                    ShoppingCart(id = 1, quantity = Quantity(3), product = productFixture1),
+                ),
             )
 
         val result = coupon.isUsable(today, order)

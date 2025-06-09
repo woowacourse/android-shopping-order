@@ -11,11 +11,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
-import retrofit2.HttpException
 import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.cart.ShoppingCarts
 import woowacourse.shopping.view.NetworkExceptionHandler
 import woowacourse.shopping.view.cart.carts.CartListFragment
 import woowacourse.shopping.view.cart.recommend.RecommendFragment
@@ -86,15 +85,7 @@ class CartActivity : AppCompatActivity() {
         }
     }
 
-    private fun getErrorMessage(throwable: Throwable): Int {
-        return when (throwable) {
-            is NullPointerException -> R.string.error_text_null_result
-            is HttpException -> R.string.error_text_network_error
-            else -> R.string.error_text_unknown
-        }
-    }
-
-    private fun changeFragment(orders: List<ShoppingCart>?) {
+    private fun changeFragment(orders: ShoppingCarts?) {
         when (supportFragmentManager.findFragmentById(R.id.fragment_container_view)) {
             is CartListFragment -> {
                 supportFragmentManager.commit {

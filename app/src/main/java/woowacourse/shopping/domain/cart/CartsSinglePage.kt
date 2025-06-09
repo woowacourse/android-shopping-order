@@ -1,11 +1,8 @@
 package woowacourse.shopping.domain.cart
 
 data class CartsSinglePage(
-    val carts: List<ShoppingCart>,
+    val carts: ShoppingCarts,
     val hasNextPage: Boolean,
 ) {
-    fun isSavedInCart(productId: Long) =
-        carts.find {
-            it.productId == productId
-        }
+    fun isSavedInCart(productId: Long) = carts.findProduct(productId)
 }

@@ -13,6 +13,7 @@ import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.CartsSinglePage
 import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.cart.ShoppingCarts
 import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
@@ -44,8 +45,10 @@ class MainViewModelTest {
             val productPage = ProductSinglePage(products = products, hasNextPage = true)
 
             val carts =
-                listOf(
-                    ShoppingCart(id = 10L, product = productFixture1, quantity = Quantity(2)),
+                ShoppingCarts(
+                    listOf(
+                        ShoppingCart(id = 10L, product = productFixture1, quantity = Quantity(2)),
+                    ),
                 )
             val cartPage = CartsSinglePage(carts = carts, hasNextPage = false)
 

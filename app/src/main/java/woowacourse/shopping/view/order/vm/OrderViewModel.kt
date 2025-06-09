@@ -5,8 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import woowacourse.shopping.domain.cart.ShoppingCart
-import woowacourse.shopping.domain.coupon.CouponApplierFactory
+import woowacourse.shopping.domain.cart.ShoppingCarts
 import woowacourse.shopping.domain.coupon.CouponValidate
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -29,7 +28,7 @@ class OrderViewModel(
     private val _uiEvent = MutableSingleLiveData<OrderUiEvent>()
     val uiEvent: SingleLiveData<OrderUiEvent> get() = _uiEvent
 
-    fun loadCoupons(order: List<ShoppingCart>) {
+    fun loadCoupons(order: ShoppingCarts) {
         viewModelScope.launch {
             couponRepository.getCoupons()
                 .onSuccess { result ->
