@@ -13,7 +13,7 @@ import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.view.common.QuantityObservable
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.getSerializableExtraData
-import woowacourse.shopping.view.order.OrderActivityActivity
+import woowacourse.shopping.view.order.OrderActivity
 import woowacourse.shopping.view.product.ProductsItem
 
 class ShoppingCartRecommendActivity :
@@ -82,7 +82,7 @@ class ShoppingCartRecommendActivity :
     }
 
     override fun onOrderButtonClick(shoppingCartProductsToOrder: List<ShoppingCartProduct>) {
-        val intent = OrderActivityActivity.newIntent(this, shoppingCartProductsToOrder)
+        val intent = OrderActivity.newIntent(this, shoppingCartProductsToOrder)
         startActivity(intent)
     }
 

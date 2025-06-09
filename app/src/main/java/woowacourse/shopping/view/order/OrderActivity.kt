@@ -15,17 +15,18 @@ import woowacourse.shopping.view.common.getSerializableExtraData
 import woowacourse.shopping.view.common.showToast
 import woowacourse.shopping.view.product.ProductsActivity
 
-class OrderActivityActivity :
+class OrderActivity :
     AppCompatActivity(),
     OrderAdapter.CouponClickListener,
     OrderActivityClickListener {
     private val binding: ActivityOrderBinding by lazy {
         ActivityOrderBinding.inflate(layoutInflater)
     }
-    private lateinit var shoppingCartProductsToOrder: List<ShoppingCartProduct>
     private val viewModel: OrderViewModel by viewModels {
         OrderViewModel.factory(
-            shoppingCartProductsToOrder,
+            intent.getSerializableExtraData<Array<ShoppingCartProduct>>(
+                EXTRA_SHOPPING_CART_PRODUCTS_TO_ORDER_KEY,
+            )?.toList() ?: emptyList(),
         )
     }
 
@@ -40,11 +41,6 @@ class OrderActivityActivity :
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-        shoppingCartProductsToOrder =
-            intent.getSerializableExtraData<Array<ShoppingCartProduct>>(
-                EXTRA_SHOPPING_CART_PRODUCTS_TO_ORDER_KEY,
-            )?.toList() ?: emptyList()
 
         bindViewModel()
         setupObservers()
@@ -99,7 +95,7 @@ class OrderActivityActivity :
             context: Context,
             shoppingCartProductsToOrder: List<ShoppingCartProduct>,
         ): Intent =
-            Intent(context, OrderActivityActivity::class.java).apply {
+            Intent(context, OrderActivity::class.java).apply {
                 putExtra(
                     EXTRA_SHOPPING_CART_PRODUCTS_TO_ORDER_KEY,
                     shoppingCartProductsToOrder.toTypedArray(),

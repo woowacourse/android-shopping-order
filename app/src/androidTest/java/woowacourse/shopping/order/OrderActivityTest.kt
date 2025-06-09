@@ -19,17 +19,17 @@ import woowacourse.shopping.matcher.matchSize
 import woowacourse.shopping.matcher.matchText
 import woowacourse.shopping.matcher.performClick
 import woowacourse.shopping.rule.MockServerRule
-import woowacourse.shopping.view.order.OrderActivityActivity
+import woowacourse.shopping.view.order.OrderActivity
 
 @Suppress("FunctionName")
 @RunWith(AndroidJUnit4::class)
 class OrderActivityTest {
     private val intent =
-        OrderActivityActivity.newIntent(
+        OrderActivity.newIntent(
             fakeContext,
             PRODUCT_TO_ORDER,
         )
-    private val scenario = ActivityScenario.launch<OrderActivityActivity>(intent)
+    private val scenario = ActivityScenario.launch<OrderActivity>(intent)
 
     @Rule
     @JvmField
