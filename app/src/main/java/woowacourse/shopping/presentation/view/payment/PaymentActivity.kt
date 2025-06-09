@@ -66,7 +66,7 @@ class PaymentActivity : AppCompatActivity() {
 
         viewModel.orderSuccessEvent.observe(this) {
             val intent = ShoppingActivity.newIntent(this)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             startActivity(intent)
         }
     }
