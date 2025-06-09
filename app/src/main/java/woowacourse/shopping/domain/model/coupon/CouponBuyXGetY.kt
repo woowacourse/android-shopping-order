@@ -12,8 +12,10 @@ data class CouponBuyXGetY(
         !isExpired() &&
             cartItems.any { cartItem -> cartItem.quantity >= buyQuantity + getQuantity }
 
-    fun getDiscountedCartItem(cartItems: List<CartItem>): CartItem =
+    override fun getDiscountPrice(cartItems: List<CartItem>): Int =
         cartItems
             .filter { cartItem -> cartItem.quantity >= buyQuantity + getQuantity }
-            .maxBy { cartItem -> cartItem.totalPrice }
+            .maxOf { cartItem -> cartItem.product.price }
+
+    override fun getDiscountDeliveryFee(): Int = 0
 }

@@ -10,4 +10,8 @@ data class CouponFixedDiscount(
 ) : Coupon() {
     override fun isAvailable(cartItems: List<CartItem>): Boolean =
         !isExpired() && minimumOrderPrice <= cartItems.sumOf { cartItem -> cartItem.totalPrice }
+
+    override fun getDiscountPrice(cartItems: List<CartItem>): Int = discountPrice
+
+    override fun getDiscountDeliveryFee(): Int = 0
 }

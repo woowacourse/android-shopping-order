@@ -1,5 +1,7 @@
 package woowacourse.shopping.common.mapper
 
+import java.time.LocalDate
+import java.time.LocalTime
 import woowacourse.shopping.data.dto.coupon.CouponResponse
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.CouponBase
@@ -9,8 +11,6 @@ import woowacourse.shopping.domain.model.coupon.CouponFixedDiscount
 import woowacourse.shopping.domain.model.coupon.CouponFreeShipping
 import woowacourse.shopping.domain.model.coupon.CouponPercentDiscount
 import woowacourse.shopping.presentation.uimodel.CouponUiModel
-import java.time.LocalDate
-import java.time.LocalTime
 
 private const val ERROR_REQUIRED_FIELD_NULL = "%s는 null 일 수 없습니다."
 
@@ -67,6 +67,7 @@ fun Coupon.toUiModel(): CouponUiModel =
                 100_000,
                 null,
                 null,
+                false,
             )
 
         is CouponBuyXGetY ->
@@ -77,6 +78,7 @@ fun Coupon.toUiModel(): CouponUiModel =
                 null,
                 null,
                 null,
+                false,
             )
 
         is CouponFreeShipping ->
@@ -87,6 +89,7 @@ fun Coupon.toUiModel(): CouponUiModel =
                 50_000,
                 null,
                 null,
+                false,
             )
 
         is CouponPercentDiscount ->
@@ -97,5 +100,6 @@ fun Coupon.toUiModel(): CouponUiModel =
                 null,
                 availableStartTime,
                 availableEndTime,
+                false,
             )
     }

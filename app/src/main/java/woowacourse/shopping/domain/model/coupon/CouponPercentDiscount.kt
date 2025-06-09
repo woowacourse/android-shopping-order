@@ -16,4 +16,11 @@ data class CouponPercentDiscount(
             nowTime.isAfter(availableStartTime) &&
             nowTime.isBefore(availableEndTime)
     }
+
+    override fun getDiscountPrice(cartItems: List<CartItem>): Int {
+        val total = cartItems.sumOf { it.totalPrice }
+        return (total * (discountPercent / 100.0)).toInt()
+    }
+
+    override fun getDiscountDeliveryFee(): Int = 0
 }
