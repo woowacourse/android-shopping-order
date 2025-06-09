@@ -12,5 +12,5 @@ interface Coupon {
         now: LocalDateTime,
     ): Boolean
 
-    fun discount(cartItems: List<CartItem>): Int
+    fun discount(cartItems: List<CartItem>): Long
 }

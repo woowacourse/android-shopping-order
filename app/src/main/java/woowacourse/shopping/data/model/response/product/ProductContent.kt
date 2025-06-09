@@ -8,6 +8,6 @@ data class ProductContent(
     @SerialName("id") val id: Long,
     @SerialName("name") val name: String,
     @SerialName("imageUrl") val imageUrl: String,
-    @SerialName("price") val price: Int,
+    @SerialName("price") val price: Long,
     @SerialName("category") val category: String,
 )

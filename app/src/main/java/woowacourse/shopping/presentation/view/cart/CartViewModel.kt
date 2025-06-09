@@ -43,7 +43,7 @@ class CartViewModel(
     private var _isLastPage = MutableLiveData<Boolean>()
     val isLastPage: LiveData<Boolean> = _isLastPage
 
-    val totalPrice: LiveData<Int> =
+    val totalPrice: LiveData<Long> =
         _cartItems.map { cartItems ->
             cartItems
                 .filter { cartItem -> cartItem.isSelected }

@@ -10,6 +10,6 @@ data class RecentProductEntity(
     val category: String,
     val name: String,
     val imageUrl: String,
-    val price: Int,
+    val price: Long,
     val viewedAt: Long = System.currentTimeMillis(),
 )

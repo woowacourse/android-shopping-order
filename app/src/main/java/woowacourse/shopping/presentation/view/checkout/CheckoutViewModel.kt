@@ -30,14 +30,14 @@ class CheckoutViewModel(
     private val _cartItems = MutableLiveData<List<CartItem>>()
     val cartItems: LiveData<List<CartItem>> = _cartItems
 
-    val totalPrice: LiveData<Int> =
+    val totalPrice: LiveData<Long> =
         _cartItems.map { cartItems ->
             cartItems.sumOf { cartItem -> cartItem.totalPrice }
         }
 
     val shippingFee = Price.SHIPPING_FEE
 
-    val discountAmount: LiveData<Int> =
+    val discountAmount: LiveData<Long> =
         _coupons.switchMap { coupons ->
             _cartItems.map { cartItems ->
                 val selectedCoupon = coupons.firstOrNull { coupon -> coupon.isSelected }
@@ -45,7 +45,7 @@ class CheckoutViewModel(
             }
         }
 
-    val grandTotal: LiveData<Int> =
+    val grandTotal: LiveData<Long> =
         totalPrice.switchMap { totalPrice ->
             discountAmount.map { discountAmount ->
                 (totalPrice - discountAmount + shippingFee).coerceAtLeast(0)
