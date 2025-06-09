@@ -49,7 +49,7 @@ sealed interface Coupon {
         override val code: String,
         override val description: String,
         override val expirationDate: LocalDate,
-        val discount: Int,
+        val discountPercentage: Int,
         val availableStartTime: LocalTime,
         val availableEndTime: LocalTime,
     ) : Coupon {

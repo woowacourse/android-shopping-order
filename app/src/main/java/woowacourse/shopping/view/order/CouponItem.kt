@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.order
 
+import woowacourse.shopping.domain.order.Coupon
 import woowacourse.shopping.domain.order.DiscountType
 
 data class CouponItem(
@@ -10,4 +11,5 @@ data class CouponItem(
     val expirationDate: String,
     val type: DiscountType,
     val isSelected: Boolean = false,
+    val origin: Coupon,
 )

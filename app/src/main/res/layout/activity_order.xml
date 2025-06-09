@@ -139,6 +139,7 @@
         <TextView
             android:id="@+id/orderCouponDiscount"
             android:layout_width="0dp"
+            android:text="@{@string/product_price_format(viewModel.couponDiscount)}"
             android:layout_height="wrap_content"
             android:gravity="end"
             android:textColor="@color/gray_3"

@@ -30,7 +30,7 @@ class OrderViewModel(
     private val _shippingFee: MutableLiveData<ShippingFee> = MutableLiveData(ShippingFee())
     val shippingFee: LiveData<ShippingFee> get() = _shippingFee
 
-    private val _couponDiscount: MutableLiveData<Int> = MutableLiveData(0)
+    private val _couponDiscount: MediatorLiveData<Int> = MediatorLiveData(0)
     val couponDiscount: LiveData<Int> get() = _couponDiscount
 
     private val _totalPrice: MediatorLiveData<Int> = MediatorLiveData(0)
@@ -38,17 +38,51 @@ class OrderViewModel(
 
     init {
         _totalPrice.apply {
-            addSource(price) { price ->
-                _totalPrice.value = _totalPrice.value?.plus(price)
-            }
-            addSource(shippingFee) { shippingFee ->
-                _totalPrice.value = _totalPrice.value?.plus(shippingFee.amount)
-            }
-            addSource(couponDiscount) { couponDiscount ->
-                _totalPrice.value = _totalPrice.value?.minus(couponDiscount)
-            }
+            addSource(price) { calculateTotalPrice() }
+            addSource(shippingFee) { calculateTotalPrice() }
+            addSource(couponDiscount) { calculateTotalPrice() }
         }
+        _couponDiscount.apply {
+            addSource(applyingCoupon) { updateDiscount() }
+            addSource(price) { updateDiscount() }
+            addSource(shippingFee) { updateDiscount() }
+        }
+
         getCoupons()
+    }
+
+    private fun calculateTotalPrice() {
+        val basePrice = price.value ?: 0
+        val shipping = shippingFee.value?.amount ?: 0
+        val discount = couponDiscount.value ?: 0
+
+        _totalPrice.value = basePrice + shipping + discount
+    }
+
+    private fun updateDiscount() {
+        val couponItem = applyingCoupon.value ?: return
+        val currentPrice = price.value ?: 0
+
+        val discountAmount =
+            when (val origin = couponItem.origin) {
+                is Coupon.PriceDiscount -> -origin.discount
+                is Coupon.PercentageDiscount -> -currentPrice * (origin.discountPercentage / 100)
+                is Coupon.Bonus -> -(calculateBonusDiscount(origin) ?: 0)
+                is Coupon.FreeShipping -> -(shippingFee.value?.amount ?: 0)
+            }
+
+        _couponDiscount.value = discountAmount
+    }
+
+    private fun calculateBonusDiscount(coupon: Coupon.Bonus): Int? {
+        val productsToApplyBonusCoupon =
+            productsToOrder
+                .filter { it.quantity >= coupon.buyQuantity + coupon.getQuantity }
+
+        val maxPricedProduct: ShoppingCartProduct =
+            productsToApplyBonusCoupon.maxByOrNull { it.price } ?: return null
+
+        return maxPricedProduct.product.price
     }
 
     private fun getCoupons() {
@@ -85,6 +119,11 @@ class OrderViewModel(
 
     fun updateApplyingCoupon(couponId: Int) {
         val couponToApply: CouponItem = coupons.value?.find { it.id == couponId } ?: return
+        if (couponToApply.isSelected) {
+            _applyingCoupon.value = null
+            _coupons.value = coupons.value?.map { it.copy(isSelected = false) }
+            return
+        }
         _applyingCoupon.value = couponToApply
         updateCouponSelected(couponToApply)
     }

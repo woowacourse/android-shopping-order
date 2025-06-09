@@ -16,6 +16,7 @@ fun Coupon.toUiModel(): CouponItem {
                 condition = "최소 주문 금액: $minimumAmount",
                 expirationDate = formattedDate,
                 type = discountType,
+                origin = this,
             )
 
         is Coupon.Bonus ->
@@ -26,6 +27,7 @@ fun Coupon.toUiModel(): CouponItem {
                 condition = "3개씩 담은 제품이 여러개인 경우, 1개당 금액이 가장 비싼 제품에 적용.",
                 expirationDate = formattedDate,
                 type = discountType,
+                origin = this,
             )
 
         is Coupon.FreeShipping ->
@@ -36,6 +38,7 @@ fun Coupon.toUiModel(): CouponItem {
                 condition = "최소 주문 금액: $minimumAmount",
                 expirationDate = formattedDate,
                 type = discountType,
+                origin = this,
             )
 
         is Coupon.PercentageDiscount ->
@@ -46,6 +49,7 @@ fun Coupon.toUiModel(): CouponItem {
                 condition = "사용 가능 시간: 오전${availableStartTime}부터 ${availableEndTime}까지",
                 expirationDate = formattedDate,
                 type = discountType,
+                origin = this,
             )
     }
 }

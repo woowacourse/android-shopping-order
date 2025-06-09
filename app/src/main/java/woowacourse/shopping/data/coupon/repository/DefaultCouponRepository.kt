@@ -48,7 +48,7 @@ class DefaultCouponRepository(
                             code = it.code,
                             description = it.description,
                             expirationDate = LocalDate.parse(it.expirationDate),
-                            discount = it.discount ?: throw IllegalArgumentException(""),
+                            discountPercentage = it.discount ?: throw IllegalArgumentException(""),
                             availableStartTime = LocalTime.parse(it.availableTime?.start),
                             availableEndTime = LocalTime.parse(it.availableTime?.end),
                         )
