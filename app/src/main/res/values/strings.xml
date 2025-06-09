@@ -47,4 +47,7 @@
     <string name="toast_fail_select_all">전체 선택에 실패했습니다.</string>
     <string name="toast_fail_load_goods">상품을 불러오는데에 실패하였습니다.\n</string>
 
+    <!-- OrderActivity -->
+    <string name="minimum_date">최소 주문 금액: %,d원</string>
+
 </resources>

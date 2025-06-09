@@ -6,10 +6,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.carts.repository.CartRepository
+import woowacourse.shopping.data.coupons.repository.OrderRepository
 import woowacourse.shopping.data.util.mapper.toCartItems
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Coupon
 
-class CouponViewModel(private val cartRepository: CartRepository) : ViewModel(
+class CouponViewModel(
+    private val cartRepository: CartRepository,
+    private val orderRepository: OrderRepository
+) : ViewModel(
 ) {
 
     private val _coupons = MutableLiveData<List<Coupon>>()
@@ -21,8 +26,8 @@ class CouponViewModel(private val cartRepository: CartRepository) : ViewModel(
     private val _totalAmount = MutableLiveData<Int>()
     val totalAmount: LiveData<Int> get() = _totalAmount
 
-    private var _originalAmount= MutableLiveData<Int>(0)
-    val originalAmount : LiveData<Int> get() = _originalAmount
+    private var _originalAmount = MutableLiveData<Int>(0)
+    val originalAmount: LiveData<Int> get() = _originalAmount
     private var _cartItems: List<CartItem> = emptyList()
     val cartItems: List<CartItem> get() = _cartItems
     private var _shippingFee = MutableLiveData<Int>(3000)
@@ -41,12 +46,10 @@ class CouponViewModel(private val cartRepository: CartRepository) : ViewModel(
     }
 
     fun loadCoupons() {
-        _coupons.value = listOf(
-            Coupon.Fixed5000(),
-            Coupon.BOGO,
-            Coupon.FreeShipping(),
-            Coupon.MiracleSale
-        )
+        viewModelScope.launch {
+            _coupons.postValue(orderRepository.fetchCoupons())
+
+        }
     }
 
     fun selectCoupon(coupon: Coupon) {
@@ -54,15 +57,10 @@ class CouponViewModel(private val cartRepository: CartRepository) : ViewModel(
         updateTotalAmount()
     }
 
-    fun clearSelection() {
-        _selectedCoupon.value = null
-        updateTotalAmount()
-    }
-
     private fun updateTotalAmount() {
         val coupon = _selectedCoupon.value
-        val discount = coupon?.calculateDiscount(cartItems, _originalAmount.value?:0) ?: 0
-        _totalAmount.value = (_originalAmount.value?:0) - discount
+        val discount = coupon?.calculateDiscount(cartItems, _originalAmount.value ?: 0) ?: 0
+        _totalAmount.value = (_originalAmount.value ?: 0) - discount
     }
 
     fun onPayClicked() {

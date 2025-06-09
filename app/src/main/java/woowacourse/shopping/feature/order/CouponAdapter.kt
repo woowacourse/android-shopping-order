@@ -3,8 +3,9 @@ package woowacourse.shopping.feature.order
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemCouponBinding
-import java.time.format.DateTimeFormatter
+import woowacourse.shopping.domain.model.Coupon
 
 class CouponAdapter(
     private val onCouponClick: (Coupon) -> Unit,
@@ -17,9 +18,8 @@ class CouponAdapter(
         private val binding: ItemCouponBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(coupon: Coupon) {
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-            binding.tvCouponExpiry.text = "만료일: ${coupon.expiry.format(formatter)}"
+            binding.tvCouponExpiry.text = "만료일: ${coupon.expirationDate?:"없음"}"
 
             binding.checkBoxCoupon.isChecked = (coupon == selectedCoupon)
 
@@ -29,25 +29,10 @@ class CouponAdapter(
             binding.root.setOnClickListener {
                 onCouponClick(coupon)
             }
+            binding.tvCouponName.text = coupon.description
+            val context = binding.root.context
 
-            when (coupon) {
-                is Coupon.Fixed5000 -> {
-                    binding.tvCouponName.text = "5,000원 할인 쿠폰"
-                    binding.tvCouponDiscount.text = "100,000원 이상 구매 시 5,000원 할인"
-                }
-                is Coupon.BOGO -> {
-                    binding.tvCouponName.text = "2+1 무료 쿠폰"
-                    binding.tvCouponDiscount.text = "3개 이상 구매 시 1개 무료 (최고가 기준)"
-                }
-                is Coupon.FreeShipping -> {
-                    binding.tvCouponName.text = "무료 배송 쿠폰"
-                    binding.tvCouponDiscount.text = "50,000원 이상 구매 시 배송비 무료"
-                }
-                is Coupon.MiracleSale -> {
-                    binding.tvCouponName.text = "미라클모닝 30% 할인"
-                    binding.tvCouponDiscount.text = "오전 4~7시 30% 할인"
-                }
-            }
+            binding.tvCouponDiscount.text = context.getString(R.string.minimum_date, coupon.minimumAmount?:0)
 
             binding.root.setOnClickListener { onCouponClick(coupon) }
         }

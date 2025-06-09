@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.carts.repository
 
+import android.util.Log
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -34,6 +35,9 @@ class CartRemoteDataSourceImpl(
         page: Int,
         size: Int
     ): CartResponse = withContext(Dispatchers.IO) {
+        Log.d("test",page.toString())
+        Log.d("test",size.toString())
+
         try {
             retrofitService.requestCartProduct(
                 page = page,
@@ -41,6 +45,7 @@ class CartRemoteDataSourceImpl(
                 authorization = "Basic ${Authorization.basicKey}"
             )
         } catch (e: Exception) {
+            Log.d("test",e.message.toString())
             throw CartFetchError.Network
         }
     }

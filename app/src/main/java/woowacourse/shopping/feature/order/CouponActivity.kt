@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
+import woowacourse.shopping.data.coupons.repository.OrderRemoteDataSourceImpl
+import woowacourse.shopping.data.coupons.repository.OrderRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCouponBinding
 import woowacourse.shopping.feature.BaseActivity
 import woowacourse.shopping.feature.cart.CartActivity
@@ -24,7 +26,8 @@ class CouponActivity : BaseActivity<ActivityCouponBinding>() {
         super.onCreate(savedInstanceState)
 
         val factory = CouponViewModelFactory(
-            CartRepositoryImpl(CartRemoteDataSourceImpl())
+            CartRepositoryImpl(CartRemoteDataSourceImpl()),
+            OrderRepositoryImpl(OrderRemoteDataSourceImpl())
         )
         viewModel = ViewModelProvider(this, factory)[CouponViewModel::class.java]
         couponAdapter = CouponAdapter { selectedCoupon ->
