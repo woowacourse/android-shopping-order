@@ -15,7 +15,16 @@ import woowacourse.shopping.presentation.view.checkout.adapter.CouponUiModel
 import woowacourse.shopping.presentation.view.common.BaseFragment
 
 class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment_checkout) {
-    private val viewModel: CheckoutViewModel by viewModels { CheckoutViewModel.Factory }
+    private val selectedProductIds: List<Long> by lazy {
+        arguments?.getLongArray(
+            SELECTED_PRODUCT_IDS,
+        )?.toList().orEmpty()
+    }
+    private val viewModel: CheckoutViewModel by viewModels {
+        CheckoutViewModel.factory(
+            selectedProductIds,
+        )
+    }
     private val adapter: CouponAdapter by lazy { CouponAdapter(checkoutEventHandler) }
 
     private val backCallback =
@@ -55,7 +64,7 @@ class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment
         requireActivity().onBackPressedDispatcher.addCallback(backCallback)
 
         val selectedProductIds = arguments?.getLongArray(SELECTED_PRODUCT_IDS)
-        viewModel.loadSelectedCartItems(selectedProductIds?.toList().orEmpty())
+        viewModel.loadSelectedCartItems()
         viewModel.loadCoupons()
     }
 

@@ -20,6 +20,7 @@ import woowacourse.shopping.presentation.view.checkout.adapter.toUiModel
 import java.time.LocalDateTime
 
 class CheckoutViewModel(
+    private val selectedProductIds: List<Long>,
     private val cartRepository: CartRepository,
     private val couponRepository: CouponRepository,
 ) : ViewModel() {
@@ -51,11 +52,11 @@ class CheckoutViewModel(
             }
         }
 
-    fun loadSelectedCartItems(ids: List<Long>) {
+    fun loadSelectedCartItems() {
         viewModelScope.launch {
             val selectedCartItems =
                 buildList {
-                    ids.forEach { id ->
+                    selectedProductIds.forEach { id ->
                         cartRepository.loadCartItemByProductId(id)?.let { cartItem ->
                             add(cartItem)
                         }
@@ -101,7 +102,7 @@ class CheckoutViewModel(
 
     companion object {
         @Suppress("UNCHECKED_CAST")
-        val Factory: ViewModelProvider.Factory =
+        fun factory(selectedProductIds: List<Long>): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(
                     modelClass: Class<T>,
@@ -110,6 +111,7 @@ class CheckoutViewModel(
                     val cartRepository = RepositoryProvider.cartRepository
                     val couponRepository = RepositoryProvider.couponRepository
                     return CheckoutViewModel(
+                        selectedProductIds,
                         cartRepository,
                         couponRepository,
                     ) as T
