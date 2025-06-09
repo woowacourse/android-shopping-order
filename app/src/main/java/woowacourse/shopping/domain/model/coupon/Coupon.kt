@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.model.coupon
 
-import java.time.LocalDate
 import woowacourse.shopping.domain.model.CartItem
+import java.time.LocalDate
 
 sealed class Coupon {
     abstract val couponBase: CouponBase

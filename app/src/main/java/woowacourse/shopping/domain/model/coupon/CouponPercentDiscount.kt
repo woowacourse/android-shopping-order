@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.model.coupon
 
-import java.time.LocalTime
 import woowacourse.shopping.domain.model.CartItem
+import java.time.LocalTime
 
 data class CouponPercentDiscount(
     override val couponBase: CouponBase,

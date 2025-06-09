@@ -2,10 +2,10 @@ package woowacourse.shopping.presentation.bindingadapter
 
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import woowacourse.shopping.R
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import woowacourse.shopping.R
 
 @BindingAdapter("price", "count")
 fun setFormattedPrice(
