@@ -42,7 +42,6 @@ class OrderFragment :
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        binding.recyclerViewCoupon.adapter = couponAdapter
 
         requireActivity().onBackPressedDispatcher.addCallback(backCallback)
 
@@ -50,12 +49,18 @@ class OrderFragment :
             arguments?.getParcelableArrayListCompat<CartItemUiModel>(ARG_SELECTED_CART_ITEM)
         selectedItems?.let { viewModel.setSelectedItems(it) }
 
+        initOrderSummary()
         initObserver()
+    }
+
+    private fun initOrderSummary() {
+        viewModel.calculateOrderSummary(coupon = null)
     }
 
     private fun initObserver() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.vm = viewModel
+        binding.recyclerViewCoupon.adapter = couponAdapter
 
         viewModel.loadCoupons()
 
