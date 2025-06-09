@@ -12,9 +12,9 @@ import woowacourse.shopping.databinding.ActivityReceiptBinding
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.util.getSerializableExtraCompat
 
-class ReceiptActivity : AppCompatActivity() {
+class ReceiptActivity : AppCompatActivity(), ReceiptActions {
     private val binding by lazy { ActivityReceiptBinding.inflate(layoutInflater) }
-    private val receiptAdapter by lazy { ReceiptAdapter() }
+    private val receiptAdapter by lazy { ReceiptAdapter(this) }
     private val viewModel: ReceiptViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,5 +57,13 @@ class ReceiptActivity : AppCompatActivity() {
 
             return intent
         }
+    }
+
+    override fun select(couponItem: CouponItem) {
+        viewModel.select(couponItem)
+    }
+
+    override fun unselect() {
+        viewModel.unselect()
     }
 }

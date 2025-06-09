@@ -5,9 +5,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 
 
-class ReceiptAdapter : ListAdapter<CouponItem, ReceiptViewHolder>(CouponsItemDiffCallback()) {
+class ReceiptAdapter(
+    private val receiptActions: ReceiptActions
+) : ListAdapter<CouponItem, ReceiptViewHolder>(CouponsItemDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReceiptViewHolder {
-        return ReceiptViewHolder.of(parent)
+        return ReceiptViewHolder.of(parent, receiptActions)
     }
 
     override fun onBindViewHolder(holder: ReceiptViewHolder, position: Int) {

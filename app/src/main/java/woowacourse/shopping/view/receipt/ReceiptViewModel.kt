@@ -28,36 +28,95 @@ class ReceiptViewModel(
 
     private var coupons: List<Coupon> = emptyList()
 
+    private var _selectedCoupon: MutableLiveData<CouponItem> = MutableLiveData()
+    val selectedCoupon: LiveData<CouponItem> = _selectedCoupon
+
+    private var _discount: MutableLiveData<Int> = MutableLiveData()
+    val discount: LiveData<Int> = _discount
+
+    private var _result: MutableLiveData<Int> = MutableLiveData()
+    val result: LiveData<Int> = _result
+
+
+    fun select(couponItem: CouponItem) {
+        _selectedCoupon.value = couponItem
+        loadCoupons()
+    }
+
+    fun unselect() {
+        _selectedCoupon.value = null
+        loadCoupons()
+    }
+
+    private fun calculator(couponItem: CouponItem?) {
+        val receipt = this.receipt.value ?: Receipt(emptyList())
+        if (couponItem == null) {
+            _discount.postValue(0)
+            _result.postValue(receipt.totalPrice + receipt.shippingPrice)
+            return
+        }
+
+        val coupon = findCouponById(couponItem.couponId)
+        val discountPrice = coupon.discountPrice(receipt)
+        _discount.postValue(discountPrice)
+        _result.postValue(receipt.totalPrice - discountPrice + receipt.shippingPrice)
+    }
+
+    private fun loadScreen() {
+        _result.value = receipt.value?.totalPrice?.plus(receipt.value?.shippingPrice ?: 0)
+    }
+
+    private fun findCouponById(couponId: Long): Coupon {
+        return coupons.find {
+            it.couponId == couponId
+        } ?: error("")
+    }
+
     private fun loadCoupons() {
+        val currentSelected = selectedCoupon.value
         _couponItem.postValue(
             coupons.map { coupon ->
-                when (coupon) {
+                val item = when (coupon) {
                     is FixedCoupon -> CouponItem(
+                        couponId = coupon.couponId,
                         description = coupon.description,
                         expirationDate = coupon.expirationDate.toString(),
                         minimumOrderPrice = coupon.minimumOrderPrice
                     )
 
                     is FreeShippingCoupon -> CouponItem(
+                        couponId = coupon.couponId,
                         description = coupon.description,
                         expirationDate = coupon.expirationDate.toString(),
                         minimumOrderPrice = coupon.minimumOrderPrice
                     )
 
                     is BoGoCoupon -> CouponItem(
+                        couponId = coupon.couponId,
                         description = coupon.description,
                         expirationDate = coupon.expirationDate.toString(),
                     )
 
                     is MiracleSaleCoupon -> CouponItem(
+                        couponId = coupon.couponId,
                         description = coupon.description,
                         expirationDate = coupon.expirationDate.toString(),
                         availableTime = "사용 가능한 시간 ${coupon.startHour}~${coupon.endHour}"
                     )
                 }
+
+                if (item.couponId == currentSelected?.couponId) {
+                    _selectedCoupon.postValue(item)
+                    calculator(selectedCoupon.value)
+                } else if (selectedCoupon.value == null) {
+                    calculator(null)
+                }
+
+                item
             }
         )
     }
+
 
     fun showAvailableCoupons(cartItems: List<CartItem>) {
         viewModelScope.launch {
@@ -74,6 +133,7 @@ class ReceiptViewModel(
 
                 this@ReceiptViewModel.coupons = result
                 loadCoupons()
+                loadScreen()
             }.onFailure {
                 //TODO : Handle by event
             }
