@@ -55,6 +55,7 @@ class OrderActivity :
             when (event) {
                 OrderEvent.ORDER_SUCCESS -> {
                     showToast(getString(R.string.order_complete))
+                    viewModel.removeShoppingCartProducts()
                     backToProducts()
                 }
 

@@ -81,10 +81,15 @@ class OrderViewModel(
 
     fun proceedOrder() {
         viewModelScope.launch(handler) {
+            _event.value = OrderEvent.ORDER_SUCCESS
+        }
+    }
+
+    fun removeShoppingCartProducts() {
+        viewModelScope.launch(handler) {
             shoppingCartProductsToOrder.forEach {
                 shoppingCartRepository.remove(it.id)
             }
-            _event.value = OrderEvent.ORDER_SUCCESS
         }
     }
 

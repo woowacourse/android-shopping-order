@@ -153,7 +153,7 @@ class OrderViewModelTest {
     }
 
     @Test
-    fun `상품을 결제하면 결제한 상품이 장바구니에서 삭제된다`() {
+    fun `상품을 결제하면 성공 이벤트를 발송한다`() {
         // given
         coEvery { couponRepository.getAllCoupons() } returns
             Result.success(
@@ -169,6 +169,24 @@ class OrderViewModelTest {
 
         // then
         assertThat(viewModel.event.getOrAwaitValue()).isEqualTo(OrderEvent.ORDER_SUCCESS)
+    }
+
+    @Test
+    fun `현재 주문한 상품을 장바구니에서 삭제할 수 있다`() {
+        // given
+        coEvery { couponRepository.getAllCoupons() } returns
+            Result.success(
+                COUPONS,
+            )
+        val expected1 = SHOPPING_CART_PRODUCTS_TO_ORDER[0].id
+        val expected2 = SHOPPING_CART_PRODUCTS_TO_ORDER[1].id
+
+        coEvery { shoppingCartRepository.remove(any()) } returns Result.success(Unit)
+
+        // when
+        viewModel.removeShoppingCartProducts()
+
+        // then
         coVerify { shoppingCartRepository.remove(expected1) }
         coVerify { shoppingCartRepository.remove(expected2) }
     }
