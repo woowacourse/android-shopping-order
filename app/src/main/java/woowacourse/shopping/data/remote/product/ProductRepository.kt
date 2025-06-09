@@ -25,7 +25,7 @@ class ProductRepository(
             }
         }
 
-    fun requestProductDetails(productId: Long): Result<ProductDetailResponse?> =
+    suspend fun requestProductDetails(productId: Long): Result<ProductDetailResponse?> =
         runCatching {
             val response = productService.requestProductDetails(productId = productId)
             if (response.isSuccessful) {

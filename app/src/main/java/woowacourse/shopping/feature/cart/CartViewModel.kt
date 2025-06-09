@@ -5,7 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
@@ -195,7 +197,7 @@ class CartViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             cartRepository
-                .fetchCart(page = currentPage)
+                .fetchCart()
                 .onSuccess { response ->
                     response?.let {
                         val cartList =
@@ -228,39 +230,41 @@ class CartViewModel(
     }
 
     fun loadProductsByCategory() {
-        historyRepository.findLatest { latestProduct ->
-//            cartRepository.fetchAllCart(
-//                onSuccess = { cartResponse ->
-//                    val cartProductIds = cartResponse.content.map { it.product.id }
-//
-//                    productRepository.fetchAllProducts(
-//                        onSuccess = { response ->
-//                            val matchedProduct =
-//                                response.content.find { it.id.toInt() == latestProduct.product.id }
-//                            val category = matchedProduct?.category
-//
-//                            val recommendProducts =
-//                                response.content
-//                                    .filter {
-//                                        it.category == category &&
-//                                            it.id.toInt() != latestProduct.product.id &&
-//                                            it.id !in cartProductIds
-//                                    }.take(10)
-//
-//                            _recommendItems.value =
-//                                recommendProducts.map {
-//                                    Cart(id = 0, product = it.toDomain(), quantity = 0)
-//                                }
-//                        },
-//                        onError = {
-//                            Log.e("loadProductsInRange", "상품 요청 실패", it)
-//                        },
-//                    )
-//                },
-//                onError = {
-//                    Log.e("loadProductsInRange", "장바구니 요청 실패", it)
-//                },
-//            )
+        viewModelScope.launch(Dispatchers.IO) {
+            val latestProduct = historyRepository.findLatest()
+            cartRepository
+                .fetchAllCart()
+                .onSuccess { cartResponse ->
+                    val cartProductIds = cartResponse?.content?.map { it.product.id }
+
+                    productRepository
+                        .fetchAllProducts()
+                        .onSuccess { response ->
+                            val matchedProduct =
+                                response?.content?.find { it.id.toInt() == latestProduct?.product?.id }
+                            val category = matchedProduct?.category
+
+                            val recommendProducts =
+                                response
+                                    ?.content
+                                    ?.filter {
+                                        it.category == category &&
+                                            it.id.toInt() != latestProduct?.product?.id &&
+                                            cartProductIds?.contains(it.id) != true
+                                    }?.take(10)
+
+                            withContext(Dispatchers.Main) {
+                                _recommendItems.value =
+                                    recommendProducts?.map {
+                                        Cart(id = 0, product = it.toDomain(), quantity = 0)
+                                    }
+                            }
+                        }.onFailure {
+                            Log.e("loadProductsInRange", "상품 요청 실패", it)
+                        }
+                }.onFailure {
+                    Log.e("loadProductsInRange", "장바구니 요청 실패", it)
+                }
         }
     }
 

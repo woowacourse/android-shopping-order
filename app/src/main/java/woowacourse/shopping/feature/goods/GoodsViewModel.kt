@@ -5,7 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
@@ -127,7 +129,9 @@ class GoodsViewModel(
 
     // 수정 해야함
     fun refreshHistoryOnly() {
-        historyRepository.getAll { histories ->
+        viewModelScope.launch(Dispatchers.IO) {
+            val histories = historyRepository.getAll()
+
             val currentItems = _items.value.orEmpty().toMutableList()
 
             val updatedItems =
@@ -138,11 +142,10 @@ class GoodsViewModel(
                     listOf(histories) + currentItems
                 }
 
-            _items.postValue(updatedItems)
+            withContext(Dispatchers.Main) { _items.value = updatedItems }
         }
     }
 
-    // 수정 해야함
     fun findCartFromHistory(cart: Cart) {
         val cart =
             _items.value
@@ -224,10 +227,12 @@ class GoodsViewModel(
         }
     }
 
-    // 수정
     private fun loadHistories() {
-        historyRepository.getAll { allHistories ->
-            histories.postValue(allHistories)
+        viewModelScope.launch(Dispatchers.IO) {
+            val allHistories = historyRepository.getAll()
+            withContext(Dispatchers.Main) {
+                histories.value = allHistories
+            }
             refreshItems()
         }
     }

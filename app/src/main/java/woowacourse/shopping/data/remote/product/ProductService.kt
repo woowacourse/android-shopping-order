@@ -13,7 +13,7 @@ interface ProductService {
     ): Response<ProductResponse>
 
     @GET("/products/{productId}")
-    fun requestProductDetails(
+    suspend fun requestProductDetails(
         @Path("productId") productId: Long,
     ): Response<ProductDetailResponse>
 }

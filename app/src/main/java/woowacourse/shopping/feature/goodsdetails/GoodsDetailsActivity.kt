@@ -3,7 +3,6 @@ package woowacourse.shopping.feature.goodsdetails
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -13,7 +12,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.application.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityGoodsDetailsBinding
 import woowacourse.shopping.feature.CustomCartQuantity
-import woowacourse.shopping.feature.CustomLastViewed
+import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.model.ResultCode
 import kotlin.getValue
 
@@ -75,15 +74,7 @@ class GoodsDetailsActivity : AppCompatActivity() {
     private fun observeCartInsertResult() {
         viewModel.isSuccess.observe(this) {
             Toast.makeText(this, R.string.goods_detail_cart_insert_success_toast_message, Toast.LENGTH_SHORT).show()
-            setResult(
-                ResultCode.GOODS_DETAIL_INSERT.code,
-                Intent().apply {
-                    putExtra("CART_ID", viewModel.cart.value?.id)
-                    putExtra("GOODS_ID", id)
-                    putExtra("GOODS_QUANTITY", viewModel.cart.value?.quantity)
-                    Log.e("123451", "${viewModel.cart.value?.quantity}")
-                },
-            )
+            CartActivity.newIntent(this)
         }
         viewModel.isFail.observe(this) {
             Toast.makeText(this, R.string.goods_detail_cart_insert_fail_toast_message, Toast.LENGTH_SHORT).show()
@@ -105,13 +96,6 @@ class GoodsDetailsActivity : AppCompatActivity() {
 
                 override fun onRemoveClick() {
                     viewModel.decreaseQuantity()
-                }
-            },
-        )
-        binding.customLastViewed.setClickListener(
-            object : CustomLastViewed.LastViewedClickListener {
-                override fun navigate() {
-                    viewModel.emitLastViewedCart()
                 }
             },
         )

@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
@@ -14,18 +16,20 @@ import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
-import woowacourse.shopping.util.updateQuantity
 
 class GoodsDetailsViewModel(
     private val cartRepository: CartRepository,
     private val historyRepository: HistoryRepository,
     private val productRepository: ProductRepository,
 ) : ViewModel() {
-    private val _cart = MutableLiveData<Cart>()
-    val cart: LiveData<Cart> get() = _cart
+    private val _product = MutableLiveData<Product>()
+    val product: LiveData<Product> get() = _product
 
-    private val _lastViewed = MutableLiveData<Cart>()
-    val lastViewed: LiveData<Cart> get() = _lastViewed
+    private val _quantity = MutableLiveData<Int>()
+    val quantity: LiveData<Int> get() = _quantity
+
+    private val _lastViewed = MutableLiveData<Product>()
+    val lastViewed: LiveData<Product> get() = _lastViewed
 
     private val _isLastViewedVisible = MutableLiveData<Boolean>()
     val isLastViewedVisible: LiveData<Boolean> get() = _isLastViewedVisible
@@ -46,38 +50,18 @@ class GoodsDetailsViewModel(
 
     fun loadProductDetails(productId: Long) {
         viewModelScope.launch {
-            cartRepository
-                .fetchAllCart()
-                .onSuccess { cartResponse ->
-                    productRepository
-                        .requestProductDetails(
-                            productId = productId,
-                        ).onSuccess { productResponse ->
-                            if (cartResponse != null && productResponse != null) {
-                                _cart.value =
-                                    Cart(
-                                        id =
-                                            cartResponse.content
-                                                .find {
-                                                    it.product.id == productResponse.id
-                                                }?.id ?: 0,
-                                        product =
-                                            Product(
-                                                id = productResponse.id.toInt(),
-                                                name = productResponse.name,
-                                                price = productResponse.price,
-                                                imageUrl = productResponse.imageUrl,
-                                                category = productResponse.category,
-                                            ),
-                                        quantity =
-                                            cartResponse.content.find { it.product.id == productResponse.id }?.quantity
-                                                ?: 1,
-                                    )
-                                if (cart.value != null) insertToHistory(cart.value as Cart)
-                            }
-                        }.onFailure {
-                            _isFail.setValue(Unit)
-                        }
+            productRepository
+                .requestProductDetails(productId)
+                .onSuccess { productId ->
+                    val product =
+                        Product(
+                            productId?.id?.toInt() ?: 0,
+                            productId?.name ?: "",
+                            productId?.price ?: 0,
+                            productId?.imageUrl ?: "",
+                            "",
+                        )
+                    _product.value = product
                 }.onFailure {
                     _isFail.setValue(Unit)
                 }
@@ -85,98 +69,87 @@ class GoodsDetailsViewModel(
     }
 
     fun increaseQuantity() {
-        val current = _cart.value
+        val current = _quantity.value
         if (current != null) {
-            val updated = current.updateQuantity(current.quantity + 1)
-            _cart.value = updated
+            val updated = current + 1
+            _quantity.value = updated
         }
     }
 
     fun decreaseQuantity() {
-        val current = _cart.value
+        val current = _quantity.value
         if (current != null) {
-            val updated = current.updateQuantity(current.quantity - 1)
-            _cart.value = updated
+            val updated = (current - 1).coerceAtLeast(1)
+            _quantity.value = updated
         }
     }
 
     fun commitCart() {
+        val product = _product.value ?: return
+        val productId = product.id
+        val quantity = _quantity.value ?: return
         viewModelScope.launch {
-            val newQuantity = cart.value?.quantity ?: 0
-            if (cart.value != null) {
-                if (cart.value?.quantity == 1) {
-                    val cartRequest =
-                        CartRequest(
-                            productId = cart.value?.product?.id ?: 0,
-                            quantity = newQuantity,
-                        )
+            cartRepository
+                .fetchAllCart()
+                .onSuccess {
+                    it?.let {
+                        val cartId =
+                            it.content
+                                .find {
+                                    // 장바구니에 동일한 상품이 저장되었는가 ?
+                                    it.product.id == productId.toLong()
+                                }?.id
 
-                    cartRepository
-                        .addToCart(cartRequest)
-                        .onSuccess { response ->
-                            val updatedCart =
-                                cart.value?.copy(id = response, quantity = newQuantity)
-
-                            insertToHistory(cart.value as Cart)
-                            updateCart(updatedCart)
-                            _isSuccess.setValue(Unit)
-                        }.onFailure {
-                            _isFail.setValue(Unit)
+                        if (cartId == null) {
+                            // 저장 되어 있지 않음
+                            cartRepository
+                                .addToCart(CartRequest(productId, quantity))
+                                .onSuccess { response ->
+                                    insertToHistory(Cart(response, product, quantity))
+                                    _isSuccess.setValue(Unit)
+                                }.onFailure {
+                                    _isFail.setValue(Unit)
+                                }
+                        } else {
+                            // 저장됨
+                            cartRepository.updateCart(cartId, CartQuantity(quantity))
                         }
-                }
-            } else {
-                cartRepository
-                    .updateCart(
-                        id = cart.value?.id ?: 0,
-                        cartQuantity = CartQuantity(newQuantity),
-                    ).onSuccess {
-                        val updatedCart = cart.value?.copy(quantity = newQuantity)
-
-                        insertToHistory(cart.value as Cart)
-                        updateCart(updatedCart)
-                        _isSuccess.setValue(Unit)
-                    }.onFailure { error ->
-                        _isFail.setValue(Unit)
                     }
-            }
+                }.onFailure { }
         }
     }
 
     fun updateLastViewedVisibility() {
-        val lastName = _lastViewed.value?.product?.name
-        val currentName = cart.value?.product?.name
+        val lastName = _lastViewed.value?.name
+        val currentName = _product.value?.name
         _isLastViewedVisible.postValue(lastName != null && currentName != null && lastName != currentName)
     }
 
     fun loadLastViewed() {
-        historyRepository.findLatest { lastViewed ->
-            _lastViewed.postValue(lastViewed)
+        viewModelScope.launch(Dispatchers.IO) {
+            val lastViewed = historyRepository.findLatest()
+            withContext(Dispatchers.Main) {
+                lastViewed?.let { _lastViewed.value }
+            }
             updateLastViewedVisibility()
         }
     }
 
-    fun emitLastViewedCart() {
-        val history = _lastViewed.value
-        if (history != null) _navigateToLastViewedCart.postValue(history)
-    }
-
-    private fun updateCart(updatedCart: Cart?) {
-        if (updatedCart != null) _cart.value = updatedCart
-    }
-
     private fun insertToHistory(cart: Cart) {
-        historyRepository.insert(
-            Cart(
-                cart.id,
-                Product(
-                    cart.product.id,
-                    cart.product.name,
-                    cart.product.price,
-                    cart.product.imageUrl,
-                    "",
+        viewModelScope.launch(Dispatchers.IO) {
+            historyRepository.insert(
+                Cart(
+                    cart.id,
+                    Product(
+                        cart.product.id,
+                        cart.product.name,
+                        cart.product.price,
+                        cart.product.imageUrl,
+                        "",
+                    ),
+                    cart.quantity,
                 ),
-                cart.quantity,
-            ),
-        )
+            )
+        }
     }
 }

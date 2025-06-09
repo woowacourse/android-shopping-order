@@ -3,9 +3,9 @@ package woowacourse.shopping.data.local.history.repository
 import woowacourse.shopping.domain.model.Cart
 
 interface HistoryRepository {
-    fun getAll(callback: (List<Cart>) -> Unit)
+    suspend fun getAll(): List<Cart>
 
-    fun insert(cart: Cart)
+    suspend fun insert(cart: Cart)
 
-    fun findLatest(callback: (Cart) -> Unit)
+    suspend fun findLatest(): Cart?
 }
