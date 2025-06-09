@@ -14,7 +14,6 @@ import woowacourse.shopping.domain.model.PageableItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.presentation.common.model.CatalogItem
 import woowacourse.shopping.presentation.common.model.toCatalogProductItem
 import woowacourse.shopping.presentation.common.model.toUiModel
@@ -25,7 +24,6 @@ import woowacourse.shopping.presentation.view.catalog.event.CatalogMessageEvent
 class CatalogViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
-    private val recentRepository: RecentProductRepository,
 ) : ViewModel() {
     private val _toastEvent = MutableSingleLiveData<CatalogMessageEvent>()
     val toastEvent: SingleLiveData<CatalogMessageEvent> = _toastEvent
@@ -106,7 +104,7 @@ class CatalogViewModel(
 
     private fun loadRecentProducts(onSuccess: (CatalogItem.RecentProducts) -> Unit) {
         viewModelScope.launch {
-            recentRepository
+            productRepository
                 .getRecentProducts(RECENT_PRODUCT_LIMIT)
                 .onFailure { emitToastMessage(CatalogMessageEvent.FETCH_RECENT_PRODUCT_FAILURE) }
                 .onSuccess {
@@ -223,7 +221,6 @@ class CatalogViewModel(
                     CatalogViewModel(
                         RepositoryProvider.productRepository,
                         RepositoryProvider.cartRepository,
-                        RepositoryProvider.recentProductRepository,
                     ) as T
             }
     }

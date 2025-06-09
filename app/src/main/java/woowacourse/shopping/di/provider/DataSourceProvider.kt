@@ -5,8 +5,8 @@ import woowacourse.shopping.data.datasource.local.CartLocalDataSource
 import woowacourse.shopping.data.datasource.local.CartLocalDataSourceImpl
 import woowacourse.shopping.data.datasource.local.CouponLocalDataSource
 import woowacourse.shopping.data.datasource.local.CouponLocalDataSourceImpl
-import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSource
-import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSourceImpl
+import woowacourse.shopping.data.datasource.local.ProductLocalDataSource
+import woowacourse.shopping.data.datasource.local.ProductLocalDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.CartRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.CouponRemoteDataSource
@@ -21,7 +21,7 @@ object DataSourceProvider {
     val productRemoteDataSource: ProductRemoteDataSource by lazy { initProductDataSource() }
     val cartRemoteDataSource: CartRemoteDataSource by lazy { initCartRemoteDataSource() }
     val cartLocalDataSource: CartLocalDataSource by lazy { initCartLocalDataSource() }
-    val recentProductLocalDataSource: RecentProductLocalDataSource by lazy { initRecentProductLocalDataSource() }
+    val productLocalDataSource: ProductLocalDataSource by lazy { initProductLocalDataSource() }
     val couponRemoteDataSource: CouponRemoteDataSource by lazy { initCouponRemoteDataSource() }
     val couponLocalDataSource: CouponLocalDataSource by lazy { initCouponLocalDataSource() }
     val orderRemoteDataSource: OrderRemoteDataSource by lazy { initOrderRemoteDataSource() }
@@ -35,10 +35,10 @@ object DataSourceProvider {
 
     private fun initCartLocalDataSource(): CartLocalDataSource = CartLocalDataSourceImpl()
 
-    private fun initRecentProductLocalDataSource(): RecentProductLocalDataSource {
+    private fun initProductLocalDataSource(): ProductLocalDataSource {
         val database = ShoppingDatabase.getDatabase(ShoppingApplication.instance)
         val recentProductDao = database.recentProductDao()
-        return RecentProductLocalDataSourceImpl(recentProductDao)
+        return ProductLocalDataSourceImpl(recentProductDao)
     }
 
     private fun initCouponRemoteDataSource(): CouponRemoteDataSource = CouponRemoteDataSourceImpl(ServiceProvider.provideCouponService())

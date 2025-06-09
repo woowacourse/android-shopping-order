@@ -15,4 +15,12 @@ interface ProductRepository {
         limit: Int,
         excludedProductIds: List<Long>,
     ): Result<List<Product>>
+
+    suspend fun getRecentProducts(limit: Int): Result<List<Product>>
+
+    suspend fun insertAndTrimToLimit(
+        productId: Long,
+        category: String,
+        recentProductLimit: Int,
+    ): Result<Unit>
 }

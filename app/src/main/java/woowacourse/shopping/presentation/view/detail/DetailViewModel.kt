@@ -11,7 +11,6 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.presentation.common.model.ProductUiModel
 import woowacourse.shopping.presentation.common.model.toUiModel
 import woowacourse.shopping.presentation.common.util.MutableSingleLiveData
@@ -22,7 +21,6 @@ class DetailViewModel(
     productId: Long,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
-    private val recentProductRepository: RecentProductRepository,
 ) : ViewModel() {
     private val _toastEvent = MutableSingleLiveData<DetailMessageEvent>()
     val toastEvent: SingleLiveData<DetailMessageEvent> = _toastEvent
@@ -85,7 +83,7 @@ class DetailViewModel(
 
     private fun loadRecentProduct() {
         viewModelScope.launch {
-            recentProductRepository
+            productRepository
                 .getRecentProducts(1)
                 .onSuccess { _recentProduct.value = it.firstOrNull()?.toUiModel() }
                 .onFailure { _toastEvent.setValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
@@ -97,7 +95,7 @@ class DetailViewModel(
         category: String,
     ) {
         viewModelScope.launch {
-            recentProductRepository
+            productRepository
                 .insertAndTrimToLimit(productId, category, RECENT_PRODUCT_LIMIT)
                 .onFailure { _toastEvent.setValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
         }
@@ -124,7 +122,6 @@ class DetailViewModel(
                         productId,
                         RepositoryProvider.productRepository,
                         RepositoryProvider.cartRepository,
-                        RepositoryProvider.recentProductRepository,
                     ) as T
             }
     }

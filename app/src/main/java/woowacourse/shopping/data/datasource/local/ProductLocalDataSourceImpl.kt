@@ -4,9 +4,9 @@ import woowacourse.shopping.data.db.RecentProductDao
 import woowacourse.shopping.data.db.RecentProductEntity
 import woowacourse.shopping.data.util.runCatchingDebugLog
 
-class RecentProductLocalDataSourceImpl(
+class ProductLocalDataSourceImpl(
     private val recentProductDao: RecentProductDao,
-) : RecentProductLocalDataSource {
+) : ProductLocalDataSource {
     override suspend fun getRecentProducts(limit: Int): Result<List<RecentProductEntity>> =
         runCatchingDebugLog { recentProductDao.getRecentProducts(limit) }
 

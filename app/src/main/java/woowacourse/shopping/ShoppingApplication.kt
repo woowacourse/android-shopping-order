@@ -5,7 +5,6 @@ import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.di.provider.DataSourceProvider
 import woowacourse.shopping.di.provider.RepositoryProvider
 
@@ -20,14 +19,13 @@ class ShoppingApplication : Application() {
     private fun initRepositories() {
         initProductRepository()
         initCartRepository()
-        initRecentProductRepository()
         initCouponRepository()
         initOrderRepository()
     }
 
     private fun initProductRepository() {
         val productDataSource = DataSourceProvider.productRemoteDataSource
-        val recentProductLocalDataSource = DataSourceProvider.recentProductLocalDataSource
+        val recentProductLocalDataSource = DataSourceProvider.productLocalDataSource
         val repository = ProductRepositoryImpl(productDataSource, recentProductLocalDataSource)
         RepositoryProvider.initProductRepository(repository)
     }
@@ -39,14 +37,6 @@ class ShoppingApplication : Application() {
         val repository =
             CartRepositoryImpl(cartRemoteDataSource, cartLocalDataSource, productDataSource)
         RepositoryProvider.initCartRepository(repository)
-    }
-
-    private fun initRecentProductRepository() {
-        val productDataSource = DataSourceProvider.productRemoteDataSource
-        val recentProductLocalDataSource = DataSourceProvider.recentProductLocalDataSource
-        val repository =
-            RecentProductRepositoryImpl(productDataSource, recentProductLocalDataSource)
-        RepositoryProvider.initRecentProductRepository(repository)
     }
 
     private fun initCouponRepository() {

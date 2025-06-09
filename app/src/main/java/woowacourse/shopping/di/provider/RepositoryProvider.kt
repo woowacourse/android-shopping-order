@@ -4,16 +4,12 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
 
 object RepositoryProvider {
     lateinit var productRepository: ProductRepository
         private set
 
     lateinit var cartRepository: CartRepository
-        private set
-
-    lateinit var recentProductRepository: RecentProductRepository
         private set
 
     lateinit var couponRepository: CouponRepository
@@ -27,10 +23,6 @@ object RepositoryProvider {
 
     fun initCartRepository(repository: CartRepository) {
         cartRepository = repository
-    }
-
-    fun initRecentProductRepository(repository: RecentProductRepository) {
-        recentProductRepository = repository
     }
 
     fun initCouponRepository(repository: CouponRepository) {
