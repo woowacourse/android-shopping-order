@@ -13,11 +13,13 @@ import woowacourse.shopping.domain.model.OrderInfo
 import woowacourse.shopping.domain.model.coupon.FixedCoupon
 import woowacourse.shopping.domain.model.coupon.FreeShippingCoupon
 import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.presentation.util.SingleLiveEvent
 
 class OrderViewModel(
     private val couponRepository: CouponRepository,
+    private val orderRepository: OrderRepository,
 ) : ViewModel() {
     private val _coupons = MutableLiveData<List<CouponUiModel>>(emptyList())
     val coupons: LiveData<List<CouponUiModel>>
@@ -48,7 +50,14 @@ class OrderViewModel(
     }
 
     fun payToOrder() {
-        _orderEvent.value = Unit
+        viewModelScope.launch {
+            val orderInfo = _orderInfo.value ?: return@launch
+            val ids = orderInfo.orderProducts.map { it.id }
+            orderRepository.orderProducts(ids)
+                .onSuccess {
+                    _orderEvent.value = Unit
+                }
+        }
     }
 
     private fun loadCoupons() {
@@ -83,6 +92,7 @@ class OrderViewModel(
             initializer {
                 OrderViewModel(
                     couponRepository = RepositoryProvider.couponRepository,
+                    orderRepository = RepositoryProvider.orderRepository,
                 )
             }
         }
