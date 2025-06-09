@@ -296,7 +296,7 @@ class ShoppingCartViewModelTest {
     }
 
     @Test
-    fun `선택된 아이템이 변경되면 하단 주문 바의 상태도 변경된다`() {
+    fun `구매할 장바구니 아이템이 변경되면 총 금액과 수량도 변경된다 `() {
         // given
         val shoppingCartProductItem =
             ShoppingCartItem.ShoppingCartProductItem(
