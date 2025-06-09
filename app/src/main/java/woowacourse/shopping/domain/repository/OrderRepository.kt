@@ -1,9 +1,7 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.data.datasource.OrderDataSource
+import woowacourse.shopping.domain.model.CartItem
 
-interface OrderRepository
-
-class OrderRepositoryImpl(
-    private val orderDataSource: OrderDataSource,
-) : OrderRepository
+interface OrderRepository {
+    suspend fun order(cartItems: List<CartItem>): Result<Unit>
+}

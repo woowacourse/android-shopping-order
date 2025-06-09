@@ -9,11 +9,11 @@ import woowacourse.shopping.data.datasource.ProductDataSourceImpl
 import woowacourse.shopping.data.db.ShoppingDatabase
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.CouponRepositoryImpl
+import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.domain.repository.OrderRepositoryImpl
 import woowacourse.shopping.domain.repository.ProductRepository
 
 object RepositoryProvider {
