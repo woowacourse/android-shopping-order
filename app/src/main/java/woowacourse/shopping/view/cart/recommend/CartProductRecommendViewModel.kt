@@ -10,19 +10,17 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
 import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
-import woowacourse.shopping.domain.usecase.product.GetProductsUseCase
+import woowacourse.shopping.domain.usecase.product.GetRecommendedProductsUseCase
 import woowacourse.shopping.view.cart.recommend.adapter.RecommendedProductItem
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
 class CartProductRecommendViewModel(
     selectedProducts: CartProducts,
-    private val recentProductRepository: RecentProductRepository,
-    private val getProductsUseCase: GetProductsUseCase,
+    private val getRecommendedProductsUseCase: GetRecommendedProductsUseCase,
     private val getCartProductsUseCase: GetCartProductsUseCase,
     private val addToCartUseCase: AddToCartUseCase,
     private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
@@ -50,24 +48,11 @@ class CartProductRecommendViewModel(
 
     private fun loadRecommendedProducts(cartProducts: List<CartProduct>) {
         viewModelScope.launch {
-            recentProductRepository
-                .getLastViewedProduct()
-                .onSuccess { recentProduct ->
-                    if (recentProduct == null) return@launch
-                    getProductsUseCase()
-                        .onSuccess { pagedResult ->
-                            val cartProductIds = cartProducts.map { it.product.id }.toSet()
-                            val recommended =
-                                pagedResult.items
-                                    .asSequence()
-                                    .filter { it.category == recentProduct.product.category }
-                                    .filter { it.id !in cartProductIds }
-                                    .shuffled()
-                                    .take(RECOMMEND_SIZE)
-                                    .map { RecommendedProductItem(it) }
-                                    .toList()
-                            _recommendedProducts.postValue(recommended)
-                        }.onFailure { Log.e("error", it.message.toString()) }
+            val cartIds = cartProducts.map { it.product.id }
+            getRecommendedProductsUseCase(cartIds)
+                .onSuccess { recommendedProducts ->
+                    val recommended = recommendedProducts.map { RecommendedProductItem(it) }
+                    _recommendedProducts.postValue(recommended)
                 }.onFailure { Log.e("error", it.message.toString()) }
         }
     }
@@ -128,7 +113,6 @@ class CartProductRecommendViewModel(
     }
 
     companion object {
-        private const val RECOMMEND_SIZE = 10
         private const val QUANTITY_TO_ADD = 1
         private const val DEFAULT_COUNT = 0
     }
