@@ -80,7 +80,7 @@ class ShoppingCartActivity :
                             (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
 
                         if (visibleLastItemPosition in totalItemCount - 1..totalItemCount) {
-                            onPlusPage()
+                            viewModel.plusPage()
                         }
                     }
                 },
@@ -122,31 +122,23 @@ class ShoppingCartActivity :
         viewModel.shoppingCartProductsToOrder.observe(this) { }
     }
 
-    override fun onMinusPage() {
-        viewModel.minusPage()
-    }
-
-    override fun onPlusPage() {
-        viewModel.plusPage()
-    }
-
-    override fun onRemoveButton(shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem) {
+    override fun onRemoveButton(shoppingCartProductItem: ShoppingCartItem) {
         viewModel.removeShoppingCartProduct(shoppingCartProductItem)
     }
 
     override fun onProductSelectedButton(
-        shoppingCartProductItem: ShoppingCartItem.ShoppingCartProductItem,
+        shoppingCartProductItem: ShoppingCartItem,
         isSelected: Boolean,
     ) {
         viewModel.selectShoppingCartProduct(shoppingCartProductItem, isSelected)
     }
 
     override fun onPlusShoppingCartClick(quantityTarget: QuantityTarget) {
-        viewModel.increaseQuantity(quantityTarget as ShoppingCartItem.ShoppingCartProductItem)
+        viewModel.increaseQuantity(quantityTarget as ShoppingCartItem)
     }
 
     override fun onMinusShoppingCartClick(quantityTarget: QuantityTarget) {
-        viewModel.decreaseQuantity(quantityTarget as ShoppingCartItem.ShoppingCartProductItem)
+        viewModel.decreaseQuantity(quantityTarget as ShoppingCartItem)
     }
 
     override fun onBackButtonClick() {
