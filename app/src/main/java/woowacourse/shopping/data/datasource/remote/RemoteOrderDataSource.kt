@@ -9,7 +9,10 @@ class RemoteOrderDataSource(
     private val handler: NetworkResultHandler,
 ) {
     suspend fun createOrder(cartItemIds: OrderRequest): Result<Unit> =
-        handler.handleResult {
+        runCatching {
             service.createOrder(cartItemIds)
-        }
+        }.fold(
+            onSuccess = { Result.success(Unit) },
+            onFailure = { handler.handleException(it) },
+        )
 }

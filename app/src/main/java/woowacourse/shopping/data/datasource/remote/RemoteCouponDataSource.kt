@@ -10,7 +10,10 @@ class RemoteCouponDataSource(
     private val handler: NetworkResultHandler,
 ) {
     suspend fun getCoupons(): Result<List<Coupon>> =
-        handler.handleResult {
+        runCatching {
             couponService.getCoupons().map { it.toDomain() }
-        }
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { handler.handleException(it) },
+        )
 }

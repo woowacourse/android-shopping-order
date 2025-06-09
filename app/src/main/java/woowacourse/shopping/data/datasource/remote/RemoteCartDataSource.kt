@@ -11,7 +11,7 @@ class RemoteCartDataSource(
     private val handler: NetworkResultHandler,
 ) {
     suspend fun addCart(request: CartItemRequest): Result<Long> =
-        handler.handleResult {
+        runCatching {
             val response = service.addCart(request)
             val location =
                 response.headers()["Location"]
@@ -19,31 +19,47 @@ class RemoteCartDataSource(
                     ?.toLongOrNull()
             requireNotNull(location) { throw NetworkError.MissingLocationHeaderError }
             location
-        }
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { handler.handleException(it) },
+        )
 
     suspend fun singlePage(
         page: Int?,
         size: Int?,
     ): Result<CartsSinglePage> =
-        handler.handleResult {
-            service.getCartSinglePage(page, size).toDomain()
-        }
+        runCatching {
+            val response = service.getCartSinglePage(page, size)
+            response.toDomain()
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { handler.handleException(it) },
+        )
 
     suspend fun updateCartQuantity(
         cartId: Long,
         quantity: Int,
     ): Result<Unit> =
-        handler.handleResult {
+        runCatching {
             service.updateCart(cartId, quantity)
-        }
+        }.fold(
+            onSuccess = { Result.success(Unit) },
+            onFailure = { handler.handleException(it) },
+        )
 
     suspend fun deleteCart(cartId: Long): Result<Unit> =
-        handler.handleResult {
+        runCatching {
             service.deleteCart(cartId)
-        }
+        }.fold(
+            onSuccess = { Result.success(Unit) },
+            onFailure = { handler.handleException(it) },
+        )
 
     suspend fun cartQuantity(): Result<Int> =
-        handler.handleResult {
+        runCatching {
             service.getCartQuantity().quantity
-        }
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { handler.handleException(it) },
+        )
 }

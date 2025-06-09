@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 fun interface CouponValidate {
     fun validCoupon(
-        now : LocalDateTime,
+        now: LocalDateTime,
         coupons: List<Coupon>,
         orders: ShoppingCarts,
     ): List<Coupon>

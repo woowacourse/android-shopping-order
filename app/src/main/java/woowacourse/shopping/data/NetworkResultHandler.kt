@@ -5,14 +5,7 @@ import retrofit2.HttpException
 import woowacourse.shopping.domain.exception.NetworkError
 
 class NetworkResultHandler {
-    suspend fun <T> handleResult(block: suspend() -> T): Result<T> =
-        runCatching { block() }
-            .fold(
-                onSuccess = { Result.success(it) },
-                onFailure = { handleException(it) },
-            )
-
-    private fun <T> handleException(error: Throwable): Result<T> {
+    fun <T> handleException(error: Throwable): Result<T> {
         logErrorDetails(error)
         return Result.failure(handleNetworkError(error))
     }

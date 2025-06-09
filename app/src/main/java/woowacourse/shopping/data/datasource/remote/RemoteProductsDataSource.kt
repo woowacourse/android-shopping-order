@@ -14,12 +14,20 @@ class RemoteProductsDataSource(
         page: Int?,
         size: Int?,
     ): Result<ProductSinglePage> =
-        handler.handleResult {
-            service.singlePage(category, page, size).toDomain()
-        }
+        runCatching {
+            val response = service.singlePage(category, page, size)
+            response.toDomain()
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { handler.handleException(it) },
+        )
 
     suspend fun getProduct(productId: Long): Result<Product> =
-        handler.handleResult {
-            service.getProduct(productId).toDomain()
-        }
+        runCatching {
+            val response = service.getProduct(productId)
+            response.toDomain()
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { handler.handleException(it) },
+        )
 }
