@@ -10,14 +10,13 @@ import java.time.LocalDate
 data class CouponUiModel(
     val id: Long,
     val name: String,
-    val isSelected: Boolean,
     val expirationDate: LocalDate,
     val minPrice: Int,
 ) {
     val hasMinPrice get() = minPrice > 0
 }
 
-fun Coupon.toUiModel(isSelected: Boolean = false): CouponUiModel {
+fun Coupon.toUiModel(): CouponUiModel {
     val minPrice =
         when (this) {
             is BogoCoupon -> null
@@ -29,7 +28,6 @@ fun Coupon.toUiModel(isSelected: Boolean = false): CouponUiModel {
     return CouponUiModel(
         id = id,
         name = description,
-        isSelected = isSelected,
         expirationDate,
         minPrice = minPrice ?: 0,
     )

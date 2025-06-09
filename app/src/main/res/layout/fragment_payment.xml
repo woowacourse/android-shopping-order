@@ -5,6 +5,13 @@
 
     <data>
 
+        <variable
+            name="orderViewModel"
+            type="woowacourse.shopping.presentation.view.order.OrderViewModel" />
+
+        <variable
+            name="paymentViewModel"
+            type="woowacourse.shopping.presentation.view.order.payment.PaymentViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -75,6 +82,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="18dp"
             android:layout_marginTop="21dp"
+            android:text="@{@string/payment_item_price_format(paymentViewModel.order.totalPrice)}"
             android:textAlignment="textEnd"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/text_view_order_price_label"
@@ -100,6 +108,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="18dp"
             android:layout_marginTop="16dp"
+            android:text="@{@string/payment_item_price_format(-paymentViewModel.order.discount)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/text_view_coupon_discount_label"
             app:layout_constraintTop_toBottomOf="@id/text_view_order_price"
@@ -124,6 +133,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="18dp"
             android:layout_marginTop="21dp"
+            android:text="@{@string/payment_item_price_format(paymentViewModel.order.deliveryPrice)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/text_view_delivery_price_label"
             app:layout_constraintTop_toBottomOf="@id/text_view_coupon_discount"
@@ -157,11 +167,13 @@
             android:layout_marginHorizontal="18dp"
             android:layout_marginTop="21dp"
             app:layout_constraintEnd_toEndOf="parent"
+            android:text="@{@string/payment_item_price_format(paymentViewModel.order.paymentPrice)}"
             app:layout_constraintStart_toEndOf="@id/text_view_delivery_price_label"
             app:layout_constraintTop_toBottomOf="@id/divider_order_content_to_payment_total_price"
             tools:text="3,000원" />
 
         <TextView
+            android:id="@+id/text_view_payment"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:background="@color/mint"

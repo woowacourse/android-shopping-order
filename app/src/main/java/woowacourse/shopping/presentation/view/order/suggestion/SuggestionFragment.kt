@@ -84,7 +84,7 @@ class SuggestionFragment :
         }
 
     override fun order() {
-        orderViewModel.orderCartItems(suggestionViewModel.purchaseProducts.value.orEmpty())
+        orderViewModel.addSelectItems(suggestionViewModel.selectedCartIds())
         navigateToPayment()
     }
 

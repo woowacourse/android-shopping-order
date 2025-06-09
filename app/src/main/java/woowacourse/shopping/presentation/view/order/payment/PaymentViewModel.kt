@@ -8,47 +8,81 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.provider.RepositoryProvider
-import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.presentation.model.CouponUiModel
+import woowacourse.shopping.presentation.model.DisplayModel
+import woowacourse.shopping.presentation.model.OrderUiModel
 import woowacourse.shopping.presentation.model.toUiModel
+import java.time.LocalTime
 
 class PaymentViewModel(
+    private val orderCartIds: List<Long>,
     private val couponRepository: CouponRepository,
-) : ViewModel() {
-    private val _coupons = MutableLiveData<List<CouponUiModel>>()
-    val coupons: LiveData<List<CouponUiModel>> = _coupons
+    private val orderRepository: OrderRepository,
+) : ViewModel(),
+    CouponStateEventListener {
+    private val _order = MutableLiveData<OrderUiModel>()
+    val order: LiveData<OrderUiModel> = _order
 
-    private val _selectedCoupon = MutableLiveData<Coupon>()
-    val selectedCoupon = _selectedCoupon
+    private val _coupons = MutableLiveData<List<DisplayModel<CouponUiModel>>>()
+    val coupons: LiveData<List<DisplayModel<CouponUiModel>>> = _coupons
 
     init {
         viewModelScope.launch {
-            loadCoupons()
+            initOrder()
         }
     }
 
-    private suspend fun loadCoupons() {
-        couponRepository
-            .fetchCoupons()
-            .onSuccess { coupons ->
-                _coupons.value =
-                    coupons.map { coupon ->
-                        coupon.toUiModel(isSelected = false)
-                    }
-            }.onFailure {
+    private fun initOrder() {
+        viewModelScope.launch {
+            val order = orderRepository.fetchOrder(orderCartIds, null)
+            _order.value = order.toUiModel()
+            couponRepository
+                .fetchFilteredCoupons(order.purchases, LocalTime.now())
+                .onSuccess { coupons ->
+                    _coupons.value =
+                        coupons.value.map { coupon ->
+                            DisplayModel(coupon.toUiModel())
+                        }
+                }.onFailure {
+                }
+        }
+    }
+
+    private fun loadOrder(
+        orderCartIds: List<Long>,
+        coupon: CouponUiModel?,
+    ) {
+        viewModelScope.launch {
+            _order.value = orderRepository.fetchOrder(orderCartIds, coupon?.id).toUiModel()
+        }
+    }
+
+    override fun onSelectCoupon(coupon: CouponUiModel) {
+        _coupons.value =
+            coupons.value.orEmpty().map { currentCoupon ->
+                if (currentCoupon.data.id == coupon.id) {
+                    val currentIsSelected = currentCoupon.isSelected
+                    currentCoupon.copy(isSelected = !currentIsSelected)
+                } else {
+                    currentCoupon.copy(isSelected = false)
+                }
             }
+        val selectedCoupon = _coupons.value?.find { it.isSelected }?.data
+        loadOrder(orderCartIds, selectedCoupon)
     }
 
     companion object {
-        val Factory: ViewModelProvider.Factory =
+        fun Factory(orderCartIds: List<Long>): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(
                     modelClass: Class<T>,
                     extras: CreationExtras,
                 ): T {
                     val couponRepository = RepositoryProvider.couponRepository
-                    return PaymentViewModel(couponRepository) as T
+                    val orderRepository = RepositoryProvider.orderRepository
+                    return PaymentViewModel(orderCartIds, couponRepository, orderRepository) as T
                 }
             }
     }

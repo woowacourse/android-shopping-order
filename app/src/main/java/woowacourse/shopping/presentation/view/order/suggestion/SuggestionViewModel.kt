@@ -31,12 +31,12 @@ class SuggestionViewModel(
     private val _suggestionProducts = MutableLiveData<List<SuggestionProductUiModel>>(emptyList())
     val suggestionProducts: LiveData<List<SuggestionProductUiModel>> = _suggestionProducts
 
-    val purchaseProducts: LiveData<List<Long>> =
-        _suggestionProducts.map { suggestionProducts ->
-            suggestionProducts
-                .filter { it.quantity > 0 }
-                .mapNotNull { cartRepository.findCartIdByProductId(it.productId).getOrNull() }
-        }
+    fun selectedCartIds(): List<Long> =
+        _suggestionProducts.value
+            ?.filter { it.quantity > 0 }
+            ?.mapNotNull {
+                cartRepository.findCartIdByProductId(it.productId).getOrNull()
+            } ?: emptyList()
 
     val totalPurchaseProductQuantity: LiveData<Int> =
         _suggestionProducts.map { suggestionProducts -> suggestionProducts.sumOf { it.quantity } }
@@ -69,7 +69,7 @@ class SuggestionViewModel(
             .onFailure { postFailureCartEvent(SuggestionMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
             .onSuccess {
                 val updatedItems = applyCartQuantities(it, suggestionProducts)
-                _suggestionProducts.postValue(updatedItems)
+                _suggestionProducts.value = updatedItems
             }
     }
 
