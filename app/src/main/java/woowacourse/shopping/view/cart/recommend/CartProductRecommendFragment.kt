@@ -62,7 +62,7 @@ class CartProductRecommendFragment : Fragment() {
                     app.recentProductRepository,
                     app.getPagedCartProductsUseCase,
                     app.addToCartUseCase,
-                    app.updateQuantityUseCase,
+                    app.updateCartQuantityUseCase,
                 ),
             )[CartProductRecommendViewModel::class.java]
         initBindings()

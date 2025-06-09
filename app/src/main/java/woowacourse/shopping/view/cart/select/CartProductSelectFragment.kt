@@ -24,7 +24,7 @@ class CartProductSelectFragment : Fragment() {
             CartProductSelectViewModelFactory(
                 app.getPagedCartProductsUseCase,
                 app.removeFromCartUseCase,
-                app.updateQuantityUseCase,
+                app.updateCartQuantityUseCase,
             ),
         )[CartProductSelectViewModel::class.java]
     }

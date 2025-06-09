@@ -14,12 +14,12 @@ import woowacourse.shopping.data.repository.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
-import woowacourse.shopping.domain.usecase.AddToCartUseCase
-import woowacourse.shopping.domain.usecase.GetCartProductByProductIdUseCase
-import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
-import woowacourse.shopping.domain.usecase.GetTotalCartProductQuantityUseCase
-import woowacourse.shopping.domain.usecase.RemoveFromCartUseCase
-import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
+import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.cart.GetCartProductByProductIdUseCase
+import woowacourse.shopping.domain.usecase.cart.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.GetTotalCartProductQuantityUseCase
+import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
+import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 
 class ShoppingApplication : Application() {
     private val database by lazy { ShoppingCartDatabase.getDataBase(this) }
@@ -46,5 +46,5 @@ class ShoppingApplication : Application() {
     val getTotalCartProductQuantityUseCase by lazy { GetTotalCartProductQuantityUseCase(cartProductRepository) }
     val addToCartUseCase by lazy { AddToCartUseCase(cartProductRepository) }
     val removeFromCartUseCase by lazy { RemoveFromCartUseCase(cartProductRepository) }
-    val updateQuantityUseCase by lazy { UpdateQuantityUseCase(cartProductRepository, removeFromCartUseCase) }
+    val updateCartQuantityUseCase by lazy { UpdateCartQuantityUseCase(cartProductRepository, removeFromCartUseCase) }
 }

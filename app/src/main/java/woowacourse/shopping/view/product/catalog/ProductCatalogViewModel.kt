@@ -13,10 +13,10 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.usecase.AddToCartUseCase
-import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
-import woowacourse.shopping.domain.usecase.GetTotalCartProductQuantityUseCase
-import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
+import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.cart.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.GetTotalCartProductQuantityUseCase
+import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 import woowacourse.shopping.view.product.catalog.adapter.ProductCatalogItem
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
@@ -27,7 +27,7 @@ class ProductCatalogViewModel(
     private val getPagedCartProductsUseCase: GetPagedCartProductsUseCase,
     private val getTotalCartProductQuantityUseCase: GetTotalCartProductQuantityUseCase,
     private val addToCartUseCase: AddToCartUseCase,
-    private val updateQuantityUseCase: UpdateQuantityUseCase,
+    private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
 ) : ViewModel(),
     ProductCatalogEventHandler {
     private var page = FIRST_PAGE
@@ -166,7 +166,7 @@ class ProductCatalogViewModel(
     ) {
         viewModelScope.launch {
             val existing = cartProducts.firstOrNull { it.product.id == item.id } ?: return@launch
-            updateQuantityUseCase(existing, quantityDelta)
+            updateCartQuantityUseCase(existing, quantityDelta)
                 .onSuccess { updated ->
                     cartProducts.removeIf { it.product.id == item.id }
                     updated?.let { cartProducts.add(it) }

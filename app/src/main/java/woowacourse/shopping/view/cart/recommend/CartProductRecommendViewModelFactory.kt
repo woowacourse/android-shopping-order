@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.usecase.AddToCartUseCase
-import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
-import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
+import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.cart.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 
 class CartProductRecommendViewModelFactory(
     private val selectedProducts: CartProducts,
@@ -15,7 +15,7 @@ class CartProductRecommendViewModelFactory(
     private val recentProductRepository: RecentProductRepository,
     private val getPagedCartProductsUseCase: GetPagedCartProductsUseCase,
     private val addToCartUseCase: AddToCartUseCase,
-    private val updateQuantityUseCase: UpdateQuantityUseCase,
+    private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -26,7 +26,7 @@ class CartProductRecommendViewModelFactory(
                 recentProductRepository,
                 getPagedCartProductsUseCase,
                 addToCartUseCase,
-                updateQuantityUseCase,
+                updateCartQuantityUseCase,
             ) as T
         }
         throw IllegalArgumentException()

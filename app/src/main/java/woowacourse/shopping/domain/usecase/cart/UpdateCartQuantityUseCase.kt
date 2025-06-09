@@ -1,9 +1,9 @@
-package woowacourse.shopping.domain.usecase
+package woowacourse.shopping.domain.usecase.cart
 
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
 
-class UpdateQuantityUseCase(
+class UpdateCartQuantityUseCase(
     private val cartProductRepository: CartProductRepository,
     private val removeFromCartUseCase: RemoveFromCartUseCase,
 ) {

@@ -10,9 +10,9 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.usecase.AddToCartUseCase
-import woowacourse.shopping.domain.usecase.GetCartProductByProductIdUseCase
-import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
+import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.cart.GetCartProductByProductIdUseCase
+import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
@@ -21,7 +21,7 @@ class ProductDetailViewModel(
     private val recentProductRepository: RecentProductRepository,
     private val getCartProductByProductIdUseCase: GetCartProductByProductIdUseCase,
     private val addToCartUseCase: AddToCartUseCase,
-    private val updateQuantityUseCase: UpdateQuantityUseCase,
+    private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
 ) : ViewModel(),
     ProductDetailEventHandler {
     private val _quantity = MutableLiveData(MINIMUM_QUANTITY)
@@ -64,7 +64,7 @@ class ProductDetailViewModel(
                         if (cartProduct == null) {
                             addToCartUseCase(product, quantityToAdd)
                         } else {
-                            updateQuantityUseCase(cartProduct, quantityToAdd)
+                            updateCartQuantityUseCase(cartProduct, quantityToAdd)
                         }
 
                     updateResult

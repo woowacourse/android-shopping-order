@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.repository.CartProductRepository
-import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
-import woowacourse.shopping.domain.usecase.RemoveFromCartUseCase
-import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
+import woowacourse.shopping.domain.usecase.cart.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
+import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.view.cart.select.CartProductSelectViewModel
 import woowacourse.shopping.viewmodel.CoroutinesTestExtension
@@ -25,7 +25,7 @@ class CartProductSelectViewModelTest {
     private lateinit var cartProductRepository: CartProductRepository
     private lateinit var getPagedCartProductsUseCase: GetPagedCartProductsUseCase
     private lateinit var removeFromCartUseCase: RemoveFromCartUseCase
-    private lateinit var updateQuantityUseCase: UpdateQuantityUseCase
+    private lateinit var updateCartQuantityUseCase: UpdateCartQuantityUseCase
 
     @BeforeEach
     fun setup() =
@@ -33,14 +33,14 @@ class CartProductSelectViewModelTest {
             cartProductRepository = FakeCartProductRepository()
             getPagedCartProductsUseCase = GetPagedCartProductsUseCase(cartProductRepository)
             removeFromCartUseCase = RemoveFromCartUseCase(cartProductRepository)
-            updateQuantityUseCase = UpdateQuantityUseCase(cartProductRepository, removeFromCartUseCase)
+            updateCartQuantityUseCase = UpdateCartQuantityUseCase(cartProductRepository, removeFromCartUseCase)
 
             repeat(12) { id -> cartProductRepository.insert(id, 1) }
             viewModel =
                 CartProductSelectViewModel(
                     getPagedCartProductsUseCase,
                     removeFromCartUseCase,
-                    updateQuantityUseCase,
+                    updateCartQuantityUseCase,
                 )
             viewModel.loadPage(1)
         }

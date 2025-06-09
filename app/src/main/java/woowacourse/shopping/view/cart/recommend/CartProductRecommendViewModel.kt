@@ -12,9 +12,9 @@ import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.usecase.AddToCartUseCase
-import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
-import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
+import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.cart.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 import woowacourse.shopping.view.cart.recommend.adapter.RecommendedProductItem
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
@@ -25,7 +25,7 @@ class CartProductRecommendViewModel(
     private val recentProductRepository: RecentProductRepository,
     private val getPagedCartProductsUseCase: GetPagedCartProductsUseCase,
     private val addToCartUseCase: AddToCartUseCase,
-    private val updateQuantityUseCase: UpdateQuantityUseCase,
+    private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
 ) : ViewModel(),
     CartProductRecommendEventHandler {
     val cartProducts = MutableLiveData(selectedProducts)
@@ -110,7 +110,7 @@ class CartProductRecommendViewModel(
                     ?: return@launch
             val newQuantity = existing.quantity + quantityDelta
 
-            updateQuantityUseCase(existing, quantityDelta)
+            updateCartQuantityUseCase(existing, quantityDelta)
                 .onSuccess { updated ->
                     var updatedList = cartProducts.value?.minus(existing)
                     if (newQuantity > DEFAULT_COUNT && updated != null) {

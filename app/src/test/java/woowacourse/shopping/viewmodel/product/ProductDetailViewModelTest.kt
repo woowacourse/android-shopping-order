@@ -8,11 +8,11 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.usecase.AddToCartUseCase
-import woowacourse.shopping.domain.usecase.GetCartProductByProductIdUseCase
-import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
-import woowacourse.shopping.domain.usecase.RemoveFromCartUseCase
-import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
+import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.cart.GetCartProductByProductIdUseCase
+import woowacourse.shopping.domain.usecase.cart.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
+import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.view.product.detail.ProductDetailViewModel
@@ -31,7 +31,7 @@ class ProductDetailViewModelTest {
     private lateinit var getCartProductByProductIdUseCase: GetCartProductByProductIdUseCase
     private lateinit var addToCartUseCase: AddToCartUseCase
     private lateinit var removeFromCartUseCase: RemoveFromCartUseCase
-    private lateinit var updateQuantityUseCase: UpdateQuantityUseCase
+    private lateinit var updateCartQuantityUseCase: UpdateCartQuantityUseCase
     private lateinit var product: Product
 
     @BeforeEach
@@ -42,7 +42,7 @@ class ProductDetailViewModelTest {
         getCartProductByProductIdUseCase = GetCartProductByProductIdUseCase(getPagedCartProductsUseCase)
         addToCartUseCase = AddToCartUseCase(cartProductRepository)
         removeFromCartUseCase = RemoveFromCartUseCase(cartProductRepository)
-        updateQuantityUseCase = UpdateQuantityUseCase(cartProductRepository, removeFromCartUseCase)
+        updateCartQuantityUseCase = UpdateCartQuantityUseCase(cartProductRepository, removeFromCartUseCase)
         product = Product(id = 0, imageUrl = "", name = "Product 0", price = 1000, category = "")
 
         viewModel =
@@ -51,7 +51,7 @@ class ProductDetailViewModelTest {
                 recentProductRepository,
                 getCartProductByProductIdUseCase,
                 addToCartUseCase,
-                updateQuantityUseCase,
+                updateCartQuantityUseCase,
             )
     }
 

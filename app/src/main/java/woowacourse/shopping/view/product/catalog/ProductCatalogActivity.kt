@@ -34,7 +34,7 @@ class ProductCatalogActivity : AppCompatActivity() {
                 app.getPagedCartProductsUseCase,
                 app.getTotalCartProductQuantityUseCase,
                 app.addToCartUseCase,
-                app.updateQuantityUseCase,
+                app.updateCartQuantityUseCase,
             ),
         )[ProductCatalogViewModel::class.java]
     }

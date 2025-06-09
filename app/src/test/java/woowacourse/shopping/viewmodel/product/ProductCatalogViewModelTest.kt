@@ -9,11 +9,11 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.usecase.AddToCartUseCase
-import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
-import woowacourse.shopping.domain.usecase.GetTotalCartProductQuantityUseCase
-import woowacourse.shopping.domain.usecase.RemoveFromCartUseCase
-import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
+import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.cart.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.GetTotalCartProductQuantityUseCase
+import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
+import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.fixture.FakeProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
@@ -35,7 +35,7 @@ class ProductCatalogViewModelTest {
     private lateinit var getTotalCartProductQuantityUseCase: GetTotalCartProductQuantityUseCase
     private lateinit var addToCartUseCase: AddToCartUseCase
     private lateinit var removeFromCartUseCase: RemoveFromCartUseCase
-    private lateinit var updateQuantityUseCase: UpdateQuantityUseCase
+    private lateinit var updateCartQuantityUseCase: UpdateCartQuantityUseCase
 
     @BeforeEach
     fun setup() =
@@ -47,7 +47,7 @@ class ProductCatalogViewModelTest {
             getTotalCartProductQuantityUseCase = GetTotalCartProductQuantityUseCase(cartProductRepository)
             addToCartUseCase = AddToCartUseCase(cartProductRepository)
             removeFromCartUseCase = RemoveFromCartUseCase(cartProductRepository)
-            updateQuantityUseCase = UpdateQuantityUseCase(cartProductRepository, removeFromCartUseCase)
+            updateCartQuantityUseCase = UpdateCartQuantityUseCase(cartProductRepository, removeFromCartUseCase)
 
             repeat(12) { id -> cartProductRepository.insert(id, 1) }
             viewModel =
@@ -57,7 +57,7 @@ class ProductCatalogViewModelTest {
                     getPagedCartProductsUseCase,
                     getTotalCartProductQuantityUseCase,
                     addToCartUseCase,
-                    updateQuantityUseCase,
+                    updateCartQuantityUseCase,
                 )
             viewModel.loadCatalog()
         }

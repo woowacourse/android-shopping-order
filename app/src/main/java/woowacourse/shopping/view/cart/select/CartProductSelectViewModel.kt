@@ -9,15 +9,15 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.CartProducts
-import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
-import woowacourse.shopping.domain.usecase.RemoveFromCartUseCase
-import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
+import woowacourse.shopping.domain.usecase.cart.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
+import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 import woowacourse.shopping.view.cart.select.adapter.CartProductItem
 
 class CartProductSelectViewModel(
     private val getPagedCartProductsUseCase: GetPagedCartProductsUseCase,
     private val removeFromCartUseCase: RemoveFromCartUseCase,
-    private val updateQuantityUseCase: UpdateQuantityUseCase,
+    private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
 ) : ViewModel(),
     CartProductSelectEventHandler {
     private val _cartProductItems = MutableLiveData<List<CartProductItem>>()
@@ -148,7 +148,7 @@ class CartProductSelectViewModel(
             val newQuantity = existing.cartProduct.quantity + quantityDelta
             if (newQuantity < MINIMUM_QUANTITY) return@launch
 
-            updateQuantityUseCase(existing.cartProduct, quantityDelta).onSuccess { updated ->
+            updateCartQuantityUseCase(existing.cartProduct, quantityDelta).onSuccess { updated ->
                 loadPage(page.value ?: FIRST_PAGE_NUMBER)
                 val currentSelected = selectedCartProducts.value
                 if (currentSelected?.contains(item) == true && updated != null) {

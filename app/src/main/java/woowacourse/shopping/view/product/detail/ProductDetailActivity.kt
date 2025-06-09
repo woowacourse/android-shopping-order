@@ -33,7 +33,7 @@ class ProductDetailActivity : AppCompatActivity() {
                     app.recentProductRepository,
                     app.getCartProductByProductIdUseCase,
                     app.addToCartUseCase,
-                    app.updateQuantityUseCase,
+                    app.updateCartQuantityUseCase,
                 ),
             )[ProductDetailViewModel::class.java]
         initBindings(product)
