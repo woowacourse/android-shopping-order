@@ -1,47 +1,38 @@
 package woowacourse.shopping.domain.usecase
 
 import woowacourse.shopping.domain.model.CouponDetailInfo
-import woowacourse.shopping.domain.model.CouponDetailInfo.Companion.isAvailable
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.repository.CouponRepository
-import java.time.LocalTime
+import woowacourse.shopping.domain.usecase.CalculatePaymentAmountByCouponUseCase.Companion.DEFAULT_SHIPPING_FEE
 
-class CalculatePaymentAmountByCouponUseCase(
+class CalculateCouponDiscountUseCase(
     private val couponRepository: CouponRepository,
 ) {
     operator fun invoke(
         couponId: Long,
         products: Products,
-        now: LocalTime = LocalTime.now(),
-    ): Int? {
+    ): Int {
         val orderAmount: Int =
             products.getSelectedCartProductsPrice()
-        val totalPaymentAmount = orderAmount + DEFAULT_SHIPPING_FEE
-        val selectedCoupon = couponRepository.fetchCoupon(couponId) ?: return null
-        if (!selectedCoupon.isAvailable(products, now)) return null
-
+        val selectedCoupon = couponRepository.fetchCoupon(couponId) ?: return 0
         return when (selectedCoupon) {
             is CouponDetailInfo.FixedDiscount -> {
-                totalPaymentAmount - selectedCoupon.discount
+                -selectedCoupon.discount
             }
 
             is CouponDetailInfo.BuyXGetYFree -> {
                 val maximumPrice = products.products.maxOf { it.productDetail.price }
-                totalPaymentAmount - (maximumPrice * selectedCoupon.getQuantity)
+                -(maximumPrice * selectedCoupon.getQuantity)
             }
 
             is CouponDetailInfo.FreeShippingOver -> {
-                totalPaymentAmount - DEFAULT_SHIPPING_FEE
+                -DEFAULT_SHIPPING_FEE
             }
 
             is CouponDetailInfo.PercentDiscount -> {
                 val discount = orderAmount * selectedCoupon.discount / 100
-                totalPaymentAmount - discount
+                -discount
             }
         }
-    }
-
-    companion object {
-        const val DEFAULT_SHIPPING_FEE: Int = 3000
     }
 }

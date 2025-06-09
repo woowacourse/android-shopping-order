@@ -12,10 +12,10 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.model.Products.Companion.EMPTY_PRODUCTS
+import woowacourse.shopping.domain.usecase.CalculateCouponDiscountUseCase
 import woowacourse.shopping.domain.usecase.CalculatePaymentAmountByCouponUseCase
 import woowacourse.shopping.domain.usecase.CalculatePaymentAmountByCouponUseCase.Companion.DEFAULT_SHIPPING_FEE
 import woowacourse.shopping.domain.usecase.GetCouponsUseCase
-import woowacourse.shopping.domain.usecase.IsFixedDiscountUseCase
 import woowacourse.shopping.domain.usecase.IsFreeShippingCouponUseCase
 import woowacourse.shopping.ui.payment.adapter.CouponUiModel.Companion.toUiModel
 
@@ -23,7 +23,7 @@ class PaymentViewModel(
     private val getCouponsUseCase: GetCouponsUseCase,
     private val calculatePaymentAmountByCouponUseCase: CalculatePaymentAmountByCouponUseCase,
     private val isFreeShippingCouponUseCase: IsFreeShippingCouponUseCase,
-    private val isFixedDiscountUseCase: IsFixedDiscountUseCase,
+    private val calculateCouponDiscountUseCase: CalculateCouponDiscountUseCase,
 ) : ViewModel() {
     private val _uiState: MutableLiveData<PaymentUiState> =
         MutableLiveData<PaymentUiState>(PaymentUiState())
@@ -33,7 +33,7 @@ class PaymentViewModel(
         updateUiState {
             it.copy(
                 selectedProducts = products.getOrderedProducts(),
-                totalPaymentAmount = products.getSelectedCartProductsPrice() + products.getSelectedCartRecommendProductsPrice(),
+                totalPaymentAmount = products.getSelectedCartProductsPrice() + DEFAULT_SHIPPING_FEE,
             )
         }
         loadCoupons()
@@ -55,12 +55,15 @@ class PaymentViewModel(
         updateUiState { it.copy(totalPaymentAmount = totalPaymentAmount) }
 
         loadDeliveryPrice(selectedCouponId)
-        loadCouponDiscount(selectedCouponId)
+        loadCouponDiscount(selectedCouponId, _uiState.value?.selectedProducts ?: EMPTY_PRODUCTS)
     }
 
-    private fun loadCouponDiscount(selectedCouponId: Long) {
+    private fun loadCouponDiscount(
+        selectedCouponId: Long,
+        products: Products,
+    ) {
         val newCouponDiscount =
-            if (isFixedDiscountUseCase(selectedCouponId)) FIXED_DISCOUNT_AMOUNT else NO_FIXED_DISCOUNT
+            calculateCouponDiscountUseCase(selectedCouponId, products)
         updateUiState { it.copy(couponDiscount = newCouponDiscount) }
     }
 
@@ -107,7 +110,7 @@ class PaymentViewModel(
                         getCouponsUseCase = application.getCouponsUseCase,
                         calculatePaymentAmountByCouponUseCase = application.calculatePaymentAmountByCouponUseCase,
                         isFreeShippingCouponUseCase = application.isFreeShippingCouponUseCase,
-                        isFixedDiscountUseCase = application.isFixedDiscountUseCase,
+                        calculateCouponDiscountUseCase = application.calculateCouponDiscountUseCase,
                     ) as T
                 }
             }

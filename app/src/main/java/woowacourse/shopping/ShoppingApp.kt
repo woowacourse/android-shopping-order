@@ -7,6 +7,7 @@ import woowacourse.shopping.data.di.NetworkModule.couponApi
 import woowacourse.shopping.data.di.NetworkModule.orderApi
 import woowacourse.shopping.data.di.NetworkModule.productApi
 import woowacourse.shopping.domain.usecase.AddSearchHistoryUseCase
+import woowacourse.shopping.domain.usecase.CalculateCouponDiscountUseCase
 import woowacourse.shopping.domain.usecase.CalculatePaymentAmountByCouponUseCase
 import woowacourse.shopping.domain.usecase.DecreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCartProductsQuantityUseCase
@@ -19,7 +20,6 @@ import woowacourse.shopping.domain.usecase.GetCouponsUseCase
 import woowacourse.shopping.domain.usecase.GetRecentSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.GetSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
-import woowacourse.shopping.domain.usecase.IsFixedDiscountUseCase
 import woowacourse.shopping.domain.usecase.IsFreeShippingCouponUseCase
 import woowacourse.shopping.domain.usecase.OrderProductsUseCase
 import woowacourse.shopping.domain.usecase.RemoveCartProductUseCase
@@ -115,8 +115,8 @@ class ShoppingApp : Application() {
         CalculatePaymentAmountByCouponUseCase(couponRepository)
     }
 
-    val isFixedDiscountUseCase by lazy {
-        IsFixedDiscountUseCase(couponRepository)
+    val calculateCouponDiscountUseCase by lazy {
+        CalculateCouponDiscountUseCase(couponRepository)
     }
 
     val isFreeShippingCouponUseCase by lazy {
