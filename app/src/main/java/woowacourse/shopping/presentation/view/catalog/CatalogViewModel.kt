@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PageableItem
@@ -119,18 +118,19 @@ class CatalogViewModel(
         currentItems: List<CatalogItem> = _products.value.orEmpty(),
     ) {
         val ids = currentItems.filterIsInstance<CatalogItem.ProductItem>().map { it.productId }
-        val newCartProducts = runBlocking { cartRepository.findCartProductsByProductIds(ids) }
+        viewModelScope.launch {
+            cartRepository
+                .findCartProductsByProductIds(ids)
+                .onFailure { emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
+                .onSuccess {
+                    val updatedItems = applyCartQuantities(it, currentItems)
+                    val finalCatalog = prependRecentProducts(recentProductsItem, updatedItems)
+                    _products.value = finalCatalog
+                    updateCartItemCount()
+                }
 
-        newCartProducts
-            .onFailure { emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
-            .onSuccess {
-                val updatedItems = applyCartQuantities(it, currentItems)
-                val finalCatalog = prependRecentProducts(recentProductsItem, updatedItems)
-                _products.value = finalCatalog
-                updateCartItemCount()
-            }
-
-        _isLoading.value = false
+            _isLoading.value = false
+        }
     }
 
     private fun updateProductQuantityInList(productId: Long) {
