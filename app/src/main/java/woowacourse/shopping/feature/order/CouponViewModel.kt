@@ -57,7 +57,7 @@ class CouponViewModel(
             _cartItems = itemIds.map { id ->
                 allCartItems.toCartItems().first { it.goods.id == id }
             }
-            _originalAmount.value = cartItems.sumOf { it.goods.price * it.quantity }
+            _originalAmount.postValue(cartItems.sumOf { it.goods.price * it.quantity }+ _shippingFee.value!!)
             updateTotalAmount()
         }
 
