@@ -30,10 +30,10 @@ class OrderViewModel(
     private val _shippingFee: MutableLiveData<ShippingFee> = MutableLiveData(ShippingFee())
     val shippingFee: LiveData<ShippingFee> get() = _shippingFee
 
-    private val _couponDiscount: MediatorLiveData<Int> = MediatorLiveData(0)
+    private val _couponDiscount: MediatorLiveData<Int> = MediatorLiveData(INITIAL_AMOUNT)
     val couponDiscount: LiveData<Int> get() = _couponDiscount
 
-    private val _totalPrice: MediatorLiveData<Int> = MediatorLiveData(0)
+    private val _totalPrice: MediatorLiveData<Int> = MediatorLiveData(INITIAL_AMOUNT)
     val totalPrice: LiveData<Int> get() = _totalPrice
 
     init {
@@ -52,24 +52,24 @@ class OrderViewModel(
     }
 
     private fun calculateTotalPrice() {
-        val basePrice = price.value ?: 0
-        val shipping = shippingFee.value?.amount ?: 0
-        val discount = couponDiscount.value ?: 0
+        val basePrice = price.value ?: INITIAL_AMOUNT
+        val shipping = shippingFee.value?.amount ?: INITIAL_AMOUNT
+        val discount = couponDiscount.value ?: INITIAL_AMOUNT
 
         _totalPrice.value = basePrice + shipping + discount
     }
 
     private fun calculateCouponDiscount() {
         val couponItem = applyingCoupon.value
-        val currentPrice = price.value ?: 0
+        val currentPrice = price.value ?: INITIAL_AMOUNT
 
         val discountAmount =
             when (val origin = couponItem?.origin) {
                 is Coupon.PriceDiscount -> -origin.discount
-                is Coupon.PercentageDiscount -> -currentPrice * (origin.discountPercentage / 100)
-                is Coupon.Bonus -> -(calculateBonusDiscount(origin) ?: 0)
-                is Coupon.FreeShipping -> -(shippingFee.value?.amount ?: 0)
-                null -> 0
+                is Coupon.PercentageDiscount -> -currentPrice * (origin.discountPercentage / PERCENT_BASE)
+                is Coupon.Bonus -> -(calculateBonusDiscount(origin) ?: INITIAL_AMOUNT)
+                is Coupon.FreeShipping -> -(shippingFee.value?.amount ?: INITIAL_AMOUNT)
+                null -> INITIAL_AMOUNT
             }
 
         _couponDiscount.value = discountAmount
@@ -145,6 +145,9 @@ class OrderViewModel(
     }
 
     companion object {
+        private const val INITIAL_AMOUNT = 0
+        private const val PERCENT_BASE = 100
+
         fun provideFactory(productsToOrder: Array<ShoppingCartProduct>): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
