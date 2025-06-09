@@ -9,7 +9,7 @@
 
         <variable
             name="couponClickListener"
-            type="woowacourse.shopping.view.order.CouponClickListener" />
+            type="woowacourse.shopping.view.order.OrderAdapter.CouponClickListener" />
 
         <import type="android.view.View" />
     </data>

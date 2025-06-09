@@ -7,7 +7,7 @@ import woowacourse.shopping.databinding.ItemCouponBinding
 
 class CouponViewHolder(
     private val binding: ItemCouponBinding,
-    couponClickListener: CouponClickListener,
+    couponClickListener: OrderAdapter.CouponClickListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.couponClickListener = couponClickListener
@@ -20,7 +20,7 @@ class CouponViewHolder(
     companion object {
         fun of(
             parent: ViewGroup,
-            couponClickListener: CouponClickListener,
+            couponClickListener: OrderAdapter.CouponClickListener,
         ): CouponViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ItemCouponBinding.inflate(layoutInflater, parent, false)

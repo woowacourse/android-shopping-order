@@ -30,8 +30,8 @@ class OrderAdapter(
     ) {
         holder.bind(getItem(position))
     }
-}
 
-interface CouponClickListener {
-    fun onCouponClick(couponState: CouponState)
+    interface CouponClickListener {
+        fun onCouponClick(couponState: CouponState)
+    }
 }

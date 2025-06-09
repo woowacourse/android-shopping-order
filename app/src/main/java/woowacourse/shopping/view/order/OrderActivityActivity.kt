@@ -17,7 +17,7 @@ import woowacourse.shopping.view.product.ProductsActivity
 
 class OrderActivityActivity :
     AppCompatActivity(),
-    CouponClickListener,
+    OrderAdapter.CouponClickListener,
     OrderActivityClickListener {
     private val binding: ActivityOrderBinding by lazy {
         ActivityOrderBinding.inflate(layoutInflater)
