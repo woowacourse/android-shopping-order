@@ -50,7 +50,7 @@
             android:layout_marginTop="8dp"
             android:text="@{String.format(@string/text_expiration_date, coupon.expirationYear, coupon.expirationMonth, coupon.expirationDay)}"
             android:textColor="@color/gray"
-            android:textSize="12dp"
+            android:textSize="12sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_coupon_title" />
 
@@ -61,7 +61,7 @@
             android:layout_marginStart="16dp"
             android:text="@{String.format(@string/text_order_minimum, coupon.minimumAmount)}"
             android:textColor="@color/gray"
-            android:textSize="12dp"
+            android:textSize="12sp"
             android:visibility="@{coupon.minimumAmount != null ? View.VISIBLE : View.GONE}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_expiration_date" />
