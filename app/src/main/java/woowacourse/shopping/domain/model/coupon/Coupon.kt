@@ -1,9 +1,12 @@
 package woowacourse.shopping.domain.model.coupon
 
+import woowacourse.shopping.domain.model.CartItem
 import java.time.LocalDate
 
 sealed class Coupon {
     abstract val couponBase: CouponBase
 
-    fun isExpired(now: LocalDate = LocalDate.now()): Boolean = now.isAfter(couponBase.expirationDate)
+    protected fun isExpired(now: LocalDate = LocalDate.now()): Boolean = now.isAfter(couponBase.expirationDate)
+
+    abstract fun isAvailable(cartItems: List<CartItem>): Boolean
 }
