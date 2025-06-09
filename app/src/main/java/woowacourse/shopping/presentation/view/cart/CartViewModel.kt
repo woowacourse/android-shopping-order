@@ -99,12 +99,7 @@ class CartViewModel(
                 return@launch
             }
             cartRepository.increaseQuantity(cartItem)
-            val updatedItem =
-                CartItemUiModel(
-                    cartItem.copy(quantity = cartItem.quantity + 1),
-                    isSelected = _selectedProductIds.value.orEmpty().contains(product.id),
-                )
-            updateCartItems(updatedItem)
+            loadPageOfShoppingCart()
 
             isProcessingRequest = false
         }
@@ -121,12 +116,8 @@ class CartViewModel(
             if (isProcessingRequest) return@launch
             isProcessingRequest = true
             cartRepository.decreaseQuantity(cartItem)
-            val updatedItem =
-                CartItemUiModel(
-                    cartItem.copy(quantity = cartItem.quantity - 1),
-                    isSelected = _selectedProductIds.value.orEmpty().contains(product.id),
-                )
-            updateCartItems(updatedItem)
+            loadPageOfShoppingCart()
+
             isProcessingRequest = false
         }
     }
@@ -213,11 +204,11 @@ class CartViewModel(
     private suspend fun updateSelectionInfo() {
         val allCartItems = cartRepository.loadAllCartItems()
         _cartItems.postValue(
-            allCartItems.map { cartItem ->
-                if (_selectedProductIds.value.orEmpty().contains(cartItem.product.id)) {
-                    cartItem.toCartItemUiModel().copy(isSelected = true)
+            _cartItems.value.orEmpty().map { cartItem ->
+                if (_selectedProductIds.value.orEmpty().contains(cartItem.cartItem.product.id)) {
+                    cartItem.copy(isSelected = true)
                 } else {
-                    cartItem.toCartItemUiModel()
+                    cartItem
                 }
             },
         )
