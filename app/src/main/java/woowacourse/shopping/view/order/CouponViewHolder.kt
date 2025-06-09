@@ -26,7 +26,7 @@ class CouponViewHolder(
     }
 
     companion object {
-        fun from(
+        fun of(
             parent: ViewGroup,
             couponListener: CouponListener,
         ): CouponViewHolder {

@@ -22,7 +22,7 @@ class CouponAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): CouponViewHolder = CouponViewHolder.from(parent, couponListener)
+    ): CouponViewHolder = CouponViewHolder.of(parent, couponListener)
 
     override fun onBindViewHolder(
         holder: CouponViewHolder,
