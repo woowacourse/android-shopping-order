@@ -5,22 +5,25 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.payment.CouponEvent
+import woowacourse.shopping.data.payment.CouponApplyEvent
 import woowacourse.shopping.data.payment.DefaultCouponRepository
+import woowacourse.shopping.data.payment.DefaultOrderRepository
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.payment.Coupon
 import woowacourse.shopping.domain.payment.CouponRepository
 import woowacourse.shopping.domain.payment.DefaultDeliveryFee
 import woowacourse.shopping.domain.payment.DeliveryFee
+import woowacourse.shopping.domain.payment.OrderRepository
 import woowacourse.shopping.view.MutableSingleLiveData
 import woowacourse.shopping.view.SingleLiveData
 
 class CouponApplyViewModel(
-    private val repository: CouponRepository = DefaultCouponRepository(),
+    private val couponRepository: CouponRepository = DefaultCouponRepository(),
+    private val orderRepository: OrderRepository = DefaultOrderRepository(),
     private val anDeliveryFee: DeliveryFee = DefaultDeliveryFee(),
 ) : ViewModel() {
-    private val _event: MutableSingleLiveData<CouponEvent> = MutableSingleLiveData()
-    val event: SingleLiveData<CouponEvent> get() = _event
+    private val _event: MutableSingleLiveData<CouponApplyEvent> = MutableSingleLiveData()
+    val event: SingleLiveData<CouponApplyEvent> get() = _event
 
     var cartItems: List<CartItem> = emptyList()
 
@@ -30,7 +33,7 @@ class CouponApplyViewModel(
 
     fun loadCouponsRepository() {
         viewModelScope.launch {
-            repository
+            couponRepository
                 .loadCoupons()
                 .onSuccess { coupons: List<Coupon> ->
                     _state.value =
@@ -47,7 +50,7 @@ class CouponApplyViewModel(
                         )
                 }.onFailure {
                     throw it
-                    _event.value = CouponEvent.LOAD_COUPONS_FAILURE
+                    _event.value = CouponApplyEvent.LOAD_COUPONS_FAILURE
                 }
         }
     }
@@ -83,5 +86,18 @@ class CouponApplyViewModel(
                 coupons = newCoupons,
                 selectedCoupon = selectedCoupon,
             )
+    }
+
+    fun order() {
+        viewModelScope.launch {
+            orderRepository
+                .order(cartItems.map(CartItem::id))
+                .onSuccess {
+                    _event.value = CouponApplyEvent.ORDER_SUCCESS
+                }.onFailure {
+                    throw it
+                    _event.value = CouponApplyEvent.ORDER_FAILURE
+                }
+        }
     }
 }

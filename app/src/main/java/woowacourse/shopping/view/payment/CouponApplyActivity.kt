@@ -10,9 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.R
-import woowacourse.shopping.data.payment.CouponEvent
+import woowacourse.shopping.data.payment.CouponApplyEvent
 import woowacourse.shopping.databinding.ActivityCouponApplyBinding
 import woowacourse.shopping.domain.cart.CartItem
+import woowacourse.shopping.view.product.ProductsActivity
 import woowacourse.shopping.view.showToast
 
 class CouponApplyActivity : AppCompatActivity() {
@@ -39,9 +40,24 @@ class CouponApplyActivity : AppCompatActivity() {
 
         binding.couponApplyCoupons.adapter = adapter
 
+        binding.couponApplyPayButton.setOnClickListener {
+            viewModel.order()
+        }
+
         viewModel.event.observe(this) { event ->
             when (event) {
-                CouponEvent.LOAD_COUPONS_FAILURE -> showToast(getString(R.string.load_coupons_error_message))
+                CouponApplyEvent.LOAD_COUPONS_FAILURE -> showToast(R.string.load_coupons_error_message)
+                CouponApplyEvent.ORDER_SUCCESS -> {
+                    showToast(R.string.order_success_message)
+
+                    val intent =
+                        Intent(this, ProductsActivity::class.java).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        }
+                    startActivity(intent)
+                }
+
+                CouponApplyEvent.ORDER_FAILURE -> showToast(R.string.order_failure_message)
             }
         }
 

@@ -9,6 +9,7 @@ import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.cart.service.CartService
 import woowacourse.shopping.data.payment.CouponService
+import woowacourse.shopping.data.payment.OrderService
 import woowacourse.shopping.data.product.service.ProductService
 
 object API {
@@ -33,6 +34,7 @@ object API {
     val productService: ProductService = retrofit.create(ProductService::class.java)
     val cartService: CartService = retrofit.create(CartService::class.java)
     val couponService: CouponService = retrofit.create(CouponService::class.java)
+    val orderService: OrderService = retrofit.create(OrderService::class.java)
 
     private fun OkHttpClient.Builder.addHttpLoggingInterceptor() =
         addInterceptor(

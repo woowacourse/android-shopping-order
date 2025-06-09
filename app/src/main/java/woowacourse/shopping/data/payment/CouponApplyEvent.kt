@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.payment
 
-enum class CouponEvent {
+enum class CouponApplyEvent {
     LOAD_COUPONS_FAILURE,
+    ORDER_SUCCESS,
+    ORDER_FAILURE,
 }
