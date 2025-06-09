@@ -65,13 +65,7 @@ class CartRemoteDataSourceImpl(
         handleApiCall(
             errorMessage = "아이템 삭제 실패",
             apiCall = { cartItemService.deleteCartItem(cartId) },
-            transform = { response ->
-                if (response.isSuccessful) {
-                    Unit
-                } else {
-                    throw IllegalStateException("삭제 실패: ${response.code()}")
-                }
-            },
+            transform = { Unit },
         )
 
     private fun <T> Response<T>.toIdOrNull(): Long? = headers()["LOCATION"]?.substringAfterLast("/")?.toLongOrNull()
