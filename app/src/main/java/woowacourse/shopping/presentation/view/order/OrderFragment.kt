@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.view.order
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
@@ -13,6 +14,7 @@ import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.extension.getParcelableArrayListCompat
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.CouponUiModel
+import woowacourse.shopping.presentation.view.catalog.CatalogFragment
 import woowacourse.shopping.presentation.view.order.coupon.CouponAdapter
 
 class OrderFragment :
@@ -51,6 +53,7 @@ class OrderFragment :
 
         initOrderSummary()
         initObserver()
+        initListener()
     }
 
     private fun initOrderSummary() {
@@ -71,6 +74,16 @@ class OrderFragment :
         viewModel.selectedCoupon.observe(viewLifecycleOwner) { selectedCoupon ->
             viewModel.calculateOrderSummary(selectedCoupon)
         }
+        viewModel.orderSuccessEvent.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), "주문에 성공했습니다", Toast.LENGTH_SHORT).show()
+            navigateToCatalog()
+        }
+    }
+
+    private fun initListener() {
+        binding.btnBack.setOnClickListener {
+            navigateToScreen()
+        }
     }
 
     private fun navigateToScreen() {
@@ -79,6 +92,15 @@ class OrderFragment :
         parentFragmentManager.popBackStack()
         parentFragmentManager.commit {
             remove(this@OrderFragment)
+        }
+    }
+
+    private fun navigateToCatalog() {
+        parentFragmentManager.setFragmentResult("cart_update_result", Bundle())
+        parentFragmentManager.popBackStack()
+        parentFragmentManager.commit {
+            setReorderingAllowed(true)
+            replace(R.id.shopping_fragment_container, CatalogFragment::class.java, null)
         }
     }
 

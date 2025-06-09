@@ -30,6 +30,9 @@ class OrderViewModel(
     private val _orderSummary = MutableLiveData<OrderSummary>()
     val orderSummary: LiveData<OrderSummary> = _orderSummary
 
+    private val _orderSuccessEvent = MutableLiveData<Unit>()
+    val orderSuccessEvent: LiveData<Unit> = _orderSuccessEvent
+
     fun loadCoupons() {
         viewModelScope.launch {
             couponRepository
@@ -85,6 +88,16 @@ class OrderViewModel(
                     couponAmount = couponAmount ?: 0,
                     shippingFee = 3000,
                 )
+        }
+    }
+
+    fun order() {
+        viewModelScope.launch {
+            orderRepository
+                .order(selectedItems.map { it.toDomain() })
+                .onSuccess {
+                    _orderSuccessEvent.postValue(Unit)
+                }
         }
     }
 
