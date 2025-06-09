@@ -24,6 +24,7 @@
         android:layout_marginHorizontal="18dp"
         android:layout_marginVertical="4dp"
         android:background="@drawable/style_product_edge"
+        android:onClick="@{() -> handler.onSelectItem(coupon)}"
         android:padding="18dp">
 
         <CheckBox
@@ -31,7 +32,6 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:checked="@{isSelected}"
-            android:onClick="@{() -> handler.onSelectItem(coupon)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
