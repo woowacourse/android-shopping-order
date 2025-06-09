@@ -43,9 +43,9 @@ class OrderViewModel(
             addSource(couponDiscount) { calculateTotalPrice() }
         }
         _couponDiscount.apply {
-            addSource(applyingCoupon) { updateDiscount() }
-            addSource(price) { updateDiscount() }
-            addSource(shippingFee) { updateDiscount() }
+            addSource(applyingCoupon) { calculateCouponDiscount() }
+            addSource(price) { calculateCouponDiscount() }
+            addSource(shippingFee) { calculateCouponDiscount() }
         }
 
         getCoupons()
@@ -59,16 +59,17 @@ class OrderViewModel(
         _totalPrice.value = basePrice + shipping + discount
     }
 
-    private fun updateDiscount() {
-        val couponItem = applyingCoupon.value ?: return
+    private fun calculateCouponDiscount() {
+        val couponItem = applyingCoupon.value
         val currentPrice = price.value ?: 0
 
         val discountAmount =
-            when (val origin = couponItem.origin) {
+            when (val origin = couponItem?.origin) {
                 is Coupon.PriceDiscount -> -origin.discount
                 is Coupon.PercentageDiscount -> -currentPrice * (origin.discountPercentage / 100)
                 is Coupon.Bonus -> -(calculateBonusDiscount(origin) ?: 0)
                 is Coupon.FreeShipping -> -(shippingFee.value?.amount ?: 0)
+                null -> 0
             }
 
         _couponDiscount.value = discountAmount
