@@ -78,15 +78,16 @@ class DetailViewModel(
         private const val MIN_QUANTITY = 1
 
         @Suppress("UNCHECKED_CAST")
-        fun factory(productId: Long): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(
-                modelClass: Class<T>,
-                extras: CreationExtras,
-            ): T {
-                val cartRepository = RepositoryProvider.cartRepository
-                val productRepository = RepositoryProvider.productRepository
-                return DetailViewModel(productId, cartRepository, productRepository) as T
+        fun factory(productId: Long): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(
+                    modelClass: Class<T>,
+                    extras: CreationExtras,
+                ): T {
+                    val cartRepository = RepositoryProvider.cartRepository
+                    val productRepository = RepositoryProvider.productRepository
+                    return DetailViewModel(productId, cartRepository, productRepository) as T
+                }
             }
-        }
     }
 }

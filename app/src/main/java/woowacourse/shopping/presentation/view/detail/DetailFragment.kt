@@ -25,7 +25,7 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
                     replace(
                         R.id.shopping_fragment_container,
                         DetailFragment::class.java,
-                        newBundle(product.id)
+                        newBundle(product.id),
                     )
                     addToBackStack(null)
                 }
