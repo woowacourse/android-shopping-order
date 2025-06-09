@@ -5,8 +5,7 @@ data class PaymentSummary(
     val discountPrice: Int = DEFAULT_DISCOUNT_PRICE,
     val deliveryFee: Int = DEFAULT_DELIVERY_FEE,
 ) {
-    val orderPrice: Int
-        get() = products.sumOf { it.totalPrice }
+    val orderPrice: Int = products.sumOf { it.totalPrice }
 
     val finalPaymentPrice: Int
         get() = orderPrice - discountPrice + deliveryFee
