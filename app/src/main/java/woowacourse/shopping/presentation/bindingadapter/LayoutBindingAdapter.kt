@@ -10,3 +10,8 @@ fun setVisible(
 ) {
     view.visibility = if (condition) View.VISIBLE else View.GONE
 }
+
+@BindingAdapter("visibleIfNotNull")
+fun View.setVisibleIfNotNull(value: Any?) {
+    visibility = if (value != null) View.VISIBLE else View.GONE
+}
