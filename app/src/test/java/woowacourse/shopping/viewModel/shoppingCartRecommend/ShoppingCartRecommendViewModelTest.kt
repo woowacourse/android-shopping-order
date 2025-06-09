@@ -16,7 +16,6 @@ import woowacourse.shopping.fixture.RECENT_PRODUCTS
 import woowacourse.shopping.fixture.RECENT_PRODUCTS_FULL
 import woowacourse.shopping.fixture.RECOMMENDED_PRODUCTS
 import woowacourse.shopping.fixture.SHOPPING_CARTS1
-import woowacourse.shopping.view.product.ProductsItem
 import woowacourse.shopping.view.shoppingCartRecommend.ShoppingCartRecommendViewModel
 import woowacourse.shopping.viewModel.common.CoroutinesTestExtension
 import woowacourse.shopping.viewModel.common.InstantTaskExecutorExtension
@@ -88,63 +87,6 @@ class ShoppingCartRecommendViewModelTest {
             )
         // then
         assertThat(viewModel.recommendProducts.getOrAwaitValue()).hasSize(10)
-    }
-
-    @Test
-    fun `장바구니에 있는 상품은 추천 상품에 없다`() {
-        // given
-        val expected =
-            ProductsItem.ProductItem(
-                1,
-                SHOPPING_CARTS1.shoppingCartItems.first().product,
-            )
-
-        coEvery { productRepository.getRecentRecommendWatchingProducts(any()) } returns
-            Result.success(
-                RECENT_PRODUCTS,
-            )
-        coEvery { shoppingCartRepository.load(any(), any()) } returns
-            Result.success(
-                SHOPPING_CARTS1,
-            )
-        // when
-        viewModel =
-            ShoppingCartRecommendViewModel(
-                SHOPPING_CARTS1.shoppingCartItems,
-                shoppingCartRepository,
-                productRepository,
-            )
-        // then
-        assertThat(viewModel.recommendProducts.getOrAwaitValue()).doesNotContain(
-            expected,
-        )
-    }
-
-    @Test
-    fun `가장 최근 본 상품의 카테고리만 추천 상품에 나열된다`() {
-        // given
-        val category = RECENT_PRODUCTS.first().category
-        coEvery { productRepository.getRecentRecommendWatchingProducts(any()) } returns
-            Result.success(
-                RECENT_PRODUCTS,
-            )
-        coEvery { shoppingCartRepository.load(any(), any()) } returns
-            Result.success(
-                SHOPPING_CARTS1,
-            )
-
-        // when
-        viewModel =
-            ShoppingCartRecommendViewModel(
-                SHOPPING_CARTS1.shoppingCartItems,
-                shoppingCartRepository,
-                productRepository,
-            )
-
-        // then
-        assertThat(viewModel.recommendProducts.getOrAwaitValue()).allMatch {
-            it.product.category == category
-        }
     }
 
     @Test

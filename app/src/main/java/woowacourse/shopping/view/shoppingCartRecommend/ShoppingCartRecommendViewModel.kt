@@ -14,6 +14,7 @@ import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
+import woowacourse.shopping.domain.product.RecommendProducts
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.view.common.MutableSingleLiveData
 import woowacourse.shopping.view.common.SingleLiveData
@@ -59,17 +60,14 @@ class ShoppingCartRecommendViewModel(
             val shoppingCarts =
                 shoppingCartRepository.load(0, MAX_RECENT_PRODUCT_LOAD_SIZE).getOrThrow()
 
-            val category = products.firstOrNull()?.category ?: return@launch
-
-            val cartProductIds: Set<Long> =
-                shoppingCarts.shoppingCartItems.map { it.product.id }.toSet()
-            val recommended =
-                products
-                    .filter { !cartProductIds.contains(it.id) }
-                    .filter { it.category == category }
-                    .map { ProductsItem.ProductItem(product = it) }
-                    .take(10)
-            _recommendProducts.value = recommended
+            _recommendProducts.value =
+                RecommendProducts(products, shoppingCarts.shoppingCartItems)
+                    .get()
+                    .map {
+                        ProductsItem.ProductItem(
+                            product = it,
+                        )
+                    }
         }
     }
 
