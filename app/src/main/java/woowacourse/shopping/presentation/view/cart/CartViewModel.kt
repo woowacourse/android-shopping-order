@@ -40,8 +40,8 @@ class CartViewModel(
     private var _hasMore = MutableLiveData<Boolean>()
     val hasMore: LiveData<Boolean> = _hasMore
 
-    private val _totalPrice = MutableLiveData<Int>()
-    val totalPrice: LiveData<Int> = _totalPrice
+    private val _totalPrice = MutableLiveData<Long>()
+    val totalPrice: LiveData<Long> = _totalPrice
 
     private val _totalCount = MutableLiveData<Int>()
     val totalCount: LiveData<Int> = _totalCount
@@ -284,7 +284,7 @@ class CartViewModel(
                 .onSuccess { allItems ->
                     val selectedItemIds = selectedStates.filterValues { it }.keys
                     val selectedItems = allItems.filter { it.cartId in selectedItemIds }
-                    _totalPrice.postValue(selectedItems.sumOf { it.totalPrice })
+                    _totalPrice.postValue(selectedItems.sumOf { it.totalPrice }.toLong())
                     _totalCount.postValue(selectedItems.sumOf { it.amount })
                     _allSelected.postValue(selectedItems.size == allItems.size)
                 }

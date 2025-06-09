@@ -71,7 +71,8 @@ sealed class Coupon {
     ) : Coupon() {
         override fun isAvailable(cartItems: List<CartItem>): Boolean = LocalTime.now() in availableTime.start..availableTime.end
 
-        override fun calculateDiscountAmount(cartItems: List<CartItem>): Int = cartItems.sumOf { it.totalPrice } * discountPercent / 100
+        override fun calculateDiscountAmount(cartItems: List<CartItem>): Int =
+            cartItems.sumOf { it.totalPrice.toInt() } * discountPercent / 100
     }
 }
 

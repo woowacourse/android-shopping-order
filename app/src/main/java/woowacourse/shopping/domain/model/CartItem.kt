@@ -5,6 +5,6 @@ data class CartItem(
     val product: Product,
     val amount: Int,
 ) {
-    val totalPrice: Int
-        get() = product.price.value * amount
+    val totalPrice: Long
+        get() = (product.price.value * amount).toLong()
 }

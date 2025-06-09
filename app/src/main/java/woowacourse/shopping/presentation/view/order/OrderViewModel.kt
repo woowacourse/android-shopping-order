@@ -77,14 +77,14 @@ class OrderViewModel(
         if (selectedCoupon is Coupon.FreeShippingCoupon) {
             _orderSummary.value =
                 OrderSummary(
-                    orderAmount = orderAmount,
+                    orderAmount = orderAmount.toLong(),
                     couponAmount = couponAmount ?: 0,
                     shippingFee = 0,
                 )
         } else {
             _orderSummary.value =
                 OrderSummary(
-                    orderAmount = orderAmount,
+                    orderAmount = orderAmount.toLong(),
                     couponAmount = couponAmount ?: 0,
                     shippingFee = 3000,
                 )
