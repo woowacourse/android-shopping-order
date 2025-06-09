@@ -34,12 +34,7 @@ class PaymentViewModel(
     val onPayClick: LiveData<Event<Unit>> get() = _onPayClick
 
     fun loadProductsInfo(products: Products) {
-        updateUiState {
-            it.copy(
-                selectedProducts = products.getOrderedProducts(),
-                totalPaymentAmount = products.getSelectedCartProductsPrice() + DEFAULT_SHIPPING_FEE,
-            )
-        }
+        setupAmountsBeforeCoupon(products)
         loadCoupons()
         val orderPrice = products.getSelectedCartProductsPrice()
         loadInitOrderPrice(orderPrice)
@@ -53,11 +48,7 @@ class PaymentViewModel(
                 ?.id
 
         val newSelectedCouponId =
-            if (currentSelectedCouponId == selectedCouponId) {
-                NO_SELECTED_COUPON_ID
-            } else {
-                selectedCouponId
-            }
+            if (currentSelectedCouponId == selectedCouponId) NO_SELECTED_COUPON_ID else selectedCouponId
 
         val updatedCoupons =
             _uiState.value?.coupons?.map {
@@ -67,17 +58,11 @@ class PaymentViewModel(
 
         val selectedProducts = _uiState.value?.selectedProducts ?: EMPTY_PRODUCTS
         if (newSelectedCouponId == NO_SELECTED_COUPON_ID) {
-            updateUiState {
-                it.copy(
-                    totalPaymentAmount = selectedProducts.getSelectedCartProductsPrice() + DEFAULT_SHIPPING_FEE,
-                    deliveryPrice = DEFAULT_SHIPPING_FEE,
-                    couponDiscount = NO_FIXED_DISCOUNT,
-                )
-            }
+            setupAmountsBeforeCoupon(selectedProducts)
         } else {
-            loadTotalPaymentAmount(newSelectedCouponId, selectedProducts)
-            loadDeliveryPrice(newSelectedCouponId)
-            loadCouponDiscount(newSelectedCouponId, selectedProducts)
+            updateTotalPaymentAmount(newSelectedCouponId, selectedProducts)
+            updateDeliveryPrice(newSelectedCouponId)
+            updateCouponDiscount(newSelectedCouponId, selectedProducts)
         }
     }
 
@@ -85,7 +70,18 @@ class PaymentViewModel(
         _onPayClick.value = Event(Unit)
     }
 
-    private fun loadTotalPaymentAmount(
+    private fun setupAmountsBeforeCoupon(products: Products) {
+        updateUiState {
+            it.copy(
+                selectedProducts = products.getOrderedProducts(),
+                totalPaymentAmount = products.getSelectedCartProductsPrice() + DEFAULT_SHIPPING_FEE,
+                deliveryPrice = DEFAULT_SHIPPING_FEE,
+                couponDiscount = NO_FIXED_DISCOUNT,
+            )
+        }
+    }
+
+    private fun updateTotalPaymentAmount(
         selectedCouponId: Long,
         selectedProducts: Products,
     ) {
@@ -97,7 +93,7 @@ class PaymentViewModel(
         updateUiState { it.copy(totalPaymentAmount = totalPaymentAmount) }
     }
 
-    private fun loadCouponDiscount(
+    private fun updateCouponDiscount(
         selectedCouponId: Long,
         products: Products,
     ) {
@@ -106,7 +102,7 @@ class PaymentViewModel(
         updateUiState { it.copy(couponDiscount = newCouponDiscount) }
     }
 
-    private fun loadDeliveryPrice(selectedCouponId: Long) {
+    private fun updateDeliveryPrice(selectedCouponId: Long) {
         val newDeliveryPrice =
             if (isFreeShippingCouponUseCase(selectedCouponId)) FREE_SHIPPING_FEE else DEFAULT_SHIPPING_FEE
         updateUiState { it.copy(deliveryPrice = newDeliveryPrice) }
