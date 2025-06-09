@@ -36,6 +36,9 @@ class RecommendViewModel(
     private val _event: MutableLiveData<RecommendEvent> = MutableLiveData()
     val event: LiveData<RecommendEvent> = _event
 
+    private var _selectedItems: List<CartItem> = emptyList()
+    val selectedItems: List<CartItem> get() = _selectedItems
+
     init {
         loadCart()
     }
@@ -71,10 +74,11 @@ class RecommendViewModel(
     }
 
     fun loadTotal(
-        cartItems: List<CartItem>
+        selectedItems: List<CartItem>
     ) {
-        _totalQuantity.postValue(cartItems.sumOf { it.quantity })
-        _totalPrice.postValue(cartItems.sumOf { it.price })
+        _selectedItems = selectedItems
+        _totalQuantity.postValue(selectedItems.sumOf { it.quantity })
+        _totalPrice.postValue(selectedItems.sumOf { it.price })
     }
 
     fun plusCartItemQuantity(

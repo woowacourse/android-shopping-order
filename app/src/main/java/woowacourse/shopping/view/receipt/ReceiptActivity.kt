@@ -10,6 +10,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityReceiptBinding
+import woowacourse.shopping.domain.cart.CartItem
+import woowacourse.shopping.util.getSerializableExtraCompat
 
 class ReceiptActivity : AppCompatActivity() {
 
@@ -26,17 +28,29 @@ class ReceiptActivity : AppCompatActivity() {
             insets
         }
         initBinding()
+
+        val cartItems: List<CartItem> =
+            intent.getSerializableExtraCompat<ArrayList<CartItem>>(EXTRA_CART_ITEMS_ID)?.toList()
+                ?: emptyList()
+
+        viewModel.showAvailableCoupons(cartItems)
     }
 
     private fun initBinding() {
         binding.lifecycleOwner = this
-        viewModel
     }
 
     companion object {
-        fun newIntent(context: Context): Intent {
+        private const val EXTRA_CART_ITEMS_ID = "woowacourse.shopping.EXTRA_CART_ITEMS_ID"
+
+        fun newIntent(
+            context: Context,
+            cartItems: List<CartItem>
+        ): Intent {
             val intent =
                 Intent(context, ReceiptActivity::class.java)
+                    .putExtra(EXTRA_CART_ITEMS_ID, ArrayList(cartItems))
+
             return intent
         }
     }

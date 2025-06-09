@@ -80,7 +80,7 @@ class RecommendActivity :
             finish()
         }
         binding.onClickOrderButton = {
-            val intent = ReceiptActivity.newIntent(this)
+            val intent = ReceiptActivity.newIntent(this, viewModel.selectedItems)
             startActivity(intent)
         }
         onBackPressedDispatcher.addCallback {
