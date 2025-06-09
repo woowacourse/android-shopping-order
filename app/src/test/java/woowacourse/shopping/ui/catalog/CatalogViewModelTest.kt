@@ -25,7 +25,7 @@ import woowacourse.shopping.model.DUMMY_PRODUCTS_1
 import woowacourse.shopping.model.DUMMY_PRODUCTS_2
 import woowacourse.shopping.model.DUMMY_PRODUCTS_3
 import woowacourse.shopping.model.DUMMY_PRODUCT_1
-import woowacourse.shopping.ui.model.CatalogUiState
+import woowacourse.shopping.ui.model.CatalogUiModel
 import woowacourse.shopping.util.CoroutinesTestExtension
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 import woowacourse.shopping.util.getOrAwaitValue
@@ -74,7 +74,7 @@ class CatalogViewModelTest {
 
     @Test
     fun `ViewModel이 초기화되면 상품 목록을 불러온다`() {
-        val state = viewModel.uiState.getOrAwaitValue()
+        val state = viewModel.uiModel.getOrAwaitValue()
         assertThat(state.catalogProducts.products).containsExactlyElementsIn(DUMMY_PRODUCTS_1.products)
         assertThat(state.isProductsLoading).isFalse()
     }
@@ -85,14 +85,14 @@ class CatalogViewModelTest {
             coEvery { getCatalogProductsUseCase(any(), any()) } returns Result.success(DUMMY_PRODUCTS_3)
 
             setUpTestLiveData(
-                CatalogUiState(catalogProducts = DUMMY_PRODUCTS_1),
-                "_uiState",
+                CatalogUiModel(catalogProducts = DUMMY_PRODUCTS_1),
+                "_uiModel",
                 viewModel,
             )
 
             viewModel.loadMoreCatalogProducts()
 
-            val state = viewModel.uiState.getOrAwaitValue()
+            val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.catalogProducts.products).containsExactlyElementsIn(
                 DUMMY_PRODUCTS_1.products + DUMMY_PRODUCTS_3.products,
             )
@@ -107,14 +107,14 @@ class CatalogViewModelTest {
             coEvery { getCatalogProductUseCase(DUMMY_PRODUCT_1.productDetail.id) } returns Result.success(updatedProduct)
 
             setUpTestLiveData(
-                CatalogUiState(catalogProducts = DUMMY_PRODUCTS_2),
-                "_uiState",
+                CatalogUiModel(catalogProducts = DUMMY_PRODUCTS_2),
+                "_uiModel",
                 viewModel,
             )
 
             viewModel.increaseCartProduct(DUMMY_PRODUCT_1.productDetail.id)
 
-            val result = viewModel.uiState.getOrAwaitValue()
+            val result = viewModel.uiModel.getOrAwaitValue()
             assertThat(result.catalogProducts.getProductByProductId(updatedProduct.productDetail.id)?.quantity).isEqualTo(10)
         }
 
@@ -127,14 +127,14 @@ class CatalogViewModelTest {
             coEvery { getCatalogProductUseCase(DUMMY_PRODUCT_1.productDetail.id) } returns Result.success(updatedProduct)
 
             setUpTestLiveData(
-                CatalogUiState(catalogProducts = DUMMY_PRODUCTS_2),
-                "_uiState",
+                CatalogUiModel(catalogProducts = DUMMY_PRODUCTS_2),
+                "_uiModel",
                 viewModel,
             )
 
             viewModel.decreaseCartProduct(DUMMY_PRODUCT_1.productDetail.id)
 
-            val result = viewModel.uiState.getOrAwaitValue()
+            val result = viewModel.uiModel.getOrAwaitValue()
             assertThat(result.catalogProducts.getProductByProductId(updatedProduct.productDetail.id)?.quantity).isEqualTo(3)
         }
 
@@ -146,14 +146,14 @@ class CatalogViewModelTest {
             coEvery { getCatalogProductUseCase(DUMMY_PRODUCT_1.productDetail.id) } returns Result.success(updatedProduct)
 
             setUpTestLiveData(
-                CatalogUiState(catalogProducts = DUMMY_PRODUCTS_1),
-                "_uiState",
+                CatalogUiModel(catalogProducts = DUMMY_PRODUCTS_1),
+                "_uiModel",
                 viewModel,
             )
 
             viewModel.loadCartProduct(DUMMY_PRODUCT_1.productDetail.id)
 
-            val result = viewModel.uiState.getOrAwaitValue()
+            val result = viewModel.uiModel.getOrAwaitValue()
             assertThat(result.catalogProducts.getProductByProductId(updatedProduct.productDetail.id)?.quantity).isEqualTo(1234)
         }
 
@@ -165,14 +165,14 @@ class CatalogViewModelTest {
             coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns Result.success(updated)
 
             setUpTestLiveData(
-                CatalogUiState(catalogProducts = DUMMY_PRODUCTS_2),
-                "_uiState",
+                CatalogUiModel(catalogProducts = DUMMY_PRODUCTS_2),
+                "_uiModel",
                 viewModel,
             )
 
             viewModel.loadCartProductsByProductIds(listOf(DUMMY_PRODUCT_1.productDetail.id))
 
-            val result = viewModel.uiState.getOrAwaitValue()
+            val result = viewModel.uiModel.getOrAwaitValue()
             assertThat(result.catalogProducts.products).containsExactlyElementsIn(updated)
         }
 
@@ -183,7 +183,7 @@ class CatalogViewModelTest {
 
             viewModel.loadHistoryProducts()
 
-            val result = viewModel.uiState.getOrAwaitValue()
+            val result = viewModel.uiModel.getOrAwaitValue()
             assertThat(result.historyProducts).containsExactly(DUMMY_HISTORY_PRODUCT_1)
         }
 
@@ -194,7 +194,7 @@ class CatalogViewModelTest {
 
             viewModel.loadCartProductsQuantity()
 
-            val result = viewModel.uiState.getOrAwaitValue()
+            val result = viewModel.uiModel.getOrAwaitValue()
             assertThat(result.cartProductsQuantity).isEqualTo(10)
         }
 
@@ -206,7 +206,7 @@ class CatalogViewModelTest {
 
             viewModel.loadMoreCatalogProducts()
 
-            val state = viewModel.uiState.getOrAwaitValue()
+            val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.connectionErrorMessage).contains("ERROR")
         }
 

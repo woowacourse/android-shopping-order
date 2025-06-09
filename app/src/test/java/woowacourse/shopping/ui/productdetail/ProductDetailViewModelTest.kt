@@ -16,7 +16,7 @@ import woowacourse.shopping.domain.usecase.GetRecentSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.UpdateCartProductUseCase
 import woowacourse.shopping.model.DUMMY_HISTORY_PRODUCT_1
 import woowacourse.shopping.model.DUMMY_PRODUCT_1
-import woowacourse.shopping.ui.model.ProductDetailUiState
+import woowacourse.shopping.ui.model.ProductDetailUiModel
 import woowacourse.shopping.util.CoroutinesTestExtension
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 import woowacourse.shopping.util.getOrAwaitValue
@@ -60,7 +60,7 @@ class ProductDetailViewModelTest {
             viewModel.loadProductDetail(expected.productDetail.id)
 
             // then
-            val state = viewModel.uiState.getOrAwaitValue()
+            val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.product).isEqualTo(expected)
             assertThat(state.connectionErrorMessage).isNull()
         }
@@ -76,7 +76,7 @@ class ProductDetailViewModelTest {
             viewModel.loadProductDetail(999)
 
             // then
-            val state = viewModel.uiState.getOrAwaitValue()
+            val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.connectionErrorMessage).contains("ERROR")
         }
 
@@ -91,7 +91,7 @@ class ProductDetailViewModelTest {
             viewModel.loadLastHistoryProduct()
 
             // then
-            val state = viewModel.uiState.getOrAwaitValue()
+            val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.lastHistoryProduct).isEqualTo(expected)
         }
 
@@ -99,13 +99,13 @@ class ProductDetailViewModelTest {
     fun `장바구니 수량을 증가시키면 상품 수량이 1 증가한다`() {
         // given
         val original = DUMMY_PRODUCT_1
-        setUpTestLiveData(ProductDetailUiState(product = original), "_uiState", viewModel)
+        setUpTestLiveData(ProductDetailUiModel(product = original), "_uiModel", viewModel)
 
         // when
         viewModel.increaseCartProductQuantity()
 
         // then
-        val state = viewModel.uiState.getOrAwaitValue()
+        val state = viewModel.uiModel.getOrAwaitValue()
         assertThat(state.product.quantity).isEqualTo(original.quantity + 1)
     }
 
@@ -113,13 +113,13 @@ class ProductDetailViewModelTest {
     fun `장바구니 수량을 감소시키면 상품 수량이 1 감소한다`() {
         // given
         val original = DUMMY_PRODUCT_1
-        setUpTestLiveData(ProductDetailUiState(product = original), "_uiState", viewModel)
+        setUpTestLiveData(ProductDetailUiModel(product = original), "_uiModel", viewModel)
 
         // when
         viewModel.decreaseCartProductQuantity()
 
         // then
-        val state = viewModel.uiState.getOrAwaitValue()
+        val state = viewModel.uiModel.getOrAwaitValue()
         assertThat(state.product.quantity).isEqualTo(original.quantity - 1)
     }
 
@@ -128,7 +128,7 @@ class ProductDetailViewModelTest {
         runTest {
             // given
             val product = DUMMY_PRODUCT_1
-            setUpTestLiveData(ProductDetailUiState(product = product), "_uiState", viewModel)
+            setUpTestLiveData(ProductDetailUiModel(product = product), "_uiModel", viewModel)
 
             coEvery {
                 updateCartProductUseCase(productId = product.productDetail.id, cartId = product.cartId, quantity = product.quantity)
@@ -138,7 +138,7 @@ class ProductDetailViewModelTest {
             viewModel.updateCartProduct()
 
             // then
-            val state = viewModel.uiState.getOrAwaitValue()
+            val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.isCartProductUpdateSuccess).isTrue()
         }
 

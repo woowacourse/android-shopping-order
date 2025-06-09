@@ -19,7 +19,7 @@ import woowacourse.shopping.ui.catalog.adapter.product.CatalogAdapter.OnClickHan
 import woowacourse.shopping.ui.catalog.adapter.product.CatalogLayoutManager
 import woowacourse.shopping.ui.common.DataBindingActivity
 import woowacourse.shopping.ui.model.ActivityResult
-import woowacourse.shopping.ui.model.CatalogUiState
+import woowacourse.shopping.ui.model.CatalogUiModel
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 
 class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.activity_catalog) {
@@ -113,24 +113,24 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
     }
 
     private fun initObservers() {
-        viewModel.uiState.observe(this) { uiState ->
-            handleCatalogProducts(uiState)
-            handleHistoryProducts(uiState)
-            handlerErrorMessage(uiState)
+        viewModel.uiModel.observe(this) { uiModel ->
+            handleCatalogProducts(uiModel)
+            handleHistoryProducts(uiModel)
+            handlerErrorMessage(uiModel)
         }
     }
 
-    private fun handleCatalogProducts(uiState: CatalogUiState) {
-        catalogAdapter.submitItems(uiState.catalogProducts.products, !uiState.catalogProducts.page.isLast)
+    private fun handleCatalogProducts(uiModel: CatalogUiModel) {
+        catalogAdapter.submitItems(uiModel.catalogProducts.products, !uiModel.catalogProducts.page.isLast)
         viewModel.loadCartProductsQuantity()
     }
 
-    private fun handleHistoryProducts(uiState: CatalogUiState) {
-        historyProductAdapter.submitItems(uiState.historyProducts)
+    private fun handleHistoryProducts(uiModel: CatalogUiModel) {
+        historyProductAdapter.submitItems(uiModel.historyProducts)
     }
 
-    private fun handlerErrorMessage(uiState: CatalogUiState) {
-        uiState.connectionErrorMessage?.let {
+    private fun handlerErrorMessage(uiModel: CatalogUiModel) {
+        uiModel.connectionErrorMessage?.let {
             Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
         }
     }

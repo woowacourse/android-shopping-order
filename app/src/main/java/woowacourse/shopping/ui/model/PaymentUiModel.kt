@@ -7,7 +7,7 @@ import woowacourse.shopping.domain.model.Price.Companion.EMPTY_PRICE
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.model.Products.Companion.EMPTY_PRODUCTS
 
-data class PaymentUiState(
+data class PaymentUiModel(
     val products: Products = EMPTY_PRODUCTS,
     val coupons: Coupons = EMPTY_COUPONS,
     val price: Price = EMPTY_PRICE,

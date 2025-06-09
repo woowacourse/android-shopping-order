@@ -61,7 +61,7 @@ class PaymentViewModelTest {
             viewModel.loadProducts(DUMMY_PRODUCTS_3.products.map { it.productDetail.id })
             viewModel.loadCoupons(DUMMY_PRODUCTS_3, DUMMY_LOCAL_DATE_TIME_1)
 
-            val state = viewModel.uiState.getOrAwaitValue()
+            val state = viewModel.uiModel.getOrAwaitValue()
 
             val expectedProducts = DUMMY_PRODUCTS_3.products.map { it.copy(isSelected = true) }
 
@@ -86,7 +86,7 @@ class PaymentViewModelTest {
                 DUMMY_LOCAL_DATE_TIME_1,
             )
 
-            val state = viewModel.uiState.getOrAwaitValue()
+            val state = viewModel.uiModel.getOrAwaitValue()
             val selected = state.coupons.value.filter { it.isSelected }
             assertThat(selected).hasSize(1)
             assertThat(state.price.result).isGreaterThan(0)
@@ -103,7 +103,7 @@ class PaymentViewModelTest {
 
             viewModel.orderProducts()
 
-            val state = viewModel.uiState.getOrAwaitValue()
+            val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.isOrderSuccess).isTrue()
         }
 
@@ -119,7 +119,7 @@ class PaymentViewModelTest {
 
             viewModel.orderProducts()
 
-            val state = viewModel.uiState.getOrAwaitValue()
+            val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.isOrderSuccess).isFalse()
             assertThat(state.connectionErrorMessage).contains("ERROR")
         }

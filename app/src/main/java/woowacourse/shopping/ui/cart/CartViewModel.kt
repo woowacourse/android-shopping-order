@@ -23,7 +23,7 @@ import woowacourse.shopping.domain.usecase.GetCartRecommendProductsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.RemoveCartProductUseCase
-import woowacourse.shopping.ui.model.CartProductUiState
+import woowacourse.shopping.ui.model.CartProductUiModel
 
 class CartViewModel(
     private val getCartProductsUseCase: GetCartProductsUseCase,
@@ -33,15 +33,15 @@ class CartViewModel(
     private val getCartRecommendProductsUseCase: GetCartRecommendProductsUseCase,
     private val getCatalogProductUseCase: GetCatalogProductUseCase,
 ) : ViewModel() {
-    private val _uiState: MutableLiveData<CartProductUiState> = MutableLiveData(CartProductUiState())
-    val uiState: LiveData<CartProductUiState> get() = _uiState
+    private val _uiModel: MutableLiveData<CartProductUiModel> = MutableLiveData(CartProductUiModel())
+    val uiModel: LiveData<CartProductUiModel> get() = _uiModel
 
     init {
         loadCartProducts()
     }
 
-    private fun loadCartProducts(page: Page = uiState.value?.cartProducts?.page ?: EMPTY_PAGE) {
-        updateUiState { current ->
+    private fun loadCartProducts(page: Page = uiModel.value?.cartProducts?.page ?: EMPTY_PAGE) {
+        updateUiModel { current ->
             current.copy(isProductsLoading = true)
         }
 
@@ -50,14 +50,14 @@ class CartViewModel(
                 page = page.current,
                 size = DEFAULT_PAGE_SIZE,
             ).onSuccess { cartProducts ->
-                updateUiState { current ->
+                updateUiModel { current ->
                     current.copy(
                         cartProducts = cartProducts,
                         isProductsLoading = false,
                     )
                 }
             }.onFailure {
-                updateUiState { current ->
+                updateUiModel { current ->
                     current.copy(connectionErrorMessage = it.message.toString())
                 }
                 Log.e("CartViewModel", it.message.toString())
@@ -72,12 +72,12 @@ class CartViewModel(
         viewModelScope.launch {
             removeCartProductUseCase(cartId)
                 .onSuccess {
-                    updateUiState { current ->
+                    updateUiModel { current ->
                         current.copy(editedProductIds = current.editedProductIds.plus(productId))
                     }
                     loadCartProducts()
                 }.onFailure {
-                    updateUiState { current ->
+                    updateUiModel { current ->
                         current.copy(connectionErrorMessage = it.message.toString())
                     }
                     Log.e("CartViewModel", it.message.toString())
@@ -86,22 +86,22 @@ class CartViewModel(
     }
 
     fun increasePage(step: Int = DEFAULT_PAGE_STEP) {
-        val page = uiState.value?.cartProducts?.page ?: EMPTY_PAGE
+        val page = uiModel.value?.cartProducts?.page ?: EMPTY_PAGE
         loadCartProducts(page.copy(current = page.current + step))
     }
 
     fun decreasePage(step: Int = DEFAULT_PAGE_STEP) {
-        val page = uiState.value?.cartProducts?.page ?: EMPTY_PAGE
+        val page = uiModel.value?.cartProducts?.page ?: EMPTY_PAGE
         loadCartProducts(page.copy(current = page.current - step))
     }
 
     fun increaseCartProductQuantity(productId: Long) {
         viewModelScope.launch {
-            val product = uiState.value?.cartProducts?.getProductByProductId(productId) ?: return@launch
+            val product = uiModel.value?.cartProducts?.getProductByProductId(productId) ?: return@launch
 
             increaseCartProductQuantityUseCase(product)
                 .onSuccess { newQuantity ->
-                    updateUiState { current ->
+                    updateUiModel { current ->
                         current.copy(
                             cartProducts = current.cartProducts.updateQuantity(product, newQuantity),
                             editedProductIds = current.editedProductIds.plus(productId),
@@ -116,12 +116,12 @@ class CartViewModel(
 
     fun decreaseCartProductQuantity(productId: Long) {
         viewModelScope.launch {
-            val product = uiState.value?.cartProducts?.getProductByProductId(productId) ?: return@launch
+            val product = uiModel.value?.cartProducts?.getProductByProductId(productId) ?: return@launch
             decreaseCartProductQuantityUseCase(product)
                 .onSuccess { newQuantity ->
                     when (newQuantity > MINIMUM_QUANTITY) {
                         true ->
-                            updateUiState { current ->
+                            updateUiModel { current ->
                                 current.copy(
                                     cartProducts = current.cartProducts.updateQuantity(product, newQuantity),
                                     editedProductIds = current.editedProductIds.plus(productId),
@@ -137,15 +137,15 @@ class CartViewModel(
     }
 
     fun toggleCartProductSelection(cartId: Long) {
-        val cartProduct = uiState.value?.cartProducts?.getProductByCartId(cartId) ?: return
+        val cartProduct = uiModel.value?.cartProducts?.getProductByCartId(cartId) ?: return
 
-        updateUiState { current ->
+        updateUiModel { current ->
             current.copy(cartProducts = current.cartProducts.updateSelection(cartProduct))
         }
     }
 
     fun toggleAllCartProductsSelection() {
-        updateUiState { current ->
+        updateUiModel { current ->
             current.copy(
                 cartProducts = current.cartProducts.toggleAllSelection(),
             )
@@ -156,11 +156,11 @@ class CartViewModel(
         viewModelScope.launch {
             getCartRecommendProductsUseCase()
                 .onSuccess { products ->
-                    updateUiState { current ->
+                    updateUiModel { current ->
                         current.copy(recommendedProducts = products)
                     }
                 }.onFailure {
-                    updateUiState { current ->
+                    updateUiModel { current ->
                         current.copy(connectionErrorMessage = it.message.toString())
                     }
                     Log.e("CartViewModel", it.message.toString())
@@ -170,14 +170,14 @@ class CartViewModel(
 
     fun increaseRecommendedProductQuantity(productId: Long) {
         viewModelScope.launch {
-            val product = uiState.value?.recommendedProducts?.getProductByProductId(productId) ?: return@launch
+            val product = uiModel.value?.recommendedProducts?.getProductByProductId(productId) ?: return@launch
 
             increaseCartProductQuantityUseCase(product)
                 .onSuccess { newQuantity ->
                     when (product.quantity <= MINIMUM_QUANTITY) {
                         true -> updateRecommendedProduct(productId)
                         false ->
-                            updateUiState { current ->
+                            updateUiModel { current ->
                                 current.copy(
                                     recommendedProducts = current.recommendedProducts.updateQuantity(product, newQuantity),
                                     editedProductIds = current.editedProductIds.plus(productId),
@@ -194,7 +194,7 @@ class CartViewModel(
         viewModelScope.launch {
             getCatalogProductUseCase(productId)
                 .onSuccess { cartProduct ->
-                    updateUiState { current ->
+                    updateUiModel { current ->
                         current.copy(
                             recommendedProducts = current.recommendedProducts.updateProduct(cartProduct.copy(isSelected = true)),
                         )
@@ -207,14 +207,14 @@ class CartViewModel(
 
     fun decreaseRecommendedProductQuantity(productId: Long) {
         viewModelScope.launch {
-            val product = uiState.value?.recommendedProducts?.getProductByProductId(productId) ?: return@launch
+            val product = uiModel.value?.recommendedProducts?.getProductByProductId(productId) ?: return@launch
 
             decreaseCartProductQuantityUseCase(product)
                 .onSuccess { newQuantity ->
                     when (product.quantity <= MINIMUM_QUANTITY) {
                         true -> updateRecommendedProduct(productId)
                         false ->
-                            updateUiState { current ->
+                            updateUiModel { current ->
                                 current.copy(
                                     recommendedProducts = current.recommendedProducts.updateQuantity(product, newQuantity),
                                     editedProductIds = current.editedProductIds.plus(productId),
@@ -228,17 +228,17 @@ class CartViewModel(
     }
 
     fun getSelectedProductIds(): Set<Long> {
-        val uiState = uiState.value ?: return emptySet()
+        val uiModel = uiModel.value ?: return emptySet()
 
-        val selectedCartProductsIds: List<Long> = uiState.cartProducts.getSelectedProductIds()
-        val selectedRecommendedProductsIds: List<Long> = uiState.recommendedProducts.getSelectedProductIds()
+        val selectedCartProductsIds: List<Long> = uiModel.cartProducts.getSelectedProductIds()
+        val selectedRecommendedProductsIds: List<Long> = uiModel.recommendedProducts.getSelectedProductIds()
 
         return (selectedCartProductsIds + selectedRecommendedProductsIds).toSet()
     }
 
-    private fun updateUiState(update: (CartProductUiState) -> CartProductUiState) {
-        val current = _uiState.value ?: return
-        _uiState.value = update(current)
+    private fun updateUiModel(update: (CartProductUiModel) -> CartProductUiModel) {
+        val current = _uiModel.value ?: return
+        _uiModel.value = update(current)
     }
 
     companion object {

@@ -10,7 +10,7 @@ import com.google.android.material.snackbar.Snackbar
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityPaymentBinding
 import woowacourse.shopping.ui.common.DataBindingActivity
-import woowacourse.shopping.ui.model.PaymentUiState
+import woowacourse.shopping.ui.model.PaymentUiModel
 import woowacourse.shopping.ui.payment.adapter.PaymentCouponAdapter
 
 class PaymentActivity : DataBindingActivity<ActivityPaymentBinding>(R.layout.activity_payment) {
@@ -51,28 +51,28 @@ class PaymentActivity : DataBindingActivity<ActivityPaymentBinding>(R.layout.act
     }
 
     private fun initObservers() {
-        viewModel.uiState.observe(this) { uiState ->
-            handleCoupons(uiState)
-            handleErrorMessage(uiState)
-            handleOrderResult(uiState)
+        viewModel.uiModel.observe(this) { uiModel ->
+            handleCoupons(uiModel)
+            handleErrorMessage(uiModel)
+            handleOrderResult(uiModel)
         }
     }
 
-    private fun handleCoupons(uiState: PaymentUiState) {
-        if (uiState.coupons.value.isEmpty() && uiState.products.products.isNotEmpty()) {
-            viewModel.loadCoupons(uiState.products)
+    private fun handleCoupons(uiModel: PaymentUiModel) {
+        if (uiModel.coupons.value.isEmpty() && uiModel.products.products.isNotEmpty()) {
+            viewModel.loadCoupons(uiModel.products)
         }
-        paymentCouponAdapter.submitList(uiState.coupons.value)
+        paymentCouponAdapter.submitList(uiModel.coupons.value)
     }
 
-    private fun handleErrorMessage(uiState: PaymentUiState) {
-        uiState.connectionErrorMessage?.let {
+    private fun handleErrorMessage(uiModel: PaymentUiModel) {
+        uiModel.connectionErrorMessage?.let {
             Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
         }
     }
 
-    private fun handleOrderResult(uiState: PaymentUiState) {
-        if (uiState.isOrderSuccess == true) {
+    private fun handleOrderResult(uiModel: PaymentUiModel) {
+        if (uiModel.isOrderSuccess == true) {
             Toast.makeText(this, getString(R.string.payment_order_success), Toast.LENGTH_SHORT).show()
             finish()
         }

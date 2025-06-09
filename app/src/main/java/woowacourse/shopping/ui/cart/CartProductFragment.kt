@@ -32,8 +32,8 @@ class CartProductFragment : DataBindingFragment<FragmentCartProductBinding>(R.la
     }
 
     private fun initObservers() {
-        viewModel.uiState.observe(requireActivity()) { uiState ->
-            cartProductAdapter.submitItems(uiState.cartProducts.products)
+        viewModel.uiModel.observe(requireActivity()) { uiModel ->
+            cartProductAdapter.submitItems(uiModel.cartProducts.products)
         }
     }
 

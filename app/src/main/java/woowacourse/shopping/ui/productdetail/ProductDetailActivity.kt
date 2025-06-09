@@ -13,7 +13,7 @@ import woowacourse.shopping.databinding.ActivityProductDetailBinding
 import woowacourse.shopping.ui.common.DataBindingActivity
 import woowacourse.shopping.ui.custom.CartCountView
 import woowacourse.shopping.ui.model.ActivityResult
-import woowacourse.shopping.ui.model.ProductDetailUiState
+import woowacourse.shopping.ui.model.ProductDetailUiModel
 
 class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(R.layout.activity_product_detail) {
     private val viewModel: ProductDetailViewModel by viewModels { ProductDetailViewModel.Factory }
@@ -66,19 +66,19 @@ class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(
     }
 
     private fun initObservers() {
-        viewModel.uiState.observe(this) { uiState ->
-            handleHistoryProduct(uiState)
-            handleCartProductAddResult(uiState)
-            handleErrorMessage(uiState)
+        viewModel.uiModel.observe(this) { uiModel ->
+            handleHistoryProduct(uiModel)
+            handleCartProductAddResult(uiModel)
+            handleErrorMessage(uiModel)
         }
     }
 
-    private fun handleHistoryProduct(uiState: ProductDetailUiState) {
-        viewModel.addHistoryProduct(uiState.product.productDetail)
+    private fun handleHistoryProduct(uiModel: ProductDetailUiModel) {
+        viewModel.addHistoryProduct(uiModel.product.productDetail)
     }
 
-    private fun handleCartProductAddResult(uiState: ProductDetailUiState) {
-        uiState.isCartProductUpdateSuccess?.let { isSuccess ->
+    private fun handleCartProductAddResult(uiModel: ProductDetailUiModel) {
+        uiModel.isCartProductUpdateSuccess?.let { isSuccess ->
             if (isSuccess) {
                 setResult(
                     ActivityResult.PRODUCT_DETAIL_CART_UPDATED.code,
@@ -92,8 +92,8 @@ class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(
         }
     }
 
-    private fun handleErrorMessage(uiState: ProductDetailUiState) {
-        uiState.connectionErrorMessage?.let {
+    private fun handleErrorMessage(uiModel: ProductDetailUiModel) {
+        uiModel.connectionErrorMessage?.let {
             Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
         }
     }

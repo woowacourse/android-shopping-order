@@ -23,7 +23,7 @@ import woowacourse.shopping.domain.usecase.GetCatalogProductsByProductIdsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsUseCase
 import woowacourse.shopping.domain.usecase.GetSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
-import woowacourse.shopping.ui.model.CatalogUiState
+import woowacourse.shopping.ui.model.CatalogUiModel
 
 class CatalogViewModel(
     private val getCatalogProductsUseCase: GetCatalogProductsUseCase,
@@ -34,8 +34,8 @@ class CatalogViewModel(
     private val decreaseCartProductQuantityUseCase: DecreaseCartProductQuantityUseCase,
     private val getCartProductsQuantityUseCase: GetCartProductsQuantityUseCase,
 ) : ViewModel() {
-    private val _uiState: MutableLiveData<CatalogUiState> = MutableLiveData(CatalogUiState())
-    val uiState: LiveData<CatalogUiState> get() = _uiState
+    private val _uiModel: MutableLiveData<CatalogUiModel> = MutableLiveData(CatalogUiModel())
+    val uiModel: LiveData<CatalogUiModel> get() = _uiModel
 
     init {
         loadCatalogProducts()
@@ -43,25 +43,25 @@ class CatalogViewModel(
 
     private fun loadCatalogProducts(
         page: Int =
-            uiState.value
+            uiModel.value
                 ?.catalogProducts
                 ?.page
                 ?.current ?: UNINITIALIZED_PAGE,
         count: Int = SHOWN_PRODUCTS_COUNT,
     ) {
         viewModelScope.launch {
-            updateUiState { current -> current.copy(isProductsLoading = true) }
+            updateUiModel { current -> current.copy(isProductsLoading = true) }
 
             getCatalogProductsUseCase(page, count)
                 .onSuccess { newProducts ->
-                    updateUiState { current ->
+                    updateUiModel { current ->
                         current.copy(
                             catalogProducts = current.catalogProducts.plus(newProducts),
                             isProductsLoading = false,
                         )
                     }
                 }.onFailure {
-                    updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
+                    updateUiModel { current -> current.copy(connectionErrorMessage = it.message.toString()) }
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }
@@ -69,7 +69,7 @@ class CatalogViewModel(
 
     fun loadMoreCatalogProducts() {
         val currentPage =
-            uiState.value
+            uiModel.value
                 ?.catalogProducts
                 ?.page
                 ?.current
@@ -80,7 +80,7 @@ class CatalogViewModel(
     fun loadHistoryProducts() {
         viewModelScope.launch {
             getSearchHistoryUseCase().onSuccess { historyProducts ->
-                updateUiState { current ->
+                updateUiModel { current ->
                     current.copy(
                         historyProducts = historyProducts,
                     )
@@ -91,7 +91,7 @@ class CatalogViewModel(
 
     fun increaseCartProduct(productId: Long) {
         viewModelScope.launch {
-            val product = uiState.value?.catalogProducts?.getProductByProductId(productId) ?: return@launch
+            val product = uiModel.value?.catalogProducts?.getProductByProductId(productId) ?: return@launch
             increaseCartProductQuantityUseCase(product).onSuccess {
                 loadCartProduct(productId)
             }
@@ -100,7 +100,7 @@ class CatalogViewModel(
 
     fun decreaseCartProduct(productId: Long) {
         viewModelScope.launch {
-            val product = uiState.value?.catalogProducts?.getProductByProductId(productId) ?: return@launch
+            val product = uiModel.value?.catalogProducts?.getProductByProductId(productId) ?: return@launch
             decreaseCartProductQuantityUseCase(product).onSuccess {
                 loadCartProduct(productId)
             }
@@ -111,13 +111,13 @@ class CatalogViewModel(
         viewModelScope.launch {
             getCatalogProductUseCase(productId)
                 .onSuccess { cartProduct ->
-                    updateUiState { current ->
+                    updateUiModel { current ->
                         current.copy(
                             catalogProducts = current.catalogProducts.updateProduct(cartProduct),
                         )
                     }
                 }.onFailure {
-                    updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
+                    updateUiModel { current -> current.copy(connectionErrorMessage = it.message.toString()) }
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }
@@ -127,13 +127,13 @@ class CatalogViewModel(
         viewModelScope.launch {
             getCatalogProductsByProductIdsUseCase(productIds)
                 .onSuccess { cartProducts ->
-                    updateUiState { current ->
+                    updateUiModel { current ->
                         current.copy(
                             catalogProducts = current.catalogProducts.updateProducts(cartProducts),
                         )
                     }
                 }.onFailure {
-                    updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
+                    updateUiModel { current -> current.copy(connectionErrorMessage = it.message.toString()) }
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }
@@ -143,16 +143,16 @@ class CatalogViewModel(
         viewModelScope.launch {
             getCartProductsQuantityUseCase()
                 .onSuccess { quantity ->
-                    updateUiState { current -> current.copy(cartProductsQuantity = quantity) }
+                    updateUiModel { current -> current.copy(cartProductsQuantity = quantity) }
                 }.onFailure {
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }
     }
 
-    private fun updateUiState(update: (CatalogUiState) -> CatalogUiState) {
-        val current = _uiState.value ?: return
-        _uiState.value = update(current)
+    private fun updateUiModel(update: (CatalogUiModel) -> CatalogUiModel) {
+        val current = _uiModel.value ?: return
+        _uiModel.value = update(current)
     }
 
     companion object {

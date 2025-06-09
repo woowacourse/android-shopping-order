@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.model.HistoryProduct
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.model.Products.Companion.EMPTY_PRODUCTS
 
-data class CatalogUiState(
+data class CatalogUiModel(
     val catalogProducts: Products = EMPTY_PRODUCTS,
     val historyProducts: List<HistoryProduct> = emptyList(),
     val cartProductsQuantity: Int = INITIAL_PRODUCT_QUANTITY,

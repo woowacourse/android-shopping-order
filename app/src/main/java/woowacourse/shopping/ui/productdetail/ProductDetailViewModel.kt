@@ -16,7 +16,7 @@ import woowacourse.shopping.domain.usecase.AddSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
 import woowacourse.shopping.domain.usecase.GetRecentSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.UpdateCartProductUseCase
-import woowacourse.shopping.ui.model.ProductDetailUiState
+import woowacourse.shopping.ui.model.ProductDetailUiModel
 
 class ProductDetailViewModel(
     private val getCatalogProductUseCase: GetCatalogProductUseCase,
@@ -24,16 +24,16 @@ class ProductDetailViewModel(
     private val addSearchHistoryUseCase: AddSearchHistoryUseCase,
     private val updateCartProductUseCase: UpdateCartProductUseCase,
 ) : ViewModel() {
-    private val _uiState: MutableLiveData<ProductDetailUiState> = MutableLiveData(ProductDetailUiState())
-    val uiState: LiveData<ProductDetailUiState> get() = _uiState
+    private val _uiModel: MutableLiveData<ProductDetailUiModel> = MutableLiveData(ProductDetailUiModel())
+    val uiModel: LiveData<ProductDetailUiModel> get() = _uiModel
 
     fun loadProductDetail(productId: Long) {
         viewModelScope.launch {
             getCatalogProductUseCase(productId)
                 .onSuccess { catalogProduct ->
-                    updateUiState { current -> current.copy(product = catalogProduct) }
+                    updateUiModel { current -> current.copy(product = catalogProduct) }
                 }.onFailure {
-                    updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
+                    updateUiModel { current -> current.copy(connectionErrorMessage = it.message.toString()) }
                 }
         }
     }
@@ -41,7 +41,7 @@ class ProductDetailViewModel(
     fun loadLastHistoryProduct() {
         viewModelScope.launch {
             getRecentSearchHistoryUseCase().onSuccess {
-                updateUiState { current -> current.copy(lastHistoryProduct = it) }
+                updateUiModel { current -> current.copy(lastHistoryProduct = it) }
             }
         }
     }
@@ -53,33 +53,33 @@ class ProductDetailViewModel(
     }
 
     fun decreaseCartProductQuantity() {
-        val uiState = uiState.value ?: return
-        updateUiState { current -> current.copy(product = uiState.product.decreaseQuantity()) }
+        val uiModel = uiModel.value ?: return
+        updateUiModel { current -> current.copy(product = uiModel.product.decreaseQuantity()) }
     }
 
     fun increaseCartProductQuantity() {
-        val uiState = uiState.value ?: return
-        updateUiState { current -> current.copy(product = uiState.product.increaseQuantity()) }
+        val uiModel = uiModel.value ?: return
+        updateUiModel { current -> current.copy(product = uiModel.product.increaseQuantity()) }
     }
 
     fun updateCartProduct() {
-        val uiState = uiState.value ?: return
+        val uiModel = uiModel.value ?: return
         viewModelScope.launch {
             updateCartProductUseCase(
-                productId = uiState.product.productDetail.id,
-                cartId = uiState.product.cartId,
-                quantity = uiState.product.quantity,
+                productId = uiModel.product.productDetail.id,
+                cartId = uiModel.product.cartId,
+                quantity = uiModel.product.quantity,
             ).onSuccess {
-                updateUiState { current -> current.copy(isCartProductUpdateSuccess = true) }
+                updateUiModel { current -> current.copy(isCartProductUpdateSuccess = true) }
             }.onFailure {
-                updateUiState { current -> current.copy(connectionErrorMessage = it.message.toString()) }
+                updateUiModel { current -> current.copy(connectionErrorMessage = it.message.toString()) }
             }
         }
     }
 
-    private fun updateUiState(update: (ProductDetailUiState) -> ProductDetailUiState) {
-        val current = _uiState.value ?: return
-        _uiState.value = update(current)
+    private fun updateUiModel(update: (ProductDetailUiModel) -> ProductDetailUiModel) {
+        val current = _uiModel.value ?: return
+        _uiModel.value = update(current)
     }
 
     companion object {

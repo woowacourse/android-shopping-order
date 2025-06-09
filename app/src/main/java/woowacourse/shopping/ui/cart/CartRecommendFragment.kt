@@ -24,8 +24,8 @@ class CartRecommendFragment : DataBindingFragment<FragmentCartRecommandBinding>(
     ) {
         super.onViewCreated(view, savedInstanceState)
         binding.cartItemsRecommendContainer.adapter = adapter
-        viewModel.uiState.observe(requireActivity()) { uiState ->
-            adapter.submitList(uiState.recommendedProducts.products)
+        viewModel.uiModel.observe(requireActivity()) { uiModel ->
+            adapter.submitList(uiModel.recommendedProducts.products)
         }
     }
 
