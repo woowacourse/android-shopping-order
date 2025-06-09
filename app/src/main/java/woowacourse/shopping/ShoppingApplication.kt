@@ -4,8 +4,8 @@ import android.app.Application
 import android.content.SharedPreferences
 import androidx.room.Room
 import woowacourse.shopping.data.authentication.repository.DefaultAuthenticationRepository
-import woowacourse.shopping.data.coupon.remote.repository.DefaultCouponRepository
 import woowacourse.shopping.data.coupon.remote.service.CouponService
+import woowacourse.shopping.data.coupon.repository.DefaultCouponRepository
 import woowacourse.shopping.data.network.ApiClient
 import woowacourse.shopping.data.product.local.database.ProductDatabase
 import woowacourse.shopping.data.product.remote.service.ProductService

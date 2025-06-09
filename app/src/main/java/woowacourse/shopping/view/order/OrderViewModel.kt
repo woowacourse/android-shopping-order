@@ -11,8 +11,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.coupon.remote.repository.CouponRepository
-import woowacourse.shopping.data.coupon.remote.repository.DefaultCouponRepository
+import woowacourse.shopping.data.coupon.repository.CouponRepository
+import woowacourse.shopping.data.coupon.repository.DefaultCouponRepository
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.coupon.Coupon

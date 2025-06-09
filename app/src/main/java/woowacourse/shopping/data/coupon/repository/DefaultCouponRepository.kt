@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.coupon.remote.repository
+package woowacourse.shopping.data.coupon.repository
 
 import woowacourse.shopping.data.coupon.remote.service.CouponService
 import woowacourse.shopping.domain.coupon.Coupon

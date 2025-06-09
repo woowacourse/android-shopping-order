@@ -13,7 +13,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import woowacourse.shopping.data.coupon.remote.repository.CouponRepository
+import woowacourse.shopping.data.coupon.repository.CouponRepository
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
 import woowacourse.shopping.fixture.COUPONS
 import woowacourse.shopping.fixture.SHOPPING_CART_PRODUCTS_TO_ORDER
