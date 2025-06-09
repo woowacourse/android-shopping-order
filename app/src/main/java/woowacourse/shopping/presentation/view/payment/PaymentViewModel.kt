@@ -2,8 +2,10 @@ package woowacourse.shopping.presentation.view.payment
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
@@ -22,7 +24,7 @@ import woowacourse.shopping.presentation.view.payment.adapter.CouponAdapter
 import woowacourse.shopping.presentation.view.payment.event.PaymentMessageEvent
 
 class PaymentViewModel(
-    orderProductIds: List<Long>,
+    private val savedStateHandle: SavedStateHandle,
     private val couponRepository: CouponRepository,
     private val orderRepository: OrderRepository,
 ) : ViewModel(),
@@ -40,7 +42,7 @@ class PaymentViewModel(
     val orderSuccessEvent: SingleLiveData<Unit> = _orderSuccessEvent
 
     init {
-        loadInitialPaymentSummary(orderProductIds)
+        loadInitialPaymentSummary()
     }
 
     override fun onSelectCoupon(couponId: Long) {
@@ -64,7 +66,9 @@ class PaymentViewModel(
         }
     }
 
-    private fun loadInitialPaymentSummary(orderProductIds: List<Long>) {
+    private fun loadInitialPaymentSummary() {
+        val orderProductIds: List<Long> = savedStateHandle[EXTRAS_ORDER_PRODUCT_IDS] ?: emptyList()
+
         viewModelScope.launch {
             orderRepository
                 .createPaymentSummary(orderProductIds)
@@ -120,15 +124,25 @@ class PaymentViewModel(
     }
 
     companion object {
+        private const val EXTRAS_ORDER_PRODUCT_IDS = "ORDER_PRODUCT_IDS"
+
         fun Factory(orderProductIds: List<Long>): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(
                     modelClass: Class<T>,
                     extras: CreationExtras,
                 ): T {
-                    val couponRepo = RepositoryProvider.couponRepository
-                    val orderRepo = RepositoryProvider.orderRepository
-                    return PaymentViewModel(orderProductIds, couponRepo, orderRepo) as T
+                    val savedStateHandle = extras.createSavedStateHandle()
+                    savedStateHandle[EXTRAS_ORDER_PRODUCT_IDS] = orderProductIds
+
+                    val couponRepository = RepositoryProvider.couponRepository
+                    val orderRepository = RepositoryProvider.orderRepository
+
+                    return PaymentViewModel(
+                        savedStateHandle,
+                        couponRepository,
+                        orderRepository,
+                    ) as T
                 }
             }
     }
