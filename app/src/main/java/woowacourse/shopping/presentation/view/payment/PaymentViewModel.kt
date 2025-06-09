@@ -41,70 +41,72 @@ class PaymentViewModel(
     private val _orderSuccessEvent = MutableSingleLiveData<Unit>()
     val orderSuccessEvent: SingleLiveData<Unit> = _orderSuccessEvent
 
+    private var allCoupons: List<Coupon> = emptyList()
+
     init {
         loadInitialPaymentSummary()
     }
 
     override fun onSelectCoupon(couponId: Long) {
-        val updatedCoupons =
+        _coupons.value =
             _coupons.value.orEmpty().map { coupon ->
-                coupon.copy(isSelected = (coupon.id == couponId && !coupon.isSelected))
+                coupon.copy(isSelected = coupon.id == couponId && !coupon.isSelected)
             }
-        _coupons.value = updatedCoupons
         updatePaymentSummaryWithSelectedCoupon()
     }
 
     fun postOrder() {
         viewModelScope.launch {
             orderRepository
-                .postOrder(orderProducts())
-                .onFailure { emitToastEvent(PaymentMessageEvent.ORDER_FAILURE) }
+                .postOrder(orderProductIds())
                 .onSuccess {
-                    emitToastEvent(PaymentMessageEvent.ORDER_SUCCESS)
+                    emitToast(PaymentMessageEvent.ORDER_SUCCESS)
                     _orderSuccessEvent.setValue(Unit)
+                }.onFailure {
+                    emitToast(PaymentMessageEvent.ORDER_FAILURE)
                 }
         }
     }
 
     private fun loadInitialPaymentSummary() {
-        val orderProductIds: List<Long> = savedStateHandle[EXTRAS_ORDER_PRODUCT_IDS] ?: emptyList()
-
+        val productIds: List<Long> = savedStateHandle[EXTRAS_ORDER_PRODUCT_IDS] ?: emptyList()
         viewModelScope.launch {
             orderRepository
-                .createPaymentSummary(orderProductIds)
+                .createPaymentSummary(productIds)
                 .onSuccess {
                     _paymentSummary.value = it
                     loadCoupons()
-                }.onFailure { emitToastEvent(PaymentMessageEvent.PAYMENT_SUMMARY_FAILURE) }
+                }.onFailure {
+                    emitToast(PaymentMessageEvent.PAYMENT_SUMMARY_FAILURE)
+                }
         }
     }
 
     private fun loadCoupons(isFilterAvailable: Boolean = true) {
-        val currentSummary = _paymentSummary.value ?: return
-
+        val summary = _paymentSummary.value ?: return
         viewModelScope.launch {
             couponRepository
-                .fetchCoupons(currentSummary, isFilterAvailable)
-                .onSuccess(::handleCouponFetchSuccess)
-                .onFailure { emitToastEvent(PaymentMessageEvent.COUPON_FETCH_FAILURE) }
+                .fetchCoupons(summary, isFilterAvailable)
+                .onSuccess {
+                    allCoupons = it
+                    _coupons.value = it.map(Coupon::toUiModel)
+                    updatePaymentSummaryWithSelectedCoupon()
+                }.onFailure {
+                    emitToast(PaymentMessageEvent.COUPON_FETCH_FAILURE)
+                }
         }
-    }
-
-    private fun handleCouponFetchSuccess(coupons: List<Coupon>) {
-        _coupons.value = coupons.map { it.toUiModel() }
-        updatePaymentSummaryWithSelectedCoupon()
     }
 
     private fun updatePaymentSummaryWithSelectedCoupon() {
-        val selectedCouponId = selectedCouponId()
-        val currentSummary = _paymentSummary.value ?: return
+        val selectedId = selectedCouponId()
+        val original = _paymentSummary.value ?: return
+        val updatedSummary = PaymentSummary(original.products).applyDiscount(selectedId)
+        _paymentSummary.value = updatedSummary
+    }
 
-        viewModelScope.launch {
-            orderRepository
-                .calculatePaymentSummary(currentSummary, selectedCouponId)
-                .onSuccess { _paymentSummary.value = it }
-                .onFailure { emitToastEvent(PaymentMessageEvent.PAYMENT_CALCULATION_FAILURE) }
-        }
+    private fun PaymentSummary.applyDiscount(couponId: Long?): PaymentSummary {
+        val coupon = allCoupons.firstOrNull { it.id == couponId } ?: return this
+        return coupon.calculateDiscountAmount(this)
     }
 
     private fun selectedCouponId(): Long? =
@@ -113,13 +115,13 @@ class PaymentViewModel(
             .firstOrNull { it.isSelected }
             ?.id
 
-    private fun orderProducts(): List<Long> =
+    private fun orderProductIds(): List<Long> =
         _paymentSummary.value
             ?.products
             .orEmpty()
             .map { it.cartId }
 
-    private fun emitToastEvent(event: PaymentMessageEvent) {
+    private fun emitToast(event: PaymentMessageEvent) {
         _toastEvent.setValue(event)
     }
 
@@ -132,16 +134,13 @@ class PaymentViewModel(
                     modelClass: Class<T>,
                     extras: CreationExtras,
                 ): T {
-                    val savedStateHandle = extras.createSavedStateHandle()
-                    savedStateHandle[EXTRAS_ORDER_PRODUCT_IDS] = orderProductIds
-
-                    val couponRepository = RepositoryProvider.couponRepository
-                    val orderRepository = RepositoryProvider.orderRepository
+                    val handle = extras.createSavedStateHandle()
+                    handle[EXTRAS_ORDER_PRODUCT_IDS] = orderProductIds
 
                     return PaymentViewModel(
-                        savedStateHandle,
-                        couponRepository,
-                        orderRepository,
+                        handle,
+                        RepositoryProvider.couponRepository,
+                        RepositoryProvider.orderRepository,
                     ) as T
                 }
             }
