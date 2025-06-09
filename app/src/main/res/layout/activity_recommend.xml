@@ -113,6 +113,7 @@
             android:layout_height="78dp"
             android:background="@color/baemin"
             android:gravity="center"
+            android:onClick="@{()->vm.navigateToOrder()}"
             android:text="@{@string/cart_order_text(vm.selectedTotalCount)}"
             android:textColor="@color/white"
             android:textSize="18sp"
