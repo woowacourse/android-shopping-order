@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.payment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import woowacourse.shopping.R
@@ -44,6 +45,16 @@ class PaymentActivity : DataBindingActivity<ActivityPaymentBinding>(R.layout.act
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.payment_title)
     }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean =
+        when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressedDispatcher.onBackPressed()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
 
     private fun initObservers() {
         viewModel.uiState.observe(this) { uiState ->
