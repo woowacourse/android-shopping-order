@@ -5,11 +5,11 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="coupon"
             type="woowacourse.shopping.view.payment.CouponsItem.CouponItem" />
-
-        <import type="android.view.View" />
 
         <variable
             name="onSelect"
@@ -44,7 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:text="@{String.valueOf(coupon.value.expirationDate)}"
+            android:text="@{@string/coupon_expiration_date_format(coupon.value.expirationDate.year, coupon.value.expirationDate.monthValue, coupon.value.expirationDate.dayOfMonth)}"
             android:textColor="@color/gray_5"
             android:textSize="12sp"
             app:layout_constraintTop_toBottomOf="@id/couponCheckBox"
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginBottom="18dp"
-            android:text="@{String.valueOf(coupon.minimumAmount)}"
+            android:text="@{@string/coupon_minimum_amount_format(coupon.minimumAmount)}"
             android:textColor="@color/gray_5"
             android:textSize="12sp"
             android:visibility="@{coupon.minimumAmount != null ? View.VISIBLE : View.INVISIBLE}"

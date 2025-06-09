@@ -45,5 +45,7 @@
     <string name="load_coupons_error_message">쿠폰을 불러오지 못했습니다.</string>
     <string name="order_success_message">주문에 성공했습니다.</string>
     <string name="order_failure_message">주문에 실패했습니다.</string>
+    <string name="coupon_expiration_date_format">만료일: %d년 %d월 %d일</string>
+    <string name="coupon_minimum_amount_format">최소 주문 금액: %,d원</string>
 
 </resources>
