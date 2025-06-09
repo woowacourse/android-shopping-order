@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.view.cart
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -40,6 +41,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                 } else {
                     parentFragmentManager.commit {
                         setReorderingAllowed(true)
+                        Log.wtf("asdf", "${viewModel.selectedProductIds.value}")
                         val bundle = CheckoutFragment.newBundle(viewModel.selectedProductIds.value.orEmpty().toLongArray())
                         replace(R.id.shopping_fragment_container, CheckoutFragment::class.java, bundle)
                         addToBackStack(null)
@@ -96,7 +98,9 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
         }
 
         viewModel.selectedProductIds.observe(viewLifecycleOwner) {}
-
+        viewModel.totalCount.observe(viewLifecycleOwner) {}
+        viewModel.totalPrice.observe(viewLifecycleOwner) {}
+        viewModel.allSelected.observe(viewLifecycleOwner) {}
         viewModel.canPlaceOrder.observe(viewLifecycleOwner) {}
     }
 

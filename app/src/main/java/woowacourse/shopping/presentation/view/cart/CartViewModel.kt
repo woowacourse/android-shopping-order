@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RepositoryProvider
+import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.ProductUiModel
@@ -43,39 +44,23 @@ class CartViewModel(
     private var _isLastPage = MutableLiveData<Boolean>()
     val isLastPage: LiveData<Boolean> = _isLastPage
 
-    val totalPrice: LiveData<Long> =
-        _cartItems.map { cartItems ->
-            cartItems
-                .filter { cartItem -> cartItem.isSelected }
-                .sumOf { selectedItem -> selectedItem.cartItem.totalPrice }
-        }
+    private val _totalPrice = MutableLiveData<Long>(0)
+    val totalPrice: LiveData<Long> = _totalPrice
 
-    val totalCount: LiveData<Int> =
-        _cartItems.map { cartItems ->
-            cartItems
-                .filter { cartItem -> cartItem.isSelected }
-                .sumOf { selectedItem -> selectedItem.cartItem.quantity }
-        }
+    private val _totalCount = MutableLiveData<Int>(0)
+    val totalCount: LiveData<Int> = _totalCount
 
-    val allSelected: LiveData<Boolean> =
-        _cartItems.map { cartItems ->
-            cartItems.all { cartItem -> cartItem.isSelected }
-        }
+    private val _allSelected = MutableLiveData<Boolean>(false)
+    val allSelected: LiveData<Boolean> = _allSelected
 
-    val selectedProductIds: LiveData<List<Long>> =
-        _cartItems.map { cartItems ->
-            cartItems
-                .filter { cartItem -> cartItem.isSelected }
-                .map { cartItem -> cartItem.cartItem.product.id }
-        }
+    private val _selectedProductIds = MutableLiveData<Set<Long>>()
+    val selectedProductIds: LiveData<Set<Long>> = _selectedProductIds
 
     val canPlaceOrder: LiveData<Boolean> =
-        selectedProductIds.map { selectedProductIds -> selectedProductIds.isNotEmpty() }
+        _selectedProductIds.map { selectedProductIds -> selectedProductIds.isNotEmpty() }
 
     private val _canSelectItems = MutableLiveData(true)
     val canSelectItems: LiveData<Boolean> = _canSelectItems
-
-    private val selectionStatus = mutableMapOf<Long, Boolean>()
 
     private var isProcessingRequest = false
 
@@ -91,7 +76,9 @@ class CartViewModel(
                 page.items.map { product ->
                     product
                         .toCartItemUiModel()
-                        .copy(isSelected = selectionStatus[product.cartId] ?: false)
+                        .copy(
+                            isSelected = _selectedProductIds.value.orEmpty().contains(product.product.id),
+                        )
                 }
             _cartItems.postValue(updatedItems)
             _pageIndex.postValue(newPageIndex)
@@ -115,7 +102,7 @@ class CartViewModel(
             val updatedItem =
                 CartItemUiModel(
                     cartItem.copy(quantity = cartItem.quantity + 1),
-                    isSelected = selectionStatus[cartItem.cartId] ?: false,
+                    isSelected = _selectedProductIds.value.orEmpty().contains(product.id),
                 )
             updateCartItems(updatedItem)
 
@@ -137,7 +124,7 @@ class CartViewModel(
             val updatedItem =
                 CartItemUiModel(
                     cartItem.copy(quantity = cartItem.quantity - 1),
-                    isSelected = selectionStatus[cartItem.cartId] ?: false,
+                    isSelected = _selectedProductIds.value.orEmpty().contains(product.id),
                 )
             updateCartItems(updatedItem)
             isProcessingRequest = false
@@ -165,7 +152,8 @@ class CartViewModel(
                 },
             )
             _itemDeleteEvent.postValue(removedItem.cartId)
-            selectionStatus.remove(removedItem.cartId)
+            _selectedProductIds.value =
+                _selectedProductIds.value.orEmpty().toMutableSet().apply { remove(removedItem.product.id) }
             fetchRecommendedProducts()
         }
     }
@@ -188,7 +176,14 @@ class CartViewModel(
         isSelected: Boolean,
     ) {
         viewModelScope.launch {
-            selectionStatus[cartItem.cartItem.cartId] = isSelected
+            _selectedProductIds.value =
+                _selectedProductIds.value.orEmpty().toMutableSet().apply {
+                    if (isSelected) {
+                        add(cartItem.cartItem.product.id)
+                    } else {
+                        remove(cartItem.cartItem.product.id)
+                    }
+                }
             updateSelectionInfo()
         }
     }
@@ -198,11 +193,16 @@ class CartViewModel(
             val cartItems = cartRepository.loadAllCartItems()
             _cartItems.postValue(
                 cartItems.map { cartItem ->
-                    selectionStatus[cartItem.cartId] = selectAll
                     cartItem.toCartItemUiModel().copy(isSelected = selectAll)
                 },
             )
-            loadPageOfShoppingCart()
+            _selectedProductIds.value =
+                if (selectAll) {
+                    cartRepository.loadAllCartItems().map { cartItem -> cartItem.product.id }.toSet()
+                } else {
+                    emptySet()
+                }
+            updateSelectionInfo()
         }
     }
 
@@ -211,17 +211,23 @@ class CartViewModel(
     }
 
     private suspend fun updateSelectionInfo() {
-        val cartItems = cartRepository.loadAllCartItems()
-        val selectedItemIds = selectionStatus.filter { it.value }.map { it.key }.toSet()
+        val allCartItems = cartRepository.loadAllCartItems()
         _cartItems.postValue(
-            cartItems.map { cartItem ->
-                if (cartItem.cartId in selectedItemIds) {
+            allCartItems.map { cartItem ->
+                if (_selectedProductIds.value.orEmpty().contains(cartItem.product.id)) {
                     cartItem.toCartItemUiModel().copy(isSelected = true)
                 } else {
                     cartItem.toCartItemUiModel()
                 }
             },
         )
+        val selectedCartItems =
+            allCartItems.filter { cartItem ->
+                _selectedProductIds.value.orEmpty().contains(cartItem.product.id)
+            }
+        _totalCount.value = selectedCartItems.size
+        _totalPrice.value = selectedCartItems.sumOf(CartItem::totalPrice)
+        _allSelected.value = selectedCartItems.isNotEmpty() && allCartItems.size == selectedCartItems.size
     }
 
     fun fetchRecommendedProducts() {
