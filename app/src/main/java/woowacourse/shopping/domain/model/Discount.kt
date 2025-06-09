@@ -3,62 +3,66 @@ package woowacourse.shopping.domain.model
 import java.time.LocalTime
 
 sealed class Discount {
+    abstract fun isApplicable(
+        products: CartProducts,
+        now: LocalTime,
+    ): Boolean
+
     abstract fun calculateDiscount(
         products: CartProducts,
         shippingFee: Int,
-        now: LocalTime = LocalTime.now(),
     ): Int
 
     data class FixedAmount(
         val discountAmount: Int,
         val minimumAmount: Int,
     ) : Discount() {
+        override fun isApplicable(
+            products: CartProducts,
+            now: LocalTime,
+        ): Boolean = products.totalPrice >= minimumAmount
+
         override fun calculateDiscount(
             products: CartProducts,
             shippingFee: Int,
-            now: LocalTime,
-        ): Int =
-            if (products.totalPrice >= minimumAmount) {
-                discountAmount
-            } else {
-                MINIMUM_AMOUNT
-            }
+        ): Int = discountAmount
     }
 
     data class BuyXGetYFree(
         val buyQuantity: Int,
         val getQuantity: Int,
     ) : Discount() {
+        private val minimumQuantity = buyQuantity + getQuantity
+
+        override fun isApplicable(
+            products: CartProducts,
+            now: LocalTime,
+        ): Boolean = products.value.any { it.quantity >= minimumQuantity }
+
         override fun calculateDiscount(
             products: CartProducts,
             shippingFee: Int,
-            now: LocalTime,
         ): Int {
             val freeProduct =
                 products.value
-                    .filter { it.quantity >= buyQuantity + getQuantity }
-                    .maxByOrNull { it.product.price }
-            return if (freeProduct != null) {
-                freeProduct.product.price * getQuantity
-            } else {
-                MINIMUM_AMOUNT
-            }
+                    .filter { it.quantity >= minimumQuantity }
+                    .maxBy { it.product.price }
+            return freeProduct.product.price * getQuantity
         }
     }
 
     data class FreeShipping(
         val minimumAmount: Int,
     ) : Discount() {
+        override fun isApplicable(
+            products: CartProducts,
+            now: LocalTime,
+        ): Boolean = products.totalPrice >= minimumAmount
+
         override fun calculateDiscount(
             products: CartProducts,
             shippingFee: Int,
-            now: LocalTime,
-        ): Int =
-            if (products.totalPrice >= minimumAmount) {
-                shippingFee
-            } else {
-                MINIMUM_AMOUNT
-            }
+        ): Int = shippingFee
     }
 
     data class Percentage(
@@ -66,19 +70,14 @@ sealed class Discount {
         val startTime: LocalTime,
         val endTime: LocalTime,
     ) : Discount() {
+        override fun isApplicable(
+            products: CartProducts,
+            now: LocalTime,
+        ): Boolean = now in startTime..endTime
+
         override fun calculateDiscount(
             products: CartProducts,
             shippingFee: Int,
-            now: LocalTime,
-        ): Int =
-            if (now in startTime..endTime) {
-                (products.totalPrice * discountPercentage) / 100
-            } else {
-                MINIMUM_AMOUNT
-            }
-    }
-
-    companion object {
-        private const val MINIMUM_AMOUNT = 0
+        ): Int = (products.totalPrice * discountPercentage) / 100
     }
 }

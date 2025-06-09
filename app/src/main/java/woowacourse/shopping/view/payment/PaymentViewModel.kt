@@ -18,7 +18,7 @@ import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
 class PaymentViewModel(
-    cartProducts: CartProducts,
+    private val cartProducts: CartProducts,
     private val couponRepository: CouponRepository,
     private val orderRepository: OrderRepository,
 ) : ViewModel(),
@@ -54,7 +54,7 @@ class PaymentViewModel(
                 .onSuccess { coupons ->
                     couponItems.postValue(
                         coupons
-                            .filter { it.isValid() }
+                            .filter { it.isValid(cartProducts) }
                             .map { PaymentItem.CouponItem(it) },
                     )
                 }.onFailure { Log.e("error", it.message.toString()) }

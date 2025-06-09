@@ -68,7 +68,7 @@ data class CouponDto(
             code = code,
             description = description,
             expirationDate = LocalDate.parse(expirationDate),
-            discountType = discount,
+            discount = discount,
         )
     }
 }
