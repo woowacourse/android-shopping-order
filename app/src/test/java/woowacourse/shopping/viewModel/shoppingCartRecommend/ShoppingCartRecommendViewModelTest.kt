@@ -32,6 +32,16 @@ class ShoppingCartRecommendViewModelTest {
 
     @BeforeEach
     fun setUp() {
+        coEvery { productRepository.getRecentRecommendWatchingProducts(any()) } returns
+            Result.success(
+                RECENT_PRODUCTS,
+            )
+
+        coEvery { shoppingCartRepository.load(any(), any()) } returns
+            Result.success(
+                SHOPPING_CARTS1,
+            )
+
         viewModel =
             ShoppingCartRecommendViewModel(
                 SHOPPING_CARTS1.shoppingCartItems,
@@ -48,14 +58,11 @@ class ShoppingCartRecommendViewModelTest {
     @Test
     fun `처음 생성됬을 때 추천 상품을 로드한다`() {
         // given
-        coEvery { productRepository.getRecentRecommendWatchingProducts(any()) } returns
-            Result.success(
-                RECENT_PRODUCTS,
-            )
         coEvery { shoppingCartRepository.load(any(), any()) } returns
             Result.success(
                 SHOPPING_CARTS1,
             )
+
         // when
         viewModel =
             ShoppingCartRecommendViewModel(
@@ -74,10 +81,6 @@ class ShoppingCartRecommendViewModelTest {
             Result.success(
                 RECENT_PRODUCTS_FULL,
             )
-        coEvery { shoppingCartRepository.load(any(), any()) } returns
-            Result.success(
-                SHOPPING_CARTS1,
-            )
         // when
         viewModel =
             ShoppingCartRecommendViewModel(
@@ -93,14 +96,6 @@ class ShoppingCartRecommendViewModelTest {
     fun `추천 상품을 장바구니에 추가할 수 있다`() {
         // given
         val product = RECOMMENDED_PRODUCTS.first()
-        coEvery { productRepository.getRecentRecommendWatchingProducts(any()) } returns
-            Result.success(
-                RECENT_PRODUCTS,
-            )
-        coEvery { shoppingCartRepository.load(any(), any()) } returns
-            Result.success(
-                SHOPPING_CARTS1,
-            )
         coEvery { shoppingCartRepository.add(any(), any()) } returns
             Result.success(
                 ShoppingCartProduct(

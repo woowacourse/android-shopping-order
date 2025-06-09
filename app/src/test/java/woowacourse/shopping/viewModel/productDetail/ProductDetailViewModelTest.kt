@@ -33,6 +33,11 @@ class ProductDetailViewModelTest {
         coEvery { productRepository.getProduct(SHOPPING_CART_PRODUCT1.product.id) } returns
             Result.success(PRODUCT1)
 
+        coEvery { productRepository.updateRecentWatchingProduct(PRODUCT1) } returns
+            Result.success(Unit)
+        coEvery { productRepository.getLatestRecentWatchingProduct() } returns
+            Result.success(PRODUCT2)
+
         viewModel =
             ProductDetailViewModel(
                 SHOPPING_CART_PRODUCT1.product.id,
@@ -71,10 +76,6 @@ class ProductDetailViewModelTest {
     @Test
     fun `처음 로드됬을 때 최근 본 상품을 업데이트할 수 있다`() {
         // given
-        coEvery { productRepository.getLatestRecentWatchingProduct() } returns
-            Result.success(PRODUCT2)
-        coEvery { productRepository.updateRecentWatchingProduct(PRODUCT1) } returns
-            Result.success(Unit)
         coEvery { productRepository.getProduct(SHOPPING_CART_PRODUCT1.product.id) } returns
             Result.success(PRODUCT1)
         coEvery { shoppingCartRepository.add(PRODUCT1, 1) } returns
@@ -97,10 +98,6 @@ class ProductDetailViewModelTest {
     @Test
     fun `최근 본 상품이 있으면 최근 본 상품을 표시한다`() {
         // given
-        coEvery { productRepository.getLatestRecentWatchingProduct() } returns
-            Result.success(PRODUCT2)
-        coEvery { productRepository.updateRecentWatchingProduct(PRODUCT1) } returns
-            Result.success(Unit)
         coEvery { productRepository.getProduct(SHOPPING_CART_PRODUCT1.product.id) } returns
             Result.success(PRODUCT1)
         coEvery { shoppingCartRepository.add(PRODUCT1, 1) } returns
@@ -123,11 +120,13 @@ class ProductDetailViewModelTest {
     @Test
     fun `현재 상품이 최근 본 상품에 속해있으면 최근 본 상품을 표시하지 않는다`() {
         // given
-        coEvery { productRepository.getLatestRecentWatchingProduct() } returns
+        coEvery { productRepository.getProduct(SHOPPING_CART_PRODUCT1.product.id) } returns
             Result.success(PRODUCT1)
+
         coEvery { productRepository.updateRecentWatchingProduct(PRODUCT1) } returns
             Result.success(Unit)
-        coEvery { productRepository.getProduct(SHOPPING_CART_PRODUCT1.product.id) } returns
+
+        coEvery { productRepository.getLatestRecentWatchingProduct() } returns
             Result.success(PRODUCT1)
 
         // when
@@ -164,10 +163,6 @@ class ProductDetailViewModelTest {
             Result.success(SHOPPING_CART_PRODUCT1)
         coEvery { productRepository.getProduct(SHOPPING_CART_PRODUCT1.product.id) } returns
             Result.success(PRODUCT1)
-        coEvery { productRepository.updateRecentWatchingProduct(PRODUCT1) } returns
-            Result.success(Unit)
-        coEvery { productRepository.getLatestRecentWatchingProduct() } returns
-            Result.success(PRODUCT2)
 
         // when
         viewModel.plusQuantity()
@@ -184,8 +179,7 @@ class ProductDetailViewModelTest {
             Result.success(SHOPPING_CART_PRODUCT1)
         coEvery { productRepository.getProduct(SHOPPING_CART_PRODUCT1.product.id) } returns
             Result.success(PRODUCT1)
-        coEvery { productRepository.updateRecentWatchingProduct(PRODUCT1) } returns
-            Result.success(Unit)
+
         // when
         viewModel.minusQuantity()
 
