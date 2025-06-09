@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentCartProductRecommendBinding
@@ -29,13 +28,11 @@ class CartProductRecommendFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         requireActivity().onBackPressedDispatcher.addCallback(this) {
-            parentFragmentManager.commit {
-                replace(
-                    this@CartProductRecommendFragment.id,
-                    CartProductSelectFragment::class.java,
-                    null,
-                )
-            }
+            parentFragmentManager.setFragmentResult(
+                CartProductSelectFragment.KET_FRAGMENT_RESULT,
+                Bundle.EMPTY,
+            )
+            parentFragmentManager.popBackStack()
         }
     }
 

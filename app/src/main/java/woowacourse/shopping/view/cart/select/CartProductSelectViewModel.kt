@@ -45,6 +45,10 @@ class CartProductSelectViewModel(
             products.isNotEmpty() && products.all { it.isSelected }
         }
 
+    init {
+        loadPage()
+    }
+
     fun loadPage(page: Int = FIRST_PAGE_NUMBER) {
         viewModelScope.launch {
             _isLoading.value = true

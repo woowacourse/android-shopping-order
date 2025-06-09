@@ -43,11 +43,12 @@ class CartProductSelectFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initBindings()
         initObservers()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.loadPage()
+        parentFragmentManager.setFragmentResultListener(
+            KET_FRAGMENT_RESULT,
+            viewLifecycleOwner,
+        ) { _, _ ->
+            viewModel.loadPage()
+        }
     }
 
     private fun initBindings() {
@@ -58,11 +59,12 @@ class CartProductSelectFragment : Fragment() {
 
         binding.btnOrder.setOnClickListener {
             parentFragmentManager.commit {
-                replace(
+                add(
                     R.id.fragment,
                     CartProductRecommendFragment::class.java,
                     CartProductRecommendFragment.newBundle(viewModel.selectedCartProducts.value),
                 )
+                addToBackStack(null)
             }
         }
     }
@@ -76,5 +78,9 @@ class CartProductSelectFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        const val KET_FRAGMENT_RESULT = "fragmentResult"
     }
 }
