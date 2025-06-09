@@ -38,7 +38,8 @@ sealed class Coupon {
 
         override fun calculateDiscountAmount(cartItems: List<CartItem>): Int {
             val eligibleItem = findEligibleItem(cartItems) ?: return 0
-            return eligibleItem.amount * getQuantity
+            val applicableFreeItems = eligibleItem.amount / (buyQuantity + getQuantity) * getQuantity
+            return applicableFreeItems * eligibleItem.product.price.value
         }
 
         private fun findEligibleItem(cartItems: List<CartItem>): CartItem? =

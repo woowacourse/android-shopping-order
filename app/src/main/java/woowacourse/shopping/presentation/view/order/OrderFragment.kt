@@ -63,7 +63,8 @@ class OrderFragment :
             couponAdapter.submitList(it)
         }
 
-        viewModel.selectedCoupon.observe(viewLifecycleOwner) {
+        viewModel.selectedCoupon.observe(viewLifecycleOwner) { selectedCoupon ->
+            viewModel.calculateOrderSummary(selectedCoupon)
         }
     }
 

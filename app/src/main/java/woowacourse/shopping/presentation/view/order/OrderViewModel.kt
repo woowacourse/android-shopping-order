@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.OrderSummary
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.presentation.model.CartItemUiModel
@@ -24,6 +26,9 @@ class OrderViewModel(
 
     private val _selectedCoupon = MutableLiveData<CouponUiModel?>()
     val selectedCoupon: LiveData<CouponUiModel?> = _selectedCoupon
+
+    private val _orderSummary = MutableLiveData<OrderSummary>()
+    val orderSummary: LiveData<OrderSummary> = _orderSummary
 
     fun loadCoupons() {
         viewModelScope.launch {
@@ -55,6 +60,32 @@ class OrderViewModel(
 
     fun setSelectedItems(items: List<CartItemUiModel>) {
         selectedItems = items.toList()
+    }
+
+    fun calculateOrderSummary(coupon: CouponUiModel?) {
+        val orderAmount = selectedItems.sumOf { it.totalPrice }
+        val selectedCoupon =
+            coupon?.id?.let { id ->
+                couponRepository.cachedCoupon?.firstOrNull { it.id == id }
+            }
+        val couponAmount =
+            selectedCoupon?.let { it.calculateDiscountAmount(selectedItems.map { it.toDomain() }) }
+
+        if (selectedCoupon is Coupon.FreeShippingCoupon) {
+            _orderSummary.value =
+                OrderSummary(
+                    orderAmount = orderAmount,
+                    couponAmount = couponAmount ?: 0,
+                    shippingFee = 0,
+                )
+        } else {
+            _orderSummary.value =
+                OrderSummary(
+                    orderAmount = orderAmount,
+                    couponAmount = couponAmount ?: 0,
+                    shippingFee = 3000,
+                )
+        }
     }
 
     companion object {

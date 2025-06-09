@@ -16,7 +16,10 @@ data class CartItemUiModel(
     val imageUrl: String,
     val price: Int,
     val isSelected: Boolean = false,
-) : Parcelable
+) : Parcelable {
+    val totalPrice: Int
+        get() = price * amount
+}
 
 fun CartItemUiModel.toDomain(): CartItem =
     CartItem(
