@@ -61,10 +61,7 @@ class PaymentActivity : AppCompatActivity() {
 
     private fun setObserver() {
         binding.vm = viewModel
-
-        viewModel.coupons.observe(this) {
-            couponAdapter.submitList(it)
-        }
+        binding.lifecycleOwner = this
 
         viewModel.toastEvent.observe(this) {
             Toast.makeText(this, it.toMessageResId(), Toast.LENGTH_SHORT).show()
