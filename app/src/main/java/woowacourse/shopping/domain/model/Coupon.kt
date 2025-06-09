@@ -27,12 +27,14 @@ data class Coupon(
             }
 
             "buyXgetY" -> {
-                val eligibleItems =
-                    cartItems.filter { it.quantity >= (buyQuantity ?: 0) + (getQuantity ?: 0) }
-                val maxItem = eligibleItems.maxByOrNull { it.goods.price }
-                maxItem?.goods?.price ?: 0
-            }
+                val requiredCount = (buyQuantity ?: 0) + (getQuantity ?: 0)
+                val eligibleItems = cartItems.filter { it.quantity >= requiredCount }
 
+                val maxItem = eligibleItems.maxByOrNull { it.goods.price }
+                val discountPerUnit = maxItem?.goods?.price ?: 0
+
+                discountPerUnit*(getQuantity?:1)
+            }
             "freeShipping" -> {
                 if (minimumAmount != null && orderAmount >= minimumAmount) shippingFee else 0
             }
