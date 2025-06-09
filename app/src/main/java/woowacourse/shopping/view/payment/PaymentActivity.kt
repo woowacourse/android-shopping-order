@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -22,7 +23,7 @@ class PaymentActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPaymentBinding
     private val viewModel: PaymentViewModel by viewModels {
         val container = (application as App).container
-        PaymentViewModelFactory(container.couponRepository, container.cartRepository)
+        PaymentViewModelFactory(container.couponRepository, container.cartRepository, container.orderRepository)
     }
     private val couponAdapter: CouponAdapter by lazy {
         CouponAdapter(viewModel)
@@ -61,6 +62,11 @@ class PaymentActivity : AppCompatActivity() {
     private fun observeViewModel() {
         viewModel.paymentUiState.observe(this) {
             couponAdapter.updateItems(it.coupons)
+        }
+
+        viewModel.isCompletedOrder.observe(this) {
+            Toast.makeText(this, "주문이 완료 되었습니다.", Toast.LENGTH_SHORT).show()
+            finish()
         }
     }
 

@@ -11,6 +11,9 @@ import woowacourse.shopping.domain.coupon.AvailableCoupons
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.view.core.event.MutableSingleLiveData
+import woowacourse.shopping.view.core.event.SingleLiveData
 import woowacourse.shopping.view.payment.state.CouponUi
 import woowacourse.shopping.view.payment.state.PaymentUi
 import woowacourse.shopping.view.payment.state.PaymentUiState
@@ -20,6 +23,7 @@ import java.time.LocalDateTime
 class PaymentViewModel(
     private val couponRepository: CouponRepository,
     private val cartRepository: CartRepository,
+    private val orderRepository: OrderRepository,
 ) : ViewModel() {
     private val _paymentUiState = MutableLiveData<PaymentUiState>()
     val paymentUiState: LiveData<PaymentUiState> get() = _paymentUiState
@@ -31,6 +35,9 @@ class PaymentViewModel(
     private val shippingPrice = 3_000
 
     private var currentOrderItems: List<ShoppingCart> = emptyList()
+
+    private val _isCompletedOrder = MutableSingleLiveData<Boolean>()
+    val isCompletedOrder: SingleLiveData<Boolean> get() = _isCompletedOrder
 
     fun setCartItems(orderItems: List<ShoppingCart>) {
         currentOrderItems = orderItems
@@ -107,5 +114,13 @@ class PaymentViewModel(
             )
 
         _paymentUiState.value = newState
+    }
+
+    fun onClickOrder() {
+        val ids = currentOrderItems.map { it.id }
+        viewModelScope.launch(Dispatchers.IO) {
+            orderRepository.createOrder(ids)
+            _isCompletedOrder.postValue(true)
+        }
     }
 }
