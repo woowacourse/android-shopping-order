@@ -12,7 +12,7 @@ data class CouponUiModel(
     val discount: Int?,
     val buyQuantity: Int?,
     val getQuantity: Int?,
-    val discountType: String,
+    val discountType: DiscountTypeUi,
     val minimumAmount: Int?,
     val availableTime: AvailableTimeUiModel?,
     val isSelected: Boolean = false,
@@ -28,12 +28,7 @@ fun CouponUiModel.toDomain(): Coupon =
                 DateTimeFormatter.ofPattern("yyyy년 M월 d일"),
             ),
         discount = discount,
-        discountType =
-            discountType.toDiscountType(
-                discount,
-                buyQuantity = buyQuantity,
-                getQuantity = getQuantity,
-            ),
+        discountType = discountType.toDomain(discount, buyQuantity, getQuantity),
         minimumAmount = minimumAmount,
         availableTime = availableTime?.toDomain(),
         buyQuantity = buyQuantity,
@@ -54,28 +49,22 @@ fun Coupon.toPresentation(): CouponUiModel =
         isSelected = false,
     )
 
-fun DiscountType.toPresentation(): String =
+fun DiscountType.toPresentation(): DiscountTypeUi =
     when (this) {
-        is DiscountType.FixedAmount -> "fixed"
-        is DiscountType.Percentage -> "percentage"
-        is DiscountType.FreeShipping -> "free_shipping"
-        is DiscountType.BuyXGetY -> "buyXgetY"
+        is DiscountType.FixedAmount -> DiscountTypeUi.FIXED
+        is DiscountType.Percentage -> DiscountTypeUi.PERCENTAGE
+        is DiscountType.FreeShipping -> DiscountTypeUi.FREE_SHIPPING
+        is DiscountType.BuyXGetY -> DiscountTypeUi.BUY_X_GET_Y
     }
 
-fun String.toDiscountType(
+fun DiscountTypeUi.toDomain(
     discount: Int?,
     buyQuantity: Int?,
     getQuantity: Int?,
 ): DiscountType =
     when (this) {
-        "fixed" -> DiscountType.FixedAmount(discount ?: 0)
-        "percentage" -> DiscountType.Percentage(discount ?: 0)
-        "free_shipping" -> DiscountType.FreeShipping
-        "buyXgetY" ->
-            DiscountType.BuyXGetY(
-                buyQuantity = buyQuantity ?: 0,
-                getQuantity = getQuantity ?: 0,
-            )
-
-        else -> throw IllegalArgumentException("알 수 없는 discountType: $this")
+        DiscountTypeUi.FIXED -> DiscountType.FixedAmount(discount ?: 0)
+        DiscountTypeUi.PERCENTAGE -> DiscountType.Percentage(discount ?: 0)
+        DiscountTypeUi.FREE_SHIPPING -> DiscountType.FreeShipping
+        DiscountTypeUi.BUY_X_GET_Y -> DiscountType.BuyXGetY(buyQuantity ?: 0, getQuantity ?: 0)
     }
