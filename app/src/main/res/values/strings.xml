@@ -62,5 +62,6 @@
     <string name="order_minimum_order_price">최소 주문 금액: </string>
     <string name="order_available_using_time_label">사용 가능 시간: </string>
     <string name="order_available_using_time_format">%d시 부터 %d시까지(0시 ~ 23시 기준)</string>
+    <string name="order_success">주문이 완료되었습니다.</string>
 
 </resources>

@@ -27,7 +27,11 @@ class OrderViewModel(
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
 
+    private val _navigateTo = SingleLiveData<Unit>()
+    val navigateTo: LiveData<Unit> = _navigateTo
+
     private lateinit var couponContextMapper: Map<Long, CouponContext>
+    private lateinit var purchaseProductIds: List<Long>
 
     fun loadOrderInfos(productIds: LongArray) {
         runCatching {
@@ -39,6 +43,16 @@ class OrderViewModel(
                 PaymentSummaryUiState(orderPrice = cartItems.sumOf { it.totalPrice })
             loadCoupons(cartItems)
         }.onFailure { _toastMessage.value = R.string.product_toast_load_failure }
+    }
+
+    fun purchase() {
+        viewModelScope.launch {
+            purchaseProductIds.forEach {
+                cartRepository.deleteProduct(it)
+            }
+            _toastMessage.value = R.string.order_success
+            _navigateTo.value = Unit
+        }
     }
 
     override fun onClickSelect(couponId: Long) {
@@ -84,6 +98,7 @@ class OrderViewModel(
     private fun loadCoupons(cartItems: List<CartItem>) {
         viewModelScope.launch {
             getAvailableCouponsUseCase(cartItems).onSuccess { couponContexts ->
+                purchaseProductIds = cartItems.map { it.product.productId }
                 couponContextMapper = couponContexts.associateBy { it.coupon.couponBase.id }
                 val couponUiModels =
                     couponContexts.map { couponContext -> couponContext.coupon.toUiModel() }

@@ -15,6 +15,7 @@ import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.Extra
+import woowacourse.shopping.presentation.product.ProductActivity
 
 class OrderActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOrderBinding
@@ -69,6 +70,12 @@ class OrderActivity : AppCompatActivity() {
 
         viewModel.toastMessage.observe(this) { resId ->
             showToast(resId)
+        }
+
+        viewModel.navigateTo.observe(this) {
+            val intent = Intent(this, ProductActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(intent)
         }
     }
 

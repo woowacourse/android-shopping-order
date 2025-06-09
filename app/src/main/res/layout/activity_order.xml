@@ -209,6 +209,7 @@
             android:layout_height="wrap_content"
             android:background="@color/baemin"
             android:gravity="center"
+            android:onClick="@{()-> vm.purchase()}"
             android:paddingVertical="8dp"
             android:text="@string/order_submit"
             android:textColor="@color/white"
