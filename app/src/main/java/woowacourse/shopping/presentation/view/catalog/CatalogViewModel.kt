@@ -32,8 +32,8 @@ class CatalogViewModel(
     private val _itemUpdateEvent = MutableLiveData<ProductUiModel>()
     val itemUpdateEvent: LiveData<ProductUiModel> = _itemUpdateEvent
 
-    private val _deleteState = MutableLiveData<Long>()
-    val deleteState: LiveData<Long> = _deleteState
+    private val _deletedItemId = MutableLiveData<Long>()
+    val deletedItemId: LiveData<Long> = _deletedItemId
 
     private val _totalCartCount = MutableLiveData<Int>()
     val totalCartCount: LiveData<Int> = _totalCartCount

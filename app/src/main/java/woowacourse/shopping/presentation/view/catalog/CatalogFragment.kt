@@ -96,7 +96,7 @@ class CatalogFragment :
         viewModel.items.observe(viewLifecycleOwner) { products ->
             catalogAdapter.submitList(products)
         }
-        viewModel.deleteState.observe(viewLifecycleOwner) { productId ->
+        viewModel.deletedItemId.observe(viewLifecycleOwner) { productId ->
             catalogAdapter.removeItemAmount(productId)
         }
         viewModel.itemUpdateEvent.observe(viewLifecycleOwner) { updatedProduct ->
