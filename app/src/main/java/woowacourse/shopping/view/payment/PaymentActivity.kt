@@ -65,7 +65,7 @@ class PaymentActivity : AppCompatActivity() {
         }
 
         viewModel.isCompletedOrder.observe(this) {
-            Toast.makeText(this, "주문이 완료 되었습니다.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.text_completed_order), Toast.LENGTH_SHORT).show()
             finish()
         }
     }
