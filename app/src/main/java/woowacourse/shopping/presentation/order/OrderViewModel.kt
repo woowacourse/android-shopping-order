@@ -19,8 +19,8 @@ import woowacourse.shopping.presentation.model.toPresentation
 
 class OrderViewModel(
     savedStateHandle: SavedStateHandle,
-    private val getAvailableCouponUseCase: GetAvailableCouponUseCase,
     private val orderRepository: OrderRepository,
+    private val getAvailableCouponUseCase: GetAvailableCouponUseCase,
 ) : ViewModel() {
     private val _coupons: MutableLiveData<List<CouponUiModel>> = MutableLiveData()
     val coupons: LiveData<List<CouponUiModel>> = _coupons
@@ -37,6 +37,7 @@ class OrderViewModel(
     init {
         val initialItems =
             savedStateHandle.get<ArrayList<CartItemUiModel>>(KEY_SELECT_ITEMS) ?: emptyList()
+
         _orderSummary.value = createOrderSummary(initialItems)
         fetchData()
     }

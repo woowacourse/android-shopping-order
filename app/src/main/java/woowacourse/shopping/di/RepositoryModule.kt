@@ -15,8 +15,7 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 object RepositoryModule {
     val productRepository: ProductRepository by lazy {
         val productDataSource = DataSourceModule.productRemoteDataSource
-        val cartRepository = cartRepository
-        ProductRepositoryImpl(productDataSource, cartRepository)
+        ProductRepositoryImpl(productDataSource)
     }
 
     val cartRepository: CartRepository by lazy {

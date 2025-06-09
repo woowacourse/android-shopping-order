@@ -18,8 +18,8 @@ import woowacourse.shopping.presentation.model.toPresentation
 
 class RecommendViewModel(
     savedStateHandle: SavedStateHandle,
-    private val recentProductRepository: RecentProductRepository,
     private val cartRepository: CartRepository,
+    private val recentProductRepository: RecentProductRepository,
     private val recommendProductsUseCase: RecommendProductsUseCase,
 ) : ViewModel() {
     private lateinit var recentCategory: String

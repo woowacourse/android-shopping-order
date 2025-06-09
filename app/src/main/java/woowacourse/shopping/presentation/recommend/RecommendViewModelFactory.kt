@@ -18,8 +18,8 @@ class RecommendViewModelFactory : ViewModelProvider.Factory {
         val recommendProductsUseCase = UseCaseModule.recommendProductsUseCase
         return RecommendViewModel(
             savedStateHandle,
-            recentProductRepository,
             cartRepository,
+            recentProductRepository,
             recommendProductsUseCase,
         ) as T
     }

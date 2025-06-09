@@ -13,8 +13,8 @@ class OrderViewModelFactory : ViewModelProvider.Factory {
         extras: CreationExtras,
     ): T {
         val savedStateHandle = extras.createSavedStateHandle()
-        val getAvailableCouponUseCase = UseCaseModule.getAvailableCouponUseCase
         val orderRepository = RepositoryModule.orderRepository
-        return OrderViewModel(savedStateHandle, getAvailableCouponUseCase, orderRepository) as T
+        val getAvailableCouponUseCase = UseCaseModule.getAvailableCouponUseCase
+        return OrderViewModel(savedStateHandle, orderRepository, getAvailableCouponUseCase) as T
     }
 }

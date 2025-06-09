@@ -10,15 +10,15 @@ import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.usecase.FetchProductsWithCartItemUseCase
 import woowacourse.shopping.presentation.SingleLiveData
 import woowacourse.shopping.presentation.UiState
 
 class ProductViewModel(
     private val cartRepository: CartRepository,
-    private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
+    private val fetchProductsWithCartItemUseCase: FetchProductsWithCartItemUseCase,
 ) : ViewModel() {
     private val _uiState: MutableLiveData<UiState<Unit>> = MutableLiveData()
     val uiState: LiveData<UiState<Unit>> = _uiState
@@ -57,8 +57,7 @@ class ProductViewModel(
         viewModelScope.launch {
             _uiState.value = UiState.Loading
 
-            val productsResult =
-                async { productRepository.fetchPagingProducts(currentPage, PAGE_SIZE) }
+            val productsResult = async { fetchProductsWithCartItemUseCase(currentPage, PAGE_SIZE) }
             val recentProductsResult = async { recentProductRepository.getRecentProducts() }
 
             productsResult
@@ -96,8 +95,7 @@ class ProductViewModel(
         val nextPage = currentPage + 1
 
         viewModelScope.launch {
-            productRepository
-                .fetchPagingProducts(nextPage, PAGE_SIZE)
+            fetchProductsWithCartItemUseCase(nextPage, PAGE_SIZE)
                 .onSuccess { newItems ->
                     val currentList = _products.value.orEmpty()
                     val updatedList = currentList + newItems
