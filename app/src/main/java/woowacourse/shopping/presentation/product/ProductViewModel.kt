@@ -11,6 +11,7 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.usecase.CheckLastPageUseCase
 import woowacourse.shopping.domain.usecase.FetchProductsWithCartItemUseCase
 import woowacourse.shopping.presentation.SingleLiveData
 import woowacourse.shopping.presentation.UiState
@@ -19,6 +20,7 @@ class ProductViewModel(
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
     private val fetchProductsWithCartItemUseCase: FetchProductsWithCartItemUseCase,
+    private val checkLastPageUseCase: CheckLastPageUseCase,
 ) : ViewModel() {
     private val _uiState: MutableLiveData<UiState<Unit>> = MutableLiveData()
     val uiState: LiveData<UiState<Unit>> = _uiState
@@ -100,11 +102,15 @@ class ProductViewModel(
                     val currentList = _products.value.orEmpty()
                     val updatedList = currentList + newItems
                     _products.value = updatedList
-                    _showLoadMore.value = updatedList.size < 100
                     currentPage = nextPage
                 }.onFailure {
                     _toastMessage.value = R.string.product_toast_load_failure
                 }
+
+            checkLastPageUseCase(currentPage)
+                .onSuccess { isLastPage ->
+                    _showLoadMore.value = !isLastPage
+                }.onFailure { _toastMessage.value = R.string.product_toast_get_last_page_fail }
         }
     }
 

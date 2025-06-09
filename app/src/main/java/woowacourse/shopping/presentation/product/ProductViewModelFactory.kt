@@ -10,10 +10,12 @@ class ProductViewModelFactory : ViewModelProvider.Factory {
         val cartRepository = RepositoryModule.cartRepository
         val recentProductRepository = RepositoryModule.recentProductRepository
         val fetchProductsWithCartItemUseCase = UseCaseModule.fetchProductsWithCartItemUseCase
+        val checkLastPageUseCase = UseCaseModule.checkLastPageUseCase
         return ProductViewModel(
             cartRepository,
             recentProductRepository,
             fetchProductsWithCartItemUseCase,
+            checkLastPageUseCase,
         ) as T
     }
 }

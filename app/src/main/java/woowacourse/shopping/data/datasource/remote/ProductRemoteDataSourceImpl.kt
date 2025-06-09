@@ -21,6 +21,15 @@ class ProductRemoteDataSourceImpl(
             },
         )
 
+    override suspend fun isLastPage(page: Int): Result<Boolean> =
+        handleApiCall(
+            errorMessage = "마지막 페이지 여부 조회 실패",
+            apiCall = { productService.requestProducts(page = page) },
+            transform = { response ->
+                response.body()?.last ?: throw IllegalStateException("응답 바디가 null입니다.")
+            },
+        )
+
     override suspend fun fetchProductById(id: Long): Result<Product> =
         handleApiCall(
             errorMessage = "Id로 상품 조회 실패",

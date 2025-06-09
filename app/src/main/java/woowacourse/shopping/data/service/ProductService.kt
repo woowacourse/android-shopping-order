@@ -16,7 +16,7 @@ interface ProductService {
     @GET("/products")
     suspend fun requestProducts(
         @Query("page") page: Int? = null,
-        @Query("size") size: Int? = null,
+        @Query("size") size: Int? = 12,
         @Query("category") category: String? = null,
     ): Response<ProductsResponse>
 }

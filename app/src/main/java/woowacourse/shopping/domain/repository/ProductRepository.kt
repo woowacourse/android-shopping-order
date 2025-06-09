@@ -9,5 +9,7 @@ interface ProductRepository {
         category: String? = null,
     ): Result<List<Product>>
 
+    suspend fun isLastPage(page: Int): Result<Boolean>
+
     suspend fun fetchProductById(productId: Long): Result<Product>
 }
