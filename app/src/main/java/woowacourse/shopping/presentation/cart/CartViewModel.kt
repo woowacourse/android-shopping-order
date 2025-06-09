@@ -36,7 +36,6 @@ class CartViewModel(
 
     init {
         loadItems()
-        fetchSelectedInfo()
     }
 
     fun loadItems(currentPage: Int = 0) {
@@ -58,6 +57,7 @@ class CartViewModel(
 
                     _cartItems.value = newItems
                     _uiState.value = UiState.Success(Unit)
+                    fetchSelectedInfo()
                 }.onFailure {
                     _uiState.value = UiState.Failure(it)
                 }
