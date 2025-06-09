@@ -53,6 +53,6 @@
 - [x] BindingAdapter - Glide 이미지 로드 실패 or 로딩 중 이미지 설정 추가
 - [ ] CartFragment - Int 범위를 넘은 가격 대응
 - [ ] *DataSource - API 요청 실패 시 대응 로직 추가
-- [ ] ProductResponse - price 타입 불일치
+- [x] ProductResponse - price 타입 불일치
 - [ ] CartViewModel - 114 : event 발생 map 밖으로 분리
 
