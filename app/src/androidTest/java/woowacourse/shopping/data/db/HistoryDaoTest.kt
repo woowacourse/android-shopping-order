@@ -41,10 +41,11 @@ class HistoryDaoTest {
 
             // given
             historyDao.insert(entity)
+            val expected = listOf(HistoryEntity(1, createdAt = 1L))
 
             // then
             val actual = historyDao.getLatestHistories()
-            assertEquals(actual, listOf(entity))
+            assertEquals(actual, expected)
         }
 
     @Test
