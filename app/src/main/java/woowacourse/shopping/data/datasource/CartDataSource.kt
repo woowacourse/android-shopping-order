@@ -16,8 +16,9 @@ class CartDataSource(
                 throw HttpException(response)
             }
 
-            val locationHeader = response.headers()["Location"]
-                ?: throw IllegalStateException("Missing Location header")
+            val locationHeader =
+                response.headers()["Location"]
+                    ?: throw IllegalStateException("Missing Location header")
 
             locationHeader.split("/").last().toLong()
         }
@@ -44,9 +45,7 @@ class CartDataSource(
         }
     }
 
-    suspend fun deleteCart(
-        cartId: Long,
-    ): Result<Unit> {
+    suspend fun deleteCart(cartId: Long): Result<Unit> {
         return runCatching {
             val response = service.deleteCart(cartId)
             if (!response.isSuccessful) {

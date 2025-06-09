@@ -20,7 +20,7 @@ class DefaultProductRepository(
     }
 
     override suspend fun loadProduct(productId: Long): Result<Product> {
-       return runCatching {
+        return runCatching {
             val response = productDataSource.getProduct(productId)
             response.toDomain()
         }

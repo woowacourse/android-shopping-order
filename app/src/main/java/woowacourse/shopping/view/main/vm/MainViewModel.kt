@@ -52,10 +52,11 @@ class MainViewModel(
     private fun loadProductsAndCarts(pageIndex: Int) {
         setLoading(true)
         viewModelScope.launch(Dispatchers.IO) {
-            val products = productRepository.loadSinglePage(
-                page = pageIndex,
-                pageSize = PAGE_SIZE
-            )
+            val products =
+                productRepository.loadSinglePage(
+                    page = pageIndex,
+                    pageSize = PAGE_SIZE,
+                )
             loadCartsAndMerge(products.getOrThrow(), pageIndex)
         }
     }
@@ -76,14 +77,15 @@ class MainViewModel(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = historyLoader()
-            val newStates = productPage.products.map { product ->
-                val cartItem = cartItems.find { it.productId == product.id }
-                ProductState(
-                    cartId = cartItem?.id,
-                    item = product,
-                    cartQuantity = cartItem?.quantity ?: Quantity(0),
-                )
-            }
+            val newStates =
+                productPage.products.map { product ->
+                    val cartItem = cartItems.find { it.productId == product.id }
+                    ProductState(
+                        cartId = cartItem?.id,
+                        item = product,
+                        cartQuantity = cartItem?.quantity ?: Quantity(0),
+                    )
+                }
 
             val updatedList = _uiState.value?.productItems.orEmpty() + newStates
 
@@ -107,11 +109,11 @@ class MainViewModel(
                 null -> {
                     viewModelScope.launch(Dispatchers.IO) {
                         cartRepository.addCart(Cart(updated.cartQuantity, productId))
-                        .onSuccess { newCartId ->
-                            _uiState.postValue(state.modifyUiState(updated.copy(cartId = newCartId)))
-                        }.onFailure {
-                            handleError(TAG_INCREASE, it)
-                        }
+                            .onSuccess { newCartId ->
+                                _uiState.postValue(state.modifyUiState(updated.copy(cartId = newCartId)))
+                            }.onFailure {
+                                handleError(TAG_INCREASE, it)
+                            }
                     }
                 }
 
@@ -135,7 +137,7 @@ class MainViewModel(
                     val result = cartRepository.updateQuantity(cartId, updated.cartQuantity)
                     result.fold(
                         onSuccess = { _uiState.postValue(state.modifyUiState(updated)) },
-                        onFailure = { handleError(TAG_DECREASE, it) }
+                        onFailure = { handleError(TAG_DECREASE, it) },
                     )
                 } else {
                     val result = cartRepository.deleteCart(cartId)
@@ -154,7 +156,7 @@ class MainViewModel(
                         _uiState.postValue(state.copy(historyItems = historyItems))
                     },
                     onFailure = {
-                    }
+                    },
                 )
             }
         }

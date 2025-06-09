@@ -10,7 +10,7 @@ data class ShoppingCart(
     val id: Long,
     val product: Product,
     val quantity: Quantity,
-): Parcelable {
+) : Parcelable {
     val productId: Long
         get() = product.id
 

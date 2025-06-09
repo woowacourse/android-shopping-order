@@ -13,7 +13,7 @@ class PaymentViewModelFactory(
         if (modelClass.isAssignableFrom(PaymentViewModel::class.java)) {
             return PaymentViewModel(
                 couponRepository,
-                cartRepository
+                cartRepository,
             ) as T
         }
         throw IllegalArgumentException()

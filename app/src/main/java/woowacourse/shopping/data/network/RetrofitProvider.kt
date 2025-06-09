@@ -33,9 +33,10 @@ object RetrofitProvider {
             .addInterceptor(logging)
             .build()
 
-    val json = Json {
-        ignoreUnknownKeys = true
-    }
+    val json =
+        Json {
+            ignoreUnknownKeys = true
+        }
 
     @OptIn(ExperimentalSerializationApi::class)
     private val BASIC_AUTH_INSTANCE: Retrofit by lazy {

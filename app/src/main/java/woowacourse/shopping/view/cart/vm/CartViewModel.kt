@@ -1,6 +1,5 @@
 package woowacourse.shopping.view.cart.vm
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -59,10 +58,11 @@ class CartViewModel(
     fun loadRecommendProduct() {
         viewModelScope.launch(Dispatchers.IO) {
             productRepository.loadSinglePage(lastSeenCategory, null, null)
-            .onSuccess { result ->
-                val recommendProduct = generateRecommendedProducts(result.products, _cartUiState.value?.cartIds ?: emptyList(), RECOMMEND_SIZE)
-                _recommendUiState.postValue(RecommendUiState(recommendProduct))
-            }
+                .onSuccess { result ->
+                    val recommendProduct =
+                        generateRecommendedProducts(result.products, _cartUiState.value?.cartIds ?: emptyList(), RECOMMEND_SIZE)
+                    _recommendUiState.postValue(RecommendUiState(recommendProduct))
+                }
         }
     }
 
@@ -88,21 +88,21 @@ class CartViewModel(
                 null -> {
                     viewModelScope.launch(Dispatchers.IO) {
                         cartRepository.addCart(Cart(updated.cartQuantity, productId))
-                        .onSuccess {
-                            val cartId = cartId ?: 0L
-                            _recommendUiState.postValue(state.modifyUiState(updated.copy(cartId = cartId)))
-                            _cartUiState.postValue(_cartUiState.value?.addCart(cartId, updated))
-                        }
+                            .onSuccess {
+                                val cartId = cartId ?: 0L
+                                _recommendUiState.postValue(state.modifyUiState(updated.copy(cartId = cartId)))
+                                _cartUiState.postValue(_cartUiState.value?.addCart(cartId, updated))
+                            }
                     }
                 }
 
                 else -> {
                     viewModelScope.launch(Dispatchers.IO) {
                         cartRepository.updateQuantity(cartId, updated.cartQuantity)
-                        .onSuccess {
-                            _recommendUiState.postValue(state.modifyUiState(updated))
-                            increaseCartQuantity(cartId)
-                        }
+                            .onSuccess {
+                                _recommendUiState.postValue(state.modifyUiState(updated))
+                                increaseCartQuantity(cartId)
+                            }
                     }
                 }
             }
@@ -116,19 +116,19 @@ class CartViewModel(
             if (updated.hasCartQuantity) {
                 viewModelScope.launch(Dispatchers.IO) {
                     cartRepository.updateQuantity(cartId, updated.cartQuantity)
-                    .onSuccess {
-                        _recommendUiState.postValue(state.modifyUiState(updated))
-                        decreaseCartQuantity(cartId)
-                    }
+                        .onSuccess {
+                            _recommendUiState.postValue(state.modifyUiState(updated))
+                            decreaseCartQuantity(cartId)
+                        }
                 }
             } else {
                 viewModelScope.launch(Dispatchers.IO) {
                     cartRepository.deleteCart(cartId)
-                    .onSuccess {
-                        val result = updated.copy(cartId = null)
-                        _recommendUiState.postValue(state.modifyUiState(result))
-                        _cartUiState.postValue(_cartUiState.value?.deleteCart(cartId))
-                    }
+                        .onSuccess {
+                            val result = updated.copy(cartId = null)
+                            _recommendUiState.postValue(state.modifyUiState(result))
+                            _cartUiState.postValue(_cartUiState.value?.deleteCart(cartId))
+                        }
                 }
             }
         }
@@ -140,9 +140,9 @@ class CartViewModel(
 
             viewModelScope.launch(Dispatchers.IO) {
                 cartRepository.updateQuantity(cartId, updatedItem.cart.quantity)
-                .onSuccess {
-                    _cartUiState.postValue(updatedState)
-                }
+                    .onSuccess {
+                        _cartUiState.postValue(updatedState)
+                    }
             }
         }
     }
@@ -154,7 +154,7 @@ class CartViewModel(
 
             viewModelScope.launch(Dispatchers.IO) {
                 cartRepository.updateQuantity(cartId, updatedItem.cart.quantity)
-                .onSuccess { _cartUiState.postValue(updatedState) }
+                    .onSuccess { _cartUiState.postValue(updatedState) }
             }
         }
     }
@@ -164,24 +164,24 @@ class CartViewModel(
         val nextPage = paging.getPageNo() - 1
         viewModelScope.launch(Dispatchers.IO) {
             cartRepository.loadSinglePage(
-                    nextPage,
-                    PAGE_SIZE,
-                )
-            .onSuccess { value ->
-                        val pageState = paging.createPageState(!value.hasNextPage)
-                        val newItems =
-                            value
-                                .carts
-                                .map { CartState(it, _cartUiState.value?.allChecked ?: false) }
+                nextPage,
+                PAGE_SIZE,
+            )
+                .onSuccess { value ->
+                    val pageState = paging.createPageState(!value.hasNextPage)
+                    val newItems =
+                        value
+                            .carts
+                            .map { CartState(it, _cartUiState.value?.allChecked ?: false) }
 
-                        val currentItems = _cartUiState.value?.items ?: emptyList()
-                        val combinedItems = currentItems + newItems
+                    val currentItems = _cartUiState.value?.items ?: emptyList()
+                    val combinedItems = currentItems + newItems
 
-                        _cartUiState.postValue(CartUiState(items = combinedItems, pageState = pageState))
-                withContext(Dispatchers.Main) {
-                    setLoading(false)
+                    _cartUiState.postValue(CartUiState(items = combinedItems, pageState = pageState))
+                    withContext(Dispatchers.Main) {
+                        setLoading(false)
+                    }
                 }
-            }
         }
     }
 
@@ -221,21 +221,21 @@ class CartViewModel(
         withState(_cartUiState.value) { state ->
             viewModelScope.launch(Dispatchers.IO) {
                 cartRepository.loadSinglePage(paging.getPageNo() - 1, PAGE_SIZE)
-                .onSuccess { value ->
-                            if (paging.resetToLastPageIfEmpty(value.carts)) {
-                                refresh()
-                            } else {
-                                val pageState = paging.createPageState(!value.hasNextPage)
-                                val carts = value.carts.map { CartState(it, state.allChecked) }
+                    .onSuccess { value ->
+                        if (paging.resetToLastPageIfEmpty(value.carts)) {
+                            refresh()
+                        } else {
+                            val pageState = paging.createPageState(!value.hasNextPage)
+                            val carts = value.carts.map { CartState(it, state.allChecked) }
 
-                                _cartUiState.postValue(
-                                    CartUiState(
-                                        items = carts,
-                                        pageState = pageState
-                                    )
-                                )
-                            }
-                }
+                            _cartUiState.postValue(
+                                CartUiState(
+                                    items = carts,
+                                    pageState = pageState,
+                                ),
+                            )
+                        }
+                    }
             }
         }
     }

@@ -19,7 +19,7 @@ data class CouponResponse(
     val expirationDate: String,
     val getQuantity: Int? = null,
     val id: Int,
-    val minimumAmount: Int? = null
+    val minimumAmount: Int? = null,
 ) {
     fun toBogoCoupon(): BogoCoupon {
         return BogoCoupon(
@@ -35,7 +35,7 @@ data class CouponResponse(
             description = description,
             expirationDate = LocalDate.parse(expirationDate),
             discount = discount ?: 0,
-            minimumAmount = minimumAmount ?: 0
+            minimumAmount = minimumAmount ?: 0,
         )
     }
 
@@ -43,7 +43,7 @@ data class CouponResponse(
         return FreeShippingCoupon(
             description = description,
             expirationDate = LocalDate.parse(expirationDate),
-            minimumAmount = minimumAmount ?: 0
+            minimumAmount = minimumAmount ?: 0,
         )
     }
 
@@ -52,8 +52,11 @@ data class CouponResponse(
             description = description,
             expirationDate = LocalDate.parse(expirationDate),
             discount = discount ?: 0,
-            availableTime = woowacourse.shopping.domain.coupon.AvailableTime(LocalTime.parse(availableTime?.start), LocalTime.parse(availableTime?.end))
+            availableTime =
+                woowacourse.shopping.domain.coupon.AvailableTime(
+                    LocalTime.parse(availableTime?.start),
+                    LocalTime.parse(availableTime?.end),
+                ),
         )
     }
 }
-

@@ -6,11 +6,11 @@ import woowacourse.shopping.domain.repository.CouponRepository
 
 class DefaultCouponRepository(
     private val dataSource: CouponDataSource,
-): CouponRepository {
+) : CouponRepository {
     override suspend fun getAll(): List<Coupon> {
         val coupons = dataSource.getAll().getOrThrow()
         return coupons.map {
-            when(it.discountType) {
+            when (it.discountType) {
                 "buyXgetY" -> it.toBogoCoupon()
                 "fixed" -> it.toFixedCoupon()
                 "freeShipping" -> it.toFreeShippingCoupon()
@@ -19,5 +19,4 @@ class DefaultCouponRepository(
             }
         }
     }
-
 }

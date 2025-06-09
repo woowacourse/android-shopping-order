@@ -1,6 +1,5 @@
 package woowacourse.shopping.view.payment.vm
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,7 +20,7 @@ import java.time.LocalDateTime
 class PaymentViewModel(
     private val couponRepository: CouponRepository,
     private val cartRepository: CartRepository,
-    ) : ViewModel() {
+) : ViewModel() {
     private val _paymentUiState = MutableLiveData<PaymentUiState>()
     val paymentUiState: LiveData<PaymentUiState> get() = _paymentUiState
 
@@ -57,10 +56,9 @@ class PaymentViewModel(
         return coupons.map { it to it.toCouponUi() }
     }
 
-
     private fun buildPaymentUiState(
         couponPairs: List<Pair<Coupon, CouponUi>>,
-        orderItems: List<ShoppingCart>
+        orderItems: List<ShoppingCart>,
     ): PaymentUiState {
         val totalPrice = orderItems.sumOf { it.product.priceValue * it.quantity.value }
         val selectedCoupon = couponPairs.find { it.second.checked }?.first
@@ -68,20 +66,25 @@ class PaymentViewModel(
 
         return PaymentUiState(
             coupons = couponPairs.map { it.second },
-            paymentUi = PaymentUi(
-                orderPrice = totalPrice,
-                discountPrice = -discountPrice,
-                shippingPrice = shippingPrice,
-                totalPrice = totalPrice + shippingPrice - discountPrice
-            )
+            paymentUi =
+                PaymentUi(
+                    orderPrice = totalPrice,
+                    discountPrice = -discountPrice,
+                    shippingPrice = shippingPrice,
+                    totalPrice = totalPrice + shippingPrice - discountPrice,
+                ),
         )
     }
 
-    fun toggleCouponChecked(couponUi: CouponUi, isChecked: Boolean) {
+    fun toggleCouponChecked(
+        couponUi: CouponUi,
+        isChecked: Boolean,
+    ) {
         val currentState = _paymentUiState.value ?: return
-        val updatedCouponUis = currentState.coupons.map {
-            if (it.title == couponUi.title) it.copy(checked = isChecked) else it
-        }
+        val updatedCouponUis =
+            currentState.coupons.map {
+                if (it.title == couponUi.title) it.copy(checked = isChecked) else it
+            }
 
         val orderItems = currentOrderItems
         if (orderItems.isEmpty()) return
@@ -90,17 +93,18 @@ class PaymentViewModel(
         val discountPrice = selectedCoupon?.calculateDiscount(orderItems) ?: 0
 
         val totalPrice = orderItems.sumOf { it.product.priceValue * it.quantity.value }
-        Log.d("TAG", "toggleCouponChecked: $discountPrice")
 
-        val newState = PaymentUiState(
-            coupons = updatedCouponUis,
-            paymentUi = PaymentUi(
-                orderPrice = totalPrice,
-                discountPrice = -discountPrice,
-                shippingPrice = shippingPrice,
-                totalPrice = totalPrice + shippingPrice - discountPrice
+        val newState =
+            PaymentUiState(
+                coupons = updatedCouponUis,
+                paymentUi =
+                    PaymentUi(
+                        orderPrice = totalPrice,
+                        discountPrice = -discountPrice,
+                        shippingPrice = shippingPrice,
+                        totalPrice = totalPrice + shippingPrice - discountPrice,
+                    ),
             )
-        )
 
         _paymentUiState.value = newState
     }

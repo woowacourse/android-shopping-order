@@ -40,13 +40,15 @@ class DetailViewModel(
                 val lastSeenProduct =
                     if (lastSeenProductId != NO_LAST_SEEN_PRODUCT && lastSeenProductId != productId) {
                         defaultProductRepository.loadProduct(lastSeenProductId).getOrNull()
-                    } else null
+                    } else {
+                        null
+                    }
 
                 _uiState.postValue(
                     DetailUiState(
                         product = ProductState(item = productValue, cartQuantity = Quantity(1)),
                         lastSeenProduct = lastSeenProduct,
-                    )
+                    ),
                 )
             }
         }
@@ -86,12 +88,12 @@ class DetailViewModel(
                 if (savedCart != null) {
                     defaultCartRepository.updateQuantity(
                         savedCart.id,
-                        state.addQuantity(savedCart.quantity)
+                        state.addQuantity(savedCart.quantity),
                     )
                     sendEvent(DetailUiEvent.NavigateToCart(state.category))
                 } else {
                     defaultCartRepository.addCart(
-                        Cart(state.cartQuantity, productId)
+                        Cart(state.cartQuantity, productId),
                     )
                     sendEvent(DetailUiEvent.NavigateToCart(state.category))
                 }
@@ -104,8 +106,8 @@ class DetailViewModel(
             historyRepository.saveHistory(lastSeenProductId)
             _event.postValue(
                 DetailUiEvent.NavigateToLastSeenProduct(
-                    lastSeenProductId
-                )
+                    lastSeenProductId,
+                ),
             )
         }
     }

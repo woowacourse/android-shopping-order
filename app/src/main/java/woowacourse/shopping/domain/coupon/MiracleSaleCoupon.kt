@@ -9,17 +9,19 @@ data class MiracleSaleCoupon(
     val expirationDate: LocalDate,
     val discount: Int,
     val availableTime: AvailableTime,
-    ): Coupon {
+) : Coupon {
     override fun calculateDiscount(cartItems: List<ShoppingCart>): Int {
         val totalPrice = cartItems.sumOf { (it.product.priceValue * it.quantity.value) }
         return (totalPrice * discount / 100)
     }
 
-    override fun isAvailable(cartItems: List<ShoppingCart>, now: LocalDateTime): Boolean {
+    override fun isAvailable(
+        cartItems: List<ShoppingCart>,
+        now: LocalDateTime,
+    ): Boolean {
         if (now.toLocalDate().isAfter(expirationDate)) {
             return false
         }
         return availableTime.isAvailable(now)
     }
 }
-

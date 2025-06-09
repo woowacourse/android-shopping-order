@@ -12,6 +12,6 @@ data class Product(
     val category: String,
     private val price: Price,
     val quantity: Quantity = Quantity(0),
-): Parcelable {
+) : Parcelable {
     val priceValue: Int = price.value
 }

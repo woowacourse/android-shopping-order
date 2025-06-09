@@ -10,5 +10,5 @@ interface ProductRepository {
         category: String? = null,
         page: Int?,
         pageSize: Int?,
-    ):Result<ProductSinglePage>
+    ): Result<ProductSinglePage>
 }

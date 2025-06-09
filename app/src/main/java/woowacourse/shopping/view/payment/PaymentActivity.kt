@@ -27,6 +27,7 @@ class PaymentActivity : AppCompatActivity() {
     private val couponAdapter: CouponAdapter by lazy {
         CouponAdapter(viewModel)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_payment)
@@ -77,7 +78,10 @@ class PaymentActivity : AppCompatActivity() {
     companion object {
         private const val EXTRA_ORDERS = "orders"
 
-        fun newIntent(context: Context, orders: List<ShoppingCart>): Intent {
+        fun newIntent(
+            context: Context,
+            orders: List<ShoppingCart>,
+        ): Intent {
             return Intent(context, PaymentActivity::class.java).apply {
                 putParcelableArrayListExtra(EXTRA_ORDERS, ArrayList(orders))
             }

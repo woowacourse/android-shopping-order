@@ -11,9 +11,7 @@ class DefaultHistoryRepository(
         return historyDataSource.latestHistory().map { it.productId }
     }
 
-    override suspend fun saveHistory(
-        productId: Long,
-    ) {
+    override suspend fun saveHistory(productId: Long) {
         historyDataSource.insertHistory(HistoryEntity(productId))
     }
 }

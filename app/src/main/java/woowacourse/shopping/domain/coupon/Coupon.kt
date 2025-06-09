@@ -6,5 +6,8 @@ import java.time.LocalDateTime
 sealed interface Coupon {
     fun calculateDiscount(cartItems: List<ShoppingCart>): Int
 
-    fun isAvailable(cartItems: List<ShoppingCart>, now: LocalDateTime): Boolean
+    fun isAvailable(
+        cartItems: List<ShoppingCart>,
+        now: LocalDateTime,
+    ): Boolean
 }

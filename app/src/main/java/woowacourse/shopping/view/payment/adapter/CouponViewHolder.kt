@@ -10,17 +10,18 @@ import woowacourse.shopping.view.payment.vm.PaymentViewModel
 
 class CouponViewHolder(
     private val binding: ItemCouponBinding,
-): RecyclerView.ViewHolder(binding.root) {
-    fun bind(item: CouponUi, viewModel: PaymentViewModel) {
+) : RecyclerView.ViewHolder(binding.root) {
+    fun bind(
+        item: CouponUi,
+        viewModel: PaymentViewModel,
+    ) {
         binding.coupon = item
         binding.vm = viewModel
         binding.executePendingBindings()
     }
 
     companion object {
-        fun of(
-            parent: ViewGroup,
-        ): CouponViewHolder {
+        fun of(parent: ViewGroup): CouponViewHolder {
             val inflater = LayoutInflater.from(parent.context).inflate(R.layout.item_coupon, parent, false)
             val binding = ItemCouponBinding.bind(inflater)
             return CouponViewHolder(binding)

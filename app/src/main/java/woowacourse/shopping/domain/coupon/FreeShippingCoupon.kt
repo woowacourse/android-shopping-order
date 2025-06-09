@@ -8,12 +8,15 @@ data class FreeShippingCoupon(
     val description: String,
     val expirationDate: LocalDate,
     val minimumAmount: Int,
-    ): Coupon {
+) : Coupon {
     override fun calculateDiscount(cartItems: List<ShoppingCart>): Int {
         return SHIPPING_PRICE
     }
 
-    override fun isAvailable(cartItems: List<ShoppingCart>, now: LocalDateTime): Boolean {
+    override fun isAvailable(
+        cartItems: List<ShoppingCart>,
+        now: LocalDateTime,
+    ): Boolean {
         if (now.toLocalDate().isAfter(expirationDate)) {
             return false
         }
@@ -24,4 +27,3 @@ data class FreeShippingCoupon(
         private const val SHIPPING_PRICE = 3_000
     }
 }
-

@@ -20,7 +20,7 @@ class DefaultCartRepository(
     ): Result<CartsSinglePage> {
         return runCatching {
             val response = dataSource.singlePage(page, pageSize).getOrThrow()
-                response.toDomain()
+            response.toDomain()
         }
     }
 
