@@ -9,13 +9,15 @@ import woowacourse.shopping.data.repository.CouponRepository
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.domain.OrderingProducts
 import woowacourse.shopping.product.catalog.ProductUiModel
+import java.time.LocalDateTime
 
 class OrderViewModel(
     products: Array<ProductUiModel>,
     private val couponRepository: CouponRepository,
     private val orderRepository: OrderRepository,
 ) : ViewModel() {
-    val orderingProducts: OrderingProducts = OrderingProducts(products.toList())
+    val orderingProducts: OrderingProducts =
+        OrderingProducts(LocalDateTime.now(), products.toList())
 
     private val _availableDisplayingCoupons = MutableLiveData<List<CouponUiModel>>(emptyList())
     val availableDisplayingCoupons: LiveData<List<CouponUiModel>> = _availableDisplayingCoupons

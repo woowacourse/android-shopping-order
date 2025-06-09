@@ -3,8 +3,10 @@ package woowacourse.shopping.domain
 import woowacourse.shopping.order.Coupon
 import woowacourse.shopping.order.CouponType
 import woowacourse.shopping.product.catalog.ProductUiModel
+import java.time.LocalDateTime
 
 data class OrderingProducts(
+    val currentLocalDateTime: LocalDateTime,
     val products: List<ProductUiModel>,
     val defaultShippingFee: Int = 3000,
 ) {
@@ -19,7 +21,12 @@ data class OrderingProducts(
             }
     }
 
-    fun availableCoupons(coupons: List<Coupon>): List<Coupon> = coupons.filter { it.isConditionMet(products) == true }
+    fun availableCoupons(coupons: List<Coupon>): List<Coupon> =
+        coupons.filter {
+            it.isConditionMet(products) == true &&
+                it.isAvailableTime(currentLocalDateTime.toLocalTime()) == true &&
+                it.isNotExpired(currentLocalDateTime.toLocalDate()) == true
+        }
 
     fun discountAmount(): Int {
         currentCoupon?.let { return it.couponType.discount(it, products) }
