@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -15,6 +14,7 @@ import woowacourse.shopping.view.common.QuantityTarget
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.getSerializableExtraData
 import woowacourse.shopping.view.common.showSnackBar
+import woowacourse.shopping.view.common.showToast
 
 class ProductDetailActivity :
     AppCompatActivity(),
@@ -65,20 +65,32 @@ class ProductDetailActivity :
     }
 
     private fun handleEvent(event: ProductDetailEvent) {
-        @StringRes
-        val messageResourceId: Int =
-            when (event) {
-                ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS -> R.string.product_detail_add_shopping_cart_success_message
-                ProductDetailEvent.ADD_SHOPPING_CART_FAILURE -> R.string.product_detail_add_shopping_cart_error_message
-                ProductDetailEvent.ADD_RECENT_WATCHING_FAILURE -> R.string.product_detail_add_recent_watching_error_message
-                ProductDetailEvent.GET_RECENT_WATCHING_FAILURE -> R.string.product_detail_update_recent_watching_error_message
-                ProductDetailEvent.GET_PRODUCT_FAILURE -> {
-                    R.string.product_not_provided_error_message
-                    return finish()
-                }
-            }
+        when (event) {
+            ProductDetailEvent.ADD_SHOPPING_CART_SUCCESS ->
+                binding.root.showSnackBar(
+                    getString(R.string.product_detail_add_shopping_cart_success_message),
+                )
 
-        binding.root.showSnackBar(getString(messageResourceId))
+            ProductDetailEvent.ADD_SHOPPING_CART_FAILURE ->
+                binding.root.showSnackBar(
+                    getString(R.string.product_detail_add_shopping_cart_error_message),
+                )
+
+            ProductDetailEvent.ADD_RECENT_WATCHING_FAILURE ->
+                binding.root.showSnackBar(
+                    getString(R.string.product_detail_add_recent_watching_error_message),
+                )
+
+            ProductDetailEvent.GET_RECENT_WATCHING_FAILURE ->
+                binding.root.showSnackBar(
+                    getString(R.string.product_detail_update_recent_watching_error_message),
+                )
+
+            ProductDetailEvent.GET_PRODUCT_FAILURE -> {
+                showToast(getString(R.string.product_not_provided_error_message))
+                return finish()
+            }
+        }
     }
 
     override fun onCloseButton() {
