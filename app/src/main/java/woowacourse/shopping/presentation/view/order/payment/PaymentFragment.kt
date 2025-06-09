@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentPaymentBinding
@@ -28,6 +29,7 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
     ) {
         super.onViewCreated(view, savedInstanceState)
         initCoupons()
+        setupActionBar()
     }
 
     private fun initCoupons() {
@@ -45,6 +47,19 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
         binding.textViewPayment.setOnClickListener {
             orderViewModel.orderCartItems()
             navigateToShopping()
+        }
+    }
+
+    private fun setupActionBar() {
+        binding.toolbarPayment.setNavigationIcon(R.drawable.ic_arrow)
+        binding.toolbarPayment.setNavigationOnClickListener {
+            navigateToSuggestion()
+        }
+    }
+
+    private fun navigateToSuggestion() {
+        parentFragmentManager.commit {
+            parentFragmentManager.popBackStack()
         }
     }
 

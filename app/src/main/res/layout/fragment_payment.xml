@@ -19,6 +19,15 @@
         android:layout_height="match_parent"
         tools:context=".presentation.view.order.payment.PaymentFragment">
 
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_payment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/gray_55"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="@string/toolbar_payment_title"
+            app:titleTextColor="@color/white" />
+
         <TextView
             android:id="@+id/text_view_coupons_title"
             android:layout_width="match_parent"
@@ -30,7 +39,7 @@
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/toolbar_payment" />
 
         <TextView
             android:id="@+id/text_view_coupons_sub_title"
@@ -166,8 +175,8 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="18dp"
             android:layout_marginTop="21dp"
-            app:layout_constraintEnd_toEndOf="parent"
             android:text="@{@string/payment_item_price_format(paymentViewModel.order.paymentPrice)}"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/text_view_delivery_price_label"
             app:layout_constraintTop_toBottomOf="@id/divider_order_content_to_payment_total_price"
             tools:text="3,000원" />

@@ -49,6 +49,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="toolbar_payment_title">결제하기</string>
     <string name="payment_coupons_title">적용 가능한 쿠폰</string>
     <string name="payment_coupon_rule">* 쿠폰은 1개만 적용 가능합니다.</string>
     <string name="payment_order_price_label">주문 금액</string>
