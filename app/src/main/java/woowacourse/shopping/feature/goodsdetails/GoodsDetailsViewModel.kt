@@ -25,7 +25,7 @@ class GoodsDetailsViewModel(
     private val _product = MutableLiveData<Product>()
     val product: LiveData<Product> get() = _product
 
-    private val _quantity = MutableLiveData<Int>()
+    private val _quantity = MutableLiveData<Int>(1)
     val quantity: LiveData<Int> get() = _quantity
 
     private val _lastViewed = MutableLiveData<Product>()
