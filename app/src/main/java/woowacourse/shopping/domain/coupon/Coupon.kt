@@ -5,6 +5,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 sealed interface Coupon {
+    val couponId: Long
     val description: String
     val expirationDate: LocalDate
 

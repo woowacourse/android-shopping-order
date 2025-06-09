@@ -6,6 +6,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 
 class MiracleSaleCoupon(
+    override val couponId: Long,
     override val description: String,
     override val expirationDate: LocalDate,
     val startHour: LocalTime,
