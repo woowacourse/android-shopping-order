@@ -17,6 +17,7 @@ import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.domain.usecase.AddToCartUseCase
 import woowacourse.shopping.domain.usecase.GetCartProductByProductIdUseCase
 import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.RemoveFromCartUseCase
 import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 
 class ShoppingApplication : Application() {
@@ -42,5 +43,6 @@ class ShoppingApplication : Application() {
     val getPagedCartProductsUseCase by lazy { GetPagedCartProductsUseCase(cartProductRepository) }
     val getCartProductByProductIdUseCase by lazy { GetCartProductByProductIdUseCase(getPagedCartProductsUseCase) }
     val addToCartUseCase by lazy { AddToCartUseCase(cartProductRepository) }
-    val updateQuantityUseCase by lazy { UpdateQuantityUseCase(cartProductRepository) }
+    val removeFromCartUseCase by lazy { RemoveFromCartUseCase(cartProductRepository) }
+    val updateQuantityUseCase by lazy { UpdateQuantityUseCase(cartProductRepository, removeFromCartUseCase) }
 }

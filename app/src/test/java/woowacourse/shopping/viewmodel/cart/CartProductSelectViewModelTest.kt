@@ -9,6 +9,7 @@ import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.RemoveFromCartUseCase
 import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.view.cart.select.CartProductSelectViewModel
@@ -23,6 +24,7 @@ class CartProductSelectViewModelTest {
     private lateinit var viewModel: CartProductSelectViewModel
     private lateinit var cartProductRepository: CartProductRepository
     private lateinit var getPagedCartProductsUseCase: GetPagedCartProductsUseCase
+    private lateinit var removeFromCartUseCase: RemoveFromCartUseCase
     private lateinit var updateQuantityUseCase: UpdateQuantityUseCase
 
     @BeforeEach
@@ -30,13 +32,14 @@ class CartProductSelectViewModelTest {
         runTest {
             cartProductRepository = FakeCartProductRepository()
             getPagedCartProductsUseCase = GetPagedCartProductsUseCase(cartProductRepository)
-            updateQuantityUseCase = UpdateQuantityUseCase(cartProductRepository)
+            removeFromCartUseCase = RemoveFromCartUseCase(cartProductRepository)
+            updateQuantityUseCase = UpdateQuantityUseCase(cartProductRepository, removeFromCartUseCase)
 
             repeat(12) { id -> cartProductRepository.insert(id, 1) }
             viewModel =
                 CartProductSelectViewModel(
-                    cartProductRepository,
                     getPagedCartProductsUseCase,
+                    removeFromCartUseCase,
                     updateQuantityUseCase,
                 )
             viewModel.loadPage(1)

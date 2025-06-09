@@ -9,14 +9,14 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.CartProducts
-import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.RemoveFromCartUseCase
 import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 import woowacourse.shopping.view.cart.select.adapter.CartProductItem
 
 class CartProductSelectViewModel(
-    private val repository: CartProductRepository,
     private val getPagedCartProductsUseCase: GetPagedCartProductsUseCase,
+    private val removeFromCartUseCase: RemoveFromCartUseCase,
     private val updateQuantityUseCase: UpdateQuantityUseCase,
 ) : ViewModel(),
     CartProductSelectEventHandler {
@@ -81,8 +81,7 @@ class CartProductSelectViewModel(
 
     override fun onProductRemoveClick(item: CartProduct) {
         viewModelScope.launch {
-            repository
-                .delete(item.id)
+            removeFromCartUseCase(item)
                 .onSuccess {
                     val currentPage = page.value ?: FIRST_PAGE_NUMBER
                     if (cartProductItems.value?.size == 1 && currentPage > FIRST_PAGE_NUMBER) {
@@ -95,9 +94,7 @@ class CartProductSelectViewModel(
                     if (currentSelected?.contains(item) == true) {
                         _selectedCartProducts.postValue(currentSelected - item)
                     }
-                }.onFailure {
-                    Log.e("error", it.message.toString())
-                }
+                }.onFailure { Log.e("error", it.message.toString()) }
         }
     }
 

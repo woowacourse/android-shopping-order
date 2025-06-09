@@ -22,8 +22,8 @@ class CartProductSelectFragment : Fragment() {
         ViewModelProvider(
             this,
             CartProductSelectViewModelFactory(
-                app.cartProductRepository,
                 app.getPagedCartProductsUseCase,
+                app.removeFromCartUseCase,
                 app.updateQuantityUseCase,
             ),
         )[CartProductSelectViewModel::class.java]

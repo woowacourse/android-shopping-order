@@ -33,10 +33,7 @@ class CartProductRepositoryImpl(
         quantityToAdd: Int,
     ): Result<Unit> {
         val newQuantity = cartProduct.quantity + quantityToAdd
-        return when {
-            newQuantity == 0 -> delete(cartProduct.id)
-            else -> remoteDataSource.updateQuantity(cartProduct.id, newQuantity)
-        }
+        return remoteDataSource.updateQuantity(cartProduct.id, newQuantity)
     }
 
     override suspend fun delete(id: Int): Result<Unit> = remoteDataSource.delete(id)

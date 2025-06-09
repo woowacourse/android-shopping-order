@@ -11,6 +11,7 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.AddToCartUseCase
 import woowacourse.shopping.domain.usecase.GetCartProductByProductIdUseCase
 import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.RemoveFromCartUseCase
 import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
@@ -29,6 +30,7 @@ class ProductDetailViewModelTest {
     private lateinit var getPagedCartProductsUseCase: GetPagedCartProductsUseCase
     private lateinit var getCartProductByProductIdUseCase: GetCartProductByProductIdUseCase
     private lateinit var addToCartUseCase: AddToCartUseCase
+    private lateinit var removeFromCartUseCase: RemoveFromCartUseCase
     private lateinit var updateQuantityUseCase: UpdateQuantityUseCase
     private lateinit var product: Product
 
@@ -39,7 +41,8 @@ class ProductDetailViewModelTest {
         getPagedCartProductsUseCase = GetPagedCartProductsUseCase(cartProductRepository)
         getCartProductByProductIdUseCase = GetCartProductByProductIdUseCase(getPagedCartProductsUseCase)
         addToCartUseCase = AddToCartUseCase(cartProductRepository)
-        updateQuantityUseCase = UpdateQuantityUseCase(cartProductRepository)
+        removeFromCartUseCase = RemoveFromCartUseCase(cartProductRepository)
+        updateQuantityUseCase = UpdateQuantityUseCase(cartProductRepository, removeFromCartUseCase)
         product = Product(id = 0, imageUrl = "", name = "Product 0", price = 1000, category = "")
 
         viewModel =

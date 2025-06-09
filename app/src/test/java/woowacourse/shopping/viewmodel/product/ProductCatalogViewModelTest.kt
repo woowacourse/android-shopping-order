@@ -11,6 +11,7 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.AddToCartUseCase
 import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.RemoveFromCartUseCase
 import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.fixture.FakeProductRepository
@@ -31,6 +32,7 @@ class ProductCatalogViewModelTest {
     private lateinit var recentProductRepository: RecentProductRepository
     private lateinit var getPagedCartProductsUseCase: GetPagedCartProductsUseCase
     private lateinit var addToCartUseCase: AddToCartUseCase
+    private lateinit var removeFromCartUseCase: RemoveFromCartUseCase
     private lateinit var updateQuantityUseCase: UpdateQuantityUseCase
 
     @BeforeEach
@@ -41,7 +43,8 @@ class ProductCatalogViewModelTest {
             recentProductRepository = FakeRecentProductRepository()
             getPagedCartProductsUseCase = GetPagedCartProductsUseCase(cartProductRepository)
             addToCartUseCase = AddToCartUseCase(cartProductRepository)
-            updateQuantityUseCase = UpdateQuantityUseCase(cartProductRepository)
+            removeFromCartUseCase = RemoveFromCartUseCase(cartProductRepository)
+            updateQuantityUseCase = UpdateQuantityUseCase(cartProductRepository, removeFromCartUseCase)
 
             repeat(12) { id -> cartProductRepository.insert(id, 1) }
             viewModel =

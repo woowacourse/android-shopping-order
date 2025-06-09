@@ -5,18 +5,19 @@ import woowacourse.shopping.domain.repository.CartProductRepository
 
 class UpdateQuantityUseCase(
     private val cartProductRepository: CartProductRepository,
+    private val removeFromCartUseCase: RemoveFromCartUseCase,
 ) {
     suspend operator fun invoke(
         cartProduct: CartProduct,
         quantityDelta: Int,
     ): Result<CartProduct?> {
         val newQuantity = cartProduct.quantity + quantityDelta
-        return cartProductRepository.updateQuantity(cartProduct, quantityDelta).map {
-            if (newQuantity > 0) {
-                cartProduct.copy(quantity = newQuantity)
-            } else {
-                null
-            }
+        return when {
+            newQuantity == 0 -> removeFromCartUseCase(cartProduct).map { null }
+            else ->
+                cartProductRepository.updateQuantity(cartProduct, quantityDelta).map {
+                    cartProduct.copy(quantity = newQuantity)
+                }
         }
     }
 }
