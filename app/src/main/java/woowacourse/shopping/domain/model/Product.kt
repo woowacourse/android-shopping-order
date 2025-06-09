@@ -1,13 +1,14 @@
 package woowacourse.shopping.domain.model
 
 import woowacourse.shopping.domain.model.ProductDetail.Companion.EMPTY_PRODUCT_DETAIL
+import java.io.Serializable
 
 data class Product(
     val productDetail: ProductDetail,
     val cartId: Long? = null,
     val quantity: Int = 0,
     val isSelected: Boolean = false,
-) {
+) : Serializable {
     val totalPrice: Int get() = productDetail.price * quantity
 
     fun increaseQuantity(delta: Int = DEFAULT_QUANTITY_DELTA): Product = copy(quantity = quantity + delta)

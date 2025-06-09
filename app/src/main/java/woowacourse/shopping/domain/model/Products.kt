@@ -2,11 +2,12 @@ package woowacourse.shopping.domain.model
 
 import woowacourse.shopping.domain.model.Page.Companion.EMPTY_PAGE
 import woowacourse.shopping.domain.model.Product.Companion.MINIMUM_QUANTITY
+import java.io.Serializable
 
 data class Products(
     val products: List<Product>,
     val page: Page = EMPTY_PAGE,
-) {
+) : Serializable {
     val isAllSelected: Boolean get() = products.all { it.isSelected }
 
     operator fun plus(other: Products): Products {
@@ -69,7 +70,9 @@ data class Products(
     fun getSelectedCartProductsPrice(): Int = products.filter { it.isSelected }.sumOf { it.productDetail.price * it.quantity }
 
     fun getSelectedCartRecommendProductsPrice(): Int =
-        products.filter { it.quantity > MINIMUM_QUANTITY }.sumOf { it.productDetail.price * it.quantity }
+        products
+            .filter { it.quantity > MINIMUM_QUANTITY }
+            .sumOf { it.productDetail.price * it.quantity }
 
     fun updateAllSelection(): Products = copy(products = products.map { it.copy(isSelected = !isAllSelected) })
 
@@ -80,6 +83,8 @@ data class Products(
     fun getSelectedCartRecommendProductIds(): List<Long> = products.filter { it.quantity > MINIMUM_QUANTITY }.map { it.productDetail.id }
 
     fun getSelectedCartRecommendProductQuantity(): Int = products.filter { it.quantity > MINIMUM_QUANTITY }.sumOf { it.quantity }
+
+    fun getOrderedProducts(): Products = copy(products = products.filter { it.quantity > MINIMUM_QUANTITY })
 
     companion object {
         val EMPTY_PRODUCTS = Products(emptyList(), EMPTY_PAGE)
