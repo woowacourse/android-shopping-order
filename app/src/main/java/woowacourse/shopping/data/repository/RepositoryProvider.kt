@@ -4,6 +4,7 @@ import android.content.Context
 import woowacourse.shopping.data.api.ApiClient
 import woowacourse.shopping.data.datasource.CartItemDataSourceImpl
 import woowacourse.shopping.data.datasource.CouponDataSourceImpl
+import woowacourse.shopping.data.datasource.OrderDataSourceImpl
 import woowacourse.shopping.data.datasource.ProductDataSourceImpl
 import woowacourse.shopping.data.db.ShoppingDatabase
 
@@ -37,6 +38,15 @@ object RepositoryProvider {
                 )
             }
 
+    private var _orderRepository: OrderRepository? = null
+    val orderRepository
+        get() =
+            requireNotNull(_orderRepository) {
+                NOT_INITIALIZED_MESSAGE.format(
+                    OrderRepository::class.simpleName,
+                )
+            }
+
     private var isInitialized = false
 
     fun initialize(context: Context) {
@@ -48,6 +58,7 @@ object RepositoryProvider {
         val productDataSource = ProductDataSourceImpl(ApiClient.productService)
         val cartItemDataSource = CartItemDataSourceImpl(ApiClient.cartItemService)
         val couponDataSource = CouponDataSourceImpl(ApiClient.couponService)
+        val orderDataSource = OrderDataSourceImpl(ApiClient.orderService)
 
         _productRepository =
             ProductRepositoryImpl(
@@ -57,6 +68,7 @@ object RepositoryProvider {
             )
         _cartRepository = CartRepositoryImpl(cartItemDataSource)
         _couponRepository = CouponRepositoryImpl(couponDataSource)
+        _orderRepository = OrderRepositoryImpl(orderDataSource)
 
         isInitialized = true
     }
@@ -71,5 +83,9 @@ object RepositoryProvider {
 
     fun initCouponRepository(repository: CouponRepository) {
         _couponRepository = repository
+    }
+
+    fun initOrderRepository(repository: OrderRepository) {
+        _orderRepository = repository
     }
 }

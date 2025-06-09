@@ -11,6 +11,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.CouponRepository
+import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.RepositoryProvider
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.Price
@@ -23,6 +24,7 @@ class CheckoutViewModel(
     private val selectedProductIds: List<Long>,
     private val cartRepository: CartRepository,
     private val couponRepository: CouponRepository,
+    private val orderRepository: OrderRepository,
 ) : ViewModel() {
     private val _coupons = MutableLiveData<List<CouponUiModel>>()
     val coupons: LiveData<List<CouponUiModel>> = _coupons
@@ -101,6 +103,9 @@ class CheckoutViewModel(
                 cartRepository.deleteCartItem(cartItem.cartId)
             }
         }
+        viewModelScope.launch {
+            orderRepository.placeOrder(_cartItems.value.orEmpty().map(CartItem::cartId))
+        }
     }
 
     companion object {
@@ -113,10 +118,12 @@ class CheckoutViewModel(
                 ): T {
                     val cartRepository = RepositoryProvider.cartRepository
                     val couponRepository = RepositoryProvider.couponRepository
+                    val orderRepository = RepositoryProvider.orderRepository
                     return CheckoutViewModel(
                         selectedProductIds,
                         cartRepository,
                         couponRepository,
+                        orderRepository,
                     ) as T
                 }
             }

@@ -4,6 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CartItemIdsRequest(
+data class OrderRequest(
     @SerialName("cartItemIds") val cartItemIds: List<Long>,
 )
