@@ -37,13 +37,13 @@ class OrderActivity : BaseActivity<ActivityOrderBinding>() {
             viewModel.selectCoupon(selectedCoupon)
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "결제하기"
+        supportActionBar?.title = getString(R.string.order_action_bar_name)
 
         binding.couponRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@OrderActivity)
             adapter = orderAdapter
         }
-        binding.tvCouponFee.text = getString(R.string.amount, 0)
+        binding.tvCouponDiscountAmount.text = getString(R.string.amount, 0)
         observeViewModel()
         viewModel.loadCoupons()
         val selectedItems =
@@ -70,15 +70,15 @@ class OrderActivity : BaseActivity<ActivityOrderBinding>() {
         }
 
         viewModel.originalAmount.observe(this) { amount ->
-            binding.summeryTexts.text = getString(R.string.amount, amount)
+            binding.tvOrderAmount.text = getString(R.string.amount, amount)
         }
 
         viewModel.totalAmount.observe(this) { amount ->
-            binding.tvTotalPayAmount.text = getString(R.string.amount, amount)
+            binding.tvTotalAmount.text = getString(R.string.amount, amount)
         }
 
         viewModel.shippingFee.observe(this) { amount ->
-            binding.tvShppingFee.text = getString(R.string.amount, amount)
+            binding.tvShippingFee.text = getString(R.string.amount, amount)
         }
 
         viewModel.selectedCoupon.observe(this) { selectedCoupon ->
@@ -86,7 +86,7 @@ class OrderActivity : BaseActivity<ActivityOrderBinding>() {
                 viewModel.cartItems,
                 viewModel.originalAmount.value ?: 0
             ) ?: 0
-            binding.tvCouponFee.text = getString(R.string.amount, discount*-1)
+            binding.tvCouponDiscountAmount.text = getString(R.string.amount, discount*-1)
         }
         viewModel.coupons.observe(this) { coupons ->
             orderAdapter.submitList(coupons, viewModel.selectedCoupon.value)
@@ -105,7 +105,7 @@ class OrderActivity : BaseActivity<ActivityOrderBinding>() {
     }
 
     private fun orderFinish(){
-        showToast("주문에 성공했습니다!")
+        showToast(getString(R.string.order_success))
 
         val intent = Intent(this, GoodsActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -119,8 +119,8 @@ class OrderActivity : BaseActivity<ActivityOrderBinding>() {
 
     private fun ToastMessageKey.toMessage():String{
         return when(this){
-            ToastMessageKey.FAIL_ORDER -> "주문에 실패했습니다."
-            ToastMessageKey.FAIL_LOAD_COUPON -> "쿠폰 불러오기에 실패했습니다."
+            ToastMessageKey.FAIL_ORDER -> getString(R.string.order_fail)
+            ToastMessageKey.FAIL_LOAD_COUPON -> getString(R.string.coupon_load_fail)
         }
     }
 

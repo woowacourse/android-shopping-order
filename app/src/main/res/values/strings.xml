@@ -49,5 +49,16 @@
 
     <!-- OrderActivity -->
     <string name="minimum_date">최소 주문 금액: %,d원</string>
+    <string name="order_action_bar_name">결제하기</string>
+    <string name="order_success">주문에 성공했습니다!</string>
+    <string name="order_fail">주문에 실패했습니다.</string>
+    <string name="coupon_load_fail">쿠폰 불러오기에 실패했습니다.</string>
+    <string name="able_coupon_title">적용 가능한 쿠폰</string>
+    <string name="one_able_coupon_message">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="order_amount_title">주문 금액</string>
+    <string name="coupon_discount_amount_title">쿠폰 할인 금액</string>
+    <string name="shipping_fee_title">배송비</string>
+    <string name="total_fee_message">총 결제 금액</string>
+    <string name="order_btn_text">결제하기</string>
 
 </resources>

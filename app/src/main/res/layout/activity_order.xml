@@ -16,12 +16,12 @@
         android:fitsSystemWindows="true">
 
         <TextView
-            android:id="@+id/summaryText23"
+            android:id="@+id/tv_able_coupon_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:layout_marginStart="20dp"
-            android:text="적용 가능한 쿠폰"
+            android:text="@string/able_coupon_title"
             app:layout_constraintBottom_toTopOf="@+id/couponRecyclerView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -30,15 +30,15 @@
             android:textSize="30sp"/>
 
         <TextView
-            android:id="@+id/summaryText2"
+            android:id="@+id/tv_coupon_able_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:text="* 쿠폰은 1개만 적용 가능합니다."
+            android:text="@string/one_able_coupon_message"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@+id/couponRecyclerView"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/summaryText23"
+            app:layout_constraintTop_toBottomOf="@id/tv_able_coupon_title"
             app:layout_constraintVertical_bias="0.0"
             android:layout_marginStart="20dp"/>
 
@@ -46,38 +46,39 @@
             android:id="@+id/couponRecyclerView"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/view23"
+            app:layout_constraintBottom_toTopOf="@+id/view_divide1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/summaryText2"
+            app:layout_constraintTop_toBottomOf="@+id/tv_coupon_able_message"
             android:layout_margin="20dp"
+            tools:listitem="@layout/item_coupon"
             />
 
         <View
-            android:id="@+id/view23"
+            android:id="@+id/view_divide1"
             android:layout_width="match_parent"
             android:layout_height="5dp"
             android:background="@color/gray_400"
-            app:layout_constraintBottom_toTopOf="@+id/textView1111"
+            app:layout_constraintBottom_toTopOf="@+id/tv_order_amount_title"
             android:layout_marginBottom="20dp"/>
 
 
         <TextView
-            android:id="@+id/textView1111"
+            android:id="@+id/tv_order_amount_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginBottom="20dp"
-            android:text="주문 금액"
+            android:text="@string/order_amount_title"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/textView111"
+            app:layout_constraintBottom_toTopOf="@+id/tv_coupon_discount_amount_title"
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
-            android:id="@+id/summeryTexts"
+            android:id="@+id/tv_order_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
@@ -85,26 +86,26 @@
             android:gravity="end"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/tv_couponFee"
+            app:layout_constraintBottom_toTopOf="@+id/tv_coupon_discount_amount"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="101,000원" />
 
 
         <TextView
-            android:id="@+id/textView111"
+            android:id="@+id/tv_coupon_discount_amount_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginBottom="20dp"
-            android:text="쿠폰 할인 금액"
+            android:text="@string/coupon_discount_amount_title"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/textView11"
+            app:layout_constraintBottom_toTopOf="@+id/tv_shipping_fee_title"
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
-            android:id="@+id/tv_couponFee"
+            android:id="@+id/tv_coupon_discount_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
@@ -112,26 +113,26 @@
             android:gravity="end"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/tv_shppingFee"
+            app:layout_constraintBottom_toTopOf="@+id/tv_shipping_fee"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="101,000원" />
 
 
         <TextView
-            android:id="@+id/textView11"
+            android:id="@+id/tv_shipping_fee_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginBottom="20dp"
-            android:text="배송비"
+            android:text="@string/shipping_fee_title"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/view2"
+            app:layout_constraintBottom_toTopOf="@id/view_divide2"
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
-            android:id="@+id/tv_shppingFee"
+            android:id="@+id/tv_shipping_fee"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
@@ -139,53 +140,53 @@
             android:gravity="end"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/view2"
+            app:layout_constraintBottom_toTopOf="@id/view_divide2"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="101,000원" />
         <View
-            android:id="@+id/view2"
+            android:id="@+id/view_divide2"
             android:layout_width="match_parent"
             android:layout_height="5dp"
             android:background="@color/gray_400"
-            app:layout_constraintBottom_toTopOf="@+id/textView"
+            app:layout_constraintBottom_toTopOf="@+id/tv_total_amount_title"
             android:layout_marginBottom="20dp"/>
 
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/tv_total_amount_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="100dp"
-            android:text="총 결제 금액"
+            android:text="@string/total_fee_message"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/btnPay"
+            app:layout_constraintBottom_toTopOf="@+id/btn_pay"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="20dp"/>
 
         <TextView
-            android:id="@+id/tv_total_pay_amount"
+            android:id="@+id/tv_total_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="100dp"
             tools:text="101,000원"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/btnPay"
+            app:layout_constraintBottom_toTopOf="@+id/btn_pay"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="20dp"
             android:gravity="end"
             />
 
         <TextView
-            android:id="@+id/btnPay"
+            android:id="@+id/btn_pay"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="결제하기"
+            android:text="@string/order_btn_text"
             android:textColor="@color/white"
             android:gravity="center"
-            android:textSize="25dp"
+            android:textSize="25sp"
             android:padding="10dp"
             android:textStyle="bold"
             android:background="@drawable/order_button_background"
