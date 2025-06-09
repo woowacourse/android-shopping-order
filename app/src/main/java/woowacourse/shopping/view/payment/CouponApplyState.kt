@@ -13,7 +13,13 @@ data class CouponApplyState(
     val orderAmount: Int = cartItems.sumOf(CartItem::price)
     val discountAmount: Int =
         when (selectedCoupon) {
-            is Coupon.BuyNGetNCoupon -> TODO()
+            is Coupon.BuyNGetNCoupon ->
+                cartItems
+                    .filter { it.quantity >= 3 }
+                    .maxByOrNull { cartItem: CartItem ->
+                        cartItem.productPrice
+                    }?.productPrice ?: 0
+
             is Coupon.FixedDiscountCoupon -> selectedCoupon.discount
             is Coupon.FreeShippingCoupon -> deliveryFee
             is Coupon.PercentageCoupon -> (orderAmount * selectedCoupon.discountRate).toInt()
