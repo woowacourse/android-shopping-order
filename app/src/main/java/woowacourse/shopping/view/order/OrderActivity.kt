@@ -22,7 +22,16 @@ class OrderActivity : AppCompatActivity() {
                     ?: error("구매할 상품이 없을 수 없습니다."),
         )
     }
-    private val couponAdapter: CouponAdapter = CouponAdapter()
+    private val couponAdapter: CouponAdapter by lazy {
+        CouponAdapter(
+            couponListener =
+                object : CouponViewHolder.CouponListener {
+                    override fun onCouponClick(couponId: Int) {
+                        viewModel.updateApplyingCoupon(couponId)
+                    }
+                },
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

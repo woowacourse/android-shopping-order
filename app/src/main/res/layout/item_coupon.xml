@@ -8,6 +8,10 @@
         <variable
             name="coupon"
             type="woowacourse.shopping.view.order.CouponItem" />
+
+        <variable
+            name="couponListener"
+            type="woowacourse.shopping.view.order.CouponViewHolder.CouponListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -15,6 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:background="@drawable/background_shopping_cart_product"
+        android:onClick="@{() -> couponListener.onCouponClick(coupon.id)}"
         android:paddingBottom="18dp">
 
         <CheckBox
@@ -22,6 +27,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
+            android:checked="@{coupon.isSelected}"
+            android:clickable="false"
             app:layout_constraintEnd_toStartOf="@id/shoppingCartProductName"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -55,11 +62,12 @@
 
         <TextView
             android:id="@+id/couponCondition"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginHorizontal="16dp"
             android:text="@{coupon.condition}"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/couponExpirationDate"
             tools:text="최소 주문 금액: 100,000원" />

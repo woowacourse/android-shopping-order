@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.data.coupon.repository.CouponRepository
 import woowacourse.shopping.data.coupon.repository.DefaultCouponRepository
 import woowacourse.shopping.domain.order.Coupon
+import woowacourse.shopping.domain.order.ShippingFee
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import java.time.LocalTime
 
@@ -19,7 +20,13 @@ class OrderViewModel(
     private val _coupons: MutableLiveData<List<CouponItem>> = MutableLiveData()
     val coupons: LiveData<List<CouponItem>> get() = _coupons
 
+    private val _applyingCoupon: MutableLiveData<CouponItem> = MutableLiveData()
+    val applyingCoupon: LiveData<CouponItem> get() = _applyingCoupon
+
     val price: Int get() = productsToOrder.sumOf { it.price }
+
+    private val _shippingFee: MutableLiveData<ShippingFee> = MutableLiveData()
+    val shippingFee: LiveData<ShippingFee> get() = _shippingFee
 
     init {
         getCoupons()
@@ -55,6 +62,27 @@ class OrderViewModel(
             }
 
         _coupons.value = availableCoupons.map { it.toUiModel() }
+    }
+
+    fun updateApplyingCoupon(couponId: Int) {
+        val couponToApply: CouponItem = coupons.value?.find { it.id == couponId } ?: return
+        _applyingCoupon.value = couponToApply
+        updateCouponSelected(couponToApply)
+    }
+
+    private fun updateCouponSelected(couponToApply: CouponItem) {
+        val currentCoupons = _coupons.value.orEmpty()
+
+        val updatedCoupons =
+            currentCoupons.map {
+                if (it.id == couponToApply.id) {
+                    it.copy(isSelected = true)
+                } else {
+                    it.copy(isSelected = false)
+                }
+            }
+
+        _coupons.value = updatedCoupons
     }
 
     companion object {
