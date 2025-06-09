@@ -13,6 +13,7 @@ class OrderViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return OrderViewModel(
                 couponRepository = RepositoryProvider.provideCouponRepository(),
+                orderRepository = RepositoryProvider.provideOrderRepository(),
                 products = products,
             ) as T
         }

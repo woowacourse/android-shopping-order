@@ -3,6 +3,7 @@ package woowacourse.shopping.order
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -11,6 +12,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
+import woowacourse.shopping.product.catalog.CatalogActivity
 import woowacourse.shopping.product.catalog.ProductUiModel
 import woowacourse.shopping.util.parcelableArray
 
@@ -58,6 +60,23 @@ class OrderActivity : AppCompatActivity() {
 
         viewModel.availableDisplayingCoupons.observe(this, couponAdapter::submitList)
         viewModel.checkSelected.observe(this, couponAdapter::applyCoupon)
+        viewModel.isOrderMade.observe(this) {
+            when (it) {
+                true -> startActivityWhenOrderMade()
+                false -> Toast.makeText(this, "주문에 실패했습니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun startActivityWhenOrderMade() {
+        Toast.makeText(this, "주문이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+
+        val intent =
+            Intent(this, CatalogActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+        startActivity(intent)
+        finish()
     }
 
     private fun setSupportActionBar() {

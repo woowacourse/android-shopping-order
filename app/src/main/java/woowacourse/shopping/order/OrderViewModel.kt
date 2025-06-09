@@ -6,12 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CouponRepository
+import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.domain.OrderingProducts
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 class OrderViewModel(
     products: Array<ProductUiModel>,
     private val couponRepository: CouponRepository,
+    private val orderRepository: OrderRepository,
 ) : ViewModel() {
     val orderingProducts: OrderingProducts = OrderingProducts(products.toList())
 
@@ -37,6 +39,9 @@ class OrderViewModel(
     private val _checkSelected = MutableLiveData<Coupon>()
     val checkSelected: LiveData<Coupon> = _checkSelected
 
+    private val _isOrderMade = MutableLiveData<Boolean>()
+    val isOrderMade: LiveData<Boolean> = _isOrderMade
+
     init {
         loadCoupons()
         setAmountsByOrderingProducts()
@@ -47,6 +52,18 @@ class OrderViewModel(
         orderingProducts.applyCoupon(selectedCoupon)
         _checkSelected.postValue(selectedCoupon)
         setAmountsByOrderingProducts()
+    }
+
+    fun makeOrder() {
+        val cartItemIds: List<Long> = orderingProducts.products.mapNotNull { it.cartItemId }
+        viewModelScope.launch {
+            val result: Result<Unit> = orderRepository.insertOrders(cartItemIds)
+            if (result.isSuccess) {
+                _isOrderMade.postValue(true)
+            } else {
+                _isOrderMade.postValue(false)
+            }
+        }
     }
 
     private fun loadCoupons() {

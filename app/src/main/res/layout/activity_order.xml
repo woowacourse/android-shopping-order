@@ -205,6 +205,8 @@
                     tools:text="202,000원" />
 
                 <Button
+                    android:onClick="@{() -> vm.makeOrder()}"
+                    android:id="@+id/button_order"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:layout_marginTop="76dp"
