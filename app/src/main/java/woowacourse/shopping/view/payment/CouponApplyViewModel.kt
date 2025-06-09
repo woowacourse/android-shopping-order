@@ -16,11 +16,13 @@ import woowacourse.shopping.domain.payment.DeliveryFee
 import woowacourse.shopping.domain.payment.OrderRepository
 import woowacourse.shopping.view.MutableSingleLiveData
 import woowacourse.shopping.view.SingleLiveData
+import java.time.LocalDate
 
 class CouponApplyViewModel(
     private val couponRepository: CouponRepository = DefaultCouponRepository(),
     private val orderRepository: OrderRepository = DefaultOrderRepository(),
     private val anDeliveryFee: DeliveryFee = DefaultDeliveryFee(),
+    private val current: LocalDate = LocalDate.now(),
 ) : ViewModel() {
     private val _event: MutableSingleLiveData<CouponApplyEvent> = MutableSingleLiveData()
     val event: SingleLiveData<CouponApplyEvent> get() = _event
@@ -41,9 +43,12 @@ class CouponApplyViewModel(
                             loading = false,
                             coupons =
                                 listOf(CouponsItem.Header) +
-                                    coupons.map { coupon: Coupon ->
-                                        CouponsItem.CouponItem(coupon, false)
-                                    },
+                                    coupons
+                                        .filterNot { coupon: Coupon ->
+                                            current.isAfter(coupon.expirationDate)
+                                        }.map { coupon: Coupon ->
+                                            CouponsItem.CouponItem(coupon, false)
+                                        },
                             selectedCoupon = null,
                             cartItems = cartItems,
                             deliveryFee = anDeliveryFee.value,
