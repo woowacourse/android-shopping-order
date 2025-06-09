@@ -55,6 +55,7 @@ class CouponApplyViewModel(
     fun selectCoupon(coupon: CouponsItem.CouponItem) {
         val oldCoupons = state.value?.coupons ?: emptyList()
         val newCoupons: List<CouponsItem>
+        val selectedCoupon: Coupon?
         if (coupon.selected) {
             newCoupons =
                 oldCoupons.map { couponItem: CouponsItem ->
@@ -64,21 +65,23 @@ class CouponApplyViewModel(
                         couponItem
                     }
                 }
+            selectedCoupon = null
         } else {
             newCoupons =
                 oldCoupons.map { couponItem: CouponsItem ->
                     if (couponItem is CouponsItem.CouponItem) {
-                        couponItem.copy(selected = couponItem.value == coupon)
+                        couponItem.copy(selected = couponItem.value == coupon.value)
                     } else {
                         couponItem
                     }
                 }
+            selectedCoupon = coupon.value
         }
 
         _state.value =
             state.value?.copy(
                 coupons = newCoupons,
-                selectedCoupon = coupon.value,
+                selectedCoupon = selectedCoupon,
             )
     }
 }
