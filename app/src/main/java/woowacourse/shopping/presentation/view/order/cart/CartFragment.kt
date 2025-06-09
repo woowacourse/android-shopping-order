@@ -7,11 +7,11 @@ import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.presentation.base.BaseFragment
-import woowacourse.shopping.presentation.view.order.OrderMessageEvent
 import woowacourse.shopping.presentation.view.order.OrderUiEventListener
 import woowacourse.shopping.presentation.view.order.OrderViewModel
 import woowacourse.shopping.presentation.view.order.cart.adapter.CartAdapter
 import woowacourse.shopping.presentation.view.order.suggestion.SuggestionFragment
+import woowacourse.shopping.presentation.view.order.toMessageResId
 
 class CartFragment :
     BaseFragment<FragmentCartBinding>(R.layout.fragment_cart),
@@ -56,26 +56,6 @@ class CartFragment :
     private fun setupCartAdapter() {
         binding.recyclerViewCart.adapter = cartAdapter
     }
-
-    private fun OrderMessageEvent.toMessageResId(): Int =
-        when (this) {
-            OrderMessageEvent.FETCH_CART_ITEMS_FAILURE ->
-                R.string.cart_screen_event_message_fetch_cart_items_failure
-
-            OrderMessageEvent.DELETE_CART_ITEM_FAILURE ->
-                R.string.cart_screen_event_message_delete_cart_item_failure
-
-            OrderMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE ->
-                R.string.cart_screen_event_message_patch_cart_product_quantity_failure
-
-            OrderMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE ->
-                R.string.cart_screen_event_message_find_quantity_failure
-
-            OrderMessageEvent.FETCH_SUGGESTION_PRODUCT_FAILURE ->
-                R.string.cart_screen_event_message_fetch_suggestion_product_failure
-
-            OrderMessageEvent.ORDER_CART_ITEMS_FAILURE -> R.string.suggestion_screen_event_message_order_failure
-        }
 
     override fun order() {
         navigateToSuggestion()
