@@ -29,8 +29,8 @@ class DefaultCouponRepository(
                             code = it.code,
                             description = it.description,
                             expirationDate = LocalDate.parse(it.expirationDate),
-                            buyQuantity = it.buyQuantity ?: throw IllegalArgumentException(""),
-                            getQuantity = it.getQuantity ?: throw IllegalArgumentException(""),
+                            buyQuantity = it.buyQuantity,
+                            getQuantity = it.getQuantity,
                         )
 
                     DiscountType.FREE_SHIPPING ->

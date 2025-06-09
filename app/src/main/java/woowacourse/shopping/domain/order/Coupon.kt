@@ -9,6 +9,8 @@ sealed interface Coupon {
     val description: String
     val expirationDate: LocalDate
     val discountType: DiscountType
+    val isExpiration: Boolean
+        get() = expirationDate.isBefore(LocalDate.now())
 
     data class PriceDiscount(
         override val id: Int,
@@ -52,7 +54,7 @@ sealed interface Coupon {
         val availableEndTime: LocalTime,
     ) : Coupon {
         override val discountType: DiscountType = DiscountType.PERCENTAGE_DISCOUNT
+        override val isExpiration: Boolean
+            get() = expirationDate.isBefore(LocalDate.now())
     }
-
-    companion object
 }
