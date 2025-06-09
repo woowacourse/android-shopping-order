@@ -7,8 +7,7 @@ data class PaymentSummary(
 ) {
     val orderPrice: Int = products.sumOf { it.totalPrice }
 
-    val finalPaymentPrice: Int
-        get() = orderPrice - discountPrice + deliveryFee
+    val finalPaymentPrice: Int = orderPrice - discountPrice + deliveryFee
 
     companion object {
         private const val DEFAULT_DELIVERY_FEE = 3000
