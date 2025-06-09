@@ -15,6 +15,7 @@ import woowacourse.shopping.util.SingleLiveData
 
 sealed class CartUiEvent {
     data class ShowToast(val key: ToastMessageKey) : CartUiEvent()
+    data object GoOrderPage : CartUiEvent()
 }
 
 enum class ToastMessageKey {
@@ -61,7 +62,9 @@ class CartViewModel(
     private val _isLoading = MutableLiveData(true)
     val isLoading: LiveData<Boolean> = _isLoading
 
-    private val selectedCartMap = mutableMapOf<Int, CartItem>()
+    private val _selectedCartMap = mutableMapOf<Int, CartItem>()
+    val selectedCartMap : MutableMap<Int,CartItem> get() = _selectedCartMap
+
 
     private val _isAllSelected = MutableLiveData(false)
     val isAllSelected: LiveData<Boolean> get() = _isAllSelected
@@ -107,14 +110,23 @@ class CartViewModel(
     }
 
     fun addCartItemOrIncreaseQuantity(cartItem: CartItem) {
-        val existing = selectedCartMap[cartItem.id]
+        val existing = _selectedCartMap.values.firstOrNull { it.goods.id == cartItem.goods.id }
         if (existing != null) {
             existing.quantity += 1
+            increaseQuantity(cartItem)
         } else {
-            selectedCartMap[cartItem.id] = cartItem.copy(quantity = 1)
+            _selectedCartMap[cartItem.id] = cartItem.copy(quantity = 1)
+            addCart(cartItem.copy(quantity = 1))
         }
         updateAllSelected()
         updateTotalPriceAndCount()
+    }
+
+    fun addCart(cartItem: CartItem){
+        viewModelScope.launch {
+            cartRepository.addCartItem(cartItem.goods,cartItem.quantity)
+            updateCartQuantity()
+        }
     }
 
     fun getPosition(cartItem: CartItem): Int? =
@@ -132,17 +144,17 @@ class CartViewModel(
 
     fun setItemSelection(cartItem: CartItem, isSelected: Boolean) {
         _visibleCart.value?.find { it.id == cartItem.id }?.let {
-            if (isSelected) selectedCartMap[cartItem.id] = it else selectedCartMap.remove(cartItem.id)
+            if (isSelected) _selectedCartMap[cartItem.id] = it else _selectedCartMap.remove(cartItem.id)
             updateAllSelected()
             updateTotalPriceAndCount()
         }
     }
 
-    fun isItemSelected(cartItem: CartItem): Boolean = selectedCartMap.containsKey(cartItem.id)
+    fun isItemSelected(cartItem: CartItem): Boolean = _selectedCartMap.containsKey(cartItem.id)
 
     fun selectAllItems(isSelected: Boolean) {
         if (!isSelected) {
-            selectedCartMap.clear()
+            _selectedCartMap.clear()
             _isAllSelected.value = false
             updateTotalPriceAndCount()
         } else {
@@ -152,13 +164,13 @@ class CartViewModel(
 
     private fun updateAllSelected() {
         val currentPageItems = _visibleCart.value ?: return
-        _isAllSelected.value = currentPageItems.all { selectedCartMap.containsKey(it.id) }
+        _isAllSelected.value = currentPageItems.all { _selectedCartMap.containsKey(it.id) }
     }
 
     private fun updateTotalPriceAndCount() {
-        val total = selectedCartMap.values.sumOf { it.goods.price * it.quantity }
+        val total = _selectedCartMap.values.sumOf { it.goods.price * it.quantity }
         _totalPrice.value = total
-        _selectedItemCount.value = selectedCartMap.size
+        _selectedItemCount.value = _selectedCartMap.size
     }
 
     fun increaseQuantity(cartItem: CartItem) {
@@ -166,7 +178,7 @@ class CartViewModel(
             try {
                 cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1))
                 updateCartQuantity()
-                selectedCartMap[cartItem.id]?.quantity = (selectedCartMap[cartItem.id]?.quantity ?: 0) + 1
+                _selectedCartMap[cartItem.id]?.quantity = (_selectedCartMap[cartItem.id]?.quantity ?: 0) + 1
             } catch (e: Exception) {
                 _event.postValue(CartUiEvent.ShowToast(ToastMessageKey.FAIL_INCREASE))
             }
@@ -181,7 +193,7 @@ class CartViewModel(
                 try {
                     cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity - 1))
                     updateCartQuantity()
-                    selectedCartMap[cartItem.id]?.quantity = (selectedCartMap[cartItem.id]?.quantity ?: 0) - 1
+                    _selectedCartMap[cartItem.id]?.quantity = (_selectedCartMap[cartItem.id]?.quantity ?: 0) - 1
                 } catch (e: Exception) {
                     _event.postValue(CartUiEvent.ShowToast(ToastMessageKey.FAIL_DECREASE))
                 }
@@ -190,7 +202,7 @@ class CartViewModel(
     }
 
     fun delete(cartItem: CartItem) {
-        selectedCartMap.remove(cartItem.id)
+        _selectedCartMap.remove(cartItem.id)
         viewModelScope.launch {
             try {
                 cartRepository.delete(cartItem.id)
@@ -205,8 +217,8 @@ class CartViewModel(
         viewModelScope.launch {
             try {
                 val allItems = cartRepository.fetchAllCartItems().toCartItems()
-                selectedCartMap.clear()
-                allItems.forEach { selectedCartMap[it.id] = it }
+                _selectedCartMap.clear()
+                allItems.forEach { _selectedCartMap[it.id] = it }
                 _isAllSelected.value = true
                 updateTotalPriceAndCount()
             } catch (e: Exception) {
@@ -235,6 +247,10 @@ class CartViewModel(
                 _event.postValue(CartUiEvent.ShowToast(ToastMessageKey.FAIL_LOGIN))
             }
         }
+    }
+
+    fun handleGoCart(){
+        _event.postValue(CartUiEvent.GoOrderPage)
     }
 
     companion object {

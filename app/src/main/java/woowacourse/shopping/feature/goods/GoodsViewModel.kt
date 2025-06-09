@@ -84,7 +84,7 @@ class GoodsViewModel(
         }
     }
 
-    fun onCartClicked() {
+    fun handleCartClicked() {
         if (!Authorization.isLogin) {
             _uiEvent.setValue(GoodsUiEvent.NavigateToLogin)
         } else {

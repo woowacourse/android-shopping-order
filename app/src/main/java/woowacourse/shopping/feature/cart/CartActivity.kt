@@ -16,6 +16,7 @@ import woowacourse.shopping.data.goods.repository.GoodsRemoteDataSourceImpl
 import woowacourse.shopping.data.goods.repository.GoodsRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.feature.cart.recommend.RecommendFragment
+import woowacourse.shopping.feature.order.CouponActivity
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
@@ -63,6 +64,10 @@ class CartActivity : AppCompatActivity() {
                 is CartUiEvent.ShowToast -> {
                     Toast.makeText(this, getStringByKey(event.key), Toast.LENGTH_SHORT).show()
                 }
+
+                is CartUiEvent.GoOrderPage -> {
+                    navigateToOrder()
+                }
             }
         }
 
@@ -89,6 +94,12 @@ class CartActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    private fun navigateToOrder() {
+        val intent = CouponActivity.newIntent(this)
+        intent.putIntegerArrayListExtra(SELECTED_CART_ITEM_KEY, ArrayList(viewModel.selectedCartMap.values.map{it.goods.id}))
+        startActivity(intent)
+    }
+
     fun navigateToRecommend() {
         supportFragmentManager
             .beginTransaction()
@@ -99,5 +110,6 @@ class CartActivity : AppCompatActivity() {
 
     companion object {
         fun newIntent(context: Context): Intent = Intent(context, CartActivity::class.java)
+        const val SELECTED_CART_ITEM_KEY = "selected_cart_item_key"
     }
 }

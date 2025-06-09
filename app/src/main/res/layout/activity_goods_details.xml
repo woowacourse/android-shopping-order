@@ -61,7 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="18dp"
             android:layout_marginTop="16dp"
-            android:text="@{@string/goods_price(viewModel.cartItem.goods.price * viewModel.cartItem.quantity)}"
+            android:text="@{@string/amount(viewModel.cartItem.goods.price * viewModel.cartItem.quantity)}"
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold"

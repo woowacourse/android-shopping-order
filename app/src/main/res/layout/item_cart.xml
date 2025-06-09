@@ -83,7 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="108dp"
             android:layout_marginEnd="12dp"
-            android:text="@{@string/goods_price(cartItem.totalPrice)}"
+            android:text="@{@string/amount(cartItem.totalPrice)}"
             android:textColor="@color/gray_700"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
