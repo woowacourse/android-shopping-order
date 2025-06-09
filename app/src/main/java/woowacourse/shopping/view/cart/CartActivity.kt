@@ -14,11 +14,13 @@ import androidx.fragment.app.commit
 import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.domain.cart.ShoppingCart
 import woowacourse.shopping.view.cart.carts.CartListFragment
 import woowacourse.shopping.view.cart.recommend.RecommendFragment
 import woowacourse.shopping.view.cart.vm.CartViewModel
 import woowacourse.shopping.view.cart.vm.CartViewModelFactory
 import woowacourse.shopping.view.core.ext.showToast
+import woowacourse.shopping.view.payment.PaymentActivity
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
@@ -67,12 +69,15 @@ class CartActivity : AppCompatActivity() {
                     showToast(getString(R.string.text_over_quantity).format(it.quantity))
                 }
 
-                CartUiEvent.NavigationToRecommendScree -> onClickOrderButton()
+                CartUiEvent.NavigationToRecommendScreen -> onClickOrderButton()
+                is CartUiEvent.NavigationToOrderScreen -> {
+                    onClickOrderButton(it.orders)
+                }
             }
         }
     }
 
-    private fun onClickOrderButton() {
+    private fun onClickOrderButton(orders: List<ShoppingCart> = emptyList()) {
         when (supportFragmentManager.findFragmentById(R.id.fragment_container_view)) {
             is CartListFragment -> {
                 supportFragmentManager.commit {
@@ -80,7 +85,11 @@ class CartActivity : AppCompatActivity() {
                 }
             }
 
-            is RecommendFragment -> {}
+            is RecommendFragment -> {
+                val intent = PaymentActivity.newIntent(this, orders)
+                startActivity(intent)
+                finish()
+            }
         }
     }
 

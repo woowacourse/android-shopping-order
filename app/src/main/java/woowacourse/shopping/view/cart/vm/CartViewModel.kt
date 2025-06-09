@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
+import woowacourse.shopping.domain.cart.ShoppingCart
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -91,7 +92,6 @@ class CartViewModel(
                             val cartId = cartId ?: 0L
                             _recommendUiState.postValue(state.modifyUiState(updated.copy(cartId = cartId)))
                             _cartUiState.postValue(_cartUiState.value?.addCart(cartId, updated))
-                            Log.d("TAG", "afterAdd: ${_cartUiState.value?.items}")
                         }
                     }
                 }
@@ -240,8 +240,21 @@ class CartViewModel(
         }
     }
 
+    fun onOrderButtonClicked() {
+        val orders: List<ShoppingCart> = _cartUiState.value?.items?.filter { it.checked }?.map { it.cart } ?: emptyList()
+        if (orders.isEmpty()) {
+            requestNavigationToRecommendScreen()
+        } else {
+            requestNavigationToOrderScreen(orders)
+        }
+    }
+
     fun requestNavigationToRecommendScreen() {
-        _event.setValue(CartUiEvent.NavigationToRecommendScree)
+        _event.setValue(CartUiEvent.NavigationToRecommendScreen)
+    }
+
+    fun requestNavigationToOrderScreen(orders: List<ShoppingCart>) {
+        _event.setValue(CartUiEvent.NavigationToOrderScreen(orders))
     }
 
     private fun setLoading(isLoading: Boolean) {
