@@ -6,7 +6,7 @@ import woowacourse.shopping.data.network.service.CouponService
 class CouponDataSource(
     private val service: CouponService,
 ) {
-    suspend fun getAll(): Result<CouponResponse> {
+    suspend fun getAll(): Result<List<CouponResponse>> {
         return runCatching {
             service.getAll()
         }

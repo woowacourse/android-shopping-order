@@ -9,7 +9,7 @@ class DefaultCouponRepository(
 ): CouponRepository {
     override suspend fun getAll(): List<Coupon> {
         val coupons = dataSource.getAll().getOrThrow()
-        return coupons.items.map {
+        return coupons.map {
             when(it.discountType) {
                 "buyXgetY" -> it.toBogoCoupon()
                 "fixed" -> it.toFixedCoupon()
