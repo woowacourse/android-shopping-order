@@ -6,8 +6,7 @@ data class OrderPriceSummary(
     val deliveryFee: Int = 3_000,
     val cartItems: List<CartItem>,
 ) {
-    val finalPrice: Int
-        get() = productTotalPrice - discountAmount + deliveryFee
+    val finalPrice: Int = productTotalPrice - discountAmount + deliveryFee
 
     fun applyCoupon(coupon: Coupon): OrderPriceSummary =
         when (val type = coupon.discountType) {
