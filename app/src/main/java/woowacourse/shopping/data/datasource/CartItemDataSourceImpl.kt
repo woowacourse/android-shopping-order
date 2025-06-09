@@ -23,6 +23,10 @@ class CartItemDataSourceImpl(
         cartItemService.deleteCartItem(cartId)
     }
 
+    override suspend fun removeCartItems(cartIds: List<Long>) {
+        cartIds.forEach { cartId -> cartItemService.deleteCartItem(cartId) }
+    }
+
     override suspend fun updateCartItem(
         cartId: Long,
         quantity: Quantity,

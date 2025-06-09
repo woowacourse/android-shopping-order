@@ -23,6 +23,8 @@ interface CartRepository {
 
     suspend fun deleteCartItem(cartId: Long)
 
+    suspend fun deleteCartItems(cartIds: List<Long>)
+
     suspend fun updateCartItemQuantity(
         cartId: Long,
         quantity: Int,

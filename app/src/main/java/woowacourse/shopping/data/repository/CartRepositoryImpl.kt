@@ -60,6 +60,10 @@ class CartRepositoryImpl(
         cartItemDataSource.removeCartItem(cartId)
     }
 
+    override suspend fun deleteCartItems(cartIds: List<Long>) {
+        cartItemDataSource.removeCartItems(cartIds)
+    }
+
     override suspend fun updateCartItemQuantity(
         cartId: Long,
         quantity: Int,
