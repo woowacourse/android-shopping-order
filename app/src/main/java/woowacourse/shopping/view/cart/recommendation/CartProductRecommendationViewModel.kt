@@ -15,6 +15,7 @@ import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.view.cart.recommendation.adapter.ProductItem
+import woowacourse.shopping.view.util.Error
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
@@ -44,6 +45,9 @@ class CartProductRecommendationViewModel(
     private val _onStartOrder = MutableSingleLiveData<List<CartProduct>>()
     val onStartOrder: SingleLiveData<List<CartProduct>> get() = _onStartOrder
 
+    private val _onError = MutableSingleLiveData<Error>()
+    val onError: SingleLiveData<Error> get() = _onError
+
     init {
         viewModelScope.launch {
             val result = cartProductRepository.getPagedProducts()
@@ -54,6 +58,7 @@ class CartProductRecommendationViewModel(
                     loadRecommendedProducts()
                 }.onFailure {
                     Log.e("error", it.message.toString())
+                    _onError.setValue(Error.FailToLoadProduct)
                 }
         }
     }
@@ -88,9 +93,11 @@ class CartProductRecommendationViewModel(
                                 getRecommendationProducts(products, recentProduct)
                         }.onFailure {
                             Log.e("error", it.message.toString())
+                            _onError.setValue(Error.FailToLoadProduct)
                         }
                 }.onFailure {
                     Log.e("error", it.message.toString())
+                    _onError.setValue(Error.FailToLoadProduct)
                 }
         }
     }
@@ -132,6 +139,7 @@ class CartProductRecommendationViewModel(
                     updateQuantity(item, QUANTITY_STEP)
                 }.onFailure {
                     Log.e("error", it.message.toString())
+                    _onError.setValue(Error.FailToCart)
                 }
         }
     }
@@ -158,6 +166,7 @@ class CartProductRecommendationViewModel(
                 }
                 .onFailure {
                     Log.e("error", it.message.toString())
+                    _onError.setValue(Error.FailToIncrease)
                 }
         }
     }
@@ -188,6 +197,7 @@ class CartProductRecommendationViewModel(
                 }
                 .onFailure {
                     Log.e("error", it.message.toString())
+                    _onError.setValue(Error.FailToDecrease)
                 }
         }
     }

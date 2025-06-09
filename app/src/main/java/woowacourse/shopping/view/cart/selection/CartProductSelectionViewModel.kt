@@ -10,6 +10,9 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.view.cart.selection.adapter.CartProductItem
+import woowacourse.shopping.view.util.Error
+import woowacourse.shopping.view.util.MutableSingleLiveData
+import woowacourse.shopping.view.util.SingleLiveData
 
 class CartProductSelectionViewModel(
     private val repository: CartProductRepository,
@@ -29,6 +32,9 @@ class CartProductSelectionViewModel(
 
     private val _isFinishedLoading = MutableLiveData(false)
     val isFinishedLoading: LiveData<Boolean> get() = _isFinishedLoading
+
+    private val _onError = MutableSingleLiveData<Error>()
+    val onError: SingleLiveData<Error> get() = _onError
 
     val totalPrice: LiveData<Int> =
         _selectedProducts.map { products ->
@@ -89,6 +95,7 @@ class CartProductSelectionViewModel(
                     }
                 }.onFailure {
                     Log.e("error", it.message.toString())
+                    _onError.setValue(Error.FailToDelete)
                 }
         }
     }
@@ -112,6 +119,7 @@ class CartProductSelectionViewModel(
                     updateSelectedProducts(cartProductItem.cartProduct, newQuantity)
                 }.onFailure {
                     Log.e("error", it.message.toString())
+                    _onError.setValue(Error.FailToIncrease)
                 }
         }
     }
@@ -137,6 +145,7 @@ class CartProductSelectionViewModel(
                     updateSelectedProducts(cartProductItem.cartProduct, newQuantity)
                 }.onFailure {
                     Log.e("error", it.message.toString())
+                    _onError.setValue(Error.FailToDecrease)
                 }
         }
     }
@@ -206,6 +215,7 @@ class CartProductSelectionViewModel(
                     updatePageState(page, hasNext)
                 }.onFailure {
                     Log.e("error", it.message.toString())
+                    _onError.setValue(Error.FailToLoadProduct)
                 }
         }
     }

@@ -12,6 +12,7 @@ import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.view.payment.adapter.CouponItem
+import woowacourse.shopping.view.util.Error
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
@@ -30,6 +31,9 @@ class PaymentViewModel(
     private val _onFinishOrder = MutableSingleLiveData<Unit>()
     val onFinishOrder: SingleLiveData<Unit> get() = _onFinishOrder
 
+    private val _onError = MutableSingleLiveData<Error>()
+    val onError: SingleLiveData<Error> get() = _onError
+
     private var selectedCouponId: Int? = null
 
     fun initSelectedProducts(selectedCartProducts: List<CartProduct>) {
@@ -47,6 +51,7 @@ class PaymentViewModel(
                         .filter { it.coupon.isValid(selectedProducts) }
             }.onFailure {
                 Log.e("error", it.message.toString())
+                _onError.setValue(Error.FailToLoadCoupon)
             }
         }
     }
@@ -88,6 +93,7 @@ class PaymentViewModel(
             result
                 .onFailure {
                     Log.e("error", it.message.toString())
+                    _onError.setValue(Error.FailToOrder)
                 }
 
             _onFinishOrder.setValue(Unit)

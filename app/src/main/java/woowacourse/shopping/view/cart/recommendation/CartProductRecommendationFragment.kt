@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
@@ -72,7 +73,8 @@ class CartProductRecommendationFragment() : Fragment() {
     }
 
     private fun initInformation() {
-        val selectedProducts: List<CartProduct> = arguments?.getSerializable(KEY_SELECTED_IDS) as ArrayList<CartProduct>
+        val selectedProducts: List<CartProduct> =
+            arguments?.getSerializable(KEY_SELECTED_IDS) as ArrayList<CartProduct>
         viewModel.initShoppingCartInfo(selectedProducts)
     }
 
@@ -95,6 +97,10 @@ class CartProductRecommendationFragment() : Fragment() {
         viewModel.onStartOrder.observe(viewLifecycleOwner) { value ->
             val intent = PaymentActivity.newIntent(requireContext(), ArrayList(value))
             startActivity(intent)
+        }
+
+        viewModel.onError.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it.messageId, Toast.LENGTH_SHORT).show()
         }
     }
 

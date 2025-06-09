@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -124,6 +125,10 @@ class ProductCatalogActivity : AppCompatActivity() {
                 binding.sfLoading.visibility = View.VISIBLE
                 binding.sfLoading.startShimmer()
             }
+        }
+
+        viewModel.onError.observe(this) {
+            Toast.makeText(this, it.messageId, Toast.LENGTH_SHORT).show()
         }
     }
 

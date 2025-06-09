@@ -14,6 +14,7 @@ import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.view.product.catalog.adapter.ProductCatalogItem
+import woowacourse.shopping.view.util.Error
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
@@ -41,6 +42,9 @@ class ProductCatalogViewModel(
     private val _onFinishLoading = MutableLiveData(false)
     val onFinishLoading: LiveData<Boolean> get() = _onFinishLoading
 
+    private val _onError = MutableSingleLiveData<Error>()
+    val onError: SingleLiveData<Error> get() = _onError
+
     override fun onRecentProductClick(item: RecentProduct) {
         _selectedProduct.setValue(item.product)
     }
@@ -59,6 +63,7 @@ class ProductCatalogViewModel(
                     updateQuantity(item, QUANTITY_STEP)
                 }.onFailure {
                     Log.e("error", it.message.toString())
+                    _onError.setValue(Error.FailToCart)
                 }
         }
     }
@@ -80,6 +85,7 @@ class ProductCatalogViewModel(
                     updateQuantity(product, QUANTITY_STEP)
                 }.onFailure {
                     Log.e("error", it.message.toString())
+                    _onError.setValue(Error.FailToIncrease)
                 }
         }
     }
@@ -108,6 +114,7 @@ class ProductCatalogViewModel(
                     updateQuantity(product, -QUANTITY_STEP)
                 }.onFailure {
                     Log.e("error", it.message.toString())
+                    _onError.setValue(Error.FailToDecrease)
                 }
         }
     }
@@ -145,6 +152,7 @@ class ProductCatalogViewModel(
                 loadProducts()
             }.onFailure {
                 Log.e("error", it.message.toString())
+                _onError.setValue(Error.FailToLoadProduct)
             }
     }
 
@@ -156,6 +164,7 @@ class ProductCatalogViewModel(
             _productCatalogItems.value = buildCatalogItems()
         }.onFailure {
             Log.e("error", it.message.toString())
+            _onError.setValue(Error.FailToLoadProduct)
         }
     }
 
@@ -168,6 +177,7 @@ class ProductCatalogViewModel(
                 applyLoadedProducts(pagedResult)
             }.onFailure {
                 Log.e("error", it.message.toString())
+                _onError.setValue(Error.FailToLoadProduct)
             }
     }
 
@@ -180,6 +190,7 @@ class ProductCatalogViewModel(
                     applyLoadedProducts(pagedResult)
                 }.onFailure {
                     Log.e("error", it.message.toString())
+                    _onError.setValue(Error.FailToLoadProduct)
                 }
         }
     }

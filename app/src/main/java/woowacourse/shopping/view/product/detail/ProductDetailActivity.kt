@@ -66,6 +66,10 @@ class ProductDetailActivity : AppCompatActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
             startActivity(intent)
         }
+
+        viewModel.onError.observe(this) {
+            Toast.makeText(this, it.messageId, Toast.LENGTH_SHORT).show()
+        }
     }
 
     companion object {

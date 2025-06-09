@@ -74,6 +74,10 @@ class PaymentActivity : AppCompatActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
         }
+
+        viewModel.onError.observe(this) {
+            Toast.makeText(this, it.messageId, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -82,6 +86,7 @@ class PaymentActivity : AppCompatActivity() {
                 onBackPressedDispatcher.onBackPressed()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }

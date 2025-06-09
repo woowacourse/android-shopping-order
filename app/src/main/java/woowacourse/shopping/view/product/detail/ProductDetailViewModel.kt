@@ -10,6 +10,7 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.view.util.Error
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
@@ -33,6 +34,9 @@ class ProductDetailViewModel(
 
     private val _lastProductClickEvent = MutableSingleLiveData<Unit>()
     val lastProductClickEvent: SingleLiveData<Unit> get() = _lastProductClickEvent
+
+    private val _onError = MutableSingleLiveData<Error>()
+    val onError: SingleLiveData<Error> get() = _onError
 
     init {
         loadLastViewedProduct()
@@ -69,6 +73,7 @@ class ProductDetailViewModel(
                                 _addToCartEvent.setValue(Unit)
                             }.onFailure {
                                 Log.e("error", it.message.toString())
+                                _onError.setValue(Error.FailToCart)
                             }
                     } else {
                         val updateResult =
@@ -83,10 +88,12 @@ class ProductDetailViewModel(
                                 _addToCartEvent.setValue(Unit)
                             }.onFailure {
                                 Log.e("error", it.message.toString())
+                                _onError.setValue(Error.FailToCart)
                             }
                     }
                 }.onFailure {
                     Log.e("error", it.message.toString())
+                    _onError.setValue(Error.FailToCart)
                 }
         }
     }
