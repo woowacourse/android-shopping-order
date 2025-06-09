@@ -10,6 +10,5 @@ class OrderViewModelFactory : ViewModelProvider.Factory {
     private val couponRepository = RepositoryModule.provideCouponRepository()
     private val getAvailableCouponsUseCase = GetAvailableCouponsUseCase(couponRepository)
 
-    override fun <T : ViewModel> create(modelClass: Class<T>): T =
-        OrderViewModel(cartRepository, couponRepository, getAvailableCouponsUseCase) as T
+    override fun <T : ViewModel> create(modelClass: Class<T>): T = OrderViewModel(cartRepository, getAvailableCouponsUseCase) as T
 }

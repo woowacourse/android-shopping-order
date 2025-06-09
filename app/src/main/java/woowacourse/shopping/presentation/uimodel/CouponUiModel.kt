@@ -10,4 +10,5 @@ data class CouponUiModel(
     val minimumOrderPrice: Int? = null,
     val availableStartTime: LocalTime? = null,
     val availableEndTime: LocalTime? = null,
+    val isSelected: Boolean = false,
 )
