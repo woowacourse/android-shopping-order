@@ -15,6 +15,8 @@ interface CartRepository {
 
     suspend fun deleteCartItem(cartId: Long): Result<Unit>
 
+    suspend fun deleteCartItems(cartIds: List<Long>): Result<Unit>
+
     suspend fun insertCartProductQuantityToCart(
         productId: Long,
         increaseCount: Int,
@@ -30,4 +32,6 @@ interface CartRepository {
     fun findQuantityByProductId(productId: Long): Result<Int>
 
     fun findCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>>
+
+    fun findCartProductsByIds(cartIds: List<Long>): Result<List<CartProduct>>
 }

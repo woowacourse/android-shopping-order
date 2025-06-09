@@ -4,7 +4,11 @@ class Cart(
     cartProducts: List<CartProduct> = emptyList(),
 ) {
     private val _cachedCartProducts = cartProducts.associateBy { it.product.id }.toMutableMap()
+
     val cachedCartProducts: List<CartProduct> get() = _cachedCartProducts.values.toList()
+
+    private val cachedCartProductsByCartIds
+        get() = cachedCartProducts.associateBy { it.cartId }.toMutableMap()
 
     fun addAll(cartProducts: List<CartProduct>) {
         _cachedCartProducts.putAll(cartProducts.associateBy { it.product.id })
@@ -23,7 +27,12 @@ class Cart(
     fun findQuantityByProductId(productId: Long): Int = _cachedCartProducts[productId]?.quantity ?: DEFAULT_QUANTITY
 
     fun findCartIdByProductId(productId: Long): Long =
-        requireNotNull(_cachedCartProducts[productId]?.cartId) { NOT_FOUND_CART_ID_ERROR_MESSAGE }
+        requireNotNull(_cachedCartProducts[productId]?.cartId) {
+            NOT_FOUND_CART_ID_ERROR_MESSAGE
+        }
+
+    fun findCartIdByCartId(cartId: Long): CartProduct =
+        requireNotNull(cachedCartProductsByCartIds[cartId]) { NOT_FOUND_CART_ID_ERROR_MESSAGE }
 
     fun updateQuantityByProductId(
         productId: Long,

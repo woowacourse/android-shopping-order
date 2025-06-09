@@ -38,9 +38,11 @@ class ShoppingApplication : Application() {
     }
 
     private fun initCartRepository() {
-        val cartDataSource = DataSourceProvider.cartRemoteDataSource
+        val cartLocalDataSource = DataSourceProvider.cartLocalDataSource
+        val cartRemoteDataSource = DataSourceProvider.cartRemoteDataSource
         val productDataSource = DataSourceProvider.productRemoteDataSource
-        val repository = CartRepositoryImpl(cartDataSource, productDataSource)
+        val repository =
+            CartRepositoryImpl(cartLocalDataSource, cartRemoteDataSource, productDataSource)
         RepositoryProvider.initCartRepository(repository)
     }
 
@@ -62,7 +64,10 @@ class ShoppingApplication : Application() {
 
     private fun initOrderRepository() {
         val orderRemoteDataSource = DataSourceProvider.orderRemoteDataSource
-        val repository = OrderRepositoryImpl(orderRemoteDataSource)
+        val couponRemoteDataSource = DataSourceProvider.couponRemoteDataSource
+        val cartLocalDataSource = DataSourceProvider.cartLocalDataSource
+        val repository =
+            OrderRepositoryImpl(orderRemoteDataSource, couponRemoteDataSource, cartLocalDataSource)
         RepositoryProvider.initOrderRepository(repository)
     }
 
