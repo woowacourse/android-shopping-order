@@ -62,6 +62,7 @@ class GoodsViewModel(
         viewModelScope.launch {
             appendCartItemsWithZeroQuantity()
             updateRecentlyViewedGoods()
+            fetchAndSetCartCache() 
         }
     }
 

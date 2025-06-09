@@ -35,8 +35,6 @@ class CartRemoteDataSourceImpl(
         page: Int,
         size: Int
     ): CartResponse = withContext(Dispatchers.IO) {
-        Log.d("test",page.toString())
-        Log.d("test",size.toString())
 
         try {
             retrofitService.requestCartProduct(
@@ -45,7 +43,6 @@ class CartRemoteDataSourceImpl(
                 authorization = "Basic ${Authorization.basicKey}"
             )
         } catch (e: Exception) {
-            Log.d("test",e.message.toString())
             throw CartFetchError.Network
         }
     }
