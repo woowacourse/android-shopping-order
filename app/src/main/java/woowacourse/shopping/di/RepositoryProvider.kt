@@ -20,7 +20,7 @@ object RepositoryProvider {
 
     fun provideRecentlyViewedProductRepository(): RecentlyViewedProductRepository =
         RecentlyViewedProductRepositoryImpl(
-            DependencyProvider.database.recentlyViewedProductDao(),
+            DatabaseProvider.database.recentlyViewedProductDao(),
             provideCatalogProductRepository(),
         )
 
