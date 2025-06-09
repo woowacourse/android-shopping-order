@@ -14,7 +14,6 @@ import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.FakeProductRepository
-import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.fixture.productsFixture
 import woowacourse.shopping.presentation.view.order.OrderActivity
 import woowacourse.shopping.util.recyclerview.clickChildInRecyclerView
@@ -23,19 +22,20 @@ import woowacourse.shopping.util.recyclerview.nthProductInRecyclerView
 class SuggestionFragmentTest {
     @BeforeEach
     fun setup() {
-        val fakeProductRepository = FakeProductRepository()
+        val fakeProductRepository =
+            FakeProductRepository(
+                initialRecentProductIds = productsFixture.take(10).map { it.id },
+            )
         val fakeCartRepository =
             FakeCartRepository(
-                initialCartProducts = productsFixture.takeLast(1).map { CartProduct(it.id, it.toDomain(), 1) },
-            )
-        val fakeRecentProductRepository =
-            FakeRecentProductRepository(
-                initialRecentProductIds = productsFixture.take(10).map { it.id },
+                initialCartProducts =
+                    productsFixture
+                        .takeLast(1)
+                        .map { CartProduct(it.id, it.toDomain(), 1) },
             )
 
         RepositoryProvider.initProductRepository(fakeProductRepository)
         RepositoryProvider.initCartRepository(fakeCartRepository)
-        RepositoryProvider.initRecentProductRepository(fakeRecentProductRepository)
 
         ActivityScenario.launch(OrderActivity::class.java)
         clickChildInRecyclerView(R.id.recycler_view_cart, 0, R.id.checkbox_select)
@@ -44,7 +44,13 @@ class SuggestionFragmentTest {
 
     @Test
     fun `추천_상품을_확인할_수_있다`() {
-        firstProductInRecyclerView(R.id.text_view_product_name).check(matches(withText(productsFixture[0].name)))
+        firstProductInRecyclerView(R.id.text_view_product_name).check(
+            matches(
+                withText(
+                    productsFixture[0].name,
+                ),
+            ),
+        )
     }
 
     @Test

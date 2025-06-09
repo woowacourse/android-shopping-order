@@ -18,4 +18,5 @@ fun clickChildInRecyclerView(
                 clickOnViewChild(childViewId),
             ),
         )
+    Thread.sleep(50)
 }

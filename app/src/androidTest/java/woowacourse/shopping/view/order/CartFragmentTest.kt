@@ -15,7 +15,6 @@ import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.FakeProductRepository
-import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.fixture.productsFixture
 import woowacourse.shopping.presentation.view.order.OrderActivity
 import woowacourse.shopping.util.recyclerview.clickChildInRecyclerView
@@ -32,11 +31,9 @@ class CartFragmentTest {
                         .take(15)
                         .map { CartProduct(it.id, it.toDomain(), 1) },
             )
-        val fakeRecentProductRepository = FakeRecentProductRepository()
 
         RepositoryProvider.initProductRepository(fakeProductRepository)
         RepositoryProvider.initCartRepository(fakeCartRepository)
-        RepositoryProvider.initRecentProductRepository(fakeRecentProductRepository)
 
         ActivityScenario.launch(OrderActivity::class.java)
     }

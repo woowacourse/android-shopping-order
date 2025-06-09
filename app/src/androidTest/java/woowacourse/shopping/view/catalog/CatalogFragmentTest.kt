@@ -21,7 +21,6 @@ import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.FakeProductRepository
-import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.fixture.productsFixture
 import woowacourse.shopping.presentation.view.catalog.CatalogFragment
 import woowacourse.shopping.util.clickOnViewChild
@@ -32,7 +31,10 @@ class CatalogFragmentTest {
 
     @BeforeEach
     fun setUp() {
-        val fakeProductRepository = FakeProductRepository()
+        val fakeProductRepository =
+            FakeProductRepository(
+                initialRecentProductIds = productsFixture.take(1).map { it.id },
+            )
         val fakeCartRepository =
             FakeCartRepository(
                 initialCartProducts =
@@ -40,14 +42,9 @@ class CatalogFragmentTest {
                         .take(1)
                         .map { CartProduct(it.id, it.toDomain(), 1) },
             )
-        val fakeRecentProductRepository =
-            FakeRecentProductRepository(
-                initialRecentProductIds = productsFixture.take(1).map { it.id },
-            )
 
         RepositoryProvider.initProductRepository(fakeProductRepository)
         RepositoryProvider.initCartRepository(fakeCartRepository)
-        RepositoryProvider.initRecentProductRepository(fakeRecentProductRepository)
 
         fragmentScenario =
             launchFragmentInContainer<CatalogFragment>(themeResId = R.style.Theme_Shopping)

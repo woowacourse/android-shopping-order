@@ -8,7 +8,6 @@ import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.FakeProductRepository
-import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.presentation.common.model.CatalogItem
 import woowacourse.shopping.presentation.view.catalog.CatalogViewModel
 import woowacourse.shopping.presentation.view.util.CoroutinesTestExtension
@@ -23,14 +22,12 @@ class CatalogViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        val fakeProductRepository = FakeProductRepository()
-        val fakeCartRepository = FakeCartRepository()
-        val fakeRecentProductRepository =
-            FakeRecentProductRepository(
+        val fakeProductRepository =
+            FakeProductRepository(
                 initialRecentProductIds = listOf(1, 2, 3),
             )
-        viewModel =
-            CatalogViewModel(fakeProductRepository, fakeCartRepository, fakeRecentProductRepository)
+        val fakeCartRepository = FakeCartRepository()
+        viewModel = CatalogViewModel(fakeProductRepository, fakeCartRepository)
     }
 
     @Test

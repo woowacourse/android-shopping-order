@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.data.model.product.toDomain
 import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.FakeProductRepository
-import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.fixture.productsFixture
 import woowacourse.shopping.presentation.common.model.toProduct
 import woowacourse.shopping.presentation.view.detail.DetailViewModel
@@ -26,14 +25,11 @@ class DetailViewModelTest {
     fun setUp() {
         val fakeProductRepository = FakeProductRepository()
         val fakeCartRepository = FakeCartRepository()
-        val fakeRecentProductRepository =
-            FakeRecentProductRepository()
         viewModel =
             DetailViewModel(
                 1,
                 fakeProductRepository,
                 fakeCartRepository,
-                fakeRecentProductRepository,
             )
     }
 

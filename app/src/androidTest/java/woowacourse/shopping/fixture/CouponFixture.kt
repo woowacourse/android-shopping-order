@@ -17,7 +17,7 @@ val couponsFixture: List<Coupon> =
             "5,000원 할인 쿠폰",
             LocalDate.now().plusDays(1),
             5000,
-            100000,
+            1000,
         ),
         BuyXGetYCoupon(
             2,
