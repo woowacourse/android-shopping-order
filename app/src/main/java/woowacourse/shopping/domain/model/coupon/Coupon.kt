@@ -4,18 +4,18 @@ import woowacourse.shopping.domain.model.PaymentSummary
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-sealed interface Coupon {
-    val id: Long
-    val code: String
-    val description: String
-    val expirationDate: LocalDate
+sealed class Coupon {
+    abstract val id: Long
+    abstract val code: String
+    abstract val description: String
+    abstract val expirationDate: LocalDate
 
-    fun calculateDiscountAmount(
+    abstract fun calculateDiscountAmount(
         paymentSummary: PaymentSummary,
         dateTime: LocalDateTime = LocalDateTime.now(),
     ): PaymentSummary
 
-    fun isAvailable(
+    open fun isAvailable(
         dateTime: LocalDateTime = LocalDateTime.now(),
         paymentSummary: PaymentSummary,
     ): Boolean = !isExpired(dateTime.toLocalDate())

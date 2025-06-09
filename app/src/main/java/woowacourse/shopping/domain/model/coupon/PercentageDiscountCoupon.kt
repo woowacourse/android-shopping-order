@@ -11,7 +11,7 @@ data class PercentageDiscountCoupon(
     override val expirationDate: LocalDate,
     val discount: Int,
     val availableTime: AvailableTime,
-) : Coupon {
+) : Coupon() {
     override fun calculateDiscountAmount(
         paymentSummary: PaymentSummary,
         dateTime: LocalDateTime,

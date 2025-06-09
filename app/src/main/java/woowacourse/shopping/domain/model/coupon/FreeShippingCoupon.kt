@@ -10,7 +10,7 @@ data class FreeShippingCoupon(
     override val description: String,
     override val expirationDate: LocalDate,
     val minimumAmount: Int,
-) : Coupon {
+) : Coupon() {
     override fun calculateDiscountAmount(
         paymentSummary: PaymentSummary,
         dateTime: LocalDateTime,

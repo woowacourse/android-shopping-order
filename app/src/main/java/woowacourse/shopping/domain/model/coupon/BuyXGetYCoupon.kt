@@ -12,7 +12,7 @@ data class BuyXGetYCoupon(
     override val expirationDate: LocalDate,
     val buyQuantity: Int,
     val getQuantity: Int,
-) : Coupon {
+) : Coupon() {
     override fun calculateDiscountAmount(
         paymentSummary: PaymentSummary,
         dateTime: LocalDateTime,
