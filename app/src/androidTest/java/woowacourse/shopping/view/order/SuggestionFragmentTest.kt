@@ -17,8 +17,8 @@ import woowacourse.shopping.fixture.FakeProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.fixture.productsFixture
 import woowacourse.shopping.presentation.view.order.OrderActivity
-import woowacourse.shopping.util.clickChildInRecyclerView
-import woowacourse.shopping.util.nthProductInRecyclerView
+import woowacourse.shopping.util.recyclerview.clickChildInRecyclerView
+import woowacourse.shopping.util.recyclerview.nthProductInRecyclerView
 
 class SuggestionFragmentTest {
     @BeforeEach

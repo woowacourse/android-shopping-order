@@ -25,7 +25,7 @@ import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.fixture.productsFixture
 import woowacourse.shopping.presentation.view.catalog.CatalogFragment
 import woowacourse.shopping.util.clickOnViewChild
-import woowacourse.shopping.util.nthProductInRecyclerView
+import woowacourse.shopping.util.recyclerview.nthProductInRecyclerView
 
 class CatalogFragmentTest {
     private lateinit var fragmentScenario: FragmentScenario<CatalogFragment>

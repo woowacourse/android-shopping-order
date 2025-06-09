@@ -1,4 +1,4 @@
-package woowacourse.shopping.util
+package woowacourse.shopping.util.recyclerview
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA

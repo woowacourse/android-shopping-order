@@ -1,4 +1,4 @@
-package woowacourse.shopping.util
+package woowacourse.shopping.util.recyclerview
 
 import android.view.View
 import android.view.ViewGroup

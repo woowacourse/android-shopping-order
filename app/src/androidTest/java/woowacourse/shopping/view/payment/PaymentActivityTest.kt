@@ -16,7 +16,7 @@ import woowacourse.shopping.fixture.FakeOrderRepository
 import woowacourse.shopping.fixture.couponsFixture
 import woowacourse.shopping.fixture.productsFixture
 import woowacourse.shopping.presentation.view.payment.PaymentActivity
-import woowacourse.shopping.util.nthProductInRecyclerView
+import woowacourse.shopping.util.recyclerview.nthProductInRecyclerView
 
 class PaymentActivityTest {
     @BeforeEach
