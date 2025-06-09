@@ -10,10 +10,12 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.domain.repository.CartProductRepository
+import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 import woowacourse.shopping.view.cart.select.adapter.CartProductItem
 
 class CartProductSelectViewModel(
     private val repository: CartProductRepository,
+    private val updateQuantityUseCase: UpdateQuantityUseCase,
 ) : ViewModel(),
     CartProductSelectEventHandler {
     private val _cartProductItems = MutableLiveData<List<CartProductItem>>()
@@ -150,17 +152,12 @@ class CartProductSelectViewModel(
             val newQuantity = existing.cartProduct.quantity + quantityDelta
             if (newQuantity < MINIMUM_QUANTITY) return@launch
 
-            repository
-                .updateQuantity(existing.cartProduct, quantityDelta)
-                .onSuccess {
-                    loadPage(page.value ?: FIRST_PAGE_NUMBER)
-                }.onFailure {
-                    Log.e("error", it.message.toString())
+            updateQuantityUseCase(existing.cartProduct, quantityDelta).onSuccess { updated ->
+                loadPage(page.value ?: FIRST_PAGE_NUMBER)
+                val currentSelected = selectedCartProducts.value
+                if (currentSelected?.contains(item) == true && updated != null) {
+                    _selectedCartProducts.postValue(currentSelected - item + updated)
                 }
-            val currentSelected = selectedCartProducts.value
-            if (currentSelected?.contains(item) == true) {
-                val newItem = item.copy(quantity = newQuantity)
-                _selectedCartProducts.postValue(currentSelected - item + newItem)
             }
         }
     }

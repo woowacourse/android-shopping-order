@@ -14,6 +14,7 @@ import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 import woowacourse.shopping.view.cart.recommend.adapter.RecommendedProductItem
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
@@ -24,6 +25,7 @@ class CartProductRecommendViewModel(
     private val cartProductRepository: CartProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val addToCartUseCase: AddToCartUseCase,
+    private val updateQuantityUseCase: UpdateQuantityUseCase,
 ) : ViewModel(),
     CartProductRecommendEventHandler {
     val cartProducts = MutableLiveData(selectedProducts)
@@ -111,12 +113,11 @@ class CartProductRecommendViewModel(
                     ?: return@launch
             val newQuantity = existing.quantity + quantityDelta
 
-            cartProductRepository
-                .updateQuantity(existing, quantityDelta)
-                .onSuccess {
+            updateQuantityUseCase(existing, quantityDelta)
+                .onSuccess { updated ->
                     var updatedList = cartProducts.value?.minus(existing)
-                    if (newQuantity > DEFAULT_COUNT) {
-                        updatedList = updatedList?.plus(existing.copy(quantity = newQuantity))
+                    if (newQuantity > DEFAULT_COUNT && updated != null) {
+                        updatedList = updatedList?.plus(updated)
                     }
                     cartProducts.postValue(updatedList ?: CartProducts(emptyList()))
                     updateProductQuantity(item, quantityDelta)

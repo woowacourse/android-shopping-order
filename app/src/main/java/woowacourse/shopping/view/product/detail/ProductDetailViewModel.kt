@@ -12,6 +12,7 @@ import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
@@ -20,6 +21,7 @@ class ProductDetailViewModel(
     private val cartProductRepository: CartProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val addToCartUseCase: AddToCartUseCase,
+    private val updateQuantityUseCase: UpdateQuantityUseCase,
 ) : ViewModel(),
     ProductDetailEventHandler {
     private val _quantity = MutableLiveData(MINIMUM_QUANTITY)
@@ -63,7 +65,7 @@ class ProductDetailViewModel(
                         if (cartProduct == null) {
                             addToCartUseCase(product, quantityToAdd)
                         } else {
-                            cartProductRepository.updateQuantity(cartProduct, quantityToAdd)
+                            updateQuantityUseCase(cartProduct, quantityToAdd)
                         }
 
                     updateResult

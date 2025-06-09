@@ -15,6 +15,7 @@ import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 import woowacourse.shopping.view.product.catalog.adapter.ProductCatalogItem
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
@@ -24,6 +25,7 @@ class ProductCatalogViewModel(
     private val cartProductRepository: CartProductRepository,
     private val recentProductRepository: RecentProductRepository,
     private val addToCartUseCase: AddToCartUseCase,
+    private val updateQuantityUseCase: UpdateQuantityUseCase,
 ) : ViewModel(),
     ProductCatalogEventHandler {
     private var page = FIRST_PAGE
@@ -164,19 +166,12 @@ class ProductCatalogViewModel(
     ) {
         viewModelScope.launch {
             val existing = cartProducts.firstOrNull { it.product.id == item.id } ?: return@launch
-            val newQuantity = existing.quantity + quantityDelta
-
-            cartProductRepository
-                .updateQuantity(existing, quantityDelta)
-                .onSuccess {
+            updateQuantityUseCase(existing, quantityDelta)
+                .onSuccess { updated ->
                     cartProducts.removeIf { it.product.id == item.id }
-                    if (newQuantity > MINIMUM_QUANTITY) {
-                        cartProducts.add(existing.copy(quantity = newQuantity))
-                    }
+                    updated?.let { cartProducts.add(it) }
                     updateProductQuantity(item, quantityDelta)
-                }.onFailure {
-                    Log.e("error", it.message.toString())
-                }
+                }.onFailure { Log.e("error", it.message.toString()) }
         }
     }
 

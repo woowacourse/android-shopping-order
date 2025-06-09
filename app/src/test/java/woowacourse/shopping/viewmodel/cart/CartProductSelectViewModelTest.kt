@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.repository.CartProductRepository
+import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.view.cart.select.CartProductSelectViewModel
 import woowacourse.shopping.viewmodel.CoroutinesTestExtension
@@ -20,13 +21,16 @@ import woowacourse.shopping.viewmodel.getOrAwaitValue
 class CartProductSelectViewModelTest {
     private lateinit var viewModel: CartProductSelectViewModel
     private lateinit var cartProductRepository: CartProductRepository
+    private lateinit var updateQuantityUseCase: UpdateQuantityUseCase
 
     @BeforeEach
     fun setup() =
         runTest {
             cartProductRepository = FakeCartProductRepository()
+            updateQuantityUseCase = UpdateQuantityUseCase(cartProductRepository)
+
             repeat(12) { id -> cartProductRepository.insert(id, 1) }
-            viewModel = CartProductSelectViewModel(cartProductRepository)
+            viewModel = CartProductSelectViewModel(cartProductRepository, updateQuantityUseCase)
             viewModel.loadPage(1)
         }
 

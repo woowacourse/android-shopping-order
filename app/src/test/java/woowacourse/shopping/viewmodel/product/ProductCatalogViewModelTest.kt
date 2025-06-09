@@ -10,6 +10,7 @@ import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.fixture.FakeProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
@@ -28,6 +29,7 @@ class ProductCatalogViewModelTest {
     private lateinit var cartProductRepository: CartProductRepository
     private lateinit var recentProductRepository: RecentProductRepository
     private lateinit var addToCartUseCase: AddToCartUseCase
+    private lateinit var updateQuantityUseCase: UpdateQuantityUseCase
 
     @BeforeEach
     fun setup() =
@@ -36,6 +38,7 @@ class ProductCatalogViewModelTest {
             cartProductRepository = FakeCartProductRepository()
             recentProductRepository = FakeRecentProductRepository()
             addToCartUseCase = AddToCartUseCase(cartProductRepository)
+            updateQuantityUseCase = UpdateQuantityUseCase(cartProductRepository)
 
             repeat(12) { id -> cartProductRepository.insert(id, 1) }
             viewModel =
@@ -44,6 +47,7 @@ class ProductCatalogViewModelTest {
                     cartProductRepository,
                     recentProductRepository,
                     addToCartUseCase,
+                    updateQuantityUseCase,
                 )
             viewModel.loadCatalog()
         }

@@ -33,6 +33,7 @@ class ProductCatalogActivity : AppCompatActivity() {
                 app.cartProductRepository,
                 app.recentProductRepository,
                 app.addToCartUseCase,
+                app.updateQuantityUseCase,
             ),
         )[ProductCatalogViewModel::class.java]
     }
