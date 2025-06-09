@@ -93,8 +93,8 @@ class CheckoutViewModel(
     }
 
     fun finalizeOrder() {
-        viewModelScope.launch {
-            _cartItems.value?.forEach { cartItem ->
+        _cartItems.value?.forEach { cartItem ->
+            viewModelScope.launch {
                 cartRepository.deleteCartItem(cartItem.cartId)
             }
         }
