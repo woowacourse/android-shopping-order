@@ -78,6 +78,11 @@ class CartProductSelectionViewModelTest {
 
     @Test
     fun `이전 페이지 로드 시 페이지 번호가 감소하고 상품이 로드된다`() {
+        // given
+        viewModel.hasPrevious.observeForever {}
+        viewModel.hasNext.observeForever {}
+        viewModel.products.observeForever {}
+
         // when
         viewModel.loadNextProducts()
         viewModel.loadPreviousProducts()
