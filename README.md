@@ -49,8 +49,8 @@
   - [x] 최종 주문이 완료되면 상품 목록으로 이동과 함께 주문 완료 토스트 메시지를 노출한다.
 
 ### 피드백 적용
-- [ ] ApiClient - baseUrl 숨기기
-- [ ] BindingAdapter - Glide 이미지 로드 실패 or 로딩 중 이미지 설정 추가
+- [x] ApiClient - baseUrl 숨기기
+- [x] BindingAdapter - Glide 이미지 로드 실패 or 로딩 중 이미지 설정 추가
 - [ ] CartFragment - Int 범위를 넘은 가격 대응
 - [ ] *DataSource - API 요청 실패 시 대응 로직 추가
 - [ ] ProductResponse - price 타입 불일치
