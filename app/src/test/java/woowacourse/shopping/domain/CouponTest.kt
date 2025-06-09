@@ -19,7 +19,7 @@ class CouponTest {
             expiredCoupon.isValidForOrder(
                 0,
                 emptyList(),
-                now = LocalDateTime.now(),
+                orderTime = LocalDateTime.now(),
             )
         assertThat(result).isFalse()
     }
@@ -30,7 +30,7 @@ class CouponTest {
             CouponFixture.fixedDummyCoupon.isValidForOrder(
                 40_000,
                 emptyList(),
-                now = LocalDateTime.now(),
+                orderTime = LocalDateTime.now(),
             )
         assertThat(result).isFalse()
     }
@@ -45,7 +45,7 @@ class CouponTest {
             timeLimitedCoupon.isValidForOrder(
                 20_000,
                 emptyList(),
-                now = LocalDateTime.of(2025, 6, 1, 12, 0),
+                orderTime = LocalDateTime.of(2025, 6, 1, 12, 0),
             )
         assertThat(result).isFalse()
     }
@@ -58,7 +58,11 @@ class CouponTest {
             )
         val items = ProductsFixture.dummyCartItems
         val result =
-            buyXGetYCoupon.isValidForOrder(20_000, items, now = LocalDateTime.of(2025, 6, 1, 10, 0))
+            buyXGetYCoupon.isValidForOrder(
+                20_000,
+                items,
+                orderTime = LocalDateTime.of(2025, 6, 1, 10, 0),
+            )
         assertThat(result).isFalse()
     }
 
@@ -74,7 +78,7 @@ class CouponTest {
             availableCoupon.isValidForOrder(
                 60_000,
                 items,
-                now = LocalDateTime.of(2025, 6, 1, 10, 0),
+                orderTime = LocalDateTime.of(2025, 6, 1, 10, 0),
             )
         assertThat(result).isTrue()
     }

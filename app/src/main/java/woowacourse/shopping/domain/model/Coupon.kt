@@ -17,13 +17,13 @@ data class Coupon(
     fun isValidForOrder(
         orderPrice: Int,
         items: List<CartItem>,
-        now: LocalDateTime = LocalDateTime.now(),
+        orderTime: LocalDateTime = LocalDateTime.now(),
     ): Boolean {
-        val isNotExpired = expirationDate >= now.toLocalDate()
+        val isNotExpired = expirationDate >= orderTime.toLocalDate()
 
         val isAvailableTime =
             availableTime?.let {
-                val currentTime = now.toLocalTime()
+                val currentTime = orderTime.toLocalTime()
                 currentTime >= it.start && currentTime <= it.end
             } ?: true
 
