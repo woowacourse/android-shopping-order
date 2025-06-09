@@ -2,12 +2,12 @@ package woowacourse.shopping.view.cart.select
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.domain.usecase.cart.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 
 class CartProductSelectViewModelFactory(
-    private val getPagedCartProductsUseCase: GetPagedCartProductsUseCase,
+    private val getCartProductsUseCase: GetCartProductsUseCase,
     private val removeFromCartUseCase: RemoveFromCartUseCase,
     private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
 ) : ViewModelProvider.Factory {
@@ -15,7 +15,7 @@ class CartProductSelectViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CartProductSelectViewModel::class.java)) {
             return CartProductSelectViewModel(
-                getPagedCartProductsUseCase,
+                getCartProductsUseCase,
                 removeFromCartUseCase,
                 updateCartQuantityUseCase,
             ) as T

@@ -59,8 +59,8 @@ class CartProductRecommendFragment : Fragment() {
                 CartProductRecommendViewModelFactory(
                     selectedProducts,
                     app.recentProductRepository,
-                    app.getPagedProductsUseCase,
-                    app.getPagedCartProductsUseCase,
+                    app.getProductsUseCase,
+                    app.getCartProductsUseCase,
                     app.addToCartUseCase,
                     app.updateCartQuantityUseCase,
                 ),

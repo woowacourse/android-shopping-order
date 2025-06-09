@@ -10,7 +10,7 @@ import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
 import woowacourse.shopping.domain.usecase.cart.GetCartProductByProductIdUseCase
-import woowacourse.shopping.domain.usecase.cart.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
@@ -27,7 +27,7 @@ class ProductDetailViewModelTest {
     private lateinit var viewModel: ProductDetailViewModel
     private lateinit var cartProductRepository: CartProductRepository
     private lateinit var recentProductRepository: RecentProductRepository
-    private lateinit var getPagedCartProductsUseCase: GetPagedCartProductsUseCase
+    private lateinit var getCartProductsUseCase: GetCartProductsUseCase
     private lateinit var getCartProductByProductIdUseCase: GetCartProductByProductIdUseCase
     private lateinit var addToCartUseCase: AddToCartUseCase
     private lateinit var removeFromCartUseCase: RemoveFromCartUseCase
@@ -38,8 +38,8 @@ class ProductDetailViewModelTest {
     fun setup() {
         cartProductRepository = FakeCartProductRepository()
         recentProductRepository = FakeRecentProductRepository()
-        getPagedCartProductsUseCase = GetPagedCartProductsUseCase(cartProductRepository)
-        getCartProductByProductIdUseCase = GetCartProductByProductIdUseCase(getPagedCartProductsUseCase)
+        getCartProductsUseCase = GetCartProductsUseCase(cartProductRepository)
+        getCartProductByProductIdUseCase = GetCartProductByProductIdUseCase(cartProductRepository)
         addToCartUseCase = AddToCartUseCase(cartProductRepository)
         removeFromCartUseCase = RemoveFromCartUseCase(cartProductRepository)
         updateCartQuantityUseCase = UpdateCartQuantityUseCase(cartProductRepository, removeFromCartUseCase)

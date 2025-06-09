@@ -9,13 +9,13 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.CartProducts
-import woowacourse.shopping.domain.usecase.cart.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 import woowacourse.shopping.view.cart.select.adapter.CartProductItem
 
 class CartProductSelectViewModel(
-    private val getPagedCartProductsUseCase: GetPagedCartProductsUseCase,
+    private val getCartProductsUseCase: GetCartProductsUseCase,
     private val removeFromCartUseCase: RemoveFromCartUseCase,
     private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
 ) : ViewModel(),
@@ -57,7 +57,7 @@ class CartProductSelectViewModel(
         viewModelScope.launch {
             _isLoading.value = true
 
-            getPagedCartProductsUseCase(page - 1, PAGE_SIZE)
+            getCartProductsUseCase(page - 1, PAGE_SIZE)
                 .onSuccess { pagedResult ->
                     _isLoading.value = false
                     _cartProductItems.value =

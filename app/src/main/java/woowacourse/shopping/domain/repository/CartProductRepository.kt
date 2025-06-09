@@ -10,8 +10,8 @@ interface CartProductRepository {
     ): Result<Int>
 
     suspend fun getPagedProducts(
-        page: Int?,
-        size: Int?,
+        page: Int? = null,
+        size: Int? = null,
     ): Result<PagedResult<CartProduct>>
 
     suspend fun getTotalQuantity(): Result<Int>

@@ -4,15 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
-import woowacourse.shopping.domain.usecase.cart.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.cart.GetTotalCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
-import woowacourse.shopping.domain.usecase.product.GetPagedProductsUseCase
+import woowacourse.shopping.domain.usecase.product.GetProductsUseCase
 
 class ProductCatalogViewModelFactory(
     private val recentProductRepository: RecentProductRepository,
-    private val getPagedProductsUseCase: GetPagedProductsUseCase,
-    private val getPagedCartProductsUseCase: GetPagedCartProductsUseCase,
+    private val getProductsUseCase: GetProductsUseCase,
+    private val getCartProductsUseCase: GetCartProductsUseCase,
     private val getTotalCartProductQuantityUseCase: GetTotalCartProductQuantityUseCase,
     private val addToCartUseCase: AddToCartUseCase,
     private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
@@ -22,8 +22,8 @@ class ProductCatalogViewModelFactory(
         if (modelClass.isAssignableFrom(ProductCatalogViewModel::class.java)) {
             return ProductCatalogViewModel(
                 recentProductRepository,
-                getPagedProductsUseCase,
-                getPagedCartProductsUseCase,
+                getProductsUseCase,
+                getCartProductsUseCase,
                 getTotalCartProductQuantityUseCase,
                 addToCartUseCase,
                 updateCartQuantityUseCase,

@@ -12,9 +12,9 @@ import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
-import woowacourse.shopping.domain.usecase.cart.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
-import woowacourse.shopping.domain.usecase.product.GetPagedProductsUseCase
+import woowacourse.shopping.domain.usecase.product.GetProductsUseCase
 import woowacourse.shopping.view.cart.recommend.adapter.RecommendedProductItem
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
@@ -22,8 +22,8 @@ import woowacourse.shopping.view.util.SingleLiveData
 class CartProductRecommendViewModel(
     selectedProducts: CartProducts,
     private val recentProductRepository: RecentProductRepository,
-    private val getPagedProductsUseCase: GetPagedProductsUseCase,
-    private val getPagedCartProductsUseCase: GetPagedCartProductsUseCase,
+    private val getProductsUseCase: GetProductsUseCase,
+    private val getCartProductsUseCase: GetCartProductsUseCase,
     private val addToCartUseCase: AddToCartUseCase,
     private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
 ) : ViewModel(),
@@ -41,7 +41,7 @@ class CartProductRecommendViewModel(
 
     init {
         viewModelScope.launch {
-            getPagedCartProductsUseCase()
+            getCartProductsUseCase()
                 .onSuccess { pagedResult ->
                     loadRecommendedProducts(pagedResult.items)
                 }.onFailure { Log.e("error", it.message.toString()) }
@@ -54,7 +54,7 @@ class CartProductRecommendViewModel(
                 .getLastViewedProduct()
                 .onSuccess { recentProduct ->
                     if (recentProduct == null) return@launch
-                    getPagedProductsUseCase()
+                    getProductsUseCase()
                         .onSuccess { pagedResult ->
                             val cartProductIds = cartProducts.map { it.product.id }.toSet()
                             val recommended =

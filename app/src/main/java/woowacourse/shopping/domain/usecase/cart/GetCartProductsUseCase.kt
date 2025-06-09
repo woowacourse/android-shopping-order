@@ -4,7 +4,7 @@ import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
 
-class GetPagedCartProductsUseCase(
+class GetCartProductsUseCase(
     private val cartProductRepository: CartProductRepository,
 ) {
     suspend operator fun invoke(

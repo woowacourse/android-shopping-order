@@ -22,7 +22,7 @@ class CartProductSelectFragment : Fragment() {
         ViewModelProvider(
             this,
             CartProductSelectViewModelFactory(
-                app.getPagedCartProductsUseCase,
+                app.getCartProductsUseCase,
                 app.removeFromCartUseCase,
                 app.updateCartQuantityUseCase,
             ),

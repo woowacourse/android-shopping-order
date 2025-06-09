@@ -10,11 +10,11 @@ import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
-import woowacourse.shopping.domain.usecase.cart.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.cart.GetTotalCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
-import woowacourse.shopping.domain.usecase.product.GetPagedProductsUseCase
+import woowacourse.shopping.domain.usecase.product.GetProductsUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.fixture.FakeProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
@@ -33,8 +33,8 @@ class ProductCatalogViewModelTest {
     private lateinit var cartProductRepository: CartProductRepository
     private lateinit var recentProductRepository: RecentProductRepository
 
-    private lateinit var getPagedProductsUseCase: GetPagedProductsUseCase
-    private lateinit var getPagedCartProductsUseCase: GetPagedCartProductsUseCase
+    private lateinit var getProductsUseCase: GetProductsUseCase
+    private lateinit var getCartProductsUseCase: GetCartProductsUseCase
     private lateinit var getTotalCartProductQuantityUseCase: GetTotalCartProductQuantityUseCase
     private lateinit var addToCartUseCase: AddToCartUseCase
     private lateinit var removeFromCartUseCase: RemoveFromCartUseCase
@@ -47,8 +47,8 @@ class ProductCatalogViewModelTest {
             cartProductRepository = FakeCartProductRepository()
             recentProductRepository = FakeRecentProductRepository()
 
-            getPagedProductsUseCase = GetPagedProductsUseCase(productRepository)
-            getPagedCartProductsUseCase = GetPagedCartProductsUseCase(cartProductRepository)
+            getProductsUseCase = GetProductsUseCase(productRepository)
+            getCartProductsUseCase = GetCartProductsUseCase(cartProductRepository)
             getTotalCartProductQuantityUseCase = GetTotalCartProductQuantityUseCase(cartProductRepository)
             addToCartUseCase = AddToCartUseCase(cartProductRepository)
             removeFromCartUseCase = RemoveFromCartUseCase(cartProductRepository)
@@ -58,8 +58,8 @@ class ProductCatalogViewModelTest {
             viewModel =
                 ProductCatalogViewModel(
                     recentProductRepository,
-                    getPagedProductsUseCase,
-                    getPagedCartProductsUseCase,
+                    getProductsUseCase,
+                    getCartProductsUseCase,
                     getTotalCartProductQuantityUseCase,
                     addToCartUseCase,
                     updateCartQuantityUseCase,

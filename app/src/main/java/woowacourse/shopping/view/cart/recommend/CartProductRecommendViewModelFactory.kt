@@ -5,15 +5,15 @@ import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
-import woowacourse.shopping.domain.usecase.cart.GetPagedCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
-import woowacourse.shopping.domain.usecase.product.GetPagedProductsUseCase
+import woowacourse.shopping.domain.usecase.product.GetProductsUseCase
 
 class CartProductRecommendViewModelFactory(
     private val selectedProducts: CartProducts,
     private val recentProductRepository: RecentProductRepository,
-    private val getPagedProductsUseCase: GetPagedProductsUseCase,
-    private val getPagedCartProductsUseCase: GetPagedCartProductsUseCase,
+    private val getProductsUseCase: GetProductsUseCase,
+    private val getCartProductsUseCase: GetCartProductsUseCase,
     private val addToCartUseCase: AddToCartUseCase,
     private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
 ) : ViewModelProvider.Factory {
@@ -23,8 +23,8 @@ class CartProductRecommendViewModelFactory(
             return CartProductRecommendViewModel(
                 selectedProducts,
                 recentProductRepository,
-                getPagedProductsUseCase,
-                getPagedCartProductsUseCase,
+                getProductsUseCase,
+                getCartProductsUseCase,
                 addToCartUseCase,
                 updateCartQuantityUseCase,
             ) as T
