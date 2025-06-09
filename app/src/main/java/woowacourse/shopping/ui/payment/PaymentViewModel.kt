@@ -17,6 +17,7 @@ import woowacourse.shopping.domain.usecase.CalculatePaymentAmountByCouponUseCase
 import woowacourse.shopping.domain.usecase.CalculatePaymentAmountByCouponUseCase.Companion.DEFAULT_SHIPPING_FEE
 import woowacourse.shopping.domain.usecase.GetCouponsUseCase
 import woowacourse.shopping.domain.usecase.IsFreeShippingCouponUseCase
+import woowacourse.shopping.domain.usecase.OrderProductsUseCase
 import woowacourse.shopping.ui.payment.adapter.CouponUiModel.Companion.toUiModel
 import woowacourse.shopping.util.Event
 
@@ -25,6 +26,7 @@ class PaymentViewModel(
     private val calculatePaymentAmountByCouponUseCase: CalculatePaymentAmountByCouponUseCase,
     private val isFreeShippingCouponUseCase: IsFreeShippingCouponUseCase,
     private val calculateCouponDiscountUseCase: CalculateCouponDiscountUseCase,
+    private val orderProductsUseCase: OrderProductsUseCase,
 ) : ViewModel() {
     private val _uiState: MutableLiveData<PaymentUiState> =
         MutableLiveData<PaymentUiState>(PaymentUiState())
@@ -66,8 +68,17 @@ class PaymentViewModel(
         }
     }
 
-    fun onPayClick() {
-        _onPayClick.value = Event(Unit)
+    fun onPayClick(products: Products) {
+        viewModelScope.launch {
+            val productIds = products.getSelectedCartRecommendProductIds().toSet()
+            val result = orderProductsUseCase(productIds)
+            result
+                .onSuccess {
+                    _onPayClick.value = Event(Unit)
+                }.onFailure {
+                    Log.e("PaymentViewModel", it.message.toString())
+                }
+        }
     }
 
     private fun setupAmountsBeforeCoupon(products: Products) {
@@ -146,6 +157,7 @@ class PaymentViewModel(
                         calculatePaymentAmountByCouponUseCase = application.calculatePaymentAmountByCouponUseCase,
                         isFreeShippingCouponUseCase = application.isFreeShippingCouponUseCase,
                         calculateCouponDiscountUseCase = application.calculateCouponDiscountUseCase,
+                        orderProductsUseCase = application.orderProductsUseCase,
                     ) as T
                 }
             }

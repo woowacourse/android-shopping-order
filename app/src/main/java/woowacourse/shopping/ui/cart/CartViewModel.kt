@@ -179,17 +179,8 @@ class CartViewModel(
             (selectedCartProductsIds + selectedRecommendedProductsIds).toSet()
 
         if (selectedProductIds.isEmpty()) return
-
-        viewModelScope.launch {
-            val result = orderProductsUseCase(selectedProductIds)
-            result
-                .onSuccess {
-                    _editedProductIds.value = selectedProductIds
-                    _isOrdered.setValue(Unit)
-                }.onFailure {
-                    Log.e("CartViewModel", it.message.toString())
-                }
-        }
+        _editedProductIds.value = selectedProductIds
+        _isOrdered.setValue(Unit)
     }
 
     private fun loadCartProducts(page: Page = cartProducts.value?.page ?: EMPTY_PAGE) {
