@@ -8,7 +8,7 @@ import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class DefaultProductRepository(
-    private val productDataSource: RemoteProductsDataSource,
+    private val remoteProductDataSource: RemoteProductsDataSource,
 ) : ProductRepository {
     override suspend fun loadSinglePage(
         category: String?,
@@ -16,11 +16,11 @@ class DefaultProductRepository(
         pageSize: Int?,
     ): Result<ProductSinglePage> =
         withContext(Dispatchers.IO) {
-            productDataSource.singlePage(category, page, pageSize)
+            remoteProductDataSource.singlePage(category, page, pageSize)
         }
 
     override suspend fun loadProduct(productId: Long): Result<Product> =
         withContext(Dispatchers.IO) {
-            productDataSource.getProduct(productId)
+            remoteProductDataSource.getProduct(productId)
         }
 }

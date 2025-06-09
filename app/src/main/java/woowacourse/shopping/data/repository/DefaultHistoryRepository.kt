@@ -7,15 +7,15 @@ import woowacourse.shopping.data.db.entity.HistoryEntity
 import woowacourse.shopping.domain.repository.HistoryRepository
 
 class DefaultHistoryRepository(
-    private val defaultHistoryDataSource: HistoryDataSource,
+    private val localHistoryDataSource: HistoryDataSource,
 ) : HistoryRepository {
     override suspend fun getHistories() =
         withContext(Dispatchers.IO) {
-            defaultHistoryDataSource.latestHistory().map { it.productId }
+            localHistoryDataSource.latestHistory().map { it.productId }
         }
 
     override suspend fun saveHistory(productId: Long) =
         withContext(Dispatchers.IO) {
-            defaultHistoryDataSource.insertHistory(HistoryEntity(productId))
+            localHistoryDataSource.insertHistory(HistoryEntity(productId))
         }
 }
