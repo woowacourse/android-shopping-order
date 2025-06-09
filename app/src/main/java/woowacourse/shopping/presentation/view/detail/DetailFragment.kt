@@ -13,7 +13,8 @@ import woowacourse.shopping.presentation.view.common.BaseFragment
 import woowacourse.shopping.presentation.view.common.ItemCounterEventHandler
 
 class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_detail) {
-    private val viewModel: DetailViewModel by viewModels { DetailViewModel.factory(arguments?.getLong(PRODUCT_ID) ?: 0) }
+    private val productId: Long by lazy { arguments?.getLong(PRODUCT_ID) ?: 0 }
+    private val viewModel: DetailViewModel by viewModels { DetailViewModel.factory(productId) }
 
     private val detailEventHandler =
         object : DetailEventHandler {
@@ -21,7 +22,11 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
                 parentFragmentManager.popBackStack()
                 parentFragmentManager.commit {
                     setReorderingAllowed(true)
-                    replace(R.id.shopping_fragment_container, DetailFragment::class.java, newBundle(product.id))
+                    replace(
+                        R.id.shopping_fragment_container,
+                        DetailFragment::class.java,
+                        newBundle(product.id)
+                    )
                     addToBackStack(null)
                 }
             }
