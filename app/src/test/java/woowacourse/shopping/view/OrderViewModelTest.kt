@@ -13,6 +13,7 @@ import woowacourse.shopping.CoroutinesTestExtension
 import woowacourse.shopping.InstantTaskExecutorExtension
 import woowacourse.shopping.domain.cart.ShoppingCarts
 import woowacourse.shopping.domain.coupon.Coupon
+import woowacourse.shopping.domain.coupon.CouponApplierFactory
 import woowacourse.shopping.domain.coupon.CouponValidate
 import woowacourse.shopping.domain.coupon.CouponValidator
 import woowacourse.shopping.domain.coupon.FixedCoupon
@@ -33,6 +34,7 @@ class OrderViewModelTest {
     private val couponRepository: CouponRepository = mockk()
     private val orderRepository: OrderRepository = mockk()
     private val couponValidate: CouponValidate = CouponValidator()
+    private val couponFactory: CouponApplierFactory = CouponApplierFactory()
 
     private lateinit var viewModel: OrderViewModel
 
@@ -43,6 +45,7 @@ class OrderViewModelTest {
                 couponRepository,
                 orderRepository,
                 couponValidate,
+                couponFactory,
             )
     }
 
@@ -50,7 +53,7 @@ class OrderViewModelTest {
     fun `쿠폰 목록 호출 후 필터링된 쿠폰으로 상태가 초기화된다`() =
         runTest {
             // given
-            val carts = ShoppingCarts(listOf(shoppingCartFixture1))
+            val carts = listOf(shoppingCartFixture1)
             val fixedCoupon =
                 FixedCoupon(
                     id = 1,
@@ -66,7 +69,7 @@ class OrderViewModelTest {
             coEvery { couponRepository.getCoupons() } returns Result.success(coupons)
 
             // when
-            viewModel.loadCoupons(carts)
+            viewModel.loadCoupons(ShoppingCarts(carts))
 
             val expected = listOf(CouponState(item = fixedCoupon, checked = false))
 
@@ -80,11 +83,11 @@ class OrderViewModelTest {
     fun `주문 성공 시 OrderComplete가 이벤트 발생한다`() =
         runTest {
             // given
-            val carts = ShoppingCarts(listOf(shoppingCartFixture1))
+            val carts = listOf(shoppingCartFixture1)
             val coupons = emptyList<Coupon>()
             val orderCartIds = listOf(1L)
 
-            viewModel.setFakeUiState(OrderUiState.of(carts, coupons, 3000))
+            viewModel.setFakeUiState(OrderUiState.of(ShoppingCarts(carts), coupons, 3000))
             coEvery { orderRepository.createOrder(orderCartIds) } returns Result.success(Unit)
 
             // when

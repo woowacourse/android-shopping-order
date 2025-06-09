@@ -2,12 +2,8 @@ package woowacourse.shopping.view.order.state
 
 import woowacourse.shopping.domain.Payment
 import woowacourse.shopping.domain.cart.ShoppingCarts
-import woowacourse.shopping.domain.coupon.BogoCoupon
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.CouponApplierFactory
-import woowacourse.shopping.domain.coupon.FixedCoupon
-import woowacourse.shopping.domain.coupon.FreeshippingCoupon
-import woowacourse.shopping.domain.coupon.MiracleSaleCoupon
 
 data class OrderUiState(
     val order: ShoppingCarts,
@@ -53,12 +49,7 @@ data class OrderUiState(
         coupon: Coupon,
         couponFactory: CouponApplierFactory,
     ): Payment {
-        return when (coupon) {
-            is BogoCoupon -> couponFactory.bogoCouponApplier.apply(originPayment, order, coupon)
-            is FixedCoupon -> couponFactory.fixedCouponApplier.apply(originPayment, coupon)
-            is FreeshippingCoupon -> couponFactory.freeShippingCouponApplier.apply(originPayment)
-            is MiracleSaleCoupon -> couponFactory.miracleSaleCouponApplier.apply(originPayment, coupon)
-        }
+        return couponFactory.apply(originPayment, order, coupon)
     }
 
     companion object {

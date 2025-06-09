@@ -35,11 +35,11 @@ class ShoppingCartsTest {
     }
 
     @Test
-    fun `mostExpensiveCartWithStandardQuantity는 기준 수량 이상인 상품 중 가장 비싼 상품을 반환한다`() {
+    fun `mostExpensiveCartWithStandardQuantity는 기준 수량 이상인 상품 중 가장 비싼 상품의 가격을 반환한다`() {
         val carts = ShoppingCarts(shoppingCartFixtures)
 
-        val result = carts.mostExpensiveCartWithStandardQuantity(3)
+        val result = carts.mostExpensiveCartPriceWithStandardQuantity(3)
 
-        assertEquals(2, result?.id)
+        assertEquals(20_000, result)
     }
 }

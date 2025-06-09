@@ -121,7 +121,7 @@ class DetailViewModel(
                 .onSuccess {
                     navigateToCart(state.category)
                 }
-            // .onFailure(::handleFailure)
+                .onFailure(::handleFailure)
         }
     }
 

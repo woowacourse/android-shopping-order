@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.cart.ShoppingCarts
+import woowacourse.shopping.domain.coupon.CouponApplierFactory
 import woowacourse.shopping.domain.coupon.CouponValidate
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository

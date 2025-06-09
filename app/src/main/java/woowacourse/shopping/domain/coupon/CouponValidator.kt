@@ -1,16 +1,16 @@
 package woowacourse.shopping.domain.coupon
 
-import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.cart.ShoppingCarts
 import java.time.LocalDateTime
 
 class CouponValidator : CouponValidate {
     override fun validCoupon(
         coupons: List<Coupon>,
-        orders: List<ShoppingCart>,
+        orders: ShoppingCarts,
     ): List<Coupon> {
         val now = LocalDateTime.now()
         val today = now.toLocalDate()
-        val totalPayment = orders.sumOf { it.payment }
+        val totalPayment = orders.totalPayment
 
         return coupons.filter { coupon ->
             when (coupon) {

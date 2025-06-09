@@ -31,6 +31,7 @@ class OrderActivity : AppCompatActivity() {
             couponRepository = container.repositoryModule.defaultCouponRepository,
             orderRepository = container.repositoryModule.defaultOrderRepository,
             couponValidator = container.couponValidator,
+            couponApplierFactory = container.couponApplierFactory,
         )
     }
 

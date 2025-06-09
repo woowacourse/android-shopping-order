@@ -1,23 +1,35 @@
 package woowacourse.shopping.domain.coupon
 
-class CouponApplierFactory {
-    val bogoCouponApplier =
-        OrderBasedCouponApplier<BogoCoupon> { origin, order, coupon ->
-            val mostExpensiveProduct =
-                order
-                    .filter { it.quantityValue == coupon.standardQuantity }
-                    .maxBy { it.product.priceValue }
-                    .product
+import woowacourse.shopping.domain.Payment
+import woowacourse.shopping.domain.cart.ShoppingCarts
 
-            val discountPrice = mostExpensiveProduct.priceValue
-            val totalPayment = origin.totalPayment - discountPrice
+class CouponApplierFactory {
+    fun apply(
+        origin: Payment,
+        order: ShoppingCarts,
+        coupon: Coupon,
+    ): Payment {
+        return when (coupon) {
+            is BogoCoupon -> bogoCouponApplier.apply(origin, order, coupon)
+            is FixedCoupon -> fixedCouponApplier.apply(origin, coupon)
+            is FreeshippingCoupon -> freeShippingCouponApplier.apply(origin)
+            is MiracleSaleCoupon -> miracleSaleCouponApplier.apply(origin, coupon)
+        }
+    }
+
+    private val bogoCouponApplier =
+        OrderBasedCouponApplier<BogoCoupon> { origin, order, coupon ->
+            val mostExpensiveProductPrice =
+                order.mostExpensiveCartPriceWithStandardQuantity(coupon.buyQuantity)
+
+            val totalPayment = origin.totalPayment - mostExpensiveProductPrice
             origin.copy(
-                couponDiscount = -discountPrice,
+                couponDiscount = -mostExpensiveProductPrice,
                 totalPayment = totalPayment,
             )
         }
 
-    val fixedCouponApplier =
+    private val fixedCouponApplier =
         CouponBasedCouponApplier<FixedCoupon> { origin, coupon ->
             val totalPayment = origin.totalPayment - coupon.discount
             origin.copy(
@@ -26,7 +38,7 @@ class CouponApplierFactory {
             )
         }
 
-    val freeShippingCouponApplier =
+    private val freeShippingCouponApplier =
         DefaultCouponApplier<FreeshippingCoupon> { origin ->
             val totalPayment = origin.totalPayment - origin.deliveryFee
             origin.copy(
@@ -35,7 +47,7 @@ class CouponApplierFactory {
             )
         }
 
-    val miracleSaleCouponApplier =
+    private val miracleSaleCouponApplier =
         CouponBasedCouponApplier<MiracleSaleCoupon> { origin, coupon ->
             val discount = origin.totalPayment * coupon.discount / 100
             val totalPayment = origin.totalPayment - discount

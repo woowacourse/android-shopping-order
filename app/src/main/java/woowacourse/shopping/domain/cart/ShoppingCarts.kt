@@ -1,6 +1,5 @@
 package woowacourse.shopping.domain.cart
 
-import woowacourse.shopping.domain.product.Product
 import java.io.Serializable
 
 class ShoppingCarts(
@@ -16,10 +15,16 @@ class ShoppingCarts(
         return shoppingCarts.find { it.productId == productId }
     }
 
-    fun mostExpensiveCartWithStandardQuantity(standardQuantity: Int): Product? {
+    fun mostExpensiveCartPriceWithStandardQuantity(standardQuantity: Int): Int {
         return shoppingCarts
             .filter { it.quantity.value >= standardQuantity }
             .maxByOrNull { it.product.priceValue }
             ?.product
+            ?.priceValue
+            ?: throw IllegalArgumentException(CAN_NOT_FOUND_PRODUCT)
+    }
+
+    companion object {
+        private const val CAN_NOT_FOUND_PRODUCT = "쿠폰에 적용할 수 있는 상품이 없습니다."
     }
 }

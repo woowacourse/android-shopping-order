@@ -1,10 +1,10 @@
 package woowacourse.shopping.domain.coupon
 
-import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.cart.ShoppingCarts
 
 fun interface CouponValidate {
     fun validCoupon(
         coupons: List<Coupon>,
-        orders: List<ShoppingCart>,
+        orders: ShoppingCarts,
     ): List<Coupon>
 }

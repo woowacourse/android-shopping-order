@@ -4,12 +4,14 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.Payment
+import woowacourse.shopping.domain.cart.ShoppingCarts
 import woowacourse.shopping.fixture.shoppingCartFixtures
 import java.time.LocalDate
 import java.time.LocalTime
 
 class CouponApplierFactoryTest {
     private lateinit var factory: CouponApplierFactory
+    private val nextDay = LocalDate.now().plusDays(1)
 
     @BeforeEach
     fun setUp() {
@@ -17,14 +19,14 @@ class CouponApplierFactoryTest {
     }
 
     @Test
-    fun `쿠폰에 명시된 수량만큼 구매한 상품 중 가장 비싼 상품의 가격이 할인된다`() {
+    fun `BOGO 쿠폰은 조건에 맞는 가장 비싼 상품의 가격만큼 할인된다`() {
         // given
         val coupon =
             BogoCoupon(
                 id = 1,
                 code = "BOGO",
                 description = "2개 구매 시 1개 무료 쿠폰",
-                expirationDate = LocalDate.parse("2099-06-30"),
+                expirationDate = nextDay,
                 buyQuantity = 2,
                 getQuantity = 1,
                 discountType = "BOGO",
@@ -38,28 +40,22 @@ class CouponApplierFactoryTest {
             )
 
         val mostExpensiveProductPrice =
-            shoppingCartFixtures
-                .filter { it.quantityValue == coupon.standardQuantity }
-                .maxBy { it.product.priceValue }
-                .product
-                .priceValue
+            ShoppingCarts(shoppingCartFixtures)
+                .mostExpensiveCartPriceWithStandardQuantity(3)
 
         // when
-        val appliedPayment =
-            factory.bogoCouponApplier.apply(
-                origin = originPayment,
-                order = shoppingCartFixtures,
-                coupon = coupon,
-            )
+        val appliedPayment = factory.apply(originPayment, ShoppingCarts(shoppingCartFixtures), coupon)
 
         // then
-        assertEquals(mostExpensiveProductPrice, 20_000)
-        assertEquals(appliedPayment.couponDiscount, -mostExpensiveProductPrice)
-        assertEquals(appliedPayment.totalPayment, originPayment.totalPayment - mostExpensiveProductPrice)
+        assertEquals(-mostExpensiveProductPrice, appliedPayment.couponDiscount)
+        assertEquals(
+            originPayment.totalPayment - mostExpensiveProductPrice,
+            appliedPayment.totalPayment,
+        )
     }
 
     @Test
-    fun `구매 가격에서 5천원이 할인된다`() {
+    fun `Fixed 쿠폰은 고정 금액만큼 할인된다`() {
         // given
         val coupon =
             FixedCoupon(
@@ -80,19 +76,15 @@ class CouponApplierFactoryTest {
             )
 
         // when
-        val appliedPayment =
-            factory.fixedCouponApplier.apply(
-                origin = originPayment,
-                coupon = coupon,
-            )
+        val appliedPayment = factory.apply(originPayment, ShoppingCarts(shoppingCartFixtures), coupon)
 
         // then
-        assertEquals(appliedPayment.couponDiscount, -coupon.discount)
-        assertEquals(appliedPayment.totalPayment, originPayment.totalPayment - coupon.discount)
+        assertEquals(-coupon.discount, appliedPayment.couponDiscount)
+        assertEquals(originPayment.totalPayment - coupon.discount, appliedPayment.totalPayment)
     }
 
     @Test
-    fun `배송비가 할인된다`() {
+    fun `FreeShipping 쿠폰은 배송비만큼 할인된다`() {
         // given
         val coupon =
             FreeshippingCoupon(
@@ -112,18 +104,18 @@ class CouponApplierFactoryTest {
             )
 
         // when
-        val appliedPayment =
-            factory.freeShippingCouponApplier.apply(
-                origin = originPayment,
-            )
+        val appliedPayment = factory.apply(originPayment, ShoppingCarts(shoppingCartFixtures), coupon)
 
         // then
-        assertEquals(appliedPayment.couponDiscount, -originPayment.deliveryFee)
-        assertEquals(appliedPayment.totalPayment, originPayment.totalPayment - originPayment.deliveryFee)
+        assertEquals(-originPayment.deliveryFee, appliedPayment.couponDiscount)
+        assertEquals(
+            originPayment.totalPayment - originPayment.deliveryFee,
+            appliedPayment.totalPayment,
+        )
     }
 
     @Test
-    fun `miracle sale coupon에 명시된 할인률 만큼 할인된다`() {
+    fun `MiracleSale 쿠폰은 설정된 할인률만큼 할인된다`() {
         // given
         val coupon =
             MiracleSaleCoupon(
@@ -146,18 +138,14 @@ class CouponApplierFactoryTest {
                 deliveryFee = 3_000,
                 couponDiscount = 0,
             )
-
         val expectedDiscount = originPayment.totalPayment * coupon.discount / 100
 
         // when
         val appliedPayment =
-            factory.miracleSaleCouponApplier.apply(
-                origin = originPayment,
-                coupon = coupon,
-            )
+            factory.apply(originPayment, ShoppingCarts(shoppingCartFixtures), coupon)
 
         // then
-        assertEquals(appliedPayment.couponDiscount, expectedDiscount)
-        assertEquals(appliedPayment.totalPayment, originPayment.totalPayment - expectedDiscount)
+        assertEquals(expectedDiscount, appliedPayment.couponDiscount)
+        assertEquals(originPayment.totalPayment - expectedDiscount, appliedPayment.totalPayment)
     }
 }
