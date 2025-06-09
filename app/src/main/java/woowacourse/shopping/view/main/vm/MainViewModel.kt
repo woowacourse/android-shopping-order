@@ -168,6 +168,8 @@ class MainViewModel(
                         updateUiState { modifyQuantity(result.carts) }
                     }.onFailure(::handleFailure)
             }
+
+            fetchCartQuantity()
         }
 
     private fun navigateToDetail(productId: Long) =
