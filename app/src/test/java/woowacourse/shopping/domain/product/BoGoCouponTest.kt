@@ -15,6 +15,7 @@ class BoGoCouponTest {
     @BeforeEach
     fun setUp() {
         boGoCoupon = BoGoCoupon(
+            couponId = 1L,
             description = "",
             expirationDate = LocalDate.of(2025, 8, 31),
             buyQuantity = 2,

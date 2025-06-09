@@ -15,6 +15,7 @@ class FreeShippingCouponTest {
     @BeforeEach
     fun setUp() {
         freeShippingCoupon = FreeShippingCoupon(
+            couponId = 1L,
             description = "",
             expirationDate = LocalDate.of(2025, 8, 31),
             minimumOrderPrice = 50_000
