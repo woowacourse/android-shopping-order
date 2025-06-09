@@ -1,14 +1,15 @@
 package woowacourse.shopping.presentation.view.checkout
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCheckoutBinding
+import woowacourse.shopping.presentation.view.catalog.CatalogFragment
 import woowacourse.shopping.presentation.view.checkout.adapter.CouponAdapter
 import woowacourse.shopping.presentation.view.checkout.adapter.CouponUiModel
 import woowacourse.shopping.presentation.view.common.BaseFragment
@@ -31,6 +32,15 @@ class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment
                 isSelected: Boolean,
             ) {
                 viewModel.setCouponSelection(coupon, isSelected)
+            }
+
+            override fun onFinalizeOrder() {
+                viewModel.finalizeOrder()
+                Toast.makeText(activity, "주문이 완료되었습니다.", Toast.LENGTH_LONG).show()
+                parentFragmentManager.popBackStack()
+                parentFragmentManager.commit {
+                    replace(R.id.shopping_fragment_container, CatalogFragment::class.java, null)
+                }
             }
         }
 
@@ -57,6 +67,7 @@ class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment
     private fun initBinding() {
         binding.vm = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
+        binding.eventHandler = checkoutEventHandler
         binding.recyclerViewCoupon.adapter = adapter
         binding.btnBack.setOnClickListener {
             navigateBack()
@@ -66,10 +77,6 @@ class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment
     private fun initObserver() {
         viewModel.coupons.observe(viewLifecycleOwner) { coupons ->
             adapter.submitList(coupons)
-        }
-
-        viewModel.cartItems.observe(viewLifecycleOwner) { cartItems ->
-            cartItems.forEach { Log.d("cartItems", "$it") }
         }
     }
 

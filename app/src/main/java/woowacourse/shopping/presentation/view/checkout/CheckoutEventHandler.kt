@@ -7,4 +7,6 @@ interface CheckoutEventHandler {
         coupon: CouponUiModel,
         isSelected: Boolean,
     )
+
+    fun onFinalizeOrder()
 }

@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.view.checkout
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -47,7 +46,9 @@ class CheckoutViewModel(
 
     val grandTotal: LiveData<Int> =
         totalPrice.switchMap { totalPrice ->
-            discountAmount.map { discountAmount -> (totalPrice - discountAmount + shippingFee).coerceAtLeast(0) }
+            discountAmount.map { discountAmount ->
+                (totalPrice - discountAmount + shippingFee).coerceAtLeast(0)
+            }
         }
 
     fun loadSelectedCartItems(ids: List<Long>) {
@@ -61,12 +62,6 @@ class CheckoutViewModel(
                     }
                 }
             _cartItems.postValue(selectedCartItems)
-            couponRepository.loadCoupons().forEach {
-                val isAvailable = it.isAvailable(_cartItems.value.orEmpty(), LocalDateTime.now())
-                val discount = if (isAvailable) it.discount(_cartItems.value.orEmpty()) else -1
-                Log.d("Coupon", "${it.info.description}: $isAvailable, $discount")
-                it.isAvailable(_cartItems.value.orEmpty(), LocalDateTime.now())
-            }
         }
     }
 
@@ -94,6 +89,14 @@ class CheckoutViewModel(
                     coupon.copy(isSelected = false)
                 }
             }
+    }
+
+    fun finalizeOrder() {
+        viewModelScope.launch {
+            _cartItems.value?.forEach { cartItem ->
+                cartRepository.deleteCartItem(cartItem.cartId)
+            }
+        }
     }
 
     companion object {
