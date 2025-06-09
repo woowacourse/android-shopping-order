@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.usecase
 
-import woowacourse.shopping.domain.model.CouponDetailInfo
+import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
 
 class IsFreeShippingCouponUseCase(
@@ -9,6 +9,6 @@ class IsFreeShippingCouponUseCase(
     operator fun invoke(couponId: Long): Boolean {
         val selectedCoupon = couponRepository.fetchCoupon(couponId) ?: return false
 
-        return selectedCoupon is CouponDetailInfo.FreeShippingOver
+        return selectedCoupon is Coupon.FreeShippingOver
     }
 }

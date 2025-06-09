@@ -2,7 +2,7 @@ package woowacourse.shopping.domain.model
 
 import java.time.LocalTime
 
-sealed interface CouponDetailInfo {
+sealed interface Coupon {
     val id: Long
     val code: String
     val description: String
@@ -15,7 +15,7 @@ sealed interface CouponDetailInfo {
         override val expirationDate: String,
         val discount: Int,
         val minimumOrderAmount: Int,
-    ) : CouponDetailInfo
+    ) : Coupon
 
     data class BuyXGetYFree(
         override val id: Long,
@@ -24,7 +24,7 @@ sealed interface CouponDetailInfo {
         override val expirationDate: String,
         val buyQuantity: Int,
         val getQuantity: Int,
-    ) : CouponDetailInfo
+    ) : Coupon
 
     data class FreeShippingOver(
         override val id: Long,
@@ -32,7 +32,7 @@ sealed interface CouponDetailInfo {
         override val description: String,
         override val expirationDate: String,
         val minimumOrderAmount: Int,
-    ) : CouponDetailInfo
+    ) : Coupon
 
     data class PercentDiscount(
         override val id: Long,
@@ -41,7 +41,7 @@ sealed interface CouponDetailInfo {
         override val expirationDate: String,
         val discount: Int,
         val availableTime: AvailableTime,
-    ) : CouponDetailInfo
+    ) : Coupon
 
     data class AvailableTime(
         val start: LocalTime,
@@ -49,7 +49,7 @@ sealed interface CouponDetailInfo {
     )
 
     companion object {
-        fun CouponDetailInfo.isAvailable(
+        fun Coupon.isAvailable(
             products: Products,
             now: LocalTime = LocalTime.now(),
         ): Boolean {

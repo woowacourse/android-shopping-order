@@ -1,14 +1,14 @@
 package woowacourse.shopping.data.mapper
 
 import woowacourse.shopping.data.model.response.CouponsResponse
-import woowacourse.shopping.domain.model.CouponDetailInfo
+import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.CouponDiscountType
 import java.time.LocalTime
 
-fun CouponsResponse.CouponResponseItem.toDomain(): CouponDetailInfo =
+fun CouponsResponse.CouponResponseItem.toDomain(): Coupon =
     when (CouponDiscountType.from(id)) {
         CouponDiscountType.FIXED_DISCOUNT ->
-            CouponDetailInfo.FixedDiscount(
+            Coupon.FixedDiscount(
                 id = id,
                 code = code,
                 description = description,
@@ -20,7 +20,7 @@ fun CouponsResponse.CouponResponseItem.toDomain(): CouponDetailInfo =
             )
 
         CouponDiscountType.BUY_X_GET_Y_FREE ->
-            CouponDetailInfo.BuyXGetYFree(
+            Coupon.BuyXGetYFree(
                 id = id,
                 code = code,
                 description = description,
@@ -34,7 +34,7 @@ fun CouponsResponse.CouponResponseItem.toDomain(): CouponDetailInfo =
             )
 
         CouponDiscountType.FREE_SHIPPING_OVER ->
-            CouponDetailInfo.FreeShippingOver(
+            Coupon.FreeShippingOver(
                 id = id,
                 code = code,
                 description = description,
@@ -45,14 +45,14 @@ fun CouponsResponse.CouponResponseItem.toDomain(): CouponDetailInfo =
             )
 
         CouponDiscountType.PERCENT_DISCOUNT ->
-            CouponDetailInfo.PercentDiscount(
+            Coupon.PercentDiscount(
                 id = id,
                 code = code,
                 description = description,
                 expirationDate = expirationDate,
                 discount = discount ?: throw IllegalArgumentException("discount is required"),
                 availableTime =
-                    CouponDetailInfo.AvailableTime(
+                    Coupon.AvailableTime(
                         LocalTime.parse(availableTime?.start),
                         LocalTime.parse(availableTime?.end),
                     ),

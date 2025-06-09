@@ -2,14 +2,14 @@ package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.api.CouponApi
 import woowacourse.shopping.data.mapper.toDomain
-import woowacourse.shopping.domain.model.CouponDetailInfo
+import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
 
 class CouponRepository(
     private val api: CouponApi,
-    private var cachedCoupons: List<CouponDetailInfo> = emptyList(),
+    private var cachedCoupons: List<Coupon> = emptyList(),
 ) : CouponRepository {
-    override suspend fun fetchAllCoupons(): Result<List<CouponDetailInfo>> =
+    override suspend fun fetchAllCoupons(): Result<List<Coupon>> =
         runCatching {
             val response = api.getAllCoupons()
             if (response.isSuccessful) {
@@ -21,5 +21,5 @@ class CouponRepository(
             }
         }
 
-    override fun fetchCoupon(couponId: Long): CouponDetailInfo? = cachedCoupons.find { it.id == couponId }
+    override fun fetchCoupon(couponId: Long): Coupon? = cachedCoupons.find { it.id == couponId }
 }

@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.usecase
 
-import woowacourse.shopping.domain.model.CouponDetailInfo
-import woowacourse.shopping.domain.model.CouponDetailInfo.Companion.isAvailable
+import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.Coupon.Companion.isAvailable
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.repository.CouponRepository
 import java.time.LocalTime
@@ -21,20 +21,20 @@ class CalculatePaymentAmountByCouponUseCase(
         if (!selectedCoupon.isAvailable(products, now)) return totalPaymentAmount
 
         return when (selectedCoupon) {
-            is CouponDetailInfo.FixedDiscount -> {
+            is Coupon.FixedDiscount -> {
                 totalPaymentAmount - selectedCoupon.discount
             }
 
-            is CouponDetailInfo.BuyXGetYFree -> {
+            is Coupon.BuyXGetYFree -> {
                 val maximumPrice = products.products.maxOf { it.productDetail.price }
                 totalPaymentAmount - (maximumPrice * selectedCoupon.getQuantity)
             }
 
-            is CouponDetailInfo.FreeShippingOver -> {
+            is Coupon.FreeShippingOver -> {
                 totalPaymentAmount - DEFAULT_SHIPPING_FEE
             }
 
-            is CouponDetailInfo.PercentDiscount -> {
+            is Coupon.PercentDiscount -> {
                 val discount = orderAmount * selectedCoupon.discount / ONE_HUNDRED_PERCENT
                 totalPaymentAmount - discount
             }

@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.payment.adapter
 
-import woowacourse.shopping.domain.model.CouponDetailInfo
+import woowacourse.shopping.domain.model.Coupon
 
 data class CouponUiModel(
     val id: Long,
@@ -12,9 +12,9 @@ data class CouponUiModel(
     val isSelected: Boolean = false,
 ) {
     companion object {
-        fun CouponDetailInfo.toUiModel(isSelected: Boolean = false): CouponUiModel =
+        fun Coupon.toUiModel(isSelected: Boolean = false): CouponUiModel =
             when (this) {
-                is CouponDetailInfo.FixedDiscount ->
+                is Coupon.FixedDiscount ->
                     CouponUiModel(
                         id = id,
                         code = code,
@@ -25,7 +25,7 @@ data class CouponUiModel(
                         isSelected = isSelected,
                     )
 
-                is CouponDetailInfo.BuyXGetYFree ->
+                is Coupon.BuyXGetYFree ->
                     CouponUiModel(
                         id = id,
                         code = code,
@@ -34,7 +34,7 @@ data class CouponUiModel(
                         isSelected = isSelected,
                     )
 
-                is CouponDetailInfo.FreeShippingOver ->
+                is Coupon.FreeShippingOver ->
                     CouponUiModel(
                         id = id,
                         code = code,
@@ -44,7 +44,7 @@ data class CouponUiModel(
                         isSelected = isSelected,
                     )
 
-                is CouponDetailInfo.PercentDiscount ->
+                is Coupon.PercentDiscount ->
                     CouponUiModel(
                         id = id,
                         code = code,
