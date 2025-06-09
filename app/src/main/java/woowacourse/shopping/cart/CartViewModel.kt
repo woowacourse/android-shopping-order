@@ -194,7 +194,9 @@ class CartViewModel(
     }
 
     fun order() {
-        _orderClicked.postValue(Unit)
+        if (orderedProducts.isNotEmpty()) {
+            _orderClicked.postValue(Unit)
+        }
     }
 
     private fun isAllProductsSelected(): Boolean {
