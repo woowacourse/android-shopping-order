@@ -42,3 +42,12 @@
     - viewType은 하나의 Adapter 내에서 다양한 레이아웃을 처리하며 조건 분기와 다형성으로 복잡도가 높아질 수 있습니다.
     - ConcatAdapter는 Adapter를 단위로 분리해서 각 역할에 집중하게 만들어서 복잡도가 줄어들게 됩니다.
 - [x] domain layer 학습 후 중복 로직(상품 수량을 늘린다, 줄인다, 장바구니 담는다) 제거
+
+## 2차 피드백 반영
+- [ ] JsonClassDiscriminator 어노테이션이 붙지 않을 데이터 수정
+- [ ] find 네이밍 함수 이름 변경 및 Result를 통한 에러 핸들링
+- [ ] 특정 값 조회의 역할을 viewModel 또는 Repository로 이전
+- [ ] 에러핸들링을 하기 위해서는 CallAdapter 에 대해서 찾아보셔도 좋습니다
+- [ ] sealed class 파일 내부에 정리
+- [ ] 주문 완료에서 Home으로 이동 수정
+- [ ] fetchCart viewModel로 이전
