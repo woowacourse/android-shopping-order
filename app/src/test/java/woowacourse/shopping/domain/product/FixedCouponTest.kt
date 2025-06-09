@@ -15,7 +15,7 @@ class FixedCouponTest {
     @BeforeEach
     fun setUp() {
         fixedCoupon = FixedCoupon(
-            couponId = 1L,
+            description = "",
             expirationDate = LocalDate.of(2025, 11, 30),
             minimumOrderPrice = 100_000,
             disCountPrice = 5_000

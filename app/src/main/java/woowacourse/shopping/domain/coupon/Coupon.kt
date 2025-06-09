@@ -4,8 +4,8 @@ import woowacourse.shopping.domain.cart.Receipt
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-interface Coupon {
-    val couponId: Long
+sealed interface Coupon {
+    val description: String
     val expirationDate: LocalDate
 
     fun isAvailable(receipt: Receipt, current: LocalDateTime): Boolean

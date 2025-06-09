@@ -6,10 +6,10 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 
 class MiracleSaleCoupon(
-    override val couponId: Long,
+    override val description: String,
     override val expirationDate: LocalDate,
-    private val startHour: LocalTime,
-    private val endHour: LocalTime,
+    val startHour: LocalTime,
+    val endHour: LocalTime,
     private val discountRate: Double,
 ) : Coupon {
     override fun isAvailable(receipt: Receipt, current: LocalDateTime): Boolean =

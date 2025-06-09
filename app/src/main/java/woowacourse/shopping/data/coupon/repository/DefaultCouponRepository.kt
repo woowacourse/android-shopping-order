@@ -27,11 +27,11 @@ class DefaultCouponRepository(
         return this.mapNotNull { item: CouponResponseItem ->
             when (item.discountType) {
                 "fixed" -> {
-                    if (item.id == null || item.expirationDate == null || item.discount == 0 || item.minimumAmount == 0) {
+                    if (item.description == null || item.expirationDate == null || item.discount == 0 || item.minimumAmount == 0) {
                         return@mapNotNull null
                     }
                     FixedCoupon(
-                        couponId = item.id,
+                        description = item.description,
                         expirationDate = LocalDate.parse(item.expirationDate),
                         disCountPrice = item.discount,
                         minimumOrderPrice = item.minimumAmount
@@ -39,11 +39,11 @@ class DefaultCouponRepository(
                 }
 
                 "buyXgetY" -> {
-                    if (item.id == null || item.expirationDate == null || item.buyQuantity == 0 || item.getQuantity == 0) {
+                    if (item.description == null || item.expirationDate == null || item.buyQuantity == 0 || item.getQuantity == 0) {
                         return@mapNotNull null
                     }
                     BoGoCoupon(
-                        couponId = item.id,
+                        description = item.description,
                         expirationDate = LocalDate.parse(item.expirationDate),
                         buyQuantity = item.buyQuantity,
                         getQuantity = item.getQuantity
@@ -51,11 +51,11 @@ class DefaultCouponRepository(
                 }
 
                 "freeShipping" -> {
-                    if (item.id == null || item.expirationDate == null || item.minimumAmount == 0) {
+                    if (item.description == null || item.expirationDate == null || item.minimumAmount == 0) {
                         return@mapNotNull null
                     }
                     FreeShippingCoupon(
-                        couponId = item.id,
+                        description = item.description,
                         expirationDate = LocalDate.parse(item.expirationDate),
                         minimumOrderPrice = item.minimumAmount
                     )
@@ -63,7 +63,7 @@ class DefaultCouponRepository(
 
                 "percentage" -> {
                     if (
-                        item.id == null ||
+                        item.description == null ||
                         item.expirationDate == null ||
                         item.discount == 0 ||
                         item.availableTime?.start == null ||
@@ -72,7 +72,7 @@ class DefaultCouponRepository(
                         return@mapNotNull null
                     }
                     MiracleSaleCoupon(
-                        couponId = item.id,
+                        description = item.description,
                         expirationDate = LocalDate.parse(item.expirationDate),
                         startHour = LocalTime.parse(item.availableTime.start),
                         endHour = LocalTime.parse(item.availableTime.end),

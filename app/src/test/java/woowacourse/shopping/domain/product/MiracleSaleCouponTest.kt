@@ -17,7 +17,7 @@ class MiracleSaleCouponTest {
     @BeforeEach
     fun setUp() {
         miracleSaleCoupon = MiracleSaleCoupon(
-            couponId = 1L,
+            description = "",
             expirationDate = LocalDate.of(2025, 8, 31),
             startHour = LocalTime.of(4, 0),
             endHour = LocalTime.of(7, 0),

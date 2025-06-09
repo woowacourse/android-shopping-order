@@ -19,24 +19,24 @@ class CouponServiceTest {
 
         val coupons = listOf(
             BoGoCoupon(
-                couponId = 1L,
+                description = "",
                 expirationDate = LocalDate.of(2025, 11, 30),
                 buyQuantity = 2,
                 getQuantity = 1
             ),
             FixedCoupon(
-                couponId = 2L,
+                description = "",
                 expirationDate = LocalDate.of(2025, 11, 30),
                 disCountPrice = 5000,
                 minimumOrderPrice = 100_000
             ),
             FreeShippingCoupon(
-                couponId = 3L,
+                description = "",
                 expirationDate = LocalDate.of(2025, 11, 30),
                 minimumOrderPrice = 50_000
             ),
             MiracleSaleCoupon(
-                couponId = 4L,
+                description = "",
                 expirationDate = LocalDate.of(2025, 11, 30),
                 startHour = LocalTime.of(4, 0),
                 endHour = LocalTime.of(7, 0),
