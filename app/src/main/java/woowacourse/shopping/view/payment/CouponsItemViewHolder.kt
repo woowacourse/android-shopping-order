@@ -21,7 +21,12 @@ sealed class CouponsItemViewHolder<I>(
 
     class CouponViewHolder(
         private val binding: ItemCouponBinding,
+        private val onSelect: (CouponsItem.CouponItem) -> Unit,
     ) : CouponsItemViewHolder<CouponsItem.CouponItem>(binding) {
+        init {
+            binding.onSelect = onSelect
+        }
+
         override fun bind(item: CouponsItem.CouponItem) {
             binding.coupon = item
         }
@@ -31,6 +36,7 @@ sealed class CouponsItemViewHolder<I>(
         fun of(
             viewType: CouponsItemViewType,
             parent: ViewGroup,
+            onSelect: (CouponsItem.CouponItem) -> Unit,
         ): CouponsItemViewHolder<CouponsItem> {
             val layoutInflater = LayoutInflater.from(parent.context)
             return when (viewType) {
@@ -41,7 +47,7 @@ sealed class CouponsItemViewHolder<I>(
 
                 CouponsItemViewType.COUPON -> {
                     val binding = ItemCouponBinding.inflate(layoutInflater, parent, false)
-                    CouponViewHolder(binding)
+                    CouponViewHolder(binding, onSelect)
                 }
             } as CouponsItemViewHolder<CouponsItem>
         }

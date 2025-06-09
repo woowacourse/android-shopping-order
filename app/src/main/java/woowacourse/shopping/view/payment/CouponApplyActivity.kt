@@ -20,7 +20,7 @@ class CouponApplyActivity : AppCompatActivity() {
         ActivityCouponApplyBinding.inflate(layoutInflater)
     }
     private val viewModel: CouponApplyViewModel by viewModels()
-    private val adapter = CouponsAdapter()
+    private val adapter by lazy { CouponsAdapter(viewModel::selectCoupon) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

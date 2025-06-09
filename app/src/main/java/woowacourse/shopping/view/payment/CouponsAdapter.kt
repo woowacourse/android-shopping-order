@@ -4,7 +4,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 
-class CouponsAdapter : ListAdapter<CouponsItem, CouponsItemViewHolder<CouponsItem>>(diffUtil) {
+class CouponsAdapter(
+    private val onSelect: (CouponsItem.CouponItem) -> Unit,
+) : ListAdapter<CouponsItem, CouponsItemViewHolder<CouponsItem>>(diffUtil) {
     override fun getItemViewType(position: Int): Int = currentList[position].viewType.ordinal
 
     override fun onCreateViewHolder(
@@ -12,7 +14,7 @@ class CouponsAdapter : ListAdapter<CouponsItem, CouponsItemViewHolder<CouponsIte
         viewType: Int,
     ): CouponsItemViewHolder<CouponsItem> {
         val viewType: CouponsItemViewType = CouponsItemViewType.entries[viewType]
-        return CouponsItemViewHolder.of(viewType, parent)
+        return CouponsItemViewHolder.of(viewType, parent, onSelect)
     }
 
     override fun onBindViewHolder(

@@ -10,6 +10,10 @@
             type="woowacourse.shopping.view.payment.CouponsItem.CouponItem" />
 
         <import type="android.view.View" />
+
+        <variable
+            name="onSelect"
+            type="kotlin.jvm.functions.Function1" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -27,6 +31,7 @@
             android:layout_marginTop="6dp"
             android:checked="@{coupon.selected}"
             android:gravity="start|center_vertical"
+            android:onClick="@{() -> onSelect.invoke(coupon)}"
             android:text="@{coupon.value.description}"
             android:textColor="@color/gray_5"
             android:textSize="18sp"
