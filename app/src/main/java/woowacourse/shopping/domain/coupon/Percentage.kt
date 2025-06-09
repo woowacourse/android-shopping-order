@@ -9,7 +9,6 @@ data class Percentage(
     override val code: String,
     override val explanationDate: LocalDate,
     override val id: Long,
-    override val discountType: DiscountType = DiscountType.PERCENTAGE,
     val discount: Int,
     override val availableStartTime: LocalTime? = null,
     override val availableEndTime: LocalTime? = null,

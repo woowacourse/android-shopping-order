@@ -9,7 +9,6 @@ data class BuyXGetY(
     override val code: String,
     override val explanationDate: LocalDate,
     override val id: Long,
-    override val discountType: DiscountType = DiscountType.BUY_X_GET_Y,
     val buyQuantity: Int,
     val getQuantity: Int,
 ) : Coupon() {

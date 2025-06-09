@@ -10,7 +10,6 @@ class FreeShipping(
     override val code: String,
     override val explanationDate: LocalDate,
     override val id: Long,
-    override val discountType: DiscountType = DiscountType.FREE_SHIPPING,
     override val minimumAmount: Int?,
 ) : Coupon(), ShippingRule by DefaultShippingRule() {
     override fun discountAmount(shoppingCartProductToOrder: List<ShoppingCartProduct>): Int {

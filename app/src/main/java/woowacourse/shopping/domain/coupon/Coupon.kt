@@ -10,7 +10,6 @@ sealed class Coupon {
     abstract val description: String
     abstract val code: String
     abstract val explanationDate: LocalDate
-    abstract val discountType: DiscountType
     open val minimumAmount: Int? = null
     open val availableStartTime: LocalTime? = null
     open val availableEndTime: LocalTime? = null

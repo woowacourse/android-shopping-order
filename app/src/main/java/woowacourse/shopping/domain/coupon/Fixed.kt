@@ -8,7 +8,6 @@ data class Fixed(
     override val code: String,
     override val explanationDate: LocalDate,
     override val id: Long,
-    override val discountType: DiscountType = DiscountType.FIXED,
     val discount: Int,
     override val minimumAmount: Int?,
 ) : Coupon() {
