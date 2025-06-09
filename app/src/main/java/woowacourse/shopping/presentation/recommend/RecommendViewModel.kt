@@ -29,7 +29,6 @@ class RecommendViewModel(
 ) : ViewModel(),
     ItemClickListener,
     CartCounterClickListener {
-    private lateinit var recentCategory: String
     private val _recommendProducts: MutableLiveData<List<CartItemUiModel>> = MutableLiveData()
     val recommendProducts: LiveData<List<CartItemUiModel>> = _recommendProducts
     private val _selectedTotalPrice: MutableLiveData<Int> = MutableLiveData(0)
@@ -56,7 +55,7 @@ class RecommendViewModel(
         viewModelScope.launch {
             val recentProduct = recentProductRepository.getMostRecentProduct()
             recentProduct.onSuccess {
-                recentCategory = it?.category ?: ""
+                val recentCategory = it?.category ?: ""
                 productRepository
                     .fetchPagingProducts(category = recentCategory)
                     .onSuccess { products ->
