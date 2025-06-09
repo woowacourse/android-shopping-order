@@ -45,7 +45,6 @@ class GoodsDetailsViewModel(
 
     fun setInitialCart(id: Long) {
         loadProductDetails(productId = id)
-        loadLastViewed()
     }
 
     fun loadProductDetails(productId: Long) {
@@ -65,6 +64,8 @@ class GoodsDetailsViewModel(
                 }.onFailure {
                     _isFail.setValue(Unit)
                 }
+
+            loadLastViewed()
         }
     }
 
@@ -122,16 +123,17 @@ class GoodsDetailsViewModel(
     fun updateLastViewedVisibility() {
         val lastName = _lastViewed.value?.name
         val currentName = _product.value?.name
-        _isLastViewedVisible.postValue(lastName != null && currentName != null && lastName != currentName)
+        _isLastViewedVisible.value = (lastName != null && currentName != null && lastName != currentName)
     }
 
     fun loadLastViewed() {
         viewModelScope.launch(Dispatchers.IO) {
             val lastViewed = historyRepository.findLatest()
+
             withContext(Dispatchers.Main) {
-                lastViewed?.let { _lastViewed.value }
+                lastViewed?.let { _lastViewed.value = it.product }
+                updateLastViewedVisibility()
             }
-            updateLastViewedVisibility()
         }
     }
 

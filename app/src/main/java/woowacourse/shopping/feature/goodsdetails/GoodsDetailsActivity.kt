@@ -74,7 +74,7 @@ class GoodsDetailsActivity : AppCompatActivity() {
     private fun observeCartInsertResult() {
         viewModel.isSuccess.observe(this) {
             Toast.makeText(this, R.string.goods_detail_cart_insert_success_toast_message, Toast.LENGTH_SHORT).show()
-            CartActivity.newIntent(this)
+            startActivity(CartActivity.newIntent(this))
         }
         viewModel.isFail.observe(this) {
             Toast.makeText(this, R.string.goods_detail_cart_insert_fail_toast_message, Toast.LENGTH_SHORT).show()
