@@ -35,8 +35,8 @@ class PaymentActivity : AppCompatActivity() {
 
     private fun initBinding() {
         binding = ActivityPaymentBinding.inflate(layoutInflater)
-        binding.lifecycleOwner = this
         binding.vm = viewModel
+        binding.lifecycleOwner = this
         setContentView(binding.root)
     }
 
@@ -60,9 +60,6 @@ class PaymentActivity : AppCompatActivity() {
     }
 
     private fun setObserver() {
-        binding.vm = viewModel
-        binding.lifecycleOwner = this
-
         viewModel.toastEvent.observe(this) {
             Toast.makeText(this, it.toMessageResId(), Toast.LENGTH_SHORT).show()
         }
