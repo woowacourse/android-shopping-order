@@ -19,7 +19,7 @@ class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
     val viewModel: CartViewModel by viewModels { CartViewModelFactory() }
     private var hasHandledTotalCount = false
-    private var fragmentState: Int = 1
+    private var fragmentState: Int = FRAGMENT_SELECTION
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,26 +65,18 @@ class CartActivity : AppCompatActivity() {
         fragmentState = FRAGMENT_RECOMMENDATION
         binding.checkboxAllSelection.visibility = View.GONE
         binding.textViewAllSelection.visibility = View.GONE
-
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            replace(
-                R.id.fragment_container_cart_selection,
-                CartRecommendationFragment::class.java,
-                null,
-            )
-        }
+        replaceFragment(CartRecommendationFragment::class.java)
     }
 
     private fun replaceCartSelectionFragment() {
         fragmentState = FRAGMENT_SELECTION
+        replaceFragment(CartSelectionFragment::class.java)
+    }
+
+    private fun replaceFragment(fragmentClass: Class<out androidx.fragment.app.Fragment>) {
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            replace(
-                R.id.fragment_container_cart_selection,
-                CartSelectionFragment::class.java,
-                null,
-            )
+            replace(R.id.fragment_container_cart_selection, fragmentClass, null)
         }
     }
 
@@ -92,7 +84,6 @@ class CartActivity : AppCompatActivity() {
         if (fragmentState == FRAGMENT_SELECTION) {
             replaceCartRecommendationFragment()
         } else if (fragmentState == FRAGMENT_RECOMMENDATION) {
-            val products = viewModel.cartProducts.value
             startActivity(OrderActivity.newIntent(this, viewModel.orderedProducts))
         }
     }
