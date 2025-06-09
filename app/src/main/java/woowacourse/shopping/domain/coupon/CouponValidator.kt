@@ -5,10 +5,10 @@ import java.time.LocalDateTime
 
 class CouponValidator : CouponValidate {
     override fun validCoupon(
+        now : LocalDateTime,
         coupons: List<Coupon>,
         orders: ShoppingCarts,
     ): List<Coupon> {
-        val now = LocalDateTime.now()
         val today = now.toLocalDate()
         val totalPayment = orders.totalPayment
 

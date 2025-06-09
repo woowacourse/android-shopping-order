@@ -16,6 +16,7 @@ import woowacourse.shopping.view.core.event.SingleLiveData
 import woowacourse.shopping.view.order.OrderUiEvent
 import woowacourse.shopping.view.order.adapter.OrderAdapter
 import woowacourse.shopping.view.order.state.OrderUiState
+import java.time.LocalDateTime
 
 class OrderViewModel(
     private val couponRepository: CouponRepository,
@@ -33,7 +34,8 @@ class OrderViewModel(
         viewModelScope.launch {
             couponRepository.getCoupons()
                 .onSuccess { result ->
-                    val coupons = couponValidator.validCoupon(result, order)
+                    val now = LocalDateTime.now()
+                    val coupons = couponValidator.validCoupon(now, result, order)
                     _uiState.value = OrderUiState.of(order, coupons, DEFAULT_DELIVERY_FEE)
                 }
                 .onFailure(::handleFailure)
