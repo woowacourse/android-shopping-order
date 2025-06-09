@@ -4,6 +4,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import woowacourse.shopping.domain.model.coupon.Coupon
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
@@ -21,3 +22,11 @@ sealed class CouponResponse {
     @SerialName("id")
     abstract val id: Long
 }
+
+fun CouponResponse.toTypedDomain(): Coupon =
+    when (this) {
+        is BogoCouponResponse -> this.toDomain()
+        is FreeShippingCouponResponse -> this.toDomain()
+        is TimeLimitedCouponResponse -> this.toDomain()
+        is DiscountCouponResponse -> this.toDomain()
+    }
