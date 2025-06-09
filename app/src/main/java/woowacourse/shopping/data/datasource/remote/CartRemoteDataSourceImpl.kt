@@ -66,7 +66,11 @@ class CartRemoteDataSourceImpl(
             errorMessage = "아이템 삭제 실패",
             apiCall = { cartItemService.deleteCartItem(cartId) },
             transform = { response ->
-                response.body() ?: throw IllegalStateException("응답 바디가 null입니다.")
+                if (response.isSuccessful) {
+                    Unit
+                } else {
+                    throw IllegalStateException("삭제 실패: ${response.code()}")
+                }
             },
         )
 
