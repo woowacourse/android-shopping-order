@@ -53,4 +53,5 @@
     <string name="coupon_bonus_discount_condition">3개씩 담은 제품이 여러개인 경우, 1개당 금액이 가장 비싼 제품에 적용</string>
     <string name="coupon_free_shipping_discount_condition">최소 주문 금액: %1$s</string>
     <string name="coupon_percentage_discount_condition">사용 가능 시간: 오전%1$s부터 %2$s까지</string>
+    <string name="order_coupon_empty_message">적용 가능한 쿠폰이\n없습니다.</string>
 </resources>
