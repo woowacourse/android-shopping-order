@@ -113,10 +113,6 @@ class CatalogFragment :
         binding.vm = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel.products.observe(viewLifecycleOwner) {
-            catalogAdapter.submitList(it)
-        }
-
         viewModel.toastEvent.observe(viewLifecycleOwner) {
             showToast(it.toMessageResId())
         }

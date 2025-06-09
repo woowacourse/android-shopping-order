@@ -8,8 +8,8 @@ import woowacourse.shopping.presentation.common.model.CatalogItem
 import woowacourse.shopping.presentation.common.ui.decorations.HorizontalEdgeSpacingDecoration
 
 class RecentProductContainerViewHolder private constructor(
-    binding: ItemRecentProductContainerBinding,
-    private val adapter: RecentProductAdapter,
+    private val binding: ItemRecentProductContainerBinding,
+    adapter: RecentProductAdapter,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.recyclerViewRecentProduct.adapter = adapter
@@ -17,7 +17,7 @@ class RecentProductContainerViewHolder private constructor(
     }
 
     fun bind(recentProducts: CatalogItem.RecentProducts) {
-        adapter.submitList(recentProducts.products)
+        binding.recentProducts = recentProducts.products
     }
 
     companion object {

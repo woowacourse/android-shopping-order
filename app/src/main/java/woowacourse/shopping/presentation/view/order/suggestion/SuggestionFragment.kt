@@ -34,9 +34,8 @@ class SuggestionFragment : BaseFragment<FragmentSuggestionBinding>(R.layout.frag
     }
 
     private fun setObservers() {
-        viewModel.suggestionProducts.observe(viewLifecycleOwner) { suggestionProducts ->
-            suggestionAdapter.submitList(suggestionProducts)
-        }
+        binding.vm = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
 
         viewModel.toastEvent.observe(viewLifecycleOwner) { event ->
             showToast(event.toMessageResId())
