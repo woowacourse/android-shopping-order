@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityRecommendBinding
+import woowacourse.shopping.presentation.order.OrderActivity
 import woowacourse.shopping.presentation.product.ProductQuantityHandler
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandler
@@ -34,6 +35,7 @@ class RecommendActivity : AppCompatActivity() {
         setUpAdapter()
         setOrderInfo()
         observeCartEvent()
+        navigateToOrder()
     }
 
     private fun setUpScreen() {
@@ -80,7 +82,7 @@ class RecommendActivity : AppCompatActivity() {
 
     private fun setOrderInfo() {
         val checkedProducts =
-            intent.getArrayListExtraCompat(CHECKED_PRODUCTS_KEY, ProductUiModel::class.java)
+            intent.getArrayListExtraCompat(RECOMMEND_KEY, ProductUiModel::class.java)
                 ?: emptyList()
         viewModel.setCheckedProducts(checkedProducts.toList())
     }
@@ -99,19 +101,26 @@ class RecommendActivity : AppCompatActivity() {
         }
     }
 
+    private fun navigateToOrder() {
+        binding.buttonOrder.setOnClickListener {
+            val newIntent = OrderActivity.newIntent(this@RecommendActivity, viewModel.checkedProducts)
+            startActivity(newIntent)
+        }
+    }
+
     private fun showToast(resId: Int) {
         Toast.makeText(this, getString(resId), Toast.LENGTH_SHORT).show()
     }
 
     companion object {
-        private const val CHECKED_PRODUCTS_KEY = "Products"
+        private const val RECOMMEND_KEY = "Recommend"
 
         fun newIntent(
             context: Context,
             products: List<ProductUiModel>,
         ): Intent {
             return Intent(context, RecommendActivity::class.java).apply {
-                putParcelableArrayListExtra(CHECKED_PRODUCTS_KEY, ArrayList(products))
+                putParcelableArrayListExtra(RECOMMEND_KEY, ArrayList(products))
             }
         }
     }

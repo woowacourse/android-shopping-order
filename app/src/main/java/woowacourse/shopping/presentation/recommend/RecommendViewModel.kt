@@ -39,7 +39,8 @@ class RecommendViewModel(
     val totalCount: LiveData<Int>
         get() = _totalCount
 
-    private var checkedProducts: List<ProductUiModel> = emptyList()
+    var checkedProducts: List<ProductUiModel> = emptyList()
+        private set
 
     init {
         loadRecommendProducts()
