@@ -3,8 +3,6 @@ package woowacourse.shopping.di.provider
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.datasource.local.CartLocalDataSource
 import woowacourse.shopping.data.datasource.local.CartLocalDataSourceImpl
-import woowacourse.shopping.data.datasource.local.CouponLocalDataSource
-import woowacourse.shopping.data.datasource.local.CouponLocalDataSourceImpl
 import woowacourse.shopping.data.datasource.local.ProductLocalDataSource
 import woowacourse.shopping.data.datasource.local.ProductLocalDataSourceImpl
 import woowacourse.shopping.data.datasource.remote.CartRemoteDataSource
@@ -23,7 +21,6 @@ object DataSourceProvider {
     val cartLocalDataSource: CartLocalDataSource by lazy { initCartLocalDataSource() }
     val productLocalDataSource: ProductLocalDataSource by lazy { initProductLocalDataSource() }
     val couponRemoteDataSource: CouponRemoteDataSource by lazy { initCouponRemoteDataSource() }
-    val couponLocalDataSource: CouponLocalDataSource by lazy { initCouponLocalDataSource() }
     val orderRemoteDataSource: OrderRemoteDataSource by lazy { initOrderRemoteDataSource() }
 
     private fun initProductDataSource(): ProductRemoteDataSource {
@@ -42,8 +39,6 @@ object DataSourceProvider {
     }
 
     private fun initCouponRemoteDataSource(): CouponRemoteDataSource = CouponRemoteDataSourceImpl(ServiceProvider.provideCouponService())
-
-    private fun initCouponLocalDataSource(): CouponLocalDataSource = CouponLocalDataSourceImpl()
 
     private fun initOrderRemoteDataSource(): OrderRemoteDataSource = OrderRemoteDataSourceImpl(ServiceProvider.provideOrderService())
 }

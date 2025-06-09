@@ -41,17 +41,15 @@ class ShoppingApplication : Application() {
 
     private fun initCouponRepository() {
         val couponRemoteDataSource = DataSourceProvider.couponRemoteDataSource
-        val couponLocalDataSource = DataSourceProvider.couponLocalDataSource
-        val repository = CouponRepositoryImpl(couponRemoteDataSource, couponLocalDataSource)
+        val repository = CouponRepositoryImpl(couponRemoteDataSource)
         RepositoryProvider.initCouponRepository(repository)
     }
 
     private fun initOrderRepository() {
         val orderRemoteDataSource = DataSourceProvider.orderRemoteDataSource
         val cartLocalDataSource = DataSourceProvider.cartLocalDataSource
-        val couponLocalDataSource = DataSourceProvider.couponLocalDataSource
         val repository =
-            OrderRepositoryImpl(orderRemoteDataSource, cartLocalDataSource, couponLocalDataSource)
+            OrderRepositoryImpl(orderRemoteDataSource, cartLocalDataSource)
         RepositoryProvider.initOrderRepository(repository)
     }
 

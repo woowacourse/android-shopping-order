@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.datasource.local.CouponLocalDataSource
 import woowacourse.shopping.data.datasource.remote.CouponRemoteDataSource
 import woowacourse.shopping.data.model.coupon.toDomain
 import woowacourse.shopping.data.util.runCatchingDebugLog
@@ -10,7 +9,6 @@ import woowacourse.shopping.domain.repository.CouponRepository
 
 class CouponRepositoryImpl(
     private val couponRemoteDataSource: CouponRemoteDataSource,
-    private val couponLocalDataSource: CouponLocalDataSource,
 ) : CouponRepository {
     override suspend fun fetchCoupons(
         paymentSummary: PaymentSummary,
@@ -19,7 +17,6 @@ class CouponRepositoryImpl(
         runCatchingDebugLog {
             val response = couponRemoteDataSource.fetchCoupons()
             val coupons = response.map { it.toDomain() }
-            couponLocalDataSource.saveCoupons(coupons)
 
             if (isFilterAvailable) coupons.availableCoupons(paymentSummary) else coupons
         }
