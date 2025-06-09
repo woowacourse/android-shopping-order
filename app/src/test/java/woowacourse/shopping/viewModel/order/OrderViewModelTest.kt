@@ -24,7 +24,6 @@ import woowacourse.shopping.view.order.OrderViewModel
 import woowacourse.shopping.viewModel.common.CoroutinesTestExtension
 import woowacourse.shopping.viewModel.common.InstantTaskExecutorExtension
 import woowacourse.shopping.viewModel.common.getOrAwaitValue
-import java.time.LocalDate
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
@@ -68,11 +67,8 @@ class OrderViewModelTest {
 
         val couponState =
             CouponState(
-                id = 0,
+                coupon = COUPONS[0],
                 isSelected = false,
-                title = "배송비 무료",
-                expirationDate = LocalDate.of(2099, 1, 1),
-                minimumOrderPrice = 0,
             )
 
         // when
@@ -98,11 +94,8 @@ class OrderViewModelTest {
 
         val couponState =
             CouponState(
-                id = 0,
+                coupon = COUPONS[0],
                 isSelected = false,
-                title = "배송비 무료",
-                expirationDate = LocalDate.of(2099, 1, 1),
-                minimumOrderPrice = 0,
             )
 
         // when
@@ -142,11 +135,8 @@ class OrderViewModelTest {
         assertThat(viewModel.couponState.getOrAwaitValue()).isEqualTo(
             listOf(
                 CouponState(
-                    id = COUPONS[0].id,
+                    coupon = COUPONS[0],
                     isSelected = false,
-                    title = COUPONS[0].description,
-                    expirationDate = COUPONS[0].explanationDate,
-                    minimumOrderPrice = COUPONS[0].minimumAmount,
                 ),
             ),
         )

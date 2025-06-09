@@ -32,7 +32,7 @@ class OrderViewModel(
             addSource(coupons) { coupons ->
                 value =
                     coupons.available(shoppingCartProductsToOrder)
-                        .map { CouponState.fromDomain(it) }
+                        .map { CouponState(it, false) }
             }
         }
 
