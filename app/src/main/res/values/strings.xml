@@ -56,5 +56,6 @@
     <string name="total_order_price">총 결제 금액</string>
     <string name="minimum_order_price">최소 주문 금액: %,d원</string>
     <string name="expirationDate">만료일: %s</string>
+    <string name="receipt_product_format">%,d원</string>
 
 </resources>

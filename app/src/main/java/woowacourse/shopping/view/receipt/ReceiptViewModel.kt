@@ -20,9 +20,11 @@ import java.time.LocalDateTime
 class ReceiptViewModel(
     private val couponRepository: CouponRepository = DefaultCouponRepository(),
 ) : ViewModel() {
-
     private var _couponItem: MutableLiveData<List<CouponItem>> = MutableLiveData()
     val couponItem: LiveData<List<CouponItem>> = _couponItem
+
+    private var _receipt: MutableLiveData<Receipt> = MutableLiveData()
+    val receipt: LiveData<Receipt> = _receipt
 
     private var coupons: List<Coupon> = emptyList()
 
@@ -57,24 +59,24 @@ class ReceiptViewModel(
         )
     }
 
-
     fun showAvailableCoupons(cartItems: List<CartItem>) {
         viewModelScope.launch {
             runCatching {
                 couponRepository.loadCoupons()
             }.onSuccess { coupons ->
                 val couponService = CouponService(coupons)
+                val receipt = Receipt(cartItems)
                 val result = couponService.applyApplicableCoupons(
-                    receipt = Receipt(cartItems),
+                    receipt = receipt,
                     current = LocalDateTime.now()
                 )
+                this@ReceiptViewModel._receipt.value = receipt
+
                 this@ReceiptViewModel.coupons = result
                 loadCoupons()
             }.onFailure {
-                //TODO
+                //TODO : Handle by event
             }
         }
     }
-
-
 }

@@ -41,6 +41,7 @@ class ReceiptActivity : AppCompatActivity() {
     private fun initBinding() {
         binding.lifecycleOwner = this
         binding.rvCoupon.adapter = receiptAdapter
+        binding.vm = viewModel
     }
 
     companion object {
