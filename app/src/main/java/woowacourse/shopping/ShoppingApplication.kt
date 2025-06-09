@@ -12,6 +12,10 @@ import woowacourse.shopping.data.coupon.dataSource.DefaultCouponRemoteDataSource
 import woowacourse.shopping.data.coupon.remote.service.CouponService
 import woowacourse.shopping.data.coupon.repository.DefaultCouponRepository
 import woowacourse.shopping.data.network.ApiClient
+import woowacourse.shopping.data.order.datasource.DefaultOrderRemoteDataSource
+import woowacourse.shopping.data.order.datasource.OrderRemoteDataSource
+import woowacourse.shopping.data.order.remote.service.OrderService
+import woowacourse.shopping.data.order.repository.DefaultOrderRepository
 import woowacourse.shopping.data.product.dataSource.DefaultProductLocalDataSource
 import woowacourse.shopping.data.product.dataSource.DefaultProductRemoteDataSource
 import woowacourse.shopping.data.product.dataSource.ProductLocalDataSource
@@ -58,6 +62,12 @@ class ShoppingApplication : Application() {
         ApiClient.getApiClient().create(CouponService::class.java)
     }
 
+    private val orderService: OrderService by lazy {
+        ApiClient
+            .getAuthenticationApiClient(DefaultAuthenticationRepository.get())
+            .create(OrderService::class.java)
+    }
+
     private val authLocalDataSource: AuthenticationLocalDataSource by lazy {
         DefaultAuthenticationLocalDataSource(authSharedPreferences)
     }
@@ -78,6 +88,10 @@ class ShoppingApplication : Application() {
         DefaultCouponRemoteDataSource(couponService)
     }
 
+    private val orderRemoteDataSource: OrderRemoteDataSource by lazy {
+        DefaultOrderRemoteDataSource(orderService)
+    }
+
     override fun onCreate() {
         super.onCreate()
         DefaultAuthenticationRepository.initialize(authLocalDataSource)
@@ -87,6 +101,7 @@ class ShoppingApplication : Application() {
             productLocalDataSource,
         )
         DefaultCouponRepository.initialize(couponRemoteDataSource)
+        DefaultOrderRepository.initialize(orderRemoteDataSource)
 
         DefaultAuthenticationRepository.get().updateUserAuthentication(
             UserAuthentication(
