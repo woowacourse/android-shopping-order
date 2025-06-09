@@ -11,7 +11,6 @@ import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.view.core.common.withState
 import woowacourse.shopping.view.core.event.MutableSingleLiveData
 import woowacourse.shopping.view.core.event.SingleLiveData
 import woowacourse.shopping.view.core.handler.CartQuantityHandler
@@ -56,27 +55,26 @@ class DetailViewModel(
     }
 
     fun increaseCartQuantity() {
-        withState(_uiState.value) { state ->
-            val result = state.product.increaseCartQuantity()
-            _uiState.value = state.copy(product = result)
-        }
+        val state = uiState.value ?: return
+        val result = state.product.increaseCartQuantity()
+        _uiState.value = state.copy(product = result)
+
     }
 
     fun decreaseCartQuantity() {
-        withState(_uiState.value) { state ->
-            val product = state.product
-            val decreasedCartQuantity = (product.cartQuantity - 1)
+        val state = uiState.value ?: return
+        val product = state.product
+        val decreasedCartQuantity = (product.cartQuantity - 1)
 
-            val quantity =
-                if (!decreasedCartQuantity.hasQuantity()) {
-                    _event.setValue(DetailUiEvent.ShowCannotDecrease)
-                    Quantity(1)
-                } else {
-                    decreasedCartQuantity
-                }
+        val quantity =
+            if (!decreasedCartQuantity.hasQuantity()) {
+                _event.setValue(DetailUiEvent.ShowCannotDecrease)
+                Quantity(1)
+            } else {
+                decreasedCartQuantity
+            }
 
-            _uiState.value = state.copy(product = product.copy(cartQuantity = quantity))
-        }
+        _uiState.value = state.copy(product = product.copy(cartQuantity = quantity))
     }
 
     fun saveCart(productId: Long) {
