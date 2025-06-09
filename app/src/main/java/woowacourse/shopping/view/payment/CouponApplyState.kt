@@ -12,7 +12,7 @@ data class CouponApplyState(
 ) {
     val orderAmount: Int = cartItems.sumOf(CartItem::price)
     val discountAmount: Int = selectedCoupon?.discountAmount(cartItems, deliveryFee) ?: 0
-    val totalPaymentAmount: Int = orderAmount - discountAmount
+    val totalPaymentAmount: Int = orderAmount - discountAmount + deliveryFee
 
     companion object {
         val Loading: CouponApplyState =
