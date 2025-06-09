@@ -1,5 +1,7 @@
 package woowacourse.shopping.presentation.product.catalog
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
@@ -120,4 +122,10 @@ class CatalogActivity : AppCompatActivity() {
         CatalogEventHandlerImpl(viewModel) { product ->
             startActivity(newIntent(this, product.id))
         }
+
+    companion object {
+        fun newIntent(context: Context): Intent {
+            return Intent(context, CatalogActivity::class.java)
+        }
+    }
 }

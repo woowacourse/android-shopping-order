@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.order
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
+import woowacourse.shopping.presentation.product.catalog.CatalogActivity
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.presentation.util.getArrayListExtraCompat
 import java.util.ArrayList
@@ -30,7 +32,7 @@ class OrderActivity : AppCompatActivity() {
         setUpBinding()
         setUpCheckedProducts()
         setUpCoupons()
-        supportActionBar?.hide()
+        observeEvent()
     }
 
     private fun setUpScreen() {
@@ -40,12 +42,16 @@ class OrderActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        supportActionBar?.hide()
     }
 
     private fun setUpBinding() {
         binding.apply {
             lifecycleOwner = this@OrderActivity
             vm = viewModel
+            btnOrder.setOnClickListener {
+                viewModel.payToOrder()
+            }
         }
     }
 
@@ -62,6 +68,16 @@ class OrderActivity : AppCompatActivity() {
         binding.rvCoupons.adapter = adapter
         viewModel.coupons.observe(this) {
             adapter.submitList(it)
+        }
+    }
+
+    private fun observeEvent() {
+        viewModel.orderEvent.observe(this) {
+            Toast.makeText(this, getString(R.string.text_order_complete), Toast.LENGTH_SHORT).show()
+            val newIntent = CatalogActivity.newIntent(this).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(newIntent)
         }
     }
 
