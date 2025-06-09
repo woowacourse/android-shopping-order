@@ -14,6 +14,7 @@ import woowacourse.shopping.data.service.ProductService
 object ApiClient {
     private const val USERNAME = BuildConfig.AUTH_USERNAME
     private const val PASSWORD = BuildConfig.AUTH_PASSWORD
+    private const val BASE_URL = BuildConfig.BASE_URL
 
     private val client =
         OkHttpClient
