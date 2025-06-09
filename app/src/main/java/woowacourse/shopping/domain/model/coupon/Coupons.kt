@@ -9,16 +9,5 @@ class Coupons(
     fun filteredCoupons(
         carts: List<CartProduct>,
         time: LocalTime,
-    ): Coupons {
-        val filteredCoupons =
-            value.filter { coupon ->
-                when (coupon) {
-                    is BogoCoupon -> carts.any { it.quantity >= 3 }
-                    is DiscountCoupon -> carts.sumOf { it.totalPrice } >= coupon.minimumAmount
-                    is FreeShippingCoupon -> carts.sumOf { it.totalPrice } >= coupon.minimumAmount
-                    is TimeLimitedCoupon -> coupon.availableTime.isAvailable(time)
-                }
-            }
-        return Coupons(filteredCoupons)
-    }
+    ): Coupons = Coupons(value.filter { it.isApplicable(carts, time) })
 }
