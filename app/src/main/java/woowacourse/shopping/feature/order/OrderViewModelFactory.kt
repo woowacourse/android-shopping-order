@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.coupons.repository.OrderRepository
 
-class CouponViewModelFactory(
+class OrderViewModelFactory(
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository
 ) : ViewModelProvider.Factory {

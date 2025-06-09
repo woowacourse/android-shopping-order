@@ -16,7 +16,7 @@ import woowacourse.shopping.data.goods.repository.GoodsRemoteDataSourceImpl
 import woowacourse.shopping.data.goods.repository.GoodsRepositoryImpl
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.feature.cart.recommend.RecommendFragment
-import woowacourse.shopping.feature.order.CouponActivity
+import woowacourse.shopping.feature.order.OrderActivity
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
@@ -95,7 +95,7 @@ class CartActivity : AppCompatActivity() {
     }
 
     private fun navigateToOrder() {
-        val intent = CouponActivity.newIntent(this)
+        val intent = OrderActivity.newIntent(this)
         intent.putIntegerArrayListExtra(SELECTED_CART_ITEM_KEY, ArrayList(viewModel.selectedCartMap.values.map{it.goods.id}))
         startActivity(intent)
     }

@@ -11,36 +11,36 @@ import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
 import woowacourse.shopping.data.coupons.repository.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.coupons.repository.OrderRepositoryImpl
-import woowacourse.shopping.databinding.ActivityCouponBinding
+import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.feature.BaseActivity
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.goods.GoodsActivity
 
-class CouponActivity : BaseActivity<ActivityCouponBinding>() {
+class OrderActivity : BaseActivity<ActivityOrderBinding>() {
 
     private lateinit var viewModel : CouponViewModel
-    private lateinit var couponAdapter: CouponAdapter
+    private lateinit var orderAdapter: OrderAdapter
 
-    override fun inflateBinding(): ActivityCouponBinding =
-        ActivityCouponBinding.inflate(layoutInflater)
+    override fun inflateBinding(): ActivityOrderBinding =
+        ActivityOrderBinding.inflate(layoutInflater)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val factory = CouponViewModelFactory(
+        val factory = OrderViewModelFactory(
             CartRepositoryImpl(CartRemoteDataSourceImpl()),
             OrderRepositoryImpl(OrderRemoteDataSourceImpl())
         )
         viewModel = ViewModelProvider(this, factory)[CouponViewModel::class.java]
-        couponAdapter = CouponAdapter { selectedCoupon ->
+        orderAdapter = OrderAdapter { selectedCoupon ->
             viewModel.selectCoupon(selectedCoupon)
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "결제하기"
 
         binding.couponRecyclerView.apply {
-            layoutManager = LinearLayoutManager(this@CouponActivity)
-            adapter = couponAdapter
+            layoutManager = LinearLayoutManager(this@OrderActivity)
+            adapter = orderAdapter
         }
         binding.tvCouponFee.text = getString(R.string.amount, 0)
         observeViewModel()
@@ -56,7 +56,7 @@ class CouponActivity : BaseActivity<ActivityCouponBinding>() {
 
     private fun observeViewModel() {
         viewModel.coupons.observe(this) { coupons ->
-            couponAdapter.submitList(coupons,null)
+            orderAdapter.submitList(coupons,null)
         }
 
         viewModel.originalAmount.observe(this) { amount ->
@@ -79,11 +79,11 @@ class CouponActivity : BaseActivity<ActivityCouponBinding>() {
             binding.tvCouponFee.text = getString(R.string.amount, discount*-1)
         }
         viewModel.coupons.observe(this) { coupons ->
-            couponAdapter.submitList(coupons, viewModel.selectedCoupon.value)
+            orderAdapter.submitList(coupons, viewModel.selectedCoupon.value)
         }
 
         viewModel.selectedCoupon.observe(this) { selectedCoupon ->
-            couponAdapter.submitList(viewModel.coupons.value ?: emptyList(), selectedCoupon)
+            orderAdapter.submitList(viewModel.coupons.value ?: emptyList(), selectedCoupon)
         }
         viewModel.uiEvent.observe(this) { orderUiEvent ->
             when(orderUiEvent){
@@ -115,6 +115,6 @@ class CouponActivity : BaseActivity<ActivityCouponBinding>() {
     }
 
     companion object {
-        fun newIntent(context: Context): Intent = Intent(context, CouponActivity::class.java)
+        fun newIntent(context: Context): Intent = Intent(context, OrderActivity::class.java)
     }
 }

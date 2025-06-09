@@ -7,9 +7,9 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ItemCouponBinding
 import woowacourse.shopping.domain.model.Coupon
 
-class CouponAdapter(
+class OrderAdapter(
     private val onCouponClick: (Coupon) -> Unit,
-) : RecyclerView.Adapter<CouponAdapter.CouponViewHolder>() {
+) : RecyclerView.Adapter<OrderAdapter.CouponViewHolder>() {
 
     private var coupons: List<Coupon> = emptyList()
     private var selectedCoupon: Coupon? = null
