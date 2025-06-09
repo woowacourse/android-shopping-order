@@ -43,7 +43,6 @@ class CartRecommendationFragment : Fragment() {
     private fun setProductAdapter() {
         val adapter =
             ProductAdapter(
-                products = emptyList(),
                 productActionListener =
                     object : ProductActionListener {
                         override fun onProductClick(product: ProductUiModel) {
@@ -74,7 +73,7 @@ class CartRecommendationFragment : Fragment() {
             binding.RecyclerViewCartRecommendation.adapter as ProductAdapter
 
         cartViewModel.recommendedProducts.observe(viewLifecycleOwner) { products ->
-            recommendProductAdapter.addLoadedItems(products.map { ProductItem(it) })
+            recommendProductAdapter.submitList(products.map { ProductItem(it) })
         }
         cartViewModel.updatedProduct.observe(viewLifecycleOwner) { product ->
             recommendProductAdapter.updateItem(product)

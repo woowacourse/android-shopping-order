@@ -1,15 +1,33 @@
 package woowacourse.shopping.product.catalog
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
 class ProductAdapter(
-    products: List<CatalogItem>,
     private val productActionListener: ProductActionListener,
     private val quantityControlListener: QuantityControlListener,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val products: MutableList<CatalogItem> = products.toMutableList()
+) : ListAdapter<CatalogItem, RecyclerView.ViewHolder>(
+        object : DiffUtil.ItemCallback<CatalogItem>() {
+            override fun areItemsTheSame(
+                oldItem: CatalogItem,
+                newItem: CatalogItem,
+            ): Boolean =
+                when {
+                    oldItem is CatalogItem.ProductItem && newItem is CatalogItem.ProductItem ->
+                        oldItem.productItem.id == newItem.productItem.id
 
+                    oldItem is CatalogItem.LoadMoreButtonItem && newItem is CatalogItem.LoadMoreButtonItem -> true
+                    else -> false
+                }
+
+            override fun areContentsTheSame(
+                oldItem: CatalogItem,
+                newItem: CatalogItem,
+            ): Boolean = oldItem == newItem
+        },
+    ) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -27,38 +45,28 @@ class ProductAdapter(
     ) {
         when (holder) {
             is ProductViewHolder -> {
-                holder.bind((products[position] as CatalogItem.ProductItem).productItem)
+                holder.bind((currentList[position] as CatalogItem.ProductItem).productItem)
             }
         }
     }
 
     override fun getItemViewType(position: Int): Int =
-        when (products[position]) {
+        when (currentList[position]) {
             CatalogItem.LoadMoreButtonItem -> VIEW_TYPE_LOAD_MORE
             is CatalogItem.ProductItem -> VIEW_TYPE_PRODUCT
         }
 
-    fun clearItems() {
-        products.clear()
-    }
-
-    fun addLoadedItems(items: List<CatalogItem>) {
-        if (products.lastOrNull() is CatalogItem.LoadMoreButtonItem) {
-            products.removeAt(products.lastIndex)
-            notifyItemRemoved(products.lastIndex + 1)
-        }
-        products.addAll(items)
-        notifyItemRangeInserted(products.lastIndex, items.size)
-    }
-
     fun updateItem(product: ProductUiModel) {
-        val index: Int =
-            products.indexOfFirst { (it as CatalogItem.ProductItem).productItem.id == product.id }
-        products[index] = CatalogItem.ProductItem(product)
-        notifyItemChanged(index)
+        val currentList = currentList.toMutableList()
+        val index =
+            currentList.indexOfFirst {
+                it is CatalogItem.ProductItem && it.productItem.id == product.id
+            }
+        if (index != -1) {
+            currentList[index] = CatalogItem.ProductItem(product)
+            submitList(currentList)
+        }
     }
-
-    override fun getItemCount(): Int = products.size
 
     companion object {
         private const val VIEW_TYPE_PRODUCT = 1

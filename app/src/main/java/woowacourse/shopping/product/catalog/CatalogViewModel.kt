@@ -74,11 +74,7 @@ class CatalogViewModel(
 
     fun loadNextCatalogProducts() {
         page++
-        val endIndex = (page + 1) * PAGE_SIZE
-        viewModelScope.launch {
-            val allProductSize = catalogProductRepository.getAllProductsSize()
-            loadCatalog(page, endIndex, 20, allProductSize)
-        }
+        loadCatalogUntilCurrentPage()
     }
 
     fun loadCatalogUntilCurrentPage() {
