@@ -78,8 +78,8 @@ class DetailViewModel(
     }
 
     fun saveCart(productId: Long) {
+        val state = _uiState.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            val state = _uiState.value ?: return@launch
             val products = defaultCartRepository.loadSinglePage(null, null)
             products.onSuccess { value ->
                 val savedCart = value.carts.find { it.productId == productId }
