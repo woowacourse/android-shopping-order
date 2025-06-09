@@ -35,12 +35,11 @@ import woowacourse.shopping.viewModel.common.getOrAwaitValue
 @ExtendWith(CoroutinesTestExtension::class)
 @Suppress("FunctionName")
 class ShoppingCartViewModelTest {
+    private val shoppingCartRepository: ShoppingCartRepository = mockk()
     private lateinit var viewModel: ShoppingCartViewModel
-    private lateinit var shoppingCartRepository: ShoppingCartRepository
 
     @BeforeEach
     fun setUp() {
-        shoppingCartRepository = mockk()
         coEvery { shoppingCartRepository.load(any(), any()) } returns
             Result.success(SHOPPING_CARTS1)
 

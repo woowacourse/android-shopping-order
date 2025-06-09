@@ -25,14 +25,11 @@ import woowacourse.shopping.viewModel.common.InstantTaskExecutorExtension
 @Suppress("FunctionName")
 class ProductDetailViewModelTest {
     private lateinit var viewModel: ProductDetailViewModel
-    private lateinit var shoppingCartRepository: ShoppingCartRepository
-    private lateinit var productRepository: ProductsRepository
+    private val shoppingCartRepository: ShoppingCartRepository = mockk()
+    private val productRepository: ProductsRepository = mockk()
 
     @BeforeEach
     fun setUp() {
-        shoppingCartRepository = mockk()
-        productRepository = mockk()
-
         coEvery { productRepository.getProduct(SHOPPING_CART_PRODUCT1.product.id) } returns
             Result.success(PRODUCT1)
 

@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.data.coupon.remote.repository.CouponRepository
-import woowacourse.shopping.data.product.repository.ProductsRepository
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
 import woowacourse.shopping.fixture.COUPONS
 import woowacourse.shopping.fixture.SHOPPING_CART_PRODUCTS_TO_ORDER
@@ -30,16 +29,11 @@ import java.time.LocalDate
 @Suppress("FunctionName")
 class OrderViewModelTest {
     private lateinit var viewModel: OrderViewModel
-    private lateinit var shoppingCartRepository: ShoppingCartRepository
-    private lateinit var productRepository: ProductsRepository
-    private lateinit var couponRepository: CouponRepository
+    private val shoppingCartRepository: ShoppingCartRepository = mockk()
+    private val couponRepository: CouponRepository = mockk()
 
     @BeforeEach
     fun setUp() {
-        shoppingCartRepository = mockk()
-        productRepository = mockk()
-        couponRepository = mockk()
-
         viewModel =
             OrderViewModel(
                 couponRepository,
