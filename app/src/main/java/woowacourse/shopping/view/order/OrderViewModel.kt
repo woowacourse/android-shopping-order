@@ -9,14 +9,19 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.coupon.repository.CouponRepository
 import woowacourse.shopping.data.coupon.repository.DefaultCouponRepository
+import woowacourse.shopping.data.order.repository.DefaultOrderRepository
+import woowacourse.shopping.data.order.repository.OrderRepository
 import woowacourse.shopping.domain.order.Coupon
 import woowacourse.shopping.domain.order.ShippingFee
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
+import woowacourse.shopping.view.common.MutableSingleLiveData
+import woowacourse.shopping.view.common.SingleLiveData
 import java.time.LocalTime
 
 class OrderViewModel(
     private val productsToOrder: List<ShoppingCartProduct>,
     private val couponRepository: CouponRepository = DefaultCouponRepository.get(),
+    private val orderRepository: OrderRepository = DefaultOrderRepository.get(),
 ) : ViewModel() {
     private val _coupons: MutableLiveData<List<CouponItem>> = MutableLiveData()
     val coupons: LiveData<List<CouponItem>> get() = _coupons
@@ -35,6 +40,9 @@ class OrderViewModel(
 
     private val _totalPrice: MediatorLiveData<Int> = MediatorLiveData(INITIAL_AMOUNT)
     val totalPrice: LiveData<Int> get() = _totalPrice
+
+    private val _event: MutableSingleLiveData<OrderEvent> = MutableSingleLiveData()
+    val event: SingleLiveData<OrderEvent> get() = _event
 
     init {
         _totalPrice.apply {
@@ -92,6 +100,8 @@ class OrderViewModel(
                 .getCoupons()
                 .onSuccess { coupons ->
                     handleAvailableCoupons(coupons)
+                }.onFailure {
+                    _event.setValue(OrderEvent.GET_COUPON_FAILURE)
                 }
         }
     }
@@ -142,6 +152,18 @@ class OrderViewModel(
             }
 
         _coupons.value = updatedCoupons
+    }
+
+    fun createOrder() {
+        viewModelScope.launch {
+            orderRepository
+                .placeOrder(productsToOrder.map { it.id })
+                .onSuccess {
+                    _event.setValue(OrderEvent.CREATE_ORDER_SUCCESS)
+                }.onFailure {
+                    _event.setValue(OrderEvent.CREATE_ORDER_FAILURE)
+                }
+        }
     }
 
     companion object {
