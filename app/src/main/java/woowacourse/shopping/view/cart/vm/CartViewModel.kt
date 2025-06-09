@@ -295,7 +295,7 @@ class CartViewModel(
 
     companion object {
         private const val RECOMMEND_SIZE = 10
-        private const val PAGE_SIZE = 20
+        private const val PAGE_SIZE = 5
         private val ALL_PAGE_INDEX = null
         private val ALL_PAGE_SIZE = null
     }
