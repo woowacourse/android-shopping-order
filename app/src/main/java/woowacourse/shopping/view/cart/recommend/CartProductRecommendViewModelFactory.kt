@@ -3,17 +3,17 @@ package woowacourse.shopping.view.cart.recommend
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.domain.model.CartProducts
-import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
 import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 
 class CartProductRecommendViewModelFactory(
     private val selectedProducts: CartProducts,
     private val productRepository: ProductRepository,
-    private val cartProductRepository: CartProductRepository,
     private val recentProductRepository: RecentProductRepository,
+    private val getPagedCartProductsUseCase: GetPagedCartProductsUseCase,
     private val addToCartUseCase: AddToCartUseCase,
     private val updateQuantityUseCase: UpdateQuantityUseCase,
 ) : ViewModelProvider.Factory {
@@ -23,8 +23,8 @@ class CartProductRecommendViewModelFactory(
             return CartProductRecommendViewModel(
                 selectedProducts,
                 productRepository,
-                cartProductRepository,
                 recentProductRepository,
+                getPagedCartProductsUseCase,
                 addToCartUseCase,
                 updateQuantityUseCase,
             ) as T

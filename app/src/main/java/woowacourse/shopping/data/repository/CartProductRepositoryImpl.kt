@@ -23,11 +23,6 @@ class CartProductRepositoryImpl(
             PagedResult(products, hasNext)
         }
 
-    override suspend fun getCartProductByProductId(productId: Int): Result<CartProduct?> =
-        getPagedProducts().mapCatching { pagedResult ->
-            pagedResult.items.firstOrNull { it.product.id == productId }
-        }
-
     override suspend fun getTotalQuantity(): Result<Int> =
         remoteDataSource.getTotalQuantity().mapCatching { dto ->
             dto.quantity

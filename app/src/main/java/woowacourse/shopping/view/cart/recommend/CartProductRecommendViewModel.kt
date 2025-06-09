@@ -10,10 +10,10 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
 import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 import woowacourse.shopping.view.cart.recommend.adapter.RecommendedProductItem
 import woowacourse.shopping.view.util.MutableSingleLiveData
@@ -22,8 +22,8 @@ import woowacourse.shopping.view.util.SingleLiveData
 class CartProductRecommendViewModel(
     selectedProducts: CartProducts,
     private val productRepository: ProductRepository,
-    private val cartProductRepository: CartProductRepository,
     private val recentProductRepository: RecentProductRepository,
+    private val getPagedCartProductsUseCase: GetPagedCartProductsUseCase,
     private val addToCartUseCase: AddToCartUseCase,
     private val updateQuantityUseCase: UpdateQuantityUseCase,
 ) : ViewModel(),
@@ -41,13 +41,10 @@ class CartProductRecommendViewModel(
 
     init {
         viewModelScope.launch {
-            cartProductRepository
-                .getPagedProducts()
-                .onSuccess {
-                    loadRecommendedProducts(it.items)
-                }.onFailure {
-                    Log.e("error", it.message.toString())
-                }
+            getPagedCartProductsUseCase()
+                .onSuccess { pagedResult ->
+                    loadRecommendedProducts(pagedResult.items)
+                }.onFailure { Log.e("error", it.message.toString()) }
         }
     }
 

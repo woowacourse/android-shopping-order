@@ -9,17 +9,17 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
-import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.GetCartProductByProductIdUseCase
 import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
 class ProductDetailViewModel(
     val product: Product,
-    private val cartProductRepository: CartProductRepository,
     private val recentProductRepository: RecentProductRepository,
+    private val getCartProductByProductIdUseCase: GetCartProductByProductIdUseCase,
     private val addToCartUseCase: AddToCartUseCase,
     private val updateQuantityUseCase: UpdateQuantityUseCase,
 ) : ViewModel(),
@@ -57,8 +57,7 @@ class ProductDetailViewModel(
 
     override fun onAddToCartClick() {
         viewModelScope.launch {
-            cartProductRepository
-                .getCartProductByProductId(product.id)
+            getCartProductByProductIdUseCase(product.id)
                 .onSuccess { cartProduct ->
                     val quantityToAdd = quantity.value ?: MINIMUM_QUANTITY
                     val updateResult =
@@ -72,9 +71,7 @@ class ProductDetailViewModel(
                         .onSuccess {
                             _quantity.postValue(MINIMUM_QUANTITY)
                             _addToCartEvent.postValue(Unit)
-                        }.onFailure {
-                            Log.e("error", it.message.toString())
-                        }
+                        }.onFailure { Log.e("error", it.message.toString()) }
                 }.onFailure { Log.e("error", it.message.toString()) }
         }
     }

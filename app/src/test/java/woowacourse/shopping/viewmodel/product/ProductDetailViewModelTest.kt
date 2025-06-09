@@ -9,6 +9,8 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.GetCartProductByProductIdUseCase
+import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
 import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
@@ -24,6 +26,8 @@ class ProductDetailViewModelTest {
     private lateinit var viewModel: ProductDetailViewModel
     private lateinit var cartProductRepository: CartProductRepository
     private lateinit var recentProductRepository: RecentProductRepository
+    private lateinit var getPagedCartProductsUseCase: GetPagedCartProductsUseCase
+    private lateinit var getCartProductByProductIdUseCase: GetCartProductByProductIdUseCase
     private lateinit var addToCartUseCase: AddToCartUseCase
     private lateinit var updateQuantityUseCase: UpdateQuantityUseCase
     private lateinit var product: Product
@@ -32,6 +36,8 @@ class ProductDetailViewModelTest {
     fun setup() {
         cartProductRepository = FakeCartProductRepository()
         recentProductRepository = FakeRecentProductRepository()
+        getPagedCartProductsUseCase = GetPagedCartProductsUseCase(cartProductRepository)
+        getCartProductByProductIdUseCase = GetCartProductByProductIdUseCase(getPagedCartProductsUseCase)
         addToCartUseCase = AddToCartUseCase(cartProductRepository)
         updateQuantityUseCase = UpdateQuantityUseCase(cartProductRepository)
         product = Product(id = 0, imageUrl = "", name = "Product 0", price = 1000, category = "")
@@ -39,8 +45,8 @@ class ProductDetailViewModelTest {
         viewModel =
             ProductDetailViewModel(
                 product,
-                cartProductRepository,
                 recentProductRepository,
+                getCartProductByProductIdUseCase,
                 addToCartUseCase,
                 updateQuantityUseCase,
             )

@@ -21,7 +21,11 @@ class CartProductSelectFragment : Fragment() {
         val app = requireActivity().application as ShoppingApplication
         ViewModelProvider(
             this,
-            CartProductSelectViewModelFactory(app.cartProductRepository, app.updateQuantityUseCase),
+            CartProductSelectViewModelFactory(
+                app.cartProductRepository,
+                app.getPagedCartProductsUseCase,
+                app.updateQuantityUseCase,
+            ),
         )[CartProductSelectViewModel::class.java]
     }
 

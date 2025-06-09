@@ -10,11 +10,13 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.domain.repository.CartProductRepository
+import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
 import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 import woowacourse.shopping.view.cart.select.adapter.CartProductItem
 
 class CartProductSelectViewModel(
     private val repository: CartProductRepository,
+    private val getPagedCartProductsUseCase: GetPagedCartProductsUseCase,
     private val updateQuantityUseCase: UpdateQuantityUseCase,
 ) : ViewModel(),
     CartProductSelectEventHandler {
@@ -55,8 +57,7 @@ class CartProductSelectViewModel(
         viewModelScope.launch {
             _isLoading.value = true
 
-            repository
-                .getPagedProducts(page - 1, PAGE_SIZE)
+            getPagedCartProductsUseCase(page - 1, PAGE_SIZE)
                 .onSuccess { pagedResult ->
                     _isLoading.value = false
                     _cartProductItems.value =
@@ -64,9 +65,7 @@ class CartProductSelectViewModel(
                             CartProductItem(it, selectedCartProducts.value?.contains(it) ?: false)
                         }
                     updatePageState(page, pagedResult.hasNext)
-                }.onFailure {
-                    Log.e("error", it.message.toString())
-                }
+                }.onFailure { Log.e("error", it.message.toString()) }
         }
     }
 

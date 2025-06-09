@@ -50,14 +50,6 @@ class FakeCartProductRepository : CartProductRepository {
             Result.failure(e)
         }
 
-    override suspend fun getCartProductByProductId(productId: Int): Result<CartProduct?> =
-        try {
-            val product = cartProducts.find { it.product.id == productId }
-            Result.success(product)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-
     override suspend fun getTotalQuantity(): Result<Int> =
         try {
             Result.success(cartProducts.sumOf { it.quantity })

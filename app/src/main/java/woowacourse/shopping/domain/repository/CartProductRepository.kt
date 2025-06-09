@@ -14,8 +14,6 @@ interface CartProductRepository {
         size: Int? = null,
     ): Result<PagedResult<CartProduct>>
 
-    suspend fun getCartProductByProductId(productId: Int): Result<CartProduct?>
-
     suspend fun getTotalQuantity(): Result<Int>
 
     suspend fun updateQuantity(

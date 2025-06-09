@@ -15,6 +15,7 @@ import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.GetPagedCartProductsUseCase
 import woowacourse.shopping.domain.usecase.UpdateQuantityUseCase
 import woowacourse.shopping.view.product.catalog.adapter.ProductCatalogItem
 import woowacourse.shopping.view.util.MutableSingleLiveData
@@ -24,6 +25,7 @@ class ProductCatalogViewModel(
     private val productRepository: ProductRepository,
     private val cartProductRepository: CartProductRepository,
     private val recentProductRepository: RecentProductRepository,
+    private val getPagedCartProductsUseCase: GetPagedCartProductsUseCase,
     private val addToCartUseCase: AddToCartUseCase,
     private val updateQuantityUseCase: UpdateQuantityUseCase,
 ) : ViewModel(),
@@ -114,11 +116,10 @@ class ProductCatalogViewModel(
 
     private fun loadCartProducts() {
         viewModelScope.launch {
-            cartProductRepository
-                .getPagedProducts()
-                .onSuccess {
+            getPagedCartProductsUseCase()
+                .onSuccess { pagedResult ->
                     cartProducts.clear()
-                    cartProducts.addAll(it.items)
+                    cartProducts.addAll(pagedResult.items)
                     loadProducts()
                 }.onFailure { Log.e("error", it.message.toString()) }
         }
