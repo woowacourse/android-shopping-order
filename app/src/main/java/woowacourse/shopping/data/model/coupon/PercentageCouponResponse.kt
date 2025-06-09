@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("percentage")
-data class PercentageCoupon(
+data class PercentageCouponResponse(
     override val code: String,
     override val id: Long,
     override val description: String,
@@ -13,4 +13,4 @@ data class PercentageCoupon(
     val discount: Int,
     val availableTime: AvailableTime,
     override val discountType: String = "percentage"
-) : Coupon()
+) : CouponResponse()

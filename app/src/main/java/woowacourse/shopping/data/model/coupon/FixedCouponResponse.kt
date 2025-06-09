@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("fixed")
-data class FixedCoupon(
+data class FixedCouponResponse(
     override val code: String,
     override val id: Long,
     override val description: String,
@@ -13,4 +13,4 @@ data class FixedCoupon(
     val discount: Int,
     val minimumAmount: Int,
     override val discountType: String = "fixed",
-) : Coupon()
+) : CouponResponse()

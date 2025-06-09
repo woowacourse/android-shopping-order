@@ -3,7 +3,7 @@ package woowacourse.shopping.data.model.coupon
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class Coupon {
+sealed class CouponResponse {
     abstract val id: Long
     abstract val code: String
     abstract val description: String
