@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+            name="couponItem"
+            type="woowacourse.shopping.view.receipt.CouponItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -30,6 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
+            android:text="@{couponItem.description}"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -44,6 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:text="@{couponItem.expirationDate}"
             android:textColor="@color/gray_5"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@id/checkbox_coupon"
@@ -56,6 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
+            android:text="@{couponItem.minimumOrderPrice.toString()}"
             android:textColor="@color/gray_5"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@id/checkbox_coupon"
@@ -68,6 +74,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
+            android:text="@{couponItem.availableTime}"
             android:textColor="@color/gray_5"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
