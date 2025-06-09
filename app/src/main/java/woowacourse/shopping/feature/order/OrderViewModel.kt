@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature.order
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,7 +10,6 @@ import woowacourse.shopping.data.coupons.repository.OrderRepository
 import woowacourse.shopping.data.util.mapper.toCartItems
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Coupon
-
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 
@@ -25,12 +23,10 @@ enum class ToastMessageKey {
     FAIL_LOAD_COUPON
 }
 
-
-class CouponViewModel(
+class OrderViewModel(
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository
-) : ViewModel(
-) {
+) : ViewModel() {
 
     private val _coupons = MutableLiveData<List<Coupon>>()
     val coupons: LiveData<List<Coupon>> get() = _coupons
@@ -43,8 +39,10 @@ class CouponViewModel(
 
     private var _originalAmount = MutableLiveData<Int>(0)
     val originalAmount: LiveData<Int> get() = _originalAmount
+
     private var _cartItems: List<CartItem> = emptyList()
     val cartItems: List<CartItem> get() = _cartItems
+
     private var _shippingFee = MutableLiveData<Int>(3000)
     val shippingFee: LiveData<Int> get() = _shippingFee
 
@@ -57,24 +55,25 @@ class CouponViewModel(
             _cartItems = itemIds.map { id ->
                 allCartItems.toCartItems().first { it.goods.id == id }
             }
-            _originalAmount.postValue(cartItems.sumOf { it.goods.price * it.quantity }+ _shippingFee.value!!)
+            val origin = _cartItems.sumOf { it.goods.price * it.quantity }
+            val shipping = _shippingFee.value ?: 0
+            _originalAmount.value = origin + shipping
             updateTotalAmount()
         }
-
     }
 
     fun loadCoupons() {
         viewModelScope.launch {
             try {
-                _coupons.postValue(orderRepository.fetchCoupons())
+                _coupons.value = orderRepository.fetchCoupons()
             } catch (e: Exception) {
-                _uiEvent.postValue(OrderUiEvent.ShowToast(ToastMessageKey.FAIL_LOAD_COUPON))
+                _uiEvent.setValue(OrderUiEvent.ShowToast(ToastMessageKey.FAIL_LOAD_COUPON))
             }
         }
     }
 
     fun selectCoupon(coupon: Coupon) {
-        _selectedCoupon.value = coupon
+        _selectedCoupon.value = if (_selectedCoupon.value == coupon) null else coupon
         updateTotalAmount()
     }
 
@@ -88,11 +87,10 @@ class CouponViewModel(
         viewModelScope.launch {
             try {
                 orderRepository.addOrder(_cartItems.map { it.id })
-                _uiEvent.postValue(OrderUiEvent.OrderSuccess)
+                _uiEvent.setValue(OrderUiEvent.OrderSuccess)
             } catch (e: Exception) {
-                _uiEvent.postValue(OrderUiEvent.ShowToast(ToastMessageKey.FAIL_ORDER))
+                _uiEvent.setValue(OrderUiEvent.ShowToast(ToastMessageKey.FAIL_ORDER))
             }
         }
-
     }
 }

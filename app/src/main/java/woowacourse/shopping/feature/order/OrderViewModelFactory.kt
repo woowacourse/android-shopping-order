@@ -12,8 +12,8 @@ class OrderViewModelFactory(
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(CouponViewModel::class.java)) {
-            return CouponViewModel(cartRepository,orderRepository) as T
+        if (modelClass.isAssignableFrom(OrderViewModel::class.java)) {
+            return OrderViewModel(cartRepository,orderRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }

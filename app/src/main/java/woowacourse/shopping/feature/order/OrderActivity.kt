@@ -19,7 +19,7 @@ import woowacourse.shopping.feature.goods.GoodsActivity
 
 class OrderActivity : BaseActivity<ActivityOrderBinding>() {
 
-    private lateinit var viewModel : CouponViewModel
+    private lateinit var viewModel : OrderViewModel
     private lateinit var orderAdapter: OrderAdapter
 
     override fun inflateBinding(): ActivityOrderBinding =
@@ -32,7 +32,7 @@ class OrderActivity : BaseActivity<ActivityOrderBinding>() {
             CartRepositoryImpl(CartRemoteDataSourceImpl()),
             OrderRepositoryImpl(OrderRemoteDataSourceImpl())
         )
-        viewModel = ViewModelProvider(this, factory)[CouponViewModel::class.java]
+        viewModel = ViewModelProvider(this, factory)[OrderViewModel::class.java]
         orderAdapter = OrderAdapter { selectedCoupon ->
             viewModel.selectCoupon(selectedCoupon)
         }
