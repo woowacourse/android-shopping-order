@@ -52,7 +52,11 @@ class PaymentViewModel(
             couponRepository
                 .getCoupons()
                 .onSuccess { coupons ->
-                    couponItems.postValue(coupons.map { PaymentItem.CouponItem(it) })
+                    couponItems.postValue(
+                        coupons
+                            .filter { it.isValid() }
+                            .map { PaymentItem.CouponItem(it) },
+                    )
                 }.onFailure { Log.e("error", it.message.toString()) }
         }
     }
