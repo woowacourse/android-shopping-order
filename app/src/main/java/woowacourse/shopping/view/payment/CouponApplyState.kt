@@ -8,10 +8,10 @@ data class CouponApplyState(
     val coupons: List<CouponsItem>,
     val selectedCoupon: Coupon?,
     val cartItems: List<CartItem>,
-    val anInt: Int,
+    val deliveryFee: Int,
 ) {
     val orderAmount: Int = cartItems.sumOf(CartItem::price)
-    val discountAmount: Int = selectedCoupon?.discountAmount(cartItems, anInt) ?: 0
+    val discountAmount: Int = selectedCoupon?.discountAmount(cartItems, deliveryFee) ?: 0
     val totalPaymentAmount: Int = orderAmount - discountAmount
 
     companion object {
@@ -21,7 +21,7 @@ data class CouponApplyState(
                 coupons = emptyList(),
                 selectedCoupon = null,
                 cartItems = emptyList(),
-                anInt = 0,
+                deliveryFee = 0,
             )
     }
 }

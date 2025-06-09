@@ -33,17 +33,33 @@ class CouponApplyActivity : AppCompatActivity() {
             insets
         }
 
+        initViewModel()
+        initViews()
+        handleEvents()
+    }
+
+    private fun initViewModel() {
         viewModel.cartItems = intent.getSelectedCartItemsExtra() ?: return finish()
         viewModel.loadCouponsRepository()
+    }
 
-        binding.onClickBackButton = { finish() }
-
+    private fun initViews() {
         binding.couponApplyCoupons.adapter = adapter
 
-        binding.couponApplyPayButton.setOnClickListener {
-            viewModel.order()
+        viewModel.state.observe(this) { state: CouponApplyState ->
+            adapter.submitList(state.coupons)
+            binding.couponApplyOrderAmount.text =
+                getString(R.string.price_format, state.orderAmount)
+            binding.couponApplyCouponDiscountAmount.text =
+                getString(R.string.price_format, state.discountAmount)
+            binding.couponApplyDeliveryFee.text =
+                getString(R.string.price_format, state.deliveryFee)
+            binding.couponApplyTotalPaymentAmount.text =
+                getString(R.string.price_format, state.totalPaymentAmount)
         }
+    }
 
+    private fun handleEvents() {
         viewModel.event.observe(this) { event ->
             when (event) {
                 CouponApplyEvent.LOAD_COUPONS_FAILURE -> showToast(R.string.load_coupons_error_message)
@@ -61,12 +77,10 @@ class CouponApplyActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.state.observe(this) { state: CouponApplyState ->
-            adapter.submitList(state.coupons)
-            binding.couponApplyOrderAmount.text = state.orderAmount.toString()
-            binding.couponApplyCouponDiscountAmount.text = state.discountAmount.toString()
-            binding.couponApplyDeliveryFee.text = state.anInt.toString()
-            binding.couponApplyTotalPaymentAmount.text = state.totalPaymentAmount.toString()
+        binding.onClickBackButton = { finish() }
+
+        binding.couponApplyPayButton.setOnClickListener {
+            viewModel.order()
         }
     }
 

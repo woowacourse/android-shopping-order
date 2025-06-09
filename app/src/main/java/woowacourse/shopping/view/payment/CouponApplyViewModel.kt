@@ -46,7 +46,7 @@ class CouponApplyViewModel(
                                     },
                             selectedCoupon = null,
                             cartItems = cartItems,
-                            anInt = anDeliveryFee.value,
+                            deliveryFee = anDeliveryFee.value,
                         )
                 }.onFailure {
                     throw it
