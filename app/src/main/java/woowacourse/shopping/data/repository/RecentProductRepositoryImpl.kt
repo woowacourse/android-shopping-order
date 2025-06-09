@@ -35,7 +35,7 @@ class RecentProductRepositoryImpl(
         offset: Int,
     ): Result<List<RecentProduct>> =
         withContext(Dispatchers.IO) {
-            return@withContext try {
+            try {
                 val entities = localDataSource.getPagedProducts(limit, offset)
                 val productIds = entities.map { it.productId }
 
@@ -59,7 +59,11 @@ class RecentProductRepositoryImpl(
 
     override suspend fun replaceRecentProduct(recentProduct: RecentProduct): Result<Unit> =
         withContext(Dispatchers.IO) {
-            localDataSource.replaceRecentProduct(recentProduct.toEntity())
-            Result.success(Unit)
+            try {
+                localDataSource.replaceRecentProduct(recentProduct.toEntity())
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
         }
 }
