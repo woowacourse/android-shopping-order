@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -37,17 +38,17 @@ class ProductCatalogActivity : AppCompatActivity() {
 
     private lateinit var productAdapter: ProductAdapter
 
+    private val activityResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            viewModel.loadCatalog()
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpView()
         initRecyclerView()
         initBindings()
         initObservers()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.loadCatalog()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -68,9 +69,10 @@ class ProductCatalogActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.shopping_cart -> {
                 val intent = ShoppingCartActivity.newIntent(this)
-                startActivity(intent)
+                activityResultLauncher.launch(intent)
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
 
@@ -119,7 +121,7 @@ class ProductCatalogActivity : AppCompatActivity() {
 
         viewModel.selectedProduct.observe(this) { value ->
             val intent = ProductDetailActivity.newIntent(this, value)
-            startActivity(intent)
+            activityResultLauncher.launch(intent)
         }
     }
 

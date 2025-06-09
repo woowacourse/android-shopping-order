@@ -47,6 +47,10 @@ class ProductCatalogViewModel(
     private val _selectedProduct = MutableSingleLiveData<Product>()
     val selectedProduct: SingleLiveData<Product> get() = _selectedProduct
 
+    init {
+        loadCatalog()
+    }
+
     fun loadCatalog() {
         viewModelScope.launch {
             _isLoading.value = true
