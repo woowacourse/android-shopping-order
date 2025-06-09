@@ -34,11 +34,12 @@ sealed class Coupon {
         val buyQuantity: Int,
         val getQuantity: Int,
     ) : Coupon() {
-        override fun isAvailable(cartItems: List<CartItem>): Boolean = cartItems.sumOf { it.amount } >= buyQuantity
+        override fun isAvailable(cartItems: List<CartItem>): Boolean = cartItems.any { it.amount >= (buyQuantity + getQuantity) }
 
         override fun calculateDiscountAmount(cartItems: List<CartItem>): Int {
             val eligibleItem = findEligibleItem(cartItems) ?: return 0
-            val applicableFreeItems = eligibleItem.amount / (buyQuantity + getQuantity) * getQuantity
+            val applicableFreeItems =
+                eligibleItem.amount / (buyQuantity + getQuantity) * getQuantity
             return applicableFreeItems * eligibleItem.product.price.value
         }
 
