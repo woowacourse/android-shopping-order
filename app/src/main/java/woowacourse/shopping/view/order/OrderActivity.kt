@@ -12,8 +12,13 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.view.common.getSerializableExtraData
+import woowacourse.shopping.view.common.showSnackBar
+import woowacourse.shopping.view.common.showToast
+import woowacourse.shopping.view.product.ProductsActivity
 
-class OrderActivity : AppCompatActivity() {
+class OrderActivity :
+    AppCompatActivity(),
+    OrderListener {
     private val binding: ActivityOrderBinding by lazy { ActivityOrderBinding.inflate(layoutInflater) }
     private val viewModel: OrderViewModel by viewModels {
         OrderViewModel.provideFactory(
@@ -50,6 +55,7 @@ class OrderActivity : AppCompatActivity() {
     private fun bindViewModel() {
         binding.lifecycleOwner = this
         binding.viewModel = this.viewModel
+        binding.orderListener = this
     }
 
     private fun setupAdapter() {
@@ -60,6 +66,30 @@ class OrderActivity : AppCompatActivity() {
         viewModel.coupons.observe(this) { coupons: List<CouponItem> ->
             couponAdapter.submitList(coupons)
         }
+
+        viewModel.event.observe(this) { event: OrderEvent ->
+            handleEvent(event)
+        }
+    }
+
+    private fun handleEvent(event: OrderEvent) {
+        when (event) {
+            OrderEvent.GET_COUPON_FAILURE -> binding.root.showSnackBar("쿠폰을 불러오지 못했습니다.")
+            OrderEvent.CREATE_ORDER_SUCCESS -> {
+                showToast("주문이 완료됐습니다! 🚀총알 배송갑니다.")
+                startActivity(ProductsActivity.newIntent(this))
+            }
+
+            OrderEvent.CREATE_ORDER_FAILURE -> binding.root.showSnackBar("주문이 실패했습니다. 잠시 후 다시 시도해주세요.")
+        }
+    }
+
+    override fun onBackButtonClick() {
+        finish()
+    }
+
+    override fun onOrderButtonClick() {
+        viewModel.createOrder()
     }
 
     companion object {

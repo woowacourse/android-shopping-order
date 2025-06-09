@@ -1,5 +1,7 @@
 package woowacourse.shopping.view.product
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
@@ -201,5 +203,12 @@ class ProductsActivity :
     override fun onMinusShoppingCartClick(quantityTarget: QuantityTarget) {
         val item = quantityTarget as ProductsItem.ProductItem
         viewModel.minusProductToShoppingCart(item, item.selectedQuantity)
+    }
+
+    companion object {
+        fun newIntent(context: Context): Intent =
+            Intent(context, ProductsActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
     }
 }
