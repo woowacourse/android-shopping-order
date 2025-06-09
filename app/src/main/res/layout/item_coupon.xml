@@ -96,7 +96,5 @@
             app:layout_constraintStart_toEndOf="@id/minimum_price_description"
             app:layout_constraintTop_toBottomOf="@id/expiration_date_description"
             tools:text="100,000원" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </layout>
