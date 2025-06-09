@@ -16,11 +16,11 @@ import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 import woowacourse.shopping.util.toDomain
 
-sealed class UiEvent {
-    data class ShowToast(val messageKey: ToastMessageKey) : UiEvent()
-    data class CartAddSuccess(val quantity: Int) : UiEvent()
-    data class ShowMostRecentlyViewed(val goods: Goods) : UiEvent()
-    data object ClickMostRecentlyViewed : UiEvent()
+sealed class GoodsUiEvent {
+    data class ShowToast(val messageKey: ToastMessageKey) : GoodsUiEvent()
+    data class CartAddSuccess(val quantity: Int) : GoodsUiEvent()
+    data class ShowMostRecentlyViewed(val goods: Goods) : GoodsUiEvent()
+    data object ClickMostRecentlyViewed : GoodsUiEvent()
 }
 
 enum class ToastMessageKey {
@@ -39,8 +39,8 @@ class GoodsDetailsViewModel(
         MutableLiveData(CartItem(goodsUiModel.toDomain(), 1))
     val cartItem: LiveData<CartItem> get() = _cartItem
 
-    private val _event = MutableSingleLiveData<UiEvent>()
-    val event: SingleLiveData<UiEvent> get() = _event
+    private val _event = MutableSingleLiveData<GoodsUiEvent>()
+    val event: SingleLiveData<GoodsUiEvent> get() = _event
 
     private val _mostRecentlyViewedGoods = MutableLiveData<Goods>()
     val mostRecentlyViewedGoods: LiveData<Goods> get() = _mostRecentlyViewedGoods
@@ -50,7 +50,7 @@ class GoodsDetailsViewModel(
             val recent = goodsRepository.fetchMostRecentGoods()
             recent?.let {
                 if (goodsUiModel.id != it.id) {
-                    _event.setValue(UiEvent.ShowMostRecentlyViewed(it))
+                    _event.setValue(GoodsUiEvent.ShowMostRecentlyViewed(it))
                 }
             }
             goodsRepository.loggingRecentGoods(goodsUiModel.toDomain())
@@ -86,18 +86,18 @@ class GoodsDetailsViewModel(
                     handleCartAdded(item.quantity)
                 } catch (e: Exception) {
                     val key = if (cartUiModel != null) ToastMessageKey.FAIL_CART_UPDATE else ToastMessageKey.FAIL_CART_ADD
-                    _event.setValue(UiEvent.ShowToast(key))
+                    _event.setValue(GoodsUiEvent.ShowToast(key))
                 }
             }
         }
     }
 
     private fun handleCartAdded(quantity: Int) {
-        _event.setValue(UiEvent.CartAddSuccess(quantity))
+        _event.setValue(GoodsUiEvent.CartAddSuccess(quantity))
         _cartItem.value = _cartItem.value?.copy(quantity = 1)
     }
 
     fun handleClickMostRecentlyGoodsSection() {
-        _event.setValue(UiEvent.ClickMostRecentlyViewed)
+        _event.setValue(GoodsUiEvent.ClickMostRecentlyViewed)
     }
 }

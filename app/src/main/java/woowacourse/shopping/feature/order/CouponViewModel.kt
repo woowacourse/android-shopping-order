@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.order
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,20 @@ import woowacourse.shopping.data.coupons.repository.OrderRepository
 import woowacourse.shopping.data.util.mapper.toCartItems
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Coupon
+
+import woowacourse.shopping.util.MutableSingleLiveData
+import woowacourse.shopping.util.SingleLiveData
+
+sealed class OrderUiEvent {
+    data class ShowToast(val messageKey: ToastMessageKey) : OrderUiEvent()
+    data object OrderSuccess : OrderUiEvent()
+}
+
+enum class ToastMessageKey {
+    FAIL_ORDER,
+    FAIL_LOAD_COUPON
+}
+
 
 class CouponViewModel(
     private val cartRepository: CartRepository,
@@ -33,6 +48,9 @@ class CouponViewModel(
     private var _shippingFee = MutableLiveData<Int>(3000)
     val shippingFee: LiveData<Int> get() = _shippingFee
 
+    private var _uiEvent = MutableSingleLiveData<OrderUiEvent>()
+    val uiEvent: SingleLiveData<OrderUiEvent> get() = _uiEvent
+
     fun setCartItems(itemIds: List<Int>) {
         viewModelScope.launch {
             val allCartItems = cartRepository.fetchAllCartItems()
@@ -47,8 +65,11 @@ class CouponViewModel(
 
     fun loadCoupons() {
         viewModelScope.launch {
-            _coupons.postValue(orderRepository.fetchCoupons())
-
+            try {
+                _coupons.postValue(orderRepository.fetchCoupons())
+            } catch (e: Exception) {
+                _uiEvent.postValue(OrderUiEvent.ShowToast(ToastMessageKey.FAIL_LOAD_COUPON))
+            }
         }
     }
 
@@ -64,6 +85,14 @@ class CouponViewModel(
     }
 
     fun onPayClicked() {
-        // 실제 결제 처리 로직은 외부로 위임
+        viewModelScope.launch {
+            try {
+                orderRepository.addOrder(_cartItems.map { it.id })
+                _uiEvent.postValue(OrderUiEvent.OrderSuccess)
+            } catch (e: Exception) {
+                _uiEvent.postValue(OrderUiEvent.ShowToast(ToastMessageKey.FAIL_ORDER))
+            }
+        }
+
     }
 }

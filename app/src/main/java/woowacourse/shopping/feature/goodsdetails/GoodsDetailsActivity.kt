@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.core.content.IntentCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.data.ShoppingDatabase
 import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
@@ -68,7 +67,7 @@ class GoodsDetailsActivity : BaseActivity<ActivityGoodsDetailsBinding>() {
     private fun observeEvent() {
         viewModel.event.observe(this) { event ->
             when (event) {
-                is UiEvent.ShowToast -> {
+                is GoodsUiEvent.ShowToast -> {
                     val msgResId = when (event.messageKey) {
                         ToastMessageKey.FAIL_CART_ADD -> R.string.toast_fail_cart_add
                         ToastMessageKey.FAIL_CART_UPDATE -> R.string.toast_fail_cart_update
@@ -76,16 +75,16 @@ class GoodsDetailsActivity : BaseActivity<ActivityGoodsDetailsBinding>() {
                     Toast.makeText(this, getString(msgResId), Toast.LENGTH_SHORT).show()
                 }
 
-                is UiEvent.CartAddSuccess -> {
+                is GoodsUiEvent.CartAddSuccess -> {
                     val message = getString(R.string.goods_detail_cart_insert_complete_toast_message, event.quantity)
                     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
                 }
 
-                is UiEvent.ShowMostRecentlyViewed -> {
+                is GoodsUiEvent.ShowMostRecentlyViewed -> {
                     mostRecentGoods = event.goods.toUi()
                 }
 
-                UiEvent.ClickMostRecentlyViewed -> {
+                GoodsUiEvent.ClickMostRecentlyViewed -> {
                     mostRecentGoods?.let {
                         startActivity(
                             newIntent(this, it).apply {

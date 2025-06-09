@@ -14,6 +14,7 @@ import woowacourse.shopping.data.carts.dto.CartItemRequest
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.coupons.CouponRequest
+import woowacourse.shopping.data.coupons.OrderRequest
 import woowacourse.shopping.data.goods.dto.Content
 import woowacourse.shopping.data.goods.dto.GoodsResponse
 
@@ -68,7 +69,8 @@ interface RetrofitService {
 
     @POST("/orders")
     suspend fun addOrder(
-        @Body cartItemIds : List<Int>
+        @Body cartItemIds : OrderRequest,
+        @Header("Authorization") authorization: String,
     )
 }
 
