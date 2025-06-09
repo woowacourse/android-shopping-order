@@ -18,12 +18,15 @@ import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.Coupons
 import woowacourse.shopping.domain.coupon.FreeShipping
+import woowacourse.shopping.domain.shoppingCart.DefaultShippingRule
+import woowacourse.shopping.domain.shoppingCart.ShippingRule
 import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 
 class OrderViewModel(
     private val couponRepository: CouponRepository = DefaultCouponRepository.get(),
     private val shoppingCartRepository: ShoppingCartRepository = DefaultShoppingCartRepository.get(),
     private val shoppingCartProductsToOrder: List<ShoppingCartProduct> = emptyList(),
+    private val shippingRule: ShippingRule = DefaultShippingRule(),
 ) : ViewModel() {
     private val coupons: MutableLiveData<Coupons> = MutableLiveData()
 
@@ -98,7 +101,7 @@ class OrderViewModel(
     }
 
     private fun List<Coupon?>.totalShippingDiscount(shoppingCartProductsToOrder: List<ShoppingCartProduct>): Int {
-        return Coupon.DEFAULT_SHIPPING_FEE -
+        return shippingRule.shippingFee -
             this
                 .filterIsInstance<FreeShipping>()
                 .sumOf { it.discountAmount(shoppingCartProductsToOrder) }

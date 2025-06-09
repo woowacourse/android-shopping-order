@@ -40,8 +40,4 @@ sealed class Coupon {
     }
 
     abstract fun discountAmount(shoppingCartProductToOrder: List<ShoppingCartProduct>): Int
-
-    companion object {
-        const val DEFAULT_SHIPPING_FEE = 3000
-    }
 }
