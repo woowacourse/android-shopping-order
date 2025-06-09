@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.order
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +15,14 @@ class CouponViewHolder(
     }
 
     fun bind(coupon: CouponItem) {
+        val conditionText = coupon.getConditionText(binding.root.context)
+        binding.couponCondition.text = conditionText
         binding.coupon = coupon
+    }
+
+    private fun CouponItem.getConditionText(context: Context): String {
+        if (conditionResId == null) return ""
+        return context.getString(conditionResId, *conditionArgs.toTypedArray())
     }
 
     companion object {

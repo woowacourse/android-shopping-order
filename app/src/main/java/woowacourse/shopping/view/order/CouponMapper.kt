@@ -1,5 +1,6 @@
 package woowacourse.shopping.view.order
 
+import woowacourse.shopping.R
 import woowacourse.shopping.domain.order.Coupon
 import java.time.format.DateTimeFormatter
 
@@ -13,18 +14,20 @@ fun Coupon.toUiModel(): CouponItem {
                 id = id,
                 description = description,
                 code = code,
-                condition = "최소 주문 금액: $minimumAmount",
+                conditionResId = R.string.coupon_price_discount_condition,
+                conditionArgs = listOf(minimumAmount),
                 expirationDate = formattedDate,
                 type = discountType,
                 origin = this,
             )
 
-        is Coupon.Bonus ->
+        is Coupon.Bonus,
+        ->
             CouponItem(
                 id = id,
                 description = description,
                 code = code,
-                condition = "3개씩 담은 제품이 여러개인 경우, 1개당 금액이 가장 비싼 제품에 적용.",
+                conditionResId = R.string.coupon_bonus_discount_condition,
                 expirationDate = formattedDate,
                 type = discountType,
                 origin = this,
@@ -35,7 +38,8 @@ fun Coupon.toUiModel(): CouponItem {
                 id = id,
                 description = description,
                 code = code,
-                condition = "최소 주문 금액: $minimumAmount",
+                conditionResId = R.string.coupon_free_shipping_discount_condition,
+                conditionArgs = listOf(minimumAmount),
                 expirationDate = formattedDate,
                 type = discountType,
                 origin = this,
@@ -46,7 +50,12 @@ fun Coupon.toUiModel(): CouponItem {
                 id = id,
                 description = description,
                 code = code,
-                condition = "사용 가능 시간: 오전${availableStartTime}부터 ${availableEndTime}까지",
+                conditionResId = R.string.coupon_percentage_discount_condition,
+                conditionArgs =
+                    listOf(
+                        availableStartTime,
+                        availableEndTime,
+                    ),
                 expirationDate = formattedDate,
                 type = discountType,
                 origin = this,

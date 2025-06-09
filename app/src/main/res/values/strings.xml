@@ -46,4 +46,11 @@
     <string name="order_shipping_fee_title">배송비</string>
     <string name="order_pay_button">결제하기</string>
     <string name="order_total_price_title">총 결제 금액</string>
+    <string name="order_get_coupon_failure_message">쿠폰을 불러오지 못했습니다.</string>
+    <string name="order_create_orders_success_message">주문이 완료됐습니다! 총알 배송갑니다. 🚀</string>
+    <string name="order_create_order_failure_message">주문이 실패했습니다. 잠시 후 다시 시도해주세요.</string>
+    <string name="coupon_price_discount_condition">최소 주문 금액: %1$s</string>
+    <string name="coupon_bonus_discount_condition">3개씩 담은 제품이 여러개인 경우, 1개당 금액이 가장 비싼 제품에 적용</string>
+    <string name="coupon_free_shipping_discount_condition">최소 주문 금액: %1$s</string>
+    <string name="coupon_percentage_discount_condition">사용 가능 시간: 오전%1$s부터 %2$s까지</string>
 </resources>

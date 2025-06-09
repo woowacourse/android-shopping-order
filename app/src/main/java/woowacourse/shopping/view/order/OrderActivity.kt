@@ -74,13 +74,13 @@ class OrderActivity :
 
     private fun handleEvent(event: OrderEvent) {
         when (event) {
-            OrderEvent.GET_COUPON_FAILURE -> binding.root.showSnackBar("쿠폰을 불러오지 못했습니다.")
+            OrderEvent.GET_COUPON_FAILURE -> binding.root.showSnackBar(getString(R.string.order_get_coupon_failure_message))
             OrderEvent.CREATE_ORDER_SUCCESS -> {
-                showToast("주문이 완료됐습니다! 🚀총알 배송갑니다.")
+                showToast(getString(R.string.order_create_orders_success_message))
                 startActivity(ProductsActivity.newIntent(this))
             }
 
-            OrderEvent.CREATE_ORDER_FAILURE -> binding.root.showSnackBar("주문이 실패했습니다. 잠시 후 다시 시도해주세요.")
+            OrderEvent.CREATE_ORDER_FAILURE -> binding.root.showSnackBar(getString(R.string.order_create_order_failure_message))
         }
     }
 
