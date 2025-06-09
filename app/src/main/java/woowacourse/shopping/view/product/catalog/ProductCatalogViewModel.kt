@@ -11,19 +11,19 @@ import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
-import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
 import woowacourse.shopping.domain.usecase.cart.GetPagedCartProductsUseCase
 import woowacourse.shopping.domain.usecase.cart.GetTotalCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
+import woowacourse.shopping.domain.usecase.product.GetPagedProductsUseCase
 import woowacourse.shopping.view.product.catalog.adapter.ProductCatalogItem
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
 class ProductCatalogViewModel(
-    private val productRepository: ProductRepository,
     private val recentProductRepository: RecentProductRepository,
+    private val getPagedProductsUseCase: GetPagedProductsUseCase,
     private val getPagedCartProductsUseCase: GetPagedCartProductsUseCase,
     private val getTotalCartProductQuantityUseCase: GetTotalCartProductQuantityUseCase,
     private val addToCartUseCase: AddToCartUseCase,
@@ -126,8 +126,7 @@ class ProductCatalogViewModel(
 
     private fun loadProducts() {
         viewModelScope.launch {
-            productRepository
-                .getPagedProducts(FIRST_PAGE, PRODUCT_SIZE_LIMIT * (page + 1))
+            getPagedProductsUseCase(FIRST_PAGE, PRODUCT_SIZE_LIMIT * (page + 1))
                 .onSuccess { pagedResult ->
                     applyLoadedProducts(pagedResult, true)
                 }.onFailure { Log.e("error", it.message.toString()) }
@@ -136,8 +135,7 @@ class ProductCatalogViewModel(
 
     private fun loadMoreProducts() {
         viewModelScope.launch {
-            productRepository
-                .getPagedProducts(page, PRODUCT_SIZE_LIMIT)
+            getPagedProductsUseCase(page, PRODUCT_SIZE_LIMIT)
                 .onSuccess { pagedResult ->
                     applyLoadedProducts(pagedResult, false)
                 }.onFailure { Log.e("error", it.message.toString()) }

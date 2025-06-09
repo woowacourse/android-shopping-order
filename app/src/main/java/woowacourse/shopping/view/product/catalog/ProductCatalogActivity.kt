@@ -29,8 +29,8 @@ class ProductCatalogActivity : AppCompatActivity() {
         ViewModelProvider(
             this,
             ProductCatalogViewModelFactory(
-                app.productRepository,
                 app.recentProductRepository,
+                app.getPagedProductsUseCase,
                 app.getPagedCartProductsUseCase,
                 app.getTotalCartProductQuantityUseCase,
                 app.addToCartUseCase,

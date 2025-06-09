@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
     suspend fun getPagedProducts(
-        page: Int? = null,
-        size: Int? = null,
+        page: Int?,
+        size: Int?,
     ): Result<PagedResult<Product>>
 }

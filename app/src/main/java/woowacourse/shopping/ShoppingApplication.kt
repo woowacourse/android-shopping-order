@@ -20,6 +20,7 @@ import woowacourse.shopping.domain.usecase.cart.GetPagedCartProductsUseCase
 import woowacourse.shopping.domain.usecase.cart.GetTotalCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
+import woowacourse.shopping.domain.usecase.product.GetPagedProductsUseCase
 
 class ShoppingApplication : Application() {
     private val database by lazy { ShoppingCartDatabase.getDataBase(this) }
@@ -32,7 +33,7 @@ class ShoppingApplication : Application() {
                 ProductRemoteDataSource(retrofitInstance.productService),
             )
         }
-    val productRepository
+    private val productRepository
         by lazy { ProductRepositoryImpl(ProductRemoteDataSource(retrofitInstance.productService)) }
     private val cartProductRepository
         by lazy { CartProductRepositoryImpl(CartProductRemoteDataSource(retrofitInstance.cartProductService)) }
@@ -40,6 +41,8 @@ class ShoppingApplication : Application() {
         by lazy { CouponRepositoryImpl(CouponRemoteDataSource(retrofitInstance.couponService)) }
     val orderRepository
         by lazy { OrderRepositoryImpl(OrderRemoteDataSource(retrofitInstance.orderService)) }
+
+    val getPagedProductsUseCase by lazy { GetPagedProductsUseCase(productRepository) }
 
     val getPagedCartProductsUseCase by lazy { GetPagedCartProductsUseCase(cartProductRepository) }
     val getCartProductByProductIdUseCase by lazy { GetCartProductByProductIdUseCase(getPagedCartProductsUseCase) }
