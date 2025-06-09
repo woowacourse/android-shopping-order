@@ -45,13 +45,11 @@ class ReceiptViewModel(
                     is BoGoCoupon -> CouponItem(
                         description = coupon.description,
                         expirationDate = coupon.expirationDate.toString(),
-                        minimumOrderPrice = 0
                     )
 
                     is MiracleSaleCoupon -> CouponItem(
                         description = coupon.description,
                         expirationDate = coupon.expirationDate.toString(),
-                        minimumOrderPrice = 0,
                         availableTime = "사용 가능한 시간 ${coupon.startHour}~${coupon.endHour}"
                     )
                 }
