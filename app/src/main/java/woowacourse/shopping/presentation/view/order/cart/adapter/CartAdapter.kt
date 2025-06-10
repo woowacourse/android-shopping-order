@@ -2,8 +2,8 @@ package woowacourse.shopping.presentation.view.order.cart.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import woowacourse.shopping.presentation.model.CartProductUiModel
-import woowacourse.shopping.presentation.ui.layout.QuantityChangeListener
+import woowacourse.shopping.presentation.common.model.CartProductUiModel
+import woowacourse.shopping.presentation.common.ui.layout.QuantityChangeListener
 
 class CartAdapter(
     private val eventListener: CartEventListener,

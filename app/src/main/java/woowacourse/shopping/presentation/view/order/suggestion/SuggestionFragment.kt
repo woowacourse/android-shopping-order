@@ -7,7 +7,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentSuggestionBinding
-import woowacourse.shopping.presentation.base.BaseFragment
+import woowacourse.shopping.presentation.common.base.BaseFragment
 import woowacourse.shopping.presentation.view.order.OrderNavigator
 import woowacourse.shopping.presentation.view.order.OrderViewModel
 import woowacourse.shopping.presentation.view.order.suggestion.adapter.SuggestionAdapter
@@ -34,9 +34,8 @@ class SuggestionFragment : BaseFragment<FragmentSuggestionBinding>(R.layout.frag
     }
 
     private fun setObservers() {
-        viewModel.suggestionProducts.observe(viewLifecycleOwner) { suggestionProducts ->
-            suggestionAdapter.submitList(suggestionProducts)
-        }
+        binding.vm = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
 
         viewModel.toastEvent.observe(viewLifecycleOwner) { event ->
             showToast(event.toMessageResId())

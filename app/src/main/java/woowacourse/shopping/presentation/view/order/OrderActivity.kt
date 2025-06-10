@@ -14,6 +14,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.presentation.view.order.cart.CartFragment
 import woowacourse.shopping.presentation.view.order.suggestion.SuggestionFragment
+import woowacourse.shopping.presentation.view.payment.PaymentActivity
 
 class OrderActivity :
     AppCompatActivity(),
@@ -72,13 +73,16 @@ class OrderActivity :
     private fun orderButtonHandler() {
         when (currentFragment()) {
             is CartFragment -> showFragment(SuggestionFragment::class.java)
-            is SuggestionFragment -> {
-                // TODO: 주문 기능 구현
-            }
+            is SuggestionFragment -> navigateToPaymentScreen()
         }
     }
 
     private fun currentFragment(): Fragment? = supportFragmentManager.fragments.firstOrNull { it.isVisible }
+
+    private fun navigateToPaymentScreen() {
+        val productIds = viewModel.orderProducts.map { it.productId }
+        startActivity(PaymentActivity.newIntent(this, productIds))
+    }
 
     companion object {
         fun newIntent(context: Context): Intent = Intent(context, OrderActivity::class.java)

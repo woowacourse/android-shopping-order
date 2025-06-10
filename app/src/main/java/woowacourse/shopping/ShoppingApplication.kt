@@ -2,8 +2,9 @@ package woowacourse.shopping
 
 import android.app.Application
 import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.CouponRepositoryImpl
+import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.di.provider.DataSourceProvider
 import woowacourse.shopping.di.provider.RepositoryProvider
 
@@ -18,12 +19,13 @@ class ShoppingApplication : Application() {
     private fun initRepositories() {
         initProductRepository()
         initCartRepository()
-        initRecentProductRepository()
+        initCouponRepository()
+        initOrderRepository()
     }
 
     private fun initProductRepository() {
         val productDataSource = DataSourceProvider.productRemoteDataSource
-        val recentProductLocalDataSource = DataSourceProvider.recentProductLocalDataSource
+        val recentProductLocalDataSource = DataSourceProvider.productLocalDataSource
         val repository = ProductRepositoryImpl(productDataSource, recentProductLocalDataSource)
         RepositoryProvider.initProductRepository(repository)
     }
@@ -32,16 +34,23 @@ class ShoppingApplication : Application() {
         val cartRemoteDataSource = DataSourceProvider.cartRemoteDataSource
         val cartLocalDataSource = DataSourceProvider.cartLocalDataSource
         val productDataSource = DataSourceProvider.productRemoteDataSource
-        val repository = CartRepositoryImpl(cartRemoteDataSource, cartLocalDataSource, productDataSource)
+        val repository =
+            CartRepositoryImpl(cartRemoteDataSource, cartLocalDataSource, productDataSource)
         RepositoryProvider.initCartRepository(repository)
     }
 
-    private fun initRecentProductRepository() {
-        val productDataSource = DataSourceProvider.productRemoteDataSource
-        val recentProductLocalDataSource = DataSourceProvider.recentProductLocalDataSource
+    private fun initCouponRepository() {
+        val couponRemoteDataSource = DataSourceProvider.couponRemoteDataSource
+        val repository = CouponRepositoryImpl(couponRemoteDataSource)
+        RepositoryProvider.initCouponRepository(repository)
+    }
+
+    private fun initOrderRepository() {
+        val orderRemoteDataSource = DataSourceProvider.orderRemoteDataSource
+        val cartLocalDataSource = DataSourceProvider.cartLocalDataSource
         val repository =
-            RecentProductRepositoryImpl(productDataSource, recentProductLocalDataSource)
-        RepositoryProvider.initRecentProductRepository(repository)
+            OrderRepositoryImpl(orderRemoteDataSource, cartLocalDataSource)
+        RepositoryProvider.initOrderRepository(repository)
     }
 
     companion object {

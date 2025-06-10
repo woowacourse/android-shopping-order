@@ -5,22 +5,22 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.presentation.model.ProductUiModel
-import woowacourse.shopping.presentation.model.toUiModel
-import woowacourse.shopping.presentation.util.MutableSingleLiveData
-import woowacourse.shopping.presentation.util.SingleLiveData
+import woowacourse.shopping.presentation.common.model.ProductUiModel
+import woowacourse.shopping.presentation.common.model.toUiModel
+import woowacourse.shopping.presentation.common.util.MutableSingleLiveData
+import woowacourse.shopping.presentation.common.util.SingleLiveData
 import woowacourse.shopping.presentation.view.detail.event.DetailMessageEvent
 
 class DetailViewModel(
     productId: Long,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
-    private val recentProductRepository: RecentProductRepository,
 ) : ViewModel() {
     private val _toastEvent = MutableSingleLiveData<DetailMessageEvent>()
     val toastEvent: SingleLiveData<DetailMessageEvent> = _toastEvent
@@ -49,12 +49,13 @@ class DetailViewModel(
     }
 
     fun loadProduct(productId: Long) {
-        productRepository.fetchProduct(productId) { result ->
-            result
+        viewModelScope.launch {
+            productRepository
+                .fetchProduct(productId)
                 .onSuccess {
-                    _product.postValue(it.toUiModel())
+                    _product.value = it.toUiModel()
                     updateRecentProduct(productId, it.category)
-                }.onFailure { _toastEvent.postValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
+                }.onFailure { _toastEvent.setValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
         }
     }
 
@@ -72,18 +73,20 @@ class DetailViewModel(
         val product = _product.value ?: return
         val quantity = _quantity.value ?: DEFAULT_QUANTITY
 
-        cartRepository.increaseQuantity(product.id, quantity) { result ->
-            result
-                .onSuccess { _addToCartSuccessEvent.postValue(Unit) }
-                .onFailure { _toastEvent.postValue(DetailMessageEvent.ADD_PRODUCT_FAILURE) }
+        viewModelScope.launch {
+            cartRepository
+                .increaseQuantity(product.id, quantity)
+                .onSuccess { _addToCartSuccessEvent.setValue(Unit) }
+                .onFailure { _toastEvent.setValue(DetailMessageEvent.ADD_PRODUCT_FAILURE) }
         }
     }
 
     private fun loadRecentProduct() {
-        recentProductRepository.getRecentProducts(1) { result ->
-            result
-                .onSuccess { _recentProduct.postValue(it.firstOrNull()?.toUiModel()) }
-                .onFailure { _toastEvent.postValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
+        viewModelScope.launch {
+            productRepository
+                .getRecentProducts(1)
+                .onSuccess { _recentProduct.value = it.firstOrNull()?.toUiModel() }
+                .onFailure { _toastEvent.setValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
         }
     }
 
@@ -91,8 +94,10 @@ class DetailViewModel(
         productId: Long,
         category: String,
     ) {
-        recentProductRepository.insertAndTrimToLimit(productId, category) { result ->
-            result.onFailure { _toastEvent.postValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
+        viewModelScope.launch {
+            productRepository
+                .insertAndTrimToLimit(productId, category, RECENT_PRODUCT_LIMIT)
+                .onFailure { _toastEvent.setValue(DetailMessageEvent.FETCH_PRODUCT_FAILURE) }
         }
     }
 
@@ -105,6 +110,7 @@ class DetailViewModel(
     companion object {
         private const val DEFAULT_QUANTITY = 1
         private const val QUANTITY_STEP = 1
+        private const val RECENT_PRODUCT_LIMIT = 10
 
         fun Factory(productId: Long): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
@@ -116,7 +122,6 @@ class DetailViewModel(
                         productId,
                         RepositoryProvider.productRepository,
                         RepositoryProvider.cartRepository,
-                        RepositoryProvider.recentProductRepository,
                     ) as T
             }
     }

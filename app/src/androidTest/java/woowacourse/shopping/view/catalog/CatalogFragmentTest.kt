@@ -8,13 +8,11 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.CoreMatchers.not
-import org.hamcrest.core.AllOf.allOf
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.R
@@ -23,18 +21,20 @@ import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.FakeProductRepository
-import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.fixture.productsFixture
 import woowacourse.shopping.presentation.view.catalog.CatalogFragment
 import woowacourse.shopping.util.clickOnViewChild
-import woowacourse.shopping.util.nthChildOf
+import woowacourse.shopping.util.recyclerview.nthProductInRecyclerView
 
 class CatalogFragmentTest {
     private lateinit var fragmentScenario: FragmentScenario<CatalogFragment>
 
     @BeforeEach
     fun setUp() {
-        val fakeProductRepository = FakeProductRepository()
+        val fakeProductRepository =
+            FakeProductRepository(
+                initialRecentProductIds = productsFixture.take(1).map { it.id },
+            )
         val fakeCartRepository =
             FakeCartRepository(
                 initialCartProducts =
@@ -42,14 +42,9 @@ class CatalogFragmentTest {
                         .take(1)
                         .map { CartProduct(it.id, it.toDomain(), 1) },
             )
-        val fakeRecentProductRepository =
-            FakeRecentProductRepository(
-                initialRecentProductIds = productsFixture.take(1).map { it.id },
-            )
 
         RepositoryProvider.initProductRepository(fakeProductRepository)
         RepositoryProvider.initCartRepository(fakeCartRepository)
-        RepositoryProvider.initRecentProductRepository(fakeRecentProductRepository)
 
         fragmentScenario =
             launchFragmentInContainer<CatalogFragment>(themeResId = R.style.Theme_Shopping)
@@ -84,7 +79,7 @@ class CatalogFragmentTest {
 
         // Then
         Thread.sleep(100)
-        nthProductInRecyclerView(R.id.textview_quantity).check(matches(withText("2")))
+        nthProductInCatalogRecyclerView(R.id.textview_quantity).check(matches(withText("2")))
     }
 
     @Test
@@ -98,7 +93,7 @@ class CatalogFragmentTest {
 
         // Then
         Thread.sleep(100)
-        nthProductInRecyclerView(R.id.textview_quantity).check(matches(withText("2")))
+        nthProductInCatalogRecyclerView(R.id.textview_quantity).check(matches(withText("2")))
     }
 
     @Test
@@ -107,7 +102,9 @@ class CatalogFragmentTest {
         increaseProductQuantity(2)
 
         // Then
-        nthProductInRecyclerView(R.id.view_quantity_selector).check(matches(isDisplayed()))
+        Thread.sleep(100)
+        nthProductInCatalogRecyclerView(R.id.view_quantity_selector, 2)
+            .check(matches(isDisplayed()))
     }
 
     @Test
@@ -117,30 +114,27 @@ class CatalogFragmentTest {
 
         // Then
         Thread.sleep(100)
-        nthProductInRecyclerView(R.id.view_quantity_selector).check(matches(not(isDisplayed())))
+        nthProductInCatalogRecyclerView(R.id.view_quantity_selector)
+            .check(matches(not(isDisplayed())))
     }
 
     @Test
     fun `최근_본_상품_목록이_보여진다`() {
         // Then
         Thread.sleep(100)
-        nthProductInRecyclerView(R.id.text_view_recent_product_name, 0).check(
-            matches(
-                withText(
-                    productsFixture[0].name,
-                ),
-            ),
-        )
+        nthProductInCatalogRecyclerView(R.id.text_view_recent_product_name, 0)
+            .check(
+                matches(withText(productsFixture[0].name)),
+            )
     }
 
-    private fun nthProductInRecyclerView(
+    private fun nthProductInCatalogRecyclerView(
         targetViewId: Int,
         position: Int = 1,
-    ) = onView(
-        allOf(
-            withId(targetViewId),
-            isDescendantOfA(nthChildOf(withId(R.id.recycler_view_products), position)),
-        ),
+    ) = nthProductInRecyclerView(
+        R.id.recycler_view_products,
+        position,
+        targetViewId,
     )
 
     private fun decreaseProductQuantity(position: Int = 1) {

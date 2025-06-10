@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+            name="recentProducts"
+            type="java.util.List&lt;woowacourse.shopping.presentation.common.model.ProductUiModel&gt;" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -32,6 +35,7 @@
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintTop_toBottomOf="@id/text_view_recent_product_title"
+            app:submitList="@{recentProducts}"
             tools:listitem="@layout/item_recent_product" />
 
         <com.google.android.material.divider.MaterialDivider

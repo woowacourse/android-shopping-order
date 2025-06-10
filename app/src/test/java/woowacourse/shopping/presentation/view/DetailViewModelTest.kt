@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.view
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -7,13 +8,15 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.data.model.product.toDomain
 import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.FakeProductRepository
-import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.fixture.productsFixture
-import woowacourse.shopping.presentation.model.toProduct
+import woowacourse.shopping.presentation.common.model.toProduct
 import woowacourse.shopping.presentation.view.detail.DetailViewModel
+import woowacourse.shopping.presentation.view.util.CoroutinesTestExtension
 import woowacourse.shopping.presentation.view.util.InstantTaskExecutorExtension
 import woowacourse.shopping.presentation.view.util.getOrAwaitValue
 
+@OptIn(ExperimentalCoroutinesApi::class)
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class DetailViewModelTest {
     private lateinit var viewModel: DetailViewModel
@@ -22,14 +25,11 @@ class DetailViewModelTest {
     fun setUp() {
         val fakeProductRepository = FakeProductRepository()
         val fakeCartRepository = FakeCartRepository()
-        val fakeRecentProductRepository =
-            FakeRecentProductRepository()
         viewModel =
             DetailViewModel(
                 1,
                 fakeProductRepository,
                 fakeCartRepository,
-                fakeRecentProductRepository,
             )
     }
 

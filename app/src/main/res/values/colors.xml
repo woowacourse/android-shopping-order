@@ -8,11 +8,13 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="gray_55">#555555</color>
     <color name="mint">#04C092</color>
-    <color name="gray_aa">#aaaaaa</color>
     <color name="transparent">#00000000</color>
+    <color name="gray_aa">#aaaaaa</color>
+    <color name="gray_55">#555555</color>
     <color name="gray_81">#81D3D3D3</color>
     <color name="gray_e2">#E2E2E2</color>
+    <color name="gray_eb">#EBEBEB</color>
     <color name="gray_f3">#F3F3F3</color>
+    <color name="gray_33">#333333</color>
 </resources>

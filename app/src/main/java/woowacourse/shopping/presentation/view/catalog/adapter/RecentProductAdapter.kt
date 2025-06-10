@@ -2,7 +2,7 @@ package woowacourse.shopping.presentation.view.catalog.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import woowacourse.shopping.presentation.model.ProductUiModel
+import woowacourse.shopping.presentation.common.model.ProductUiModel
 
 class RecentProductAdapter(
     private val eventListener: CatalogAdapter.CatalogEventListener,

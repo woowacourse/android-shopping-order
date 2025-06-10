@@ -5,7 +5,7 @@
 
     <data>
 
-        <import type="woowacourse.shopping.presentation.model.FetchPageDirection" />
+        <import type="woowacourse.shopping.presentation.common.model.FetchPageDirection" />
 
         <variable
             name="vm"
@@ -35,6 +35,7 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@id/text_view_page"
             app:layout_constraintTop_toBottomOf="@id/toolbar_cart"
+            app:submitList="@{vm.cartProducts}"
             tools:listitem="@layout/item_cart" />
 
         <ImageButton

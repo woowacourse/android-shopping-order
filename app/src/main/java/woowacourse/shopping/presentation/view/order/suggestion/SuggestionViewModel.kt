@@ -4,16 +4,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.presentation.model.SuggestionProductUiModel
-import woowacourse.shopping.presentation.model.toSuggestionUiModel
-import woowacourse.shopping.presentation.util.MutableSingleLiveData
-import woowacourse.shopping.presentation.util.SingleLiveData
+import woowacourse.shopping.presentation.common.model.SuggestionProductUiModel
+import woowacourse.shopping.presentation.common.model.toSuggestionUiModel
+import woowacourse.shopping.presentation.common.util.MutableSingleLiveData
+import woowacourse.shopping.presentation.common.util.SingleLiveData
 import woowacourse.shopping.presentation.view.order.suggestion.event.SuggestionMessageEvent
 
 class SuggestionViewModel(
@@ -33,33 +36,36 @@ class SuggestionViewModel(
     }
 
     fun fetchSuggestionProducts() {
-        productRepository.fetchSuggestionProducts(
-            SUGGESTION_LIMIT,
-            excludeCartProductIds,
-        ) { result ->
-            result
+        viewModelScope.launch {
+            productRepository
+                .fetchSuggestionProducts(SUGGESTION_LIMIT, excludeCartProductIds)
                 .onSuccess { fetchSuggestionProductsSuccessHandle(it) }
-                .onFailure { _toastEvent.postValue(SuggestionMessageEvent.FETCH_SUGGESTION_PRODUCT_FAILURE) }
+                .onFailure { _toastEvent.setValue(SuggestionMessageEvent.FETCH_SUGGESTION_PRODUCT_FAILURE) }
         }
     }
 
     private fun excludeCartProductIds(): List<Long> =
-        cartRepository
-            .getAllCartProducts()
-            .getOrNull()
-            .orEmpty()
-            .filter { it.quantity != 0 }
-            .map { it.product.id }
+        runBlocking {
+            cartRepository
+                .getAllCartProducts()
+                .getOrNull()
+                .orEmpty()
+                .filter { it.quantity != 0 }
+                .map { it.product.id }
+        }
 
     private fun fetchSuggestionProductsSuccessHandle(suggestionProducts: List<Product>) {
         val ids = suggestionProducts.map { it.id }
-        cartRepository
-            .findCartProductsByProductIds(ids)
-            .onFailure { _toastEvent.postValue(SuggestionMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
-            .onSuccess {
-                val updatedItems = applyCartQuantities(it, suggestionProducts)
-                _suggestionProducts.postValue(updatedItems)
-            }
+
+        viewModelScope.launch {
+            cartRepository
+                .findCartProductsByProductIds(ids)
+                .onFailure { _toastEvent.setValue(SuggestionMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
+                .onSuccess {
+                    val updatedItems = applyCartQuantities(it, suggestionProducts)
+                    _suggestionProducts.value = updatedItems
+                }
+        }
     }
 
     private fun applyCartQuantities(

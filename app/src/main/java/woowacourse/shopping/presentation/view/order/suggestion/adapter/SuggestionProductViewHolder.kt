@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemSuggestionBinding
-import woowacourse.shopping.presentation.model.SuggestionProductUiModel
+import woowacourse.shopping.presentation.common.model.SuggestionProductUiModel
 
 class SuggestionProductViewHolder(
     private val binding: ItemSuggestionBinding,

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="vm"
+            type="woowacourse.shopping.presentation.view.payment.PaymentViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_coupon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/gray_55"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="@string/toolbar_payment_title"
+            app:titleTextColor="@color/white" />
+
+        <TextView
+            android:id="@+id/text_view_coupons_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="30dp"
+            android:text="@string/payment_screen_coupons_title"
+            android:textColor="@color/gray_33"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_coupon" />
+
+        <TextView
+            android:id="@+id/text_view_coupons_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/payment_screen_coupons_description"
+            android:textColor="@color/gray_55"
+            android:textSize="12sp"
+            app:layout_constraintTop_toBottomOf="@id/text_view_coupons_title" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_coupon"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="18dp"
+            app:submitList="@{vm.coupons}"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="@id/guideline_1"
+            app:layout_constraintTop_toBottomOf="@id/text_view_coupons_description"
+            tools:listitem="@layout/item_coupon" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider_1"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:layout_marginTop="30dp"
+            app:dividerColor="@color/gray_eb"
+            app:layout_constraintBottom_toBottomOf="@id/guideline_1"
+            app:layout_constraintTop_toTopOf="@id/guideline_1" />
+
+        <TextView
+            android:id="@+id/text_view_total_order_price_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:text="@string/payment_screen_order_price"
+            android:textColor="@color/gray_33"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/text_view_discount_price_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/guideline_1" />
+
+        <TextView
+            android:id="@+id/text_view_total_order_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:text="@{String.format(@string/price_format_krw, vm.paymentSummary.orderPrice)}"
+            android:textAlignment="textEnd"
+            android:textColor="@color/gray_33"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@id/text_view_total_order_price_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/text_view_total_order_price_title"
+            app:layout_constraintTop_toTopOf="@id/text_view_total_order_price_title"
+            tools:text="204,200원" />
+
+        <TextView
+            android:id="@+id/text_view_discount_price_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:text="@string/payment_screen_coupon_discount_amount"
+            android:textColor="@color/gray_33"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/text_view_delivery_fee_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_view_total_order_price_title" />
+
+        <TextView
+            android:id="@+id/text_view_discount_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:text="@{String.format(@string/price_format_krw, -vm.paymentSummary.discountPrice)}"
+            android:textAlignment="textEnd"
+            android:textColor="@color/gray_33"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@id/text_view_discount_price_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/text_view_discount_price_title"
+            app:layout_constraintTop_toTopOf="@id/text_view_discount_price_title"
+            tools:text="-5,000원" />
+
+        <TextView
+            android:id="@+id/text_view_delivery_fee_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:text="@string/payment_screen_delivery_fee"
+            android:textColor="@color/gray_33"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/guideline_2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_view_discount_price_title" />
+
+        <TextView
+            android:id="@+id/text_view_delivery_fee"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:text="@{String.format(@string/price_format_krw, vm.paymentSummary.deliveryFee)}"
+            android:textAlignment="textEnd"
+            android:textColor="@color/gray_33"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@id/text_view_delivery_fee_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/text_view_delivery_fee_title"
+            app:layout_constraintTop_toTopOf="@id/text_view_delivery_fee_title"
+            tools:text="3,000원" />
+
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider_2"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:layout_marginTop="20dp"
+            app:dividerColor="@color/gray_eb"
+            app:layout_constraintBottom_toBottomOf="@id/guideline_2"
+            app:layout_constraintTop_toTopOf="@id/guideline_2" />
+
+        <TextView
+            android:id="@+id/text_view_final_payment_price_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginVertical="16dp"
+            android:text="@string/payment_screen_total_payment_price"
+            android:textColor="@color/gray_33"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider_2" />
+
+        <TextView
+            android:id="@+id/text_view_final_payment_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:text="@{String.format(@string/price_format_krw, vm.paymentSummary.finalPaymentPrice)}"
+            android:textAlignment="textEnd"
+            android:textColor="@color/gray_33"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@id/text_view_final_payment_price_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/text_view_total_order_price_title"
+            app:layout_constraintTop_toTopOf="@id/text_view_final_payment_price_title"
+            app:layout_constraintVertical_bias="0.0"
+            tools:text="202,200원" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_payment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/mint"
+            android:onClick="@{() -> vm.postOrder()}"
+            android:paddingVertical="12dp"
+            android:text="@string/payment_screen_payment_btn"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.8" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.6" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

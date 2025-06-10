@@ -1,51 +1,83 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.datasource.ProductRemoteDataSource
-import woowacourse.shopping.data.datasource.RecentProductLocalDataSource
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import woowacourse.shopping.data.datasource.local.ProductLocalDataSource
+import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
+import woowacourse.shopping.data.db.RecentProductEntity
+import woowacourse.shopping.data.model.product.ProductResponse
 import woowacourse.shopping.data.model.product.toDomain
-import woowacourse.shopping.data.util.runCatchingInThread
+import woowacourse.shopping.data.util.result.flatMapCatching
+import woowacourse.shopping.data.util.result.mapCatchingDebugLog
 import woowacourse.shopping.domain.model.PageableItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepositoryImpl(
     private val productRemoteDataSource: ProductRemoteDataSource,
-    private val recentProductLocalDataSource: RecentProductLocalDataSource,
+    private val productLocalDataSource: ProductLocalDataSource,
 ) : ProductRepository {
-    override fun fetchProduct(
-        id: Long,
-        onResult: (Result<Product>) -> Unit,
-    ) = runCatchingInThread(onResult) {
-        productRemoteDataSource.fetchProduct(id).getOrThrow().toDomain()
-    }
+    override suspend fun fetchProduct(id: Long): Result<Product> =
+        productRemoteDataSource.fetchProduct(id).mapCatchingDebugLog { it.toDomain() }
 
-    override fun fetchProducts(
+    override suspend fun fetchProducts(
         page: Int,
         size: Int,
-        onResult: (Result<PageableItem<Product>>) -> Unit,
-    ) = runCatchingInThread(onResult) {
-        val response = productRemoteDataSource.fetchProducts(null, page, size).getOrThrow()
-        val products = response.content.map { it.toDomain() }
-        val hasMore = !response.last
-        PageableItem(products, hasMore)
-    }
+    ): Result<PageableItem<Product>> =
+        productRemoteDataSource.fetchProducts(null, page, size).mapCatchingDebugLog { response ->
+            val products = response.content.map { it.toDomain() }
+            val hasMore = !response.last
+            PageableItem(products, hasMore)
+        }
 
-    override fun fetchSuggestionProducts(
+    override suspend fun fetchSuggestionProducts(
         limit: Int,
         excludedProductIds: List<Long>,
-        onResult: (Result<List<Product>>) -> Unit,
-    ) = runCatchingInThread(onResult) {
-        val category = recentProductLocalDataSource.getRecentViewedProductCategory()
+    ): Result<List<Product>> =
+        productLocalDataSource
+            .getRecentViewedProductCategory()
+            .flatMapCatching { category ->
+                val fetchLimit = limit + excludedProductIds.size
+                productRemoteDataSource.fetchProducts(category, 0, fetchLimit)
+            }.mapCatchingDebugLog { response ->
+                val filteredProducts =
+                    response.content.filterSuggestionProducts(excludedProductIds, limit)
+                filteredProducts.map { it.toDomain() }
+            }
 
-        val fetchLimit = limit + excludedProductIds.size
-        val response = productRemoteDataSource.fetchProducts(category, 0, fetchLimit).getOrNull()
-        val allProducts = response?.content ?: emptyList()
+    override suspend fun getRecentProducts(limit: Int): Result<List<Product>> =
+        productLocalDataSource.getRecentProducts(limit).mapCatchingDebugLog { entities ->
+            val productIds = entities.map { it.productId }
+            fetchAllProductsConcurrently(productIds)
+        }
 
-        val filteredProducts =
-            allProducts
-                .filterNot { excludedProductIds.contains(it.id) }
-                .take(limit)
+    override suspend fun insertAndTrimToLimit(
+        productId: Long,
+        category: String,
+        recentProductLimit: Int,
+    ): Result<Unit> =
+        productLocalDataSource
+            .insertRecentProduct(RecentProductEntity(productId, category))
+            .mapCatchingDebugLog { productLocalDataSource.trimToLimit(recentProductLimit) }
 
-        filteredProducts.map { it.toDomain() }
-    }
+    private fun List<ProductResponse>.filterSuggestionProducts(
+        excludedProductIds: List<Long>,
+        limit: Int,
+    ): List<ProductResponse> =
+        this
+            .filterNot { excludedProductIds.contains(it.id) }
+            .take(limit)
+
+    private suspend fun fetchAllProductsConcurrently(productIds: List<Long>): List<Product> =
+        coroutineScope {
+            val deferredProducts =
+                productIds.map { productId -> async { fetchAndConvertToDomain(productId) } }
+            deferredProducts.mapNotNull { it.await() }
+        }
+
+    private suspend fun fetchAndConvertToDomain(productId: Long): Product? =
+        productRemoteDataSource
+            .fetchProduct(productId)
+            .mapCatchingDebugLog { it.toDomain() }
+            .getOrNull()
 }

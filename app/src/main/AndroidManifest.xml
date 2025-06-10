@@ -29,6 +29,8 @@
             android:name=".presentation.view.order.OrderActivity"
             android:exported="false" />
         <activity android:name="androidx.fragment.app.testing.EmptyFragmentActivity" />
+
+        <activity android:name=".presentation.view.payment.PaymentActivity" />
     </application>
 
 </manifest>

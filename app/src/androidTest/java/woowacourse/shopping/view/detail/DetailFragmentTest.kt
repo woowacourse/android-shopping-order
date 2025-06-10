@@ -15,7 +15,6 @@ import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.FakeProductRepository
-import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.fixture.productsFixture
 import woowacourse.shopping.presentation.view.detail.DetailFragment
 
@@ -25,13 +24,14 @@ class DetailFragmentTest {
         val fakeProductRepository = FakeProductRepository()
         val fakeCartRepository =
             FakeCartRepository(
-                initialCartProducts = productsFixture.take(1).map { CartProduct(it.id, it.toDomain(), 1) },
+                initialCartProducts =
+                    productsFixture
+                        .take(1)
+                        .map { CartProduct(it.id, it.toDomain(), 1) },
             )
-        val fakeRecentProductRepository = FakeRecentProductRepository()
 
         RepositoryProvider.initProductRepository(fakeProductRepository)
         RepositoryProvider.initCartRepository(fakeCartRepository)
-        RepositoryProvider.initRecentProductRepository(fakeRecentProductRepository)
 
         launchFragmentInContainer(
             DetailFragment.newBundle(productsFixture[0].id),

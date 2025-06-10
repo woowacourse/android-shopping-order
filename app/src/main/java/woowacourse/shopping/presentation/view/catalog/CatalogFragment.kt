@@ -10,9 +10,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCatalogBinding
 import woowacourse.shopping.databinding.MenuItemCartBinding
-import woowacourse.shopping.presentation.base.BaseFragment
-import woowacourse.shopping.presentation.model.CatalogItem
-import woowacourse.shopping.presentation.ui.decorations.GridSpacingItemDecoration
+import woowacourse.shopping.presentation.common.base.BaseFragment
+import woowacourse.shopping.presentation.common.model.CatalogItem
+import woowacourse.shopping.presentation.common.ui.decorations.GridSpacingItemDecoration
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogAdapter
 import woowacourse.shopping.presentation.view.catalog.event.CatalogMessageEvent
 import woowacourse.shopping.presentation.view.detail.DetailFragment
@@ -113,10 +113,6 @@ class CatalogFragment :
         binding.vm = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel.products.observe(viewLifecycleOwner) {
-            catalogAdapter.submitList(it)
-        }
-
         viewModel.toastEvent.observe(viewLifecycleOwner) {
             showToast(it.toMessageResId())
         }
@@ -140,6 +136,9 @@ class CatalogFragment :
 
             CatalogMessageEvent.FETCH_CART_ITEM_COUNT_FAILURE ->
                 R.string.catalog_screen_event_message_fetch_cart_item_count_failure
+
+            CatalogMessageEvent.FETCH_CART_FAILURE ->
+                R.string.catalog_screen_event_message_fetch_cart_failure
 
             CatalogMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE ->
                 R.string.catalog_screen_event_message_patch_cart_product_quantity_failure

@@ -1,21 +1,27 @@
 package woowacourse.shopping.di.provider
 
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.data.datasource.CartLocalDataSource
-import woowacourse.shopping.data.datasource.CartLocalDataSourceImpl
-import woowacourse.shopping.data.datasource.CartRemoteDataSource
-import woowacourse.shopping.data.datasource.CartRemoteDataSourceImpl
-import woowacourse.shopping.data.datasource.ProductRemoteDataSource
-import woowacourse.shopping.data.datasource.ProductRemoteDataSourceImpl
-import woowacourse.shopping.data.datasource.RecentProductLocalDataSource
-import woowacourse.shopping.data.datasource.RecentProductLocalDataSourceImpl
+import woowacourse.shopping.data.datasource.local.CartLocalDataSource
+import woowacourse.shopping.data.datasource.local.CartLocalDataSourceImpl
+import woowacourse.shopping.data.datasource.local.ProductLocalDataSource
+import woowacourse.shopping.data.datasource.local.ProductLocalDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.CartRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.CouponRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.CouponRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.OrderRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.OrderRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.db.ShoppingDatabase
 
 object DataSourceProvider {
     val productRemoteDataSource: ProductRemoteDataSource by lazy { initProductDataSource() }
     val cartRemoteDataSource: CartRemoteDataSource by lazy { initCartRemoteDataSource() }
     val cartLocalDataSource: CartLocalDataSource by lazy { initCartLocalDataSource() }
-    val recentProductLocalDataSource: RecentProductLocalDataSource by lazy { initRecentProductLocalDataSource() }
+    val productLocalDataSource: ProductLocalDataSource by lazy { initProductLocalDataSource() }
+    val couponRemoteDataSource: CouponRemoteDataSource by lazy { initCouponRemoteDataSource() }
+    val orderRemoteDataSource: OrderRemoteDataSource by lazy { initOrderRemoteDataSource() }
 
     private fun initProductDataSource(): ProductRemoteDataSource {
         val productService = ServiceProvider.provideProduceService()
@@ -26,9 +32,13 @@ object DataSourceProvider {
 
     private fun initCartLocalDataSource(): CartLocalDataSource = CartLocalDataSourceImpl()
 
-    private fun initRecentProductLocalDataSource(): RecentProductLocalDataSource {
+    private fun initProductLocalDataSource(): ProductLocalDataSource {
         val database = ShoppingDatabase.getDatabase(ShoppingApplication.instance)
         val recentProductDao = database.recentProductDao()
-        return RecentProductLocalDataSourceImpl(recentProductDao)
+        return ProductLocalDataSourceImpl(recentProductDao)
     }
+
+    private fun initCouponRemoteDataSource(): CouponRemoteDataSource = CouponRemoteDataSourceImpl(ServiceProvider.provideCouponService())
+
+    private fun initOrderRemoteDataSource(): OrderRemoteDataSource = OrderRemoteDataSourceImpl(ServiceProvider.provideOrderService())
 }
