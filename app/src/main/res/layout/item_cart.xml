@@ -92,7 +92,7 @@
             android:id="@+id/text_view_price"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@{String.format(@string/product_price_format, cartItem.cartItem.totalPrice)}"
+            android:text="@{@string/product_price_format(cartItem.cartItem.totalPrice)}"
             android:textAlignment="textEnd"
             android:textColor="@color/gray_55"
             android:textSize="20sp"

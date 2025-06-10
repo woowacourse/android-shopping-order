@@ -82,7 +82,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@{String.format(@string/product_price_format, product.price)}"
+            android:text="@{@string/product_price_format(product.price)}"
             android:textColor="@color/gray_55"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"

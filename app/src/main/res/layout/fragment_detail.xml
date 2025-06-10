@@ -90,7 +90,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:text="@{String.format(@string/product_price_format, product.price * vm.product.quantity)}"
+            android:text="@{@string/product_price_format(product.price * vm.product.quantity)}"
             android:textAlignment="textEnd"
             android:textColor="@color/black"
             android:textSize="20sp"
