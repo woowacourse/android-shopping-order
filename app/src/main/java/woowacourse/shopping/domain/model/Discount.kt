@@ -46,8 +46,8 @@ sealed class Discount {
             val freeProduct =
                 products.value
                     .filter { it.quantity >= minimumQuantity }
-                    .maxBy { it.product.price }
-            return freeProduct.product.price * getQuantity
+                    .maxByOrNull { it.product.price }
+            return freeProduct?.let { it.product.price * getQuantity } ?: DEFAULT_DISCOUNT_AMOUNT
         }
     }
 
@@ -79,5 +79,9 @@ sealed class Discount {
             products: CartProducts,
             shippingFee: Int,
         ): Int = (products.totalPrice * discountPercentage) / 100
+    }
+
+    companion object {
+        private const val DEFAULT_DISCOUNT_AMOUNT = 0
     }
 }
