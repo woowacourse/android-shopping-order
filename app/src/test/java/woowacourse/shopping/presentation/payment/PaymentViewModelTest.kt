@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.CouponType
+import woowacourse.shopping.domain.usecase.ApplyCouponPolicyUseCase
 import woowacourse.shopping.fixture.CouponFixture
 import woowacourse.shopping.fixture.FakeCouponRepository
 import woowacourse.shopping.fixture.FakeOrderRepository

@@ -14,6 +14,7 @@ import woowacourse.shopping.RepositoryProvider.cartItemRepository
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.usecase.ApplyCouponPolicyUseCase
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.presentation.recommend.OrderEvent
@@ -105,8 +106,9 @@ class PaymentViewModel(
     }
 
     fun updateOrderInfo(coupon: Coupon) {
+        val items = initialCheckedItems.map { it.toDomain() }
         val adjustment =
-            applyCouponPolicyUseCase.applyPolicy(coupon, initialOrderPrice, initialCheckedItems)
+            applyCouponPolicyUseCase.applyPolicy(coupon, initialOrderPrice, items)
 
         _discountAmount.postValue(adjustment.discount)
         _deliverCharge.postValue(adjustment.deliveryCharge)

@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.payment
+package woowacourse.shopping.domain.model
 
 data class OrderAdjustment(
     val discount: Long = INITIAL_DISCOUNT_CHARGE,

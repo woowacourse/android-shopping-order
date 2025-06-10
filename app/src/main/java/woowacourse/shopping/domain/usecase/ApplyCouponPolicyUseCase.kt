@@ -1,17 +1,18 @@
-package woowacourse.shopping.presentation.payment
+package woowacourse.shopping.domain.usecase
 
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.CouponType
+import woowacourse.shopping.domain.model.OrderAdjustment
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CouponPolicy
-import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class ApplyCouponPolicyUseCase {
     fun applyPolicy(
         coupon: Coupon,
         initialOrderPrice: Long,
-        checkedItems: List<ProductUiModel>,
+        checkedItems: List<Product>,
     ): OrderAdjustment {
-        val policy = CouponType.from(coupon.code).getPolicy()
+        val policy = CouponType.Companion.from(coupon.code).getPolicy()
         val discount = coupon.discount ?: 0L
         val discountPercentage = (coupon.discount ?: 0L).toDouble() / 100.0
 
@@ -32,7 +33,7 @@ class ApplyCouponPolicyUseCase {
 
     private fun calculateBogoDiscount(
         coupon: Coupon,
-        checkedItems: List<ProductUiModel>,
+        checkedItems: List<Product>,
     ): Long {
         val targetProduct =
             checkedItems
