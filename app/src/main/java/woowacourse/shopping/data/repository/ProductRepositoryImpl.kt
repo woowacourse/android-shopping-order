@@ -8,7 +8,7 @@ import woowacourse.shopping.domain.model.ProductDetail.Companion.EMPTY_PRODUCT_D
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.repository.ProductRepository
 
-class ProductRepository(
+class ProductRepositoryImpl(
     private val api: ProductApi,
 ) : ProductRepository {
     override suspend fun fetchCatalogProduct(productId: Long): Result<Product?> =

@@ -28,98 +28,102 @@ import woowacourse.shopping.domain.usecase.UpdateCartProductUseCase
 class ShoppingApp : Application() {
     private val database: ShoppingDatabase by lazy { ShoppingDatabase.getInstance(this) }
 
-    private val cartRepository: woowacourse.shopping.domain.repository.CartRepository by lazy {
+    private val cartRepositoryImpl: woowacourse.shopping.domain.repository.CartRepository by lazy {
         woowacourse.shopping.data.repository
-            .CartRepository(cartApi)
+            .CartRepositoryImpl(cartApi)
     }
 
-    private val productRepository: woowacourse.shopping.domain.repository.ProductRepository by lazy {
+    private val productRepositoryImpl: woowacourse.shopping.domain.repository.ProductRepository by lazy {
         woowacourse.shopping.data.repository
-            .ProductRepository(productApi)
+            .ProductRepositoryImpl(productApi)
     }
 
-    private val historyRepository: woowacourse.shopping.domain.repository.HistoryRepository by lazy {
+    private val historyRepositoryImpl: woowacourse.shopping.domain.repository.HistoryRepository by lazy {
         woowacourse.shopping.data.repository
-            .HistoryRepository(database.historyDao())
+            .HistoryRepositoryImpl(database.historyDao())
     }
 
-    private val orderRepository: woowacourse.shopping.domain.repository.OrderRepository by lazy {
+    private val orderRepositoryImpl: woowacourse.shopping.domain.repository.OrderRepository by lazy {
         woowacourse.shopping.data.repository
-            .OrderRepository(orderApi)
+            .OrderRepositoryImpl(orderApi)
     }
 
-    private val couponRepository: woowacourse.shopping.domain.repository.CouponRepository by lazy {
+    private val couponRepositoryImpl: woowacourse.shopping.domain.repository.CouponRepository by lazy {
         woowacourse.shopping.data.repository
-            .CouponRepository(couponApi)
+            .CouponRepositoryImpl(couponApi)
     }
 
     val getCartProductsUseCase by lazy {
-        GetCartProductsUseCase(cartRepository)
+        GetCartProductsUseCase(cartRepositoryImpl)
     }
 
     val increaseCartProductQuantityUseCase by lazy {
-        IncreaseCartProductQuantityUseCase(cartRepository)
+        IncreaseCartProductQuantityUseCase(cartRepositoryImpl)
     }
 
     val decreaseCartProductQuantityUseCase by lazy {
-        DecreaseCartProductQuantityUseCase(cartRepository)
+        DecreaseCartProductQuantityUseCase(cartRepositoryImpl)
     }
 
     val removeCartProductUseCase by lazy {
-        RemoveCartProductUseCase(cartRepository)
+        RemoveCartProductUseCase(cartRepositoryImpl)
     }
 
     val updateCartProductUseCase by lazy {
-        UpdateCartProductUseCase(cartRepository)
+        UpdateCartProductUseCase(cartRepositoryImpl)
     }
 
     val getSearchHistoryUseCase by lazy {
-        GetSearchHistoryUseCase(historyRepository)
+        GetSearchHistoryUseCase(historyRepositoryImpl)
     }
 
     val addSearchHistoryUseCase by lazy {
-        AddSearchHistoryUseCase(historyRepository)
+        AddSearchHistoryUseCase(historyRepositoryImpl)
     }
 
     val getRecentSearchHistoryUseCase by lazy {
-        GetRecentSearchHistoryUseCase(historyRepository)
+        GetRecentSearchHistoryUseCase(historyRepositoryImpl)
     }
 
     val getCatalogProductsUseCase by lazy {
-        GetCatalogProductsUseCase(productRepository, cartRepository)
+        GetCatalogProductsUseCase(productRepositoryImpl, cartRepositoryImpl)
     }
 
     val getCatalogProductUseCase by lazy {
-        GetCatalogProductUseCase(productRepository, cartRepository)
+        GetCatalogProductUseCase(productRepositoryImpl, cartRepositoryImpl)
     }
 
     val getCatalogProductsByIdsUseCase by lazy {
-        GetCatalogProductsByIdsUseCase(productRepository, cartRepository)
+        GetCatalogProductsByIdsUseCase(productRepositoryImpl, cartRepositoryImpl)
     }
 
     val getCartProductsQuantityUseCase by lazy {
-        GetCartProductsQuantityUseCase(cartRepository)
+        GetCartProductsQuantityUseCase(cartRepositoryImpl)
     }
 
     val getCartRecommendProductsUseCase by lazy {
-        GetCartRecommendProductsUseCase(productRepository, cartRepository, historyRepository)
+        GetCartRecommendProductsUseCase(
+            productRepositoryImpl,
+            cartRepositoryImpl,
+            historyRepositoryImpl,
+        )
     }
 
     val orderProductsUseCase by lazy {
-        OrderProductsUseCase(productRepository, cartRepository, orderRepository)
+        OrderProductsUseCase(productRepositoryImpl, cartRepositoryImpl, orderRepositoryImpl)
     }
     val getCouponsUseCase by lazy {
-        GetCouponsUseCase(couponRepository)
+        GetCouponsUseCase(couponRepositoryImpl)
     }
     val calculatePaymentAmountByCouponUseCase by lazy {
-        CalculatePaymentAmountByCouponUseCase(couponRepository)
+        CalculatePaymentAmountByCouponUseCase(couponRepositoryImpl)
     }
 
     val calculateCouponDiscountUseCase by lazy {
-        CalculateCouponDiscountUseCase(couponRepository)
+        CalculateCouponDiscountUseCase(couponRepositoryImpl)
     }
 
     val isFreeShippingCouponUseCase by lazy {
-        IsFreeShippingCouponUseCase(couponRepository)
+        IsFreeShippingCouponUseCase(couponRepositoryImpl)
     }
 }

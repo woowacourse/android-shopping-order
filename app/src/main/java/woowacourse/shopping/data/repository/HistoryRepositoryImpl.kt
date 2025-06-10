@@ -7,7 +7,7 @@ import woowacourse.shopping.domain.model.HistoryProduct
 import woowacourse.shopping.domain.model.ProductDetail
 import woowacourse.shopping.domain.repository.HistoryRepository
 
-class HistoryRepository(
+class HistoryRepositoryImpl(
     private val dao: HistoryDao,
 ) : HistoryRepository {
     override suspend fun fetchAllHistory(): Result<List<HistoryProduct>> =

@@ -5,7 +5,7 @@ import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
 
-class CouponRepository(
+class CouponRepositoryImpl(
     private val api: CouponApi,
     private var cachedCoupons: List<Coupon> = emptyList(),
 ) : CouponRepository {

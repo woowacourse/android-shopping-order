@@ -8,7 +8,7 @@ import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.repository.CartRepository
 
-class CartRepository(
+class CartRepositoryImpl(
     private val api: CartApi,
 ) : CartRepository {
     override suspend fun fetchCartProducts(
