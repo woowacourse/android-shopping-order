@@ -16,11 +16,10 @@ import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.product.ProductRepository
-import woowacourse.shopping.domain.model.CartProduct
-import woowacourse.shopping.domain.model.History
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.feature.cart.CartViewModel
 import woowacourse.shopping.fixture.CartResponseFixture
+import woowacourse.shopping.fixture.dummyCartProduct
+import woowacourse.shopping.fixture.dummyHistory
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 import woowacourse.shopping.util.getOrAwaitValue
 import kotlin.test.AfterTest
@@ -37,29 +36,6 @@ class CartViewModelTest {
     private lateinit var cartRepo: CartRepository
     private lateinit var productRepo: ProductRepository
     private lateinit var historyRepo: HistoryRepository
-
-    private val dummyProduct =
-        Product(
-            id = 1L,
-            name = "테스트상품",
-            price = 1000,
-            imageUrl = "https://example.com",
-            category = "테스트",
-        )
-
-    private val dummyCart =
-        CartProduct(
-            id = 1L,
-            product = dummyProduct,
-            quantity = 2,
-        )
-
-    private val dummyHistory =
-        History(
-            id = 1L,
-            name = "테스트상품",
-            thumbnailUrl = "",
-        )
 
     @BeforeTest
     fun setup() {
@@ -91,60 +67,18 @@ class CartViewModelTest {
         whenever(productRepo.fetchRecommendProducts(any(), any())).thenReturn(emptyList())
     }
 
-//    @Test
-//    fun `plusPage 호출 시 페이지가 증가한다`() =
-//        runTest {
-//            advanceUntilIdle()
-//            assertEquals(0, viewModel.page.getOrAwaitValue())
-//
-//            viewModel.plusPage()
-//            advanceUntilIdle()
-//
-//            assertEquals(1, viewModel.page.getOrAwaitValue())
-//        }
-//
-//    @Test
-//    fun `minusPage 호출 시 페이지가 감소한다`() =
-//        runTest {
-//            advanceUntilIdle()
-//
-//            viewModel.plusPage()
-//            advanceUntilIdle()
-//            assertEquals(1, viewModel.page.getOrAwaitValue())
-//
-//            viewModel.minusPage()
-//            advanceUntilIdle()
-//            assertEquals(0, viewModel.page.getOrAwaitValue())
-//        }
-
     @Test
-    fun `addToCart 호출 시 수량이 증가한다`() =
+    fun `수량이 2 이상일 때 removeFromCart 호출 시 수량이 감소한다`() =
         runTest {
             advanceUntilIdle()
 
-            whenever(cartRepo.updateCart(id = dummyCart.id, cartQuantity = CartQuantity(3)))
+            whenever(cartRepo.updateCart(id = dummyCartProduct.id, cartQuantity = CartQuantity(1)))
                 .thenReturn(Result.success(Result.success(Unit)))
 
-            viewModel.addToCart(dummyCart)
+            viewModel.removeFromCart(dummyCartProduct)
             advanceUntilIdle()
 
-            val updatedCart = viewModel.carts.getOrAwaitValue().find { it.id == dummyCart.id }
-            assertNotNull(updatedCart)
-            assertEquals(1, updatedCart.quantity)
-        }
-
-    @Test
-    fun `removeFromCart 호출 시 수량이 감소한다`() =
-        runTest {
-            advanceUntilIdle()
-
-            whenever(cartRepo.updateCart(id = dummyCart.id, cartQuantity = CartQuantity(1)))
-                .thenReturn(Result.success(Result.success(Unit)))
-
-            viewModel.removeFromCart(dummyCart)
-            advanceUntilIdle()
-
-            val updatedCart = viewModel.carts.getOrAwaitValue().find { it.id == dummyCart.id }
+            val updatedCart = viewModel.carts.getOrAwaitValue().find { it.id == dummyCartProduct.id }
             assertNotNull(updatedCart)
             assertEquals(1, updatedCart.quantity)
         }
@@ -154,7 +88,7 @@ class CartViewModelTest {
         runTest {
             advanceUntilIdle()
 
-            val oneQuantityCart = dummyCart.copy(quantity = 1)
+            val oneQuantityCart = dummyCartProduct.copy(quantity = 1)
 
             whenever(cartRepo.deleteCart(oneQuantityCart.id)).thenReturn(Result.success(Unit))
             whenever(cartRepo.getCartCounts()).thenReturn(Result.success(0))

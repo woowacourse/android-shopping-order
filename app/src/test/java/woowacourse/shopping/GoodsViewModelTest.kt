@@ -19,13 +19,13 @@ import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.product.ProductRepository
-import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.feature.goods.GoodsViewModel
 import woowacourse.shopping.feature.model.GoodsItem
 import woowacourse.shopping.feature.model.State
 import woowacourse.shopping.fixture.CartResponseFixture
 import woowacourse.shopping.fixture.ProductResponseFixture
+import woowacourse.shopping.fixture.dummyCartProduct
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 import woowacourse.shopping.util.getOrAwaitValue
 import kotlin.test.AfterTest
@@ -40,22 +40,6 @@ class GoodsViewModelTest {
     private lateinit var cartRepo: CartRepository
     private lateinit var productRepo: ProductRepository
     private lateinit var historyRepo: HistoryRepository
-
-    private val dummyProductDto =
-        Product(
-            id = 1L,
-            name = "Mock 상품",
-            price = 1000,
-            imageUrl = "https://example.com/image.jpg",
-            category = "mockCategory",
-        )
-
-    private val dummyCartProduct =
-        CartProduct(
-            id = 1L,
-            product = dummyProductDto,
-            quantity = 2,
-        )
 
     @BeforeTest
     fun setup() {
@@ -120,7 +104,32 @@ class GoodsViewModelTest {
         }
 
     @Test
-    fun `removeFromCart 호출 시 수량이 감소한다`() =
+    fun `수량이 1 이상일 때 addToCart 호출 시 기존 아이템의 수량이 증가한다`() =
+        runTest {
+            advanceUntilIdle()
+
+            val existingCart = dummyCartProduct.copy(quantity = 1)
+
+            whenever(cartRepo.updateCart(id = existingCart.id, cartQuantity = CartQuantity(2)))
+                .thenReturn(Result.success(Result.success(Unit)))
+            whenever(cartRepo.getCartCounts()).thenReturn(Result.success(2))
+
+            viewModel.addToCart(existingCart)
+
+            advanceUntilIdle()
+
+            val updated =
+                viewModel.items
+                    .getOrAwaitValue()
+                    .filterIsInstance<GoodsItem.Product>()
+                    .find { it.cart.product.id == existingCart.product.id }
+
+            assertNotNull(updated)
+            assertEquals(2, updated.cart.quantity)
+        }
+
+    @Test
+    fun `수량이 2 이상일 때 removeFromCart 호출 시 수량이 감소한다`() =
         runTest {
             advanceUntilIdle()
 
@@ -142,5 +151,28 @@ class GoodsViewModelTest {
 
             assertNotNull(updated)
             assertEquals(1, updated.cart.quantity)
+        }
+
+    @Test
+    fun `수량이 1일 때 removeFromCart 호출 시 장바구니에서 해당 상품을 제거한다`() =
+        runTest {
+            val target = dummyCartProduct.copy(quantity = 1)
+
+            whenever(cartRepo.deleteCart(id = target.id)).thenReturn(Result.success(Unit))
+            whenever(cartRepo.getCartCounts()).thenReturn(Result.success(0))
+
+            viewModel.removeFromCart(target)
+
+            advanceUntilIdle()
+
+            val updated =
+                viewModel.items
+                    .getOrAwaitValue()
+                    .filterIsInstance<GoodsItem.Product>()
+                    .find { it.cart.product.id == target.product.id }
+
+            assertNotNull(updated)
+            assertEquals(0, updated.cart.quantity)
+            assertEquals(0L, updated.cart.id)
         }
 }
