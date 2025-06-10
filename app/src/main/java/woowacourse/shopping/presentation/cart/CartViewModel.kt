@@ -39,7 +39,7 @@ class CartViewModel(
 
     val checkedProductCount: LiveData<Int> =
         _checkedProducts.map { products ->
-            products.size
+            products.sumOf { it.quantity }
         }
 
     val isAllChecked = MutableLiveData(false)
@@ -189,14 +189,15 @@ class CartViewModel(
     }
 
     private fun updateProductInPagingData(updatedProduct: ProductUiModel) {
-        _pagingData.value =
-            _pagingData.value?.let { paging ->
-                val updatedList =
-                    paging.products.map {
-                        if (it.id == updatedProduct.id) updatedProduct else it
-                    }
-                paging.copy(products = updatedList)
-            }
+        val currentPagingData = _pagingData.value ?: return
+        _pagingData.value = currentPagingData.copy(
+            products = currentPagingData.products.update(updatedProduct)
+        )
+        _checkedProducts.value = _checkedProducts.value?.update(updatedProduct)
+    }
+
+    private fun List<ProductUiModel>.update(updated: ProductUiModel): List<ProductUiModel> {
+        return map { if (it.id == updated.id) updated else it }
     }
 
     companion object {
