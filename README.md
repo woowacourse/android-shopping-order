@@ -54,3 +54,6 @@ Cart 화면 구현
 - CartViewModel
   - [x] totalCount가 -1 라는 것은 논리적으로 읽을 수 없음 -> 상수화
 ----- https://github.com/woowacourse/android-shopping-order/pull/111#discussion_r2113932605 여기 부터 적용 다시
+
+### 3단계 기능 요구 사항
+- [x] 코루틴 적용

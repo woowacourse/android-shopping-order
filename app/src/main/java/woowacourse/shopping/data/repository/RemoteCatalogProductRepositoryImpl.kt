@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository
 
+import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -12,176 +13,121 @@ import woowacourse.shopping.product.catalog.ProductUiModel
 class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
     val retrofitService = RetrofitProductService.INSTANCE.create(ProductService::class.java)
 
-    override fun getRecommendedProducts(
+    override suspend fun getRecommendedProducts(
         category: String,
         page: Int,
         size: Int,
-        callback: (List<ProductUiModel>) -> Unit,
-    ) {
-        retrofitService
+    ): List<ProductUiModel> {
+        val response = retrofitService
             .requestProducts(
                 category = category,
                 page = page,
                 size = size,
-            ).enqueue(
-                object : Callback<ProductResponse> {
-                    override fun onResponse(
-                        call: Call<ProductResponse>,
-                        response: Response<ProductResponse>,
-                    ) {
-                        if (response.isSuccessful) {
-                            val body: ProductResponse? = response.body()
-                            val content: List<Content>? = body?.content
-                            val products: List<ProductUiModel>? =
-                                content?.mapNotNull {
-                                    ProductUiModel(
-                                        id = it.id.toInt(),
-                                        imageUrl = it.imageUrl,
-                                        name = it.name,
-                                        price = it.price,
-                                    )
-                                }
-                            callback(products ?: emptyList())
-                            println("body : $body")
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<ProductResponse>,
-                        t: Throwable,
-                    ) {
-                        println("error : $t")
-                    }
-                },
             )
+
+        if (!response.isSuccessful) {
+            Log.d("error", "error : $response")
+        }
+
+        val body: ProductResponse? = response.body()
+        val content: List<Content>? = body?.content
+        val products: List<ProductUiModel> =
+            content?.mapNotNull {
+                ProductUiModel(
+                    id = it.id.toInt(),
+                    imageUrl = it.imageUrl,
+                    name = it.name,
+                    price = it.price,
+                )
+            } ?: return emptyList()
+        return products
     }
 
-    override fun getAllProductsSize(callback: (Int) -> Unit) {
-        retrofitService.requestProducts().enqueue(
-            object : Callback<ProductResponse> {
-                override fun onResponse(
-                    call: Call<ProductResponse>,
-                    response: Response<ProductResponse>,
-                ) {
-                    if (response.isSuccessful) {
-                        val body: ProductResponse? = response.body()
-                        callback(body?.totalElements?.toInt() ?: 0)
-                        println("body : $body")
-                    }
-                }
+    override suspend fun getAllProductsSize(): Int {
+        val response = retrofitService.requestProducts()
 
-                override fun onFailure(
-                    call: Call<ProductResponse>,
-                    t: Throwable,
-                ) {
-                    println("error : $t")
-                }
-            },
-        )
+
+        val body: ProductResponse? = response.body()
+        return body?.totalElements?.toInt() ?: 0
     }
 
-    override fun getCartProductsByUids(
+    override suspend fun getCartProductsByUids(
         uids: List<Int>,
-        callback: (List<ProductUiModel>) -> Unit,
-    ) {
+    ): List<ProductUiModel> {
         val resultsMap = mutableMapOf<Int, ProductUiModel>()
         var completedCount = 0
 
         if (uids.isEmpty()) {
-            callback(emptyList())
-            return
+            return emptyList()
         }
 
         uids.forEach { uid ->
-            getProduct(uid) { product ->
-                resultsMap[uid] = product
-                completedCount++
-
-                if (completedCount == uids.size) {
-                    val orderedResults = uids.mapNotNull { resultsMap[it] }
-                    callback(orderedResults)
-                }
+            val product = getProduct(uid)
+            resultsMap[uid] = product as ProductUiModel
+            completedCount++
+            if (completedCount == uids.size) {
+                val orderedResults = uids.mapNotNull { resultsMap[it] }
+                return orderedResults
             }
         }
+        return emptyList()
     }
 
-    override fun getProductsByPage(
+    override suspend fun getProductsByPage(
         page: Int,
         size: Int,
-        callback: (List<ProductUiModel>) -> Unit,
-    ) {
-        retrofitService
+    ): List<ProductUiModel> {
+        val response = retrofitService
             .requestProducts(
                 page = page,
                 size = size,
-            ).enqueue(
-                object : Callback<ProductResponse> {
-                    override fun onResponse(
-                        call: Call<ProductResponse>,
-                        response: Response<ProductResponse>,
-                    ) {
-                        if (response.isSuccessful) {
-                            val body: ProductResponse? = response.body()
-                            val content: List<Content>? = body?.content
-                            val products: List<ProductUiModel>? =
-                                content?.mapNotNull {
-                                    ProductUiModel(
-                                        id = it.id.toInt(),
-                                        imageUrl = it.imageUrl,
-                                        name = it.name,
-                                        price = it.price,
-                                    )
-                                }
-                            callback(products ?: emptyList())
-                            println("body : $body")
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<ProductResponse>,
-                        t: Throwable,
-                    ) {
-                        println("error : $t")
-                    }
-                },
             )
+
+        if (!response.isSuccessful) {
+            Log.d("error", "error : $response")
+        }
+
+        val body: ProductResponse? = response.body()
+        val content: List<Content>? = body?.content
+        val products: List<ProductUiModel>? =
+            content?.mapNotNull {
+                ProductUiModel(
+                    id = it.id.toInt(),
+                    imageUrl = it.imageUrl,
+                    name = it.name,
+                    price = it.price,
+                )
+            }
+        return products ?: emptyList()
     }
 
-    override fun getProduct(
+    override suspend fun getProduct(
         id: Int,
-        callback: (ProductUiModel) -> Unit,
-    ) {
-        retrofitService
+    ): ProductUiModel {
+        val response = retrofitService
             .requestDetailProduct(
                 id = id,
-            ).enqueue(
-                object : Callback<Content> {
-                    override fun onResponse(
-                        call: Call<Content>,
-                        response: Response<Content>,
-                    ) {
-                        if (response.isSuccessful) {
-                            val body: Content = response.body() ?: return
-                            val product =
-                                ProductUiModel(
-                                    id = body.id.toInt(),
-                                    imageUrl = body.imageUrl,
-                                    name = body.name,
-                                    price = body.price,
-                                    category = body.category,
-                                )
-                            callback(product)
-                            println("body : $body")
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<Content>,
-                        t: Throwable,
-                    ) {
-                        println("error : $t")
-                    }
-                },
             )
+
+        if (!response.isSuccessful) {
+            Log.d("error", "error : $response")
+        }
+
+        val body: Content = response.body() ?: return ProductUiModel(
+            id = 0,
+            name = "[병천아우내] 모듬순대",
+            price = 11900,
+            category = "음식",
+            imageUrl = "https://product-image.kurly.com/hdims/resize/%5E%3E360x%3E468/cropcenter/360x468/quality/85/src/product/image/00fb05f8-cb19-4d21-84b1-5cf6b9988749.jpg",
+        )
+        val product =
+            ProductUiModel(
+                id = body.id.toInt(),
+                imageUrl = body.imageUrl,
+                name = body.name,
+                price = body.price,
+                category = body.category,
+            )
+        return product
     }
 }

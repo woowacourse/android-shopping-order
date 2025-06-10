@@ -3,34 +3,29 @@ package woowacourse.shopping.data.source
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 interface CartProductDataSource {
-    fun insertCartProduct(
+    suspend fun insertCartProduct(
         cartProduct: ProductUiModel,
-        callback: (ProductUiModel) -> Unit,
-    )
+    ): ProductUiModel
 
-    fun deleteCartProduct(
+    suspend fun deleteCartProduct(
         cartProduct: ProductUiModel,
-        callback: (Boolean) -> Unit,
-    )
+    ): Boolean
 
-    fun getCartProductsInRange(
+    suspend fun getCartProductsInRange(
         currentPage: Int,
         pageSize: Int,
-        callback: (List<ProductUiModel>) -> Unit,
-    )
+    ): List<ProductUiModel>
 
-    fun updateProduct(
+    suspend fun updateProduct(
         cartProduct: ProductUiModel,
         quantity: Int,
-        callback: (Boolean) -> Unit,
-    )
+    ): Boolean
 
-    fun getCartItemSize(callback: (Int) -> Unit)
+    suspend fun getCartItemSize(): Int
 
-    fun getTotalElements(callback: (Int) -> Unit)
+    suspend fun getTotalElements(): Int
 
-    fun getCartProducts(
+    suspend fun getCartProducts(
         totalElements: Int,
-        callback: (List<ProductUiModel>) -> Unit,
-    )
+    ): List<ProductUiModel>
 }
