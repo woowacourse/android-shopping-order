@@ -6,8 +6,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
+import woowacourse.shopping.data.remote.HeaderInterceptor
 import woowacourse.shopping.data.remote.cart.CartService
-import woowacourse.shopping.data.remote.cart.HeaderInterceptor
 import woowacourse.shopping.data.remote.coupon.CouponService
 import woowacourse.shopping.data.remote.order.OrderService
 import woowacourse.shopping.data.remote.product.ProductService
