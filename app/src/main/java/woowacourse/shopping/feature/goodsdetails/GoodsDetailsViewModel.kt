@@ -137,7 +137,7 @@ class GoodsDetailsViewModel(
     private fun updateLastViewedVisibility() {
         val history = lastViewed.value
         val currentCart = cartProduct.value
-        _shouldShowLastViewed.value = history != null && history.name != currentCart?.product?.name
+        _shouldShowLastViewed.value = (history?.id != 0L) && history?.name != currentCart?.product?.name
     }
 
     private fun updateCart(updatedCart: CartProduct?) {
