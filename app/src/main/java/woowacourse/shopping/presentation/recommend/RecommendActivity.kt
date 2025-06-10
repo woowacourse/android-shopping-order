@@ -102,8 +102,9 @@ class RecommendActivity : AppCompatActivity() {
     }
 
     private fun navigateToOrder() {
+        val selectedProducts = viewModel.selectedProducts.value ?: emptyList()
         binding.buttonOrder.setOnClickListener {
-            val newIntent = OrderActivity.newIntent(this@RecommendActivity, viewModel.checkedProducts)
+            val newIntent = OrderActivity.newIntent(this@RecommendActivity, selectedProducts)
             startActivity(newIntent)
         }
     }
