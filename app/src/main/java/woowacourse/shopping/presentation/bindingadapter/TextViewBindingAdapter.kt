@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.bindingadapter
 
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import woowacourse.shopping.R
 import woowacourse.shopping.presentation.model.AvailableTimeUiModel
@@ -35,4 +36,12 @@ fun setExpirationDate(
     val context = view.context
     val formattedDate = date?.format(DateTimeFormatter.ofPattern("yyyy년 M월 d일"))
     view.text = context.getString(R.string.item_coupon_expiration_date, formattedDate)
+}
+
+@BindingAdapter("visibleIfNotNull")
+fun setTextViewVisible(
+    view: TextView,
+    value: Any?,
+) {
+    view.isVisible = value != null && value != 0
 }
