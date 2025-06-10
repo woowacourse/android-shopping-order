@@ -57,6 +57,16 @@ class CartRepositoryImpl(
         return loadCartItemByProductId(cartItem.product.id)
     }
 
+    override suspend fun addOrUpdateCartItem(cartItem: CartItem) {
+        loadCartItemByProductId(cartItem.product.id).let { existingItem ->
+            if (existingItem == null) {
+                addCartItem(cartItem)
+            } else {
+                updateCartItemQuantity(cartItem.cartId, existingItem.quantity + cartItem.quantity)
+            }
+        }
+    }
+
     override suspend fun deleteCartItem(cartId: Long) {
         cartItemDataSource.removeCartItem(cartId)
     }
@@ -65,7 +75,7 @@ class CartRepositoryImpl(
         cartItemDataSource.removeCartItems(cartIds)
     }
 
-    override suspend fun updateCartItemQuantity(
+    private suspend fun updateCartItemQuantity(
         cartId: Long,
         quantity: Int,
     ) {

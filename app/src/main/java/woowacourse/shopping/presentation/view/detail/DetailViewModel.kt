@@ -60,17 +60,8 @@ class DetailViewModel(
     fun addToCart() {
         viewModelScope.launch {
             val product = _product.value ?: return@launch
-            val cartItem = cartRepository.loadCartItemByProductId(product.id)
-            if (cartItem == null) {
-                cartRepository.addCartItem(product.toCartItem())
-                _saveEvent.postValue(Unit)
-            } else {
-                cartRepository.updateCartItemQuantity(
-                    cartId = product.cartId,
-                    quantity = cartItem.quantity + product.quantity,
-                )
-                _saveEvent.postValue(Unit)
-            }
+            cartRepository.addOrUpdateCartItem(product.toCartItem())
+            _saveEvent.postValue(Unit)
         }
     }
 
