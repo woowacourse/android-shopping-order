@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.bindingadapter
 
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 
 @BindingAdapter("visibleIf")
@@ -13,5 +14,5 @@ fun setVisible(
 
 @BindingAdapter("visibleIfNotNull")
 fun View.setVisibleIfNotNull(value: Any?) {
-    visibility = if (value != null) View.VISIBLE else View.GONE
+    this.isVisible = value != null
 }
