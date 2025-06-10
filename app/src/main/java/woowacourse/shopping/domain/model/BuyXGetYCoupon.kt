@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.model
 
-data object BuyTwoGetOneCoupon : CouponRule() {
+data object BuyXGetYCoupon : CouponRule() {
     private const val DEFAULT_SHIPPING_FEE = 3_000
 
     override fun isAvailable(

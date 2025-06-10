@@ -16,7 +16,7 @@ sealed class CouponRule {
         fun getContract(discountType: String): CouponRule =
             when (discountType) {
                 DiscountType.FIXED.code -> FixedCoupon
-                DiscountType.BUY_X_GET_Y.code -> BuyTwoGetOneCoupon
+                DiscountType.BUY_X_GET_Y.code -> BuyXGetYCoupon
                 DiscountType.FREE_SHIPPING.code -> FreeShippingCoupon
                 DiscountType.PERCENTAGE.code -> MiracleSaleCoupon
                 else -> throw IllegalArgumentException("알 수 없는 할인 타입입니다: $discountType")
