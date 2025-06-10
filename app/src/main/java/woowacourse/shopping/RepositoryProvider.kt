@@ -8,6 +8,7 @@ import woowacourse.shopping.data.repository.ProductsRepositoryImpl
 import woowacourse.shopping.data.repository.ViewedItemRepositoryImpl
 import woowacourse.shopping.data.source.local.cart.CartItemsLocalDataSource
 import woowacourse.shopping.data.source.local.recent.ViewedItemDatabase
+import woowacourse.shopping.data.source.local.recent.ViewedItemLocalDataSource
 import woowacourse.shopping.data.source.remote.Client.getCartRetrofitService
 import woowacourse.shopping.data.source.remote.Client.getCouponApiService
 import woowacourse.shopping.data.source.remote.Client.getOrderRetrofitService
@@ -32,11 +33,13 @@ object RepositoryProvider {
 
     fun init(application: Application) {
         viewedItemRepository =
-            ViewedItemRepositoryImpl(ViewedItemDatabase.getInstance(application).viewedItemDao())
+            ViewedItemRepositoryImpl(
+                ViewedItemLocalDataSource(ViewedItemDatabase.getInstance(application).viewedItemDao()),
+            )
         productsRepository =
             ProductsRepositoryImpl(
                 ProductsRemoteDataSource(getProductRetrofitService),
-                viewedItemRepository,
+                ViewedItemLocalDataSource(ViewedItemDatabase.getInstance(application).viewedItemDao()),
             )
         cartItemRepository =
             CartItemsRepositoryImpl(

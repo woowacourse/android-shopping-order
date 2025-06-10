@@ -1,26 +1,25 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.model.ViewedItem
-import woowacourse.shopping.data.source.local.recent.ViewedItemDao
+import woowacourse.shopping.data.source.local.recent.ViewedItemDataSource
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ViewedItemRepository
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toViewedItem
 
 class ViewedItemRepositoryImpl(
-    private val dao: ViewedItemDao,
+    private val viewedItemDataSource: ViewedItemDataSource,
 ) : ViewedItemRepository {
     override suspend fun insertViewedItem(product: Product) {
-        dao.insertViewedProduct(product.toViewedItem())
+        viewedItemDataSource.insertViewedItem(product.toViewedItem())
     }
 
-    override suspend fun getViewedItems(): List<Product> {
-        val recentItems: List<ViewedItem> = dao.getRecentViewedItems()
-        return recentItems.map { it.toDomain() }
-    }
+    override suspend fun getViewedItems(): Result<List<Product>> =
+        runCatching {
+            viewedItemDataSource.getRecentViewedItems().map { it.toDomain() }
+        }
 
-    override suspend fun getLastViewedItem(): Product? {
-        val lastViewed: ViewedItem? = dao.getLastViewedItem()
-        return lastViewed?.toDomain()
-    }
+    override suspend fun getLastViewedItem(): Result<Product?> =
+        runCatching {
+            viewedItemDataSource.getLastViewedItem()?.toDomain()
+        }
 }
