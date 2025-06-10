@@ -11,15 +11,15 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.Order
-import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.usecase.coupon.GetCouponsUseCase
 import woowacourse.shopping.view.payment.adapter.PaymentItem
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
 class PaymentViewModel(
     private val cartProducts: CartProducts,
-    private val couponRepository: CouponRepository,
+    private val getCouponsUseCase: GetCouponsUseCase,
     private val orderRepository: OrderRepository,
 ) : ViewModel(),
     PaymentEventHandler {
@@ -49,8 +49,7 @@ class PaymentViewModel(
 
     private fun loadCoupons() {
         viewModelScope.launch {
-            couponRepository
-                .getCoupons()
+            getCouponsUseCase()
                 .onSuccess { coupons ->
                     couponItems.postValue(
                         coupons

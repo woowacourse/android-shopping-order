@@ -20,6 +20,7 @@ import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.cart.GetTotalCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
+import woowacourse.shopping.domain.usecase.coupon.GetCouponsUseCase
 import woowacourse.shopping.domain.usecase.product.GetProductsUseCase
 import woowacourse.shopping.domain.usecase.product.GetRecentProductsUseCase
 import woowacourse.shopping.domain.usecase.product.GetRecommendedProductsUseCase
@@ -57,4 +58,6 @@ class ShoppingApplication : Application() {
     val addToCartUseCase by lazy { AddToCartUseCase(cartProductRepository) }
     val removeFromCartUseCase by lazy { RemoveFromCartUseCase(cartProductRepository) }
     val updateCartQuantityUseCase by lazy { UpdateCartQuantityUseCase(cartProductRepository, removeFromCartUseCase) }
+
+    val getCouponsUseCase by lazy { GetCouponsUseCase(couponRepository) }
 }

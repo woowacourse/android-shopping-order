@@ -35,7 +35,7 @@ class PaymentActivity : AppCompatActivity() {
                 this,
                 PaymentViewModelFactory(
                     cartProducts,
-                    app.couponRepository,
+                    app.getCouponsUseCase,
                     app.orderRepository,
                 ),
             )[PaymentViewModel::class.java]
