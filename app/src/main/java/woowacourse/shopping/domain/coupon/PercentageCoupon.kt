@@ -17,7 +17,7 @@ data class PercentageCoupon(override val info: CouponInfo, override val type: Co
         return true
     }
 
-    override fun discount(cartItems: List<CartItem>): Long {
+    override fun discountAmount(cartItems: List<CartItem>): Long {
         val discountRate = (info.discount ?: 0) / 100.0
         return (cartItems.sumOf(CartItem::totalPrice) * discountRate).toLong()
     }

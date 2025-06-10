@@ -18,7 +18,7 @@ data class BuyXGetYFreeCoupon(override val info: CouponInfo, override val type: 
         return true
     }
 
-    override fun discount(cartItems: List<CartItem>): Long {
+    override fun discountAmount(cartItems: List<CartItem>): Long {
         val requiredQuantity = ((info.buyQuantity ?: 0) + (info.getQuantity ?: 0)).coerceAtLeast(1)
         val bonusQuantity = info.getQuantity ?: 0
         val applicableItem =

@@ -43,7 +43,7 @@ class CheckoutViewModel(
         _coupons.switchMap { coupons ->
             _cartItems.map { cartItems ->
                 val selectedCoupon = coupons.firstOrNull { coupon -> coupon.isSelected }
-                selectedCoupon?.coupon?.discount(cartItems) ?: 0
+                selectedCoupon?.coupon?.discountAmount(cartItems) ?: 0
             }
         }
 

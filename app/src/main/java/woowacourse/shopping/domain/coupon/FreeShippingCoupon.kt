@@ -21,5 +21,5 @@ data class FreeShippingCoupon(
         return true
     }
 
-    override fun discount(cartItems: List<CartItem>): Long = Price.SHIPPING_FEE
+    override fun discountAmount(cartItems: List<CartItem>): Long = Price.SHIPPING_FEE
 }

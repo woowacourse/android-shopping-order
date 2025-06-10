@@ -20,7 +20,7 @@ data class FixedCoupon(
         return true
     }
 
-    override fun discount(cartItems: List<CartItem>): Long = DISCOUNT_AMOUNT
+    override fun discountAmount(cartItems: List<CartItem>): Long = DISCOUNT_AMOUNT
 
     companion object {
         private const val DISCOUNT_AMOUNT = 5_000L
