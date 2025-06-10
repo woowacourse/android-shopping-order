@@ -81,7 +81,7 @@ class CartViewModel(
 
             val filteredProducts = recommendProducts.filterNot { it.id in cartProductIds }
 
-            _recommendedProducts.postValue(filteredProducts)
+            _recommendedProducts.value = filteredProducts
         }
     }
 
@@ -111,7 +111,7 @@ class CartViewModel(
                         val result: Boolean =
                             cartProductRepository.deleteCartProduct(product.cartItemId)
                         if (result) {
-                            _updatedProduct.postValue(product.copy(quantity = 0))
+                            _updatedProduct.value = product.copy(quantity = 0)
                             loadCartProducts()
                         }
                     } else {
@@ -121,7 +121,7 @@ class CartViewModel(
                                 product.quantity - 1,
                             )
                         if (result) {
-                            _updatedProduct.postValue(product.copy(quantity = product.quantity - 1))
+                            _updatedProduct.value = product.copy(quantity = product.quantity - 1)
                             loadCartProducts()
                         }
                     }
@@ -135,7 +135,7 @@ class CartViewModel(
                                 product.quantity + 1,
                             )
                         if (result) {
-                            _updatedProduct.postValue(product.copy(quantity = product.quantity + 1))
+                            _updatedProduct.value = product.copy(quantity = product.quantity + 1)
                             loadCartProducts()
                         }
                     }
@@ -149,7 +149,7 @@ class CartViewModel(
             val cartItemId =
                 cartProductRepository.insertCartProduct(productId = product.id, quantity = 1)
             val addedProduct = product.copy(quantity = 1, cartItemId = cartItemId)
-            _updatedProduct.postValue(addedProduct)
+            _updatedProduct.value = addedProduct
             refreshProductsInfo()
             loadCartProducts()
         }
@@ -232,12 +232,12 @@ class CartViewModel(
                     compareBy<ProductItem> { it.productItem.id },
                 ).apply { addAll(pagedProducts) }
 
-            _cartProducts.postValue(items)
+            _cartProducts.value = items
             updateTotalCount()
             updateTotalPrice()
             loadSelectAllState()
 
-            _loadingState.postValue(LoadingState.loaded())
+            _loadingState.value = LoadingState.loaded()
             isInitialLoad = false
         }
     }

@@ -54,7 +54,7 @@ class DetailViewModel(
     fun setLatestViewedProduct() {
         viewModelScope.launch {
             val product = recentlyViewedProductRepository.getLatestViewedProduct() ?: return@launch
-            _latestViewedProduct.postValue(product)
+            _latestViewedProduct.value = product
         }
     }
 

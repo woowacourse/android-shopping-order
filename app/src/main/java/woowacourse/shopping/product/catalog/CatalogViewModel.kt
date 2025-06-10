@@ -42,12 +42,12 @@ class CatalogViewModel(
             if (product.quantity == 0) {
                 val cartItemId = cartProductRepository.insertCartProduct(product.id, quantity = 1)
                 val addedProduct = product.copy(quantity = 1, cartItemId = cartItemId)
-                _updatedItem.postValue(addedProduct)
+                _updatedItem.value = addedProduct
             } else if (product.cartItemId != null) {
                 val result: Boolean =
                     cartProductRepository.updateProduct(product.cartItemId, product.quantity + 1)
                 if (result) {
-                    _updatedItem.postValue(product.copy(quantity = product.quantity + 1))
+                    _updatedItem.value = product.copy(quantity = product.quantity + 1)
                 }
             }
             loadCartItemSize()
@@ -59,13 +59,13 @@ class CatalogViewModel(
             if (product.quantity == 1 && product.cartItemId != null) {
                 val result: Boolean = cartProductRepository.deleteCartProduct(product.cartItemId)
                 if (result) {
-                    _updatedItem.postValue(product.copy(quantity = 0))
+                    _updatedItem.value = product.copy(quantity = 0)
                 }
             } else if (product.cartItemId != null) {
                 val result: Boolean =
                     cartProductRepository.updateProduct(product.cartItemId, product.quantity - 1)
                 if (result == true) {
-                    _updatedItem.postValue(product.copy(quantity = product.quantity - 1))
+                    _updatedItem.value = product.copy(quantity = product.quantity - 1)
                 }
             }
             loadCartItemSize()
@@ -124,22 +124,22 @@ class CatalogViewModel(
                     items
                 }
 
-            _loadedCatalogItems.postValue(updatedItems)
-            _loadingState.postValue(LoadingState.loaded())
+            _loadedCatalogItems.value = updatedItems
+            _loadingState.value = LoadingState.loaded()
         }
     }
 
     fun loadCartItemSize() {
         viewModelScope.launch {
             val cartItemSize = cartProductRepository.getCartItemSize()
-            _cartItemSize.postValue(cartItemSize)
+            _cartItemSize.value = cartItemSize
         }
     }
 
     fun loadRecentlyViewedProducts() {
         viewModelScope.launch {
             val products = recentlyViewedProductRepository.getRecentlyViewedProducts()
-            _recentlyViewedProducts.postValue(products.map { it.toUiModel() })
+            _recentlyViewedProducts.value = products.map { it.toUiModel() }
         }
     }
 

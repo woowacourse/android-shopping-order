@@ -60,11 +60,7 @@ class OrderViewModel(
         val cartItemIds: List<Long> = orderingProducts.products.mapNotNull { it.cartItemId }
         viewModelScope.launch {
             val result: Result<Unit> = orderRepository.insertOrders(cartItemIds)
-            if (result.isSuccess) {
-                _isOrderMade.postValue(true)
-            } else {
-                _isOrderMade.postValue(false)
-            }
+            _isOrderMade.value = result.isSuccess
         }
     }
 
@@ -74,7 +70,7 @@ class OrderViewModel(
             val filteredAvailableCoupons: List<Coupon> =
                 orderingProducts.availableCoupons(allCoupons)
             availableCoupons = filteredAvailableCoupons
-            _availableDisplayingCoupons.postValue(filteredAvailableCoupons.map { it.toUiModel() })
+            _availableDisplayingCoupons.value = filteredAvailableCoupons.map { it.toUiModel() }
         }
     }
 
