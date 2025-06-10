@@ -9,16 +9,16 @@ interface CartRemoteDataSource {
     suspend fun fetchCartItems(
         page: Int,
         size: Int,
-    ): PageableResponse<CartItemResponse>
+    ): Result<PageableResponse<CartItemResponse>>
 
-    suspend fun addCartItem(addCartItemCommand: AddCartItemCommand): Long
+    suspend fun addCartItem(addCartItemCommand: AddCartItemCommand): Result<Long>
 
-    suspend fun deleteCartItem(cartId: Long)
+    suspend fun deleteCartItem(cartId: Long): Result<Unit>
 
     suspend fun patchCartItemQuantity(
         cartId: Long,
         quantity: Quantity,
-    )
+    ): Result<Unit>
 
-    suspend fun fetchCartItemCount(): Quantity
+    suspend fun fetchCartItemCount(): Result<Quantity>
 }

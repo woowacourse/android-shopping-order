@@ -8,7 +8,7 @@ interface ProductRemoteDataSource {
         category: String?,
         page: Int,
         size: Int,
-    ): PageableResponse<ProductResponse>
+    ): Result<PageableResponse<ProductResponse>>
 
-    suspend fun fetchProduct(productId: Long): ProductResponse
+    suspend fun fetchProduct(productId: Long): Result<ProductResponse>
 }

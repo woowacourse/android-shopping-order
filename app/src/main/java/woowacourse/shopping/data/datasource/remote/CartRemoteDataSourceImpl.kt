@@ -6,6 +6,7 @@ import woowacourse.shopping.data.model.cart.CartItemResponse
 import woowacourse.shopping.data.model.cart.Quantity
 import woowacourse.shopping.data.model.common.PageableResponse
 import woowacourse.shopping.data.service.CartService
+import woowacourse.shopping.data.util.runCatchingDebugLog
 import woowacourse.shopping.data.util.safeApiCall
 
 class CartRemoteDataSourceImpl(
@@ -14,35 +15,32 @@ class CartRemoteDataSourceImpl(
     override suspend fun fetchCartItems(
         page: Int,
         size: Int,
-    ): PageableResponse<CartItemResponse> =
+    ): Result<PageableResponse<CartItemResponse>> =
         safeApiCall {
-            cartService.fetchCartItems(
-                page,
-                size,
-            )
+            cartService.fetchCartItems(page, size)
         }
 
-    override suspend fun addCartItem(addCartItemCommand: AddCartItemCommand): Long {
-        val response = cartService.addCartItem(addCartItemCommand)
-        val cartId = response.extractCartItemId()
-        return requireNotNull(cartId)
-    }
+    override suspend fun addCartItem(addCartItemCommand: AddCartItemCommand): Result<Long> =
+        runCatchingDebugLog {
+            val response = cartService.addCartItem(addCartItemCommand)
+            val cartId = response.extractCartItemId()
+            requireNotNull(cartId)
+        }
 
-    override suspend fun deleteCartItem(cartId: Long) =
+    override suspend fun deleteCartItem(cartId: Long): Result<Unit> =
         safeApiCall {
-            cartService.deleteCartItem(
-                cartId,
-            )
+            cartService.deleteCartItem(cartId)
         }
 
     override suspend fun patchCartItemQuantity(
         cartId: Long,
         quantity: Quantity,
-    ) = safeApiCall {
-        cartService.patchCartItemQuantity(cartId, quantity)
-    }
+    ): Result<Unit> =
+        safeApiCall {
+            cartService.patchCartItemQuantity(cartId, quantity)
+        }
 
-    override suspend fun fetchCartItemCount(): Quantity =
+    override suspend fun fetchCartItemCount(): Result<Quantity> =
         safeApiCall {
             cartService.fetchCartItem()
         }
