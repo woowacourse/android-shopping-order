@@ -7,8 +7,7 @@ import woowacourse.shopping.domain.repository.OrderRepository
 class OrderRepository(
     private val api: OrderApi,
 ) : OrderRepository {
-    override suspend fun postOrderProducts(cartIds: List<Long>): Result<Unit> =
-        runCatching {
-            api.postOrderProducts(OrderProductsRequest(cartIds))
-        }
+    override suspend fun postOrderProducts(cartIds: List<Long>) {
+        api.postOrderProducts(OrderProductsRequest(cartIds))
+    }
 }

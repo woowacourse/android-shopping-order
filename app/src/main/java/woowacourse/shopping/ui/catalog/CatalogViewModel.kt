@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.UseCaseInjection.decreaseCartProductQuantityUseCase
 import woowacourse.shopping.di.UseCaseInjection.getCartProductsQuantityUseCase
@@ -49,21 +50,20 @@ class CatalogViewModel(
                 ?.current ?: UNINITIALIZED_PAGE,
         count: Int = SHOWN_PRODUCTS_COUNT,
     ) {
-        viewModelScope.launch {
-            updateUiModel { current -> current.copy(isProductsLoading = true) }
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                updateUiModel { current -> current.copy(connectionErrorMessage = e.message.toString()) }
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
+            val products = getCatalogProductsUseCase(page, count)
 
-            getCatalogProductsUseCase(page, count)
-                .onSuccess { newProducts ->
-                    updateUiModel { current ->
-                        current.copy(
-                            catalogProducts = current.catalogProducts.plus(newProducts),
-                            isProductsLoading = false,
-                        )
-                    }
-                }.onFailure {
-                    updateUiModel { current -> current.copy(connectionErrorMessage = it.message.toString()) }
-                    Log.e("CatalogViewModel", it.message.toString())
-                }
+            updateUiModel { current ->
+                current.copy(
+                    catalogProducts = current.catalogProducts.plus(products),
+                    isProductsLoading = false,
+                )
+            }
         }
     }
 
@@ -74,79 +74,90 @@ class CatalogViewModel(
                 ?.page
                 ?.current
                 ?.plus(DEFAULT_PAGE_STEP) ?: UNINITIALIZED_PAGE
+
         loadCatalogProducts(page = currentPage)
     }
 
     fun loadHistoryProducts() {
-        viewModelScope.launch {
-            getSearchHistoryUseCase().onSuccess { historyProducts ->
-                updateUiModel { current ->
-                    current.copy(
-                        historyProducts = historyProducts,
-                    )
-                }
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
+            val products = getSearchHistoryUseCase()
+
+            updateUiModel { current ->
+                current.copy(
+                    historyProducts = products,
+                )
             }
         }
     }
 
     fun increaseCartProduct(productId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
             val product = uiModel.value?.catalogProducts?.getProductByProductId(productId) ?: return@launch
-            increaseCartProductQuantityUseCase(product).onSuccess {
-                loadCartProduct(productId)
-            }
+            increaseCartProductQuantityUseCase(product)
+            loadCartProduct(productId)
         }
     }
 
     fun decreaseCartProduct(productId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
             val product = uiModel.value?.catalogProducts?.getProductByProductId(productId) ?: return@launch
-            decreaseCartProductQuantityUseCase(product).onSuccess {
-                loadCartProduct(productId)
-            }
+            decreaseCartProductQuantityUseCase(product)
+            loadCartProduct(productId)
         }
     }
 
     fun loadCartProduct(productId: Long) {
-        viewModelScope.launch {
-            getCatalogProductUseCase(productId)
-                .onSuccess { cartProduct ->
-                    updateUiModel { current ->
-                        current.copy(
-                            catalogProducts = current.catalogProducts.updateProduct(cartProduct),
-                        )
-                    }
-                }.onFailure {
-                    updateUiModel { current -> current.copy(connectionErrorMessage = it.message.toString()) }
-                    Log.e("CatalogViewModel", it.message.toString())
-                }
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
+            val product = getCatalogProductUseCase(productId)
+
+            updateUiModel { current ->
+                current.copy(
+                    catalogProducts = current.catalogProducts.updateProduct(product),
+                )
+            }
         }
     }
 
     fun loadCartProductsByProductIds(productIds: List<Long>) {
-        viewModelScope.launch {
-            getCatalogProductsByProductIdsUseCase(productIds)
-                .onSuccess { cartProducts ->
-                    updateUiModel { current ->
-                        current.copy(
-                            catalogProducts = current.catalogProducts.updateProducts(cartProducts),
-                        )
-                    }
-                }.onFailure {
-                    updateUiModel { current -> current.copy(connectionErrorMessage = it.message.toString()) }
-                    Log.e("CatalogViewModel", it.message.toString())
-                }
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
+            val products = getCatalogProductsByProductIdsUseCase(productIds)
+
+            updateUiModel { current ->
+                current.copy(
+                    catalogProducts = current.catalogProducts.updateProducts(products),
+                )
+            }
         }
     }
 
     fun loadCartProductsQuantity() {
-        viewModelScope.launch {
-            getCartProductsQuantityUseCase()
-                .onSuccess { quantity ->
-                    updateUiModel { current -> current.copy(cartProductsQuantity = quantity) }
-                }.onFailure {
-                    Log.e("CatalogViewModel", it.message.toString())
-                }
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
+            val quantity = getCartProductsQuantityUseCase()
+            updateUiModel { current -> current.copy(cartProductsQuantity = quantity) }
         }
     }
 
@@ -156,6 +167,7 @@ class CatalogViewModel(
     }
 
     companion object {
+        private const val TAG: String = "CatalogViewModel"
         private const val DEFAULT_PAGE_STEP: Int = 1
         private const val SHOWN_PRODUCTS_COUNT: Int = 20
 

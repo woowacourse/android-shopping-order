@@ -9,8 +9,8 @@ import woowacourse.shopping.domain.repository.CouponRepository
 class CouponRepository(
     private val api: CouponApi,
 ) : CouponRepository {
-    override suspend fun fetchAllCoupons(): Result<List<Coupon>> =
-        runCatching {
-            api.getCoupons().mapNotNull { it.toDomain()?.toCoupon() }
-        }
+    override suspend fun fetchAllCoupons(): List<Coupon> =
+        api
+            .getCoupons()
+            .mapNotNull { it.toDomain()?.toCoupon() }
 }

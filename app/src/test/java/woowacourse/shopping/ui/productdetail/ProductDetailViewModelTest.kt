@@ -55,7 +55,7 @@ class ProductDetailViewModelTest {
         runTest {
             // given
             val expected = DUMMY_PRODUCT_1
-            coEvery { getCatalogProductUseCase(expected.productDetail.id) } returns Result.success(expected)
+            coEvery { getCatalogProductUseCase(expected.productDetail.id) } returns expected
 
             // when
             viewModel.loadProductDetail(expected.productDetail.id)
@@ -68,27 +68,11 @@ class ProductDetailViewModelTest {
         }
 
     @Test
-    fun `상품 정보를 불러오는데 실패하면 에러 메시지를 반환한다`() =
-        runTest {
-            // given
-            val error = Throwable("ERROR")
-            coEvery { getCatalogProductUseCase(any()) } returns Result.failure(error)
-
-            // when
-            viewModel.loadProductDetail(999)
-            advanceUntilIdle()
-
-            // then
-            val state = viewModel.uiModel.getOrAwaitValue()
-            assertThat(state.connectionErrorMessage).contains("ERROR")
-        }
-
-    @Test
     fun `최근 탐색한 상품을 불러온다`() =
         runTest {
             // given
             val expected = DUMMY_HISTORY_PRODUCT_1
-            coEvery { getRecentSearchHistoryUseCase() } returns Result.success(expected)
+            coEvery { getRecentSearchHistoryUseCase() } returns expected
 
             // when
             viewModel.loadLastHistoryProduct()
@@ -136,7 +120,7 @@ class ProductDetailViewModelTest {
 
             coEvery {
                 updateCartProductUseCase(productId = product.productDetail.id, cartId = product.cartId, quantity = product.quantity)
-            } returns Result.success(Unit)
+            } returns Unit
 
             // when
             viewModel.updateCartProduct()

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.UseCaseInjection.decreaseCartProductQuantityUseCase
 import woowacourse.shopping.di.UseCaseInjection.getCartProductsUseCase
@@ -45,22 +46,23 @@ class CartViewModel(
             current.copy(isProductsLoading = true)
         }
 
-        viewModelScope.launch {
-            getCartProductsUseCase(
-                page = page.current,
-                size = DEFAULT_PAGE_SIZE,
-            ).onSuccess { cartProducts ->
-                updateUiModel { current ->
-                    current.copy(
-                        cartProducts = cartProducts,
-                        isProductsLoading = false,
-                    )
-                }
-            }.onFailure {
-                updateUiModel { current ->
-                    current.copy(connectionErrorMessage = it.message.toString())
-                }
-                Log.e("CartViewModel", it.message.toString())
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                updateUiModel { current -> current.copy(connectionErrorMessage = e.message.toString()) }
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
+            val products =
+                getCartProductsUseCase(
+                    page = page.current,
+                    size = DEFAULT_PAGE_SIZE,
+                )
+
+            updateUiModel { current ->
+                current.copy(
+                    cartProducts = products,
+                    isProductsLoading = false,
+                )
             }
         }
     }
@@ -69,19 +71,17 @@ class CartViewModel(
         cartId: Long,
         productId: Long,
     ) {
-        viewModelScope.launch {
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                updateUiModel { current -> current.copy(connectionErrorMessage = e.message.toString()) }
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
             removeCartProductUseCase(cartId)
-                .onSuccess {
-                    updateUiModel { current ->
-                        current.copy(editedProductIds = current.editedProductIds.plus(productId))
-                    }
-                    loadCartProducts()
-                }.onFailure {
-                    updateUiModel { current ->
-                        current.copy(connectionErrorMessage = it.message.toString())
-                    }
-                    Log.e("CartViewModel", it.message.toString())
-                }
+            updateUiModel { current ->
+                current.copy(editedProductIds = current.editedProductIds.plus(productId))
+            }
+            loadCartProducts()
         }
     }
 
@@ -96,43 +96,45 @@ class CartViewModel(
     }
 
     fun increaseCartProductQuantity(productId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
             val product = uiModel.value?.cartProducts?.getProductByProductId(productId) ?: return@launch
+            val newQuantity = increaseCartProductQuantityUseCase(product)
 
-            increaseCartProductQuantityUseCase(product)
-                .onSuccess { newQuantity ->
-                    updateUiModel { current ->
-                        current.copy(
-                            cartProducts = current.cartProducts.updateQuantity(product, newQuantity),
-                            editedProductIds = current.editedProductIds.plus(productId),
-                            isProductsLoading = false,
-                        )
-                    }
-                }.onFailure {
-                    Log.e("CartViewModel", it.message.toString())
-                }
+            updateUiModel { current ->
+                current.copy(
+                    cartProducts = current.cartProducts.updateQuantity(product, newQuantity),
+                    editedProductIds = current.editedProductIds.plus(productId),
+                    isProductsLoading = false,
+                )
+            }
         }
     }
 
     fun decreaseCartProductQuantity(productId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
             val product = uiModel.value?.cartProducts?.getProductByProductId(productId) ?: return@launch
-            decreaseCartProductQuantityUseCase(product)
-                .onSuccess { newQuantity ->
-                    when (newQuantity > MINIMUM_QUANTITY) {
-                        true ->
-                            updateUiModel { current ->
-                                current.copy(
-                                    cartProducts = current.cartProducts.updateQuantity(product, newQuantity),
-                                    editedProductIds = current.editedProductIds.plus(productId),
-                                )
-                            }
+            val newQuantity = decreaseCartProductQuantityUseCase(product)
 
-                        false -> loadCartProducts()
+            when (newQuantity > MINIMUM_QUANTITY) {
+                true -> {
+                    updateUiModel { current ->
+                        current.copy(
+                            cartProducts = current.cartProducts.updateQuantity(product, newQuantity),
+                            editedProductIds = current.editedProductIds.plus(productId),
+                        )
                     }
-                }.onFailure {
-                    Log.e("CartViewModel", it.message.toString())
                 }
+
+                false -> loadCartProducts()
+            }
         }
     }
 
@@ -153,77 +155,79 @@ class CartViewModel(
     }
 
     fun loadRecommendedProducts() {
-        viewModelScope.launch {
-            getCartRecommendProductsUseCase()
-                .onSuccess { products ->
-                    updateUiModel { current ->
-                        current.copy(recommendedProducts = products)
-                    }
-                }.onFailure {
-                    updateUiModel { current ->
-                        current.copy(connectionErrorMessage = it.message.toString())
-                    }
-                    Log.e("CartViewModel", it.message.toString())
-                }
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                updateUiModel { current -> current.copy(connectionErrorMessage = e.message.toString()) }
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
+            val products = getCartRecommendProductsUseCase()
+
+            updateUiModel { current ->
+                current.copy(recommendedProducts = products)
+            }
         }
     }
 
     fun increaseRecommendedProductQuantity(productId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
             val product = uiModel.value?.recommendedProducts?.getProductByProductId(productId) ?: return@launch
+            val newQuantity = increaseCartProductQuantityUseCase(product)
 
-            increaseCartProductQuantityUseCase(product)
-                .onSuccess { newQuantity ->
-                    when (product.quantity <= MINIMUM_QUANTITY) {
-                        true -> updateRecommendedProduct(productId)
-                        false ->
-                            updateUiModel { current ->
-                                current.copy(
-                                    recommendedProducts = current.recommendedProducts.updateQuantity(product, newQuantity),
-                                    editedProductIds = current.editedProductIds.plus(productId),
-                                )
-                            }
+            when (product.quantity <= MINIMUM_QUANTITY) {
+                true -> updateRecommendedProduct(productId)
+                false -> {
+                    updateUiModel { current ->
+                        current.copy(
+                            recommendedProducts = current.recommendedProducts.updateQuantity(product, newQuantity),
+                            editedProductIds = current.editedProductIds.plus(productId),
+                        )
                     }
-                }.onFailure {
-                    Log.e("CartViewModel", it.message.toString())
                 }
+            }
         }
     }
 
     private fun updateRecommendedProduct(productId: Long) {
-        viewModelScope.launch {
-            getCatalogProductUseCase(productId)
-                .onSuccess { cartProduct ->
-                    updateUiModel { current ->
-                        current.copy(
-                            recommendedProducts = current.recommendedProducts.updateProduct(cartProduct.copy(isSelected = true)),
-                        )
-                    }
-                }.onFailure {
-                    Log.e("CatalogViewModel", it.message.toString())
-                }
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
+            val product = getCatalogProductUseCase(productId)
+
+            updateUiModel { current ->
+                current.copy(
+                    recommendedProducts = current.recommendedProducts.updateProduct(product.copy(isSelected = true)),
+                )
+            }
         }
     }
 
     fun decreaseRecommendedProductQuantity(productId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
             val product = uiModel.value?.recommendedProducts?.getProductByProductId(productId) ?: return@launch
+            val newQuantity = decreaseCartProductQuantityUseCase(product)
 
-            decreaseCartProductQuantityUseCase(product)
-                .onSuccess { newQuantity ->
-                    when (product.quantity <= MINIMUM_QUANTITY) {
-                        true -> updateRecommendedProduct(productId)
-                        false ->
-                            updateUiModel { current ->
-                                current.copy(
-                                    recommendedProducts = current.recommendedProducts.updateQuantity(product, newQuantity),
-                                    editedProductIds = current.editedProductIds.plus(productId),
-                                )
-                            }
+            when (product.quantity <= MINIMUM_QUANTITY) {
+                true -> updateRecommendedProduct(productId)
+                false -> {
+                    updateUiModel { current ->
+                        current.copy(
+                            recommendedProducts = current.recommendedProducts.updateQuantity(product, newQuantity),
+                            editedProductIds = current.editedProductIds.plus(productId),
+                        )
                     }
-                }.onFailure {
-                    Log.e("CartViewModel", it.message.toString())
                 }
+            }
         }
     }
 
@@ -245,6 +249,7 @@ class CartViewModel(
         const val DEFAULT_PAGE_STEP: Int = 1
         const val PAGE_INDEX_OFFSET: Int = 1
         private const val DEFAULT_PAGE_SIZE: Int = 5
+        private const val TAG: String = "CartViewModel"
 
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {

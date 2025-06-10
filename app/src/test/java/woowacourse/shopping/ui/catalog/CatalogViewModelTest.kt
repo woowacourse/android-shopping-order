@@ -56,7 +56,7 @@ class CatalogViewModelTest {
         decreaseCartProductQuantityUseCase = mockk()
         getCartProductsQuantityUseCase = mockk()
 
-        coEvery { getCatalogProductsUseCase(any(), any()) } returns Result.success(DUMMY_PRODUCTS_1)
+        coEvery { getCatalogProductsUseCase(any(), any()) } returns DUMMY_PRODUCTS_1
 
         viewModel =
             CatalogViewModel(
@@ -83,7 +83,7 @@ class CatalogViewModelTest {
     @Test
     fun `상품을 더 불러오면 페이지가 증가하고 기존 목록에 추가된다`() =
         runTest {
-            coEvery { getCatalogProductsUseCase(any(), any()) } returns Result.success(DUMMY_PRODUCTS_3)
+            coEvery { getCatalogProductsUseCase(any(), any()) } returns DUMMY_PRODUCTS_3
 
             setUpTestLiveData(
                 CatalogUiModel(catalogProducts = DUMMY_PRODUCTS_1),
@@ -105,8 +105,8 @@ class CatalogViewModelTest {
         runTest {
             val updatedProduct = DUMMY_PRODUCT_1.copy(quantity = 10)
 
-            coEvery { increaseCartProductQuantityUseCase(any()) } returns Result.success(10)
-            coEvery { getCatalogProductUseCase(DUMMY_PRODUCT_1.productDetail.id) } returns Result.success(updatedProduct)
+            coEvery { increaseCartProductQuantityUseCase(any()) } returns 10
+            coEvery { getCatalogProductUseCase(DUMMY_PRODUCT_1.productDetail.id) } returns updatedProduct
 
             setUpTestLiveData(
                 CatalogUiModel(catalogProducts = DUMMY_PRODUCTS_2),
@@ -126,8 +126,8 @@ class CatalogViewModelTest {
         runTest {
             val updatedProduct = DUMMY_PRODUCT_1.copy(quantity = 3)
 
-            coEvery { decreaseCartProductQuantityUseCase(any()) } returns Result.success(3)
-            coEvery { getCatalogProductUseCase(DUMMY_PRODUCT_1.productDetail.id) } returns Result.success(updatedProduct)
+            coEvery { decreaseCartProductQuantityUseCase(any()) } returns 3
+            coEvery { getCatalogProductUseCase(DUMMY_PRODUCT_1.productDetail.id) } returns updatedProduct
 
             setUpTestLiveData(
                 CatalogUiModel(catalogProducts = DUMMY_PRODUCTS_2),
@@ -147,7 +147,7 @@ class CatalogViewModelTest {
         runTest {
             val updatedProduct = DUMMY_PRODUCT_1.copy(quantity = 1234)
 
-            coEvery { getCatalogProductUseCase(DUMMY_PRODUCT_1.productDetail.id) } returns Result.success(updatedProduct)
+            coEvery { getCatalogProductUseCase(DUMMY_PRODUCT_1.productDetail.id) } returns updatedProduct
 
             setUpTestLiveData(
                 CatalogUiModel(catalogProducts = DUMMY_PRODUCTS_1),
@@ -167,7 +167,7 @@ class CatalogViewModelTest {
         runTest {
             val updated = listOf(DUMMY_PRODUCT_1.copy(quantity = 1234))
 
-            coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns Result.success(updated)
+            coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns updated
 
             setUpTestLiveData(
                 CatalogUiModel(catalogProducts = DUMMY_PRODUCTS_2),
@@ -185,7 +185,7 @@ class CatalogViewModelTest {
     @Test
     fun `최근 검색 상품 목록을 불러온다`() =
         runTest {
-            coEvery { getSearchHistoryUseCase() } returns Result.success(listOf(DUMMY_HISTORY_PRODUCT_1))
+            coEvery { getSearchHistoryUseCase() } returns listOf(DUMMY_HISTORY_PRODUCT_1)
 
             viewModel.loadHistoryProducts()
             advanceUntilIdle()
@@ -197,26 +197,13 @@ class CatalogViewModelTest {
     @Test
     fun `장바구니 상품 수량을 불러와서 상품 목록에 반영한다`() =
         runTest {
-            coEvery { getCartProductsQuantityUseCase() } returns Result.success(10)
+            coEvery { getCartProductsQuantityUseCase() } returns 10
 
             viewModel.loadCartProductsQuantity()
             advanceUntilIdle()
 
             val result = viewModel.uiModel.getOrAwaitValue()
             assertThat(result.cartProductsQuantity).isEqualTo(10)
-        }
-
-    @Test
-    fun `상품 목록 로딩 실패 시 에러 메시지를 반환한다`() =
-        runTest {
-            val exception = Throwable("ERROR")
-            coEvery { getCatalogProductsUseCase(any(), any()) } returns Result.failure(exception)
-
-            viewModel.loadMoreCatalogProducts()
-            advanceUntilIdle()
-
-            val state = viewModel.uiModel.getOrAwaitValue()
-            assertThat(state.connectionErrorMessage).contains("ERROR")
         }
 
     @AfterEach

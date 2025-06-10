@@ -9,5 +9,5 @@ class GetCartProductsUseCase(
     suspend operator fun invoke(
         page: Int,
         size: Int,
-    ): Result<Products> = repository.fetchCartProducts(page, size)
+    ): Products = repository.fetchCartProducts(page, size)
 }

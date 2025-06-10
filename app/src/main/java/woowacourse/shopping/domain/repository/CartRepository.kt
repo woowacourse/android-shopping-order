@@ -6,21 +6,21 @@ interface CartRepository {
     suspend fun fetchCartProducts(
         page: Int,
         size: Int,
-    ): Result<Products>
+    ): Products
 
-    suspend fun fetchAllCartProducts(): Result<Products>
+    suspend fun fetchAllCartProducts(): Products
 
-    suspend fun fetchCartItemCount(): Result<Int>
+    suspend fun fetchCartItemCount(): Int
 
     suspend fun addCartProduct(
         productId: Long,
         quantity: Int,
-    ): Result<Unit>
+    ): Unit
 
-    suspend fun deleteCartProduct(cartId: Long): Result<Unit>
+    suspend fun deleteCartProduct(cartId: Long): Unit
 
     suspend fun updateCartProduct(
         cartId: Long,
         quantity: Int,
-    ): Result<Unit>
+    ): Unit
 }

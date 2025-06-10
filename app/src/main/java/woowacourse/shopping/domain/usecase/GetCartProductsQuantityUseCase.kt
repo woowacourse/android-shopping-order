@@ -5,5 +5,5 @@ import woowacourse.shopping.domain.repository.CartRepository
 class GetCartProductsQuantityUseCase(
     private val repository: CartRepository,
 ) {
-    suspend operator fun invoke(): Result<Int> = repository.fetchCartItemCount()
+    suspend operator fun invoke(): Int = repository.fetchCartItemCount()
 }

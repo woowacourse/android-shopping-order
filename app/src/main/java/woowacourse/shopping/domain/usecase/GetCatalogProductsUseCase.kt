@@ -12,25 +12,18 @@ class GetCatalogProductsUseCase(
     suspend operator fun invoke(
         page: Int,
         size: Int,
-    ): Result<Products> {
-        val catalogProducts =
-            productRepository.fetchProducts(page, size).getOrElse {
-                return Result.failure(Throwable("[GetCatalogProductsUseCase] 상품 목록 불러오기 오류", it))
-            }
-
+    ): Products {
+        val catalogProducts = productRepository.fetchProducts(page, size)
         return combineCartProducts(catalogProducts)
     }
 
-    private suspend fun combineCartProducts(catalogProducts: Products): Result<Products> {
-        val cartProducts =
-            cartRepository.fetchAllCartProducts().getOrElse {
-                return Result.failure(Throwable("[GetCatalogProductsUseCase] 장바구니 불러오기 오류", it))
-            }
+    private suspend fun combineCartProducts(catalogProducts: Products): Products {
+        val cartProducts = cartRepository.fetchAllCartProducts()
         val cartProductsByProductId = cartProducts.products.associateBy { it.productDetail.id }
 
         val updatedProducts = updateProducts(catalogProducts, cartProductsByProductId)
 
-        return Result.success(catalogProducts.copy(products = updatedProducts))
+        return catalogProducts.copy(products = updatedProducts)
     }
 
     private fun updateProducts(

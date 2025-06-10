@@ -5,5 +5,5 @@ import woowacourse.shopping.domain.repository.CartRepository
 class RemoveCartProductUseCase(
     private val repository: CartRepository,
 ) {
-    suspend operator fun invoke(cartId: Long): Result<Unit> = repository.deleteCartProduct(cartId)
+    suspend operator fun invoke(cartId: Long): Unit = repository.deleteCartProduct(cartId)
 }

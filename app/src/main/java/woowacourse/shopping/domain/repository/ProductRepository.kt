@@ -9,9 +9,9 @@ interface ProductRepository {
         page: Int,
         size: Int,
         category: String? = null,
-    ): Result<Products>
+    ): Products
 
-    suspend fun fetchAllProducts(): Result<List<Product>>
+    suspend fun fetchAllProducts(): List<Product>
 
-    suspend fun fetchProduct(productId: Long): Result<ProductDetail>
+    suspend fun fetchProduct(productId: Long): ProductDetail
 }

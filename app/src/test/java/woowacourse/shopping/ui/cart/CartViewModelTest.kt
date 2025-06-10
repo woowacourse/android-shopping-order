@@ -47,7 +47,7 @@ class CartViewModelTest {
         getCartRecommendProductsUseCase = mockk()
         getCatalogProductUseCase = mockk()
 
-        coEvery { getCartProductsUseCase(any(), any()) } returns Result.success(DUMMY_PRODUCTS_1)
+        coEvery { getCartProductsUseCase(any(), any()) } returns DUMMY_PRODUCTS_1
 
         viewModel =
             CartViewModel(
@@ -69,8 +69,8 @@ class CartViewModelTest {
     @Test
     fun `장바구니 상품을 제거하면 UI 상태에서 제거되고 상품 목록을 다시 불러온다`() =
         runTest {
-            coEvery { removeCartProductUseCase(DUMMY_PRODUCT_1.cartId!!) } returns Result.success(Unit)
-            coEvery { getCartProductsUseCase(any(), any()) } returns Result.success(DUMMY_PRODUCTS_1)
+            coEvery { removeCartProductUseCase(DUMMY_PRODUCT_1.cartId!!) } returns Unit
+            coEvery { getCartProductsUseCase(any(), any()) } returns DUMMY_PRODUCTS_1
 
             setUpTestLiveData(CartProductUiModel(cartProducts = DUMMY_PRODUCTS_1), "_uiModel", viewModel)
 
@@ -84,7 +84,7 @@ class CartViewModelTest {
     @Test
     fun `장바구니 상품 수량을 증가시키면 변경된 수량이 UI에 반영된다`() =
         runTest {
-            coEvery { increaseCartProductQuantityUseCase(any()) } returns Result.success(10)
+            coEvery { increaseCartProductQuantityUseCase(any()) } returns 10
 
             setUpTestLiveData(CartProductUiModel(cartProducts = DUMMY_PRODUCTS_1), "_uiModel", viewModel)
 
@@ -98,7 +98,7 @@ class CartViewModelTest {
     @Test
     fun `장바구니 상품 수량을 감소시키면 변경된 수량이 UI에 반영된다`() =
         runTest {
-            coEvery { decreaseCartProductQuantityUseCase(any()) } returns Result.success(3)
+            coEvery { decreaseCartProductQuantityUseCase(any()) } returns 3
 
             setUpTestLiveData(CartProductUiModel(cartProducts = DUMMY_PRODUCTS_1), "_uiModel", viewModel)
 
@@ -148,7 +148,7 @@ class CartViewModelTest {
             val updatedQuantity = 2
             val updated = DUMMY_PRODUCT_1.copy(quantity = updatedQuantity)
 
-            coEvery { increaseCartProductQuantityUseCase(any()) } returns Result.success(updatedQuantity)
+            coEvery { increaseCartProductQuantityUseCase(any()) } returns updatedQuantity
 
             setUpTestLiveData(CartProductUiModel(recommendedProducts = DUMMY_PRODUCTS_1), "_uiModel", viewModel)
 
@@ -165,7 +165,7 @@ class CartViewModelTest {
             val updatedQuantity = 1
             val updated = DUMMY_PRODUCT_1.copy(quantity = updatedQuantity)
 
-            coEvery { decreaseCartProductQuantityUseCase(any()) } returns Result.success(updatedQuantity)
+            coEvery { decreaseCartProductQuantityUseCase(any()) } returns updatedQuantity
 
             setUpTestLiveData(CartProductUiModel(recommendedProducts = DUMMY_PRODUCTS_1), "_uiModel", viewModel)
 

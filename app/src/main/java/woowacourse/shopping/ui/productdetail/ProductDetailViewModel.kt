@@ -1,11 +1,13 @@
 package woowacourse.shopping.ui.productdetail
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.UseCaseInjection.addSearchHistoryUseCase
 import woowacourse.shopping.di.UseCaseInjection.getCatalogProductUseCase
@@ -28,27 +30,38 @@ class ProductDetailViewModel(
     val uiModel: LiveData<ProductDetailUiModel> get() = _uiModel
 
     fun loadProductDetail(productId: Long) {
-        viewModelScope.launch {
-            getCatalogProductUseCase(productId)
-                .onSuccess { catalogProduct ->
-                    updateUiModel { current -> current.copy(product = catalogProduct) }
-                }.onFailure {
-                    updateUiModel { current -> current.copy(connectionErrorMessage = it.message.toString()) }
-                }
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                updateUiModel { current -> current.copy(connectionErrorMessage = e.message.toString()) }
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
+            val product = getCatalogProductUseCase(productId)
+            updateUiModel { current -> current.copy(product = product) }
         }
     }
 
     fun loadLastHistoryProduct() {
-        viewModelScope.launch {
-            getRecentSearchHistoryUseCase().onSuccess {
-                updateUiModel { current -> current.copy(lastHistoryProduct = it) }
-            }
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                updateUiModel { current -> current.copy(connectionErrorMessage = e.message.toString()) }
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
+            val product = getRecentSearchHistoryUseCase()
+            updateUiModel { current -> current.copy(lastHistoryProduct = product) }
         }
     }
 
     fun addHistoryProduct(productDetail: ProductDetail) {
         viewModelScope.launch {
-            addSearchHistoryUseCase(productDetail)
+            viewModelScope.launch(
+                CoroutineExceptionHandler { _, e ->
+                    Log.e(TAG, e.message.toString())
+                },
+            ) {
+                addSearchHistoryUseCase(productDetail)
+            }
         }
     }
 
@@ -64,16 +77,18 @@ class ProductDetailViewModel(
 
     fun updateCartProduct() {
         val uiModel = uiModel.value ?: return
-        viewModelScope.launch {
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                updateUiModel { current -> current.copy(connectionErrorMessage = e.message.toString()) }
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
             updateCartProductUseCase(
                 productId = uiModel.product.productDetail.id,
                 cartId = uiModel.product.cartId,
                 quantity = uiModel.product.quantity,
-            ).onSuccess {
-                updateUiModel { current -> current.copy(isCartProductUpdateSuccess = true) }
-            }.onFailure {
-                updateUiModel { current -> current.copy(connectionErrorMessage = it.message.toString()) }
-            }
+            )
+            updateUiModel { current -> current.copy(isCartProductUpdateSuccess = true) }
         }
     }
 
@@ -83,6 +98,7 @@ class ProductDetailViewModel(
     }
 
     companion object {
+        private const val TAG: String = "ProductDetailViewModel"
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

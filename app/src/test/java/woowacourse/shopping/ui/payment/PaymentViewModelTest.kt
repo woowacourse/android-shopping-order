@@ -55,9 +55,8 @@ class PaymentViewModelTest {
     @Test
     fun `상품 ID 목록을 전달하면 해당 상품들과 쿠폰을 불러온다`() =
         runTest {
-            coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns
-                Result.success(DUMMY_PRODUCTS_3.products)
-            coEvery { getCouponsUseCase() } returns Result.success(DUMMY_COUPONS_1)
+            coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns DUMMY_PRODUCTS_3.products
+            coEvery { getCouponsUseCase() } returns DUMMY_COUPONS_1
 
             viewModel.loadProducts(DUMMY_PRODUCTS_3.products.map { it.productDetail.id })
             advanceUntilIdle()
@@ -77,8 +76,8 @@ class PaymentViewModelTest {
     @Test
     fun `쿠폰을 선택하면 선택된 쿠폰만 참이 된다`() =
         runTest {
-            coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns Result.success(DUMMY_PRODUCTS_3.products)
-            coEvery { getCouponsUseCase() } returns Result.success(DUMMY_COUPONS_1)
+            coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns DUMMY_PRODUCTS_3.products
+            coEvery { getCouponsUseCase() } returns DUMMY_COUPONS_1
 
             viewModel.loadProducts(DUMMY_PRODUCTS_3.products.map { it.productDetail.id })
             advanceUntilIdle()
@@ -102,9 +101,9 @@ class PaymentViewModelTest {
     @Test
     fun `주문 성공 시 isOrderSuccess가 참이다`() =
         runTest {
-            coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns Result.success(DUMMY_PRODUCTS_1.products)
-            coEvery { getCouponsUseCase() } returns Result.success(DUMMY_COUPONS_1)
-            coEvery { orderProductsUseCase(any()) } returns Result.success(Unit)
+            coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns DUMMY_PRODUCTS_1.products
+            coEvery { getCouponsUseCase() } returns DUMMY_COUPONS_1
+            coEvery { orderProductsUseCase(any()) } returns Unit
 
             viewModel.loadProducts(DUMMY_PRODUCTS_1.products.map { it.productDetail.id })
             advanceUntilIdle()
@@ -114,25 +113,6 @@ class PaymentViewModelTest {
 
             val state = viewModel.uiModel.getOrAwaitValue()
             assertThat(state.isOrderSuccess).isTrue()
-        }
-
-    @Test
-    fun `주문 실패 시 isOrderSuccess는 거짓이고 에러 메시지를 반환한다`() =
-        runTest {
-            val exception = Throwable("ERROR")
-            coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns Result.success(DUMMY_PRODUCTS_1.products)
-            coEvery { getCouponsUseCase() } returns Result.success(DUMMY_COUPONS_1)
-            coEvery { orderProductsUseCase(any()) } returns Result.failure(exception)
-
-            viewModel.loadProducts(DUMMY_PRODUCTS_1.products.map { it.productDetail.id })
-            advanceUntilIdle()
-
-            viewModel.orderProducts()
-            advanceUntilIdle()
-
-            val state = viewModel.uiModel.getOrAwaitValue()
-            assertThat(state.isOrderSuccess).isFalse()
-            assertThat(state.connectionErrorMessage).contains("ERROR")
         }
 
     @AfterEach

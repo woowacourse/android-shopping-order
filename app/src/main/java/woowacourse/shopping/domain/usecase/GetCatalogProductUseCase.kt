@@ -8,33 +8,23 @@ class GetCatalogProductUseCase(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) {
-    suspend operator fun invoke(productId: Long): Result<Product> {
-        val productDetail =
-            productRepository.fetchProduct(productId).getOrElse {
-                return Result.failure(Throwable("[GetCatalogProductUseCase] 상품 목록 불러오기 오류", it))
-            }
-
+    suspend operator fun invoke(productId: Long): Product {
+        val productDetail = productRepository.fetchProduct(productId)
         val product = Product(productDetail)
-
         return combineCartProduct(productId, product)
     }
 
     private suspend fun combineCartProduct(
         productId: Long,
         catalogProduct: Product,
-    ): Result<Product> {
-        val cartProducts =
-            cartRepository.fetchAllCartProducts().getOrElse {
-                return Result.failure(Throwable("[GetCatalogProductUseCase] 장바구니 불러오기 오류", it))
-            }
+    ): Product {
+        val cartProducts = cartRepository.fetchAllCartProducts()
         val cartProductsByProductId = cartProducts.products.associateBy { it.productDetail.id }
 
-        val updatedProduct = updateProducts(cartProductsByProductId, productId, catalogProduct)
-
-        return Result.success(updatedProduct)
+        return updateProduct(cartProductsByProductId, productId, catalogProduct)
     }
 
-    private fun updateProducts(
+    private fun updateProduct(
         cartProducts: Map<Long, Product>,
         productId: Long,
         catalogProduct: Product,

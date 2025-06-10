@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.UseCaseInjection.getCatalogProductsByProductIdsUseCase
 import woowacourse.shopping.di.UseCaseInjection.getCouponsUseCase
@@ -27,24 +28,23 @@ class PaymentViewModel(
     val uiModel: LiveData<PaymentUiModel> get() = _uiModel
 
     fun loadProducts(productIds: List<Long>) {
-        viewModelScope.launch {
-            getCatalogProductsByProductIdsUseCase(productIds)
-                .onSuccess { newProducts ->
-                    val products =
-                        Products(
-                            newProducts
-                                .filterNot { it.cartId == null }
-                                .map { it.copy(isSelected = true) },
-                        )
-                    updateUiModel { current ->
-                        current.copy(
-                            products = products,
-                        )
-                    }
-                }.onFailure {
-                    updateUiModel { current -> current.copy(connectionErrorMessage = it.message.toString()) }
-                    Log.e("PaymentViewModel", it.toString())
-                }
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                updateUiModel { current -> current.copy(connectionErrorMessage = e.message.toString()) }
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
+            val products =
+                Products(
+                    getCatalogProductsByProductIdsUseCase(productIds)
+                        .filterNot { it.cartId == null }
+                        .map { it.copy(isSelected = true) },
+                )
+            updateUiModel { current ->
+                current.copy(
+                    products = products,
+                )
+            }
         }
     }
 
@@ -52,19 +52,19 @@ class PaymentViewModel(
         products: Products,
         nowDateTime: LocalDateTime = LocalDateTime.now(),
     ) {
-        viewModelScope.launch {
-            getCouponsUseCase()
-                .onSuccess {
-                    updateUiModel { current ->
-                        current.copy(
-                            coupons = it.filterAvailableCoupons(products, nowDateTime),
-                            price = current.coupons.applyCoupon(products, nowDateTime),
-                        )
-                    }
-                }.onFailure {
-                    updateUiModel { current -> current.copy(connectionErrorMessage = it.message.toString()) }
-                    Log.e("PaymentViewModel", it.toString())
-                }
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                updateUiModel { current -> current.copy(connectionErrorMessage = e.message.toString()) }
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
+            val coupons = getCouponsUseCase()
+            updateUiModel { current ->
+                current.copy(
+                    coupons = coupons.filterAvailableCoupons(products, nowDateTime),
+                    price = current.coupons.applyCoupon(products, nowDateTime),
+                )
+            }
         }
     }
 
@@ -85,23 +85,23 @@ class PaymentViewModel(
     }
 
     fun orderProducts() {
-        viewModelScope.launch {
-            val cartIds: Set<Long> = uiModel.value?.products?.getSelectedCartIds() ?: return@launch
-
-            orderProductsUseCase(cartIds)
-                .onSuccess {
-                    updateUiModel { current ->
-                        current.copy(isOrderSuccess = true)
-                    }
-                }.onFailure {
-                    updateUiModel { current ->
-                        current.copy(
-                            isOrderSuccess = false,
-                            connectionErrorMessage = it.message.toString(),
-                        )
-                    }
-                    Log.e("CartViewModel", it.message.toString())
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, e ->
+                updateUiModel { current ->
+                    current.copy(
+                        isOrderSuccess = false,
+                        connectionErrorMessage = e.message.toString(),
+                    )
                 }
+                Log.e(TAG, e.message.toString())
+            },
+        ) {
+            val cartIds: Set<Long> = uiModel.value?.products?.getSelectedCartIds() ?: return@launch
+            orderProductsUseCase(cartIds)
+
+            updateUiModel { current ->
+                current.copy(isOrderSuccess = true)
+            }
         }
     }
 
@@ -111,7 +111,8 @@ class PaymentViewModel(
     }
 
     companion object {
-        const val MAX_USABLE_COUPON_COUNT = 1
+        const val MAX_USABLE_COUPON_COUNT: Int = 1
+        private const val TAG: String = "PaymentViewModel"
 
         val Factory: ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {

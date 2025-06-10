@@ -10,30 +10,19 @@ class DecreaseCartProductQuantityUseCase(
     suspend operator fun invoke(
         product: Product,
         step: Int = DEFAULT_QUANTITY_STEP,
-    ): Result<Int> {
-        if (product.cartId == null) return Result.failure(Throwable("[DecreaseCartProductQuantityUseCase] 유효하지 않은 상품"))
+    ): Int {
+        val cartId = product.cartId ?: throw IllegalArgumentException("[DecreaseCartProductQuantityUseCase] 유효하지 않은 상품")
 
         val newQuantity = (product.quantity - step).coerceAtLeast(MINIMUM_QUANTITY)
 
         return if (newQuantity <= MINIMUM_QUANTITY) {
-            deleteCartProduct(product.cartId)
+            repository.deleteCartProduct(cartId)
+            MINIMUM_QUANTITY
         } else {
-            updateCartProduct(product.cartId, newQuantity)
+            repository.updateCartProduct(cartId, newQuantity)
+            newQuantity
         }
     }
-
-    private suspend fun deleteCartProduct(cartId: Long): Result<Int> =
-        repository
-            .deleteCartProduct(cartId)
-            .map { MINIMUM_QUANTITY }
-
-    private suspend fun updateCartProduct(
-        cartId: Long,
-        newQuantity: Int,
-    ): Result<Int> =
-        repository
-            .updateCartProduct(cartId, newQuantity)
-            .map { newQuantity }
 
     companion object {
         private const val DEFAULT_QUANTITY_STEP = 1

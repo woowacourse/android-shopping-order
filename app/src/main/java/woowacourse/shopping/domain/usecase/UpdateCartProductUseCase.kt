@@ -9,7 +9,7 @@ class UpdateCartProductUseCase(
         productId: Long,
         cartId: Long?,
         quantity: Int,
-    ): Result<Unit> =
+    ): Unit =
         if (cartId == null) {
             repository.addCartProduct(productId, quantity)
         } else {

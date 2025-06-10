@@ -16,25 +16,19 @@ class ProductRepository(
         page: Int,
         size: Int,
         category: String?,
-    ): Result<Products> =
-        runCatching {
-            api.getProducts(category, page, size)
-        }.mapCatching { response ->
-            val items = response.content.map { it.toDomain() }
-            val pageInfo = Page(page, response.first, response.last)
-            Products(items, pageInfo)
-        }
-
-    override suspend fun fetchAllProducts(): Result<List<Product>> {
-        val firstPage = 0
-        val maxSize = Int.MAX_VALUE
-
-        return runCatching {
-            api.getProducts(page = firstPage, size = maxSize)
-        }.mapCatching { response ->
-            response.content.map { it.toDomain() }
-        }
+    ): Products {
+        val response = api.getProducts(category, page, size)
+        val items = response.content.map { it.toDomain() }
+        val pageInfo = Page(page, response.first, response.last)
+        return Products(items, pageInfo)
     }
 
-    override suspend fun fetchProduct(productId: Long): Result<ProductDetail> = runCatching { api.getProduct(productId).toDomain() }
+    override suspend fun fetchAllProducts(): List<Product> {
+        val firstPage = 0
+        val maxSize = Int.MAX_VALUE
+        val response = api.getProducts(page = firstPage, size = maxSize)
+        return response.content.map { it.toDomain() }
+    }
+
+    override suspend fun fetchProduct(productId: Long): ProductDetail = api.getProduct(productId).toDomain()
 }

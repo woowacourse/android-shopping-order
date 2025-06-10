@@ -9,34 +9,30 @@ class IncreaseCartProductQuantityUseCase(
     suspend operator fun invoke(
         product: Product,
         step: Int = DEFAULT_QUANTITY_STEP,
-    ): Result<Int> {
+    ): Int {
         val newQuantity = product.quantity + step
 
-        return if (product.cartId == null) {
+        if (product.cartId == null) {
             addCartProduct(product, newQuantity)
         } else {
             updateCartProduct(product.cartId, newQuantity)
         }
+
+        return newQuantity
     }
 
     private suspend fun addCartProduct(
         product: Product,
         newQuantity: Int,
-    ): Result<Int> {
-        repository.addCartProduct(product.productDetail.id, newQuantity).getOrElse {
-            return Result.failure(Throwable("[IncreaseCartProductQuantityUseCase] 장바구니 상품 추가 오류", it))
-        }
-        return Result.success(newQuantity)
+    ) {
+        repository.addCartProduct(product.productDetail.id, newQuantity)
     }
 
     private suspend fun updateCartProduct(
         cartId: Long,
         newQuantity: Int,
-    ): Result<Int> {
-        repository.updateCartProduct(cartId, newQuantity).getOrElse {
-            return Result.failure(Throwable("[IncreaseCartProductQuantityUseCase] 장바구니 상품 추가 오류", it))
-        }
-        return Result.success(newQuantity)
+    ) {
+        repository.updateCartProduct(cartId, newQuantity)
     }
 
     companion object {
