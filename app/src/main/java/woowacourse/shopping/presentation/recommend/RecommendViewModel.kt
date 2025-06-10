@@ -76,18 +76,19 @@ class RecommendViewModel(
         }
     }
 
+    private fun updateCartItemQuantityAndApplyChange(updated: ProductUiModel) {
+        viewModelScope.launch {
+            val result = cartItemRepository.updateCartItemQuantity(updated.id, updated.quantity)
+            result.onSuccess {
+                _updatedProduct.postValue(updated)
+                applyProductChange(updated)
+            }
+        }
+    }
+
     fun increaseQuantity(product: ProductUiModel) {
         val newProduct = product.copy(quantity = product.quantity + 1)
-
-        viewModelScope.launch {
-            val result =
-                cartItemRepository.updateCartItemQuantity(newProduct.id, newProduct.quantity)
-            result
-                .onSuccess {
-                    _updatedProduct.postValue(newProduct)
-                    applyProductChange(newProduct)
-                }
-        }
+        updateCartItemQuantityAndApplyChange(newProduct)
     }
 
     fun decreaseQuantity(product: ProductUiModel) {
@@ -96,17 +97,11 @@ class RecommendViewModel(
         viewModelScope.launch {
             if (product.quantity == 0) {
                 val result = cartItemRepository.deleteCartItem(product.id)
-
                 result.onSuccess {
                     applyProductChange(product)
                 }
             } else {
-                val result = cartItemRepository.updateCartItemQuantity(updated.id, updated.quantity)
-
-                result.onSuccess {
-                    _updatedProduct.postValue(updated)
-                    applyProductChange(updated)
-                }
+                updateCartItemQuantityAndApplyChange(updated)
             }
         }
     }
