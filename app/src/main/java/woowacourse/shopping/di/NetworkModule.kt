@@ -9,6 +9,7 @@ import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.service.CartItemService
 import woowacourse.shopping.data.service.CouponService
 import woowacourse.shopping.data.service.OkHttpClientProvider
+import woowacourse.shopping.data.service.OrderService
 import woowacourse.shopping.data.service.ProductService
 
 object NetworkModule {
@@ -16,6 +17,7 @@ object NetworkModule {
     private var productService: ProductService? = null
     private var cartItemService: CartItemService? = null
     private var couponService: CouponService? = null
+    private var orderService: OrderService? = null
 
     private fun provideRetrofit(): Retrofit =
         Retrofit
@@ -30,4 +32,6 @@ object NetworkModule {
     fun provideCartItemService(): CartItemService = cartItemService ?: provideRetrofit().create()
 
     fun provideCouponService(): CouponService = couponService ?: provideRetrofit().create()
+
+    fun provideOrderService(): OrderService = orderService ?: provideRetrofit().create()
 }

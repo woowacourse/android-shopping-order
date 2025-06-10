@@ -10,12 +10,14 @@ import woowacourse.shopping.common.mapper.toUiModel
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.coupon.CouponContext
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.usecase.GetAvailableCouponsUseCase
 import woowacourse.shopping.presentation.SingleLiveData
 import woowacourse.shopping.presentation.uimodel.CouponUiModel
 
 class OrderViewModel(
     private val cartRepository: CartRepository,
+    private val orderRepository: OrderRepository,
     private val getAvailableCouponsUseCase: GetAvailableCouponsUseCase,
 ) : ViewModel(),
     CouponClickListener {
@@ -31,7 +33,7 @@ class OrderViewModel(
     val navigateTo: LiveData<Unit> = _navigateTo
 
     private lateinit var couponContextMapper: Map<Long, CouponContext>
-    private lateinit var purchaseProductIds: List<Long>
+    private lateinit var purchaseCartItemIds: List<Long>
 
     fun loadOrderInfos(productIds: LongArray) {
         runCatching {
@@ -47,9 +49,7 @@ class OrderViewModel(
 
     fun purchase() {
         viewModelScope.launch {
-            purchaseProductIds.forEach {
-                cartRepository.deleteProduct(it)
-            }
+            orderRepository.createOrder(purchaseCartItemIds)
             _toastMessage.value = R.string.order_success
             _navigateTo.value = Unit
         }
@@ -125,7 +125,7 @@ class OrderViewModel(
         viewModelScope.launch {
             getAvailableCouponsUseCase(cartItems)
                 .onSuccess { couponContexts ->
-                    purchaseProductIds = cartItems.map { it.product.productId }
+                    purchaseCartItemIds = cartItems.map { it.cartId }
                     couponContextMapper = couponContexts.associateBy { it.coupon.couponBase.id }
                     val couponUiModels =
                         couponContexts.map { couponContext -> couponContext.coupon.toUiModel() }
