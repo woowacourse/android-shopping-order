@@ -31,8 +31,8 @@ class FakeCouponRepository(
         return Result.success(filteredCoupons)
     }
 
-    private fun Coupon.toResponse(): CouponResponse {
-        return CouponResponse(
+    private fun Coupon.toResponse(): CouponResponse =
+        CouponResponse(
             id = this.id,
             description = this.description,
             expirationDate = this.expirationDate,
@@ -50,5 +50,4 @@ class FakeCouponRepository(
                     )
                 },
         )
-    }
 }

@@ -22,11 +22,7 @@ class FakeViewedItemRepository(
         viewed.add(0, product)
     }
 
-    override suspend fun getViewedItems(): List<ProductUiModel> {
-        return viewed.take(10)
-    }
+    override suspend fun getViewedItems(): List<ProductUiModel> = viewed.take(10)
 
-    override suspend fun getLastViewedItem(): ProductUiModel? {
-        return viewed.firstOrNull()
-    }
+    override suspend fun getLastViewedItem(): ProductUiModel? = viewed.firstOrNull()
 }

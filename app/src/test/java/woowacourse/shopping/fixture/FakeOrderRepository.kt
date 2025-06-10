@@ -3,7 +3,9 @@ package woowacourse.shopping.fixture
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
-class FakeOrderRepository(private val size: Int) : OrderRepository {
+class FakeOrderRepository(
+    private val size: Int,
+) : OrderRepository {
     private val fakeOrderProducts: List<ProductUiModel> =
         List(size) { index ->
             ProductUiModel(
