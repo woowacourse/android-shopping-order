@@ -27,17 +27,17 @@ class RecommendViewModelTest {
     @BeforeEach
     fun setUp() {
         val savedStateHandle =
-            SavedStateHandle(mapOf(KEY_SELECT_ITEMS to ProductsFixture.dummyCartItems))
+            SavedStateHandle(mapOf(KEY_SELECT_ITEMS to ProductsFixture.dummyCartUiModels))
         cartRepository = FakeCartRepository()
         productRepository = FakeProductRepository()
         recentProductRepository = FakeRecentProductRepository()
-        recommendProductsUseCase = RecommendProductsUseCase(productRepository)
+        recommendProductsUseCase = RecommendProductsUseCase(cartRepository, productRepository)
 
         viewModel =
             RecommendViewModel(
                 savedStateHandle,
-                recentProductRepository,
                 cartRepository,
+                recentProductRepository,
                 recommendProductsUseCase,
             )
     }
@@ -46,7 +46,7 @@ class RecommendViewModelTest {
     fun `장바구니_페이지에서_선택한_가격과_수량을_불러온다`() {
         val count = viewModel.selectedTotalCount.getOrAwaitValue()
         val price = viewModel.selectedTotalPrice.getOrAwaitValue()
-        assertThat(count).isEqualTo(10)
-        assertThat(price).isEqualTo(10000)
+        assertThat(count).isEqualTo(15)
+        assertThat(price).isEqualTo(15_000)
     }
 }

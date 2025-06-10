@@ -44,7 +44,7 @@ class OrderViewModelTest {
             )
         } returns Result.success(CouponFixture.couponList)
 
-        viewModel = OrderViewModel(savedStateHandle, getAvailableCouponUseCase, orderRepository)
+        viewModel = OrderViewModel(savedStateHandle, orderRepository, getAvailableCouponUseCase)
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 

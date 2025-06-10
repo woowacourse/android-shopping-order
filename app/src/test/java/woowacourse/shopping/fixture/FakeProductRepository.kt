@@ -1,6 +1,6 @@
 package woowacourse.shopping.fixture
 
-import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.PageableItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 
@@ -9,19 +9,13 @@ class FakeProductRepository : ProductRepository {
         page: Int?,
         pageSize: Int?,
         category: String?,
-    ): Result<List<CartItem>> {
+    ): Result<PageableItem<Product>> {
         val pagedItems = ProductsFixture.dummyProducts.drop(0).take(12)
-        val result = pagedItems.toCartItems()
-        return Result.success(result)
+        return Result.success(PageableItem(pagedItems, true))
     }
 
     override suspend fun fetchProductById(productId: Long): Result<Product> {
         val product = ProductsFixture.dummyProducts.find { it.productId == productId }
         return Result.success(product!!)
     }
-
-    private fun List<Product>.toCartItems(): List<CartItem> =
-        this.map { product ->
-            CartItem(1111, product, 1)
-        }
 }

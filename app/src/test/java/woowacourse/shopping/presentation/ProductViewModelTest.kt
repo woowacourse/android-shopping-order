@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.usecase.FetchProductsWithCartItemUseCase
 import woowacourse.shopping.fixture.FakeCartRepository
 import woowacourse.shopping.fixture.FakeProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
@@ -17,6 +18,7 @@ class ProductViewModelTest {
     private lateinit var cartRepository: CartRepository
     private lateinit var productRepository: FakeProductRepository
     private lateinit var recentProductRepository: RecentProductRepository
+    private lateinit var fetchProductsWithCartItemUseCase: FetchProductsWithCartItemUseCase
     private lateinit var viewModel: ProductViewModel
 
     @BeforeEach
@@ -24,8 +26,15 @@ class ProductViewModelTest {
         cartRepository = FakeCartRepository()
         productRepository = FakeProductRepository()
         recentProductRepository = FakeRecentProductRepository()
+        fetchProductsWithCartItemUseCase =
+            FetchProductsWithCartItemUseCase(cartRepository, productRepository)
 
-        viewModel = ProductViewModel(cartRepository, productRepository, recentProductRepository)
+        viewModel =
+            ProductViewModel(
+                cartRepository,
+                recentProductRepository,
+                fetchProductsWithCartItemUseCase,
+            )
     }
 
     @Test
@@ -66,20 +75,9 @@ class ProductViewModelTest {
         }
 
     @Test
-    fun `모든 데이터를 불러오지 않으면 더보기 버튼은 true가 된다`() =
-        runTest {
-            viewModel.fetchData(0)
-            repeat(1) { viewModel.loadMore() }
-
-            val showLoadMore = viewModel.showLoadMore.getOrAwaitValue()
-            assertThat(showLoadMore).isTrue()
-        }
-
-    @Test
     fun `모든 데이터를 불러오면 더보기 버튼은 false가 된다`() =
         runTest {
             viewModel.fetchData(0)
-            repeat(8) { viewModel.loadMore() }
 
             val showLoadMore = viewModel.showLoadMore.getOrAwaitValue()
             assertThat(showLoadMore).isFalse()

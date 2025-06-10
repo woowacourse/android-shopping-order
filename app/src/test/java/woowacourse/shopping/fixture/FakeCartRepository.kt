@@ -22,7 +22,7 @@ class FakeCartRepository : CartRepository {
     override suspend fun insertProduct(
         product: Product,
         productQuantity: Int,
-    ): Result<Long> = Result.success(1)
+    ): Result<Unit> = Result.success(Unit)
 
     override suspend fun updateProduct(
         cartId: Long,
@@ -36,5 +36,5 @@ class FakeCartRepository : CartRepository {
 
     override suspend fun deleteProduct(productId: Long): Result<Unit> = Result.success(Unit)
 
-    override fun getCartItemById(productId: Long): CartItem = ProductsFixture.dummyCartItem
+    override fun getCartItemById(productId: Long): Result<CartItem> = Result.success(ProductsFixture.dummyCartItem)
 }
