@@ -26,13 +26,5 @@ class CouponsResponse : ArrayList<CouponsResponse.CouponResponseItem>() {
         val getQuantity: Int?,
         @SerialName("availableTime")
         val availableTime: AvailableTime?,
-    ) {
-        @Serializable
-        data class AvailableTime(
-            @SerialName("start")
-            val start: String,
-            @SerialName("end")
-            val end: String,
-        )
-    }
+    )
 }
