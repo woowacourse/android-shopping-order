@@ -47,7 +47,7 @@ class ShoppingApplication : Application() {
     val getRecentProductsUseCase by lazy { GetRecentProductsUseCase(recentProductRepository) }
 
     val getProductsUseCase by lazy { GetProductsUseCase(productRepository) }
-    val getRecommendedProductsUseCase by lazy { GetRecommendedProductsUseCase(recentProductRepository, getProductsUseCase) }
+    val getRecommendedProductsUseCase by lazy { GetRecommendedProductsUseCase(getRecentProductsUseCase, getProductsUseCase) }
 
     val getCartProductsUseCase by lazy { GetCartProductsUseCase(cartProductRepository) }
     val getCartProductByProductIdUseCase by lazy { GetCartProductByProductIdUseCase(cartProductRepository) }

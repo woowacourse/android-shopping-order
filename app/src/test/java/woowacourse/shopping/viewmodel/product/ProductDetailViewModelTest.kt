@@ -13,6 +13,7 @@ import woowacourse.shopping.domain.usecase.cart.GetCartProductByProductIdUseCase
 import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
+import woowacourse.shopping.domain.usecase.product.GetRecentProductsUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.view.product.detail.ProductDetailViewModel
@@ -27,6 +28,8 @@ class ProductDetailViewModelTest {
     private lateinit var viewModel: ProductDetailViewModel
     private lateinit var cartProductRepository: CartProductRepository
     private lateinit var recentProductRepository: RecentProductRepository
+
+    private lateinit var getRecentProductsUseCase: GetRecentProductsUseCase
     private lateinit var getCartProductsUseCase: GetCartProductsUseCase
     private lateinit var getCartProductByProductIdUseCase: GetCartProductByProductIdUseCase
     private lateinit var addToCartUseCase: AddToCartUseCase
@@ -38,6 +41,8 @@ class ProductDetailViewModelTest {
     fun setup() {
         cartProductRepository = FakeCartProductRepository()
         recentProductRepository = FakeRecentProductRepository()
+
+        getRecentProductsUseCase = GetRecentProductsUseCase(recentProductRepository)
         getCartProductsUseCase = GetCartProductsUseCase(cartProductRepository)
         getCartProductByProductIdUseCase = GetCartProductByProductIdUseCase(cartProductRepository)
         addToCartUseCase = AddToCartUseCase(cartProductRepository)
@@ -49,6 +54,7 @@ class ProductDetailViewModelTest {
             ProductDetailViewModel(
                 product,
                 recentProductRepository,
+                getRecentProductsUseCase,
                 getCartProductByProductIdUseCase,
                 addToCartUseCase,
                 updateCartQuantityUseCase,

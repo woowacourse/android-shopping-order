@@ -6,8 +6,6 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 class FakeRecentProductRepository : RecentProductRepository {
     private val recentProducts = mutableListOf<RecentProduct>()
 
-    override suspend fun getLastViewedProduct(): Result<RecentProduct?> = Result.success(recentProducts.lastOrNull())
-
     override suspend fun getPagedProducts(
         limit: Int,
         offset: Int,

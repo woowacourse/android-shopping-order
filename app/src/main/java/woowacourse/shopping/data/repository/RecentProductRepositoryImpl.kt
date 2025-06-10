@@ -15,16 +15,6 @@ class RecentProductRepositoryImpl(
     private val localDataSource: RecentProductLocalDataSource,
     private val productRemoteDataSource: ProductRemoteDataSource,
 ) : RecentProductRepository {
-    override suspend fun getLastViewedProduct(): Result<RecentProduct?> =
-        localDataSource.getLastViewedProduct().mapCatching { entity ->
-            if (entity != null) {
-                val product = getProductById(entity.productId)
-                RecentProduct(product, entity.viewedAt.toLocalDateTime())
-            } else {
-                null
-            }
-        }
-
     override suspend fun getPagedProducts(
         limit: Int,
         offset: Int,

@@ -17,9 +17,6 @@ interface RecentProductDao {
         offset: Int,
     ): List<RecentProductEntity>
 
-    @Query("SELECT * FROM recent_product ORDER BY viewed_at DESC LIMIT 1")
-    suspend fun getLastViewedProduct(): RecentProductEntity?
-
     @Query("DELETE from recent_product WHERE product_id == :productId")
     suspend fun deleteByProductId(productId: Int)
 

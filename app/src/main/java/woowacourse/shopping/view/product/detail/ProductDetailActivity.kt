@@ -31,6 +31,7 @@ class ProductDetailActivity : AppCompatActivity() {
                 ProductDetailViewModelFactory(
                     product,
                     app.recentProductRepository,
+                    app.getRecentProductsUseCase,
                     app.getCartProductByProductIdUseCase,
                     app.addToCartUseCase,
                     app.updateCartQuantityUseCase,

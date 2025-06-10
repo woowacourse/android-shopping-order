@@ -7,10 +7,12 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
 import woowacourse.shopping.domain.usecase.cart.GetCartProductByProductIdUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
+import woowacourse.shopping.domain.usecase.product.GetRecentProductsUseCase
 
 class ProductDetailViewModelFactory(
     private val product: Product,
     private val recentProductRepository: RecentProductRepository,
+    private val getRecentProductsUseCase: GetRecentProductsUseCase,
     private val getCartProductByProductIdUseCase: GetCartProductByProductIdUseCase,
     private val addToCartUseCase: AddToCartUseCase,
     private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
@@ -21,6 +23,7 @@ class ProductDetailViewModelFactory(
             return ProductDetailViewModel(
                 product,
                 recentProductRepository,
+                getRecentProductsUseCase,
                 getCartProductByProductIdUseCase,
                 addToCartUseCase,
                 updateCartQuantityUseCase,

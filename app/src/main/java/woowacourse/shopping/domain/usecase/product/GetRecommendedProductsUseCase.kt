@@ -1,18 +1,18 @@
 package woowacourse.shopping.domain.usecase.product
 
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.RecentProductRepository
 
 class GetRecommendedProductsUseCase(
-    private val recentProductRepository: RecentProductRepository,
+    private val getRecentProductsUseCase: GetRecentProductsUseCase,
     private val getProductsUseCase: GetProductsUseCase,
 ) {
     suspend operator fun invoke(cartIds: List<Int>): Result<List<Product>> =
-        recentProductRepository.getLastViewedProduct().fold(
-            onSuccess = { lastViewedProduct ->
-                if (lastViewedProduct == null) {
+        getRecentProductsUseCase(LAST_VIEWED_PRODUCT_LIMIT).fold(
+            onSuccess = { recentProducts ->
+                if (recentProducts.isEmpty()) {
                     Result.success(emptyList())
                 } else {
+                    val lastViewedProduct = recentProducts[0]
                     getProductsUseCase().map { pagedResult ->
                         pagedResult.items
                             .asSequence()
@@ -29,5 +29,6 @@ class GetRecommendedProductsUseCase(
 
     companion object {
         private const val RECOMMENDED_PRODUCTS_COUNT = 10
+        private const val LAST_VIEWED_PRODUCT_LIMIT = 1
     }
 }

@@ -13,12 +13,14 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
 import woowacourse.shopping.domain.usecase.cart.GetCartProductByProductIdUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
+import woowacourse.shopping.domain.usecase.product.GetRecentProductsUseCase
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
 class ProductDetailViewModel(
     val product: Product,
     private val recentProductRepository: RecentProductRepository,
+    private val getRecentProductsUseCase: GetRecentProductsUseCase,
     private val getCartProductByProductIdUseCase: GetCartProductByProductIdUseCase,
     private val addToCartUseCase: AddToCartUseCase,
     private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
@@ -83,13 +85,12 @@ class ProductDetailViewModel(
 
     private fun loadLastViewedProduct() {
         viewModelScope.launch {
-            recentProductRepository
-                .getLastViewedProduct()
-                .onSuccess {
-                    _lastViewedProduct.postValue(it)
-                }.onFailure {
-                    Log.e("error", it.message.toString())
-                }
+            getRecentProductsUseCase(LAST_VIEWED_PRODUCT_LIMIT)
+                .onSuccess { recentProducts ->
+                    if (recentProducts.isNotEmpty()) {
+                        _lastViewedProduct.postValue(recentProducts[0])
+                    }
+                }.onFailure { Log.e("error", it.message.toString()) }
         }
     }
 
@@ -107,5 +108,6 @@ class ProductDetailViewModel(
     companion object {
         private const val MINIMUM_QUANTITY = 1
         private const val QUANTITY_TO_ADD = 1
+        private const val LAST_VIEWED_PRODUCT_LIMIT = 1
     }
 }
