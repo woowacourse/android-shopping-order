@@ -1,6 +1,5 @@
 package woowacourse.shopping.di
 
-import retrofit2.create
 import woowacourse.shopping.data.datasource.CartRemoteDataSource
 import woowacourse.shopping.data.datasource.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.CatalogRemoteDataSource
@@ -20,7 +19,7 @@ object DataSourceProvider {
     private val cartItemService: CartItemService =
         RetrofitProductService.INSTANCE.create(CartItemService::class.java)
 
-    private val couponServcie: CouponService =
+    private val couponService: CouponService =
         RetrofitProductService.INSTANCE.create(CouponService::class.java)
 
     val orderService: OrderService =
@@ -30,5 +29,5 @@ object DataSourceProvider {
 
     fun provideCartRemoteDataSource(): CartRemoteDataSource = CartRemoteDataSourceImpl(cartItemService)
 
-    fun provideCouponRemoteDataSource(): CouponDataSource = CouponDataSourceImpl(couponServcie)
+    fun provideCouponRemoteDataSource(): CouponDataSource = CouponDataSourceImpl(couponService)
 }
