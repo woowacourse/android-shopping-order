@@ -7,7 +7,8 @@ import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.db.RecentProductEntity
 import woowacourse.shopping.data.model.product.ProductResponse
 import woowacourse.shopping.data.model.product.toDomain
-import woowacourse.shopping.data.util.runCatchingDebugLog
+import woowacourse.shopping.data.util.result.flatMapCatching
+import woowacourse.shopping.data.util.result.mapCatchingDebugLog
 import woowacourse.shopping.domain.model.PageableItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -17,16 +18,13 @@ class ProductRepositoryImpl(
     private val productLocalDataSource: ProductLocalDataSource,
 ) : ProductRepository {
     override suspend fun fetchProduct(id: Long): Result<Product> =
-        runCatchingDebugLog {
-            productRemoteDataSource.fetchProduct(id).toDomain()
-        }
+        productRemoteDataSource.fetchProduct(id).mapCatchingDebugLog { it.toDomain() }
 
     override suspend fun fetchProducts(
         page: Int,
         size: Int,
     ): Result<PageableItem<Product>> =
-        runCatchingDebugLog {
-            val response = productRemoteDataSource.fetchProducts(null, page, size)
+        productRemoteDataSource.fetchProducts(null, page, size).mapCatchingDebugLog { response ->
             val products = response.content.map { it.toDomain() }
             val hasMore = !response.last
             PageableItem(products, hasMore)
@@ -36,22 +34,21 @@ class ProductRepositoryImpl(
         limit: Int,
         excludedProductIds: List<Long>,
     ): Result<List<Product>> =
-        runCatchingDebugLog {
-            val category = productLocalDataSource.getRecentViewedProductCategory().getOrNull()
-
-            val fetchLimit = limit + excludedProductIds.size
-            val response = productRemoteDataSource.fetchProducts(category, 0, fetchLimit)
-            val allProducts = response.content
-            val filteredProducts = allProducts.filterSuggestionProducts(excludedProductIds, limit)
-            filteredProducts.map { it.toDomain() }
-        }
+        productLocalDataSource
+            .getRecentViewedProductCategory()
+            .flatMapCatching { category ->
+                val fetchLimit = limit + excludedProductIds.size
+                productRemoteDataSource.fetchProducts(category, 0, fetchLimit)
+            }.mapCatchingDebugLog { response ->
+                val filteredProducts =
+                    response.content.filterSuggestionProducts(excludedProductIds, limit)
+                filteredProducts.map { it.toDomain() }
+            }
 
     override suspend fun getRecentProducts(limit: Int): Result<List<Product>> =
-        runCatchingDebugLog {
-            val recentEntities = productLocalDataSource.getRecentProducts(limit).getOrNull()
-            val recentProductIds = recentEntities?.map { it.productId } ?: emptyList()
-
-            fetchAllProductsConcurrently(recentProductIds)
+        productLocalDataSource.getRecentProducts(limit).mapCatchingDebugLog { entities ->
+            val productIds = entities.map { it.productId }
+            fetchAllProductsConcurrently(productIds)
         }
 
     override suspend fun insertAndTrimToLimit(
@@ -59,11 +56,9 @@ class ProductRepositoryImpl(
         category: String,
         recentProductLimit: Int,
     ): Result<Unit> =
-        runCatchingDebugLog {
-            val entity = RecentProductEntity(productId, category)
-            productLocalDataSource.insertRecentProduct(entity)
-            productLocalDataSource.trimToLimit(recentProductLimit)
-        }
+        productLocalDataSource
+            .insertRecentProduct(RecentProductEntity(productId, category))
+            .mapCatchingDebugLog { productLocalDataSource.trimToLimit(recentProductLimit) }
 
     private fun List<ProductResponse>.filterSuggestionProducts(
         excludedProductIds: List<Long>,
@@ -83,5 +78,6 @@ class ProductRepositoryImpl(
     private suspend fun fetchAndConvertToDomain(productId: Long): Product? =
         productRemoteDataSource
             .fetchProduct(productId)
-            .toDomain()
+            .mapCatchingDebugLog { it.toDomain() }
+            .getOrNull()
 }
