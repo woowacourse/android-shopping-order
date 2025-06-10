@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.model
 
-import woowacourse.shopping.domain.repository.CouponPolicy
+import woowacourse.shopping.domain.policy.CouponPolicy
 
 enum class CouponType(
     val code: String,

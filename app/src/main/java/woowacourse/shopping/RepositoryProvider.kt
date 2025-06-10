@@ -18,6 +18,7 @@ import woowacourse.shopping.data.source.remote.order.OrderRemoteDataSource
 import woowacourse.shopping.data.source.remote.payment.PaymentRemoteDataSource
 import woowacourse.shopping.data.source.remote.products.ProductsRemoteDataSource
 import woowacourse.shopping.data.util.SystemTimeProvider
+import woowacourse.shopping.domain.policy.CouponEvaluator
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -34,12 +35,16 @@ object RepositoryProvider {
     fun init(application: Application) {
         viewedItemRepository =
             ViewedItemRepositoryImpl(
-                ViewedItemLocalDataSource(ViewedItemDatabase.getInstance(application).viewedItemDao()),
+                ViewedItemLocalDataSource(
+                    ViewedItemDatabase.getInstance(application).viewedItemDao(),
+                ),
             )
         productsRepository =
             ProductsRepositoryImpl(
                 ProductsRemoteDataSource(getProductRetrofitService),
-                ViewedItemLocalDataSource(ViewedItemDatabase.getInstance(application).viewedItemDao()),
+                ViewedItemLocalDataSource(
+                    ViewedItemDatabase.getInstance(application).viewedItemDao(),
+                ),
             )
         cartItemRepository =
             CartItemsRepositoryImpl(
@@ -56,7 +61,7 @@ object RepositoryProvider {
             )
         couponRepository =
             CouponRepositoryImpl(
-                SystemTimeProvider(),
+                CouponEvaluator(SystemTimeProvider()),
                 PaymentRemoteDataSource(getCouponApiService),
             )
     }

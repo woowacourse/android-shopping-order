@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.CouponType
 import woowacourse.shopping.domain.model.OrderAdjustment
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.CouponPolicy
+import woowacourse.shopping.domain.policy.CouponPolicy
 
 class ApplyCouponPolicyUseCase {
     fun applyPolicy(
