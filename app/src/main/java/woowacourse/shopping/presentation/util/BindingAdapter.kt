@@ -64,6 +64,9 @@ fun setFormattedPrice(
     view: TextView,
     amount: Long?,
 ) {
-    val formatted = if (amount != null) String.format("%,d원", amount) else ""
-    view.text = formatted
+    if (amount != null) {
+        view.text = view.context.getString(R.string.format_price, amount)
+    } else {
+        view.text = ""
+    }
 }
