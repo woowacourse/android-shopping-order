@@ -34,6 +34,8 @@ object RepositoryProvider {
     lateinit var orderRepository: OrderRepository
         private set
 
+    private val cartItemsLocalDataSource by lazy { CartItemsLocalDataSource() }
+
     fun init(context: Context) {
         productsRepository =
             ProductsRepositoryImpl(
@@ -43,14 +45,14 @@ object RepositoryProvider {
         cartItemRepository =
             CartItemsRepositoryImpl(
                 CartItemsRemoteDataSource(getCartApiService),
-                CartItemsLocalDataSource(),
+                cartItemsLocalDataSource,
             )
         viewedItemRepository =
             ViewedItemRepositoryImpl(ViewedItemDatabase.getInstance(context).viewedItemDao())
         couponRepository = CouponRepositoryImpl(CouponRemoteDataSource(getCouponApiService))
         orderRepository = OrderRepositoryImpl(
             OrderRemoteDataSource(getOrderApiService),
-            CartItemsLocalDataSource()
+            cartItemsLocalDataSource,
         )
     }
 }
