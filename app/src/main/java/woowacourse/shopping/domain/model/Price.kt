@@ -5,4 +5,8 @@ data class Price(
     val discountPrice: Int = 0,
     val shippingFee: Int = 3_000,
     val totalPrice: Int = 0,
-)
+) {
+    companion object {
+        val DEFAULT_PRICE = Price()
+    }
+}

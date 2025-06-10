@@ -13,6 +13,7 @@ import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.CouponRule
 import woowacourse.shopping.domain.model.Price
+import woowacourse.shopping.domain.model.Price.Companion.DEFAULT_PRICE
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 import woowacourse.shopping.util.toDomain
@@ -25,7 +26,7 @@ class PaymentViewModel(
     private val _coupons = MutableLiveData<List<Coupon>>()
     val coupons: LiveData<List<Coupon>> = _coupons
 
-    private val _price = MutableLiveData<Price>(Price())
+    private val _price = MutableLiveData<Price>(DEFAULT_PRICE)
     val price: LiveData<Price> = _price
 
     private val _orderCompletedEvent = MutableSingleLiveData<Unit>()
