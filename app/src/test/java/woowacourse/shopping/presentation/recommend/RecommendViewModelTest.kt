@@ -47,7 +47,7 @@ class RecommendViewModelTest {
         }
 
     @Test
-    fun `toggleQuantity 호출 시 상품 수량이 증가한다`() =
+    fun `상품 수량이 정상적으로 증가한다`() =
         runTest {
             val product = ProductUiModel(id = 12L, name = "아이스 카페 아메리카노", imageUrl = "", price = 1000, quantity = 0)
 
@@ -78,7 +78,7 @@ class RecommendViewModelTest {
         }
 
     @Test
-    fun `checkedItems 변경 시 총 금액과 총 수량이 반영된다`() =
+    fun `선택한 상품들이 변경되면 총 금액과 총 수량이 반영된다`() =
         runTest {
             val checkedProducts =
                 listOf(
@@ -101,7 +101,7 @@ class RecommendViewModelTest {
         }
 
     @Test
-    fun `onOrderClick 클릭 시 navigateToPaymentEvent가 발생한다`() =
+    fun `주문 요청 성공 시 결제 화면 이동 이벤트가 발생한다`() =
         runTest {
             val checkedProducts =
                 listOf(
@@ -122,7 +122,7 @@ class RecommendViewModelTest {
         }
 
     @Test
-    fun `restoreCheckedProducts 호출 시 checkedItems와 items이 동기화된다`() =
+    fun `RecommendActivity에서 돌아와도 이전의 데이터가 동일하게 유지된다`() =
         runTest {
             viewModel =
                 RecommendViewModel(

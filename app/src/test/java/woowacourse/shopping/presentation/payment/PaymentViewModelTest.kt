@@ -118,7 +118,7 @@ class PaymentViewModelTest {
     }
 
     @Test
-    fun `getCoupons 호출 시 유효한 쿠폰들만 필터링 되어 업데이트 된다`() =
+    fun `유효한 쿠폰들만 필터링 되어 업데이트 된다`() =
         runTest {
             viewModel.getCoupons()
 
@@ -132,7 +132,7 @@ class PaymentViewModelTest {
         }
 
     @Test
-    fun `onCheckCoupon 호출 시 할인금액과 배송비가 정확히 계산된다`() {
+    fun `할인금액과 배송비가 정확히 계산된다`() {
         val coupon =
             Coupon(
                 id = 1L,
@@ -160,7 +160,7 @@ class PaymentViewModelTest {
     }
 
     @Test
-    fun `만료된 쿠폰은 getCoupons 결과에 포함되지 않는다`() =
+    fun `만료된 쿠폰은 적용 가능한 쿠폰들에 포함되지 않는다`() =
         runTest {
             val expiredCoupon =
                 Coupon(
@@ -198,7 +198,7 @@ class PaymentViewModelTest {
         }
 
     @Test
-    fun `resetOrderInfo 호출 시 할인금액과 배송비는 초기값으로`() {
+    fun `할인 금액과 배송비는 초기값을 가진다`() {
         viewModel.resetOrderInfo()
 
         val discount = viewModel.discountAmount.getOrAwaitValue()
@@ -209,7 +209,7 @@ class PaymentViewModelTest {
     }
 
     @Test
-    fun `updateOrderInfo 호출 시 totalAmount도 갱신된다`() {
+    fun `쿠폰을 적용하거나, 값이 변하면 총 금액이 변경된다`() {
         val coupon =
             Coupon(
                 id = 1L,
@@ -237,7 +237,7 @@ class PaymentViewModelTest {
     }
 
     @Test
-    fun `FIXED5000 쿠폰 적용 시 totalAmount는 고정 할인 적용`() {
+    fun `FIXED5000 쿠폰 적용 시 고정 할인가를 적용`() {
         val coupon = CouponFixture.fixed5000Coupon()
 
         viewModel.updateOrderInfo(coupon)
@@ -254,7 +254,7 @@ class PaymentViewModelTest {
     }
 
     @Test
-    fun `FREESHIPPING 쿠폰 적용 시 배송비는 0원이 되고 totalAmount 계산`() {
+    fun `FREESHIPPING 쿠폰 적용 시 배송비는 0원이 된다`() {
         val coupon = CouponFixture.freeShippingCoupon()
 
         viewModel.updateOrderInfo(coupon)
@@ -305,7 +305,7 @@ class PaymentViewModelTest {
     }
 
     @Test
-    fun `초기 상태에서 totalAmount는 주문금액 + 배송비`() {
+    fun `초기 상태에서의 총 금액은 주문금액 + 배송비`() {
         val total = viewModel.totalAmount.getOrAwaitValue()
         val expected = viewModel.initialOrderPrice + 3000L
 
