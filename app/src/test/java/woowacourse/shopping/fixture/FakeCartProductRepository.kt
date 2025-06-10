@@ -67,7 +67,7 @@ class FakeCartProductRepository : CartProductRepository {
                 delete(cartProduct.id)
             } else {
                 cartProducts.replaceAll {
-                    if (it.product.id == cartProduct.product.id) {
+                    if (it.id == cartProduct.id) {
                         it.copy(quantity = newQuantity)
                     } else {
                         it
@@ -81,7 +81,7 @@ class FakeCartProductRepository : CartProductRepository {
 
     override suspend fun delete(id: Int): Result<Unit> =
         try {
-            cartProducts.removeIf { it.product.id == id }
+            cartProducts.removeIf { it.id == id }
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
