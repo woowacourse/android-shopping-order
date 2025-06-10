@@ -10,8 +10,10 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import woowacourse.shopping.RepositoryProvider
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
+import woowacourse.shopping.mapper.toUiModel
 import woowacourse.shopping.presentation.cart.OrderInfo
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.presentation.util.SingleLiveEvent
@@ -55,8 +57,8 @@ class RecommendViewModel(
 
             val result = productsRepository.getRecommendedProductsFromLastViewed(cartProductIds)
 
-            result.onSuccess { recommendedProducts ->
-                _items.postValue(recommendedProducts)
+            result.onSuccess { recommendedProducts: List<Product> ->
+                _items.postValue(recommendedProducts.map { it.toUiModel() })
             }
         }
     }
@@ -162,8 +164,8 @@ class RecommendViewModel(
     }
 
     companion object {
-        fun provideFactory(initialCheckedItems: List<ProductUiModel>): ViewModelProvider.Factory {
-            return viewModelFactory {
+        fun provideFactory(initialCheckedItems: List<ProductUiModel>): ViewModelProvider.Factory =
+            viewModelFactory {
                 initializer {
                     RecommendViewModel(
                         productsRepository = RepositoryProvider.productsRepository,
@@ -172,6 +174,5 @@ class RecommendViewModel(
                     )
                 }
             }
-        }
     }
 }

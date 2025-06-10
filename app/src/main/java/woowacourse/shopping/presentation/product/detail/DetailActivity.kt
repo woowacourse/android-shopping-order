@@ -108,6 +108,7 @@ class DetailActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean =
         when (item.itemId) {
             R.id.menu_detail_back -> {
+                setResult(RESULT_OK)
                 finish()
                 true
             }

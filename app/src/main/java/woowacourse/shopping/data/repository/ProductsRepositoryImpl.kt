@@ -1,17 +1,18 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.model.ProductResponse
+import woowacourse.shopping.data.model.ViewedItem
+import woowacourse.shopping.data.source.local.recent.ViewedItemDataSource
 import woowacourse.shopping.data.source.remote.products.ProductsRemoteDataSource
 import woowacourse.shopping.domain.model.PagingData
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductsRepository
-import woowacourse.shopping.domain.repository.ViewedItemRepository
+import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toUiModel
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class ProductsRepositoryImpl(
     private val productsRemoteDataSource: ProductsRemoteDataSource,
-    private val viewedItemRepository: ViewedItemRepository,
+    private val viewedItemLocalDataSource: ViewedItemDataSource,
 ) : ProductsRepository {
     override suspend fun getProducts(
         page: Int,
@@ -35,8 +36,8 @@ class ProductsRepositoryImpl(
                 response.toDomain().toUiModel()
             }
 
-    override suspend fun getRecommendedProductsFromLastViewed(cartProductIds: List<Long>): Result<List<ProductUiModel>> {
-        val lastViewedItem = viewedItemRepository.getLastViewedItem()
+    override suspend fun getRecommendedProductsFromLastViewed(cartProductIds: List<Long>): Result<List<Product>> {
+        val lastViewedItem: ViewedItem? = viewedItemLocalDataSource.getLastViewedItem()
 
         return if (lastViewedItem != null) {
             getRecommendedProducts(
@@ -51,7 +52,7 @@ class ProductsRepositoryImpl(
     private suspend fun getRecommendedProducts(
         category: String,
         cartProductIds: List<Long>,
-    ): Result<List<ProductUiModel>> =
+    ): Result<List<Product>> =
         productsRemoteDataSource
             .getProductsByCategory(category)
             .mapCatching { response ->
@@ -59,16 +60,5 @@ class ProductsRepositoryImpl(
                     .map { it.toDomain() }
                     .filter { it.id !in cartProductIds }
                     .take(10)
-                    .map { it.toUiModel() }
             }
-
-    private fun ProductResponse.toDomain(): Product =
-        Product(
-            id = this.id,
-            name = this.name,
-            price = this.price,
-            imageUrl = this.imageUrl,
-            quantity = 0,
-            category = this.category,
-        )
 }

@@ -72,10 +72,15 @@ class DetailViewModel(
 
     fun loadLastViewedItem() {
         viewModelScope.launch {
-            val lastViewedItem = viewedRepository.getLastViewedItem()
+            val result = viewedRepository.getLastViewedItem()
 
-            val filtered: Product? = if (lastViewedItem?.id == productId) null else lastViewedItem
-            _lastViewed.postValue(filtered?.toUiModel())
+            result
+                .onSuccess { lastViewedItem ->
+                    val filtered: Product? = if (lastViewedItem?.id == productId) null else lastViewedItem
+                    _lastViewed.postValue(filtered?.toUiModel())
+                }.onFailure {
+                    _lastViewed.postValue(null)
+                }
         }
     }
 

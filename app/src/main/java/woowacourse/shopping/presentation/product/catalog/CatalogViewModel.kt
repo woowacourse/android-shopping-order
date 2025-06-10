@@ -139,9 +139,12 @@ class CatalogViewModel(
 
     fun loadRecentViewedItems() {
         viewModelScope.launch {
-            val items: List<Product> = viewedItemRepository.getViewedItems()
-            _recentViewedItems.postValue(items.map { it.toUiModel() })
-            _hasRecentViewedItems.postValue(items.isNotEmpty())
+            val result: Result<List<Product>> = viewedItemRepository.getViewedItems()
+
+            result.onSuccess { items ->
+                _recentViewedItems.postValue(items.map { it.toUiModel() })
+                _hasRecentViewedItems.postValue(items.isNotEmpty())
+            }
         }
     }
 

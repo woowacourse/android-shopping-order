@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.PagingData
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 interface ProductsRepository {
@@ -11,5 +12,5 @@ interface ProductsRepository {
 
     suspend fun getProductById(id: Long): Result<ProductUiModel>
 
-    suspend fun getRecommendedProductsFromLastViewed(cartProductIds: List<Long>): Result<List<ProductUiModel>>
+    suspend fun getRecommendedProductsFromLastViewed(cartProductIds: List<Long>): Result<List<Product>>
 }
