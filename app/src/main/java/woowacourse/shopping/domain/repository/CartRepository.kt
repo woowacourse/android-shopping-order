@@ -2,12 +2,13 @@ package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.data.model.response.Quantity
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.PagedCartItems
 
 interface CartRepository {
     suspend fun getCartItems(
         page: Int,
         limit: Int,
-    ): Result<Pair<List<CartItem>, Boolean>>
+    ): Result<PagedCartItems>
 
     suspend fun getAllCartItems(): Result<List<CartItem>>
 

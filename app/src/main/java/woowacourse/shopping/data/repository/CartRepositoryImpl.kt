@@ -5,6 +5,7 @@ import woowacourse.shopping.data.mapper.toCartItem
 import woowacourse.shopping.data.model.request.CartItemRequest
 import woowacourse.shopping.data.model.response.Quantity
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.PagedCartItems
 import woowacourse.shopping.domain.repository.CartRepository
 
 class CartRepositoryImpl(
@@ -13,12 +14,13 @@ class CartRepositoryImpl(
     override suspend fun getCartItems(
         page: Int,
         limit: Int,
-    ): Result<Pair<List<CartItem>, Boolean>> =
+    ): Result<PagedCartItems> =
         runCatching {
             val response = cartItemDataSource.fetchCartItems(page, limit).getOrThrow()
             val cartItems = response.content.map { it.toCartItem() }
             val hasMore = !response.last
-            cartItems to hasMore
+
+            PagedCartItems(cartItems, hasMore)
         }
 
     override suspend fun getAllCartItems(): Result<List<CartItem>> =
