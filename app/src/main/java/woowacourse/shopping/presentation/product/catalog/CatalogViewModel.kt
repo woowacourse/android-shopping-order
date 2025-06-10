@@ -40,6 +40,13 @@ class CatalogViewModel(
     private var currentPage = 0
     val page: Int get() = currentPage
 
+    init {
+        initializeCart()
+        loadInitialCatalogProducts()
+        loadRecentViewedItems()
+        updateCartCount()
+    }
+
     fun toggleQuantity(product: ProductUiModel) {
         val toggled =
             product.copy(quantity = product.quantity + 1)

@@ -48,7 +48,6 @@ class CatalogActivity : AppCompatActivity() {
         binding.viewModel = viewModel
 
         observeViewModel()
-        setViewModel()
     }
 
     private fun applyWindowInsets() {
@@ -57,13 +56,6 @@ class CatalogActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-    }
-
-    private fun setViewModel() {
-        viewModel.initializeCart()
-        viewModel.loadInitialCatalogProducts()
-        viewModel.loadRecentViewedItems()
-        viewModel.updateCartCount()
     }
 
     private fun initRecyclerView() {

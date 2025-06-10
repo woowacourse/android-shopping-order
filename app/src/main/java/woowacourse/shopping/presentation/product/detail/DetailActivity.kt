@@ -36,7 +36,6 @@ class DetailActivity : AppCompatActivity() {
         initBinding()
         initObservers()
         initHandlers()
-        loadInitialData()
     }
 
     private fun initBinding() {
@@ -73,11 +72,6 @@ class DetailActivity : AppCompatActivity() {
             }
         binding.handler = handler
         binding.detailHandler = handler
-    }
-
-    private fun loadInitialData() {
-        viewModel.setProduct()
-        viewModel.loadLastViewedItem()
     }
 
     private fun setupToolbar() {

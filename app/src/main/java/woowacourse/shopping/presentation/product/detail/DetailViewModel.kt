@@ -38,7 +38,12 @@ class DetailViewModel(
     private val _productInserted = MutableLiveData<Boolean>()
     val productInserted: LiveData<Boolean> = _productInserted
 
-    fun setProduct() {
+    init {
+        loadProduct()
+        loadLastViewedItem()
+    }
+
+    fun loadProduct() {
         viewModelScope.launch {
             val result = productsRepository.getProductById(productId)
 
@@ -76,7 +81,8 @@ class DetailViewModel(
 
             result
                 .onSuccess { lastViewedItem ->
-                    val filtered: Product? = if (lastViewedItem?.id == productId) null else lastViewedItem
+                    val filtered: Product? =
+                        if (lastViewedItem?.id == productId) null else lastViewedItem
                     _lastViewed.postValue(filtered?.toUiModel())
                 }.onFailure {
                     _lastViewed.postValue(null)

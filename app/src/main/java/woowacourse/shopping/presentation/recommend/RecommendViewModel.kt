@@ -48,10 +48,10 @@ class RecommendViewModel(
     val navigateToPaymentEvent: LiveData<OrderInfo> = _navigateToPaymentEvent
 
     init {
-        loadRecommendedProductsFromLastViewed()
+        loadRecommendedProducts()
     }
 
-    private fun loadRecommendedProductsFromLastViewed() {
+    private fun loadRecommendedProducts() {
         viewModelScope.launch {
             val cartProductIds = cartItemRepository.getCartItemProductIds()
 
