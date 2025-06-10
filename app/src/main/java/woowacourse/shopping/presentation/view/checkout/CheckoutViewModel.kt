@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.view.checkout
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -101,7 +100,6 @@ class CheckoutViewModel(
     fun finalizeOrder() {
         viewModelScope.launch {
             val cartIds = _cartItems.value.orEmpty().map(CartItem::cartId)
-            Log.wtf("asdf", "$cartIds")
             cartRepository.deleteCartItems(cartIds)
         }
         viewModelScope.launch {
