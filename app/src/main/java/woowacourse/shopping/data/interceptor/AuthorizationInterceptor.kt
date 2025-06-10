@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.remote.interceptor
+package woowacourse.shopping.data.interceptor
 
 import android.util.Base64
 import okhttp3.Interceptor
