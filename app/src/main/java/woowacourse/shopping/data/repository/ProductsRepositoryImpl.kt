@@ -8,7 +8,6 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductsRepository
 import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toUiModel
-import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class ProductsRepositoryImpl(
     private val productsRemoteDataSource: ProductsRemoteDataSource,
@@ -29,11 +28,11 @@ class ProductsRepositoryImpl(
                 )
             }
 
-    override suspend fun getProductById(id: Long): Result<ProductUiModel> =
+    override suspend fun getProductById(id: Long): Result<Product> =
         productsRemoteDataSource
             .getProductById(id)
             .mapCatching { response ->
-                response.toDomain().toUiModel()
+                response.toDomain()
             }
 
     override suspend fun getRecommendedProductsFromLastViewed(cartProductIds: List<Long>): Result<List<Product>> {
