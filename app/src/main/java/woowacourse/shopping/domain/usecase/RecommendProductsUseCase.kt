@@ -15,10 +15,11 @@ class RecommendProductsUseCase(
                 pageSize = null,
                 category = category,
             ).mapCatching { products ->
-                products
+                products.items
                     .asSequence()
-                    .filter { product -> cartRepository.getCartItemById(product.productId) == null }
-                    .take(10)
+                    .filter { product ->
+                        cartRepository.getCartItemById(product.productId).getOrNull() == null
+                    }.take(10)
                     .map { product -> CartItem(product = product, quantity = 0) }
                     .toList()
             }

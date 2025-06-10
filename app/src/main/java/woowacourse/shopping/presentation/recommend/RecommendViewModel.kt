@@ -69,8 +69,15 @@ class RecommendViewModel(
         viewModelScope.launch {
             cartRepository
                 .insertProduct(cartItem.product.toDomain(), 1)
-                .onSuccess { cartId ->
-                    updateQuantity(cartId = cartId, productId = cartItem.product.id, delta = 1)
+                .onSuccess {
+                    val cartId =
+                        cartRepository.getCartItemById(cartItem.product.id).getOrThrow()?.cartId
+                            ?: throw Exception()
+                    updateQuantity(
+                        cartId = cartId,
+                        productId = cartItem.product.id,
+                        delta = 1,
+                    )
                 }.onFailure {
                     _toastMessage.value = R.string.product_toast_add_cart_fail
                 }
