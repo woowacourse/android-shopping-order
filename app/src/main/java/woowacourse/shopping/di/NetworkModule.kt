@@ -6,10 +6,10 @@ import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import retrofit2.create
 import woowacourse.shopping.BuildConfig
-import woowacourse.shopping.data.remote.CartItemService
-import woowacourse.shopping.data.remote.CouponService
-import woowacourse.shopping.data.remote.OkHttpClientProvider
-import woowacourse.shopping.data.remote.ProductService
+import woowacourse.shopping.data.service.CartItemService
+import woowacourse.shopping.data.service.CouponService
+import woowacourse.shopping.data.service.OkHttpClientProvider
+import woowacourse.shopping.data.service.ProductService
 
 object NetworkModule {
     private const val BASE_URL = BuildConfig.BASE_URL

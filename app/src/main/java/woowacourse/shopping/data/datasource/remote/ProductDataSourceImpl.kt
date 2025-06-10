@@ -2,7 +2,7 @@ package woowacourse.shopping.data.datasource.remote
 
 import retrofit2.HttpException
 import woowacourse.shopping.data.dto.product.ProductContent
-import woowacourse.shopping.data.remote.ProductService
+import woowacourse.shopping.data.service.ProductService
 
 class ProductDataSourceImpl(
     private val productService: ProductService,

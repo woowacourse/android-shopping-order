@@ -7,7 +7,7 @@ import woowacourse.shopping.data.dto.cart.CartIdResponse
 import woowacourse.shopping.data.dto.cart.CartItemCountResponse
 import woowacourse.shopping.data.dto.cart.CartItemRequest
 import woowacourse.shopping.data.dto.cart.UpdateCartRequest
-import woowacourse.shopping.data.remote.CartItemService
+import woowacourse.shopping.data.service.CartItemService
 
 class CartDataSourceImpl(
     private val cartItemService: CartItemService,

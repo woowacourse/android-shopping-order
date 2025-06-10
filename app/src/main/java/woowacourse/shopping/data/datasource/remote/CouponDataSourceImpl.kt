@@ -2,7 +2,7 @@ package woowacourse.shopping.data.datasource.remote
 
 import retrofit2.HttpException
 import woowacourse.shopping.data.dto.coupon.CouponResponse
-import woowacourse.shopping.data.remote.CouponService
+import woowacourse.shopping.data.service.CouponService
 
 class CouponDataSourceImpl(
     private val couponService: CouponService,
