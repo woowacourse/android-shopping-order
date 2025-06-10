@@ -51,9 +51,10 @@ class CartRepositoryImpl(
         )
     }
 
-    override suspend fun addCartItem(cartItem: CartItem) {
+    override suspend fun addCartItem(cartItem: CartItem): CartItem? {
         val request = CartItemRequest(cartItem.product.id, cartItem.quantity)
         cartItemDataSource.submitCartItem(request)
+        return loadCartItemByProductId(cartItem.product.id)
     }
 
     override suspend fun deleteCartItem(cartId: Long) {

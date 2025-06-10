@@ -141,9 +141,7 @@ class CartViewModel(
 
     private suspend fun addToCart(cartItem: CartItemUiModel) {
         val newItem = cartItem.cartItem.copy(quantity = 1)
-        cartRepository.addCartItem(newItem)
-        val addedItem = cartRepository.loadCartItemByProductId(cartItem.cartItem.product.id)
-        if (addedItem != null) {
+        cartRepository.addCartItem(newItem)?.let { addedItem ->
             _cartItems.postValue(_cartItems.value?.plus(cartItem.copy(cartItem = newItem)))
             _itemUpdateEvent.postValue(addedItem.toCartItemUiModel().copy(isSelected = true))
             setCartItemSelection(addedItem.toCartItemUiModel(), true)

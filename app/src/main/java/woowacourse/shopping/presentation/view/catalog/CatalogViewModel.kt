@@ -124,10 +124,10 @@ class CatalogViewModel(
 
     private suspend fun addToCart(cartItem: CartItemUiModel) {
         val newItem = cartItem.cartItem.copy(quantity = 1)
-        cartRepository.addCartItem(newItem)
-        val addedItem = cartRepository.loadCartItemByProductId(cartItem.cartItem.product.id)
-        _itemUpdateEvent.postValue(addedItem?.toProductUiModel())
-        calculateTotalCartCount()
+        cartRepository.addCartItem(newItem)?.let { addedItem ->
+            _itemUpdateEvent.postValue(addedItem.toProductUiModel())
+            calculateTotalCartCount()
+        }
     }
 
     private suspend fun calculateTotalCartCount() {

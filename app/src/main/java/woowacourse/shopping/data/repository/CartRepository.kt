@@ -19,7 +19,7 @@ interface CartRepository {
 
     suspend fun decreaseQuantity(cartItem: CartItem)
 
-    suspend fun addCartItem(cartItem: CartItem)
+    suspend fun addCartItem(cartItem: CartItem): CartItem?
 
     suspend fun deleteCartItem(cartId: Long)
 
