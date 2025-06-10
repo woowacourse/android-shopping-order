@@ -107,6 +107,7 @@ class CartViewModel(
                     cartItem.copy(quantity = cartItem.quantity + 1),
                     isSelected = _selectedProductIds.value.orEmpty().contains(product.id),
                 )
+            updateSelectionInfo()
             loadPageOfShoppingCart()
 
             isProcessingRequest = false
@@ -131,6 +132,7 @@ class CartViewModel(
                     cartItem.copy(quantity = cartItem.quantity - 1),
                     isSelected = _selectedProductIds.value.orEmpty().contains(product.id),
                 )
+            updateSelectionInfo()
             loadPageOfShoppingCart()
 
             isProcessingRequest = false
