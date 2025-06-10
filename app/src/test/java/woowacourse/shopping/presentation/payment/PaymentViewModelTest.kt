@@ -8,13 +8,13 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.data.model.Coupon
 import woowacourse.shopping.data.model.CouponType
-import woowacourse.shopping.data.util.TestTimeProvider
 import woowacourse.shopping.fixture.CouponFixture
 import woowacourse.shopping.fixture.FakeCouponRepository
 import woowacourse.shopping.fixture.FakeOrderRepository
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.util.CoroutinesTestExtension
 import woowacourse.shopping.util.InstantTaskExecutorExtension
+import woowacourse.shopping.util.TestTimeProvider
 import woowacourse.shopping.util.getOrAwaitValue
 import java.time.LocalDateTime
 import kotlin.test.Test
