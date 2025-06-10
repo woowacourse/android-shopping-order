@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.recommend
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -102,8 +103,8 @@ class RecommendActivity : AppCompatActivity() {
     }
 
     private fun navigateToOrder() {
-        val selectedProducts = viewModel.selectedProducts.value ?: emptyList()
         binding.buttonOrder.setOnClickListener {
+            val selectedProducts = viewModel.selectedProducts.value ?: emptyList()
             val newIntent = OrderActivity.newIntent(this@RecommendActivity, selectedProducts)
             startActivity(newIntent)
         }
