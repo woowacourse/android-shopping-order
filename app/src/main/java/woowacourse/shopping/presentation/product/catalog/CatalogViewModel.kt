@@ -104,28 +104,19 @@ class CatalogViewModel(
 
     fun loadInitialCatalogProducts(pageSize: Int = PAGE_SIZE) {
         currentPage = 0
-        loadCatalogProducts(currentPage, pageSize)
-        currentPage++
+        loadCatalogProducts(pageSize)
     }
 
-    fun loadNextCatalogProducts(pageSize: Int = PAGE_SIZE) {
-        loadCatalogProducts(currentPage, pageSize)
-        currentPage++
-    }
-
-    private fun loadCatalogProducts(
-        page: Int,
-        pageSize: Int = PAGE_SIZE,
-    ) {
+    fun loadCatalogProducts(pageSize: Int = PAGE_SIZE) {
         viewModelScope.launch {
-            val result = productsRepository.getProducts(page, pageSize)
+            val result = productsRepository.getProducts(currentPage, pageSize)
 
             result.onSuccess { pagingData ->
                 val newPagingData = cartRepository.getQuantity(pagingData)
                 val updatedProducts = newPagingData.products.map { it.copy() }
 
                 val finalProducts =
-                    if (page == 0) {
+                    if (currentPage == 0) {
                         updatedProducts
                     } else {
                         val currentProducts = _pagingData.value?.products.orEmpty()
@@ -133,8 +124,13 @@ class CatalogViewModel(
                     }
 
                 _pagingData.postValue(newPagingData.copy(products = finalProducts))
+                currentPage++
             }
         }
+    }
+
+    fun loadNextCatalogProducts(pageSize: Int = PAGE_SIZE) {
+        loadCatalogProducts(pageSize)
     }
 
     fun loadRecentViewedItems() {
