@@ -7,7 +7,7 @@ interface RecentProductRepository {
 
     suspend fun getPagedProducts(
         limit: Int,
-        offset: Int = 0,
+        offset: Int,
     ): Result<List<RecentProduct>>
 
     suspend fun replaceRecentProduct(recentProduct: RecentProduct): Result<Unit>

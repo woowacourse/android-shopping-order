@@ -11,18 +11,18 @@ import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
 import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.cart.GetTotalCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 import woowacourse.shopping.domain.usecase.product.GetProductsUseCase
+import woowacourse.shopping.domain.usecase.product.GetRecentProductsUseCase
 import woowacourse.shopping.view.product.catalog.adapter.ProductCatalogItem
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
 class ProductCatalogViewModel(
-    private val recentProductRepository: RecentProductRepository,
+    private val getRecentProductsUseCase: GetRecentProductsUseCase,
     private val getProductsUseCase: GetProductsUseCase,
     private val getCartProductsUseCase: GetCartProductsUseCase,
     private val getTotalCartProductQuantityUseCase: GetTotalCartProductQuantityUseCase,
@@ -103,13 +103,10 @@ class ProductCatalogViewModel(
 
     private fun loadRecentProducts() {
         viewModelScope.launch {
-            recentProductRepository
-                .getPagedProducts(RECENT_PRODUCT_SIZE_LIMIT)
+            getRecentProductsUseCase(RECENT_PRODUCT_SIZE_LIMIT)
                 .onSuccess {
                     recentProducts.postValue(it)
-                }.onFailure {
-                    Log.e("error", it.message.toString())
-                }
+                }.onFailure { Log.e("error", it.message.toString()) }
         }
     }
 

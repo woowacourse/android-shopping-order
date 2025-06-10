@@ -15,6 +15,7 @@ import woowacourse.shopping.domain.usecase.cart.GetTotalCartProductQuantityUseCa
 import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 import woowacourse.shopping.domain.usecase.product.GetProductsUseCase
+import woowacourse.shopping.domain.usecase.product.GetRecentProductsUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.fixture.FakeProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
@@ -33,6 +34,7 @@ class ProductCatalogViewModelTest {
     private lateinit var cartProductRepository: CartProductRepository
     private lateinit var recentProductRepository: RecentProductRepository
 
+    private lateinit var getRecentProductsUseCase: GetRecentProductsUseCase
     private lateinit var getProductsUseCase: GetProductsUseCase
     private lateinit var getCartProductsUseCase: GetCartProductsUseCase
     private lateinit var getTotalCartProductQuantityUseCase: GetTotalCartProductQuantityUseCase
@@ -47,6 +49,7 @@ class ProductCatalogViewModelTest {
             cartProductRepository = FakeCartProductRepository()
             recentProductRepository = FakeRecentProductRepository()
 
+            getRecentProductsUseCase = GetRecentProductsUseCase(recentProductRepository)
             getProductsUseCase = GetProductsUseCase(productRepository)
             getCartProductsUseCase = GetCartProductsUseCase(cartProductRepository)
             getTotalCartProductQuantityUseCase = GetTotalCartProductQuantityUseCase(cartProductRepository)
@@ -57,7 +60,7 @@ class ProductCatalogViewModelTest {
             repeat(12) { id -> cartProductRepository.insert(id, 1) }
             viewModel =
                 ProductCatalogViewModel(
-                    recentProductRepository,
+                    getRecentProductsUseCase,
                     getProductsUseCase,
                     getCartProductsUseCase,
                     getTotalCartProductQuantityUseCase,

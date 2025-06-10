@@ -2,15 +2,15 @@ package woowacourse.shopping.view.product.catalog
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
 import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.cart.GetTotalCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 import woowacourse.shopping.domain.usecase.product.GetProductsUseCase
+import woowacourse.shopping.domain.usecase.product.GetRecentProductsUseCase
 
 class ProductCatalogViewModelFactory(
-    private val recentProductRepository: RecentProductRepository,
+    private val getRecentProductsUseCase: GetRecentProductsUseCase,
     private val getProductsUseCase: GetProductsUseCase,
     private val getCartProductsUseCase: GetCartProductsUseCase,
     private val getTotalCartProductQuantityUseCase: GetTotalCartProductQuantityUseCase,
@@ -21,7 +21,7 @@ class ProductCatalogViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ProductCatalogViewModel::class.java)) {
             return ProductCatalogViewModel(
-                recentProductRepository,
+                getRecentProductsUseCase,
                 getProductsUseCase,
                 getCartProductsUseCase,
                 getTotalCartProductQuantityUseCase,
