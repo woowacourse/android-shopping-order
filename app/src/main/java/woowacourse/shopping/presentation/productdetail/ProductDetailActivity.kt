@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -117,7 +116,6 @@ class ProductDetailActivity :
     }
 
     override fun onClickPlus(id: Long) {
-        Log.d("meeple_log", "onclick")
         viewModel.increaseQuantity()
     }
 

@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.cart
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -76,7 +75,6 @@ class CartViewModel(
             cartRepository
                 .deleteProduct(cartItem.product.id)
                 .onSuccess {
-                    Log.d("meeple_log", "suceess")
                     _toastMessage.value = R.string.cart_toast_delete_success
                     loadItems()
                 }.onFailure {
