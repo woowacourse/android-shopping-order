@@ -13,6 +13,8 @@ import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.ui.cart.CartActivity.OnClickHandler
 import woowacourse.shopping.ui.common.DataBindingActivity
 import woowacourse.shopping.ui.model.ActivityResult
+import woowacourse.shopping.ui.model.CartProductUiModel
+import woowacourse.shopping.ui.payment.PaymentActivity
 
 class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_cart) {
     private val viewModel: CartViewModel by viewModels { CartViewModel.Factory }
@@ -61,32 +63,37 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
                         binding.cartCheckAllButtonText.visibility = View.GONE
                     }
 
-                    is CartRecommendFragment -> viewModel.orderProducts()
+                    is CartRecommendFragment -> {
+                        val intent = PaymentActivity.newIntent(this, viewModel.getSelectedProductIds().toLongArray())
+                        startActivity(intent)
+                        finish()
+                    }
                 }
             }
     }
 
     private fun initObservers() {
-        viewModel.editedProductIds.observe(this) { editedProductIds ->
-            setResult(
-                ActivityResult.CART_PRODUCT_EDITED.code,
-                Intent().apply {
-                    putExtra(
-                        ActivityResult.CART_PRODUCT_EDITED.key,
-                        editedProductIds.toLongArray(),
-                    )
-                },
-            )
+        viewModel.uiModel.observe(this) { uiModel ->
+            handleCartProducts(uiModel)
+            handleErrorMessage(uiModel)
         }
+    }
 
-        viewModel.isOrdered.observe(this) {
-            finish()
-        }
+    private fun handleCartProducts(uiModel: CartProductUiModel) {
+        setResult(
+            ActivityResult.CART_PRODUCT_EDITED.code,
+            Intent().apply {
+                putExtra(
+                    ActivityResult.CART_PRODUCT_EDITED.key,
+                    uiModel.editedProductIds.toLongArray(),
+                )
+            },
+        )
+    }
 
-        viewModel.isError.observe(this) { errorMessage ->
-            errorMessage?.let {
-                Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
-            }
+    private fun handleErrorMessage(uiModel: CartProductUiModel) {
+        uiModel.connectionErrorMessage?.let {
+            Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
         }
     }
 

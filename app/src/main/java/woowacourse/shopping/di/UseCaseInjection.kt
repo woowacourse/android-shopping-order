@@ -1,17 +1,19 @@
 package woowacourse.shopping.di
 
-import woowacourse.shopping.di.RepositoryModule.cartRepository
-import woowacourse.shopping.di.RepositoryModule.historyRepository
-import woowacourse.shopping.di.RepositoryModule.orderRepository
-import woowacourse.shopping.di.RepositoryModule.productRepository
+import woowacourse.shopping.di.RepositoryInjection.cartRepository
+import woowacourse.shopping.di.RepositoryInjection.couponRepository
+import woowacourse.shopping.di.RepositoryInjection.historyRepository
+import woowacourse.shopping.di.RepositoryInjection.orderRepository
+import woowacourse.shopping.di.RepositoryInjection.productRepository
 import woowacourse.shopping.domain.usecase.AddSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.DecreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCartProductsQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.GetCartRecommendProductsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
-import woowacourse.shopping.domain.usecase.GetCatalogProductsByIdsUseCase
+import woowacourse.shopping.domain.usecase.GetCatalogProductsByProductIdsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsUseCase
+import woowacourse.shopping.domain.usecase.GetCouponsUseCase
 import woowacourse.shopping.domain.usecase.GetRecentSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.GetSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
@@ -19,7 +21,7 @@ import woowacourse.shopping.domain.usecase.OrderProductsUseCase
 import woowacourse.shopping.domain.usecase.RemoveCartProductUseCase
 import woowacourse.shopping.domain.usecase.UpdateCartProductUseCase
 
-object UseCaseModule {
+object UseCaseInjection {
     val getCartProductsUseCase by lazy {
         GetCartProductsUseCase(cartRepository)
     }
@@ -60,8 +62,8 @@ object UseCaseModule {
         GetCatalogProductUseCase(productRepository, cartRepository)
     }
 
-    val getCatalogProductsByIdsUseCase by lazy {
-        GetCatalogProductsByIdsUseCase(productRepository, cartRepository)
+    val getCatalogProductsByProductIdsUseCase by lazy {
+        GetCatalogProductsByProductIdsUseCase(productRepository, cartRepository)
     }
 
     val getCartProductsQuantityUseCase by lazy {
@@ -73,6 +75,9 @@ object UseCaseModule {
     }
 
     val orderProductsUseCase by lazy {
-        OrderProductsUseCase(productRepository, cartRepository, orderRepository)
+        OrderProductsUseCase(orderRepository)
+    }
+    val getCouponsUseCase by lazy {
+        GetCouponsUseCase(couponRepository)
     }
 }

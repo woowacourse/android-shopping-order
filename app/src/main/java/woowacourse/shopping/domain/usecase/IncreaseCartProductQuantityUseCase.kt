@@ -6,48 +6,33 @@ import woowacourse.shopping.domain.repository.CartRepository
 class IncreaseCartProductQuantityUseCase(
     private val repository: CartRepository,
 ) {
-    operator fun invoke(
+    suspend operator fun invoke(
         product: Product,
         step: Int = DEFAULT_QUANTITY_STEP,
-        callback: (quantity: Result<Int>) -> Unit = {},
-    ) {
+    ): Int {
         val newQuantity = product.quantity + step
 
         if (product.cartId == null) {
-            addCartProduct(product, newQuantity, callback)
+            addCartProduct(product, newQuantity)
         } else {
-            updateCartProduct(product.cartId, newQuantity, callback)
+            updateCartProduct(product.cartId, newQuantity)
         }
+
+        return newQuantity
     }
 
-    private fun addCartProduct(
+    private suspend fun addCartProduct(
         product: Product,
         newQuantity: Int,
-        callback: (quantity: Result<Int>) -> Unit,
     ) {
-        repository.addCartProduct(product.productDetail.id, newQuantity) { result ->
-            result
-                .onSuccess {
-                    callback(Result.success(newQuantity))
-                }.onFailure {
-                    callback(Result.failure(it))
-                }
-        }
+        repository.addCartProduct(product.productDetail.id, newQuantity)
     }
 
-    private fun updateCartProduct(
+    private suspend fun updateCartProduct(
         cartId: Long,
         newQuantity: Int,
-        callback: (quantity: Result<Int>) -> Unit,
     ) {
-        repository.updateCartProduct(cartId, newQuantity) { result ->
-            result
-                .onSuccess {
-                    callback(Result.success(newQuantity))
-                }.onFailure {
-                    callback(Result.failure(it))
-                }
-        }
+        repository.updateCartProduct(cartId, newQuantity)
     }
 
     companion object {

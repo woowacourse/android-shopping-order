@@ -8,51 +8,31 @@ class GetCatalogProductUseCase(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) {
-    operator fun invoke(
-        productId: Long,
-        callback: (product: Result<Product?>) -> Unit,
-    ) {
-        productRepository.fetchAllProducts { result ->
-            result
-                .onSuccess { catalogProducts ->
-                    catalogProducts.find { product -> product.productDetail.id == productId }?.let { catalogProduct ->
-                        combineCartProduct(productId, catalogProduct, callback)
-                    } ?: return@fetchAllProducts callback(Result.success(null))
-                }.onFailure {
-                    callback(Result.failure(it))
-                }
-        }
+    suspend operator fun invoke(productId: Long): Product {
+        val productDetail = productRepository.fetchProduct(productId)
+        val product = Product(productDetail)
+        return combineCartProduct(productId, product)
     }
 
-    private fun combineCartProduct(
+    private suspend fun combineCartProduct(
         productId: Long,
         catalogProduct: Product,
-        callback: (product: Result<Product?>) -> Unit,
-    ) {
-        cartRepository.fetchAllCartProducts { result ->
-            result
-                .onSuccess { cartProducts ->
-                    val cartProductsByProductId: Map<Long, Product> =
-                        cartProducts.products.associateBy { product ->
-                            product.productDetail.id
-                        }
-                    val updatedProduct = getUpdatedProduct(cartProductsByProductId, productId, catalogProduct)
+    ): Product {
+        val cartProducts = cartRepository.fetchAllCartProducts()
+        val cartProductsByProductId = cartProducts.products.associateBy { it.productDetail.id }
 
-                    callback(Result.success(updatedProduct))
-                }.onFailure {
-                    callback(Result.failure(it))
-                }
-        }
+        return updateProduct(cartProductsByProductId, productId, catalogProduct)
     }
 
-    private fun getUpdatedProduct(
+    private fun updateProduct(
         cartProducts: Map<Long, Product>,
         productId: Long,
         catalogProduct: Product,
-    ) = cartProducts[productId]?.let { cartProduct ->
-        catalogProduct.copy(
-            cartId = cartProduct.cartId,
-            quantity = cartProduct.quantity,
-        )
-    } ?: catalogProduct
+    ): Product =
+        cartProducts[productId]?.let { cartProduct ->
+            catalogProduct.copy(
+                cartId = cartProduct.cartId,
+                quantity = cartProduct.quantity,
+            )
+        } ?: catalogProduct
 }

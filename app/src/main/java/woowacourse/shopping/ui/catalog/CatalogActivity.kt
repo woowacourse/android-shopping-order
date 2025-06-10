@@ -19,6 +19,7 @@ import woowacourse.shopping.ui.catalog.adapter.product.CatalogAdapter.OnClickHan
 import woowacourse.shopping.ui.catalog.adapter.product.CatalogLayoutManager
 import woowacourse.shopping.ui.common.DataBindingActivity
 import woowacourse.shopping.ui.model.ActivityResult
+import woowacourse.shopping.ui.model.CatalogUiModel
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 
 class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.activity_catalog) {
@@ -76,7 +77,7 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
             }
 
             override fun onLoadMoreClick() {
-                viewModel.loadMoreCartProducts()
+                viewModel.loadMoreCatalogProducts()
             }
         }
 
@@ -112,19 +113,25 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
     }
 
     private fun initObservers() {
-        viewModel.products.observe(this) { products ->
-            catalogAdapter.submitItems(products.products, !products.page.isLast)
-            viewModel.loadCartProductsQuantity()
+        viewModel.uiModel.observe(this) { uiModel ->
+            handleCatalogProducts(uiModel)
+            handleHistoryProducts(uiModel)
+            handlerErrorMessage(uiModel)
         }
+    }
 
-        viewModel.historyProducts.observe(this) { products ->
-            historyProductAdapter.submitItems(products)
-        }
+    private fun handleCatalogProducts(uiModel: CatalogUiModel) {
+        catalogAdapter.submitItems(uiModel.catalogProducts.products, !uiModel.catalogProducts.page.isLast)
+        viewModel.loadCartProductsQuantity()
+    }
 
-        viewModel.isError.observe(this) { errorMessage ->
-            errorMessage?.let {
-                Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
-            }
+    private fun handleHistoryProducts(uiModel: CatalogUiModel) {
+        historyProductAdapter.submitItems(uiModel.historyProducts)
+    }
+
+    private fun handlerErrorMessage(uiModel: CatalogUiModel) {
+        uiModel.connectionErrorMessage?.let {
+            Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
         }
     }
 
@@ -152,7 +159,7 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
                         )
 
                     ActivityResult.CART_PRODUCT_EDITED.code ->
-                        viewModel.loadCartProductsByIds(
+                        viewModel.loadCartProductsByProductIds(
                             result.data
                                 ?.getLongArrayExtra(ActivityResult.CART_PRODUCT_EDITED.key)
                                 ?.toList() ?: emptyList(),

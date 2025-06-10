@@ -1,8 +1,6 @@
 package woowacourse.shopping.domain.usecase
 
-import woowacourse.shopping.domain.model.HistoryProduct
 import woowacourse.shopping.domain.model.Products
-import woowacourse.shopping.domain.model.Products.Companion.EMPTY_PRODUCTS
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -12,48 +10,34 @@ class GetCartRecommendProductsUseCase(
     private val cartRepository: CartRepository,
     private val historyRepository: HistoryRepository,
 ) {
-    operator fun invoke(callback: (products: Result<Products>) -> Unit) {
-        historyRepository.fetchRecentHistory { historyProduct ->
-            if (historyProduct == null) {
-                callback(Result.success(EMPTY_PRODUCTS))
-            } else {
-                filterProductsByCategory(historyProduct, callback)
-            }
-        }
+    suspend operator fun invoke(): Products {
+        val recent = historyRepository.fetchRecentHistory()
+        return filterProductsByCategory(recent?.category)
     }
 
-    private fun filterProductsByCategory(
-        historyProduct: HistoryProduct,
-        callback: (products: Result<Products>) -> Unit,
-    ) {
-        productRepository.fetchProducts(0, Int.MAX_VALUE, historyProduct.category) { result ->
-            result
-                .onSuccess { catalogProducts ->
-                    combineCartProducts(catalogProducts, callback)
-                }.onFailure {
-                    callback(Result.failure(it))
-                }
-        }
+    private suspend fun filterProductsByCategory(category: String?): Products {
+        val products =
+            productRepository.fetchProducts(
+                page = 0,
+                size = Int.MAX_VALUE,
+                category = category,
+            )
+        return combineCartProducts(products)
     }
 
-    private fun combineCartProducts(
-        catalogProducts: Products,
-        callback: (products: Result<Products>) -> Unit,
-    ) {
-        cartRepository.fetchAllCartProducts { result ->
-            result
-                .onSuccess { cartProducts ->
-                    val cartProductIds = cartProducts.products.map { product -> product.productDetail.id }
-                    val filteredProducts =
-                        catalogProducts.products
-                            .filterNot { product ->
-                                product.productDetail.id in cartProductIds
-                            }.take(10)
+    private suspend fun combineCartProducts(catalogProducts: Products): Products {
+        val cartProducts = cartRepository.fetchAllCartProducts()
+        val cartProductIds = cartProducts.products.map { it.productDetail.id }
 
-                    callback(Result.success(Products(filteredProducts)))
-                }.onFailure {
-                    callback(Result.failure(it))
-                }
-        }
+        val filteredProducts =
+            catalogProducts.products
+                .filterNot { it.productDetail.id in cartProductIds }
+                .take(RECOMMEND_PRODUCT_COUNT)
+
+        return Products(filteredProducts)
+    }
+
+    companion object {
+        private const val RECOMMEND_PRODUCT_COUNT = 10
     }
 }

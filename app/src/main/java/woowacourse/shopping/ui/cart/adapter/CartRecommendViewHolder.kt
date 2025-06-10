@@ -13,10 +13,13 @@ class CartRecommendViewHolder private constructor(
 ) : RecyclerView.ViewHolder(binding.root) {
     private lateinit var item: Product
 
+    init {
+        binding.onClickHandler = onClickHandler
+    }
+
     fun bind(item: Product) {
         this.item = item
-        binding.product = this.item
-        binding.onClickHandler = onClickHandler
+        binding.product = item
         binding.cartRecommendProductCount.setOnClickHandler(
             object : CartCountView.OnClickHandler {
                 override fun onIncreaseClick() {

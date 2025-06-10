@@ -5,26 +5,18 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.api.CartApi
+import woowacourse.shopping.data.api.CouponApi
 import woowacourse.shopping.data.api.OrderApi
 import woowacourse.shopping.data.api.ProductApi
 import woowacourse.shopping.data.interceptor.ShoppingAuthInterceptor
-import woowacourse.shopping.di.PreferenceModule.authSharedPreference
+import woowacourse.shopping.di.PreferenceInjection.authSharedPreference
 
-object NetworkModule {
+object NetworkInjection {
     private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient
             .Builder()
             .addInterceptor(
-                ShoppingAuthInterceptor(
-                    authSharedPreference.getAuthUsername()
-                        ?: BuildConfig.DEFAULT_USERNAME.apply {
-                            authSharedPreference.putAuthId(this)
-                        },
-                    authSharedPreference.getAuthPassword()
-                        ?: BuildConfig.DEFAULT_PASSWORD.apply {
-                            authSharedPreference.putAuthPassword(this)
-                        },
-                ),
+                ShoppingAuthInterceptor(authSharedPreference),
             ).build()
     }
 
@@ -45,5 +37,8 @@ object NetworkModule {
     }
     val orderApi: OrderApi by lazy {
         retrofit.create(OrderApi::class.java)
+    }
+    val couponApi: CouponApi by lazy {
+        retrofit.create(CouponApi::class.java)
     }
 }

@@ -1,6 +1,7 @@
+@file:Suppress("ktlint:standard:no-empty-file")
+
 package woowacourse.shopping.study.data.dao
 
-class CartDaoStudyTest
 /*
 import android.content.Context
 import android.os.SystemClock

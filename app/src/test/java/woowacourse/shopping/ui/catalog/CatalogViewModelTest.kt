@@ -1,196 +1,210 @@
 package woowacourse.shopping.ui.catalog
 
+import android.util.Log
 import com.google.common.truth.Truth.assertThat
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.unmockkAll
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import woowacourse.shopping.domain.model.HistoryProduct
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.usecase.DecreaseCartProductQuantityUseCase
+import woowacourse.shopping.domain.usecase.GetCartProductsQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
-import woowacourse.shopping.domain.usecase.GetCatalogProductsByIdsUseCase
+import woowacourse.shopping.domain.usecase.GetCatalogProductsByProductIdsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsUseCase
 import woowacourse.shopping.domain.usecase.GetSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
-import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCTS_1
-import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCTS_2
-import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_1
-import woowacourse.shopping.model.DUMMY_CATALOG_PRODUCT_2
 import woowacourse.shopping.model.DUMMY_HISTORY_PRODUCT_1
-import woowacourse.shopping.model.DUMMY_PRODUCT_Detail_1
+import woowacourse.shopping.model.DUMMY_PRODUCTS_1
+import woowacourse.shopping.model.DUMMY_PRODUCTS_2
+import woowacourse.shopping.model.DUMMY_PRODUCTS_3
+import woowacourse.shopping.model.DUMMY_PRODUCT_1
+import woowacourse.shopping.ui.model.CatalogUiModel
+import woowacourse.shopping.util.CoroutinesTestExtension
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 import woowacourse.shopping.util.getOrAwaitValue
 import woowacourse.shopping.util.setUpTestLiveData
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
+@ExtendWith(CoroutinesTestExtension::class)
 class CatalogViewModelTest {
     private lateinit var getCatalogProductsUseCase: GetCatalogProductsUseCase
     private lateinit var getCatalogProductUseCase: GetCatalogProductUseCase
-    private lateinit var getCatalogProductsByIdsUseCase: GetCatalogProductsByIdsUseCase
+    private lateinit var getCatalogProductsByProductIdsUseCase: GetCatalogProductsByProductIdsUseCase
     private lateinit var getSearchHistoryUseCase: GetSearchHistoryUseCase
     private lateinit var increaseCartProductQuantityUseCase: IncreaseCartProductQuantityUseCase
     private lateinit var decreaseCartProductQuantityUseCase: DecreaseCartProductQuantityUseCase
+    private lateinit var getCartProductsQuantityUseCase: GetCartProductsQuantityUseCase
+
     private lateinit var viewModel: CatalogViewModel
 
     @BeforeEach
     fun setup() {
         getCatalogProductsUseCase = mockk()
         getCatalogProductUseCase = mockk()
-        getCatalogProductsByIdsUseCase = mockk()
+        getCatalogProductsByProductIdsUseCase = mockk()
         getSearchHistoryUseCase = mockk()
         increaseCartProductQuantityUseCase = mockk()
         decreaseCartProductQuantityUseCase = mockk()
+        getCartProductsQuantityUseCase = mockk()
 
-        every {
-            getCatalogProductsUseCase.invoke(any(), any(), any())
-        } answers {
-            thirdArg<(Products) -> Unit>().invoke(DUMMY_CATALOG_PRODUCTS_1)
-        }
+        coEvery { getCatalogProductsUseCase(any(), any()) } returns DUMMY_PRODUCTS_1
 
         viewModel =
             CatalogViewModel(
                 getCatalogProductsUseCase,
                 getCatalogProductUseCase,
-                getCatalogProductsByIdsUseCase,
+                getCatalogProductsByProductIdsUseCase,
                 getSearchHistoryUseCase,
                 increaseCartProductQuantityUseCase,
                 decreaseCartProductQuantityUseCase,
+                getCartProductsQuantityUseCase,
             )
+
+        mockkStatic(Log::class)
+        every { Log.e(any(), any()) } returns 0
     }
 
     @Test
-    fun `전체 상품 목록과 다른 상품 존재 여부를 불러온다`() {
-        // given
-        setUpTestLiveData(DUMMY_CATALOG_PRODUCTS_1, "_catalogProducts", viewModel)
-
-        val newProduct = DUMMY_CATALOG_PRODUCT_2
-        val newData = Products(products = listOf(newProduct), hasMore = false)
-
-        every {
-            getCatalogProductsUseCase.invoke(any(), any(), any())
-        } answers {
-            thirdArg<(Products) -> Unit>().invoke(newData)
-        }
-
-        // when
-        viewModel.loadCartProducts()
-
-        // then
-        val result = viewModel.products.getOrAwaitValue()
-        assertThat(result.products).containsExactlyElementsIn(DUMMY_CATALOG_PRODUCTS_1.products + newProduct)
-        assertThat(result.hasMore).isFalse()
+    fun `ViewModel이 초기화되면 상품 목록을 불러온다`() {
+        val state = viewModel.uiModel.getOrAwaitValue()
+        assertThat(state.catalogProducts.products).containsExactlyElementsIn(DUMMY_PRODUCTS_1.products)
+        assertThat(state.isProductsLoading).isFalse()
     }
 
     @Test
-    fun `최근에 탐색한 상품 목록을 불러온다`() {
-        // given
-        val expected = listOf(DUMMY_HISTORY_PRODUCT_1)
+    fun `상품을 더 불러오면 페이지가 증가하고 기존 목록에 추가된다`() =
+        runTest {
+            coEvery { getCatalogProductsUseCase(any(), any()) } returns DUMMY_PRODUCTS_3
 
-        every {
-            getSearchHistoryUseCase.invoke(any())
-        } answers {
-            firstArg<(List<HistoryProduct>) -> Unit>().invoke(expected)
+            setUpTestLiveData(
+                CatalogUiModel(catalogProducts = DUMMY_PRODUCTS_1),
+                "_uiModel",
+                viewModel,
+            )
+
+            viewModel.loadMoreCatalogProducts()
+            advanceUntilIdle()
+
+            val state = viewModel.uiModel.getOrAwaitValue()
+            assertThat(state.catalogProducts.products).containsExactlyElementsIn(
+                DUMMY_PRODUCTS_1.products + DUMMY_PRODUCTS_3.products,
+            )
         }
-
-        // when
-        viewModel.loadHistoryProducts()
-
-        // then
-        val result = viewModel.historyProducts.getOrAwaitValue()
-        assertThat(result).containsExactlyElementsIn(expected)
-    }
 
     @Test
-    fun `장바구니 상품 갯수를 증가시킨다`() {
-        // given
-        val productId = DUMMY_CATALOG_PRODUCT_1.productDetail.id
-        setUpTestLiveData(DUMMY_CATALOG_PRODUCTS_1, "_catalogProducts", viewModel)
+    fun `장바구니 수량을 증가시키면 상품 수량에 반영된다`() =
+        runTest {
+            val updatedProduct = DUMMY_PRODUCT_1.copy(quantity = 10)
 
-        every {
-            increaseCartProductQuantityUseCase.invoke(eq(productId), any(), any())
-        } answers {
-            thirdArg<(Int) -> Unit>().invoke(10)
+            coEvery { increaseCartProductQuantityUseCase(any()) } returns 10
+            coEvery { getCatalogProductUseCase(DUMMY_PRODUCT_1.productDetail.id) } returns updatedProduct
+
+            setUpTestLiveData(
+                CatalogUiModel(catalogProducts = DUMMY_PRODUCTS_2),
+                "_uiModel",
+                viewModel,
+            )
+
+            viewModel.increaseCartProduct(DUMMY_PRODUCT_1.productDetail.id)
+            advanceUntilIdle()
+
+            val result = viewModel.uiModel.getOrAwaitValue()
+            assertThat(result.catalogProducts.getProductByProductId(updatedProduct.productDetail.id)?.quantity).isEqualTo(10)
         }
-
-        // when
-        viewModel.increaseCartProduct(productId)
-
-        // then
-        val updated = viewModel.products.getOrAwaitValue()
-        assertThat(updated.products.first { it.productDetail.id == productId }.quantity).isEqualTo(
-            10,
-        )
-    }
 
     @Test
-    fun `장바구니 상품 갯수를 감소시킨다`() {
-        // given
-        val productId = DUMMY_CATALOG_PRODUCT_1.productDetail.id
-        setUpTestLiveData(DUMMY_CATALOG_PRODUCTS_1, "_catalogProducts", viewModel)
+    fun `장바구니 수량을 감소시키면 상품 수량에 반영된다`() =
+        runTest {
+            val updatedProduct = DUMMY_PRODUCT_1.copy(quantity = 3)
 
-        every {
-            decreaseCartProductQuantityUseCase.invoke(eq(productId), any(), any())
-        } answers {
-            thirdArg<(Int) -> Unit>().invoke(1)
+            coEvery { decreaseCartProductQuantityUseCase(any()) } returns 3
+            coEvery { getCatalogProductUseCase(DUMMY_PRODUCT_1.productDetail.id) } returns updatedProduct
+
+            setUpTestLiveData(
+                CatalogUiModel(catalogProducts = DUMMY_PRODUCTS_2),
+                "_uiModel",
+                viewModel,
+            )
+
+            viewModel.decreaseCartProduct(DUMMY_PRODUCT_1.productDetail.id)
+            advanceUntilIdle()
+
+            val result = viewModel.uiModel.getOrAwaitValue()
+            assertThat(result.catalogProducts.getProductByProductId(updatedProduct.productDetail.id)?.quantity).isEqualTo(3)
         }
-
-        // when
-        viewModel.decreaseCartProduct(productId)
-
-        // then
-        val updated = viewModel.products.getOrAwaitValue()
-        assertThat(updated.products.first { it.productDetail.id == productId }.quantity).isEqualTo(1)
-    }
 
     @Test
-    fun `특정 상품의 정보를 불러와 상품 목록에 반영한다`() {
-        // given
-        val productId = DUMMY_CATALOG_PRODUCT_1.productDetail.id
-        setUpTestLiveData(DUMMY_CATALOG_PRODUCTS_1, "_catalogProducts", viewModel)
+    fun `특정 상품 정보를 불러오면 상품 목록에 반영된다`() =
+        runTest {
+            val updatedProduct = DUMMY_PRODUCT_1.copy(quantity = 1234)
 
-        val updatedProduct = DUMMY_CATALOG_PRODUCT_1.copy(quantity = 100)
+            coEvery { getCatalogProductUseCase(DUMMY_PRODUCT_1.productDetail.id) } returns updatedProduct
 
-        every {
-            getCatalogProductUseCase.invoke(eq(productId), any())
-        } answers {
-            secondArg<(Product?) -> Unit>().invoke(updatedProduct)
+            setUpTestLiveData(
+                CatalogUiModel(catalogProducts = DUMMY_PRODUCTS_1),
+                "_uiModel",
+                viewModel,
+            )
+
+            viewModel.loadCartProduct(DUMMY_PRODUCT_1.productDetail.id)
+            advanceUntilIdle()
+
+            val result = viewModel.uiModel.getOrAwaitValue()
+            assertThat(result.catalogProducts.getProductByProductId(updatedProduct.productDetail.id)?.quantity).isEqualTo(1234)
         }
-
-        // when
-        viewModel.loadCartProduct(productId)
-
-        // then
-        val result = viewModel.products.getOrAwaitValue()
-        assertThat(result.products.first { it.productDetail.id == productId }.quantity).isEqualTo(
-            100,
-        )
-    }
 
     @Test
-    fun `특정 상품들의 정보를 불러와 상품 목록에 반영한다`() {
-        // given
-        setUpTestLiveData(DUMMY_CATALOG_PRODUCTS_2, "_catalogProducts", viewModel)
+    fun `여러 상품 정보를 불러오면 상품 목록에 반영된다`() =
+        runTest {
+            val updated = listOf(DUMMY_PRODUCT_1.copy(quantity = 1234))
 
-        val updatedProducts = listOf(DUMMY_CATALOG_PRODUCT_1.copy(quantity = 6))
+            coEvery { getCatalogProductsByProductIdsUseCase(any()) } returns updated
 
-        every {
-            getCatalogProductsByIdsUseCase.invoke(any(), any())
-        } answers {
-            secondArg<(List<Product>) -> Unit>().invoke(updatedProducts)
+            setUpTestLiveData(
+                CatalogUiModel(catalogProducts = DUMMY_PRODUCTS_2),
+                "_uiModel",
+                viewModel,
+            )
+
+            viewModel.loadCartProductsByProductIds(listOf(DUMMY_PRODUCT_1.productDetail.id))
+            advanceUntilIdle()
+
+            val result = viewModel.uiModel.getOrAwaitValue()
+            assertThat(result.catalogProducts.products).containsExactlyElementsIn(updated)
         }
 
-        // when
-        viewModel.loadCartProductsByIds(listOf(DUMMY_PRODUCT_Detail_1.id))
+    @Test
+    fun `최근 검색 상품 목록을 불러온다`() =
+        runTest {
+            coEvery { getSearchHistoryUseCase() } returns listOf(DUMMY_HISTORY_PRODUCT_1)
 
-        // then
-        val result = viewModel.products.getOrAwaitValue()
-        assertThat(result.products).containsExactlyElementsIn(updatedProducts)
-    }
+            viewModel.loadHistoryProducts()
+            advanceUntilIdle()
+
+            val result = viewModel.uiModel.getOrAwaitValue()
+            assertThat(result.historyProducts).containsExactly(DUMMY_HISTORY_PRODUCT_1)
+        }
+
+    @Test
+    fun `장바구니 상품 수량을 불러와서 상품 목록에 반영한다`() =
+        runTest {
+            coEvery { getCartProductsQuantityUseCase() } returns 10
+
+            viewModel.loadCartProductsQuantity()
+            advanceUntilIdle()
+
+            val result = viewModel.uiModel.getOrAwaitValue()
+            assertThat(result.cartProductsQuantity).isEqualTo(10)
+        }
 
     @AfterEach
     fun tearDown() {

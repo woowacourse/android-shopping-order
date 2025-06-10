@@ -1,13 +1,13 @@
 package woowacourse.shopping
 
 import android.app.Application
-import woowacourse.shopping.di.DatabaseModule
-import woowacourse.shopping.di.PreferenceModule
+import woowacourse.shopping.di.DatabaseInjection
+import woowacourse.shopping.di.PreferenceInjection
 
 class ShoppingApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        DatabaseModule.init(this)
-        PreferenceModule.init(this)
+        DatabaseInjection.init(this)
+        PreferenceInjection.init(this)
     }
 }
