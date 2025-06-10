@@ -15,11 +15,7 @@
 
         <variable
             name="viewModel"
-            type="woowacourse.shopping.view.shoppingCart.viewModel.ShoppingCartViewModel" />
-
-        <variable
-            name="orderBarViewModel"
-            type="woowacourse.shopping.view.shoppingCart.viewModel.OrderBarViewModel" />
+            type="woowacourse.shopping.view.shoppingCart.ShoppingCartViewModel" />
 
         <import type="android.view.View" />
 
@@ -97,7 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:checked="@{orderBarViewModel.isAllSelected}"
+                android:checked="@{viewModel.orderBarState.isAllSelected}"
                 android:onClick="@{() -> shoppingCartListener.onAllSelectedButtonClick()}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -121,7 +117,7 @@
                 android:ellipsize="end"
                 android:gravity="end"
                 android:maxLines="1"
-                android:text="@{@string/product_price_format(orderBarViewModel.totalPrice)}"
+                android:text="@{@string/product_price_format(viewModel.orderBarState.totalPrice)}"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -137,12 +133,12 @@
             android:id="@+id/shoppingCartOrderButton"
             android:layout_width="wrap_content"
             android:layout_height="86dp"
-            android:enabled="@{orderBarViewModel.isOrderEnabled}"
+            android:enabled="@{viewModel.orderBarState.isOrderEnabled}"
             android:background="@drawable/background_order_button"
             android:gravity="center"
             android:onClick="@{() -> shoppingCartListener.onOrderButtonClick()}"
             android:paddingHorizontal="16dp"
-            android:text="@{@string/shopping_cart_order_button(orderBarViewModel.totalQuantity)}"
+            android:text="@{@string/shopping_cart_order_button(viewModel.orderBarState.totalQuantity)}"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"

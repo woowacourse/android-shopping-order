@@ -15,7 +15,7 @@ import woowacourse.shopping.fixture.MockShoppingCartDispatcher
 import kotlin.concurrent.thread
 
 class MockServerRule<T : Activity>(
-    private val scenario: ActivityScenario<T>,
+    private var scenario: ActivityScenario<T>,
 ) : ExternalResource() {
     val mockProductServer = MockWebServer()
     val mockShoppingCartServer = MockWebServer()
@@ -47,7 +47,7 @@ class MockServerRule<T : Activity>(
             val app = activity.application as ShoppingApplication
             thread {
                 app.productDatabase.clearAllTables()
-            }
+            }.join()
             DefaultShoppingCartRepository.initialize(shoppingCartService)
             DefaultProductsRepository.initialize(
                 app.productDatabase.recentWatchingDao(),

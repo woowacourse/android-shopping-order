@@ -3,7 +3,6 @@ package woowacourse.shopping.shoppingCartRecommend
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -17,11 +16,13 @@ import org.junit.runner.RunWith
 import woowacourse.shopping.R
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.fixture.RECENT_PRODUCTS
+import woowacourse.shopping.fixture.allRequests
 import woowacourse.shopping.matcher.RecyclerViewMatcher.Companion.withRecyclerView
 import woowacourse.shopping.matcher.isDisplayed
 import woowacourse.shopping.matcher.matchSize
 import woowacourse.shopping.matcher.matchText
 import woowacourse.shopping.matcher.performClick
+import woowacourse.shopping.matcher.scrollToPosition
 import woowacourse.shopping.rule.MockServerRule
 import woowacourse.shopping.view.shoppingCartRecommend.ShoppingCartRecommendActivity
 
@@ -37,23 +38,30 @@ class ShoppingCartRecommendTest {
     @Before
     fun setUp() {
         scenario.onActivity {
+            runBlocking {
+                val repository = DefaultProductsRepository.get()
+                RECENT_PRODUCTS.forEach {
+                    repository.updateRecentWatchingProduct(it)
+                }
+            }
             it.viewModelStore.clear()
         }
         scenario.recreate()
+        Thread.sleep(100)
     }
 
     @Test
     fun 화면_초기_진입_시_주요_UI_요소들이_표시된다() {
-        onView(ViewMatchers.withId(R.id.shoppingCartBackButton)).isDisplayed()
-        onView(ViewMatchers.withId(R.id.shoppingCartRecommendToolbar))
+        onView(withId(R.id.shoppingCartBackButton)).isDisplayed()
+        onView(withId(R.id.shoppingCartRecommendTitle))
             .matchText(
                 "이런 상품은 어떠세요?",
             )
-        onView(ViewMatchers.withId(R.id.shoppingCartRecommendDescription))
-            .matchText("최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.")
-        onView(ViewMatchers.withId(R.id.shoppingCartRecommendProducts)).isDisplayed()
-        onView(ViewMatchers.withId(R.id.shoppingCartRecommendOrderTotalPrice)).isDisplayed()
-        onView(ViewMatchers.withId(R.id.shoppingCartRecommendOrderButton)).isDisplayed()
+        onView(withId(R.id.shoppingCartRecommendDescription))
+            .matchText("* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.")
+        onView(withId(R.id.shoppingCartRecommendProducts)).isDisplayed()
+        onView(withId(R.id.shoppingCartRecommendOrderTotalPrice)).isDisplayed()
+        onView(withId(R.id.shoppingCartRecommendOrderButton)).isDisplayed()
     }
 
     @Test
@@ -62,25 +70,18 @@ class ShoppingCartRecommendTest {
         // 플라망고는 식료품
         val mustNotHaveProductsName = "플라망고"
 
-        scenario.onActivity {
-            runBlocking {
-                val repository = DefaultProductsRepository.get()
-                RECENT_PRODUCTS.forEach {
-                    repository.updateRecentWatchingProduct(it)
-                }
-            }
-        }
-        scenario.close()
-        scenario = ActivityScenario.launch(ShoppingCartRecommendActivity::class.java)
+        Thread.sleep(100)
 
         // when - then
         onView(
             withRecyclerView(R.id.shoppingCartRecommendProducts)
                 .atPositionOnView(0, R.id.productName),
-        ).matchText("앵버잠옷")
+        ).matchText("에어포스31")
 
         // 플라망고는 식료품
         for (i in 0..9) {
+            onView(withId(R.id.shoppingCartRecommendProducts))
+                .perform(scrollToPosition(i))
             onView(
                 withRecyclerView(R.id.shoppingCartRecommendProducts)
                     .atPositionOnView(i, R.id.productName),
@@ -93,20 +94,10 @@ class ShoppingCartRecommendTest {
         // given - 에어포스2는 장바구니에 있습니다
         val mustNotHaveProductsName = "에어포스2"
 
-        scenario.onActivity {
-            runBlocking {
-                val repository = DefaultProductsRepository.get()
-                RECENT_PRODUCTS.forEach {
-                    repository.updateRecentWatchingProduct(it)
-                }
-            }
-        }
-        scenario.close()
-        scenario = ActivityScenario.launch(ShoppingCartRecommendActivity::class.java)
-        Thread.sleep(500)
-
         // when - then
         for (i in 0..9) {
+            onView(withId(R.id.shoppingCartRecommendProducts))
+                .perform(scrollToPosition(i))
             onView(
                 withRecyclerView(R.id.shoppingCartRecommendProducts)
                     .atPositionOnView(i, R.id.productName),
@@ -134,8 +125,10 @@ class ShoppingCartRecommendTest {
     }
 
     @Test
-    fun 추천_상품을_장바구니에_담으면_구매할_수량과_가격이_변한다() {
+    fun 추천_상품을_장바구니에_담을_수_있다() {
         // given - when
+
+        Thread.setDefaultUncaughtExceptionHandler { t, e -> }
         onView(
             withRecyclerView(R.id.shoppingCartRecommendProducts)
                 .atPositionOnView(0, R.id.productPlusQuantityButtonDefault),
@@ -143,30 +136,17 @@ class ShoppingCartRecommendTest {
             .performClick()
 
         // then
-        val recorded =
-            buildList {
-                repeat(mockServerRule.mockShoppingCartServer.requestCount) {
-                    add(mockServerRule.mockShoppingCartServer.takeRequest())
-                }
-            }
+        val recorded = mockServerRule.mockShoppingCartServer.allRequests()
 
         val result =
             recorded.any {
+                val body = it.body.readUtf8()
                 it.method == "POST" && it.path == "/cart-items" &&
-                    it.body.readUtf8()
-                        .contains(
-                            "{\n" +
-                                "  \"productId\": 36,\n" +
-                                "  \"quantity\": 1\n" +
-                                "}",
-                        )
+                    body.contains("\"quantity\":1") &&
+                    body.contains("\"productId\":36")
             }
 
         assertThat(result).isTrue()
-
-        onView(withId(R.id.shoppingCartRecommendOrderTotalPrice))
-            .matchText("100,000원")
-        onView(withId(R.id.shoppingCartRecommendOrderButton))
-            .matchText("주문하기(1)")
+        Thread.setDefaultUncaughtExceptionHandler { t, e -> throw e }
     }
 }

@@ -14,51 +14,65 @@ class DefaultShoppingCartRepository(
     override suspend fun load(
         page: Int,
         size: Int,
-    ): ShoppingCarts {
-        val result =
-            shoppingCartService
-                .getCartItems(page, size)
-        return ShoppingCarts(
-            last = result.last,
-            shoppingCartItems = result.shoppingCartItems.map { it.toDomain() },
-        )
+    ): Result<ShoppingCarts> {
+        return runCatching {
+            val result =
+                shoppingCartService
+                    .getCartItems(page, size)
+            ShoppingCarts(
+                last = result.last,
+                shoppingCartItems = result.shoppingCartItems.map { it.toDomain() },
+            )
+        }
     }
 
     override suspend fun add(
         product: Product,
         quantity: Int,
-    ): ShoppingCartProduct {
-        shoppingCartService
-            .postCartItem(
-                CartItemRequest(
-                    productId = product.id,
-                    quantity = quantity,
-                ),
-            )
+    ): Result<ShoppingCartProduct> {
+        return runCatching {
+            shoppingCartService
+                .postCartItem(
+                    CartItemRequest(
+                        productId = product.id,
+                        quantity = quantity,
+                    ),
+                )
 
-        return load().shoppingCartItems
-            .firstOrNull { it.product.id == product.id } ?: throw IOException(ERR_NOT_ADDED_PRODUCT)
+            load().getOrThrow().shoppingCartItems
+                .firstOrNull { it.product.id == product.id } ?: throw IOException(
+                ERR_NOT_ADDED_PRODUCT,
+            )
+        }
     }
 
     override suspend fun updateQuantity(
         shoppingCartId: Long,
         quantity: Int,
-    ): ShoppingCartProduct? {
-        val requestDto = CartItemQuantityRequest(quantity = quantity)
-        shoppingCartService
-            .updateCartItemQuantity(
-                shoppingCartId = shoppingCartId,
-                cartItemQuantityRequest = requestDto,
-            )
-        return load().shoppingCartItems
-            .firstOrNull { it.id == shoppingCartId }
+    ): Result<ShoppingCartProduct?> {
+        return runCatching {
+            val requestDto = CartItemQuantityRequest(quantity = quantity)
+            shoppingCartService
+                .updateCartItemQuantity(
+                    shoppingCartId = shoppingCartId,
+                    cartItemQuantityRequest = requestDto,
+                )
+            load().getOrThrow().shoppingCartItems
+                .firstOrNull { it.id == shoppingCartId }
+        }
     }
 
-    override suspend fun remove(shoppingCartId: Long) {
-        shoppingCartService.deleteCartItem(shoppingCartId)
+    override suspend fun remove(shoppingCartId: Long): Result<Unit> {
+        return runCatching {
+            shoppingCartService.deleteCartItem(shoppingCartId)
+        }
     }
 
-    override suspend fun fetchAllQuantity(): Int = shoppingCartService.getCartCounts().quantity
+    override suspend fun fetchAllQuantity(): Result<Int> {
+        return runCatching {
+            shoppingCartService.getCartCounts().quantity
+        }
+    }
 
     companion object {
         @Suppress("ktlint:standard:property-naming")

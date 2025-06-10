@@ -8,12 +8,12 @@ import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 @Serializable
 data class ShoppingCartItemsResponse(
     @SerialName("content")
-    val shoppingCartItems: List<ShoppingCartItemResponseDto>,
+    val shoppingCartItems: List<ShoppingCartItemResponse>,
     @SerialName("last")
     val last: Boolean,
 ) {
     @Serializable
-    data class ShoppingCartItemResponseDto(
+    data class ShoppingCartItemResponse(
         @SerialName("id")
         val id: Long,
         @SerialName("product")
