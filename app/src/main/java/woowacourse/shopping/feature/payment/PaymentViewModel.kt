@@ -8,7 +8,6 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.coupon.CouponRepository
 import woowacourse.shopping.data.remote.order.OrderRepository
-import woowacourse.shopping.data.remote.order.OrderRequest
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.CouponRule
@@ -92,7 +91,7 @@ class PaymentViewModel(
     fun order() {
         viewModelScope.launch {
             orderRepository
-                .order(OrderRequest(_orderedCarts.map { it.id }))
+                .order(_orderedCarts.map { it.id })
                 .onSuccess {
                     _orderCompletedEvent.setValue(Unit)
                 }

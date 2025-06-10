@@ -3,9 +3,9 @@ package woowacourse.shopping.data.remote.order
 class OrderRepository(
     private val orderService: OrderService,
 ) {
-    suspend fun order(orderRequest: OrderRequest): Result<Unit> =
+    suspend fun order(orderIds: List<Long>): Result<Unit> =
         try {
-            val response = orderService.order(orderRequest)
+            val response = orderService.order(OrderRequest(orderIds))
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
