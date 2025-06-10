@@ -1,19 +1,19 @@
-package woowacourse.shopping.domain.repository
+package woowacourse.shopping.domain.policy
 
-import woowacourse.shopping.data.model.CouponResponse
+import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.CouponPolicyContext
 import java.time.LocalDate
 import java.time.LocalTime
 
 sealed class CouponPolicy {
     abstract fun isApplicable(
-        coupon: CouponResponse,
+        coupon: Coupon,
         context: CouponPolicyContext,
     ): Boolean
 
     object Fixed5000 : CouponPolicy() {
         override fun isApplicable(
-            coupon: CouponResponse,
+            coupon: Coupon,
             context: CouponPolicyContext,
         ): Boolean {
             val date = LocalDate.parse(coupon.expirationDate)
@@ -25,7 +25,7 @@ sealed class CouponPolicy {
 
     object FreeShipping : CouponPolicy() {
         override fun isApplicable(
-            coupon: CouponResponse,
+            coupon: Coupon,
             context: CouponPolicyContext,
         ): Boolean {
             val date = LocalDate.parse(coupon.expirationDate)
@@ -37,7 +37,7 @@ sealed class CouponPolicy {
 
     object MiracleSale : CouponPolicy() {
         override fun isApplicable(
-            coupon: CouponResponse,
+            coupon: Coupon,
             context: CouponPolicyContext,
         ): Boolean {
             val date = LocalDate.parse(coupon.expirationDate)
@@ -57,7 +57,7 @@ sealed class CouponPolicy {
 
     object Bogo : CouponPolicy() {
         override fun isApplicable(
-            coupon: CouponResponse,
+            coupon: Coupon,
             context: CouponPolicyContext,
         ): Boolean {
             val date = LocalDate.parse(coupon.expirationDate)
@@ -71,7 +71,7 @@ sealed class CouponPolicy {
 
     object Default : CouponPolicy() {
         override fun isApplicable(
-            coupon: CouponResponse,
+            coupon: Coupon,
             context: CouponPolicyContext,
         ): Boolean = true
     }
