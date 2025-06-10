@@ -24,7 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:checked="@{coupon.checked}"
+            android:checked="@{coupon.applied}"
             android:onClick="@{() -> couponClickListener.onCouponCheck(coupon)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>

@@ -57,9 +57,9 @@ class PaymentViewModel(
         val updated =
             _coupons.value?.map {
                 if (it.couponDetail.id == selectedCoupon.couponDetail.id) {
-                    it.copy(isChecked = true)
+                    it.copy(isApplied = true)
                 } else {
-                    it.copy(isChecked = false)
+                    it.copy(isApplied = false)
                 }
             }
         _coupons.value = updated ?: emptyList()
