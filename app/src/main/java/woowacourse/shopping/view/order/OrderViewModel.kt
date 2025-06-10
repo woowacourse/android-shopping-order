@@ -75,7 +75,7 @@ class OrderViewModel(
         }
     }
 
-    fun toggleCoupon(couponState: CouponState) {
+    fun selectCouponState(couponState: CouponState) {
         _couponState.value =
             _couponState.value?.map {
                 it.copy(isSelected = (it.coupon.id == couponState.coupon.id))

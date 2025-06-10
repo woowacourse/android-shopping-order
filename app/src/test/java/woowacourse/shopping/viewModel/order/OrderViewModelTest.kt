@@ -75,7 +75,7 @@ class OrderViewModelTest {
         viewModel.couponState.observeForever {}
         dispatcher.scheduler.advanceUntilIdle()
 
-        viewModel.toggleCoupon(couponState)
+        viewModel.selectCouponState(couponState)
 
         // then
         assertThat(viewModel.couponState.getOrAwaitValue()[0].isSelected).isEqualTo(true)
@@ -102,7 +102,7 @@ class OrderViewModelTest {
         viewModel.couponState.observeForever {}
         dispatcher.scheduler.advanceUntilIdle()
 
-        viewModel.toggleCoupon(couponState)
+        viewModel.selectCouponState(couponState)
 
         // then
         assertThat(viewModel.orderState.getOrAwaitValue()).isEqualTo(

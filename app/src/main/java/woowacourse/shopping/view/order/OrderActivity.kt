@@ -79,7 +79,7 @@ class OrderActivity :
     }
 
     override fun onCouponClick(couponState: CouponState) {
-        viewModel.toggleCoupon(couponState)
+        viewModel.selectCouponState(couponState)
     }
 
     override fun onBackButtonClick() {
