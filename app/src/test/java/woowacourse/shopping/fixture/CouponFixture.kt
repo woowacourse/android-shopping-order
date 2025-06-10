@@ -1,7 +1,7 @@
 package woowacourse.shopping.fixture
 
-import woowacourse.shopping.data.model.Coupon
-import woowacourse.shopping.data.model.CouponType
+import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.CouponType
 
 object CouponFixture {
     fun fixed5000Coupon(

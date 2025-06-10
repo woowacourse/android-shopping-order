@@ -3,7 +3,7 @@ package woowacourse.shopping.presentation.payment
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.data.model.Coupon
+import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.presentation.payment.event.CouponEventHandler
 import woowacourse.shopping.presentation.util.CouponDiffCallback
 
@@ -15,9 +15,7 @@ class CouponAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): RecyclerView.ViewHolder {
-        return CouponViewHolder(parent, couponHandler)
-    }
+    ): RecyclerView.ViewHolder = CouponViewHolder(parent, couponHandler)
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,

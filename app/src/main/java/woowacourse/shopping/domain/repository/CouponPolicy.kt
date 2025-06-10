@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.data.model.CouponPolicyContext
 import woowacourse.shopping.data.model.CouponResponse
+import woowacourse.shopping.domain.model.CouponPolicyContext
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -73,8 +73,6 @@ sealed class CouponPolicy {
         override fun isApplicable(
             coupon: CouponResponse,
             context: CouponPolicyContext,
-        ): Boolean {
-            return true
-        }
+        ): Boolean = true
     }
 }

@@ -9,7 +9,7 @@
 
         <variable
             name="coupon"
-            type="woowacourse.shopping.data.model.Coupon" />
+            type="woowacourse.shopping.domain.model.Coupon" />
 
         <variable
             name="isChecked"

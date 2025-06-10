@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.R
-import woowacourse.shopping.data.model.Coupon
 import woowacourse.shopping.databinding.CouponItemBinding
+import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.presentation.payment.event.CouponEventHandler
 
 class CouponViewHolder(

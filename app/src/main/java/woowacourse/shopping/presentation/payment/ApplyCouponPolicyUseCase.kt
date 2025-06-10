@@ -1,7 +1,7 @@
 package woowacourse.shopping.presentation.payment
 
-import woowacourse.shopping.data.model.Coupon
-import woowacourse.shopping.data.model.CouponType
+import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.CouponType
 import woowacourse.shopping.domain.repository.CouponPolicy
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 

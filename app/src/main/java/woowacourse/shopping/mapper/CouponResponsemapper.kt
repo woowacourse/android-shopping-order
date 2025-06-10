@@ -1,8 +1,8 @@
 package woowacourse.shopping.mapper
 
-import woowacourse.shopping.data.model.Coupon
-import woowacourse.shopping.data.model.Coupon.AvailableTime
 import woowacourse.shopping.data.model.CouponResponse
+import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.Coupon.AvailableTime
 
 fun CouponResponse.toDomain() =
     Coupon(

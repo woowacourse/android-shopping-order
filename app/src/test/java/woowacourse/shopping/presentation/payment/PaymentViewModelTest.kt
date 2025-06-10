@@ -6,8 +6,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
-import woowacourse.shopping.data.model.Coupon
-import woowacourse.shopping.data.model.CouponType
+import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.CouponType
 import woowacourse.shopping.fixture.CouponFixture
 import woowacourse.shopping.fixture.FakeCouponRepository
 import woowacourse.shopping.fixture.FakeOrderRepository

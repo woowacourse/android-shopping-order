@@ -1,6 +1,5 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.domain.model
 
-import woowacourse.shopping.domain.model.Product
 import java.time.LocalDateTime
 
 data class CouponPolicyContext(

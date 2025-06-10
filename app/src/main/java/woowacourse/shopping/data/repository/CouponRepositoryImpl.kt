@@ -1,11 +1,11 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.model.Coupon
-import woowacourse.shopping.data.model.CouponPolicyContext
 import woowacourse.shopping.data.model.CouponResponse
-import woowacourse.shopping.data.model.CouponType
 import woowacourse.shopping.data.source.remote.payment.PaymentDataSource
 import woowacourse.shopping.data.util.TimeProvider
+import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.CouponPolicyContext
+import woowacourse.shopping.domain.model.CouponType
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.mapper.toDomain

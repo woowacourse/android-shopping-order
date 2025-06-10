@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.domain.model
 
 data class Coupon(
     val id: Long,
