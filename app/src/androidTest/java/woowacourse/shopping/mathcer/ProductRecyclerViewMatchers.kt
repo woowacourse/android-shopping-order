@@ -15,7 +15,7 @@ object ProductRecyclerViewMatchers {
 
         override fun matchesSafely(view: View): Boolean {
             val recyclerView =
-                view.rootView.findViewById<RecyclerView>(R.id.recycler_view_product)
+                view.rootView.findViewById<RecyclerView>(R.id.rv_product_list)
                     ?: return false
             val viewHolder =
                 recyclerView.findViewHolderForAdapterPosition(position)

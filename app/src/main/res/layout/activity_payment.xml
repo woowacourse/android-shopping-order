@@ -10,22 +10,22 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/main"
+        android:id="@+id/root_payment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".view.payment.PaymentActivity">
 
         <com.google.android.material.divider.MaterialDivider
-            android:id="@+id/materialDivider2"
+            android:id="@+id/divider_final_price"
             android:layout_width="match_parent"
             android:layout_height="7dp"
             android:layout_marginTop="21dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView6" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_payment_shipping_price_title" />
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/tv_payment_coupon_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="18dp"
@@ -38,7 +38,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/tv_payment_coupon_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/coupon_detail"
@@ -47,10 +47,10 @@
             android:textSize="12sp"
             android:textColor="@color/gray"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textView2" />
+            app:layout_constraintTop_toBottomOf="@id/tv_payment_coupon_title" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/payment_rv_coupon"
+            android:id="@+id/rv_payment_coupon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxHeight="400dp"
@@ -59,18 +59,18 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textView3"
+            app:layout_constraintTop_toBottomOf="@id/tv_payment_coupon_detail"
             tools:listitem="@layout/item_coupon" />
 
         <com.google.android.material.divider.MaterialDivider
-            android:id="@+id/materialDivider"
+            android:id="@+id/divider_coupons_to_summary"
             android:layout_width="match_parent"
             android:layout_height="7dp"
             android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/payment_rv_coupon" />
+            app:layout_constraintTop_toBottomOf="@id/rv_payment_coupon" />
 
         <TextView
-            android:id="@+id/textView4"
+            android:id="@+id/tv_payment_order_price_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/order_title"
@@ -80,10 +80,10 @@
             android:textColor="@color/black"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/materialDivider" />
+            app:layout_constraintTop_toBottomOf="@+id/divider_coupons_to_summary" />
 
         <TextView
-            android:id="@+id/textView5"
+            android:id="@+id/tv_payment_discount_price_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/discount_coupon_title"
@@ -93,10 +93,10 @@
             android:layout_marginStart="18dp"
             android:layout_marginTop="16dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView4" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_payment_order_price_title" />
 
         <TextView
-            android:id="@+id/textView6"
+            android:id="@+id/tv_payment_shipping_price_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/shipping_title"
@@ -106,10 +106,10 @@
             android:layout_marginStart="18dp"
             android:layout_marginTop="16dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView5" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_payment_discount_price_title" />
 
         <TextView
-            android:id="@+id/textView7"
+            android:id="@+id/tv_payment_order_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
@@ -120,11 +120,11 @@
             android:layout_marginTop="16dp"
             android:text="@{@string/format_thousand_won(vm.paymentUiState.paymentUi.orderPrice)}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/materialDivider"
+            app:layout_constraintTop_toBottomOf="@+id/divider_coupons_to_summary"
             tools:text="10,000원"/>
 
         <TextView
-            android:id="@+id/textView8"
+            android:id="@+id/tv_payment_discount_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
@@ -135,11 +135,11 @@
             android:layout_marginTop="16dp"
             android:text="@{@string/format_thousand_won(vm.paymentUiState.paymentUi.discountPrice)}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView7"
+            app:layout_constraintTop_toBottomOf="@+id/tv_payment_order_price"
             tools:text="10,000원" />
 
         <TextView
-            android:id="@+id/textView9"
+            android:id="@+id/tv_payment_shipping_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
@@ -150,11 +150,11 @@
             android:layout_marginTop="16dp"
             android:text="@{@string/format_thousand_won(vm.paymentUiState.paymentUi.shippingPrice)}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView8"
+            app:layout_constraintTop_toBottomOf="@+id/tv_payment_discount_price"
             tools:text="10,000원" />
 
         <TextView
-            android:id="@+id/textView10"
+            android:id="@+id/tv_payment_total_price_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/total_payment_title"
@@ -164,10 +164,10 @@
             android:layout_marginStart="18dp"
             android:layout_marginTop="21dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/materialDivider2" />
+            app:layout_constraintTop_toBottomOf="@+id/divider_final_price" />
 
         <TextView
-            android:id="@+id/textView11"
+            android:id="@+id/tv_payment_total_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
@@ -178,7 +178,7 @@
             android:layout_marginTop="21dp"
             android:text="@{@string/format_thousand_won(vm.paymentUiState.paymentUi.totalPrice)}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/materialDivider2"
+            app:layout_constraintTop_toBottomOf="@+id/divider_final_price"
             tools:text="10,000원" />
 
         <TextView

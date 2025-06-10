@@ -29,7 +29,7 @@
         android:background="@drawable/cart_border">
         
         <CheckBox
-            android:id="@+id/checkbox"
+            android:id="@+id/cb_item_cart"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
@@ -39,7 +39,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/text_view_product_name"
+            android:id="@+id/tv_item_cart_product_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
@@ -48,12 +48,12 @@
             android:textColor="@color/gray"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@id/checkbox"
+            app:layout_constraintStart_toEndOf="@id/cb_item_cart"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="[든든] 동원 스위트콘" />
 
         <ImageView
-            android:id="@+id/image_view_delete"
+            android:id="@+id/iv_delete"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="8dp"
@@ -65,14 +65,14 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/image_view_product"
+            android:id="@+id/iv_product"
             setImage="@{model.imgUrl}"
             android:layout_width="136dp"
             android:layout_height="72dp"
             android:layout_marginStart="12dp"
             android:layout_marginBottom="18dp"
             android:scaleType="centerCrop"
-            app:layout_constraintTop_toBottomOf="@id/text_view_product_name"
+            app:layout_constraintTop_toBottomOf="@id/tv_item_cart_product_name"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -82,7 +82,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/image_view_delete"
+            app:layout_constraintTop_toBottomOf="@id/iv_delete"
             android:visibility="@{model.hasQuantity ? View.VISIBLE : View.GONE}"
             bind:eventHandler="@{cartQuantityEventHandler}"
             app:quantity="@{model.quantity}"
@@ -90,7 +90,7 @@
             />
 
         <TextView
-            android:id="@+id/text_view_product_price"
+            android:id="@+id/tv_product_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"

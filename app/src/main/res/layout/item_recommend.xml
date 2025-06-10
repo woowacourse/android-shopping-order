@@ -24,14 +24,14 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/root"
+        android:id="@+id/root_item_recommend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/product_item_background"
         android:onClick="@{() -> adapterEventHandler.showQuantity(model.productId)}">
 
         <ImageView
-            android:id="@+id/image_view_product"
+            android:id="@+id/iv_product"
             setImage="@{model.item.imgUrl}"
             android:layout_width="154dp"
             android:layout_height="154dp"
@@ -42,7 +42,7 @@
             tools:srcCompat="@tools:sample/avatars" />
 
         <TextView
-            android:id="@+id/textView_product_name"
+            android:id="@+id/tv_item_cart_product_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -56,11 +56,11 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/image_view_product"
+            app:layout_constraintTop_toBottomOf="@id/iv_product"
             tools:text="PET보틀-정사각..." />
 
         <TextView
-            android:id="@+id/textView_product_price"
+            android:id="@+id/v_shimmer_product_price"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -73,7 +73,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textView_product_name"
+            app:layout_constraintTop_toBottomOf="@id/tv_item_cart_product_name"
             tools:text="10,000원" />
 
         <ImageView
@@ -88,16 +88,16 @@
             android:scaleType="center"
             android:src="@drawable/ic_add"
             android:visibility="@{model.hasCartQuantity ? View.GONE : View.VISIBLE}"
-            app:layout_constraintBottom_toBottomOf="@id/image_view_product"
+            app:layout_constraintBottom_toBottomOf="@id/iv_product"
             app:layout_constraintEnd_toEndOf="parent" />
 
             <include
                 layout="@layout/item_quantity_changer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@id/image_view_product"
-                app:layout_constraintEnd_toEndOf="@id/image_view_product"
-                app:layout_constraintStart_toStartOf="@id/image_view_product"
+                app:layout_constraintBottom_toBottomOf="@id/iv_product"
+                app:layout_constraintEnd_toEndOf="@id/iv_product"
+                app:layout_constraintStart_toStartOf="@id/iv_product"
                 android:visibility="@{model.hasCartQuantity ? View.VISIBLE : View.GONE}"
                 bind:eventHandler="@{cartQuantityEventHandler}"
                 app:quantity="@{model.cartQuantityValue}"

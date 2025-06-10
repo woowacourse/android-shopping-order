@@ -58,7 +58,7 @@ class DetailActivity : AppCompatActivity() {
 
     private fun setUpSystemBars() {
         enableEdgeToEdge()
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { view, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root_detail)) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
