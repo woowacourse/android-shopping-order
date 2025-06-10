@@ -13,13 +13,12 @@ sealed class CouponRule {
     ): Price
 
     companion object {
-        fun getContract(discountType: String): CouponRule =
+        fun getContract(discountType: DiscountType): CouponRule =
             when (discountType) {
-                DiscountType.FIXED.code -> FixedCoupon
-                DiscountType.BUY_X_GET_Y.code -> BuyXGetYCoupon
-                DiscountType.FREE_SHIPPING.code -> FreeShippingCoupon
-                DiscountType.PERCENTAGE.code -> MiracleSaleCoupon
-                else -> throw IllegalArgumentException("알 수 없는 할인 타입입니다: $discountType")
+                DiscountType.FIXED -> FixedCoupon
+                DiscountType.BUY_X_GET_Y -> BuyXGetYCoupon
+                DiscountType.FREE_SHIPPING -> FreeShippingCoupon
+                DiscountType.PERCENTAGE -> MiracleSaleCoupon
             }
     }
 }

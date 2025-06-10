@@ -7,7 +7,7 @@ data class CouponDetail(
     val code: String,
     val description: String,
     val expirationDate: String,
-    val discountType: String,
+    val discountType: DiscountType,
     val discount: Int,
     val minimumAmount: Int,
     val buyQuantity: Int,

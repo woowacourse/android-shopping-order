@@ -6,6 +6,7 @@ import woowacourse.shopping.data.remote.coupon.CouponResponse
 import woowacourse.shopping.data.remote.product.ProductResponse
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.CouponDetail
+import woowacourse.shopping.domain.model.DiscountType
 import woowacourse.shopping.domain.model.Product
 import java.time.LocalDate
 import java.time.LocalTime
@@ -52,7 +53,7 @@ fun CouponResponse.toDomain(): CouponDetail {
         code = this.code,
         description = this.description,
         expirationDate = formattedDate,
-        discountType = this.discountType,
+        discountType = this.discountType.toDiscountType(),
         discount = this.discount ?: 0,
         minimumAmount = this.minimumAmount ?: 0,
         buyQuantity = this.buyQuantity ?: 0,
@@ -63,3 +64,12 @@ fun CouponResponse.toDomain(): CouponDetail {
             } ?: LocalTime.MIN,
     )
 }
+
+private fun String.toDiscountType(): DiscountType =
+    when (this) {
+        "fixed" -> DiscountType.FIXED
+        "buyXgetY" -> DiscountType.BUY_X_GET_Y
+        "freeShipping" -> DiscountType.FREE_SHIPPING
+        "percentage" -> DiscountType.PERCENTAGE
+        else -> throw IllegalArgumentException("알 수 없는 할인 타입입니다: $this")
+    }
