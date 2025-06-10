@@ -68,8 +68,8 @@ class DetailViewModel(
                     cartId = if (product.cartId != 0L) product.cartId else null,
                     quantity = updatedAmount,
                 ).onSuccess {
-                    _product.postValue(product.copy(amount = updatedAmount))
-                    _saveState.postValue(Unit)
+                    _product.value = product.copy(amount = updatedAmount)
+                    _saveState.value = Unit
                 }
         }
     }

@@ -33,14 +33,14 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
         val product = arguments.getParcelableCompat<ProductUiModel>(EXTRA_PRODUCT)
         product.let { viewModel.fetchProduct(it) }
 
-        viewModel.fetchLastViewedProduct(product.id)
-    }
-
-    private fun initObserver() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.vm = viewModel
         binding.detailItemCounter.listener = viewModel
 
+        viewModel.fetchLastViewedProduct(product.id)
+    }
+
+    private fun initObserver() {
         viewModel.saveState.observe(viewLifecycleOwner) { saveState ->
             saveState?.let { navigateToCatalog() }
         }
