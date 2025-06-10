@@ -95,10 +95,6 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
             binding.canSelectItems = it
         }
 
-        viewModel.selectedProductIds.observe(viewLifecycleOwner) {}
-        viewModel.totalCount.observe(viewLifecycleOwner) {}
-        viewModel.totalPrice.observe(viewLifecycleOwner) {}
-        viewModel.allSelected.observe(viewLifecycleOwner) {}
         viewModel.canPlaceOrder.observe(viewLifecycleOwner) {}
     }
 
