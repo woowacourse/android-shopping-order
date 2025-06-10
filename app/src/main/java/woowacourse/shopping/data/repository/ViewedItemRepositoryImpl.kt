@@ -15,14 +15,15 @@ class ViewedItemRepositoryImpl(
 
     override suspend fun getViewedItems(): Result<List<Product>?> =
         runCatching {
-            val items = dao.getRecentViewedItems()
+            val items = dao.getRecentViewedItems(RECENT_VIEWED_ITEMS_COUNT)
             items?.map { it.toDomain() }
         }
 
     override suspend fun getLastViewedItem(): Result<Product?> =
         runCatching {
-            val item = dao.getLastViewedItem()
-            item?.toDomain()
+            dao.getRecentViewedItems(LAST_VIEWED_ITEM_COUNT)
+                ?.firstOrNull()
+                ?.toDomain()
         }
 
     private fun Product.toEntity() =
@@ -42,4 +43,9 @@ class ViewedItemRepositoryImpl(
             imageUrl = this.imageUrl,
             category = this.category,
         )
+
+    companion object {
+        private const val RECENT_VIEWED_ITEMS_COUNT = 10
+        private const val LAST_VIEWED_ITEM_COUNT = 1
+    }
 }

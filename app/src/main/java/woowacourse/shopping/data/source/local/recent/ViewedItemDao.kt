@@ -11,9 +11,6 @@ interface ViewedItemDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertViewedProduct(viewedItem: ViewedItem)
 
-    @Query("SELECT * FROM ViewedItemEntity ORDER BY viewedAt DESC LIMIT 10")
-    suspend fun getRecentViewedItems(): List<ViewedItem>?
-
-    @Query("SELECT * FROM ViewedItemEntity ORDER BY viewedAt DESC LIMIT 1")
-    suspend fun getLastViewedItem(): ViewedItem?
+    @Query("SELECT * FROM ViewedItemEntity ORDER BY viewedAt DESC LIMIT :count")
+    suspend fun getRecentViewedItems(count: Int): List<ViewedItem>?
 }
