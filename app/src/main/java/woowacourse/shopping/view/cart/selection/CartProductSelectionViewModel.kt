@@ -33,8 +33,8 @@ class CartProductSelectionViewModel(
     private val _isFinishedLoading = MutableLiveData(false)
     val isFinishedLoading: LiveData<Boolean> get() = _isFinishedLoading
 
-    private val _onError = MutableSingleLiveData<Error>()
-    val onError: SingleLiveData<Error> get() = _onError
+    private val _errorEvent = MutableSingleLiveData<Error>()
+    val errorEvent: SingleLiveData<Error> get() = _errorEvent
 
     val totalPrice: LiveData<Int> =
         _selectedProducts.map { products ->
@@ -95,7 +95,7 @@ class CartProductSelectionViewModel(
                     }
                 }.onFailure {
                     Log.e("error", it.message.toString())
-                    _onError.setValue(Error.FailToDelete)
+                    _errorEvent.setValue(Error.FailToDelete)
                 }
         }
     }
@@ -119,7 +119,7 @@ class CartProductSelectionViewModel(
                     updateSelectedProducts(cartProductItem.cartProduct, newQuantity)
                 }.onFailure {
                     Log.e("error", it.message.toString())
-                    _onError.setValue(Error.FailToIncrease)
+                    _errorEvent.setValue(Error.FailToIncrease)
                 }
         }
     }
@@ -145,7 +145,7 @@ class CartProductSelectionViewModel(
                     updateSelectedProducts(cartProductItem.cartProduct, newQuantity)
                 }.onFailure {
                     Log.e("error", it.message.toString())
-                    _onError.setValue(Error.FailToDecrease)
+                    _errorEvent.setValue(Error.FailToDecrease)
                 }
         }
     }
@@ -215,7 +215,7 @@ class CartProductSelectionViewModel(
                     updatePageState(page, hasNext)
                 }.onFailure {
                     Log.e("error", it.message.toString())
-                    _onError.setValue(Error.FailToLoadProduct)
+                    _errorEvent.setValue(Error.FailToLoadProduct)
                 }
         }
     }

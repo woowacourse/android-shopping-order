@@ -127,7 +127,7 @@ class ProductCatalogActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.onError.observe(this) {
+        viewModel.errorEvent.observe(this) {
             Toast.makeText(this, it.messageId, Toast.LENGTH_SHORT).show()
         }
     }

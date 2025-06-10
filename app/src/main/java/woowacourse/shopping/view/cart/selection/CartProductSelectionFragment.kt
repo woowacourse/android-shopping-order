@@ -89,7 +89,7 @@ class CartProductSelectionFragment() : Fragment() {
             }
         }
 
-        viewModel.onError.observe(viewLifecycleOwner) {
+        viewModel.errorEvent.observe(viewLifecycleOwner) {
             Toast.makeText(requireContext(), it.messageId, Toast.LENGTH_SHORT).show()
         }
     }

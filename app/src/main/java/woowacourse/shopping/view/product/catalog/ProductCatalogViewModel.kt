@@ -42,8 +42,8 @@ class ProductCatalogViewModel(
     private val _isFinishedLoading = MutableLiveData(false)
     val isFinishedLoading: LiveData<Boolean> get() = _isFinishedLoading
 
-    private val _onError = MutableSingleLiveData<Error>()
-    val onError: SingleLiveData<Error> get() = _onError
+    private val _errorEvent = MutableSingleLiveData<Error>()
+    val errorEvent: SingleLiveData<Error> get() = _errorEvent
 
     override fun onRecentProductClick(item: RecentProduct) {
         _selectedProduct.setValue(item.product)
@@ -63,7 +63,7 @@ class ProductCatalogViewModel(
                     updateQuantity(item, QUANTITY_STEP)
                 }.onFailure {
                     Log.e("error", it.message.toString())
-                    _onError.setValue(Error.FailToCart)
+                    _errorEvent.setValue(Error.FailToCart)
                 }
         }
     }
@@ -85,7 +85,7 @@ class ProductCatalogViewModel(
                     updateQuantity(product, QUANTITY_STEP)
                 }.onFailure {
                     Log.e("error", it.message.toString())
-                    _onError.setValue(Error.FailToIncrease)
+                    _errorEvent.setValue(Error.FailToIncrease)
                 }
         }
     }
@@ -114,7 +114,7 @@ class ProductCatalogViewModel(
                     updateQuantity(product, -QUANTITY_STEP)
                 }.onFailure {
                     Log.e("error", it.message.toString())
-                    _onError.setValue(Error.FailToDecrease)
+                    _errorEvent.setValue(Error.FailToDecrease)
                 }
         }
     }
@@ -152,7 +152,7 @@ class ProductCatalogViewModel(
                 loadProducts()
             }.onFailure {
                 Log.e("error", it.message.toString())
-                _onError.setValue(Error.FailToLoadProduct)
+                _errorEvent.setValue(Error.FailToLoadProduct)
             }
     }
 
@@ -164,7 +164,7 @@ class ProductCatalogViewModel(
             _productCatalogItems.value = buildCatalogItems()
         }.onFailure {
             Log.e("error", it.message.toString())
-            _onError.setValue(Error.FailToLoadProduct)
+            _errorEvent.setValue(Error.FailToLoadProduct)
         }
     }
 
@@ -177,7 +177,7 @@ class ProductCatalogViewModel(
                 applyLoadedProducts(pagedResult)
             }.onFailure {
                 Log.e("error", it.message.toString())
-                _onError.setValue(Error.FailToLoadProduct)
+                _errorEvent.setValue(Error.FailToLoadProduct)
             }
     }
 
@@ -190,7 +190,7 @@ class ProductCatalogViewModel(
                     applyLoadedProducts(pagedResult)
                 }.onFailure {
                     Log.e("error", it.message.toString())
-                    _onError.setValue(Error.FailToLoadProduct)
+                    _errorEvent.setValue(Error.FailToLoadProduct)
                 }
         }
     }

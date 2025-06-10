@@ -28,11 +28,11 @@ class PaymentViewModel(
     private val _coupons = MutableLiveData<List<CouponItem>>()
     val coupons: LiveData<List<CouponItem>> get() = _coupons
 
-    private val _onFinishOrder = MutableSingleLiveData<Unit>()
-    val onFinishOrder: SingleLiveData<Unit> get() = _onFinishOrder
+    private val _orderComplete = MutableSingleLiveData<Unit>()
+    val orderComplete: SingleLiveData<Unit> get() = _orderComplete
 
-    private val _onError = MutableSingleLiveData<Error>()
-    val onError: SingleLiveData<Error> get() = _onError
+    private val _errorEvent = MutableSingleLiveData<Error>()
+    val errorEvent: SingleLiveData<Error> get() = _errorEvent
 
     private var selectedCouponId: Int? = null
 
@@ -51,7 +51,7 @@ class PaymentViewModel(
                         .filter { it.coupon.isValid(selectedProducts) }
             }.onFailure {
                 Log.e("error", it.message.toString())
-                _onError.setValue(Error.FailToLoadCoupon)
+                _errorEvent.setValue(Error.FailToLoadCoupon)
             }
         }
     }
@@ -92,11 +92,11 @@ class PaymentViewModel(
 
             result
                 .onSuccess {
-                    _onFinishOrder.setValue(Unit)
+                    _orderComplete.setValue(Unit)
                 }
                 .onFailure {
                     Log.e("error", it.message.toString())
-                    _onError.setValue(Error.FailToOrder)
+                    _errorEvent.setValue(Error.FailToOrder)
                 }
         }
     }

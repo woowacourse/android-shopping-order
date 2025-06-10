@@ -89,7 +89,7 @@ class CartProductRecommendationFragment() : Fragment() {
             adapter.submitList(value)
         }
 
-        viewModel.onSelectedProduct.observe(viewLifecycleOwner) { value ->
+        viewModel.selectedProduct.observe(viewLifecycleOwner) { value ->
             val intent = ProductDetailActivity.newIntent(requireContext(), value)
             startActivity(intent)
         }
@@ -99,7 +99,7 @@ class CartProductRecommendationFragment() : Fragment() {
             startActivity(intent)
         }
 
-        viewModel.onError.observe(viewLifecycleOwner) {
+        viewModel.errorEvent.observe(viewLifecycleOwner) {
             Toast.makeText(requireContext(), it.messageId, Toast.LENGTH_SHORT).show()
         }
     }

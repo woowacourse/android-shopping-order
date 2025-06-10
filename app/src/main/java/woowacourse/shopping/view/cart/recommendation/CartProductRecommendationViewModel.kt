@@ -43,11 +43,11 @@ class CartProductRecommendationViewModel(
     private val _startOrder = MutableLiveData<List<CartProduct>>()
     val startOrder: LiveData<List<CartProduct>> get() = _startOrder
 
-    private val _onSelectedProduct = MutableSingleLiveData<Product>()
-    val onSelectedProduct: SingleLiveData<Product> get() = _onSelectedProduct
+    private val _selectedProduct = MutableSingleLiveData<Product>()
+    val selectedProduct: SingleLiveData<Product> get() = _selectedProduct
 
-    private val _onError = MutableSingleLiveData<Error>()
-    val onError: SingleLiveData<Error> get() = _onError
+    private val _errorEvent = MutableSingleLiveData<Error>()
+    val errorEvent: SingleLiveData<Error> get() = _errorEvent
 
     init {
         viewModelScope.launch {
@@ -59,7 +59,7 @@ class CartProductRecommendationViewModel(
                     loadRecommendedProducts()
                 }.onFailure {
                     Log.e("error", it.message.toString())
-                    _onError.setValue(Error.FailToLoadProduct)
+                    _errorEvent.setValue(Error.FailToLoadProduct)
                 }
         }
     }
@@ -94,11 +94,11 @@ class CartProductRecommendationViewModel(
                                 getRecommendationProducts(products, recentProduct)
                         }.onFailure {
                             Log.e("error", it.message.toString())
-                            _onError.setValue(Error.FailToLoadProduct)
+                            _errorEvent.setValue(Error.FailToLoadProduct)
                         }
                 }.onFailure {
                     Log.e("error", it.message.toString())
-                    _onError.setValue(Error.FailToLoadProduct)
+                    _errorEvent.setValue(Error.FailToLoadProduct)
                 }
         }
     }
@@ -119,7 +119,7 @@ class CartProductRecommendationViewModel(
     }
 
     override fun onProductClick(item: Product) {
-        _onSelectedProduct.setValue(item)
+        _selectedProduct.setValue(item)
     }
 
     override fun onAddClick(item: Product) {
@@ -140,7 +140,7 @@ class CartProductRecommendationViewModel(
                     updateQuantity(item, QUANTITY_STEP)
                 }.onFailure {
                     Log.e("error", it.message.toString())
-                    _onError.setValue(Error.FailToCart)
+                    _errorEvent.setValue(Error.FailToCart)
                 }
         }
     }
@@ -167,7 +167,7 @@ class CartProductRecommendationViewModel(
                 }
                 .onFailure {
                     Log.e("error", it.message.toString())
-                    _onError.setValue(Error.FailToIncrease)
+                    _errorEvent.setValue(Error.FailToIncrease)
                 }
         }
     }
@@ -198,7 +198,7 @@ class CartProductRecommendationViewModel(
                 }
                 .onFailure {
                     Log.e("error", it.message.toString())
-                    _onError.setValue(Error.FailToDecrease)
+                    _errorEvent.setValue(Error.FailToDecrease)
                 }
         }
     }

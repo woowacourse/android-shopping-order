@@ -68,14 +68,14 @@ class PaymentActivity : AppCompatActivity() {
             adapter.submitList(it)
         }
 
-        viewModel.onFinishOrder.observe(this) {
+        viewModel.orderComplete.observe(this) {
             Toast.makeText(this, R.string.finish_order, Toast.LENGTH_SHORT).show()
             val intent = ProductCatalogActivity.newIntent(this)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
         }
 
-        viewModel.onError.observe(this) {
+        viewModel.errorEvent.observe(this) {
             Toast.makeText(this, it.messageId, Toast.LENGTH_SHORT).show()
         }
     }

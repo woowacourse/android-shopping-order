@@ -35,8 +35,8 @@ class ProductDetailViewModel(
     private val _lastProductClickEvent = MutableSingleLiveData<Unit>()
     val lastProductClickEvent: SingleLiveData<Unit> get() = _lastProductClickEvent
 
-    private val _onError = MutableSingleLiveData<Error>()
-    val onError: SingleLiveData<Error> get() = _onError
+    private val _errorEvent = MutableSingleLiveData<Error>()
+    val errorEvent: SingleLiveData<Error> get() = _errorEvent
 
     init {
         loadLastViewedProduct()
@@ -73,7 +73,7 @@ class ProductDetailViewModel(
                                 _addToCartEvent.setValue(Unit)
                             }.onFailure {
                                 Log.e("error", it.message.toString())
-                                _onError.setValue(Error.FailToCart)
+                                _errorEvent.setValue(Error.FailToCart)
                             }
                     } else {
                         val updateResult =
@@ -88,12 +88,12 @@ class ProductDetailViewModel(
                                 _addToCartEvent.setValue(Unit)
                             }.onFailure {
                                 Log.e("error", it.message.toString())
-                                _onError.setValue(Error.FailToCart)
+                                _errorEvent.setValue(Error.FailToCart)
                             }
                     }
                 }.onFailure {
                     Log.e("error", it.message.toString())
-                    _onError.setValue(Error.FailToCart)
+                    _errorEvent.setValue(Error.FailToCart)
                 }
         }
     }
