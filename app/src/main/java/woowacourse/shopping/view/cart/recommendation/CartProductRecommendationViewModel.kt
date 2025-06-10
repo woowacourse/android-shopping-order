@@ -6,6 +6,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
@@ -80,14 +81,14 @@ class CartProductRecommendationViewModel(
 
     private fun loadRecommendedProducts() {
         viewModelScope.launch {
-            val result = recentProductRepository.getLastViewedProduct()
+            val deferredRecentProductResult = async { recentProductRepository.getLastViewedProduct() }
+            val deferredPagedProductResult = async { productRepository.getPagedProducts() }
 
-            result
+            deferredRecentProductResult.await()
                 .onSuccess { recentProduct ->
                     recentProduct ?: return@launch
-                    val pagedProductsResult = productRepository.getPagedProducts()
 
-                    pagedProductsResult
+                    deferredPagedProductResult.await()
                         .onSuccess { products ->
                             _recommendedProducts.value =
                                 getRecommendationProducts(products, recentProduct)
