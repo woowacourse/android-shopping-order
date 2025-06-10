@@ -17,6 +17,7 @@ class DefaultCouponRepository(
     companion object {
         @Suppress("ktlint:standard:property-naming")
         private var INSTANCE: CouponRepository? = null
+        private const val ERR_NOT_ADDED_PRODUCT = "상품이 추가되지 않았습니다"
 
         fun initialize(couponService: CouponService) {
             INSTANCE =

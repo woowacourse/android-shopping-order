@@ -7,6 +7,7 @@ import woowacourse.shopping.data.authentication.repository.DefaultAuthentication
 import woowacourse.shopping.data.coupon.remote.service.CouponService
 import woowacourse.shopping.data.coupon.repository.DefaultCouponRepository
 import woowacourse.shopping.data.network.ApiClient
+import woowacourse.shopping.data.order.repository.DefaultOrderRepository
 import woowacourse.shopping.data.product.local.database.ProductDatabase
 import woowacourse.shopping.data.product.remote.service.ProductService
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
@@ -61,6 +62,7 @@ class ShoppingApplication : Application() {
         )
 
         DefaultCouponRepository.initialize(couponService)
+        DefaultOrderRepository.initialize(shoppingCartService)
 
         thread {
             DefaultAuthenticationRepository.get().updateUserAuthentication(

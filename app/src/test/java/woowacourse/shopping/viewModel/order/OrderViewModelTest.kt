@@ -14,7 +14,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.data.coupon.repository.CouponRepository
-import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
+import woowacourse.shopping.data.order.repository.OrderRepository
 import woowacourse.shopping.fixture.COUPONS
 import woowacourse.shopping.fixture.SHOPPING_CART_PRODUCTS_TO_ORDER
 import woowacourse.shopping.view.order.CouponState
@@ -31,7 +31,7 @@ import woowacourse.shopping.viewModel.common.getOrAwaitValue
 @Suppress("FunctionName")
 class OrderViewModelTest {
     private lateinit var viewModel: OrderViewModel
-    private val shoppingCartRepository: ShoppingCartRepository = mockk()
+    private val orderRepository: OrderRepository = mockk()
     private val couponRepository: CouponRepository = mockk()
 
     @BeforeEach
@@ -44,7 +44,7 @@ class OrderViewModelTest {
         viewModel =
             OrderViewModel(
                 couponRepository,
-                shoppingCartRepository,
+                orderRepository,
                 SHOPPING_CART_PRODUCTS_TO_ORDER,
             )
     }
@@ -127,7 +127,7 @@ class OrderViewModelTest {
         viewModel =
             OrderViewModel(
                 couponRepository,
-                shoppingCartRepository,
+                orderRepository,
                 SHOPPING_CART_PRODUCTS_TO_ORDER,
             )
 
@@ -152,7 +152,10 @@ class OrderViewModelTest {
         val expected1 = SHOPPING_CART_PRODUCTS_TO_ORDER[0].id
         val expected2 = SHOPPING_CART_PRODUCTS_TO_ORDER[1].id
 
-        coEvery { shoppingCartRepository.remove(any()) } returns Result.success(Unit)
+        coEvery { orderRepository.removeProductsFromShoppingCart(any()) } returns
+            Result.success(
+                Unit,
+            )
 
         // when
         viewModel.proceedOrder()
@@ -162,22 +165,22 @@ class OrderViewModelTest {
     }
 
     @Test
-    fun `현재 주문한 상품을 장바구니에서 삭제할 수 있다`() {
+    fun `상품을 결제하면 장바구니에서 주문한 상품이 삭제된다`() {
         // given
         coEvery { couponRepository.getAllCoupons() } returns
             Result.success(
                 COUPONS,
             )
-        val expected1 = SHOPPING_CART_PRODUCTS_TO_ORDER[0].id
-        val expected2 = SHOPPING_CART_PRODUCTS_TO_ORDER[1].id
 
-        coEvery { shoppingCartRepository.remove(any()) } returns Result.success(Unit)
+        coEvery { orderRepository.removeProductsFromShoppingCart(any()) } returns
+            Result.success(
+                Unit,
+            )
 
         // when
-        viewModel.removeShoppingCartProducts()
+        viewModel.proceedOrder()
 
         // then
-        coVerify { shoppingCartRepository.remove(expected1) }
-        coVerify { shoppingCartRepository.remove(expected2) }
+        coVerify { orderRepository.removeProductsFromShoppingCart(SHOPPING_CART_PRODUCTS_TO_ORDER) }
     }
 }

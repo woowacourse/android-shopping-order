@@ -13,8 +13,8 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.coupon.repository.CouponRepository
 import woowacourse.shopping.data.coupon.repository.DefaultCouponRepository
-import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
-import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
+import woowacourse.shopping.data.order.repository.DefaultOrderRepository
+import woowacourse.shopping.data.order.repository.OrderRepository
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.Coupons
 import woowacourse.shopping.domain.coupon.FreeShipping
@@ -24,7 +24,7 @@ import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 
 class OrderViewModel(
     private val couponRepository: CouponRepository = DefaultCouponRepository.get(),
-    private val shoppingCartRepository: ShoppingCartRepository = DefaultShoppingCartRepository.get(),
+    private val orderRepository: OrderRepository = DefaultOrderRepository.get(),
     private val shoppingCartProductsToOrder: List<ShoppingCartProduct> = emptyList(),
     private val shippingRule: ShippingRule = DefaultShippingRule(),
 ) : ViewModel() {
@@ -85,14 +85,7 @@ class OrderViewModel(
     fun proceedOrder() {
         viewModelScope.launch(handler) {
             _event.value = OrderEvent.ORDER_SUCCESS
-        }
-    }
-
-    fun removeShoppingCartProducts() {
-        viewModelScope.launch(handler) {
-            shoppingCartProductsToOrder.forEach {
-                shoppingCartRepository.remove(it.id)
-            }
+            orderRepository.removeProductsFromShoppingCart(shoppingCartProductsToOrder)
         }
     }
 
