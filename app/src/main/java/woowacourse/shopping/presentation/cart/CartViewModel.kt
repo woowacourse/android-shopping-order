@@ -137,14 +137,11 @@ class CartViewModel(
     }
 
     fun onCheckAllCartItems() {
-        pagingData.value?.let { currentPagingData ->
-            val updatedProducts =
-                currentPagingData.products.map {
-                    it.copy(isChecked = isAllChecked.value!!)
-                }
-            _pagingData.value = currentPagingData.copy(products = updatedProducts)
-            setOrderData()
-        }
+        val paging = _pagingData.value ?: return
+
+        val updatedProducts = paging.products.map { it.copy(isChecked = isAllChecked.value!!) }
+        _pagingData.value = paging.copy(products = updatedProducts)
+        setOrderData()
     }
 
     private fun setOrderData() {
@@ -176,7 +173,8 @@ class CartViewModel(
                 if (pagingData.products.isEmpty() && pagingData.page > 0) {
                     loadCartProducts(page = pagingData.page - 1)
                     isAllChecked.value =
-                        pagingData.products.isNotEmpty() && pagingData.products.all { it.isChecked }
+                        pagingData.products.isNotEmpty() &&
+                        pagingData.products.all { it.isChecked }
                 } else {
                     val checkedProductIds = _checkedProducts.value?.map { it.id } ?: emptyList()
                     val updatedProducts =
@@ -195,33 +193,26 @@ class CartViewModel(
     }
 
     private fun updateProductInPagingData(updatedProduct: ProductUiModel) {
-        _pagingData.value =
-            _pagingData.value?.let { paging ->
-                val updatedList =
-                    paging.products.map {
-                        if (it.id == updatedProduct.id) updatedProduct else it
-                    }
-                paging.copy(products = updatedList)
-            }
+        val paging = _pagingData.value ?: return
+        val updatedList =
+            paging.products.map { if (it.id == updatedProduct.id) updatedProduct else it }
+        _pagingData.value = paging.copy(products = updatedList)
     }
 
     fun onOrderClick() {
         val count = checkedProductCount.value ?: 0
+        if (count == 0) return
+
         val checkedItems = checkedProducts.value ?: emptyList()
-        if (count > 0) {
-            _navigateToRecommendEvent.value = OrderInfo(checkedItems)
-        }
+        _navigateToRecommendEvent.value = OrderInfo(checkedItems)
     }
 
     fun restoreCheckedProducts(checkedIds: List<Long>) {
-        pagingData.value?.let { currentPagingData ->
-            val updatedProducts =
-                currentPagingData.products.map {
-                    it.copy(isChecked = it.id in checkedIds)
-                }
-            _pagingData.value = currentPagingData.copy(products = updatedProducts)
-            setOrderData()
-        }
+        val paging = _pagingData.value ?: return
+        val updatedProducts = paging.products.map { it.copy(isChecked = it.id in checkedIds) }
+
+        _pagingData.value = paging.copy(products = updatedProducts)
+        setOrderData()
     }
 
     companion object {
