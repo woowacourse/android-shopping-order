@@ -13,7 +13,6 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
 import woowacourse.shopping.domain.repository.ViewedItemRepository
-import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toUiModel
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.presentation.product.detail.CartEvent.AddItemFailure
@@ -50,9 +49,9 @@ class DetailViewModel(
             result
                 .onSuccess { product ->
                     val loadedProduct = product.copy(quantity = 1)
-                    _product.postValue(loadedProduct)
+                    _product.postValue(loadedProduct.toUiModel())
 
-                    viewedRepository.insertViewedItem(loadedProduct.toDomain())
+                    viewedRepository.insertViewedItem(loadedProduct)
                     _productInserted.postValue(true)
                 }.onFailure {
                     _productInserted.postValue(false)

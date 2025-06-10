@@ -2,28 +2,28 @@ package woowacourse.shopping.presentation.payment
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.presentation.payment.CouponViewHolder
 import woowacourse.shopping.presentation.payment.event.CouponEventHandler
 import woowacourse.shopping.presentation.util.CouponDiffCallback
 
 class CouponAdapter(
     private val couponHandler: CouponEventHandler,
-) : ListAdapter<Coupon, RecyclerView.ViewHolder>(CouponDiffCallback()) {
+) : ListAdapter<Coupon, CouponViewHolder>(CouponDiffCallback()) {
     var selectedCouponId: Long? = null
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): RecyclerView.ViewHolder = CouponViewHolder(parent, couponHandler)
+    ): CouponViewHolder = CouponViewHolder(parent, couponHandler)
 
     override fun onBindViewHolder(
-        holder: RecyclerView.ViewHolder,
+        holder: CouponViewHolder,
         position: Int,
     ) {
         val item = getItem(position)
         val isChecked = (item.id == selectedCouponId)
-        (holder as CouponViewHolder).bind(item, isChecked)
+        holder.bind(item, isChecked)
     }
 
     fun couponCheck(newSelectedCouponId: Long?) {
