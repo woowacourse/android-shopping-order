@@ -9,13 +9,11 @@ import woowacourse.shopping.domain.repository.CouponRepository
 class CouponRepositoryImpl(
     private val couponDataSource: CouponDataSource,
 ) : CouponRepository {
-    private var _cachedCoupons: List<Coupon>? = null
-    override val cachedCoupon: List<Coupon>?
-        get() = _cachedCoupons
+    private var cachedCoupons: List<Coupon>? = null
 
     override suspend fun getCoupons(): Result<List<Coupon>> =
         runCatching {
-            _cachedCoupons ?: fetchAndCacheCoupons()
+            cachedCoupons ?: fetchAndCacheCoupons()
         }
 
     override suspend fun getAvailableCoupons(cartItems: List<CartItem>): Result<List<Coupon>> =
@@ -24,9 +22,14 @@ class CouponRepositoryImpl(
             allCoupons.filter { it.isAvailable(cartItems) }
         }
 
+    override fun getCouponById(couponId: Long): Result<Coupon?> =
+        runCatching {
+            cachedCoupons?.firstOrNull { it.id == couponId }
+        }
+
     private suspend fun fetchAndCacheCoupons(): List<Coupon> {
         val fetched = couponDataSource.fetchCoupons().getOrThrow().map { it.toDomain() }
-        _cachedCoupons = fetched
+        cachedCoupons = fetched
         return fetched
     }
 }

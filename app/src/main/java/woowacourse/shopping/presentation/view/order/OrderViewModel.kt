@@ -19,7 +19,7 @@ class OrderViewModel(
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
 ) : ViewModel() {
-    private var selectedItems = emptyList<CartItemUiModel>() ?: emptyList()
+    private var selectedItems = emptyList<CartItemUiModel>()
 
     private val _couponList = MutableLiveData<List<CouponUiModel>>()
     val couponList: LiveData<List<CouponUiModel>> = _couponList
@@ -67,28 +67,21 @@ class OrderViewModel(
 
     fun calculateOrderSummary(coupon: CouponUiModel?) {
         val orderAmount = selectedItems.sumOf { it.totalPrice }
+
         val selectedCoupon =
             coupon?.id?.let { id ->
-                couponRepository.cachedCoupon?.firstOrNull { it.id == id }
+                couponRepository.getCouponById(id).getOrNull()
             }
+
         val couponAmount =
             selectedCoupon?.let { it.calculateDiscountAmount(selectedItems.map { it.toDomain() }) }
 
-        if (selectedCoupon is Coupon.FreeShippingCoupon) {
-            _orderSummary.value =
-                OrderSummary(
-                    orderAmount = orderAmount.toLong(),
-                    couponAmount = couponAmount ?: 0,
-                    shippingFee = 0,
-                )
-        } else {
-            _orderSummary.value =
-                OrderSummary(
-                    orderAmount = orderAmount.toLong(),
-                    couponAmount = couponAmount ?: 0,
-                    shippingFee = 3000,
-                )
-        }
+        _orderSummary.value =
+            OrderSummary(
+                orderAmount = orderAmount.toLong(),
+                couponAmount = couponAmount ?: 0,
+                shippingFee = if (selectedCoupon is Coupon.FreeShippingCoupon) 0 else 3000,
+            )
     }
 
     fun order() {
