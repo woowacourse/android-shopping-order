@@ -11,8 +11,8 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.Order
-import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.usecase.coupon.GetCouponsUseCase
+import woowacourse.shopping.domain.usecase.payment.OrderProductsUseCase
 import woowacourse.shopping.view.payment.adapter.PaymentItem
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
@@ -20,7 +20,7 @@ import woowacourse.shopping.view.util.SingleLiveData
 class PaymentViewModel(
     private val cartProducts: CartProducts,
     private val getCouponsUseCase: GetCouponsUseCase,
-    private val orderRepository: OrderRepository,
+    private val orderProductsUseCase: OrderProductsUseCase,
 ) : ViewModel(),
     PaymentEventHandler {
     private val couponItems = MutableLiveData<List<PaymentItem.CouponItem>>(emptyList())
@@ -76,8 +76,7 @@ class PaymentViewModel(
     override fun onPayClick() {
         viewModelScope.launch {
             order.value?.let { order ->
-                orderRepository
-                    .createOrder(order.cartProducts.ids)
+                orderProductsUseCase(order.cartProducts.ids)
                     .onSuccess {
                         _finishOrderEvent.postValue(Unit)
                     }.onFailure { Log.e("error", it.message.toString()) }
