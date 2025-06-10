@@ -81,11 +81,11 @@ class ProductCatalogViewModel(
     }
 
     override fun onQuantityIncreaseClick(item: Product) {
-        updateCartProduct(item, QUANTITY_TO_ADD)
+        updateCartQuantity(item, QUANTITY_TO_ADD)
     }
 
     override fun onQuantityDecreaseClick(item: Product) {
-        updateCartProduct(item, -QUANTITY_TO_ADD)
+        updateCartQuantity(item, -QUANTITY_TO_ADD)
     }
 
     override fun onProductClick(item: Product) {
@@ -158,13 +158,14 @@ class ProductCatalogViewModel(
         _isLoading.value = false
     }
 
-    private fun updateCartProduct(
+    private fun updateCartQuantity(
         item: Product,
         quantityDelta: Int,
     ) {
         viewModelScope.launch {
             val existing = cartProducts.firstOrNull { it.product.id == item.id } ?: return@launch
-            updateCartQuantityUseCase(existing, quantityDelta)
+            val newQuantity = existing.quantity + quantityDelta
+            updateCartQuantityUseCase(existing, newQuantity)
                 .onSuccess { updated ->
                     cartProducts.removeIf { it.product.id == item.id }
                     updated?.let { cartProducts.add(it) }
@@ -175,14 +176,14 @@ class ProductCatalogViewModel(
 
     private fun updateProductQuantity(
         item: Product,
-        quantityToAdd: Int,
+        quantityDelta: Int,
     ) {
         val updatedItems =
             productItems.value.orEmpty().map {
-                if (it.product.id == item.id) it.copy(quantity = it.quantity + quantityToAdd) else it
+                if (it.product.id == item.id) it.copy(quantity = it.quantity + quantityDelta) else it
             }
         productItems.postValue(updatedItems)
-        _totalQuantity.postValue((totalQuantity.value ?: MINIMUM_QUANTITY) + quantityToAdd)
+        _totalQuantity.postValue((totalQuantity.value ?: MINIMUM_QUANTITY) + quantityDelta)
     }
 
     private fun buildCatalogItems(): List<ProductCatalogItem> {

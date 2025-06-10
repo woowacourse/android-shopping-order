@@ -72,14 +72,14 @@ class CartProductRecommendViewModel(
     }
 
     override fun onQuantityIncreaseClick(item: Product) {
-        updateCartProduct(item, QUANTITY_TO_ADD)
+        updateCartQuantity(item, QUANTITY_TO_ADD)
     }
 
     override fun onQuantityDecreaseClick(item: Product) {
-        updateCartProduct(item, -QUANTITY_TO_ADD)
+        updateCartQuantity(item, -QUANTITY_TO_ADD)
     }
 
-    private fun updateCartProduct(
+    private fun updateCartQuantity(
         item: Product,
         quantityDelta: Int,
     ) {
@@ -89,10 +89,10 @@ class CartProductRecommendViewModel(
                     ?: return@launch
             val newQuantity = existing.quantity + quantityDelta
 
-            updateCartQuantityUseCase(existing, quantityDelta)
+            updateCartQuantityUseCase(existing, newQuantity)
                 .onSuccess { updated ->
                     var updatedList = cartProducts.value?.minus(existing)
-                    if (newQuantity > DEFAULT_COUNT && updated != null) {
+                    if (newQuantity > MINIMUM_QUANTITY && updated != null) {
                         updatedList = updatedList?.plus(updated)
                     }
                     cartProducts.postValue(updatedList ?: CartProducts(emptyList()))
@@ -103,17 +103,17 @@ class CartProductRecommendViewModel(
 
     private fun updateProductQuantity(
         item: Product,
-        quantityToAdd: Int,
+        quantityDelta: Int,
     ) {
         val updatedList =
             recommendedProducts.value.orEmpty().map {
-                if (it.product.id == item.id) it.copy(quantity = it.quantity + quantityToAdd) else it
+                if (it.product.id == item.id) it.copy(quantity = it.quantity + quantityDelta) else it
             }
         _recommendedProducts.postValue(updatedList)
     }
 
     companion object {
         private const val QUANTITY_TO_ADD = 1
-        private const val DEFAULT_COUNT = 0
+        private const val MINIMUM_QUANTITY = 0
     }
 }

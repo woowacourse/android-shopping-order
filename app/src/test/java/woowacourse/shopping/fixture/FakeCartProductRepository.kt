@@ -29,7 +29,7 @@ class FakeCartProductRepository : CartProductRepository {
                     quantity = quantity,
                 )
             cartProducts.add(cartProduct)
-            Result.success(cartProduct.id) // cartId 반환
+            Result.success(cartProduct.id)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -59,10 +59,9 @@ class FakeCartProductRepository : CartProductRepository {
 
     override suspend fun updateQuantity(
         cartProduct: CartProduct,
-        quantityToAdd: Int,
+        newQuantity: Int,
     ): Result<Unit> =
         try {
-            val newQuantity = cartProduct.quantity + quantityToAdd
             if (newQuantity == 0) {
                 delete(cartProduct.id)
             } else {

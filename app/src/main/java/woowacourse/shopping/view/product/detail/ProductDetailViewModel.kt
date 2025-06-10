@@ -64,7 +64,8 @@ class ProductDetailViewModel(
                         if (cartProduct == null) {
                             addToCartUseCase(product, quantityToAdd)
                         } else {
-                            updateCartQuantityUseCase(cartProduct, quantityToAdd)
+                            val newQuantity = cartProduct.quantity + quantityToAdd
+                            updateCartQuantityUseCase(cartProduct, newQuantity)
                         }
 
                     updateResult

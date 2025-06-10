@@ -9,15 +9,13 @@ class UpdateCartQuantityUseCase(
 ) {
     suspend operator fun invoke(
         cartProduct: CartProduct,
-        quantityDelta: Int,
-    ): Result<CartProduct?> {
-        val newQuantity = cartProduct.quantity + quantityDelta
-        return when {
+        newQuantity: Int,
+    ): Result<CartProduct?> =
+        when {
             newQuantity == 0 -> removeFromCartUseCase(cartProduct).map { null }
             else ->
-                cartProductRepository.updateQuantity(cartProduct, quantityDelta).map {
+                cartProductRepository.updateQuantity(cartProduct, newQuantity).map {
                     cartProduct.copy(quantity = newQuantity)
                 }
         }
-    }
 }

@@ -18,7 +18,7 @@ interface CartProductRepository {
 
     suspend fun updateQuantity(
         cartProduct: CartProduct,
-        quantityToAdd: Int,
+        newQuantity: Int,
     ): Result<Unit>
 
     suspend fun delete(id: Int): Result<Unit>

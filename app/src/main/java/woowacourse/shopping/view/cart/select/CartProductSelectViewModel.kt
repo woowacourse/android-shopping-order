@@ -99,11 +99,11 @@ class CartProductSelectViewModel(
     }
 
     override fun onQuantityIncreaseClick(item: CartProduct) {
-        updateCartProduct(item, QUANTITY_TO_ADD)
+        updateCartQuantity(item, QUANTITY_TO_ADD)
     }
 
     override fun onQuantityDecreaseClick(item: CartProduct) {
-        updateCartProduct(item, -QUANTITY_TO_ADD)
+        updateCartQuantity(item, -QUANTITY_TO_ADD)
     }
 
     override fun onSelectItem(item: CartProduct) {
@@ -137,7 +137,7 @@ class CartProductSelectViewModel(
         _cartProductItems.value = updatedProducts
     }
 
-    private fun updateCartProduct(
+    private fun updateCartQuantity(
         item: CartProduct,
         quantityDelta: Int,
     ) {
@@ -148,7 +148,7 @@ class CartProductSelectViewModel(
             val newQuantity = existing.cartProduct.quantity + quantityDelta
             if (newQuantity < MINIMUM_QUANTITY) return@launch
 
-            updateCartQuantityUseCase(existing.cartProduct, quantityDelta).onSuccess { updated ->
+            updateCartQuantityUseCase(existing.cartProduct, newQuantity).onSuccess { updated ->
                 loadPage(page.value ?: FIRST_PAGE_NUMBER)
                 val currentSelected = selectedCartProducts.value
                 if (currentSelected?.contains(item) == true && updated != null) {
