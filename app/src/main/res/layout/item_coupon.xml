@@ -40,7 +40,7 @@
             android:textColor="@color/gray_5"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:text="@{couponState.title}"
+            android:text="@{couponState.coupon.description}"
             app:layout_constraintBottom_toBottomOf="@id/couponCheckbox"
             app:layout_constraintStart_toEndOf="@id/couponCheckbox"
             app:layout_constraintTop_toTopOf="@id/couponCheckbox"
@@ -54,20 +54,20 @@
             android:textColor="@color/gray_5"
             android:textSize="12sp"
             android:textStyle="normal"
-            app:expirationDate="@{couponState.expirationDate}"
+            app:expirationDate="@{couponState.coupon.expirationDate}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/couponCheckbox"
             tools:text="만료일: 2024년 11월 30일" />
 
         <TextView
-            android:visibility="@{couponState.minimumOrderPrice != null ? View.VISIBLE : View.GONE}"
+            android:visibility="@{couponState.coupon.minimumAmount != null ? View.VISIBLE : View.GONE}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:textColor="@color/gray_5"
             android:textSize="12sp"
             android:textStyle="normal"
-            android:text="@{@string/couponMinimumOrderPrice(couponState.minimumOrderPrice)}"
+            android:text="@{@string/couponMinimumOrderPrice(couponState.coupon.minimumAmount)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/couponExpiration"
             tools:text="최소 주문 금액: 100,000원" />

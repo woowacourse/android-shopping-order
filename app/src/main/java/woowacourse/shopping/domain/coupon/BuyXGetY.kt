@@ -7,7 +7,7 @@ import java.time.LocalTime
 data class BuyXGetY(
     override val description: String,
     override val code: String,
-    override val explanationDate: LocalDate,
+    override val expirationDate: LocalDate,
     override val id: Long,
     val buyQuantity: Int,
     val getQuantity: Int,

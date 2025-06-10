@@ -6,7 +6,7 @@ import java.time.LocalDate
 data class Fixed(
     override val description: String,
     override val code: String,
-    override val explanationDate: LocalDate,
+    override val expirationDate: LocalDate,
     override val id: Long,
     val discount: Int,
     override val minimumAmount: Int?,

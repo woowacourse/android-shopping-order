@@ -8,7 +8,7 @@ import java.time.LocalDate
 class FreeShipping(
     override val description: String,
     override val code: String,
-    override val explanationDate: LocalDate,
+    override val expirationDate: LocalDate,
     override val id: Long,
     override val minimumAmount: Int?,
 ) : Coupon(), ShippingRule by DefaultShippingRule() {

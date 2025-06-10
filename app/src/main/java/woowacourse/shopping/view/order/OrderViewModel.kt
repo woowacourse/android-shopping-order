@@ -51,7 +51,7 @@ class OrderViewModel(
             val coupon =
                 couponState
                     .filter { it.isSelected }
-                    .map { coupons.value?.get(it.id) }
+                    .map { coupons.value?.get(it.coupon.id) }
 
             val totalPrice = shoppingCartProductsToOrder.sumOf { it.price }
             val totalShippingDiscount =
@@ -78,7 +78,7 @@ class OrderViewModel(
     fun toggleCoupon(couponState: CouponState) {
         _couponState.value =
             _couponState.value?.map {
-                it.copy(isSelected = (it.id == couponState.id))
+                it.copy(isSelected = (it.coupon.id == couponState.coupon.id))
             }
     }
 

@@ -14,7 +14,7 @@ fun CouponResponse.toBuyXGetY(): BuyXGetY {
         id = id.toLong(),
         description = description,
         code = code,
-        explanationDate = LocalDate.parse(expirationDate, DateTimeFormatter.ISO_LOCAL_DATE),
+        expirationDate = LocalDate.parse(expirationDate, DateTimeFormatter.ISO_LOCAL_DATE),
         buyQuantity = buyQuantity!!,
         getQuantity = getQuantity!!,
     )
@@ -25,7 +25,7 @@ fun CouponResponse.toFixed(): Fixed {
         id = id.toLong(),
         description = description,
         code = code,
-        explanationDate = LocalDate.parse(expirationDate, DateTimeFormatter.ISO_LOCAL_DATE),
+        expirationDate = LocalDate.parse(expirationDate, DateTimeFormatter.ISO_LOCAL_DATE),
         discount = discount!!,
         minimumAmount = minimumAmount,
     )
@@ -36,7 +36,7 @@ fun CouponResponse.toPercentage(): Percentage {
         id = id.toLong(),
         description = description,
         code = code,
-        explanationDate = LocalDate.parse(expirationDate, DateTimeFormatter.ISO_LOCAL_DATE),
+        expirationDate = LocalDate.parse(expirationDate, DateTimeFormatter.ISO_LOCAL_DATE),
         discount = discount!!,
         availableStartTime =
             availableTime?.let {
@@ -60,7 +60,7 @@ fun CouponResponse.toFreeShipping(): FreeShipping {
         id = id.toLong(),
         description = description,
         code = code,
-        explanationDate = LocalDate.parse(expirationDate, DateTimeFormatter.ISO_LOCAL_DATE),
+        expirationDate = LocalDate.parse(expirationDate, DateTimeFormatter.ISO_LOCAL_DATE),
         minimumAmount = minimumAmount,
     )
 }

@@ -77,14 +77,14 @@ val COUPONS =
         FreeShipping(
             id = 0,
             description = "무료배송",
-            explanationDate = LocalDate.of(2099, 1, 1),
+            expirationDate = LocalDate.of(2099, 1, 1),
             code = "adsf",
             minimumAmount = 0,
         ),
         BuyXGetY(
             id = 1,
             description = "10000원 쿠폰",
-            explanationDate = LocalDate.of(2000, 1, 1),
+            expirationDate = LocalDate.of(2000, 1, 1),
             code = "adsf",
             buyQuantity = 2,
             getQuantity = 1,
@@ -96,14 +96,14 @@ val COUPONS2 =
         FreeShipping(
             id = 0,
             description = "무료배송",
-            explanationDate = LocalDate.of(2099, 1, 1),
+            expirationDate = LocalDate.of(2099, 1, 1),
             code = "adsf",
             minimumAmount = 0,
         ),
         Fixed(
             id = 1,
             description = "10000원 쿠폰",
-            explanationDate = LocalDate.of(2000, 1, 1),
+            expirationDate = LocalDate.of(2000, 1, 1),
             code = "adsf",
             discount = 10000,
             minimumAmount = 0,
@@ -111,7 +111,7 @@ val COUPONS2 =
         Fixed(
             id = 1,
             description = "10000원 쿠폰",
-            explanationDate = LocalDate.of(2000, 1, 1),
+            expirationDate = LocalDate.of(2000, 1, 1),
             code = "adsf",
             discount = 10000,
             minimumAmount = 0,

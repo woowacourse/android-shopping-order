@@ -11,7 +11,7 @@ class OrderAdapter(
             override fun areItemsTheSame(
                 oldItem: CouponState,
                 newItem: CouponState,
-            ): Boolean = oldItem.id == newItem.id
+            ): Boolean = oldItem.coupon.id == newItem.coupon.id
 
             override fun areContentsTheSame(
                 oldItem: CouponState,

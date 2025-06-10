@@ -7,7 +7,7 @@ import java.time.LocalTime
 data class Percentage(
     override val description: String,
     override val code: String,
-    override val explanationDate: LocalDate,
+    override val expirationDate: LocalDate,
     override val id: Long,
     val discount: Int,
     override val availableStartTime: LocalTime? = null,
