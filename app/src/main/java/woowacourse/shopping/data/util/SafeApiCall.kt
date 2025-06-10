@@ -7,9 +7,9 @@ inline fun <T> safeApiCall(apiCall: () -> retrofit2.Response<T>): Result<T> =
     try {
         val response = apiCall()
         if (response.isSuccessful) {
-            Result.success(
-                response.body() as T,
-            )
+            response.body()?.let { body ->
+                Result.success(body)
+            } ?: Result.failure(NullPointerException("SafeApiCall: response body is null"))
         } else {
             Result.failure(HttpException(response))
         }
