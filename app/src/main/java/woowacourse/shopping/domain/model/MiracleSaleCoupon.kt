@@ -2,7 +2,7 @@ package woowacourse.shopping.domain.model
 
 import java.time.LocalTime
 
-data object MiracleSaleCoupon : CouponContract() {
+data object MiracleSaleCoupon : CouponRule() {
     override fun isAvailable(
         orderedPrice: Int,
         orderedCarts: List<CartProduct>,

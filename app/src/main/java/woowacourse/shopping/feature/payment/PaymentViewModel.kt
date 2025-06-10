@@ -11,7 +11,7 @@ import woowacourse.shopping.data.remote.order.OrderRepository
 import woowacourse.shopping.data.remote.order.OrderRequest
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Coupon
-import woowacourse.shopping.domain.model.CouponContract
+import woowacourse.shopping.domain.model.CouponRule
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
@@ -81,7 +81,7 @@ class PaymentViewModel(
             return
         }
 
-        val contract = CouponContract.getContract(selectedCoupon.couponDetail.discountType)
+        val contract = CouponRule.getContract(selectedCoupon.couponDetail.discountType)
         val newPrice = contract.apply(currentPrice, selectedCoupon, orderedCarts)
 
         _price.value = newPrice
@@ -106,7 +106,7 @@ class PaymentViewModel(
             val availableCoupons =
                 allCoupons
                     .filter { couponDetail ->
-                        val contract = CouponContract.getContract(couponDetail.discountType)
+                        val contract = CouponRule.getContract(couponDetail.discountType)
                         contract.isAvailable(orderedPrice, orderedCarts) == true
                     }.map { Coupon(couponDetail = it) }
 

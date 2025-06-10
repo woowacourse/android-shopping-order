@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.model
 
-data object FreeShippingCoupon : CouponContract() {
+data object FreeShippingCoupon : CouponRule() {
     override fun isAvailable(
         orderedPrice: Int,
         orderedCarts: List<CartProduct>,

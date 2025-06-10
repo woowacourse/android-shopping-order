@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.model
 
-sealed class CouponContract {
+sealed class CouponRule {
     abstract fun isAvailable(
         orderedPrice: Int,
         orderedCarts: List<CartProduct>,
@@ -13,7 +13,7 @@ sealed class CouponContract {
     ): Price
 
     companion object {
-        fun getContract(discountType: String): CouponContract =
+        fun getContract(discountType: String): CouponRule =
             when (discountType) {
                 DiscountType.FIXED.code -> FixedCoupon
                 DiscountType.BUY_X_GET_Y.code -> BuyTwoGetOneCoupon

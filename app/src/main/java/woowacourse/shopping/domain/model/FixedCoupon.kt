@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.model
 
-data object FixedCoupon : CouponContract() {
+data object FixedCoupon : CouponRule() {
     private const val DEFAULT_SHIPPING_FEE = 3_000
     private const val MIN_PURCHASE_FOR_BENEFIT = 100_000
 
