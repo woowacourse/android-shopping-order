@@ -1,11 +1,12 @@
 package woowacourse.shopping.data.remote.cart
 
-import woowacourse.shopping.data.remote.NetworkClient
 import woowacourse.shopping.data.remote.cart.CartResponse.Content
 import kotlin.text.substringAfterLast
 
-class CartRepository {
-    suspend fun fetchAllCart() = NetworkClient.getCartService().requestCart(size = Int.MAX_VALUE)
+class CartRepository(
+    private val cartService: CartService,
+) {
+    suspend fun fetchAllCart() = cartService.requestCart(size = Int.MAX_VALUE)
 
     suspend fun findCartByProductId(productId: Long): Content? {
         val response = fetchAllCart()
@@ -13,11 +14,11 @@ class CartRepository {
         return matched
     }
 
-    suspend fun fetchCart(page: Int) = NetworkClient.getCartService().requestCart(page = page)
+    suspend fun fetchCart(page: Int) = cartService.requestCart(page = page)
 
     suspend fun addToCart(cartRequest: CartRequest): Result<Long> =
         try {
-            val response = NetworkClient.getCartService().addToCart(cartRequest = cartRequest)
+            val response = cartService.addToCart(cartRequest = cartRequest)
             if (response.isSuccessful) {
                 val id =
                     response.headers()["Location"]?.substringAfterLast("/")?.toLongOrNull() ?: 0
@@ -31,7 +32,7 @@ class CartRepository {
 
     suspend fun deleteCart(id: Long): Result<Unit> =
         try {
-            val response = NetworkClient.getCartService().deleteFromCart(id = id)
+            val response = cartService.deleteFromCart(id = id)
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
@@ -45,8 +46,7 @@ class CartRepository {
         id: Long,
         cartQuantity: CartQuantity,
     ) = try {
-        val response =
-            NetworkClient.getCartService().updateCart(id = id, cartQuantity = cartQuantity)
+        val response = cartService.updateCart(id = id, cartQuantity = cartQuantity)
         if (response.isSuccessful) {
             Result.success(Result.success(Unit))
         } else {
@@ -58,7 +58,7 @@ class CartRepository {
 
     suspend fun getCartCounts(): Result<Long> =
         try {
-            val response = NetworkClient.getCartService().getCartCounts()
+            val response = cartService.getCartCounts()
             if (response.isSuccessful) {
                 val totalCount = response.body()?.quantity?.toLong() ?: 0L
                 Result.success(totalCount)

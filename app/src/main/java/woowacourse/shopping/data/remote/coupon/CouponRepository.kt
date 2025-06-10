@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.remote.coupon
 
-import woowacourse.shopping.data.remote.NetworkClient
-
-class CouponRepository {
-    suspend fun fetchAllCoupons(): List<CouponResponse> = NetworkClient.getCouponService().requestCoupons()
+class CouponRepository(
+    private val couponService: CouponService,
+) {
+    suspend fun fetchAllCoupons(): List<CouponResponse> = couponService.requestCoupons()
 }

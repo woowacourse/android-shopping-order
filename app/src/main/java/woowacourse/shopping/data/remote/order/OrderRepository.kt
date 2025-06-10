@@ -1,11 +1,11 @@
 package woowacourse.shopping.data.remote.order
 
-import woowacourse.shopping.data.remote.NetworkClient
-
-class OrderRepository {
+class OrderRepository(
+    private val orderService: OrderService,
+) {
     suspend fun order(orderRequest: OrderRequest): Result<Unit> =
         try {
-            val response = NetworkClient.getOrderService().order(orderRequest)
+            val response = orderService.order(orderRequest)
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {

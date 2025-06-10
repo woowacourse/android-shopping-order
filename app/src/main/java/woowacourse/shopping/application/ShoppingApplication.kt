@@ -3,6 +3,7 @@ package woowacourse.shopping.application
 import android.app.Application
 import woowacourse.shopping.data.local.ShoppingDatabase
 import woowacourse.shopping.data.local.history.repository.HistoryRepositoryImpl
+import woowacourse.shopping.data.remote.NetworkClient
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.coupon.CouponRepository
 import woowacourse.shopping.data.remote.order.OrderRepository
@@ -20,8 +21,8 @@ class ShoppingApplication : Application() {
         ViewModelFactory {
             GoodsViewModel(
                 HistoryRepositoryImpl(database.historyDao()),
-                ProductRepository(),
-                CartRepository(),
+                ProductRepository(NetworkClient.productService),
+                CartRepository(NetworkClient.cartService),
             )
         }
     }
@@ -29,9 +30,9 @@ class ShoppingApplication : Application() {
     val goodsDetailsFactory by lazy {
         ViewModelFactory {
             GoodsDetailsViewModel(
-                CartRepository(),
+                CartRepository(NetworkClient.cartService),
                 HistoryRepositoryImpl(database.historyDao()),
-                ProductRepository(),
+                ProductRepository(NetworkClient.productService),
             )
         }
     }
@@ -39,8 +40,8 @@ class ShoppingApplication : Application() {
     val cartFactory by lazy {
         ViewModelFactory {
             CartViewModel(
-                CartRepository(),
-                ProductRepository(),
+                CartRepository(NetworkClient.cartService),
+                ProductRepository(NetworkClient.productService),
                 HistoryRepositoryImpl(database.historyDao()),
             )
         }
@@ -49,9 +50,9 @@ class ShoppingApplication : Application() {
     val paymentFactory by lazy {
         ViewModelFactory {
             PaymentViewModel(
-                CouponRepository(),
-                CartRepository(),
-                OrderRepository(),
+                CouponRepository(NetworkClient.couponService),
+                CartRepository(NetworkClient.cartService),
+                OrderRepository(NetworkClient.orderService),
             )
         }
     }

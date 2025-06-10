@@ -30,11 +30,11 @@ object NetworkClient {
             .build()
     }
 
-    fun getCartService(): CartService = retrofitService.create(CartService::class.java)
+    val cartService: CartService by lazy { retrofitService.create(CartService::class.java) }
 
-    fun getProductService(): ProductService = retrofitService.create(ProductService::class.java)
+    val productService: ProductService by lazy { retrofitService.create(ProductService::class.java) }
 
-    fun getCouponService(): CouponService = retrofitService.create(CouponService::class.java)
+    val couponService: CouponService by lazy { retrofitService.create(CouponService::class.java) }
 
-    fun getOrderService(): OrderService = retrofitService.create(OrderService::class.java)
+    val orderService: OrderService by lazy { retrofitService.create(OrderService::class.java) }
 }
