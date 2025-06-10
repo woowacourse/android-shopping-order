@@ -4,6 +4,7 @@ import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSource
 import woowacourse.shopping.data.entity.RecentlyViewedProduct
 import woowacourse.shopping.data.entity.toData
 import woowacourse.shopping.data.entity.toDomain
+import woowacourse.shopping.data.handleResult
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
@@ -11,28 +12,35 @@ class RecentProductRepositoryImpl(
     private val recentProductLocalDataSource: RecentProductLocalDataSource,
 ) : RecentProductRepository {
     override suspend fun getRecentProducts(): Result<List<Product>> =
-        runCatching {
-            recentProductLocalDataSource
-                .getProducts()
-                .map { recentProduct -> recentProduct.toDomain() }
-        }
+        recentProductLocalDataSource
+            .getProducts()
+            .map { list -> list.map { it.toDomain() } }
 
     override suspend fun getMostRecentProduct(): Result<Product?> =
-        runCatching {
-            recentProductLocalDataSource.getMostRecentProduct()?.toDomain()
-        }
+        recentProductLocalDataSource
+            .getMostRecentProduct()
+            .map { it?.toDomain() }
 
     override suspend fun insertRecentProduct(product: Product): Result<Unit> =
-        runCatching {
-            val recentProducts = recentProductLocalDataSource.getProducts()
+        handleResult {
             val productId = product.productId
+            val recentProducts =
+                recentProductLocalDataSource
+                    .getProducts()
+                    .getOrThrow()
 
             if (isNewProduct(recentProducts, productId) && recentProducts.size == 10) {
-                val oldProduct = recentProductLocalDataSource.getOldestProduct()
-                recentProductLocalDataSource.delete(oldProduct)
+                val oldest =
+                    recentProductLocalDataSource
+                        .getOldestProduct()
+                        .getOrThrow()
+
+                recentProductLocalDataSource
+                    .delete(oldest)
+                    .getOrThrow()
             }
 
-            recentProductLocalDataSource.insert(product.toData())
+            return recentProductLocalDataSource.insert(product.toData())
         }
 
     private fun isNewProduct(

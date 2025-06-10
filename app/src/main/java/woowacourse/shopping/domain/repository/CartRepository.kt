@@ -35,5 +35,5 @@ interface CartRepository {
 
     suspend fun deleteProduct(productId: Long): Result<Unit>
 
-    fun getCartItemById(productId: Long): CartItem?
+    fun getCartItemById(productId: Long): Result<CartItem?>
 }

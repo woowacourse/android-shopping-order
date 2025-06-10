@@ -3,15 +3,15 @@ package woowacourse.shopping.data.datasource.local
 import woowacourse.shopping.data.entity.RecentlyViewedProduct
 
 interface RecentProductLocalDataSource {
-    suspend fun getProducts(): List<RecentlyViewedProduct>
+    suspend fun getProducts(): Result<List<RecentlyViewedProduct>>
 
-    suspend fun getMostRecentProduct(): RecentlyViewedProduct?
+    suspend fun getMostRecentProduct(): Result<RecentlyViewedProduct?>
 
-    suspend fun getOldestProduct(): RecentlyViewedProduct
+    suspend fun getOldestProduct(): Result<RecentlyViewedProduct>
 
-    suspend fun getCount(): Int
+    suspend fun getCount(): Result<Int>
 
-    suspend fun insert(product: RecentlyViewedProduct)
+    suspend fun insert(product: RecentlyViewedProduct): Result<Unit>
 
-    suspend fun delete(product: RecentlyViewedProduct)
+    suspend fun delete(product: RecentlyViewedProduct): Result<Unit>
 }

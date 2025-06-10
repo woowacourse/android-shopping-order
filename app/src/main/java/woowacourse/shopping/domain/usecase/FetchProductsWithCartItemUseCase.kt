@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.usecase
 
-import woowacourse.shopping.data.repository.remote.PageableItem
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.PageableItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
