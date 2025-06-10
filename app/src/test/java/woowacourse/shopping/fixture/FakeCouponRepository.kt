@@ -1,12 +1,11 @@
 package woowacourse.shopping.fixture
 
-import woowacourse.shopping.data.model.CouponResponse
 import woowacourse.shopping.data.util.TimeProvider
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.CouponPolicyContext
 import woowacourse.shopping.domain.model.CouponType
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CouponRepository
-import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class FakeCouponRepository(
     private val coupons: List<Coupon>,
@@ -14,7 +13,7 @@ class FakeCouponRepository(
 ) : CouponRepository {
     override suspend fun getCoupons(
         totalAmount: Long,
-        orderProducts: List<ProductUiModel>,
+        orderProducts: List<Product>,
     ): Result<List<Coupon>> {
         val filteredCoupons =
             coupons.filter { coupon ->
@@ -25,29 +24,9 @@ class FakeCouponRepository(
                         orderProducts = orderProducts,
                         currentDateTime = timeProvider.currentTime(),
                     )
-                policy.isApplicable(coupon.toResponse(), policyContext)
+                policy.isApplicable(coupon, policyContext)
             }
 
         return Result.success(filteredCoupons)
     }
-
-    private fun Coupon.toResponse(): CouponResponse =
-        CouponResponse(
-            id = this.id,
-            description = this.description,
-            expirationDate = this.expirationDate,
-            code = this.code,
-            discount = this.discount,
-            minimumAmount = this.minimumAmount,
-            discountType = this.discountType,
-            buyQuantity = this.buyQuantity,
-            getQuantity = this.getQuantity,
-            availableTime =
-                this.availableTime?.let {
-                    CouponResponse.AvailableTime(
-                        start = it.start,
-                        end = it.end,
-                    )
-                },
-        )
 }

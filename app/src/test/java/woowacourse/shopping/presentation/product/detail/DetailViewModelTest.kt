@@ -31,7 +31,7 @@ class DetailViewModelTest {
                     productId = 100,
                 )
 
-            viewModel.setProduct()
+            viewModel.loadProduct()
             viewModel.loadLastViewedItem()
 
             val lastViewed = viewModel.lastViewed.value
@@ -49,7 +49,7 @@ class DetailViewModelTest {
                     productId = 1L,
                 )
 
-            viewModel.setProduct()
+            viewModel.loadProduct()
             viewModel.loadLastViewedItem()
 
             val lastViewed = viewModel.lastViewed.value
@@ -69,12 +69,13 @@ class DetailViewModelTest {
                     productId = 10L,
                 )
 
-            viewModel.setProduct()
+            viewModel.loadProduct()
 
             cartRepository.addCartItem(id = 10L, quantity = 2)
 
             val pagingData =
-                cartRepository.getCartItems(page = 0, size = 5)
+                cartRepository
+                    .getCartItems(page = 0, size = 5)
                     .getOrThrow()
 
             val cartItems = pagingData.products
@@ -97,12 +98,13 @@ class DetailViewModelTest {
                     productId = 10L,
                 )
 
-            viewModel.setProduct()
+            viewModel.loadProduct()
 
             cartRepository.addCartItem(id = 10L, quantity = 3)
 
             val pagingData =
-                cartRepository.getCartItems(page = 0, size = 5)
+                cartRepository
+                    .getCartItems(page = 0, size = 5)
                     .getOrThrow()
 
             val cartItems = pagingData.products
