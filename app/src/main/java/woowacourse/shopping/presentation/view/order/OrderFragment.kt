@@ -52,7 +52,9 @@ class OrderFragment :
             arguments?.getParcelableArrayListCompat<CartItemUiModel>(ARG_SELECTED_CART_ITEM)
         selectedItems?.let { viewModel.setSelectedItems(it) }
 
+        fetchCoupons()
         initOrderSummary()
+        initBindings()
         initObserver()
         initListener()
     }
@@ -62,12 +64,6 @@ class OrderFragment :
     }
 
     private fun initObserver() {
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.vm = viewModel
-        binding.recyclerViewCoupon.adapter = couponAdapter
-
-        viewModel.loadCoupons()
-
         viewModel.couponList.observe(viewLifecycleOwner) {
             couponAdapter.submitList(it)
         }
@@ -75,10 +71,21 @@ class OrderFragment :
         viewModel.selectedCoupon.observe(viewLifecycleOwner) { selectedCoupon ->
             viewModel.calculateOrderSummary(selectedCoupon)
         }
+
         viewModel.orderSuccessEvent.observe(viewLifecycleOwner) {
             Toast.makeText(requireContext(), "주문에 성공했습니다", Toast.LENGTH_SHORT).show()
             navigateToCatalog()
         }
+    }
+
+    private fun fetchCoupons() {
+        viewModel.loadCoupons()
+    }
+
+    private fun initBindings() {
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.vm = viewModel
+        binding.recyclerViewCoupon.adapter = couponAdapter
     }
 
     private fun initListener() {
