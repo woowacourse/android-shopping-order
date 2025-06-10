@@ -49,7 +49,14 @@ class RecommendViewModelTest {
     @Test
     fun `상품 수량이 정상적으로 증가한다`() =
         runTest {
-            val product = ProductUiModel(id = 2L, name = "아이스 카페 아메리카노", imageUrl = "", price = 1000, quantity = 0)
+            val product =
+                ProductUiModel(
+                    id = 2L,
+                    name = "아이스 카페 아메리카노",
+                    imageUrl = "",
+                    price = 1000,
+                    quantity = 0,
+                )
 
             viewModel =
                 RecommendViewModel(
@@ -82,8 +89,20 @@ class RecommendViewModelTest {
         runTest {
             val checkedProducts =
                 listOf(
-                    ProductUiModel(id = 1L, name = "아이스 아메리카노", imageUrl = "", price = 1000, quantity = 2),
-                    ProductUiModel(id = 2L, name = "베르가못 콜드브루", imageUrl = "", price = 2000, quantity = 1),
+                    ProductUiModel(
+                        id = 1L,
+                        name = "아이스 아메리카노",
+                        imageUrl = "",
+                        price = 1000,
+                        quantity = 2,
+                    ),
+                    ProductUiModel(
+                        id = 2L,
+                        name = "베르가못 콜드브루",
+                        imageUrl = "",
+                        price = 2000,
+                        quantity = 1,
+                    ),
                 )
 
             viewModel =
@@ -105,7 +124,13 @@ class RecommendViewModelTest {
         runTest {
             val checkedProducts =
                 listOf(
-                    ProductUiModel(id = 1L, name = "아이스 아메리카노", imageUrl = "", price = 1000, quantity = 1),
+                    ProductUiModel(
+                        id = 1L,
+                        name = "아이스 아메리카노",
+                        imageUrl = "",
+                        price = 1000,
+                        quantity = 1,
+                    ),
                 )
 
             viewModel =
@@ -133,7 +158,13 @@ class RecommendViewModelTest {
 
             val toRestore =
                 listOf(
-                    ProductUiModel(id = 2L, name = "아이스 아메리카노", imageUrl = "", price = 1000, quantity = 2),
+                    ProductUiModel(
+                        id = 2L,
+                        name = "아이스 아메리카노",
+                        imageUrl = "",
+                        price = 1000,
+                        quantity = 2,
+                    ),
                 )
 
             viewModel.restoreCheckedProducts(toRestore)

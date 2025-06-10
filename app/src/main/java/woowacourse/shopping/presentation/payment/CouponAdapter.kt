@@ -3,7 +3,6 @@ package woowacourse.shopping.presentation.payment
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.domain.model.Coupon
-import woowacourse.shopping.presentation.payment.CouponViewHolder
 import woowacourse.shopping.presentation.payment.event.CouponEventHandler
 import woowacourse.shopping.presentation.util.CouponDiffCallback
 
