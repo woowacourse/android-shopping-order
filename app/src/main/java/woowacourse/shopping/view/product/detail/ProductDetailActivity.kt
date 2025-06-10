@@ -32,9 +32,7 @@ class ProductDetailActivity : AppCompatActivity() {
                     product,
                     app.getRecentProductsUseCase,
                     app.saveRecentlyViewedProductUseCase,
-                    app.getCartProductByProductIdUseCase,
                     app.addToCartUseCase,
-                    app.updateCartQuantityUseCase,
                 ),
             )[ProductDetailViewModel::class.java]
         initBindings(product)

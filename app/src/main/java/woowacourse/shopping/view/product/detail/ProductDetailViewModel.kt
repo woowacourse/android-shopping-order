@@ -10,8 +10,6 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
 import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
-import woowacourse.shopping.domain.usecase.cart.GetCartProductByProductIdUseCase
-import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 import woowacourse.shopping.domain.usecase.product.GetRecentProductsUseCase
 import woowacourse.shopping.domain.usecase.product.SaveRecentlyViewedProductUseCase
 import woowacourse.shopping.view.util.MutableSingleLiveData
@@ -21,9 +19,7 @@ class ProductDetailViewModel(
     val product: Product,
     private val getRecentProductsUseCase: GetRecentProductsUseCase,
     private val saveRecentlyViewedProductUseCase: SaveRecentlyViewedProductUseCase,
-    private val getCartProductByProductIdUseCase: GetCartProductByProductIdUseCase,
     private val addToCartUseCase: AddToCartUseCase,
-    private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
 ) : ViewModel(),
     ProductDetailEventHandler {
     private val _quantity = MutableLiveData(MINIMUM_QUANTITY)
@@ -59,22 +55,11 @@ class ProductDetailViewModel(
 
     override fun onAddToCartClick() {
         viewModelScope.launch {
-            getCartProductByProductIdUseCase(product.id)
-                .onSuccess { cartProduct ->
-                    val quantityToAdd = quantity.value ?: MINIMUM_QUANTITY
-                    val updateResult =
-                        if (cartProduct == null) {
-                            addToCartUseCase(product, quantityToAdd)
-                        } else {
-                            val newQuantity = cartProduct.quantity + quantityToAdd
-                            updateCartQuantityUseCase(cartProduct, newQuantity)
-                        }
-
-                    updateResult
-                        .onSuccess {
-                            _quantity.postValue(MINIMUM_QUANTITY)
-                            _addToCartEvent.postValue(Unit)
-                        }.onFailure { Log.e("error", it.message.toString()) }
+            val quantityToAdd = quantity.value ?: MINIMUM_QUANTITY
+            addToCartUseCase(product, quantityToAdd)
+                .onSuccess {
+                    _quantity.postValue(MINIMUM_QUANTITY)
+                    _addToCartEvent.postValue(Unit)
                 }.onFailure { Log.e("error", it.message.toString()) }
         }
     }

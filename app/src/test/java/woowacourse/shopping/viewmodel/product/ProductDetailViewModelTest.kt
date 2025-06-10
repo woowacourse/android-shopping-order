@@ -9,7 +9,6 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
-import woowacourse.shopping.domain.usecase.cart.GetCartProductByProductIdUseCase
 import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
@@ -33,10 +32,9 @@ class ProductDetailViewModelTest {
     private lateinit var getRecentProductsUseCase: GetRecentProductsUseCase
     private lateinit var saveRecentlyViewedProductUseCase: SaveRecentlyViewedProductUseCase
     private lateinit var getCartProductsUseCase: GetCartProductsUseCase
-    private lateinit var getCartProductByProductIdUseCase: GetCartProductByProductIdUseCase
-    private lateinit var addToCartUseCase: AddToCartUseCase
     private lateinit var removeFromCartUseCase: RemoveFromCartUseCase
     private lateinit var updateCartQuantityUseCase: UpdateCartQuantityUseCase
+    private lateinit var addToCartUseCase: AddToCartUseCase
     private lateinit var product: Product
 
     @BeforeEach
@@ -47,10 +45,9 @@ class ProductDetailViewModelTest {
         getRecentProductsUseCase = GetRecentProductsUseCase(recentProductRepository)
         saveRecentlyViewedProductUseCase = SaveRecentlyViewedProductUseCase(recentProductRepository)
         getCartProductsUseCase = GetCartProductsUseCase(cartProductRepository)
-        getCartProductByProductIdUseCase = GetCartProductByProductIdUseCase(cartProductRepository)
-        addToCartUseCase = AddToCartUseCase(cartProductRepository)
         removeFromCartUseCase = RemoveFromCartUseCase(cartProductRepository)
         updateCartQuantityUseCase = UpdateCartQuantityUseCase(cartProductRepository, removeFromCartUseCase)
+        addToCartUseCase = AddToCartUseCase(cartProductRepository, updateCartQuantityUseCase)
         product = Product(id = 0, imageUrl = "", name = "Product 0", price = 1000, category = "")
 
         viewModel =
@@ -58,9 +55,7 @@ class ProductDetailViewModelTest {
                 product,
                 getRecentProductsUseCase,
                 saveRecentlyViewedProductUseCase,
-                getCartProductByProductIdUseCase,
                 addToCartUseCase,
-                updateCartQuantityUseCase,
             )
     }
 

@@ -65,7 +65,7 @@ class CartProductRecommendViewModel(
         viewModelScope.launch {
             addToCartUseCase(item, QUANTITY_TO_ADD)
                 .onSuccess { cartProduct ->
-                    cartProducts.postValue(cartProducts.value?.plus(cartProduct))
+                    cartProducts.postValue(cartProduct?.let { cartProducts.value?.plus(it) })
                     updateProductQuantity(item, QUANTITY_TO_ADD)
                 }.onFailure { Log.e("error", it.message.toString()) }
         }

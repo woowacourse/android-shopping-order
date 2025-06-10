@@ -38,9 +38,9 @@ class ProductCatalogViewModelTest {
     private lateinit var getProductsUseCase: GetProductsUseCase
     private lateinit var getCartProductsUseCase: GetCartProductsUseCase
     private lateinit var getTotalCartProductQuantityUseCase: GetTotalCartProductQuantityUseCase
-    private lateinit var addToCartUseCase: AddToCartUseCase
     private lateinit var removeFromCartUseCase: RemoveFromCartUseCase
     private lateinit var updateCartQuantityUseCase: UpdateCartQuantityUseCase
+    private lateinit var addToCartUseCase: AddToCartUseCase
 
     @BeforeEach
     fun setup() =
@@ -53,9 +53,9 @@ class ProductCatalogViewModelTest {
             getProductsUseCase = GetProductsUseCase(productRepository)
             getCartProductsUseCase = GetCartProductsUseCase(cartProductRepository)
             getTotalCartProductQuantityUseCase = GetTotalCartProductQuantityUseCase(cartProductRepository)
-            addToCartUseCase = AddToCartUseCase(cartProductRepository)
             removeFromCartUseCase = RemoveFromCartUseCase(cartProductRepository)
             updateCartQuantityUseCase = UpdateCartQuantityUseCase(cartProductRepository, removeFromCartUseCase)
+            addToCartUseCase = AddToCartUseCase(cartProductRepository, updateCartQuantityUseCase)
 
             repeat(12) { id -> cartProductRepository.insert(id, 1) }
             viewModel =

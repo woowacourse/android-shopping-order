@@ -74,7 +74,7 @@ class ProductCatalogViewModel(
         viewModelScope.launch {
             addToCartUseCase(item, QUANTITY_TO_ADD)
                 .onSuccess { cartProduct ->
-                    cartProducts.add(cartProduct)
+                    cartProduct?.let { cartProducts.add(it) }
                     updateProductQuantity(item, QUANTITY_TO_ADD)
                 }.onFailure { Log.e("error", it.message.toString()) }
         }
