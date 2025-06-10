@@ -58,8 +58,9 @@ class PaymentViewModel(
     val selectedCouponId: LiveData<Long?> = _selectedCouponId
 
     fun getCoupons() {
+        val items = initialCheckedItems.map { it.toDomain() }
         viewModelScope.launch {
-            val result = couponRepository.getCoupons(initialOrderPrice, initialCheckedItems)
+            val result = couponRepository.getCoupons(initialOrderPrice, items)
 
             result.onSuccess { coupons ->
                 _coupons.postValue(coupons)
