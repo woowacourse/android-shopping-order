@@ -4,6 +4,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
+import retrofit2.create
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.remote.CartItemService
 import woowacourse.shopping.data.remote.CouponService
@@ -24,9 +25,9 @@ object NetworkModule {
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
 
-    fun provideProductService(): ProductService = productService ?: provideRetrofit().create(ProductService::class.java)
+    fun provideProductService(): ProductService = productService ?: provideRetrofit().create()
 
-    fun provideCartItemService(): CartItemService = cartItemService ?: provideRetrofit().create(CartItemService::class.java)
+    fun provideCartItemService(): CartItemService = cartItemService ?: provideRetrofit().create()
 
-    fun provideCouponService(): CouponService = couponService ?: provideRetrofit().create(CouponService::class.java)
+    fun provideCouponService(): CouponService = couponService ?: provideRetrofit().create()
 }
