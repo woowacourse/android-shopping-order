@@ -4,9 +4,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ProductsResponse(
+data class PageableResponse<T>(
     @SerialName("content")
-    val content: List<ProductContent>,
+    val content: List<T>,
     @SerialName("empty")
     val empty: Boolean,
     @SerialName("first")

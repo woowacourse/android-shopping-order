@@ -1,5 +1,6 @@
 package woowacourse.shopping.domain.repository
 
+import woowacourse.shopping.data.repository.remote.PageableItem
 import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
@@ -7,9 +8,7 @@ interface ProductRepository {
         page: Int? = null,
         pageSize: Int? = null,
         category: String? = null,
-    ): Result<List<Product>>
-
-    suspend fun isLastPage(page: Int): Result<Boolean>
+    ): Result<PageableItem<Product>>
 
     suspend fun fetchProductById(productId: Long): Result<Product>
 }

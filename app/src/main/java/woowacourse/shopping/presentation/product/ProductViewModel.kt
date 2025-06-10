@@ -11,7 +11,6 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.domain.usecase.CheckLastPageUseCase
 import woowacourse.shopping.domain.usecase.FetchProductsWithCartItemUseCase
 import woowacourse.shopping.presentation.SingleLiveData
 import woowacourse.shopping.presentation.UiState
@@ -20,7 +19,6 @@ class ProductViewModel(
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
     private val fetchProductsWithCartItemUseCase: FetchProductsWithCartItemUseCase,
-    private val checkLastPageUseCase: CheckLastPageUseCase,
 ) : ViewModel() {
     private val _uiState: MutableLiveData<UiState<Unit>> = MutableLiveData()
     val uiState: LiveData<UiState<Unit>> = _uiState
@@ -64,8 +62,9 @@ class ProductViewModel(
 
             productsResult
                 .await()
-                .onSuccess { cartItems ->
-                    _products.value = cartItems
+                .onSuccess { pageableItems ->
+                    _products.value = pageableItems.items
+                    _showLoadMore.value = !pageableItems.last
                     _uiState.value = UiState.Success(Unit)
                 }.onFailure { throwable ->
                     _uiState.value = UiState.Failure(throwable)
@@ -98,19 +97,19 @@ class ProductViewModel(
 
         viewModelScope.launch {
             fetchProductsWithCartItemUseCase(nextPage, PAGE_SIZE)
-                .onSuccess { newItems ->
+                .onSuccess { pageableItems ->
                     val currentList = _products.value.orEmpty()
-                    val updatedList = currentList + newItems
+                    val updatedList = currentList + pageableItems.items
                     _products.value = updatedList
                     currentPage = nextPage
                 }.onFailure {
                     _toastMessage.value = R.string.product_toast_load_failure
                 }
 
-            checkLastPageUseCase(currentPage)
-                .onSuccess { isLastPage ->
-                    _showLoadMore.value = !isLastPage
-                }.onFailure { _toastMessage.value = R.string.product_toast_get_last_page_fail }
+//            checkLastPageUseCase(currentPage)
+//                .onSuccess { isLastPage ->
+//                    _showLoadMore.value = !isLastPage
+//                }.onFailure { _toastMessage.value = R.string.product_toast_get_last_page_fail }
         }
     }
 

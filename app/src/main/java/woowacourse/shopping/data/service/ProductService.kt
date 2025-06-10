@@ -4,8 +4,8 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import woowacourse.shopping.data.dto.product.PageableResponse
 import woowacourse.shopping.data.dto.product.ProductContent
-import woowacourse.shopping.data.dto.product.ProductsResponse
 
 interface ProductService {
     @GET("/products/{id}")
@@ -18,5 +18,5 @@ interface ProductService {
         @Query("page") page: Int? = null,
         @Query("size") size: Int? = 12,
         @Query("category") category: String? = null,
-    ): Response<ProductsResponse>
+    ): Response<PageableResponse<ProductContent>>
 }

@@ -1,6 +1,8 @@
 package woowacourse.shopping.data.repository.remote
 
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
+import woowacourse.shopping.data.dto.product.toDomain
+import woowacourse.shopping.data.repository.handleResult
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 
@@ -11,21 +13,15 @@ class ProductRepositoryImpl(
         page: Int?,
         pageSize: Int?,
         category: String?,
-    ): Result<List<Product>> {
-        val result = productRemoteDataSource.fetchPagingProducts(page, pageSize, category)
-        return result.fold(
-            onSuccess = { products -> Result.success(products) },
-            onFailure = { throwable -> Result.failure(throwable) },
-        )
-    }
+    ): Result<PageableItem<Product>> =
+        handleResult {
+            val response =
+                productRemoteDataSource.fetchPagingProducts(page, pageSize, category).getOrThrow()
+            val products = response.content.map { productContent -> productContent.toDomain() }
+            val last = response.last
 
-    override suspend fun isLastPage(page: Int): Result<Boolean> {
-        val result = productRemoteDataSource.isLastPage(page)
-        return result.fold(
-            onSuccess = { isLastPage -> Result.success(isLastPage) },
-            onFailure = { throwable -> Result.failure(throwable) },
-        )
-    }
+            PageableItem(products, last)
+        }
 
     override suspend fun fetchProductById(productId: Long): Result<Product> {
         val result = productRemoteDataSource.fetchProductById(productId)
@@ -35,3 +31,8 @@ class ProductRepositoryImpl(
         )
     }
 }
+
+data class PageableItem<T>(
+    val items: List<T>,
+    val last: Boolean,
+)

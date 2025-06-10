@@ -1,15 +1,14 @@
 package woowacourse.shopping.data.datasource.remote
 
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.data.dto.product.PageableResponse
+import woowacourse.shopping.data.dto.product.ProductContent
 
 interface ProductRemoteDataSource {
     suspend fun fetchPagingProducts(
         page: Int? = null,
         pageSize: Int? = null,
         category: String? = null,
-    ): Result<List<Product>>
+    ): Result<PageableResponse<ProductContent>>
 
-    suspend fun isLastPage(page: Int): Result<Boolean>
-
-    suspend fun fetchProductById(id: Long): Result<Product>
+    suspend fun fetchProductById(id: Long): Result<ProductContent>
 }

@@ -21,7 +21,7 @@ interface CartRepository {
     suspend fun insertProduct(
         product: Product,
         productQuantity: Int,
-    ): Result<Long>
+    ): Result<Unit>
 
     suspend fun updateProduct(
         cartId: Long,

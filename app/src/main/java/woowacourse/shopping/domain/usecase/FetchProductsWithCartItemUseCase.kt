@@ -1,6 +1,8 @@
 package woowacourse.shopping.domain.usecase
 
+import woowacourse.shopping.data.repository.remote.PageableItem
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 
@@ -12,13 +14,22 @@ class FetchProductsWithCartItemUseCase(
         page: Int?,
         pageSize: Int?,
         category: String? = null,
-    ): Result<List<CartItem>> =
+    ): Result<PageableItem<CartItem>> =
         productRepository
             .fetchPagingProducts(page, pageSize, category)
-            .map { products ->
-                products.map { product ->
-                    cartRepository.getCartItemById(product.productId)
-                        ?: CartItem(product = product, quantity = 0)
-                }
+            .mapCatching { pageableItem: PageableItem<Product> ->
+                val cartItems =
+                    pageableItem.items
+                        .map { product ->
+                            cartRepository
+                                .getCartItemById(product.productId)
+                                .getOrElse { throw it }
+                                ?: CartItem(product = product, quantity = 0)
+                        }
+
+                PageableItem(
+                    items = cartItems,
+                    last = pageableItem.last,
+                )
             }
 }
