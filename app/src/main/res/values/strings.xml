@@ -39,4 +39,7 @@
     <string name="coupon_expiration_date_text">만료일: %s</string>
     <string name="coupon_minimum_order_amount_text">최소 주문 금액: %d원</string>
 
+    <!-- Toast Message -->
+    <string name="toast_order_success_text">주문에 성공했습니다</string>
+
 </resources>

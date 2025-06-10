@@ -73,7 +73,9 @@ class OrderFragment :
         }
 
         viewModel.orderSuccessEvent.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), "주문에 성공했습니다", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(),
+                getString(R.string.toast_order_success_text),
+                Toast.LENGTH_SHORT).show()
             navigateToCatalog()
         }
     }
