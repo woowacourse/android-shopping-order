@@ -9,7 +9,6 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import woowacourse.shopping.RepositoryProvider
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartItemsRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
 import woowacourse.shopping.domain.repository.ViewedItemRepository
@@ -37,9 +36,10 @@ class DetailViewModel(
         onInserted: () -> Unit = {},
     ) {
         viewModelScope.launch {
-            val product = productsRepository.getProductById(id)
-                .mapCatching { it.toUiModel() }
-                .getOrNull()
+            val product =
+                productsRepository.getProductById(id)
+                    .mapCatching { it.toUiModel() }
+                    .getOrNull()
             val loadedProduct = product?.copy(quantity = 1)
             _product.value = loadedProduct
 
@@ -56,15 +56,15 @@ class DetailViewModel(
                 .onFailure {
                     _uiState.postValue(CartEvent.ADD_TO_CART_FAILURE)
                 }
-
         }
     }
 
     fun loadLastViewedItem(currentProductId: Long) {
         viewModelScope.launch {
-            val item = viewedRepository.getLastViewedItem()
-                .mapCatching { it?.toUiModel() }
-                .getOrNull()
+            val item =
+                viewedRepository.getLastViewedItem()
+                    .mapCatching { it?.toUiModel() }
+                    .getOrNull()
 
             item?.let {
                 val filtered = if (it.id == currentProductId) null else it

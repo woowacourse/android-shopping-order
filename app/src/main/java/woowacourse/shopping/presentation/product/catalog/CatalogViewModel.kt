@@ -36,8 +36,9 @@ class CatalogViewModel(
 
     fun loadCatalogProducts(pageSize: Int = PAGE_SIZE) {
         viewModelScope.launch {
-            val pagingData = productsRepository.getProducts(currentPage, pageSize)
-                .getOrNull() ?: return@launch
+            val pagingData =
+                productsRepository.getProducts(currentPage, pageSize)
+                    .getOrNull() ?: return@launch
 
             cartRepository.getQuantity(pagingData)
                 .onSuccess {

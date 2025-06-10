@@ -16,7 +16,7 @@ import woowacourse.shopping.domain.repository.CouponRepository
 import java.time.LocalDate
 
 class CouponRepositoryImpl(
-    private val couponRemoteDataSource: CouponRemoteDataSource
+    private val couponRemoteDataSource: CouponRemoteDataSource,
 ) : CouponRepository {
     override suspend fun getCoupons(): Result<List<Coupon>> {
         return couponRemoteDataSource.getCoupons()
@@ -36,42 +36,46 @@ class CouponRepositoryImpl(
         }
     }
 
-    private fun BuyXGetYCouponResponse.toDomain() = BuyXGetYCoupon(
-        code = this.code,
-        id = this.id,
-        description = this.description,
-        expirationDate = LocalDate.parse(this.expirationDate),
-        buyQuantity = this.buyQuantity,
-        getQuantity = this.getQuantity,
-        discountType = this.discountType,
-    )
+    private fun BuyXGetYCouponResponse.toDomain() =
+        BuyXGetYCoupon(
+            code = this.code,
+            id = this.id,
+            description = this.description,
+            expirationDate = LocalDate.parse(this.expirationDate),
+            buyQuantity = this.buyQuantity,
+            getQuantity = this.getQuantity,
+            discountType = this.discountType,
+        )
 
-    private fun FixedCouponResponse.toDomain() = FixedCoupon(
-        code = this.code,
-        id = this.id,
-        description = this.description,
-        expirationDate = LocalDate.parse(this.expirationDate),
-        discount = this.discount,
-        minimumAmount = this.minimumAmount,
-        discountType = this.discountType,
-    )
+    private fun FixedCouponResponse.toDomain() =
+        FixedCoupon(
+            code = this.code,
+            id = this.id,
+            description = this.description,
+            expirationDate = LocalDate.parse(this.expirationDate),
+            discount = this.discount,
+            minimumAmount = this.minimumAmount,
+            discountType = this.discountType,
+        )
 
-    private fun FreeShippingCouponResponse.toDomain() = FreeShippingCoupon(
-        code = this.code,
-        id = this.id,
-        description = this.description,
-        expirationDate = LocalDate.parse(this.expirationDate),
-        minimumAmount = this.minimumAmount,
-        discountType = this.discountType,
-    )
+    private fun FreeShippingCouponResponse.toDomain() =
+        FreeShippingCoupon(
+            code = this.code,
+            id = this.id,
+            description = this.description,
+            expirationDate = LocalDate.parse(this.expirationDate),
+            minimumAmount = this.minimumAmount,
+            discountType = this.discountType,
+        )
 
-    private fun PercentageCouponResponse.toDomain() = PercentageCoupon(
-        code = this.code,
-        id = this.id,
-        description = this.description,
-        expirationDate = LocalDate.parse(this.expirationDate),
-        discount = this.discount,
-        availableTime = AvailableTime.of(this.availableTime.start, this.availableTime.end),
-        discountType = this.discountType,
-    )
+    private fun PercentageCouponResponse.toDomain() =
+        PercentageCoupon(
+            code = this.code,
+            id = this.id,
+            description = this.description,
+            expirationDate = LocalDate.parse(this.expirationDate),
+            discount = this.discount,
+            availableTime = AvailableTime.of(this.availableTime.start, this.availableTime.end),
+            discountType = this.discountType,
+        )
 }

@@ -62,9 +62,10 @@ class OrderActivity : AppCompatActivity() {
     }
 
     private fun setUpCoupons() {
-        val adapter = CouponAdapter {
-            viewModel.selectCoupon(it)
-        }
+        val adapter =
+            CouponAdapter {
+                viewModel.selectCoupon(it)
+            }
         binding.rvCoupons.adapter = adapter
         viewModel.coupons.observe(this) {
             adapter.submitList(it)
@@ -74,9 +75,10 @@ class OrderActivity : AppCompatActivity() {
     private fun observeEvent() {
         viewModel.orderEvent.observe(this) {
             Toast.makeText(this, getString(R.string.text_order_complete), Toast.LENGTH_SHORT).show()
-            val newIntent = CatalogActivity.newIntent(this).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
+            val newIntent =
+                CatalogActivity.newIntent(this).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
             startActivity(newIntent)
         }
     }

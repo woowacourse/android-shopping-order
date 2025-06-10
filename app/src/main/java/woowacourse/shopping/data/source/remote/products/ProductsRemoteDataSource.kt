@@ -11,13 +11,15 @@ class ProductsRemoteDataSource(
     override suspend fun getProducts(
         page: Int?,
         size: Int?,
-    ): Result<ProductsResponse> = safeApiCall {
-        api.getProducts(page = page, size = size)
-    }
+    ): Result<ProductsResponse> =
+        safeApiCall {
+            api.getProducts(page = page, size = size)
+        }
 
-    override suspend fun getProductById(id: Long): Result<ProductResponse> = safeApiCall {
-        api.getProductById(id = id)
-    }
+    override suspend fun getProductById(id: Long): Result<ProductResponse> =
+        safeApiCall {
+            api.getProductById(id = id)
+        }
 
     override suspend fun getProductsByCategory(category: String): Result<ProductsResponse> =
         safeApiCall {

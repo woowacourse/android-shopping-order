@@ -10,10 +10,11 @@ class OrderRepositoryImpl(
 ) : OrderRepository {
     override suspend fun orderProducts(ids: List<Long>): Result<Unit> {
         return runCatching {
-            val cartIds = ids.map { productId ->
-                val cartId = cartItemsLocalDataSource.getCartId(productId)
-                requireNotNull(cartId)
-            }
+            val cartIds =
+                ids.map { productId ->
+                    val cartId = cartItemsLocalDataSource.getCartId(productId)
+                    requireNotNull(cartId)
+                }
 
             orderDataSource.orderProducts(cartIds)
             ids.forEach { cartItemsLocalDataSource.remove(it) }

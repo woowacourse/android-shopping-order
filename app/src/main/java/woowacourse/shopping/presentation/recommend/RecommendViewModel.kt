@@ -91,9 +91,10 @@ class RecommendViewModel(
 
     private fun loadRecommendProducts() {
         viewModelScope.launch {
-            val lastViewedItem = viewedItemRepository.getLastViewedItem()
-                .mapCatching { it?.toUiModel() }
-                .getOrNull()
+            val lastViewedItem =
+                viewedItemRepository.getLastViewedItem()
+                    .mapCatching { it?.toUiModel() }
+                    .getOrNull()
             lastViewedItem?.let { loadProductsByCategory(it.category) }
         }
     }

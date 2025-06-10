@@ -50,9 +50,10 @@ object RepositoryProvider {
         viewedItemRepository =
             ViewedItemRepositoryImpl(ViewedItemDatabase.getInstance(context).viewedItemDao())
         couponRepository = CouponRepositoryImpl(CouponRemoteDataSource(getCouponApiService))
-        orderRepository = OrderRepositoryImpl(
-            OrderRemoteDataSource(getOrderApiService),
-            cartItemsLocalDataSource,
-        )
+        orderRepository =
+            OrderRepositoryImpl(
+                OrderRemoteDataSource(getOrderApiService),
+                cartItemsLocalDataSource,
+            )
     }
 }

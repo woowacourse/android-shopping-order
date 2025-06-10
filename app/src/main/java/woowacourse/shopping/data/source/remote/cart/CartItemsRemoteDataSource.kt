@@ -12,33 +12,38 @@ class CartItemsRemoteDataSource(
     override suspend fun getCartItems(
         page: Int?,
         size: Int?,
-    ): Result<CartItemResponse> = safeApiCall {
-        api.getCartItems(page = page, size = size)
-    }
+    ): Result<CartItemResponse> =
+        safeApiCall {
+            api.getCartItems(page = page, size = size)
+        }
 
     override suspend fun addCartItem(
         id: Long,
         quantity: Int,
-    ): Result<Long> = runCatching {
-        val request = CartRequest(productId = id, quantity = quantity)
-        val response = api.postCartItems(request = request)
-        val locationHeader = response.headers()["Location"]
-        val cartId = locationHeader?.substringAfterLast("/")?.toLongOrNull()
-        requireNotNull(cartId)
-    }
+    ): Result<Long> =
+        runCatching {
+            val request = CartRequest(productId = id, quantity = quantity)
+            val response = api.postCartItems(request = request)
+            val locationHeader = response.headers()["Location"]
+            val cartId = locationHeader?.substringAfterLast("/")?.toLongOrNull()
+            requireNotNull(cartId)
+        }
 
-    override suspend fun deleteCartItem(id: Long): Result<Unit> = safeApiCall {
-        api.deleteCartItems(id = id)
-    }
+    override suspend fun deleteCartItem(id: Long): Result<Unit> =
+        safeApiCall {
+            api.deleteCartItems(id = id)
+        }
 
     override suspend fun updateCartItem(
         id: Long,
         quantity: Int,
-    ): Result<Unit> = safeApiCall {
-        api.patchCartItems(id = id, quantity = quantity)
-    }
+    ): Result<Unit> =
+        safeApiCall {
+            api.patchCartItems(id = id, quantity = quantity)
+        }
 
-    override suspend fun getCartCount(): Result<ItemCount> = safeApiCall {
-        api.getCartItemsCounts()
-    }
+    override suspend fun getCartCount(): Result<ItemCount> =
+        safeApiCall {
+            api.getCartItemsCounts()
+        }
 }

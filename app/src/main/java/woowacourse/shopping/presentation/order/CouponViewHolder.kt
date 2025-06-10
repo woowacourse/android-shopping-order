@@ -10,8 +10,8 @@ class CouponViewHolder(
     parent: ViewGroup,
     private val couponClickListener: CouponClickListener,
 ) : RecyclerView.ViewHolder(
-    LayoutInflater.from(parent.context).inflate(R.layout.item_coupon, parent, false)
-) {
+        LayoutInflater.from(parent.context).inflate(R.layout.item_coupon, parent, false),
+    ) {
     private val binding: ItemCouponBinding = ItemCouponBinding.bind(itemView)
 
     init {

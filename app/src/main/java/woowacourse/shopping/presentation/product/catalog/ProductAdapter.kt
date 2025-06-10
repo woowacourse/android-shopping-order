@@ -61,16 +61,17 @@ class ProductAdapter(
         private const val PRODUCT = 1
         private const val LOAD_BUTTON = 2
 
-        private val DiffCallback = object : DiffUtil.ItemCallback<ProductUiModel>() {
-            override fun areContentsTheSame(
-                oldItem: ProductUiModel,
-                newItem: ProductUiModel
-            ): Boolean = oldItem == newItem
+        private val DiffCallback =
+            object : DiffUtil.ItemCallback<ProductUiModel>() {
+                override fun areContentsTheSame(
+                    oldItem: ProductUiModel,
+                    newItem: ProductUiModel,
+                ): Boolean = oldItem == newItem
 
-            override fun areItemsTheSame(
-                oldItem: ProductUiModel,
-                newItem: ProductUiModel
-            ): Boolean = oldItem.id == newItem.id
-        }
+                override fun areItemsTheSame(
+                    oldItem: ProductUiModel,
+                    newItem: ProductUiModel,
+                ): Boolean = oldItem.id == newItem.id
+            }
     }
 }

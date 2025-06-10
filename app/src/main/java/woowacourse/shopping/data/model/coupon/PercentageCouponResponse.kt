@@ -12,5 +12,5 @@ data class PercentageCouponResponse(
     override val expirationDate: String,
     val discount: Int,
     val availableTime: AvailableTime,
-    override val discountType: String = "percentage"
+    override val discountType: String = "percentage",
 ) : CouponResponse()

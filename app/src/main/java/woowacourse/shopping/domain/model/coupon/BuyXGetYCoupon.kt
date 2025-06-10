@@ -13,13 +13,15 @@ data class BuyXGetYCoupon(
     override val discountType: String,
 ) : Coupon {
     override fun calculateDiscount(orderInfo: OrderInfo): OrderInfo {
-        val availableProducts = orderInfo.orderProducts
-            .filter { it.quantity >= buyQuantity + getQuantity }
+        val availableProducts =
+            orderInfo.orderProducts
+                .filter { it.quantity >= buyQuantity + getQuantity }
 
         if (availableProducts.isEmpty()) return orderInfo
 
-        val maxPricedProduct = availableProducts.maxByOrNull { it.price }
-            ?: return orderInfo
+        val maxPricedProduct =
+            availableProducts.maxByOrNull { it.price }
+                ?: return orderInfo
 
         val discount = maxPricedProduct.price
 

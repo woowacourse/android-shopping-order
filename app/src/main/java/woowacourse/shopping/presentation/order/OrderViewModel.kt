@@ -40,12 +40,13 @@ class OrderViewModel(
 
     fun selectCoupon(coupon: CouponUiModel) {
         val coupons = _coupons.value ?: return
-        _coupons.value = coupons.map {
-            when {
-                it.id == coupon.id -> it.copy(isSelected = !it.isSelected)
-                else -> it.copy(isSelected = false)
+        _coupons.value =
+            coupons.map {
+                when {
+                    it.id == coupon.id -> it.copy(isSelected = !it.isSelected)
+                    else -> it.copy(isSelected = false)
+                }
             }
-        }
         calculateOrderInfo(coupon.id)
     }
 
@@ -65,15 +66,16 @@ class OrderViewModel(
             val orderAmount = _orderInfo.value?.orderAmount ?: 0
             couponRepository.getCoupons()
                 .onSuccess { coupons ->
-                    _coupons.value = coupons
-                        .filter { coupon ->
-                            when (coupon) {
-                                is FixedCoupon -> orderAmount >= coupon.minimumAmount
-                                is FreeShippingCoupon -> orderAmount >= coupon.minimumAmount
-                                else -> true
+                    _coupons.value =
+                        coupons
+                            .filter { coupon ->
+                                when (coupon) {
+                                    is FixedCoupon -> orderAmount >= coupon.minimumAmount
+                                    is FreeShippingCoupon -> orderAmount >= coupon.minimumAmount
+                                    else -> true
+                                }
                             }
-                        }
-                        .map { it.toUiModel() }
+                            .map { it.toUiModel() }
                 }
         }
     }
@@ -88,13 +90,14 @@ class OrderViewModel(
     }
 
     companion object {
-        val FACTORY: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                OrderViewModel(
-                    couponRepository = RepositoryProvider.couponRepository,
-                    orderRepository = RepositoryProvider.orderRepository,
-                )
+        val FACTORY: ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer {
+                    OrderViewModel(
+                        couponRepository = RepositoryProvider.couponRepository,
+                        orderRepository = RepositoryProvider.orderRepository,
+                    )
+                }
             }
-        }
     }
 }

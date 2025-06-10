@@ -93,7 +93,6 @@ class CartViewModel(
                     setOrderData()
                 }
                 .onFailure {
-
                 }
         }
     }
@@ -109,7 +108,6 @@ class CartViewModel(
                     setOrderData()
                 }
                 .onFailure {
-
                 }
         }
     }
@@ -178,9 +176,10 @@ class CartViewModel(
                             pagingData.products.isNotEmpty() && pagingData.products.all { it.isChecked }
                     } else {
                         val checkedProductIds = _checkedProducts.value?.map { it.id } ?: emptyList()
-                        val updatedProducts = pagingData.products.map { product ->
-                            product.copy(isChecked = product.id in checkedProductIds)
-                        }
+                        val updatedProducts =
+                            pagingData.products.map { product ->
+                                product.copy(isChecked = product.id in checkedProductIds)
+                            }
                         isAllChecked.value = false
                         _pagingData.value = pagingData.copy(products = updatedProducts)
                     }
@@ -190,9 +189,10 @@ class CartViewModel(
 
     private fun updateProductInPagingData(updatedProduct: ProductUiModel) {
         val currentPagingData = _pagingData.value ?: return
-        _pagingData.value = currentPagingData.copy(
-            products = currentPagingData.products.update(updatedProduct)
-        )
+        _pagingData.value =
+            currentPagingData.copy(
+                products = currentPagingData.products.update(updatedProduct),
+            )
         _checkedProducts.value = _checkedProducts.value?.update(updatedProduct)
     }
 

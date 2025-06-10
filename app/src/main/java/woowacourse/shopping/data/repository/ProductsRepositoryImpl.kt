@@ -34,19 +34,22 @@ class ProductsRepositoryImpl(
 
     override suspend fun getRecommendProducts(category: String): Result<List<Product>> =
         runCatching {
-            val categoryResult = productsRemoteDataSource.getProductsByCategory(category = category)
-                .getOrThrow()
+            val categoryResult =
+                productsRemoteDataSource.getProductsByCategory(category = category)
+                    .getOrThrow()
 
             val productsByCategory = categoryResult.content.map { it.toDomain() }
 
-            val cartResult = cartItemsRemoteDataSource.getCartItems(null, null)
-                .getOrThrow()
+            val cartResult =
+                cartItemsRemoteDataSource.getCartItems(null, null)
+                    .getOrThrow()
 
             val cartIds = cartResult.content.map { it.product.id }
 
-            val recommendProducts = productsByCategory
-                .filterNot { it.id in cartIds }
-                .take(10)
+            val recommendProducts =
+                productsByCategory
+                    .filterNot { it.id in cartIds }
+                    .take(10)
 
             recommendProducts
         }

@@ -8,6 +8,6 @@ import woowacourse.shopping.data.model.coupon.CouponResponse
 interface CouponApiService {
     @GET("/coupons")
     suspend fun getCoupons(
-        @Header("accept") accept: String = "*/*"
+        @Header("accept") accept: String = "*/*",
     ): Response<List<CouponResponse>>
 }

@@ -15,13 +15,14 @@ class CartItemsRepositoryImpl(
     override suspend fun preloadCartItems(): Result<Unit> {
         return cartItemsRemoteDataSource.getCartItems(null, null)
             .mapCatching { remoteItems ->
-                val cachedCartItems = remoteItems.content.map {
-                    CachedCartItem(
-                        cartId = it.id,
-                        productId = it.product.id,
-                        quantity = it.quantity,
-                    )
-                }
+                val cachedCartItems =
+                    remoteItems.content.map {
+                        CachedCartItem(
+                            cartId = it.id,
+                            productId = it.product.id,
+                            quantity = it.quantity,
+                        )
+                    }
                 cartItemsLocalDataSource.saveCartItems(cachedCartItems)
             }
     }
@@ -41,8 +42,9 @@ class CartItemsRepositoryImpl(
     }
 
     override suspend fun deleteCartItem(id: Long): Result<Unit> {
-        val cartId = cartItemsLocalDataSource.getCartId(id)
-            ?: return Result.failure(IllegalArgumentException(DELETE_ERROR))
+        val cartId =
+            cartItemsLocalDataSource.getCartId(id)
+                ?: return Result.failure(IllegalArgumentException(DELETE_ERROR))
 
         return cartItemsRemoteDataSource.deleteCartItem(cartId)
             .mapCatching { cartItemsLocalDataSource.remove(id) }
@@ -60,8 +62,9 @@ class CartItemsRepositoryImpl(
         id: Long,
         quantity: Int,
     ): Result<Unit> {
-        val cartId = cartItemsLocalDataSource.getCartId(id)
-            ?: return Result.failure(IllegalArgumentException(DELETE_ERROR))
+        val cartId =
+            cartItemsLocalDataSource.getCartId(id)
+                ?: return Result.failure(IllegalArgumentException(DELETE_ERROR))
 
         return cartItemsRemoteDataSource.updateCartItem(cartId, quantity)
             .mapCatching { cartItemsLocalDataSource.update(id, quantity) }

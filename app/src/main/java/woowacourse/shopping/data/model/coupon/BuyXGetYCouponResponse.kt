@@ -12,5 +12,5 @@ data class BuyXGetYCouponResponse(
     override val expirationDate: String,
     val buyQuantity: Int,
     val getQuantity: Int,
-    override val discountType: String = "buyXgetY"
+    override val discountType: String = "buyXgetY",
 ) : CouponResponse()

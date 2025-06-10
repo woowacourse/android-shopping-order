@@ -58,10 +58,11 @@ object Client {
             .build()
     }
 
-    private val json = Json {
-        ignoreUnknownKeys = true
-        classDiscriminator = "discountType"
-    }
+    private val json =
+        Json {
+            ignoreUnknownKeys = true
+            classDiscriminator = "discountType"
+        }
 
     private const val BASE_URL =
         "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com"

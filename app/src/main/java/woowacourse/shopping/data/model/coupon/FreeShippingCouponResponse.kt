@@ -11,5 +11,5 @@ data class FreeShippingCouponResponse(
     override val description: String,
     override val expirationDate: String,
     val minimumAmount: Int,
-    override val discountType: String = "freeShipping"
+    override val discountType: String = "freeShipping",
 ) : CouponResponse()
