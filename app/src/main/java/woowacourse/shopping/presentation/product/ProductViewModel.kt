@@ -60,6 +60,14 @@ class ProductViewModel(
             val productsResult = async { fetchProductsWithCartItemUseCase(currentPage, PAGE_SIZE) }
             val recentProductsResult = async { recentProductRepository.getRecentProducts() }
 
+            recentProductsResult
+                .await()
+                .onSuccess { recentProducts ->
+                    _recentProducts.value = recentProducts
+                }.onFailure {
+                    _toastMessage.value = R.string.product_toast_most_recent_load_fail
+                }
+
             productsResult
                 .await()
                 .onSuccess { pageableItems ->
@@ -68,14 +76,6 @@ class ProductViewModel(
                     _uiState.value = UiState.Success(Unit)
                 }.onFailure { throwable ->
                     _uiState.value = UiState.Failure(throwable)
-                }
-
-            recentProductsResult
-                .await()
-                .onSuccess { recentProducts ->
-                    _recentProducts.value = recentProducts
-                }.onFailure {
-                    _toastMessage.value = R.string.product_toast_most_recent_load_fail
                 }
         }
     }
@@ -105,11 +105,6 @@ class ProductViewModel(
                 }.onFailure {
                     _toastMessage.value = R.string.product_toast_load_failure
                 }
-
-//            checkLastPageUseCase(currentPage)
-//                .onSuccess { isLastPage ->
-//                    _showLoadMore.value = !isLastPage
-//                }.onFailure { _toastMessage.value = R.string.product_toast_get_last_page_fail }
         }
     }
 

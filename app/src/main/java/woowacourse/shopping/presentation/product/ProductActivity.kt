@@ -144,6 +144,10 @@ class ProductActivity :
             productAdapter.submitList(list)
         }
 
+        viewModel.recentProducts.observe(this) { products ->
+            recentAdapter.submitList(products)
+        }
+
         viewModel.cartItemCount.observe(this) { count ->
             _toolbarBinding?.tvCartCount?.apply {
                 text = count.toString()
