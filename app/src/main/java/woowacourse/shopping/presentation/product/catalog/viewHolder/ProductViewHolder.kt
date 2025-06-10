@@ -17,7 +17,6 @@ class ProductViewHolder(
         binding.product = product
         binding.catalogHandler = catalogHandler
         binding.handler = handler
-        binding.executePendingBindings()
     }
 
     companion object {
