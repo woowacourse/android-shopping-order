@@ -32,7 +32,7 @@ class CartProductRecommendViewModel(
     val recommendedProducts: LiveData<List<RecommendedProductItem>> get() = _recommendedProducts
 
     val totalPrice: LiveData<Int> = cartProducts.map { it.totalPrice }
-    val totalCount: LiveData<Int> = cartProducts.map { it.totalQuantity }
+    val totalQuantity: LiveData<Int> = cartProducts.map { it.totalQuantity }
 
     private val _selectedProduct = MutableSingleLiveData<Product>()
     val selectedProduct: SingleLiveData<Product> get() = _selectedProduct
