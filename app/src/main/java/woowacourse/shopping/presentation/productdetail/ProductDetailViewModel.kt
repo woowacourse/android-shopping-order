@@ -3,12 +3,13 @@ package woowacourse.shopping.presentation.productdetail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.SingleLiveData
 
 class ProductDetailViewModel(
@@ -18,26 +19,29 @@ class ProductDetailViewModel(
 ) : ViewModel() {
     private val _product: MutableLiveData<Product> = MutableLiveData()
     val product: LiveData<Product> = _product
+
     private val _productCount: MutableLiveData<Int> = MutableLiveData(1)
     val productCount: LiveData<Int> = _productCount
+
     private val _recentProduct: MutableLiveData<Product?> = MutableLiveData()
     val recentProduct: LiveData<Product?> = _recentProduct
+
     private val _isRecentProduct: MutableLiveData<Boolean> = MutableLiveData()
     val isRecentProduct: LiveData<Boolean> = _isRecentProduct
-    private val _insertProductResult: MutableLiveData<ResultState<Unit>> = MutableLiveData()
-    val insertProductResult: LiveData<ResultState<Unit>> = _insertProductResult
+
     private val _toastMessage = SingleLiveData<Int>()
     val toastMessage: LiveData<Int> = _toastMessage
 
     fun fetchData(productId: Long) {
-        productRepository.fetchProductById(productId) { result ->
-            result
+        viewModelScope.launch {
+            productRepository
+                .fetchProductById(productId)
                 .onSuccess { product ->
-                    _product.postValue(product)
+                    _product.value = product
                     handleRecentProduct(productId)
                     insertCurrentProductToRecent(product)
                 }.onFailure {
-                    _toastMessage.postValue(R.string.product_detail_toast_load_fail)
+                    _toastMessage.value = R.string.product_detail_toast_load_fail
                 }
         }
     }
@@ -45,8 +49,10 @@ class ProductDetailViewModel(
     fun addToCart() {
         val product: Product = product.value ?: return
         val productCount: Int = productCount.value ?: return
-        cartRepository.insertOrUpdate(product, productCount) { result ->
-            result
+
+        viewModelScope.launch {
+            cartRepository
+                .insertOrUpdate(product, productCount)
                 .onSuccess {
                     _toastMessage.value = R.string.product_detail_add_cart_toast_insert_success
                 }.onFailure {
@@ -70,22 +76,25 @@ class ProductDetailViewModel(
     }
 
     private fun insertCurrentProductToRecent(product: Product) {
-        recentProductRepository.insertRecentProduct(product) { result ->
-            result.onFailure {
-                _toastMessage.postValue(R.string.product_detail_toast_most_recent_insert_fail)
-            }
+        viewModelScope.launch {
+            recentProductRepository
+                .insertRecentProduct(product)
+                .onFailure {
+                    _toastMessage.value = R.string.product_detail_toast_most_recent_insert_fail
+                }
         }
     }
 
     private fun handleRecentProduct(currentProductId: Long) {
-        recentProductRepository.getMostRecentProduct { result ->
-            result
+        viewModelScope.launch {
+            recentProductRepository
+                .getMostRecentProduct()
                 .onSuccess { recentProduct ->
-                    _recentProduct.postValue(recentProduct)
+                    _recentProduct.value = recentProduct
 
                     val isSame =
                         recentProduct == null || recentProduct.productId == currentProductId
-                    _isRecentProduct.postValue(isSame)
+                    _isRecentProduct.value = isSame
                 }.onFailure {
                     _toastMessage.postValue(R.string.product_detail_toast_most_recent_load_fail)
                 }

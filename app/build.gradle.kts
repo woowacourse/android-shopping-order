@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.android.junit5)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
+    id("kotlin-parcelize")
     alias(libs.plugins.serialization)
 }
 
@@ -90,6 +91,10 @@ dependencies {
 
     // shimmer
     implementation(libs.shimmer)
+
+    // coroutine
+    implementation(libs.kotlinx.coroutines.android)
+    testImplementation(libs.kotlinx.coroutines.test)
 
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter)

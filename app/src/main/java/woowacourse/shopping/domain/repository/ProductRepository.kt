@@ -1,18 +1,14 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.PageableItem
 import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
-    fun fetchPagingProducts(
+    suspend fun fetchPagingProducts(
         page: Int? = null,
         pageSize: Int? = null,
         category: String? = null,
-        onResult: (Result<List<CartItem>>) -> Unit,
-    )
+    ): Result<PageableItem<Product>>
 
-    fun fetchProductById(
-        productId: Long,
-        onResult: (Result<Product>) -> Unit,
-    )
+    suspend fun fetchProductById(productId: Long): Result<Product>
 }

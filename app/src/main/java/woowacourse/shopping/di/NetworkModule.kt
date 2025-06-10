@@ -4,8 +4,11 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
+import retrofit2.create
 import woowacourse.shopping.data.service.CartItemService
+import woowacourse.shopping.data.service.CouponService
 import woowacourse.shopping.data.service.OkHttpClientProvider
+import woowacourse.shopping.data.service.OrderService
 import woowacourse.shopping.data.service.ProductService
 
 object NetworkModule {
@@ -21,11 +24,11 @@ object NetworkModule {
             .build()
     }
 
-    val productService: ProductService by lazy {
-        retrofit.create(ProductService::class.java)
-    }
+    val productService: ProductService by lazy { retrofit.create() }
 
-    val cartItemService: CartItemService by lazy {
-        retrofit.create(CartItemService::class.java)
-    }
+    val cartItemService: CartItemService by lazy { retrofit.create() }
+
+    val couponService: CouponService by lazy { retrofit.create() }
+
+    val orderService: OrderService by lazy { retrofit.create() }
 }

@@ -38,7 +38,7 @@ class CartActivityTest {
     fun `장바구니_아이템에는_체크박스가_표시된다`() {
         onView(withId(R.id.rv_cart_product))
             .scrollToPosition(0)
-            .checkHasDescendantWithIdDisplayed(R.id.checkbox_cart_item)
+            .checkHasDescendantWithIdDisplayed(R.id.checkbox_coupon)
     }
 
     @Test
@@ -81,7 +81,7 @@ class CartActivityTest {
 
     @Test
     fun 선택한_상품_가격의_수량이_표시된다() {
-        onView(withId(R.id.layout_cart_recommend)).checkIsDisplayed()
+        onView(withId(R.id.btn_cart_order)).checkIsDisplayed()
     }
 
     @After

@@ -2,6 +2,8 @@ package woowacourse.shopping.presentation.recommend
 
 import woowacourse.shopping.presentation.model.CartItemUiModel
 
-interface RecommendItemClickListener {
+interface RecommendClickListener {
     fun onClickAddToCart(cartItem: CartItemUiModel)
+
+    fun onClickOrder()
 }

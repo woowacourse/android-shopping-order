@@ -1,34 +1,26 @@
 package woowacourse.shopping.domain.usecase
 
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class RecommendProductsUseCase(
+    private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
 ) {
-    operator fun invoke(
-        category: String? = null,
-        onResult: (Result<List<CartItem>>) -> Unit,
-    ) {
-        productRepository.fetchPagingProducts(
-            page = null,
-            pageSize = null,
-            category = category,
-        ) { result ->
-            result.fold(
-                onSuccess = { products ->
-                    val recommendedItems =
-                        products
-                            .asSequence()
-                            .filter { it.quantity == 0 }
-                            .take(10)
-                            .toList()
-                    onResult(Result.success(recommendedItems))
-                },
-                onFailure = { throwable ->
-                    onResult(Result.failure(throwable))
-                },
-            )
-        }
-    }
+    suspend operator fun invoke(category: String? = null): Result<List<CartItem>> =
+        productRepository
+            .fetchPagingProducts(
+                page = null,
+                pageSize = null,
+                category = category,
+            ).mapCatching { products ->
+                products.items
+                    .asSequence()
+                    .filter { product ->
+                        cartRepository.getCartItemById(product.productId).getOrNull() == null
+                    }.take(10)
+                    .map { product -> CartItem(product = product, quantity = 0) }
+                    .toList()
+            }
 }

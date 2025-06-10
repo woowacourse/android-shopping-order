@@ -15,7 +15,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
-import woowacourse.shopping.presentation.ResultState
+import woowacourse.shopping.presentation.UiState
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.recommend.RecommendActivity
 
@@ -82,24 +82,19 @@ class CartActivity :
     private fun observeViewModel() {
         viewModel.uiState.observe(this) { state ->
             when (state) {
-                is ResultState.Loading -> {
+                is UiState.Loading -> {
                     showSkeleton(true)
                 }
 
-                is ResultState.Success -> {
+                is UiState.Success -> {
                     showSkeleton(false)
                 }
 
-                is ResultState.Failure -> {
+                is UiState.Failure -> {
                     showSkeleton(true)
                     showToast(state.throwable?.message)
                 }
             }
-        }
-
-        viewModel.cartItems.observe(this) { cartItems ->
-            cartAdapter.submitList(cartItems)
-            viewModel.fetchSelectedInfo()
         }
 
         viewModel.toastMessage.observe(this) { resId ->
@@ -141,12 +136,9 @@ class CartActivity :
     }
 
     override fun onClickRecommend() {
-        val intent =
-            RecommendActivity.newIntent(
-                this,
-                viewModel.selectedTotalPrice.value ?: 0,
-                viewModel.selectedTotalCount.value ?: 0,
-            )
+        val cartItems = viewModel.cartItems.value ?: return
+        val selectedCartItem = cartItems.filter { it.isSelected }
+        val intent = RecommendActivity.newIntent(this, selectedCartItem)
         activityResultLauncher.launch(intent)
     }
 

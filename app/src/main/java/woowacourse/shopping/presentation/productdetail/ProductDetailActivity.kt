@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -19,7 +18,6 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityDetailProductBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.presentation.Extra
-import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
 import woowacourse.shopping.presentation.product.ItemClickListener
 
@@ -85,14 +83,6 @@ class ProductDetailActivity :
     }
 
     private fun observeViewModel() {
-        viewModel.insertProductResult.observe(this) { result ->
-            when (result) {
-                is ResultState.Success -> showToast(R.string.product_detail_add_cart_toast_insert_success)
-                is ResultState.Failure -> showToast(R.string.product_detail_add_cart_toast_insert_fail)
-                else -> Unit
-            }
-        }
-
         viewModel.toastMessage.observe(this) { resId ->
             showToast(resId)
         }
@@ -126,7 +116,6 @@ class ProductDetailActivity :
     }
 
     override fun onClickPlus(id: Long) {
-        Log.d("meeple_log", "onclick")
         viewModel.increaseQuantity()
     }
 

@@ -16,7 +16,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductBinding
 import woowacourse.shopping.databinding.ViewCartActionBinding
 import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.presentation.ResultState
+import woowacourse.shopping.presentation.UiState
 import woowacourse.shopping.presentation.cart.CartActivity
 import woowacourse.shopping.presentation.cart.CartCounterClickListener
 import woowacourse.shopping.presentation.productdetail.ProductDetailActivity
@@ -45,6 +45,7 @@ class ProductActivity :
         enableEdgeToEdge()
         binding = DataBindingUtil.setContentView(this, R.layout.activity_product)
         binding.lifecycleOwner = this
+        binding.vm = viewModel
 
         initInsets()
         setupToolbar()
@@ -68,8 +69,6 @@ class ProductActivity :
         toolbarBinding.ivCart.setOnClickListener {
             navigateToCart()
         }
-
-        viewModel.fetchCartItemCount()
 
         return true
     }
@@ -124,15 +123,15 @@ class ProductActivity :
     private fun observeViewModel() {
         viewModel.uiState.observe(this) { state ->
             when (state) {
-                is ResultState.Loading -> {
+                is UiState.Loading -> {
                     showSkeleton(true)
                 }
 
-                is ResultState.Success -> {
+                is UiState.Success -> {
                     showSkeleton(false)
                 }
 
-                is ResultState.Failure -> {
+                is UiState.Failure -> {
                     showSkeleton(true)
                     showToast(state.throwable?.message)
                 }
@@ -145,8 +144,8 @@ class ProductActivity :
             productAdapter.submitList(list)
         }
 
-        viewModel.recentProducts.observe(this) { recentProducts ->
-            recentAdapter.submitList(recentProducts)
+        viewModel.recentProducts.observe(this) { products ->
+            recentAdapter.submitList(products)
         }
 
         viewModel.cartItemCount.observe(this) { count ->

@@ -2,19 +2,20 @@ package woowacourse.shopping.data.datasource.local
 
 import woowacourse.shopping.data.dao.RecentlyProductDao
 import woowacourse.shopping.data.entity.RecentlyViewedProduct
+import woowacourse.shopping.data.handleResult
 
 class RecentProductLocalDataSourceImpl(
     private val dao: RecentlyProductDao,
 ) : RecentProductLocalDataSource {
-    override fun getProducts(): List<RecentlyViewedProduct> = dao.getProducts()
+    override suspend fun getProducts(): Result<List<RecentlyViewedProduct>> = handleResult { dao.getProducts() }
 
-    override fun getMostRecentProduct(): RecentlyViewedProduct? = dao.getMostRecentProduct()
+    override suspend fun getMostRecentProduct(): Result<RecentlyViewedProduct?> = handleResult { dao.getMostRecentProduct() }
 
-    override fun getOldestProduct(): RecentlyViewedProduct = dao.getOldestProduct()
+    override suspend fun getOldestProduct(): Result<RecentlyViewedProduct> = handleResult { dao.getOldestProduct() }
 
-    override fun getCount(): Int = dao.getCount()
+    override suspend fun getCount(): Result<Int> = handleResult { dao.getCount() }
 
-    override fun insert(product: RecentlyViewedProduct) = dao.insertProduct(product)
+    override suspend fun insert(product: RecentlyViewedProduct): Result<Unit> = handleResult { dao.insertProduct(product) }
 
-    override fun delete(product: RecentlyViewedProduct) = dao.delete(product)
+    override suspend fun delete(product: RecentlyViewedProduct): Result<Unit> = handleResult { dao.delete(product) }
 }
