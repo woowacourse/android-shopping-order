@@ -4,6 +4,7 @@ import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.usecase.CalculatePaymentAmountByCouponUseCase.Companion.DEFAULT_SHIPPING_FEE
+import woowacourse.shopping.domain.usecase.CalculatePaymentAmountByCouponUseCase.Companion.ONE_HUNDRED_PERCENT
 
 class CalculateCouponDiscountUseCase(
     private val couponRepository: CouponRepository,
@@ -14,7 +15,7 @@ class CalculateCouponDiscountUseCase(
     ): Int {
         val orderAmount: Int =
             products.getSelectedCartProductsPrice()
-        val selectedCoupon = couponRepository.fetchCoupon(couponId) ?: return 0
+        val selectedCoupon = couponRepository.fetchCoupon(couponId) ?: return ZERO_DISCOUNT
         return when (selectedCoupon) {
             is Coupon.FixedDiscount -> {
                 -selectedCoupon.discount
@@ -30,9 +31,13 @@ class CalculateCouponDiscountUseCase(
             }
 
             is Coupon.PercentDiscount -> {
-                val discount = orderAmount * selectedCoupon.discount / 100
+                val discount = orderAmount * selectedCoupon.discount / ONE_HUNDRED_PERCENT
                 -discount
             }
         }
+    }
+
+    companion object {
+        private const val ZERO_DISCOUNT: Int = 0
     }
 }

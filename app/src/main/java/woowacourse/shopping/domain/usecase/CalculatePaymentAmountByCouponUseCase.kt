@@ -43,6 +43,6 @@ class CalculatePaymentAmountByCouponUseCase(
 
     companion object {
         const val DEFAULT_SHIPPING_FEE: Int = 3000
-        private const val ONE_HUNDRED_PERCENT: Int = 100
+        const val ONE_HUNDRED_PERCENT: Int = 100
     }
 }
