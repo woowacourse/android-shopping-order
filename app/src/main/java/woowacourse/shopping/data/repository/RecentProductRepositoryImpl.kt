@@ -40,7 +40,7 @@ class RecentProductRepositoryImpl(
                 val productIds = entities.map { it.productId }
 
                 val productResult = productRepository.getProductsByIds(productIds)
-                val products = productResult.getOrElse { throw it } ?: emptyList()
+                val products = productResult.getOrThrow() ?: emptyList()
 
                 val productMap = products.associateBy { it.id }
 
