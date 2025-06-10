@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.view
 
+import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -32,8 +33,8 @@ class PaymentViewModelTest {
                 cartProducts = orderProducts.map { CartProduct(it.id, it.toDomain(), 1) },
             )
 
-        viewModel =
-            PaymentViewModel(orderProducts.map { it.id }, fakeCouponRepository, fakeOrderRepository)
+        val handle = SavedStateHandle(mapOf("ORDER_PRODUCT_IDS" to orderProducts.map { it.id }))
+        viewModel = PaymentViewModel(handle, fakeCouponRepository, fakeOrderRepository)
     }
 
     @Test

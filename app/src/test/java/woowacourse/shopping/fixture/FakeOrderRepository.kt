@@ -14,17 +14,5 @@ class FakeOrderRepository(
             PaymentSummary(cartProducts)
         }
 
-    override suspend fun calculatePaymentSummary(
-        paymentSummary: PaymentSummary,
-        couponId: Long?,
-    ): Result<PaymentSummary> =
-        runCatchingDebugLog {
-            val clearedPaymentSummary = PaymentSummary(paymentSummary.products)
-            if (couponId == null) return@runCatchingDebugLog clearedPaymentSummary
-
-            val coupon = couponsFixture.find { it.id == couponId } ?: return@runCatchingDebugLog clearedPaymentSummary
-            coupon.calculateDiscountAmount(clearedPaymentSummary)
-        }
-
     override suspend fun postOrder(cartProductIds: List<Long>): Result<Unit> = Result.success(Unit)
 }
