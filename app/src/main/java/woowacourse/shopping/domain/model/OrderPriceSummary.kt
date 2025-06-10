@@ -11,11 +11,11 @@ data class OrderPriceSummary(
     fun applyCoupon(coupon: Coupon): OrderPriceSummary =
         when (val type = coupon.discountType) {
             is DiscountType.FixedAmount -> {
-                this.copy(discountAmount = type.amount)
+                this.copy(discountAmount = type.amount ?: 0)
             }
 
             is DiscountType.Percentage -> {
-                val discount = (productTotalPrice * type.rate * 0.01).toInt()
+                val discount = (productTotalPrice * (type.rate ?: 0) * 0.01).toInt()
                 this.copy(discountAmount = discount)
             }
 
@@ -36,9 +36,11 @@ data class OrderPriceSummary(
         )
 
     private fun calculateBogoDiscount(
-        buyQuantity: Int,
-        getQuantity: Int,
+        buyQuantity: Int?,
+        getQuantity: Int?,
     ): Int {
+        if (buyQuantity == null || getQuantity == null) return 0
+
         val discountItem =
             cartItems
                 .filter { it.quantity >= buyQuantity + getQuantity }

@@ -33,9 +33,11 @@ data class Coupon(
             } ?: true
 
         val isBuyXGetYSatisfied =
-            (discountType as? DiscountType.BuyXGetY)
-                ?.let { items.any { item -> item.quantity >= it.buyQuantity + it.getQuantity } }
-                ?: true
+            if (this.buyQuantity == null || this.getQuantity == null) {
+                false
+            } else {
+                items.any { item -> item.quantity >= this.buyQuantity + this.getQuantity }
+            }
 
         return isNotExpired && isAvailableTime && isAmountSatisfied && isBuyXGetYSatisfied
     }

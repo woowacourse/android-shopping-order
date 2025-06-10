@@ -45,13 +45,13 @@ fun CouponResponseItem.toDomain(): Coupon =
 
 private fun CouponResponseItem.toDiscountType(): DiscountType =
     when (this.discountType) {
-        "fixed" -> DiscountType.FixedAmount(this.discount!!)
-        "percentage" -> DiscountType.Percentage(this.discount!!)
+        "fixed" -> DiscountType.FixedAmount(this.discount)
+        "percentage" -> DiscountType.Percentage(this.discount)
         "freeShipping" -> DiscountType.FreeShipping
         "buyXgetY" ->
             DiscountType.BuyXGetY(
-                buyQuantity = this.buyQuantity!!,
-                getQuantity = this.getQuantity!!,
+                buyQuantity = this.buyQuantity,
+                getQuantity = this.getQuantity,
             )
 
         else -> throw IllegalArgumentException("알 수 없는 discount type: ${this.discountType}")
