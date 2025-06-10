@@ -31,10 +31,7 @@ class DetailViewModel(
     private val _lastViewed = MutableLiveData<ProductUiModel?>()
     val lastViewed: LiveData<ProductUiModel?> = _lastViewed
 
-    fun setProduct(
-        id: Long,
-        onInserted: () -> Unit = {},
-    ) {
+    fun setProduct(id: Long) {
         viewModelScope.launch {
             val product =
                 productsRepository.getProductById(id)
@@ -54,7 +51,7 @@ class DetailViewModel(
             val product = _product.value ?: return@launch
             cartItemRepository.addCartItemQuantity(product.id, product.quantity)
                 .onFailure {
-                    _uiState.postValue(CartEvent.ADD_TO_CART_FAILURE)
+                    _uiState.value = CartEvent.ADD_TO_CART_FAILURE
                 }
         }
     }
@@ -66,8 +63,8 @@ class DetailViewModel(
                     .mapCatching { it?.toUiModel() }
                     .getOrNull()
 
-            item?.let {
-                val filtered = if (it.id == currentProductId) null else it
+            if (item != null) {
+                val filtered = if (item.id == currentProductId) null else item
                 _lastViewed.value = filtered
             }
         }
