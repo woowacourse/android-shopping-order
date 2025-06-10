@@ -33,7 +33,7 @@ class RecentProductRepositoryImpl(
             }
         }
 
-    override suspend fun replaceRecentProduct(recentProduct: RecentProduct): Result<Unit> =
+    override suspend fun saveRecentlyViewedProduct(recentProduct: RecentProduct): Result<Unit> =
         localDataSource.replaceRecentProduct(recentProduct.toEntity())
 
     private suspend fun getProductById(id: Int): Product = productRemoteDataSource.getProductById(id).getOrThrow().toProduct()

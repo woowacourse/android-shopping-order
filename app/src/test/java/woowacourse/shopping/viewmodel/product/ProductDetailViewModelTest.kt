@@ -14,6 +14,7 @@ import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 import woowacourse.shopping.domain.usecase.product.GetRecentProductsUseCase
+import woowacourse.shopping.domain.usecase.product.SaveRecentlyViewedProductUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.view.product.detail.ProductDetailViewModel
@@ -30,6 +31,7 @@ class ProductDetailViewModelTest {
     private lateinit var recentProductRepository: RecentProductRepository
 
     private lateinit var getRecentProductsUseCase: GetRecentProductsUseCase
+    private lateinit var saveRecentlyViewedProductUseCase: SaveRecentlyViewedProductUseCase
     private lateinit var getCartProductsUseCase: GetCartProductsUseCase
     private lateinit var getCartProductByProductIdUseCase: GetCartProductByProductIdUseCase
     private lateinit var addToCartUseCase: AddToCartUseCase
@@ -43,6 +45,7 @@ class ProductDetailViewModelTest {
         recentProductRepository = FakeRecentProductRepository()
 
         getRecentProductsUseCase = GetRecentProductsUseCase(recentProductRepository)
+        saveRecentlyViewedProductUseCase = SaveRecentlyViewedProductUseCase(recentProductRepository)
         getCartProductsUseCase = GetCartProductsUseCase(cartProductRepository)
         getCartProductByProductIdUseCase = GetCartProductByProductIdUseCase(cartProductRepository)
         addToCartUseCase = AddToCartUseCase(cartProductRepository)
@@ -53,8 +56,8 @@ class ProductDetailViewModelTest {
         viewModel =
             ProductDetailViewModel(
                 product,
-                recentProductRepository,
                 getRecentProductsUseCase,
+                saveRecentlyViewedProductUseCase,
                 getCartProductByProductIdUseCase,
                 addToCartUseCase,
                 updateCartQuantityUseCase,

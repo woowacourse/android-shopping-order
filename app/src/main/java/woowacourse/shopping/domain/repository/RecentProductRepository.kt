@@ -8,5 +8,5 @@ interface RecentProductRepository {
         offset: Int,
     ): Result<List<RecentProduct>>
 
-    suspend fun replaceRecentProduct(recentProduct: RecentProduct): Result<Unit>
+    suspend fun saveRecentlyViewedProduct(recentProduct: RecentProduct): Result<Unit>
 }

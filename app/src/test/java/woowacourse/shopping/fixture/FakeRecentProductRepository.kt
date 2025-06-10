@@ -17,7 +17,7 @@ class FakeRecentProductRepository : RecentProductRepository {
                 .take(limit),
         )
 
-    override suspend fun replaceRecentProduct(recentProduct: RecentProduct): Result<Unit> {
+    override suspend fun saveRecentlyViewedProduct(recentProduct: RecentProduct): Result<Unit> {
         recentProducts.removeIf { it.product.id == recentProduct.product.id }
         recentProducts.add(recentProduct)
         return Result.success(Unit)

@@ -9,18 +9,18 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
 import woowacourse.shopping.domain.usecase.cart.GetCartProductByProductIdUseCase
 import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 import woowacourse.shopping.domain.usecase.product.GetRecentProductsUseCase
+import woowacourse.shopping.domain.usecase.product.SaveRecentlyViewedProductUseCase
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
 class ProductDetailViewModel(
     val product: Product,
-    private val recentProductRepository: RecentProductRepository,
     private val getRecentProductsUseCase: GetRecentProductsUseCase,
+    private val saveRecentlyViewedProductUseCase: SaveRecentlyViewedProductUseCase,
     private val getCartProductByProductIdUseCase: GetCartProductByProductIdUseCase,
     private val addToCartUseCase: AddToCartUseCase,
     private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
@@ -96,12 +96,8 @@ class ProductDetailViewModel(
 
     private fun updateRecentProduct() {
         viewModelScope.launch {
-            val recentProduct = RecentProduct(product = product)
-            recentProductRepository
-                .replaceRecentProduct(recentProduct)
-                .onFailure {
-                    Log.e("error", it.message.toString())
-                }
+            saveRecentlyViewedProductUseCase(RecentProduct(product = product))
+                .onFailure { Log.e("error", it.message.toString()) }
         }
     }
 

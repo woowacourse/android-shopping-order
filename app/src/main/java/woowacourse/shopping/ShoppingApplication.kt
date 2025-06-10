@@ -23,12 +23,13 @@ import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 import woowacourse.shopping.domain.usecase.product.GetProductsUseCase
 import woowacourse.shopping.domain.usecase.product.GetRecentProductsUseCase
 import woowacourse.shopping.domain.usecase.product.GetRecommendedProductsUseCase
+import woowacourse.shopping.domain.usecase.product.SaveRecentlyViewedProductUseCase
 
 class ShoppingApplication : Application() {
     private val database by lazy { ShoppingCartDatabase.getDataBase(this) }
     private val retrofitInstance by lazy { RetrofitInstance(TokenProvider(this)) }
 
-    val recentProductRepository
+    private val recentProductRepository
         by lazy {
             RecentProductRepositoryImpl(
                 RecentProductLocalDataSource(database.recentProductDao),
@@ -45,6 +46,7 @@ class ShoppingApplication : Application() {
         by lazy { OrderRepositoryImpl(OrderRemoteDataSource(retrofitInstance.orderService)) }
 
     val getRecentProductsUseCase by lazy { GetRecentProductsUseCase(recentProductRepository) }
+    val saveRecentlyViewedProductUseCase by lazy { SaveRecentlyViewedProductUseCase(recentProductRepository) }
 
     val getProductsUseCase by lazy { GetProductsUseCase(productRepository) }
     val getRecommendedProductsUseCase by lazy { GetRecommendedProductsUseCase(getRecentProductsUseCase, getProductsUseCase) }
