@@ -57,53 +57,80 @@ class OrderViewModel(
 
     override fun onClickSelect(couponId: Long) {
         val couponUiModels = _coupons.value ?: return
-        var paymentSummary = _paymentSummaryUiState.value ?: return
+        var paymentSummaryUiState = _paymentSummaryUiState.value ?: return
 
         val updateCouponUiModels =
             couponUiModels.map { couponUiModel ->
-                if (couponUiModel.id == couponId) {
-                    if (!couponUiModel.isSelected) {
-                        val coupon = couponContextMapper[couponId]!!
-                        paymentSummary =
-                            paymentSummary.update(
-                                -coupon.getDiscountPrice(),
-                                -coupon.getDiscountDeliveryFee(),
+                when {
+                    couponUiModel.id == couponId -> {
+                        val (coupon, paymentSummary) =
+                            selectCoupon(
+                                couponUiModel.id,
+                                couponUiModel,
+                                paymentSummaryUiState,
                             )
-                        couponUiModel.copy(isSelected = true)
-                    } else {
-                        val coupon = couponContextMapper[couponId]!!
-                        paymentSummary =
-                            paymentSummary.update(
-                                coupon.getDiscountPrice(),
-                                coupon.getDiscountDeliveryFee(),
-                            )
-                        couponUiModel.copy(isSelected = false)
+                        paymentSummaryUiState = paymentSummary
+                        coupon
                     }
-                } else if (couponUiModel.isSelected) {
-                    val coupon = couponContextMapper[couponUiModel.id]!!
-                    paymentSummary =
-                        paymentSummary.update(
-                            coupon.getDiscountPrice(),
-                            coupon.getDiscountDeliveryFee(),
-                        )
-                    couponUiModel.copy(isSelected = false)
-                } else {
-                    couponUiModel
+
+                    couponUiModel.isSelected -> {
+                        val (coupon, paymentSummary) =
+                            deselectCoupon(
+                                couponUiModel.id,
+                                couponUiModel,
+                                paymentSummaryUiState,
+                            )
+                        paymentSummaryUiState = paymentSummary
+                        coupon
+                    }
+
+                    else -> couponUiModel
                 }
             }
-        _paymentSummaryUiState.value = paymentSummary
+
+        _paymentSummaryUiState.value = paymentSummaryUiState
         _coupons.value = updateCouponUiModels
+    }
+
+    private fun selectCoupon(
+        couponId: Long,
+        couponUiModel: CouponUiModel,
+        paymentSummaryUiState: PaymentSummaryUiState,
+    ): Pair<CouponUiModel, PaymentSummaryUiState> {
+        couponContextMapper[couponId]?.let { coupon ->
+            val updatePaymentSummary =
+                if (couponUiModel.isSelected) {
+                    paymentSummaryUiState.cancelCoupon(coupon)
+                } else {
+                    paymentSummaryUiState.applyCoupon(coupon)
+                }
+            return couponUiModel.copy(isSelected = !couponUiModel.isSelected) to updatePaymentSummary
+        }
+            ?: return couponUiModel to paymentSummaryUiState
+    }
+
+    private fun deselectCoupon(
+        couponId: Long,
+        couponUiModel: CouponUiModel,
+        paymentSummaryUiState: PaymentSummaryUiState,
+    ): Pair<CouponUiModel, PaymentSummaryUiState> {
+        couponContextMapper[couponId]?.let { coupon ->
+            val updatePaymentSummary = paymentSummaryUiState.cancelCoupon(coupon)
+            return couponUiModel.copy(isSelected = false) to updatePaymentSummary
+        }
+        return couponUiModel to paymentSummaryUiState
     }
 
     private fun loadCoupons(cartItems: List<CartItem>) {
         viewModelScope.launch {
-            getAvailableCouponsUseCase(cartItems).onSuccess { couponContexts ->
-                purchaseProductIds = cartItems.map { it.product.productId }
-                couponContextMapper = couponContexts.associateBy { it.coupon.couponBase.id }
-                val couponUiModels =
-                    couponContexts.map { couponContext -> couponContext.coupon.toUiModel() }
-                _coupons.value = couponUiModels
-            }
+            getAvailableCouponsUseCase(cartItems)
+                .onSuccess { couponContexts ->
+                    purchaseProductIds = cartItems.map { it.product.productId }
+                    couponContextMapper = couponContexts.associateBy { it.coupon.couponBase.id }
+                    val couponUiModels =
+                        couponContexts.map { couponContext -> couponContext.coupon.toUiModel() }
+                    _coupons.value = couponUiModels
+                }.onFailure { _toastMessage.value = R.string.order_coupon_load_fail }
         }
     }
 }

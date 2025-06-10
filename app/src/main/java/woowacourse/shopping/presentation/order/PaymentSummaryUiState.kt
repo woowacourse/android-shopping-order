@@ -1,5 +1,7 @@
 package woowacourse.shopping.presentation.order
 
+import woowacourse.shopping.domain.model.coupon.CouponContext
+
 data class PaymentSummaryUiState(
     val orderPrice: Int,
     val couponDiscountPrice: Int = 0,
@@ -7,13 +9,17 @@ data class PaymentSummaryUiState(
 ) {
     val totalPaymentAmount: Int get() = orderPrice + couponDiscountPrice + shippingFee
 
-    fun update(
-        couponDiscountPrice: Int,
-        shippingFee: Int,
-    ): PaymentSummaryUiState =
+    fun applyCoupon(coupon: CouponContext): PaymentSummaryUiState =
         PaymentSummaryUiState(
             orderPrice,
-            this.couponDiscountPrice + couponDiscountPrice,
-            this.shippingFee + shippingFee,
+            this.couponDiscountPrice - coupon.getDiscountPrice(),
+            this.shippingFee - coupon.getDiscountDeliveryFee(),
+        )
+
+    fun cancelCoupon(coupon: CouponContext): PaymentSummaryUiState =
+        PaymentSummaryUiState(
+            orderPrice,
+            this.couponDiscountPrice + coupon.getDiscountPrice(),
+            this.shippingFee + coupon.getDiscountDeliveryFee(),
         )
 }
