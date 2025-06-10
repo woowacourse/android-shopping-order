@@ -6,7 +6,7 @@ import woowacourse.shopping.data.source.remote.api.OrderApiService
 class OrderRemoteDataSource(
     private val api: OrderApiService,
 ) : OrderDataSource {
-    override suspend fun orderCheckedItems(cartIds: List<Long>): Result<Unit> =
+    override suspend fun createOrder(cartIds: List<Long>): Result<Unit> =
         runCatching {
             val request = OrderRequest(cartItemIds = cartIds)
             val response = api.postOrders(request = request)

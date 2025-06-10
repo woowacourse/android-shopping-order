@@ -8,7 +8,7 @@ class OrderRepositoryImpl(
     private val cartItemRepository: CartItemsRepositoryImpl,
 ) : OrderRepository {
     override suspend fun orderItems(cartIds: List<Long>): Result<Unit> {
-        val result = orderDataSource.orderCheckedItems(cartIds)
+        val result = orderDataSource.createOrder(cartIds)
 
         cartIds.forEach { id ->
             cartItemRepository.deleteCartItemByCartId(id)
