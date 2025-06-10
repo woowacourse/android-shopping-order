@@ -10,9 +10,11 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.domain.model.PagingData
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
 import woowacourse.shopping.domain.repository.ViewedItemRepository
+import woowacourse.shopping.mapper.toUiModel
 import woowacourse.shopping.presentation.util.SingleLiveEvent
 
 class CatalogViewModel(
@@ -137,8 +139,8 @@ class CatalogViewModel(
 
     fun loadRecentViewedItems() {
         viewModelScope.launch {
-            val items = viewedItemRepository.getViewedItems()
-            _recentViewedItems.postValue(items)
+            val items: List<Product> = viewedItemRepository.getViewedItems()
+            _recentViewedItems.postValue(items.map { it.toUiModel() })
             _hasRecentViewedItems.postValue(items.isNotEmpty())
         }
     }

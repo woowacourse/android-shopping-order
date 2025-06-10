@@ -5,6 +5,7 @@ import woowacourse.shopping.data.model.CartItemResponse.Content
 import woowacourse.shopping.data.source.local.cart.CartItemsLocalDataSource
 import woowacourse.shopping.data.source.remote.cart.CartItemsRemoteDataSource
 import woowacourse.shopping.domain.model.PagingData
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
@@ -31,15 +32,12 @@ class CartItemsRepositoryImpl(
         return pagingData.copy(products = updatedProducts)
     }
 
-    override fun getCartItemProductIds(): List<Long> {
-        return cartItemsLocalDataSource.getCartItemProductIds()
-    }
+    override fun getCartItemProductIds(): List<Long> = cartItemsLocalDataSource.getCartItemProductIds()
 
-    override fun getCartIdsByProducts(products: List<ProductUiModel>): List<Long> {
-        return products.mapNotNull { product ->
+    override fun getCartIdsByProducts(products: List<Product>): List<Long> =
+        products.mapNotNull { product ->
             cartItemsLocalDataSource.findCachedCartId(product.id)
         }
-    }
 
     override suspend fun getInitialCartItems(
         page: Int?,
@@ -103,12 +101,12 @@ class CartItemsRepositoryImpl(
     override suspend fun addCartItem(
         id: Long,
         quantity: Int,
-    ): Result<Unit> {
-        return cartItemsRemoteDataSource.addCartItem(id, quantity)
+    ): Result<Unit> =
+        cartItemsRemoteDataSource
+            .addCartItem(id, quantity)
             .mapCatching { cartId ->
                 cartItemsLocalDataSource.add(cartId, id, quantity)
             }
-    }
 
     override suspend fun updateCartItemQuantity(
         id: Long,
@@ -145,19 +143,20 @@ class CartItemsRepositoryImpl(
 
             result
         } else {
-            cartItemsRemoteDataSource.addCartItem(id, quantity)
+            cartItemsRemoteDataSource
+                .addCartItem(id, quantity)
                 .mapCatching { newCartId ->
                     cartItemsLocalDataSource.add(newCartId, id, quantity)
                 }
         }
     }
 
-    override suspend fun getCartItemsCount(): Result<Int> {
-        return cartItemsRemoteDataSource.getCarItemsCount()
+    override suspend fun getCartItemsCount(): Result<Int> =
+        cartItemsRemoteDataSource
+            .getCarItemsCount()
             .mapCatching {
                 it.quantity
             }
-    }
 
     private fun Content.toUiModel() =
         ProductUiModel(

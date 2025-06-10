@@ -16,8 +16,9 @@ class ProductsRepositoryImpl(
     override suspend fun getProducts(
         page: Int,
         size: Int,
-    ): Result<PagingData> {
-        return productsRemoteDataSource.getProducts(page, size)
+    ): Result<PagingData> =
+        productsRemoteDataSource
+            .getProducts(page, size)
             .mapCatching { response ->
                 PagingData(
                     products = response.content.map { it.toDomain().toUiModel() },
@@ -26,14 +27,13 @@ class ProductsRepositoryImpl(
                     hasPrevious = !response.first,
                 )
             }
-    }
 
-    override suspend fun getProductById(id: Long): Result<ProductUiModel> {
-        return productsRemoteDataSource.getProductById(id)
+    override suspend fun getProductById(id: Long): Result<ProductUiModel> =
+        productsRemoteDataSource
+            .getProductById(id)
             .mapCatching { response ->
                 response.toDomain().toUiModel()
             }
-    }
 
     override suspend fun getRecommendedProductsFromLastViewed(cartProductIds: List<Long>): Result<List<ProductUiModel>> {
         val lastViewedItem = viewedItemRepository.getLastViewedItem()
@@ -51,8 +51,9 @@ class ProductsRepositoryImpl(
     private suspend fun getRecommendedProducts(
         category: String,
         cartProductIds: List<Long>,
-    ): Result<List<ProductUiModel>> {
-        return productsRemoteDataSource.getProductsByCategory(category)
+    ): Result<List<ProductUiModel>> =
+        productsRemoteDataSource
+            .getProductsByCategory(category)
             .mapCatching { response ->
                 response.content
                     .map { it.toDomain() }
@@ -60,15 +61,14 @@ class ProductsRepositoryImpl(
                     .take(10)
                     .map { it.toUiModel() }
             }
-    }
 
-    private fun ProductResponse.toDomain(): Product {
-        return Product(
+    private fun ProductResponse.toDomain(): Product =
+        Product(
             id = this.id,
             name = this.name,
             price = this.price,
             imageUrl = this.imageUrl,
+            quantity = 0,
             category = this.category,
         )
-    }
 }

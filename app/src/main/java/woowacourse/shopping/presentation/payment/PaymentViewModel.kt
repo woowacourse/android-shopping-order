@@ -14,6 +14,7 @@ import woowacourse.shopping.RepositoryProvider.cartItemRepository
 import woowacourse.shopping.data.model.Coupon
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.presentation.recommend.OrderEvent
 import woowacourse.shopping.presentation.recommend.OrderEvent.OrderItemFailure
@@ -67,15 +68,19 @@ class PaymentViewModel(
     }
 
     fun orderItems() {
+        val items =
+            initialCheckedItems.map {
+                it.toDomain()
+            }
+
         viewModelScope.launch {
-            val cartIds = cartItemRepository.getCartIdsByProducts(initialCheckedItems)
+            val cartIds = cartItemRepository.getCartIdsByProducts(items)
             val result = orderRepository.orderItems(cartIds)
 
             result
                 .onSuccess {
                     _orderEvent.postValue(OrderItemSuccess)
-                }
-                .onFailure {
+                }.onFailure {
                     _orderEvent.postValue(OrderItemFailure)
                 }
         }
@@ -110,8 +115,8 @@ class PaymentViewModel(
         private const val INITIAL_DELIVERY_CHARGE = 3_000L
         private const val INITIAL_DISCOUNT_AMOUNT = 0L
 
-        fun provideFactory(initialCheckedItems: List<ProductUiModel>): ViewModelProvider.Factory {
-            return viewModelFactory {
+        fun provideFactory(initialCheckedItems: List<ProductUiModel>): ViewModelProvider.Factory =
+            viewModelFactory {
                 initializer {
                     PaymentViewModel(
                         couponRepository = RepositoryProvider.couponRepository,
@@ -121,6 +126,5 @@ class PaymentViewModel(
                     )
                 }
             }
-        }
     }
 }

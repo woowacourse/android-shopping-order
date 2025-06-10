@@ -9,9 +9,12 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import woowacourse.shopping.RepositoryProvider
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
 import woowacourse.shopping.domain.repository.ViewedItemRepository
+import woowacourse.shopping.mapper.toDomain
+import woowacourse.shopping.mapper.toUiModel
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.presentation.product.detail.CartEvent.AddItemFailure
 import woowacourse.shopping.presentation.product.detail.CartEvent.AddItemSuccess
@@ -44,10 +47,9 @@ class DetailViewModel(
                     val loadedProduct = product.copy(quantity = 1)
                     _product.postValue(loadedProduct)
 
-                    viewedRepository.insertViewedItem(loadedProduct)
+                    viewedRepository.insertViewedItem(loadedProduct.toDomain())
                     _productInserted.postValue(true)
-                }
-                .onFailure {
+                }.onFailure {
                     _productInserted.postValue(false)
                 }
         }
@@ -59,11 +61,12 @@ class DetailViewModel(
         viewModelScope.launch {
             val result = cartItemRepository.addCartItemQuantity(product.id, product.quantity)
 
-            result.onSuccess {
-                _cartEvent.postValue(AddItemSuccess)
-            }.onFailure {
-                _cartEvent.postValue(AddItemFailure)
-            }
+            result
+                .onSuccess {
+                    _cartEvent.postValue(AddItemSuccess)
+                }.onFailure {
+                    _cartEvent.postValue(AddItemFailure)
+                }
         }
     }
 
@@ -71,8 +74,8 @@ class DetailViewModel(
         viewModelScope.launch {
             val lastViewedItem = viewedRepository.getLastViewedItem()
 
-            val filtered = if (lastViewedItem?.id == productId) null else lastViewedItem
-            _lastViewed.postValue(filtered)
+            val filtered: Product? = if (lastViewedItem?.id == productId) null else lastViewedItem
+            _lastViewed.postValue(filtered?.toUiModel())
         }
     }
 
@@ -87,8 +90,8 @@ class DetailViewModel(
     }
 
     companion object {
-        fun provideFactory(productId: Long): ViewModelProvider.Factory {
-            return viewModelFactory {
+        fun provideFactory(productId: Long): ViewModelProvider.Factory =
+            viewModelFactory {
                 initializer {
                     DetailViewModel(
                         productsRepository = RepositoryProvider.productsRepository,
@@ -98,6 +101,5 @@ class DetailViewModel(
                     )
                 }
             }
-        }
     }
 }
