@@ -49,7 +49,7 @@ class RecommendViewModelTest {
     @Test
     fun `상품 수량이 정상적으로 증가한다`() =
         runTest {
-            val product = ProductUiModel(id = 12L, name = "아이스 카페 아메리카노", imageUrl = "", price = 1000, quantity = 0)
+            val product = ProductUiModel(id = 2L, name = "아이스 카페 아메리카노", imageUrl = "", price = 1000, quantity = 0)
 
             viewModel =
                 RecommendViewModel(

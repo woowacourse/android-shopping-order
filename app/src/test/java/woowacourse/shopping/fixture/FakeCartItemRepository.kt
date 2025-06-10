@@ -2,6 +2,7 @@ package woowacourse.shopping.fixture
 
 import woowacourse.shopping.data.model.CachedCartItem
 import woowacourse.shopping.domain.model.PagingData
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
@@ -152,11 +153,7 @@ class FakeCartItemRepository(
         return pagingData.copy(products = updatedProducts)
     }
 
-    override fun getCartItemProductIds(): List<Long> {
-        return fakeCartItems.map { it.id }
-    }
+    override fun getCartItemProductIds(): List<Long> = fakeCartItems.map { it.id }
 
-    override fun getCartIdsByProducts(products: List<ProductUiModel>): List<Long> {
-        return products.map { it.id }
-    }
+    override fun getCartIdsByProducts(products: List<Product>): List<Long> = products.map { it.id }
 }
