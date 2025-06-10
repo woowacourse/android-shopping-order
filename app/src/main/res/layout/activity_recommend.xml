@@ -74,12 +74,12 @@
                 tools:text="184,200원" />
 
             <TextView
-                android:onClick="@{() -> viewModel.onOrderClick()}"
                 android:id="@+id/button_order"
                 android:layout_width="122dp"
                 android:layout_height="match_parent"
                 android:background="@color/mint_blue"
                 android:gravity="center"
+                android:onClick="@{() -> viewModel.onOrderClick()}"
                 android:text="@{@string/text_order_button(viewModel.totalOrderCount)}"
                 android:textColor="@color/white"
                 android:textSize="18sp"

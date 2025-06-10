@@ -14,6 +14,7 @@
         <variable
             name="isChecked"
             type="Boolean" />
+
         <variable
             name="handler"
             type="woowacourse.shopping.presentation.payment.event.CouponEventHandler" />
@@ -27,11 +28,11 @@
         android:background="@drawable/cart_item_background">
 
         <CheckBox
-            android:checked="@{isChecked}"
             android:id="@+id/checkbox_coupon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
+            android:checked="@{isChecked}"
             android:onClick="@{()-> handler.onCouponCheck(coupon)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -51,13 +52,13 @@
 
         <TextView
             android:id="@+id/textView_coupon_expiration_date"
-            expirationDateFormatted="@{coupon.expirationDate}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:textColor="@color/gray_5"
             android:textSize="12sp"
+            app:expirationDateFormatted="@{coupon.expirationDate}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textView_coupon_name"
             tools:text="만료일: 2024년 11월 30일" />
