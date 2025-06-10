@@ -60,19 +60,13 @@ class CartRepositoryImpl(
     override suspend fun insertProduct(
         product: Product,
         productQuantity: Int,
-    ): Result<Long> =
-        cartRemoteDataSource
-            .insertCartItem(product.productId, productQuantity)
-            .mapCatching { cartId ->
-                val cartItem =
-                    CartItem(
-                        cartId = cartId,
-                        product = product,
-                        quantity = productQuantity,
-                    )
-                cartLocalDataSource.add(cartItem)
-                cartId
-            }
+    ): Result<Unit> =
+        handleResult {
+            val cartId =
+                cartRemoteDataSource.insertCartItem(product.productId, productQuantity).getOrThrow()
+            val newCartItem = CartItem(cartId, product, productQuantity)
+            cartLocalDataSource.add(newCartItem)
+        }
 
     override suspend fun updateProduct(
         cartId: Long,
