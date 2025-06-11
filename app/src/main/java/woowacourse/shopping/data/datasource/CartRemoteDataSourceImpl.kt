@@ -13,65 +13,50 @@ class CartRemoteDataSourceImpl(
     override suspend fun insertProduct(
         productId: Long,
         quantity: Int,
-    ): Long =
-        withContext(Dispatchers.IO) {
-            val response =
-                cartItemService
-                    .postCartItem(
-                        UpdateCartItemRequest(productId = productId, quantity = quantity),
-                    )
+    ): Long {
+        val response =
+            cartItemService
+                .postCartItem(
+                    UpdateCartItemRequest(productId = productId, quantity = quantity),
+                )
 
-            if (response.isSuccessful) {
-                val locationHeader = response.headers()["location"]
-                val id = locationHeader?.substringAfterLast("/")?.toLongOrNull()
-                id ?: throw Exception("cartItemId 가져오기에 실패했습니다.")
-            } else {
-                throw Exception("서버 응답 실패 : ${response.code()}")
-            }
+        return if (response.isSuccessful) {
+            val locationHeader = response.headers()["location"]
+            val id = locationHeader?.substringAfterLast("/")?.toLongOrNull()
+            id ?: throw Exception("cartItemId 가져오기에 실패했습니다.")
+        } else {
+            throw Exception("서버 응답 실패 : ${response.code()}")
         }
+    }
 
     override suspend fun deleteProduct(productId: Long) {
-        withContext(Dispatchers.IO) {
-            val response = cartItemService.deleteCartItem(productId)
-
-            if (!response.isSuccessful) {
-                throw Exception("상품 삭제 실패 : ${response.code()}")
-            }
-        }
+        cartItemService.deleteCartItem(productId)
     }
 
     override suspend fun fetchProducts(
         page: Int,
         size: Int,
-    ): ProductResponse =
-        withContext(Dispatchers.IO) {
-            val response =
-                cartItemService.requestCartItems(
-                    page = page,
-                    size = size,
-                )
+    ): ProductResponse {
+        val response =
+            cartItemService.requestCartItems(
+                page = page,
+                size = size,
+            )
 
-            if (response.isSuccessful) {
-                response.body() ?: throw Exception("장바구니 상품 가져오기에 실패했습니다.")
-            } else {
-                throw Exception("서버 응답 실패 : ${response.code()}")
-            }
+        return if (response.isSuccessful) {
+            response.body() ?: throw Exception("장바구니 상품 가져오기에 실패했습니다.")
+        } else {
+            throw Exception("서버 응답 실패 : ${response.code()}")
         }
+    }
 
     override suspend fun updateProduct(
         cartItemId: Long,
         quantity: Int,
-    ) = withContext(Dispatchers.IO) {
-        val response =
-            cartItemService.patchCartItemQuantity(
-                cartItemId = cartItemId,
-                quantity = Quantity(quantity),
-            )
-
-        if (!response.isSuccessful) {
-            throw Exception("장바구니 상품 업데이트 실패 : ${response.code()}")
-        }
-    }
+    ) = cartItemService.patchCartItemQuantity(
+        cartItemId = cartItemId,
+        quantity = Quantity(quantity),
+    )
 
     override suspend fun fetchCartTotalElements(): Long =
         withContext(Dispatchers.IO) {
@@ -88,14 +73,5 @@ class CartRemoteDataSourceImpl(
             }
         }
 
-    override suspend fun fetchCartItemsCount(): Int =
-        withContext(Dispatchers.IO) {
-            val response = cartItemService.getCartItemsCount()
-
-            if (response.isSuccessful) {
-                response.body()?.value ?: throw Exception("장바구니 수량이 없습니다.")
-            } else {
-                throw Exception("서버 응답 실패 : ${response.code()}")
-            }
-        }
+    override suspend fun fetchCartItemsCount(): Int = cartItemService.getCartItemsCount().value
 }

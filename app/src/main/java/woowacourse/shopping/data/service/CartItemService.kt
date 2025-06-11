@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.service
 
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -17,12 +18,12 @@ interface CartItemService {
         @Query("page") page: Int? = 0,
         @Query("size") size: Int? = 1,
         @Query("sort") sort: List<String> = listOf(),
-    ): ProductResponse
+    ): Response<ProductResponse>
 
     @POST("/cart-items")
     suspend fun postCartItem(
         @Body request: UpdateCartItemRequest,
-    )
+    ): Response<Unit>
 
     @DELETE("/cart-items/{id}")
     suspend fun deleteCartItem(
