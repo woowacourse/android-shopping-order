@@ -21,7 +21,6 @@ class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
     val viewModel: CartViewModel by viewModels { CartViewModelFactory() }
     private var hasHandledTotalCount = false
-    private var fragmentState: Int = FRAGMENT_SELECTION
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,14 +68,12 @@ class CartActivity : AppCompatActivity() {
     }
 
     private fun replaceCartRecommendationFragment() {
-        fragmentState = FRAGMENT_RECOMMENDATION
         binding.checkboxAllSelection.visibility = View.GONE
         binding.textViewAllSelection.visibility = View.GONE
         replaceFragment(CartRecommendationFragment::class.java)
     }
 
     private fun replaceCartSelectionFragment() {
-        fragmentState = FRAGMENT_SELECTION
         replaceFragment(CartSelectionFragment::class.java)
     }
 
@@ -88,10 +85,17 @@ class CartActivity : AppCompatActivity() {
     }
 
     private fun processOrderClick(orderedProducts: Array<ProductUiModel>) {
-        if (fragmentState == FRAGMENT_SELECTION) {
-            replaceCartRecommendationFragment()
-        } else if (fragmentState == FRAGMENT_RECOMMENDATION) {
-            startActivity(OrderActivity.newIntent(this, orderedProducts))
+        val currentFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container_cart_selection)
+
+        when (currentFragment) {
+            is CartSelectionFragment -> {
+                replaceCartRecommendationFragment()
+            }
+
+            is CartRecommendationFragment -> {
+                startActivity(OrderActivity.newIntent(this, orderedProducts))
+            }
         }
     }
 
@@ -105,8 +109,5 @@ class CartActivity : AppCompatActivity() {
 
     companion object {
         fun newIntent(context: Context): Intent = Intent(context, CartActivity::class.java)
-
-        private const val FRAGMENT_SELECTION = 1
-        private const val FRAGMENT_RECOMMENDATION = 2
     }
 }
