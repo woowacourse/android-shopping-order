@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.view.product.catalog.ProductCatalogEventHandler
+import woowacourse.shopping.view.product.catalog.adapter.ProductCatalogItem.ViewType
 import woowacourse.shopping.view.product.catalog.adapter.recent.RecentProductListViewHolder
 import woowacourse.shopping.view.util.product.ProductViewHolder
 
@@ -16,7 +17,11 @@ class ProductAdapter(
                 oldItem: ProductCatalogItem,
                 newItem: ProductCatalogItem,
             ): Boolean {
-                return oldItem == newItem
+                return when {
+                    oldItem is ProductCatalogItem.ProductItem && newItem is ProductCatalogItem.ProductItem ->
+                        oldItem.product.id == newItem.product.id
+                    else -> oldItem == newItem
+                }
             }
 
             override fun areContentsTheSame(
@@ -31,15 +36,15 @@ class ProductAdapter(
         parent: ViewGroup,
         viewType: Int,
     ): RecyclerView.ViewHolder =
-        when (ProductCatalogItem.ViewType.entries[viewType]) {
-            ProductCatalogItem.ViewType.RECENT_PRODUCT ->
+        when (ViewType.entries[viewType]) {
+            ViewType.RECENT_PRODUCT ->
                 RecentProductListViewHolder.from(
                     parent,
                     eventHandler,
                 )
 
-            ProductCatalogItem.ViewType.PRODUCT -> ProductViewHolder.from(parent, eventHandler)
-            ProductCatalogItem.ViewType.LOAD_MORE -> LoadMoreViewHolder.from(parent, eventHandler)
+            ViewType.PRODUCT -> ProductViewHolder.from(parent, eventHandler)
+            ViewType.LOAD_MORE -> LoadMoreViewHolder.from(parent, eventHandler)
         }
 
     override fun onBindViewHolder(

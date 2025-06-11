@@ -3,6 +3,8 @@ package woowacourse.shopping.viewmodel.cart.selection
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldHaveSize
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -10,23 +12,27 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.repository.CartProductRepository
+import woowacourse.shopping.fixture.CoroutinesTestExtension
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.view.cart.selection.CartProductSelectionViewModel
 import woowacourse.shopping.viewmodel.InstantTaskExecutorExtension
 import woowacourse.shopping.viewmodel.getOrAwaitValue
 
+@ExperimentalCoroutinesApi
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class CartProductSelectionViewModelTest {
     private lateinit var viewModel: CartProductSelectionViewModel
     private lateinit var cartProductRepository: CartProductRepository
 
     @BeforeEach
-    fun setup() {
-        cartProductRepository = FakeCartProductRepository()
-        repeat(12) { id -> cartProductRepository.insert(id, 1) {} }
-        viewModel = CartProductSelectionViewModel(cartProductRepository)
-        viewModel.loadPage(1)
-    }
+    fun setup() =
+        runTest {
+            cartProductRepository = FakeCartProductRepository()
+            repeat(12) { id -> cartProductRepository.insert(id, 1) }
+            viewModel = CartProductSelectionViewModel(cartProductRepository)
+            viewModel.loadPage(1)
+        }
 
     @Test
     fun `초기 로드 시 첫 페이지의 상품이 로드된다`() {
@@ -72,6 +78,11 @@ class CartProductSelectionViewModelTest {
 
     @Test
     fun `이전 페이지 로드 시 페이지 번호가 감소하고 상품이 로드된다`() {
+        // given
+        viewModel.hasPrevious.observeForever {}
+        viewModel.hasNext.observeForever {}
+        viewModel.products.observeForever {}
+
         // when
         viewModel.loadNextProducts()
         viewModel.loadPreviousProducts()
@@ -132,7 +143,7 @@ class CartProductSelectionViewModelTest {
                 .first()
                 .cartProduct
         // when
-        viewModel.onQuantityIncreaseClick(cartProductItem)
+        viewModel.onQuantityIncreaseClick(cartProductItem.id)
 
         // then
         val updatedItem =
@@ -151,10 +162,10 @@ class CartProductSelectionViewModelTest {
                 .getOrAwaitValue()
                 .first()
                 .cartProduct
-        viewModel.onQuantityIncreaseClick(cartProduct)
+        viewModel.onQuantityIncreaseClick(cartProduct.id)
 
         // when
-        viewModel.onQuantityDecreaseClick(cartProduct)
+        viewModel.onQuantityDecreaseClick(cartProduct.id)
 
         // then
         val updatedItem =
@@ -176,10 +187,10 @@ class CartProductSelectionViewModelTest {
 
         // when
         viewModel.onSelectItem(cartProduct)
-        val actual = viewModel.selectedIds
+        val actual = viewModel.selectedProducts
 
         // then
-        actual shouldContain cartProduct.id
+        actual shouldContain cartProduct
     }
 
     @Test
@@ -192,20 +203,21 @@ class CartProductSelectionViewModelTest {
 
         // when
         viewModel.onSelectAllItems()
-        val actual = viewModel.selectedIds
+        val actual = viewModel.selectedProducts
 
         // then
-        actual shouldContainAll cartProducts.map { it.id }
+        actual shouldContainAll cartProducts
     }
 
     @Test
     fun `전체 상품이 담긴 상태에서 상품 전체 선택 시 선택된 상품에서 제거된다`() {
         // given
         viewModel.onSelectAllItems()
+        viewModel.isSelectedAll.getOrAwaitValue()
 
         // when
         viewModel.onSelectAllItems()
-        val actual = viewModel.selectedIds
+        val actual = viewModel.selectedProducts
 
         // then
         actual shouldHaveSize 0

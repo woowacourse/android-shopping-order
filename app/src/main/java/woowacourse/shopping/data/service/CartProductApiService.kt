@@ -1,10 +1,9 @@
 package woowacourse.shopping.data.service
 
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -16,30 +15,27 @@ import woowacourse.shopping.data.dto.response.CartProductResponseDto
 
 interface CartProductApiService {
     @GET("/cart-items")
-    fun getPagedProducts(
-        @Header("accept") accept: String = "application/json",
+    suspend fun getPagedProducts(
         @Query("page") page: Int?,
         @Query("size") size: Int?,
-    ): Call<CartProductResponseDto>
+    ): Result<CartProductResponseDto?>
 
     @POST("/cart-items")
-    fun insert(
+    suspend fun insert(
         @Body body: CartProductRequestDto,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @DELETE("/cart-items/{id}")
-    fun delete(
+    suspend fun delete(
         @Path("id") id: Int,
-    ): Call<Unit>
+    ): Result<Unit>
 
     @GET("/cart-items/counts")
-    fun getTotalQuantity(
-        @Header("accept") accept: String = "application/json",
-    ): Call<CartProductQuantityResponseDto>
+    suspend fun getTotalQuantity(): Result<CartProductQuantityResponseDto>
 
     @PATCH("/cart-items/{id}")
-    fun updateQuantity(
+    suspend fun updateQuantity(
         @Path("id") id: Int,
         @Body body: CartProductQuantityRequestDto,
-    ): Call<Unit>
+    ): Result<Unit>
 }

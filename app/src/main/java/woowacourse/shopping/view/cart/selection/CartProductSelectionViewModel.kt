@@ -5,51 +5,66 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.view.cart.selection.adapter.CartProductItem
+import woowacourse.shopping.view.util.Error
+import woowacourse.shopping.view.util.MutableSingleLiveData
+import woowacourse.shopping.view.util.SingleLiveData
 
 class CartProductSelectionViewModel(
     private val repository: CartProductRepository,
 ) : ViewModel(),
     CartProductSelectionEventHandler {
-    private val _selectedIds: MutableSet<Int> = mutableSetOf()
-    val selectedIds: Set<Int> get() = _selectedIds
+    private val _selectedProducts = MutableLiveData<Set<CartProduct>>(emptySet())
+    val selectedProducts get() = _selectedProducts.value.orEmpty()
 
     private val _products = MutableLiveData<List<CartProductItem>>()
     val products: LiveData<List<CartProductItem>> get() = _products
 
-    val totalPrice: LiveData<Int> =
-        _products.map { products ->
-            products
-                .filter { it.cartProduct.id in _selectedIds }
-                .sumOf { it.cartProduct.product.price * it.cartProduct.quantity }
-        }
-
-    val totalCount: LiveData<Int> =
-        _products.map { products ->
-            products
-                .filter { it.cartProduct.id in _selectedIds }
-                .sumOf { it.cartProduct.quantity }
-        }
-
-    private var _page = MutableLiveData(FIRST_PAGE_NUMBER)
+    private val _page = MutableLiveData(FIRST_PAGE_NUMBER)
     val page: LiveData<Int> get() = _page
 
     private val _hasNext = MutableLiveData(false)
     val hasNext: LiveData<Boolean> get() = _hasNext
 
-    private val _hasPrevious = MutableLiveData(false)
-    val hasPrevious: LiveData<Boolean> get() = _hasPrevious
-
-    private val _isSinglePage = MutableLiveData(true)
-    val isSinglePage: LiveData<Boolean> get() = _isSinglePage
-
-    private val _isSelectedAll = MutableLiveData(false)
-    val isSelectedAll: LiveData<Boolean> get() = _isSelectedAll
-
     private val _isFinishedLoading = MutableLiveData(false)
     val isFinishedLoading: LiveData<Boolean> get() = _isFinishedLoading
+
+    private val _errorEvent = MutableSingleLiveData<Error>()
+    val errorEvent: SingleLiveData<Error> get() = _errorEvent
+
+    val totalPrice: LiveData<Int> =
+        _selectedProducts.map { products ->
+            products.sumOf { it.totalPrice }
+        }
+
+    val totalCount: LiveData<Int> =
+        _selectedProducts.map { products ->
+            products.sumOf { it.quantity }
+        }
+
+    val isSelectedAll: LiveData<Boolean> =
+        _products.map { products ->
+            products.all { it.isSelected } && products.isNotEmpty()
+        }
+
+    val canOrder: LiveData<Boolean> =
+        _selectedProducts.map { products ->
+            products.isNotEmpty()
+        }
+
+    val hasPrevious: LiveData<Boolean> =
+        _page.map { page ->
+            page > FIRST_PAGE_NUMBER
+        }
+
+    val isSinglePage: LiveData<Boolean> =
+        _hasNext.map { hasNext ->
+            hasNext == false && hasPrevious.value == false
+        }
 
     override fun loadNextProducts() {
         val nextPage = page.value?.plus(1) ?: FIRST_PAGE_NUMBER
@@ -58,45 +73,105 @@ class CartProductSelectionViewModel(
 
     override fun loadPreviousProducts() {
         val prevPage = page.value?.minus(1) ?: FIRST_PAGE_NUMBER
-        if (_hasPrevious.value == true) loadPage(prevPage)
+        if (hasPrevious.value == true) loadPage(prevPage)
     }
 
     override fun onProductRemoveClick(item: CartProduct) {
-        repository.delete(item.id) {
-            val currentPage = page.value ?: FIRST_PAGE_NUMBER
+        viewModelScope.launch {
+            val result = repository.delete(item.id)
 
-            if (products.value?.size == 1 && currentPage > FIRST_PAGE_NUMBER) {
-                loadPage(currentPage - 1)
-            } else {
-                loadPage(currentPage)
-            }
+            result
+                .onSuccess {
+                    val currentPage = page.value ?: FIRST_PAGE_NUMBER
+
+                    if (products.value?.size == 1 && currentPage > FIRST_PAGE_NUMBER) {
+                        loadPage(currentPage - 1)
+                    } else {
+                        loadPage(currentPage)
+                    }
+                    val currentSelected = _selectedProducts.value.orEmpty()
+                    if (item in currentSelected) {
+                        _selectedProducts.value = currentSelected - item
+                    }
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                    _errorEvent.setValue(Error.FailToDelete)
+                }
         }
     }
 
-    override fun onQuantityIncreaseClick(item: CartProduct) {
+    override fun onQuantityIncreaseClick(id: Int) {
         val cartProductItem =
-            products.value.orEmpty().first { it.cartProduct.product.id == item.product.id }
-        repository.updateQuantity(cartProductItem.cartProduct, 1) {
-            loadPage(_page.value ?: FIRST_PAGE_NUMBER)
+            products.value.orEmpty().firstOrNull { it.cartProduct.id == id }
+                ?: return
+
+        viewModelScope.launch {
+            val newQuantity = cartProductItem.cartProduct.quantity + QUANTITY_STEP
+            val result =
+                repository.updateQuantity(
+                    cartProductItem.cartProduct,
+                    newQuantity,
+                )
+
+            result
+                .onSuccess {
+                    loadPage(_page.value ?: FIRST_PAGE_NUMBER)
+                    updateSelectedProducts(cartProductItem.cartProduct, newQuantity)
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                    _errorEvent.setValue(Error.FailToIncrease)
+                }
         }
     }
 
-    override fun onQuantityDecreaseClick(item: CartProduct) {
+    override fun onQuantityDecreaseClick(id: Int) {
         val cartProductItem =
-            products.value.orEmpty().first { it.cartProduct.product.id == item.product.id }
+            products.value.orEmpty()
+                .firstOrNull { it.cartProduct.id == id }
+                ?: return
         if (cartProductItem.cartProduct.quantity == 1) return
-        repository.updateQuantity(cartProductItem.cartProduct, -1) {
-            loadPage(_page.value ?: FIRST_PAGE_NUMBER)
+
+        viewModelScope.launch {
+            val newQuantity = cartProductItem.cartProduct.quantity - QUANTITY_STEP
+            val result =
+                repository.updateQuantity(
+                    cartProductItem.cartProduct,
+                    newQuantity,
+                )
+
+            result
+                .onSuccess {
+                    loadPage(_page.value ?: FIRST_PAGE_NUMBER)
+                    updateSelectedProducts(cartProductItem.cartProduct, newQuantity)
+                }.onFailure {
+                    Log.e("error", it.message.toString())
+                    _errorEvent.setValue(Error.FailToDecrease)
+                }
+        }
+    }
+
+    private fun updateSelectedProducts(
+        item: CartProduct,
+        newQuantity: Int,
+    ) {
+        val currentSelected = _selectedProducts.value.orEmpty()
+        if (item in currentSelected) {
+            val newItem =
+                item.copy(quantity = newQuantity)
+            _selectedProducts.value = currentSelected - item + newItem
         }
     }
 
     override fun onSelectItem(item: CartProduct) {
-        val isSelected = item.id in _selectedIds
-        if (isSelected) {
-            _selectedIds.remove(item.id)
-        } else {
-            _selectedIds.add(item.id)
-        }
+        val currentSelected = _selectedProducts.value.orEmpty()
+        val isSelected = item in currentSelected
+
+        _selectedProducts.value =
+            if (isSelected) {
+                currentSelected - item
+            } else {
+                currentSelected + item
+            }
         _products.value =
             products.value.orEmpty().map {
                 if (it.cartProduct.id == item.id) {
@@ -105,58 +180,56 @@ class CartProductSelectionViewModel(
                     it
                 }
             }
-        updateIsSelectedAll()
     }
 
     override fun onSelectAllItems() {
-        val currentProducts = products.value.orEmpty()
-        val allIds = currentProducts.map { it.cartProduct.id }
-        val isSelectedAll = isSelectedAll.value ?: false
-
-        if (isSelectedAll) {
-            _selectedIds.removeAll(allIds.toSet())
+        val currentProducts = _products.value.orEmpty()
+        val currentSelected = _selectedProducts.value.orEmpty()
+        val isAllSelected = isSelectedAll.value == true
+        if (isAllSelected == true) {
+            _selectedProducts.value =
+                currentSelected - currentProducts.map { it.cartProduct }.toSet()
         } else {
-            _selectedIds.addAll(allIds)
+            _selectedProducts.value =
+                currentSelected + currentProducts.map { it.cartProduct }.toSet()
         }
-        val updatedProducts = currentProducts.map { it.copy(isSelected = !isSelectedAll) }
-        _isSelectedAll.value = !isSelectedAll
+        val updatedProducts = currentProducts.map { it.copy(isSelected = !isAllSelected) }
         _products.value = updatedProducts
     }
 
     fun loadPage(page: Int = FIRST_PAGE_NUMBER) {
         _isFinishedLoading.value = false
-        repository.getPagedProducts(page - 1, PAGE_SIZE) { result ->
+        viewModelScope.launch {
+            val result = repository.getPagedProducts(page - 1, PAGE_SIZE)
+
             result
                 .onSuccess { pagedResult ->
                     _isFinishedLoading.value = true
                     _products.value =
-                        (pagedResult.items.map { CartProductItem(it, it.id in _selectedIds) })
+                        (
+                            pagedResult.items.map {
+                                CartProductItem(it, it in _selectedProducts.value.orEmpty())
+                            }
+                        )
                     val hasNext = pagedResult.hasNext
                     updatePageState(page, hasNext)
-                    updateIsSelectedAll()
                 }.onFailure {
                     Log.e("error", it.message.toString())
+                    _errorEvent.setValue(Error.FailToLoadProduct)
                 }
         }
-    }
-
-    private fun updateIsSelectedAll() {
-        val isAllSelected = products.value?.all { it.isSelected } ?: false
-        _isSelectedAll.postValue(isAllSelected)
     }
 
     private fun updatePageState(
         page: Int,
         hasNext: Boolean,
     ) {
-        _page.postValue(page)
-        val hasPrevious = page > FIRST_PAGE_NUMBER
-        _hasPrevious.postValue(page > FIRST_PAGE_NUMBER)
-        _hasNext.postValue(hasNext)
-        _isSinglePage.postValue(!hasNext && !hasPrevious)
+        _page.value = page
+        _hasNext.value = hasNext
     }
 
     companion object {
+        private const val QUANTITY_STEP = 1
         private const val FIRST_PAGE_NUMBER = 1
         private const val PAGE_SIZE = 5
     }

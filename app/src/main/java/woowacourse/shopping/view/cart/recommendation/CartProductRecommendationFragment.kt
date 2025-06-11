@@ -11,29 +11,26 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentCartProductRecommendationBinding
-import woowacourse.shopping.domain.repository.CartProductRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.view.cart.recommendation.adapter.RecommendationAdapter
 import woowacourse.shopping.view.cart.selection.CartProductSelectionFragment
+import woowacourse.shopping.view.payment.PaymentActivity
 import woowacourse.shopping.view.product.detail.ProductDetailActivity
 
-class CartProductRecommendationFragment(
-    private val productRepository: ProductRepository,
-    private val cartProductRepository: CartProductRepository,
-    private val recentProductRepository: RecentProductRepository,
-) : Fragment() {
+class CartProductRecommendationFragment() : Fragment() {
     private var _binding: FragmentCartProductRecommendationBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel by lazy {
+        val app = requireContext().applicationContext as ShoppingApplication
         ViewModelProvider(
             this,
             CartProductRecommendationViewModelFactory(
-                productRepository,
-                cartProductRepository,
-                recentProductRepository,
+                app.productRepository,
+                app.cartProductRepository,
+                app.recentProductRepository,
             ),
         )[CartProductRecommendationViewModel::class.java]
     }
@@ -48,7 +45,7 @@ class CartProductRecommendationFragment(
         requireActivity().onBackPressedDispatcher.addCallback(this) {
             parentFragmentManager.commit {
                 replace(
-                    this@CartProductRecommendationFragment.id,
+                    R.id.fragment,
                     CartProductSelectionFragment::class.java,
                     null,
                 )
@@ -76,21 +73,15 @@ class CartProductRecommendationFragment(
     }
 
     private fun initInformation() {
-        val selectedIds = arguments?.getIntArray(KEY_SELECTED_IDS)?.toSet() ?: emptySet()
-        val totalPrice = arguments?.getInt(KEY_TOTAL_PRICE)
-        val totalCount = arguments?.getInt(KEY_TOTAL_COUNT)
-        viewModel.initShoppingCartInfo(selectedIds, totalPrice, totalCount)
+        val selectedProducts: List<CartProduct> =
+            arguments?.getSerializable(KEY_SELECTED_IDS) as ArrayList<CartProduct>
+        viewModel.initShoppingCartInfo(selectedProducts)
     }
 
     private fun initBindings() {
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
         binding.rvRecommendedProducts.adapter = adapter
-        binding.btnOrder.setOnClickListener {
-            Toast.makeText(requireContext(), R.string.finish_order, Toast.LENGTH_SHORT).show()
-            viewModel.finishOrder()
-            requireActivity().finish()
-        }
     }
 
     private fun initObservers() {
@@ -102,6 +93,15 @@ class CartProductRecommendationFragment(
             val intent = ProductDetailActivity.newIntent(requireContext(), value)
             startActivity(intent)
         }
+
+        viewModel.startOrder.observe(viewLifecycleOwner) { value ->
+            val intent = PaymentActivity.newIntent(requireContext(), ArrayList(value))
+            startActivity(intent)
+        }
+
+        viewModel.errorEvent.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it.messageId, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onDestroyView() {
@@ -111,18 +111,10 @@ class CartProductRecommendationFragment(
 
     companion object {
         private const val KEY_SELECTED_IDS = "selectedIds"
-        private const val KEY_TOTAL_PRICE = "totalPrice"
-        private const val KEY_TOTAL_COUNT = "totalCount"
 
-        fun newBundle(
-            selectedIds: Set<Int>,
-            totalPrice: Int?,
-            totalCount: Int?,
-        ): Bundle =
+        fun newBundle(selectedCartProducts: Set<CartProduct>): Bundle =
             Bundle().apply {
-                putIntArray(KEY_SELECTED_IDS, selectedIds.toIntArray())
-                putSerializable(KEY_TOTAL_PRICE, totalPrice)
-                putSerializable(KEY_TOTAL_COUNT, totalCount)
+                putSerializable(KEY_SELECTED_IDS, ArrayList(selectedCartProducts))
             }
     }
 }

@@ -36,8 +36,4 @@ class RecommendationAdapter(
         val item = getItem(position)
         holder.bind(item.product, item.quantity)
     }
-
-    fun updateItems(newItems: List<ProductItem>) {
-        submitList(newItems)
-    }
 }

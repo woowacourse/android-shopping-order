@@ -1,70 +1,69 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSource
+import woowacourse.shopping.data.entity.toEntity
+import woowacourse.shopping.data.entity.toRecentProduct
 import woowacourse.shopping.data.util.toLocalDateTime
 import woowacourse.shopping.domain.model.RecentProduct
-import woowacourse.shopping.domain.model.toEntity
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import kotlin.concurrent.thread
 
 class RecentProductRepositoryImpl(
     private val localDataSource: RecentProductLocalDataSource,
     private val productRepository: ProductRepository,
 ) : RecentProductRepository {
-    override fun getLastViewedProduct(onResult: (Result<RecentProduct?>) -> Unit) {
-        thread {
+    override suspend fun getLastViewedProduct(): Result<RecentProduct?> =
+        withContext(Dispatchers.IO) {
             val entity = localDataSource.getLastViewedProduct()
             if (entity != null) {
-                productRepository.getProductById(entity.productId) { result ->
-                    result.onSuccess { product ->
-                        val recentProduct =
-                            product?.let { RecentProduct(it, entity.viewedAt.toLocalDateTime()) }
-                        onResult(Result.success(recentProduct))
+                val result = productRepository.getProductById(entity.productId)
+
+                result.mapCatching { product ->
+                    product?.let {
+                        entity.toRecentProduct(it)
                     }
                 }
             } else {
-                onResult(Result.success(null))
+                Result.success(null)
             }
         }
-    }
 
-    override fun getPagedProducts(
+    override suspend fun getPagedProducts(
         limit: Int,
         offset: Int,
-        onResult: (Result<List<RecentProduct>>) -> Unit,
-    ) {
-        thread {
-            val entities = localDataSource.getPagedProducts(limit, offset)
-            val productIds = entities.map { it.productId }
-            productRepository.getProductsByIds(productIds) { result ->
-                result
-                    .onSuccess { products ->
-                        if (products == null) {
-                            onResult(Result.success(emptyList()))
-                            return@getProductsByIds
-                        }
+    ): Result<List<RecentProduct>> =
+        withContext(Dispatchers.IO) {
+            try {
+                val entities = localDataSource.getPagedProducts(limit, offset)
+                val productIds = entities.map { it.productId }
 
-                        val productMap = products.associateBy { it.id }
-                        val recentProducts =
-                            entities.mapNotNull { entity ->
-                                productMap[entity.productId]?.let { product ->
-                                    RecentProduct(product, entity.viewedAt.toLocalDateTime())
-                                }
-                            }
-                        onResult(Result.success(recentProducts))
-                    }.onFailure {}
+                val productResult = productRepository.getProductsByIds(productIds)
+                val products = productResult.getOrThrow() ?: emptyList()
+
+                val productMap = products.associateBy { it.id }
+
+                val recentProducts =
+                    entities.mapNotNull { entity ->
+                        productMap[entity.productId]?.let { product ->
+                            RecentProduct(product, entity.viewedAt.toLocalDateTime())
+                        }
+                    }
+
+                Result.success(recentProducts)
+            } catch (e: Exception) {
+                Result.failure(e)
             }
         }
-    }
 
-    override fun replaceRecentProduct(
-        recentProduct: RecentProduct,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        thread {
-            localDataSource.replaceRecentProduct(recentProduct.toEntity())
-            onResult(Result.success(Unit))
+    override suspend fun replaceRecentProduct(recentProduct: RecentProduct): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            try {
+                localDataSource.replaceRecentProduct(recentProduct.toEntity())
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
         }
-    }
 }

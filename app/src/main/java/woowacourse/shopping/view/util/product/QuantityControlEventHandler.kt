@@ -1,7 +1,7 @@
 package woowacourse.shopping.view.util.product
 
-interface QuantityControlEventHandler<T> {
-    fun onQuantityIncreaseClick(item: T)
+interface QuantityControlEventHandler {
+    fun onQuantityIncreaseClick(id: Int)
 
-    fun onQuantityDecreaseClick(item: T)
+    fun onQuantityDecreaseClick(id: Int)
 }

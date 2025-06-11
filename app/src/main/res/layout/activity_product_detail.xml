@@ -14,6 +14,10 @@
         <variable
             name="handler"
             type="woowacourse.shopping.view.product.detail.ProductDetailEventHandler" />
+
+        <variable
+            name="quantityController"
+            type="woowacourse.shopping.view.util.product.QuantityControlEventHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -79,18 +83,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="14dp"
+                    app:id="@{viewmodel.product.id}"
                     app:layout_constraintBottom_toBottomOf="@id/tv_detail_product_price"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/tv_detail_product_price"
-                    app:quantity="@{viewmodel.quantity}" />
+                    app:quantity="@{viewmodel.quantity}"
+                    app:quantityController="@{quantityController}" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="18dp"
                     android:layout_marginTop="24dp"
-                    android:onClick="@{() -> handler.onLastProductClick()}"
                     android:background="@drawable/style_product_edge"
+                    android:onClick="@{() -> handler.onLastProductClick()}"
                     android:paddingHorizontal="18dp"
                     android:paddingVertical="16dp"
                     android:visibility="@{viewmodel.lastViewedProduct == null || viewmodel.lastViewedProduct.product.id == viewmodel.product.id ? View.GONE : View.VISIBLE}"

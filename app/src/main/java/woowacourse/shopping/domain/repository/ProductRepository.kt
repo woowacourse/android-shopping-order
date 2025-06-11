@@ -4,19 +4,12 @@ import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
-    fun getProductById(
-        id: Int,
-        onResult: (Result<Product?>) -> Unit,
-    )
+    suspend fun getProductById(id: Int): Result<Product?>
 
-    fun getProductsByIds(
-        ids: List<Int>,
-        onResult: (Result<List<Product>?>) -> Unit,
-    )
+    suspend fun getProductsByIds(ids: List<Int>): Result<List<Product>?>
 
-    fun getPagedProducts(
+    suspend fun getPagedProducts(
         page: Int? = null,
         size: Int? = null,
-        onResult: (Result<PagedResult<Product>>) -> Unit,
-    )
+    ): Result<PagedResult<Product>>
 }

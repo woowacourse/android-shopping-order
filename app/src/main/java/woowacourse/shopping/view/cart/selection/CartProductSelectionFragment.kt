@@ -4,22 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.R
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentCartProductSelectionBinding
-import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.view.cart.recommendation.CartProductRecommendationFragment
 import woowacourse.shopping.view.cart.selection.adapter.CartProductAdapter
 
-class CartProductSelectionFragment(
-    repository: CartProductRepository,
-) : Fragment() {
+class CartProductSelectionFragment() : Fragment() {
     private val viewModel by lazy {
+        val app = requireContext().applicationContext as ShoppingApplication
         ViewModelProvider(
             this,
-            CartProductSelectionViewModelFactory(repository),
+            CartProductSelectionViewModelFactory(app.cartProductRepository),
         )[CartProductSelectionViewModel::class.java]
     }
     private var _binding: FragmentCartProductSelectionBinding? = null
@@ -67,9 +67,7 @@ class CartProductSelectionFragment(
                     R.id.fragment,
                     CartProductRecommendationFragment::class.java,
                     CartProductRecommendationFragment.newBundle(
-                        viewModel.selectedIds,
-                        viewModel.totalPrice.value,
-                        viewModel.totalCount.value,
+                        viewModel.selectedProducts,
                     ),
                 )
             }
@@ -89,6 +87,10 @@ class CartProductSelectionFragment(
                     binding.sfLoading.startShimmer()
                 }
             }
+        }
+
+        viewModel.errorEvent.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it.messageId, Toast.LENGTH_SHORT).show()
         }
     }
 

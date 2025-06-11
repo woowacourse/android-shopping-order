@@ -6,31 +6,25 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 class FakeRecentProductRepository : RecentProductRepository {
     private val recentProducts = mutableListOf<RecentProduct>()
 
-    override fun getLastViewedProduct(onResult: (Result<RecentProduct?>) -> Unit) {
-        onResult(Result.success(recentProducts.lastOrNull()))
+    override suspend fun getLastViewedProduct(): Result<RecentProduct?> {
+        return Result.success(recentProducts.lastOrNull())
     }
 
-    override fun getPagedProducts(
+    override suspend fun getPagedProducts(
         limit: Int,
         offset: Int,
-        onResult: (Result<List<RecentProduct>>) -> Unit,
-    ) {
-        onResult(
-            Result.success(
-                recentProducts
-                    .sortedByDescending { it.viewedAt }
-                    .drop(offset)
-                    .take(limit),
-            ),
+    ): Result<List<RecentProduct>> {
+        return Result.success(
+            recentProducts
+                .sortedByDescending { it.viewedAt }
+                .drop(offset)
+                .take(limit),
         )
     }
 
-    override fun replaceRecentProduct(
-        recentProduct: RecentProduct,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
+    override suspend fun replaceRecentProduct(recentProduct: RecentProduct): Result<Unit> {
         recentProducts.removeIf { it.product.id == recentProduct.product.id }
         recentProducts.add(recentProduct)
-        onResult(Result.success(Unit))
+        return Result.success(Unit)
     }
 }

@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
+import woowacourse.shopping.data.dto.response.toProduct
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -8,25 +9,27 @@ import woowacourse.shopping.domain.repository.ProductRepository
 class ProductRepositoryImpl(
     private val remoteDataSource: ProductRemoteDataSource,
 ) : ProductRepository {
-    override fun getProductById(
-        id: Int,
-        onResult: (Result<Product?>) -> Unit,
-    ) {
-        remoteDataSource.getProductById(id, onResult)
+    override suspend fun getProductById(id: Int): Result<Product?> {
+        return remoteDataSource.getProductById(id).mapCatching { productDto ->
+            productDto?.toProduct()
+        }
     }
 
-    override fun getProductsByIds(
-        ids: List<Int>,
-        onResult: (Result<List<Product>?>) -> Unit,
-    ) {
-        remoteDataSource.getProductsByIds(ids, onResult)
+    override suspend fun getProductsByIds(ids: List<Int>): Result<List<Product>?> {
+        return remoteDataSource.getProductsByIds(ids).mapCatching { productDtos ->
+            productDtos?.map { it.toProduct() }
+        }
     }
 
-    override fun getPagedProducts(
+    override suspend fun getPagedProducts(
         page: Int?,
         size: Int?,
-        onResult: (Result<PagedResult<Product>>) -> Unit,
-    ) {
-        remoteDataSource.getPagedProducts(page, size, onResult)
+    ): Result<PagedResult<Product>> {
+        return remoteDataSource.getPagedProducts(page, size).mapCatching {
+            PagedResult(
+                it.items.map { productDto -> productDto.toProduct() },
+                it.hasNext,
+            )
+        }
     }
 }

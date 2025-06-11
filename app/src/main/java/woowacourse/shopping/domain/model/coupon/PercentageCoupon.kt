@@ -1,0 +1,23 @@
+package woowacourse.shopping.domain.model.coupon
+
+import woowacourse.shopping.domain.model.CartProduct
+import java.time.LocalTime
+
+data class PercentageCoupon(
+    override val id: Int,
+    override val code: String,
+    override val description: String,
+    override val expirationDate: String,
+    val discount: Int,
+    val availableTime: AvailableTime,
+) : Coupon {
+    override fun isValid(items: List<CartProduct>): Boolean {
+        return availableTime.isInRange(LocalTime.now())
+    }
+
+    override fun calculateDiscountAmount(items: List<CartProduct>): Int {
+        val totalPrice = items.sumOf { it.totalPrice }
+        val discountRate = discount / 100.0
+        return (totalPrice * discountRate).toInt()
+    }
+}
