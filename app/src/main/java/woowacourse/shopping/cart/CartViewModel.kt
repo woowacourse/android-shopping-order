@@ -23,14 +23,6 @@ class CartViewModel(
     private val _cartProducts = MutableLiveData<TreeSet<ProductItem>>()
     val cartProducts: LiveData<TreeSet<ProductItem>> = _cartProducts
 
-    val orderedProducts: Array<ProductUiModel>
-        get() =
-            cartProducts.value
-                ?.map { it.productItem }
-                ?.filter { it.isChecked }
-                ?.toTypedArray()
-                ?: emptyArray()
-
     private val _loadingState: MutableLiveData<LoadingState> =
         MutableLiveData(LoadingState.loading())
     val loadingState: LiveData<LoadingState> get() = _loadingState
@@ -57,8 +49,8 @@ class CartViewModel(
     private val _updatedProduct = MutableLiveData<ProductUiModel>()
     val updatedProduct: LiveData<ProductUiModel> = _updatedProduct
 
-    private val _orderClicked = MutableLiveData<Unit>()
-    val orderClicked: LiveData<Unit> = _orderClicked
+    private val _orderClicked = MutableLiveData<Array<ProductUiModel>>()
+    val orderClicked: LiveData<Array<ProductUiModel>> = _orderClicked
 
     private val _errorMessage = MutableSingleLiveData<String>()
     val errorMessage: SingleLiveData<String> = _errorMessage
@@ -223,8 +215,15 @@ class CartViewModel(
     }
 
     fun order() {
+        val orderedProducts: Array<ProductUiModel> =
+            cartProducts.value
+                ?.map { it.productItem }
+                ?.filter { it.isChecked }
+                ?.toTypedArray()
+                ?: emptyArray()
+
         if (orderedProducts.isNotEmpty()) {
-            _orderClicked.postValue(Unit)
+            _orderClicked.postValue(orderedProducts)
         }
     }
 

@@ -15,6 +15,7 @@ import androidx.fragment.app.commit
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.order.OrderActivity
+import woowacourse.shopping.product.catalog.ProductUiModel
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
@@ -49,7 +50,7 @@ class CartActivity : AppCompatActivity() {
         viewModel.cartProducts.observe(this) { viewModel.refreshProductsInfo() }
         viewModel.selectedEvent.observe(this) { viewModel.refreshProductsInfo() }
         viewModel.totalCount.observe(this) { replaceFragmentByTotalCount(it) }
-        viewModel.orderClicked.observe(this) { processOrderClick() }
+        viewModel.orderClicked.observe(this) { processOrderClick(it) }
         viewModel.errorMessage.observe(this) { showToast(it) }
     }
 
@@ -86,11 +87,11 @@ class CartActivity : AppCompatActivity() {
         }
     }
 
-    private fun processOrderClick() {
+    private fun processOrderClick(orderedProducts: Array<ProductUiModel>) {
         if (fragmentState == FRAGMENT_SELECTION) {
             replaceCartRecommendationFragment()
         } else if (fragmentState == FRAGMENT_RECOMMENDATION) {
-            startActivity(OrderActivity.newIntent(this, viewModel.orderedProducts))
+            startActivity(OrderActivity.newIntent(this, orderedProducts))
         }
     }
 
