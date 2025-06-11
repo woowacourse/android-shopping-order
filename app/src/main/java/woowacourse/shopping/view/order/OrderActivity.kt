@@ -14,9 +14,9 @@ import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
 import woowacourse.shopping.domain.cart.ShoppingCarts
-import woowacourse.shopping.view.NetworkExceptionHandler
 import woowacourse.shopping.view.core.ext.getSerializableObject
 import woowacourse.shopping.view.core.ext.showToast
+import woowacourse.shopping.view.core.handler.NetworkExceptionHandler
 import woowacourse.shopping.view.main.MainActivity
 import woowacourse.shopping.view.order.adapter.OrderAdapter
 import woowacourse.shopping.view.order.vm.OrderViewModel
@@ -30,8 +30,6 @@ class OrderActivity : AppCompatActivity() {
         OrderViewModelFactory(
             couponRepository = container.repositoryModule.defaultCouponRepository,
             orderRepository = container.repositoryModule.defaultOrderRepository,
-            couponValidator = container.couponValidator,
-            couponApplierFactory = container.couponApplierFactory,
         )
     }
 

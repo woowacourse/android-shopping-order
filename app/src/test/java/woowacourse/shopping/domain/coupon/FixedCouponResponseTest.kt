@@ -3,7 +3,10 @@ package woowacourse.shopping.domain.coupon
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.domain.cart.ShoppingCarts
+import woowacourse.shopping.fixture.shoppingCartFixture1
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 class FixedCouponResponseTest {
     @Test
@@ -23,8 +26,9 @@ class FixedCouponResponseTest {
         // when
         val result =
             coupon.isUsable(
-                standardDate = LocalDate.of(2025, 1, 1),
-                standardAmount = 20000,
+                LocalDateTime.of(2025, 1, 1, 10, 0, 0),
+                ShoppingCarts(listOf(shoppingCartFixture1)),
+                20000,
             )
 
         // then
@@ -48,8 +52,9 @@ class FixedCouponResponseTest {
         // when
         val result =
             coupon.isUsable(
-                standardDate = LocalDate.of(2025, 6, 6),
-                standardAmount = 9999,
+                LocalDateTime.of(2025, 6, 6, 10, 0, 0),
+                ShoppingCarts(listOf(shoppingCartFixture1)),
+                9999,
             )
 
         // then
@@ -73,8 +78,9 @@ class FixedCouponResponseTest {
         // when
         val result =
             coupon.isUsable(
-                standardDate = LocalDate.of(2025, 6, 6),
-                standardAmount = 15000,
+                LocalDateTime.of(2025, 6, 6, 10, 0, 0),
+                ShoppingCarts(listOf(shoppingCartFixture1)),
+                15000,
             )
 
         // then
@@ -98,8 +104,9 @@ class FixedCouponResponseTest {
         // when
         val result =
             coupon.isUsable(
-                standardDate = LocalDate.of(2025, 6, 6),
-                standardAmount = 10000,
+                LocalDateTime.of(2025, 6, 6, 10, 0, 0),
+                ShoppingCarts(listOf(shoppingCartFixture1)),
+                10000,
             )
 
         // then

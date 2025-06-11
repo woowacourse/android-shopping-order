@@ -3,6 +3,8 @@ package woowacourse.shopping.domain.coupon
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.domain.cart.ShoppingCarts
+import woowacourse.shopping.fixture.shoppingCartFixture1
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -28,6 +30,8 @@ class MiracleSaleCouponTest {
         val result =
             coupon.isUsable(
                 LocalDateTime.of(2025, 1, 1, 10, 0),
+                ShoppingCarts(listOf(shoppingCartFixture1)),
+                15000,
             )
 
         assertFalse(result)
@@ -53,6 +57,8 @@ class MiracleSaleCouponTest {
         val result =
             coupon.isUsable(
                 LocalDateTime.of(2025, 6, 6, 9, 59),
+                ShoppingCarts(listOf(shoppingCartFixture1)),
+                15000,
             )
 
         assertFalse(result)
@@ -77,7 +83,9 @@ class MiracleSaleCouponTest {
 
         val result =
             coupon.isUsable(
-                LocalDateTime.of(2025, 6, 6, 10, 0),
+                LocalDateTime.of(2025, 6, 6, 12, 0),
+                ShoppingCarts(listOf(shoppingCartFixture1)),
+                15000,
             )
 
         assertTrue(result)
@@ -103,6 +111,8 @@ class MiracleSaleCouponTest {
         val result =
             coupon.isUsable(
                 LocalDateTime.of(2025, 6, 6, 18, 0),
+                ShoppingCarts(listOf(shoppingCartFixture1)),
+                15000,
             )
 
         assertTrue(result)
@@ -128,6 +138,8 @@ class MiracleSaleCouponTest {
         val result =
             coupon.isUsable(
                 LocalDateTime.of(2025, 6, 6, 12, 1),
+                ShoppingCarts(listOf(shoppingCartFixture1)),
+                15000,
             )
 
         assertFalse(result)

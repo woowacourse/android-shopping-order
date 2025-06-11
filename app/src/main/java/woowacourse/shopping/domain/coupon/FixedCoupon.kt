@@ -1,6 +1,9 @@
 package woowacourse.shopping.domain.coupon
 
+import woowacourse.shopping.domain.Payment
+import woowacourse.shopping.domain.cart.ShoppingCarts
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class FixedCoupon(
     override val id: Int,
@@ -11,13 +14,25 @@ data class FixedCoupon(
     val minimumAmount: Int,
     val discount: Int,
 ) : Coupon {
-    fun isUsable(
-        standardDate: LocalDate,
-        standardAmount: Int,
+    override fun isUsable(
+        today: LocalDateTime,
+        order: ShoppingCarts,
+        payment: Int,
     ): Boolean {
-        if (isExpired(standardDate)) return false
-        if (!isMinimumAmountSatisfied(standardAmount)) return false
+        if (isExpired(today.toLocalDate())) return false
+        if (!isMinimumAmountSatisfied(payment)) return false
         return true
+    }
+
+    override fun applyToPayment(
+        origin: Payment,
+        order: ShoppingCarts,
+    ): Payment {
+        val totalPayment = origin.totalPayment - discount
+        return origin.copy(
+            couponDiscount = -discount,
+            totalPayment = totalPayment,
+        )
     }
 
     private fun isMinimumAmountSatisfied(standardAmount: Int) = standardAmount >= minimumAmount

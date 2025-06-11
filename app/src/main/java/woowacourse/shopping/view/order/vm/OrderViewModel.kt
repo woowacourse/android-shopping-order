@@ -6,8 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.cart.ShoppingCarts
-import woowacourse.shopping.domain.coupon.CouponApplierFactory
-import woowacourse.shopping.domain.coupon.CouponValidate
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.view.core.common.withState
@@ -21,8 +19,6 @@ import java.time.LocalDateTime
 class OrderViewModel(
     private val couponRepository: CouponRepository,
     private val orderRepository: OrderRepository,
-    private val couponValidator: CouponValidate,
-    private val couponFactory: CouponApplierFactory,
 ) : ViewModel() {
     private val _uiState = MutableLiveData<OrderUiState>()
     val uiState: LiveData<OrderUiState> get() = _uiState
@@ -35,7 +31,7 @@ class OrderViewModel(
             couponRepository.getCoupons()
                 .onSuccess { result ->
                     val now = LocalDateTime.now()
-                    val coupons = couponValidator.validCoupon(now, result, order)
+                    val coupons = result.filter { it.isUsable(now, order, order.totalPayment) }
                     _uiState.value = OrderUiState.of(order, coupons, DEFAULT_DELIVERY_FEE)
                 }
                 .onFailure(::handleFailure)
@@ -54,7 +50,7 @@ class OrderViewModel(
 
     private fun changeCouponCheckState(couponId: Int) {
         withState(_uiState.value) { state ->
-            _uiState.value = state.changeCouponCheckState(couponId, couponFactory)
+            _uiState.value = state.changeCouponCheckState(couponId)
         }
     }
 

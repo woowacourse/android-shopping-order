@@ -1,7 +1,9 @@
 package woowacourse.shopping.domain.coupon
 
+import woowacourse.shopping.domain.Payment
 import woowacourse.shopping.domain.cart.ShoppingCarts
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class BogoCoupon(
     override val id: Int,
@@ -12,13 +14,27 @@ data class BogoCoupon(
     val buyQuantity: Int,
     val getQuantity: Int,
 ) : Coupon {
-    fun isUsable(
-        standardDate: LocalDate,
+    override fun isUsable(
+        today: LocalDateTime,
         order: ShoppingCarts,
+        payment: Int,
     ): Boolean {
-        if (isExpired(standardDate)) return false
+        if (isExpired(today.toLocalDate())) return false
         if (hasEnoughQuantity(order).not()) return false
         return true
+    }
+
+    override fun applyToPayment(
+        origin: Payment,
+        order: ShoppingCarts,
+    ): Payment {
+        val mostExpensiveProductPrice = order.mostExpensiveCartPriceWithStandardQuantity(buyQuantity)
+
+        val totalPayment = origin.totalPayment - mostExpensiveProductPrice
+        return origin.copy(
+            couponDiscount = -mostExpensiveProductPrice,
+            totalPayment = totalPayment,
+        )
     }
 
     private fun hasEnoughQuantity(order: ShoppingCarts): Boolean {

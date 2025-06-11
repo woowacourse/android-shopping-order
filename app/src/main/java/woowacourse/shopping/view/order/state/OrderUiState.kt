@@ -3,7 +3,6 @@ package woowacourse.shopping.view.order.state
 import woowacourse.shopping.domain.Payment
 import woowacourse.shopping.domain.cart.ShoppingCarts
 import woowacourse.shopping.domain.coupon.Coupon
-import woowacourse.shopping.domain.coupon.CouponApplierFactory
 
 data class OrderUiState(
     val order: ShoppingCarts,
@@ -14,10 +13,7 @@ data class OrderUiState(
     val orderCartIds: List<Long>
         get() = order.cartIds
 
-    fun changeCouponCheckState(
-        couponId: Int,
-        couponFactory: CouponApplierFactory,
-    ): OrderUiState {
+    fun changeCouponCheckState(couponId: Int): OrderUiState {
         val targetIndex = coupons.indexOfFirst { it.item.id == couponId }
         if (targetIndex == -1) return this
 
@@ -37,19 +33,12 @@ data class OrderUiState(
         val newPayment =
             if (!currentChecked) {
                 val selectedCoupon = updatedCoupons[targetIndex].item
-                applyCoupon(selectedCoupon, couponFactory)
+                selectedCoupon.applyToPayment(originPayment, order)
             } else {
                 originPayment
             }
 
         return copy(coupons = updatedCoupons, payment = newPayment)
-    }
-
-    private fun applyCoupon(
-        coupon: Coupon,
-        couponFactory: CouponApplierFactory,
-    ): Payment {
-        return couponFactory.apply(originPayment, order, coupon)
     }
 
     companion object {

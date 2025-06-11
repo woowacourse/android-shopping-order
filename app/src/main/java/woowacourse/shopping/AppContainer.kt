@@ -8,8 +8,6 @@ import woowacourse.shopping.data.di.DatabaseModule
 import woowacourse.shopping.data.di.NetworkModule
 import woowacourse.shopping.data.di.RepositoryModule
 import woowacourse.shopping.data.di.RetrofitModule
-import woowacourse.shopping.domain.coupon.CouponApplierFactory
-import woowacourse.shopping.domain.coupon.CouponValidator
 
 class AppContainer(
     context: Context,
@@ -22,8 +20,4 @@ class AppContainer(
     private val dataSourceModule = DataSourceModule(databaseModule, networkModule, networkResultHandler)
 
     val repositoryModule = RepositoryModule(dataSourceModule)
-
-    val couponValidator: CouponValidator = CouponValidator()
-
-    val couponApplierFactory: CouponApplierFactory = CouponApplierFactory()
 }

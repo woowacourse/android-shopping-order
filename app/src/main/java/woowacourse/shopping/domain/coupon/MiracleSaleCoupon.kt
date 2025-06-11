@@ -1,5 +1,7 @@
 package woowacourse.shopping.domain.coupon
 
+import woowacourse.shopping.domain.Payment
+import woowacourse.shopping.domain.cart.ShoppingCarts
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -13,10 +15,27 @@ data class MiracleSaleCoupon(
     val discount: Int,
     val availableTime: AvailableTime,
 ) : Coupon {
-    fun isUsable(standardTime: LocalDateTime): Boolean {
-        if (isExpired(standardTime.toLocalDate())) return false
-        if (timeElapsed(standardTime)) return false
+    override fun isUsable(
+        today: LocalDateTime,
+        order: ShoppingCarts,
+        payment: Int,
+    ): Boolean {
+        if (isExpired(today.toLocalDate())) return false
+        if (timeElapsed(today)) return false
         return true
+    }
+
+    override fun applyToPayment(
+        origin: Payment,
+        order: ShoppingCarts,
+    ): Payment {
+        val discount = origin.totalPayment * discount / 100
+        val totalPayment = origin.totalPayment - discount
+
+        return origin.copy(
+            couponDiscount = discount,
+            totalPayment = totalPayment,
+        )
     }
 
     private fun timeElapsed(standardTime: LocalDateTime): Boolean {
