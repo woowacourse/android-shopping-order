@@ -15,5 +15,5 @@ interface RecentlyViewedProductDao {
     suspend fun getRecentlyViewedProductIds(): List<Long>
 
     @Query("SELECT productUid FROM RecentlyViewedProducts ORDER BY timestamp DESC LIMIT 1")
-    suspend fun getLatestViewedProductId(): Long
+    suspend fun getLatestViewedProductId(): Long?
 }

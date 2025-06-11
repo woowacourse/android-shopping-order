@@ -29,7 +29,7 @@ class RecentlyViewedProductRepositoryImpl(
 
     override suspend fun getLatestViewedProduct(): Result<ProductUiModel?> =
         runCatching {
-            val productId = recentlyViewedProductDao.getLatestViewedProductId()
+            val productId: Long = recentlyViewedProductDao.getLatestViewedProductId() ?: return@runCatching null
             val productResult = catalogProductRepository.getProduct(productId)
             productResult.getOrNull()
         }
