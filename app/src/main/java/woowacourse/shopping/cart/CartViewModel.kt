@@ -50,6 +50,7 @@ class CartViewModel(
     }
 
     fun movePay() {
+        if (_totalPurchaseCount.value == 0) return
         _isMovePay.value = Unit
     }
 

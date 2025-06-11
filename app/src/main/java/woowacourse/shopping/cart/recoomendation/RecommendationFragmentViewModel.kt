@@ -31,6 +31,7 @@ class RecommendationFragmentViewModel(
     }
 
     fun movePay() {
+        if (_selectedProductsCount.value == 0) return
         _isMovePay.value = Unit
     }
 
