@@ -117,20 +117,25 @@ class MainViewModel(
             val request = Cart(updated.cartQuantity, productId)
             viewModelScope.launch {
                 if (updated.cartId == NOT_IN_CART) {
-                    cartRepository.addCart(request)
-                        .onSuccess { newId ->
-                            updateUiState { modifyUiState(updated.copy(cartId = newId)) }
-                        }.onFailure(::handleFailure)
+                    addToCart(request, updated)
                 } else {
                     cartRepository.updateQuantity(updated.cartId, updated.cartQuantity)
-                        .onSuccess {
-                            updateUiState { modifyUiState(updated) }
-                        }
+                        .onSuccess { updateUiState { modifyUiState(updated) } }
                         .onFailure(::handleFailure)
                 }
                 fetchCartQuantity()
             }
         }
+
+    private suspend fun addToCart(
+        cart: Cart,
+        updated: ProductState,
+    ) {
+        cartRepository.addCart(cart)
+            .onSuccess { newId ->
+                updateUiState { modifyUiState(updated.copy(cartId = newId)) }
+            }.onFailure(::handleFailure)
+    }
 
     fun decreaseCartQuantity(productId: Long) =
         withState(_uiState.value) { state ->
@@ -139,18 +144,32 @@ class MainViewModel(
 
             viewModelScope.launch {
                 if (updated.hasCartQuantity) {
-                    cartRepository.updateQuantity(cartId, updated.cartQuantity)
-                        .onSuccess { updateUiState { modifyUiState(updated) } }
-                        .onFailure(::handleFailure)
+                    updateQuantity(cartId, updated)
                 } else {
-                    cartRepository.deleteCart(cartId)
-                        .onSuccess {
-                            updateUiState { modifyUiState(updated.copy(cartId = NOT_IN_CART)) }
-                        }.onFailure(::handleFailure)
+                    deleteCart(cartId, updated)
                 }
                 fetchCartQuantity()
             }
         }
+
+    private suspend fun updateQuantity(
+        cartId: Long,
+        updated: ProductState,
+    ) {
+        cartRepository.updateQuantity(cartId, updated.cartQuantity)
+            .onSuccess { updateUiState { modifyUiState(updated) } }
+            .onFailure(::handleFailure)
+    }
+
+    private suspend fun deleteCart(
+        cartId: Long,
+        updated: ProductState,
+    ) {
+        cartRepository.deleteCart(cartId)
+            .onSuccess {
+                updateUiState { modifyUiState(updated.copy(cartId = NOT_IN_CART)) }
+            }.onFailure(::handleFailure)
+    }
 
     fun syncHistory() =
         withState(_uiState.value) {
