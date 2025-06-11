@@ -1,4 +1,4 @@
-package woowacourse.shopping.view
+package woowacourse.shopping.view.core.handler
 
 import android.content.Context
 import woowacourse.shopping.R

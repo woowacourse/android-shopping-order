@@ -15,12 +15,12 @@ import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
 import woowacourse.shopping.domain.cart.ShoppingCarts
-import woowacourse.shopping.view.NetworkExceptionHandler
 import woowacourse.shopping.view.cart.carts.CartListFragment
 import woowacourse.shopping.view.cart.recommend.RecommendFragment
 import woowacourse.shopping.view.cart.vm.CartViewModel
 import woowacourse.shopping.view.cart.vm.CartViewModelFactory
 import woowacourse.shopping.view.core.ext.showToast
+import woowacourse.shopping.view.core.handler.NetworkExceptionHandler
 import woowacourse.shopping.view.order.OrderActivity
 
 class CartActivity : AppCompatActivity() {
