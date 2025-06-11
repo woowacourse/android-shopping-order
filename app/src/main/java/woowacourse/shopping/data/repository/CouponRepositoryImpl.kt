@@ -7,10 +7,8 @@ import woowacourse.shopping.order.Coupon
 class CouponRepositoryImpl(
     private val couponDataSource: CouponDataSource,
 ) : CouponRepository {
-    override suspend fun getCoupons(): List<Coupon> =
-        try {
+    override suspend fun getCoupons(): Result<List<Coupon>> =
+        runCatching {
             couponDataSource.fetchCoupons().map { it.toDomain() }
-        } catch (e: Exception) {
-            emptyList()
         }
 }

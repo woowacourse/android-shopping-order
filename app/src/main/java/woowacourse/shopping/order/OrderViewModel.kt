@@ -9,6 +9,8 @@ import woowacourse.shopping.data.repository.CouponRepository
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.domain.OrderingProducts
 import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.util.MutableSingleLiveData
+import woowacourse.shopping.util.SingleLiveData
 import java.time.LocalDateTime
 
 class OrderViewModel(
@@ -44,6 +46,9 @@ class OrderViewModel(
     private val _isOrderMade = MutableLiveData<Boolean>()
     val isOrderMade: LiveData<Boolean> = _isOrderMade
 
+    private val _errorMessage = MutableSingleLiveData<String>()
+    val errorMessage: SingleLiveData<String> = _errorMessage
+
     init {
         loadCoupons()
         setAmountsByOrderingProducts()
@@ -66,7 +71,11 @@ class OrderViewModel(
 
     private fun loadCoupons() {
         viewModelScope.launch {
-            val allCoupons: List<Coupon> = couponRepository.getCoupons()
+            val allCoupons: List<Coupon> =
+                couponRepository.getCoupons().getOrElse {
+                    _errorMessage.setValue("쿠폰을 불러오는 데 실패했습니다.")
+                    return@launch
+                }
             val filteredAvailableCoupons: List<Coupon> =
                 orderingProducts.availableCoupons(allCoupons)
             availableCoupons = filteredAvailableCoupons
