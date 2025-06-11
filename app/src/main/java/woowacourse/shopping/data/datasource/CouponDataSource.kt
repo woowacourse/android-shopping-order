@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.datasource
 
-import woowacourse.shopping.data.dto.order.Coupons
+import woowacourse.shopping.data.dto.order.Coupon
 
 interface CouponDataSource {
-    suspend fun fetchCoupons(): Coupons
+    suspend fun fetchCoupons(): List<Coupon>
 }
