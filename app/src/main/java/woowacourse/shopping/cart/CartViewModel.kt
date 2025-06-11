@@ -1,5 +1,6 @@
 package woowacourse.shopping.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -41,8 +42,15 @@ class CartViewModel(
     private val _allChecked = MutableLiveData<Boolean>(true)
     val allChecked: LiveData<Boolean> get() = _allChecked
 
+    private val _isMovePay = MutableLiveData<Unit>()
+    val isMovePay: LiveData<Unit> get() = _isMovePay
+
     init {
         loadCartProducts()
+    }
+
+    fun movePay() {
+        _isMovePay.value = Unit
     }
 
     fun onAllSelectedProducts() {

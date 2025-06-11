@@ -1,6 +1,7 @@
 package woowacourse.shopping.cart.selection
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import woowacourse.shopping.cart.CartViewModel
 import woowacourse.shopping.cart.CartViewModelFactory
 import woowacourse.shopping.cart.DeleteProductClickListener
 import woowacourse.shopping.databinding.FragmentCartSelectionBinding
+import woowacourse.shopping.pay.PayActivity
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 class SelectionFragment : Fragment() {
@@ -70,6 +72,10 @@ class SelectionFragment : Fragment() {
             page.observe(viewLifecycleOwner) { updateCartItems() }
             updatedItem.observe(viewLifecycleOwner) { item ->
                 (binding.recyclerViewCart.adapter as CartAdapter).setCartItem(item)
+            }
+            isMovePay.observe(viewLifecycleOwner) {
+                val intent = PayActivity.newIntent(requireContext())
+                startActivity(intent)
             }
         }
     }

@@ -23,8 +23,15 @@ class RecommendationFragmentViewModel(
     private val _updatedItem = MutableLiveData<ProductUiModel>()
     val updatedItem: LiveData<ProductUiModel> = _updatedItem
 
+    private val _isMovePay = MutableLiveData<Unit>()
+    val isMovePay: LiveData<Unit> get() = _isMovePay
+
     init {
         loadRecentlyViewedProduct()
+    }
+
+    fun movePay() {
+        _isMovePay.value = Unit
     }
 
     fun loadRecentlyViewedProduct() {
