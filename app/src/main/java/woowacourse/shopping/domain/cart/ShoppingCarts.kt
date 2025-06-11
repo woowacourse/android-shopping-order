@@ -5,11 +5,9 @@ import java.io.Serializable
 class ShoppingCarts(
     val shoppingCarts: List<ShoppingCart> = emptyList(),
 ) : Serializable {
-    val cartIds: List<Long>
-        get() = shoppingCarts.map { it.id }
+    val cartIds: List<Long> = shoppingCarts.map { it.id }
 
-    val totalPayment: Int
-        get() = shoppingCarts.sumOf { it.payment }
+    val totalPayment: Int = shoppingCarts.sumOf { it.payment }
 
     fun findProduct(productId: Long): ShoppingCart? {
         return shoppingCarts.find { it.productId == productId }

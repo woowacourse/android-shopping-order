@@ -11,14 +11,12 @@ data class ProductUiState(
     val load: LoadState = LoadState.CannotLoad,
     val isFetching: Boolean = true,
 ) {
+    val lastSeenProductId = historyItems.firstOrNull()?.id
+
+    val lastSeenProductCategory = historyItems.firstOrNull()?.category
+
     val productItemSize: Int
         get() = productItems.size
-
-    val lastSeenProductId
-        get() = historyItems.firstOrNull()?.id
-
-    val lastSeenProductCategory
-        get() = historyItems.firstOrNull()?.category
 
     fun modifySumOfCartQuantity(quantity: Int): ProductUiState {
         return copy(sumOfCartQuantity = quantity)

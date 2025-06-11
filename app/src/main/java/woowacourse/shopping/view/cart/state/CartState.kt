@@ -6,20 +6,15 @@ data class CartState(
     val cart: ShoppingCart,
     val checked: Boolean,
 ) {
-    val name: String
-        get() = cart.product.name
+    val name: String = cart.product.name
 
-    val cartId: Long
-        get() = cart.id
+    val cartId: Long = cart.id
 
-    val quantity: Int
-        get() = cart.quantity.value
+    val quantity: Int = cart.quantity.value
 
-    val price: Int
-        get() = cart.product.priceValue
+    val price: Int = cart.product.priceValue
 
-    val imgUrl: String
-        get() = cart.product.imgUrl
+    val imgUrl: String = cart.product.imgUrl
 
     val hasQuantity: Boolean
         get() = cart.quantity.hasQuantity()
