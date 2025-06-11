@@ -10,33 +10,17 @@ data class OrderUiState(
     val originPayment: Payment,
     val payment: Payment,
 ) {
-    val orderCartIds: List<Long>
-        get() = order.cartIds
+    val orderCartIds: List<Long> = order.cartIds
 
     fun changeCouponCheckState(couponId: Int): OrderUiState {
-        val targetIndex = coupons.indexOfFirst { it.item.id == couponId }
-        if (targetIndex == -1) return this
-
-        val currentChecked = coupons[targetIndex].checked
         val updatedCoupons =
-            coupons.mapIndexed { index, state ->
-                val checked =
-                    if (index == targetIndex) {
-                        !state.checked
-                    } else {
-                        false
-                    }
-
-                state.copy(checked = checked)
+            coupons.map { state ->
+                val isTarget = state.item.id == couponId
+                state.copy(checked = isTarget && !state.checked)
             }
 
-        val newPayment =
-            if (!currentChecked) {
-                val selectedCoupon = updatedCoupons[targetIndex].item
-                selectedCoupon.applyToPayment(originPayment, order)
-            } else {
-                originPayment
-            }
+        val selectedCoupon = updatedCoupons.find { it.checked }
+        val newPayment = selectedCoupon?.item?.applyToPayment(originPayment, order) ?: originPayment
 
         return copy(coupons = updatedCoupons, payment = newPayment)
     }
@@ -47,11 +31,12 @@ data class OrderUiState(
             coupons: List<Coupon>,
             deliveryFee: Int,
         ): OrderUiState {
-            val orderPrice = order.totalPayment
-            val originPayment = Payment(orderPrice, deliveryFee)
+            val originPayment = Payment(order.totalPayment, deliveryFee)
+            val couponStates = coupons.map { CouponState(it) }
+
             return OrderUiState(
                 order = order,
-                coupons = coupons.map { CouponState(it) },
+                coupons = couponStates,
                 originPayment = originPayment,
                 payment = originPayment,
             )
