@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.cart.ShoppingCart
-import woowacourse.shopping.domain.coupon.AvailableCoupons
+import woowacourse.shopping.domain.coupon.Coupons
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
@@ -56,7 +56,7 @@ class PaymentViewModel(
 
     private suspend fun fetchAvailableCoupons(orderItems: List<ShoppingCart>): List<Coupon> {
         val coupons = couponRepository.getAll()
-        return AvailableCoupons(coupons, orderItems, LocalDateTime.now()).get()
+        return Coupons(coupons).getAvailable(orderItems, LocalDateTime.now())
     }
 
     private fun convertToCouponUiPairs(coupons: List<Coupon>): List<Pair<Coupon, CouponUi>> {

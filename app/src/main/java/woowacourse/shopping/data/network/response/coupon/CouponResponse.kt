@@ -52,8 +52,8 @@ data class CouponResponse(
             description = description,
             expirationDate = LocalDate.parse(expirationDate),
             discount = discount ?: 0,
-            availableTime =
-                woowacourse.shopping.domain.coupon.AvailableTime(
+            timeSlot =
+                woowacourse.shopping.domain.coupon.TimeSlot(
                     LocalTime.parse(availableTime?.start),
                     LocalTime.parse(availableTime?.end),
                 ),

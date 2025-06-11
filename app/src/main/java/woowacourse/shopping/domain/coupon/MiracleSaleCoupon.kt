@@ -8,7 +8,7 @@ data class MiracleSaleCoupon(
     val description: String,
     val expirationDate: LocalDate,
     val discount: Int,
-    val availableTime: AvailableTime,
+    val timeSlot: TimeSlot,
 ) : Coupon {
     override fun calculateDiscount(cartItems: List<ShoppingCart>): Int {
         val totalPrice = cartItems.sumOf { (it.product.priceValue * it.quantity.value) }
@@ -22,6 +22,6 @@ data class MiracleSaleCoupon(
         if (now.toLocalDate().isAfter(expirationDate)) {
             return false
         }
-        return availableTime.isAvailable(now)
+        return timeSlot.isAvailable(now)
     }
 }

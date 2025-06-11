@@ -3,7 +3,7 @@ package woowacourse.shopping.domain.coupon
 import java.time.LocalDateTime
 import java.time.LocalTime
 
-data class AvailableTime(
+data class TimeSlot(
     val start: LocalTime,
     val end: LocalTime,
 ) {

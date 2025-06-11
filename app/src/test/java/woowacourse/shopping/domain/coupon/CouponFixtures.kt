@@ -35,7 +35,7 @@ val MIRACLE_SALE_COUPON =
         description = "미라클모닝",
         expirationDate = LocalDate.of(2025, 6, 30),
         discount = 30,
-        availableTime = AvailableTime(LocalTime.of(4, 0), LocalTime.of(7, 0)),
+        timeSlot = TimeSlot(LocalTime.of(4, 0), LocalTime.of(7, 0)),
     )
 
 val COUPONS: List<Coupon> = listOf(BOGO_COUPON, FIXED_COUPON, FREE_SHIPPING_COUPON, MIRACLE_SALE_COUPON)
