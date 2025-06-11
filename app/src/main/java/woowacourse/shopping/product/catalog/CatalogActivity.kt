@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -132,6 +133,11 @@ class CatalogActivity : AppCompatActivity() {
         viewModel.updatedItem.observe(this, productsAdapter::updateItem)
         viewModel.recentlyViewedProducts.observe(this, recentProductsAdapter::submitList)
         viewModel.loadingState.observe(this) { changeShimmerState(it.isLoading) }
+        viewModel.errorMessage.observe(this) { showToast(it) }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun applyWindowInsets() {

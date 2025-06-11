@@ -7,16 +7,16 @@ interface CatalogProductRepository {
         category: String,
         page: Int,
         size: Int,
-    ): List<ProductUiModel>
+    ): Result<List<ProductUiModel>>
 
-    suspend fun getAllProductsSize(): Long
+    suspend fun getAllProductsSize(): Result<Long>
 
-    suspend fun getCartProductsByIds(productIds: List<Long>): List<ProductUiModel>
+    suspend fun getCartProductsByIds(productIds: List<Long>): Result<List<ProductUiModel>>
 
     suspend fun getProductsByPage(
         page: Int,
         size: Int,
-    ): List<ProductUiModel>
+    ): Result<List<ProductUiModel>>
 
-    suspend fun getProduct(productId: Long): ProductUiModel?
+    suspend fun getProduct(productId: Long): Result<ProductUiModel?>
 }

@@ -15,8 +15,8 @@ class RemoteCatalogProductRepositoryImpl(
         category: String,
         page: Int,
         size: Int,
-    ): List<ProductUiModel> =
-        try {
+    ): Result<List<ProductUiModel>> =
+        runCatching {
             remoteDataSource
                 .fetchProducts(
                     category = category,
@@ -24,40 +24,31 @@ class RemoteCatalogProductRepositoryImpl(
                     size = size,
                 ).productContent
                 .map { it.toUiModel() }
-        } catch (e: Exception) {
-            emptyList()
         }
 
-    override suspend fun getAllProductsSize(): Long =
-        try {
+    override suspend fun getAllProductsSize(): Result<Long> =
+        runCatching {
             remoteDataSource.fetchAllProducts().totalElements
-        } catch (e: Exception) {
-            0
         }
 
-    override suspend fun getCartProductsByIds(productIds: List<Long>): List<ProductUiModel> {
-        if (productIds.isEmpty()) return emptyList()
+    override suspend fun getCartProductsByIds(productIds: List<Long>): Result<List<ProductUiModel>> =
+        runCatching {
+            coroutineScope {
+                val deferredProducts: List<Deferred<ProductUiModel?>> =
+                    productIds.map { async { remoteDataSource.fetchProductDetail(it).toUiModel() } }
 
-        return coroutineScope {
-            val deferredProducts: List<Deferred<ProductUiModel?>> =
-                productIds.map {
-                    async {
-                        getProduct(it)
-                    }
-                }
-
-            deferredProducts
-                .awaitAll()
-                .filterNotNull()
-                .sortedBy { (id, _) -> productIds.indexOf(id) }
+                deferredProducts
+                    .awaitAll()
+                    .filterNotNull()
+                    .sortedBy { (id, _) -> productIds.indexOf(id) }
+            }
         }
-    }
 
     override suspend fun getProductsByPage(
         page: Int,
         size: Int,
-    ): List<ProductUiModel> =
-        try {
+    ): Result<List<ProductUiModel>> =
+        runCatching {
             remoteDataSource
                 .fetchProducts(
                     category = null,
@@ -65,14 +56,10 @@ class RemoteCatalogProductRepositoryImpl(
                     size = size,
                 ).productContent
                 .map { it.toUiModel() }
-        } catch (e: Exception) {
-            emptyList()
         }
 
-    override suspend fun getProduct(productId: Long): ProductUiModel? =
-        try {
+    override suspend fun getProduct(productId: Long): Result<ProductUiModel?> =
+        runCatching {
             remoteDataSource.fetchProductDetail(productId).toUiModel()
-        } catch (e: Exception) {
-            null
         }
 }

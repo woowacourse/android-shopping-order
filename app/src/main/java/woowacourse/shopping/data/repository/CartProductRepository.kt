@@ -6,26 +6,26 @@ interface CartProductRepository {
     suspend fun insertCartProduct(
         productId: Long,
         quantity: Int,
-    ): Long?
+    ): Result<Long?>
     // cartItemId 반환
 
-    suspend fun deleteCartProduct(cartItemId: Long): Boolean
+    suspend fun deleteCartProduct(cartItemId: Long): Result<Boolean>
 
     suspend fun getCartProductsInRange(
         currentPage: Int,
         pageSize: Int,
-    ): List<ProductUiModel>
+    ): Result<List<ProductUiModel>>
 
     suspend fun updateProduct(
         cartItemId: Long,
         quantity: Int,
-    ): Boolean
+    ): Result<Boolean>
 
     // 장바구니에 담긴 아이템들의 개수 반환
-    suspend fun getCartItemSize(): Int
+    suspend fun getCartItemSize(): Result<Int>
 
     // 장바구니 상품 종류 개수 반환
-    suspend fun getTotalElements(): Long
+    suspend fun getTotalElements(): Result<Long>
 
-    suspend fun getCartProducts(totalElements: Long): List<ProductUiModel>
+    suspend fun getCartProducts(totalElements: Long): Result<List<ProductUiModel>>
 }

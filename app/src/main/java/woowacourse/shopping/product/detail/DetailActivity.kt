@@ -83,6 +83,11 @@ class DetailActivity : AppCompatActivity() {
         viewModel.latestViewedProduct.observe(this) { product ->
             binding.layoutLatestViewedProduct.product = product
         }
+        viewModel.errorMessage.observe(this) { showToast(it) }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

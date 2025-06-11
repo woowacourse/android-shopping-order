@@ -11,6 +11,8 @@ import woowacourse.shopping.data.repository.CatalogProductRepository
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.domain.LoadingState
 import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.util.MutableSingleLiveData
+import woowacourse.shopping.util.SingleLiveData
 import java.util.TreeSet
 
 class CartViewModel(
@@ -58,6 +60,9 @@ class CartViewModel(
     private val _orderClicked = MutableLiveData<Unit>()
     val orderClicked: LiveData<Unit> = _orderClicked
 
+    private val _errorMessage = MutableSingleLiveData<String>()
+    val errorMessage: SingleLiveData<String> = _errorMessage
+
     init {
         loadCartProducts()
         loadRecommendProducts()
@@ -66,15 +71,25 @@ class CartViewModel(
     fun loadRecommendProducts() {
         viewModelScope.launch {
             val latestViewedProduct: ProductUiModel? =
-                recentlyViewedProductRepository.getLatestViewedProduct()
-            latestViewedProduct?.id ?: return@launch
+                recentlyViewedProductRepository.getLatestViewedProduct().getOrNull()
+            latestViewedProduct?.id ?: run {
+                _errorMessage.setValue("최근 본 상품을 불러오는 데 실패했습니다.")
+                return@launch
+            }
 
             val categorizedProduct =
-                catalogProductRepository.getProduct(latestViewedProduct.id) ?: return@launch
+                catalogProductRepository.getProduct(latestViewedProduct.id).getOrElse {
+                    _errorMessage.setValue("카테고리 상품을 가져오는 데 실패했습니다.")
+                    return@launch
+                }
 
             val recommendProducts: List<ProductUiModel> =
                 catalogProductRepository
-                    .getRecommendedProducts(categorizedProduct.category ?: "", 0, 10)
+                    .getRecommendedProducts(categorizedProduct?.category ?: "", 0, 10)
+                    .getOrElse {
+                        _errorMessage.setValue("추천 상품을 가져오는 데 실패했습니다.")
+                        return@launch
+                    }
 
             val cartProductIds =
                 cartProducts.value?.map { it.productItem.id }?.toSet() ?: emptySet()
@@ -109,17 +124,24 @@ class CartViewModel(
 
                     if (product.quantity == 1) {
                         val result: Boolean =
-                            cartProductRepository.deleteCartProduct(product.cartItemId)
+                            cartProductRepository.deleteCartProduct(product.cartItemId).getOrElse {
+                                _errorMessage.setValue("상품 삭제에 실패했습니다.")
+                                return@launch
+                            }
                         if (result) {
                             _updatedProduct.value = product.copy(quantity = 0)
                             loadCartProducts()
                         }
                     } else {
                         val result: Boolean =
-                            cartProductRepository.updateProduct(
-                                product.cartItemId,
-                                product.quantity - 1,
-                            )
+                            cartProductRepository
+                                .updateProduct(
+                                    product.cartItemId,
+                                    product.quantity - 1,
+                                ).getOrElse {
+                                    _errorMessage.setValue("상품 업데이트에 실패했습니다.")
+                                    return@launch
+                                }
                         if (result) {
                             _updatedProduct.value = product.copy(quantity = product.quantity - 1)
                             loadCartProducts()
@@ -130,10 +152,14 @@ class CartViewModel(
                 ButtonEvent.INCREASE -> {
                     if (product.cartItemId != null) {
                         val result: Boolean =
-                            cartProductRepository.updateProduct(
-                                product.cartItemId,
-                                product.quantity + 1,
-                            )
+                            cartProductRepository
+                                .updateProduct(
+                                    product.cartItemId,
+                                    product.quantity + 1,
+                                ).getOrElse {
+                                    _errorMessage.setValue("상품 업데이트에 실패했습니다.")
+                                    return@launch
+                                }
                         if (result) {
                             _updatedProduct.value = product.copy(quantity = product.quantity + 1)
                             loadCartProducts()
@@ -147,7 +173,10 @@ class CartViewModel(
     fun addProduct(product: ProductUiModel) {
         viewModelScope.launch {
             val cartItemId =
-                cartProductRepository.insertCartProduct(productId = product.id, quantity = 1)
+                cartProductRepository.insertCartProduct(productId = product.id, quantity = 1).getOrElse {
+                    _errorMessage.setValue("상품 추가에 실패했습니다.")
+                    return@launch
+                }
             val addedProduct = product.copy(quantity = 1, cartItemId = cartItemId)
             _updatedProduct.value = addedProduct
             refreshProductsInfo()
@@ -213,9 +242,16 @@ class CartViewModel(
         }
 
         viewModelScope.launch {
-            val totalSize: Long = cartProductRepository.getTotalElements()
+            val totalSize: Long =
+                cartProductRepository.getTotalElements().getOrElse {
+                    _errorMessage.setValue("장바구니 총합 개수를 불러오는 데 실패했습니다.")
+                    return@launch
+                }
             val cartProducts: List<ProductUiModel> =
-                cartProductRepository.getCartProductsInRange(0, totalSize.toInt())
+                cartProductRepository.getCartProductsInRange(0, totalSize.toInt()).getOrElse {
+                    _errorMessage.setValue("장바구니 상품을 불러오는 데 실패했습니다.")
+                    return@launch
+                }
             val pagedProducts: List<ProductItem> =
                 cartProducts
                     .map {

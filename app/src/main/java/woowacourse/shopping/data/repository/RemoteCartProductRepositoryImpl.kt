@@ -10,70 +10,56 @@ class RemoteCartProductRepositoryImpl(
     override suspend fun insertCartProduct(
         productId: Long,
         quantity: Int,
-    ): Long? =
-        try {
+    ): Result<Long?> =
+        runCatching {
             cartRemoteDataSource.insertProduct(productId = productId, quantity = quantity)
-        } catch (e: Exception) {
-            null
         }
 
-    override suspend fun deleteCartProduct(cartItemId: Long): Boolean =
-        try {
+    override suspend fun deleteCartProduct(cartItemId: Long): Result<Boolean> =
+        runCatching {
             cartRemoteDataSource.deleteProduct(cartItemId)
             true
-        } catch (e: Exception) {
-            false
         }
 
     override suspend fun getCartProductsInRange(
         currentPage: Int,
         pageSize: Int,
-    ): List<ProductUiModel> =
-        try {
+    ): Result<List<ProductUiModel>> =
+        runCatching {
             cartRemoteDataSource
                 .fetchProducts(
                     page = currentPage,
                     size = pageSize,
                 ).cartItemContent
                 .map { it.toUiModel() }
-        } catch (e: Exception) {
-            emptyList()
         }
 
     override suspend fun updateProduct(
         cartItemId: Long,
         quantity: Int,
-    ): Boolean =
-        try {
+    ): Result<Boolean> =
+        runCatching {
             cartRemoteDataSource.updateProduct(cartItemId, quantity)
             true
-        } catch (e: Exception) {
-            false
         }
 
-    override suspend fun getCartItemSize(): Int =
-        try {
+    override suspend fun getCartItemSize(): Result<Int> =
+        runCatching {
             cartRemoteDataSource.fetchCartItemsCount()
-        } catch (e: Exception) {
-            0
         }
 
-    override suspend fun getTotalElements(): Long =
-        try {
+    override suspend fun getTotalElements(): Result<Long> =
+        runCatching {
             cartRemoteDataSource.fetchCartTotalElements()
-        } catch (e: Exception) {
-            0
         }
 
-    override suspend fun getCartProducts(totalElements: Long): List<ProductUiModel> =
-        try {
+    override suspend fun getCartProducts(totalElements: Long): Result<List<ProductUiModel>> =
+        runCatching {
             cartRemoteDataSource
                 .fetchProducts(
                     page = 0,
                     size = totalElements.toInt(),
                 ).cartItemContent
                 .map { it.toUiModel() }
-        } catch (e: Exception) {
-            emptyList()
         }
 }

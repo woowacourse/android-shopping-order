@@ -9,6 +9,8 @@ import woowacourse.shopping.cart.ButtonEvent
 import woowacourse.shopping.data.repository.CartProductRepository
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.util.MutableSingleLiveData
+import woowacourse.shopping.util.SingleLiveData
 
 class DetailViewModel(
     product: ProductUiModel,
@@ -26,6 +28,9 @@ class DetailViewModel(
 
     private val _latestViewedProduct = MutableLiveData<ProductUiModel>()
     val latestViewedProduct: LiveData<ProductUiModel> = _latestViewedProduct
+
+    private val _errorMessage = MutableSingleLiveData<String>()
+    val errorMessage: SingleLiveData<String> = _errorMessage
 
     init {
         viewModelScope.launch {
@@ -53,8 +58,12 @@ class DetailViewModel(
 
     fun setLatestViewedProduct() {
         viewModelScope.launch {
-            val product = recentlyViewedProductRepository.getLatestViewedProduct() ?: return@launch
-            _latestViewedProduct.value = product
+            val product =
+                recentlyViewedProductRepository.getLatestViewedProduct().getOrElse {
+                    _errorMessage.setValue("최근 본 상품을 가져오는 데 실패했습니다.")
+                    return@launch
+                }
+            product?.let { _latestViewedProduct.value = it }
         }
     }
 
