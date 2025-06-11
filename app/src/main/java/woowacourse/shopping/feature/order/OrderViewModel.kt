@@ -1,6 +1,7 @@
 package woowacourse.shopping.feature.order
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -48,6 +49,22 @@ class OrderViewModel(
 
     private var _uiEvent = MutableSingleLiveData<OrderUiEvent>()
     val uiEvent: SingleLiveData<OrderUiEvent> get() = _uiEvent
+
+    private val _discountAmount = MediatorLiveData<Int>().apply {
+        addSource(_selectedCoupon) { updateDiscountAmount() }
+        addSource(_originalAmount) { updateDiscountAmount() }
+        addSource(_shippingFee) { updateDiscountAmount() }
+    }
+    val discountAmount: LiveData<Int> get() = _discountAmount
+
+    private fun updateDiscountAmount() {
+        val discount = _selectedCoupon.value?.calculateDiscount(
+            _cartItems,
+            _originalAmount.value ?: 0,
+            _shippingFee.value ?: 3000
+        ) ?: 0
+        _discountAmount.value = discount
+    }
 
     fun setCartItems(itemIds: List<Int>) {
         viewModelScope.launch {

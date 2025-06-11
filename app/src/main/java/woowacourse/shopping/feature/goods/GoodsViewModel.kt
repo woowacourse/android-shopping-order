@@ -18,8 +18,8 @@ import woowacourse.shopping.util.SingleLiveData
 
 sealed class GoodsUiEvent {
     data class ShowToast(val messageKey: ToastMessageKey) : GoodsUiEvent()
-    object NavigateToCart : GoodsUiEvent()
-    object NavigateToLogin : GoodsUiEvent()
+    data object NavigateToCart : GoodsUiEvent()
+    data object NavigateToLogin : GoodsUiEvent()
 }
 
 enum class ToastMessageKey {

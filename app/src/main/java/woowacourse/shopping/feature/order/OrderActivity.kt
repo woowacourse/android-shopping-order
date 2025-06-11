@@ -43,13 +43,13 @@ class OrderActivity : BaseActivity<ActivityOrderBinding>() {
             layoutManager = LinearLayoutManager(this@OrderActivity)
             adapter = orderAdapter
         }
-        binding.tvCouponDiscountAmount.text = getString(R.string.amount, 0)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
         observeViewModel()
         viewModel.loadCoupons()
         val selectedItems =
             intent.getIntegerArrayListExtra(CartActivity.SELECTED_CART_ITEM_KEY) ?: arrayListOf()
         viewModel.setCartItems(selectedItems)
-
         binding.btnPay.setOnClickListener {
             viewModel.onPayClicked()
         }
@@ -66,35 +66,9 @@ class OrderActivity : BaseActivity<ActivityOrderBinding>() {
 
     private fun observeViewModel() {
         viewModel.coupons.observe(this) { coupons ->
-            orderAdapter.submitList(coupons,null)
-        }
-
-        viewModel.originalAmount.observe(this) { amount ->
-            binding.tvOrderAmount.text = getString(R.string.amount, amount)
-        }
-
-        viewModel.totalAmount.observe(this) { amount ->
-            binding.tvTotalAmount.text = getString(R.string.amount, amount)
-        }
-
-        viewModel.shippingFee.observe(this) { amount ->
-            binding.tvShippingFee.text = getString(R.string.amount, amount)
-        }
-
-        viewModel.selectedCoupon.observe(this) { selectedCoupon ->
-            val discount = selectedCoupon?.calculateDiscount(
-                viewModel.cartItems,
-                viewModel.originalAmount.value ?: 0
-            ) ?: 0
-            binding.tvCouponDiscountAmount.text = getString(R.string.amount, discount*-1)
-        }
-        viewModel.coupons.observe(this) { coupons ->
             orderAdapter.submitList(coupons, viewModel.selectedCoupon.value)
         }
 
-        viewModel.selectedCoupon.observe(this) { selectedCoupon ->
-            orderAdapter.submitList(viewModel.coupons.value ?: emptyList(), selectedCoupon)
-        }
         viewModel.uiEvent.observe(this) { orderUiEvent ->
             when(orderUiEvent){
                 OrderUiEvent.OrderSuccess -> orderFinish()
