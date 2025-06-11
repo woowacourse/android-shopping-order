@@ -8,7 +8,12 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @BindingAdapter("expirationDate")
-fun TextView.setExpirationDate(date: LocalDate) {
+fun TextView.setExpirationDate(date: LocalDate?) {
+    if (date == null) {
+        text = ""
+        return
+    }
+
     val context = this.context
     val pattern = context.getString(R.string.date_format_full)
     val formatter = DateTimeFormatter.ofPattern(pattern, Locale.getDefault())
@@ -19,7 +24,11 @@ fun TextView.setExpirationDate(date: LocalDate) {
 }
 
 @BindingAdapter("priceText")
-fun TextView.setPriceText(price: Int) {
-    val pattern = context.getString(R.string.thousand_unit_format)
-    text = pattern.format(price)
+fun TextView.setPriceText(price: Int?) {
+    text = if (price != null) {
+        val pattern = context.getString(R.string.thousand_unit_format)
+        pattern.format(price)
+    } else {
+        ""
+    }
 }
