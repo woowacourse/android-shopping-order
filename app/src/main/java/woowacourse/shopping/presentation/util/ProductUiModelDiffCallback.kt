@@ -3,7 +3,7 @@ package woowacourse.shopping.presentation.util
 import androidx.recyclerview.widget.DiffUtil
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
-class DiffCallback : DiffUtil.ItemCallback<ProductUiModel>() {
+class ProductUiModelDiffCallback : DiffUtil.ItemCallback<ProductUiModel>() {
     override fun areItemsTheSame(
         oldItem: ProductUiModel,
         newItem: ProductUiModel,

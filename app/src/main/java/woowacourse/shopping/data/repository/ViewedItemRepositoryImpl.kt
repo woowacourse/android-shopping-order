@@ -1,39 +1,25 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.model.ViewedItem
-import woowacourse.shopping.data.source.local.recent.ViewedItemDao
+import woowacourse.shopping.data.source.local.recent.ViewedItemDataSource
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ViewedItemRepository
-import woowacourse.shopping.mapper.toUiModel
+import woowacourse.shopping.mapper.toDomain
 import woowacourse.shopping.mapper.toViewedItem
-import woowacourse.shopping.presentation.product.catalog.ProductUiModel
-import kotlin.concurrent.thread
 
 class ViewedItemRepositoryImpl(
-    private val dao: ViewedItemDao,
+    private val viewedItemDataSource: ViewedItemDataSource,
 ) : ViewedItemRepository {
-    override fun insertViewedItem(
-        product: ProductUiModel,
-        onComplete: () -> Unit,
-    ) {
-        thread {
-            dao.insertViewedProduct(product.toViewedItem())
-            onComplete()
-        }
+    override suspend fun insertViewedItem(product: Product) {
+        viewedItemDataSource.insertViewedItem(product.toViewedItem())
     }
 
-    override fun getViewedItems(callback: (List<ProductUiModel>) -> Unit) {
-        thread {
-            val recentItems: List<ViewedItem> = dao.getRecentViewedItems()
-            val uiModels = recentItems.map { it.toUiModel() }
-            callback(uiModels)
+    override suspend fun getViewedItems(): Result<List<Product>> =
+        runCatching {
+            viewedItemDataSource.getRecentViewedItems().map { it.toDomain() }
         }
-    }
 
-    override fun getLastViewedItem(callback: (ProductUiModel?) -> Unit) {
-        thread {
-            val lastViewed = dao.getLastViewedItem()
-            val uiModel = lastViewed?.toUiModel()
-            callback(uiModel)
+    override suspend fun getLastViewedItem(): Result<Product?> =
+        runCatching {
+            viewedItemDataSource.getLastViewedItem()?.toDomain()
         }
-    }
 }

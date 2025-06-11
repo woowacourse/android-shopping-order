@@ -1,7 +1,9 @@
 package woowacourse.shopping.presentation.cart
 
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -19,6 +21,14 @@ class CartActivity : AppCompatActivity() {
     }
 
     private lateinit var cartAdapter: CartAdapter
+
+    private val cartLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val checkedIds = result.data?.getLongArrayExtra("checked_product_ids")?.toList() ?: emptyList()
+                viewModel.restoreCheckedProducts(checkedIds)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,11 +56,24 @@ class CartActivity : AppCompatActivity() {
 
     private fun initRecyclerView() {
         val handler = CartEventHandlerImpl(viewModel)
-        cartAdapter = CartAdapter(
-            cartHandler = handler,
-            handler = handler,
-        )
+        cartAdapter =
+            CartAdapter(
+                cartHandler = handler,
+                handler = handler,
+            )
         binding.recyclerViewCart.adapter = cartAdapter
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                setResult(RESULT_OK)
+                finish()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun observeCartViewModel() {
@@ -76,11 +99,12 @@ class CartActivity : AppCompatActivity() {
         }
 
         viewModel.navigateToRecommendEvent.observe(this) { orderInfo ->
-            val intent = RecommendActivity.newIntent(
-                this@CartActivity,
-                ArrayList(orderInfo.checkedItems),
-            )
-            startActivity(intent)
+            val intent =
+                RecommendActivity.newIntent(
+                    this@CartActivity,
+                    ArrayList(orderInfo.checkedItems),
+                )
+            cartLauncher.launch(intent)
         }
     }
 

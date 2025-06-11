@@ -13,4 +13,5 @@
     <color name="catalog_divider_background">#EBEBEB</color>
     <color name="skeleton_background">#E2E2E2</color>
     <color name="skeleton_cart_background">#F3F3F3</color>
+    <color name="black_3">#333333</color>
 </resources>

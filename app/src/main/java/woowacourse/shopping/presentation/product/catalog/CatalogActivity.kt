@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.product.catalog
 import android.os.Bundle
 import android.view.Menu
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -14,7 +15,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCatalogBinding
 import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandlerImpl
 import woowacourse.shopping.presentation.product.catalog.viewHolder.CartActionViewHolder
-import woowacourse.shopping.presentation.product.detail.DetailActivity.Companion.newIntent
+import woowacourse.shopping.presentation.product.detail.DetailActivity
 import woowacourse.shopping.presentation.product.recent.ViewedItemAdapter
 
 class CatalogActivity : AppCompatActivity() {
@@ -25,6 +26,16 @@ class CatalogActivity : AppCompatActivity() {
     private val viewModel: CatalogViewModel by viewModels {
         CatalogViewModel.FACTORY
     }
+
+    private val resultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                viewModel.loadInitialCatalogProducts()
+                viewModel.loadRecentViewedItems()
+                viewModel.updateProductQuantities()
+                viewModel.updateCartCount()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +48,6 @@ class CatalogActivity : AppCompatActivity() {
         binding.viewModel = viewModel
 
         observeViewModel()
-        viewModel.loadCatalogProducts()
     }
 
     private fun applyWindowInsets() {
@@ -48,12 +58,6 @@ class CatalogActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.loadRecentViewedItems()
-        viewModel.updateCartCount()
-    }
-
     private fun initRecyclerView() {
         val handler = createHandler()
 
@@ -62,9 +66,10 @@ class CatalogActivity : AppCompatActivity() {
     }
 
     private fun setupProductRecyclerView(handler: CatalogEventHandlerImpl) {
-        productAdapter = ProductAdapter(handler, handler, onQuantityClick = { product ->
-            handler.toggleQuantity(product)
-        })
+        productAdapter =
+            ProductAdapter(handler, handler, onQuantityClick = { product ->
+                handler.toggleQuantity(product)
+            })
         binding.recyclerViewProducts.apply {
             this.adapter = productAdapter
             layoutManager =
@@ -76,8 +81,7 @@ class CatalogActivity : AppCompatActivity() {
         GridLayoutManager(this, 2).apply {
             spanSizeLookup =
                 object : GridLayoutManager.SpanSizeLookup() {
-                    override fun getSpanSize(position: Int): Int =
-                        if (adapter.isLoadMoreButtonPosition(position)) 2 else 1
+                    override fun getSpanSize(position: Int): Int = if (adapter.isLoadMoreButtonPosition(position)) 2 else 1
                 }
         }
 
@@ -113,12 +117,13 @@ class CatalogActivity : AppCompatActivity() {
 
     private fun setupCartActionView(menu: Menu?) {
         val menuItem = menu?.findItem(R.id.menu_cart) ?: return
-        val holder = CartActionViewHolder(this, this, viewModel)
+        val holder = CartActionViewHolder(this, this, viewModel, resultLauncher)
         menuItem.actionView = holder.rootView
     }
 
     private fun createHandler(): CatalogEventHandlerImpl =
         CatalogEventHandlerImpl(viewModel) { product ->
-            startActivity(newIntent(this, product.id))
+            val intent = DetailActivity.newIntent(this, product.id)
+            resultLauncher.launch(intent)
         }
 }

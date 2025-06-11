@@ -14,7 +14,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityDetailBinding
-import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.presentation.product.detail.CartEvent.AddItemFailure
 import woowacourse.shopping.presentation.product.detail.CartEvent.AddItemSuccess
 import woowacourse.shopping.presentation.product.detail.event.DetailEventHandlerImpl
@@ -37,7 +36,6 @@ class DetailActivity : AppCompatActivity() {
         initBinding()
         initObservers()
         initHandlers()
-        loadInitialData()
     }
 
     private fun initBinding() {
@@ -50,6 +48,7 @@ class DetailActivity : AppCompatActivity() {
             when (state) {
                 is AddItemSuccess -> {
                     showToast(R.string.text_add_to_cart_success)
+                    setResult(RESULT_OK)
                     finish()
                 }
 
@@ -73,11 +72,6 @@ class DetailActivity : AppCompatActivity() {
             }
         binding.handler = handler
         binding.detailHandler = handler
-    }
-
-    private fun loadInitialData() {
-        viewModel.setProduct()
-        viewModel.loadLastViewedItem()
     }
 
     private fun setupToolbar() {
@@ -108,6 +102,7 @@ class DetailActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean =
         when (item.itemId) {
             R.id.menu_detail_back -> {
+                setResult(RESULT_OK)
                 finish()
                 true
             }

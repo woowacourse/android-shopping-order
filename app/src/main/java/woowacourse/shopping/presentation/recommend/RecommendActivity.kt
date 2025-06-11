@@ -3,8 +3,9 @@ package woowacourse.shopping.presentation.recommend
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
+import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -12,9 +13,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityRecommendBinding
-import woowacourse.shopping.presentation.product.catalog.CatalogActivity
+import woowacourse.shopping.presentation.payment.PaymentActivity
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
-import woowacourse.shopping.presentation.recommend.OrderEvent.OrderItemSuccess
 import woowacourse.shopping.presentation.util.IntentCompat
 
 class RecommendActivity : AppCompatActivity() {
@@ -28,6 +28,19 @@ class RecommendActivity : AppCompatActivity() {
     private val recommendViewModel: RecommendViewModel by viewModels {
         RecommendViewModel.provideFactory(checkedItems)
     }
+
+    private val recommendLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val checkedProducts =
+                    IntentCompat.getParcelableArrayListExtra<ProductUiModel>(
+                        result.data ?: return@registerForActivityResult,
+                        "checked_products",
+                    ) ?: emptyList()
+
+                recommendViewModel.restoreCheckedProducts(checkedProducts)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +60,22 @@ class RecommendActivity : AppCompatActivity() {
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                val resultIntent =
+                    Intent().apply {
+                        putExtra("checked_product_ids", checkedItems.map { it.id }.toLongArray())
+                    }
+                setResult(RESULT_OK, resultIntent)
+                finish()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     private fun setupToolbar() {
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
@@ -63,11 +92,13 @@ class RecommendActivity : AppCompatActivity() {
     }
 
     private fun setAdapter() {
-        recommendAdapter = RecommendAdapter(
-            handler = RecommendEventHandlerImpl(recommendViewModel),
-            onQuantityClick = { product ->
-                recommendViewModel.toggleQuantity(product)
-            })
+        recommendAdapter =
+            RecommendAdapter(
+                handler = RecommendEventHandlerImpl(recommendViewModel),
+                onQuantityClick = { product ->
+                    recommendViewModel.toggleQuantity(product)
+                },
+            )
     }
 
     private fun requireCheckedItems(): List<ProductUiModel> {
@@ -82,33 +113,18 @@ class RecommendActivity : AppCompatActivity() {
             recommendAdapter.updateProduct(product)
         }
 
-        recommendViewModel.orderEvent.observe(this) { state ->
-            when (state) {
-                is OrderItemSuccess -> {
-                    navigateToMain()
-                    showToast(R.string.message_order_success)
-                }
-
-                is OrderEvent.OrderItemFailure -> {
-                    showToast(R.string.message_order_fail)
-                }
-            }
+        recommendViewModel.navigateToPaymentEvent.observe(this) { orderInfo ->
+            val intent =
+                PaymentActivity.newIntent(
+                    this@RecommendActivity,
+                    ArrayList(orderInfo.checkedItems),
+                )
+            recommendLauncher.launch(intent)
         }
 
         recommendViewModel.items.observe(this) { items ->
             recommendAdapter.submitList(items)
         }
-    }
-
-    private fun showToast(messageResId: Int) {
-        Toast.makeText(this, getString(messageResId), Toast.LENGTH_SHORT).show()
-    }
-
-    private fun navigateToMain() {
-        val intent = Intent(this, CatalogActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        startActivity(intent)
-        finish()
     }
 
     companion object {

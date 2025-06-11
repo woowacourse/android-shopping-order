@@ -2,48 +2,45 @@ package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.data.model.CachedCartItem
 import woowacourse.shopping.domain.model.PagingData
+import woowacourse.shopping.domain.model.Product
 
 interface CartItemRepository {
-    fun getInitialCartItems(
+    suspend fun initializeCartItems(): Result<List<CachedCartItem>>
+
+    suspend fun getInitialCartItems(
         page: Int?,
         size: Int?,
-        onResult: (Result<List<CachedCartItem>>) -> Unit,
-    )
+    ): Result<List<CachedCartItem>>
 
-    fun getCartItems(
+    suspend fun getCartItems(
         page: Int?,
         size: Int? = 5,
-        onResult: (Result<PagingData>) -> Unit,
-    )
+    ): Result<PagingData>
 
-    fun deleteCartItem(
-        id: Long,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    suspend fun deleteCartItem(id: Long): Result<Unit>
 
-    fun addCartItem(
+    suspend fun deleteCartItemByCartId(cartId: Long): Result<Unit>
+
+    suspend fun addCartItem(
         id: Long,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun updateCartItemQuantity(
+    suspend fun updateCartItemQuantity(
         id: Long,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun addCartItemQuantity(
+    suspend fun addCartItemQuantity(
         id: Long,
         quantity: Int,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun getCartItemsCount(onResult: (Result<Int>) -> Unit)
+    suspend fun getCartItemsCount(): Result<Int>
 
     fun getQuantity(pagingData: PagingData): PagingData
 
     fun getCartItemProductIds(): List<Long>
 
-    fun getCartItemCartIds(): List<Long>
+    fun getCartIdsByProducts(products: List<Product>): List<Long>
 }

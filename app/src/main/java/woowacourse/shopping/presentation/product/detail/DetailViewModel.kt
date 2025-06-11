@@ -4,12 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.launch
 import woowacourse.shopping.RepositoryProvider
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartItemRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
 import woowacourse.shopping.domain.repository.ViewedItemRepository
+import woowacourse.shopping.mapper.toUiModel
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.presentation.product.detail.CartEvent.AddItemFailure
 import woowacourse.shopping.presentation.product.detail.CartEvent.AddItemSuccess
@@ -33,18 +37,23 @@ class DetailViewModel(
     private val _productInserted = MutableLiveData<Boolean>()
     val productInserted: LiveData<Boolean> = _productInserted
 
-    fun setProduct() {
-        productsRepository.getProductById(productId) { result ->
+    init {
+        loadProduct()
+        loadLastViewedItem()
+    }
+
+    fun loadProduct() {
+        viewModelScope.launch {
+            val result = productsRepository.getProductById(productId)
+
             result
                 .onSuccess { product ->
                     val loadedProduct = product.copy(quantity = 1)
-                    _product.postValue(loadedProduct)
+                    _product.postValue(loadedProduct.toUiModel())
 
-                    viewedRepository.insertViewedItem(loadedProduct) {
-                        _productInserted.postValue(true)
-                    }
-                }
-                .onFailure {
+                    viewedRepository.insertViewedItem(loadedProduct)
+                    _productInserted.postValue(true)
+                }.onFailure {
                     _productInserted.postValue(false)
                 }
         }
@@ -52,21 +61,31 @@ class DetailViewModel(
 
     fun addToCart() {
         val product = _product.value ?: return
-        cartItemRepository.addCartItemQuantity(product.id, product.quantity) { result ->
+
+        viewModelScope.launch {
+            val result = cartItemRepository.addCartItemQuantity(product.id, product.quantity)
+
             result
                 .onSuccess {
                     _cartEvent.postValue(AddItemSuccess)
-                }
-                .onFailure {
+                }.onFailure {
                     _cartEvent.postValue(AddItemFailure)
                 }
         }
     }
 
     fun loadLastViewedItem() {
-        viewedRepository.getLastViewedItem { lastViewedItem ->
-            val filtered = if (lastViewedItem?.id == productId) null else lastViewedItem
-            _lastViewed.postValue(filtered)
+        viewModelScope.launch {
+            val result = viewedRepository.getLastViewedItem()
+
+            result
+                .onSuccess { lastViewedItem ->
+                    val filtered: Product? =
+                        if (lastViewedItem?.id == productId) null else lastViewedItem
+                    _lastViewed.postValue(filtered?.toUiModel())
+                }.onFailure {
+                    _lastViewed.postValue(null)
+                }
         }
     }
 
@@ -81,20 +100,16 @@ class DetailViewModel(
     }
 
     companion object {
-        fun provideFactory(
-            productId: Long,
-        ): ViewModelProvider.Factory {
-            return viewModelFactory {
+        fun provideFactory(productId: Long): ViewModelProvider.Factory =
+            viewModelFactory {
                 initializer {
                     DetailViewModel(
                         productsRepository = RepositoryProvider.productsRepository,
                         cartItemRepository = RepositoryProvider.cartItemRepository,
                         viewedRepository = RepositoryProvider.viewedItemRepository,
-                        productId = productId
+                        productId = productId,
                     )
                 }
             }
-        }
-
     }
 }

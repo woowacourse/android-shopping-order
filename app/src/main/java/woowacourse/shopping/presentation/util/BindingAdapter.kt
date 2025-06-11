@@ -4,12 +4,9 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import woowacourse.shopping.R
 import woowacourse.shopping.presentation.cart.event.CartEventHandler
-import woowacourse.shopping.presentation.product.catalog.ProductUiModel
-import woowacourse.shopping.presentation.recommend.RecommendAdapter
 
 @BindingAdapter("loadImage")
 fun loadImage(
@@ -49,3 +46,27 @@ fun setPrevButtonEnabled(
     view.isEnabled = isEnabled
 }
 
+@BindingAdapter("expirationDateFormatted")
+fun TextView.setExpirationDateFormatted(expirationDate: String?) {
+    expirationDate?.let {
+        val parts = it.split("-")
+        if (parts.size == 3) {
+            val formatted = "만료일: ${parts[0]}년 ${parts[1]}월 ${parts[2]}일"
+            text = formatted
+        } else {
+            View.GONE
+        }
+    }
+}
+
+@BindingAdapter("formattedPrice")
+fun setFormattedPrice(
+    view: TextView,
+    amount: Long?,
+) {
+    if (amount != null) {
+        view.text = view.context.getString(R.string.format_price, amount)
+    } else {
+        view.text = ""
+    }
+}

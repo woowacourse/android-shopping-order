@@ -5,4 +5,14 @@ data class ProductsResponse(
     val pageable: Pageable,
     val last: Boolean,
     val first: Boolean,
-)
+) {
+    companion object {
+        val EMPTY =
+            ProductsResponse(
+                content = emptyList(),
+                pageable = Pageable.EMPTY,
+                last = false,
+                first = false,
+            )
+    }
+}

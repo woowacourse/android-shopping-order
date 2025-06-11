@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="coupon"
+            type="woowacourse.shopping.domain.model.Coupon" />
+
+        <variable
+            name="isChecked"
+            type="Boolean" />
+
+        <variable
+            name="handler"
+            type="woowacourse.shopping.presentation.payment.event.CouponEventHandler" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="18dp"
+        android:layout_marginVertical="5dp"
+        android:background="@drawable/cart_item_background">
+
+        <CheckBox
+            android:id="@+id/checkbox_coupon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:checked="@{isChecked}"
+            android:onClick="@{()-> handler.onCouponCheck(coupon)}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView_coupon_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@{coupon.description}"
+            android:textColor="@color/gray_5"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/checkbox_coupon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="5,000원 할인 쿠폰" />
+
+        <TextView
+            android:id="@+id/textView_coupon_expiration_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/gray_5"
+            android:textSize="12sp"
+            app:expirationDateFormatted="@{coupon.expirationDate}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textView_coupon_name"
+            tools:text="만료일: 2024년 11월 30일" />
+
+        <TextView
+            android:id="@+id/textView_coupon_minimum_order_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="18dp"
+            android:text="@{@string/text_minimum_order_amount(coupon.minimumAmount)}"
+            android:textColor="@color/gray_5"
+            android:textSize="12sp"
+            android:visibility="@{coupon.minimumAmount== 0? View.INVISIBLE : View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textView_coupon_expiration_date"
+            tools:text="최소 주문 금액: 100,000원" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

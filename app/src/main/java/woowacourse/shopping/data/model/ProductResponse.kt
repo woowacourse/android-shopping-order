@@ -6,4 +6,15 @@ data class ProductResponse(
     val price: Int,
     val imageUrl: String,
     val category: String,
-)
+) {
+    companion object {
+        val EMPTY =
+            ProductResponse(
+                id = -1L,
+                name = "",
+                price = 0,
+                imageUrl = "",
+                category = "",
+            )
+    }
+}

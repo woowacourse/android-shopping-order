@@ -44,8 +44,4 @@ class CartItemsLocalDataSource {
     fun getCartItemProductIds(): List<Long> {
         return cache.map { it.productId }
     }
-
-    fun getCartItemCartIds(): List<Long> {
-        return cache.map { it.cartId }
-    }
 }

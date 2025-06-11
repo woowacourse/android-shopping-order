@@ -1,8 +1,5 @@
 package woowacourse.shopping.domain.repository
 
 interface OrderRepository {
-    fun orderItems(
-        checkedItems: List<Long>,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    suspend fun orderItems(checkedItems: List<Long>): Result<Unit>
 }

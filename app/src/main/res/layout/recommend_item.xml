@@ -52,7 +52,6 @@
             app:product="@{product}" />
 
         <include
-            app:onClick="@{onQuantityClick}"
             android:id="@+id/layout_recommend_button_open_quantity_selector"
             layout="@layout/product_count_open_item"
             android:layout_width="53dp"
@@ -62,6 +61,7 @@
             android:visibility="@{product.quantity > 0 ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@id/imageView_product"
             app:layout_constraintEnd_toEndOf="parent"
+            app:onClick="@{onQuantityClick}"
             app:product="@{product}" />
 
         <TextView

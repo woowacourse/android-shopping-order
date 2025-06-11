@@ -1,36 +1,29 @@
 package woowacourse.shopping.fixture
 
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ViewedItemRepository
-import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 
 class FakeViewedItemRepository(
     private val size: Int,
 ) : ViewedItemRepository {
     private val viewed =
         MutableList(size) { index ->
-            ProductUiModel(
+            Product(
                 id = index + 1L,
                 name = "${index + 1} 아이스 카페 아메리카노",
                 imageUrl = "https://image.istarbucks.co.kr/upload/store/skuimg/2021/04/[110563]_20210426095937947.jpg",
                 price = 1000 * (index + 1),
-                quantity = 0
+                quantity = 0,
+                category = "",
             )
         }.toMutableList()
 
-    override fun insertViewedItem(
-        product: ProductUiModel,
-        onComplete: () -> Unit,
-    ) {
+    override suspend fun insertViewedItem(product: Product) {
         viewed.removeAll { it.id == product.id }
         viewed.add(0, product)
-        onComplete()
     }
 
-    override fun getViewedItems(callback: (List<ProductUiModel>) -> Unit) {
-        callback(viewed.take(10))
-    }
+    override suspend fun getViewedItems(): Result<List<Product>> = Result.success(viewed.take(10).toList())
 
-    override fun getLastViewedItem(callback: (ProductUiModel?) -> Unit) {
-        callback(viewed.firstOrNull())
-    }
+    override suspend fun getLastViewedItem(): Result<Product?> = Result.success(viewed.firstOrNull())
 }

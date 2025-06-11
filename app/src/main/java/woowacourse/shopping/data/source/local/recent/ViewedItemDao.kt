@@ -9,11 +9,11 @@ import woowacourse.shopping.data.model.ViewedItem
 @Dao
 interface ViewedItemDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertViewedProduct(viewedItem: ViewedItem)
+    suspend fun insertViewedProduct(viewedItem: ViewedItem)
 
     @Query("SELECT * FROM ViewedItemEntity ORDER BY viewedAt DESC LIMIT 10")
-    fun getRecentViewedItems(): List<ViewedItem>
+    suspend fun getRecentViewedItems(): List<ViewedItem>
 
     @Query("SELECT * FROM ViewedItemEntity ORDER BY viewedAt DESC LIMIT 1")
-    fun getLastViewedItem(): ViewedItem?
+    suspend fun getLastViewedItem(): ViewedItem?
 }
