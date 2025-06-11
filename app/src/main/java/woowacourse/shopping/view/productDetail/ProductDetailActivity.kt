@@ -15,6 +15,7 @@ import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.getSerializableExtraData
 import woowacourse.shopping.view.common.showSnackBar
 import woowacourse.shopping.view.common.showToast
+import woowacourse.shopping.view.product.ProductsActivity.Companion.RESULT_UPDATED_ITEM_KEY
 
 class ProductDetailActivity :
     AppCompatActivity(),
@@ -96,7 +97,7 @@ class ProductDetailActivity :
     override fun onCloseButton() {
         val intent =
             Intent().apply {
-                putExtra("updateProduct", viewModel.product.value?.product)
+                putExtra(RESULT_UPDATED_ITEM_KEY, viewModel.product.value?.product)
             }
         setResult(ResultFrom.PRODUCT_DETAIL_BACK.RESULT_OK, intent)
         finish()

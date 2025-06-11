@@ -38,7 +38,7 @@ class ProductsActivity :
             when (result.resultCode) {
                 ResultFrom.PRODUCT_DETAIL_BACK.RESULT_OK -> {
                     val updateItem: Product? =
-                        result.data?.getSerializableExtraData("updateProduct")
+                        result.data?.getSerializableExtraData(RESULT_UPDATED_ITEM_KEY)
                     if (updateItem != null) {
                         viewModel.updateShoppingCartQuantity()
                         viewModel.updateProducts()
@@ -48,14 +48,14 @@ class ProductsActivity :
 
                 ResultFrom.SHOPPING_CART_BACK.RESULT_OK -> {
                     val hasUpdatedItems: Boolean? =
-                        result.data?.getSerializableExtraData("updateProducts")
+                        result.data?.getSerializableExtraData(RESULT_UPDATED_ITEMS_KEY)
                     if (hasUpdatedItems != null && hasUpdatedItems) viewModel.updateProducts()
                     viewModel.updateShoppingCartQuantity()
                 }
 
                 ResultFrom.PRODUCT_RECENT_WATCHING_CLICK.RESULT_OK -> {
                     val recentProduct: Product =
-                        result.data?.getSerializableExtraData("recentProduct")
+                        result.data?.getSerializableExtraData(RESULT_RECENT_PRODUCT_KEY)
                             ?: return@registerForActivityResult
                     navigateToRecentProduct(recentProduct)
                 }
@@ -206,6 +206,10 @@ class ProductsActivity :
     }
 
     companion object {
+        const val RESULT_UPDATED_ITEM_KEY = "updateProduct"
+        const val RESULT_UPDATED_ITEMS_KEY = "updateProducts"
+        const val RESULT_RECENT_PRODUCT_KEY = "recentProduct"
+
         fun newIntent(context: Context): Intent =
             Intent(context, ProductsActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

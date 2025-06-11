@@ -18,6 +18,7 @@ import woowacourse.shopping.databinding.ActivityShoppingCartBinding
 import woowacourse.shopping.view.common.QuantityTarget
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.showSnackBar
+import woowacourse.shopping.view.product.ProductsActivity.Companion.RESULT_UPDATED_ITEMS_KEY
 import woowacourse.shopping.view.shoppingCartRecommend.ShoppingCartRecommendActivity
 
 class ShoppingCartActivity :
@@ -144,7 +145,7 @@ class ShoppingCartActivity :
     override fun onBackButtonClick() {
         val intent =
             Intent().apply {
-                putExtra("updateProducts", viewModel.hasUpdatedProducts)
+                putExtra(RESULT_UPDATED_ITEMS_KEY, viewModel.hasUpdatedProducts)
             }
         setResult(ResultFrom.SHOPPING_CART_BACK.RESULT_OK, intent)
         finish()
