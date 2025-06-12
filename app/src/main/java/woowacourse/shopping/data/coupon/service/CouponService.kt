@@ -6,5 +6,5 @@ import woowacourse.shopping.data.coupon.dto.CouponResponseItem
 interface CouponService {
     @GET("/coupons")
     suspend fun getCoupons(
-    ): List<CouponResponseItem>?
+    ): List<CouponResponseItem>
 }

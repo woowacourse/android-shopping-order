@@ -14,10 +14,10 @@ class DefaultCouponRepository(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : CouponRepository {
     override suspend fun loadCoupons(): List<Coupon> = withContext(ioDispatcher) {
-        val couponResponse: List<CouponResponseItem>? = couponDataSource.coupons()
-        couponResponse?.toDomain() ?: emptyList()
+        val couponResponse: List<CouponResponseItem> = couponDataSource.coupons()
+        couponResponse.toDomain()
     }
-    
+
     private fun List<CouponResponseItem>.toDomain(): List<Coupon> {
         return this.mapNotNull { item ->
             when (item) {
