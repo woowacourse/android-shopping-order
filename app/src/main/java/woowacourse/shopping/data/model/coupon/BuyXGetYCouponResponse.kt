@@ -13,4 +13,4 @@ data class BuyXGetYCouponResponse(
     val buyQuantity: Int,
     val getQuantity: Int,
     override val discountType: String = "buyXgetY",
-) : CouponResponse()
+) : CouponResponse

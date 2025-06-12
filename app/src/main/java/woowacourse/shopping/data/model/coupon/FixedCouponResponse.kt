@@ -13,4 +13,4 @@ data class FixedCouponResponse(
     val discount: Int,
     val minimumAmount: Int,
     override val discountType: String = "fixed",
-) : CouponResponse()
+) : CouponResponse

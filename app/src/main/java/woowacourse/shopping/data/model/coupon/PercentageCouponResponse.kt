@@ -13,4 +13,4 @@ data class PercentageCouponResponse(
     val discount: Int,
     val availableTime: AvailableTime,
     override val discountType: String = "percentage",
-) : CouponResponse()
+) : CouponResponse
