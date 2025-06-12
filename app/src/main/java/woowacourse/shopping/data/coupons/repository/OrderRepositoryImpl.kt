@@ -5,6 +5,7 @@ import woowacourse.shopping.data.coupons.CouponRequest
 import woowacourse.shopping.domain.model.Coupon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import woowacourse.shopping.domain.model.DiscountType
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -22,14 +23,13 @@ class OrderRepositoryImpl(
         orderRemoteDataSource.postOrder(cartItemIds)
     }
 }
-
 private fun CouponItem.toDomainModel(): Coupon {
     return Coupon(
         id = id,
         code = code,
         description = description,
         expirationDate = expirationDate.toLocalDate(),
-        discountType = discountType,
+        discountType = discountType.toDomainType(),
         discount = discount,
         minimumAmount = minimumAmount,
         buyQuantity = buyQuantity,
@@ -37,6 +37,16 @@ private fun CouponItem.toDomainModel(): Coupon {
         availableStartTime = availableTime?.start?.toLocalTime(),
         availableEndTime = availableTime?.end?.toLocalTime()
     )
+}
+
+private fun String.toDomainType(): DiscountType {
+    return when(this) {
+        "fixed" -> DiscountType.FIXED
+        "buyXgetY" -> DiscountType.BUY_X_GET_Y
+        "freeShipping" -> DiscountType.FREE_SHIPPING
+        "percentage" -> DiscountType.PERCENTAGE
+        else -> throw IllegalArgumentException()
+    }
 }
 
 private fun String.toLocalDate(): LocalDate {
