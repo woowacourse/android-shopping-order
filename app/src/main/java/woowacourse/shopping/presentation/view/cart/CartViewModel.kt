@@ -30,8 +30,8 @@ class CartViewModel(
     private val _recommendedProducts = MutableLiveData<List<ProductUiModel>>()
     val recommendedProducts: LiveData<List<ProductUiModel>> = _recommendedProducts
 
-    private val _deleteState = MutableLiveData<Long>()
-    val deleteState: LiveData<Long> = _deleteState
+    private val _deletedItemId = MutableLiveData<Long>()
+    val deletedItemId: LiveData<Long> = _deletedItemId
 
     private val _itemUpdateEvent = MutableLiveData<ProductUiModel>()
     val itemUpdateEvent: LiveData<ProductUiModel> = _itemUpdateEvent
@@ -120,7 +120,7 @@ class CartViewModel(
             cartRepository
                 .deleteCartItem(cartId)
                 .onSuccess {
-                    _deleteState.postValue(it)
+                    _deletedItemId.postValue(it)
                     updateSelectionInfo()
                 }.onFailure {
                     _toastEvent.setValue(CartEvent.DELETE_CART_ITEM_FAILURE)

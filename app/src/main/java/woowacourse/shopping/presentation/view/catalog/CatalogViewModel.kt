@@ -31,8 +31,8 @@ class CatalogViewModel(
     private val _items = MutableLiveData<List<CatalogItem>>()
     val items: LiveData<List<CatalogItem>> = _items
 
-    private val _itemUpdateEvent = MutableLiveData<ProductUiModel>()
-    val itemUpdateEvent: LiveData<ProductUiModel> = _itemUpdateEvent
+    private val _updatedItem = MutableLiveData<ProductUiModel>()
+    val updatedItem: LiveData<ProductUiModel> = _updatedItem
 
     private val _deletedItemId = MutableLiveData<Long>()
     val deletedItemId: LiveData<Long> = _deletedItemId
@@ -187,7 +187,7 @@ class CatalogViewModel(
                         cartRepository
                             .deleteCartItem(existing.cartId)
                             .onSuccess {
-                                _itemUpdateEvent.postValue(product.copy(amount = 0))
+                                _updatedItem.postValue(product.copy(amount = 0))
                                 updateCartCount()
                             }
                     } else {
@@ -204,7 +204,7 @@ class CatalogViewModel(
                     cartRepository
                         .addCartItem(newItem.toCartItem())
                         .onSuccess {
-                            _itemUpdateEvent.postValue(newItem)
+                            _updatedItem.postValue(newItem)
                             refreshCartState()
                         }
                 }
@@ -215,7 +215,7 @@ class CatalogViewModel(
     private fun postUpdatedCart(cartId: Long) {
         viewModelScope.launch {
             val item = getCartItemByCartId(cartId)
-            item?.let { _itemUpdateEvent.postValue(it.toUiModel()) }
+            item?.let { _updatedItem.postValue(it.toUiModel()) }
             updateCartCount()
         }
     }

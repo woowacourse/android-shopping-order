@@ -100,7 +100,7 @@ class CatalogFragment :
         viewModel.deletedItemId.observe(viewLifecycleOwner) { productId ->
             catalogAdapter.removeItemAmount(productId)
         }
-        viewModel.itemUpdateEvent.observe(viewLifecycleOwner) { updatedProduct ->
+        viewModel.updatedItem.observe(viewLifecycleOwner) { updatedProduct ->
             catalogAdapter.updateItem(updatedProduct)
         }
         viewModel.toastEvent.observe(viewLifecycleOwner) { event ->

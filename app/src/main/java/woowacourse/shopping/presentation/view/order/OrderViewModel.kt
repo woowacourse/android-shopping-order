@@ -32,8 +32,8 @@ class OrderViewModel(
     private val _orderSummary = MutableLiveData<OrderSummary>()
     val orderSummary: LiveData<OrderSummary> = _orderSummary
 
-    private val _orderSuccessEvent = MutableLiveData<Unit>()
-    val orderSuccessEvent: LiveData<Unit> = _orderSuccessEvent
+    private val _orderSuccessEvent = MutableSingleLiveData<Unit>()
+    val orderSuccessEvent: SingleLiveData<Unit> = _orderSuccessEvent
 
     private val _toastEvent = MutableSingleLiveData<OrderEvent>()
     val toastEvent: SingleLiveData<OrderEvent> = _toastEvent
