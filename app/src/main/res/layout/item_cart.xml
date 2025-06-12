@@ -29,8 +29,7 @@
         <CheckBox
             android:id="@+id/checkbox"
             cartItem="@{cartItem}"
-            isChecked="@{cartItem.isSelected}"
-            onCheckedChanged="@{eventHandler}"
+            eventHandler="@{eventHandler}"
             android:layout_width="40dp"
             android:layout_height="0dp"
             android:gravity="center"

@@ -18,15 +18,14 @@ fun setImageBindingAdapter(
         .into(imageView)
 }
 
-@BindingAdapter("isChecked", "onCheckedChanged", "cartItem")
+@BindingAdapter(value = ["cartItem", "eventHandler"], requireAll = true)
 fun setOnCheckedChangedBindingAdapter(
     checkBox: CheckBox,
-    isChecked: Boolean,
-    eventHandler: CartItemEventHandler,
     cartItem: CartItemUiModel,
+    eventHandler: CartItemEventHandler,
 ) {
     checkBox.setOnCheckedChangeListener(null)
-    checkBox.isChecked = isChecked
+    checkBox.isChecked = cartItem.isSelected
     checkBox.setOnCheckedChangeListener { _, checked ->
         eventHandler.onProductSelectionToggle(cartItem, checked)
     }
