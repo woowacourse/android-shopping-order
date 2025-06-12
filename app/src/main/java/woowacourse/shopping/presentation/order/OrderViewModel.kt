@@ -10,6 +10,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.domain.model.OrderInfo
+import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.FixedCoupon
 import woowacourse.shopping.domain.model.coupon.FreeShippingCoupon
 import woowacourse.shopping.domain.repository.CouponRepository
@@ -64,19 +65,16 @@ class OrderViewModel(
     private fun loadCoupons() {
         viewModelScope.launch {
             val orderAmount = _orderInfo.value?.orderAmount ?: 0
-            couponRepository.getCoupons()
-                .onSuccess { coupons ->
-                    _coupons.value =
-                        coupons
-                            .filter { coupon ->
-                                when (coupon) {
-                                    is FixedCoupon -> orderAmount >= coupon.minimumAmount
-                                    is FreeShippingCoupon -> orderAmount >= coupon.minimumAmount
-                                    else -> true
-                                }
-                            }
-                            .map { it.toUiModel() }
-                }
+
+            val result = couponRepository.getCoupons()
+            if (result.isFailure) return@launch
+
+            val filtered = result.getOrNull()
+                ?.filter { it.isApplicable(orderAmount) }
+                ?.map { it.toUiModel() }
+                ?: return@launch
+
+            _coupons.value = filtered
         }
     }
 
@@ -86,6 +84,14 @@ class OrderViewModel(
             val targetCoupon = coupons.find { it.id == couponId } ?: return@launch
             val currentOrderInfo = _orderInfo.value ?: return@launch
             _orderInfo.value = targetCoupon.calculateDiscount(currentOrderInfo)
+        }
+    }
+
+    private fun Coupon.isApplicable(orderAmount: Int): Boolean {
+        return when (this) {
+            is FixedCoupon -> orderAmount >= minimumAmount
+            is FreeShippingCoupon -> orderAmount >= minimumAmount
+            else -> true
         }
     }
 
