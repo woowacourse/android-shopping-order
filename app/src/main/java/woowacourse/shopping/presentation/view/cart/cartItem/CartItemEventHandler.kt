@@ -5,8 +5,5 @@ import woowacourse.shopping.presentation.model.CartItemUiModel
 interface CartItemEventHandler {
     fun onProductDeletion(cartItem: CartItemUiModel)
 
-    fun onProductSelectionToggle(
-        cartItem: CartItemUiModel,
-        isChecked: Boolean,
-    )
+    fun onProductSelectionToggle(cartItem: CartItemUiModel)
 }

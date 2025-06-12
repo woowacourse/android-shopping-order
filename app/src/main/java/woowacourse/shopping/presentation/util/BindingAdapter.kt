@@ -26,7 +26,7 @@ fun setOnCheckedChangedBindingAdapter(
 ) {
     checkBox.setOnCheckedChangeListener(null)
     checkBox.isChecked = cartItem.isSelected
-    checkBox.setOnCheckedChangeListener { _, checked ->
-        eventHandler.onProductSelectionToggle(cartItem, checked)
+    checkBox.setOnCheckedChangeListener { _, _ ->
+        eventHandler.onProductSelectionToggle(cartItem)
     }
 }

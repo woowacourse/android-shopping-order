@@ -141,11 +141,12 @@ class CartViewModel(
 
     private suspend fun addToCart(cartItem: CartItemUiModel) {
         val newItem = cartItem.cartItem.copy(quantity = 1)
-        cartRepository.addCartItem(newItem)?.let { addedItem ->
-            _cartItems.postValue(_cartItems.value?.plus(cartItem.copy(cartItem = newItem)))
-            _itemUpdateEvent.postValue(addedItem.toCartItemUiModel().copy(isSelected = true))
-            setCartItemSelection(addedItem.toCartItemUiModel(), true)
-        }
+        _cartItems.postValue(_cartItems.value?.plus(cartItem.copy(cartItem = newItem)))
+        cartRepository.addCartItem(newItem)?.toCartItemUiModel()
+            ?.let { addedItem ->
+                _itemUpdateEvent.postValue(addedItem)
+                toggleCartItemSelection(addedItem)
+            }
     }
 
     fun removeFromCart(cartItem: CartItemUiModel) {
@@ -166,19 +167,17 @@ class CartViewModel(
         }
     }
 
-    fun setCartItemSelection(
-        cartItem: CartItemUiModel,
-        isSelected: Boolean,
-    ) {
+    fun toggleCartItemSelection(cartItem: CartItemUiModel) {
         viewModelScope.launch {
             _selectedProductIds.value =
                 _selectedProductIds.value.orEmpty().toMutableSet().apply {
-                    if (isSelected) {
-                        add(cartItem.cartItem.product.id)
-                    } else {
+                    if (cartItem.isSelected) {
                         remove(cartItem.cartItem.product.id)
+                    } else {
+                        add(cartItem.cartItem.product.id)
                     }
                 }
+            _itemUpdateEvent.postValue(cartItem.copy(isSelected = !cartItem.isSelected))
             updateSelectionInfo()
         }
     }

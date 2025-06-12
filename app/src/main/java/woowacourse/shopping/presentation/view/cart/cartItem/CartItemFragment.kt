@@ -26,11 +26,8 @@ class CartItemFragment : BaseFragment<FragmentCartItemBinding>(R.layout.fragment
                 viewModel.removeFromCart(cartItem)
             }
 
-            override fun onProductSelectionToggle(
-                cartItem: CartItemUiModel,
-                isChecked: Boolean,
-            ) {
-                viewModel.setCartItemSelection(cartItem, isChecked)
+            override fun onProductSelectionToggle(cartItem: CartItemUiModel) {
+                viewModel.toggleCartItemSelection(cartItem)
             }
         }
 
