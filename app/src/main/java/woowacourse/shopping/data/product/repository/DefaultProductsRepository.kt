@@ -54,7 +54,9 @@ class DefaultProductsRepository(
 
     override suspend fun loadLatestViewedProduct(): Product? =
         withContext(ioDispatcher) {
-            val productId = recentViewedProductsDataSource.load().maxBy { it.viewedAt }.productId
+            val productId =
+                recentViewedProductsDataSource.load().maxByOrNull { it.viewedAt }?.productId
+                    ?: return@withContext null
             productsDataSource.getProductById(productId)?.toDomain()
         }
 

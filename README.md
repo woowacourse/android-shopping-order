@@ -29,7 +29,7 @@
 - [x] ReceiptViewModel | error("") 대신 더 안전한 방식으로 변경
 - [ ] 아직 수정하지 않은 execute, body 삭제
 - [x] RecommendViewModel | error("") 대신 더 안전한 방식으로 변경
-- [ ] DefaultProductsRepository | maxBy { it.viewedAt }가 빈리스트일 경우 핸들링
+- [x] DefaultProductsRepository | maxBy { it.viewedAt }가 빈리스트일 경우 핸들링
 - [x] CouponResponseItem | 다형성을 사용하여 파싱하도록 수정
 - [ ] ReceiptActivity | 네트워크가 끊어지게 되면 생기는 오류 핸들링
 - [ ] 전체적으로 mapper함수 생성
@@ -38,3 +38,4 @@
 - [ ] ReceiptViewModel | BindingAdapter를 사용
 - [ ] RecommendViewModel | 추천 목록에 있는 상품들은 장바구니에서 제외
 - [ ] ReceiptViewModel | map사용
+- [ ] ReceiptViewModel | mapper사용
