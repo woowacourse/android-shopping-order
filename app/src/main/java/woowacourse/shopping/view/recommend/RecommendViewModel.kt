@@ -106,7 +106,19 @@ class RecommendViewModel(
         quantity: Int,
     ) {
         viewModelScope.launch {
-            val cartItemId = cartItems.find { it.productId == productId }?.id ?: error("")
+            val cartItemId = cartItems.find { it.productId == productId }?.id
+
+            if (cartItemId == null) {
+                _event.postValue(
+                    if (quantity == 0) {
+                        RecommendEvent.REMOVE_CART_ITEM_FAILURE
+                    } else {
+                        RecommendEvent.MINUS_CART_ITEM_FAILURE
+                    }
+                )
+                return@launch
+            }
+
             runCatching {
                 if (quantity == 0) {
                     cartRepository.remove(cartItemId)
