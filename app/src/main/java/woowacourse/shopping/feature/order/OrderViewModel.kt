@@ -15,8 +15,9 @@ import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 
 sealed class OrderUiEvent {
-    data class ShowToast(val messageKey: ToastMessageKey) : OrderUiEvent()
     data object OrderSuccess : OrderUiEvent()
+    data object OrderFailPay : OrderUiEvent()
+    data object OrderFailCoupon : OrderUiEvent()
 }
 
 enum class ToastMessageKey {
@@ -89,7 +90,7 @@ class OrderViewModel(
             try {
                 _coupons.value = orderRepository.fetchCoupons()
             } catch (e: Exception) {
-                _uiEvent.setValue(OrderUiEvent.ShowToast(ToastMessageKey.FAIL_LOAD_COUPON))
+                _uiEvent.setValue(OrderUiEvent.OrderFailCoupon)
             }
         }
     }
@@ -111,7 +112,7 @@ class OrderViewModel(
                 orderRepository.addOrder(_cartItems.map { it.id })
                 _uiEvent.setValue(OrderUiEvent.OrderSuccess)
             } catch (e: Exception) {
-                _uiEvent.setValue(OrderUiEvent.ShowToast(ToastMessageKey.FAIL_ORDER))
+                _uiEvent.setValue(OrderUiEvent.OrderFailPay)
             }
         }
     }

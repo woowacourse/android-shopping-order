@@ -76,7 +76,8 @@ class OrderActivity : BaseActivity<ActivityOrderBinding>() {
         viewModel.uiEvent.observe(this) { orderUiEvent ->
             when(orderUiEvent){
                 OrderUiEvent.OrderSuccess -> orderFinish()
-                is OrderUiEvent.ShowToast -> showToast(orderUiEvent.messageKey.toMessage())
+                OrderUiEvent.OrderFailCoupon -> showToast(getString(R.string.order_fail))
+                OrderUiEvent.OrderFailPay -> showToast(getString(R.string.coupon_load_fail))
             }
         }
 
@@ -98,12 +99,6 @@ class OrderActivity : BaseActivity<ActivityOrderBinding>() {
         Toast.makeText(this,message,Toast.LENGTH_SHORT).show()
     }
 
-    private fun ToastMessageKey.toMessage():String{
-        return when(this){
-            ToastMessageKey.FAIL_ORDER -> getString(R.string.order_fail)
-            ToastMessageKey.FAIL_LOAD_COUPON -> getString(R.string.coupon_load_fail)
-        }
-    }
 
     companion object {
         fun newIntent(context: Context): Intent = Intent(context, OrderActivity::class.java)
