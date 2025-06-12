@@ -11,6 +11,7 @@ import woowacourse.shopping.feature.cart.adapter.CartAdapter
 import woowacourse.shopping.feature.cart.adapter.CartGoodsItem
 import woowacourse.shopping.feature.cart.adapter.RecommendAdapter
 import woowacourse.shopping.feature.goods.adapter.GoodsAdapter
+import woowacourse.shopping.feature.goods.adapter.GoodsRvItems
 
 @BindingAdapter("imgUrl")
 fun ImageView.loadImageFromUrl(url: String?) {
@@ -42,10 +43,8 @@ fun RecyclerView.bindRecommendCartItems(items: List<Cart>?) {
 }
 
 @BindingAdapter("items")
-fun RecyclerView.bindItems(items: List<Any>?) {
-    if (adapter is GoodsAdapter && items != null) {
-        (adapter as GoodsAdapter).setItems(items)
-    }
+fun RecyclerView.bindItems(items: List<GoodsRvItems>) {
+    (adapter as GoodsAdapter).submitList(items)
 }
 
 @BindingAdapter("visible")

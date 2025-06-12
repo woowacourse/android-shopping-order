@@ -13,7 +13,6 @@ import woowacourse.shopping.application.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityGoodsDetailsBinding
 import woowacourse.shopping.feature.CustomCartQuantity
 import woowacourse.shopping.feature.cart.CartActivity
-import woowacourse.shopping.feature.model.ResultCode
 import kotlin.getValue
 
 class GoodsDetailsActivity : AppCompatActivity() {
@@ -34,7 +33,7 @@ class GoodsDetailsActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         id = intent.getLongExtra(GOODS_KEY, 0)
-        viewModel.setInitialCart(id)
+        viewModel.loadProductDetails(id)
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
@@ -55,6 +54,8 @@ class GoodsDetailsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.nav_close -> {
+                val resultIntent = Intent()
+                setResult(RESULT_OK, resultIntent)
                 finish()
             }
         }
@@ -62,9 +63,13 @@ class GoodsDetailsActivity : AppCompatActivity() {
     }
 
     private fun navigateToLastViewed() {
-        viewModel.navigateToLastViewedCart.observe(this) { lastViewedCart ->
-            lastViewedCart.let {
-                val intent = newIntent(this@GoodsDetailsActivity, it.product.id.toLong())
+        viewModel.navigateToLastViewed.observe(this) { value ->
+            if (value) {
+                val id = viewModel.lastViewed.value?.id ?: 0L
+                val intent =
+                    newIntent(this@GoodsDetailsActivity, id.toLong()).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    }
                 startActivity(intent)
                 finish()
             }
@@ -73,18 +78,22 @@ class GoodsDetailsActivity : AppCompatActivity() {
 
     private fun observeCartInsertResult() {
         viewModel.isSuccess.observe(this) {
-            Toast.makeText(this, R.string.goods_detail_cart_insert_success_toast_message, Toast.LENGTH_SHORT).show()
+            Toast
+                .makeText(
+                    this,
+                    R.string.goods_detail_cart_insert_success_toast_message,
+                    Toast.LENGTH_SHORT,
+                ).show()
             startActivity(CartActivity.newIntent(this))
         }
         viewModel.isFail.observe(this) {
-            Toast.makeText(this, R.string.goods_detail_cart_insert_fail_toast_message, Toast.LENGTH_SHORT).show()
+            Toast
+                .makeText(
+                    this,
+                    R.string.goods_detail_cart_insert_fail_toast_message,
+                    Toast.LENGTH_SHORT,
+                ).show()
         }
-        setResult(
-            ResultCode.GOODS_DETAIL_INSERT.code,
-            Intent().apply {
-                putExtra("HISTORY_ID", id)
-            },
-        )
     }
 
     private fun setOnClickListener() {

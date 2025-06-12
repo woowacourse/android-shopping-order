@@ -8,7 +8,7 @@ class CartRepository(
 ) {
     suspend fun fetchAllCart(): Result<CartResponse?> =
         runCatching {
-            val response = cartService.requestCart(size = Int.MAX_VALUE)
+            val response = cartService.requestCart(page = null, size = null)
             if (response.isSuccessful) {
                 response.body()
             } else {
@@ -16,9 +16,12 @@ class CartRepository(
             }
         }
 
-    suspend fun fetchCart(): Result<CartResponse?> =
+    suspend fun fetchCart(
+        page: Int?,
+        size: Int?,
+    ): Result<CartResponse?> =
         runCatching {
-            val response = cartService.requestCart()
+            val response = cartService.requestCart(page = page, size = size)
             if (response.isSuccessful) {
                 response.body()
             } else {

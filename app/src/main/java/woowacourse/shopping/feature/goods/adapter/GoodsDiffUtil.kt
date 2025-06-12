@@ -1,7 +1,6 @@
-package woowacourse.shopping.feature.goods
+package woowacourse.shopping.feature.goods.adapter
 
 import androidx.recyclerview.widget.DiffUtil
-import woowacourse.shopping.feature.goods.adapter.GoodsRvItems
 
 val GoodsDiffUtil =
     object : DiffUtil.ItemCallback<GoodsRvItems>() {

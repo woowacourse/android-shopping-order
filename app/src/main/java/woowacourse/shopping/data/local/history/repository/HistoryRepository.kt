@@ -1,11 +1,11 @@
 package woowacourse.shopping.data.local.history.repository
 
-import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.Product
 
 interface HistoryRepository {
-    suspend fun getAll(): List<Cart>
+    suspend fun getAll(): List<Product>
 
-    suspend fun insert(cart: Cart)
+    suspend fun insert(product: Product)
 
-    suspend fun findLatest(): Cart?
+    suspend fun findLatest(): Product?
 }

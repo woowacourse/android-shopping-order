@@ -14,13 +14,11 @@ import woowacourse.shopping.R
 import woowacourse.shopping.application.ShoppingApplication
 import woowacourse.shopping.databinding.ActivityGoodsBinding
 import woowacourse.shopping.databinding.MenuCartActionViewBinding
-import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.goods.adapter.GoodsAdapter
 import woowacourse.shopping.feature.goods.adapter.GoodsClickListener
 import woowacourse.shopping.feature.goods.adapter.GoodsSpanSizeLookup
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsActivity
-import woowacourse.shopping.feature.model.ResultCode
 
 class GoodsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGoodsBinding
@@ -33,7 +31,15 @@ class GoodsActivity : AppCompatActivity() {
             app.cartRepository,
         )
     }
-    private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
+
+    private val activityResultLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                viewModel.syncData()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +51,6 @@ class GoodsActivity : AppCompatActivity() {
         setupAdapter()
         setupRecyclerView()
         observeViewModel()
-        setupActivityResultLauncher()
         observeCartInsertResult()
     }
 
@@ -67,7 +72,7 @@ class GoodsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.nav_cart -> {
-                val intent = Intent(this, CartActivity::class.java)
+                val intent = CartActivity.newIntent(this)
                 activityResultLauncher.launch(intent)
             }
         }
@@ -79,11 +84,12 @@ class GoodsActivity : AppCompatActivity() {
         gridLayoutManager.spanSizeLookup = GoodsSpanSizeLookup(adapter)
         binding.rvGoods.layoutManager = gridLayoutManager
         binding.rvGoods.adapter = adapter
+        binding.rvGoods.itemAnimator = null
     }
 
     private fun observeViewModel() {
-        viewModel.hasNextPage.observe(this) { hasNext ->
-            adapter.setHasNextPage(hasNext)
+        viewModel.goodsItems.observe(this) { goods ->
+            adapter.addItems(goods)
         }
         viewModel.navigateToCart.observe(this) { cart ->
             navigate(cart)
@@ -113,20 +119,24 @@ class GoodsActivity : AppCompatActivity() {
         adapter =
             GoodsAdapter(
                 object : GoodsClickListener {
-                    override fun onClickGoods(cart: Cart) {
-                        navigate(cart)
+                    override fun onClickGoods(productId: Int) {
+                        navigate(productId)
                     }
 
-                    override fun onClickHistory(cart: Cart) {
-                        viewModel.findCartFromHistory(cart)
+                    override fun onClickHistory(productId: Int) {
+                        viewModel.findCartFromHistory(productId)
                     }
 
-                    override fun insertToCart(cart: Cart) {
-                        viewModel.addToCart(cart)
+                    override fun addToCart(productId: Int) {
+                        viewModel.addToCart(productId)
                     }
 
-                    override fun removeFromCart(cart: Cart) {
-                        viewModel.removeFromCart(cart)
+                    override fun increaseQuantity(cart: GoodsProduct) {
+                        viewModel.increaseQuantity(cart)
+                    }
+
+                    override fun decreaseQuantity(cart: GoodsProduct) {
+                        viewModel.decreaseQuantity(cart)
                     }
 
                     override fun loadMore() {
@@ -136,31 +146,8 @@ class GoodsActivity : AppCompatActivity() {
             )
     }
 
-    private fun setupActivityResultLauncher() {
-        activityResultLauncher =
-            registerForActivityResult(
-                ActivityResultContracts.StartActivityForResult(),
-            ) { result ->
-                when (result.resultCode) {
-                    ResultCode.GOODS_DETAIL_INSERT.code,
-                    ResultCode.CART_INSERT.code,
-                    -> {
-                        handleActivityResult(result.data)
-                    }
-                }
-            }
-    }
-
-    private fun handleActivityResult(data: Intent?) {
-        val changedCartId = data?.getLongExtra("CART_ID", 0) ?: 0
-        val changedGoodsId = data?.getLongExtra("GOODS_ID", 0) ?: 0
-        val changedQuantity = data?.getIntExtra("GOODS_QUANTITY", 0) ?: 0
-        viewModel.updateItem(changedCartId, changedGoodsId.toInt(), changedQuantity)
-        viewModel.refreshHistoryOnly()
-    }
-
-    private fun navigate(cart: Cart) {
-        val intent = GoodsDetailsActivity.newIntent(this, cart.product.id.toLong())
+    private fun navigate(productId: Int) {
+        val intent = GoodsDetailsActivity.newIntent(this, productId.toLong())
         activityResultLauncher.launch(intent)
     }
 }

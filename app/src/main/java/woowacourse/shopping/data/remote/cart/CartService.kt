@@ -14,8 +14,8 @@ interface CartService {
     @GET("/cart-items")
     suspend fun requestCart(
         @Header("accept") accept: String = "*/*",
-        @Query("page") page: Int = 0,
-        @Query("size") size: Int = 5,
+        @Query("page") page: Int?,
+        @Query("size") size: Int?,
     ): Response<CartResponse>
 
     @POST("/cart-items")

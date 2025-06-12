@@ -16,7 +16,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="154dp"
         android:layout_height="210dp"
-        android:onClick="@{() -> goodsClickListener.onClickGoods(cart)}"
+        android:onClick="@{() -> goodsClickListener.onClickGoods(cart.product.id)}"
         android:paddingHorizontal="6dp"
         android:paddingBottom="12dp">
 
@@ -41,7 +41,7 @@
             android:layout_margin="8dp"
             android:background="@drawable/goods_add_button_background"
             android:contentDescription="@string/goods_cart_add_button_description"
-            android:onClick="@{() -> goodsClickListener.insertToCart(cart)}"
+
             android:src="@drawable/ic_add"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="@+id/iv_item_goods_thumbnail"
