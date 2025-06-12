@@ -25,7 +25,7 @@
             android:layout_height="48dp"
             android:layout_marginTop="6dp"
             android:checked="@{coupon.checked}"
-            android:onCheckedChanged="@{(button, isChecked) -> vm.toggleCouponChecked(coupon, isChecked)}"
+            android:onCheckedChanged="@{() -> vm.toggleCouponChecked(coupon)}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

@@ -85,12 +85,11 @@ class PaymentViewModel(
 
     fun toggleCouponChecked(
         couponUi: CouponUi,
-        isChecked: Boolean,
     ) {
         val currentState = _paymentUiState.value ?: return
         val updatedCouponUis =
             currentState.coupons.map {
-                if (it.title == couponUi.title) it.copy(checked = isChecked) else it
+                if (it.title == couponUi.title) it.copy(checked = !couponUi.checked) else it
             }
 
         val orderItems = currentOrderItems
