@@ -19,6 +19,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import woowacourse.shopping.data.account.AccountRepository
 import woowacourse.shopping.data.carts.AddItemResult
 import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.CartUpdateResult
@@ -35,6 +36,9 @@ import woowacourse.shopping.util.InstantTaskExecutorExtension
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class GoodsViewModelTest {
+    @MockK
+    private lateinit var accountRepository: AccountRepository
+
     @MockK
     private lateinit var cartRepository: CartRepository
 
@@ -56,7 +60,7 @@ class GoodsViewModelTest {
             Dispatchers.setMain(testDispatcher)
             MockKAnnotations.init(this@GoodsViewModelTest)
             setupRepositoryMocks()
-            viewModel = GoodsViewModel(cartRepository, goodsRepository)
+            viewModel = GoodsViewModel(accountRepository, cartRepository, goodsRepository)
             setupLiveDataObservers()
             mockkStatic("woowacourse.shopping.data.util.mapper.CartResponseMapperKt")
             every { any<CartResponse>().toCartItems() } returns emptyList()
@@ -82,7 +86,7 @@ class GoodsViewModelTest {
             CartFetchResult.Success(
                 createEmptyCartResponse(),
             )
-        coEvery { cartRepository.checkValidLocalSavedBasicKey() } returns
+        coEvery { accountRepository.checkValidLocalSavedBasicKey() } returns
             CartFetchResult.Success(
                 200,
             )
@@ -217,7 +221,7 @@ class GoodsViewModelTest {
     @Test
     fun `로그인 성공 시 Authorization 상태가 true로 설정된다`() =
         runTest {
-            coEvery { cartRepository.checkValidLocalSavedBasicKey() } returns
+            coEvery { accountRepository.checkValidLocalSavedBasicKey() } returns
                 CartFetchResult.Success(
                     200,
                 )
@@ -225,12 +229,12 @@ class GoodsViewModelTest {
             viewModel.login()
 
             assertThat(Authorization.isLogin).isTrue()
-            coVerify { cartRepository.checkValidLocalSavedBasicKey() }
+            coVerify { accountRepository.checkValidLocalSavedBasicKey() }
         }
 
     @Test
     fun `로그인 실패 시 Authorization 상태가 false로 설정된다`() {
-        coEvery { cartRepository.checkValidLocalSavedBasicKey() } returns
+        coEvery { accountRepository.checkValidLocalSavedBasicKey() } returns
             CartFetchResult.Success(
                 401,
             )
