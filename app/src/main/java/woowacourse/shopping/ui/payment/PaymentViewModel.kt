@@ -18,6 +18,7 @@ import woowacourse.shopping.domain.usecase.CalculatePaymentAmountByCouponUseCase
 import woowacourse.shopping.domain.usecase.GetCouponsUseCase
 import woowacourse.shopping.domain.usecase.IsFreeShippingCouponUseCase
 import woowacourse.shopping.domain.usecase.OrderProductsUseCase
+import woowacourse.shopping.ui.common.ToastMessageHandler
 import woowacourse.shopping.ui.payment.adapter.CouponUiModel.Companion.toUiModel
 import woowacourse.shopping.util.Event
 
@@ -27,13 +28,17 @@ class PaymentViewModel(
     private val isFreeShippingCouponUseCase: IsFreeShippingCouponUseCase,
     private val calculateCouponDiscountUseCase: CalculateCouponDiscountUseCase,
     private val orderProductsUseCase: OrderProductsUseCase,
-) : ViewModel() {
+) : ViewModel(),
+    ToastMessageHandler {
     private val _uiState: MutableLiveData<PaymentUiState> =
         MutableLiveData<PaymentUiState>(PaymentUiState())
     val uiState: LiveData<PaymentUiState> get() = _uiState
 
     private val _onPayClick: MutableLiveData<Event<Unit>> = MutableLiveData<Event<Unit>>()
     val onPayClick: LiveData<Event<Unit>> get() = _onPayClick
+
+    private val _dataError: MutableLiveData<Event<Unit>> = MutableLiveData()
+    override val dataError: LiveData<Event<Unit>> get() = _dataError
 
     fun loadProductsInfo(products: Products) {
         setupAmountsBeforeCoupon(products)
@@ -76,6 +81,7 @@ class PaymentViewModel(
                 .onSuccess {
                     _onPayClick.value = Event(Unit)
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("PaymentViewModel", it.message.toString())
                 }
         }
@@ -125,6 +131,7 @@ class PaymentViewModel(
                 .onSuccess { coupons ->
                     updateUiState { it.copy(coupons = coupons.map { coupon -> coupon.toUiModel() }) }
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("PaymentViewModel", it.message.toString())
                 }
         }

@@ -40,4 +40,5 @@
     <string name="payment_price">%,d원</string>
     <string name="expiration_date">만료일: %1$s</string>
     <string name="minimum_amount">최소 주문 금액: %,d원</string>
+    <string name="fail_data_load_message">데이터 로드에 실패했습니다.</string>
 </resources>

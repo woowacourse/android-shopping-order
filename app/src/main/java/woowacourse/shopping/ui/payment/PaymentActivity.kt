@@ -67,6 +67,7 @@ class PaymentActivity : DataBindingActivity<ActivityPaymentBinding>(R.layout.act
                 finish()
             }
         }
+        viewModel.observeDataError(this)
     }
 
     companion object {

@@ -68,6 +68,7 @@ class ProductDetailActivity : DataBindingActivity<ActivityProductDetailBinding>(
         viewModel.onCartProductAddSuccess.observe(this) { isSuccess ->
             isSuccess?.let { handleCartProductAddResult(it) }
         }
+        viewModel.observeDataError(this)
     }
 
     private fun handleCartProductAddResult(isSuccess: Boolean) {

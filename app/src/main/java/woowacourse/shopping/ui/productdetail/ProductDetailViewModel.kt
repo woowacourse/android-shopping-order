@@ -18,6 +18,8 @@ import woowacourse.shopping.domain.usecase.AddSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
 import woowacourse.shopping.domain.usecase.GetRecentSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.UpdateCartProductUseCase
+import woowacourse.shopping.ui.common.ToastMessageHandler
+import woowacourse.shopping.util.Event
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 
@@ -26,7 +28,8 @@ class ProductDetailViewModel(
     private val getRecentSearchHistoryUseCase: GetRecentSearchHistoryUseCase,
     private val addSearchHistoryUseCase: AddSearchHistoryUseCase,
     private val updateCartProductUseCase: UpdateCartProductUseCase,
-) : ViewModel() {
+) : ViewModel(),
+    ToastMessageHandler {
     private val _product: MutableLiveData<Product> =
         MutableLiveData(EMPTY_PRODUCT)
     val product: LiveData<Product> get() = _product
@@ -38,6 +41,9 @@ class ProductDetailViewModel(
         MutableSingleLiveData(null)
     val onCartProductAddSuccess: SingleLiveData<Boolean?> get() = _onCartProductAddSuccess
 
+    private val _dataError: MutableLiveData<Event<Unit>> = MutableLiveData()
+    override val dataError: LiveData<Event<Unit>> = _dataError
+
     fun loadProductDetail(id: Long) {
         viewModelScope.launch {
             val result = getCatalogProductUseCase(id)
@@ -45,6 +51,7 @@ class ProductDetailViewModel(
                 .onSuccess { catalogProduct ->
                     _product.value = catalogProduct ?: EMPTY_PRODUCT
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("ProductDetailViewModel", it.message.toString())
                 }
         }
@@ -57,6 +64,7 @@ class ProductDetailViewModel(
                 .onSuccess { historyProduct ->
                     _lastHistoryProduct.value = historyProduct
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("ProductDetailViewModel", it.message.toString())
                 }
         }
@@ -89,6 +97,7 @@ class ProductDetailViewModel(
                 .onSuccess {
                     _onCartProductAddSuccess.setValue(true)
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("ProductDetailViewModel", it.message.toString())
                 }
         }

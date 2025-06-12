@@ -20,9 +20,10 @@ import woowacourse.shopping.domain.usecase.DecreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.GetCartRecommendProductsUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
-import woowacourse.shopping.domain.usecase.OrderProductsUseCase
 import woowacourse.shopping.domain.usecase.RemoveCartProductUseCase
 import woowacourse.shopping.ui.cart.adapter.CartProductViewHolder
+import woowacourse.shopping.ui.common.ToastMessageHandler
+import woowacourse.shopping.util.Event
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 
@@ -32,9 +33,9 @@ class CartViewModel(
     private val increaseCartProductQuantityUseCase: IncreaseCartProductQuantityUseCase,
     private val decreaseCartProductQuantityUseCase: DecreaseCartProductQuantityUseCase,
     private val getCartRecommendProductsUseCase: GetCartRecommendProductsUseCase,
-    private val orderProductsUseCase: OrderProductsUseCase,
 ) : ViewModel(),
-    CartProductViewHolder.OnClickHandler {
+    CartProductViewHolder.OnClickHandler,
+    ToastMessageHandler {
     private val _cartProducts: MutableLiveData<Products> = MutableLiveData(EMPTY_PRODUCTS)
     val cartProducts: LiveData<Products> get() = _cartProducts
 
@@ -71,6 +72,9 @@ class CartViewModel(
 
     private val _isOrdered: MutableSingleLiveData<Unit> = MutableSingleLiveData()
     val isOrdered: SingleLiveData<Unit> get() = _isOrdered
+
+    private val _dataError: MutableLiveData<Event<Unit>> = MutableLiveData()
+    override val dataError: LiveData<Event<Unit>> = _dataError
 
     init {
         loadCartProducts()
@@ -116,6 +120,7 @@ class CartViewModel(
                 .onSuccess { products ->
                     _recommendedProducts.value = products
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CartViewModel", it.message.toString())
                 }
         }
@@ -139,6 +144,7 @@ class CartViewModel(
 
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CartViewModel", it.message.toString())
                 }
         }
@@ -165,6 +171,7 @@ class CartViewModel(
                     }
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CartViewModel", it.message.toString())
                 }
         }
@@ -196,6 +203,7 @@ class CartViewModel(
                     _cartProducts.value = cartProducts
                     _isLoading.value = false
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CartViewModel", it.message.toString())
                 }
         }
@@ -213,6 +221,7 @@ class CartViewModel(
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
                     loadCartProducts()
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CartViewModel", it.message.toString())
                 }
         }
@@ -234,6 +243,7 @@ class CartViewModel(
 
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CartViewModel", it.message.toString())
                 }
         }
@@ -258,6 +268,7 @@ class CartViewModel(
                     }
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CartViewModel", it.message.toString())
                 }
         }
@@ -289,7 +300,6 @@ class CartViewModel(
                         increaseCartProductQuantityUseCase = application.increaseCartProductQuantityUseCase,
                         decreaseCartProductQuantityUseCase = application.decreaseCartProductQuantityUseCase,
                         getCartRecommendProductsUseCase = application.getCartRecommendProductsUseCase,
-                        orderProductsUseCase = application.orderProductsUseCase,
                     ) as T
                 }
             }

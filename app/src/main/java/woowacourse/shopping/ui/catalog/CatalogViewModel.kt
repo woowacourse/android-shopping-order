@@ -21,6 +21,8 @@ import woowacourse.shopping.domain.usecase.GetCatalogProductsByIdsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsUseCase
 import woowacourse.shopping.domain.usecase.GetSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
+import woowacourse.shopping.ui.common.ToastMessageHandler
+import woowacourse.shopping.util.Event
 
 class CatalogViewModel(
     private val getCatalogProductsUseCase: GetCatalogProductsUseCase,
@@ -30,7 +32,8 @@ class CatalogViewModel(
     private val increaseCartProductQuantityUseCase: IncreaseCartProductQuantityUseCase,
     private val decreaseCartProductQuantityUseCase: DecreaseCartProductQuantityUseCase,
     private val getCartProductsQuantityUseCase: GetCartProductsQuantityUseCase,
-) : ViewModel() {
+) : ViewModel(),
+    ToastMessageHandler {
     private val _products: MutableLiveData<Products> = MutableLiveData(EMPTY_PRODUCTS)
     val products: LiveData<Products> get() = _products
 
@@ -44,6 +47,9 @@ class CatalogViewModel(
 
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
+
+    private val _dataError: MutableLiveData<Event<Unit>> = MutableLiveData()
+    override val dataError: LiveData<Event<Unit>> get() = _dataError
 
     init {
         loadCartProducts()
@@ -66,6 +72,7 @@ class CatalogViewModel(
                     _products.value = products.value?.plus(newProducts)
                     _isLoading.value = false
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }
@@ -90,6 +97,7 @@ class CatalogViewModel(
                         _historyProducts.value = newHistory
                     }
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }
@@ -105,6 +113,7 @@ class CatalogViewModel(
                 .onSuccess {
                     loadCartProduct(productId)
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }
@@ -120,6 +129,7 @@ class CatalogViewModel(
                 .onSuccess {
                     loadCartProduct(productId)
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }
@@ -135,6 +145,7 @@ class CatalogViewModel(
                             cartProduct ?: return@launch,
                         )
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }
@@ -147,6 +158,7 @@ class CatalogViewModel(
                 .onSuccess { cartProducts ->
                     _products.value = products.value?.updateProducts(cartProducts)
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }
@@ -159,6 +171,7 @@ class CatalogViewModel(
                 .onSuccess { quantity ->
                     _cartProductsQuantity.value = quantity
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CatalogViewModel", it.message.toString())
                 }
         }

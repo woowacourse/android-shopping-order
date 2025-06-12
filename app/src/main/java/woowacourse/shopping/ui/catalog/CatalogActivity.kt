@@ -126,6 +126,7 @@ class CatalogActivity : DataBindingActivity<ActivityCatalogBinding>(R.layout.act
         viewModel.historyProducts.observe(this) { products ->
             historyProductAdapter.submitList(products)
         }
+        viewModel.observeDataError(this)
     }
 
     private fun initActivityResultLauncher() {

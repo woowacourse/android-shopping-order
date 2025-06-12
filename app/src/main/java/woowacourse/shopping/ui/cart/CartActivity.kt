@@ -94,6 +94,7 @@ class CartActivity : DataBindingActivity<ActivityCartBinding>(R.layout.activity_
                 )
             startActivity(intent)
         }
+        viewModel.observeDataError(this)
     }
 
     fun interface OnClickHandler {
