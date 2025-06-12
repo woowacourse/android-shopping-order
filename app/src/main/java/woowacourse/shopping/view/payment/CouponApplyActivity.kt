@@ -63,6 +63,7 @@ class CouponApplyActivity : AppCompatActivity() {
         viewModel.event.observe(this) { event ->
             when (event) {
                 CouponApplyEvent.LOAD_COUPONS_FAILURE -> showToast(R.string.load_coupons_error_message)
+
                 CouponApplyEvent.ORDER_SUCCESS -> {
                     showToast(R.string.order_success_message)
 
@@ -77,7 +78,9 @@ class CouponApplyActivity : AppCompatActivity() {
             }
         }
 
-        binding.onClickBackButton = { finish() }
+        binding.couponApplyBackButton.setOnClickListener {
+            finish()
+        }
 
         binding.couponApplyPayButton.setOnClickListener {
             viewModel.order()
