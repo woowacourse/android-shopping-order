@@ -34,7 +34,7 @@ object ApiClient {
     private val retrofit: Retrofit =
         Retrofit
             .Builder()
-            .baseUrl("http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com")
+            .baseUrl(BASE_URL)
             .client(client)
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
