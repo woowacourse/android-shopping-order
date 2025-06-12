@@ -13,57 +13,52 @@ import woowacourse.shopping.data.source.remote.api.OrderApiService
 import woowacourse.shopping.data.source.remote.api.ProductsApiService
 
 object Client {
+
     val getProductsApiService: ProductsApiService by lazy {
-        retrofit.create(
-            ProductsApiService::class.java,
-        )
+        buildRetrofit(client = defaultOkHttpClient)
+            .create(ProductsApiService::class.java)
     }
 
-    val getCartApiService: CartApiService by lazy { authRetrofit.create(CartApiService::class.java) }
+    val getCartApiService: CartApiService by lazy {
+        buildRetrofit(client = authOkHttpClient)
+            .create(CartApiService::class.java)
+    }
 
     val getCouponApiService: CouponApiService by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-            .build()
+        buildRetrofit(client = defaultOkHttpClient, json = couponJson)
             .create(CouponApiService::class.java)
     }
 
     val getOrderApiService: OrderApiService by lazy {
-        Retrofit.Builder()
-            .client(okHttpClient)
-            .baseUrl(BASE_URL)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-            .build()
+        buildRetrofit(client = authOkHttpClient)
             .create(OrderApiService::class.java)
     }
 
-    private val okHttpClient =
-        OkHttpClient.Builder()
-            .addInterceptor(BasicAuthInterceptor())
-            .build()
+    private const val BASE_URL = "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com"
 
-    private val authRetrofit: Retrofit by lazy {
-        Retrofit.Builder()
-            .client(okHttpClient)
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+    private val contentType = "application/json".toMediaType()
+
+    private val basicJson = Json {
+        ignoreUnknownKeys = true
     }
 
-    private val retrofit: Retrofit by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+    private val couponJson = Json {
+        ignoreUnknownKeys = true
+        classDiscriminator = "discountType"
     }
 
-    private val json =
-        Json {
-            ignoreUnknownKeys = true
-            classDiscriminator = "discountType"
-        }
+    private val defaultOkHttpClient: OkHttpClient = OkHttpClient.Builder().build()
 
-    private const val BASE_URL =
-        "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com"
+    private val authOkHttpClient: OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(BasicAuthInterceptor())
+        .build()
+
+    private fun buildRetrofit(
+        client: OkHttpClient,
+        json: Json = basicJson
+    ): Retrofit = Retrofit.Builder()
+        .client(client)
+        .baseUrl(BASE_URL)
+        .addConverterFactory(json.asConverterFactory(contentType))
+        .build()
 }
