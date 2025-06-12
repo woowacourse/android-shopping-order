@@ -1,25 +1,21 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.api.ProductApi
+import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.ProductDetail.Companion.EMPTY_PRODUCT_DETAIL
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepositoryImpl(
-    private val api: ProductApi,
+    private val dataSource: ProductRemoteDataSource,
 ) : ProductRepository {
     override suspend fun fetchCatalogProduct(productId: Long): Result<Product?> =
         runCatching {
-            val response = api.getProductDetail(productId)
-            val detail = response.body()?.toDomain() ?: EMPTY_PRODUCT_DETAIL
-            if (response.isSuccessful) {
-                Product(detail)
-            } else {
-                throw IllegalArgumentException()
-            }
+            val response = dataSource.getProductDetail(productId)
+            val detail = response.toDomain()
+
+            Product(detail)
         }
 
     override suspend fun fetchProducts(
@@ -28,28 +24,22 @@ class ProductRepositoryImpl(
         category: String?,
     ): Result<Products> =
         runCatching {
-            val response = api.getProducts(category, page, size)
+            val response = dataSource.getProducts(category, page, size)
+            val items = response.content.map { it.toDomain() }
+            val isFirst = response.first
+            val isLast = response.last
+            val pageInfo = Page(page, isFirst, isLast)
 
-            if (response.isSuccessful) {
-                val body = response.body()
-                val items = body?.content?.map { it.toDomain() } ?: emptyList()
-                val pageInfo = Page(page, body?.first ?: false, body?.last ?: false)
-                Products(items, pageInfo)
-            } else {
-                throw IllegalArgumentException()
-            }
+            Products(items, pageInfo)
         }
 
     override suspend fun fetchAllProducts(): Result<List<Product>> =
         runCatching {
             val fistPage = 0
             val maxsize = Int.MAX_VALUE
-            val response = api.getProducts(page = fistPage, size = maxsize)
-            if (response.isSuccessful) {
-                val products = response.body()?.content?.map { it.toDomain() } ?: emptyList()
-                products
-            } else {
-                throw IllegalArgumentException()
-            }
+            val response = dataSource.getProducts(page = fistPage, size = maxsize)
+            val products = response.content.map { it.toDomain() }
+
+            products
         }
 }

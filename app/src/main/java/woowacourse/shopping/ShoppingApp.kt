@@ -2,6 +2,16 @@ package woowacourse.shopping
 
 import android.app.Application
 import woowacourse.shopping.data.database.ShoppingDatabase
+import woowacourse.shopping.data.datasource.cart.CartRemoteDataSource
+import woowacourse.shopping.data.datasource.cart.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.coupon.CouponRemoteDataSource
+import woowacourse.shopping.data.datasource.coupon.CouponRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.history.HistoryLocalDataSource
+import woowacourse.shopping.data.datasource.history.HistoryLocalDataSourceImpl
+import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
+import woowacourse.shopping.data.datasource.order.OrderRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
+import woowacourse.shopping.data.datasource.product.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.di.NetworkModule.cartApi
 import woowacourse.shopping.data.di.NetworkModule.couponApi
 import woowacourse.shopping.data.di.NetworkModule.orderApi
@@ -28,29 +38,49 @@ import woowacourse.shopping.domain.usecase.UpdateCartProductUseCase
 class ShoppingApp : Application() {
     private val database: ShoppingDatabase by lazy { ShoppingDatabase.getInstance(this) }
 
+    private val cartRemoteDataSource: CartRemoteDataSource by lazy {
+        CartRemoteDataSourceImpl(cartApi)
+    }
+
+    private val couponRemoteDataSource: CouponRemoteDataSource by lazy {
+        CouponRemoteDataSourceImpl(couponApi)
+    }
+
+    private val historyLocalDataSource: HistoryLocalDataSource by lazy {
+        HistoryLocalDataSourceImpl(database.historyDao())
+    }
+
+    private val orderRemoteDataSource: OrderRemoteDataSource by lazy {
+        OrderRemoteDataSourceImpl(orderApi)
+    }
+
+    private val productRemoteDataSource: ProductRemoteDataSource by lazy {
+        ProductRemoteDataSourceImpl(productApi)
+    }
+
     private val cartRepositoryImpl: woowacourse.shopping.domain.repository.CartRepository by lazy {
         woowacourse.shopping.data.repository
-            .CartRepositoryImpl(cartApi)
+            .CartRepositoryImpl(cartRemoteDataSource)
     }
 
     private val productRepositoryImpl: woowacourse.shopping.domain.repository.ProductRepository by lazy {
         woowacourse.shopping.data.repository
-            .ProductRepositoryImpl(productApi)
+            .ProductRepositoryImpl(productRemoteDataSource)
     }
 
     private val historyRepositoryImpl: woowacourse.shopping.domain.repository.HistoryRepository by lazy {
         woowacourse.shopping.data.repository
-            .HistoryRepositoryImpl(database.historyDao())
+            .HistoryRepositoryImpl(historyLocalDataSource)
     }
 
     private val orderRepositoryImpl: woowacourse.shopping.domain.repository.OrderRepository by lazy {
         woowacourse.shopping.data.repository
-            .OrderRepositoryImpl(orderApi)
+            .OrderRepositoryImpl(orderRemoteDataSource)
     }
 
     private val couponRepositoryImpl: woowacourse.shopping.domain.repository.CouponRepository by lazy {
         woowacourse.shopping.data.repository
-            .CouponRepositoryImpl(couponApi)
+            .CouponRepositoryImpl(couponRemoteDataSource)
     }
 
     val getCartProductsUseCase by lazy {
