@@ -3,6 +3,7 @@ package woowacourse.shopping.feature
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ConcatAdapter
@@ -13,6 +14,8 @@ import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.feature.cart.adapter.CartAdapter
 import woowacourse.shopping.feature.goods.adapter.vertical.GoodsAdapter
 import woowacourse.shopping.feature.goods.adapter.vertical.MoreButtonAdapter
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @BindingAdapter("imgUrl")
 fun loadImageFromUrl(
@@ -73,4 +76,14 @@ fun RecyclerView.setMoreButtonVisible(visible: Boolean) {
 @BindingAdapter("layout_visible")
 fun LinearLayout.setVisible(visible: Boolean) {
     this.visibility = if (visible) View.VISIBLE else View.GONE
+}
+
+@BindingAdapter("setExpirationDateText")
+fun TextView.setDateText(date: LocalDate?) {
+    date?.let {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        text = "만료일: ${it.format(formatter)}"
+    } ?: run {
+        text = "만료일: 없음"
+    }
 }

@@ -19,7 +19,7 @@ class OrderAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(coupon: Coupon) {
 
-            binding.tvCouponExpiry.text = "만료일: ${coupon.expirationDate?:"없음"}"
+            binding.coupon = coupon
 
             binding.checkBoxCoupon.isChecked = (coupon == selectedCoupon)
 
@@ -29,10 +29,6 @@ class OrderAdapter(
             binding.root.setOnClickListener {
                 onCouponClick(coupon)
             }
-            binding.tvCouponName.text = coupon.description
-            val context = binding.root.context
-
-            binding.tvCouponDiscount.text = context.getString(R.string.minimum_date, coupon.minimumAmount?:0)
 
             binding.root.setOnClickListener { onCouponClick(coupon) }
         }
@@ -57,6 +53,18 @@ class OrderAdapter(
         coupons = newCoupons
         selectedCoupon = selected
         notifyDataSetChanged()
+    }
+
+    fun submitCoupon(selected: Coupon?) {
+        val previousSelected = selectedCoupon
+        selectedCoupon = selected
+
+        previousSelected?.let {
+            notifyItemChanged(coupons.indexOf(it))
+        }
+        selectedCoupon?.let {
+            notifyItemChanged(coupons.indexOf(it))
+        }
     }
 
 }

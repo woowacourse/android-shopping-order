@@ -76,6 +76,9 @@ class OrderActivity : BaseActivity<ActivityOrderBinding>() {
             }
 
         }
+        viewModel.selectedCoupon.observe(this){selectCoupon ->
+            orderAdapter.submitCoupon(selectCoupon)
+        }
     }
 
     private fun orderFinish(){
