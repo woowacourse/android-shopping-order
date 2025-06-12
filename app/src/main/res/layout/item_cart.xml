@@ -14,8 +14,8 @@
             type="woowacourse.shopping.domain.model.CartItem" />
 
         <variable
-            name="viewModel"
-            type="woowacourse.shopping.feature.cart.CartViewModel" />
+            name="cartItemClickHandler"
+            type="woowacourse.shopping.feature.cart.cartdetail.CartItemClickHandler" />
 
 
     </data>
@@ -35,7 +35,7 @@
             android:padding="0dp"
             android:focusableInTouchMode="false"
             android:checked="@{cartItem.isSelected}"
-            android:onClick="@{() -> viewModel.toggleCartItemCheck(cartItem)}"
+            android:onClick="@{() -> cartItemClickHandler.toggleSelected(cartItem)}"
             app:layout_constraintBottom_toTopOf="@+id/iv_cart_item_image"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -101,7 +101,7 @@
             android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
             android:contentDescription="@string/cart_item_delete_button_description"
-            android:onClick="@{() -> viewModel.delete(cartItem)}"
+            android:onClick="@{() -> cartItemClickHandler.itemDelete(cartItem)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_close_gray" />

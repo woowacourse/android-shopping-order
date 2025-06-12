@@ -8,10 +8,10 @@ import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.databinding.ItemCartSkeletonBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.feature.QuantityChangeListener
-import woowacourse.shopping.feature.cart.CartViewModel
+import woowacourse.shopping.feature.cart.cartdetail.CartItemClickHandler
 
 class CartAdapter(
-    private val viewModel: CartViewModel,
+    private val cartItemClickHandler: CartItemClickHandler,
     private val quantityChangeListener: QuantityChangeListener,
 ) : ListAdapter<CartListItem, RecyclerView.ViewHolder>(CartDiffCallback()) {
     fun showSkeleton(count: Int = 5) {
@@ -43,7 +43,7 @@ class CartAdapter(
             }
             TYPE_CART_ITEM -> {
                 val binding = ItemCartBinding.inflate(inflater, parent, false)
-                binding.viewModel = viewModel
+                binding.cartItemClickHandler = cartItemClickHandler
                 binding.quantityChangeListener = quantityChangeListener
                 CartViewHolder(binding)
             }

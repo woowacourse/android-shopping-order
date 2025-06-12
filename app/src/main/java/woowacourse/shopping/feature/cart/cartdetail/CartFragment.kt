@@ -10,8 +10,6 @@ import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.databinding.FragmentCartBinding
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.feature.QuantityChangeListener
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.cart.CartViewModel
 import woowacourse.shopping.feature.cart.cartdetail.adapter.CartAdapter
@@ -26,18 +24,10 @@ class CartFragment : Fragment() {
     }
 
     private val cartAdapter: CartAdapter by lazy {
+        val cartHandler = CartItemHandler(viewModel)
         CartAdapter(
-            viewModel = viewModel,
-            quantityChangeListener =
-                object : QuantityChangeListener {
-                    override fun onIncrease(cartItem: CartItem) {
-                        viewModel.increaseCartItemQuantity(cartItem)
-                    }
-
-                    override fun onDecrease(cartItem: CartItem) {
-                        viewModel.removeCartItemOrDecreaseQuantity(cartItem)
-                    }
-                },
+            cartItemClickHandler = cartHandler,
+            quantityChangeListener = cartHandler,
         ).apply {
             showSkeleton()
         }
