@@ -11,13 +11,13 @@ interface CartLocalDataSource {
 
     fun deleteCartProductFromCartByCartId(cartId: Long)
 
-    fun findCartProductByProductId(productId: Long): CartProduct?
+    fun fetchCartProductByProductId(productId: Long): CartProduct
 
-    fun findCartProductByCartId(cartId: Long): CartProduct?
+    fun fetchCartProductByCartId(cartId: Long): CartProduct
 
-    fun findQuantityByProductId(productId: Long): Int
+    fun fetchQuantityByProductId(productId: Long): Int
 
-    fun findCartIdByProductId(productId: Long): Long
+    fun fetchCartIdByProductId(productId: Long): Long
 
     fun updateQuantityByProductId(
         productId: Long,

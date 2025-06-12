@@ -175,7 +175,7 @@ class OrderViewModel(
     fun addSelectItems(purchaseSuggestionIds: List<Long>) {
         viewModelScope.launch {
             cartRepository
-                .findCartProductsByIds(purchaseSuggestionIds)
+                .fetchCartProductsByIds(purchaseSuggestionIds)
                 .onSuccess {
                     selectedCartItems.value =
                         selectedCartItems.value.orEmpty() + it.map { it.toCartItemUiModel() }

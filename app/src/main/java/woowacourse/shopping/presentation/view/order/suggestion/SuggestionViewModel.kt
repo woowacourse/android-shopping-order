@@ -35,7 +35,7 @@ class SuggestionViewModel(
         _suggestionProducts.value
             ?.filter { it.quantity > 0 }
             ?.mapNotNull {
-                cartRepository.findCartIdByProductId(it.productId).getOrNull()
+                cartRepository.fetchCartIdByProductId(it.productId).getOrNull()
             } ?: emptyList()
 
     val totalPurchaseProductQuantity: LiveData<Int> =
@@ -65,7 +65,7 @@ class SuggestionViewModel(
     private fun combine(suggestionProducts: List<Product>) {
         val ids = suggestionProducts.map { it.id }
         cartRepository
-            .findCartProductsByProductIds(ids)
+            .fetchCartProductsByProductIds(ids)
             .onFailure { postFailureCartEvent(SuggestionMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
             .onSuccess {
                 val updatedItems = applyCartQuantities(it, suggestionProducts)

@@ -26,11 +26,16 @@ class CartRepositoryImpl(
         PageableItem(products, hasMore)
     }
 
+    override fun fetchCartProductByProductId(productId: Long): Result<CartProduct> =
+        runCatching {
+            cartLocalDataSource.fetchCartProductByProductId(productId)
+        }
+
     override fun fetchAllCartItems(): Result<List<CartProduct>> = runCatching { cartLocalDataSource.cachedCartProducts }
 
-    override fun findCartIdByProductId(productId: Long): Result<Long> =
+    override fun fetchCartIdByProductId(productId: Long): Result<Long> =
         runCatching {
-            cartLocalDataSource.findCartIdByProductId(productId)
+            cartLocalDataSource.fetchCartIdByProductId(productId)
         }
 
     override suspend fun deleteCartItem(cartId: Long) =
@@ -52,7 +57,7 @@ class CartRepositoryImpl(
         increaseCount: Int,
     ): Result<Unit> =
         runCatching {
-            val currentQuantity = cartLocalDataSource.findQuantityByProductId(productId)
+            val currentQuantity = cartLocalDataSource.fetchQuantityByProductId(productId)
             if (currentQuantity == 0) {
                 val newCartId =
                     cartDataSource
@@ -69,7 +74,7 @@ class CartRepositoryImpl(
         decreaseCount: Int,
     ): Result<Unit> =
         runCatching {
-            val currentQuantity = cartLocalDataSource.findQuantityByProductId(productId)
+            val currentQuantity = cartLocalDataSource.fetchQuantityByProductId(productId)
             patchCartItemQuantity(productId, currentQuantity + (-decreaseCount))
         }
 
@@ -85,24 +90,21 @@ class CartRepositoryImpl(
             result.quantity >= 0
         }
 
-    override fun findQuantityByProductId(productId: Long): Result<Int> =
-        runCatching { cartLocalDataSource.findQuantityByProductId(productId) }
-
-    override fun findCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>> =
+    override fun fetchCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>> =
         runCatching {
-            productIds.mapNotNull { cartLocalDataSource.findCartProductByProductId(it) }
+            productIds.mapNotNull { cartLocalDataSource.fetchCartProductByProductId(it) }
         }
 
-    override fun findCartProductsByIds(cartIds: List<Long>): Result<List<CartProduct>> =
+    override fun fetchCartProductsByIds(cartIds: List<Long>): Result<List<CartProduct>> =
         runCatching {
-            cartIds.mapNotNull { cartLocalDataSource.findCartProductByCartId(it) }
+            cartIds.mapNotNull { cartLocalDataSource.fetchCartProductByCartId(it) }
         }
 
     private suspend fun patchCartItemQuantity(
         productId: Long,
         quantity: Int,
     ) {
-        val cartId = cartLocalDataSource.findCartIdByProductId(productId)
+        val cartId = cartLocalDataSource.fetchCartIdByProductId(productId)
         val updatedQuantity = Quantity(quantity)
         cartDataSource.patchCartItemQuantity(cartId, updatedQuantity).getOrThrow()
         cartLocalDataSource.updateQuantityByProductId(productId, quantity)

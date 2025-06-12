@@ -121,7 +121,7 @@ class CatalogViewModel(
         currentItems: List<CatalogItem> = _products.value.orEmpty(),
     ) {
         val ids = currentItems.filterIsInstance<CatalogItem.ProductItem>().map { it.productId }
-        val newCartProducts = cartRepository.findCartProductsByProductIds(ids)
+        val newCartProducts = cartRepository.fetchCartProductsByProductIds(ids)
 
         newCartProducts
             .onFailure { emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
@@ -136,9 +136,9 @@ class CatalogViewModel(
 
     private suspend fun updateProductQuantityInList(productId: Long) {
         cartRepository
-            .findQuantityByProductId(productId)
-            .onSuccess { newQuantity ->
-                applyProductQuantityUpdate(productId, newQuantity)
+            .fetchCartProductByProductId(productId)
+            .onSuccess { cartProduct ->
+                applyProductQuantityUpdate(productId, cartProduct.quantity)
             }.onFailure { emitToastMessage(CatalogMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
     }
 

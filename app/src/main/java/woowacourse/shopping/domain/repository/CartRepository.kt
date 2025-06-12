@@ -13,7 +13,9 @@ interface CartRepository {
 
     fun fetchAllCartItems(): Result<List<CartProduct>>
 
-    fun findCartIdByProductId(productId: Long): Result<Long>
+    fun fetchCartIdByProductId(productId: Long): Result<Long>
+
+    fun fetchCartProductByProductId(productId: Long): Result<CartProduct>
 
     suspend fun deleteCartItem(cartId: Long): Result<Unit>
 
@@ -33,9 +35,7 @@ interface CartRepository {
 
     suspend fun hasCartItem(): Result<Boolean>
 
-    fun findQuantityByProductId(productId: Long): Result<Int>
+    fun fetchCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>>
 
-    fun findCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>>
-
-    fun findCartProductsByIds(cartIds: List<Long>): Result<List<CartProduct>>
+    fun fetchCartProductsByIds(cartIds: List<Long>): Result<List<CartProduct>>
 }

@@ -23,7 +23,7 @@ class OrderRepositoryImpl(
     ): Order =
         Order(
             cartItemIds.mapNotNull {
-                cartLocalDataSource.findCartProductByCartId(it)
+                cartLocalDataSource.fetchCartProductByCartId(it)
             },
             couponRemoteDataSource
                 .fetchCoupons()

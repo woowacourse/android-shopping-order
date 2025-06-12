@@ -22,16 +22,18 @@ class Cart(
         _cachedCartProducts.values.removeIf { it.cartId == cartId }
     }
 
-    fun findCartProductByProductId(productId: Long): CartProduct? = _cachedCartProducts[productId]
+    fun fetchCartProductByProductId(productId: Long): CartProduct =
+        requireNotNull(_cachedCartProducts[productId]) { NOT_FOUND_PRODUCT_ID_ERROR_MESSAGE }
 
-    fun findQuantityByProductId(productId: Long): Int = _cachedCartProducts[productId]?.quantity ?: DEFAULT_QUANTITY
+    fun fetchQuantityByProductId(productId: Long): Int =
+        requireNotNull(_cachedCartProducts[productId]?.quantity) { NOT_FOUND_PRODUCT_ID_ERROR_MESSAGE }
 
-    fun findCartIdByProductId(productId: Long): Long =
+    fun fetchCartIdByProductId(productId: Long): Long =
         requireNotNull(_cachedCartProducts[productId]?.cartId) {
             NOT_FOUND_CART_ID_ERROR_MESSAGE
         }
 
-    fun findCartIdByCartId(cartId: Long): CartProduct =
+    fun fetchCartIdByCartId(cartId: Long): CartProduct =
         requireNotNull(cachedCartProductsByCartIds[cartId]) { NOT_FOUND_CART_ID_ERROR_MESSAGE }
 
     fun updateQuantityByProductId(
@@ -43,7 +45,7 @@ class Cart(
     }
 
     companion object {
-        private const val DEFAULT_QUANTITY = 0
         private const val NOT_FOUND_CART_ID_ERROR_MESSAGE = "해당 상품의 카트 ID를 찾을 수 없습니다."
+        private const val NOT_FOUND_PRODUCT_ID_ERROR_MESSAGE = "해당 상품의 제품 ID를 찾을 수 없습니다."
     }
 }
