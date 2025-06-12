@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.account
 
 interface AccountLocalDataSource {
-    fun saveBasicKey(basicKey: String): Result<Unit>
+    suspend fun saveBasicKey(basicKey: String): Result<Unit>
 
-    fun loadBasicKey(): Result<String>
+    suspend fun loadBasicKey(): Result<String>
 }
