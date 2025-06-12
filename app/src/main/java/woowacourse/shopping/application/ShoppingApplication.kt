@@ -27,9 +27,10 @@ class ShoppingApplication : Application() {
         }
     }
 
-    val goodsDetailsFactory by lazy {
+    val goodsDetailsFactory: (Long) -> ViewModelFactory<GoodsDetailsViewModel> = { id ->
         ViewModelFactory {
             GoodsDetailsViewModel(
+                id,
                 CartRepository(NetworkClient.cartService),
                 HistoryRepositoryImpl(database.historyDao()),
                 ProductRepository(NetworkClient.productService),

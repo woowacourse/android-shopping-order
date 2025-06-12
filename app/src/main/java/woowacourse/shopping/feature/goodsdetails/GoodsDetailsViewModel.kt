@@ -22,6 +22,7 @@ import woowacourse.shopping.util.toDomain
 import woowacourse.shopping.util.updateQuantity
 
 class GoodsDetailsViewModel(
+    private val id: Long,
     private val cartRepository: CartRepository,
     private val historyRepository: HistoryRepository,
     private val productRepository: ProductRepository,
@@ -43,16 +44,12 @@ class GoodsDetailsViewModel(
 
     init {
         _shouldShowLastViewed.addSource(cartProduct) { updateLastViewedVisibility() }
+        setInitialCart(id)
     }
 
-    suspend fun setInitialCart(id: Long) {
-        loadProductDetails(productId = id)
-        loadLastViewed()
-    }
-
-    suspend fun loadProductDetails(productId: Long) {
-        val productContent = productRepository.requestProductDetails(productId = productId)
+    fun loadProductDetails(productId: Long) {
         viewModelScope.launch {
+            val productContent = productRepository.requestProductDetails(productId = productId)
             val matchedCart = cartRepository.findCartByProductId(productContent.id)
             val cartProduct =
                 CartProduct(
@@ -156,5 +153,10 @@ class GoodsDetailsViewModel(
                 History(id = cart.product.id, name = cart.product.name, thumbnailUrl = cart.product.imageUrl),
             )
         }
+    }
+
+    private fun setInitialCart(id: Long) {
+        loadProductDetails(productId = id)
+        loadLastViewed()
     }
 }
