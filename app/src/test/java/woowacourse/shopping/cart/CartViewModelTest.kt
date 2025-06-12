@@ -1,118 +1,156 @@
 package woowacourse.shopping.cart
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Rule
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import woowacourse.shopping.data.mapper.toEntity
-import woowacourse.shopping.data.repository.FakeCartProductRepositoryImpl
+import woowacourse.shopping.data.repository.CartProductRepository
+import woowacourse.shopping.data.repository.CatalogProductRepository
+import woowacourse.shopping.data.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.util.CoroutinesTestExtension
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 import woowacourse.shopping.util.getOrAwaitValue
 
+@ExperimentalCoroutinesApi
 @ExtendWith(InstantTaskExecutorExtension::class)
+@ExtendWith(CoroutinesTestExtension::class)
 class CartViewModelTest {
-    @get:Rule
-    val instantExecutorRule = InstantTaskExecutorRule()
+    private lateinit var cartProductRepository: CartProductRepository
+    private lateinit var catalogProductRepository: CatalogProductRepository
+    private lateinit var recentlyViewedProductRepository: RecentlyViewedProductRepository
 
     private lateinit var viewModel: CartViewModel
-    private lateinit var fakeCartRepository: FakeCartProductRepositoryImpl
-
-    private val dummyProducts =
-        (1..12).map {
-            ProductUiModel(
-                id = it,
-                name = "상품 $it",
-                imageUrl = "https://example.com/$it.jpg",
-                price = 1000 * it,
-                quantity = it,
-            )
-        }
 
     @BeforeEach
     fun setUp() {
-        fakeCartRepository =
-            FakeCartProductRepositoryImpl().apply {
-                dummyProducts.forEach { insertCartProduct(it.toEntity()) }
-            }
-        viewModel = CartViewModel(fakeCartRepository)
+        cartProductRepository = mockk(relaxed = true)
+        catalogProductRepository = mockk(relaxed = true)
+        recentlyViewedProductRepository = mockk(relaxed = true)
+
+        viewModel =
+            CartViewModel(
+                cartProductRepository,
+                catalogProductRepository,
+                recentlyViewedProductRepository,
+            )
     }
 
     @Test
-    fun `초기 로딩 시 첫 페이지의 상품 5개만 로딩된다`() {
-        val loaded = viewModel.cartProducts.getOrAwaitValue()
-        Assertions.assertNotNull(loaded)
-        assertThat(loaded.size).isEqualTo(5)
-        assertThat(loaded.first().name).isEqualTo("상품 1")
-    }
+    fun `addProduct - 장바구니에 상품을 추가하면 updatedProduct와 cartProducts가 갱신된다`() =
+        runTest {
+            // given
+            val dummyProduct =
+                ProductUiModel(id = 1L, name = "Test", price = 1000, imageUrl = "url")
+            coEvery { cartProductRepository.insertCartProduct(dummyProduct.id, any()) } returns 99L
+            coEvery { cartProductRepository.getTotalElements() } returns 1L
+            coEvery { cartProductRepository.getCartProductsInRange(any(), any()) } returns
+                listOf(
+                    dummyProduct.copy(cartItemId = 99L),
+                )
+
+            // when
+            viewModel.addProduct(dummyProduct)
+
+            // then
+            val updated = viewModel.updatedProduct.getOrAwaitValue()
+            assertThat(1L).isEqualTo(updated.id)
+            assertThat(1).isEqualTo(updated.quantity)
+            assertThat(99L).isEqualTo(updated.cartItemId)
+
+            val cart = viewModel.cartProducts.getOrAwaitValue()
+            assertThat(cart.any { it.productItem.id == 1L }).isTrue()
+        }
 
     @Test
-    fun `다음 페이지 버튼 클릭 시 다음 상품 페이지 로딩`() {
-        viewModel.cartProducts.getOrAwaitValue()
-        viewModel.onPaginationButtonClick(2) // NEXT_BUTTON = 2
-        val loaded = viewModel.cartProducts.getOrAwaitValue()
-        Assertions.assertNotNull(loaded)
-        assertThat(loaded.size).isEqualTo(5)
-        assertThat(loaded.first().name).isEqualTo("상품 6")
-    }
+    fun `updateQuantity - 수량을 증가시키면 updatedProduct가 변경되고 cartProducts가 갱신된다`() =
+        runTest {
+            // given
+            val initialProduct =
+                ProductUiModel(
+                    id = 1L,
+                    name = "Test",
+                    price = 1000,
+                    quantity = 1,
+                    cartItemId = 10L,
+                    imageUrl = "url",
+                )
+            coEvery { cartProductRepository.updateProduct(10L, 2) } returns true
+            coEvery { cartProductRepository.getTotalElements() } returns 1L
+            coEvery { cartProductRepository.getCartProductsInRange(any(), any()) } returns
+                listOf(
+                    initialProduct.copy(quantity = 2),
+                )
+
+            // when
+            viewModel.updateQuantity(ButtonEvent.INCREASE, initialProduct)
+
+            // then
+            val updated = viewModel.updatedProduct.getOrAwaitValue()
+            assertThat(2).isEqualTo(updated.quantity)
+            assertThat(initialProduct.id).isEqualTo(updated.id)
+        }
 
     @Test
-    fun `이전 페이지 버튼 클릭 시 이전 상품 페이지 로딩`() {
-        viewModel.cartProducts.getOrAwaitValue()
-        viewModel.onPaginationButtonClick(2) // NEXT_BUTTON
-        viewModel.cartProducts.getOrAwaitValue()
-        viewModel.onPaginationButtonClick(1) // PREV_BUTTON
-        val loaded = viewModel.cartProducts.getOrAwaitValue()
-        assertThat(loaded.first().name).isEqualTo("상품 1")
-    }
+    fun `deleteCartProduct - 삭제 요청이 들어오면 repository를 호출하고 cartProducts를 갱신한다`() =
+        runTest {
+            // given
+            coEvery { cartProductRepository.deleteCartProduct(10L) } returns true
+            coEvery { cartProductRepository.getTotalElements() } returns 0L
+            coEvery {
+                cartProductRepository.getCartProductsInRange(
+                    any(),
+                    any(),
+                )
+            } returns emptyList()
+
+            // when
+            viewModel.deleteCartProduct(10L)
+
+            // then
+            coVerify { cartProductRepository.deleteCartProduct(10L) }
+            val cart = viewModel.cartProducts.getOrAwaitValue()
+            assertThat(cart.isEmpty()).isTrue()
+        }
 
     @Test
-    fun `상품 수량 증가 시 updatedItem에 반영된다`() {
-        val product = dummyProducts[0]
-        viewModel.updateQuantity(1, product) // INCREASE_BUTTON
-        val updated = viewModel.updatedItem.getOrAwaitValue()
-        Assertions.assertNotNull(updated)
-        assertThat(product.id).isEqualTo(updated.id)
-        assertThat(product.quantity + 1).isEqualTo(updated.quantity)
-    }
+    fun `loadRecommendProducts - 최근 본 상품이 있고, 추천 상품이 로드되면 recommendedProducts가 업데이트된다`() =
+        runTest {
+            // given
+            val viewedProduct =
+                ProductUiModel(
+                    id = 1L,
+                    name = "최근본",
+                    price = 1000,
+                    imageUrl = "url",
+                    category = "음료",
+                )
+            val recommended =
+                listOf(
+                    ProductUiModel(id = 2L, name = "추천1", price = 1500, imageUrl = "url"),
+                    ProductUiModel(id = 3L, name = "추천2", price = 2000, imageUrl = "url"),
+                )
+            coEvery { recentlyViewedProductRepository.getLatestViewedProduct() } returns viewedProduct
+            coEvery { catalogProductRepository.getProduct(1L) } returns viewedProduct
+            coEvery {
+                catalogProductRepository.getRecommendedProducts(
+                    "음료",
+                    0,
+                    10,
+                )
+            } returns recommended
 
-    @Test
-    fun `상품 수량 감소 시 updatedItem에 반영된다`() {
-        val product = dummyProducts[1]
-        viewModel.updateQuantity(0, product) // DECREASE_BUTTON
-        val updated = viewModel.updatedItem.getOrAwaitValue()
-        Assertions.assertNotNull(updated)
-        assertThat(product.id).isEqualTo(updated?.id)
-        assertThat(product.quantity - 1).isEqualTo(updated.quantity)
-    }
+            // when
+            viewModel.loadRecommendProducts()
 
-    @Test
-    fun `상품 삭제 시 해당 상품이 목록에서 제거된다`() {
-        val toDelete = viewModel.cartProducts.getOrAwaitValue().first()
-        viewModel.deleteCartProduct(CartItem.ProductItem(toDelete))
-        val updated = viewModel.cartProducts.getOrAwaitValue()
-        assertThat(updated.any { it.id == toDelete.id }).isEqualTo(false)
-    }
-
-    @Test
-    fun `페이지 끝에서 상품 삭제 시 페이지가 감소된다`() {
-        // 페이지 끝으로 이동
-        viewModel.onPaginationButtonClick(2)
-        viewModel.onPaginationButtonClick(2)
-        val lastPage = viewModel.page.getOrAwaitValue()
-        val toDelete = viewModel.cartProducts.getOrAwaitValue().first()
-
-        viewModel.deleteCartProduct(CartItem.ProductItem(toDelete))
-        val newPage = viewModel.page.getOrAwaitValue()
-        assertThat(newPage <= lastPage).isEqualTo(true)
-    }
-
-    @Test
-    fun `초기 상태에서 이전 버튼은 비활성화, 다음 버튼은 활성화`() {
-        assertThat(viewModel.isPrevButtonEnabled.getOrAwaitValue()).isEqualTo(false)
-        assertThat(viewModel.isNextButtonEnabled.getOrAwaitValue()).isEqualTo(true)
-    }
+            // then
+            val recommendResult = viewModel.recommendedProducts.getOrAwaitValue()
+            assertThat(2).isEqualTo(recommendResult.size)
+            assertThat(2L).isEqualTo(recommendResult[0].id)
+        }
 }

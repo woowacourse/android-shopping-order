@@ -3,34 +3,29 @@ package woowacourse.shopping.data.repository
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 interface CartProductRepository {
-    fun insertCartProduct(
-        cartProduct: ProductUiModel,
-        callback: (ProductUiModel) -> Unit,
-    )
+    suspend fun insertCartProduct(
+        productId: Long,
+        quantity: Int,
+    ): Result<Long?>
+    // cartItemId 반환
 
-    fun deleteCartProduct(
-        cartItemId: Int,
-        callback: (Boolean) -> Unit,
-    )
+    suspend fun deleteCartProduct(cartItemId: Long): Result<Boolean>
 
-    fun getCartProductsInRange(
+    suspend fun getCartProductsInRange(
         currentPage: Int,
         pageSize: Int,
-        callback: (List<ProductUiModel>) -> Unit,
-    )
+    ): Result<List<ProductUiModel>>
 
-    fun updateProduct(
-        cartItemId: Int,
+    suspend fun updateProduct(
+        cartItemId: Long,
         quantity: Int,
-        callback: (Boolean) -> Unit,
-    )
+    ): Result<Boolean>
 
-    fun getCartItemSize(callback: (Int) -> Unit)
+    // 장바구니에 담긴 아이템들의 개수 반환
+    suspend fun getCartItemSize(): Result<Int>
 
-    fun getTotalElements(callback: (Int) -> Unit)
+    // 장바구니 상품 종류 개수 반환
+    suspend fun getTotalElements(): Result<Long>
 
-    fun getCartProducts(
-        totalElements: Int,
-        callback: (List<ProductUiModel>) -> Unit,
-    )
+    suspend fun getCartProducts(totalElements: Long): Result<List<ProductUiModel>>
 }

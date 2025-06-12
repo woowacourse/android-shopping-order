@@ -31,7 +31,7 @@
             android:minWidth="48dp"
             android:minHeight="48dp"
             android:onClick="@{() -> cartActionListener.onCheckToggle(cartProduct)}"
-            android:checked="true"
+            android:checked="@{cartProduct.checked}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:buttonTint="@color/mint_blue"

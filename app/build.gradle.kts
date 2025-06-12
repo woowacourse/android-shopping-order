@@ -88,7 +88,8 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.fragment.ktx)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+    implementation(libs.kotlinx.coroutines.android)
+    testImplementation(libs.mockk)
 
     testImplementation(libs.androidx.core.testing)
     testImplementation(libs.assertj.core)

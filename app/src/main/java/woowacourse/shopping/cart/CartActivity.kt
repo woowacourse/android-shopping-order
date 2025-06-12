@@ -3,8 +3,8 @@ package woowacourse.shopping.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.TextUtils.replace
 import android.view.View
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -12,9 +12,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
-import androidx.lifecycle.observe
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.order.OrderActivity
+import woowacourse.shopping.product.catalog.ProductUiModel
 
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
@@ -48,6 +49,12 @@ class CartActivity : AppCompatActivity() {
         viewModel.cartProducts.observe(this) { viewModel.refreshProductsInfo() }
         viewModel.selectedEvent.observe(this) { viewModel.refreshProductsInfo() }
         viewModel.totalCount.observe(this) { replaceFragmentByTotalCount(it) }
+        viewModel.orderClicked.observe(this) { processOrderClick(it) }
+        viewModel.errorMessage.observe(this) { showToast(it) }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun replaceFragmentByTotalCount(totalCount: Int) {
@@ -63,25 +70,32 @@ class CartActivity : AppCompatActivity() {
     private fun replaceCartRecommendationFragment() {
         binding.checkboxAllSelection.visibility = View.GONE
         binding.textViewAllSelection.visibility = View.GONE
-
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            replace(
-                R.id.fragment_container_cart_selection,
-                CartRecommendationFragment::class.java,
-                null,
-            )
-        }
+        replaceFragment(CartRecommendationFragment::class.java)
     }
 
     private fun replaceCartSelectionFragment() {
+        replaceFragment(CartSelectionFragment::class.java)
+    }
+
+    private fun replaceFragment(fragmentClass: Class<out androidx.fragment.app.Fragment>) {
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            replace(
-                R.id.fragment_container_cart_selection,
-                CartSelectionFragment::class.java,
-                null,
-            )
+            replace(R.id.fragment_container_cart_selection, fragmentClass, null)
+        }
+    }
+
+    private fun processOrderClick(orderedProducts: Array<ProductUiModel>) {
+        val currentFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container_cart_selection)
+
+        when (currentFragment) {
+            is CartSelectionFragment -> {
+                replaceCartRecommendationFragment()
+            }
+
+            is CartRecommendationFragment -> {
+                startActivity(OrderActivity.newIntent(this, orderedProducts))
+            }
         }
     }
 

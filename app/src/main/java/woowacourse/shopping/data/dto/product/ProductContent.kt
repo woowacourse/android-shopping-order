@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.dto.product
 
-
 import com.google.gson.annotations.SerializedName
+import woowacourse.shopping.product.catalog.ProductUiModel
 
-data class Content(
+data class ProductContent(
     @SerializedName("category")
     val category: String,
     @SerializedName("id")
@@ -13,5 +13,14 @@ data class Content(
     @SerializedName("name")
     val name: String,
     @SerializedName("price")
-    val price: Int
+    val price: Int,
 )
+
+fun ProductContent.toUiModel(): ProductUiModel =
+    ProductUiModel(
+        id = id,
+        imageUrl = imageUrl,
+        name = name,
+        price = price,
+        category = category,
+    )

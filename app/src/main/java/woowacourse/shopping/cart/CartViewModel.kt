@@ -3,12 +3,16 @@ package woowacourse.shopping.cart
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.cart.CartItem.ProductItem
 import woowacourse.shopping.data.repository.CartProductRepository
 import woowacourse.shopping.data.repository.CatalogProductRepository
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.domain.LoadingState
 import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.util.MutableSingleLiveData
+import woowacourse.shopping.util.SingleLiveData
 import java.util.TreeSet
 
 class CartViewModel(
@@ -32,7 +36,7 @@ class CartViewModel(
     private val _selectedEvent = MutableLiveData<Unit>()
     val selectedEvent: LiveData<Unit> = _selectedEvent
 
-    private val selectedState: MutableMap<Int, Boolean> = mutableMapOf()
+    private val selectedState: MutableMap<Long, Boolean> = mutableMapOf()
 
     private val _isAllSelected = MutableLiveData<Boolean>(true)
     val isAllSelected: LiveData<Boolean> = _isAllSelected
@@ -45,20 +49,46 @@ class CartViewModel(
     private val _updatedProduct = MutableLiveData<ProductUiModel>()
     val updatedProduct: LiveData<ProductUiModel> = _updatedProduct
 
+    private val _orderClicked = MutableLiveData<Array<ProductUiModel>>()
+    val orderClicked: LiveData<Array<ProductUiModel>> = _orderClicked
+
+    private val _errorMessage = MutableSingleLiveData<String>()
+    val errorMessage: SingleLiveData<String> = _errorMessage
+
     init {
         loadCartProducts()
         loadRecommendProducts()
     }
 
     fun loadRecommendProducts() {
-        recentlyViewedProductRepository.getLatestViewedProduct { product ->
-            catalogProductRepository.getProduct(product.id, onSuccess = { categoryProduct ->
-                val category = categoryProduct.category ?: ""
-                catalogProductRepository.getRecommendedProducts(category, 0, 10) { products ->
-                    _recommendedProducts.postValue(products)
-                }
-            }) {
+        viewModelScope.launch {
+            val latestViewedProduct: ProductUiModel? =
+                recentlyViewedProductRepository.getLatestViewedProduct().getOrNull()
+            latestViewedProduct?.id ?: run {
+                _errorMessage.setValue("최근 본 상품을 불러오는 데 실패했습니다.")
+                return@launch
             }
+
+            val categorizedProduct =
+                catalogProductRepository.getProduct(latestViewedProduct.id).getOrElse {
+                    _errorMessage.setValue("카테고리 상품을 가져오는 데 실패했습니다.")
+                    return@launch
+                }
+
+            val recommendProducts: List<ProductUiModel> =
+                catalogProductRepository
+                    .getRecommendedProducts(categorizedProduct?.category ?: "", 0, 10)
+                    .getOrElse {
+                        _errorMessage.setValue("추천 상품을 가져오는 데 실패했습니다.")
+                        return@launch
+                    }
+
+            val cartProductIds =
+                cartProducts.value?.map { it.productItem.id }?.toSet() ?: emptySet()
+
+            val filteredProducts = recommendProducts.filterNot { it.id in cartProductIds }
+
+            _recommendedProducts.value = filteredProducts
         }
     }
 
@@ -67,9 +97,10 @@ class CartViewModel(
         updateTotalCount()
     }
 
-    fun deleteCartProduct(cartItemId: Int?) {
+    fun deleteCartProduct(cartItemId: Long?) {
         cartItemId ?: return
-        cartProductRepository.deleteCartProduct(cartItemId) {
+        viewModelScope.launch {
+            cartProductRepository.deleteCartProduct(cartItemId)
             loadCartProducts()
         }
     }
@@ -78,29 +109,53 @@ class CartViewModel(
         buttonEvent: ButtonEvent,
         product: ProductUiModel,
     ) {
-        when (buttonEvent) {
-            ButtonEvent.DECREASE -> {
-                if (product.quantity != 1) {
-                    cartProductRepository.updateProduct(
-                        product.cartItemId ?: return,
-                        product.quantity - 1,
-                    ) { result ->
-                        if (result == true) {
-                            _updatedProduct.postValue(product.copy(quantity = product.quantity - 1))
+        viewModelScope.launch {
+            when (buttonEvent) {
+                ButtonEvent.DECREASE -> {
+                    if (product.cartItemId == null) return@launch
+
+                    if (product.quantity == 1) {
+                        val result: Boolean =
+                            cartProductRepository.deleteCartProduct(product.cartItemId).getOrElse {
+                                _errorMessage.setValue("상품 삭제에 실패했습니다.")
+                                return@launch
+                            }
+                        if (result) {
+                            _updatedProduct.value = product.copy(quantity = 0)
+                            loadCartProducts()
+                        }
+                    } else {
+                        val result: Boolean =
+                            cartProductRepository
+                                .updateProduct(
+                                    product.cartItemId,
+                                    product.quantity - 1,
+                                ).getOrElse {
+                                    _errorMessage.setValue("상품 업데이트에 실패했습니다.")
+                                    return@launch
+                                }
+                        if (result) {
+                            _updatedProduct.value = product.copy(quantity = product.quantity - 1)
                             loadCartProducts()
                         }
                     }
                 }
-            }
 
-            ButtonEvent.INCREASE -> {
-                cartProductRepository.updateProduct(
-                    product.cartItemId ?: return,
-                    product.quantity + 1,
-                ) { result ->
-                    if (result == true) {
-                        _updatedProduct.postValue(product.copy(quantity = product.quantity + 1))
-                        loadCartProducts()
+                ButtonEvent.INCREASE -> {
+                    if (product.cartItemId != null) {
+                        val result: Boolean =
+                            cartProductRepository
+                                .updateProduct(
+                                    product.cartItemId,
+                                    product.quantity + 1,
+                                ).getOrElse {
+                                    _errorMessage.setValue("상품 업데이트에 실패했습니다.")
+                                    return@launch
+                                }
+                        if (result) {
+                            _updatedProduct.value = product.copy(quantity = product.quantity + 1)
+                            loadCartProducts()
+                        }
                     }
                 }
             }
@@ -108,8 +163,14 @@ class CartViewModel(
     }
 
     fun addProduct(product: ProductUiModel) {
-        cartProductRepository.insertCartProduct(product.copy(quantity = 1)) { product ->
-            _updatedProduct.postValue(product)
+        viewModelScope.launch {
+            val cartItemId =
+                cartProductRepository.insertCartProduct(productId = product.id, quantity = 1).getOrElse {
+                    _errorMessage.setValue("상품 추가에 실패했습니다.")
+                    return@launch
+                }
+            val addedProduct = product.copy(quantity = 1, cartItemId = cartItemId)
+            _updatedProduct.value = addedProduct
             refreshProductsInfo()
             loadCartProducts()
         }
@@ -153,6 +214,19 @@ class CartViewModel(
         _isAllSelected.postValue(isAllProductsSelected())
     }
 
+    fun order() {
+        val orderedProducts: Array<ProductUiModel> =
+            cartProducts.value
+                ?.map { it.productItem }
+                ?.filter { it.isChecked }
+                ?.toTypedArray()
+                ?: emptyArray()
+
+        if (orderedProducts.isNotEmpty()) {
+            _orderClicked.postValue(orderedProducts)
+        }
+    }
+
     private fun isAllProductsSelected(): Boolean {
         val allProducts = cartProducts.value ?: return false
         val result = allProducts.filter { it.productItem.isChecked }.size == allProducts.size
@@ -166,31 +240,40 @@ class CartViewModel(
             _loadingState.postValue(LoadingState.refreshing())
         }
 
-        cartProductRepository.getTotalElements { totalSize ->
-            cartProductRepository.getCartProductsInRange(0, totalSize) { cartProducts ->
-                val pagedProducts: List<ProductItem> =
-                    cartProducts
-                        .map {
+        viewModelScope.launch {
+            val totalSize: Long =
+                cartProductRepository.getTotalElements().getOrElse {
+                    _errorMessage.setValue("장바구니 총합 개수를 불러오는 데 실패했습니다.")
+                    return@launch
+                }
+            val cartProducts: List<ProductUiModel> =
+                cartProductRepository.getCartProductsInRange(0, totalSize.toInt()).getOrElse {
+                    _errorMessage.setValue("장바구니 상품을 불러오는 데 실패했습니다.")
+                    return@launch
+                }
+            val pagedProducts: List<ProductItem> =
+                cartProducts
+                    .map {
+                        ProductItem(
                             if (selectedState.contains(it.id)) {
                                 it.copy(isChecked = selectedState[it.id] == true)
                             } else {
                                 it
-                            }
-                        }.map { ProductItem(it) }
+                            },
+                        )
+                    }
+            val items =
+                TreeSet(
+                    compareBy<ProductItem> { it.productItem.id },
+                ).apply { addAll(pagedProducts) }
 
-                val items =
-                    TreeSet(
-                        compareBy<ProductItem> { it.productItem.id },
-                    ).apply { addAll(pagedProducts) }
+            _cartProducts.value = items
+            updateTotalCount()
+            updateTotalPrice()
+            loadSelectAllState()
 
-                _cartProducts.postValue(items)
-                updateTotalCount()
-                updateTotalPrice()
-                loadSelectAllState()
-
-                _loadingState.postValue(LoadingState.loaded())
-                isInitialLoad = false
-            }
+            _loadingState.value = LoadingState.loaded()
+            isInitialLoad = false
         }
     }
 

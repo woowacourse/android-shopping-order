@@ -3,7 +3,7 @@ package woowacourse.shopping.di
 import android.content.Context
 import woowacourse.shopping.data.database.ShoppingDatabase
 
-object DependencyProvider {
+object DatabaseProvider {
     lateinit var database: ShoppingDatabase
         private set
 

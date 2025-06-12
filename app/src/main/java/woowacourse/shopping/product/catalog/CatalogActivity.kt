@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -38,7 +39,6 @@ class CatalogActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        (binding.recyclerViewProducts.adapter as ProductAdapter).clearItems()
         viewModel.loadCatalogUntilCurrentPage()
         viewModel.loadCartItemSize()
         viewModel.loadRecentlyViewedProducts()
@@ -74,7 +74,6 @@ class CatalogActivity : AppCompatActivity() {
     private fun setProductAdapter() {
         val adapter =
             ProductAdapter(
-                products = emptyList(),
                 productActionListener =
                     object : ProductActionListener {
                         override fun onProductClick(product: ProductUiModel) {
@@ -128,10 +127,17 @@ class CatalogActivity : AppCompatActivity() {
         val recentProductsAdapter: RecentlyViewedProductAdapter =
             binding.recyclerViewRecentlyViewedProducts.adapter as RecentlyViewedProductAdapter
 
-        viewModel.loadedCatalogItems.observe(this, productsAdapter::addLoadedItems)
+        viewModel.loadedCatalogItems.observe(this) {
+            productsAdapter.submitList(it)
+        }
         viewModel.updatedItem.observe(this, productsAdapter::updateItem)
         viewModel.recentlyViewedProducts.observe(this, recentProductsAdapter::submitList)
         viewModel.loadingState.observe(this) { changeShimmerState(it.isLoading) }
+        viewModel.errorMessage.observe(this) { showToast(it) }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun applyWindowInsets() {

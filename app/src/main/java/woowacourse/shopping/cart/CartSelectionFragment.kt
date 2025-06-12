@@ -57,7 +57,6 @@ class CartSelectionFragment : Fragment() {
         val cartAdapter = binding.recyclerViewCart.adapter as CartAdapter
         viewModel.cartProducts.observe(viewLifecycleOwner) { products ->
             cartAdapter.submitList(products.toList())
-            viewModel.loadSelectAllState()
         }
         viewModel.loadingState.observe(viewLifecycleOwner) { changeShimmerState(it) }
     }

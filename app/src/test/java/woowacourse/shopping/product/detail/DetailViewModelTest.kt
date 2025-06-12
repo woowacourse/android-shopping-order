@@ -1,92 +1,102 @@
 package woowacourse.shopping.product.detail
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import org.junit.Rule
+import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import woowacourse.shopping.data.repository.FakeCartProductRepositoryImpl
-import woowacourse.shopping.data.repository.FakeCatalogProductRepositoryImpl
-import woowacourse.shopping.data.repository.FakeRecentlyViewedProductRepositoryImpl
+import woowacourse.shopping.cart.ButtonEvent
+import woowacourse.shopping.data.repository.CartProductRepository
+import woowacourse.shopping.data.repository.CatalogProductRepository
+import woowacourse.shopping.data.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.util.CoroutinesTestExtension
 import woowacourse.shopping.util.InstantTaskExecutorExtension
+import woowacourse.shopping.util.getOrAwaitValue
 
+@ExperimentalCoroutinesApi
 @ExtendWith(InstantTaskExecutorExtension::class)
+@ExtendWith(CoroutinesTestExtension::class)
 class DetailViewModelTest {
-    @get:Rule
-    val instantExecutorRule = InstantTaskExecutorRule()
+    private lateinit var cartProductRepository: CartProductRepository
+    private lateinit var catalogProductRepository: CatalogProductRepository
+    private lateinit var recentlyViewedProductRepository: RecentlyViewedProductRepository
 
     private lateinit var viewModel: DetailViewModel
 
     private val dummyProduct =
         ProductUiModel(
-            id = 1,
-            name = "아이스 카페 아메리카노",
-            imageUrl = "https://image.istarbucks.co.kr/upload/store/skuimg/2021/04/[110563]_20210426095937947.jpg",
-            price = 10000,
+            id = 1L,
+            name = "Test Product",
+            price = 1000,
+            imageUrl = "https://example.com/image.jpg",
+            quantity = 1,
+            cartItemId = null,
         )
 
-    private val fakeCartRepository = FakeCartProductRepositoryImpl()
-    private val fakeRecentlyViewedRepository =
-        FakeRecentlyViewedProductRepositoryImpl(FakeCatalogProductRepositoryImpl(size = 25))
+    @BeforeEach
+    fun setUp() {
+        cartProductRepository = mockk(relaxed = true)
+        recentlyViewedProductRepository = mockk(relaxed = true)
 
-    private fun createViewModel() {
         viewModel =
             DetailViewModel(
-                productData = dummyProduct,
-                cartProductRepository = fakeCartRepository,
-                recentlyViewedProductRepository = fakeRecentlyViewedRepository,
+                product = dummyProduct,
+                cartProductRepository = cartProductRepository,
+                recentlyViewedProductRepository = recentlyViewedProductRepository,
             )
     }
 
     @Test
-    fun `초기 상태는 수량과 가격이 0이다`() {
-        createViewModel()
-        assert(viewModel.quantity.value == 0)
-        assert(viewModel.price.value == 0)
-        assert(viewModel.product.value == dummyProduct)
-    }
+    fun `초기 product 값은 생성자 인자로 설정된 값과 동일하다`() =
+        runTest {
+            val product = viewModel.product.getOrAwaitValue()
+            assertThat(product).isEqualTo(dummyProduct)
+        }
 
     @Test
-    fun `수량을 증가시키면 수량이 1 증가하고, 가격도 갱신된다`() {
-        createViewModel()
-        viewModel.increaseQuantity()
-        assert(viewModel.quantity.value == 1)
-        assert(viewModel.price.value == 10000)
-    }
+    fun `수량 증가 버튼 클릭 시 quantity가 1 증가한다`() =
+        runTest {
+            viewModel.updateQuantity(ButtonEvent.INCREASE)
+
+            val updated = viewModel.product.getOrAwaitValue()
+            assertThat(updated.quantity).isEqualTo(dummyProduct.quantity + 1)
+        }
 
     @Test
-    fun `수량을 감소시키면 수량이 1 감소하고, 가격도 갱신된다`() {
-        createViewModel()
-        viewModel.increaseQuantity() // 1
-        viewModel.increaseQuantity() // 2
-        viewModel.decreaseQuantity() // 1
-        assert(viewModel.quantity.value == 1)
-        assert(viewModel.price.value == 10000)
-    }
+    fun `수량 감소 버튼 클릭 시 quantity가 1 감소한다`() =
+        runTest {
+            viewModel.updateQuantity(ButtonEvent.DECREASE)
+
+            val updated = viewModel.product.getOrAwaitValue()
+            assertThat(updated.quantity).isEqualTo(dummyProduct.quantity - 1)
+        }
 
     @Test
-    fun `setQuantity는 productData의 수량을 설정한다`() {
-        val productWithQuantity = dummyProduct.copy(quantity = 3)
-        viewModel =
-            DetailViewModel(
-                productData = productWithQuantity,
-                cartProductRepository = fakeCartRepository,
-                recentlyViewedProductRepository = fakeRecentlyViewedRepository,
-            )
+    fun `quantity가 0일 때 감소 버튼 클릭 시 값이 변하지 않는다`() =
+        runTest {
+            val productWithZeroQuantity = dummyProduct.copy(quantity = 0)
+            viewModel =
+                DetailViewModel(
+                    productWithZeroQuantity,
+                    cartProductRepository,
+                    recentlyViewedProductRepository,
+                )
 
-        viewModel.setQuantity()
-        assert(viewModel.quantity.value == 3)
-    }
+            viewModel.updateQuantity(ButtonEvent.DECREASE)
+
+            val updated = viewModel.product.getOrAwaitValue()
+            assertThat(updated.quantity).isEqualTo(0)
+        }
 
     @Test
-    fun `장바구니에 추가 시 수량이 포함된 상품이 저장된다`() {
-        createViewModel()
-        viewModel.increaseQuantity() // 수량 1
-        viewModel.addToCart()
+    fun `최근 본 상품 설정 시 해당 값이 LiveData로 노출된다`() =
+        runTest {
+            viewModel.setLatestViewedProduct()
 
-        val added = fakeCartRepository.cartProducts.firstOrNull()
-        requireNotNull(added)
-        assert(added.uid == dummyProduct.id)
-        assert(added.quantity == 1)
-    }
+            val viewed = viewModel.latestViewedProduct.getOrAwaitValue()
+            assertThat(viewed).isEqualTo(dummyProduct)
+        }
 }

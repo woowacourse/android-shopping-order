@@ -3,29 +3,20 @@ package woowacourse.shopping.data.repository
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 interface CatalogProductRepository {
-    fun getRecommendedProducts(
+    suspend fun getRecommendedProducts(
         category: String,
         page: Int,
         size: Int,
-        callback: (List<ProductUiModel>) -> Unit,
-    )
+    ): Result<List<ProductUiModel>>
 
-    fun getAllProductsSize(callback: (Int) -> Unit)
+    suspend fun getAllProductsSize(): Result<Long>
 
-    fun getCartProductsByIds(
-        productIds: List<Int>,
-        callback: (List<ProductUiModel>) -> Unit,
-    )
+    suspend fun getCartProductsByIds(productIds: List<Long>): Result<List<ProductUiModel>>
 
-    fun getProductsByPage(
+    suspend fun getProductsByPage(
         page: Int,
         size: Int,
-        callback: (List<ProductUiModel>) -> Unit,
-    )
+    ): Result<List<ProductUiModel>>
 
-    fun getProduct(
-        productId: Int,
-        onSuccess: (ProductUiModel) -> Unit,
-        onFailure: () -> Unit,
-    )
+    suspend fun getProduct(productId: Long): Result<ProductUiModel?>
 }

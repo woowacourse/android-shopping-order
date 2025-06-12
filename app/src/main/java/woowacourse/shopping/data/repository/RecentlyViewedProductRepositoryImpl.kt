@@ -5,36 +5,32 @@ import woowacourse.shopping.data.entity.CartProductEntity
 import woowacourse.shopping.data.entity.RecentlyViewedProductEntity
 import woowacourse.shopping.data.mapper.toEntity
 import woowacourse.shopping.product.catalog.ProductUiModel
-import kotlin.concurrent.thread
 
 class RecentlyViewedProductRepositoryImpl(
     private val recentlyViewedProductDao: RecentlyViewedProductDao,
     private val catalogProductRepository: CatalogProductRepository,
 ) : RecentlyViewedProductRepository {
-    override fun insertRecentlyViewedProductId(productId: Int) {
-        thread {
-            recentlyViewedProductDao.insertRecentlyViewedProductUid(
+    override suspend fun insertRecentlyViewedProductId(productId: Long): Result<Unit> =
+        runCatching {
+            recentlyViewedProductDao.insertRecentlyViewedProductId(
                 RecentlyViewedProductEntity(productId),
             )
         }
-    }
 
-    override fun getRecentlyViewedProducts(callback: (List<CartProductEntity>) -> Unit) {
-        thread {
-            val productIds = recentlyViewedProductDao.getRecentlyViewedProductIds()
-            catalogProductRepository.getCartProductsByIds(productIds) { products ->
-                val entities = products.map { it.toEntity() }
-                callback(entities)
-            }
+    override suspend fun getRecentlyViewedProducts(): Result<List<CartProductEntity>> =
+        runCatching {
+            val productIds: List<Long> = recentlyViewedProductDao.getRecentlyViewedProductIds()
+            if (productIds.isEmpty()) return@runCatching emptyList<CartProductEntity>()
+            val productsResult = catalogProductRepository.getCartProductsByIds(productIds)
+            productsResult
+                .getOrThrow()
+                .map { it.toEntity() }
         }
-    }
 
-    override fun getLatestViewedProduct(callback: (ProductUiModel) -> Unit) {
-        thread {
-            val productId = recentlyViewedProductDao.getLatestViewedProductId()
-            catalogProductRepository.getProduct(productId, onSuccess = { product ->
-                callback(product)
-            }) {}
+    override suspend fun getLatestViewedProduct(): Result<ProductUiModel?> =
+        runCatching {
+            val productId: Long = recentlyViewedProductDao.getLatestViewedProductId() ?: return@runCatching null
+            val productResult = catalogProductRepository.getProduct(productId)
+            productResult.getOrNull()
         }
-    }
 }
