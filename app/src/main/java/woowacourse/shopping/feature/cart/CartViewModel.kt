@@ -264,7 +264,9 @@ class CartViewModel(
                     _coupons.value = allItems
                 }
 
-                is ApiResult.Error -> Log.w(TAG, "보유 쿠폰 로드 실패")
+                is ApiResult.Error -> {
+                    Log.w(TAG, "보유 쿠폰 로드 실패")
+                }
             }
         }
     }

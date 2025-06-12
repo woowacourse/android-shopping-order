@@ -20,15 +20,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.R
 import woowacourse.shopping.data.carts.AddItemResult
-import woowacourse.shopping.data.carts.ApiResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
-import woowacourse.shopping.data.payment.ApiError
-import woowacourse.shopping.data.payment.ApiResult
 import woowacourse.shopping.data.payment.dto.CouponResponseItem
 import woowacourse.shopping.data.payment.repository.PaymentRepository
+import woowacourse.shopping.data.util.api.ApiError
+import woowacourse.shopping.data.util.api.ApiResult
 import woowacourse.shopping.data.util.mapper.toCartItems
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Goods

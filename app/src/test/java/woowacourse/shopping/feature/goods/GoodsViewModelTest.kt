@@ -21,11 +21,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.data.account.AccountRepository
 import woowacourse.shopping.data.carts.AddItemResult
-import woowacourse.shopping.data.carts.ApiResult
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.dto.GoodsResponse
 import woowacourse.shopping.data.goods.repository.GoodsRepository
+import woowacourse.shopping.data.util.api.ApiResult
 import woowacourse.shopping.data.util.mapper.toCartItems
 import woowacourse.shopping.domain.model.Authorization
 import woowacourse.shopping.domain.model.CartItem

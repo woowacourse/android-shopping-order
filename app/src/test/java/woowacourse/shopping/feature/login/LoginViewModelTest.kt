@@ -16,8 +16,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.data.account.AccountRepository
-import woowacourse.shopping.data.carts.ApiError
-import woowacourse.shopping.data.carts.ApiResult
+import woowacourse.shopping.data.util.api.ApiError
+import woowacourse.shopping.data.util.api.ApiResult
 import woowacourse.shopping.domain.model.Authorization
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 
