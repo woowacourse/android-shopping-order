@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.cart.repository.CartRepository
 import woowacourse.shopping.data.cart.repository.DefaultCartRepository
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
@@ -46,30 +48,28 @@ class RecommendViewModel(
     }
 
     fun plusCartItemQuantity(recommend: RecommendProduct) {
-        if (recommend.quantity == 0) {
-            cartRepository.addCartItem(recommend.productId, 1) { result ->
-                result
+        viewModelScope.launch {
+            if (recommend.quantity == 0) {
+                cartRepository
+                    .addCartItem(recommend.productId, 1)
                     .onSuccess { cartItemId: Long? ->
                         cartItemId ?: return@onSuccess
 
                         addedItems = addedItems.plus(recommend.productId to cartItemId)
                         recommend.update(1)
-                        selectedCartItems.postValue(
+                        selectedCartItems.value =
                             selectedCartItems.value?.plus(
                                 CartItem(cartItemId, recommend.product, 1),
-                            ),
-                        )
-                    }.onFailure { _event.postValue(RecommendEvent.MODIFY_CART_FAILURE) }
-            }
-        } else {
-            cartRepository.updateCartItemQuantity(
-                addedItems[recommend.productId] ?: return,
-                recommend.quantity + 1,
-            ) { result ->
-                result
-                    .onSuccess {
+                            )
+                    }.onFailure { _event.value = RecommendEvent.MODIFY_CART_FAILURE }
+            } else {
+                cartRepository
+                    .updateCartItemQuantity(
+                        addedItems[recommend.productId] ?: return@launch,
+                        recommend.quantity + 1,
+                    ).onSuccess {
                         recommend.update(recommend.quantity + 1)
-                        selectedCartItems.postValue(
+                        selectedCartItems.value =
                             selectedCartItems.value
                                 ?.minus(
                                     CartItem(
@@ -83,46 +83,42 @@ class RecommendViewModel(
                                         recommend.product,
                                         recommend.quantity + 1,
                                     ),
-                                ),
-                        )
+                                )
                     }.onFailure {
-                        _event.postValue(RecommendEvent.MODIFY_CART_FAILURE)
+                        _event.value = RecommendEvent.MODIFY_CART_FAILURE
                     }
             }
         }
     }
 
     fun minusCartItemQuantity(recommend: RecommendProduct) {
-        if (recommend.quantity == 1) {
-            cartRepository.remove(
-                addedItems[recommend.productId] ?: return,
-            ) { result ->
-                result
-                    .onSuccess {
+        viewModelScope.launch {
+            if (recommend.quantity == 1) {
+                cartRepository
+                    .remove(
+                        addedItems[recommend.productId] ?: return@launch,
+                    ).onSuccess {
                         recommend.update(0)
-                        selectedCartItems.postValue(
+                        selectedCartItems.value =
                             selectedCartItems.value?.minus(
                                 CartItem(
                                     addedItems[recommend.productId] ?: return@onSuccess,
                                     recommend.product,
                                     1,
                                 ),
-                            ),
-                        )
+                            )
                         addedItems = addedItems.minus(recommend.productId)
                     }.onFailure {
-                        _event.postValue(RecommendEvent.MODIFY_CART_FAILURE)
+                        _event.value = RecommendEvent.MODIFY_CART_FAILURE
                     }
-            }
-        } else {
-            cartRepository.updateCartItemQuantity(
-                addedItems[recommend.productId] ?: return,
-                recommend.quantity - 1,
-            ) { result ->
-                result
-                    .onSuccess {
+            } else {
+                cartRepository
+                    .updateCartItemQuantity(
+                        addedItems[recommend.productId] ?: return@launch,
+                        recommend.quantity - 1,
+                    ).onSuccess {
                         recommend.update(recommend.quantity - 1)
-                        selectedCartItems.postValue(
+                        selectedCartItems.value =
                             selectedCartItems.value
                                 ?.minus(
                                     CartItem(
@@ -136,24 +132,23 @@ class RecommendViewModel(
                                         recommend.product,
                                         recommend.quantity - 1,
                                     ),
-                                ),
-                        )
+                                )
                     }.onFailure {
-                        _event.postValue(RecommendEvent.MODIFY_CART_FAILURE)
+                        _event.value = RecommendEvent.MODIFY_CART_FAILURE
                     }
             }
         }
     }
 
     private fun loadRecommendedProducts() {
-        productsRepository.loadRecommendedProducts(RECOMMEND_COUNT) { result ->
-            result
+        viewModelScope.launch {
+            productsRepository
+                .loadRecommendedProducts(RECOMMEND_COUNT)
                 .onSuccess { recommendedProducts: List<Product> ->
-                    _recommendedProducts.postValue(
-                        recommendedProducts.map { product -> RecommendProduct(product) },
-                    )
+                    _recommendedProducts.value =
+                        recommendedProducts.map { product -> RecommendProduct(product) }
                 }.onFailure {
-                    _event.postValue(RecommendEvent.LOAD_RECOMMENDED_PRODUCTS_FAILURE)
+                    _event.value = RecommendEvent.LOAD_RECOMMENDED_PRODUCTS_FAILURE
                 }
         }
     }
@@ -164,9 +159,8 @@ class RecommendViewModel(
             recommendedProducts.value?.toMutableList()
 
         if (index != null && newProducts != null) {
-            newProducts[index] =
-                newProducts[index].copy(quantity = newQuantity)
-            _recommendedProducts.postValue(newProducts)
+            newProducts[index] = newProducts[index].copy(quantity = newQuantity)
+            _recommendedProducts.value = newProducts
         }
     }
 

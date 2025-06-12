@@ -129,7 +129,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@{@string/product_price_format(recommendProduct.price)}"
+            android:text="@{@string/price_format(recommendProduct.price)}"
             android:textColor="@color/gray_5"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"

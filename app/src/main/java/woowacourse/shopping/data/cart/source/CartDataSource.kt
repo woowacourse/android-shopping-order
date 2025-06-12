@@ -4,24 +4,24 @@ import woowacourse.shopping.data.cart.PageableCartItemData
 import woowacourse.shopping.data.product.entity.CartItemEntity
 
 interface CartDataSource {
-    fun pageableCartItems(
+    suspend fun pageableCartItems(
         page: Int,
         size: Int,
     ): PageableCartItemData
 
-    fun cart(): List<CartItemEntity>
+    suspend fun cart(): List<CartItemEntity>
 
-    fun addCartItem(
+    suspend fun addCartItem(
         productId: Long,
         quantity: Int,
     ): Long?
 
-    fun remove(cartItemId: Long)
+    suspend fun remove(cartItemId: Long)
 
-    fun updateCartItemQuantity(
+    suspend fun updateCartItemQuantity(
         cartItemId: Long,
         newQuantity: Int,
     )
 
-    fun cartItemsSize(): Int
+    suspend fun cartItemsSize(): Int
 }

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/couponApplyRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".view.payment.CouponApplyActivity">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/couponApplyToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/gray_5"
+            android:gravity="center_vertical"
+            android:minHeight="?attr/actionBarSize"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/couponApplyBackButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:padding="16dp"
+                android:src="@drawable/ic_back"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:text="@string/coupon_apply_title"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/couponApplyBackButton"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/couponApplyCoupons"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:paddingBottom="14dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/couponApplyFirstDivider"
+            app:layout_constraintTop_toBottomOf="@id/couponApplyToolbar"
+            tools:listitem="@layout/item_coupon" />
+
+        <View
+            android:id="@+id/couponApplyFirstDivider"
+            android:layout_width="match_parent"
+            android:layout_height="7dp"
+            android:background="@color/gray_eb"
+            app:layout_constraintBottom_toTopOf="@id/couponApplyOrderAmountTitle"
+            app:layout_constraintTop_toBottomOf="@id/couponApplyCoupons" />
+
+        <TextView
+            android:id="@+id/couponApplyOrderAmountTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="21dp"
+            android:text="주문 금액"
+            android:textColor="@color/gray_3"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/couponApplyCouponDiscountAmountTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/couponApplyFirstDivider" />
+
+        <TextView
+            android:id="@+id/couponApplyOrderAmount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:gravity="end"
+            android:textColor="@color/gray_3"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/couponApplyOrderAmountTitle"
+            app:layout_constraintTop_toTopOf="@id/couponApplyOrderAmountTitle"
+            tools:text="204,200원" />
+
+        <TextView
+            android:id="@+id/couponApplyCouponDiscountAmountTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="21dp"
+            android:text="쿠폰 할인 금액"
+            android:textColor="@color/gray_3"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/couponApplyDeliveryFeeTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/couponApplyOrderAmountTitle" />
+
+        <TextView
+            android:id="@+id/couponApplyCouponDiscountAmount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:gravity="end"
+            android:textColor="@color/gray_3"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/couponApplyCouponDiscountAmountTitle"
+            app:layout_constraintTop_toTopOf="@id/couponApplyCouponDiscountAmountTitle"
+            tools:text="-5,000원" />
+
+        <TextView
+            android:id="@+id/couponApplyDeliveryFeeTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="21dp"
+            android:text="배송비"
+            android:textColor="@color/gray_3"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/couponApplySecondDivider"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/couponApplyCouponDiscountAmountTitle" />
+
+        <TextView
+            android:id="@+id/couponApplyDeliveryFee"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:gravity="end"
+            android:textColor="@color/gray_3"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/couponApplyDeliveryFeeTitle"
+            app:layout_constraintTop_toTopOf="@id/couponApplyDeliveryFeeTitle"
+            tools:text="3,000원" />
+
+        <View
+            android:id="@+id/couponApplySecondDivider"
+            android:layout_width="match_parent"
+            android:layout_height="7dp"
+            android:layout_marginTop="14dp"
+            android:background="@color/gray_eb"
+            app:layout_constraintBottom_toTopOf="@id/couponApplyTotalPaymentAmountTitle"
+            app:layout_constraintTop_toBottomOf="@id/couponApplyDeliveryFeeTitle" />
+
+        <TextView
+            android:id="@+id/couponApplyTotalPaymentAmountTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="21dp"
+            android:layout_marginStart="16dp"
+            android:text="총 결제 금액"
+            android:textColor="@color/gray_3"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/couponApplyPayButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/couponApplySecondDivider" />
+
+        <TextView
+            android:id="@+id/couponApplyTotalPaymentAmount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:gravity="end"
+            android:textColor="@color/gray_3"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/couponApplyTotalPaymentAmountTitle"
+            app:layout_constraintTop_toTopOf="@id/couponApplyTotalPaymentAmountTitle"
+            tools:text="202,200원" />
+
+        <TextView
+            android:id="@+id/couponApplyPayButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/mint"
+            android:gravity="center"
+            android:paddingVertical="12dp"
+            android:text="@string/coupon_apply_pay"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

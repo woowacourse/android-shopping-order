@@ -12,6 +12,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.databinding.ActivityRecommnedBinding
 import woowacourse.shopping.view.cart.CartItemType.ProductItem
+import woowacourse.shopping.view.payment.CouponApplyActivity
 import java.io.Serializable
 
 class RecommendActivity : AppCompatActivity() {
@@ -48,6 +49,14 @@ class RecommendActivity : AppCompatActivity() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         binding.recommendCartItems.adapter = adapter
+        binding.onOrder = {
+            startActivity(
+                CouponApplyActivity.newIntent(
+                    this,
+                    viewModel.selectedCartItems.value as? ArrayList ?: ArrayList(),
+                ),
+            )
+        }
         viewModel.recommendedProducts.observe(this) { adapter.submitList(it) }
 
         binding.recommendBackButton.setOnClickListener {
@@ -64,25 +73,25 @@ class RecommendActivity : AppCompatActivity() {
     private fun Intent.getSelectedCartItemsExtra(): Set<ProductItem>? =
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
             getSerializableExtra(
-                EXTRA_SELECTED_CART_ITEM_IDS,
+                EXTRA_SELECTED_CART_ITEMS,
                 HashSet::class.java,
             ) as? Set<ProductItem>
         } else {
-            getSerializableExtra(EXTRA_SELECTED_CART_ITEM_IDS) as? Set<ProductItem>
+            getSerializableExtra(EXTRA_SELECTED_CART_ITEMS) as? Set<ProductItem>
         }
 
     companion object {
         fun newIntent(
             context: Context,
-            selectedCartItemIds: Set<ProductItem>,
+            productItems: Set<ProductItem>,
         ): Intent {
             val intent =
                 Intent(context, RecommendActivity::class.java)
-                    .putExtra(EXTRA_SELECTED_CART_ITEM_IDS, selectedCartItemIds as Serializable)
+                    .putExtra(EXTRA_SELECTED_CART_ITEMS, productItems as Serializable)
             return intent
         }
 
-        private const val EXTRA_SELECTED_CART_ITEM_IDS =
+        private const val EXTRA_SELECTED_CART_ITEMS =
             "woowacourse.shopping.EXTRA_SELECTED_CART_ITEM_IDS"
     }
 }
