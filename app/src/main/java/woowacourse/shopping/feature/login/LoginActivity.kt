@@ -7,19 +7,15 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.data.account.AccountLocalDataSourceImpl
-import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
-import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
+import woowacourse.shopping.data.account.AccountRemoteDataSourceImpl
+import woowacourse.shopping.data.account.AccountRepositoryImpl
 import woowacourse.shopping.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
 
-    private val accountLocalDataSource by lazy {
-        AccountLocalDataSourceImpl(this)
-    }
-
     private val viewModel: LoginViewModel by viewModels {
-        LoginViewModelFactory(CartRepositoryImpl(CartRemoteDataSourceImpl(), accountLocalDataSource))
+        LoginViewModelFactory(AccountRepositoryImpl(AccountRemoteDataSourceImpl(), AccountLocalDataSourceImpl(this)))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

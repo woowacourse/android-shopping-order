@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.IntentCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.data.ShoppingDatabase
-import woowacourse.shopping.data.account.AccountLocalDataSourceImpl
 import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
 import woowacourse.shopping.data.goods.repository.GoodsLocalDataSourceImpl
@@ -36,7 +35,7 @@ class GoodsDetailsActivity : AppCompatActivity() {
     private val viewModel: GoodsDetailsViewModel by viewModels {
         GoodsDetailsViewModelFactory(
             goodsUiModel,
-            CartRepositoryImpl(CartRemoteDataSourceImpl(), AccountLocalDataSourceImpl(this)),
+            CartRepositoryImpl(CartRemoteDataSourceImpl()),
             GoodsRepositoryImpl(
                 GoodsRemoteDataSourceImpl(),
                 GoodsLocalDataSourceImpl(ShoppingDatabase.getDatabase(this)),

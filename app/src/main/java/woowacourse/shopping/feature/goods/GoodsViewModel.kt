@@ -10,6 +10,7 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
+import woowacourse.shopping.data.account.AccountRepository
 import woowacourse.shopping.data.carts.CartFetchResult
 import woowacourse.shopping.data.carts.CartUpdateResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
@@ -26,6 +27,7 @@ import woowacourse.shopping.util.SingleLiveData
 
 @Suppress("ktlint:standard:backing-property-naming")
 class GoodsViewModel(
+    private val accountRepository: AccountRepository,
     private val cartRepository: CartRepository,
     private val goodsRepository: GoodsRepository,
 ) : ViewModel() {
@@ -110,7 +112,7 @@ class GoodsViewModel(
 
     fun login() {
         viewModelScope.launch {
-            val result = cartRepository.checkValidLocalSavedBasicKey()
+            val result = accountRepository.checkValidLocalSavedBasicKey()
             when (result) {
                 is CartFetchResult.Error -> {
                     _alertEvent.setValue(R.string.goods_auto_login_error_toast_message)

@@ -4,14 +4,14 @@ import androidx.databinding.ObservableField
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import woowacourse.shopping.data.account.AccountRepository
 import woowacourse.shopping.data.carts.CartFetchResult
-import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.domain.model.Authorization
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 
 class LoginViewModel(
-    private val cartRepository: CartRepository,
+    private val accountRepository: AccountRepository,
 ) : ViewModel() {
     private val _loginSuccessEvent = MutableSingleLiveData<Unit>()
     val loginSuccessEvent: SingleLiveData<Unit> get() = _loginSuccessEvent
@@ -26,7 +26,7 @@ class LoginViewModel(
         Authorization.setBasicKeyByIdPw(idValue, pwValue)
         viewModelScope.launch {
             val result =
-                cartRepository.checkValidBasicKey(
+                accountRepository.checkValidBasicKey(
                     Authorization.basicKey,
                 )
             when (result) {
@@ -46,7 +46,7 @@ class LoginViewModel(
 
     private fun saveBasicKey() {
         viewModelScope.launch {
-            val result = cartRepository.saveBasicKey()
+            val result = accountRepository.saveBasicKey()
 
             when {
                 result.isSuccess -> _loginSuccessEvent.setValue(Unit)

@@ -8,12 +8,6 @@ import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.domain.model.Goods
 
 interface CartRepository {
-    suspend fun saveBasicKey(): Result<Unit>
-
-    suspend fun checkValidBasicKey(basicKey: String): CartFetchResult<Int>
-
-    suspend fun checkValidLocalSavedBasicKey(): CartFetchResult<Int>
-
     suspend fun fetchAllCartItems(): CartFetchResult<CartResponse>
 
     suspend fun fetchCartItemsByOffset(
