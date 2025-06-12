@@ -55,6 +55,9 @@ class CartViewModel(
     private val _orderItems = MutableSingleLiveData<List<Long>>()
     val orderItems: SingleLiveData<List<Long>> get() = _orderItems
 
+    private val _isAllItemsChecked = MutableLiveData(false)
+    val isAllItemsChecked: LiveData<Boolean> get() = _isAllItemsChecked
+
     init {
         fetchTotalItemsCount()
         loadCarts()
@@ -88,6 +91,8 @@ class CartViewModel(
         val carts = if (isRecommend) _carts.value ?: emptyList() else updatedList
         val recommends = if (isRecommend) updatedList else _recommendItems.value ?: emptyList()
         updateCheckedSummary(carts, recommends)
+
+        if (!isRecommend) updateAllItemsCheckedState()
     }
 
     fun selectAllCarts() = setCartChecked(true)
@@ -263,6 +268,11 @@ class CartViewModel(
 
         val currentRecommendList = _recommendItems.value ?: emptyList()
         updateCheckedSummary(updatedCartList, currentRecommendList)
+    }
+
+    private fun updateAllItemsCheckedState() {
+        val cartItems = _carts.value ?: emptyList()
+        _isAllItemsChecked.value = cartItems.isNotEmpty() && cartItems.all { it.isChecked }
     }
 
     companion object {
