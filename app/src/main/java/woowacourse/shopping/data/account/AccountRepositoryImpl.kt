@@ -16,7 +16,7 @@ class AccountRepositoryImpl(
         val result = accountLocalDataSource.loadBasicKey()
         when {
             result.isSuccess -> {
-                val basicKey = result.getOrNull() ?: ""
+                val basicKey = result.getOrDefault("")
                 if (basicKey.isNotEmpty()) {
                     Authorization.setBasicKey(basicKey)
                     return remoteDataSource.fetchAuthCode(basicKey)
