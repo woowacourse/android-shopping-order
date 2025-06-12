@@ -12,5 +12,5 @@ sealed interface Coupon {
 
     fun calculateDiscount(orderInfo: OrderInfo): OrderInfo
 
-    fun isAvailable(): Boolean = expirationDate.isAfter(LocalDate.now())
+    fun isAvailable(date: LocalDate = LocalDate.now()): Boolean = expirationDate.isAfter(date)
 }
