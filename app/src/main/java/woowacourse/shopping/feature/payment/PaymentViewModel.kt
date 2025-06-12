@@ -10,7 +10,6 @@ import woowacourse.shopping.data.remote.coupon.CouponRepository
 import woowacourse.shopping.data.remote.order.OrderRepository
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Coupon
-import woowacourse.shopping.domain.model.CouponRule
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Price.Companion.DEFAULT_DISCOUNT
 import woowacourse.shopping.domain.model.Price.Companion.DEFAULT_PRICE
@@ -36,7 +35,7 @@ class PaymentViewModel(
     private var _orderedCarts: List<CartProduct> = emptyList()
     val orderedCarts: List<CartProduct> get() = _orderedCarts
 
-    private var currentCoupon: Coupon? = null
+    private var currentCouponRule: Coupon? = null
 
     fun setOrderDetails(orderIds: LongArray) {
         viewModelScope
@@ -55,39 +54,39 @@ class PaymentViewModel(
             }
     }
 
-    fun toggleCheck(selectedCoupon: Coupon) {
+    fun toggleCheck(selectedCouponRule: Coupon) {
         val updated =
             _coupons.value?.map {
-                if (it.couponDetail.id == selectedCoupon.couponDetail.id) {
-                    it.copy(isApplied = true)
+                if (it.couponDetail.id == selectedCouponRule.couponDetail.id) {
+                    it.copyWithApplied(true)
                 } else {
-                    it.copy(isApplied = false)
+                    it.copyWithApplied(false)
                 }
             }
         _coupons.value = updated ?: emptyList()
 
-        applyCoupon(selectedCoupon)
+        applyCoupon(selectedCouponRule)
     }
 
-    fun applyCoupon(selectedCoupon: Coupon) {
+    fun applyCoupon(selectedCouponRule: Coupon) {
         val currentPrice = _price.value ?: Price()
 
-        if (currentCoupon?.couponDetail?.code == selectedCoupon.couponDetail.code) {
+        if (currentCouponRule?.couponDetail?.code == selectedCouponRule.couponDetail.code) {
             _price.value =
                 currentPrice.copy(
                     discountPrice = DEFAULT_DISCOUNT,
                     shippingFee = DEFAULT_SHIPPING_FEE,
                     totalPrice = currentPrice.orderPrice + DEFAULT_SHIPPING_FEE,
                 )
-            currentCoupon = null
+            currentCouponRule = null
             return
         }
 
-        val contract = CouponRule.getContract(selectedCoupon.couponDetail.discountType)
-        val newPrice = contract.apply(currentPrice, selectedCoupon, orderedCarts)
+        val contract = Coupon.getContract(selectedCouponRule.couponDetail)
+        val newPrice = contract.apply(currentPrice, selectedCouponRule, orderedCarts)
 
         _price.value = newPrice
-        currentCoupon = selectedCoupon
+        currentCouponRule = selectedCouponRule
     }
 
     fun order() {
@@ -105,14 +104,16 @@ class PaymentViewModel(
             val allCoupons = couponRepository.fetchAllCoupons().map { it.toDomain() }
             val orderedPrice = _price.value?.orderPrice ?: 0
 
-            val availableCoupons =
+            val availableCouponRules =
                 allCoupons
                     .filter { couponDetail ->
-                        val contract = CouponRule.getContract(couponDetail.discountType)
-                        contract.isAvailable(orderedPrice, orderedCarts) == true
-                    }.map { Coupon(couponDetail = it) }
+                        val contract = Coupon.getContract(couponDetail)
+                        contract.isAvailable(orderedPrice, orderedCarts)
+                    }.map { couponDetail ->
+                        Coupon.getContract(couponDetail)
+                    }
 
-            _coupons.postValue(availableCoupons)
+            _coupons.postValue(availableCouponRules)
         }
     }
 }

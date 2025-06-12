@@ -1,6 +1,11 @@
 package woowacourse.shopping.domain.model
 
-data object FreeShippingCoupon : CouponRule() {
+data class FreeShippingCoupon(
+    override val couponDetail: CouponDetail,
+    override val isApplied: Boolean = false,
+) : Coupon(couponDetail, isApplied) {
+    override fun copyWithApplied(isApplied: Boolean): Coupon = this.copy(isApplied = isApplied)
+
     override fun isAvailable(
         orderedPrice: Int,
         orderedCarts: List<CartProduct>,
@@ -8,7 +13,7 @@ data object FreeShippingCoupon : CouponRule() {
 
     override fun apply(
         currentPrice: Price,
-        selectedCoupon: Coupon,
+        selectedCouponRule: Coupon,
         orderedCarts: List<CartProduct>,
     ): Price =
         currentPrice.copy(

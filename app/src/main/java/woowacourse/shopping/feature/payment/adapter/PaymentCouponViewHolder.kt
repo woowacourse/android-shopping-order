@@ -10,8 +10,8 @@ class PaymentCouponViewHolder(
     private val binding: ItemCouponBinding,
     private val couponClickListener: CouponClickListener,
 ) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(coupon: Coupon) {
-        binding.coupon = coupon
+    fun bind(couponRule: Coupon) {
+        binding.coupon = couponRule
         binding.couponClickListener = couponClickListener
     }
 
@@ -27,6 +27,6 @@ class PaymentCouponViewHolder(
     }
 
     interface CouponClickListener {
-        fun onCouponCheck(coupon: Coupon)
+        fun onCouponCheck(couponRule: Coupon)
     }
 }

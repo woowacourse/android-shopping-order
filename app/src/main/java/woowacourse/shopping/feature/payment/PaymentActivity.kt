@@ -36,9 +36,12 @@ class PaymentActivity : AppCompatActivity() {
         viewModel.setOrderDetails(orderIds)
 
         viewModel.orderCompletedEvent.observe(this) {
-            Toast.makeText(this,
-                getString(R.string.payment_complete_order_message),
-                Toast.LENGTH_SHORT).show()
+            Toast
+                .makeText(
+                    this,
+                    getString(R.string.payment_complete_order_message),
+                    Toast.LENGTH_SHORT,
+                ).show()
             navigate()
         }
     }
@@ -47,8 +50,8 @@ class PaymentActivity : AppCompatActivity() {
         adapter =
             PaymentCouponAdapter(
                 object : CouponClickListener {
-                    override fun onCouponCheck(coupon: Coupon) {
-                        viewModel.toggleCheck(coupon)
+                    override fun onCouponCheck(couponRule: Coupon) {
+                        viewModel.toggleCheck(couponRule)
                     }
                 },
             )

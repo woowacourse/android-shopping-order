@@ -1,7 +1,10 @@
 package woowacourse.shopping.domain.model
 
-data object BuyXGetYCoupon : CouponRule() {
-    private const val DEFAULT_SHIPPING_FEE = 3_000
+data class BuyXGetYCoupon(
+    override val couponDetail: CouponDetail,
+    override val isApplied: Boolean = false,
+) : Coupon(couponDetail, isApplied) {
+    override fun copyWithApplied(isApplied: Boolean): Coupon = this.copy(isApplied = isApplied)
 
     override fun isAvailable(
         orderedPrice: Int,
@@ -10,7 +13,7 @@ data object BuyXGetYCoupon : CouponRule() {
 
     override fun apply(
         currentPrice: Price,
-        selectedCoupon: Coupon,
+        selectedCouponRule: Coupon,
         orderedCarts: List<CartProduct>,
     ): Price {
         val bulkItems = orderedCarts.filter { it.quantity >= 3 }
@@ -21,5 +24,9 @@ data object BuyXGetYCoupon : CouponRule() {
             totalPrice =
                 currentPrice.totalPrice - discountPrice,
         )
+    }
+
+    companion object {
+        private const val DEFAULT_SHIPPING_FEE = 3_000
     }
 }
