@@ -69,7 +69,7 @@ class ReceiptViewModel(
     private fun findCouponById(couponId: Long): Coupon {
         return coupons.find {
             it.couponId == couponId
-        } ?: error("")
+        } ?: error(COUPON_NOT_FOUND_ERROR_MESSAGE.format(couponId))
     }
 
     private fun loadCoupons() {
@@ -138,5 +138,9 @@ class ReceiptViewModel(
                 //TODO : Handle by event
             }
         }
+    }
+
+    companion object {
+        private const val COUPON_NOT_FOUND_ERROR_MESSAGE = "쿠폰 ID %d 에 해당하는 쿠폰을 찾을 수 없습니다."
     }
 }

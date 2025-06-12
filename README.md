@@ -26,7 +26,7 @@
 ## 피드백 반영
 
 - [x] CouponService | 빈 리스트를 반환하도록 변경
-- [ ] ReceiptViewModel | error("") 대신 더 안전한 방식으로 변경
+- [x] ReceiptViewModel | error("") 대신 더 안전한 방식으로 변경
 - [ ] 아직 수정하지 않은 execute, body 삭제
 - [ ] RecommendViewModel | error("") 대신 더 안전한 방식으로 변경
 - [ ] DefaultProductsRepository | maxBy { it.viewedAt }가 빈리스트일 경우 핸들링
