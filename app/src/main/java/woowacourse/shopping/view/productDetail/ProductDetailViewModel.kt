@@ -29,8 +29,8 @@ class ProductDetailViewModel(
     private val _quantity: MutableLiveData<Int> = MutableLiveData(1)
     val quantity: LiveData<Int> get() = _quantity
 
-    val price =
-        MediatorLiveData<Int>().apply { product.value?.product?.price }
+    val price = MediatorLiveData<Int>()
+
     private val _recentWatchingProduct: MutableLiveData<Product> = MutableLiveData()
     val recentWatchingProduct: LiveData<Product> get() = _recentWatchingProduct
 
