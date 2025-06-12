@@ -28,11 +28,16 @@ class OrderActivity : BaseActivity<ActivityOrderBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val selectedItems =
+            intent.getIntegerArrayListExtra(CartActivity.SELECTED_CART_ITEM_KEY) ?: arrayListOf()
+
         val factory = OrderViewModelFactory(
             CartRepositoryImpl(CartRemoteDataSourceImpl()),
-            OrderRepositoryImpl(OrderRemoteDataSourceImpl())
+            OrderRepositoryImpl(OrderRemoteDataSourceImpl()),
+            selectedItems
         )
         viewModel = ViewModelProvider(this, factory)[OrderViewModel::class.java]
+
         orderAdapter = OrderAdapter { selectedCoupon ->
             viewModel.selectCoupon(selectedCoupon)
         }
@@ -47,13 +52,12 @@ class OrderActivity : BaseActivity<ActivityOrderBinding>() {
         binding.lifecycleOwner = this
         observeViewModel()
         viewModel.loadCoupons()
-        val selectedItems =
-            intent.getIntegerArrayListExtra(CartActivity.SELECTED_CART_ITEM_KEY) ?: arrayListOf()
-        viewModel.setCartItems(selectedItems)
+
         binding.btnPay.setOnClickListener {
             viewModel.onPayClicked()
         }
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
@@ -74,9 +78,9 @@ class OrderActivity : BaseActivity<ActivityOrderBinding>() {
                 OrderUiEvent.OrderSuccess -> orderFinish()
                 is OrderUiEvent.ShowToast -> showToast(orderUiEvent.messageKey.toMessage())
             }
-
         }
-        viewModel.selectedCoupon.observe(this){selectCoupon ->
+
+        viewModel.selectedCoupon.observe(this){ selectCoupon ->
             orderAdapter.submitCoupon(selectCoupon)
         }
     }

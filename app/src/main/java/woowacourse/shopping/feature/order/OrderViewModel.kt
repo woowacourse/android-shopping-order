@@ -26,7 +26,8 @@ enum class ToastMessageKey {
 
 class OrderViewModel(
     private val cartRepository: CartRepository,
-    private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository,
+    private val selectedItemIds: List<Int>
 ) : ViewModel() {
 
     private val _coupons = MutableLiveData<List<Coupon>>()
@@ -38,16 +39,16 @@ class OrderViewModel(
     private val _totalAmount = MutableLiveData<Int>()
     val totalAmount: LiveData<Int> get() = _totalAmount
 
-    private var _originalAmount = MutableLiveData<Int>(0)
+    private val _originalAmount = MutableLiveData<Int>(0)
     val originalAmount: LiveData<Int> get() = _originalAmount
 
     private var _cartItems: List<CartItem> = emptyList()
     val cartItems: List<CartItem> get() = _cartItems
 
-    private var _shippingFee = MutableLiveData<Int>(3000)
+    private val _shippingFee = MutableLiveData<Int>(3000)
     val shippingFee: LiveData<Int> get() = _shippingFee
 
-    private var _uiEvent = MutableSingleLiveData<OrderUiEvent>()
+    private val _uiEvent = MutableSingleLiveData<OrderUiEvent>()
     val uiEvent: SingleLiveData<OrderUiEvent> get() = _uiEvent
 
     private val _discountAmount = MediatorLiveData<Int>().apply {
@@ -56,6 +57,10 @@ class OrderViewModel(
         addSource(_shippingFee) { updateDiscountAmount() }
     }
     val discountAmount: LiveData<Int> get() = _discountAmount
+
+    init {
+        loadCartItems()
+    }
 
     private fun updateDiscountAmount() {
         val discount = _selectedCoupon.value?.calculateDiscount(
@@ -66,10 +71,10 @@ class OrderViewModel(
         _discountAmount.value = discount
     }
 
-    fun setCartItems(itemIds: List<Int>) {
+    private fun loadCartItems() {
         viewModelScope.launch {
             val allCartItems = cartRepository.fetchAllCartItems()
-            _cartItems = itemIds.map { id ->
+            _cartItems = selectedItemIds.map { id ->
                 allCartItems.toCartItems().first { it.goods.id == id }
             }
             val origin = _cartItems.sumOf { it.goods.price * it.quantity }
