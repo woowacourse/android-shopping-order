@@ -1,8 +1,10 @@
 package woowacourse.shopping.presentation.order
 
+import woowacourse.shopping.domain.model.coupon.BuyXGetYCoupon
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.FixedCoupon
 import woowacourse.shopping.domain.model.coupon.FreeShippingCoupon
+import woowacourse.shopping.domain.model.coupon.PercentageCoupon
 import java.time.LocalDate
 
 data class CouponUiModel(
@@ -27,6 +29,7 @@ private fun Coupon.getMinimumAmount(): Int? {
     return when (this) {
         is FixedCoupon -> minimumAmount
         is FreeShippingCoupon -> minimumAmount
-        else -> null
+        is BuyXGetYCoupon -> null
+        is PercentageCoupon -> null
     }
 }
