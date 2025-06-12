@@ -46,19 +46,13 @@ class OrderViewModel(
     }
 
     fun selectCoupon(coupon: CouponUiModel) {
-        if (_selectedCoupon.value?.id == coupon.id) {
-            _selectedCoupon.value = null
-            _couponList.value =
-                _couponList.value?.map {
-                    it.copy(isSelected = false)
-                }
-        } else {
-            _selectedCoupon.value = coupon
-            _couponList.value =
-                _couponList.value?.map {
-                    it.copy(isSelected = it.id == coupon.id)
-                }
-        }
+        val isSelected = _selectedCoupon.value?.id == coupon.id
+
+        _selectedCoupon.value = if (isSelected) null else coupon
+        _couponList.value =
+            _couponList.value?.map {
+                it.copy(isSelected = if (isSelected) false else it.id == coupon.id)
+            }
     }
 
     fun setSelectedItems(items: List<CartItemUiModel>) {
