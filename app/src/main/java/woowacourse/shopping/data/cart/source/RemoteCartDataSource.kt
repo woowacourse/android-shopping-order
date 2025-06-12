@@ -13,13 +13,13 @@ class RemoteCartDataSource(
         page: Int,
         size: Int,
     ): CartResponse? {
-        val response: CartResponse? = cartService.getCart(page = page, size = size).execute().body()
+        val response: CartResponse? = cartService.getCart(page = page, size = size)
 
         return response
     }
 
     override suspend fun cart(): List<CartItemEntity> {
-        val response: CartResponse? = cartService.getAllCart().execute().body()
+        val response: CartResponse? = cartService.getAllCart()
         return response?.content?.mapNotNull { it.toCartItemEntityOrNull() } ?: emptyList()
     }
 
@@ -27,11 +27,11 @@ class RemoteCartDataSource(
         productId: Long,
         quantity: Int,
     ) {
-        cartService.postCartItem(CartItemRequest(productId, quantity)).execute()
+        cartService.postCartItem(CartItemRequest(productId, quantity))
     }
 
     override suspend fun remove(cartItemId: Long) {
-        cartService.deleteShoppingCartItem(cartItemId).execute()
+        cartService.deleteShoppingCartItem(cartItemId)
     }
 
     override suspend fun updateCartItemQuantity(
@@ -42,11 +42,11 @@ class RemoteCartDataSource(
             .patchCartItemQuantity(
                 cartItemId,
                 CartItemQuantityRequest(newQuantity),
-            ).execute()
+            )
     }
 
     override suspend fun cartItemsSize(): Int {
-        val response = cartService.getCartItemQuantity().execute().body()
+        val response = cartService.getCartItemQuantity()
         return response?.quantity ?: 0
     }
 

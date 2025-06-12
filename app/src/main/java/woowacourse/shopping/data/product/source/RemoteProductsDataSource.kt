@@ -13,18 +13,18 @@ class RemoteProductsDataSource(
         page: Int,
         size: Int,
     ): ProductsResponse? {
-        val response: ProductsResponse? = productService.getProducts(page, size).execute().body()
+        val response: ProductsResponse? = productService.getProducts(page, size)
         return response
     }
 
     override suspend fun getProductById(id: Long): ProductEntity? {
-        val response: ProductResponse? = productService.getProductById(id).execute().body()
+        val response: ProductResponse? = productService.getProductById(id)
         return response.toEntityOrNull()
     }
 
     override suspend fun getProductsByCategory(category: String): List<ProductEntity> {
         val response: ProductsResponse? =
-            productService.getProductsByCategory(category).execute().body()
+            productService.getProductsByCategory(category)
 
         return response?.content?.mapNotNull {
             it.toEntityOrNull()
