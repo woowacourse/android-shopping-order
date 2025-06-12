@@ -43,7 +43,7 @@ class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment
 
             override fun onFinalizeOrder() {
                 viewModel.finalizeOrder()
-                Toast.makeText(activity, "주문이 완료되었습니다.", Toast.LENGTH_LONG).show()
+                Toast.makeText(activity, R.string.message_order_completed, Toast.LENGTH_LONG).show()
                 parentFragmentManager.popBackStack()
                 parentFragmentManager.commit {
                     replace(R.id.shopping_fragment_container, CatalogFragment::class.java, null)

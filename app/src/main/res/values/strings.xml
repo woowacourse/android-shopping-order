@@ -38,4 +38,6 @@
     <string name="minimum_price_description">"최소 주문 금액: "</string>
     <string name="product_discount_format">-%,d원</string>
     <string name="date_formatter_pattern">yyyy년 MM월 dd일</string>
+    <string name="message_no_item_selected">선택된 상품이 없습니다.</string>
+    <string name="message_order_completed">주문이 완료되었습니다.</string>
 </resources>

@@ -27,7 +27,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
         object : CartEventHandler {
             override fun onPlaceOrder() {
                 if (viewModel.canPlaceOrder.value != true) {
-                    Toast.makeText(activity, "선택된 상품이 없습니다.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(activity, R.string.message_no_item_selected, Toast.LENGTH_LONG).show()
                     return
                 }
 
