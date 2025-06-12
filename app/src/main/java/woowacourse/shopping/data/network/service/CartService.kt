@@ -28,12 +28,12 @@ interface CartService {
     suspend fun updateCart(
         @Path("id") id: Long,
         @Body request: Int,
-    )
+    ): Response<Unit>
 
     @DELETE("/cart-items/{id}")
     suspend fun deleteCart(
         @Path("id") id: Long,
-    )
+    ): Response<Unit>
 
     @GET("/cart-items/counts")
     suspend fun getCartQuantity(): CartCountResponse
