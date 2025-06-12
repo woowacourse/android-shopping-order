@@ -47,9 +47,10 @@ class ShoppingApplication : Application() {
         }
     }
 
-    val paymentFactory by lazy {
+    val paymentFactory: (LongArray) -> ViewModelFactory<PaymentViewModel> = { orderIds ->
         ViewModelFactory {
             PaymentViewModel(
+                orderIds,
                 CouponRepository(NetworkClient.couponService),
                 CartRepository(NetworkClient.cartService),
                 OrderRepository(NetworkClient.orderService),

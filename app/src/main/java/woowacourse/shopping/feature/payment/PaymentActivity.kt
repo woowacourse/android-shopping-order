@@ -18,7 +18,8 @@ class PaymentActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPaymentBinding
     private lateinit var adapter: PaymentCouponAdapter
     private val viewModel: PaymentViewModel by viewModels {
-        (application as ShoppingApplication).paymentFactory
+        val orderIds = intent.getLongArrayExtra(ORDER_IDS) ?: longArrayOf()
+        (application as ShoppingApplication).paymentFactory(orderIds)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,9 +32,6 @@ class PaymentActivity : AppCompatActivity() {
         setupAdapter()
         binding.rvCoupons.adapter = adapter
         binding.rvCoupons.isNestedScrollingEnabled = false
-
-        val orderIds = intent.getLongArrayExtra(ORDER_IDS) ?: longArrayOf()
-        viewModel.setOrderDetails(orderIds)
 
         viewModel.orderCompletedEvent.observe(this) {
             Toast

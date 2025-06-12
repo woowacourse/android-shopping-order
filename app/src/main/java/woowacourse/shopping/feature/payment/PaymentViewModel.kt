@@ -19,6 +19,7 @@ import woowacourse.shopping.util.SingleLiveData
 import woowacourse.shopping.util.toDomain
 
 class PaymentViewModel(
+    private val orderIds: LongArray,
     private val couponRepository: CouponRepository,
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
@@ -37,21 +38,8 @@ class PaymentViewModel(
 
     private var currentCouponRule: Coupon? = null
 
-    fun setOrderDetails(orderIds: LongArray) {
-        viewModelScope
-            .launch {
-                val allCarts = cartRepository.fetchAllCart().content
-                _orderedCarts = allCarts.filter { it.id in orderIds }.map { it.toDomain() }
-
-                val orderedPrice = _orderedCarts.sumOf { it.product.price * it.quantity }
-
-                val newPrice =
-                    _price.value?.copy(orderPrice = orderedPrice, totalPrice = orderedPrice + DEFAULT_SHIPPING_FEE)
-                        ?: Price(orderPrice = orderedPrice, totalPrice = orderedPrice + DEFAULT_SHIPPING_FEE)
-                _price.postValue(newPrice)
-
-                getAvailableCoupons()
-            }
+    init {
+        setOrderDetails(orderIds)
     }
 
     fun toggleCheck(selectedCouponRule: Coupon) {
@@ -115,5 +103,22 @@ class PaymentViewModel(
 
             _coupons.postValue(availableCouponRules)
         }
+    }
+
+    private fun setOrderDetails(orderIds: LongArray) {
+        viewModelScope
+            .launch {
+                val allCarts = cartRepository.fetchAllCart().content
+                _orderedCarts = allCarts.filter { it.id in orderIds }.map { it.toDomain() }
+
+                val orderedPrice = _orderedCarts.sumOf { it.product.price * it.quantity }
+
+                val newPrice =
+                    _price.value?.copy(orderPrice = orderedPrice, totalPrice = orderedPrice + DEFAULT_SHIPPING_FEE)
+                        ?: Price(orderPrice = orderedPrice, totalPrice = orderedPrice + DEFAULT_SHIPPING_FEE)
+                _price.postValue(newPrice)
+
+                getAvailableCoupons()
+            }
     }
 }
