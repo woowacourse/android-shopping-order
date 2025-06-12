@@ -49,5 +49,5 @@
 - [ ] 특정 값 조회의 역할을 viewModel 또는 Repository로 이전
 - [ ] 에러핸들링을 하기 위해서는 CallAdapter 에 대해서 찾아보셔도 좋습니다
 - [ ] sealed class 파일 내부에 정리
-- [ ] 주문 완료에서 Home으로 이동 수정
+- [x] 주문 완료에서 Home으로 이동 수정
 - [ ] fetchCart viewModel로 이전

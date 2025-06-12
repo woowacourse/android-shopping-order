@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.view.order.payment
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
@@ -64,10 +63,7 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
     }
 
     private fun navigateToShopping() {
-        val intent =
-            ShoppingActivity.newIntent(requireActivity()).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-            }
+        val intent = ShoppingActivity.newIntent(requireContext())
         startActivity(intent)
         requireActivity().finish()
     }

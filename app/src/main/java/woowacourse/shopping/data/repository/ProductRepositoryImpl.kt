@@ -19,12 +19,13 @@ class ProductRepositoryImpl(
     override suspend fun fetchProducts(
         page: Int,
         size: Int,
-    ): Result<PageableItem<Product>> {
-        val response = productRemoteDataSource.fetchProducts(null, page, size).getOrThrow()
-        val products = response.content.map { it.toDomain() }
-        val hasMore = !response.last
-        return runCatching { PageableItem(products, hasMore) }
-    }
+    ): Result<PageableItem<Product>> =
+        runCatching {
+            val response = productRemoteDataSource.fetchProducts(null, page, size).getOrThrow()
+            val products = response.content.map { it.toDomain() }
+            val hasMore = !response.last
+            PageableItem(products, hasMore)
+        }
 
     override suspend fun fetchSuggestionProducts(
         limit: Int,

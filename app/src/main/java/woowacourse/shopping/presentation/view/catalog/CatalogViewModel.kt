@@ -54,8 +54,11 @@ class CatalogViewModel(
         viewModelScope.launch {
             productRepository
                 .fetchProducts(page, PRODUCT_LOAD_LIMIT)
-                .onSuccess { handleProductPageLoad(it) }
-                .onFailure { emitToastMessage(CatalogMessageEvent.FETCH_PRODUCTS_FAILURE) }
+                .onSuccess {
+                    handleProductPageLoad(it)
+                }.onFailure {
+                    emitToastMessage(CatalogMessageEvent.FETCH_PRODUCTS_FAILURE)
+                }
         }
     }
 
@@ -118,11 +121,10 @@ class CatalogViewModel(
             .onSuccess {
                 val updatedItems = applyCartQuantities(it, currentItems)
                 val finalCatalog = prependRecentProducts(recentProductsItem, updatedItems)
-                _products.postValue(finalCatalog)
+                _products.value = finalCatalog
+                _isLoading.value = true
                 updateCartItemCount()
             }
-
-        _isLoading.postValue(false)
     }
 
     private suspend fun updateProductQuantityInList(productId: Long) {
