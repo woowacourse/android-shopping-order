@@ -303,14 +303,12 @@ class CartViewModel(
         viewModelScope.launch {
             val goods = goodsRepository.fetchMostRecentGoods()
             if (goods != null) {
-                viewModelScope.launch {
-                    try {
-                        val goodsResponse = goodsRepository.fetchCategoryGoods(10, goods.category)
-                        val categoryGoods = goodsResponse.content.map { CartItem(it.toDomain(), 0) }
-                        filterAndSetRecommendedGoods(categoryGoods)
-                    } catch (e: Exception) {
-                        loadDefaultRecommendedGoods()
-                    }
+                try {
+                    val goodsResponse = goodsRepository.fetchCategoryGoods(10, goods.category)
+                    val categoryGoods = goodsResponse.content.map { CartItem(it.toDomain(), 0) }
+                    filterAndSetRecommendedGoods(categoryGoods)
+                } catch (e: Exception) {
+                    loadDefaultRecommendedGoods()
                 }
             } else {
                 loadDefaultRecommendedGoods()
@@ -345,15 +343,13 @@ class CartViewModel(
         }
     }
 
-    private fun loadDefaultRecommendedGoods(pageOffset: Int = 0) {
-        viewModelScope.launch {
-            try {
-                val goodsResponse = goodsRepository.fetchPageGoods(10, pageOffset * 10)
-                val allGoodsList = goodsResponse.content.map { CartItem(it.toDomain(), 0) }
-                filterAndSetRecommendedGoods(allGoodsList, pageOffset)
-            } catch (e: Exception) {
-                _recommendedGoods.value = emptyList()
-            }
+    private suspend fun loadDefaultRecommendedGoods(pageOffset: Int = 0) {
+        try {
+            val goodsResponse = goodsRepository.fetchPageGoods(10, pageOffset * 10)
+            val allGoodsList = goodsResponse.content.map { CartItem(it.toDomain(), 0) }
+            filterAndSetRecommendedGoods(allGoodsList, pageOffset)
+        } catch (e: Exception) {
+            _recommendedGoods.value = emptyList()
         }
     }
 
