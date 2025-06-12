@@ -17,9 +17,9 @@ data class PercentageCoupon(
         return orderInfo.copy(discount = -discount)
     }
 
-    override fun isAvailable(): Boolean {
+    override fun isAvailable(date: LocalDate): Boolean {
         val isAvailable = availableTime.isAvailableTime()
-        return super.isAvailable() && isAvailable
+        return super.isAvailable(date) && isAvailable
     }
 
     companion object {
