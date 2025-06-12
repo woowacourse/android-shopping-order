@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.Discount
+import woowacourse.shopping.domain.model.DiscountType
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -32,25 +33,25 @@ data class CouponDto(
 ) {
     fun toCoupon(): Coupon {
         val discount =
-            when (this.discountType) {
-                "fixed" -> {
+            when (DiscountType.from(this.discountType)) {
+                DiscountType.FIXED -> {
                     requireNotNull(discount)
                     requireNotNull(minimumAmount)
                     Discount.FixedAmount(discount, minimumAmount)
                 }
 
-                "buyXgetY" -> {
+                DiscountType.BUY_X_GET_Y -> {
                     requireNotNull(buyQuantity)
                     requireNotNull(getQuantity)
                     Discount.BuyXGetYFree(buyQuantity, getQuantity)
                 }
 
-                "freeShipping" -> {
+                DiscountType.FREE_SHIPPING -> {
                     requireNotNull(minimumAmount)
                     Discount.FreeShipping(minimumAmount)
                 }
 
-                "percentage" -> {
+                DiscountType.PERCENTAGE -> {
                     requireNotNull(discount)
                     val time = requireNotNull(availableTime)
                     Discount.Percentage(
@@ -59,8 +60,6 @@ data class CouponDto(
                         LocalTime.parse(time.end),
                     )
                 }
-
-                else -> throw IllegalArgumentException()
             }
 
         return Coupon(
