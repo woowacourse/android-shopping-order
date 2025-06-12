@@ -30,7 +30,7 @@
 - [ ] 아직 수정하지 않은 execute, body 삭제
 - [ ] RecommendViewModel | error("") 대신 더 안전한 방식으로 변경
 - [ ] DefaultProductsRepository | maxBy { it.viewedAt }가 빈리스트일 경우 핸들링
-- [ ] CouponResponseItem | 다형성을 사용하여 파싱하도록 수정
+- [x] CouponResponseItem | 다형성을 사용하여 파싱하도록 수정
 - [ ] ReceiptActivity | 네트워크가 끊어지게 되면 생기는 오류 핸들링
 - [ ] 전체적으로 mapper함수 생성
 - [ ] 각 viewmodel에 비즈니스 로직을 Repository로 이동
