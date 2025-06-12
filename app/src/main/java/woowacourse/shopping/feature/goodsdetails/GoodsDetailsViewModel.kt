@@ -101,8 +101,11 @@ class GoodsDetailsViewModel(
                             insertToHistory(cartProduct.value as CartProduct)
                             updateCart(updatedCart)
                             _insertState.value = Event(State.Success)
-                        }.onFailure {
-                            _insertState.value = Event(State.Failure)
+                        }.onFailure { throwable ->
+                            when (throwable.message) {
+                                "400" -> _insertState.value = Event(State.Failure.BadRequest)
+                                else -> _insertState.value = Event(State.Failure.NetworkError)
+                            }
                         }
                 } else {
                     cartRepository
@@ -114,8 +117,11 @@ class GoodsDetailsViewModel(
                             insertToHistory(cartProduct.value as CartProduct)
                             updateCart(updatedCart)
                             _insertState.value = Event(State.Success)
-                        }.onFailure {
-                            _insertState.value = Event(State.Failure)
+                        }.onFailure { throwable ->
+                            when (throwable.message) {
+                                "400" -> _insertState.value = Event(State.Failure.BadRequest)
+                                else -> _insertState.value = Event(State.Failure.NetworkError)
+                            }
                         }
                 }
             }

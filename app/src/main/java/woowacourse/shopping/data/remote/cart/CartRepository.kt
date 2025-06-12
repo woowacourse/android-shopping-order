@@ -20,11 +20,10 @@ class CartRepository(
         try {
             val response = cartService.addToCart(cartRequest = cartRequest)
             if (response.isSuccessful) {
-                val id =
-                    response.headers()["Location"]?.substringAfterLast("/")?.toLongOrNull() ?: 0
+                val id = response.headers()["Location"]?.substringAfterLast("/")?.toLongOrNull() ?: 0
                 Result.success(id)
             } else {
-                Result.failure(Throwable("응답 실패: ${response.code()}"))
+                Result.failure(Throwable(response.code().toString()))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -36,7 +35,7 @@ class CartRepository(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                Result.failure(Throwable("응답 실패: ${response.code()}"))
+                Result.failure(Throwable(response.code().toString()))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -50,7 +49,7 @@ class CartRepository(
         if (response.isSuccessful) {
             Result.success(Result.success(Unit))
         } else {
-            Result.failure(Throwable("응답 실패: ${response.code()}"))
+            Result.failure(Throwable(response.code().toString()))
         }
     } catch (e: Exception) {
         Result.failure(e)

@@ -108,11 +108,18 @@ class GoodsActivity : AppCompatActivity() {
                                 R.string.goods_detail_cart_insert_success_toast_message,
                                 Toast.LENGTH_SHORT,
                             ).show()
-                    is State.Failure ->
+                    is State.Failure.BadRequest ->
                         Toast
                             .makeText(
                                 this,
-                                R.string.goods_detail_cart_insert_fail_toast_message,
+                                R.string.goods_detail_cart_bad_request_fail_toast_message,
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                    is State.Failure.NetworkError ->
+                        Toast
+                            .makeText(
+                                this,
+                                R.string.goods_detail_cart_network_error_fail_toast_message,
                                 Toast.LENGTH_SHORT,
                             ).show()
                 }

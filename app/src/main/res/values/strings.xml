@@ -15,7 +15,8 @@
     <string name="goods_details_cart_button">장바구니 담기</string>
     <string name="goods_detail_price">가격</string>
     <string name="goods_detail_cart_insert_success_toast_message">상품이 장바구니에 담겼습니다!</string>
-    <string name="goods_detail_cart_insert_fail_toast_message">장바구니 수정에 실패했습니다. 다시 시도해주세요!</string>
+    <string name="goods_detail_cart_bad_request_fail_toast_message">장바구니 수정에 실패했습니다. 다시 시도해주세요!</string>
+    <string name="goods_detail_cart_network_error_fail_toast_message">네트워크 오류가 발생했습니다. 인터넷 연결을 확인한 후 다시 시도해 주세요.</string>
 
     <!--    CartActivity-->
     <string name="cart_action_bar_name">Cart</string>

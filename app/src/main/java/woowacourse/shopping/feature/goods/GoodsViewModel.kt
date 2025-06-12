@@ -79,8 +79,11 @@ class GoodsViewModel(
                         updateItems(updatedCart)
                         getCartCounts()
                         _insertState.value = Event(State.Success)
-                    }.onFailure {
-                        _insertState.value = Event(State.Failure)
+                    }.onFailure { throwable ->
+                        when (throwable.message) {
+                            "400" -> _insertState.value = Event(State.Failure.BadRequest)
+                            else -> _insertState.value = Event(State.Failure.NetworkError)
+                        }
                     }
             } else {
                 cartRepository
@@ -90,8 +93,11 @@ class GoodsViewModel(
                         updateItems(updatedCart)
                         getCartCounts()
                         _insertState.value = Event(State.Success)
-                    }.onFailure {
-                        _insertState.value = Event(State.Failure)
+                    }.onFailure { throwable ->
+                        when (throwable.message) {
+                            "400" -> _insertState.value = Event(State.Failure.BadRequest)
+                            else -> _insertState.value = Event(State.Failure.NetworkError)
+                        }
                     }
             }
         }
@@ -106,8 +112,11 @@ class GoodsViewModel(
                         val updatedCart = cart.copy(id = 0, quantity = 0)
                         updateItems(updatedCart)
                         getCartCounts()
-                    }.onFailure {
-                        _insertState.value = Event(State.Failure)
+                    }.onFailure { throwable ->
+                        when (throwable.message) {
+                            "400" -> _insertState.value = Event(State.Failure.BadRequest)
+                            else -> _insertState.value = Event(State.Failure.NetworkError)
+                        }
                     }
             } else {
                 cartRepository
@@ -118,8 +127,11 @@ class GoodsViewModel(
                         val updatedCart = cart.copy(quantity = cart.quantity - 1)
                         updateItems(updatedCart)
                         getCartCounts()
-                    }.onFailure {
-                        _insertState.value = Event(State.Failure)
+                    }.onFailure { throwable ->
+                        when (throwable.message) {
+                            "400" -> _insertState.value = Event(State.Failure.BadRequest)
+                            else -> _insertState.value = Event(State.Failure.NetworkError)
+                        }
                     }
             }
         }
