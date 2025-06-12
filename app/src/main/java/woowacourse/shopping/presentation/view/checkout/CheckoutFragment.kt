@@ -38,7 +38,7 @@ class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment
                 coupon: CouponUiModel,
                 isSelected: Boolean,
             ) {
-                viewModel.setCouponSelection(coupon, isSelected)
+                viewModel.toggleCouponSelection(coupon)
             }
 
             override fun onFinalizeOrder() {

@@ -83,14 +83,11 @@ class CheckoutViewModel(
         _coupons.value = availableCoupons
     }
 
-    fun setCouponSelection(
-        target: CouponUiModel,
-        isSelected: Boolean,
-    ) {
+    fun toggleCouponSelection(target: CouponUiModel) {
         _coupons.value =
             _coupons.value?.map { coupon ->
                 if (coupon.coupon.info.id == target.coupon.info.id) {
-                    coupon.copy(isSelected = isSelected)
+                    coupon.copy(isSelected = !target.isSelected)
                 } else {
                     coupon.copy(isSelected = false)
                 }
