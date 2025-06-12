@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.util.mapper
 
 import woowacourse.shopping.data.carts.dto.CartResponse
-import woowacourse.shopping.data.payment.dto.CouponResponse
+import woowacourse.shopping.data.payment.dto.CouponListResponse
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.coupon.CalculateBonusGoods
 import woowacourse.shopping.domain.model.coupon.Coupon
@@ -13,7 +13,7 @@ import java.time.LocalTime
 
 fun CartResponse.toCartItems(): List<CartItem> = this.content.map { CartItem(it.product.toDomain(), it.quantity, it.id) }
 
-fun CouponResponse.toCouponItems(): List<Coupon> =
+fun CouponListResponse.toCouponItems(): List<Coupon> =
     this.mapNotNull { couponItem ->
 
         val id = couponItem.id

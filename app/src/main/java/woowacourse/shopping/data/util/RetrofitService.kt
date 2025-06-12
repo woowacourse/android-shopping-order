@@ -13,7 +13,7 @@ import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.goods.dto.Content
 import woowacourse.shopping.data.goods.dto.GoodsResponse
-import woowacourse.shopping.data.payment.dto.CouponResponse
+import woowacourse.shopping.data.payment.dto.CouponListResponse
 import woowacourse.shopping.data.payment.dto.OrderRequestBody
 
 interface RetrofitService {
@@ -56,7 +56,7 @@ interface RetrofitService {
     ): Response<Unit>
 
     @GET("/coupons")
-    suspend fun requestCoupons(): CouponResponse
+    suspend fun requestCoupons(): CouponListResponse
 
     @POST("/orders")
     suspend fun requestOrder(
