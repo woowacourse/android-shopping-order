@@ -69,29 +69,18 @@ class OrderViewModel(
 
     private fun calculateCouponDiscount() {
         val couponItem = applyingCoupon.value
-        val currentPrice = price.value ?: INITIAL_AMOUNT
+        val priceToOrder = price.value ?: INITIAL_AMOUNT
 
         val discountAmount =
-            when (val origin = couponItem?.origin) {
-                is Coupon.PriceDiscount -> -origin.discount
-                is Coupon.PercentageDiscount -> -currentPrice * (origin.discountPercentage / PERCENT_BASE)
-                is Coupon.Bonus -> -(calculateBonusDiscount(origin) ?: INITIAL_AMOUNT)
-                is Coupon.FreeShipping -> -(shippingFee.value?.amount ?: INITIAL_AMOUNT)
+            when (val coupon = couponItem?.origin) {
+                is Coupon.PriceDiscount -> coupon.calculateDiscount()
+                is Coupon.PercentageDiscount -> coupon.calculateDiscount(priceToOrder)
+                is Coupon.Bonus -> coupon.calculateDiscount(productsToOrder)
+                is Coupon.FreeShipping -> -coupon.calculateDiscount(shippingFee.value ?: return)
                 null -> INITIAL_AMOUNT
             }
 
         _couponDiscount.value = discountAmount
-    }
-
-    private fun calculateBonusDiscount(coupon: Coupon.Bonus): Int? {
-        val productsToApplyBonusCoupon =
-            productsToOrder
-                .filter { it.quantity >= coupon.buyQuantity + coupon.getQuantity }
-
-        val maxPricedProduct: ShoppingCartProduct =
-            productsToApplyBonusCoupon.maxByOrNull { it.price } ?: return null
-
-        return maxPricedProduct.product.price
     }
 
     private fun getCoupons() {
@@ -112,16 +101,10 @@ class OrderViewModel(
                 if (coupon.isExpiration) return@filter false
 
                 when (coupon) {
-                    is Coupon.PriceDiscount -> (price.value ?: return) >= coupon.minimumAmount
-                    is Coupon.FreeShipping -> (price.value ?: return) >= coupon.minimumAmount
-                    is Coupon.PercentageDiscount -> {
-                        val now = LocalTime.now()
-                        now in coupon.availableStartTime..coupon.availableEndTime
-                    }
-
-                    is Coupon.Bonus -> {
-                        productsToOrder.any { it.quantity >= coupon.buyQuantity + coupon.getQuantity }
-                    }
+                    is Coupon.PriceDiscount -> coupon.isAvailable(price.value ?: return)
+                    is Coupon.FreeShipping -> coupon.isAvailable(price.value ?: return)
+                    is Coupon.PercentageDiscount -> coupon.isAvailable(LocalTime.now())
+                    is Coupon.Bonus -> coupon.isAvailable(productsToOrder)
                 }
             }
 
@@ -168,7 +151,6 @@ class OrderViewModel(
 
     companion object {
         private const val INITIAL_AMOUNT = 0
-        private const val PERCENT_BASE = 100
 
         fun provideFactory(productsToOrder: Array<ShoppingCartProduct>): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {

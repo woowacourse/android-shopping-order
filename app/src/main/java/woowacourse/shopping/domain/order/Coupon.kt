@@ -1,5 +1,6 @@
 package woowacourse.shopping.domain.order
 
+import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -21,6 +22,10 @@ sealed interface Coupon {
         val minimumAmount: Int,
     ) : Coupon {
         override val discountType: DiscountType = DiscountType.PRICE_DISCOUNT
+
+        fun isAvailable(priceToOrder: Int): Boolean = priceToOrder >= minimumAmount
+
+        fun calculateDiscount(): Int = -discount
     }
 
     data class Bonus(
@@ -32,6 +37,22 @@ sealed interface Coupon {
         val getQuantity: Int,
     ) : Coupon {
         override val discountType: DiscountType = DiscountType.BONUS
+
+        fun isAvailable(productsToOrder: List<ShoppingCartProduct>): Boolean =
+            productsToOrder.any { it.quantity >= buyQuantity + getQuantity }
+
+        fun calculateDiscount(productsToOrder: List<ShoppingCartProduct>): Int = -(calculateMaxPrice(productsToOrder))
+
+        private fun calculateMaxPrice(productsToOrder: List<ShoppingCartProduct>): Int {
+            val productsToApplyBonusCoupon =
+                productsToOrder.filter { it.quantity >= buyQuantity + getQuantity }
+
+            val maxPricedProduct: ShoppingCartProduct =
+                productsToApplyBonusCoupon.maxByOrNull { it.price }
+                    ?: throw error("2+1 쿠폰을 적용할 수 없습니다.")
+
+            return maxPricedProduct.product.price
+        }
     }
 
     data class FreeShipping(
@@ -42,6 +63,10 @@ sealed interface Coupon {
         val minimumAmount: Int,
     ) : Coupon {
         override val discountType: DiscountType = DiscountType.FREE_SHIPPING
+
+        fun isAvailable(priceToOrder: Int): Boolean = priceToOrder >= minimumAmount
+
+        fun calculateDiscount(shippingFee: ShippingFee): Int = -(shippingFee.amount)
     }
 
     data class PercentageDiscount(
@@ -56,5 +81,13 @@ sealed interface Coupon {
         override val discountType: DiscountType = DiscountType.PERCENTAGE_DISCOUNT
         override val isExpiration: Boolean
             get() = expirationDate.isBefore(LocalDate.now())
+
+        fun isAvailable(currentTime: LocalTime): Boolean = currentTime in availableStartTime..availableEndTime
+
+        fun calculateDiscount(priceToOrder: Int): Int = -priceToOrder * discountPercentage / PERCENT_BASE
+    }
+
+    companion object {
+        private const val PERCENT_BASE = 100
     }
 }
