@@ -3,13 +3,14 @@ package woowacourse.shopping.domain.model
 import java.util.Base64
 
 object Authorization {
-    private var _isLogin: Boolean = false
-    val isLogin get() = _isLogin
-    private var _basicKey: String = ""
-    val basicKey get() = _basicKey
+    var isLogin: Boolean = false
+        private set
+
+    var basicKey: String = ""
+        private set
 
     fun setLoginStatus(status: Boolean) {
-        _isLogin = status
+        isLogin = status
     }
 
     fun setBasicKeyByIdPw(
@@ -21,6 +22,6 @@ object Authorization {
     }
 
     fun setBasicKey(basicKey: String) {
-        _basicKey = basicKey
+        this.basicKey = basicKey
     }
 }
