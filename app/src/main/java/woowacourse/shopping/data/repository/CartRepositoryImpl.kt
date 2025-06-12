@@ -1,8 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import woowacourse.shopping.data.datasource.CartLocalDataSource
 import woowacourse.shopping.data.datasource.CartRemoteDataSource
 import woowacourse.shopping.data.datasource.ProductRemoteDataSource
@@ -19,12 +16,6 @@ class CartRepositoryImpl(
     private val cartDataSource: CartRemoteDataSource,
     private val productDataSource: ProductRemoteDataSource,
 ) : CartRepository {
-    init {
-        CoroutineScope(Dispatchers.Default).launch {
-            fetchCart()
-        }
-    }
-
     override suspend fun fetchCartItems(
         page: Int,
         size: Int,
@@ -88,6 +79,12 @@ class CartRepositoryImpl(
             result.quantity
         }
 
+    override suspend fun hasCartItem(): Result<Boolean> =
+        runCatching {
+            val result = cartDataSource.fetchCartItemCount().getOrThrow()
+            result.quantity >= 0
+        }
+
     override fun findQuantityByProductId(productId: Long): Result<Int> =
         runCatching { cartLocalDataSource.findQuantityByProductId(productId) }
 
@@ -111,7 +108,7 @@ class CartRepositoryImpl(
         cartLocalDataSource.updateQuantityByProductId(productId, quantity)
     }
 
-    private suspend fun fetchCart() {
+    override suspend fun fetchCart() {
         val totalElements = cartDataSource.fetchCartItems(0, 1).getOrThrow().totalElements
         val result = cartDataSource.fetchCartItems(0, totalElements).getOrThrow().content
         return cartLocalDataSource.addAll(result.map { it.toDomain() })

@@ -4,6 +4,8 @@ import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PageableItem
 
 interface CartRepository {
+    suspend fun fetchCart()
+
     suspend fun fetchCartItems(
         page: Int,
         size: Int,
@@ -28,6 +30,8 @@ interface CartRepository {
     ): Result<Unit>
 
     suspend fun fetchCartItemCount(): Result<Int>
+
+    suspend fun hasCartItem(): Result<Boolean>
 
     fun findQuantityByProductId(productId: Long): Result<Int>
 

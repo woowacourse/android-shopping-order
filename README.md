@@ -47,7 +47,7 @@
 - [ ] JsonClassDiscriminator 어노테이션이 붙지 않을 데이터 수정
 - [ ] find 네이밍 함수 이름 변경 및 Result를 통한 에러 핸들링
 - [ ] 특정 값 조회의 역할을 viewModel 또는 Repository로 이전
-- [ ] 에러핸들링을 하기 위해서는 CallAdapter 에 대해서 찾아보셔도 좋습니다
+- [ ] 에러핸들링을 하기 위해서는 CallAdapter 에 대해서 찾아보고 적용
 - [x] sealed class 파일 내부에 정리
 - [x] 주문 완료에서 Home으로 이동 수정
-- [ ] fetchCart viewModel로 이전
+- [x] fetchCart viewModel로 이전

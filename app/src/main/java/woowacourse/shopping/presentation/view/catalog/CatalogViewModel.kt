@@ -52,6 +52,13 @@ class CatalogViewModel(
     fun loadProducts() {
         _isLoading.value = true
         viewModelScope.launch {
+            cartRepository
+                .hasCartItem()
+                .onSuccess {
+                    if (it) cartRepository.fetchCart()
+                }.onFailure {
+                    emitToastMessage(CatalogMessageEvent.FETCH_PRODUCTS_FAILURE)
+                }
             productRepository
                 .fetchProducts(page, PRODUCT_LOAD_LIMIT)
                 .onSuccess {
