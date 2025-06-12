@@ -32,18 +32,18 @@ class DetailViewModel(
         loadProduct()
     }
 
-    fun loadProduct() {
+    private fun loadProduct() {
         viewModelScope.launch {
-            val product = productRepository.findProductById(productId)
+            val product = productRepository.loadProductById(productId)
             val cartItem = cartRepository.loadCartItemByProductId(productId)
             if (cartItem == null) {
                 _product.postValue(product?.toProductUiModel()?.copy(quantity = MIN_QUANTITY))
             } else {
                 _product.postValue(cartItem.toProductUiModel().copy(quantity = MIN_QUANTITY))
             }
-            val recentProduct = productRepository.getMostRecentProduct()
-            _lastViewedProduct.postValue(recentProduct?.toProductUiModel())
-            if (product != null) productRepository.addRecentProduct(product)
+            productRepository.getMostRecentProduct()?.let { recentProduct ->
+                _lastViewedProduct.postValue(recentProduct.toProductUiModel())
+            }
         }
     }
 
@@ -54,7 +54,14 @@ class DetailViewModel(
 
     fun decreaseQuantity() {
         val currentQuantity = _product.value?.quantity ?: MIN_QUANTITY
-        _product.postValue(_product.value?.copy(quantity = (currentQuantity - 1).coerceAtLeast(MIN_QUANTITY)))
+        _product.postValue(
+            _product.value?.copy(
+                quantity =
+                    (currentQuantity - 1).coerceAtLeast(
+                        MIN_QUANTITY,
+                    ),
+            ),
+        )
     }
 
     fun addToCart() {

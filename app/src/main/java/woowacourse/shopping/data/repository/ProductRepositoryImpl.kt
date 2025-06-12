@@ -32,8 +32,10 @@ class ProductRepositoryImpl(
         return Page(products, response.first, isLast)
     }
 
-    override suspend fun findProductById(id: Long): Product {
-        return productDataSource.fetchProduct(id).toProduct()
+    override suspend fun loadProductById(id: Long): Product {
+        val product = productDataSource.fetchProduct(id).toProduct()
+        addRecentProduct(product)
+        return product
     }
 
     override suspend fun loadAllCartItems(): List<CartItem> {

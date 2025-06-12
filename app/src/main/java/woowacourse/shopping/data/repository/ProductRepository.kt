@@ -20,7 +20,7 @@ interface ProductRepository {
 
     suspend fun loadAllCartItems(): List<CartItem>
 
-    suspend fun findProductById(id: Long): Product?
+    suspend fun loadProductById(id: Long): Product?
 
     suspend fun addRecentProduct(product: Product)
 }
