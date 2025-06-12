@@ -12,7 +12,9 @@ import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.CouponRule
 import woowacourse.shopping.domain.model.Price
+import woowacourse.shopping.domain.model.Price.Companion.DEFAULT_DISCOUNT
 import woowacourse.shopping.domain.model.Price.Companion.DEFAULT_PRICE
+import woowacourse.shopping.domain.model.Price.Companion.DEFAULT_SHIPPING_FEE
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 import woowacourse.shopping.util.toDomain
@@ -112,10 +114,5 @@ class PaymentViewModel(
 
             _coupons.postValue(availableCoupons)
         }
-    }
-
-    companion object {
-        private const val DEFAULT_SHIPPING_FEE: Int = 3_000
-        private const val DEFAULT_DISCOUNT: Int = 0
     }
 }

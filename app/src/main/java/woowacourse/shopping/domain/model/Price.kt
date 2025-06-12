@@ -8,5 +8,7 @@ data class Price(
 ) {
     companion object {
         val DEFAULT_PRICE = Price()
+        const val DEFAULT_SHIPPING_FEE: Int = 3000
+        const val DEFAULT_DISCOUNT: Int = 0
     }
 }
