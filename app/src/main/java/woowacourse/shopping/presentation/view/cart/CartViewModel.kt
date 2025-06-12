@@ -16,6 +16,8 @@ import woowacourse.shopping.presentation.model.toCartItem
 import woowacourse.shopping.presentation.model.toCartItemUiModel
 import woowacourse.shopping.presentation.model.toProductUiModel
 import woowacourse.shopping.presentation.model.toUiModel
+import woowacourse.shopping.presentation.util.MutableSingleLiveData
+import woowacourse.shopping.presentation.util.SingleLiveData
 import kotlin.math.max
 
 class CartViewModel(
@@ -51,6 +53,9 @@ class CartViewModel(
 
     private val selectedStates = mutableMapOf<Long, Boolean>()
 
+    private val _toastEvent = MutableSingleLiveData<CartEvent>()
+    val toastEvent: SingleLiveData<CartEvent> = _toastEvent
+
     init {
         fetchShoppingCart(false)
     }
@@ -77,6 +82,8 @@ class CartViewModel(
                     _page.postValue(newPage)
                     _hasMore.postValue(hasMore)
                     updateSelectionInfo()
+                }.onFailure {
+                    _toastEvent.setValue(CartEvent.LOAD_CART_ITEM_FAILURE)
                 }
         }
     }
@@ -92,6 +99,8 @@ class CartViewModel(
                     _itemUpdateEvent.postValue(updatedCartItem.toProductUiModel())
                     updateProducts(updatedCartItem)
                     fetchShoppingCart(isNextPage = false, isRefresh = true)
+                }.onFailure {
+                    _toastEvent.setValue(CartEvent.ADD_CART_ITEM_FAILURE)
                 }
         }
     }
@@ -113,6 +122,8 @@ class CartViewModel(
                 .onSuccess {
                     _deleteState.postValue(it)
                     updateSelectionInfo()
+                }.onFailure {
+                    _toastEvent.setValue(CartEvent.DELETE_CART_ITEM_FAILURE)
                 }
         }
     }
@@ -220,6 +231,8 @@ class CartViewModel(
                     )
                     updateSelectionInfo()
                     fetchShoppingCart(false, true)
+                }.onFailure {
+                    _toastEvent.setValue(CartEvent.LOAD_CART_ITEM_FAILURE)
                 }
         }
     }
@@ -243,6 +256,8 @@ class CartViewModel(
                                     .take(10)
                             _recommendedProducts.postValue(filtered.map { it.toUiModel() })
                         }
+                }.onFailure {
+                    _toastEvent.setValue(CartEvent.LOAD_RECOMMENDED_PRODUCT_FAILURE)
                 }
         }
     }

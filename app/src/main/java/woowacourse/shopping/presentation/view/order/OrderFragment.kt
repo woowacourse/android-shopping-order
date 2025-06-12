@@ -2,7 +2,6 @@ package woowacourse.shopping.presentation.view.order
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
@@ -14,6 +13,7 @@ import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.extension.getParcelableArrayListCompat
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.CouponUiModel
+import woowacourse.shopping.presentation.util.showToast
 import woowacourse.shopping.presentation.view.catalog.CatalogFragment
 import woowacourse.shopping.presentation.view.catalog.CatalogFragment.Companion.CART_UPDATE_REQUEST_KEY
 import woowacourse.shopping.presentation.view.order.coupon.CouponAdapter
@@ -73,10 +73,20 @@ class OrderFragment :
         }
 
         viewModel.orderSuccessEvent.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(),
-                getString(R.string.toast_order_success_text),
-                Toast.LENGTH_SHORT).show()
             navigateToCatalog()
+        }
+        viewModel.toastEvent.observe(viewLifecycleOwner) { orderEvent ->
+            when (orderEvent) {
+                OrderEvent.ORDER_SUCCESS -> {
+                    requireContext().showToast(R.string.toast_order_success_text)
+                }
+                OrderEvent.ORDER_FAILURE -> {
+                    requireContext().showToast(R.string.toast_order_failure_text)
+                }
+                OrderEvent.LOAD_COUPONS_FAILURE -> {
+                    requireContext().showToast(R.string.toast_order_load_coupons_failure_text)
+                }
+            }
         }
     }
 

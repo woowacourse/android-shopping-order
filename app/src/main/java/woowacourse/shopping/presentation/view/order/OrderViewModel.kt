@@ -14,6 +14,8 @@ import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.CouponUiModel
 import woowacourse.shopping.presentation.model.toDomain
 import woowacourse.shopping.presentation.model.toUiModel
+import woowacourse.shopping.presentation.util.MutableSingleLiveData
+import woowacourse.shopping.presentation.util.SingleLiveData
 
 class OrderViewModel(
     private val orderRepository: OrderRepository,
@@ -33,6 +35,9 @@ class OrderViewModel(
     private val _orderSuccessEvent = MutableLiveData<Unit>()
     val orderSuccessEvent: LiveData<Unit> = _orderSuccessEvent
 
+    private val _toastEvent = MutableSingleLiveData<OrderEvent>()
+    val toastEvent: SingleLiveData<OrderEvent> = _toastEvent
+
     fun loadCoupons() {
         viewModelScope.launch {
             couponRepository
@@ -41,6 +46,7 @@ class OrderViewModel(
                     _couponList.value = coupon.map { it.toUiModel() }
                 }.onFailure {
                     _couponList.value = emptyList()
+                    _toastEvent.setValue(OrderEvent.LOAD_COUPONS_FAILURE)
                 }
         }
     }
@@ -84,6 +90,9 @@ class OrderViewModel(
                 .order(selectedItems.map { it.toDomain() })
                 .onSuccess {
                     _orderSuccessEvent.postValue(Unit)
+                    _toastEvent.setValue(OrderEvent.ORDER_SUCCESS)
+                }.onFailure {
+                    _toastEvent.setValue(OrderEvent.ORDER_FAILURE)
                 }
         }
     }

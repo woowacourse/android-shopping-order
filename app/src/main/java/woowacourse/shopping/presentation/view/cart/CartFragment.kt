@@ -11,6 +11,7 @@ import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.model.ProductUiModel
+import woowacourse.shopping.presentation.util.showToast
 import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.cartItem.CartItemFragment
 import woowacourse.shopping.presentation.view.cart.recommendation.CartRecommendationFragment
@@ -75,6 +76,14 @@ class CartFragment :
     private fun initObserver() {
         viewModel.allSelected.observe(viewLifecycleOwner) {
             binding.selectAll.isChecked = it
+        }
+        viewModel.toastEvent.observe(viewLifecycleOwner) {
+            when (it) {
+                CartEvent.LOAD_CART_ITEM_FAILURE -> requireContext().showToast(R.string.cart_load_failure)
+                CartEvent.ADD_CART_ITEM_FAILURE -> requireContext().showToast(R.string.cart_add_failure)
+                CartEvent.DELETE_CART_ITEM_FAILURE -> requireContext().showToast(R.string.cart_delete_failure)
+                CartEvent.LOAD_RECOMMENDED_PRODUCT_FAILURE -> requireContext().showToast(R.string.cart_load_failure)
+            }
         }
     }
 

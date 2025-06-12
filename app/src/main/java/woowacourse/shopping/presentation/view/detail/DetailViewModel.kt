@@ -12,6 +12,8 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toUiModel
+import woowacourse.shopping.presentation.util.MutableSingleLiveData
+import woowacourse.shopping.presentation.util.SingleLiveData
 import woowacourse.shopping.presentation.view.ItemCounterListener
 
 class DetailViewModel(
@@ -33,6 +35,9 @@ class DetailViewModel(
 
     private val _showLastViewedProduct = MediatorLiveData<Boolean>()
     val showLastViewedProduct: LiveData<Boolean> = _showLastViewedProduct
+
+    private val _toastEvent = MutableSingleLiveData<DetailEvent>()
+    val toastEvent: SingleLiveData<DetailEvent> = _toastEvent
 
     init {
         _showLastViewedProduct.addSource(_product) { updateShowLastViewedProduct() }
@@ -70,6 +75,9 @@ class DetailViewModel(
                 ).onSuccess {
                     _product.value = product.copy(amount = updatedAmount)
                     _saveState.value = Unit
+                    _toastEvent.setValue(DetailEvent.ADD_TO_CART_SUCCESS)
+                }.onFailure {
+                    _toastEvent.setValue(DetailEvent.ADD_TO_CART_FAILURE)
                 }
         }
     }
@@ -80,6 +88,8 @@ class DetailViewModel(
                 .getProductById(productId)
                 .onSuccess { product ->
                     _product.postValue(product.toUiModel())
+                }.onFailure {
+                    _toastEvent.setValue(DetailEvent.LOAD_PRODUCT_FAILURE)
                 }
         }
     }

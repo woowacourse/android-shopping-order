@@ -15,6 +15,8 @@ import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toCartItem
 import woowacourse.shopping.presentation.model.toProduct
 import woowacourse.shopping.presentation.model.toUiModel
+import woowacourse.shopping.presentation.util.MutableSingleLiveData
+import woowacourse.shopping.presentation.util.SingleLiveData
 import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem
 
@@ -37,6 +39,9 @@ class CatalogViewModel(
 
     private val _totalCartCount = MutableLiveData<Int>()
     val totalCartCount: LiveData<Int> = _totalCartCount
+
+    private val _toastEvent = MutableSingleLiveData<CatalogEvent>()
+    val toastEvent: SingleLiveData<CatalogEvent> = _toastEvent
 
     private val loadSize = 20
     private var currentPage = 0
@@ -72,6 +77,8 @@ class CatalogViewModel(
                                 updateCatalogItems(products, cartMap, recentItem, hasMore)
                                 currentPage++
                             }
+                    }.onFailure {
+                        _toastEvent.setValue(CatalogEvent.LOAD_PRODUCT_FAILURE)
                     }
             }
             _isLoading.value = false
@@ -85,6 +92,8 @@ class CatalogViewModel(
                 _totalCartCount.value = cartItems.sumOf { it.amount }
                 val map = cartItems.associate { it.product.id to it.toUiModel() }
                 onCollected(map)
+            }.onFailure {
+                _toastEvent.setValue(CatalogEvent.CART_LOAD_FAILURE)
             }
     }
 

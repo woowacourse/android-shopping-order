@@ -11,6 +11,7 @@ import woowacourse.shopping.databinding.FragmentDetailBinding
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.extension.getParcelableCompat
 import woowacourse.shopping.presentation.model.ProductUiModel
+import woowacourse.shopping.presentation.util.showToast
 import woowacourse.shopping.presentation.view.cart.CartFragment
 import woowacourse.shopping.presentation.view.catalog.CatalogFragment.Companion.CART_UPDATE_REQUEST_KEY
 
@@ -51,6 +52,13 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
         viewModel.lastViewedProduct.observe(viewLifecycleOwner) { recentProduct ->
             binding.viewDetailLastViewed.setOnClickListener {
                 viewModel.loadProductById(recentProduct.id)
+            }
+        }
+        viewModel.toastEvent.observe(viewLifecycleOwner) { event ->
+            when (event) {
+                DetailEvent.ADD_TO_CART_SUCCESS -> requireContext().showToast(R.string.add_cart_success)
+                DetailEvent.ADD_TO_CART_FAILURE -> requireContext().showToast(R.string.add_cart_failure)
+                DetailEvent.LOAD_PRODUCT_FAILURE -> requireContext().showToast(R.string.load_product_failure)
             }
         }
     }
