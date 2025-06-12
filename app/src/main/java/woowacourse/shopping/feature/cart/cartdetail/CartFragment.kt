@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
-import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.cart.CartViewModel
@@ -65,11 +64,7 @@ class CartFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.loginErrorEvent.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is CartFetchError.Network -> extracted("네트워크 에러 발생")
-                is CartFetchError.Server -> extracted("로그인 실패")
-                is CartFetchError.Local -> extracted("로컬 저장소 에러 발생")
-            }
+            showErrorMessage("네트워크 에러 발생")
             requireActivity().finish()
         }
 
@@ -78,7 +73,7 @@ class CartFragment : Fragment() {
         }
     }
 
-    private fun extracted(message: String) {
+    private fun showErrorMessage(message: String) {
         Toast
             .makeText(
                 requireContext(),

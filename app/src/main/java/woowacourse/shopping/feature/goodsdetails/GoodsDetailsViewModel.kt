@@ -8,11 +8,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
-import woowacourse.shopping.data.carts.CartFetchResult
-import woowacourse.shopping.data.carts.CartUpdateResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
+import woowacourse.shopping.data.util.api.ApiResult
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Goods
 import woowacourse.shopping.feature.GoodsUiModel
@@ -75,14 +74,14 @@ class GoodsDetailsViewModel(
     private suspend fun updateCartItem(item: CartItem) {
         val result = cartRepository.updateQuantity(cartId, CartQuantity(item.quantity))
         when (result) {
-            is CartUpdateResult.Success -> {
+            is ApiResult.Success -> {
                 alertMessageEvent(
                     R.string.goods_detail_cart_update_complete_toast_message,
                     item.quantity,
                 )
             }
 
-            is CartUpdateResult.Error -> {
+            is ApiResult.Error -> {
                 _alertEvent.setValue(
                     GoodsDetailsAlertMessage.ResourceId(
                         R.string.goods_detail_cart_update_error_toast_message,
@@ -96,13 +95,13 @@ class GoodsDetailsViewModel(
         viewModelScope.launch {
             val result = cartRepository.addCartItem(item.goods, item.quantity)
             when (result) {
-                is CartFetchResult.Error ->
+                is ApiResult.Error ->
                     _alertEvent.setValue(
                         GoodsDetailsAlertMessage.ResourceId(
                             R.string.goods_detail_cart_insert_error_toast_message,
                         ),
                     )
-                is CartFetchResult.Success -> {
+                is ApiResult.Success -> {
                     alertMessageEvent(R.string.goods_detail_cart_insert_complete_toast_message, item.quantity)
                     cartId = result.data.cartId
                 }

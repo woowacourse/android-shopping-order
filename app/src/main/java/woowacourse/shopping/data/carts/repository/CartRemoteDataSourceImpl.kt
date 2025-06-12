@@ -1,15 +1,13 @@
 package woowacourse.shopping.data.carts.repository
 
 import woowacourse.shopping.data.carts.AddItemResult
-import woowacourse.shopping.data.carts.CartFetchError
-import woowacourse.shopping.data.carts.CartFetchResult
-import woowacourse.shopping.data.carts.CartUpdateError
-import woowacourse.shopping.data.carts.CartUpdateResult
 import woowacourse.shopping.data.carts.dto.CartItemRequest
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.util.NetworkModule
 import woowacourse.shopping.data.util.RetrofitService
+import woowacourse.shopping.data.util.api.ApiError
+import woowacourse.shopping.data.util.api.ApiResult
 
 class CartRemoteDataSourceImpl(
     private val retrofitService: RetrofitService = NetworkModule.retrofitService,
@@ -17,71 +15,71 @@ class CartRemoteDataSourceImpl(
     override suspend fun fetchCartItemByOffset(
         limit: Int,
         offset: Int,
-    ): CartFetchResult<CartResponse> = fetchCartItemByPage(offset / limit, limit)
+    ): ApiResult<CartResponse> = fetchCartItemByPage(offset / limit, limit)
 
     override suspend fun fetchCartItemByPage(
         page: Int,
         size: Int,
-    ): CartFetchResult<CartResponse> =
+    ): ApiResult<CartResponse> =
         try {
             val response = retrofitService.requestCartProduct(page = page, size = size)
-            CartFetchResult.Success(response)
+            ApiResult.Success(response)
         } catch (e: Exception) {
-            CartFetchResult.Error(CartFetchError.Network)
+            ApiResult.Error(ApiError.Network)
         }
 
-    override suspend fun fetchAuthCode(validKey: String): CartFetchResult<Int> {
+    override suspend fun fetchAuthCode(validKey: String): ApiResult<Int> {
         try {
             val response = retrofitService.requestCartCounts()
             return when {
-                response.isSuccessful -> CartFetchResult.Success(response.code())
-                else -> CartFetchResult.Error(CartFetchError.Server(response.code(), response.message()))
+                response.isSuccessful -> ApiResult.Success(response.code())
+                else -> ApiResult.Error(ApiError.Server(response.code(), response.message()))
             }
         } catch (e: Exception) {
-            return CartFetchResult.Error(CartFetchError.Network)
+            return ApiResult.Error(ApiError.Network)
         }
     }
 
     override suspend fun updateCartItemCount(
         cartId: Int,
         cartQuantity: CartQuantity,
-    ): CartUpdateResult<Int> {
+    ): ApiResult<Int> {
         val response =
             retrofitService.updateCartCounts(
                 cartId = cartId,
                 requestBody = cartQuantity,
             )
         return if (response.isSuccessful) {
-            CartUpdateResult.Success(response.code())
+            ApiResult.Success(response.code())
         } else {
             if (response.code() == 400) {
-                CartUpdateResult.Error(CartUpdateError.NotFound)
+                ApiResult.Error(ApiError.NotFound)
             } else {
-                CartUpdateResult.Error(
-                    CartUpdateError.Server(response.code(), response.message()),
+                ApiResult.Error(
+                    ApiError.Server(response.code(), response.message()),
                 )
             }
         }
     }
 
-    override suspend fun deleteItem(cartId: Int): CartFetchResult<Int> =
+    override suspend fun deleteItem(cartId: Int): ApiResult<Int> =
         try {
             val response = retrofitService.deleteCartItem(cartId = cartId)
             if (response.isSuccessful) {
-                CartFetchResult.Success(response.code())
+                ApiResult.Success(response.code())
             } else {
-                CartFetchResult.Error(
-                    CartFetchError.Server(response.code(), response.message()),
+                ApiResult.Error(
+                    ApiError.Server(response.code(), response.message()),
                 )
             }
         } catch (e: Exception) {
-            CartFetchResult.Error(CartFetchError.Network)
+            ApiResult.Error(ApiError.Network)
         }
 
     override suspend fun addItem(
         itemId: Int,
         itemCount: Int,
-    ): CartFetchResult<AddItemResult> {
+    ): ApiResult<AddItemResult> {
         try {
             val response =
                 retrofitService
@@ -92,14 +90,14 @@ class CartRemoteDataSourceImpl(
                 val location = response.headers()["Location"]
                 val cartItemId = extractCartItemId(location)
 
-                return CartFetchResult.Success(AddItemResult(response.code(), cartItemId))
+                return ApiResult.Success(AddItemResult(response.code(), cartItemId))
             } else {
-                return CartFetchResult.Error(
-                    CartFetchError.Server(response.code(), response.message()),
+                return ApiResult.Error(
+                    ApiError.Server(response.code(), response.message()),
                 )
             }
         } catch (e: Exception) {
-            return CartFetchResult.Error(CartFetchError.Network)
+            return ApiResult.Error(ApiError.Network)
         }
     }
 

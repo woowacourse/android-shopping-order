@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.account
 
-import woowacourse.shopping.data.carts.CartFetchError
-import woowacourse.shopping.data.carts.CartFetchResult
+import woowacourse.shopping.data.util.api.ApiError
+import woowacourse.shopping.data.util.api.ApiResult
 import woowacourse.shopping.domain.model.Authorization
 
 class AccountRepositoryImpl(
@@ -10,9 +10,9 @@ class AccountRepositoryImpl(
 ) : AccountRepository {
     override suspend fun saveBasicKey(): Result<Unit> = accountLocalDataSource.saveBasicKey(Authorization.basicKey)
 
-    override suspend fun checkValidBasicKey(basicKey: String): CartFetchResult<Int> = remoteDataSource.fetchAuthCode(basicKey)
+    override suspend fun checkValidBasicKey(basicKey: String): ApiResult<Int> = remoteDataSource.fetchAuthCode(basicKey)
 
-    override suspend fun checkValidLocalSavedBasicKey(): CartFetchResult<Int> {
+    override suspend fun checkValidLocalSavedBasicKey(): ApiResult<Int> {
         val result = accountLocalDataSource.loadBasicKey()
         when {
             result.isSuccess -> {
@@ -23,6 +23,6 @@ class AccountRepositoryImpl(
                 }
             }
         }
-        return CartFetchResult.Error(CartFetchError.Local)
+        return ApiResult.Error(ApiError.Local)
     }
 }

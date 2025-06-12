@@ -1,33 +1,32 @@
 package woowacourse.shopping.data.carts.repository
 
 import woowacourse.shopping.data.carts.AddItemResult
-import woowacourse.shopping.data.carts.CartFetchResult
-import woowacourse.shopping.data.carts.CartUpdateResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
+import woowacourse.shopping.data.util.api.ApiResult
 
 interface CartRemoteDataSource {
     suspend fun fetchCartItemByPage(
         page: Int,
         size: Int,
-    ): CartFetchResult<CartResponse>
+    ): ApiResult<CartResponse>
 
     suspend fun fetchCartItemByOffset(
         limit: Int,
         offset: Int,
-    ): CartFetchResult<CartResponse>
+    ): ApiResult<CartResponse>
 
-    suspend fun fetchAuthCode(validKey: String): CartFetchResult<Int>
+    suspend fun fetchAuthCode(validKey: String): ApiResult<Int>
 
     suspend fun updateCartItemCount(
         cartId: Int,
         cartQuantity: CartQuantity,
-    ): CartUpdateResult<Int>
+    ): ApiResult<Int>
 
-    suspend fun deleteItem(cartId: Int): CartFetchResult<Int>
+    suspend fun deleteItem(cartId: Int): ApiResult<Int>
 
     suspend fun addItem(
         itemId: Int,
         itemCount: Int,
-    ): CartFetchResult<AddItemResult>
+    ): ApiResult<AddItemResult>
 }

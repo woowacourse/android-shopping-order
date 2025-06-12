@@ -21,8 +21,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.data.account.AccountRepository
 import woowacourse.shopping.data.carts.AddItemResult
-import woowacourse.shopping.data.carts.CartFetchResult
-import woowacourse.shopping.data.carts.CartUpdateResult
+import woowacourse.shopping.data.carts.ApiResult
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.dto.GoodsResponse
@@ -83,15 +82,15 @@ class GoodsViewModelTest {
         coEvery { goodsRepository.fetchPageGoods(any(), any()) } returns createEmptyGoodsResponse()
         coEvery { goodsRepository.fetchRecentGoods() } returns emptyList()
         coEvery { cartRepository.fetchAllCartItems() } returns
-            CartFetchResult.Success(
+            ApiResult.Success(
                 createEmptyCartResponse(),
             )
         coEvery { accountRepository.checkValidLocalSavedBasicKey() } returns
-            CartFetchResult.Success(
+            ApiResult.Success(
                 200,
             )
         coEvery { cartRepository.addCartItem(any(), any()) } returns
-            CartFetchResult.Success(
+            ApiResult.Success(
                 AddItemResult(200, 1),
             )
         coEvery {
@@ -99,8 +98,8 @@ class GoodsViewModelTest {
                 any(),
                 any(),
             )
-        } returns CartUpdateResult.Success(200)
-        coEvery { cartRepository.delete(any()) } returns CartFetchResult.Success(200)
+        } returns ApiResult.Success(200)
+        coEvery { cartRepository.delete(any()) } returns ApiResult.Success(200)
     }
 
     private fun createEmptyGoodsResponse(): GoodsResponse =
@@ -222,7 +221,7 @@ class GoodsViewModelTest {
     fun `로그인 성공 시 Authorization 상태가 true로 설정된다`() =
         runTest {
             coEvery { accountRepository.checkValidLocalSavedBasicKey() } returns
-                CartFetchResult.Success(
+                ApiResult.Success(
                     200,
                 )
 
@@ -235,7 +234,7 @@ class GoodsViewModelTest {
     @Test
     fun `로그인 실패 시 Authorization 상태가 false로 설정된다`() {
         coEvery { accountRepository.checkValidLocalSavedBasicKey() } returns
-            CartFetchResult.Success(
+            ApiResult.Success(
                 401,
             )
 
@@ -264,7 +263,7 @@ class GoodsViewModelTest {
         Authorization.setLoginStatus(true)
         viewModel.setTestCartCache(emptyList())
         coEvery { cartRepository.addCartItem(any(), any()) } returns
-            CartFetchResult.Success(
+            ApiResult.Success(
                 AddItemResult(200, 1),
             )
 
@@ -282,7 +281,7 @@ class GoodsViewModelTest {
                 any(),
                 any(),
             )
-        } returns CartUpdateResult.Success(200)
+        } returns ApiResult.Success(200)
         viewModel.addCartItemOrIncreaseQuantity(sampleCartItem1)
 
         coVerify { cartRepository.updateQuantity(eq(1), any()) }

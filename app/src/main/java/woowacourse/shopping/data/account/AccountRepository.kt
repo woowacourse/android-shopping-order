@@ -1,11 +1,11 @@
 package woowacourse.shopping.data.account
 
-import woowacourse.shopping.data.carts.CartFetchResult
+import woowacourse.shopping.data.util.api.ApiResult
 
 interface AccountRepository {
     suspend fun saveBasicKey(): Result<Unit>
 
-    suspend fun checkValidBasicKey(basicKey: String): CartFetchResult<Int>
+    suspend fun checkValidBasicKey(basicKey: String): ApiResult<Int>
 
-    suspend fun checkValidLocalSavedBasicKey(): CartFetchResult<Int>
+    suspend fun checkValidLocalSavedBasicKey(): ApiResult<Int>
 }

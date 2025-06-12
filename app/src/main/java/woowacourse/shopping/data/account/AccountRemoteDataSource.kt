@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.account
 
-import woowacourse.shopping.data.carts.CartFetchResult
+import woowacourse.shopping.data.util.api.ApiResult
 
 interface AccountRemoteDataSource {
-    suspend fun fetchAuthCode(validKey: String): CartFetchResult<Int>
+    suspend fun fetchAuthCode(validKey: String): ApiResult<Int>
 }

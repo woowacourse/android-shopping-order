@@ -1,16 +1,15 @@
 package woowacourse.shopping.data.carts.repository
 
 import woowacourse.shopping.data.carts.AddItemResult
-import woowacourse.shopping.data.carts.CartFetchResult
-import woowacourse.shopping.data.carts.CartUpdateResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
+import woowacourse.shopping.data.util.api.ApiResult
 import woowacourse.shopping.domain.model.Goods
 
 class CartRepositoryImpl(
     private val remoteDataSource: CartRemoteDataSource,
 ) : CartRepository {
-    override suspend fun fetchAllCartItems(): CartFetchResult<CartResponse> =
+    override suspend fun fetchAllCartItems(): ApiResult<CartResponse> =
         remoteDataSource.fetchCartItemByOffset(
             Int.MAX_VALUE,
             0,
@@ -19,7 +18,7 @@ class CartRepositoryImpl(
     override suspend fun fetchCartItemsByOffset(
         limit: Int,
         offset: Int,
-    ): CartFetchResult<CartResponse> =
+    ): ApiResult<CartResponse> =
         remoteDataSource.fetchCartItemByOffset(
             limit,
             offset,
@@ -28,13 +27,13 @@ class CartRepositoryImpl(
     override suspend fun updateQuantity(
         cartId: Int,
         cartQuantity: CartQuantity,
-    ): CartUpdateResult<Int> =
+    ): ApiResult<Int> =
         remoteDataSource.updateCartItemCount(
             cartId = cartId,
             cartQuantity = cartQuantity,
         )
 
-    override suspend fun delete(cartId: Int): CartFetchResult<Int> =
+    override suspend fun delete(cartId: Int): ApiResult<Int> =
         remoteDataSource.deleteItem(
             cartId = cartId,
         )
@@ -42,5 +41,5 @@ class CartRepositoryImpl(
     override suspend fun addCartItem(
         goods: Goods,
         quantity: Int,
-    ): CartFetchResult<AddItemResult> = remoteDataSource.addItem(goods.id, quantity)
+    ): ApiResult<AddItemResult> = remoteDataSource.addItem(goods.id, quantity)
 }

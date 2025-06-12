@@ -50,6 +50,8 @@
     <string name="order_payment_success_alert">주문에 성공했습니다.</string>
     <string name="order_payment_network_error_alert">네트워크 오류로 주문에 실패했습니다.</string>
     <string name="order_payment_server_error_alert">서버 오류로 주문에 실패했습니다.</string>
+    <string name="order_payment_local_error_alert">네트워크 오류로 주문에 실패했습니다.</string>
+    <string name="order_payment_notfound_error_alert">서버 오류로 주문에 실패했습니다.</string>
 
 
 

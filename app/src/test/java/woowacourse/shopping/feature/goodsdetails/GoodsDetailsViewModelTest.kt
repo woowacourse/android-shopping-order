@@ -17,8 +17,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.R
 import woowacourse.shopping.data.carts.AddItemResult
-import woowacourse.shopping.data.carts.CartFetchResult
-import woowacourse.shopping.data.carts.CartUpdateResult
+import woowacourse.shopping.data.carts.ApiResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
@@ -83,9 +82,9 @@ class GoodsDetailsViewModelTest {
                 any(),
                 any(),
             )
-        } returns CartUpdateResult.Success(200)
+        } returns ApiResult.Success(200)
         coEvery { cartRepository.addCartItem(any(), any()) } returns
-            CartFetchResult.Success(
+            ApiResult.Success(
                 AddItemResult(200, 1),
             )
     }
@@ -164,7 +163,7 @@ class GoodsDetailsViewModelTest {
                 any(),
                 any(),
             )
-        } returns CartUpdateResult.Success(200)
+        } returns ApiResult.Success(200)
 
         // 수량 2
         viewModel.increaseSelectorQuantity()
@@ -186,7 +185,7 @@ class GoodsDetailsViewModelTest {
         runTest {
             val newCartId = 999
             coEvery { cartRepository.addCartItem(any(), any()) } returns
-                CartFetchResult.Success(
+                ApiResult.Success(
                     AddItemResult(200, newCartId),
                 )
 

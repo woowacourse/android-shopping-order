@@ -20,15 +20,13 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.R
 import woowacourse.shopping.data.carts.AddItemResult
-import woowacourse.shopping.data.carts.CartFetchResult
-import woowacourse.shopping.data.carts.CartUpdateResult
+import woowacourse.shopping.data.carts.ApiResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
-import woowacourse.shopping.data.payment.CouponFetchResult
-import woowacourse.shopping.data.payment.OrderRequestError
-import woowacourse.shopping.data.payment.OrderRequestResult
+import woowacourse.shopping.data.payment.ApiError
+import woowacourse.shopping.data.payment.ApiResult
 import woowacourse.shopping.data.payment.dto.CouponResponseItem
 import woowacourse.shopping.data.payment.repository.PaymentRepository
 import woowacourse.shopping.data.util.mapper.toCartItems
@@ -130,15 +128,15 @@ class CartViewModelTest {
 
     private fun setupRepositoryMocks() {
         coEvery { cartRepository.fetchAllCartItems() } returns
-            CartFetchResult.Success(
+            ApiResult.Success(
                 mockk(relaxed = true) { every { toCartItems() } returns emptyList() },
             )
         coEvery {
             cartRepository.updateQuantity(any(), any())
-        } returns CartUpdateResult.Success(200)
-        coEvery { cartRepository.delete(any()) } returns CartFetchResult.Success(200)
+        } returns ApiResult.Success(200)
+        coEvery { cartRepository.delete(any()) } returns ApiResult.Success(200)
         coEvery { cartRepository.addCartItem(any(), any()) } returns
-            CartFetchResult.Success(AddItemResult(200, 1))
+            ApiResult.Success(AddItemResult(200, 1))
 
         // GoodsRepository
         coEvery { goodsRepository.fetchMostRecentGoods() } returns null
@@ -341,7 +339,7 @@ class CartViewModelTest {
             val cartQuantitySlot = slot<CartQuantity>()
             coEvery {
                 cartRepository.updateQuantity(any(), capture(cartQuantitySlot))
-            } returns CartUpdateResult.Success(200)
+            } returns ApiResult.Success(200)
 
             viewModel.setTestCarts(listOf(sampleCartItem1))
 
@@ -354,7 +352,7 @@ class CartViewModelTest {
     @Test
     fun `delete 호출 시 repository의 delete가 호출된다`() =
         runTest {
-            coEvery { cartRepository.delete(any()) } returns CartFetchResult.Success(200)
+            coEvery { cartRepository.delete(any()) } returns ApiResult.Success(200)
             viewModel.setTestCarts(listOf(sampleCartItem1))
 
             viewModel.delete(sampleCartItem1)
@@ -368,7 +366,7 @@ class CartViewModelTest {
             val goodsSlot = slot<Goods>()
             coEvery {
                 cartRepository.addCartItem(capture(goodsSlot), any())
-            } returns CartFetchResult.Success(AddItemResult(200, 1))
+            } returns ApiResult.Success(AddItemResult(200, 1))
 
             viewModel.addCartItemOrIncreaseQuantityFromRecommend(sampleCartItem1)
 
@@ -381,7 +379,7 @@ class CartViewModelTest {
         runTest {
             coEvery {
                 cartRepository.updateQuantity(any(), any())
-            } returns CartUpdateResult.Success(200)
+            } returns ApiResult.Success(200)
 
             viewModel.setTestCarts(listOf(sampleCartItem1))
 
@@ -402,7 +400,7 @@ class CartViewModelTest {
     fun `decreaseCartItemQuantity 호출 시 수량이 1이면 delete가 호출된다`() =
         runTest {
             val itemWithQuantity1 = CartItem(sampleGoods1, 1, 1, true)
-            coEvery { cartRepository.delete(any()) } returns CartFetchResult.Success(200)
+            coEvery { cartRepository.delete(any()) } returns ApiResult.Success(200)
             viewModel.setTestCarts(listOf(itemWithQuantity1))
 
             viewModel.removeCartItemOrDecreaseQuantity(itemWithQuantity1)
@@ -415,7 +413,7 @@ class CartViewModelTest {
         runTest {
             coEvery {
                 cartRepository.updateQuantity(any(), any())
-            } returns CartUpdateResult.Success(200)
+            } returns ApiResult.Success(200)
             viewModel.setTestCarts(listOf(sampleCartItem1)) // quantity = 2
 
             viewModel.removeCartItemOrDecreaseQuantity(sampleCartItem1)
@@ -426,7 +424,7 @@ class CartViewModelTest {
     @Test
     fun `removeCartItemOrDecreaseQuantity 호출 시 수량이 1이면 delete가 호출된다`() =
         runTest {
-            coEvery { cartRepository.delete(any()) } returns CartFetchResult.Success(200)
+            coEvery { cartRepository.delete(any()) } returns ApiResult.Success(200)
             viewModel.setTestCarts(listOf(sampleCartItem2))
 
             viewModel.removeCartItemOrDecreaseQuantity(sampleCartItem2)
@@ -439,7 +437,7 @@ class CartViewModelTest {
         runTest {
             val cartResponse = createCartResponseWithItems(listOf(sampleCartItem1, sampleCartItem2))
             coEvery { cartRepository.fetchAllCartItems() } returns
-                CartFetchResult.Success(
+                ApiResult.Success(
                     cartResponse,
                 )
 
@@ -464,7 +462,7 @@ class CartViewModelTest {
                         2,
                     ),
                 )
-            } returns OrderRequestResult.Success(200)
+            } returns ApiResult.Success(200)
 
             viewModel.paymentSubmit()
 
@@ -476,7 +474,7 @@ class CartViewModelTest {
         runTest {
             viewModel.setTestCarts(listOf(sampleCartItem1.copy(isSelected = true)))
             coEvery { paymentRepository.requestOrder(any()) } returns
-                OrderRequestResult.Error(OrderRequestError.Network)
+                ApiResult.Error(ApiError.Network)
 
             viewModel.paymentSubmit()
 
@@ -489,7 +487,7 @@ class CartViewModelTest {
         runTest {
             viewModel.setTestCarts(listOf(sampleCartItem1.copy(isSelected = true)))
             coEvery { paymentRepository.requestOrder(any()) } returns
-                OrderRequestResult.Error(OrderRequestError.Server(500, "Internal Server Error"))
+                ApiResult.Error(ApiError.Server(500, "Internal Server Error"))
 
             viewModel.paymentSubmit()
 
@@ -507,7 +505,7 @@ class CartViewModelTest {
                 )
             viewModel.setTestCarts(items)
             coEvery { paymentRepository.requestOrder(any()) } returns
-                OrderRequestResult.Success(200)
+                ApiResult.Success(200)
 
             viewModel.paymentSubmit()
 
@@ -523,7 +521,7 @@ class CartViewModelTest {
                     createMockCouponResponseItem("percentage", 2, 10),
                 )
             coEvery { paymentRepository.fetchAllCoupons() } returns
-                CouponFetchResult.Success(mockCouponResponse)
+                ApiResult.Success(mockCouponResponse)
 
             viewModel.updateWholeCoupons()
 

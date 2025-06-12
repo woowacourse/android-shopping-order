@@ -1,19 +1,19 @@
 package woowacourse.shopping.data.payment.repository
 
-import woowacourse.shopping.data.payment.CouponFetchError
-import woowacourse.shopping.data.payment.CouponFetchResult
 import woowacourse.shopping.data.payment.dto.CouponListResponse
 import woowacourse.shopping.data.util.NetworkModule
 import woowacourse.shopping.data.util.RetrofitService
+import woowacourse.shopping.data.util.api.ApiError
+import woowacourse.shopping.data.util.api.ApiResult
 
 class CouponsRemoteDataSourceImpl(
     private val retrofitService: RetrofitService = NetworkModule.retrofitService,
 ) : CouponRemoteDataSource {
-    override suspend fun fetchCoupons(): CouponFetchResult<CouponListResponse> =
+    override suspend fun fetchCoupons(): ApiResult<CouponListResponse> =
         try {
             val response = retrofitService.requestCoupons()
-            CouponFetchResult.Success(response)
+            ApiResult.Success(response)
         } catch (e: Exception) {
-            CouponFetchResult.Error(CouponFetchError.Network)
+            ApiResult.Error(ApiError.Network)
         }
 }

@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.account.AccountRepository
-import woowacourse.shopping.data.carts.CartFetchResult
+import woowacourse.shopping.data.util.api.ApiResult
 import woowacourse.shopping.domain.model.Authorization
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
@@ -30,8 +30,8 @@ class LoginViewModel(
                     Authorization.basicKey,
                 )
             when (result) {
-                is CartFetchResult.Error -> _loginErrorEvent.setValue(LoginError.NotFound)
-                is CartFetchResult.Success -> {
+                is ApiResult.Error -> _loginErrorEvent.setValue(LoginError.NotFound)
+                is ApiResult.Success -> {
                     when {
                         result.data == 200 -> {
                             Authorization.setLoginStatus(true)

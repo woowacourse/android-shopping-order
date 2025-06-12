@@ -16,8 +16,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.data.account.AccountRepository
-import woowacourse.shopping.data.carts.CartFetchError
-import woowacourse.shopping.data.carts.CartFetchResult
+import woowacourse.shopping.data.carts.ApiError
+import woowacourse.shopping.data.carts.ApiResult
 import woowacourse.shopping.domain.model.Authorization
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 
@@ -47,8 +47,8 @@ class LoginViewModelTest {
     }
 
     private fun setupRepositoryMocks() {
-        coEvery { accountRepository.checkValidLocalSavedBasicKey() } returns CartFetchResult.Success(200)
-        coEvery { accountRepository.checkValidBasicKey(any()) } returns CartFetchResult.Success(200)
+        coEvery { accountRepository.checkValidLocalSavedBasicKey() } returns ApiResult.Success(200)
+        coEvery { accountRepository.checkValidBasicKey(any()) } returns ApiResult.Success(200)
         coEvery { accountRepository.saveBasicKey() } returns Result.success(Unit)
     }
 
@@ -79,7 +79,7 @@ class LoginViewModelTest {
             val expectedBasicKey = Authorization.basicKey
 
             coEvery { accountRepository.saveBasicKey() } returns Result.success(Unit)
-            coEvery { accountRepository.checkValidBasicKey(any()) } returns CartFetchResult.Success(200)
+            coEvery { accountRepository.checkValidBasicKey(any()) } returns ApiResult.Success(200)
 
             viewModel.id.set(testId)
             viewModel.pw.set(testPw)
@@ -92,7 +92,7 @@ class LoginViewModelTest {
     @Test
     fun `로그인 성공 시 saveBasicKey가 호출된다`() =
         runTest {
-            coEvery { accountRepository.checkValidBasicKey(any()) } returns CartFetchResult.Success(200)
+            coEvery { accountRepository.checkValidBasicKey(any()) } returns ApiResult.Success(200)
             coEvery { accountRepository.saveBasicKey() } returns Result.success(Unit)
 
             viewModel.login()
@@ -103,7 +103,7 @@ class LoginViewModelTest {
     @Test
     fun `잘못된 계정으로 로그인 실패시 loginErrorEvent가 NotFound로 발생한다`() =
         runTest {
-            coEvery { accountRepository.checkValidBasicKey(any()) } returns CartFetchResult.Error(CartFetchError.Network)
+            coEvery { accountRepository.checkValidBasicKey(any()) } returns ApiResult.Error(ApiError.Network)
 
             viewModel.id.set("wronguser")
             viewModel.pw.set("wrongpass")

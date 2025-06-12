@@ -11,15 +11,12 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.data.carts.AddItemResult
-import woowacourse.shopping.data.carts.CartFetchResult
-import woowacourse.shopping.data.carts.CartUpdateResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
-import woowacourse.shopping.data.payment.CouponFetchResult
-import woowacourse.shopping.data.payment.OrderRequestError
-import woowacourse.shopping.data.payment.OrderRequestResult
 import woowacourse.shopping.data.payment.repository.PaymentRepository
+import woowacourse.shopping.data.util.api.ApiError
+import woowacourse.shopping.data.util.api.ApiResult
 import woowacourse.shopping.data.util.mapper.toCartItems
 import woowacourse.shopping.data.util.mapper.toCouponItems
 import woowacourse.shopping.data.util.mapper.toDomain
@@ -137,11 +134,12 @@ class CartViewModel(
             val selectedCartIds = getSelectedCartIds()
             val result = paymentRepository.requestOrder(selectedCartIds)
             when (result) {
-                is OrderRequestResult.Success -> _orderSuccessEvent.setValue(Unit)
-                is OrderRequestResult.Error -> {
+                is ApiResult.Success -> _orderSuccessEvent.setValue(Unit)
+                is ApiResult.Error -> {
                     when (result.error) {
-                        OrderRequestError.Network -> _orderFailedEvent.setValue(R.string.order_payment_network_error_alert)
-                        is OrderRequestError.Server -> _orderFailedEvent.setValue(R.string.order_payment_server_error_alert)
+                        ApiError.Network -> _orderFailedEvent.setValue(R.string.order_payment_network_error_alert)
+                        is ApiError.Server -> _orderFailedEvent.setValue(R.string.order_payment_server_error_alert)
+                        else -> Log.w(TAG, "지정되지 않은 오류")
                     }
                 }
             }
@@ -248,12 +246,12 @@ class CartViewModel(
     internal fun updateWholeCarts() {
         viewModelScope.launch {
             when (val result = cartRepository.fetchAllCartItems()) {
-                is CartFetchResult.Success -> {
+                is ApiResult.Success -> {
                     val allItems = result.data.toCartItems()
                     _carts.value = allItems.associateBy { it.id }
                 }
 
-                is CartFetchResult.Error -> Log.w(TAG, "전체 장바구니 아이템 로드 실패")
+                is ApiResult.Error -> Log.w(TAG, "전체 장바구니 아이템 로드 실패")
             }
         }
     }
@@ -261,12 +259,12 @@ class CartViewModel(
     fun updateWholeCoupons() {
         viewModelScope.launch {
             when (val result = paymentRepository.fetchAllCoupons()) {
-                is CouponFetchResult.Success -> {
+                is ApiResult.Success -> {
                     val allItems = result.data.toCouponItems()
                     _coupons.value = allItems
                 }
 
-                is CouponFetchResult.Error -> Log.w(TAG, "보유 쿠폰 로드 실패")
+                is ApiResult.Error -> Log.w(TAG, "보유 쿠폰 로드 실패")
             }
         }
     }
@@ -322,7 +320,7 @@ class CartViewModel(
     ) {
         viewModelScope.launch {
             when (val result = cartRepository.fetchAllCartItems()) {
-                is CartFetchResult.Success -> {
+                is ApiResult.Success -> {
                     val cartItems = result.data.toCartItems()
                     val cartGoodsIds = cartItems.map { it.goods.id }.toSet()
 
@@ -338,7 +336,7 @@ class CartViewModel(
                     }
                 }
 
-                is CartFetchResult.Error -> Log.w(TAG, "추천 아이템 필터링을 위한 장바구니 전체 조회 실패")
+                is ApiResult.Error -> Log.w(TAG, "추천 아이템 필터링을 위한 장바구니 전체 조회 실패")
             }
         }
     }
@@ -370,8 +368,8 @@ class CartViewModel(
         viewModelScope.launch {
             val result = cartRepository.addCartItem(cartItem.goods, quantity = 1)
             when (result) {
-                is CartFetchResult.Error -> Log.w(TAG, "장바구니 아이템 추가 실패")
-                is CartFetchResult.Success -> {
+                is ApiResult.Error -> Log.w(TAG, "장바구니 아이템 추가 실패")
+                is ApiResult.Success -> {
                     addRecommendItemToLocalVariables(cartItem, result)
                 }
             }
@@ -380,7 +378,7 @@ class CartViewModel(
 
     private fun addRecommendItemToLocalVariables(
         cartItem: CartItem,
-        result: CartFetchResult.Success<AddItemResult>,
+        result: ApiResult.Success<AddItemResult>,
     ) {
         val newItem =
             cartItem.copy(
@@ -439,13 +437,13 @@ class CartViewModel(
             val result =
                 cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity + 1))
             when (result) {
-                is CartUpdateResult.Success -> {
+                is ApiResult.Success -> {
                     updateCartItem(cartItem.id) { item ->
                         item.copy(quantity = item.quantity + 1)
                     }
                 }
 
-                is CartUpdateResult.Error -> Log.w(TAG, "장바구니 수량 증가 실패")
+                is ApiResult.Error -> Log.w(TAG, "장바구니 수량 증가 실패")
             }
         }
     }
@@ -475,7 +473,7 @@ class CartViewModel(
     fun delete(cartItem: CartItem) {
         viewModelScope.launch {
             when (cartRepository.delete(cartItem.id)) {
-                is CartFetchResult.Success -> {
+                is ApiResult.Success -> {
                     val currentMap = _carts.value ?: return@launch
                     val newMap = currentMap.toMutableMap()
                     newMap.remove(cartItem.id)
@@ -488,7 +486,7 @@ class CartViewModel(
                     }
                 }
 
-                is CartFetchResult.Error -> Log.w(TAG, "장바구니 아이템 삭제 실패")
+                is ApiResult.Error -> Log.w(TAG, "장바구니 아이템 삭제 실패")
             }
         }
     }
@@ -498,13 +496,13 @@ class CartViewModel(
             val result =
                 cartRepository.updateQuantity(cartItem.id, CartQuantity(cartItem.quantity - 1))
             when (result) {
-                is CartUpdateResult.Success -> {
+                is ApiResult.Success -> {
                     updateCartItem(cartItem.id) { item ->
                         item.copy(quantity = (item.quantity - 1))
                     }
                 }
 
-                is CartUpdateResult.Error -> Log.w(TAG, "장바구니 수량 감소 실패")
+                is ApiResult.Error -> Log.w(TAG, "장바구니 수량 감소 실패")
             }
         }
     }

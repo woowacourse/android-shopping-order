@@ -11,12 +11,11 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.data.account.AccountRepository
-import woowacourse.shopping.data.carts.CartFetchResult
-import woowacourse.shopping.data.carts.CartUpdateResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.dto.GoodsResponse
 import woowacourse.shopping.data.goods.repository.GoodsRepository
+import woowacourse.shopping.data.util.api.ApiResult
 import woowacourse.shopping.data.util.mapper.toCartItems
 import woowacourse.shopping.data.util.mapper.toDomain
 import woowacourse.shopping.domain.model.Authorization
@@ -114,10 +113,10 @@ class GoodsViewModel(
         viewModelScope.launch {
             val result = accountRepository.checkValidLocalSavedBasicKey()
             when (result) {
-                is CartFetchResult.Error -> {
+                is ApiResult.Error -> {
                     _alertEvent.setValue(R.string.goods_auto_login_error_toast_message)
                 }
-                is CartFetchResult.Success -> {
+                is ApiResult.Success -> {
                     when {
                         result.data == 200 -> Authorization.setLoginStatus(true)
                         else -> Authorization.setLoginStatus(false)
@@ -150,12 +149,12 @@ class GoodsViewModel(
     fun fetchAndSetCartCache() {
         viewModelScope.launch {
             when (val result = cartRepository.fetchAllCartItems()) {
-                is CartFetchResult.Success -> {
+                is ApiResult.Success -> {
                     val cartItems = result.data.toCartItems()
                     _cartCache.value = cartItems.associateBy { it.goods.id }
                 }
 
-                is CartFetchResult.Error -> {
+                is ApiResult.Error -> {
                     Log.w(TAG, "장바구니 전체 로드후 캐싱 실패")
                 }
             }
@@ -190,10 +189,10 @@ class GoodsViewModel(
             if (existingItem.quantity - 1 <= 0) {
                 viewModelScope.launch {
                     when (cartRepository.delete(existingItem.id)) {
-                        is CartFetchResult.Success -> {
+                        is ApiResult.Success -> {
                             removeFromCartCache(existingItem.goods.id)
                         }
-                        is CartFetchResult.Error -> Log.w(TAG, "장바구니 아이템 삭제 실패")
+                        is ApiResult.Error -> Log.w(TAG, "장바구니 아이템 삭제 실패")
                     }
                 }
             } else {
@@ -238,8 +237,8 @@ class GoodsViewModel(
         viewModelScope.launch {
             val result = cartRepository.addCartItem(cartItem.goods, 1)
             when (result) {
-                is CartFetchResult.Error -> Log.w(TAG, "장바구니 추가 실패")
-                is CartFetchResult.Success -> updateCartCacheItem(cartItem.copy(quantity = 1, id = result.data.cartId))
+                is ApiResult.Error -> Log.w(TAG, "장바구니 추가 실패")
+                is ApiResult.Success -> updateCartCacheItem(cartItem.copy(quantity = 1, id = result.data.cartId))
             }
         }
     }
@@ -251,8 +250,8 @@ class GoodsViewModel(
         viewModelScope.launch {
             val result = cartRepository.updateQuantity(cartId, CartQuantity(cartItem.quantity))
             when (result) {
-                is CartUpdateResult.Error -> Log.w(TAG, "장바구니 ${cartItem}아이템 수량 갱신실패")
-                is CartUpdateResult.Success -> updateCartCacheItem(cartItem)
+                is ApiResult.Error -> Log.w(TAG, "장바구니 ${cartItem}아이템 수량 갱신실패")
+                is ApiResult.Success -> updateCartCacheItem(cartItem)
             }
         }
     }
