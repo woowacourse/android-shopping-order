@@ -17,6 +17,7 @@ import woowacourse.shopping.data.coupons.CouponRequest
 import woowacourse.shopping.data.coupons.OrderRequest
 import woowacourse.shopping.data.goods.dto.Content
 import woowacourse.shopping.data.goods.dto.GoodsResponse
+import woowacourse.shopping.domain.model.Authorization
 
 interface RetrofitService {
     @GET("/products")
@@ -36,31 +37,26 @@ interface RetrofitService {
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 5,
         @Query("sort") sort: String = "id,desc",
-        @Header("Authorization") authorization: String,
     ): CartResponse
 
     @GET("/cart-items/counts")
     suspend fun requestCartCounts(
-        @Header("Authorization") authorization: String,
     ): CartQuantity
 
     @PATCH("/cart-items/{id}")
     suspend fun updateCartCounts(
         @Path("id") cartId: Int,
         @Body requestBody: CartQuantity,
-        @Header("Authorization") authorization: String,
     )
 
     @DELETE("/cart-items/{id}")
     suspend fun deleteCartItem(
         @Path("id") cartId: Int,
-        @Header("Authorization") authorization: String,
     )
 
     @POST("/cart-items")
     suspend fun addCartItem(
         @Body cartItem: CartItemRequest,
-        @Header("Authorization") authorization: String,
     )
 
     @GET("/coupons")
@@ -70,7 +66,6 @@ interface RetrofitService {
     @POST("/orders")
     suspend fun addOrder(
         @Body cartItemIds : OrderRequest,
-        @Header("Authorization") authorization: String,
     )
 }
 
@@ -78,6 +73,7 @@ class AppInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val requestWithHeaders = chain.request().newBuilder()
             .addHeader("accept", "*/*")
+            .addHeader("Authorization", "Basic ${Authorization.basicKey}")
             .build()
         return chain.proceed(requestWithHeaders)
     }

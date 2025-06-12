@@ -40,7 +40,6 @@ class CartRemoteDataSourceImpl(
             retrofitService.requestCartProduct(
                 page = page,
                 size = size,
-                authorization = "Basic ${Authorization.basicKey}"
             )
         } catch (e: Exception) {
             throw CartFetchError.Network
@@ -55,7 +54,7 @@ class CartRemoteDataSourceImpl(
     override suspend fun fetchCartCount(): Int = withContext(Dispatchers.IO) {
         try {
             retrofitService
-                .requestCartCounts(authorization = "Basic ${Authorization.basicKey}")
+                .requestCartCounts()
                 .quantity
         } catch (e: Exception) {
             throw CartFetchError.Network
@@ -65,7 +64,7 @@ class CartRemoteDataSourceImpl(
     override suspend fun fetchAuthCode(validKey: String): Int = withContext(Dispatchers.IO) {
         try {
             retrofitService
-            .requestCartCounts(authorization = "Basic $validKey").quantity
+            .requestCartCounts().quantity
         } catch (e: Exception) {
             throw CartFetchError.Network
         }
@@ -79,7 +78,6 @@ class CartRemoteDataSourceImpl(
             retrofitService.updateCartCounts(
                 cartId = cartId,
                 requestBody = cartQuantity,
-                authorization = "Basic ${Authorization.basicKey}"
             )
         } catch (e: Exception) {
             throw CartFetchError.Network
@@ -90,7 +88,6 @@ class CartRemoteDataSourceImpl(
         try {
             retrofitService.deleteCartItem(
                 cartId = cartId,
-                authorization = "Basic ${Authorization.basicKey}"
             )
         } catch (e: Exception) {
             throw CartFetchError.Network
@@ -104,7 +101,6 @@ class CartRemoteDataSourceImpl(
         try {
             retrofitService.addCartItem(
                 cartItem = CartItemRequest(itemId, itemCount),
-                authorization = "Basic ${Authorization.basicKey}"
             )
         } catch (e: Exception) {
             throw CartFetchError.Network

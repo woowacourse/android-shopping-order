@@ -33,6 +33,6 @@ class OrderRemoteDataSourceImpl(
     }
 
     override suspend fun postOrder(cartItemIds: List<Int>) {
-        retrofitService.addOrder(OrderRequest(cartItemIds),"Basic ${Authorization.basicKey}")
+        retrofitService.addOrder(OrderRequest(cartItemIds))
     }
 }
