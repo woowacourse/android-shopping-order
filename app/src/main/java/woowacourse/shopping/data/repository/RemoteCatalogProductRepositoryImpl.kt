@@ -54,24 +54,13 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
     override suspend fun getCartProductsByUids(
         uids: List<Int>,
     ): List<ProductUiModel> {
-        val resultsMap = mutableMapOf<Int, ProductUiModel>()
-        var completedCount = 0
-
-        if (uids.isEmpty()) {
-            return emptyList()
+        return uids.mapNotNull { uid ->
+            runCatching {
+                getProduct(uid) as ProductUiModel
+            }.getOrNull()
         }
-
-        uids.forEach { uid ->
-            val product = getProduct(uid)
-            resultsMap[uid] = product as ProductUiModel
-            completedCount++
-            if (completedCount == uids.size) {
-                val orderedResults = uids.mapNotNull { resultsMap[it] }
-                return orderedResults
-            }
-        }
-        return emptyList()
     }
+
 
     override suspend fun getProductsByPage(
         page: Int,
