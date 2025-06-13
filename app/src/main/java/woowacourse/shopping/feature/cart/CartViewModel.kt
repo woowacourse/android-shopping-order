@@ -36,18 +36,8 @@ class CartViewModel(
     private val paymentRepository: PaymentRepository,
     private val couponService: CouponService,
 ) : ViewModel() {
-    @VisibleForTesting
-    internal fun setTestPage(page: Int) {
-        _page.value = page
-    }
-
     private val _page = MutableLiveData(MINIMUM_PAGE)
     val page: LiveData<Int> get() = _page
-
-    @VisibleForTesting
-    internal fun setTestCarts(items: List<CartItem>) {
-        _carts.value = items.associateBy { it.id }
-    }
 
     private val _carts = MutableLiveData<Map<Int, CartItem>>(emptyMap())
 
@@ -129,29 +119,6 @@ class CartViewModel(
     private val _orderFailedEvent = MutableSingleLiveData<Int>()
     val orderFailedEvent: SingleLiveData<Int> get() = _orderFailedEvent
 
-    fun paymentSubmit() {
-        viewModelScope.launch {
-            val selectedCartIds = getSelectedCartIds()
-            val result = paymentRepository.requestOrder(selectedCartIds)
-            when (result) {
-                is ApiResult.Success -> _orderSuccessEvent.setValue(Unit)
-                is ApiResult.Error -> {
-                    when (result.error) {
-                        ApiError.Network -> _orderFailedEvent.setValue(R.string.order_payment_network_error_alert)
-                        is ApiError.Server -> _orderFailedEvent.setValue(R.string.order_payment_server_error_alert)
-                        else -> Log.w(TAG, "지정되지 않은 오류")
-                    }
-                }
-            }
-        }
-    }
-
-    private fun getSelectedCartIds(): List<Int> =
-        cartsList.value
-            ?.filter { it.isSelected }
-            ?.map { it.id }
-            ?: emptyList()
-
     private val _loginErrorEvent = MutableSingleLiveData<Unit>()
     val loginErrorEvent: SingleLiveData<Unit> get() = _loginErrorEvent
 
@@ -159,11 +126,6 @@ class CartViewModel(
     val appBarTitle: LiveData<String> = _appBarTitle
 
     private val _coupons = MutableLiveData<List<Coupon>>()
-
-    @VisibleForTesting
-    internal fun setTestCoupons(coupons: List<Coupon>) {
-        _coupons.value = coupons
-    }
 
     val validCoupons: LiveData<List<Coupon>> =
         MediatorLiveData<List<Coupon>>().apply {
@@ -200,6 +162,43 @@ class CartViewModel(
             addSource(totalPrice) { update() }
         }
 
+    val shippingFee: LiveData<Int> =
+        MediatorLiveData<Int>().apply {
+            fun update() {
+                val coupon = selectedCoupon.value
+                value = getShippingFee(coupon)
+            }
+            addSource(selectedCoupon) { update() }
+        }
+
+    val totalOrderPrice: LiveData<Int> =
+        MediatorLiveData<Int>().apply {
+            fun update() {
+                val totalPrice = totalPrice.value ?: 0
+                val discountedAmount = discountAmount.value ?: 0
+                val shippingFee = shippingFee.value ?: 0
+                value = (totalPrice + discountedAmount + shippingFee)
+            }
+            addSource(totalPrice) { update() }
+            addSource(discountAmount) { update() }
+            addSource(shippingFee) { update() }
+        }
+
+    @VisibleForTesting
+    internal fun setTestPage(page: Int) {
+        _page.value = page
+    }
+
+    @VisibleForTesting
+    internal fun setTestCarts(items: List<CartItem>) {
+        _carts.value = items.associateBy { it.id }
+    }
+
+    @VisibleForTesting
+    internal fun setTestCoupons(coupons: List<Coupon>) {
+        _coupons.value = coupons
+    }
+
     private fun getDiscountAmount(coupon: Coupon?): Int =
         when (coupon) {
             is Coupon.BonusGoods -> {
@@ -215,32 +214,33 @@ class CartViewModel(
             null -> 0
         }
 
-    val shippingFee: LiveData<Int> =
-        MediatorLiveData<Int>().apply {
-            fun update() {
-                val coupon = selectedCoupon.value
-                value = getShippingFee(coupon)
+    fun paymentSubmit() {
+        viewModelScope.launch {
+            val selectedCartIds = getSelectedCartIds()
+            val result = paymentRepository.requestOrder(selectedCartIds)
+            when (result) {
+                is ApiResult.Success -> _orderSuccessEvent.setValue(Unit)
+                is ApiResult.Error -> {
+                    when (result.error) {
+                        ApiError.Network -> _orderFailedEvent.setValue(R.string.order_payment_network_error_alert)
+                        is ApiError.Server -> _orderFailedEvent.setValue(R.string.order_payment_server_error_alert)
+                        else -> Log.w(TAG, "지정되지 않은 오류")
+                    }
+                }
             }
-            addSource(selectedCoupon) { update() }
         }
+    }
+
+    private fun getSelectedCartIds(): List<Int> =
+        cartsList.value
+            ?.filter { it.isSelected }
+            ?.map { it.id }
+            ?: emptyList()
 
     private fun getShippingFee(coupon: Coupon?): Int =
         when (coupon) {
             is Coupon.FreeShipping -> 0
             else -> SHIPPING_FEE
-        }
-
-    val totalOrderPrice: LiveData<Int> =
-        MediatorLiveData<Int>().apply {
-            fun update() {
-                val totalPrice = totalPrice.value ?: 0
-                val discountedAmount = discountAmount.value ?: 0
-                val shippingFee = shippingFee.value ?: 0
-                value = (totalPrice + discountedAmount + shippingFee)
-            }
-            addSource(totalPrice) { update() }
-            addSource(discountAmount) { update() }
-            addSource(shippingFee) { update() }
         }
 
     internal fun updateWholeCarts() {
