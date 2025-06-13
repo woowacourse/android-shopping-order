@@ -36,6 +36,6 @@ fun MiracleSaleCoupon.toItem(): CouponItem {
         couponId = this.couponId,
         description = this.description,
         expirationDate = this.expirationDate.toString(),
-        availableTime = "사용 가능한 시간 ${this.startHour}~${this.endHour}"
+        availableTime = "${this.startHour}~${this.endHour}"
     )
 }

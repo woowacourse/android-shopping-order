@@ -35,7 +35,7 @@
 - [x] ProductDetailViewModel | loading을 방어적 복사를 사용하도록 수정
 - [ ] 각 viewmodel에 비즈니스 로직을 Repository로 이동
 - [x] ReceiptViewModel | calculator 메서드 네이밍 수정
-- [ ] ReceiptViewModel | BindingAdapter를 사용
+- [x] ReceiptViewModel | 다국어 지원을 위해 string.xml에 하드코딩 이동
 - [x] RecommendViewModel | 추천 목록에 있는 상품들은 장바구니 품목 제외
 - [ ] ReceiptViewModel | map사용
 - [x] ReceiptViewModel | mapper사용

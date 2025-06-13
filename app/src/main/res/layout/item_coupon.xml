@@ -81,7 +81,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
-            android:text="@{couponItem.availableTime}"
+            android:text="@{@string/receipt_available_time_format(couponItem.availableTime)}"
             android:textColor="@color/gray_5"
             android:textSize="14sp"
             android:visibility="@{couponItem.availableTime != null ? View.VISIBLE : View.GONE}"
