@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.cart.Receipt
 import woowacourse.shopping.domain.coupon.BoGoCoupon
-import woowacourse.shopping.domain.coupon.CouponService
+import woowacourse.shopping.domain.coupon.Coupons
 import woowacourse.shopping.domain.coupon.FixedCoupon
 import woowacourse.shopping.domain.coupon.FreeShippingCoupon
 import woowacourse.shopping.domain.coupon.MiracleSaleCoupon
@@ -48,7 +48,7 @@ class CouponServiceTest {
             )
         )
 
-        val couponService = CouponService(
+        val couponService = Coupons(
             coupons
         )
 

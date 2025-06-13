@@ -11,7 +11,7 @@ import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.cart.Receipt
 import woowacourse.shopping.domain.coupon.BoGoCoupon
 import woowacourse.shopping.domain.coupon.Coupon
-import woowacourse.shopping.domain.coupon.CouponService
+import woowacourse.shopping.domain.coupon.Coupons
 import woowacourse.shopping.domain.coupon.FixedCoupon
 import woowacourse.shopping.domain.coupon.FreeShippingCoupon
 import woowacourse.shopping.domain.coupon.MiracleSaleCoupon
@@ -102,7 +102,7 @@ class ReceiptViewModel(
             runCatching {
                 couponRepository.loadCoupons()
             }.onSuccess { coupons ->
-                val couponService = CouponService(coupons)
+                val couponService = Coupons(coupons)
                 val receipt = Receipt(cartItems)
                 val result = couponService.applyApplicableCoupons(
                     receipt = receipt,
