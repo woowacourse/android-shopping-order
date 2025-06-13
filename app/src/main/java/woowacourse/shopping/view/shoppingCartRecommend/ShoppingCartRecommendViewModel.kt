@@ -33,7 +33,6 @@ class ShoppingCartRecommendViewModel(
     val recommendProducts: LiveData<List<ProductsItem.ProductItem>> get() = _recommendProducts
 
     private var recentWatchingProducts: List<Product> = emptyList()
-    private var shoppingCartProducts: List<ShoppingCartProduct> = emptyList()
 
     init {
         _totalPrice.addSource(_shoppingCartProductsToOrder) { it ->
@@ -63,13 +62,12 @@ class ShoppingCartRecommendViewModel(
             shoppingCartRepository
                 .load(0, MAX_RECENT_PRODUCT_LOAD_SIZE)
                 .onSuccess { shoppingCarts ->
-                    shoppingCartProducts = shoppingCarts.shoppingCartItems
-                    getRecommendProducts()
+                    updateRecommendProducts(shoppingCarts.shoppingCartItems)
                 }
         }
     }
 
-    private fun getRecommendProducts() {
+    private fun updateRecommendProducts(shoppingCartProducts: List<ShoppingCartProduct>) {
         val cartProductIds: Set<Long> = shoppingCartProducts.map { it.product.id }.toSet()
         val recommended =
             recentWatchingProducts
@@ -156,8 +154,6 @@ class ShoppingCartRecommendViewModel(
                                     set(index, updatedItem)
                                 }
                         }
-
-                    shoppingCartProducts = shoppingCarts.shoppingCartItems
                 }
         }
     }
