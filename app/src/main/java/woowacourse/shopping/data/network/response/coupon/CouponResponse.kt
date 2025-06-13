@@ -22,36 +22,55 @@ data class CouponResponse(
     val minimumAmount: Int? = null,
 ) {
     fun toBogoCoupon(): BogoCoupon {
+        if (buyQuantity == null) {
+            throw IllegalArgumentException("buyQuantity가 필요합니다.")
+        }
+        if (getQuantity == null) {
+            throw IllegalArgumentException("buyQuantity가 필요합니다.")
+        }
+
         return BogoCoupon(
             description = description,
             expirationDate = LocalDate.parse(expirationDate),
-            buyQuantity = buyQuantity ?: 2,
-            getQuantity = getQuantity ?: 1,
+            buyQuantity = buyQuantity,
+            getQuantity = getQuantity,
         )
     }
 
     fun toFixedCoupon(): FixedCoupon {
+        if (discount == null) {
+            throw IllegalArgumentException("discount가 필요합니다.")
+        }
+        if (minimumAmount == null) {
+            throw IllegalArgumentException("minimumAmount가 필요합니다.")
+        }
         return FixedCoupon(
             description = description,
             expirationDate = LocalDate.parse(expirationDate),
-            discount = discount ?: 0,
-            minimumAmount = minimumAmount ?: 0,
+            discount = discount,
+            minimumAmount = minimumAmount,
         )
     }
 
     fun toFreeShippingCoupon(): FreeShippingCoupon {
+        if (minimumAmount == null) {
+            throw IllegalArgumentException("minimumAmount가 필요합니다.")
+        }
         return FreeShippingCoupon(
             description = description,
             expirationDate = LocalDate.parse(expirationDate),
-            minimumAmount = minimumAmount ?: 0,
+            minimumAmount = minimumAmount,
         )
     }
 
     fun toMiracleSaleCoupon(): MiracleSaleCoupon {
+        if (discount == null) {
+            throw IllegalArgumentException("discount가 필요합니다.")
+        }
         return MiracleSaleCoupon(
             description = description,
             expirationDate = LocalDate.parse(expirationDate),
-            discount = discount ?: 0,
+            discount = discount,
             timeSlot =
                 woowacourse.shopping.domain.coupon.TimeSlot(
                     LocalTime.parse(availableTime?.start),
