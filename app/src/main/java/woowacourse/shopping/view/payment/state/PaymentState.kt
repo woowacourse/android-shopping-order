@@ -1,6 +1,6 @@
 package woowacourse.shopping.view.payment.state
 
-data class PaymentUi(
+data class PaymentState(
     val orderPrice: Int,
     val discountPrice: Int,
     val shippingPrice: Int,

@@ -118,7 +118,7 @@
             android:textStyle="bold"
             android:layout_marginEnd="18dp"
             android:layout_marginTop="16dp"
-            android:text="@{@string/format_thousand_won(vm.paymentUiState.paymentUi.orderPrice)}"
+            android:text="@{@string/format_thousand_won(vm.paymentUiState.paymentState.orderPrice)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/divider_coupons_to_summary"
             tools:text="10,000원"/>
@@ -133,7 +133,7 @@
             android:textStyle="bold"
             android:layout_marginEnd="18dp"
             android:layout_marginTop="16dp"
-            android:text="@{@string/format_thousand_won(vm.paymentUiState.paymentUi.discountPrice)}"
+            android:text="@{@string/format_thousand_won(vm.paymentUiState.paymentState.discountPrice)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_payment_order_price"
             tools:text="10,000원" />
@@ -148,7 +148,7 @@
             android:textStyle="bold"
             android:layout_marginEnd="18dp"
             android:layout_marginTop="16dp"
-            android:text="@{@string/format_thousand_won(vm.paymentUiState.paymentUi.shippingPrice)}"
+            android:text="@{@string/format_thousand_won(vm.paymentUiState.paymentState.shippingPrice)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_payment_discount_price"
             tools:text="10,000원" />
@@ -176,7 +176,7 @@
             android:textStyle="bold"
             android:layout_marginEnd="18dp"
             android:layout_marginTop="21dp"
-            android:text="@{@string/format_thousand_won(vm.paymentUiState.paymentUi.totalPrice)}"
+            android:text="@{@string/format_thousand_won(vm.paymentUiState.paymentState.totalPrice)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/divider_final_price"
             tools:text="10,000원" />

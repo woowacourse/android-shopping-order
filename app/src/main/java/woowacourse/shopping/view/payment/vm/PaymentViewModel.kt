@@ -15,7 +15,7 @@ import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.view.core.event.MutableSingleLiveData
 import woowacourse.shopping.view.core.event.SingleLiveData
 import woowacourse.shopping.view.payment.state.CouponUi
-import woowacourse.shopping.view.payment.state.PaymentUi
+import woowacourse.shopping.view.payment.state.PaymentState
 import woowacourse.shopping.view.payment.state.PaymentUiState
 import woowacourse.shopping.view.payment.state.toCouponUi
 import java.time.LocalDateTime
@@ -73,8 +73,8 @@ class PaymentViewModel(
 
         return PaymentUiState(
             coupons = couponPairs.map { it.second },
-            paymentUi =
-                PaymentUi(
+            paymentState =
+                PaymentState(
                     orderPrice = totalPrice,
                     discountPrice = -discountPrice,
                     shippingPrice = shippingPrice,
@@ -103,8 +103,8 @@ class PaymentViewModel(
         val newState =
             PaymentUiState(
                 coupons = updatedCouponUis,
-                paymentUi =
-                    PaymentUi(
+                paymentState =
+                    PaymentState(
                         orderPrice = totalPrice,
                         discountPrice = -discountPrice,
                         shippingPrice = shippingPrice,
