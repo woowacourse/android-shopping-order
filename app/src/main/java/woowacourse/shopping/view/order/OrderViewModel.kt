@@ -5,6 +5,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.coupon.repository.CouponRepository
@@ -26,8 +27,10 @@ class OrderViewModel(
     private val _coupons: MutableLiveData<List<CouponItem>> = MutableLiveData()
     val coupons: LiveData<List<CouponItem>> get() = _coupons
 
-    private val _applyingCoupon: MutableLiveData<CouponItem> = MutableLiveData()
-    val applyingCoupon: LiveData<CouponItem> get() = _applyingCoupon
+    val applyingCoupon: LiveData<CouponItem?> =
+        _coupons.map { list ->
+            list.find { it.isSelected }
+        }
 
     private val _price: MutableLiveData<Int> = MutableLiveData(productsToOrder.sumOf { it.price })
     val price: LiveData<Int> get() = _price
@@ -112,29 +115,15 @@ class OrderViewModel(
     }
 
     fun updateApplyingCoupon(couponId: Int) {
-        val couponToApply: CouponItem = coupons.value?.find { it.id == couponId } ?: return
-        if (couponToApply.isSelected) {
-            _applyingCoupon.value = null
-            _coupons.value = coupons.value?.map { it.copy(isSelected = false) }
-            return
-        }
-        _applyingCoupon.value = couponToApply
-        updateCouponSelected(couponToApply)
-    }
-
-    private fun updateCouponSelected(couponToApply: CouponItem) {
-        val currentCoupons = _coupons.value.orEmpty()
-
-        val updatedCoupons =
-            currentCoupons.map {
-                if (it.id == couponToApply.id) {
-                    it.copy(isSelected = true)
+        val updatedList =
+            _coupons.value?.map {
+                if (it.id == couponId) {
+                    it.copy(isSelected = !it.isSelected)
                 } else {
                     it.copy(isSelected = false)
                 }
             }
-
-        _coupons.value = updatedCoupons
+        _coupons.value = updatedList
     }
 
     fun createOrder() {
