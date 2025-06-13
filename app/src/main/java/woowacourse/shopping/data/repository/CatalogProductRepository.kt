@@ -22,5 +22,5 @@ interface CatalogProductRepository {
 
     suspend fun getProduct(
         id: Int,
-    ): ProductUiModel
+    ): ProductUiModel?
 }
