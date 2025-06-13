@@ -8,7 +8,7 @@ data class CouponUi(
     val minimumAmount: Int? = null,
     val checked: Boolean = false,
 ) {
-    fun isChecked(): CouponUi {
+    fun toggleChecked(): CouponUi {
         return copy(checked = !checked)
     }
 }
