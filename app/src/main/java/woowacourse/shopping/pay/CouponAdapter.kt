@@ -5,9 +5,10 @@ import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.domain.Coupon
 
 class CouponAdapter(
-    private val coupons: List<Map<Coupon, Boolean>>,
     private val onCheckClick: (Coupon, Int) -> Unit
 ) : RecyclerView.Adapter<CouponViewHolder>() {
+    private val coupons: MutableList<Map<Coupon, Boolean>> = mutableListOf()
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -24,5 +25,9 @@ class CouponAdapter(
 
     override fun getItemCount(): Int = coupons.size
 
-    fun updateCouponList(newCoupons: List<Coupon>, position: Int) {}
+    fun updateCouponList(newCoupons: List<Map<Coupon, Boolean>>) {
+        coupons.clear()
+        coupons.addAll(newCoupons)
+        notifyDataSetChanged()
+    }
 }

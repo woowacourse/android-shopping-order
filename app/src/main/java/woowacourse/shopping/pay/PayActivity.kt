@@ -10,6 +10,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityPayBinding
 import woowacourse.shopping.product.catalog.ProductUiModel
@@ -30,7 +31,6 @@ class PayActivity : AppCompatActivity() {
     }
     private val adapter: CouponAdapter by lazy {
         CouponAdapter(
-            coupons = viewModel.couponList.value.orEmpty(),
             onCheckClick = { coupon, position -> viewModel.updateCoupon(coupon) }
         )
     }
@@ -77,12 +77,13 @@ class PayActivity : AppCompatActivity() {
             viewModel.setOrderAmount()
             viewModel.setTotalAmount()
         }
-        viewModel.couponList.observe(this) { couponList -> }
+        viewModel.couponList.observe(this) { couponList -> adapter.updateCouponList(couponList) }
     }
 
     private fun initDataBinding() {
         binding.vm = viewModel
         binding.lifecycleOwner = this
+        binding.recyclerViewPay.layoutManager = LinearLayoutManager(this)
         binding.recyclerViewPay.adapter = adapter
     }
 

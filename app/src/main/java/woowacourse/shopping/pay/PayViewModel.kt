@@ -75,11 +75,16 @@ class PayViewModel(
         val coupons = _couponList.value.orEmpty()
 
         val updatedList = coupons.map { map ->
-            map.mapValues { (key, value) ->
-                if (key == coupon && coupon.minimumAmount > (_totalAmount.value
-                        ?: 0) && coupon.expirationDate.isBefore(LocalDate.now())
-                ) {
-                    !value
+            map.mapValues { (key, _) ->
+                if (key == coupon) {
+                    val isOrderAmountValid = (_orderAmount.value ?: 0) >= coupon.minimumAmount
+                    val isNotExpired = !coupon.expirationDate.isBefore(LocalDate.now())
+
+                    if (isOrderAmountValid && isNotExpired) {
+                        true
+                    } else {
+                        false
+                    }
                 } else {
                     false
                 }
