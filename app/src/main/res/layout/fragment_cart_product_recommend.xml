@@ -6,10 +6,6 @@
         <variable
             name="viewmodel"
             type="woowacourse.shopping.view.cart.recommend.CartProductRecommendViewModel" />
-
-        <variable
-            name="handler"
-            type="woowacourse.shopping.view.cart.recommend.CartProductRecommendEventHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -61,7 +57,7 @@
             android:background="@color/dark_gray"
             android:gravity="end|center"
             android:padding="12dp"
-            android:text="@{String.format(@string/product_price, viewmodel.totalPrice)}"
+            android:text="@{@string/price_format(viewmodel.totalPrice)}"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -75,13 +71,13 @@
             android:layout_width="140dp"
             android:layout_height="78dp"
             android:background="@color/primary_color"
-            android:text="@{@string/order(viewmodel.totalCount)}"
+            android:text="@{@string/order(viewmodel.totalQuantity)}"
             android:textColor="@color/white"
             android:textSize="21sp"
-            android:onClick="@{() -> handler.onOrderClick()}"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="주문하기(2)" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>

@@ -5,12 +5,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartProduct
-import woowacourse.shopping.domain.repository.CartProductRepository
+import woowacourse.shopping.domain.model.CartProducts
+import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
+import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
 import woowacourse.shopping.view.cart.select.adapter.CartProductItem
 
 class CartProductSelectViewModel(
-    private val repository: CartProductRepository,
+    private val getCartProductsUseCase: GetCartProductsUseCase,
+    private val removeFromCartUseCase: RemoveFromCartUseCase,
+    private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
 ) : ViewModel(),
     CartProductSelectEventHandler {
     private val _cartProductItems = MutableLiveData<List<CartProductItem>>()
@@ -31,33 +38,31 @@ class CartProductSelectViewModel(
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    private val _selectedCartProducts = MutableLiveData<Set<CartProduct>>(emptySet())
-    val selectedCartProducts: LiveData<Set<CartProduct>> get() = _selectedCartProducts
+    private val _selectedCartProducts = MutableLiveData(CartProducts(emptyList()))
+    val selectedCartProducts: LiveData<CartProducts> get() = _selectedCartProducts
 
-    val totalPrice: LiveData<Int> =
-        _selectedCartProducts.map { products ->
-            products.sumOf { it.totalPrice }
-        }
-
-    val totalCount: LiveData<Int> =
-        _selectedCartProducts.map { products ->
-            products.sumOf { it.quantity }
-        }
+    val totalPrice: LiveData<Int> = _selectedCartProducts.map { it.totalPrice }
+    val totalQuantity: LiveData<Int> = _selectedCartProducts.map { it.totalQuantity }
 
     val isSelectedAll: LiveData<Boolean> =
         _cartProductItems.map { products ->
             products.isNotEmpty() && products.all { it.isSelected }
         }
 
+    init {
+        loadPage()
+    }
+
     fun loadPage(page: Int = FIRST_PAGE_NUMBER) {
-        _isLoading.value = true
-        repository.getPagedProducts(page - 1, PAGE_SIZE) { result ->
-            result
+        viewModelScope.launch {
+            _isLoading.value = true
+
+            getCartProductsUseCase(page - 1, PAGE_SIZE)
                 .onSuccess { pagedResult ->
                     _isLoading.value = false
                     _cartProductItems.value =
                         pagedResult.items.map {
-                            CartProductItem(it, it in selectedCartProducts.value.orEmpty())
+                            CartProductItem(it, selectedCartProducts.value?.contains(it) ?: false)
                         }
                     updatePageState(page, pagedResult.hasNext)
                 }.onFailure { Log.e("error", it.message.toString()) }
@@ -75,36 +80,39 @@ class CartProductSelectViewModel(
     }
 
     override fun onProductRemoveClick(item: CartProduct) {
-        repository.delete(item.id) {
-            val currentPage = page.value ?: FIRST_PAGE_NUMBER
-            if (cartProductItems.value?.size == 1 && currentPage > FIRST_PAGE_NUMBER) {
-                loadPage(currentPage - 1)
-            } else {
-                loadPage(currentPage)
-            }
-        }
+        viewModelScope.launch {
+            removeFromCartUseCase(item)
+                .onSuccess {
+                    val currentPage = page.value ?: FIRST_PAGE_NUMBER
+                    if (cartProductItems.value?.size == 1 && currentPage > FIRST_PAGE_NUMBER) {
+                        loadPage(currentPage - 1)
+                    } else {
+                        loadPage(currentPage)
+                    }
 
-        val currentSelected = selectedCartProducts.value.orEmpty()
-        if (item in currentSelected) {
-            _selectedCartProducts.postValue(currentSelected - item)
+                    val currentSelected = selectedCartProducts.value
+                    if (currentSelected?.contains(item) == true) {
+                        _selectedCartProducts.postValue(currentSelected - item)
+                    }
+                }.onFailure { Log.e("error", it.message.toString()) }
         }
     }
 
     override fun onQuantityIncreaseClick(item: CartProduct) {
-        updateCartProduct(item, QUANTITY_TO_ADD)
+        updateCartQuantity(item, QUANTITY_TO_ADD)
     }
 
     override fun onQuantityDecreaseClick(item: CartProduct) {
-        updateCartProduct(item, -QUANTITY_TO_ADD)
+        updateCartQuantity(item, -QUANTITY_TO_ADD)
     }
 
     override fun onSelectItem(item: CartProduct) {
-        val currentSelected = selectedCartProducts.value.orEmpty()
-        val isSelected = item in currentSelected
+        val currentSelected = selectedCartProducts.value
+        val isSelected = currentSelected?.contains(item) == true
         if (isSelected) {
-            _selectedCartProducts.postValue(currentSelected - item)
+            _selectedCartProducts.postValue(currentSelected?.minus(item))
         } else {
-            _selectedCartProducts.postValue(currentSelected + item)
+            _selectedCartProducts.postValue(currentSelected?.plus(item))
         }
         _cartProductItems.value =
             cartProductItems.value.orEmpty().map {
@@ -118,36 +126,35 @@ class CartProductSelectViewModel(
 
     override fun onSelectAllClick() {
         val currentProducts = cartProductItems.value.orEmpty()
-        val currentSelected = selectedCartProducts.value.orEmpty()
+        val currentSelected = selectedCartProducts.value
         val isSelectedAll = isSelectedAll.value ?: false
         if (isSelectedAll) {
-            _selectedCartProducts.postValue(
-                currentSelected - currentProducts.map { it.cartProduct }.toSet(),
-            )
+            _selectedCartProducts.postValue(currentSelected?.minus(currentProducts.map { it.cartProduct }))
         } else {
-            _selectedCartProducts.postValue(
-                currentSelected + currentProducts.map { it.cartProduct }.toSet(),
-            )
+            _selectedCartProducts.postValue(currentSelected?.plus(currentProducts.map { it.cartProduct }))
         }
         val updatedProducts = currentProducts.map { it.copy(isSelected = !isSelectedAll) }
         _cartProductItems.value = updatedProducts
     }
 
-    private fun updateCartProduct(
+    private fun updateCartQuantity(
         item: CartProduct,
         quantityDelta: Int,
     ) {
-        val existing =
-            cartProductItems.value.orEmpty().firstOrNull { it.cartProduct.id == item.id } ?: return
-        val newQuantity = existing.cartProduct.quantity + quantityDelta
-        if (newQuantity < MINIMUM_QUANTITY) return
-        repository.updateQuantity(existing.cartProduct, quantityDelta) {
-            loadPage(page.value ?: FIRST_PAGE_NUMBER)
-        }
-        val currentSelected = selectedCartProducts.value.orEmpty()
-        if (item in currentSelected) {
-            val newItem = item.copy(quantity = newQuantity)
-            _selectedCartProducts.postValue(currentSelected - item + newItem)
+        viewModelScope.launch {
+            val existing =
+                cartProductItems.value.orEmpty().firstOrNull { it.cartProduct.id == item.id }
+                    ?: return@launch
+            val newQuantity = existing.cartProduct.quantity + quantityDelta
+            if (newQuantity < MINIMUM_QUANTITY) return@launch
+
+            updateCartQuantityUseCase(existing.cartProduct, newQuantity).onSuccess { updated ->
+                loadPage(page.value ?: FIRST_PAGE_NUMBER)
+                val currentSelected = selectedCartProducts.value
+                if (currentSelected?.contains(item) == true && updated != null) {
+                    _selectedCartProducts.postValue(currentSelected - item + updated)
+                }
+            }
         }
     }
 

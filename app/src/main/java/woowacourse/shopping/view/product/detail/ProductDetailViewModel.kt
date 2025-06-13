@@ -5,17 +5,21 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
-import woowacourse.shopping.domain.repository.CartProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.product.GetRecentProductsUseCase
+import woowacourse.shopping.domain.usecase.product.SaveRecentlyViewedProductUseCase
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
 class ProductDetailViewModel(
     val product: Product,
-    private val cartProductRepository: CartProductRepository,
-    private val recentProductRepository: RecentProductRepository,
+    private val getRecentProductsUseCase: GetRecentProductsUseCase,
+    private val saveRecentlyViewedProductUseCase: SaveRecentlyViewedProductUseCase,
+    private val addToCartUseCase: AddToCartUseCase,
 ) : ViewModel(),
     ProductDetailEventHandler {
     private val _quantity = MutableLiveData(MINIMUM_QUANTITY)
@@ -50,22 +54,14 @@ class ProductDetailViewModel(
     }
 
     override fun onAddToCartClick() {
-        cartProductRepository.getCartProductByProductId(product.id) { result ->
-            result
-                .onSuccess { cartProduct ->
-                    val quantityToAdd = quantity.value ?: MINIMUM_QUANTITY
-                    if (cartProduct == null) {
-                        cartProductRepository.insert(product.id, quantityToAdd) {
-                            _quantity.postValue(MINIMUM_QUANTITY)
-                        }
-                    } else {
-                        cartProductRepository.updateQuantity(cartProduct, quantityToAdd) {
-                            _quantity.postValue(MINIMUM_QUANTITY)
-                        }
-                    }
+        viewModelScope.launch {
+            val quantityToAdd = quantity.value ?: MINIMUM_QUANTITY
+            addToCartUseCase(product, quantityToAdd)
+                .onSuccess {
+                    _quantity.postValue(MINIMUM_QUANTITY)
+                    _addToCartEvent.postValue(Unit)
                 }.onFailure { Log.e("error", it.message.toString()) }
         }
-        _addToCartEvent.setValue(Unit)
     }
 
     override fun onLastViewedProductClick() {
@@ -73,23 +69,26 @@ class ProductDetailViewModel(
     }
 
     private fun loadLastViewedProduct() {
-        recentProductRepository.getLastViewedProduct { result ->
-            result
-                .onSuccess {
-                    _lastViewedProduct.postValue(it)
+        viewModelScope.launch {
+            getRecentProductsUseCase(LAST_VIEWED_PRODUCT_LIMIT)
+                .onSuccess { recentProducts ->
+                    if (recentProducts.isNotEmpty()) {
+                        _lastViewedProduct.postValue(recentProducts[0])
+                    }
                 }.onFailure { Log.e("error", it.message.toString()) }
         }
     }
 
     private fun updateRecentProduct() {
-        val recentProduct = RecentProduct(product = product)
-        recentProductRepository.replaceRecentProduct(recentProduct) {
-            it.onFailure { Log.e("error", it.message.toString()) }
+        viewModelScope.launch {
+            saveRecentlyViewedProductUseCase(RecentProduct(product = product))
+                .onFailure { Log.e("error", it.message.toString()) }
         }
     }
 
     companion object {
         private const val MINIMUM_QUANTITY = 1
         private const val QUANTITY_TO_ADD = 1
+        private const val LAST_VIEWED_PRODUCT_LIMIT = 1
     }
 }

@@ -5,21 +5,29 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RecentProduct
-import woowacourse.shopping.domain.repository.CartProductRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.GetTotalCartProductQuantityUseCase
+import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
+import woowacourse.shopping.domain.usecase.product.GetProductsUseCase
+import woowacourse.shopping.domain.usecase.product.GetRecentProductsUseCase
 import woowacourse.shopping.view.product.catalog.adapter.ProductCatalogItem
 import woowacourse.shopping.view.util.MutableSingleLiveData
 import woowacourse.shopping.view.util.SingleLiveData
 
 class ProductCatalogViewModel(
-    private val productRepository: ProductRepository,
-    private val cartProductRepository: CartProductRepository,
-    private val recentProductRepository: RecentProductRepository,
+    private val getRecentProductsUseCase: GetRecentProductsUseCase,
+    private val getProductsUseCase: GetProductsUseCase,
+    private val getCartProductsUseCase: GetCartProductsUseCase,
+    private val getTotalCartProductQuantityUseCase: GetTotalCartProductQuantityUseCase,
+    private val addToCartUseCase: AddToCartUseCase,
+    private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
 ) : ViewModel(),
     ProductCatalogEventHandler {
     private var page = FIRST_PAGE
@@ -45,34 +53,39 @@ class ProductCatalogViewModel(
     private val _selectedProduct = MutableSingleLiveData<Product>()
     val selectedProduct: SingleLiveData<Product> get() = _selectedProduct
 
+    init {
+        loadCatalog()
+    }
+
     fun loadCatalog() {
-        _isLoading.value = true
-        loadRecentProducts()
-        loadCartProducts()
-        cartProductRepository.getTotalQuantity { result ->
-            result
-                .onSuccess {
-                    _totalQuantity.postValue(it)
+        viewModelScope.launch {
+            _isLoading.value = true
+            loadRecentProducts()
+            loadCartProducts()
+
+            getTotalCartProductQuantityUseCase()
+                .onSuccess { quantity ->
+                    _totalQuantity.postValue(quantity)
                 }.onFailure { Log.e("error", it.message.toString()) }
         }
     }
 
     override fun onPlusClick(item: Product) {
-        cartProductRepository.insert(item.id, QUANTITY_TO_ADD) { result ->
-            result
-                .onSuccess { cartProductId ->
-                    cartProducts.add(CartProduct(cartProductId, item, QUANTITY_TO_ADD))
+        viewModelScope.launch {
+            addToCartUseCase(item, QUANTITY_TO_ADD)
+                .onSuccess { cartProduct ->
+                    cartProduct?.let { cartProducts.add(it) }
                     updateProductQuantity(item, QUANTITY_TO_ADD)
                 }.onFailure { Log.e("error", it.message.toString()) }
         }
     }
 
     override fun onQuantityIncreaseClick(item: Product) {
-        updateCartProduct(item, QUANTITY_TO_ADD)
+        updateCartQuantity(item, QUANTITY_TO_ADD)
     }
 
     override fun onQuantityDecreaseClick(item: Product) {
-        updateCartProduct(item, -QUANTITY_TO_ADD)
+        updateCartQuantity(item, -QUANTITY_TO_ADD)
     }
 
     override fun onProductClick(item: Product) {
@@ -89,8 +102,8 @@ class ProductCatalogViewModel(
     }
 
     private fun loadRecentProducts() {
-        recentProductRepository.getPagedProducts(RECENT_PRODUCT_SIZE_LIMIT) { result ->
-            result
+        viewModelScope.launch {
+            getRecentProductsUseCase(RECENT_PRODUCT_SIZE_LIMIT)
                 .onSuccess {
                     recentProducts.postValue(it)
                 }.onFailure { Log.e("error", it.message.toString()) }
@@ -98,19 +111,19 @@ class ProductCatalogViewModel(
     }
 
     private fun loadCartProducts() {
-        cartProductRepository.getPagedProducts { result ->
-            result
-                .onSuccess {
+        viewModelScope.launch {
+            getCartProductsUseCase()
+                .onSuccess { pagedResult ->
                     cartProducts.clear()
-                    cartProducts.addAll(it.items)
+                    cartProducts.addAll(pagedResult.items)
                     loadProducts()
                 }.onFailure { Log.e("error", it.message.toString()) }
         }
     }
 
     private fun loadProducts() {
-        productRepository.getPagedProducts(FIRST_PAGE, PRODUCT_SIZE_LIMIT * (page + 1)) { result ->
-            result
+        viewModelScope.launch {
+            getProductsUseCase(FIRST_PAGE, PRODUCT_SIZE_LIMIT * (page + 1))
                 .onSuccess { pagedResult ->
                     applyLoadedProducts(pagedResult, true)
                 }.onFailure { Log.e("error", it.message.toString()) }
@@ -118,8 +131,8 @@ class ProductCatalogViewModel(
     }
 
     private fun loadMoreProducts() {
-        productRepository.getPagedProducts(page, PRODUCT_SIZE_LIMIT) { result ->
-            result
+        viewModelScope.launch {
+            getProductsUseCase(page, PRODUCT_SIZE_LIMIT)
                 .onSuccess { pagedResult ->
                     applyLoadedProducts(pagedResult, false)
                 }.onFailure { Log.e("error", it.message.toString()) }
@@ -142,31 +155,32 @@ class ProductCatalogViewModel(
         _isLoading.value = false
     }
 
-    private fun updateCartProduct(
+    private fun updateCartQuantity(
         item: Product,
         quantityDelta: Int,
     ) {
-        val existing = cartProducts.firstOrNull { it.product.id == item.id } ?: return
-        val newQuantity = existing.quantity + quantityDelta
-        cartProductRepository.updateQuantity(existing, quantityDelta) {
-            cartProducts.removeIf { it.product.id == item.id }
-            if (newQuantity > MINIMUM_QUANTITY) {
-                cartProducts.add(existing.copy(quantity = newQuantity))
-            }
-            updateProductQuantity(item, quantityDelta)
+        viewModelScope.launch {
+            val existing = cartProducts.firstOrNull { it.product.id == item.id } ?: return@launch
+            val newQuantity = existing.quantity + quantityDelta
+            updateCartQuantityUseCase(existing, newQuantity)
+                .onSuccess { updated ->
+                    cartProducts.removeIf { it.product.id == item.id }
+                    updated?.let { cartProducts.add(it) }
+                    updateProductQuantity(item, quantityDelta)
+                }.onFailure { Log.e("error", it.message.toString()) }
         }
     }
 
     private fun updateProductQuantity(
         item: Product,
-        quantityToAdd: Int,
+        quantityDelta: Int,
     ) {
         val updatedItems =
             productItems.value.orEmpty().map {
-                if (it.product.id == item.id) it.copy(quantity = it.quantity + quantityToAdd) else it
+                if (it.product.id == item.id) it.copy(quantity = it.quantity + quantityDelta) else it
             }
         productItems.postValue(updatedItems)
-        _totalQuantity.postValue((totalQuantity.value ?: MINIMUM_QUANTITY) + quantityToAdd)
+        _totalQuantity.postValue((totalQuantity.value ?: MINIMUM_QUANTITY) + quantityDelta)
     }
 
     private fun buildCatalogItems(): List<ProductCatalogItem> {

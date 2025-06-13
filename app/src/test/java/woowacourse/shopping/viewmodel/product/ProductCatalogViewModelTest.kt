@@ -1,5 +1,7 @@
 package woowacourse.shopping.viewmodel.product
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -7,14 +9,24 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.GetTotalCartProductQuantityUseCase
+import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
+import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
+import woowacourse.shopping.domain.usecase.product.GetProductsUseCase
+import woowacourse.shopping.domain.usecase.product.GetRecentProductsUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.fixture.FakeProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.view.product.catalog.ProductCatalogViewModel
 import woowacourse.shopping.view.product.catalog.adapter.ProductCatalogItem
+import woowacourse.shopping.viewmodel.CoroutinesTestExtension
 import woowacourse.shopping.viewmodel.InstantTaskExecutorExtension
 import woowacourse.shopping.viewmodel.getOrAwaitValue
 
+@ExperimentalCoroutinesApi
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ProductCatalogViewModelTest {
     private lateinit var viewModel: ProductCatalogViewModel
@@ -22,20 +34,41 @@ class ProductCatalogViewModelTest {
     private lateinit var cartProductRepository: CartProductRepository
     private lateinit var recentProductRepository: RecentProductRepository
 
+    private lateinit var getRecentProductsUseCase: GetRecentProductsUseCase
+    private lateinit var getProductsUseCase: GetProductsUseCase
+    private lateinit var getCartProductsUseCase: GetCartProductsUseCase
+    private lateinit var getTotalCartProductQuantityUseCase: GetTotalCartProductQuantityUseCase
+    private lateinit var removeFromCartUseCase: RemoveFromCartUseCase
+    private lateinit var updateCartQuantityUseCase: UpdateCartQuantityUseCase
+    private lateinit var addToCartUseCase: AddToCartUseCase
+
     @BeforeEach
-    fun setup() {
-        productRepository = FakeProductRepository()
-        cartProductRepository = FakeCartProductRepository()
-        recentProductRepository = FakeRecentProductRepository()
-        repeat(12) { id -> cartProductRepository.insert(id, 1) {} }
-        viewModel =
-            ProductCatalogViewModel(
-                productRepository,
-                cartProductRepository,
-                recentProductRepository,
-            )
-        viewModel.loadCatalog()
-    }
+    fun setup() =
+        runTest {
+            productRepository = FakeProductRepository()
+            cartProductRepository = FakeCartProductRepository()
+            recentProductRepository = FakeRecentProductRepository()
+
+            getRecentProductsUseCase = GetRecentProductsUseCase(recentProductRepository)
+            getProductsUseCase = GetProductsUseCase(productRepository)
+            getCartProductsUseCase = GetCartProductsUseCase(cartProductRepository)
+            getTotalCartProductQuantityUseCase = GetTotalCartProductQuantityUseCase(cartProductRepository)
+            removeFromCartUseCase = RemoveFromCartUseCase(cartProductRepository)
+            updateCartQuantityUseCase = UpdateCartQuantityUseCase(cartProductRepository, removeFromCartUseCase)
+            addToCartUseCase = AddToCartUseCase(cartProductRepository, updateCartQuantityUseCase)
+
+            repeat(12) { id -> cartProductRepository.insert(id, 1) }
+            viewModel =
+                ProductCatalogViewModel(
+                    getRecentProductsUseCase,
+                    getProductsUseCase,
+                    getCartProductsUseCase,
+                    getTotalCartProductQuantityUseCase,
+                    addToCartUseCase,
+                    updateCartQuantityUseCase,
+                )
+            viewModel.loadCatalog()
+        }
 
     @Test
     fun `초기 로드 시 첫 페이지의 상품과 더보기 버튼이 포함된다`() {

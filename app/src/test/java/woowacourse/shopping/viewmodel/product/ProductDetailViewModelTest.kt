@@ -1,5 +1,6 @@
 package woowacourse.shopping.viewmodel.product
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -7,25 +8,55 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
+import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
+import woowacourse.shopping.domain.usecase.product.GetRecentProductsUseCase
+import woowacourse.shopping.domain.usecase.product.SaveRecentlyViewedProductUseCase
 import woowacourse.shopping.fixture.FakeCartProductRepository
 import woowacourse.shopping.fixture.FakeRecentProductRepository
 import woowacourse.shopping.view.product.detail.ProductDetailViewModel
+import woowacourse.shopping.viewmodel.CoroutinesTestExtension
 import woowacourse.shopping.viewmodel.InstantTaskExecutorExtension
 import woowacourse.shopping.viewmodel.getOrAwaitValue
 
+@ExperimentalCoroutinesApi
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ProductDetailViewModelTest {
     private lateinit var viewModel: ProductDetailViewModel
     private lateinit var cartProductRepository: CartProductRepository
     private lateinit var recentProductRepository: RecentProductRepository
+
+    private lateinit var getRecentProductsUseCase: GetRecentProductsUseCase
+    private lateinit var saveRecentlyViewedProductUseCase: SaveRecentlyViewedProductUseCase
+    private lateinit var getCartProductsUseCase: GetCartProductsUseCase
+    private lateinit var removeFromCartUseCase: RemoveFromCartUseCase
+    private lateinit var updateCartQuantityUseCase: UpdateCartQuantityUseCase
+    private lateinit var addToCartUseCase: AddToCartUseCase
     private lateinit var product: Product
 
     @BeforeEach
     fun setup() {
         cartProductRepository = FakeCartProductRepository()
         recentProductRepository = FakeRecentProductRepository()
-        product = Product(id = 0, imageUrl = "", name = "Product 0", price = 1000)
-        viewModel = ProductDetailViewModel(product, cartProductRepository, recentProductRepository)
+
+        getRecentProductsUseCase = GetRecentProductsUseCase(recentProductRepository)
+        saveRecentlyViewedProductUseCase = SaveRecentlyViewedProductUseCase(recentProductRepository)
+        getCartProductsUseCase = GetCartProductsUseCase(cartProductRepository)
+        removeFromCartUseCase = RemoveFromCartUseCase(cartProductRepository)
+        updateCartQuantityUseCase = UpdateCartQuantityUseCase(cartProductRepository, removeFromCartUseCase)
+        addToCartUseCase = AddToCartUseCase(cartProductRepository, updateCartQuantityUseCase)
+        product = Product(id = 0, imageUrl = "", name = "Product 0", price = 1000, category = "")
+
+        viewModel =
+            ProductDetailViewModel(
+                product,
+                getRecentProductsUseCase,
+                saveRecentlyViewedProductUseCase,
+                addToCartUseCase,
+            )
     }
 
     @Test

@@ -2,7 +2,7 @@
     <string name="app_name">Shopping</string>
     <string name="price">가격</string>
     <string name="add_shopping_cart">장바구니 담기</string>
-    <string name="product_price">%,d원</string>
+    <string name="price_format">%,d원</string>
     <string name="shopping">Shopping</string>
     <string name="left_arrow"><![CDATA[<]]></string>
     <string name="right_arrow"><![CDATA[>]]></string>
@@ -16,5 +16,14 @@
     <string name="select_all">전체</string>
     <string name="recommend_label">이런 상품은 어떠세요?</string>
     <string name="recommend_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들은 추천해 드려요.</string>
-    <string name="finish_order">주문이 완료되었습니다 !</string>
+    <string name="finish_order">주문이 완료되었습니다</string>
+    <string name="available_coupon">적용 가능한 쿠폰</string>
+    <string name="coupon_description">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="order_amount">주문 금액</string>
+    <string name="coupon_discount_amount">쿠폰 할인 금액</string>
+    <string name="delivery_fee">배송비</string>
+    <string name="total_amount">총 결제 금액</string>
+    <string name="pay">결제하기</string>
+    <string name="expiration_date">만료일: %s</string>
+    <string name="minimum_amount">최소 주문 금액: %,d원</string>
 </resources>

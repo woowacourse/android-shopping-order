@@ -5,29 +5,60 @@ import woowacourse.shopping.data.ShoppingCartDatabase
 import woowacourse.shopping.data.TokenProvider
 import woowacourse.shopping.data.datasource.local.RecentProductLocalDataSource
 import woowacourse.shopping.data.datasource.remote.CartProductRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.CouponRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.OrderRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.network.RetrofitInstance
 import woowacourse.shopping.data.repository.CartProductRepositoryImpl
+import woowacourse.shopping.data.repository.CouponRepositoryImpl
+import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
+import woowacourse.shopping.domain.usecase.cart.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.cart.GetCartProductsUseCase
+import woowacourse.shopping.domain.usecase.cart.GetTotalCartProductQuantityUseCase
+import woowacourse.shopping.domain.usecase.cart.RemoveFromCartUseCase
+import woowacourse.shopping.domain.usecase.cart.UpdateCartQuantityUseCase
+import woowacourse.shopping.domain.usecase.coupon.GetCouponsUseCase
+import woowacourse.shopping.domain.usecase.payment.OrderProductsUseCase
+import woowacourse.shopping.domain.usecase.product.GetProductsUseCase
+import woowacourse.shopping.domain.usecase.product.GetRecentProductsUseCase
+import woowacourse.shopping.domain.usecase.product.GetRecommendedProductsUseCase
+import woowacourse.shopping.domain.usecase.product.SaveRecentlyViewedProductUseCase
 
 class ShoppingApplication : Application() {
     private val database by lazy { ShoppingCartDatabase.getDataBase(this) }
     private val retrofitInstance by lazy { RetrofitInstance(TokenProvider(this)) }
 
-    val productRepository
-        by lazy { ProductRepositoryImpl(ProductRemoteDataSource(retrofitInstance.productService)) }
-    val cartProductRepository
-        by lazy {
-            CartProductRepositoryImpl(
-                CartProductRemoteDataSource(retrofitInstance.cartProductService),
-            )
-        }
-    val recentProductRepository
+    private val recentProductRepository
         by lazy {
             RecentProductRepositoryImpl(
                 RecentProductLocalDataSource(database.recentProductDao),
-                productRepository,
+                ProductRemoteDataSource(retrofitInstance.productService),
             )
         }
+    private val productRepository
+        by lazy { ProductRepositoryImpl(ProductRemoteDataSource(retrofitInstance.productService)) }
+    private val cartProductRepository
+        by lazy { CartProductRepositoryImpl(CartProductRemoteDataSource(retrofitInstance.cartProductService)) }
+    private val couponRepository
+        by lazy { CouponRepositoryImpl(CouponRemoteDataSource(retrofitInstance.couponService)) }
+    private val orderRepository
+        by lazy { OrderRepositoryImpl(OrderRemoteDataSource(retrofitInstance.orderService)) }
+
+    val getRecentProductsUseCase by lazy { GetRecentProductsUseCase(recentProductRepository) }
+    val saveRecentlyViewedProductUseCase by lazy { SaveRecentlyViewedProductUseCase(recentProductRepository) }
+
+    val getProductsUseCase by lazy { GetProductsUseCase(productRepository) }
+    val getRecommendedProductsUseCase by lazy { GetRecommendedProductsUseCase(getRecentProductsUseCase, getProductsUseCase) }
+
+    val getCartProductsUseCase by lazy { GetCartProductsUseCase(cartProductRepository) }
+    val getTotalCartProductQuantityUseCase by lazy { GetTotalCartProductQuantityUseCase(cartProductRepository) }
+    val removeFromCartUseCase by lazy { RemoveFromCartUseCase(cartProductRepository) }
+    val updateCartQuantityUseCase by lazy { UpdateCartQuantityUseCase(cartProductRepository, removeFromCartUseCase) }
+    val addToCartUseCase by lazy { AddToCartUseCase(cartProductRepository, updateCartQuantityUseCase) }
+
+    val getCouponsUseCase by lazy { GetCouponsUseCase(couponRepository) }
+
+    val orderProductsUseCase by lazy { OrderProductsUseCase(orderRepository) }
 }

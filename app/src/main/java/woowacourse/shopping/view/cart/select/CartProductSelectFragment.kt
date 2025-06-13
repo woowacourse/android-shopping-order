@@ -18,16 +18,18 @@ class CartProductSelectFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel by lazy {
-        val application = requireActivity().application as ShoppingApplication
+        val app = requireActivity().application as ShoppingApplication
         ViewModelProvider(
             this,
-            CartProductSelectViewModelFactory(application.cartProductRepository),
+            CartProductSelectViewModelFactory(
+                app.getCartProductsUseCase,
+                app.removeFromCartUseCase,
+                app.updateCartQuantityUseCase,
+            ),
         )[CartProductSelectViewModel::class.java]
     }
 
-    private val adapter: CartProductAdapter by lazy {
-        CartProductAdapter(eventHandler = viewModel)
-    }
+    private val adapter: CartProductAdapter by lazy { CartProductAdapter(viewModel) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,11 +47,12 @@ class CartProductSelectFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initBindings()
         initObservers()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.loadPage()
+        parentFragmentManager.setFragmentResultListener(
+            KET_FRAGMENT_RESULT,
+            viewLifecycleOwner,
+        ) { _, _ ->
+            viewModel.loadPage()
+        }
     }
 
     private fun initBindings() {
@@ -60,18 +63,12 @@ class CartProductSelectFragment : Fragment() {
 
         binding.btnOrder.setOnClickListener {
             parentFragmentManager.commit {
-                replace(
+                add(
                     R.id.fragment,
                     CartProductRecommendFragment::class.java,
-                    CartProductRecommendFragment.newBundle(
-                        viewModel.selectedCartProducts.value
-                            .orEmpty()
-                            .map { it.id }
-                            .toSet(),
-                        viewModel.totalPrice.value,
-                        viewModel.totalCount.value,
-                    ),
+                    CartProductRecommendFragment.newBundle(viewModel.selectedCartProducts.value),
                 )
+                addToBackStack(null)
             }
         }
     }
@@ -85,5 +82,9 @@ class CartProductSelectFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        const val KET_FRAGMENT_RESULT = "fragmentResult"
     }
 }

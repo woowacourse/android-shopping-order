@@ -4,33 +4,22 @@ import woowacourse.shopping.data.model.PagedResult
 import woowacourse.shopping.domain.model.CartProduct
 
 interface CartProductRepository {
-    fun insert(
+    suspend fun insert(
         productId: Int,
         quantity: Int,
-        onResult: (Result<Int>) -> Unit,
-    )
+    ): Result<Int>
 
-    fun getPagedProducts(
+    suspend fun getPagedProducts(
         page: Int? = null,
         size: Int? = null,
-        onResult: (Result<PagedResult<CartProduct>>) -> Unit,
-    )
+    ): Result<PagedResult<CartProduct>>
 
-    fun getCartProductByProductId(
-        productId: Int,
-        onResult: (Result<CartProduct?>) -> Unit,
-    )
+    suspend fun getTotalQuantity(): Result<Int>
 
-    fun getTotalQuantity(onResult: (Result<Int>) -> Unit)
-
-    fun updateQuantity(
+    suspend fun updateQuantity(
         cartProduct: CartProduct,
-        quantityToAdd: Int,
-        onResult: (Result<Unit>) -> Unit,
-    )
+        newQuantity: Int,
+    ): Result<Unit>
 
-    fun delete(
-        id: Int,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    suspend fun delete(id: Int): Result<Unit>
 }

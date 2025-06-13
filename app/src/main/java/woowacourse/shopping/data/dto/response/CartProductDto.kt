@@ -12,11 +12,11 @@ data class CartProductDto(
     val quantity: Int,
     @SerialName("product")
     val product: ProductDto,
-)
-
-fun CartProductDto.toCartProduct(): CartProduct =
-    CartProduct(
-        id = id,
-        quantity = quantity,
-        product = product.toProduct(),
-    )
+) {
+    fun toCartProduct(): CartProduct =
+        CartProduct(
+            id = id,
+            quantity = quantity,
+            product = product.toProduct(),
+        )
+}

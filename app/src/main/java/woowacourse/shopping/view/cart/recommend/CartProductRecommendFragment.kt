@@ -5,49 +5,34 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
-import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentCartProductRecommendBinding
+import woowacourse.shopping.domain.model.CartProducts
 import woowacourse.shopping.view.cart.recommend.adapter.RecommendedProductAdapter
 import woowacourse.shopping.view.cart.select.CartProductSelectFragment
+import woowacourse.shopping.view.payment.PaymentActivity
 import woowacourse.shopping.view.product.detail.ProductDetailActivity
+import woowacourse.shopping.view.util.getSerializableCompat
 
 class CartProductRecommendFragment : Fragment() {
     private var _binding: FragmentCartProductRecommendBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel by lazy {
-        val application = requireActivity().application as ShoppingApplication
-        ViewModelProvider(
-            this,
-            CartProductRecommendViewModelFactory(
-                application.productRepository,
-                application.cartProductRepository,
-                application.recentProductRepository,
-            ),
-        )[CartProductRecommendViewModel::class.java]
-    }
+    private lateinit var viewModel: CartProductRecommendViewModel
 
-    private val adapter: RecommendedProductAdapter by lazy {
-        RecommendedProductAdapter(eventHandler = viewModel)
-    }
+    private val adapter: RecommendedProductAdapter by lazy { RecommendedProductAdapter(viewModel) }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
         requireActivity().onBackPressedDispatcher.addCallback(this) {
-            parentFragmentManager.commit {
-                replace(
-                    this@CartProductRecommendFragment.id,
-                    CartProductSelectFragment::class.java,
-                    null,
-                )
-            }
+            parentFragmentManager.setFragmentResult(
+                CartProductSelectFragment.KET_FRAGMENT_RESULT,
+                Bundle.EMPTY,
+            )
+            parentFragmentManager.popBackStack()
         }
     }
 
@@ -65,23 +50,35 @@ class CartProductRecommendFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        initInformation()
+        val app = requireActivity().application as ShoppingApplication
+        val selectedProducts =
+            arguments?.getSerializableCompat<CartProducts>(KEY_SELECTED_PRODUCTS) ?: return
+        viewModel =
+            ViewModelProvider(
+                this,
+                CartProductRecommendViewModelFactory(
+                    selectedProducts,
+                    app.getRecommendedProductsUseCase,
+                    app.getCartProductsUseCase,
+                    app.addToCartUseCase,
+                    app.updateCartQuantityUseCase,
+                ),
+            )[CartProductRecommendViewModel::class.java]
         initBindings()
         initObservers()
-    }
-
-    private fun initInformation() {
-        val selectedIds = arguments?.getIntArray(KEY_SELECTED_IDS)?.toSet() ?: emptySet()
-        val totalPrice = arguments?.getInt(KEY_TOTAL_PRICE)
-        val totalCount = arguments?.getInt(KEY_TOTAL_COUNT)
-        viewModel.initShoppingCartInfo(selectedIds, totalPrice, totalCount)
     }
 
     private fun initBindings() {
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
-        binding.handler = viewModel
         binding.rvRecommendedProducts.adapter = adapter
+
+        binding.btnOrder.setOnClickListener {
+            val intent =
+                PaymentActivity.newIntent(requireContext(), viewModel.cartProducts.value)
+            startActivity(intent)
+            requireActivity().finish()
+        }
     }
 
     private fun initObservers() {
@@ -93,11 +90,6 @@ class CartProductRecommendFragment : Fragment() {
             val intent = ProductDetailActivity.newIntent(requireContext(), value)
             startActivity(intent)
         }
-
-        viewModel.finishOrderEvent.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), R.string.finish_order, Toast.LENGTH_SHORT).show()
-            requireActivity().finish()
-        }
     }
 
     override fun onDestroyView() {
@@ -106,19 +98,11 @@ class CartProductRecommendFragment : Fragment() {
     }
 
     companion object {
-        private const val KEY_SELECTED_IDS = "selectedIds"
-        private const val KEY_TOTAL_PRICE = "totalPrice"
-        private const val KEY_TOTAL_COUNT = "totalCount"
+        private const val KEY_SELECTED_PRODUCTS = "selectedProducts"
 
-        fun newBundle(
-            selectedIds: Set<Int>,
-            totalPrice: Int?,
-            totalCount: Int?,
-        ): Bundle =
+        fun newBundle(selectedProducts: CartProducts?): Bundle =
             Bundle().apply {
-                putIntArray(KEY_SELECTED_IDS, selectedIds.toIntArray())
-                putSerializable(KEY_TOTAL_PRICE, totalPrice)
-                putSerializable(KEY_TOTAL_COUNT, totalCount)
+                putSerializable(KEY_SELECTED_PRODUCTS, selectedProducts)
             }
     }
 }

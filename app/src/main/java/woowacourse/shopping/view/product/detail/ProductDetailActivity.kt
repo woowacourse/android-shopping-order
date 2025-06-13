@@ -30,8 +30,9 @@ class ProductDetailActivity : AppCompatActivity() {
                 this,
                 ProductDetailViewModelFactory(
                     product,
-                    app.cartProductRepository,
-                    app.recentProductRepository,
+                    app.getRecentProductsUseCase,
+                    app.saveRecentlyViewedProductUseCase,
+                    app.addToCartUseCase,
                 ),
             )[ProductDetailViewModel::class.java]
         initBindings(product)
@@ -46,6 +47,7 @@ class ProductDetailActivity : AppCompatActivity() {
                 finish()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
 
@@ -77,7 +79,8 @@ class ProductDetailActivity : AppCompatActivity() {
         }
 
         viewModel.lastViewedProductClickEvent.observe(this) {
-            val intent = newIntent(this, viewModel.lastViewedProduct.value?.product ?: return@observe)
+            val intent =
+                newIntent(this, viewModel.lastViewedProduct.value?.product ?: return@observe)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
             startActivity(intent)
         }

@@ -3,16 +3,10 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.model.RecentProduct
 
 interface RecentProductRepository {
-    fun getLastViewedProduct(onResult: (Result<RecentProduct?>) -> Unit)
-
-    fun getPagedProducts(
+    suspend fun getPagedProducts(
         limit: Int,
-        offset: Int = 0,
-        onResult: (Result<List<RecentProduct>>) -> Unit,
-    )
+        offset: Int,
+    ): Result<List<RecentProduct>>
 
-    fun replaceRecentProduct(
-        recentProduct: RecentProduct,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    suspend fun saveRecentlyViewedProduct(recentProduct: RecentProduct): Result<Unit>
 }
