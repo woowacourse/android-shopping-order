@@ -111,7 +111,7 @@
             android:id="@+id/tv_item_goods_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{@string/goods_price(cartItem.goods.price)}"
+            android:text="@{@string/amount(cartItem.goods.price)}"
             android:textColor="@color/gray_800"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="@+id/tv_item_goods_name"

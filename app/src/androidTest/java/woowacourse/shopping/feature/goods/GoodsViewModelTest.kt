@@ -179,13 +179,13 @@ class GoodsViewModelTest {
     }
 
     @Test
-    fun onCartClicked_호출시_navigateToCart_이벤트_발생() {
+    fun handleCartClicked_호출시_navigateToCart_이벤트_발생() {
         // Given
         val beforeEvent = viewModel.navigateToCart.getValue()
         assertThat(beforeEvent).isNull()
 
         // When
-        viewModel.onCartClicked()
+        viewModel.handleCartClicked()
 
         // Then
         val afterEvent = viewModel.navigateToCart.getValue()

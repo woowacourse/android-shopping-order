@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
-        android:onClick="@{() -> viewModel.onCartClicked()}"
+        android:onClick="@{() -> viewModel.handleCartClicked()}"
         android:orientation="horizontal">
 
         <ImageView

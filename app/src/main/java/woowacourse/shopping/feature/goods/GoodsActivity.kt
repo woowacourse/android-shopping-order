@@ -79,7 +79,6 @@ class GoodsActivity : BaseActivity<ActivityGoodsBinding>() {
     private val moreButtonAdapter by lazy {
         MoreButtonAdapter {
             viewModel.addPage()
-            viewModel.fetchAndSetCartCache()
         }
     }
 
@@ -104,10 +103,6 @@ class GoodsActivity : BaseActivity<ActivityGoodsBinding>() {
 
         observeUiEvent()
 
-        viewModel.goodsWithCartQuantity.observe(this) {
-            viewModel.fetchAndSetCartCache()
-        }
-
         viewModel.recentlyViewedGoods.observe(this) { goods ->
             recentlyViewedGoodsAdapter.setItems(goods)
         }
@@ -122,7 +117,6 @@ class GoodsActivity : BaseActivity<ActivityGoodsBinding>() {
                 }
             }
         }
-
     }
 
     private fun observeUiEvent() {

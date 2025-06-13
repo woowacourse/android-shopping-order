@@ -22,7 +22,7 @@ class RecommendFragment : Fragment() {
         (requireActivity() as CartActivity).sharedViewModelFactory
     }
 
-    val recommendAdapter by lazy {
+    private val recommendAdapter by lazy {
         RecommendAdapter(
             lifecycleOwner = viewLifecycleOwner,
             object : QuantityChangeListener {
@@ -31,7 +31,7 @@ class RecommendFragment : Fragment() {
                 }
 
                 override fun onDecrease(cartItem: CartItem) {
-                    viewModel.removeCartItemOrDecreaseQuantity(cartItem.copy(quantity = 1))
+                    viewModel.removeCartItemOrDecreaseQuantity(cartItem)
                 }
             },
         )
@@ -70,6 +70,9 @@ class RecommendFragment : Fragment() {
         binding.viewModel = viewModel
         binding.bottomBar.checkboxAll.visibility = View.GONE
         binding.bottomBar.tvAll.visibility = View.GONE
+        binding.bottomBar.orderButton.setOnClickListener{
+            viewModel.handleGoCart()
+        }
     }
 
     override fun onDestroyView() {

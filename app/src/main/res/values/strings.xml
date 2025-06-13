@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Shopping</string>
+    <string name="amount">%,d원</string>
 
     <!--    GoodsActivity-->
     <string name="goods_image_description">상품 이미지</string>
-    <string name="goods_price">%,d원</string>
     <string name="goods_more_button">더보기</string>
 
     <!--    GoodsDetailsActivity-->
@@ -46,5 +46,19 @@
     <string name="toast_fail_delete">카트 아이템 삭제에 실패했습니다.</string>
     <string name="toast_fail_select_all">전체 선택에 실패했습니다.</string>
     <string name="toast_fail_load_goods">상품을 불러오는데에 실패하였습니다.\n</string>
+
+    <!-- OrderActivity -->
+    <string name="minimum_date">최소 주문 금액: %,d원</string>
+    <string name="order_action_bar_name">결제하기</string>
+    <string name="order_success">주문에 성공했습니다!</string>
+    <string name="order_fail">주문에 실패했습니다.</string>
+    <string name="coupon_load_fail">쿠폰 불러오기에 실패했습니다.</string>
+    <string name="able_coupon_title">적용 가능한 쿠폰</string>
+    <string name="one_able_coupon_message">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="order_amount_title">주문 금액</string>
+    <string name="coupon_discount_amount_title">쿠폰 할인 금액</string>
+    <string name="shipping_fee_title">배송비</string>
+    <string name="total_fee_message">총 결제 금액</string>
+    <string name="order_btn_text">결제하기</string>
 
 </resources>

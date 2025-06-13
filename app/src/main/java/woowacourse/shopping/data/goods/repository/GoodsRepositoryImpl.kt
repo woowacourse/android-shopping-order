@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.goods.repository
 
-import woowacourse.shopping.data.goods.dto.GoodsResponse
 import woowacourse.shopping.data.util.mapper.toDomain
 import woowacourse.shopping.domain.model.Goods
 
@@ -8,99 +7,52 @@ class GoodsRepositoryImpl(
     private val remoteDataSource: GoodsRemoteDataSource,
     private val localDataSource: GoodsLocalDataSource,
 ) : GoodsRepository {
-    override fun fetchGoodsSize(onComplete: (Int) -> Unit) {
-        remoteDataSource.fetchGoodsSize(onComplete)
+
+    override suspend fun fetchGoodsSize(): Int {
+        return remoteDataSource.fetchGoodsSize()
     }
 
-    override fun fetchPageGoods(
+    override suspend fun fetchPageGoods(
         limit: Int,
         offset: Int,
-        onComplete: (GoodsResponse) -> Unit,
-        onFail: (Throwable) -> Unit,
-    ) {
-        remoteDataSource.fetchPageGoods(
-            limit,
-            offset,
-            { response ->
-                onComplete(response)
-            },
-            onFail,
-        )
+    ): List<Goods> {
+        return remoteDataSource.fetchPageGoods(limit, offset).content.map { it.toDomain() }
     }
 
-    override fun fetchCategoryGoods(
+    override suspend fun fetchCategoryGoods(
         limit: Int,
         category: String,
-        onComplete: (GoodsResponse) -> Unit,
-        onFail: (Throwable) -> Unit,
-    ) {
-        remoteDataSource.fetchGoodsByCategory(
-            limit,
-            category,
-            { response ->
-                onComplete(response)
-            },
-            onFail,
-        )
+    ): List<Goods> {
+        return remoteDataSource.fetchGoodsByCategory(limit, category).content.map { it.toDomain() }
     }
 
-    override fun fetchGoodsById(
-        id: Int,
-        onComplete: (Goods?) -> Unit,
-    ) {
-        remoteDataSource.fetchGoodsById(id, { response ->
-            onComplete(response.toDomain())
-        })
+    override suspend fun fetchGoodsById(id: Int): Goods? {
+        return remoteDataSource.fetchGoodsById(id).toDomain()
     }
 
-    override fun fetchRecentGoodsIds(onComplete: (List<String>) -> Unit) {
-        localDataSource.fetchRecentGoodsIds(onComplete)
+    override suspend fun fetchRecentGoodsIds(): List<String> {
+        return localDataSource.fetchRecentGoodsIds()
     }
 
-    override fun fetchRecentGoods(onComplete: (List<Goods>) -> Unit) {
-        fetchRecentGoodsIds { recentIds ->
-            if (recentIds.isEmpty()) {
-                onComplete(emptyList())
-                return@fetchRecentGoodsIds
-            }
+    override suspend fun fetchRecentGoods(): List<Goods> {
+        val recentIds = fetchRecentGoodsIds()
+        if (recentIds.isEmpty()) return emptyList()
 
-            val goodsList = mutableListOf<Goods>()
-            var completedCount = 0
-
-            recentIds.forEach { idString ->
-                val id = idString.toIntOrNull() ?: return@forEach
-
-                fetchGoodsById(id) { goods ->
-                    goods?.let { goodsList.add(it) }
-                    completedCount++
-
-                    if (completedCount == recentIds.size) {
-                        val sortedGoods =
-                            goodsList.sortedBy { goods ->
-                                recentIds.indexOf(goods.id.toString())
-                            }
-                        onComplete(sortedGoods)
-                    }
-                }
-            }
+        val goodsList = recentIds.mapNotNull { idString ->
+            val id = idString.toIntOrNull() ?: return@mapNotNull null
+            fetchGoodsById(id)
         }
+
+        return goodsList.sortedBy { recentIds.indexOf(it.id.toString()) }
     }
 
-    override fun fetchMostRecentGoods(onComplete: (Goods?) -> Unit) {
-        fetchRecentGoodsIds { recentIds ->
-            if (recentIds.isEmpty()) {
-                onComplete(null)
-                return@fetchRecentGoodsIds
-            }
-            val id = recentIds[0].toInt()
-            fetchGoodsById(id) { onComplete(it) }
-        }
+    override suspend fun fetchMostRecentGoods(): Goods? {
+        val recentIds = fetchRecentGoodsIds()
+        val id = recentIds.firstOrNull()?.toIntOrNull() ?: return null
+        return fetchGoodsById(id)
     }
 
-    override fun loggingRecentGoods(
-        goods: Goods,
-        onComplete: () -> Unit,
-    ) {
-        localDataSource.loggingRecentGoods(goods, onComplete)
+    override suspend fun loggingRecentGoods(goods: Goods) {
+        localDataSource.loggingRecentGoods(goods)
     }
 }

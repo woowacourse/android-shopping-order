@@ -1,7 +1,5 @@
 package woowacourse.shopping.data.carts
 
-sealed class CartFetchError {
-    data class Server(val code: Int, val message: String) : CartFetchError()
-
-    object Network : CartFetchError()
+sealed class CartFetchError(message: String? = null) : Throwable(message) {
+    object Network : CartFetchError("Network Error")
 }

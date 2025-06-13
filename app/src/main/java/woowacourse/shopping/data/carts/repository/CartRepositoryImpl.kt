@@ -3,113 +3,75 @@ package woowacourse.shopping.data.carts.repository
 import woowacourse.shopping.data.carts.CartFetchError
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
-import woowacourse.shopping.data.util.mapper.toCartItems
-import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Goods
 
 class CartRepositoryImpl(
     private val remoteDataSource: CartRemoteDataSource,
 ) : CartRepository {
-    override fun checkValidBasicKey(
-        validKey: String,
-        onResponse: (Int) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    ) {
-        remoteDataSource.fetchAuthCode(validKey, onResponse, onFail)
+
+    override suspend fun checkValidBasicKey(validKey: String): Int {
+        return try {
+            remoteDataSource.fetchAuthCode(validKey)
+        } catch (e: Exception) {
+            throw CartFetchError.Network
+        }
     }
 
-    override fun fetchAllCartItems(
-        onComplete: (CartResponse) -> Unit,
-        onFail: (Throwable) -> Unit,
-    ) {
-        remoteDataSource.fetchCartItemByOffset(
-            Int.MAX_VALUE,
-            0,
-            { response ->
-                onComplete(response)
-            },
-            { },
-        )
+    override suspend fun fetchAllCartItems(): CartResponse {
+        return try {
+            remoteDataSource.fetchCartItemByOffset(Int.MAX_VALUE, 0)
+        } catch (e: Exception) {
+            throw CartFetchError.Network
+        }
     }
 
-    override fun fetchCartItemsByOffset(
-        limit: Int,
-        offset: Int,
-        onComplete: (CartResponse) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    ) {
-        remoteDataSource.fetchCartItemByOffset(
-            limit,
-            offset,
-            { response ->
-                onComplete(response)
-            },
-            { response ->
-                onFail(response)
-            },
-        )
+    override suspend fun fetchCartItemsByOffset(limit: Int, offset: Int): CartResponse {
+        return try {
+            remoteDataSource.fetchCartItemByOffset(limit, offset)
+        } catch (e: Exception) {
+            throw CartFetchError.Network
+        }
     }
 
-    override fun fetchCartItemsByPage(
-        page: Int,
-        size: Int,
-        onComplete: (CartResponse) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    ) {
-        remoteDataSource.fetchCartItemByPage(
-            page,
-            size,
-            { response ->
-                onComplete(response)
-            },
-            { response ->
-                onFail(response)
-            },
-        )
+    override suspend fun fetchCartItemsByPage(page: Int, size: Int): CartResponse {
+        return try {
+            remoteDataSource.fetchCartItemByPage(page, size)
+        } catch (e: Exception) {
+            throw CartFetchError.Network
+        }
     }
 
-    private fun getCartItemByCartResponse(cartResponse: CartResponse): List<CartItem> = cartResponse.toCartItems()
-
-    override fun updateQuantity(
-        cartId: Int,
-        cartQuantity: CartQuantity,
-        onComplete: () -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    ) {
-        remoteDataSource.updateCartItemCount(
-            cartId = cartId,
-            cartQuantity = cartQuantity,
-            onSuccess = { resultCode ->
-                onComplete()
-            },
-            onFailure = { error ->
-                onFail(error)
-            },
-        )
+    override suspend fun updateQuantity(cartId: Int, cartQuantity: CartQuantity) {
+        try {
+            remoteDataSource.updateCartItemCount(cartId, cartQuantity)
+        } catch (e: Exception) {
+            throw CartFetchError.Network
+        }
     }
 
-    override fun delete(
-        cartId: Int,
-        onComplete: (Int) -> Unit,
-        onFail: (CartFetchError) -> Unit
-    ) {
-        remoteDataSource.deleteItem(
-            cartId = cartId,
-            onSuccess = onComplete,
-            onFailure = onFail
-        )
+    override suspend fun delete(cartId: Int): Int {
+        return try {
+            remoteDataSource.deleteItem(cartId)
+            cartId
+        } catch (e: Exception) {
+            throw CartFetchError.Network
+        }
     }
 
-    override fun addCartItem(
-        goods: Goods,
-        quantity: Int,
-        onComplete: (Int) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    ) {
-        remoteDataSource.addItem(goods.id, quantity, onComplete, onFail)
+    override suspend fun getAllItemsSize(): Int {
+        return try {
+            remoteDataSource.fetchCartCount()
+        } catch (e: Exception) {
+            throw CartFetchError.Network
+        }
     }
 
-    override fun getAllItemsSize(onComplete: (Int) -> Unit) {
-        // Todo
+    override suspend fun addCartItem(goods: Goods, quantity: Int): Int {
+        return try {
+            remoteDataSource.addItem(goods.id, quantity)
+            goods.id
+        } catch (e: Exception) {
+            throw CartFetchError.Network
+        }
     }
 }

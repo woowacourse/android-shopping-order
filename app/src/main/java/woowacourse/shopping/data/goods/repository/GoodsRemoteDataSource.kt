@@ -4,24 +4,19 @@ import woowacourse.shopping.data.goods.dto.Content
 import woowacourse.shopping.data.goods.dto.GoodsResponse
 
 interface GoodsRemoteDataSource {
-    fun fetchGoodsSize(onComplete: (Int) -> Unit)
+    suspend fun fetchGoodsSize(): Int
 
-    fun fetchPageGoods(
+    suspend fun fetchPageGoods(
         limit: Int,
         offset: Int,
-        onSuccess: (GoodsResponse) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    )
+    ): GoodsResponse
 
-    fun fetchGoodsByCategory(
+    suspend fun fetchGoodsByCategory(
         limit: Int,
         category: String,
-        onSuccess: (GoodsResponse) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    )
+    ): GoodsResponse
 
-    fun fetchGoodsById(
+    suspend fun fetchGoodsById(
         id: Int,
-        onComplete: (Content) -> Unit,
-    )
+    ): Content
 }
