@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.datasource.ProductsDataSource
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.ProductSinglePage
@@ -12,15 +14,15 @@ class DefaultProductRepository(
         category: String?,
         page: Int?,
         pageSize: Int?,
-    ): Result<ProductSinglePage> {
-        return runCatching {
+    ): Result<ProductSinglePage> = withContext(Dispatchers.IO) {
+        runCatching {
             val response = productDataSource.singlePage(category, page, pageSize)
             response.toDomain()
         }
     }
 
-    override suspend fun loadProduct(productId: Long): Result<Product> {
-        return runCatching {
+    override suspend fun loadProduct(productId: Long): Result<Product> = withContext(Dispatchers.IO) {
+        runCatching {
             val response = productDataSource.getProduct(productId)
             response.toDomain()
         }

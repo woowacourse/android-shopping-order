@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.datasource.CartDataSource
 import woowacourse.shopping.data.network.request.toRequest
 import woowacourse.shopping.domain.Quantity
@@ -10,16 +12,16 @@ import woowacourse.shopping.domain.repository.CartRepository
 class DefaultCartRepository(
     private val dataSource: CartDataSource,
 ) : CartRepository {
-    override suspend fun addCart(cart: Cart): Result<Long> {
-        return dataSource.addCart(cart.toRequest())
+    override suspend fun addCart(cart: Cart): Result<Long> = withContext(Dispatchers.IO) {
+        runCatching { dataSource.addCart(cart.toRequest()) }
     }
 
     override suspend fun loadSinglePage(
         page: Int?,
         pageSize: Int?,
-    ): Result<CartsSinglePage> {
-        return runCatching {
-            val response = dataSource.singlePage(page, pageSize).getOrThrow()
+    ): Result<CartsSinglePage> = withContext(Dispatchers.IO) {
+        runCatching {
+            val response = dataSource.singlePage(page, pageSize)
             response.toDomain()
         }
     }
@@ -27,21 +29,15 @@ class DefaultCartRepository(
     override suspend fun updateQuantity(
         cartId: Long,
         quantity: Quantity,
-    ): Result<Unit> {
-        return runCatching {
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatching {
             dataSource.updateCartQuantity(cartId, quantity.value)
-        }.mapCatching { response ->
-            response.onSuccess { Result.success(Unit) }
-            response.onFailure { Result.failure<Unit>(NullPointerException("Response was null")) }
         }
     }
 
-    override suspend fun deleteCart(cartId: Long): Result<Unit> {
-        return runCatching {
+    override suspend fun deleteCart(cartId: Long): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatching {
             dataSource.deleteCart(cartId)
-        }.mapCatching { response ->
-            response.onSuccess { Result.success(Unit) }
-            response.onFailure { Result.failure<Unit>(NullPointerException("Response was null")) }
         }
     }
 }

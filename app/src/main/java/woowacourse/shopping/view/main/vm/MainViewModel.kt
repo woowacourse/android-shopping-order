@@ -50,7 +50,7 @@ class MainViewModel(
 
     private fun loadProductsAndCarts(pageIndex: Int) {
         setLoading(true)
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val products =
                 productRepository.loadSinglePage(
                     page = pageIndex,
@@ -64,7 +64,7 @@ class MainViewModel(
         productPage: ProductSinglePage,
         pageIndex: Int,
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val cartResult = cartRepository.loadSinglePage(pageIndex, PAGE_SIZE)
             applyMergedUiState(productPage, cartResult.getOrThrow().carts)
         }
@@ -74,7 +74,7 @@ class MainViewModel(
         productPage: ProductSinglePage,
         cartItems: List<ShoppingCart>,
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val result = historyLoader()
             val newStates =
                 productPage.products.map { product ->
@@ -106,7 +106,7 @@ class MainViewModel(
 
         when (val cartId = updated.cartId) {
             null -> {
-                viewModelScope.launch(Dispatchers.IO) {
+                viewModelScope.launch {
                     cartRepository.addCart(Cart(updated.cartQuantity, productId))
                         .onSuccess { newCartId ->
                             _uiState.postValue(state.modifyUiState(updated.copy(cartId = newCartId)))
@@ -117,7 +117,7 @@ class MainViewModel(
             }
 
             else -> {
-                viewModelScope.launch(Dispatchers.IO) {
+                viewModelScope.launch {
                     val result = cartRepository.updateQuantity(cartId, updated.cartQuantity)
                     result.onSuccess { _uiState.postValue(state.modifyUiState(updated)) }
                         .onFailure { handleError(TAG_INCREASE, it) }
@@ -131,7 +131,7 @@ class MainViewModel(
         val updated = state.decreaseCartQuantity(productId)
         val cartId = updated.cartId ?: return
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             if (updated.hasCartQuantity) {
                 val result = cartRepository.updateQuantity(cartId, updated.cartQuantity)
                 result.fold(
@@ -148,7 +148,7 @@ class MainViewModel(
 
     fun syncHistory() {
         val state = _uiState.value ?: return
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val result = historyLoader()
             result.fold(
                 onSuccess = { historyItems ->
@@ -162,7 +162,7 @@ class MainViewModel(
 
     fun syncCartQuantities() {
         val state = _uiState.value ?: return
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val result = cartRepository.loadSinglePage(null, null)
             result.fold(
                 onSuccess = { value ->

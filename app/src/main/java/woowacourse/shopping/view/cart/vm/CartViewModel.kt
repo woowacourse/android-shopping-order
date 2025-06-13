@@ -55,7 +55,7 @@ class CartViewModel(
     }
 
     fun loadRecommendProduct() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             productRepository.loadSinglePage(lastSeenCategory, null, null)
                 .onSuccess { result ->
                     val recommendProduct =
@@ -89,7 +89,7 @@ class CartViewModel(
 
         when (val cartId = updated.cartId) {
             null -> {
-                viewModelScope.launch(Dispatchers.IO) {
+                viewModelScope.launch {
                     cartRepository.addCart(Cart(updated.cartQuantity, productId))
                         .onSuccess {
                             val cartId = cartId ?: 0L
@@ -100,7 +100,7 @@ class CartViewModel(
             }
 
             else -> {
-                viewModelScope.launch(Dispatchers.IO) {
+                viewModelScope.launch {
                     cartRepository.updateQuantity(cartId, updated.cartQuantity)
                         .onSuccess {
                             _recommendUiState.postValue(state.modifyUiState(updated))
@@ -117,7 +117,7 @@ class CartViewModel(
         val cartId = updated.cartId ?: return
 
         if (updated.hasCartQuantity) {
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch {
                 cartRepository.updateQuantity(cartId, updated.cartQuantity)
                     .onSuccess {
                         _recommendUiState.postValue(state.modifyUiState(updated))
@@ -125,7 +125,7 @@ class CartViewModel(
                     }
             }
         } else {
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch {
                 cartRepository.deleteCart(cartId)
                     .onSuccess {
                         val result = updated.copy(cartId = null)
@@ -141,7 +141,7 @@ class CartViewModel(
         val updatedState = state.decreaseCartQuantity(cartId)
         val updatedItem = updatedState.items.first { it.cartId == cartId }
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             cartRepository.updateQuantity(cartId, updatedItem.cart.quantity)
                 .onSuccess {
                     _cartUiState.postValue(updatedState)
@@ -154,7 +154,7 @@ class CartViewModel(
         val updatedState = state.increaseCartQuantity(cartId)
         val updatedItem = updatedState.findCart(cartId)
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             cartRepository.updateQuantity(cartId, updatedItem.cart.quantity)
                 .onSuccess { _cartUiState.postValue(updatedState) }
         }
@@ -163,7 +163,7 @@ class CartViewModel(
     fun loadCarts() {
         setLoading(true)
         val nextPage = paging.getPageNo() - 1
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             cartRepository.loadSinglePage(
                 nextPage,
                 PAGE_SIZE,
@@ -184,9 +184,7 @@ class CartViewModel(
                             pageState = pageState,
                         ),
                     )
-                    withContext(Dispatchers.Main) {
-                        setLoading(false)
-                    }
+                    setLoading(false)
                 }
         }
     }

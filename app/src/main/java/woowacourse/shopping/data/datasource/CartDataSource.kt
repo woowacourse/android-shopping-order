@@ -8,49 +8,41 @@ import woowacourse.shopping.data.network.service.CartService
 class CartDataSource(
     private val service: CartService,
 ) {
-    suspend fun addCart(request: CartItemRequest): Result<Long> {
-        return runCatching {
-            val response = service.addCart(request)
+    suspend fun addCart(request: CartItemRequest): Long {
+        val response = service.addCart(request)
 
-            if (!response.isSuccessful) {
-                throw HttpException(response)
-            }
-
-            val locationHeader =
-                response.headers()["Location"]
-                    ?: throw IllegalStateException("Missing Location header")
-
-            locationHeader.split("/").last().toLong()
+        if (!response.isSuccessful) {
+            throw HttpException(response)
         }
+
+        val locationHeader =
+            response.headers()["Location"]
+                ?: throw IllegalStateException("Missing Location header")
+
+        return locationHeader.split("/").last().toLong()
     }
 
     suspend fun singlePage(
         page: Int?,
         size: Int?,
-    ): Result<CartsResponse> {
-        return runCatching {
-            service.getCartSinglePage(page, size)
-        }
+    ): CartsResponse {
+        return service.getCartSinglePage(page, size)
     }
 
     suspend fun updateCartQuantity(
         cartId: Long,
         quantity: Int,
-    ): Result<Unit> {
-        return runCatching {
-            val response = service.updateCart(cartId, quantity)
-            if (!response.isSuccessful) {
-                Result.failure<Unit>(HttpException(response))
-            }
+    ) {
+        val response = service.updateCart(cartId, quantity)
+        if (!response.isSuccessful) {
+            throw IllegalStateException("요청이 처리되지 않았습니다.")
         }
     }
 
-    suspend fun deleteCart(cartId: Long): Result<Unit> {
-        return runCatching {
-            val response = service.deleteCart(cartId)
-            if (!response.isSuccessful) {
-                Result.failure<Unit>(HttpException(response))
-            }
+    suspend fun deleteCart(cartId: Long) {
+        val response = service.deleteCart(cartId)
+        if (!response.isSuccessful) {
+            throw IllegalStateException("요청이 처리되지 않았습니다.")
         }
     }
 }

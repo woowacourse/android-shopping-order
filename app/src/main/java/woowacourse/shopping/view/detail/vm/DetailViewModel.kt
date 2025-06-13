@@ -33,7 +33,7 @@ class DetailViewModel(
         productId: Long,
         lastSeenProductId: Long,
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val productResult = defaultProductRepository.loadProduct(productId)
             productResult.onSuccess { productValue ->
                 val lastSeenProduct =
@@ -78,7 +78,7 @@ class DetailViewModel(
 
     fun saveCart(productId: Long) {
         val state = _uiState.value ?: return
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val products = defaultCartRepository.loadSinglePage(null, null)
             products.onSuccess { value ->
                 val savedCart = value.carts.find { it.productId == productId }
@@ -99,7 +99,7 @@ class DetailViewModel(
     }
 
     fun loadLastSeenProduct(lastSeenProductId: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             historyRepository.saveHistory(lastSeenProductId)
             _event.postValue(
                 DetailUiEvent.NavigateToLastSeenProduct(
@@ -110,7 +110,7 @@ class DetailViewModel(
     }
 
     private fun saveHistory(productId: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             historyRepository.saveHistory(productId)
         }
     }

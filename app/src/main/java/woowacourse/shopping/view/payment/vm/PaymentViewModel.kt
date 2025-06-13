@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.cart.ShoppingCart
 import woowacourse.shopping.domain.coupon.Coupons
@@ -45,7 +44,7 @@ class PaymentViewModel(
     }
 
     fun loadAvailableCoupons(orderItems: List<ShoppingCart>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             coupons = fetchAvailableCoupons(orderItems)
             couponPairs = convertToCouponUiPairs(coupons)
 
@@ -117,7 +116,7 @@ class PaymentViewModel(
 
     fun orderProduct() {
         val ids = currentOrderItems.map { it.id }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             orderRepository.createOrder(ids)
             _isCompletedOrder.postValue(true)
         }
