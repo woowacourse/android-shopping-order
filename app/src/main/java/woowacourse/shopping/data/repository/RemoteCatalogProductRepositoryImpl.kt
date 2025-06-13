@@ -9,6 +9,7 @@ import woowacourse.shopping.data.dto.product.ProductResponse
 import woowacourse.shopping.data.service.ProductService
 import woowacourse.shopping.data.service.RetrofitProductService
 import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.util.toResult
 
 class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
     val retrofitService = RetrofitProductService.INSTANCE.create(ProductService::class.java)
@@ -92,23 +93,13 @@ class RemoteCatalogProductRepositoryImpl : CatalogProductRepository {
 
     override suspend fun getProduct(
         id: Int,
-    ): ProductUiModel {
+    ): ProductUiModel? {
         val response = retrofitService
             .requestDetailProduct(
                 id = id,
-            )
+            ).toResult().getOrThrow()
 
-        if (!response.isSuccessful) {
-            Log.d("error", "error : $response")
-        }
-
-        val body: Content = response.body() ?: return ProductUiModel(
-            id = 0,
-            name = "[병천아우내] 모듬순대",
-            price = 11900,
-            category = "음식",
-            imageUrl = "https://product-image.kurly.com/hdims/resize/%5E%3E360x%3E468/cropcenter/360x468/quality/85/src/product/image/00fb05f8-cb19-4d21-84b1-5cf6b9988749.jpg",
-        )
+        val body: Content = response.body() ?: return null
         val product =
             ProductUiModel(
                 id = body.id.toInt(),

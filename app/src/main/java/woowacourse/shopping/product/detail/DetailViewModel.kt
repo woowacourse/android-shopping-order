@@ -47,16 +47,14 @@ class DetailViewModel(
     }
 
     fun addToCart() {
-        val addedProduct = product.value?.copy(quantity = quantity.value ?: 0)
+        val addedProduct = product.value?.copy(quantity = quantity.value ?: 0) ?: return
 
-        if (addedProduct?.cartItemId != null) {
-            viewModelScope.launch {
-                cartProductRepository.updateProduct(addedProduct, addedProduct.quantity)
-            }
-        } else {
-            addedProduct?.let {
-                viewModelScope.launch {
-                    cartProductRepository.insertCartProduct(it)
+        viewModelScope.launch {
+            runCatching {
+                if (addedProduct.cartItemId != null) {
+                    cartProductRepository.updateProduct(addedProduct, addedProduct.quantity)
+                } else {
+                    cartProductRepository.insertCartProduct(addedProduct)
                 }
             }
         }
