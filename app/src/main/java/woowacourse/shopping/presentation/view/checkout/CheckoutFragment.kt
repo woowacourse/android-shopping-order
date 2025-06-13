@@ -56,10 +56,9 @@ class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-
         initBinding()
         initObserver()
-        requireActivity().onBackPressedDispatcher.addCallback(backCallback)
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backCallback)
     }
 
     override fun onDestroyView() {

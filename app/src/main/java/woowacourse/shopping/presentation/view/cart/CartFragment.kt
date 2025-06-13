@@ -67,7 +67,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
         super.onViewCreated(view, savedInstanceState)
         initBinding()
         initObserver()
-        requireActivity().onBackPressedDispatcher.addCallback(backCallback)
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backCallback)
     }
 
     override fun onDestroyView() {
