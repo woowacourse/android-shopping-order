@@ -57,5 +57,6 @@
     <string name="minimum_order_price">최소 주문 금액: %,d원</string>
     <string name="expirationDate">만료일: %s</string>
     <string name="receipt_product_format">%,d원</string>
+    <string name="receipt_load_coupon_items_error_message">쿠폰 목록을 불러오는데 실패했습니다. 인터넷을 확인해주세요.</string>
 
 </resources>

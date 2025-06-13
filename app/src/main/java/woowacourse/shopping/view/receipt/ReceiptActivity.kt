@@ -8,9 +8,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityReceiptBinding
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.util.getSerializableExtraCompat
+import woowacourse.shopping.view.showToast
 
 class ReceiptActivity : AppCompatActivity(), ReceiptActions {
     private val binding by lazy { ActivityReceiptBinding.inflate(layoutInflater) }
@@ -35,6 +37,14 @@ class ReceiptActivity : AppCompatActivity(), ReceiptActions {
         viewModel.showAvailableCoupons(cartItems)
         viewModel.couponItem.observe(this) { couponItems: List<CouponItem> ->
             receiptAdapter.submitList(couponItems)
+        }
+        viewModel.event.observe(this) { event: ReceiptEvent ->
+            when (event) {
+                ReceiptEvent.LOAD_MORE_COUPON_FAILURE -> {
+                    showToast(getString(R.string.receipt_load_coupon_items_error_message))
+                    finish()
+                }
+            }
         }
     }
 

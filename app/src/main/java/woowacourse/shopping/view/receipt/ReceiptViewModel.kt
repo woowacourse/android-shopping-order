@@ -37,6 +37,8 @@ class ReceiptViewModel(
     private var _result: MutableLiveData<Int> = MutableLiveData()
     val result: LiveData<Int> = _result
 
+    private val _event: MutableLiveData<ReceiptEvent> = MutableLiveData()
+    val event: LiveData<ReceiptEvent> = _event
 
     fun select(couponItem: CouponItem) {
         _selectedCoupon.value = couponItem
@@ -135,7 +137,7 @@ class ReceiptViewModel(
                 loadCoupons()
                 loadScreen()
             }.onFailure {
-                //TODO : Handle by event
+                _event.postValue(ReceiptEvent.LOAD_MORE_COUPON_FAILURE)
             }
         }
     }
