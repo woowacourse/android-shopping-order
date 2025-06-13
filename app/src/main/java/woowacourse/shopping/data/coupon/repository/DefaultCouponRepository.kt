@@ -1,8 +1,11 @@
 package woowacourse.shopping.data.coupon.repository
 
 import woowacourse.shopping.data.coupon.dataSource.CouponRemoteDataSource
+import woowacourse.shopping.data.coupon.remote.dto.BuyXGetYCoupon
+import woowacourse.shopping.data.coupon.remote.dto.FixedCoupon
+import woowacourse.shopping.data.coupon.remote.dto.FreeShippingCoupon
+import woowacourse.shopping.data.coupon.remote.dto.PercentageCoupon
 import woowacourse.shopping.domain.order.Coupon
-import woowacourse.shopping.domain.order.DiscountType
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -11,46 +14,50 @@ class DefaultCouponRepository(
 ) : CouponRepository {
     override suspend fun getCoupons(): Result<List<Coupon>> =
         runCatching {
-            couponRemoteDataSource.getCoupons().map {
-                when (DiscountType.from(it.discountType)) {
-                    DiscountType.PRICE_DISCOUNT ->
+            couponRemoteDataSource.getCoupons().map { dto ->
+                when (dto) {
+                    is FixedCoupon ->
                         Coupon.PriceDiscount(
-                            id = it.id,
-                            code = it.code,
-                            description = it.description,
-                            expirationDate = LocalDate.parse(it.expirationDate),
-                            discount = it.discount ?: throw IllegalArgumentException(""),
-                            minimumAmount = it.minimumAmount ?: throw IllegalArgumentException(""),
+                            id = dto.id,
+                            code = dto.code,
+                            description = dto.description,
+                            expirationDate = LocalDate.parse(dto.expirationDate),
+                            discount = dto.discount,
+                            minimumAmount = dto.minimumAmount,
                         )
 
-                    DiscountType.BONUS ->
+                    is BuyXGetYCoupon ->
                         Coupon.Bonus(
-                            id = it.id,
-                            code = it.code,
-                            description = it.description,
-                            expirationDate = LocalDate.parse(it.expirationDate),
-                            buyQuantity = it.buyQuantity,
-                            getQuantity = it.getQuantity,
+                            id = dto.id,
+                            code = dto.code,
+                            description = dto.description,
+                            expirationDate = LocalDate.parse(dto.expirationDate),
+                            buyQuantity = dto.buyQuantity,
+                            getQuantity = dto.getQuantity,
                         )
 
-                    DiscountType.FREE_SHIPPING ->
+                    is FreeShippingCoupon ->
                         Coupon.FreeShipping(
-                            id = it.id,
-                            code = it.code,
-                            description = it.description,
-                            expirationDate = LocalDate.parse(it.expirationDate),
-                            minimumAmount = it.minimumAmount ?: throw IllegalArgumentException(""),
+                            id = dto.id,
+                            code = dto.code,
+                            description = dto.description,
+                            expirationDate = LocalDate.parse(dto.expirationDate),
+                            minimumAmount = dto.minimumAmount,
                         )
 
-                    DiscountType.PERCENTAGE_DISCOUNT ->
+                    is PercentageCoupon ->
                         Coupon.PercentageDiscount(
-                            id = it.id,
-                            code = it.code,
-                            description = it.description,
-                            expirationDate = LocalDate.parse(it.expirationDate),
-                            discountPercentage = it.discount ?: throw IllegalArgumentException(""),
-                            availableStartTime = LocalTime.parse(it.availableTime?.start),
-                            availableEndTime = LocalTime.parse(it.availableTime?.end),
+                            id = dto.id,
+                            code = dto.code,
+                            description = dto.description,
+                            expirationDate = LocalDate.parse(dto.expirationDate),
+                            discountPercentage = dto.discount,
+                            availableStartTime =
+                                dto.availableTime.start.let(LocalTime::parse)
+                                    ?: throw IllegalArgumentException("사용 가능한 시작 시간이 없습니다."),
+                            availableEndTime =
+                                dto.availableTime.end.let(LocalTime::parse)
+                                    ?: throw IllegalArgumentException("사용 가능한 종료 시간이 없습니다."),
                         )
                 }
             }

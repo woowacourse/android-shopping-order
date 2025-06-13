@@ -10,7 +10,7 @@ import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.authentication.repository.AuthenticationRepository
 
 object ApiClient {
-    private const val MEDIA_TYPE_JSON = "application/json"
+    const val MEDIA_TYPE_JSON = "application/json"
 
     fun getApiClient(): Retrofit =
         Retrofit
@@ -30,7 +30,7 @@ object ApiClient {
                 Json.asConverterFactory(MEDIA_TYPE_JSON.toMediaType()),
             ).build()
 
-    private fun provideOkHttpClient(interceptor: AuthenticationInterceptor? = null): OkHttpClient {
+    fun provideOkHttpClient(interceptor: AuthenticationInterceptor? = null): OkHttpClient {
         val loggingInterceptor =
             HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY

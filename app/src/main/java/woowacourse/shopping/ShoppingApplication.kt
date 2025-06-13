@@ -9,6 +9,7 @@ import woowacourse.shopping.data.authentication.model.UserAuthentication
 import woowacourse.shopping.data.authentication.repository.DefaultAuthenticationRepository
 import woowacourse.shopping.data.coupon.dataSource.CouponRemoteDataSource
 import woowacourse.shopping.data.coupon.dataSource.DefaultCouponRemoteDataSource
+import woowacourse.shopping.data.coupon.remote.network.CouponApiClient
 import woowacourse.shopping.data.coupon.remote.service.CouponService
 import woowacourse.shopping.data.coupon.repository.DefaultCouponRepository
 import woowacourse.shopping.data.network.ApiClient
@@ -59,7 +60,7 @@ class ShoppingApplication : Application() {
     }
 
     private val couponService: CouponService by lazy {
-        ApiClient.getApiClient().create(CouponService::class.java)
+        CouponApiClient.getApiClient().create(CouponService::class.java)
     }
 
     private val orderService: OrderService by lazy {
