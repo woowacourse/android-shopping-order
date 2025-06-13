@@ -81,7 +81,7 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
     ): Boolean {
         val response = retrofitService
             .patchCartItemQuantity(
-                cartItemId = cartProduct.cartItemId!!,
+                cartItemId = cartProduct.cartItemId ?: 0,
                 quantity = Quantity(quantity),
             )
 
