@@ -11,6 +11,7 @@ import woowacourse.shopping.data.repository.RepositoryProvider
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.Page
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.ProductUiModel
@@ -39,28 +40,38 @@ class CatalogViewModel(
     fun loadCatalog(nextPage: Boolean) {
         viewModelScope.launch {
             _isLoadingData.value = true
+
             calculateTotalCartCount()
-            val productsCount = _items.value?.filterIsInstance<CatalogItem.ProductItem>()?.size ?: 0
-            val pageIndex =
-                ((productsCount - 1) / PAGE_SIZE)
-                    .coerceAtLeast(0)
-                    .let { if (nextPage) it + 1 else it }
-            val pageOfProducts = productRepository.loadProductsUpToPage(pageIndex, PAGE_SIZE)
+            val pageOfProducts = productRepository.loadProductsUpToPage(computePageIndex(nextPage), PAGE_SIZE)
             val cartItems = productRepository.loadAllCartItems()
             val recentProducts = productRepository.loadRecentProducts(RECENTLY_VIEWED_PRODUCTS_COUNT)
-            val productUiModels = matchProductsToCartItems(pageOfProducts.items, cartItems)
-            val items =
-                buildList {
-                    if (recentProducts.isNotEmpty()) {
-                        val recentProductsItem =
-                            CatalogItem.RecentProductsItem(recentProducts.map(Product::toProductUiModel))
-                        add(recentProductsItem)
-                    }
-                    addAll(productUiModels.map { uiModel -> CatalogItem.ProductItem(uiModel) })
-                    if (!pageOfProducts.isLast) add(CatalogItem.LoadMoreItem)
-                }
-            _items.postValue(items)
+            _items.postValue(buildCatalogItems(pageOfProducts, cartItems, recentProducts))
+
             _isLoadingData.value = false
+        }
+    }
+
+    private fun computePageIndex(nextPage: Boolean): Int {
+        val productsCount = _items.value?.filterIsInstance<CatalogItem.ProductItem>()?.size ?: 0
+        return ((productsCount - 1) / PAGE_SIZE)
+            .coerceAtLeast(0)
+            .let { index -> if (nextPage) index + 1 else index }
+    }
+
+    private fun buildCatalogItems(
+        pageOfProducts: Page<Product>,
+        cartItems: List<CartItem>,
+        recentProducts: List<Product>,
+    ): List<CatalogItem> {
+        val productUiModels = matchProductsToCartItems(pageOfProducts.items, cartItems)
+        return buildList {
+            if (recentProducts.isNotEmpty()) {
+                val recentProductsItem =
+                    CatalogItem.RecentProductsItem(recentProducts.map(Product::toProductUiModel))
+                add(recentProductsItem)
+            }
+            addAll(productUiModels.map { uiModel -> CatalogItem.ProductItem(uiModel) })
+            if (!pageOfProducts.isLast) add(CatalogItem.LoadMoreItem)
         }
     }
 
