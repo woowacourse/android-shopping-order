@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
     alias(libs.plugins.serialization)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -69,6 +70,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.logging.interceptor)
     implementation(libs.retrofit)

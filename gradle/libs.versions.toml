@@ -14,6 +14,7 @@ google-material = "1.12.0"
 junit-jupiter = "5.12.0"
 kotest-runner-junit5 = "5.9.1"
 kotlin = "2.1.0"
+kotlinx-coroutines-android = "1.3.9"
 ktlint = "12.1.0"
 mannodermaus-junit5 = "1.7.0"
 mockk = "1.13.8"
@@ -25,6 +26,7 @@ shimmer = "0.5.0"
 kotlinx-serialization-json = "1.8.1"
 
 [libraries]
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines-android" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "androidx-activity-ktx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }

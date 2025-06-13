@@ -11,7 +11,7 @@
         android:background="@drawable/product_item_background">
 
         <View
-            android:id="@+id/image_view_product"
+            android:id="@+id/v_shimmer_product"
             android:layout_width="154dp"
             android:layout_height="154dp"
             android:background="@color/shimmer_background"
@@ -20,7 +20,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <View
-            android:id="@+id/textView_product_name"
+            android:id="@+id/v_shimmer_product_name"
             android:layout_width="140dp"
             android:layout_height="20dp"
             android:layout_marginStart="16dp"
@@ -29,10 +29,10 @@
             android:background="@color/shimmer_background"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/image_view_product" />
+            app:layout_constraintTop_toBottomOf="@id/v_shimmer_product" />
 
         <View
-            android:id="@+id/textView_product_price"
+            android:id="@+id/v_shimmer_product_price"
             android:layout_width="120dp"
             android:layout_height="25dp"
             android:layout_marginStart="15dp"
@@ -43,7 +43,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textView_product_name" />
+            app:layout_constraintTop_toBottomOf="@id/v_shimmer_product_name" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

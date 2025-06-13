@@ -21,24 +21,24 @@ class DetailActivityTest {
 
     @Test
     fun `상품_상세_화면이_정상적으로_표시된다`() {
-        onView(withId(R.id.text_view_product_name)).isTextMatches("[태우한우] 1+ 한우 안심 스테이크 200g (냉장)")
-        onView(withId(R.id.text_view_product_price)).isTextMatches("2,000원")
+        onView(withId(R.id.tv_item_cart_product_name)).isTextMatches("[태우한우] 1+ 한우 안심 스테이크 200g (냉장)")
+        onView(withId(R.id.tv_product_price)).isTextMatches("2,000원")
     }
 
     @Test
     fun `수량을_증가시키면_가격이_증가한다`() {
         onView(withId(R.id.image_view_plus)).performClick()
 
-        onView(withId(R.id.text_view_product_price)).isTextMatches("4,000원")
+        onView(withId(R.id.tv_product_price)).isTextMatches("4,000원")
     }
 
     @Test
     fun `수량을_감소시키면_가격이_감소한다`() {
-        onView(withId(R.id.text_view_product_price)).isTextMatches("2,000원")
+        onView(withId(R.id.tv_product_price)).isTextMatches("2,000원")
 
         onView(withId(R.id.image_view_plus)).performClick()
         onView(withId(R.id.image_view_minus)).performClick()
 
-        onView(withId(R.id.text_view_product_price)).isTextMatches("2,000원")
+        onView(withId(R.id.tv_product_price)).isTextMatches("2,000원")
     }
 }

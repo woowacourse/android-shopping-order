@@ -1,11 +1,16 @@
 package woowacourse.shopping.view.cart.vm
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
+import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.view.cart.CartUiEvent
@@ -16,7 +21,6 @@ import woowacourse.shopping.view.cart.state.CartUiState
 import woowacourse.shopping.view.cart.state.RecommendUiState
 import woowacourse.shopping.view.cart.vm.Paging.Companion.INITIAL_PAGE_NO
 import woowacourse.shopping.view.cart.vm.Paging.Companion.PAGE_SIZE
-import woowacourse.shopping.view.core.common.withState
 import woowacourse.shopping.view.core.event.MutableSingleLiveData
 import woowacourse.shopping.view.core.event.SingleLiveData
 import woowacourse.shopping.view.core.handler.CartQuantityHandler
@@ -51,133 +55,120 @@ class CartViewModel(
     }
 
     fun loadRecommendProduct() {
-        withState(_cartUiState.value) { state ->
-            productRepository.loadSinglePage(lastSeenCategory, null, null) { products ->
-                products.fold(
-                    onSuccess = { result ->
+        viewModelScope.launch {
+            productRepository.loadSinglePage(lastSeenCategory, null, null)
+                .onSuccess { result ->
+                    val recommendProduct =
+                        generateRecommendedProducts(
+                            result.products,
+                            _cartUiState.value?.cartIds ?: emptyList(),
+                            RECOMMEND_SIZE,
+                        )
+                    _recommendUiState.postValue(RecommendUiState(recommendProduct))
+                }
+        }
+    }
 
-                        val recommendProduct =
-                            result
-                                .products
-                                .asSequence()
-                                .filter { it.id !in state.cartIds }
-                                .shuffled()
-                                .take(RECOMMEND_SIZE)
-                                .map { ProductState(item = it, cartQuantity = Quantity(0)) }
-                                .toList()
-                        _recommendUiState.value = RecommendUiState(recommendProduct)
-                    },
-                    onFailure = {},
-                )
+    fun generateRecommendedProducts(
+        allProducts: List<Product>,
+        cartIds: List<Long>,
+        recommendSize: Int,
+    ): List<ProductState> {
+        return allProducts
+            .asSequence()
+            .filter { it.id !in cartIds }
+            .shuffled()
+            .take(recommendSize)
+            .map { ProductState(item = it, cartQuantity = Quantity(0)) }
+            .toList()
+    }
+
+    fun increaseRecommendProductQuantity(productId: Long) {
+        val state = _recommendUiState.value ?: return
+        val updated = state.increaseQuantity(productId)
+
+        when (val cartId = updated.cartId) {
+            null -> {
+                viewModelScope.launch {
+                    cartRepository.addCart(Cart(updated.cartQuantity, productId))
+                        .onSuccess {
+                            val cartId = cartId ?: 0L
+                            _recommendUiState.postValue(state.modifyUiState(updated.copy(cartId = cartId)))
+                            _cartUiState.postValue(_cartUiState.value?.addCart(cartId, updated))
+                        }
+                }
+            }
+
+            else -> {
+                viewModelScope.launch {
+                    cartRepository.updateQuantity(cartId, updated.cartQuantity)
+                        .onSuccess {
+                            _recommendUiState.postValue(state.modifyUiState(updated))
+                            increaseCartQuantity(cartId)
+                        }
+                }
             }
         }
     }
 
-    fun increaseRecommendProductQuantity(productId: Long) =
-        withState(_recommendUiState.value) { state ->
-            val updated = state.increaseQuantity(productId)
+    fun decreaseRecommendProductQuantity(productId: Long) {
+        val state = _recommendUiState.value ?: return
+        val updated = state.decreaseCartQuantity(productId)
+        val cartId = updated.cartId ?: return
 
-            when (val cartId = updated.cartId) {
-                null -> {
-                    cartRepository.addCart(Cart(updated.cartQuantity, productId)) {
-                        it.fold(
-                            onSuccess = { value ->
-                                val cartId = value?.toLong() ?: 0L
-                                _recommendUiState.value =
-                                    state.modifyUiState(updated.copy(cartId = cartId))
-                                _cartUiState.value = _cartUiState.value?.addCart(cartId, updated)
-                                Log.d("TAG", "afterAdd: ${_cartUiState.value?.items}")
-                            },
-                            onFailure = { },
-                        )
+        if (updated.hasCartQuantity) {
+            viewModelScope.launch {
+                cartRepository.updateQuantity(cartId, updated.cartQuantity)
+                    .onSuccess {
+                        _recommendUiState.postValue(state.modifyUiState(updated))
+                        decreaseCartQuantity(cartId)
                     }
-                }
-
-                else -> {
-                    cartRepository.updateQuantity(cartId, updated.cartQuantity) { value ->
-                        value.fold(
-                            onSuccess = {
-                                _recommendUiState.value = state.modifyUiState(updated)
-                                increaseCartQuantity(cartId)
-                            },
-                            onFailure = { },
-                        )
+            }
+        } else {
+            viewModelScope.launch {
+                cartRepository.deleteCart(cartId)
+                    .onSuccess {
+                        val result = updated.copy(cartId = null)
+                        _recommendUiState.postValue(state.modifyUiState(result))
+                        _cartUiState.postValue(_cartUiState.value?.deleteCart(cartId))
                     }
-                }
             }
         }
-
-    fun decreaseRecommendProductQuantity(productId: Long) =
-        withState(_recommendUiState.value) { state ->
-            val updated = state.decreaseCartQuantity(productId)
-            val cartId = updated.cartId ?: return
-
-            if (updated.hasCartQuantity) {
-                cartRepository.updateQuantity(cartId, updated.cartQuantity) {
-                    it.fold(
-                        onSuccess = {
-                            _recommendUiState.value = state.modifyUiState(updated)
-                            decreaseCartQuantity(cartId)
-                        },
-                        onFailure = { },
-                    )
-                }
-            } else {
-                cartRepository.deleteCart(cartId) {
-                    it.fold(
-                        onSuccess = {
-                            val result = updated.copy(cartId = null)
-                            _recommendUiState.value = state.modifyUiState(result)
-                            _cartUiState.value = _cartUiState.value?.deleteCart(cartId)
-                        },
-                        onFailure = { },
-                    )
-                }
-            }
-        }
+    }
 
     fun decreaseCartQuantity(cartId: Long) {
-        withState(_cartUiState.value) { state ->
-            val updatedState = state.decreaseCartQuantity(cartId)
-            val updatedItem = updatedState.items.first { it.cartId == cartId }
+        val state = _cartUiState.value ?: return
+        val updatedState = state.decreaseCartQuantity(cartId)
+        val updatedItem = updatedState.items.first { it.cartId == cartId }
 
-            cartRepository.updateQuantity(cartId, updatedItem.cart.quantity) { result ->
-                result.fold(
-                    onSuccess = {
-                        _cartUiState.value = updatedState
-                    },
-                    onFailure = {},
-                )
-            }
+        viewModelScope.launch {
+            cartRepository.updateQuantity(cartId, updatedItem.cart.quantity)
+                .onSuccess {
+                    _cartUiState.postValue(updatedState)
+                }
         }
     }
 
     fun increaseCartQuantity(cartId: Long) {
-        withState(_cartUiState.value) { state ->
-            val updatedState = state.increaseCartQuantity(cartId)
-            val updatedItem = updatedState.findCart(cartId)
+        val state = _cartUiState.value ?: return
+        val updatedState = state.increaseCartQuantity(cartId)
+        val updatedItem = updatedState.findCart(cartId)
 
-            cartRepository.updateQuantity(cartId, updatedItem.cart.quantity) { result ->
-                result.fold(
-                    onSuccess = {
-                        _cartUiState.value = updatedState
-                    },
-                    onFailure = {},
-                )
-            }
+        viewModelScope.launch {
+            cartRepository.updateQuantity(cartId, updatedItem.cart.quantity)
+                .onSuccess { _cartUiState.postValue(updatedState) }
         }
     }
 
     fun loadCarts() {
         setLoading(true)
         val nextPage = paging.getPageNo() - 1
-        cartRepository.loadSinglePage(
-            nextPage,
-            PAGE_SIZE,
-        ) { result ->
-
-            result.fold(
-                onSuccess = { value ->
+        viewModelScope.launch {
+            cartRepository.loadSinglePage(
+                nextPage,
+                PAGE_SIZE,
+            )
+                .onSuccess { value ->
                     val pageState = paging.createPageState(!value.hasNextPage)
                     val newItems =
                         value
@@ -187,11 +178,14 @@ class CartViewModel(
                     val currentItems = _cartUiState.value?.items ?: emptyList()
                     val combinedItems = currentItems + newItems
 
-                    _cartUiState.value = CartUiState(items = combinedItems, pageState = pageState)
-                },
-                onFailure = {},
-            )
-            setLoading(false)
+                    _cartUiState.postValue(
+                        CartUiState(
+                            items = combinedItems,
+                            pageState = pageState,
+                        ),
+                    )
+                    setLoading(false)
+                }
         }
     }
 
@@ -206,8 +200,9 @@ class CartViewModel(
     }
 
     fun deleteProduct(productId: Long) {
-        cartRepository.deleteCart(productId) {
-            refresh()
+        viewModelScope.launch(Dispatchers.IO) {
+            cartRepository.deleteCart(productId)
+                .onSuccess { refresh() }
         }
     }
 
@@ -215,40 +210,53 @@ class CartViewModel(
         cartId: Long,
         isChecked: Boolean,
     ) {
-        withState(_cartUiState.value) { state ->
-            _cartUiState.value = state.modifyCheckedState(cartId, isChecked)
-        }
+        val state = _cartUiState.value ?: return
+        _cartUiState.postValue(state.modifyCheckedState(cartId, isChecked))
     }
 
     fun changeAllStateChecked(isChecked: Boolean) {
-        withState(_cartUiState.value) { state ->
-            _cartUiState.value = state.setAllItemsChecked(isChecked)
-        }
+        val state = _cartUiState.value ?: return
+        _cartUiState.postValue(state.setAllItemsChecked(isChecked))
     }
 
     private fun refresh() {
-        withState(_cartUiState.value) { state ->
-            cartRepository.loadSinglePage(paging.getPageNo() - 1, PAGE_SIZE) { result ->
-                result.fold(
-                    onSuccess = { value ->
-                        if (paging.resetToLastPageIfEmpty(value.carts)) {
-                            refresh()
-                            return@loadSinglePage
-                        }
-
+        val state = _cartUiState.value ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            cartRepository.loadSinglePage(paging.getPageNo() - 1, PAGE_SIZE)
+                .onSuccess { value ->
+                    if (paging.resetToLastPageIfEmpty(value.carts)) {
+                        refresh()
+                    } else {
                         val pageState = paging.createPageState(!value.hasNextPage)
                         val carts = value.carts.map { CartState(it, state.allChecked) }
 
-                        _cartUiState.postValue(CartUiState(items = carts, pageState = pageState))
-                    },
-                    onFailure = {},
-                )
-            }
+                        _cartUiState.postValue(
+                            CartUiState(
+                                items = carts,
+                                pageState = pageState,
+                            ),
+                        )
+                    }
+                }
+        }
+    }
+
+    fun onOrderButtonClicked() {
+        val orders: List<ShoppingCart> =
+            _cartUiState.value?.items?.filter { it.checked }?.map { it.cart } ?: emptyList()
+        if (orders.isEmpty()) {
+            requestNavigationToRecommendScreen()
+        } else {
+            requestNavigationToOrderScreen(orders)
         }
     }
 
     fun requestNavigationToRecommendScreen() {
-        _event.setValue(CartUiEvent.NavigationToRecommendScree)
+        _event.setValue(CartUiEvent.NavigationToRecommendScreen)
+    }
+
+    fun requestNavigationToOrderScreen(orders: List<ShoppingCart>) {
+        _event.setValue(CartUiEvent.NavigationToOrderScreen(orders))
     }
 
     private fun setLoading(isLoading: Boolean) {

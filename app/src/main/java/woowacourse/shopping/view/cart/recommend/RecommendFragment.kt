@@ -50,7 +50,7 @@ class RecommendFragment : Fragment(R.layout.fragment_recommend) {
     }
 
     private fun setUpRecyclerView(binding: FragmentRecommendBinding) {
-        binding.recyclerViewRecommend.layoutManager =
+        binding.rvRecommendList.layoutManager =
             LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
     }
 }
