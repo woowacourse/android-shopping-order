@@ -48,7 +48,7 @@ class ReceiptViewModel(
         loadCoupons()
     }
 
-    private fun calculator(couponItem: CouponItem?) {
+    private fun updateTotalsWithCoupon(couponItem: CouponItem?) {
         val receipt = this.receipt.value ?: Receipt(emptyList())
         if (couponItem == null) {
             _discount.postValue(0)
@@ -107,9 +107,9 @@ class ReceiptViewModel(
 
                 if (item.couponId == currentSelected?.couponId) {
                     _selectedCoupon.postValue(item)
-                    calculator(selectedCoupon.value)
+                    updateTotalsWithCoupon(selectedCoupon.value)
                 } else if (selectedCoupon.value == null) {
-                    calculator(null)
+                    updateTotalsWithCoupon(null)
                 }
 
                 item

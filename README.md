@@ -35,7 +35,7 @@
 - [x] ProductDetailViewModel | loading을 방어적 복사를 사용하도록 수정
 - [ ] 전체적으로 mapper함수 생성
 - [ ] 각 viewmodel에 비즈니스 로직을 Repository로 이동
-- [ ] ReceiptViewModel | calculator 메서드 네이밍 수정
+- [x] ReceiptViewModel | calculator 메서드 네이밍 수정
 - [ ] ReceiptViewModel | BindingAdapter를 사용
 - [ ] RecommendViewModel | 추천 목록에 있는 상품들은 장바구니에서 제외
 - [ ] ReceiptViewModel | map사용
