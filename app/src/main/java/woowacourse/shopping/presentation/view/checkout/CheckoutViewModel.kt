@@ -96,10 +96,6 @@ class CheckoutViewModel(
 
     fun finalizeOrder() {
         viewModelScope.launch {
-            val cartIds = _cartItems.value.orEmpty().map(CartItem::cartId)
-            cartRepository.deleteCartItems(cartIds)
-        }
-        viewModelScope.launch {
             orderRepository.placeOrder(_cartItems.value.orEmpty().map(CartItem::cartId))
         }
     }

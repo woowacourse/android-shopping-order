@@ -68,7 +68,7 @@ object RepositoryProvider {
             )
         _cartRepository = CartRepositoryImpl(cartItemDataSource)
         _couponRepository = CouponRepositoryImpl(couponDataSource)
-        _orderRepository = OrderRepositoryImpl(orderDataSource)
+        _orderRepository = OrderRepositoryImpl(orderDataSource, cartItemDataSource)
 
         isInitialized = true
     }
