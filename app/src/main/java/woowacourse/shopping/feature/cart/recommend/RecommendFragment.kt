@@ -7,12 +7,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentRecommendBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.feature.QuantityChangeListener
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.cart.CartViewModel
-import woowacourse.shopping.feature.cart.adapter.RecommendAdapter
+import woowacourse.shopping.feature.cart.recommend.adapter.RecommendAdapter
 
 class RecommendFragment : Fragment() {
     private var _binding: FragmentRecommendBinding? = null
@@ -61,8 +62,10 @@ class RecommendFragment : Fragment() {
             recommendAdapter.setRecommendItem(goodsList)
         }
 
+        viewModel.updateAppBarTitle(getString(R.string.cart_action_bar_name))
         viewModel.loadRecommendedGoods()
         setupBinding()
+        observeViewModel()
     }
 
     private fun setupBinding() {
@@ -70,6 +73,12 @@ class RecommendFragment : Fragment() {
         binding.viewModel = viewModel
         binding.bottomBar.checkboxAll.visibility = View.GONE
         binding.bottomBar.tvAll.visibility = View.GONE
+    }
+
+    private fun observeViewModel() {
+        binding.bottomBar.orderButton.setOnClickListener {
+            (requireActivity() as CartActivity).navigateToOrder()
+        }
     }
 
     override fun onDestroyView() {

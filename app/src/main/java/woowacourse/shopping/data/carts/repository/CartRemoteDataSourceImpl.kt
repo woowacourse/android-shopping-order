@@ -1,235 +1,104 @@
 package woowacourse.shopping.data.carts.repository
 
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import woowacourse.shopping.BuildConfig
-import woowacourse.shopping.data.carts.CartFetchError
-import woowacourse.shopping.data.carts.CartUpdateError
+import woowacourse.shopping.data.carts.AddItemResult
 import woowacourse.shopping.data.carts.dto.CartItemRequest
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
+import woowacourse.shopping.data.util.NetworkModule
 import woowacourse.shopping.data.util.RetrofitService
-import woowacourse.shopping.domain.model.Authorization
+import woowacourse.shopping.data.util.api.ApiError
+import woowacourse.shopping.data.util.api.ApiResult
 
 class CartRemoteDataSourceImpl(
-    baseUrl: String = BuildConfig.BASE_URL,
+    private val retrofitService: RetrofitService = NetworkModule.retrofitService,
 ) : CartRemoteDataSource {
-    private val retrofitService: RetrofitService =
-        Retrofit
-            .Builder()
-            .baseUrl(baseUrl)
-            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-            .build()
-            .create(RetrofitService::class.java)
-
-    override fun fetchCartItemSize(onComplete: (Int) -> Unit) {
-        // Todo
-    }
-
-    override fun fetchCartItemByPage(
-        page: Int,
-        size: Int,
-        onSuccess: (CartResponse) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        retrofitService
-            .requestCartProduct(page = page, size = size, authorization = "Basic " + Authorization.basicKey)
-            .enqueue(
-                object : Callback<CartResponse> {
-                    override fun onResponse(
-                        call: Call<CartResponse>,
-                        response: Response<CartResponse>,
-                    ) {
-                        if (response.isSuccessful && response.body() != null) {
-                            onSuccess(response.body()!!)
-                        } else {
-                            onFailure(CartFetchError.Server(response.code(), response.message()))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<CartResponse>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartFetchError.Network)
-                    }
-                },
-            )
-    }
-
-    override fun fetchCartItemByOffset(
+    override suspend fun fetchCartItemByOffset(
         limit: Int,
         offset: Int,
-        onSuccess: (CartResponse) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        fetchCartItemByPage(offset / limit, limit, onSuccess, onFailure)
+    ): ApiResult<CartResponse> = fetchCartItemByPage(offset / limit, limit)
+
+    override suspend fun fetchCartItemByPage(
+        page: Int,
+        size: Int,
+    ): ApiResult<CartResponse> =
+        try {
+            val response = retrofitService.requestCartProduct(page = page, size = size)
+            ApiResult.Success(response)
+        } catch (e: Exception) {
+            ApiResult.Error(ApiError.Network)
+        }
+
+    override suspend fun fetchAuthCode(validKey: String): ApiResult<Int> {
+        try {
+            val response = retrofitService.requestCartCounts()
+            return when {
+                response.isSuccessful -> ApiResult.Success(response.code())
+                else -> ApiResult.Error(ApiError.Server(response.code(), response.message()))
+            }
+        } catch (e: Exception) {
+            return ApiResult.Error(ApiError.Network)
+        }
     }
 
-    override fun fetchCartCount(
-        onSuccess: (Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        retrofitService
-            .requestCartCounts(authorization = "Basic " + Authorization.basicKey)
-            .enqueue(
-                object : Callback<CartQuantity> {
-                    override fun onResponse(
-                        call: Call<CartQuantity>,
-                        response: Response<CartQuantity>,
-                    ) {
-                        if (response.isSuccessful && response.body() != null) {
-                            onSuccess(response.body()!!.quantity)
-                        } else {
-                            onFailure(CartFetchError.Server(response.code(), response.message()))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<CartQuantity>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartFetchError.Network)
-                    }
-                },
-            )
-    }
-
-    override fun fetchAuthCode(
-        validKey: String,
-        onResponse: (Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        retrofitService
-            .requestCartCounts(authorization = "Basic $validKey")
-            .enqueue(
-                object : Callback<CartQuantity> {
-                    override fun onResponse(
-                        call: Call<CartQuantity>,
-                        response: Response<CartQuantity>,
-                    ) {
-                        onResponse(response.code())
-                    }
-
-                    override fun onFailure(
-                        call: Call<CartQuantity>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartFetchError.Network)
-                    }
-                },
-            )
-    }
-
-    override fun updateCartItemCount(
+    override suspend fun updateCartItemCount(
         cartId: Int,
         cartQuantity: CartQuantity,
-        onSuccess: (resultCode: Int) -> Unit,
-        onFailure: (CartUpdateError) -> Unit,
-    ) {
-        retrofitService
-            .updateCartCounts(
+    ): ApiResult<Int> {
+        val response =
+            retrofitService.updateCartCounts(
                 cartId = cartId,
                 requestBody = cartQuantity,
-                authorization = "Basic " + Authorization.basicKey,
-            ).enqueue(
-                object : Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
-                        if (response.isSuccessful) {
-                            onSuccess(response.code())
-                        } else {
-                            val errorBody = response.errorBody()?.string() ?: ""
-                            when {
-                                errorBody.contains("cartItem not found") -> onFailure(CartUpdateError.NotFound)
-                                else -> onFailure(CartUpdateError.Server(response.code(), errorBody))
-                            }
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<Unit>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartUpdateError.Network)
-                    }
-                },
             )
+        return if (response.isSuccessful) {
+            ApiResult.Success(response.code())
+        } else {
+            if (response.code() == 400) {
+                ApiResult.Error(ApiError.NotFound)
+            } else {
+                ApiResult.Error(
+                    ApiError.Server(response.code(), response.message()),
+                )
+            }
+        }
     }
 
-    override fun deleteItem(
-        cartId: Int,
-        onSuccess: (resultCode: Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        retrofitService
-            .deleteCartItem(
-                cartId = cartId,
-                authorization = "Basic " + Authorization.basicKey,
-            ).enqueue(
-                object : Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
-                        if (response.isSuccessful) {
-                            onSuccess(response.code())
-                        } else {
-                            onFailure(CartFetchError.Server(response.code(), response.message()))
-                        }
-                    }
+    override suspend fun deleteItem(cartId: Int): ApiResult<Int> =
+        try {
+            val response = retrofitService.deleteCartItem(cartId = cartId)
+            if (response.isSuccessful) {
+                ApiResult.Success(response.code())
+            } else {
+                ApiResult.Error(
+                    ApiError.Server(response.code(), response.message()),
+                )
+            }
+        } catch (e: Exception) {
+            ApiResult.Error(ApiError.Network)
+        }
 
-                    override fun onFailure(
-                        call: Call<Unit>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartFetchError.Network)
-                    }
-                },
-            )
-    }
-
-    override fun addItem(
+    override suspend fun addItem(
         itemId: Int,
         itemCount: Int,
-        onSuccess: (resultCode: Int, cartId: Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    ) {
-        retrofitService
-            .addCartItem(
-                cartItem = CartItemRequest(itemId, itemCount),
-                authorization = "Basic " + Authorization.basicKey,
-            ).enqueue(
-                object : Callback<Unit> {
-                    override fun onResponse(
-                        call: Call<Unit>,
-                        response: Response<Unit>,
-                    ) {
-                        if (response.isSuccessful) {
-                            val location = response.headers()["Location"]
-                            val cartItemId = extractCartItemId(location)
+    ): ApiResult<AddItemResult> {
+        try {
+            val response =
+                retrofitService
+                    .addCartItem(
+                        cartItem = CartItemRequest(itemId, itemCount),
+                    )
+            if (response.isSuccessful) {
+                val location = response.headers()["Location"]
+                val cartItemId = extractCartItemId(location)
 
-                            onSuccess(response.code(), cartItemId)
-                        } else {
-                            onFailure(CartFetchError.Server(response.code(), response.message()))
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<Unit>,
-                        t: Throwable,
-                    ) {
-                        onFailure(CartFetchError.Network)
-                    }
-                },
-            )
+                return ApiResult.Success(AddItemResult(response.code(), cartItemId))
+            } else {
+                return ApiResult.Error(
+                    ApiError.Server(response.code(), response.message()),
+                )
+            }
+        } catch (e: Exception) {
+            return ApiResult.Error(ApiError.Network)
+        }
     }
 
     private fun extractCartItemId(location: String?): Int =

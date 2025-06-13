@@ -1,9 +1,9 @@
 package woowacourse.shopping.feature.goods
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.util.component1
@@ -12,6 +12,9 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.data.ShoppingDatabase
+import woowacourse.shopping.data.account.AccountLocalDataSourceImpl
+import woowacourse.shopping.data.account.AccountRemoteDataSourceImpl
+import woowacourse.shopping.data.account.AccountRepositoryImpl
 import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
 import woowacourse.shopping.data.goods.repository.GoodsLocalDataSourceImpl
@@ -39,8 +42,10 @@ import woowacourse.shopping.util.toUi
 class GoodsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGoodsBinding
     private lateinit var navbarBinding: MenuCartNavbarBinding
+
     private val viewModel: GoodsViewModel by viewModels {
         GoodsViewModelFactory(
+            AccountRepositoryImpl(AccountRemoteDataSourceImpl(), AccountLocalDataSourceImpl(this)),
             CartRepositoryImpl(CartRemoteDataSourceImpl()),
             GoodsRepositoryImpl(
                 GoodsRemoteDataSourceImpl(),
@@ -116,6 +121,14 @@ class GoodsActivity : AppCompatActivity() {
         viewModel.navigateToLogin.observe(this) {
             navigateGoodsLogin()
         }
+
+        viewModel.alertEvent.observe(this) { messageId ->
+            showToastMessage(getString(messageId))
+        }
+    }
+
+    private fun showToastMessage(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun getLayoutManager(): GridLayoutManager {
@@ -135,8 +148,6 @@ class GoodsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val sharedPreferences = getSharedPreferences("AccountInfo", Context.MODE_PRIVATE)
-        sharedPreferences.getString("basicKey", "")?.let { viewModel.login(it) }
         viewModel.fetchAndSetCartCache()
         viewModel.updateRecentlyViewedGoods()
     }

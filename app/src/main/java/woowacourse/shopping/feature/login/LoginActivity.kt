@@ -3,41 +3,33 @@ package woowacourse.shopping.feature.login
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import woowacourse.shopping.R
-import woowacourse.shopping.data.account.AccountLocalDataSource
 import woowacourse.shopping.data.account.AccountLocalDataSourceImpl
-import woowacourse.shopping.data.carts.repository.CartRemoteDataSourceImpl
-import woowacourse.shopping.data.carts.repository.CartRepositoryImpl
+import woowacourse.shopping.data.account.AccountRemoteDataSourceImpl
+import woowacourse.shopping.data.account.AccountRepositoryImpl
 import woowacourse.shopping.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var viewModel: LoginViewModel
-    private lateinit var accountLocalDataSource: AccountLocalDataSource
+
+    private val viewModel: LoginViewModel by viewModels {
+        LoginViewModelFactory(AccountRepositoryImpl(AccountRemoteDataSourceImpl(), AccountLocalDataSourceImpl(this)))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        viewModel = LoginViewModel(CartRepositoryImpl(CartRemoteDataSourceImpl()))
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
-        accountLocalDataSource = AccountLocalDataSourceImpl(this)
 
-        viewModel.loginSuccessEvent.observe(this) { basicKey ->
-            accountLocalDataSource.saveBasicKey(
-                basicKey = basicKey,
-                onComplete = {
-                    showToastMessage(getString(R.string.login_alert_success_login))
-                    finish()
-                },
-                onFail = {
-                    showToastMessage(getString(R.string.login_alert_save_basic_key_failed))
-                },
-            )
+        viewModel.loginSuccessEvent.observe(this) {
+            showToastMessage(getString(R.string.login_alert_success_login))
+            finish()
         }
         viewModel.loginErrorEvent.observe(this) { loginError ->
             when (loginError) {

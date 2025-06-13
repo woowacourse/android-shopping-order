@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.cart
+package woowacourse.shopping.feature.cart.cartdetail
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,16 +7,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import woowacourse.shopping.data.carts.CartFetchError
+import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.feature.QuantityChangeListener
-import woowacourse.shopping.feature.cart.adapter.CartAdapter
-import woowacourse.shopping.feature.cart.adapter.CartViewHolder
+import woowacourse.shopping.feature.cart.CartActivity
+import woowacourse.shopping.feature.cart.CartViewModel
+import woowacourse.shopping.feature.cart.cartdetail.adapter.CartAdapter
 
-class CartFragment :
-    Fragment(),
-    CartViewHolder.CartClickListener {
+class CartFragment : Fragment() {
     @Suppress("ktlint:standard:backing-property-naming")
     private var _binding: FragmentCartBinding? = null
     private val binding get() = _binding!!
@@ -26,18 +23,10 @@ class CartFragment :
     }
 
     private val cartAdapter: CartAdapter by lazy {
+        val cartHandler = CartItemHandler(viewModel)
         CartAdapter(
-            cartClickListener = this,
-            quantityChangeListener =
-                object : QuantityChangeListener {
-                    override fun onIncrease(cartItem: CartItem) {
-                        viewModel.increaseQuantity(cartItem)
-                    }
-
-                    override fun onDecrease(cartItem: CartItem) {
-                        viewModel.removeCartItemOrDecreaseQuantity(cartItem)
-                    }
-                },
+            cartItemClickHandler = cartHandler,
+            quantityChangeListener = cartHandler,
         ).apply {
             showSkeleton()
         }
@@ -58,6 +47,7 @@ class CartFragment :
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.updateAppBarTitle(getString(R.string.cart_action_bar_name))
         setupBinding()
         setupRecyclerView()
         observeViewModel()
@@ -74,32 +64,22 @@ class CartFragment :
 
     private fun observeViewModel() {
         viewModel.loginErrorEvent.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                CartFetchError.Network ->
-                    Toast
-                        .makeText(
-                            requireContext(),
-                            "네트워크 에러 발생",
-                            Toast.LENGTH_SHORT,
-                        ).show()
-
-                is CartFetchError.Server ->
-                    Toast
-                        .makeText(
-                            requireContext(),
-                            "로그인 실패",
-                            Toast.LENGTH_SHORT,
-                        ).show()
-            }
+            showErrorMessage("네트워크 에러 발생")
             requireActivity().finish()
         }
 
-        viewModel.removeItemEvent.observe(viewLifecycleOwner) { cartItem ->
-            onCartItemDelete(cartItem)
-        }
         binding.bottomBar.orderButton.setOnClickListener {
             (requireActivity() as CartActivity).navigateToRecommend()
         }
+    }
+
+    private fun showErrorMessage(message: String) {
+        Toast
+            .makeText(
+                requireContext(),
+                message,
+                Toast.LENGTH_SHORT,
+            ).show()
     }
 
     override fun onResume() {
@@ -110,19 +90,6 @@ class CartFragment :
                 binding.rvCartItems.scrollToPosition(0)
             }
         }
-    }
-
-    override fun onCartItemDelete(cartItem: CartItem) {
-        viewModel.delete(cartItem) {
-            cartAdapter.removeItem(cartItem)
-        }
-    }
-
-    override fun onCartItemChecked(
-        cartItem: CartItem,
-        changeCheckValue: Boolean,
-    ) {
-        viewModel.updateCartItemCheck(cartItem, changeCheckValue)
     }
 
     override fun onDestroyView() {

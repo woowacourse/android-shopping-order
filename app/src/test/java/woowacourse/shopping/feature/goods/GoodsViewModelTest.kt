@@ -1,22 +1,44 @@
 package woowacourse.shopping.feature.goods
 
 import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import woowacourse.shopping.data.account.AccountRepository
+import woowacourse.shopping.data.account.BasicKeyAuthorizationResult
+import woowacourse.shopping.data.carts.AddItemResult
+import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.carts.repository.CartRepository
+import woowacourse.shopping.data.goods.dto.GoodsResponse
 import woowacourse.shopping.data.goods.repository.GoodsRepository
+import woowacourse.shopping.data.util.api.ApiResult
+import woowacourse.shopping.data.util.mapper.toCartItems
 import woowacourse.shopping.domain.model.Authorization
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Goods
 import woowacourse.shopping.util.InstantTaskExecutorExtension
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class GoodsViewModelTest {
+    @MockK
+    private lateinit var accountRepository: AccountRepository
+
     @MockK
     private lateinit var cartRepository: CartRepository
 
@@ -25,17 +47,29 @@ class GoodsViewModelTest {
 
     private lateinit var viewModel: GoodsViewModel
 
+    private val testDispatcher = UnconfinedTestDispatcher()
+
     private val sampleGoods1 = Goods("상품1", 10000, "url1", 1, "카테고리1")
     private val sampleGoods2 = Goods("상품2", 20000, "url2", 2, "카테고리2")
     private val sampleCartItem1 = CartItem(sampleGoods1, 1, 1, true)
     private val sampleCartItem2 = CartItem(sampleGoods2, 2, 2, true)
 
     @BeforeEach
-    fun setUp() {
-        MockKAnnotations.init(this)
-        viewModel = GoodsViewModel(cartRepository, goodsRepository)
-        setupRepositoryMocks()
-        setupLiveDataObservers()
+    fun setUp() =
+        runTest {
+            Dispatchers.setMain(testDispatcher)
+            MockKAnnotations.init(this@GoodsViewModelTest)
+            setupRepositoryMocks()
+            viewModel = GoodsViewModel(accountRepository, cartRepository, goodsRepository)
+            setupLiveDataObservers()
+            mockkStatic("woowacourse.shopping.data.util.mapper.CartResponseMapperKt")
+            every { any<CartResponse>().toCartItems() } returns emptyList()
+        }
+
+    @AfterEach
+    fun tearDown() {
+        unmockkStatic("woowacourse.shopping.data.util.mapper.CartResponseMapperKt")
+        Dispatchers.resetMain()
     }
 
     private fun setupLiveDataObservers() {
@@ -46,12 +80,37 @@ class GoodsViewModelTest {
     }
 
     private fun setupRepositoryMocks() {
-        every { goodsRepository.fetchPageGoods(any(), any(), any(), any()) } answers { }
-        every { goodsRepository.fetchRecentGoods(any()) } answers {
-            firstArg<(List<Goods>) -> Unit>()(emptyList())
-        }
-        every { cartRepository.fetchAllCartItems(any(), any()) } answers { }
+        coEvery { goodsRepository.fetchPageGoods(any(), any()) } returns createEmptyGoodsResponse()
+        coEvery { goodsRepository.fetchRecentGoods() } returns emptyList()
+        coEvery { cartRepository.fetchAllCartItems() } returns
+            ApiResult.Success(
+                createEmptyCartResponse(),
+            )
+        coEvery { accountRepository.checkValidLocalSavedBasicKey() } returns
+            BasicKeyAuthorizationResult.LoginSuccess
+        coEvery { cartRepository.addCartItem(any(), any()) } returns
+            ApiResult.Success(
+                AddItemResult(200, 1),
+            )
+        coEvery {
+            cartRepository.updateQuantity(
+                any(),
+                any(),
+            )
+        } returns ApiResult.Success(200)
+        coEvery { cartRepository.delete(any()) } returns ApiResult.Success(200)
     }
+
+    private fun createEmptyGoodsResponse(): GoodsResponse =
+        mockk(relaxed = true) {
+            every { content } returns emptyList()
+            every { last } returns true
+        }
+
+    private fun createEmptyCartResponse(): CartResponse =
+        mockk(relaxed = true) {
+            every { toCartItems() } returns emptyList()
+        }
 
     @Test
     fun `초기 상태에서 모든 LiveData가 기본값으로 설정된다`() {
@@ -158,24 +217,23 @@ class GoodsViewModelTest {
     }
 
     @Test
-    fun `로그인 성공 시 Authorization 상태가 true로 설정된다`() {
-        every { cartRepository.checkValidBasicKey(any(), any(), any()) } answers {
-            secondArg<(Int) -> Unit>()(200)
+    fun `로그인 성공 시 Authorization 상태가 true로 설정된다`() =
+        runTest {
+            coEvery { accountRepository.checkValidLocalSavedBasicKey() } returns
+                BasicKeyAuthorizationResult.LoginSuccess
+
+            viewModel.login()
+
+            assertThat(Authorization.isLogin).isTrue()
+            coVerify { accountRepository.checkValidLocalSavedBasicKey() }
         }
-
-        viewModel.login("validKey")
-
-        assertThat(Authorization.isLogin).isTrue()
-        verify { cartRepository.checkValidBasicKey("validKey", any(), any()) }
-    }
 
     @Test
     fun `로그인 실패 시 Authorization 상태가 false로 설정된다`() {
-        every { cartRepository.checkValidBasicKey(any(), any(), any()) } answers {
-            secondArg<(Int) -> Unit>()(401)
-        }
+        coEvery { accountRepository.checkValidLocalSavedBasicKey() } returns
+            BasicKeyAuthorizationResult.LoginError
 
-        viewModel.login("invalidKey")
+        viewModel.login()
 
         assertThat(Authorization.isLogin).isFalse()
     }
@@ -199,38 +257,39 @@ class GoodsViewModelTest {
     fun `로그인 상태에서 새 아이템 추가 시 repository addCartItem이 호출된다`() {
         Authorization.setLoginStatus(true)
         viewModel.setTestCartCache(emptyList())
-        every { cartRepository.addCartItem(any(), any(), any(), any()) } answers {
-            thirdArg<(Int, Int) -> Unit>()(200, 1)
-        }
+        coEvery { cartRepository.addCartItem(any(), any()) } returns
+            ApiResult.Success(
+                AddItemResult(200, 1),
+            )
 
         viewModel.addCartItemOrIncreaseQuantity(sampleCartItem1)
 
-        verify { cartRepository.addCartItem(sampleGoods1, 1, any(), any()) }
+        coVerify { cartRepository.addCartItem(sampleGoods1, 1) }
     }
 
     @Test
     fun `로그인 상태에서 기존 아이템 수량 증가 시 repository updateQuantity가 호출된다`() {
         Authorization.setLoginStatus(true)
         viewModel.setTestCartCache(listOf(sampleCartItem1))
-        every { cartRepository.updateQuantity(any(), any(), any(), any()) } answers {
-            thirdArg<() -> Unit>()()
-        }
-
+        coEvery {
+            cartRepository.updateQuantity(
+                any(),
+                any(),
+            )
+        } returns ApiResult.Success(200)
         viewModel.addCartItemOrIncreaseQuantity(sampleCartItem1)
 
-        verify { cartRepository.updateQuantity(eq(1), any(), any(), any()) }
+        coVerify { cartRepository.updateQuantity(eq(1), any()) }
     }
 
     @Test
     fun `updateRecentlyViewedGoods 호출 시 repository fetchRecentGoods가 호출된다`() {
         val recentGoods = listOf(sampleGoods1, sampleGoods2)
-        every { goodsRepository.fetchRecentGoods(any()) } answers {
-            firstArg<(List<Goods>) -> Unit>()(recentGoods)
-        }
+        coEvery { goodsRepository.fetchRecentGoods() } returns recentGoods
 
         viewModel.updateRecentlyViewedGoods()
 
-        verify { goodsRepository.fetchRecentGoods(any()) }
+        coVerify { goodsRepository.fetchRecentGoods() }
         assertThat(viewModel.recentlyViewedGoods.value).isEqualTo(recentGoods)
     }
 
@@ -238,6 +297,6 @@ class GoodsViewModelTest {
     fun `fetchAndSetCartCache repository 호출 검증`() {
         viewModel.fetchAndSetCartCache()
 
-        verify { cartRepository.fetchAllCartItems(any(), any()) }
+        coVerify { cartRepository.fetchAllCartItems() }
     }
 }

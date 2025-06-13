@@ -1,56 +1,28 @@
 package woowacourse.shopping.data.carts.repository
 
-import woowacourse.shopping.data.carts.CartFetchError
-import woowacourse.shopping.data.carts.CartUpdateError
+import woowacourse.shopping.data.carts.AddItemResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
+import woowacourse.shopping.data.util.api.ApiResult
 import woowacourse.shopping.domain.model.Goods
 
 interface CartRepository {
-    fun checkValidBasicKey(
-        validKey: String,
-        onResponse: (Int) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    )
+    suspend fun fetchAllCartItems(): ApiResult<CartResponse>
 
-    fun fetchAllCartItems(
-        onComplete: (CartResponse) -> Unit,
-        onFail: (Throwable) -> Unit,
-    )
-
-    fun fetchCartItemsByOffset(
+    suspend fun fetchCartItemsByOffset(
         limit: Int,
         offset: Int,
-        onComplete: (CartResponse) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    )
+    ): ApiResult<CartResponse>
 
-    fun fetchCartItemsByPage(
-        page: Int,
-        size: Int,
-        onComplete: (CartResponse) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    )
-
-    fun updateQuantity(
+    suspend fun updateQuantity(
         cartId: Int,
         cartQuantity: CartQuantity,
-        onComplete: () -> Unit,
-        onFail: (CartUpdateError) -> Unit,
-    )
+    ): ApiResult<Int>
 
-    fun delete(
-        cartId: Int,
-        onComplete: (Int) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    )
+    suspend fun delete(cartId: Int): ApiResult<Int>
 
-    fun getAllItemsSize(onComplete: (Int) -> Unit)
-
-    fun addCartItem(
+    suspend fun addCartItem(
         goods: Goods,
         quantity: Int,
-        onComplete: (resultCode: Int, cartId: Int) -> Unit,
-        onFail: (CartFetchError) -> Unit,
-    )
+    ): ApiResult<AddItemResult>
 }

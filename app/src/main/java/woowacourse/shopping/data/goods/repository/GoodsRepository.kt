@@ -4,35 +4,23 @@ import woowacourse.shopping.data.goods.dto.GoodsResponse
 import woowacourse.shopping.domain.model.Goods
 
 interface GoodsRepository {
-    fun fetchGoodsSize(onComplete: (Int) -> Unit)
-
-    fun fetchPageGoods(
+    suspend fun fetchPageGoods(
         limit: Int,
         offset: Int,
-        onComplete: (GoodsResponse) -> Unit,
-        onFail: (Throwable) -> Unit,
-    )
+    ): GoodsResponse
 
-    fun fetchCategoryGoods(
+    suspend fun fetchCategoryGoods(
         limit: Int,
         category: String,
-        onComplete: (GoodsResponse) -> Unit,
-        onFail: (Throwable) -> Unit,
-    )
+    ): GoodsResponse
 
-    fun fetchGoodsById(
-        id: Int,
-        onComplete: (Goods?) -> Unit,
-    )
+    suspend fun fetchGoodsByGoodsId(id: Int): Goods?
 
-    fun fetchRecentGoodsIds(onComplete: (List<String>) -> Unit)
+    suspend fun fetchRecentGoodsIds(): List<String>
 
-    fun fetchRecentGoods(onComplete: (List<Goods>) -> Unit)
+    suspend fun fetchRecentGoods(): List<Goods>
 
-    fun fetchMostRecentGoods(onComplete: (Goods?) -> Unit)
+    suspend fun fetchMostRecentGoods(): Goods?
 
-    fun loggingRecentGoods(
-        goods: Goods,
-        onComplete: () -> Unit,
-    )
+    suspend fun loggingRecentGoods(goods: Goods)
 }
