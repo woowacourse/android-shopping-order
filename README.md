@@ -37,6 +37,6 @@
 - [ ] 각 viewmodel에 비즈니스 로직을 Repository로 이동
 - [x] ReceiptViewModel | calculator 메서드 네이밍 수정
 - [ ] ReceiptViewModel | BindingAdapter를 사용
-- [ ] RecommendViewModel | 추천 목록에 있는 상품들은 장바구니에서 제외
+- [x] RecommendViewModel | 추천 목록에 있는 상품들은 장바구니 품목 제외
 - [ ] ReceiptViewModel | map사용
 - [ ] ReceiptViewModel | mapper사용

@@ -5,7 +5,7 @@ import java.io.Serializable
 
 data class CartItem(
     val id: Long,
-    private val product: Product,
+    val product: Product,
     val quantity: Int = 0,
 ) : Serializable {
     val imageUrl: String? = product.imageUrl
@@ -24,5 +24,5 @@ data class CartItem(
         imageUrl: String? = null,
         quantity: Int = 0,
     ) :
-        this(id, Product(productId, productName, productPrice, category, imageUrl), quantity)
+            this(id, Product(productId, productName, productPrice, category, imageUrl), quantity)
 }

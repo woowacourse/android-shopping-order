@@ -156,7 +156,7 @@ class RecommendViewModel(
         val products: List<Product> =
             productRecommendationStrategy.recommendedProducts(
                 products = categoryProducts,
-                prohibitedProducts = recentProducts,
+                prohibitedProducts = recentProducts + cartItems.map { it.product },
             )
 
         return products.map { product: Product ->
