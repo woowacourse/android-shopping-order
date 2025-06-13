@@ -19,13 +19,13 @@ class PayViewModel(
     private val _couponList = MutableLiveData<List<Map<Coupon, Boolean>>>()
     val couponList: LiveData<List<Map<Coupon, Boolean>>> = _couponList
 
-    private val _orderAmount = MutableLiveData<Int>()
+    private val _orderAmount = MutableLiveData<Int>(0)
     val orderAmount: LiveData<Int> = _orderAmount
 
-    private val _discountAmount = MutableLiveData<Int>()
+    private val _discountAmount = MutableLiveData<Int>(0)
     val discountAmount: LiveData<Int> = _discountAmount
 
-    private val _totalAmount = MutableLiveData<Int>()
+    private val _totalAmount = MutableLiveData<Int>(0)
     val totalAmount: LiveData<Int> = _totalAmount
 
     val shipmentFee: Int = SHIPMENT_FEE
@@ -36,11 +36,11 @@ class PayViewModel(
 
     fun getOrderProducts(products: List<ProductUiModel>) {
         _orderProducts.value = products
-        getOrderAmount()
-        getTotalAmount()
+        setOrderAmount()
+        setTotalAmount()
     }
 
-    fun getOrderAmount() {
+    fun setOrderAmount() {
         _orderAmount.value = _orderProducts.value?.sumOf { it.price }
     }
 
@@ -52,7 +52,7 @@ class PayViewModel(
         }
     }
 
-    fun getDiscountAmount() {
+    fun setDiscountAmount() {
         _couponList.value
             ?.forEach { couponMap ->
                 couponMap.forEach { (coupon, isChecked) ->
@@ -63,7 +63,7 @@ class PayViewModel(
             }
     }
 
-    fun getTotalAmount() {
+    fun setTotalAmount() {
         _orderAmount.value?.let { orderAmount ->
             _discountAmount.value?.let { discountAmount ->
                 _totalAmount.value = orderAmount - discountAmount + shipmentFee
@@ -87,8 +87,8 @@ class PayViewModel(
         }
 
         _couponList.value = updatedList
-        getDiscountAmount()
-        getTotalAmount()
+        setDiscountAmount()
+        setTotalAmount()
     }
 
     companion object {

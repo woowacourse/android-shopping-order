@@ -11,9 +11,9 @@ data class Coupon(
     @SerializedName("description")
     val description: String,
     @SerializedName("expirationDate")
-    val expirationDate: LocalDate,
+    val expirationDate: String,
     @SerializedName("discountType")
-    val discountType: Int,
+    val discountType: String,
     @SerializedName("discount")
     val discount: Int,
     @SerializedName("minimumAmount")

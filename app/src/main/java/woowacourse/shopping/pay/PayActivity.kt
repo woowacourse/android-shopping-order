@@ -74,8 +74,8 @@ class PayActivity : AppCompatActivity() {
 
     private fun observeData() {
         viewModel.orderProducts.observe(this) {
-            viewModel.getOrderAmount()
-            viewModel.getTotalAmount()
+            viewModel.setOrderAmount()
+            viewModel.setTotalAmount()
         }
         viewModel.couponList.observe(this) { couponList -> }
     }

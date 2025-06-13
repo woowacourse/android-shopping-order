@@ -3,6 +3,7 @@ package woowacourse.shopping.data.repository
 import woowacourse.shopping.domain.Coupon
 import woowacourse.shopping.data.source.CouponDataSource
 import woowacourse.shopping.data.source.OrderDataSource
+import java.time.LocalDate
 
 class PayRepositoryImpl(
     private val orderDataSource: OrderDataSource,
@@ -14,7 +15,7 @@ class PayRepositoryImpl(
                 id = coupon.id,
                 code = coupon.code,
                 description = coupon.description,
-                expirationDate = coupon.expirationDate,
+                expirationDate = LocalDate.parse(coupon.expirationDate),
                 discountType = coupon.discountType,
                 discount = coupon.discount,
                 minimumAmount = coupon.minimumAmount,

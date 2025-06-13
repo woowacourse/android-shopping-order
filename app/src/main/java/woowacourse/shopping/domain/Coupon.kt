@@ -10,7 +10,7 @@ data class Coupon(
     val code: String,
     val description: String,
     val expirationDate: LocalDate,
-    val discountType: Int,
+    val discountType: String,
     val discount: Int,
     val minimumAmount: Int,
 ) : Parcelable
