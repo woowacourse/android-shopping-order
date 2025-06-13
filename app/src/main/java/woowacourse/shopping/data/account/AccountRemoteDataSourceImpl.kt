@@ -12,7 +12,10 @@ class AccountRemoteDataSourceImpl(
         try {
             val response = retrofitService.requestCartCounts()
             return when {
-                response.isSuccessful -> ApiResult.Success(response.code())
+                response.isSuccessful -> {
+                    val authCode = response.code()
+                    ApiResult.Success(authCode)
+                }
                 else -> ApiResult.Error(ApiError.Server(response.code(), response.message()))
             }
         } catch (e: Exception) {

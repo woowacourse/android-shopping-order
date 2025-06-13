@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.data.account.AccountRepository
+import woowacourse.shopping.data.account.BasicKeyAuthorizationResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.dto.GoodsResponse
@@ -113,14 +114,12 @@ class GoodsViewModel(
         viewModelScope.launch {
             val result = accountRepository.checkValidLocalSavedBasicKey()
             when (result) {
-                is ApiResult.Error -> {
-                    _alertEvent.setValue(R.string.goods_auto_login_error_toast_message)
+                BasicKeyAuthorizationResult.LoginSuccess -> {
+                    Authorization.setLoginStatus(true)
                 }
-                is ApiResult.Success -> {
-                    when {
-                        result.data == 200 -> Authorization.setLoginStatus(true)
-                        else -> Authorization.setLoginStatus(false)
-                    }
+                else -> {
+                    _alertEvent.setValue(R.string.goods_auto_login_error_toast_message)
+                    Authorization.setLoginStatus(false)
                 }
             }
         }

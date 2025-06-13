@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.account.AccountRepository
-import woowacourse.shopping.data.util.api.ApiResult
+import woowacourse.shopping.data.account.BasicKeyAuthorizationResult
 import woowacourse.shopping.domain.model.Authorization
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
@@ -30,15 +30,14 @@ class LoginViewModel(
                     Authorization.basicKey,
                 )
             when (result) {
-                is ApiResult.Error -> _loginErrorEvent.setValue(LoginError.NotFound)
-                is ApiResult.Success -> {
-                    when {
-                        result.data == 200 -> {
-                            Authorization.setLoginStatus(true)
-                            saveBasicKey()
-                        }
-                        else -> _loginErrorEvent.postValue(LoginError.Network)
-                    }
+                BasicKeyAuthorizationResult.LoginSuccess -> {
+                    Authorization.setLoginStatus(true)
+                    saveBasicKey()
+                }
+
+                else -> {
+                    _loginErrorEvent.setValue(LoginError.NotFound)
+                    Authorization.setLoginStatus(false)
                 }
             }
         }

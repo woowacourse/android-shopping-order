@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.data.account.AccountRepository
+import woowacourse.shopping.data.account.BasicKeyAuthorizationResult
 import woowacourse.shopping.data.carts.AddItemResult
 import woowacourse.shopping.data.carts.dto.CartResponse
 import woowacourse.shopping.data.carts.repository.CartRepository
@@ -86,9 +87,7 @@ class GoodsViewModelTest {
                 createEmptyCartResponse(),
             )
         coEvery { accountRepository.checkValidLocalSavedBasicKey() } returns
-            ApiResult.Success(
-                200,
-            )
+            BasicKeyAuthorizationResult.LoginSuccess
         coEvery { cartRepository.addCartItem(any(), any()) } returns
             ApiResult.Success(
                 AddItemResult(200, 1),
@@ -221,9 +220,7 @@ class GoodsViewModelTest {
     fun `로그인 성공 시 Authorization 상태가 true로 설정된다`() =
         runTest {
             coEvery { accountRepository.checkValidLocalSavedBasicKey() } returns
-                ApiResult.Success(
-                    200,
-                )
+                BasicKeyAuthorizationResult.LoginSuccess
 
             viewModel.login()
 
@@ -234,9 +231,7 @@ class GoodsViewModelTest {
     @Test
     fun `로그인 실패 시 Authorization 상태가 false로 설정된다`() {
         coEvery { accountRepository.checkValidLocalSavedBasicKey() } returns
-            ApiResult.Success(
-                401,
-            )
+            BasicKeyAuthorizationResult.LoginError
 
         viewModel.login()
 
