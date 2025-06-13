@@ -1,7 +1,5 @@
 package woowacourse.shopping.data.datasource
 
-import woowacourse.shopping.data.model.request.OrderRequest
-
 interface OrderDataSource {
-    suspend fun submitOrder(orderRequest: OrderRequest)
+    suspend fun submitOrder(cartIds: List<Long>)
 }

@@ -6,7 +6,7 @@ import woowacourse.shopping.data.service.OrderService
 class OrderDataSourceImpl(
     private val orderService: OrderService,
 ) : OrderDataSource {
-    override suspend fun submitOrder(orderRequest: OrderRequest) {
-        orderService.postOrder(orderRequest)
+    override suspend fun submitOrder(cartIds: List<Long>) {
+        orderService.postOrder(OrderRequest(cartIds))
     }
 }

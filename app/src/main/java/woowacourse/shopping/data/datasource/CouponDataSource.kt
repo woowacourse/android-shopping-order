@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.datasource
 
-import woowacourse.shopping.data.model.response.coupon.CouponResponse
+import woowacourse.shopping.domain.coupon.Coupon
 
 interface CouponDataSource {
-    suspend fun fetchCoupons(): List<CouponResponse>
+    suspend fun fetchCoupons(): List<Coupon>
 }

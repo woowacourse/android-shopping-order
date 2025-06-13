@@ -1,16 +1,18 @@
 package woowacourse.shopping.data.datasource
 
-import woowacourse.shopping.data.model.request.CartItemRequest
-import woowacourse.shopping.data.model.response.Quantity
-import woowacourse.shopping.data.model.response.cartitem.CartItemResponse
+import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.Page
 
 interface CartItemDataSource {
     suspend fun fetchPageOfCartItems(
         pageIndex: Int,
         pageSize: Int,
-    ): CartItemResponse
+    ): Page<CartItem>
 
-    suspend fun submitCartItem(cartItem: CartItemRequest)
+    suspend fun submitCartItem(
+        productId: Long,
+        quantity: Int,
+    )
 
     suspend fun removeCartItem(cartId: Long)
 
@@ -18,8 +20,8 @@ interface CartItemDataSource {
 
     suspend fun updateCartItem(
         cartId: Long,
-        quantity: Quantity,
+        quantity: Int,
     )
 
-    suspend fun fetchCartItemsCount(): Quantity
+    suspend fun fetchCartItemsCount(): Int
 }

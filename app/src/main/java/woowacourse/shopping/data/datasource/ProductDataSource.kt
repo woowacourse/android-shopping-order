@@ -1,13 +1,13 @@
 package woowacourse.shopping.data.datasource
 
-import woowacourse.shopping.data.model.response.product.ProductResponse
-import woowacourse.shopping.data.model.response.product.ProductsResponse
+import woowacourse.shopping.domain.Page
+import woowacourse.shopping.domain.Product
 
 interface ProductDataSource {
-    suspend fun fetchProduct(id: Long): ProductResponse
+    suspend fun fetchProduct(id: Long): Product
 
     suspend fun fetchPageOfProducts(
         pageIndex: Int,
         pageSize: Int,
-    ): ProductsResponse
+    ): Page<Product>
 }

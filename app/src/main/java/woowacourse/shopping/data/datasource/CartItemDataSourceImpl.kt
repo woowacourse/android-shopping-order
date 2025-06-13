@@ -1,9 +1,12 @@
 package woowacourse.shopping.data.datasource
 
+import woowacourse.shopping.data.mapper.toCartItem
 import woowacourse.shopping.data.model.request.CartItemRequest
 import woowacourse.shopping.data.model.response.Quantity
-import woowacourse.shopping.data.model.response.cartitem.CartItemResponse
+import woowacourse.shopping.data.model.response.cartitem.CartItemContent
 import woowacourse.shopping.data.service.CartItemService
+import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.Page
 
 class CartItemDataSourceImpl(
     private val cartItemService: CartItemService,
@@ -11,12 +14,20 @@ class CartItemDataSourceImpl(
     override suspend fun fetchPageOfCartItems(
         pageIndex: Int,
         pageSize: Int,
-    ): CartItemResponse {
-        return cartItemService.getCartItems(page = pageIndex, size = pageSize)
+    ): Page<CartItem> {
+        val response = cartItemService.getCartItems(page = pageIndex, size = pageSize)
+        return Page(
+            response.content.map(CartItemContent::toCartItem),
+            response.first,
+            response.last,
+        )
     }
 
-    override suspend fun submitCartItem(cartItem: CartItemRequest) {
-        cartItemService.postCartItem(cartItem)
+    override suspend fun submitCartItem(
+        productId: Long,
+        quantity: Int,
+    ) {
+        cartItemService.postCartItem(CartItemRequest(productId, quantity))
     }
 
     override suspend fun removeCartItem(cartId: Long) {
@@ -29,12 +40,12 @@ class CartItemDataSourceImpl(
 
     override suspend fun updateCartItem(
         cartId: Long,
-        quantity: Quantity,
+        quantity: Int,
     ) {
-        cartItemService.patchCartItem(cartId, quantity)
+        cartItemService.patchCartItem(cartId, Quantity(quantity))
     }
 
-    override suspend fun fetchCartItemsCount(): Quantity {
-        return cartItemService.getCartItemsCount()
+    override suspend fun fetchCartItemsCount(): Int {
+        return cartItemService.getCartItemsCount().quantity
     }
 }

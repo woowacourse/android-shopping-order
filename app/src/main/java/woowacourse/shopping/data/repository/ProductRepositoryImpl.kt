@@ -4,10 +4,8 @@ import woowacourse.shopping.data.datasource.CartItemDataSource
 import woowacourse.shopping.data.datasource.ProductDataSource
 import woowacourse.shopping.data.db.RecentProductDao
 import woowacourse.shopping.data.db.RecentProductEntity
-import woowacourse.shopping.data.mapper.toCartItem
 import woowacourse.shopping.data.mapper.toProduct
 import woowacourse.shopping.data.mapper.toRecentEntity
-import woowacourse.shopping.data.model.response.product.ProductContent
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.Page
 import woowacourse.shopping.domain.Product
@@ -22,29 +20,23 @@ class ProductRepositoryImpl(
         pageSize: Int,
     ): Page<Product> {
         val sizeToLoad = pageSize * (pageIndex + 1)
-        val response =
+        val page =
             productDataSource.fetchPageOfProducts(
                 pageIndex = 0,
                 pageSize = sizeToLoad,
             )
-        val products = response.productContent.map(ProductContent::toProduct)
-        val isLast = products.size < sizeToLoad
-        return Page(products, response.first, isLast)
+        val isLast = page.items.size < sizeToLoad
+        return page.copy(isLast = isLast)
     }
 
     override suspend fun loadProductById(id: Long): Product {
-        val product = productDataSource.fetchProduct(id).toProduct()
+        val product = productDataSource.fetchProduct(id)
         addRecentProduct(product)
         return product
     }
 
     override suspend fun loadAllCartItems(): List<CartItem> {
-        val response =
-            cartItemDataSource.fetchPageOfCartItems(
-                pageIndex = 0,
-                pageSize = Int.MAX_VALUE,
-            )
-        return response.content.map { content -> content.toCartItem() }
+        return cartItemDataSource.fetchPageOfCartItems(0, Int.MAX_VALUE).items
     }
 
     override suspend fun addRecentProduct(product: Product) {
@@ -74,7 +66,7 @@ class ProductRepositoryImpl(
             productDataSource.fetchPageOfProducts(
                 pageIndex = 0,
                 pageSize = Int.MAX_VALUE,
-            ).productContent.map(ProductContent::toProduct)
+            ).items
         return products.filter { product -> product.category == category }
     }
 }
