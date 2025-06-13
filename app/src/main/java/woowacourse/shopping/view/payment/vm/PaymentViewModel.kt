@@ -115,7 +115,7 @@ class PaymentViewModel(
         _paymentUiState.value = newState
     }
 
-    fun onClickOrder() {
+    fun orderProduct() {
         val ids = currentOrderItems.map { it.id }
         viewModelScope.launch(Dispatchers.IO) {
             orderRepository.createOrder(ids)

@@ -185,7 +185,7 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:clickable="true"
-            android:onClick="@{() -> vm.onClickOrder()}"
+            android:onClick="@{() -> vm.orderProduct()}"
             android:text="@string/payment_text"
             android:textAlignment="center"
             android:gravity="center"
