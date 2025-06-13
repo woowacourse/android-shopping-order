@@ -31,7 +31,6 @@ sealed class CouponResponse {
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @SerialName("percentage")
-@JsonClassDiscriminator("discountType")
 data class TimeLimitedCouponResponse(
     @SerialName("availableTime")
     val availableTime: AvailableTimeResponse?,
@@ -50,7 +49,6 @@ data class TimeLimitedCouponResponse(
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @SerialName("fixed")
-@JsonClassDiscriminator("discountType")
 data class DiscountCouponResponse(
     @SerialName("code")
     override val code: String,
@@ -69,7 +67,6 @@ data class DiscountCouponResponse(
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @SerialName("freeShipping")
-@JsonClassDiscriminator("discountType")
 data class FreeShippingCouponResponse(
     @SerialName("code")
     override val code: String,
@@ -86,7 +83,6 @@ data class FreeShippingCouponResponse(
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @SerialName("buyXgetY")
-@JsonClassDiscriminator("discountType")
 data class BogoCouponResponse(
     @SerialName("buyQuantity")
     val buyQuantity: Int,
