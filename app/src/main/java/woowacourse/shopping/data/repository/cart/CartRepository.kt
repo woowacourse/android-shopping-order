@@ -6,6 +6,8 @@ import woowacourse.shopping.domain.Page
 interface CartRepository {
     suspend fun loadCartItemByProductId(id: Long): CartItem?
 
+    suspend fun loadCartItemsByProductIds(ids: List<Long>): List<CartItem>
+
     suspend fun loadPageOfCartItems(
         pageIndex: Int,
         pageSize: Int,

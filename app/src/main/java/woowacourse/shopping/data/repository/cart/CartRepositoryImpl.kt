@@ -12,6 +12,14 @@ class CartRepositoryImpl(
         return cartItems.find { cartItem -> cartItem.product.id == id }
     }
 
+    override suspend fun loadCartItemsByProductIds(ids: List<Long>): List<CartItem> {
+        return buildList {
+            ids.forEach { id ->
+                loadCartItemByProductId(id)?.let { cartItem -> add(cartItem) }
+            }
+        }
+    }
+
     override suspend fun loadPageOfCartItems(
         pageIndex: Int,
         pageSize: Int,

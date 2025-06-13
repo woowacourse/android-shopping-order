@@ -62,15 +62,9 @@ class CheckoutViewModel(
     }
 
     private suspend fun loadSelectedCartItems() {
-        val selectedCartItems =
-            buildList {
-                selectedProductIds.forEach { id ->
-                    cartRepository.loadCartItemByProductId(id)?.let { cartItem ->
-                        add(cartItem)
-                    }
-                }
-            }
-        _cartItems.postValue(selectedCartItems)
+        cartRepository.loadCartItemsByProductIds(selectedProductIds).let { selectedCartItems ->
+            _cartItems.postValue(selectedCartItems)
+        }
     }
 
     private suspend fun loadCoupons() {
