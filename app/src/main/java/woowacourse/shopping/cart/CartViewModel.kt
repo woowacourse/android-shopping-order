@@ -49,6 +49,10 @@ class CartViewModel(
         loadCartProducts()
     }
 
+    fun orderProduct(): List<ProductUiModel> {
+        return _cartProducts.value?.filter { it.isChecked == true } ?: emptyList()
+    }
+
     fun movePay() {
         if (_totalPurchaseCount.value == 0) return
         _isMovePay.value = Unit
