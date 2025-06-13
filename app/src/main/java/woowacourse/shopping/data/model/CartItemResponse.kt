@@ -1,5 +1,8 @@
 package woowacourse.shopping.data.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class CartItemResponse(
     val content: List<Content>,
     val empty: Boolean,

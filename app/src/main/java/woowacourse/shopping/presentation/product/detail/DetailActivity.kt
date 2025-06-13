@@ -53,10 +53,6 @@ class DetailActivity : AppCompatActivity() {
                     showToast(R.string.text_unInserted_toast)
                 }
             }
-
-            viewModel.lastViewed.observe(this) {
-                binding.recentItem = it
-            }
         }
     }
 

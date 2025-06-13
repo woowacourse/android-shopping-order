@@ -1,5 +1,7 @@
 package woowacourse.shopping.presentation.product.catalog
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
@@ -37,12 +39,14 @@ class CatalogActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
 
+        viewModel.loadCatalogProducts()
         observeViewModel()
     }
 
     override fun onStart() {
         super.onStart()
-        viewModel.initCatalog()
+        viewModel.loadRecentViewedItems()
+        viewModel.updateCartCount()
     }
 
     private fun applyWindowInsets() {
@@ -55,13 +59,12 @@ class CatalogActivity : AppCompatActivity() {
 
     private fun initRecyclerView() {
         val handler = createHandler()
-
         setupProductRecyclerView(handler)
         setupRecentViewedRecyclerView(handler)
     }
 
     private fun setupProductRecyclerView(handler: CatalogEventHandlerImpl) {
-        productAdapter = ProductAdapter(emptyList(), handler, handler)
+        productAdapter = ProductAdapter(handler, handler)
         binding.recyclerViewProducts.apply {
             this.adapter = productAdapter
             layoutManager =
@@ -93,16 +96,12 @@ class CatalogActivity : AppCompatActivity() {
             binding.recyclerViewProducts.visibility = View.VISIBLE
 
             productAdapter.apply {
-                setData(paging.products)
+                submitList(paging.products)
                 setLoadButtonVisible(paging.hasNext)
             }
         }
         viewModel.recentViewedItems.observe(this) { recentItems ->
             viewedAdapter.setData(recentItems)
-        }
-
-        viewModel.updatedProduct.observe(this) { updatedItem ->
-            productAdapter.updateProduct(updatedItem)
         }
     }
 
@@ -122,4 +121,10 @@ class CatalogActivity : AppCompatActivity() {
         CatalogEventHandlerImpl(viewModel) { product ->
             startActivity(newIntent(this, product.id))
         }
+
+    companion object {
+        fun newIntent(context: Context): Intent {
+            return Intent(context, CatalogActivity::class.java)
+        }
+    }
 }

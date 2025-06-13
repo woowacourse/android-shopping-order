@@ -2,7 +2,9 @@ package woowacourse.shopping.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity(tableName = "ViewedItemEntity")
 data class ViewedItem(
     @PrimaryKey val id: Long,

@@ -4,17 +4,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.launch
 import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.domain.model.PagingData
-import woowacourse.shopping.domain.repository.CartItemRepository
+import woowacourse.shopping.domain.repository.CartItemsRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
 import woowacourse.shopping.domain.repository.ViewedItemRepository
 
 class CatalogViewModel(
     private val productsRepository: ProductsRepository,
-    private val cartRepository: CartItemRepository,
+    private val cartRepository: CartItemsRepository,
     private val viewedRepository: ViewedItemRepository,
 ) : ViewModel() {
     private val _pagingData = MutableLiveData<PagingData>()
@@ -29,70 +31,89 @@ class CatalogViewModel(
     private val _hasRecentViewedItems = MutableLiveData(false)
     val hasRecentViewedItems: LiveData<Boolean> = _hasRecentViewedItems
 
-    private val _updatedProduct = MutableLiveData<ProductUiModel>()
-    val updatedProduct: LiveData<ProductUiModel> = _updatedProduct
-
     private var currentPage = 0
     val page: Int get() = currentPage
 
-    fun initCatalog() {
-        currentPage = 0
-        loadCatalogProducts()
-        loadRecentViewedItems()
-        updateCartCount()
+    fun loadCatalogProducts(pageSize: Int = PAGE_SIZE) {
+        viewModelScope.launch {
+            val pagingData =
+                productsRepository.getProducts(currentPage, pageSize)
+                    .getOrNull() ?: return@launch
+
+            cartRepository.getQuantity(pagingData)
+                .onSuccess {
+                    val currentProducts = _pagingData.value?.products ?: emptyList()
+                    _pagingData.value = it.copy(products = currentProducts + it.products)
+                }
+        }
     }
 
-    fun onQuantitySelectorToggled(product: ProductUiModel) {
-        val toggled =
-            product.copy(isExpanded = !product.isExpanded, quantity = product.quantity + 1)
+    fun loadRecentViewedItems() {
+        viewModelScope.launch {
+            viewedRepository.getViewedItems()
+                .onSuccess { items ->
+                    _recentViewedItems.value = items?.map { it.toUiModel() }
+                    _hasRecentViewedItems.value = !items.isNullOrEmpty()
+                }
+        }
+    }
 
-        _updatedProduct.value = toggled
-        cartRepository.addCartItem(toggled.id, toggled.quantity) { result ->
-            result
+    fun updateCartCount() {
+        viewModelScope.launch {
+            cartRepository.getCartItemsCount()
                 .onSuccess {
-                    _updatedProduct.postValue(toggled)
+                    _cartCount.value = it
+                }
+        }
+    }
+
+    fun toggleQuantitySelector(product: ProductUiModel) {
+        viewModelScope.launch {
+            val toggled =
+                product.copy(isExpanded = !product.isExpanded, quantity = product.quantity + 1)
+            cartRepository.addCartItem(toggled.id, toggled.quantity)
+                .onSuccess {
                     applyProductChange(toggled)
                 }
         }
     }
 
     fun increaseQuantity(product: ProductUiModel) {
-        val newProduct = product.copy(quantity = product.quantity + 1)
-        _updatedProduct.value = newProduct
-        cartRepository.updateCartItemQuantity(newProduct.id, newProduct.quantity) { result ->
-            result
+        viewModelScope.launch {
+            val newProduct = product.copy(quantity = product.quantity + 1)
+            cartRepository.updateCartItemQuantity(newProduct.id, newProduct.quantity)
                 .onSuccess {
-                    _updatedProduct.postValue(newProduct)
                     applyProductChange(newProduct)
                 }
+                .onFailure {}
         }
     }
 
     fun decreaseQuantity(product: ProductUiModel) {
-        val newQuantity = (product.quantity - 1).coerceAtLeast(0)
-        val updated =
-            product.copy(
-                quantity = newQuantity,
-                isExpanded = newQuantity > 0,
-            )
-
-        _updatedProduct.value = updated
-        if (product.quantity == 0) {
-            cartRepository.deleteCartItem(product.id) { result ->
-                result
+        viewModelScope.launch {
+            val newQuantity = (product.quantity - 1).coerceAtLeast(0)
+            val updated =
+                product.copy(
+                    quantity = newQuantity,
+                    isExpanded = newQuantity > 0,
+                )
+            if (product.quantity == 0) {
+                cartRepository.deleteCartItem(product.id)
                     .onSuccess {
                         applyProductChange(product)
                     }
-            }
-        } else {
-            cartRepository.updateCartItemQuantity(updated.id, updated.quantity) { result ->
-                result
+            } else {
+                cartRepository.updateCartItemQuantity(updated.id, updated.quantity)
                     .onSuccess {
-                        _updatedProduct.postValue(updated)
                         applyProductChange(updated)
                     }
             }
         }
+    }
+
+    fun loadNextCatalogProducts() {
+        currentPage++
+        loadCatalogProducts()
     }
 
     private fun applyProductChange(updated: ProductUiModel) {
@@ -101,38 +122,8 @@ class CatalogViewModel(
             currentPagingData.products.map {
                 if (it.id == updated.id) updated else it
             }
-        _pagingData.postValue(currentPagingData.copy(products = updatedProducts))
+        _pagingData.value = currentPagingData.copy(products = updatedProducts)
         updateCartCount()
-    }
-
-    fun loadNextCatalogProducts() {
-        currentPage++
-        loadCatalogProducts()
-    }
-
-    private fun loadCatalogProducts(pageSize: Int = PAGE_SIZE) {
-        productsRepository.getProducts(currentPage, pageSize) { result ->
-            result
-                .onSuccess { pagingData ->
-                    val newPagingData = cartRepository.getQuantity(pagingData)
-                    _pagingData.postValue(newPagingData)
-                }
-        }
-    }
-
-    private fun loadRecentViewedItems() {
-        viewedRepository.getViewedItems { items ->
-            _recentViewedItems.postValue(items)
-            _hasRecentViewedItems.postValue(items.isNotEmpty())
-        }
-    }
-
-    private fun updateCartCount() {
-        cartRepository.getCartItemsCount { result ->
-            result.onSuccess { cartCount ->
-                _cartCount.postValue(cartCount)
-            }
-        }
     }
 
     companion object {

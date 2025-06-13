@@ -1,5 +1,8 @@
 package woowacourse.shopping.data.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ProductsResponse(
     val content: List<ProductResponse>,
     val pageable: Pageable,
