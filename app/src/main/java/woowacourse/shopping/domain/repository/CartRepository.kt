@@ -4,36 +4,38 @@ import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PageableItem
 
 interface CartRepository {
-    fun fetchCartItems(
+    suspend fun fetchCart(): Result<Unit>
+
+    suspend fun fetchCartItems(
         page: Int,
         size: Int,
-        onResult: (Result<PageableItem<CartProduct>>) -> Unit,
-    )
+    ): Result<PageableItem<CartProduct>>
 
     fun fetchAllCartItems(): Result<List<CartProduct>>
 
-    fun findCartIdByProductId(productId: Long): Result<Long>
+    fun fetchCartIdByProductId(productId: Long): Result<Long>
 
-    fun deleteCartItem(
-        cartId: Long,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    fun fetchCartProductByProductId(productId: Long): Result<CartProduct>
 
-    fun insertCartProductQuantityToCart(
+    suspend fun deleteCartItem(cartId: Long): Result<Unit>
+
+    suspend fun deleteCartItems(cartIds: List<Long>): Result<Unit>
+
+    suspend fun insertCartProductQuantityToCart(
         productId: Long,
         increaseCount: Int,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun decreaseCartProductQuantityFromCart(
+    suspend fun decreaseCartProductQuantityFromCart(
         productId: Long,
         decreaseCount: Int,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    ): Result<Unit>
 
-    fun fetchCartItemCount(onResult: (Result<Int>) -> Unit)
+    suspend fun fetchCartItemCount(): Result<Int>
 
-    fun findQuantityByProductId(productId: Long): Result<Int>
+    suspend fun hasCartItem(): Result<Boolean>
 
-    fun findCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>>
+    suspend fun fetchCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>>
+
+    fun fetchCartProductsByIds(cartIds: List<Long>): Result<List<CartProduct>>
 }

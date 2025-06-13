@@ -4,7 +4,11 @@ class Cart(
     cartProducts: List<CartProduct> = emptyList(),
 ) {
     private val _cachedCartProducts = cartProducts.associateBy { it.product.id }.toMutableMap()
+
     val cachedCartProducts: List<CartProduct> get() = _cachedCartProducts.values.toList()
+
+    private val cachedCartProductsByCartIds
+        get() = cachedCartProducts.associateBy { it.cartId }.toMutableMap()
 
     fun addAll(cartProducts: List<CartProduct>) {
         _cachedCartProducts.putAll(cartProducts.associateBy { it.product.id })
@@ -18,12 +22,20 @@ class Cart(
         _cachedCartProducts.values.removeIf { it.cartId == cartId }
     }
 
-    fun findCartProductByProductId(productId: Long): CartProduct? = _cachedCartProducts[productId]
+    fun fetchCartProductByProductId(productId: Long): CartProduct =
+        requireNotNull(_cachedCartProducts[productId]) { NOT_FOUND_PRODUCT_ID_ERROR_MESSAGE + "fetchCartProductByProductId" }
 
-    fun findQuantityByProductId(productId: Long): Int = _cachedCartProducts[productId]?.quantity ?: DEFAULT_QUANTITY
+    fun fetchCartProductsByProductIds(productIds: List<Long>): List<CartProduct> = productIds.mapNotNull { _cachedCartProducts[it] }
 
-    fun findCartIdByProductId(productId: Long): Long =
-        requireNotNull(_cachedCartProducts[productId]?.cartId) { NOT_FOUND_CART_ID_ERROR_MESSAGE }
+    fun fetchQuantityByProductId(productId: Long): Int? = _cachedCartProducts[productId]?.quantity
+
+    fun fetchCartIdByProductId(productId: Long): Long =
+        requireNotNull(_cachedCartProducts[productId]?.cartId) {
+            NOT_FOUND_CART_ID_ERROR_MESSAGE
+        }
+
+    fun fetchCartIdByCartId(cartId: Long): CartProduct =
+        requireNotNull(cachedCartProductsByCartIds[cartId]) { NOT_FOUND_CART_ID_ERROR_MESSAGE }
 
     fun updateQuantityByProductId(
         productId: Long,
@@ -34,7 +46,7 @@ class Cart(
     }
 
     companion object {
-        private const val DEFAULT_QUANTITY = 0
         private const val NOT_FOUND_CART_ID_ERROR_MESSAGE = "해당 상품의 카트 ID를 찾을 수 없습니다."
+        private const val NOT_FOUND_PRODUCT_ID_ERROR_MESSAGE = "해당 상품의 제품 ID를 찾을 수 없습니다."
     }
 }

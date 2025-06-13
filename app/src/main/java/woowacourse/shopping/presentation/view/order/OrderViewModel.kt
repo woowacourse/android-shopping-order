@@ -6,7 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.di.provider.UseCaseProvider
 import woowacourse.shopping.domain.model.CartProduct
@@ -36,6 +38,9 @@ class OrderViewModel(
 
     private val cartItems = MutableLiveData<List<CartProductUiModel>>(emptyList())
     private val selectedCartItems = MutableLiveData<List<CartProductUiModel>>(emptyList())
+
+    val selectedCartIds get() = selectedCartItems.value.orEmpty().map { it.cartId }
+
     val cartDisplayItems =
         MediatorLiveData<List<DisplayModel<CartProductUiModel>>>().apply {
             addSource(cartItems) { cartItems ->
@@ -88,15 +93,18 @@ class OrderViewModel(
         val newPage = calculatePage(direction)
         _isLoading.postValue(true)
 
-        cartRepository.fetchCartItems(newPage, limit) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .fetchCartItems(newPage, limit)
                 .onSuccess { onFetchCartItemsSuccess(it, newPage) }
-                .onFailure { postFailureOrderEvent(OrderMessageEvent.FETCH_CART_ITEMS_FAILURE) }
+                .onFailure { postOrderEvent(OrderMessageEvent.FETCH_CART_ITEMS_FAILURE) }
         }
     }
 
     override fun onDeleteProduct(cartId: Long) {
-        deleteCartItem(cartId)
+        viewModelScope.launch {
+            deleteCartItem(cartId)
+        }
     }
 
     override fun increaseQuantity(productId: Long) {
@@ -104,7 +112,9 @@ class OrderViewModel(
     }
 
     override fun decreaseQuantity(productId: Long) {
-        decreaseProductQuantity(productId)
+        viewModelScope.launch {
+            decreaseProductQuantity(productId)
+        }
     }
 
     override fun onCheckOrder(cartId: Long) {
@@ -115,28 +125,27 @@ class OrderViewModel(
         selectCurrentPageCartProduct()
     }
 
-    private fun deleteCartItem(cartId: Long) {
-        cartRepository.deleteCartItem(cartId) { result ->
-            result
-                .onSuccess { handleFetchCartItemDeleted(cartId) }
-                .onFailure { postFailureOrderEvent(OrderMessageEvent.DELETE_CART_ITEM_FAILURE) }
-        }
+    private suspend fun deleteCartItem(cartId: Long) {
+        cartRepository
+            .deleteCartItem(cartId)
+            .onSuccess { handleFetchCartItemDeleted(cartId) }
+            .onFailure { postOrderEvent(OrderMessageEvent.DELETE_CART_ITEM_FAILURE) }
     }
 
     private fun increaseProductQuantity(productId: Long) {
-        increaseCartProductQuantityUseCase(productId, QUANTITY_STEP) { result ->
-            result
-                .onSuccess { refreshFetchItem() }
-                .onFailure { postFailureOrderEvent(OrderMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
+        viewModelScope.launch {
+            increaseCartProductQuantityUseCase(
+                productId,
+                QUANTITY_STEP,
+            ).onSuccess { refreshFetchItem() }
+                .onFailure { postOrderEvent(OrderMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
         }
     }
 
-    private fun decreaseProductQuantity(productId: Long) {
-        decreaseProductQuantityUseCase(productId, QUANTITY_STEP) { result ->
-            result
-                .onSuccess { refreshFetchItem() }
-                .onFailure { postFailureOrderEvent(OrderMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
-        }
+    private suspend fun decreaseProductQuantity(productId: Long) {
+        decreaseProductQuantityUseCase(productId, QUANTITY_STEP)
+            .onSuccess { refreshFetchItem() }
+            .onFailure { postOrderEvent(OrderMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
     }
 
     private fun switchCartItemSelection(cartId: Long) {
@@ -163,21 +172,25 @@ class OrderViewModel(
         selectedCartItems.value = emptyList()
     }
 
-    fun orderCartItems(purchaseSuggestionIds: List<Long>) {
-        val selectedItemIds = selectedCartItems.value.orEmpty().map { it.cartId }
-        val purchaseCartIds = selectedItemIds + purchaseSuggestionIds
-
-        orderRepository.addOrder(purchaseCartIds.map { it.toString() }) { result ->
-            result
-                .onSuccess { deleteSelectedCartItems(purchaseCartIds) }
-                .onFailure { postFailureOrderEvent(OrderMessageEvent.ORDER_CART_ITEMS_FAILURE) }
+    fun addSelectItems(purchaseSuggestionIds: List<Long>) {
+        viewModelScope.launch {
+            cartRepository
+                .fetchCartProductsByIds(purchaseSuggestionIds)
+                .onSuccess {
+                    selectedCartItems.value =
+                        selectedCartItems.value.orEmpty() + it.map { it.toCartItemUiModel() }
+                }.onFailure {
+                }
         }
     }
 
-    private fun deleteSelectedCartItems(purchaseCartIds: List<Long>) {
-        purchaseCartIds.map {
-            cartRepository.deleteCartItem(it) {
-            }
+    fun orderCartItems() {
+        viewModelScope.launch {
+            val cartIds = selectedCartIds
+            orderRepository
+                .addOrder(cartIds.map { it.toString() })
+                .onSuccess { postOrderEvent(OrderMessageEvent.ORDER_CART_ITEMS_SUCCESS) }
+                .onFailure { postOrderEvent(OrderMessageEvent.ORDER_CART_ITEMS_FAILURE) }
         }
     }
 
@@ -190,13 +203,12 @@ class OrderViewModel(
         }
     }
 
-    private fun refreshFetchItem() {
+    private suspend fun refreshFetchItem() {
         val newPage = calculatePage(FetchPageDirection.CURRENT)
-        cartRepository.fetchCartItems(newPage, limit) { result ->
-            result
-                .onSuccess { onRefreshProductQuantitySuccess(it) }
-                .onFailure { postFailureOrderEvent(OrderMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
-        }
+        cartRepository
+            .fetchCartItems(newPage, limit)
+            .onSuccess { onRefreshProductQuantitySuccess(it) }
+            .onFailure { postOrderEvent(OrderMessageEvent.FIND_PRODUCT_QUANTITY_FAILURE) }
     }
 
     private fun handleFetchCartItemDeleted(deletedCartId: Long) {
@@ -240,7 +252,7 @@ class OrderViewModel(
         selectedCartItems.postValue(updatedSelectedItems)
     }
 
-    private fun postFailureOrderEvent(event: OrderMessageEvent) {
+    private fun postOrderEvent(event: OrderMessageEvent) {
         this._toastOrderEvent.postValue(event)
     }
 

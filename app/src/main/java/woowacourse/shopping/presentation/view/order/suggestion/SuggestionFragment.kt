@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.view.order.suggestion
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -10,9 +9,9 @@ import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentSuggestionBinding
 import woowacourse.shopping.presentation.base.BaseFragment
-import woowacourse.shopping.presentation.view.ShoppingActivity
 import woowacourse.shopping.presentation.view.order.OrderUiEventListener
 import woowacourse.shopping.presentation.view.order.OrderViewModel
+import woowacourse.shopping.presentation.view.order.payment.PaymentFragment
 import woowacourse.shopping.presentation.view.order.suggestion.adatper.SuggestionAdapter
 import woowacourse.shopping.presentation.view.order.suggestion.event.SuggestionMessageEvent
 
@@ -55,9 +54,6 @@ class SuggestionFragment :
         suggestionViewModel.toastSuggestionEvent.observe(viewLifecycleOwner) { event ->
             showToast(event.toMessageResId())
         }
-
-        suggestionViewModel.purchaseProducts.observe(viewLifecycleOwner) {
-        }
     }
 
     private fun setupActionBar() {
@@ -88,16 +84,15 @@ class SuggestionFragment :
         }
 
     override fun order() {
-        orderViewModel.orderCartItems(suggestionViewModel.purchaseProducts.value.orEmpty())
-        navigateToShopping()
+        orderViewModel.addSelectItems(suggestionViewModel.selectedCartIds())
+        navigateToPayment()
     }
 
-    private fun navigateToShopping() {
-        val intent =
-            ShoppingActivity.newIntent(requireActivity()).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-            }
-        startActivity(intent)
-        requireActivity().finish()
+    private fun navigateToPayment() {
+        parentFragmentManager.commit {
+            hide(this@SuggestionFragment)
+            add(R.id.cart_fragment_container, PaymentFragment::class.java, null)
+            addToBackStack(null)
+        }
     }
 }

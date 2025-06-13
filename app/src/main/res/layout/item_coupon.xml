@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="coupon"
+            type="woowacourse.shopping.presentation.model.CouponUiModel" />
+
+        <variable
+            name="isSelected"
+            type="boolean" />
+
+        <variable
+            name="stateListener"
+            type="woowacourse.shopping.presentation.view.order.payment.CouponStateEventListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/shape_coupon_item"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="16dp">
+
+        <CheckBox
+            android:id="@+id/checkbox_select"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="12dp"
+            android:checked="@{isSelected}"
+            android:onClick="@{() -> stateListener.onSelectCoupon(coupon)}"
+            android:background="@drawable/selector_checkbox"
+            android:button="@null"
+            app:layout_constraintEnd_toStartOf="@id/text_view_coupon_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/text_view_coupon_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{coupon.name}"
+            android:textColor="@color/gray_55"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/checkbox_select"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="5,000원 할인 쿠폰" />
+
+        <TextView
+            android:id="@+id/text_view_expiration_date_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/expiration_date"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_view_coupon_name" />
+
+        <TextView
+            android:id="@+id/text_view_expiration_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:formatDate="@{coupon.expirationDate}"
+            app:formatPattern="@{@string/date_format}"
+            app:layout_constraintBottom_toBottomOf="@id/text_view_expiration_date_label"
+            app:layout_constraintStart_toEndOf="@+id/text_view_expiration_date_label"
+            app:layout_constraintTop_toBottomOf="@id/text_view_coupon_name"
+            tools:text="2024년 11월 30일" />
+
+        <TextView
+            android:id="@+id/text_view_min_order_price_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/coupon_min_order_price"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@id/text_view_min_order_price"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_view_expiration_date_label" />
+
+        <TextView
+            android:id="@+id/text_view_min_order_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@{@string/payment_item_price_format(coupon.minPrice)}"
+            app:layout_constraintStart_toEndOf="@+id/text_view_min_order_price_label"
+            app:layout_constraintTop_toBottomOf="@id/text_view_expiration_date"
+            tools:text="100,000원" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_min_order_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="@{coupon.hasMinPrice ? View.VISIBLE: View.INVISIBLE}"
+            app:constraint_referenced_ids="text_view_min_order_price_label,text_view_min_order_price" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

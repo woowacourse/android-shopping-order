@@ -5,7 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.di.provider.RepositoryProvider
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.Product
@@ -29,12 +31,12 @@ class SuggestionViewModel(
     private val _suggestionProducts = MutableLiveData<List<SuggestionProductUiModel>>(emptyList())
     val suggestionProducts: LiveData<List<SuggestionProductUiModel>> = _suggestionProducts
 
-    val purchaseProducts: LiveData<List<Long>> =
-        _suggestionProducts.map { suggestionProducts ->
-            suggestionProducts
-                .filter { it.quantity > 0 }
-                .mapNotNull { cartRepository.findCartIdByProductId(it.productId).getOrNull() }
-        }
+    fun selectedCartIds(): List<Long> =
+        _suggestionProducts.value
+            ?.filter { it.quantity > 0 }
+            ?.mapNotNull {
+                cartRepository.fetchCartIdByProductId(it.productId).getOrNull()
+            } ?: emptyList()
 
     val totalPurchaseProductQuantity: LiveData<Int> =
         _suggestionProducts.map { suggestionProducts -> suggestionProducts.sumOf { it.quantity } }
@@ -50,22 +52,24 @@ class SuggestionViewModel(
                 .filter { cart ->
                     !suggestionProducts.value.orEmpty().any { it.productId == cart.product.id }
                 }.map { it.product.id }
-
-        productRepository.fetchSuggestionProducts(SUGGESTION_LIMIT, excludedProductIds) { result ->
-            result
-                .onSuccess { combine(it) }
+        viewModelScope.launch {
+            productRepository
+                .fetchSuggestionProducts(
+                    SUGGESTION_LIMIT,
+                    excludedProductIds,
+                ).onSuccess { combine(it) }
                 .onFailure { }
         }
     }
 
-    private fun combine(suggestionProducts: List<Product>) {
+    private suspend fun combine(suggestionProducts: List<Product>) {
         val ids = suggestionProducts.map { it.id }
         cartRepository
-            .findCartProductsByProductIds(ids)
+            .fetchCartProductsByProductIds(ids)
             .onFailure { postFailureCartEvent(SuggestionMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
             .onSuccess {
                 val updatedItems = applyCartQuantities(it, suggestionProducts)
-                _suggestionProducts.postValue(updatedItems)
+                _suggestionProducts.value = updatedItems
             }
     }
 
@@ -90,23 +94,25 @@ class SuggestionViewModel(
     }
 
     override fun decreaseQuantity(productId: Long) {
-        decreaseProductQuantity(productId)
+        viewModelScope.launch {
+            decreaseProductQuantity(productId)
+        }
     }
 
     private fun increaseProductQuantity(productId: Long) {
-        cartRepository.insertCartProductQuantityToCart(productId, QUANTITY_STEP) { result ->
-            result
+        viewModelScope.launch {
+            cartRepository
+                .insertCartProductQuantityToCart(productId, QUANTITY_STEP)
                 .onSuccess { fetchSuggestionProducts() }
                 .onFailure { postFailureCartEvent(SuggestionMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
         }
     }
 
-    private fun decreaseProductQuantity(productId: Long) {
-        cartRepository.decreaseCartProductQuantityFromCart(productId, QUANTITY_STEP) { result ->
-            result
-                .onSuccess { fetchSuggestionProducts() }
-                .onFailure { postFailureCartEvent(SuggestionMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
-        }
+    private suspend fun decreaseProductQuantity(productId: Long) {
+        cartRepository
+            .decreaseCartProductQuantityFromCart(productId, QUANTITY_STEP)
+            .onSuccess { fetchSuggestionProducts() }
+            .onFailure { postFailureCartEvent(SuggestionMessageEvent.PATCH_CART_PRODUCT_QUANTITY_FAILURE) }
     }
 
     private fun postFailureCartEvent(event: SuggestionMessageEvent) {

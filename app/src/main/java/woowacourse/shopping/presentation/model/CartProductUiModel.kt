@@ -8,6 +8,7 @@ data class CartProductUiModel(
     val productName: String,
     val imageUrl: String,
     val quantity: Int,
+    val price: Int,
     val totalPrice: Int,
 )
 
@@ -18,5 +19,6 @@ fun CartProduct.toCartItemUiModel() =
         product.name,
         product.imageUrl,
         quantity,
+        product.price.value,
         totalPrice,
     )

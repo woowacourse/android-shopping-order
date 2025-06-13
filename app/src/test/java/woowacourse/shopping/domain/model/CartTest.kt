@@ -24,8 +24,8 @@ class CartTest {
 
         // Then
         assertAll(
-            { assertThat(cart.findQuantityByProductId(product1.id)).isEqualTo(2) },
-            { assertThat(cart.findQuantityByProductId(product2.id)).isEqualTo(1) },
+            { assertThat(cart.fetchQuantityByProductId(product1.id)).isEqualTo(2) },
+            { assertThat(cart.fetchQuantityByProductId(product2.id)).isEqualTo(1) },
         )
     }
 
@@ -36,7 +36,7 @@ class CartTest {
 
         // When
         cart.addCartProductToCart(cartProduct1)
-        val actual = cart.findCartProductByProductId(product1.id)
+        val actual = cart.fetchCartProductByProductId(product1.id)
 
         // Then
         assertAll(
@@ -52,7 +52,7 @@ class CartTest {
         val cart = Cart(listOf(cartProduct1, cartProduct2))
 
         // When
-        val found = cart.findCartProductByProductId(product2.id)
+        val found = cart.fetchCartProductByProductId(product2.id)
 
         // Then
         assertAll(
@@ -67,7 +67,7 @@ class CartTest {
         val cart = Cart(listOf(cartProduct1))
 
         // When
-        val actual = cart.findQuantityByProductId(product1.id)
+        val actual = cart.fetchQuantityByProductId(product1.id)
 
         // Then
         assertThat(actual).isEqualTo(cartProduct1.quantity)
@@ -79,7 +79,7 @@ class CartTest {
         val cart = Cart(listOf(cartProduct1))
 
         // When
-        val actual = cart.findQuantityByProductId(999L)
+        val actual = cart.fetchQuantityByProductId(999L)
 
         // Then
         assertThat(actual).isEqualTo(0)
@@ -91,7 +91,7 @@ class CartTest {
         val cart = Cart(listOf(cartProduct2))
 
         // When
-        val actual = cart.findCartIdByProductId(product2.id)
+        val actual = cart.fetchCartIdByProductId(product2.id)
 
         // Then
         assertThat(actual).isEqualTo(102L)
@@ -104,7 +104,7 @@ class CartTest {
 
         // Then
         assertThrows<IllegalArgumentException> {
-            cart.findCartIdByProductId(999L)
+            cart.fetchCartIdByProductId(999L)
         }
     }
 
@@ -117,7 +117,7 @@ class CartTest {
         cart.updateQuantityByProductId(product1.id, 10)
 
         // Then
-        val updated = cart.findCartProductByProductId(product1.id)
+        val updated = cart.fetchCartProductByProductId(product1.id)
         assertAll(
             { assertThat(updated).isNotNull() },
             { assertThat(updated?.quantity).isEqualTo(10) },
@@ -134,9 +134,9 @@ class CartTest {
 
         // Then
         assertAll(
-            { assertThat(cart.findCartProductByProductId(product2.id)).isNull() },
-            { assertThat(cart.findCartProductByProductId(product1.id)).isNotNull() },
-            { assertThat(cart.findCartProductByProductId(product3.id)).isNotNull() },
+            { assertThat(cart.fetchCartProductByProductId(product2.id)).isNull() },
+            { assertThat(cart.fetchCartProductByProductId(product1.id)).isNotNull() },
+            { assertThat(cart.fetchCartProductByProductId(product3.id)).isNotNull() },
         )
     }
 }

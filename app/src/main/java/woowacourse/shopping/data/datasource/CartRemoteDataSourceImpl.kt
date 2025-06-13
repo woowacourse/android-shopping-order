@@ -7,42 +7,38 @@ import woowacourse.shopping.data.model.cart.CartItemResponse
 import woowacourse.shopping.data.model.cart.Quantity
 import woowacourse.shopping.data.model.common.PageableResponse
 import woowacourse.shopping.data.service.CartService
-import woowacourse.shopping.data.util.safeApiCall
+import woowacourse.shopping.domain.error.NetworkError
+import woowacourse.shopping.domain.error.NetworkExceptionWrapper
 
 class CartRemoteDataSourceImpl(
     private val cartService: CartService,
 ) : CartRemoteDataSource {
-    override fun fetchCartItems(
+    override suspend fun fetchCartItems(
         page: Int,
         size: Int,
-    ): Result<PageableResponse<CartItemResponse>> = safeApiCall { cartService.fetchCartItems(AUTHORIZATION_KEY, page, size).execute() }
+    ): PageableResponse<CartItemResponse> = cartService.fetchCartItems(AUTHORIZATION_KEY, page, size)
 
-    override fun addCartItem(addCartItemCommand: AddCartItemCommand): Result<Long> =
-        runCatching {
-            val response = cartService.addCartItem(AUTHORIZATION_KEY, addCartItemCommand).execute()
-            val cartId = response.extractCartItemId()
-            requireNotNull(cartId) { ADD_CART_PRODUCT_FAILURE_MESSAGE.format(addCartItemCommand.productId) }
-        }
+    override suspend fun addCartItem(addCartItemCommand: AddCartItemCommand): Long {
+        val response = cartService.addCartItem(AUTHORIZATION_KEY, addCartItemCommand)
+        return response.extractCartItemId()
+    }
 
-    override fun deleteCartItem(cartId: Long): Result<Unit> =
-        safeApiCall { cartService.deleteCartItem(AUTHORIZATION_KEY, cartId).execute() }
+    override suspend fun deleteCartItem(cartId: Long) = cartService.deleteCartItem(AUTHORIZATION_KEY, cartId)
 
-    override fun patchCartItemQuantity(
+    override suspend fun patchCartItemQuantity(
         cartId: Long,
         quantity: Quantity,
-    ): Result<Unit> =
-        safeApiCall {
-            cartService.patchCartItemQuantity(AUTHORIZATION_KEY, cartId, quantity).execute()
-        }
+    ) = cartService.patchCartItemQuantity(AUTHORIZATION_KEY, cartId, quantity)
 
-    override fun fetchCartItemCount(): Result<Quantity> = safeApiCall { cartService.fetchCartItem(AUTHORIZATION_KEY).execute() }
+    override suspend fun fetchCartItemCount(): Quantity = cartService.fetchCartItem(AUTHORIZATION_KEY)
 
-    private fun Response<*>.extractCartItemId(): Long? {
+    private fun Response<*>.extractCartItemId(): Long {
         val locationHeader = this.headers()[HEADER_LOCATION]
         return locationHeader
             ?.substringAfter(HEADER_CART_ID_PREFIX)
             ?.takeWhile { it.isDigit() }
             ?.toLongOrNull()
+            ?: throw NetworkExceptionWrapper(NetworkError.NotFound)
     }
 
     companion object {
