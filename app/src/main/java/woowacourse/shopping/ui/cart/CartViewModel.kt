@@ -7,7 +7,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApp
 import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.Page.Companion.EMPTY_PAGE
@@ -18,9 +20,10 @@ import woowacourse.shopping.domain.usecase.DecreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCartProductsUseCase
 import woowacourse.shopping.domain.usecase.GetCartRecommendProductsUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
-import woowacourse.shopping.domain.usecase.OrderProductsUseCase
 import woowacourse.shopping.domain.usecase.RemoveCartProductUseCase
 import woowacourse.shopping.ui.cart.adapter.CartProductViewHolder
+import woowacourse.shopping.ui.common.ToastMessageHandler
+import woowacourse.shopping.util.Event
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 
@@ -30,9 +33,9 @@ class CartViewModel(
     private val increaseCartProductQuantityUseCase: IncreaseCartProductQuantityUseCase,
     private val decreaseCartProductQuantityUseCase: DecreaseCartProductQuantityUseCase,
     private val getCartRecommendProductsUseCase: GetCartRecommendProductsUseCase,
-    private val orderProductsUseCase: OrderProductsUseCase,
 ) : ViewModel(),
-    CartProductViewHolder.OnClickHandler {
+    CartProductViewHolder.OnClickHandler,
+    ToastMessageHandler {
     private val _cartProducts: MutableLiveData<Products> = MutableLiveData(EMPTY_PRODUCTS)
     val cartProducts: LiveData<Products> get() = _cartProducts
 
@@ -69,6 +72,9 @@ class CartViewModel(
 
     private val _isOrdered: MutableSingleLiveData<Unit> = MutableSingleLiveData()
     val isOrdered: SingleLiveData<Unit> get() = _isOrdered
+
+    private val _dataError: MutableLiveData<Event<Unit>> = MutableLiveData()
+    override val dataError: LiveData<Event<Unit>> = _dataError
 
     init {
         loadCartProducts()
@@ -108,20 +114,26 @@ class CartViewModel(
     }
 
     fun loadRecommendedProducts() {
-        getCartRecommendProductsUseCase { result ->
+        viewModelScope.launch {
+            val result = getCartRecommendProductsUseCase()
             result
                 .onSuccess { products ->
                     _recommendedProducts.value = products
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CartViewModel", it.message.toString())
                 }
         }
     }
 
     fun increaseRecommendedProductQuantity(productId: Long) {
-        increaseCartProductQuantityUseCase(
-            product = recommendedProducts.value?.getProductByProductId(productId) ?: return,
-        ) { result ->
+        viewModelScope.launch {
+            val result =
+                increaseCartProductQuantityUseCase(
+                    product =
+                        recommendedProducts.value?.getProductByProductId(productId)
+                            ?: return@launch,
+                )
             result
                 .onSuccess { newQuantity ->
                     _recommendedProducts.value =
@@ -132,15 +144,20 @@ class CartViewModel(
 
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CartViewModel", it.message.toString())
                 }
         }
     }
 
     fun decreaseRecommendedProductQuantity(productId: Long) {
-        decreaseCartProductQuantityUseCase(
-            product = recommendedProducts.value?.getProductByProductId(productId) ?: return,
-        ) { result ->
+        viewModelScope.launch {
+            val result =
+                decreaseCartProductQuantityUseCase(
+                    product =
+                        recommendedProducts.value?.getProductByProductId(productId)
+                            ?: return@launch,
+                )
             result
                 .onSuccess { newQuantity ->
                     if (newQuantity > MINIMUM_QUANTITY) {
@@ -154,6 +171,7 @@ class CartViewModel(
                     }
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CartViewModel", it.message.toString())
                 }
         }
@@ -168,29 +186,24 @@ class CartViewModel(
             (selectedCartProductsIds + selectedRecommendedProductsIds).toSet()
 
         if (selectedProductIds.isEmpty()) return
-
-        orderProductsUseCase.invoke(selectedProductIds) { result ->
-            result
-                .onSuccess {
-                    _editedProductIds.value = selectedProductIds
-                    _isOrdered.setValue(Unit)
-                }.onFailure {
-                    Log.e("CartViewModel", it.message.toString())
-                }
-        }
+        _editedProductIds.value = selectedProductIds
+        _isOrdered.setValue(Unit)
     }
 
     private fun loadCartProducts(page: Page = cartProducts.value?.page ?: EMPTY_PAGE) {
         _isLoading.value = true
-        getCartProductsUseCase(
-            page = page.current,
-            size = DEFAULT_PAGE_SIZE,
-        ) { result ->
+        viewModelScope.launch {
+            val result =
+                getCartProductsUseCase(
+                    page = page.current,
+                    size = DEFAULT_PAGE_SIZE,
+                )
             result
                 .onSuccess { cartProducts ->
                     _cartProducts.value = cartProducts
                     _isLoading.value = false
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CartViewModel", it.message.toString())
                 }
         }
@@ -200,21 +213,26 @@ class CartViewModel(
         cartId: Long,
         productId: Long,
     ) {
-        removeCartProductUseCase(cartId) { result ->
+        viewModelScope.launch {
+            val result = removeCartProductUseCase(cartId)
+
             result
                 .onSuccess {
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
                     loadCartProducts()
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CartViewModel", it.message.toString())
                 }
         }
     }
 
     private fun increaseCartProductQuantity(productId: Long) {
-        increaseCartProductQuantityUseCase(
-            product = cartProducts.value?.getProductByProductId(productId) ?: return,
-        ) { result ->
+        viewModelScope.launch {
+            val result =
+                increaseCartProductQuantityUseCase(
+                    product = cartProducts.value?.getProductByProductId(productId) ?: return@launch,
+                )
             result
                 .onSuccess { newQuantity ->
                     _cartProducts.value =
@@ -225,15 +243,18 @@ class CartViewModel(
 
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CartViewModel", it.message.toString())
                 }
         }
     }
 
     private fun decreaseCartProductQuantity(productId: Long) {
-        decreaseCartProductQuantityUseCase(
-            product = cartProducts.value?.getProductByProductId(productId) ?: return,
-        ) { result ->
+        viewModelScope.launch {
+            val result =
+                decreaseCartProductQuantityUseCase(
+                    product = cartProducts.value?.getProductByProductId(productId) ?: return@launch,
+                )
             result
                 .onSuccess { newQuantity ->
                     if (newQuantity > MINIMUM_QUANTITY) {
@@ -247,6 +268,7 @@ class CartViewModel(
                     }
                     _editedProductIds.value = editedProductIds.value?.plus(productId)
                 }.onFailure {
+                    _dataError.value = Event(Unit)
                     Log.e("CartViewModel", it.message.toString())
                 }
         }
@@ -278,7 +300,6 @@ class CartViewModel(
                         increaseCartProductQuantityUseCase = application.increaseCartProductQuantityUseCase,
                         decreaseCartProductQuantityUseCase = application.decreaseCartProductQuantityUseCase,
                         getCartRecommendProductsUseCase = application.getCartRecommendProductsUseCase,
-                        orderProductsUseCase = application.orderProductsUseCase,
                     ) as T
                 }
             }

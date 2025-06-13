@@ -1,10 +1,12 @@
 package woowacourse.shopping.domain.model
 
+import java.io.Serializable
+
 data class Page(
     val current: Int,
     val isFirst: Boolean,
     val isLast: Boolean,
-) {
+) : Serializable {
     val isSingle: Boolean get() = isFirst == isLast
 
     operator fun plus(step: Int): Page = copy(current = current + step)

@@ -1,11 +1,24 @@
 package woowacourse.shopping
 
+import ProductRemoteDataSourceImpl
 import android.app.Application
 import woowacourse.shopping.data.database.ShoppingDatabase
+import woowacourse.shopping.data.datasource.cart.CartRemoteDataSource
+import woowacourse.shopping.data.datasource.cart.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.coupon.CouponRemoteDataSource
+import woowacourse.shopping.data.datasource.coupon.CouponRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.history.HistoryLocalDataSource
+import woowacourse.shopping.data.datasource.history.HistoryLocalDataSourceImpl
+import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
+import woowacourse.shopping.data.datasource.order.OrderRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
 import woowacourse.shopping.data.di.NetworkModule.cartApi
+import woowacourse.shopping.data.di.NetworkModule.couponApi
 import woowacourse.shopping.data.di.NetworkModule.orderApi
 import woowacourse.shopping.data.di.NetworkModule.productApi
 import woowacourse.shopping.domain.usecase.AddSearchHistoryUseCase
+import woowacourse.shopping.domain.usecase.CalculateCouponDiscountUseCase
+import woowacourse.shopping.domain.usecase.CalculatePaymentAmountByCouponUseCase
 import woowacourse.shopping.domain.usecase.DecreaseCartProductQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCartProductsQuantityUseCase
 import woowacourse.shopping.domain.usecase.GetCartProductsUseCase
@@ -13,9 +26,11 @@ import woowacourse.shopping.domain.usecase.GetCartRecommendProductsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsByIdsUseCase
 import woowacourse.shopping.domain.usecase.GetCatalogProductsUseCase
+import woowacourse.shopping.domain.usecase.GetCouponsUseCase
 import woowacourse.shopping.domain.usecase.GetRecentSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.GetSearchHistoryUseCase
 import woowacourse.shopping.domain.usecase.IncreaseCartProductQuantityUseCase
+import woowacourse.shopping.domain.usecase.IsFreeShippingCouponUseCase
 import woowacourse.shopping.domain.usecase.OrderProductsUseCase
 import woowacourse.shopping.domain.usecase.RemoveCartProductUseCase
 import woowacourse.shopping.domain.usecase.UpdateCartProductUseCase
@@ -23,79 +38,122 @@ import woowacourse.shopping.domain.usecase.UpdateCartProductUseCase
 class ShoppingApp : Application() {
     private val database: ShoppingDatabase by lazy { ShoppingDatabase.getInstance(this) }
 
-    private val cartRepository: woowacourse.shopping.domain.repository.CartRepository by lazy {
-        woowacourse.shopping.data.repository
-            .CartRepository(cartApi)
+    private val cartRemoteDataSource: CartRemoteDataSource by lazy {
+        CartRemoteDataSourceImpl(cartApi)
     }
 
-    private val productRepository: woowacourse.shopping.domain.repository.ProductRepository by lazy {
-        woowacourse.shopping.data.repository
-            .ProductRepository(productApi)
+    private val couponRemoteDataSource: CouponRemoteDataSource by lazy {
+        CouponRemoteDataSourceImpl(couponApi)
     }
 
-    private val historyRepository: woowacourse.shopping.domain.repository.HistoryRepository by lazy {
-        woowacourse.shopping.data.repository
-            .HistoryRepository(database.historyDao())
+    private val historyLocalDataSource: HistoryLocalDataSource by lazy {
+        HistoryLocalDataSourceImpl(database.historyDao())
     }
 
-    private val orderRepository: woowacourse.shopping.domain.repository.OrderRepository by lazy {
+    private val orderRemoteDataSource: OrderRemoteDataSource by lazy {
+        OrderRemoteDataSourceImpl(orderApi)
+    }
+
+    private val productRemoteDataSource: ProductRemoteDataSource by lazy {
+        ProductRemoteDataSourceImpl(productApi)
+    }
+
+    private val cartRepositoryImpl: woowacourse.shopping.domain.repository.CartRepository by lazy {
         woowacourse.shopping.data.repository
-            .OrderRepository(orderApi)
+            .CartRepositoryImpl(cartRemoteDataSource)
+    }
+
+    private val productRepositoryImpl: woowacourse.shopping.domain.repository.ProductRepository by lazy {
+        woowacourse.shopping.data.repository
+            .ProductRepositoryImpl(productRemoteDataSource)
+    }
+
+    private val historyRepositoryImpl: woowacourse.shopping.domain.repository.HistoryRepository by lazy {
+        woowacourse.shopping.data.repository
+            .HistoryRepositoryImpl(historyLocalDataSource)
+    }
+
+    private val orderRepositoryImpl: woowacourse.shopping.domain.repository.OrderRepository by lazy {
+        woowacourse.shopping.data.repository
+            .OrderRepositoryImpl(orderRemoteDataSource)
+    }
+
+    private val couponRepositoryImpl: woowacourse.shopping.domain.repository.CouponRepository by lazy {
+        woowacourse.shopping.data.repository
+            .CouponRepositoryImpl(couponRemoteDataSource)
     }
 
     val getCartProductsUseCase by lazy {
-        GetCartProductsUseCase(cartRepository)
+        GetCartProductsUseCase(cartRepositoryImpl)
     }
 
     val increaseCartProductQuantityUseCase by lazy {
-        IncreaseCartProductQuantityUseCase(cartRepository)
+        IncreaseCartProductQuantityUseCase(cartRepositoryImpl)
     }
 
     val decreaseCartProductQuantityUseCase by lazy {
-        DecreaseCartProductQuantityUseCase(cartRepository)
+        DecreaseCartProductQuantityUseCase(cartRepositoryImpl)
     }
 
     val removeCartProductUseCase by lazy {
-        RemoveCartProductUseCase(cartRepository)
+        RemoveCartProductUseCase(cartRepositoryImpl)
     }
 
     val updateCartProductUseCase by lazy {
-        UpdateCartProductUseCase(cartRepository)
+        UpdateCartProductUseCase(cartRepositoryImpl)
     }
 
     val getSearchHistoryUseCase by lazy {
-        GetSearchHistoryUseCase(historyRepository)
+        GetSearchHistoryUseCase(historyRepositoryImpl)
     }
 
     val addSearchHistoryUseCase by lazy {
-        AddSearchHistoryUseCase(historyRepository)
+        AddSearchHistoryUseCase(historyRepositoryImpl)
     }
 
     val getRecentSearchHistoryUseCase by lazy {
-        GetRecentSearchHistoryUseCase(historyRepository)
+        GetRecentSearchHistoryUseCase(historyRepositoryImpl)
     }
 
     val getCatalogProductsUseCase by lazy {
-        GetCatalogProductsUseCase(productRepository, cartRepository)
+        GetCatalogProductsUseCase(productRepositoryImpl, cartRepositoryImpl)
     }
 
     val getCatalogProductUseCase by lazy {
-        GetCatalogProductUseCase(productRepository, cartRepository)
+        GetCatalogProductUseCase(productRepositoryImpl, cartRepositoryImpl)
     }
 
     val getCatalogProductsByIdsUseCase by lazy {
-        GetCatalogProductsByIdsUseCase(productRepository, cartRepository)
+        GetCatalogProductsByIdsUseCase(productRepositoryImpl, cartRepositoryImpl)
     }
 
     val getCartProductsQuantityUseCase by lazy {
-        GetCartProductsQuantityUseCase(cartRepository)
+        GetCartProductsQuantityUseCase(cartRepositoryImpl)
     }
 
     val getCartRecommendProductsUseCase by lazy {
-        GetCartRecommendProductsUseCase(productRepository, cartRepository, historyRepository)
+        GetCartRecommendProductsUseCase(
+            productRepositoryImpl,
+            cartRepositoryImpl,
+            historyRepositoryImpl,
+        )
     }
 
     val orderProductsUseCase by lazy {
-        OrderProductsUseCase(productRepository, cartRepository, orderRepository)
+        OrderProductsUseCase(productRepositoryImpl, cartRepositoryImpl, orderRepositoryImpl)
+    }
+    val getCouponsUseCase by lazy {
+        GetCouponsUseCase(couponRepositoryImpl)
+    }
+    val calculatePaymentAmountByCouponUseCase by lazy {
+        CalculatePaymentAmountByCouponUseCase(couponRepositoryImpl)
+    }
+
+    val calculateCouponDiscountUseCase by lazy {
+        CalculateCouponDiscountUseCase(couponRepositoryImpl)
+    }
+
+    val isFreeShippingCouponUseCase by lazy {
+        IsFreeShippingCouponUseCase(couponRepositoryImpl)
     }
 }

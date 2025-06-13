@@ -1,0 +1,43 @@
+package woowacourse.shopping.domain.usecase
+
+import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.Products
+import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.usecase.CalculatePaymentAmountByCouponUseCase.Companion.DEFAULT_SHIPPING_FEE
+import woowacourse.shopping.domain.usecase.CalculatePaymentAmountByCouponUseCase.Companion.ONE_HUNDRED_PERCENT
+
+class CalculateCouponDiscountUseCase(
+    private val couponRepository: CouponRepository,
+) {
+    operator fun invoke(
+        couponId: Long,
+        products: Products,
+    ): Int {
+        val orderAmount: Int =
+            products.getSelectedCartProductsPrice()
+        val selectedCoupon = couponRepository.fetchCoupon(couponId) ?: return ZERO_DISCOUNT
+        return when (selectedCoupon) {
+            is Coupon.FixedDiscount -> {
+                -selectedCoupon.discount
+            }
+
+            is Coupon.BuyXGetYFree -> {
+                val maximumPrice = products.products.maxOf { it.productDetail.price }
+                -(maximumPrice * selectedCoupon.getQuantity)
+            }
+
+            is Coupon.FreeShippingOver -> {
+                -DEFAULT_SHIPPING_FEE
+            }
+
+            is Coupon.PercentDiscount -> {
+                val discount = orderAmount * selectedCoupon.discount / ONE_HUNDRED_PERCENT
+                -discount
+            }
+        }
+    }
+
+    companion object {
+        private const val ZERO_DISCOUNT: Int = 0
+    }
+}
