@@ -79,32 +79,10 @@ class ReceiptViewModel(
         _couponItem.postValue(
             coupons.map { coupon ->
                 val item = when (coupon) {
-                    is FixedCoupon -> CouponItem(
-                        couponId = coupon.couponId,
-                        description = coupon.description,
-                        expirationDate = coupon.expirationDate.toString(),
-                        minimumOrderPrice = coupon.minimumOrderPrice
-                    )
-
-                    is FreeShippingCoupon -> CouponItem(
-                        couponId = coupon.couponId,
-                        description = coupon.description,
-                        expirationDate = coupon.expirationDate.toString(),
-                        minimumOrderPrice = coupon.minimumOrderPrice
-                    )
-
-                    is BoGoCoupon -> CouponItem(
-                        couponId = coupon.couponId,
-                        description = coupon.description,
-                        expirationDate = coupon.expirationDate.toString(),
-                    )
-
-                    is MiracleSaleCoupon -> CouponItem(
-                        couponId = coupon.couponId,
-                        description = coupon.description,
-                        expirationDate = coupon.expirationDate.toString(),
-                        availableTime = "사용 가능한 시간 ${coupon.startHour}~${coupon.endHour}"
-                    )
+                    is FixedCoupon -> coupon.toItem()
+                    is FreeShippingCoupon -> coupon.toItem()
+                    is BoGoCoupon -> coupon.toItem()
+                    is MiracleSaleCoupon -> coupon.toItem()
                 }
 
                 if (item.couponId == currentSelected?.couponId) {
@@ -118,7 +96,6 @@ class ReceiptViewModel(
             }
         )
     }
-
 
     fun showAvailableCoupons(cartItems: List<CartItem>) {
         viewModelScope.launch {
