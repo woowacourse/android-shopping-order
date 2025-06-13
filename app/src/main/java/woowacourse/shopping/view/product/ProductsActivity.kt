@@ -63,7 +63,16 @@ class ProductsActivity :
         }
 
     private fun navigateToRecentProduct(product: Product) {
-        activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product.id))
+        val productItem = viewModel.getProductItem(product)
+        activityResultLauncher.launch(
+            ProductDetailActivity.newIntent(
+                context = this,
+                shoppingCartId = productItem.shoppingCartId,
+                quantity = productItem.selectedQuantity,
+                productId = product.id,
+                isLastWatching = true,
+            ),
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

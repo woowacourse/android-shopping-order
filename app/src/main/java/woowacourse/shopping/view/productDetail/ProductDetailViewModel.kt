@@ -22,8 +22,7 @@ class ProductDetailViewModel(
     private val _product: MutableLiveData<ProductsItem.ProductItem> = MutableLiveData()
     val product: LiveData<ProductsItem.ProductItem> get() = _product
 
-    private val _event: MutableSingleLiveData<ProductDetailEvent> =
-        MutableSingleLiveData()
+    private val _event: MutableSingleLiveData<ProductDetailEvent> = MutableSingleLiveData()
     val event: SingleLiveData<ProductDetailEvent> get() = _event
 
     private val _quantity: MutableLiveData<Int> = MutableLiveData(1)
@@ -56,6 +55,7 @@ class ProductDetailViewModel(
         productId: Long,
         shoppingCartQuantity: Int,
         shoppingCartId: Long?,
+        isLastWatching: Boolean,
     ) {
         viewModelScope.launch {
             productsRepository
@@ -63,16 +63,16 @@ class ProductDetailViewModel(
                 .onSuccess { product ->
                     if (product == null) {
                         _event.setValue(ProductDetailEvent.GET_PRODUCT_FAILURE)
-                    } else {
-                        _product.value =
-                            ProductsItem.ProductItem(
-                                product = product,
-                                selectedQuantity = shoppingCartQuantity,
-                                shoppingCartId = shoppingCartId,
-                            )
-
-                        updateRecentWatchingProduct()
+                        return@launch
                     }
+                    _product.value =
+                        ProductsItem.ProductItem(
+                            product = product,
+                            selectedQuantity = shoppingCartQuantity,
+                            shoppingCartId = shoppingCartId,
+                        )
+
+                    if (!isLastWatching) updateRecentWatchingProduct()
                 }.onFailure {
                     _event.setValue(ProductDetailEvent.GET_PRODUCT_FAILURE)
                 }

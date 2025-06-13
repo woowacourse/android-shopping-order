@@ -10,11 +10,13 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductDetailBinding
+import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.common.QuantityTarget
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.getSerializableExtraData
 import woowacourse.shopping.view.common.showSnackBar
 import woowacourse.shopping.view.common.showToast
+import woowacourse.shopping.view.product.ProductsActivity.Companion.RESULT_RECENT_PRODUCT_KEY
 import woowacourse.shopping.view.product.ProductsActivity.Companion.RESULT_UPDATED_ITEM_KEY
 
 class ProductDetailActivity :
@@ -44,7 +46,10 @@ class ProductDetailActivity :
 
         val shoppingCartQuantity: Int =
             intent.getSerializableExtraData(EXTRA_SHOPPING_CART_QUANTITY) ?: 0
-        viewModel.updateProduct(productId, shoppingCartQuantity, shoppingCartId)
+
+        val isLastWatching: Boolean =
+            intent.getSerializableExtraData(EXTRA_IS_LAST_WATCHING) ?: false
+        viewModel.updateProduct(productId, shoppingCartQuantity, shoppingCartId, isLastWatching)
         bindViewModel()
         setupObservers()
     }
@@ -107,6 +112,15 @@ class ProductDetailActivity :
         viewModel.addToShoppingCart()
     }
 
+    override fun onRecentProductClick(product: Product) {
+        val intent =
+            Intent().apply {
+                putExtra(RESULT_RECENT_PRODUCT_KEY, viewModel.recentWatchingProduct.value)
+            }
+        setResult(ResultFrom.PRODUCT_RECENT_WATCHING_CLICK.RESULT_OK, intent)
+        finish()
+    }
+
     override fun onPlusShoppingCartClick(quantityTarget: QuantityTarget) {
         viewModel.plusQuantity()
     }
@@ -120,12 +134,14 @@ class ProductDetailActivity :
         private const val EXTRA_SHOPPING_CART_ID = "woowacourse.shopping.EXTRA_SHOPPING_CART_ID"
         private const val EXTRA_SHOPPING_CART_QUANTITY =
             "woowacourse.shopping.EXTRA_SHOPPING_CART_QUANTITY"
+        private const val EXTRA_IS_LAST_WATCHING = "woowacourse.shopping.EXTRA_IS_LAST_WATCHING"
 
         fun newIntent(
             context: Context,
             productId: Long,
             shoppingCartId: Long? = 0,
             quantity: Int = 0,
+            isLastWatching: Boolean = false,
         ): Intent =
             Intent(context, ProductDetailActivity::class.java).apply {
                 putExtra(
@@ -134,6 +150,7 @@ class ProductDetailActivity :
                 )
                 putExtra(EXTRA_SHOPPING_CART_ID, shoppingCartId)
                 putExtra(EXTRA_SHOPPING_CART_QUANTITY, quantity)
+                putExtra(EXTRA_IS_LAST_WATCHING, isLastWatching)
             }
     }
 }

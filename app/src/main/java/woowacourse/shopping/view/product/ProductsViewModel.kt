@@ -338,6 +338,11 @@ class ProductsViewModel(
         updateProducts()
     }
 
+    fun getProductItem(product: Product): ProductItem =
+        products.value?.filterIsInstance<ProductItem>()?.find {
+            it.product == product
+        } ?: throw IllegalArgumentException("상품 목록에 해당 상품이 없습니다")
+
     companion object {
         private const val MINIMUM_PAGE = 1
         private const val LOAD_PRODUCTS_SIZE = 20
