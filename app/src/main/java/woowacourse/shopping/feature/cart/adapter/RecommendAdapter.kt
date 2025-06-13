@@ -5,11 +5,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.domain.model.CartProduct
 
-class RecommendAdapter : ListAdapter<CartProduct, RecommendViewHolder>(DIFF_CALLBACK) {
+class RecommendAdapter(
+    private val recommendClickListener: RecommendClickListener,
+) : ListAdapter<CartProduct, RecommendViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): RecommendViewHolder = RecommendViewHolder.from(parent)
+    ): RecommendViewHolder = RecommendViewHolder.from(parent, recommendClickListener)
 
     override fun onBindViewHolder(
         holder: RecommendViewHolder,
@@ -25,7 +27,7 @@ class RecommendAdapter : ListAdapter<CartProduct, RecommendViewHolder>(DIFF_CALL
                 override fun areItemsTheSame(
                     oldItem: CartProduct,
                     newItem: CartProduct,
-                ): Boolean = oldItem.id == newItem.id
+                ): Boolean = oldItem == newItem
 
                 override fun areContentsTheSame(
                     oldItem: CartProduct,

@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.goods
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -71,6 +72,14 @@ class GoodsActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        intent.let {
+            val changedGoodsIds = it.getLongArrayExtra(ORDERED_GOODS_IDS)
+            if (changedGoodsIds != null) viewModel.updateItemsAfterOrder(changedGoodsIds.toList())
+        }
+    }
+
     private fun setupRecyclerView() {
         val gridLayoutManager = GridLayoutManager(this, 2)
         gridLayoutManager.spanSizeLookup = GoodsSpanSizeLookup(adapter)
@@ -99,11 +108,18 @@ class GoodsActivity : AppCompatActivity() {
                                 R.string.goods_detail_cart_insert_success_toast_message,
                                 Toast.LENGTH_SHORT,
                             ).show()
-                    is State.Failure ->
+                    is State.Failure.BadRequest ->
                         Toast
                             .makeText(
                                 this,
-                                R.string.goods_detail_cart_insert_fail_toast_message,
+                                R.string.goods_detail_cart_bad_request_fail_toast_message,
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                    is State.Failure.NetworkError ->
+                        Toast
+                            .makeText(
+                                this,
+                                R.string.goods_detail_cart_network_error_fail_toast_message,
                                 Toast.LENGTH_SHORT,
                             ).show()
                 }
@@ -170,5 +186,15 @@ class GoodsActivity : AppCompatActivity() {
         private const val CART_ID = "CART_ID"
         private const val GOODS_ID = "GOODS_ID"
         private const val GOODS_QUANTITY = "GOODS_QUANTITY"
+        private const val ORDERED_GOODS_IDS = "ORDERED_GOODS_IDS"
+
+        fun newIntent(
+            context: Context,
+            orderedIds: List<Long>,
+        ): Intent =
+            Intent(context, GoodsActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                putExtra(ORDERED_GOODS_IDS, orderedIds.toLongArray())
+            }
     }
 }

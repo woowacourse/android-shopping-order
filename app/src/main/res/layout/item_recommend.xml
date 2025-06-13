@@ -9,17 +9,15 @@
             name="cart"
             type="woowacourse.shopping.domain.model.CartProduct" />
         <variable
-            name="goodsClickListener"
-            type="woowacourse.shopping.feature.goods.adapter.GoodsClickListener" />
+            name="recommendClickListener"
+            type="woowacourse.shopping.feature.cart.adapter.RecommendClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="154dp"
         android:layout_height="210dp"
-        android:onClick="@{() -> goodsClickListener.onClickGoods(cart)}"
         android:paddingHorizontal="6dp"
         android:paddingBottom="12dp">
-
 
         <ImageView
             android:id="@+id/iv_item_goods_thumbnail"
@@ -41,7 +39,7 @@
             android:layout_margin="8dp"
             android:background="@drawable/goods_add_button_background"
             android:contentDescription="@string/goods_cart_add_button_description"
-            android:onClick="@{() -> goodsClickListener.insertToCart(cart)}"
+            android:onClick="@{() -> recommendClickListener.insertToCart(cart)}"
             android:src="@drawable/ic_add"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="@+id/iv_item_goods_thumbnail"

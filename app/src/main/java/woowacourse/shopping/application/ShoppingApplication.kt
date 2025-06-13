@@ -3,11 +3,15 @@ package woowacourse.shopping.application
 import android.app.Application
 import woowacourse.shopping.data.local.ShoppingDatabase
 import woowacourse.shopping.data.local.history.repository.HistoryRepositoryImpl
+import woowacourse.shopping.data.remote.NetworkClient
 import woowacourse.shopping.data.remote.cart.CartRepository
+import woowacourse.shopping.data.remote.coupon.CouponRepository
+import woowacourse.shopping.data.remote.order.OrderRepository
 import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.feature.cart.CartViewModel
 import woowacourse.shopping.feature.goods.GoodsViewModel
 import woowacourse.shopping.feature.goodsdetails.GoodsDetailsViewModel
+import woowacourse.shopping.feature.payment.PaymentViewModel
 import woowacourse.shopping.util.ViewModelFactory
 
 class ShoppingApplication : Application() {
@@ -17,18 +21,19 @@ class ShoppingApplication : Application() {
         ViewModelFactory {
             GoodsViewModel(
                 HistoryRepositoryImpl(database.historyDao()),
-                ProductRepository(),
-                CartRepository(),
+                ProductRepository(NetworkClient.productService),
+                CartRepository(NetworkClient.cartService),
             )
         }
     }
 
-    val goodsDetailsFactory by lazy {
+    val goodsDetailsFactory: (Long) -> ViewModelFactory<GoodsDetailsViewModel> = { id ->
         ViewModelFactory {
             GoodsDetailsViewModel(
-                CartRepository(),
+                id,
+                CartRepository(NetworkClient.cartService),
                 HistoryRepositoryImpl(database.historyDao()),
-                ProductRepository(),
+                ProductRepository(NetworkClient.productService),
             )
         }
     }
@@ -36,9 +41,20 @@ class ShoppingApplication : Application() {
     val cartFactory by lazy {
         ViewModelFactory {
             CartViewModel(
-                CartRepository(),
-                ProductRepository(),
+                CartRepository(NetworkClient.cartService),
+                ProductRepository(NetworkClient.productService),
                 HistoryRepositoryImpl(database.historyDao()),
+            )
+        }
+    }
+
+    val paymentFactory: (LongArray) -> ViewModelFactory<PaymentViewModel> = { orderIds ->
+        ViewModelFactory {
+            PaymentViewModel(
+                orderIds,
+                CouponRepository(NetworkClient.couponService),
+                CartRepository(NetworkClient.cartService),
+                OrderRepository(NetworkClient.orderService),
             )
         }
     }

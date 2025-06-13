@@ -1,18 +1,16 @@
 package woowacourse.shopping.util
 
+import woowacourse.shopping.data.remote.cart.CartResponse
 import woowacourse.shopping.data.remote.cart.CartResponse.Content.CartRemoteProduct
-import woowacourse.shopping.data.remote.product.ProductResponse.Content
+import woowacourse.shopping.data.remote.coupon.CouponResponse
+import woowacourse.shopping.data.remote.product.ProductResponse
 import woowacourse.shopping.domain.model.CartProduct
+import woowacourse.shopping.domain.model.CouponDetail
+import woowacourse.shopping.domain.model.DiscountType
 import woowacourse.shopping.domain.model.Product
-
-fun List<Any>.replaceCartByProductId(newCart: CartProduct): List<Any> =
-    map {
-        if (it is CartProduct && it.product.id == newCart.product.id) {
-            newCart
-        } else {
-            it
-        }
-    }
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 fun CartProduct.updateQuantity(newQuantity: Int): CartProduct = this.copy(quantity = newQuantity)
 
@@ -25,7 +23,7 @@ fun CartRemoteProduct.toDomain(): Product =
         category = category,
     )
 
-fun Content.toDomain(): Product =
+fun ProductResponse.Content.toDomain(): Product =
     Product(
         id = id,
         name = name,
@@ -33,3 +31,45 @@ fun Content.toDomain(): Product =
         imageUrl = imageUrl,
         category = category,
     )
+
+fun CartResponse.Content.toDomain(): CartProduct =
+    CartProduct(
+        id = id,
+        product = product.toDomain(),
+        quantity = quantity,
+    )
+
+fun CouponResponse.toDomain(): CouponDetail {
+    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+    val dateFormatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")
+
+    val formattedDate =
+        this.expirationDate?.let {
+            LocalDate.parse(it).format(dateFormatter)
+        } ?: ""
+
+    return CouponDetail(
+        id = this.id,
+        code = this.code,
+        description = this.description,
+        expirationDate = formattedDate,
+        discountType = this.discountType.toDiscountType(),
+        discount = this.discount ?: 0,
+        minimumAmount = this.minimumAmount ?: 0,
+        buyQuantity = this.buyQuantity ?: 0,
+        getQuantity = this.getQuantity ?: 0,
+        availableTime =
+            this.availableTime?.start?.let {
+                LocalTime.parse(it, timeFormatter)
+            } ?: LocalTime.MIN,
+    )
+}
+
+private fun String.toDiscountType(): DiscountType =
+    when (this) {
+        "fixed" -> DiscountType.FIXED
+        "buyXgetY" -> DiscountType.BUY_X_GET_Y
+        "freeShipping" -> DiscountType.FREE_SHIPPING
+        "percentage" -> DiscountType.PERCENTAGE
+        else -> throw IllegalArgumentException("알 수 없는 할인 타입입니다: $this")
+    }

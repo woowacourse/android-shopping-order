@@ -22,7 +22,8 @@ class GoodsDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGoodsDetailsBinding
     private var id: Long = 0
     private val viewModel: GoodsDetailsViewModel by viewModels {
-        (application as ShoppingApplication).goodsDetailsFactory
+        id = intent.getLongExtra(GOODS_KEY, 0)
+        (application as ShoppingApplication).goodsDetailsFactory(id)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,8 +31,6 @@ class GoodsDetailsActivity : AppCompatActivity() {
         binding = ActivityGoodsDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        id = intent.getLongExtra(GOODS_KEY, 0)
-        viewModel.setInitialCart(id)
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
@@ -89,8 +88,20 @@ class GoodsDetailsActivity : AppCompatActivity() {
                             },
                         )
                     }
-                    is State.Failure ->
-                        Toast.makeText(this, R.string.goods_detail_cart_insert_fail_toast_message, Toast.LENGTH_SHORT).show()
+                    is State.Failure.BadRequest ->
+                        Toast
+                            .makeText(
+                                this,
+                                R.string.goods_detail_cart_bad_request_fail_toast_message,
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                    is State.Failure.NetworkError ->
+                        Toast
+                            .makeText(
+                                this,
+                                R.string.goods_detail_cart_network_error_fail_toast_message,
+                                Toast.LENGTH_SHORT,
+                            ).show()
                 }
             }
         }

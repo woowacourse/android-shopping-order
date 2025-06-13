@@ -63,6 +63,9 @@ android {
         dataBinding = true
         buildConfig = true
     }
+    testOptions {
+        animationsDisabled = true
+    }
 }
 
 dependencies {
@@ -94,6 +97,8 @@ dependencies {
     testImplementation(libs.androidx.core.testing)
     testImplementation(libs.mockwebserver)
     testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.lifecycle.runtime.testing)
     androidTestImplementation(libs.hamcrest)
     androidTestImplementation(libs.androidx.espresso.core)

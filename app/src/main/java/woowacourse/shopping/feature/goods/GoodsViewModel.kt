@@ -1,11 +1,12 @@
 package woowacourse.shopping.feature.goods
 
-import android.os.Handler
-import android.os.Looper.getMainLooper
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
@@ -19,6 +20,8 @@ import woowacourse.shopping.util.Event
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 import woowacourse.shopping.util.toDomain
+import kotlin.collections.get
+import kotlin.text.toLong
 
 class GoodsViewModel(
     private val historyRepository: HistoryRepository,
@@ -61,67 +64,74 @@ class GoodsViewModel(
     fun addToCart(cart: CartProduct) {
         val newQuantity = cart.quantity + 1
 
-        if (cart.quantity == 0) {
-            val cartRequest =
-                CartRequest(
-                    productId = cart.product.id,
-                    quantity = newQuantity,
-                )
+        viewModelScope.launch {
+            if (cart.quantity == 0) {
+                val cartRequest =
+                    CartRequest(
+                        productId = cart.product.id,
+                        quantity = newQuantity,
+                    )
 
-            cartRepository.addToCart(cartRequest) { result ->
-                result
+                cartRepository
+                    .addToCart(cartRequest)
                     .onSuccess { newCartId ->
                         val updatedCart = cart.copy(id = newCartId, quantity = newQuantity)
-
                         updateItems(updatedCart)
                         getCartCounts()
                         _insertState.value = Event(State.Success)
-                    }.onFailure {
-                        _insertState.value = Event(State.Failure)
+                    }.onFailure { throwable ->
+                        when (throwable.message) {
+                            "400" -> _insertState.value = Event(State.Failure.BadRequest)
+                            else -> _insertState.value = Event(State.Failure.NetworkError)
+                        }
                     }
-            }
-        } else {
-            cartRepository.updateCart(
-                id = cart.id,
-                cartQuantity = CartQuantity(newQuantity),
-            ) { result ->
-                result
+            } else {
+                cartRepository
+                    .updateCart(id = cart.id, cartQuantity = CartQuantity(newQuantity))
                     .onSuccess {
                         val updatedCart = cart.copy(quantity = newQuantity)
                         updateItems(updatedCart)
                         getCartCounts()
                         _insertState.value = Event(State.Success)
-                    }.onFailure { error ->
-                        _insertState.value = Event(State.Failure)
+                    }.onFailure { throwable ->
+                        when (throwable.message) {
+                            "400" -> _insertState.value = Event(State.Failure.BadRequest)
+                            else -> _insertState.value = Event(State.Failure.NetworkError)
+                        }
                     }
             }
         }
     }
 
     fun removeFromCart(cart: CartProduct) {
-        if (cart.quantity == 1) {
-            cartRepository.deleteCart(cart.id) { result ->
-                result
+        viewModelScope.launch {
+            if (cart.quantity == 1) {
+                cartRepository
+                    .deleteCart(cart.id)
                     .onSuccess {
-                        val updatedCart = cart.copy(id = 0, quantity = cart.quantity - 1)
+                        val updatedCart = cart.copy(id = 0, quantity = 0)
                         updateItems(updatedCart)
                         getCartCounts()
-                    }.onFailure { error ->
-                        _insertState.value = Event(State.Failure)
+                    }.onFailure { throwable ->
+                        when (throwable.message) {
+                            "400" -> _insertState.value = Event(State.Failure.BadRequest)
+                            else -> _insertState.value = Event(State.Failure.NetworkError)
+                        }
                     }
-            }
-        } else {
-            cartRepository.updateCart(
-                id = cart.id,
-                cartQuantity = CartQuantity(cart.quantity - 1),
-            ) { result ->
-                result
-                    .onSuccess {
+            } else {
+                cartRepository
+                    .updateCart(
+                        id = cart.id,
+                        cartQuantity = CartQuantity(cart.quantity - 1),
+                    ).onSuccess {
                         val updatedCart = cart.copy(quantity = cart.quantity - 1)
                         updateItems(updatedCart)
                         getCartCounts()
-                    }.onFailure { error ->
-                        _insertState.value = Event(State.Failure)
+                    }.onFailure { throwable ->
+                        when (throwable.message) {
+                            "400" -> _insertState.value = Event(State.Failure.BadRequest)
+                            else -> _insertState.value = Event(State.Failure.NetworkError)
+                        }
                     }
             }
         }
@@ -129,12 +139,13 @@ class GoodsViewModel(
     }
 
     fun refreshHistoryOnly() {
-        historyRepository.getAll { historiesList ->
+        viewModelScope.launch {
+            val allHistories = historyRepository.getAll()
             val currentItems = _items.value.orEmpty().toMutableList()
             val cartsOnly = currentItems.filterIsInstance<GoodsItem.Product>()
             val updatedItems = mutableListOf<GoodsItem>()
-            if (historiesList.isNotEmpty()) {
-                updatedItems.add(GoodsItem.Recent(historiesList))
+            if (allHistories.isNotEmpty()) {
+                updatedItems.add(GoodsItem.Recent(allHistories))
             }
             updatedItems.addAll(cartsOnly)
             _items.postValue(updatedItems)
@@ -153,82 +164,92 @@ class GoodsViewModel(
         goodsId: Long,
         quantity: Int,
     ) {
-        val currentItems = _items.value.orEmpty().toMutableList()
+        replaceItem(
+            isTargetItem = { it.cart.product.id == goodsId },
+            transform = {
+                it.copy(cart = it.cart.copy(id = cartId, quantity = quantity))
+            },
+        )
+    }
 
-        val index = currentItems.indexOfFirst { it is GoodsItem.Product && it.cart.product.id == goodsId }
-
-        if (index != -1) {
-            val oldItem = currentItems[index] as GoodsItem.Product
-            val updatedItem = oldItem.copy(cart = oldItem.cart.copy(id = cartId, quantity = quantity))
-
-            currentItems[index] = updatedItem
-            _items.value = currentItems
-
-            val total = currentItems.filterIsInstance<GoodsItem.Product>().sumOf { it.cart.quantity }
-            _totalQuantity.value = total
+    fun updateItemsAfterOrder(goodsIds: List<Long>) {
+        goodsIds.forEach { goodsId ->
+            replaceItem(
+                isTargetItem = { it.cart.product.id == goodsId },
+                transform = {
+                    it.copy(cart = it.cart.copy(quantity = 0))
+                },
+            )
         }
     }
 
     private fun updateItems(updatedCart: CartProduct) {
-        val currentItems = _items.value.orEmpty().toMutableList()
-        val index =
-            currentItems.indexOfFirst {
-                it is GoodsItem.Product && it.cart.product.id == updatedCart.product.id
-            }
+        replaceItem(
+            isTargetItem = { it.cart.product.id == updatedCart.product.id },
+            transform = {
+                GoodsItem.Product(updatedCart)
+            },
+        )
+    }
 
-        if (index != -1) {
-            val updatedItem = GoodsItem.Product(updatedCart)
-            currentItems[index] = updatedItem
+    private fun replaceItem(
+        isTargetItem: (GoodsItem.Product) -> Boolean,
+        transform: (GoodsItem.Product) -> GoodsItem.Product,
+    ) {
+        val currentItems = _items.value.orEmpty().toMutableList()
+        var updated = false
+
+        currentItems.forEachIndexed { index, item ->
+            if (item is GoodsItem.Product && isTargetItem(item)) {
+                currentItems[index] = transform(item)
+                updated = true
+            }
+        }
+
+        if (updated) {
             _items.value = currentItems
+            _totalQuantity.value =
+                currentItems
+                    .filterIsInstance<GoodsItem.Product>()
+                    .sumOf { it.cart.quantity }
         }
     }
 
     private fun loadProducts() {
-        _isLoading.postValue(true)
-        Handler(getMainLooper()).postDelayed({
-            cartRepository.fetchAllCart(
-                onSuccess = { cartList ->
-                    val cartByProductId = cartList.content.associateBy { it.product.id }
+        viewModelScope.launch {
+            _isLoading.postValue(true)
+            delay(1000) // 스켈레톤 UI 테스트를 위한 딜레이입니다.
 
-                    productRepository.fetchProducts(
-                        onSuccess = { response ->
-                            val newCarts =
-                                response.content.map { product ->
-                                    val matchedCart = cartByProductId[product.id]
-                                    CartProduct(
-                                        id = matchedCart?.id?.toLong() ?: 0,
-                                        product = product.toDomain(),
-                                        quantity = matchedCart?.quantity ?: 0,
-                                    )
-                                }
+            val cartList = cartRepository.fetchAllCart()
+            val cartByProductId = cartList.content.associateBy { it.product.id }
 
-                            val currentProducts = products
-                            val combinedCarts = currentProducts + newCarts
-                            products.clear()
-                            products.addAll(combinedCarts)
+            val response = productRepository.fetchProducts(page)
 
-                            _hasNextPage.value = !response.last
-
-                            refreshItems()
-                            _isLoading.postValue(false)
-                        },
-                        onError = {
-                            Log.e("loadProductsInRange", "상품 API 실패", it)
-                            _isLoading.postValue(false)
-                        },
-                        page = page,
+            val newCarts =
+                response.content.map { product ->
+                    val matchedCart = cartByProductId[product.id]
+                    CartProduct(
+                        id = matchedCart?.id?.toLong() ?: 0,
+                        product = product.toDomain(),
+                        quantity = matchedCart?.quantity ?: 0,
                     )
-                },
-                onError = {
-                    Log.e("loadProductsInRange", "장바구니 API 실패", it)
-                    _isLoading.postValue(false)
-                },
-            )
-        }, 1000) // 스켈레톤 UI 테스트를 위한 딜레이입니다.
+                }
+
+            val currentProducts = products
+            val combinedCarts = currentProducts + newCarts
+            products.clear()
+            products.addAll(combinedCarts)
+
+            _hasNextPage.value = !response.last
+
+            refreshItems()
+            _isLoading.postValue(false)
+        }
     }
 
     private fun loadHistories() {
-        historyRepository.getAll { allHistories ->
+        viewModelScope.launch {
+            val allHistories = historyRepository.getAll()
             histories.clear()
             histories.addAll(allHistories)
             refreshItems()
@@ -249,12 +270,15 @@ class GoodsViewModel(
     }
 
     private fun getCartCounts() {
-        cartRepository.getCartCounts(
-            onSuccess = { totalCount ->
-                _totalQuantity.value = totalCount.toInt()
-            },
-            onError = { Log.e("GoodsViewModel", "장바구니 개수 조회 실패", it) },
-        )
+        viewModelScope.launch {
+            cartRepository
+                .getCartCounts()
+                .onSuccess { totalCount ->
+                    _totalQuantity.value = totalCount.toInt()
+                }.onFailure {
+                    Log.e("GoodsViewModel", "장바구니 개수 조회 실패", it)
+                }
+        }
     }
 
     companion object {
