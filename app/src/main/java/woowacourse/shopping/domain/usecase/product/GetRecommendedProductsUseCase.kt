@@ -1,24 +1,23 @@
 package woowacourse.shopping.domain.usecase.product
 
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.RecentProduct
 
 class GetRecommendedProductsUseCase(
     private val getRecentProductsUseCase: GetRecentProductsUseCase,
     private val getProductsUseCase: GetProductsUseCase,
 ) {
     suspend operator fun invoke(cartIds: List<Int>): Result<List<Product>> =
-        getRecentProductsUseCase(LAST_VIEWED_PRODUCT_LIMIT).fold(
-            onSuccess = { recentProducts ->
-                if (recentProducts.isEmpty()) {
+        getLastViewedProduct().fold(
+            onSuccess = { lastViewedProduct ->
+                if (lastViewedProduct == null) {
                     Result.success(emptyList())
                 } else {
-                    val lastViewedProduct = recentProducts[0]
-                    getProductsUseCase().map { pagedResult ->
-                        pagedResult.items
+                    getProducts().map { products ->
+                        products
                             .asSequence()
                             .filter { it.category == lastViewedProduct.product.category }
                             .filter { it.id !in cartIds }
-                            .shuffled()
                             .take(RECOMMENDED_PRODUCTS_COUNT)
                             .toList()
                     }
@@ -26,6 +25,16 @@ class GetRecommendedProductsUseCase(
             },
             onFailure = { Result.failure(it) },
         )
+
+    private suspend fun getLastViewedProduct(): Result<RecentProduct?> =
+        getRecentProductsUseCase(LAST_VIEWED_PRODUCT_LIMIT).map { recentProducts ->
+            recentProducts.firstOrNull()
+        }
+
+    private suspend fun getProducts(): Result<List<Product>> =
+        getProductsUseCase().map { pagedResult ->
+            pagedResult.items
+        }
 
     companion object {
         private const val RECOMMENDED_PRODUCTS_COUNT = 10

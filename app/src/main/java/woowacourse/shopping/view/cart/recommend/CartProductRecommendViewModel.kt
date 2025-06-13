@@ -51,8 +51,11 @@ class CartProductRecommendViewModel(
             val cartIds = cartProducts.map { it.product.id }
             getRecommendedProductsUseCase(cartIds)
                 .onSuccess { recommendedProducts ->
-                    val recommended = recommendedProducts.map { RecommendedProductItem(it) }
-                    _recommendedProducts.postValue(recommended)
+                    val recommendedItems =
+                        recommendedProducts
+                            .shuffled()
+                            .map { RecommendedProductItem(it) }
+                    _recommendedProducts.postValue(recommendedItems)
                 }.onFailure { Log.e("error", it.message.toString()) }
         }
     }
