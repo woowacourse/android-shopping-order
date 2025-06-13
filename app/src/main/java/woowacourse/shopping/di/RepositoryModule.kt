@@ -3,8 +3,12 @@ package woowacourse.shopping.di
 import android.content.Context
 import woowacourse.shopping.data.repository.local.RecentProductRepositoryImpl
 import woowacourse.shopping.data.repository.remote.CartRepositoryImpl
+import woowacourse.shopping.data.repository.remote.CouponRepositoryImpl
+import woowacourse.shopping.data.repository.remote.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.remote.ProductRepositoryImpl
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
@@ -12,6 +16,8 @@ object RepositoryModule {
     private var productRepository: ProductRepository? = null
     private var cartRepository: CartRepository? = null
     private var recentProductRepository: RecentProductRepository? = null
+    private var couponRepository: CouponRepository? = null
+    private var orderRepository: OrderRepository? = null
     private lateinit var appContext: Context
 
     fun init(context: Context) {
@@ -38,6 +44,22 @@ object RepositoryModule {
             val recentlyProductDataSource = DataSourceModule.provideRecentProductDataSource()
             RecentProductRepositoryImpl(recentlyProductDataSource).also {
                 recentProductRepository = it
+            }
+        }
+
+    fun provideCouponRepository(): CouponRepository =
+        couponRepository ?: run {
+            val couponDataSource = DataSourceModule.provideCouponDataSource()
+            CouponRepositoryImpl(couponDataSource).also {
+                couponRepository = it
+            }
+        }
+
+    fun provideOrderRepository(): OrderRepository =
+        orderRepository ?: run {
+            val orderDataSource = DataSourceModule.provideOrderDataSource()
+            OrderRepositoryImpl(orderDataSource).also {
+                orderRepository = it
             }
         }
 }

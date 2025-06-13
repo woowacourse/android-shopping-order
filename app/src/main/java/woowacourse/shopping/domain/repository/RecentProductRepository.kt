@@ -3,12 +3,9 @@ package woowacourse.shopping.domain.repository
 import woowacourse.shopping.domain.model.Product
 
 interface RecentProductRepository {
-    fun getRecentProducts(onResult: (Result<List<Product>>) -> Unit)
+    suspend fun getRecentProducts(): Result<List<Product>>
 
-    fun getMostRecentProduct(onResult: (Result<Product?>) -> Unit)
+    suspend fun getMostRecentProduct(): Result<Product?>
 
-    fun insertRecentProduct(
-        product: Product,
-        onResult: (Result<Unit>) -> Unit,
-    )
+    suspend fun insertRecentProduct(product: Product): Result<Unit>
 }

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="clickListener"
+            type="woowacourse.shopping.presentation.order.CouponClickListener" />
+
+        <variable
+            name="couponUiModel"
+            type="woowacourse.shopping.presentation.uimodel.CouponUiModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginVertical="8dp"
+        android:background="@drawable/bg_coupon_item"
+        android:padding="16dp">
+
+        <CheckBox
+            android:id="@+id/checkbox_coupon_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/baemin"
+            android:checked="@{couponUiModel.isSelected}"
+            android:onClick="@{()->clickListener.onClickSelect(couponUiModel.id)}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:checked="true" />
+
+        <TextView
+            android:id="@+id/tv_coupon_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="@{couponUiModel.description}"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/checkbox_coupon_item"
+            app:layout_constraintStart_toEndOf="@id/checkbox_coupon_item"
+            app:layout_constraintTop_toTopOf="@id/checkbox_coupon_item"
+            tools:text="2개 구매 시 1개 무료 쿠폰" />
+
+        <TextView
+            android:id="@+id/tv_expired_date_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/order_expiry_label"
+            app:layout_constraintStart_toStartOf="@id/checkbox_coupon_item"
+            app:layout_constraintTop_toBottomOf="@id/checkbox_coupon_item"
+            tools:text="만료일: " />
+
+        <TextView
+            android:id="@+id/tv_expired_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:formattedDate="@{couponUiModel.expirationDate}"
+            app:layout_constraintBottom_toBottomOf="@id/tv_expired_date_label"
+            app:layout_constraintStart_toEndOf="@id/tv_expired_date_label"
+            app:layout_constraintTop_toTopOf="@id/tv_expired_date_label"
+            tools:text="2024년 11월 30일" />
+
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_minimum_order_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="tv_minimum_order_price_label,tv_minimum_order_price"
+            app:visibleIfNotNull="@{couponUiModel.minimumOrderPrice}" />
+
+        <TextView
+            android:id="@+id/tv_minimum_order_price_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/order_minimum_order_price"
+            app:layout_constraintStart_toStartOf="@id/tv_expired_date_label"
+            app:layout_constraintTop_toBottomOf="@id/tv_expired_date_label"
+            tools:text="최소 주문 금액: " />
+
+        <TextView
+            android:id="@+id/tv_minimum_order_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{@string/order_price_format(couponUiModel.minimumOrderPrice)}"
+            app:layout_constraintBottom_toBottomOf="@id/tv_minimum_order_price_label"
+            app:layout_constraintStart_toEndOf="@id/tv_minimum_order_price_label"
+            app:layout_constraintTop_toTopOf="@id/tv_minimum_order_price_label"
+            tools:text="100,000원" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_available_using_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="tv_available_using_time_label,tv_available_using_time"
+            app:visibleIfNotNull="@{couponUiModel.availableStartTime}" />
+
+        <TextView
+            android:id="@+id/tv_available_using_time_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/order_available_using_time_label"
+            app:layout_constraintStart_toStartOf="@id/tv_expired_date_label"
+            app:layout_constraintTop_toBottomOf="@id/tv_expired_date_label"
+            tools:text="사용 가능 시간: " />
+
+        <TextView
+            android:id="@+id/tv_available_using_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:endTime="@{couponUiModel.availableEndTime}"
+            app:layout_constraintBottom_toBottomOf="@id/tv_available_using_time_label"
+            app:layout_constraintStart_toEndOf="@id/tv_available_using_time_label"
+            app:layout_constraintTop_toTopOf="@id/tv_available_using_time_label"
+            app:startTime="@{couponUiModel.availableStartTime}"
+            tools:text="오전 4시부터 7시까지" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

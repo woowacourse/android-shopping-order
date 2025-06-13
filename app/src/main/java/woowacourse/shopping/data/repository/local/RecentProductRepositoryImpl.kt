@@ -1,43 +1,35 @@
 package woowacourse.shopping.data.repository.local
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.datasource.local.RecentProductDataSource
 import woowacourse.shopping.data.entity.RecentlyViewedProduct
-import woowacourse.shopping.data.runThread
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
 class RecentProductRepositoryImpl(
     private val recentProductDataSource: RecentProductDataSource,
+    private val defaultDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : RecentProductRepository {
-    override fun getRecentProducts(onResult: (Result<List<Product>>) -> Unit) {
-        runThread(
-            block = {
-                recentProductDataSource
-                    .getProducts()
-                    .map {
-                        it.toDomain()
-                    }
-            },
-            onResult = onResult,
-        )
-    }
+    override suspend fun getRecentProducts(): Result<List<Product>> =
+        withContext(defaultDispatcher) {
+            runCatching {
+                recentProductDataSource.getProducts().map { it.toDomain() }
+            }
+        }
 
-    override fun getMostRecentProduct(onResult: (Result<Product?>) -> Unit) {
-        runThread(
-            block = {
+    override suspend fun getMostRecentProduct(): Result<Product?> =
+        withContext(defaultDispatcher) {
+            runCatching {
                 recentProductDataSource.getMostRecentProduct()?.toDomain()
-            },
-            onResult = onResult,
-        )
-    }
+            }
+        }
 
-    override fun insertRecentProduct(
-        product: Product,
-        onResult: (Result<Unit>) -> Unit,
-    ) {
-        runThread(
-            block = {
+    override suspend fun insertRecentProduct(product: Product): Result<Unit> =
+        withContext(defaultDispatcher) {
+            runCatching {
                 val recentProducts = recentProductDataSource.getProducts()
                 val productId = product.productId
 
@@ -47,11 +39,8 @@ class RecentProductRepositoryImpl(
                 }
 
                 recentProductDataSource.insert(product.toEntity())
-                Result.success(Unit)
-            },
-            onResult = onResult,
-        )
-    }
+            }
+        }
 
     private fun isNewProduct(
         recentProducts: List<RecentlyViewedProduct>,

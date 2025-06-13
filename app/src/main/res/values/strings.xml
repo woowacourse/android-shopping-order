@@ -35,6 +35,7 @@
     <string name="cart_toast_increase_fail">수량을 증가시키는 데 실패하였습니다</string>
     <string name="cart_toast_decrease_fail">수량을 감소시키는 데 실패하였습니다</string>
     <string name="cart_toast_delete_fail">상품을 삭제하는 데 실패하였습니다</string>
+    <string name="cart_toast_invalid_order_quantity">주문할 상품을 1개 이상 선택해주세요</string>
 
     <string name="menu_cart_title">장바구니</string>
     <string name="menu_cart_detail_title">닫기</string>
@@ -47,5 +48,22 @@
     <string name="recommend_text">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
     <string name="recommend_toast_load_fail">추천 상품 조회를 실패하였습니다.</string>
     <string name="recommend_toast_load_not_enough_products">최근 본 상품으로 추천할 상품이 존재하지 않습니다. </string>
+
+    <string name="order_toolbar_text">결제하기</string>
+    <string name="order_available_coupon">적용 가능한 쿠폰</string>
+    <string name="order_available_coupon_info">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="order_price">주문 금액</string>
+    <string name="order_coupon_discount">쿠폰 할인 금액</string>
+    <string name="order_delivery_price">배송비</string>
+    <string name="order_total_price">총 결제 금액</string>
+    <string name="order_submit">결제하기</string>
+    <string name="order_price_format">%,d원</string>
+    <string name="order_expiry_label">만료일: </string>
+    <string name="order_minimum_order_price">최소 주문 금액: </string>
+    <string name="order_available_using_time_label">사용 가능 시간: </string>
+    <string name="order_available_using_time_format">%d시 부터 %d시까지(0시 ~ 23시 기준)</string>
+    <string name="order_success">주문이 완료되었습니다.</string>
+    <string name="order_coupon_load_fail">쿠폰 정보를 불러오지 못했습니다.</string>
+
 
 </resources>

@@ -2,8 +2,8 @@ package woowacourse.shopping.di
 
 import okhttp3.Interceptor
 import okhttp3.logging.HttpLoggingInterceptor
-import woowacourse.shopping.data.remote.interceptor.AuthorizationInterceptor
-import woowacourse.shopping.data.remote.interceptor.DefaultLogger
+import woowacourse.shopping.data.interceptor.AuthorizationInterceptor
+import woowacourse.shopping.data.interceptor.DefaultLogger
 
 object InterceptorModule {
     fun provideLoggingInterceptor(): HttpLoggingInterceptor =

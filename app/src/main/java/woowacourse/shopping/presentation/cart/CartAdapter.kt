@@ -2,7 +2,7 @@ package woowacourse.shopping.presentation.cart
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import woowacourse.shopping.presentation.CartItemUiModel
+import woowacourse.shopping.presentation.uimodel.CartItemUiModel
 
 class CartAdapter(
     private val cartCounterClickListener: CartCounterClickListener,

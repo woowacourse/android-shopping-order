@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
@@ -15,6 +16,7 @@ import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityRecommendBinding
 import woowacourse.shopping.presentation.Extra
+import woowacourse.shopping.presentation.order.OrderActivity
 import woowacourse.shopping.presentation.productdetail.ProductDetailActivity
 
 class RecommendActivity : AppCompatActivity() {
@@ -31,14 +33,31 @@ class RecommendActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.vm = viewModel
 
-        val price = intent.getIntExtra(Extra.KEY_SELECT_PRICE, 0)
-        val count = intent.getIntExtra(Extra.KEY_SELECT_COUNT, 0)
-        viewModel.fetchSelectedInfo(price, count)
+        val productsIds =
+            intent.getLongArrayExtra(Extra.KEY_SELECT_PRODUCT_IDS) ?: longArrayOf()
+        viewModel.fetchSelectedInfo(productsIds)
 
+        setOnBackPressedCallback()
         initInsets()
         setupToolbar()
         initAdapter()
         observeViewModel()
+    }
+
+    private fun setOnBackPressedCallback() {
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val intent =
+                        Intent().apply {
+                            putExtra(Extra.KEY_RECOMMEND_IS_UPDATE, viewModel.isUpdated)
+                        }
+                    setResult(Activity.RESULT_OK, intent)
+                    finish()
+                }
+            },
+        )
     }
 
     private fun initInsets() {
@@ -54,7 +73,11 @@ class RecommendActivity : AppCompatActivity() {
         binding.tbRecommend.apply {
             setNavigationIcon(R.drawable.ic_back)
             setNavigationOnClickListener {
-                setResult(Activity.RESULT_OK)
+                val intent =
+                    Intent().apply {
+                        putExtra(Extra.KEY_RECOMMEND_IS_UPDATE, viewModel.isUpdated)
+                    }
+                setResult(Activity.RESULT_OK, intent)
                 finish()
             }
         }
@@ -76,9 +99,14 @@ class RecommendActivity : AppCompatActivity() {
             showToast(resId)
         }
 
-        viewModel.navigateTo.observe(this) { productId ->
+        viewModel.navigateToDetail.observe(this) { productId ->
             val intent =
                 ProductDetailActivity.newIntent(this, productId = productId)
+            startActivity(intent)
+        }
+
+        viewModel.navigateToOrder.observe(this) { orderProductIds ->
+            val intent = OrderActivity.newIntent(this, orderProductIds)
             startActivity(intent)
         }
     }
@@ -92,12 +120,10 @@ class RecommendActivity : AppCompatActivity() {
     companion object {
         fun newIntent(
             context: Context,
-            selectedPrice: Int,
-            selectedCount: Int,
+            selectedProductIds: LongArray,
         ): Intent =
             Intent(context, RecommendActivity::class.java).apply {
-                putExtra(Extra.KEY_SELECT_PRICE, selectedPrice)
-                putExtra(Extra.KEY_SELECT_COUNT, selectedCount)
+                putExtra(Extra.KEY_SELECT_PRODUCT_IDS, selectedProductIds)
             }
     }
 }

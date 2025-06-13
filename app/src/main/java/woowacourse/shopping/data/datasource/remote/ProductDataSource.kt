@@ -1,17 +1,13 @@
 package woowacourse.shopping.data.datasource.remote
 
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.data.dto.product.ProductContent
 
 interface ProductDataSource {
-    fun fetchPagingProducts(
+    suspend fun fetchPagingProducts(
         page: Int?,
         pageSize: Int?,
         category: String?,
-        onResult: (Result<List<Product>>) -> Unit,
-    )
+    ): List<ProductContent>
 
-    fun fetchProductById(
-        id: Long,
-        onResult: (Result<Product>) -> Unit,
-    )
+    suspend fun fetchProductById(id: Long): ProductContent
 }

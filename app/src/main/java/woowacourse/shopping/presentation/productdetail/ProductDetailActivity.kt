@@ -16,10 +16,10 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityDetailProductBinding
-import woowacourse.shopping.presentation.CartItemUiModel
 import woowacourse.shopping.presentation.Extra
 import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.product.ItemClickListener
+import woowacourse.shopping.presentation.uimodel.CartItemUiModel
 
 class ProductDetailActivity :
     AppCompatActivity(),
@@ -77,7 +77,18 @@ class ProductDetailActivity :
     private fun initListeners() {
         binding.btnProductDetailAddCart.setOnClickListener {
             viewModel.addToCart()
+            intentWithInfos()
         }
+    }
+
+    private fun intentWithInfos() {
+        val resultIntent =
+            Intent().apply {
+                putExtra(Extra.KEY_PRODUCT_ID, viewModel.product.value?.productId ?: -1)
+                putExtra(Extra.KEY_PRODUCT_ADD_QUANTITY, viewModel.productCount.value ?: 0)
+            }
+        setResult(RESULT_OK, resultIntent)
+        finish()
     }
 
     private fun observeViewModel() {
@@ -109,7 +120,7 @@ class ProductDetailActivity :
     }
 
     override fun onClickAddToCart(cartItemUiModel: CartItemUiModel) {
-        // TODO: 여기에 이 인터페이스가 필요한가 ?
+        // TODO: 여기에는 이 인터페이스가 필요 없다. 매개변수가 달라 vm 내에서 메서드 생성 후 처리
     }
 
     companion object {

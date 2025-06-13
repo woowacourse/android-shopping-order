@@ -6,7 +6,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.presentation.Extra
 import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.recommend.RecommendActivity
 
@@ -37,16 +40,12 @@ class CartActivity : AppCompatActivity() {
         binding.clickListener = viewModel
         binding.lifecycleOwner = this
 
+        setOnBackPressedCallback()
         showSkeleton(true)
         initInsets()
         initAdapter()
         setupToolbar()
         observeViewModel()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.loadItems()
     }
 
     private fun initInsets() {
@@ -69,10 +68,30 @@ class CartActivity : AppCompatActivity() {
         binding.tbCart.apply {
             setNavigationIcon(R.drawable.ic_back)
             setNavigationOnClickListener {
-                setResult(Activity.RESULT_OK)
+                val intent =
+                    Intent().apply {
+                        putExtra(Extra.KEY_CART_IS_UPDATE, viewModel.isUpdated)
+                    }
+                setResult(Activity.RESULT_OK, intent)
                 finish()
             }
         }
+    }
+
+    private fun setOnBackPressedCallback() {
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val intent =
+                        Intent().apply {
+                            putExtra(Extra.KEY_CART_IS_UPDATE, viewModel.isUpdated)
+                        }
+                    setResult(Activity.RESULT_OK, intent)
+                    finish()
+                }
+            },
+        )
     }
 
     private fun observeViewModel() {
@@ -103,12 +122,24 @@ class CartActivity : AppCompatActivity() {
             showToast(resId)
         }
 
-        viewModel.navigateTo.observe(this) { (totalPrice, totalCount) ->
-            val intent =
-                RecommendActivity.newIntent(this, totalPrice, totalCount)
-            startActivity(intent)
+        viewModel.navigateTo.observe(this) { productIds ->
+            val intent = RecommendActivity.newIntent(this, productIds)
+            recommendLauncher.launch(intent)
         }
     }
+
+    private val recommendLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val isUpdated =
+                    result.data?.getBooleanExtra(Extra.KEY_RECOMMEND_IS_UPDATE, true) ?: true
+                if (isUpdated) {
+                    viewModel.updateItems()
+                }
+            }
+        }
 
     private fun showSkeleton(isLoading: Boolean) {
         if (isLoading) {

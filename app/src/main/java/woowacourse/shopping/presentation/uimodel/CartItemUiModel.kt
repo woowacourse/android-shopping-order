@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation
+package woowacourse.shopping.presentation.uimodel
 
 import woowacourse.shopping.domain.model.CartItem
 
@@ -17,10 +17,11 @@ fun CartItemUiModel.toDomain(): CartItem =
         quantity = quantity,
     )
 
-fun CartItem.toPresentation(): CartItemUiModel =
+fun CartItem.toPresentation(isSelected: Boolean = false): CartItemUiModel =
     CartItemUiModel(
         id = this.cartId,
         product = this.product.toPresentation(),
         quantity = this.quantity,
+        isSelected = isSelected,
         totalPrice = this.totalPrice,
     )

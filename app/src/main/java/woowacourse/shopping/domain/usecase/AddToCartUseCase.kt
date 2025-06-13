@@ -6,16 +6,8 @@ import woowacourse.shopping.domain.repository.CartRepository
 class AddToCartUseCase(
     private val cartRepository: CartRepository,
 ) {
-    operator fun invoke(
+    suspend operator fun invoke(
         product: Product,
         quantity: Int,
-        onSuccess: () -> Unit,
-        onFailure: (Throwable) -> Unit,
-    ) {
-        cartRepository.insertProduct(product, quantity) { result ->
-            result
-                .onSuccess { onSuccess() }
-                .onFailure { onFailure(it) }
-        }
-    }
+    ): Result<Unit> = cartRepository.insertProduct(product, quantity)
 }

@@ -1,11 +1,13 @@
 package woowacourse.shopping.presentation.product
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +18,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityProductBinding
 import woowacourse.shopping.databinding.ViewCartActionBinding
+import woowacourse.shopping.presentation.Extra
 import woowacourse.shopping.presentation.ResultState
 import woowacourse.shopping.presentation.cart.CartActivity
 import woowacourse.shopping.presentation.productdetail.ProductDetailActivity
@@ -48,12 +51,6 @@ class ProductActivity : AppCompatActivity() {
         setupToolbar()
         initAdapter()
         observeViewModel()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.fetchData()
-        viewModel.fetchCartItemCount()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -155,9 +152,22 @@ class ProductActivity : AppCompatActivity() {
         viewModel.navigateTo.observe(this) { productId ->
             val intent =
                 ProductDetailActivity.newIntent(this, productId = productId)
-            startActivity(intent)
+            productDetailLauncher.launch(intent)
         }
     }
+
+    private val productDetailLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val updatedProductId = result.data?.getLongExtra(Extra.KEY_PRODUCT_ID, 0L) ?: 0L
+                val updateAddQuantity =
+                    result.data?.getIntExtra(Extra.KEY_PRODUCT_ADD_QUANTITY, 0) ?: 0
+
+                viewModel.updateCartItem(updatedProductId, updateAddQuantity)
+            }
+        }
 
     private fun showSkeleton(isLoading: Boolean) {
         if (isLoading) {
@@ -187,8 +197,21 @@ class ProductActivity : AppCompatActivity() {
 
     private fun navigateToCart() {
         val intent = CartActivity.newIntent(this)
-        startActivity(intent)
+        cartLauncher.launch(intent)
     }
+
+    private val cartLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val isUpdated = result.data?.getBooleanExtra(Extra.KEY_CART_IS_UPDATE, true) ?: true
+                if (isUpdated) {
+                    viewModel.fetchData()
+                    viewModel.fetchCartItemCount()
+                }
+            }
+        }
 
     override fun onDestroy() {
         super.onDestroy()
