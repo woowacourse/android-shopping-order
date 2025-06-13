@@ -218,7 +218,7 @@ class ShoppingCartViewModel(
                 return@launch removeShoppingCartProduct(shoppingCartProductItem)
             }
             shoppingCartRepository
-                .decreaseQuantity(
+                .updateQuantity(
                     shoppingCartId,
                     quantityToUpdate,
                 ).onSuccess {
@@ -240,7 +240,7 @@ class ShoppingCartViewModel(
             val shoppingCartId = shoppingCartProductItem.shoppingCartProduct.id
             val quantityToUpdate = shoppingCartProductItem.shoppingCartProduct.quantity + 1
             shoppingCartRepository
-                .increaseQuantity(
+                .updateQuantity(
                     shoppingCartId,
                     quantityToUpdate,
                 ).onSuccess {

@@ -14,12 +14,7 @@ interface ShoppingCartRepository {
         quantity: Int,
     ): Result<Unit>
 
-    suspend fun increaseQuantity(
-        shoppingCartId: Long,
-        quantity: Int,
-    ): Result<Unit>
-
-    suspend fun decreaseQuantity(
+    suspend fun updateQuantity(
         shoppingCartId: Long,
         quantity: Int,
     ): Result<Unit>

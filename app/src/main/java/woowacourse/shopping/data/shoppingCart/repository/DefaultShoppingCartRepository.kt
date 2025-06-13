@@ -31,12 +31,7 @@ class DefaultShoppingCartRepository(
             )
         }
 
-    override suspend fun increaseQuantity(
-        shoppingCartId: Long,
-        quantity: Int,
-    ): Result<Unit> = updateShoppingCartQuantity(quantity, shoppingCartId)
-
-    override suspend fun decreaseQuantity(
+    override suspend fun updateQuantity(
         shoppingCartId: Long,
         quantity: Int,
     ): Result<Unit> {

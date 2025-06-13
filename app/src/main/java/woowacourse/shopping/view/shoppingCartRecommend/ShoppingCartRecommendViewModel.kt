@@ -97,7 +97,7 @@ class ShoppingCartRecommendViewModel(
 
                 false -> {
                     shoppingCartRepository
-                        .increaseQuantity(
+                        .updateQuantity(
                             item.shoppingCartId,
                             selectedQuantity + 1,
                         ).onSuccess {
@@ -173,7 +173,7 @@ class ShoppingCartRecommendViewModel(
     ) {
         viewModelScope.launch {
             shoppingCartRepository
-                .decreaseQuantity(
+                .updateQuantity(
                     item.shoppingCartId ?: return@launch,
                     selectedQuantity - 1,
                 ).onSuccess {

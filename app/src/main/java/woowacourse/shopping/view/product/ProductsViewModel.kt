@@ -283,7 +283,7 @@ class ProductsViewModel(
                 return@launch
             }
             shoppingCartRepository
-                .increaseQuantity(
+                .updateQuantity(
                     productItem.shoppingCartId,
                     quantity + 1,
                 ).onSuccess {
@@ -311,7 +311,7 @@ class ProductsViewModel(
     ) {
         viewModelScope.launch {
             shoppingCartRepository
-                .decreaseQuantity(
+                .updateQuantity(
                     productItem.shoppingCartId ?: return@launch,
                     quantity - 1,
                 ).onSuccess {

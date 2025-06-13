@@ -128,7 +128,7 @@ class ProductDetailViewModel(
                 return@launch
             }
             shoppingCartRepository
-                .increaseQuantity(
+                .updateQuantity(
                     product.shoppingCartId,
                     totalQuantity,
                 ).onSuccess {
