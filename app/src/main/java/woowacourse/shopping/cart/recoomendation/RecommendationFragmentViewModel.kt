@@ -30,6 +30,10 @@ class RecommendationFragmentViewModel(
         loadRecentlyViewedProduct()
     }
 
+    fun orderProduct(): List<ProductUiModel> {
+        return _recommendedProducts.value?.filter { it.isChecked == true } ?: emptyList()
+    }
+
     fun movePay() {
         if (_selectedProductsCount.value == 0) return
         _isMovePay.value = Unit

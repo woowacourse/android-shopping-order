@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.map
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentCartRecommendationBinding
@@ -103,7 +104,8 @@ class RecommendationFragment : Fragment() {
             }
         }
         viewModel.isMovePay.observe(viewLifecycleOwner) {
-            val intent = PayActivity.newIntent(requireContext())
+            val orderProducts = viewModel.orderProduct()
+            val intent = PayActivity.newIntent(requireContext(), orderProducts)
             startActivity(intent)
         }
     }
