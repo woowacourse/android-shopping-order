@@ -74,7 +74,8 @@ class SelectionFragment : Fragment() {
                 (binding.recyclerViewCart.adapter as CartAdapter).setCartItem(item)
             }
             isMovePay.observe(viewLifecycleOwner) {
-                val intent = PayActivity.newIntent(requireContext())
+                val orderProducts = viewModel.orderProduct()
+                val intent = PayActivity.newIntent(requireContext(), orderProducts)
                 startActivity(intent)
             }
         }
