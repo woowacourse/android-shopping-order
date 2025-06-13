@@ -24,7 +24,6 @@ class DetailViewModelFactory(
                         ShoppingDatabase.getInstance(application).recentlyViewedProductDao(),
                         RemoteCatalogProductRepositoryImpl(),
                     ),
-                catalogProductRepository = RemoteCatalogProductRepositoryImpl(),
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

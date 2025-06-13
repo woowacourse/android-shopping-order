@@ -5,34 +5,25 @@ import woowacourse.shopping.data.entity.CartProductEntity
 import woowacourse.shopping.data.entity.RecentlyViewedProductEntity
 import woowacourse.shopping.data.mapper.toEntity
 import woowacourse.shopping.product.catalog.ProductUiModel
-import kotlin.concurrent.thread
 
 class RecentlyViewedProductRepositoryImpl(
     val recentlyViewedProductDao: RecentlyViewedProductDao,
     val catalogProductRepository: CatalogProductRepository,
 ) : RecentlyViewedProductRepository {
-    override fun insertRecentlyViewedProductUid(uid: Int) {
-        thread {
-            recentlyViewedProductDao.insertRecentlyViewedProductUid(RecentlyViewedProductEntity(uid))
-        }
+    override suspend fun insertRecentlyViewedProductUid(uid: Int) {
+        recentlyViewedProductDao.insertRecentlyViewedProductUid(RecentlyViewedProductEntity(uid))
     }
 
-    override fun getRecentlyViewedProducts(callback: (List<CartProductEntity>) -> Unit) {
-        thread {
-            val uids = recentlyViewedProductDao.getRecentlyViewedProductUids()
-            catalogProductRepository.getCartProductsByUids(uids) { products ->
-                val entities = products.map { it.toEntity() }
-                callback(entities)
-            }
-        }
+    override suspend fun getRecentlyViewedProducts(): List<CartProductEntity> {
+        val uids = recentlyViewedProductDao.getRecentlyViewedProductUids()
+        val products = catalogProductRepository.getCartProductsByUids(uids)
+        val entities = products.map { it.toEntity() }
+        return entities
     }
 
-    override fun getLatestViewedProduct(callback: (ProductUiModel) -> Unit) {
-        thread {
-            val uid = recentlyViewedProductDao.getLatestViewedProductUid()
-            catalogProductRepository.getProduct(uid) { product ->
-                callback(product)
-            }
-        }
+    override suspend fun getLatestViewedProduct(): ProductUiModel? {
+        val uid = recentlyViewedProductDao.getLatestViewedProductUid()
+        val product = catalogProductRepository.getProduct(uid)
+        return product
     }
 }

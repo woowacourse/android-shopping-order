@@ -3,28 +3,24 @@ package woowacourse.shopping.data.source
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 interface CatalogProductDataSource {
-    fun getRecommendedProducts(
+    suspend fun getRecommendedProducts(
         category: String,
         page: Int,
         size: Int,
-        callback: (List<ProductUiModel>) -> Unit,
-    )
+    ): List<ProductUiModel>
 
-    fun getAllProductsSize(callback: (Int) -> Unit)
+    suspend fun getAllProductsSize(): Int
 
-    fun getCartProductsByUids(
+    suspend fun getCartProductsByUids(
         uids: List<Int>,
-        callback: (List<ProductUiModel>) -> Unit,
-    )
+    ): List<ProductUiModel>
 
-    fun getProductsByPage(
+    suspend fun getProductsByPage(
         page: Int,
         size: Int,
-        callback: (List<ProductUiModel>) -> Unit,
-    )
+    ): List<ProductUiModel>
 
-    fun getProduct(
+    suspend fun getProduct(
         id: Int,
-        callback: (ProductUiModel) -> Unit,
-    )
+    ): ProductUiModel
 }

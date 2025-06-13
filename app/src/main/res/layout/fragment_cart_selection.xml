@@ -67,6 +67,7 @@
             app:layout_constraintEnd_toEndOf="@id/view_cart_order"
             app:layout_constraintStart_toStartOf="@id/view_cart_order"
             app:layout_constraintTop_toTopOf="@id/view_cart_order"
+            android:onClick="@{() -> vm.movePay()}"
             tools:text="주문하기(2)" />
 
         <CheckBox

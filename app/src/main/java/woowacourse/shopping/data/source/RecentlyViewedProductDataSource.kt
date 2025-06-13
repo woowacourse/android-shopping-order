@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.source
 
 interface RecentlyViewedProductDataSource {
-    fun insertRecentlyViewedProductUid(uid: Int)
+    suspend fun insertRecentlyViewedProductUid(uid: Int)
 
-    fun getRecentlyViewedProducts(callback: (List<Int>) -> Unit)
+    suspend fun getRecentlyViewedProducts(): List<Int>
 
-    fun getLatestViewedProduct(callback: (Int) -> Unit)
+    suspend fun getLatestViewedProduct(): Int
 }

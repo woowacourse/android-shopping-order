@@ -9,11 +9,11 @@ import woowacourse.shopping.data.entity.RecentlyViewedProductEntity
 @Dao
 interface RecentlyViewedProductDao {
     @Insert(onConflict = REPLACE)
-    fun insertRecentlyViewedProductUid(recentlyViewedProductEntity: RecentlyViewedProductEntity)
+    suspend fun insertRecentlyViewedProductUid(recentlyViewedProductEntity: RecentlyViewedProductEntity)
 
     @Query("SELECT productUid FROM RecentlyViewedProducts ORDER BY timestamp DESC")
-    fun getRecentlyViewedProductUids(): List<Int>
+    suspend fun getRecentlyViewedProductUids(): List<Int>
 
     @Query("SELECT productUid FROM RecentlyViewedProducts ORDER BY timestamp DESC LIMIT 1")
-    fun getLatestViewedProductUid(): Int
+    suspend fun getLatestViewedProductUid(): Int
 }

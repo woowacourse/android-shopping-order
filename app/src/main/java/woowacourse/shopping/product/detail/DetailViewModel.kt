@@ -3,6 +3,8 @@ package woowacourse.shopping.product.detail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartProductRepository
 import woowacourse.shopping.data.repository.CatalogProductRepository
 import woowacourse.shopping.data.repository.RecentlyViewedProductRepository
@@ -12,7 +14,6 @@ class DetailViewModel(
     product: ProductUiModel,
     private val cartProductRepository: CartProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
-    private val catalogProductRepository: CatalogProductRepository,
 ) : ViewModel() {
     private val _product = MutableLiveData<ProductUiModel>(product)
     val product: LiveData<ProductUiModel> = _product
@@ -46,24 +47,29 @@ class DetailViewModel(
     }
 
     fun addToCart() {
-        val addedProduct = product.value?.copy(quantity = quantity.value ?: 0)
+        val addedProduct = product.value?.copy(quantity = quantity.value ?: 0) ?: return
 
-        if (addedProduct?.cartItemId != null) {
-            cartProductRepository.updateProduct(addedProduct, addedProduct.quantity) {}
-        } else {
-            addedProduct?.let {
-                cartProductRepository.insertCartProduct(it) {}
+        viewModelScope.launch {
+            runCatching {
+                if (addedProduct.cartItemId != null) {
+                    cartProductRepository.updateProduct(addedProduct, addedProduct.quantity)
+                } else {
+                    cartProductRepository.insertCartProduct(addedProduct)
+                }
             }
         }
     }
 
     fun addToRecentlyViewedProduct() {
         val uid = product.value?.id ?: return
-        recentlyViewedProductRepository.insertRecentlyViewedProductUid(uid)
+        viewModelScope.launch {
+            recentlyViewedProductRepository.insertRecentlyViewedProductUid(uid)
+        }
     }
 
     fun setLatestViewedProduct() {
-        recentlyViewedProductRepository.getLatestViewedProduct { product ->
+        viewModelScope.launch {
+            val product = recentlyViewedProductRepository.getLatestViewedProduct()
             _latestViewedProduct.postValue(product)
         }
     }

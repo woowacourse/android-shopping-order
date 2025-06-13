@@ -158,4 +158,48 @@
         <item name="android:textColor">@color/gray_5</item>
     </style>
 
+    <!--  Pay 페이지 타이틀 스타일  -->
+    <style name="PayTitleStyle" parent="BaseTextStyle">
+        <item name="android:gravity">start</item>
+        <item name="android:textSize">@dimen/font_size_xlarge</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!--  Pay 페이지 부제 타이틀 스타일  -->
+    <style name="PaySubTitleStyle" parent="BaseTextStyle">
+        <item name="android:gravity">start</item>
+        <item name="android:textSize">@dimen/font_size_xsmall</item>
+        <item name="android:textColor">@color/gray_5</item>
+    </style>
+
+    <!--  Pay 페이지 목차 스타일 -->
+    <style name="PayListStyle" parent="BaseTextStyle">
+        <item name="android:gravity">start</item>
+        <item name="android:textColor">@color/gray_7</item>
+        <item name="android:textSize">@dimen/font_size_normal</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!--  Pay 페이지 목차 스타일 -->
+    <style name="PayPriceStyle" parent="BaseTextStyle">
+        <item name="android:gravity">start</item>
+        <item name="android:textColor">@color/gray_7</item>
+        <item name="android:textSize">@dimen/font_size_normal</item>
+    </style>
+
+    <!--  Pay 페이지 쿠폰 글자 스타일 -->
+    <style name="PayCouponTitleStyle" parent="BaseTextStyle">
+        <item name="android:gravity">start</item>
+        <item name="android:textColor">@color/gray_5</item>
+        <item name="android:textSize">@dimen/font_size_xlarge</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!--  Pay 페이지 쿠폰 글자 스타일 -->
+    <style name="PayCouponSubTitleStyle" parent="BaseTextStyle">
+        <item name="android:gravity">start</item>
+        <item name="android:textColor">@color/gray_5</item>
+        <item name="android:textSize">@dimen/font_size_xsmall</item>
+    </style>
+
 </resources>

@@ -3,6 +3,7 @@ package woowacourse.shopping.cart
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -14,6 +15,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.cart.recoomendation.RecommendationFragment
 import woowacourse.shopping.cart.selection.SelectionFragment
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.pay.PayActivity
 
 class CartActivity : AppCompatActivity() {
     private val binding: ActivityCartBinding by lazy {

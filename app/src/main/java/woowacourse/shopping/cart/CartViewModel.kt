@@ -1,8 +1,11 @@
 package woowacourse.shopping.cart
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.cart.CartItem.ProductItem
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.product.catalog.ProductUiModel
@@ -39,8 +42,20 @@ class CartViewModel(
     private val _allChecked = MutableLiveData<Boolean>(true)
     val allChecked: LiveData<Boolean> get() = _allChecked
 
+    private val _isMovePay = MutableLiveData<Unit>()
+    val isMovePay: LiveData<Unit> get() = _isMovePay
+
     init {
         loadCartProducts()
+    }
+
+    fun orderProduct(): List<ProductUiModel> {
+        return _cartProducts.value?.filter { it.isChecked == true } ?: emptyList()
+    }
+
+    fun movePay() {
+        if (_totalPurchaseCount.value == 0) return
+        _isMovePay.value = Unit
     }
 
     fun onAllSelectedProducts() {
@@ -66,7 +81,8 @@ class CartViewModel(
     }
 
     fun deleteCartProduct(cartProduct: ProductItem) {
-        cartRepository.deleteCartProduct(cartProduct.productItem) { result ->
+        viewModelScope.launch {
+            val result = cartRepository.deleteCartProduct(cartProduct.productItem)
             if (result) {
                 val newCartProducts =
                     _cartProducts.value?.filterNot { it == cartProduct.productItem } ?: emptyList()
@@ -82,7 +98,8 @@ class CartViewModel(
     }
 
     fun onPaginationButtonClick(buttonDirection: Int) {
-        cartRepository.getTotalProductsCount { totalSize ->
+        viewModelScope.launch {
+            val totalSize = cartRepository.getTotalProductsCount()
             val currentPage = page.value ?: INITIAL_PAGE
             val lastPage = (totalSize - 1) / PAGE_SIZE
 
@@ -115,10 +132,11 @@ class CartViewModel(
     }
 
     fun increaseQuantity(product: ProductUiModel) {
-        cartRepository.updateCartProduct(
-            product,
-            product.quantity + A_COUNT,
-        ) { success ->
+        viewModelScope.launch {
+            val success =  cartRepository.updateCartProduct(
+                product,
+                product.quantity + A_COUNT,
+            )
             if (success) {
                 val newProduct = product.copy(quantity = product.quantity + A_COUNT)
                 updateItem(newProduct)
@@ -129,10 +147,11 @@ class CartViewModel(
     fun decreaseQuantity(product: ProductUiModel) {
         if (product.quantity > INITIAL_PRODUCT_COUNT) {
             val newProduct = product.copy(quantity = product.quantity - A_COUNT)
-            cartRepository.updateCartProduct(
-                product,
-                product.quantity - A_COUNT,
-            ) { success ->
+            viewModelScope.launch {
+                val success = cartRepository.updateCartProduct(
+                    product,
+                    product.quantity - A_COUNT,
+                )
                 if (success) {
                     updateItem(newProduct)
                 }
@@ -188,27 +207,28 @@ class CartViewModel(
     }
 
     private fun loadCartProducts(pageSize: Int = PAGE_SIZE) {
-        cartRepository.getTotalProductsCount { totalSize ->
+        viewModelScope.launch {
+            val totalSize = cartRepository.getTotalProductsCount()
             _totalPurchaseCount.postValue(totalSize)
             val currentPage = page.value ?: INITIAL_PAGE
             val startIndex = currentPage * pageSize
             if (startIndex >= totalSize) {
-                return@getTotalProductsCount
+                return@launch
             }
-            cartRepository
-                .getCartProductsInRange(currentPage, pageSize) { cartProducts ->
-                    val pagedProducts: List<ProductUiModel> =
-                        cartProducts.map {
-                            it.copy(isChecked = true)
-                        }
-                    _cartProducts.postValue(pagedProducts)
-                    checkNextButtonEnabled(totalSize)
-                    checkPrevButtonEnabled()
-                    _loadingState.postValue(false)
-                    val amount =
-                        pagedProducts.filter { it.isChecked == true }.sumOf { it.price * it.quantity }
-                    _totalPurchaseAmount.postValue(amount)
+            val cartProducts =cartRepository
+                .getCartProductsInRange(currentPage, pageSize)
+            val pagedProducts: List<ProductUiModel> =
+                cartProducts.map {
+                    it.copy(isChecked = true)
                 }
+            _cartProducts.postValue(pagedProducts)
+            checkNextButtonEnabled(totalSize)
+            checkPrevButtonEnabled()
+            _loadingState.postValue(false)
+            val amount =
+                pagedProducts.filter { it.isChecked == true }
+                    .sumOf { it.price * it.quantity }
+            _totalPurchaseAmount.postValue(amount)
         }
     }
 
