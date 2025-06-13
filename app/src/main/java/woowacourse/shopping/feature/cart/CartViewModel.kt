@@ -13,6 +13,7 @@ import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.Carts
 import woowacourse.shopping.feature.cart.adapter.CartGoodsItem
 import woowacourse.shopping.util.toDomain
 import woowacourse.shopping.util.updateQuantity
@@ -36,8 +37,8 @@ class CartViewModel(
     private val _page = MutableLiveData(currentPage)
     val page: LiveData<Int> get() = _page
 
-    private val _carts = MutableLiveData<List<CartGoodsItem>>()
-    val carts: LiveData<List<CartGoodsItem>> get() = _carts
+    private val _carts = MutableLiveData<Carts>() // private val _carts = MutableLiveData<List<CartGoodsItem>>()이 원래 선언되어 있던것
+    val carts: LiveData<Carts> get() = _carts
 
     private val _totalCheckedItemsCount = MutableLiveData(0)
     val totalCheckedItemsCount: LiveData<Int> get() = _totalCheckedItemsCount
@@ -88,9 +89,9 @@ class CartViewModel(
     }
 
     fun changeAllChecked() {
-        val currentList = carts.value ?: emptyList()
-        val newState = currentList.map { it.copy(isChecked = !it.isChecked) }
-        _carts.value = newState
+        val currentList = carts.value ?: return
+        val newState = currentList.carts.map { it.copy(isChecked = !it.isChecked) }
+        _carts.value = currentList.copy(carts = newState)
     }
 
     fun updatePageButtonStates(
@@ -104,6 +105,7 @@ class CartViewModel(
     }
 
     fun delete(cart: Cart) {
+        val currentList = carts.value ?: return
         val total = totalItemsCount.value ?: 0
         val endPage = ((total - 1) / PAGE_SIZE) + 1
 
@@ -116,9 +118,8 @@ class CartViewModel(
             cartRepository
                 .deleteCart(cart.id)
                 .onSuccess {
-                    val updatedList =
-                        _carts.value?.filter { it.cart.id != cart.id } ?: emptyList()
-                    _carts.value = updatedList
+                    val updatedList = currentList.carts.filter { it.cart.id != cart.id }
+                    _carts.value = currentList.copy(carts = updatedList)
                     fetchTotalItemsCount()
                 }.onFailure {
                     Log.e("DeleteCartTest", "장바구니 삭제 실패")
@@ -127,6 +128,7 @@ class CartViewModel(
     }
 
     fun addToCart(cart: Cart) {
+        val currentList = carts.value ?: return
         viewModelScope.launch {
             cartRepository
                 .updateCart(
@@ -134,7 +136,7 @@ class CartViewModel(
                     cartQuantity = CartQuantity(cart.quantity + 1),
                 ).onSuccess {
                     val updatedList =
-                        _carts.value?.map {
+                        currentList.carts.map {
                             val updatedCart = it.cart
                             if (updatedCart.product.id == cart.product.id) {
                                 val updated = updatedCart.updateQuantity(updatedCart.quantity + 1)
@@ -142,8 +144,8 @@ class CartViewModel(
                             } else {
                                 it
                             }
-                        } ?: emptyList()
-                    _carts.postValue(updatedList)
+                        }
+                    _carts.postValue(currentList.copy(carts = updatedList))
                     fetchTotalItemsCount()
                 }.onFailure {
                     Log.e("addCartTest", "장바구니 추가 실패")
@@ -152,6 +154,7 @@ class CartViewModel(
     }
 
     fun removeFromCart(cart: Cart) {
+        val currentList = carts.value ?: return
         viewModelScope.launch {
             if (cart.quantity == 1) {
                 delete(cart)
@@ -162,7 +165,7 @@ class CartViewModel(
                         cartQuantity = CartQuantity(cart.quantity - 1),
                     ).onSuccess {
                         val updatedList =
-                            _carts.value?.map {
+                            currentList.carts.map {
                                 val updatedCart = it.cart
                                 if (updatedCart.product.id == cart.product.id) {
                                     val updated =
@@ -171,8 +174,8 @@ class CartViewModel(
                                 } else {
                                     it
                                 }
-                            } ?: emptyList()
-                        _carts.value = updatedList
+                            }
+                        _carts.value = currentList.copy(carts = updatedList)
                         fetchTotalItemsCount()
                     }.onFailure {
                         Log.e("RemoveCartTest", "장바구니 삭제 실패")
@@ -194,10 +197,11 @@ class CartViewModel(
     }
 
     private fun loadCarts() {
+        val currentList = carts.value ?: return
         viewModelScope.launch {
             _isLoading.value = true
             cartRepository
-                .fetchCart()
+                .fetchCart(currentPage, 5)
                 .onSuccess { response ->
                     response?.let {
                         val cartList =
@@ -211,7 +215,7 @@ class CartViewModel(
                                 )
                             }
 
-                        _carts.value = cartList
+                        _carts.value = currentList.copy(carts = cartList)
 
                         _page.value = response.number
                         updatePageButtonStates(
@@ -241,7 +245,7 @@ class CartViewModel(
                         .fetchAllProducts()
                         .onSuccess { response ->
                             val matchedProduct =
-                                response?.content?.find { it.id.toInt() == latestProduct?.product?.id }
+                                response?.content?.find { it.id.toInt() == latestProduct?.id }
                             val category = matchedProduct?.category
 
                             val recommendProducts =
@@ -249,7 +253,7 @@ class CartViewModel(
                                     ?.content
                                     ?.filter {
                                         it.category == category &&
-                                            it.id.toInt() != latestProduct?.product?.id &&
+                                            it.id.toInt() != latestProduct?.id &&
                                             cartProductIds?.contains(it.id) != true
                                     }?.take(10)
 

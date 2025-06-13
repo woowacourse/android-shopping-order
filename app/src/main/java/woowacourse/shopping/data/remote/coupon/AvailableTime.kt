@@ -9,4 +9,10 @@ data class AvailableTime(
     val end: String,
     @SerialName("start")
     val start: String,
-)
+) {
+    fun toDomain(): AvailableTime =
+        AvailableTime(
+            end = end,
+            start = start,
+        )
+}

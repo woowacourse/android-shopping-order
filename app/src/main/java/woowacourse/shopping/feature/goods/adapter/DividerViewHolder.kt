@@ -3,6 +3,7 @@ package woowacourse.shopping.feature.goods.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import woowacourse.shopping.databinding.ItemDividerBinding
 
 class DividerViewHolder(
     val binding: ItemDividerBinding,
