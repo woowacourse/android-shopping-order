@@ -24,4 +24,30 @@
     <string name="product_count_up_text">+</string>
     <string name="catalog_recent_product_title">최근 본 상품</string>
     <string name="place_order_text">주문하기(%s)</string>
+
+    <!-- Order Screen -->
+    <string name="toolbar_order_title">결제하기</string>
+    <string name="order_available_coupon_title">적용 가능한 쿠폰</string>
+    <string name="order_available_coupon_desc">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="order_order_amount_title">주문금액</string>
+    <string name="order_coupon_discount_amount_title">쿠폰 할인 금액</string>
+    <string name="order_shipping_fee_title">배송비</string>
+    <string name="order_total_amount_title">총 결제 금액</string>
+    <string name="order_pay_btn_text">결제하기</string>
+
+    <!-- Coupon Item Screen -->
+    <string name="coupon_expiration_date_text">만료일: %s</string>
+    <string name="coupon_minimum_order_amount_text">최소 주문 금액: %d원</string>
+
+    <!-- Toast Message -->
+    <string name="toast_order_load_coupons_failure_text">쿠폰 조회에 실패했습니다</string>
+    <string name="toast_order_success_text">주문에 성공했습니다</string>
+    <string name="toast_order_failure_text">주문에 실패했습니다</string>
+    <string name="add_cart_success">선택한 상품을 장바구니에 추가했습니다</string>
+    <string name="add_cart_failure">장바구니 추가에 실패했습니다</string>
+    <string name="load_product_failure">상품 정보를 불러올 수 없습니다</string>
+    <string name="cart_load_failure">장바구니 상품을 불러오는데 실패했습니다</string>
+    <string name="cart_add_failure">장바구니 상품 추가에 실패했습니다</string>
+    <string name="cart_delete_failure">장바구니 상품 삭제에 실패했습니다</string>
+
 </resources>

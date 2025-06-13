@@ -4,14 +4,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toCartItem
 import woowacourse.shopping.presentation.model.toProduct
 import woowacourse.shopping.presentation.model.toUiModel
+import woowacourse.shopping.presentation.util.MutableSingleLiveData
+import woowacourse.shopping.presentation.util.SingleLiveData
 import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem
 
@@ -26,203 +31,205 @@ class CatalogViewModel(
     private val _items = MutableLiveData<List<CatalogItem>>()
     val items: LiveData<List<CatalogItem>> = _items
 
-    private val _itemUpdateEvent = MutableLiveData<ProductUiModel>()
-    val itemUpdateEvent: LiveData<ProductUiModel> = _itemUpdateEvent
+    private val _updatedItem = MutableLiveData<ProductUiModel>()
+    val updatedItem: LiveData<ProductUiModel> = _updatedItem
 
-    private val _deleteState = MutableLiveData<Long>()
-    val deleteState: LiveData<Long> = _deleteState
+    private val _deletedItemId = MutableLiveData<Long>()
+    val deletedItemId: LiveData<Long> = _deletedItemId
 
     private val _totalCartCount = MutableLiveData<Int>()
     val totalCartCount: LiveData<Int> = _totalCartCount
 
-    private val loadSize: Int = 20
-    private var lastId: Long = DEFAULT_ID
-    private var currentPage: Int = 0
+    private val _toastEvent = MutableSingleLiveData<CatalogEvent>()
+    val toastEvent: SingleLiveData<CatalogEvent> = _toastEvent
+
+    private val loadSize = 20
+    private var currentPage = 0
 
     init {
         fetchProducts()
     }
 
     override fun increase(product: ProductUiModel) {
-        addOrIncreaseCartItem(product)
+        updateCartItemQuantity(product, isIncrement = true)
     }
 
     override fun decrease(product: ProductUiModel) {
-        decreaseOrDeleteCartItem(product)
+        updateCartItemQuantity(product, isIncrement = false)
     }
 
     fun fetchProducts() {
         _isLoading.value = true
 
-        productRepository.loadCartItems { cartItems ->
-            val totalCount = cartItems?.sumOf { it.amount } ?: 0
-            _totalCartCount.postValue(totalCount)
+        viewModelScope.launch {
+            collectCartState { cartMap ->
+                productRepository
+                    .loadRecentProducts(10)
+                    .onSuccess { recentProducts ->
+                        val recentItem =
+                            CatalogItem.RecentProductItem(
+                                recentProducts.map { it.toUiModel() },
+                            )
 
-            val cartItemState =
-                cartItems?.associateBy(
-                    { it.product.id },
-                    { it.toUiModel() },
-                )
-
-            productRepository.loadRecentProducts(limit = 10) { recentProducts ->
-                val recentUiModels = recentProducts.map { it.toUiModel() }
-                val recentItem = CatalogItem.RecentProductItem(recentUiModels)
-
-                productRepository.loadProducts(currentPage, loadSize) { fetchedProducts, hasMore ->
-                    val fetchedUiModels =
-                        fetchedProducts.map { product ->
-                            cartItemState?.get(product.id) ?: product.toUiModel()
-                        }
-                    lastId = fetchedUiModels.lastOrNull()?.id ?: DEFAULT_ID
-
-                    val currentUiModels =
-                        _items.value
-                            .orEmpty()
-                            .filterIsInstance<CatalogItem.ProductItem>()
-                            .map { it.product }
-
-                    val combinedUiModels =
-                        (currentUiModels + fetchedUiModels)
-                            .distinctBy { it.id }
-
-                    val updatedItems = mutableListOf<CatalogItem>()
-                    if (recentUiModels.isNotEmpty()) {
-                        updatedItems.add(recentItem)
+                        productRepository
+                            .loadProducts(currentPage, loadSize)
+                            .onSuccess { (products, hasMore) ->
+                                updateCatalogItems(products, cartMap, recentItem, hasMore)
+                                currentPage++
+                            }
+                    }.onFailure {
+                        _toastEvent.setValue(CatalogEvent.LOAD_PRODUCT_FAILURE)
                     }
-                    updatedItems.addAll(
-                        combinedUiModels.map { CatalogItem.ProductItem(it) },
-                    )
-                    if (hasMore && updatedItems.none { it is CatalogItem.LoadMoreItem }) {
-                        updatedItems.add(CatalogItem.LoadMoreItem)
-                    }
-
-                    _items.postValue(updatedItems)
-                    currentPage++
-                }
             }
             _isLoading.value = false
         }
     }
 
+    private suspend fun collectCartState(onCollected: suspend (Map<Long, ProductUiModel>) -> Unit) {
+        cartRepository
+            .getAllCartItems()
+            .onSuccess { cartItems ->
+                _totalCartCount.value = cartItems.sumOf { it.amount }
+                val map = cartItems.associate { it.product.id to it.toUiModel() }
+                onCollected(map)
+            }.onFailure {
+                _toastEvent.setValue(CatalogEvent.CART_LOAD_FAILURE)
+            }
+    }
+
+    private fun updateCatalogItems(
+        products: List<Product>,
+        cartUiMap: Map<Long, ProductUiModel>,
+        recentItem: CatalogItem.RecentProductItem,
+        hasMore: Boolean,
+    ) {
+        val fetchedUiModels = products.map { cartUiMap[it.id] ?: it.toUiModel() }
+        val existingItems =
+            _items.value
+                .orEmpty()
+                .filterIsInstance<CatalogItem.ProductItem>()
+                .map { it.product }
+
+        val combined = (existingItems + fetchedUiModels).distinctBy { it.id }
+
+        val updatedItems =
+            buildList {
+                if (recentItem.products.isNotEmpty()) add(recentItem)
+                addAll(combined.map { CatalogItem.ProductItem(it) })
+                if (hasMore && none { it is CatalogItem.LoadMoreItem }) add(CatalogItem.LoadMoreItem)
+            }
+
+        _items.value = updatedItems
+    }
+
     fun refreshCartState() {
         if (_items.value.isNullOrEmpty()) return
 
-        productRepository.loadCartItems { cartItems ->
-            val updatedCartState =
-                cartItems?.associateBy(
-                    { it.product.id },
-                    { it.toUiModel() },
-                )
-
-            val totalCount = cartItems?.sumOf { it.amount } ?: 0
-            _totalCartCount.postValue(totalCount)
-
-            val updatedItems =
-                _items.value
-                    ?.map { updatedItem ->
-                        if (updatedItem is CatalogItem.ProductItem) {
-                            val updatedProduct = updatedCartState?.get(updatedItem.product.id)
+        viewModelScope.launch {
+            collectCartState { cartMap ->
+                val updated =
+                    _items.value?.map {
+                        if (it is CatalogItem.ProductItem) {
                             CatalogItem.ProductItem(
-                                updatedProduct ?: updatedItem.product.copy(amount = 0),
+                                cartMap[it.product.id] ?: it.product.copy(amount = 0),
                             )
                         } else {
-                            updatedItem
+                            it
                         }
                     }
-
-            _items.postValue(updatedItems.orEmpty())
+                _items.value = updated.orEmpty()
+            }
         }
     }
 
     fun addRecentProduct(product: ProductUiModel) {
-        productRepository.addRecentProduct(product.toProduct()) {
+        viewModelScope.launch {
+            productRepository.addRecentProduct(product.toProduct())
             updateRecentProducts()
         }
     }
 
-    fun addOrIncreaseCartItem(product: ProductUiModel) {
-        cartRepository.getAllCartItems { cartItems ->
+    private fun updateRecentProducts() {
+        viewModelScope.launch {
+            productRepository.loadRecentProducts(10).onSuccess { recentProducts ->
+                val recentItem =
+                    CatalogItem.RecentProductItem(recentProducts.map { it.toUiModel() })
+                val newItems =
+                    _items.value.orEmpty().filterNot { it is CatalogItem.RecentProductItem }
+                _items.value =
+                    buildList {
+                        if (recentItem.products.isNotEmpty()) add(recentItem)
+                        addAll(newItems)
+                    }
+            }
+        }
+    }
+
+    private fun updateCartItemQuantity(
+        product: ProductUiModel,
+        isIncrement: Boolean,
+    ) {
+        viewModelScope.launch {
+            val cartItems = cartRepository.getAllCartItems().getOrNull()
             val existing = cartItems?.find { it.product.id == product.id }
 
-            if (existing != null) {
-                cartRepository.increaseCartItem(existing) { id ->
-                    handleUpdatedCartItem(id)
+            when {
+                existing != null && isIncrement -> {
+                    cartRepository
+                        .increaseCartItem(existing)
+                        .onSuccess {
+                            postUpdatedCart(it)
+                        }
                 }
-            } else {
-                val newItem = product.copy(amount = 1)
-                cartRepository.addCartItem(newItem.toCartItem()) {
-                    _itemUpdateEvent.postValue(newItem)
-                    refreshCartState()
+
+                existing != null -> {
+                    if (existing.amount <= 1) {
+                        cartRepository
+                            .deleteCartItem(existing.cartId)
+                            .onSuccess {
+                                _updatedItem.postValue(product.copy(amount = 0))
+                                updateCartCount()
+                            }
+                    } else {
+                        cartRepository
+                            .decreaseCartItem(existing)
+                            .onSuccess {
+                                postUpdatedCart(it)
+                            }
+                    }
+                }
+
+                isIncrement -> {
+                    val newItem = product.copy(amount = 1)
+                    cartRepository
+                        .addCartItem(newItem.toCartItem())
+                        .onSuccess {
+                            _updatedItem.postValue(newItem)
+                            refreshCartState()
+                        }
                 }
             }
         }
     }
 
-    private fun decreaseOrDeleteCartItem(product: ProductUiModel) {
-        val cartItem = product.toCartItem()
-
-        if (cartItem.amount <= 1) {
-            cartRepository.deleteCartItem(cartItem.cartId) {
-                _itemUpdateEvent.postValue(product.copy(amount = 0))
-                calculateTotalCartCount()
-            }
-        } else {
-            cartRepository.decreaseCartItem(cartItem) { id ->
-                handleUpdatedCartItem(id)
-            }
+    private fun postUpdatedCart(cartId: Long) {
+        viewModelScope.launch {
+            val item = getCartItemByCartId(cartId)
+            item?.let { _updatedItem.postValue(it.toUiModel()) }
+            updateCartCount()
         }
     }
 
-    private fun handleUpdatedCartItem(cartId: Long) {
-        getCartItemByCartId(cartId) { cartItem ->
-            if (cartItem != null) {
-                _itemUpdateEvent.postValue(cartItem.toUiModel())
-            }
-            calculateTotalCartCount()
-        }
-    }
-
-    private fun calculateTotalCartCount() {
-        cartRepository.getAllCartItemsCount { count ->
+    private fun updateCartCount() {
+        viewModelScope.launch {
+            val count = cartRepository.getAllCartItemsCount().getOrNull()
             _totalCartCount.postValue(count?.quantity)
         }
     }
 
-    private fun updateRecentProducts() {
-        productRepository.loadRecentProducts(limit = 10) { recentProducts ->
-            val recentUiModels = recentProducts.map { it.toUiModel() }
-            val recentItem = CatalogItem.RecentProductItem(recentUiModels)
-
-            val currentItems = _items.value.orEmpty()
-
-            val updatedItems =
-                buildList {
-                    if (recentUiModels.isNotEmpty()) {
-                        add(recentItem)
-                    }
-
-                    addAll(
-                        currentItems.filter { it !is CatalogItem.RecentProductItem },
-                    )
-                }
-
-            _items.postValue(updatedItems)
-        }
-    }
-
-    private fun getCartItemByCartId(
-        id: Long,
-        callback: (CartItem?) -> Unit,
-    ) {
-        cartRepository.getAllCartItems { list ->
-            val foundItem = list?.find { it.cartId == id }
-            callback(foundItem)
-        }
-    }
+    private suspend fun getCartItemByCartId(id: Long): CartItem? = cartRepository.getAllCartItems().getOrNull()?.find { it.cartId == id }
 
     companion object {
-        private const val DEFAULT_ID = 0L
-
         fun factory(
             productRepository: ProductRepository,
             cartRepository: CartRepository,

@@ -36,8 +36,7 @@ class CatalogAdapter(
                 (holder as ProductViewHolder).bind(item)
             }
 
-            is CatalogItem.LoadMoreItem -> {
-            }
+            is CatalogItem.LoadMoreItem -> Unit
         }
     }
 

@@ -60,7 +60,7 @@ class CartItemFragment :
             cartItemAdapter.updateCartItems(it)
         }
 
-        viewModel.deleteState.observe(viewLifecycleOwner) {
+        viewModel.deletedItemId.observe(viewLifecycleOwner) {
             it?.let {
                 cartItemAdapter.removeProduct(it)
                 viewModel.fetchShoppingCart(isNextPage = false, isRefresh = true)

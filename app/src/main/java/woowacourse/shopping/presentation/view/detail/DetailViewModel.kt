@@ -5,11 +5,15 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toUiModel
+import woowacourse.shopping.presentation.util.MutableSingleLiveData
+import woowacourse.shopping.presentation.util.SingleLiveData
 import woowacourse.shopping.presentation.view.ItemCounterListener
 
 class DetailViewModel(
@@ -32,21 +36,12 @@ class DetailViewModel(
     private val _showLastViewedProduct = MediatorLiveData<Boolean>()
     val showLastViewedProduct: LiveData<Boolean> = _showLastViewedProduct
 
+    private val _toastEvent = MutableSingleLiveData<DetailEvent>()
+    val toastEvent: SingleLiveData<DetailEvent> = _toastEvent
+
     init {
         _showLastViewedProduct.addSource(_product) { updateShowLastViewedProduct() }
         _showLastViewedProduct.addSource(_lastViewedProduct) { updateShowLastViewedProduct() }
-    }
-
-    private fun updateShowLastViewedProduct() {
-        val currentProduct = _product.value
-        val lastViewedProduct = _lastViewedProduct.value
-
-        val canShow =
-            currentProduct != null &&
-                lastViewedProduct != null &&
-                currentProduct.id != lastViewedProduct.id
-
-        _showLastViewedProduct.value = canShow
     }
 
     fun decreaseAmount() {
@@ -71,29 +66,41 @@ class DetailViewModel(
         val amountToAdd = _amount.value ?: 1
         val updatedAmount = product.amount + amountToAdd
 
-        cartRepository.upsertCartItemQuantity(
-            productId = product.id,
-            cartId = if (product.cartId != 0L) product.cartId else null,
-            quantity = updatedAmount,
-        ) {
-            _product.postValue(product.copy(amount = updatedAmount))
-            _saveState.postValue(Unit)
+        viewModelScope.launch {
+            cartRepository
+                .upsertCartItemQuantity(
+                    productId = product.id,
+                    cartId = if (product.cartId != 0L) product.cartId else null,
+                    quantity = updatedAmount,
+                ).onSuccess {
+                    _product.value = product.copy(amount = updatedAmount)
+                    _saveState.value = Unit
+                    _toastEvent.setValue(DetailEvent.ADD_TO_CART_SUCCESS)
+                }.onFailure {
+                    _toastEvent.setValue(DetailEvent.ADD_TO_CART_FAILURE)
+                }
         }
     }
 
     fun loadProductById(productId: Long) {
-        productRepository.getProductById(productId) { product ->
-            product?.let {
-                fetchProduct(it.toUiModel())
-            }
+        viewModelScope.launch {
+            productRepository
+                .getProductById(productId)
+                .onSuccess { product ->
+                    _product.postValue(product.toUiModel())
+                }.onFailure {
+                    _toastEvent.setValue(DetailEvent.LOAD_PRODUCT_FAILURE)
+                }
         }
     }
 
     fun fetchLastViewedProduct(currentProductId: Long) {
-        productRepository.loadLastViewedProduct(currentProductId) { product ->
-            if (product != null) {
-                _lastViewedProduct.postValue(product.toUiModel())
-            }
+        viewModelScope.launch {
+            productRepository
+                .loadLastViewedProduct(currentProductId)
+                .onSuccess { product ->
+                    _lastViewedProduct.postValue(product.toUiModel())
+                }
         }
     }
 
@@ -103,6 +110,18 @@ class DetailViewModel(
 
     override fun decrease(product: ProductUiModel) {
         decreaseAmount()
+    }
+
+    private fun updateShowLastViewedProduct() {
+        val currentProduct = _product.value
+        val lastViewedProduct = _lastViewedProduct.value
+
+        val canShow =
+            currentProduct != null &&
+                lastViewedProduct != null &&
+                currentProduct.id != lastViewedProduct.id
+
+        _showLastViewedProduct.value = canShow
     }
 
     companion object {

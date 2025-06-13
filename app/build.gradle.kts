@@ -21,10 +21,12 @@ android {
 
     val authUsername = localProperties["auth.username"] as String
     val authPassword = localProperties["auth.password"] as String
+    val baseUrl = localProperties["BASE_URL"] as String
 
     defaultConfig {
         buildConfigField("String", "AUTH_USERNAME", "\"$authUsername\"")
         buildConfigField("String", "AUTH_PASSWORD", "\"$authPassword\"")
+        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
     }
 
     defaultConfig {

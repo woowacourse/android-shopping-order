@@ -11,7 +11,9 @@ import woowacourse.shopping.databinding.FragmentDetailBinding
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.extension.getParcelableCompat
 import woowacourse.shopping.presentation.model.ProductUiModel
+import woowacourse.shopping.presentation.util.showToast
 import woowacourse.shopping.presentation.view.cart.CartFragment
+import woowacourse.shopping.presentation.view.catalog.CatalogFragment.Companion.CART_UPDATE_REQUEST_KEY
 
 class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_detail) {
     private val viewModel: DetailViewModel by viewModels {
@@ -32,14 +34,14 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
         val product = arguments.getParcelableCompat<ProductUiModel>(EXTRA_PRODUCT)
         product.let { viewModel.fetchProduct(it) }
 
-        viewModel.fetchLastViewedProduct(product.id)
-    }
-
-    private fun initObserver() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.vm = viewModel
         binding.detailItemCounter.listener = viewModel
 
+        viewModel.fetchLastViewedProduct(product.id)
+    }
+
+    private fun initObserver() {
         viewModel.saveState.observe(viewLifecycleOwner) { saveState ->
             saveState?.let { navigateToCatalog() }
         }
@@ -52,17 +54,24 @@ class DetailFragment : BaseFragment<FragmentDetailBinding>(R.layout.fragment_det
                 viewModel.loadProductById(recentProduct.id)
             }
         }
+        viewModel.toastEvent.observe(viewLifecycleOwner) { event ->
+            when (event) {
+                DetailEvent.ADD_TO_CART_SUCCESS -> requireContext().showToast(R.string.add_cart_success)
+                DetailEvent.ADD_TO_CART_FAILURE -> requireContext().showToast(R.string.add_cart_failure)
+                DetailEvent.LOAD_PRODUCT_FAILURE -> requireContext().showToast(R.string.load_product_failure)
+            }
+        }
     }
 
     private fun initListener() {
         binding.btnClose.setOnClickListener {
-            parentFragmentManager.setFragmentResult("cart_update_result", Bundle())
+            parentFragmentManager.setFragmentResult(CART_UPDATE_REQUEST_KEY, Bundle())
             parentFragmentManager.popBackStack()
         }
     }
 
     private fun navigateToCatalog() {
-        parentFragmentManager.setFragmentResult("cart_update_result", Bundle())
+        parentFragmentManager.setFragmentResult(CART_UPDATE_REQUEST_KEY, Bundle())
 
         parentFragmentManager.commit {
             setReorderingAllowed(true)

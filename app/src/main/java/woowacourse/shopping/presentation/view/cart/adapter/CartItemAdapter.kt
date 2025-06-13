@@ -34,7 +34,7 @@ class CartItemAdapter(
     }
 
     fun updateItem(updatedItem: CartItemUiModel) {
-        val index = cartItems.indexOfFirst { it.cartItem.cartId == updatedItem.cartItem.cartId }
+        val index = cartItems.indexOfFirst { it.cartId == updatedItem.cartId }
         if (index != -1) {
             cartItems[index] = updatedItem
             notifyItemChanged(index)
@@ -42,7 +42,7 @@ class CartItemAdapter(
     }
 
     fun removeProduct(id: Long) {
-        val index = cartItems.indexOfFirst { it.cartItem.cartId == id }
+        val index = cartItems.indexOfFirst { it.cartId == id }
         cartItems.removeAt(index)
         notifyItemRemoved(index)
     }

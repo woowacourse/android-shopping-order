@@ -7,12 +7,14 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.service.CartItemService
+import woowacourse.shopping.data.service.CouponService
 import woowacourse.shopping.data.service.OrderService
 import woowacourse.shopping.data.service.ProductService
 
 object ApiClient {
     private const val USERNAME = BuildConfig.AUTH_USERNAME
     private const val PASSWORD = BuildConfig.AUTH_PASSWORD
+    private const val BASE_URL = BuildConfig.BASE_URL
 
     private val client =
         OkHttpClient
@@ -32,7 +34,7 @@ object ApiClient {
     private val retrofit: Retrofit =
         Retrofit
             .Builder()
-            .baseUrl("http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com")
+            .baseUrl(BASE_URL)
             .client(client)
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
@@ -40,4 +42,5 @@ object ApiClient {
     val productService: ProductService = retrofit.create(ProductService::class.java)
     val cartItemService: CartItemService = retrofit.create(CartItemService::class.java)
     val orderService: OrderService = retrofit.create(OrderService::class.java)
+    val couponService: CouponService = retrofit.create(CouponService::class.java)
 }

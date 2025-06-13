@@ -11,9 +11,12 @@ import woowacourse.shopping.RepositoryProvider
 import woowacourse.shopping.databinding.FragmentCartBinding
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.model.ProductUiModel
+import woowacourse.shopping.presentation.util.showToast
 import woowacourse.shopping.presentation.view.ItemCounterListener
 import woowacourse.shopping.presentation.view.cart.cartItem.CartItemFragment
 import woowacourse.shopping.presentation.view.cart.recommendation.CartRecommendationFragment
+import woowacourse.shopping.presentation.view.catalog.CatalogFragment.Companion.CART_UPDATE_REQUEST_KEY
+import woowacourse.shopping.presentation.view.order.OrderFragment
 
 class CartFragment :
     BaseFragment<FragmentCartBinding>(R.layout.fragment_cart),
@@ -62,7 +65,7 @@ class CartFragment :
     }
 
     private fun navigateBack() {
-        parentFragmentManager.setFragmentResult("cart_update_result", Bundle())
+        parentFragmentManager.setFragmentResult(CART_UPDATE_REQUEST_KEY, Bundle())
 
         parentFragmentManager.popBackStack()
         parentFragmentManager.commit {
@@ -74,15 +77,39 @@ class CartFragment :
         viewModel.allSelected.observe(viewLifecycleOwner) {
             binding.selectAll.isChecked = it
         }
+        viewModel.toastEvent.observe(viewLifecycleOwner) {
+            when (it) {
+                CartEvent.LOAD_CART_ITEM_FAILURE -> requireContext().showToast(R.string.cart_load_failure)
+                CartEvent.ADD_CART_ITEM_FAILURE -> requireContext().showToast(R.string.cart_add_failure)
+                CartEvent.DELETE_CART_ITEM_FAILURE -> requireContext().showToast(R.string.cart_delete_failure)
+                CartEvent.LOAD_RECOMMENDED_PRODUCT_FAILURE -> requireContext().showToast(R.string.cart_load_failure)
+            }
+        }
     }
 
-    private fun navigateToRecommendation() {
-        childFragmentManager.commit {
-            replace(R.id.cart_fragment_container, CartRecommendationFragment())
+    private fun navigateTo() {
+        val currentChild = childFragmentManager.findFragmentById(R.id.cart_fragment_container)
+        when (currentChild) {
+            is CartItemFragment -> {
+                childFragmentManager.commit {
+                    replace(R.id.cart_fragment_container, CartRecommendationFragment())
+                }
+                binding.selectAll.isVisible = false
+                binding.tvSelectAllDescription.isVisible = false
+                viewModel.fetchRecommendedProducts()
+            }
+            is CartRecommendationFragment -> {
+                val selectedCartItems = viewModel.getSelectedCartItems()
+                val fragment = OrderFragment.newInstance(selectedCartItems)
+                parentFragmentManager.commit {
+                    replace(
+                        R.id.shopping_fragment_container,
+                        fragment,
+                    )
+                    addToBackStack(null)
+                }
+            }
         }
-        binding.selectAll.isVisible = false
-        binding.tvSelectAllDescription.isVisible = false
-        viewModel.fetchRecommendedProducts()
     }
 
     override fun onDestroyView() {
@@ -95,7 +122,7 @@ class CartFragment :
     }
 
     override fun onPlaceOrderClick() {
-        navigateToRecommendation()
+        navigateTo()
     }
 
     override fun increase(product: ProductUiModel) {

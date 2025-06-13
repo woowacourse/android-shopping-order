@@ -12,6 +12,7 @@ import woowacourse.shopping.databinding.FragmentCatalogBinding
 import woowacourse.shopping.presentation.base.BaseFragment
 import woowacourse.shopping.presentation.custom.GridSpacingItemDecoration
 import woowacourse.shopping.presentation.model.ProductUiModel
+import woowacourse.shopping.presentation.util.showToast
 import woowacourse.shopping.presentation.view.cart.CartFragment
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogAdapter
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem
@@ -40,7 +41,7 @@ class CatalogFragment :
         super.onViewCreated(view, savedInstanceState)
 
         parentFragmentManager.setFragmentResultListener(
-            "cart_update_result",
+            CART_UPDATE_REQUEST_KEY,
             viewLifecycleOwner,
         ) { _, _ ->
             viewModel.refreshCartState()
@@ -61,7 +62,7 @@ class CatalogFragment :
     }
 
     override fun onInitialAddToCartClicked(product: ProductUiModel) {
-        viewModel.addOrIncreaseCartItem(product)
+        viewModel.increase(product)
     }
 
     private fun setCatalogAdapter() {
@@ -96,11 +97,17 @@ class CatalogFragment :
         viewModel.items.observe(viewLifecycleOwner) { products ->
             catalogAdapter.submitList(products)
         }
-        viewModel.deleteState.observe(viewLifecycleOwner) { productId ->
+        viewModel.deletedItemId.observe(viewLifecycleOwner) { productId ->
             catalogAdapter.removeItemAmount(productId)
         }
-        viewModel.itemUpdateEvent.observe(viewLifecycleOwner) { updatedProduct ->
+        viewModel.updatedItem.observe(viewLifecycleOwner) { updatedProduct ->
             catalogAdapter.updateItem(updatedProduct)
+        }
+        viewModel.toastEvent.observe(viewLifecycleOwner) { event ->
+            when (event) {
+                CatalogEvent.LOAD_PRODUCT_FAILURE -> requireContext().showToast(R.string.load_product_failure)
+                CatalogEvent.CART_LOAD_FAILURE -> requireContext().showToast(R.string.cart_load_failure)
+            }
         }
     }
 
@@ -122,6 +129,7 @@ class CatalogFragment :
     }
 
     companion object {
+        const val CART_UPDATE_REQUEST_KEY = "cart_update_result"
         private const val SPAN_COUNT = 2
         private const val SINGLE_SPAN_COUNT = 1
         private const val ITEM_SPACING = 12f

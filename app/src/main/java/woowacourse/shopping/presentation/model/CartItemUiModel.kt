@@ -1,13 +1,58 @@
 package woowacourse.shopping.presentation.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Price
+import woowacourse.shopping.domain.model.Product
 
+@Parcelize
 data class CartItemUiModel(
-    val cartItem: CartItem,
+    val cartId: Long,
+    val amount: Int,
+    val productId: Long,
+    val category: String,
+    val name: String,
+    val imageUrl: String,
+    val price: Int,
     val isSelected: Boolean = false,
-)
+) : Parcelable {
+    val totalPrice: Int
+        get() = price * amount
+}
+
+fun CartItemUiModel.toDomain(): CartItem =
+    CartItem(
+        cartId = cartId,
+        product =
+            Product(
+                id = productId,
+                category = category,
+                name = name,
+                imageUrl = imageUrl,
+                price = Price(price),
+            ),
+        amount = amount,
+    )
 
 fun CartItem.toCartItemUiModel(): CartItemUiModel =
     CartItemUiModel(
-        cartItem = this,
+        cartId = cartId,
+        amount = amount,
+        productId = product.id,
+        category = product.category,
+        name = product.name,
+        imageUrl = product.imageUrl,
+        price = product.price.value,
+    )
+
+fun CartItemUiModel.toProductUiModel(): ProductUiModel =
+    ProductUiModel(
+        id = productId,
+        name = name,
+        imageUrl = imageUrl,
+        price = price,
+        cartId = cartId,
+        amount = amount,
+        category = category,
     )
