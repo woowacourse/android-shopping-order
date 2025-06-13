@@ -43,11 +43,6 @@ sealed interface Coupon {
         val availableTime: AvailableTime,
     ) : Coupon
 
-    data class AvailableTime(
-        val start: LocalTime,
-        val end: LocalTime,
-    )
-
     companion object {
         fun Coupon.isAvailable(
             products: Products,

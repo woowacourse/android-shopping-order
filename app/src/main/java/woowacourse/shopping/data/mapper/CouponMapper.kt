@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.mapper
 
 import woowacourse.shopping.data.model.response.CouponsResponse
+import woowacourse.shopping.domain.model.AvailableTime
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.CouponDiscountType
 import java.time.LocalTime
@@ -52,7 +53,7 @@ fun CouponsResponse.CouponResponseItem.toDomain(): Coupon =
                 expirationDate = expirationDate,
                 discount = discount ?: throw IllegalArgumentException("discount is required"),
                 availableTime =
-                    Coupon.AvailableTime(
+                    AvailableTime(
                         LocalTime.parse(availableTime?.start),
                         LocalTime.parse(availableTime?.end),
                     ),
