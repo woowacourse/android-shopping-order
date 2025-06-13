@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.cart.CartRemoteDataSource
+import woowacourse.shopping.data.di.ApiResult
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.model.Page
 import woowacourse.shopping.domain.model.Products
@@ -13,15 +14,19 @@ class CartRepositoryImpl(
         page: Int,
         size: Int,
     ): Result<Products> =
-        runCatching {
-            val response = dataSource.getCartItems(page, size)
-            val items = response.content.map { it.toDomain() }
+        when (val apiResult = dataSource.getCartItems(page, size)) {
+            is ApiResult.Success ->
+                runCatching {
+                    val response = apiResult.data
+                    val items = response.content.map { it.toDomain() }
+                    val pageInfo = Page(page, response.first, response.last)
+                    Products(items, pageInfo)
+                }
 
-            val isFirst = response.first
-            val isLast = response.last
-            val pageInfo = Page(page, isFirst, isLast)
-
-            Products(items, pageInfo)
+            is ApiResult.ClientError -> Result.failure(Exception("Client error: ${apiResult.code} ${apiResult.message}"))
+            is ApiResult.ServerError -> Result.failure(Exception("Server error: ${apiResult.code} ${apiResult.message}"))
+            is ApiResult.NetworkError -> Result.failure(apiResult.throwable)
+            ApiResult.UnknownError -> Result.failure(Exception("Unknown error"))
         }
 
     override suspend fun fetchAllCartProducts(): Result<Products> {
@@ -32,9 +37,12 @@ class CartRepositoryImpl(
     }
 
     override suspend fun fetchCartItemCount(): Result<Int> =
-        runCatching {
-            val response = dataSource.getCartItemsCount()
-            response.quantity
+        when (val apiResult = dataSource.getCartItemsCount()) {
+            is ApiResult.Success -> runCatching { apiResult.data.quantity }
+            is ApiResult.ClientError -> Result.failure(Exception("Client error: ${apiResult.code} ${apiResult.message}"))
+            is ApiResult.ServerError -> Result.failure(Exception("Server error: ${apiResult.code} ${apiResult.message}"))
+            is ApiResult.NetworkError -> Result.failure(apiResult.throwable)
+            ApiResult.UnknownError -> Result.failure(Exception("Unknown error"))
         }
 
     override suspend fun addCartProduct(

@@ -24,6 +24,7 @@ object NetworkModule {
             .baseUrl(BuildConfig.TECHCOURSE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(ApiResultCallAdapterFactory())
             .build()
     }
 

@@ -1,5 +1,6 @@
 package woowacourse.shopping
 
+import ProductRemoteDataSourceImpl
 import android.app.Application
 import woowacourse.shopping.data.database.ShoppingDatabase
 import woowacourse.shopping.data.datasource.cart.CartRemoteDataSource
@@ -11,7 +12,6 @@ import woowacourse.shopping.data.datasource.history.HistoryLocalDataSourceImpl
 import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
 import woowacourse.shopping.data.datasource.order.OrderRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
-import woowacourse.shopping.data.datasource.product.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.di.NetworkModule.cartApi
 import woowacourse.shopping.data.di.NetworkModule.couponApi
 import woowacourse.shopping.data.di.NetworkModule.orderApi
