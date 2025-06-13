@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Shopping</string>
     <string name="format_price">%,d원</string>
+    <string name="format_discount_price">%-,d원</string>
     <string name="text_product_detail_image">product_detail_image</string>
     <string name="text_product_image">product_image</string>
     <string name="text_price">가격</string>
@@ -28,4 +29,6 @@
     <string name="shipment_fee">배송비</string>
     <string name="total_pay_amount">총 결제 금액</string>
     <string name="pay">결제하기</string>
+    <string name="coupon_minimum_amount">최소 주문 금액: %,d원</string>
+    <string name="coupon_expiration_date">만료일: %s</string>
 </resources>
