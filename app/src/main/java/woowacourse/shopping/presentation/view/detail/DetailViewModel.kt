@@ -7,9 +7,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RepositoryProvider
+import woowacourse.shopping.data.repository.cart.CartRepository
+import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toCartItem
 import woowacourse.shopping.presentation.model.toProductUiModel

@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.view.checkout.adapter
+package woowacourse.shopping.presentation.model
 
 import woowacourse.shopping.domain.coupon.Coupon
 

@@ -11,7 +11,7 @@ import woowacourse.shopping.presentation.view.cart.recommendation.adapter.Recomm
 import woowacourse.shopping.presentation.view.common.BaseFragment
 import woowacourse.shopping.presentation.view.common.ItemCounterEventHandler
 
-class CartRecommendationFragment : BaseFragment<FragmentCartRecommendationBinding>(R.layout.fragment_cart_recommendation) {
+class RecommendationFragment : BaseFragment<FragmentCartRecommendationBinding>(R.layout.fragment_cart_recommendation) {
     private val viewModel: CartViewModel by viewModels(
         ownerProducer = { requireParentFragment() },
         factoryProducer = { CartViewModel.Factory },

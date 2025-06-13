@@ -1,14 +1,14 @@
-package woowacourse.shopping.data.repository
+package woowacourse.shopping.data.repository.cart
 
-import woowacourse.shopping.data.datasource.CartItemDataSource
+import woowacourse.shopping.data.datasource.cart.CartDataSource
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.Page
 
 class CartRepositoryImpl(
-    private val cartItemDataSource: CartItemDataSource,
+    private val cartDataSource: CartDataSource,
 ) : CartRepository {
     override suspend fun loadCartItemByProductId(id: Long): CartItem? {
-        val cartItems = cartItemDataSource.fetchPageOfCartItems(0, Int.MAX_VALUE).items
+        val cartItems = cartDataSource.fetchPageOfCartItems(0, Int.MAX_VALUE).items
         return cartItems.find { cartItem -> cartItem.product.id == id }
     }
 
@@ -16,33 +16,33 @@ class CartRepositoryImpl(
         pageIndex: Int,
         pageSize: Int,
     ): Page<CartItem> {
-        return cartItemDataSource.fetchPageOfCartItems(pageIndex, pageSize)
+        return cartDataSource.fetchPageOfCartItems(pageIndex, pageSize)
     }
 
     override suspend fun loadAllCartItems(): List<CartItem> {
-        return cartItemDataSource.fetchPageOfCartItems(0, Int.MAX_VALUE).items
+        return cartDataSource.fetchPageOfCartItems(0, Int.MAX_VALUE).items
     }
 
     override suspend fun loadTotalCartCount(): Int {
-        return cartItemDataSource.fetchCartItemsCount()
+        return cartDataSource.fetchCartItemsCount()
     }
 
     override suspend fun increaseQuantity(cartItem: CartItem) {
-        cartItemDataSource.updateCartItem(
+        cartDataSource.updateCartItem(
             cartItem.cartId,
             cartItem.quantity + 1,
         )
     }
 
     override suspend fun decreaseQuantity(cartItem: CartItem) {
-        cartItemDataSource.updateCartItem(
+        cartDataSource.updateCartItem(
             cartItem.cartId,
             cartItem.quantity - 1,
         )
     }
 
     override suspend fun addCartItem(cartItem: CartItem): CartItem? {
-        cartItemDataSource.submitCartItem(cartItem.product.id, cartItem.quantity)
+        cartDataSource.submitCartItem(cartItem.product.id, cartItem.quantity)
         return loadCartItemByProductId(cartItem.product.id)
     }
 
@@ -57,13 +57,13 @@ class CartRepositoryImpl(
     }
 
     override suspend fun deleteCartItem(cartId: Long) {
-        cartItemDataSource.removeCartItem(cartId)
+        cartDataSource.removeCartItem(cartId)
     }
 
     private suspend fun updateCartItemQuantity(
         cartId: Long,
         quantity: Int,
     ) {
-        cartItemDataSource.updateCartItem(cartId, quantity)
+        cartDataSource.updateCartItem(cartId, quantity)
     }
 }

@@ -1,7 +1,7 @@
-package woowacourse.shopping.data.repository
+package woowacourse.shopping.data.repository.product
 
-import woowacourse.shopping.data.datasource.CartItemDataSource
-import woowacourse.shopping.data.datasource.ProductDataSource
+import woowacourse.shopping.data.datasource.cart.CartDataSource
+import woowacourse.shopping.data.datasource.product.ProductDataSource
 import woowacourse.shopping.data.db.RecentProductDao
 import woowacourse.shopping.data.db.RecentProductEntity
 import woowacourse.shopping.data.mapper.toProduct
@@ -13,7 +13,7 @@ import woowacourse.shopping.domain.Product
 class ProductRepositoryImpl(
     private val recentProductDao: RecentProductDao,
     private val productDataSource: ProductDataSource,
-    private val cartItemDataSource: CartItemDataSource,
+    private val cartDataSource: CartDataSource,
 ) : ProductRepository {
     override suspend fun loadProductsUpToPage(
         pageIndex: Int,
@@ -36,7 +36,7 @@ class ProductRepositoryImpl(
     }
 
     override suspend fun loadAllCartItems(): List<CartItem> {
-        return cartItemDataSource.fetchPageOfCartItems(0, Int.MAX_VALUE).items
+        return cartDataSource.fetchPageOfCartItems(0, Int.MAX_VALUE).items
     }
 
     override suspend fun addRecentProduct(product: Product) {

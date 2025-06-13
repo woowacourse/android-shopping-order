@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.data.repository.ProductRepository
+import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.Product
 

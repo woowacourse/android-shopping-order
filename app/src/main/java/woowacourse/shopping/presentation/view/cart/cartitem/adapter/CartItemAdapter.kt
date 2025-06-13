@@ -1,10 +1,10 @@
-package woowacourse.shopping.presentation.view.cart.cartItem.adapter
+package woowacourse.shopping.presentation.view.cart.cartitem.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.presentation.model.CartItemUiModel
-import woowacourse.shopping.presentation.view.cart.cartItem.CartItemEventHandler
+import woowacourse.shopping.presentation.view.cart.cartitem.CartItemEventHandler
 import woowacourse.shopping.presentation.view.common.ItemCounterEventHandler
 
 class CartItemAdapter(

@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.datasource
+package woowacourse.shopping.data.datasource.cart
 
 import woowacourse.shopping.data.mapper.toCartItem
 import woowacourse.shopping.data.model.request.CartItemRequest
@@ -8,9 +8,9 @@ import woowacourse.shopping.data.service.CartItemService
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.Page
 
-class CartItemDataSourceImpl(
+class CartDataSourceImpl(
     private val cartItemService: CartItemService,
-) : CartItemDataSource {
+) : CartDataSource {
     override suspend fun fetchPageOfCartItems(
         pageIndex: Int,
         pageSize: Int,

@@ -1,6 +1,5 @@
 package woowacourse.shopping.domain.coupon
 
-import woowacourse.shopping.domain.TimeRange
 import java.time.LocalDate
 
 data class CouponInfo(

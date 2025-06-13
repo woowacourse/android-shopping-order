@@ -9,9 +9,9 @@ import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCheckoutBinding
+import woowacourse.shopping.presentation.model.CouponUiModel
 import woowacourse.shopping.presentation.view.catalog.CatalogFragment
 import woowacourse.shopping.presentation.view.checkout.adapter.CouponAdapter
-import woowacourse.shopping.presentation.view.checkout.adapter.CouponUiModel
 import woowacourse.shopping.presentation.view.common.BaseFragment
 
 class CheckoutFragment : BaseFragment<FragmentCheckoutBinding>(R.layout.fragment_checkout) {

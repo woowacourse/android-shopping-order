@@ -5,7 +5,7 @@ import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import woowacourse.shopping.presentation.model.CartItemUiModel
-import woowacourse.shopping.presentation.view.cart.cartItem.CartItemEventHandler
+import woowacourse.shopping.presentation.view.cart.cartitem.CartItemEventHandler
 
 @BindingAdapter("imageUrl")
 fun setImageBindingAdapter(

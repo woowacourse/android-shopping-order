@@ -13,7 +13,7 @@
 
         <variable
             name="coupon"
-            type="woowacourse.shopping.presentation.view.checkout.adapter.CouponUiModel" />
+            type="woowacourse.shopping.presentation.model.CouponUiModel" />
 
         <variable
             name="eventHandler"

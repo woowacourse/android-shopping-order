@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.view.cart.cartItem
+package woowacourse.shopping.presentation.view.cart.cartitem
 
 import android.os.Bundle
 import android.view.View
@@ -10,7 +10,7 @@ import woowacourse.shopping.databinding.FragmentCartItemBinding
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.cart.CartViewModel
-import woowacourse.shopping.presentation.view.cart.cartItem.adapter.CartItemAdapter
+import woowacourse.shopping.presentation.view.cart.cartitem.adapter.CartItemAdapter
 import woowacourse.shopping.presentation.view.common.BaseFragment
 import woowacourse.shopping.presentation.view.common.ItemCounterEventHandler
 

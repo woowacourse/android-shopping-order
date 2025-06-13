@@ -1,6 +1,6 @@
-package woowacourse.shopping.data.repository
+package woowacourse.shopping.data.repository.coupon
 
-import woowacourse.shopping.data.datasource.CouponDataSource
+import woowacourse.shopping.data.datasource.coupon.CouponDataSource
 import woowacourse.shopping.domain.coupon.Coupon
 
 class CouponRepositoryImpl(

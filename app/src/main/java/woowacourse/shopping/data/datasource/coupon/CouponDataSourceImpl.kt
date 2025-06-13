@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.datasource
+package woowacourse.shopping.data.datasource.coupon
 
 import woowacourse.shopping.data.mapper.toCoupon
 import woowacourse.shopping.data.model.response.coupon.CouponResponse

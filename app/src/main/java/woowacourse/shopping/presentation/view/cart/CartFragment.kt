@@ -8,8 +8,8 @@ import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
-import woowacourse.shopping.presentation.view.cart.cartItem.CartItemFragment
-import woowacourse.shopping.presentation.view.cart.recommendation.CartRecommendationFragment
+import woowacourse.shopping.presentation.view.cart.cartitem.CartItemFragment
+import woowacourse.shopping.presentation.view.cart.recommendation.RecommendationFragment
 import woowacourse.shopping.presentation.view.checkout.CheckoutFragment
 import woowacourse.shopping.presentation.view.common.BaseFragment
 
@@ -33,7 +33,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
 
                 if (viewModel.canSelectItems.value == true) {
                     childFragmentManager.commit {
-                        replace(R.id.cart_fragment_container, CartRecommendationFragment())
+                        replace(R.id.cart_fragment_container, RecommendationFragment())
                     }
                     viewModel.disableSelection()
                     viewModel.fetchRecommendedProducts()

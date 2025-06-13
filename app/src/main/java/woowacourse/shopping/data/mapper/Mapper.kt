@@ -8,7 +8,6 @@ import woowacourse.shopping.data.model.response.product.ProductResponse
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.Price
 import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.TimeRange
 import woowacourse.shopping.domain.coupon.BuyXGetYFreeCoupon
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.CouponInfo
@@ -16,6 +15,7 @@ import woowacourse.shopping.domain.coupon.CouponType
 import woowacourse.shopping.domain.coupon.FixedCoupon
 import woowacourse.shopping.domain.coupon.FreeShippingCoupon
 import woowacourse.shopping.domain.coupon.PercentageCoupon
+import woowacourse.shopping.domain.coupon.TimeRange
 import java.time.LocalDate
 import java.time.LocalTime
 

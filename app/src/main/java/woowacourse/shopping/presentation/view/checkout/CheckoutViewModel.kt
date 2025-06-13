@@ -9,15 +9,15 @@ import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.CouponRepository
-import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.RepositoryProvider
+import woowacourse.shopping.data.repository.cart.CartRepository
+import woowacourse.shopping.data.repository.coupon.CouponRepository
+import woowacourse.shopping.data.repository.order.OrderRepository
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.Price
 import woowacourse.shopping.domain.coupon.Coupon
-import woowacourse.shopping.presentation.view.checkout.adapter.CouponUiModel
-import woowacourse.shopping.presentation.view.checkout.adapter.toUiModel
+import woowacourse.shopping.presentation.model.CouponUiModel
+import woowacourse.shopping.presentation.model.toUiModel
 import java.time.LocalDateTime
 
 class CheckoutViewModel(

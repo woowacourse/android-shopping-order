@@ -1,9 +1,9 @@
-package woowacourse.shopping.data.datasource
+package woowacourse.shopping.data.datasource.cart
 
 import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.Page
 
-interface CartItemDataSource {
+interface CartDataSource {
     suspend fun fetchPageOfCartItems(
         pageIndex: Int,
         pageSize: Int,

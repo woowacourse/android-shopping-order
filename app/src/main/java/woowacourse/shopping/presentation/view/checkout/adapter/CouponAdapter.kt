@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.view.checkout.adapter
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import woowacourse.shopping.presentation.model.CouponUiModel
 import woowacourse.shopping.presentation.view.checkout.CheckoutEventHandler
 
 class CouponAdapter(

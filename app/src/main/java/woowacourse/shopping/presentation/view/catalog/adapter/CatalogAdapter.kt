@@ -6,10 +6,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.catalog.CatalogEventHandler
-import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem.CatalogType
-import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem.LoadMoreItem
-import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem.ProductItem
-import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem.RecentProductsItem
+import woowacourse.shopping.presentation.view.catalog.CatalogItem
+import woowacourse.shopping.presentation.view.catalog.CatalogItem.CatalogType
+import woowacourse.shopping.presentation.view.catalog.CatalogItem.LoadMoreItem
+import woowacourse.shopping.presentation.view.catalog.CatalogItem.ProductItem
+import woowacourse.shopping.presentation.view.catalog.CatalogItem.RecentProductsItem
 import woowacourse.shopping.presentation.view.common.ItemCounterEventHandler
 
 class CatalogAdapter(
