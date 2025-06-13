@@ -10,7 +10,8 @@ class DefaultProductRemoteDataSource(
     override suspend fun getProducts(
         page: Int,
         size: Int,
-    ): ProductsResponseDto = productService.getProducts(page, size)
+        category: String?,
+    ): ProductsResponseDto = productService.getProducts(page, size, category)
 
     override suspend fun getProductDetail(productId: Long): ProductResponseDto = productService.getProductDetail(productId)
 }

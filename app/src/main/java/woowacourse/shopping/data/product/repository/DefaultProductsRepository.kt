@@ -25,7 +25,18 @@ class DefaultProductsRepository(
 
     override suspend fun getRecentRecommendWatchingProducts(size: Int): Result<List<Product>> =
         runCatching {
-            productLocalDataSource.getRecentRecommendWatchingProducts(size).map { it.product }
+            val recentWatchingCategory: String =
+                productLocalDataSource
+                    .getRecentWatchingProducts(1)
+                    .firstOrNull()
+                    ?.product
+                    ?.category
+                    ?: return Result.failure(error("최근 본 상품이 없어 카테고리가 없습니다."))
+
+            productRemoteDataSource
+                .getProducts(page = 0, size = size, category = recentWatchingCategory)
+                .toDomain()
+                .shuffled()
         }
 
     override suspend fun updateRecentWatchingProduct(product: Product): Result<Unit> =

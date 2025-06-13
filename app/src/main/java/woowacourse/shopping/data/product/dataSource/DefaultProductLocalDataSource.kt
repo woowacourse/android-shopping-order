@@ -10,9 +10,6 @@ class DefaultProductLocalDataSource(
         recentWatchingDao.insertRecentWatching(recentWatchingEntity)
     }
 
-    override suspend fun getRecentRecommendWatchingProducts(size: Int): List<RecentWatchingEntity> =
-        recentWatchingDao.getRecentRecommendWatchingProducts(size)
-
     override suspend fun getRecentWatchingProducts(size: Int): List<RecentWatchingEntity> =
         recentWatchingDao.getRecentWatchingProducts(size)
 }
