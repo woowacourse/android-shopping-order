@@ -62,7 +62,7 @@ class SuggestionViewModel(
         }
     }
 
-    private fun combine(suggestionProducts: List<Product>) {
+    private suspend fun combine(suggestionProducts: List<Product>) {
         val ids = suggestionProducts.map { it.id }
         cartRepository
             .fetchCartProductsByProductIds(ids)

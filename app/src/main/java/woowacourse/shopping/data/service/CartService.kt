@@ -21,7 +21,7 @@ interface CartService {
         @Header("Authorization") key: String,
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Response<PageableResponse<CartItemResponse>>
+    ): PageableResponse<CartItemResponse>
 
     @POST("/cart-items")
     suspend fun addCartItem(
@@ -33,17 +33,17 @@ interface CartService {
     suspend fun deleteCartItem(
         @Header("Authorization") key: String,
         @Path("id") cartId: Long,
-    ): Response<Unit>
+    )
 
     @PATCH("/cart-items/{id}")
     suspend fun patchCartItemQuantity(
         @Header("Authorization") key: String,
         @Path("id") cartId: Long,
         @Body quantity: Quantity,
-    ): Response<Unit>
+    )
 
     @GET("/cart-items/counts")
     suspend fun fetchCartItem(
         @Header("Authorization") key: String,
-    ): Response<Quantity>
+    ): Quantity
 }

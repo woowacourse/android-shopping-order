@@ -34,20 +34,20 @@ class PaymentViewModel(
         }
     }
 
-    private fun initOrder() {
-        viewModelScope.launch {
-            val order = orderRepository.fetchOrder(orderCartIds, null)
-            _order.value = order.toUiModel()
-            couponRepository
-                .fetchFilteredCoupons(order.purchases, LocalTime.now())
-                .onSuccess { coupons ->
-                    _coupons.value =
-                        coupons.value.map { coupon ->
-                            DisplayModel(coupon.toUiModel())
-                        }
-                }.onFailure {
-                }
-        }
+    private suspend fun initOrder() {
+        val order =
+            orderRepository.fetchOrder(orderCartIds, null).getOrElse {
+                return
+            }
+
+        _order.value = order.toUiModel()
+
+        val coupons =
+            couponRepository.fetchFilteredCoupons(order.purchases, LocalTime.now()).getOrElse {
+                return
+            }
+
+        _coupons.value = coupons.value.map { DisplayModel(it.toUiModel()) }
     }
 
     private fun loadOrder(
@@ -55,7 +55,12 @@ class PaymentViewModel(
         coupon: CouponUiModel?,
     ) {
         viewModelScope.launch {
-            _order.value = orderRepository.fetchOrder(orderCartIds, coupon?.id).toUiModel()
+            orderRepository
+                .fetchOrder(orderCartIds, coupon?.id)
+                .onSuccess {
+                    _order.value = it.toUiModel()
+                }.onFailure {
+                }
         }
     }
 

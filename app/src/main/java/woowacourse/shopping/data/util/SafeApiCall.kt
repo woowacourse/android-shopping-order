@@ -1,18 +1,28 @@
 package woowacourse.shopping.data.util
 
+import android.util.Log
 import retrofit2.HttpException
+import woowacourse.shopping.domain.error.NetworkError
+import woowacourse.shopping.domain.error.NetworkExceptionWrapper
+import java.io.IOException
 
-inline fun <T> safeApiCall(apiCall: () -> retrofit2.Response<T>): Result<T> =
+suspend inline fun <T> safeApiCall(crossinline block: suspend () -> T): Result<T> =
     try {
-        val response = apiCall()
-        if (response.isSuccessful) {
-            Result.success(
-                response.body() ?: Unit as T,
-            )
-        } else {
-            Result.failure(HttpException(response))
-        }
+        val result = block()
+        Result.success(result)
+    } catch (e: IOException) {
+        Log.d("12345", e.toString())
+        Result.failure(NetworkExceptionWrapper(NetworkError.Network))
+    } catch (e: HttpException) {
+        val error =
+            when (e.code()) {
+                401 -> NetworkError.Unauthorized
+                404 -> NetworkError.NotFound
+                else -> NetworkError.Server(e.code())
+            }
+        Log.d("12345", e.toString())
+        Result.failure(NetworkExceptionWrapper(error))
     } catch (e: Exception) {
-        e.printStackTrace()
-        Result.failure(e)
+        Log.d("12345", e.toString())
+        Result.failure(NetworkExceptionWrapper(NetworkError.Unknown(e)))
     }

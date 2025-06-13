@@ -20,14 +20,16 @@ class CartLocalDataSourceImpl : CartLocalDataSource {
         cachedCart.deleteCartProductFromCartByCartId(cartId)
     }
 
-    override fun fetchCartProductByProductId(productId: Long): CartProduct =
-        cachedCart.fetchCartProductByProductId(productId) ?: throw IllegalStateException("장바구니에 productId $productId 가 없습니다.")
+    override fun fetchCartProductByProductId(productId: Long): CartProduct = cachedCart.fetchCartProductByProductId(productId)
 
     override fun fetchCartProductByCartId(cartId: Long): CartProduct = cachedCart.fetchCartIdByCartId(cartId)
 
-    override fun fetchQuantityByProductId(productId: Long): Int = cachedCart.fetchQuantityByProductId(productId)
+    override fun findQuantityByProductId(productId: Long): Int? = cachedCart.fetchQuantityByProductId(productId)
 
     override fun fetchCartIdByProductId(productId: Long): Long = cachedCart.fetchCartIdByProductId(productId)
+
+    override fun fetchCartProductsByProductIds(productIds: List<Long>): List<CartProduct> =
+        cachedCart.fetchCartProductsByProductIds(productIds)
 
     override fun updateQuantityByProductId(
         productId: Long,

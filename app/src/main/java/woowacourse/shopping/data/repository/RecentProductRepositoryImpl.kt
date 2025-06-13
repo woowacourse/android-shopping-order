@@ -16,8 +16,8 @@ class RecentProductRepositoryImpl(
         runCatching {
             recentProductLocalDataSource
                 .getRecentProducts(limit)
-                .mapNotNull {
-                    productRemoteDataSource.fetchProduct(it.productId).getOrNull()?.toDomain()
+                .map {
+                    productRemoteDataSource.fetchProduct(it.productId).toDomain()
                 }
         }
 
@@ -26,7 +26,12 @@ class RecentProductRepositoryImpl(
         category: String,
     ): Result<Unit> =
         runCatching {
-            recentProductLocalDataSource.insertRecentProduct(RecentProductEntity(productId, category))
+            recentProductLocalDataSource.insertRecentProduct(
+                RecentProductEntity(
+                    productId,
+                    category,
+                ),
+            )
             recentProductLocalDataSource.trimToLimit(recentProductLimit)
         }
 }

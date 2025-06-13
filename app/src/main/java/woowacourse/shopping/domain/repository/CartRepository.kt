@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.PageableItem
 
 interface CartRepository {
-    suspend fun fetchCart()
+    suspend fun fetchCart(): Result<Unit>
 
     suspend fun fetchCartItems(
         page: Int,
@@ -35,7 +35,7 @@ interface CartRepository {
 
     suspend fun hasCartItem(): Result<Boolean>
 
-    fun fetchCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>>
+    suspend fun fetchCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>>
 
     fun fetchCartProductsByIds(cartIds: List<Long>): Result<List<CartProduct>>
 }

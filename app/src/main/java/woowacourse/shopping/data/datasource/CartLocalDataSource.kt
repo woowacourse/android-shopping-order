@@ -15,9 +15,11 @@ interface CartLocalDataSource {
 
     fun fetchCartProductByCartId(cartId: Long): CartProduct
 
-    fun fetchQuantityByProductId(productId: Long): Int
+    fun findQuantityByProductId(productId: Long): Int?
 
     fun fetchCartIdByProductId(productId: Long): Long
+
+    fun fetchCartProductsByProductIds(productIds: List<Long>): List<CartProduct>
 
     fun updateQuantityByProductId(
         productId: Long,

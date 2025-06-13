@@ -87,7 +87,7 @@ class FakeCartRepository(
         onResult(Result.success(cartItems.size))
     }
 
-    override fun fetchCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>> {
+    override suspend fun fetchCartProductsByProductIds(productIds: List<Long>): Result<List<CartProduct>> {
         val foundCartProducts = cartItems.filterKeys { it in productIds }.values.toList()
         return Result.success(foundCartProducts)
     }

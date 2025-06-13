@@ -2,6 +2,7 @@ package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.CouponRemoteDataSource
 import woowacourse.shopping.data.model.coupon.toTypedDomain
+import woowacourse.shopping.data.util.safeApiCall
 import woowacourse.shopping.domain.model.CartProduct
 import woowacourse.shopping.domain.model.coupon.Coupons
 import woowacourse.shopping.domain.repository.CouponRepository
@@ -14,8 +15,10 @@ class CouponRepositoryImpl(
         cartProducts: List<CartProduct>,
         time: LocalTime,
     ): Result<Coupons> =
-        couponRemoteDataSource.fetchCoupons().map { coupons ->
-            Coupons(coupons.map { coupon -> coupon.toTypedDomain() }).filteredCoupons(
+        safeApiCall {
+            Coupons(
+                couponRemoteDataSource.fetchCoupons().map { it.toTypedDomain() },
+            ).filteredCoupons(
                 cartProducts,
                 time,
             )

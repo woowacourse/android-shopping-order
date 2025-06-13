@@ -23,10 +23,11 @@ class Cart(
     }
 
     fun fetchCartProductByProductId(productId: Long): CartProduct =
-        requireNotNull(_cachedCartProducts[productId]) { NOT_FOUND_PRODUCT_ID_ERROR_MESSAGE }
+        requireNotNull(_cachedCartProducts[productId]) { NOT_FOUND_PRODUCT_ID_ERROR_MESSAGE + "fetchCartProductByProductId" }
 
-    fun fetchQuantityByProductId(productId: Long): Int =
-        requireNotNull(_cachedCartProducts[productId]?.quantity) { NOT_FOUND_PRODUCT_ID_ERROR_MESSAGE }
+    fun fetchCartProductsByProductIds(productIds: List<Long>): List<CartProduct> = productIds.mapNotNull { _cachedCartProducts[it] }
+
+    fun fetchQuantityByProductId(productId: Long): Int? = _cachedCartProducts[productId]?.quantity
 
     fun fetchCartIdByProductId(productId: Long): Long =
         requireNotNull(_cachedCartProducts[productId]?.cartId) {

@@ -8,5 +8,5 @@ interface OrderRepository {
     suspend fun fetchOrder(
         cartItemIds: List<Long>,
         couponId: Long?,
-    ): Order
+    ): Result<Order>
 }
