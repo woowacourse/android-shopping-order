@@ -60,7 +60,6 @@ class ShoppingCartRecommendActivity :
         viewModel.recommendProducts.observe(this) { recommendItems ->
             recommendProductAdapter.submitList(recommendItems)
         }
-        viewModel.shoppingCartProductsToOrder.observe(this) { }
     }
 
     override fun onPlusShoppingCartClick(quantityTarget: QuantityTarget) {
@@ -82,7 +81,7 @@ class ShoppingCartRecommendActivity :
         startActivity(
             OrderActivity.newIntent(
                 this,
-                viewModel.shoppingCartProductsToOrder.value?.toTypedArray() ?: emptyArray(),
+                viewModel.shoppingCartProductsToOrder.toTypedArray(),
             ),
         )
     }

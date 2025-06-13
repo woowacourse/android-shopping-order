@@ -20,7 +20,8 @@ class ShoppingCartRecommendViewModel(
 ) : ViewModel() {
     private val _shoppingCartProductsToOrder: MutableLiveData<List<ShoppingCartProduct>> =
         MutableLiveData()
-    val shoppingCartProductsToOrder: LiveData<List<ShoppingCartProduct>> get() = _shoppingCartProductsToOrder
+    val shoppingCartProductsToOrder: List<ShoppingCartProduct>
+        get() = _shoppingCartProductsToOrder.value ?: emptyList()
 
     val totalPrice: LiveData<Int> =
         _shoppingCartProductsToOrder.map {
