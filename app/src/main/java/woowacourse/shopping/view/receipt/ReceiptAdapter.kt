@@ -20,7 +20,7 @@ class ReceiptAdapter(
 private class CouponsItemDiffCallback : DiffUtil.ItemCallback<CouponItem>() {
 
     override fun areItemsTheSame(oldItem: CouponItem, newItem: CouponItem): Boolean {
-        return oldItem.description == newItem.description
+        return oldItem.couponId == newItem.couponId
     }
 
     override fun areContentsTheSame(oldItem: CouponItem, newItem: CouponItem): Boolean {
