@@ -1,9 +1,9 @@
 package woowacourse.shopping.view.shoppingCart
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
@@ -25,23 +25,40 @@ class ShoppingCartViewModel(
     private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    private val _totalPrice: MediatorLiveData<Int> = MediatorLiveData<Int>().apply { value = 0 }
-    val totalPrice: LiveData<Int> get() = _totalPrice
+    val totalPrice: LiveData<Int> =
+        _shoppingCart.map {
+            it
+                .filterIsInstance<ShoppingCartItem>()
+                .filter { item -> item.isChecked }
+                .sumOf { item -> item.shoppingCartProduct.price }
+        }
 
-    private val _totalQuantity: MediatorLiveData<Int> = MediatorLiveData<Int>().apply { value = 0 }
-    val totalQuantity: LiveData<Int> get() = _totalQuantity
+    val totalQuantity: LiveData<Int> =
+        _shoppingCart.map {
+            it
+                .filterIsInstance<ShoppingCartItem>()
+                .filter { item -> item.isChecked }
+                .sumOf { item -> item.shoppingCartProduct.quantity }
+        }
 
-    private val _isAllSelected: MediatorLiveData<Boolean> =
-        MediatorLiveData<Boolean>().apply { value = false }
-    val isAllSelected: LiveData<Boolean> get() = _isAllSelected
+    val isAllSelected: LiveData<Boolean> =
+        _shoppingCart.map { item ->
+            if (item.isEmpty()) {
+                false
+            } else {
+                item.all { item -> item.isChecked }
+            }
+        }
 
-    private val _shoppingCartProductsToOrder: MediatorLiveData<List<ShoppingCartProduct>> =
-        MediatorLiveData(emptyList<ShoppingCartProduct>())
-    val shoppingCartProductsToOrder: LiveData<List<ShoppingCartProduct>> get() = _shoppingCartProductsToOrder
+    val shoppingCartProductsToOrder: LiveData<List<ShoppingCartProduct>> =
+        _shoppingCart.map {
+            it
+                .filterIsInstance<ShoppingCartItem>()
+                .filter { it.isChecked == true }
+                .map { it.shoppingCartProduct }
+        }
 
-    private val _isOrderEnabled: MediatorLiveData<Boolean> =
-        MediatorLiveData<Boolean>().apply { value = false }
-    val isOrderEnabled: LiveData<Boolean> get() = _isOrderEnabled
+    val isOrderEnabled: LiveData<Boolean> = totalQuantity.map { it > 0 }
 
     private var page: Int = MINIMUM_PAGE
 
@@ -49,47 +66,6 @@ class ShoppingCartViewModel(
 
     var hasUpdatedProducts: Boolean = false
         private set
-
-    init {
-        _totalPrice.addSource(_shoppingCart) { it ->
-            _totalPrice.value =
-                it
-                    .filterIsInstance<ShoppingCartItem>()
-                    .filter { item -> item.isChecked }
-                    .sumOf { item -> item.shoppingCartProduct.price }
-        }
-
-        _totalQuantity.addSource(_shoppingCart) {
-            _totalQuantity.value =
-                it
-                    .filterIsInstance<ShoppingCartItem>()
-                    .filter { item -> item.isChecked }
-                    .sumOf { item -> item.shoppingCartProduct.quantity }
-        }
-
-        _isAllSelected.addSource(_shoppingCart) {
-            _isAllSelected.value = isAllSelected(it)
-        }
-
-        _shoppingCartProductsToOrder.addSource(_shoppingCart) {
-            _shoppingCartProductsToOrder.value =
-                it
-                    .filterIsInstance<ShoppingCartItem>()
-                    .filter { it.isChecked == true }
-                    .map { it.shoppingCartProduct }
-        }
-
-        _isOrderEnabled.addSource(totalQuantity) {
-            _isOrderEnabled.value = it > 0
-        }
-    }
-
-    private fun isAllSelected(items: List<ShoppingCartItem>): Boolean =
-        if (items.isEmpty()) {
-            false
-        } else {
-            items.all { item -> item.isChecked }
-        }
 
     fun updateShoppingCart() {
         val page = this.page - 1

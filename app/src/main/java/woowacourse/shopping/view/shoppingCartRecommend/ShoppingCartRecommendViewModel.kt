@@ -1,9 +1,9 @@
 package woowacourse.shopping.view.shoppingCartRecommend
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
@@ -22,11 +22,17 @@ class ShoppingCartRecommendViewModel(
         MutableLiveData()
     val shoppingCartProductsToOrder: LiveData<List<ShoppingCartProduct>> get() = _shoppingCartProductsToOrder
 
-    private val _totalPrice: MediatorLiveData<Int> = MediatorLiveData<Int>().apply { value = 0 }
-    val totalPrice: LiveData<Int> get() = _totalPrice
+    val totalPrice: LiveData<Int> =
+        _shoppingCartProductsToOrder.map {
+            it.sumOf { item -> item.price }
+        }
 
-    private val _totalQuantity: MediatorLiveData<Int> = MediatorLiveData<Int>().apply { value = 0 }
-    val totalQuantity: LiveData<Int> get() = _totalQuantity
+    val totalQuantity: LiveData<Int> =
+        _shoppingCartProductsToOrder.map {
+            it.sumOf { item ->
+                item.quantity
+            }
+        }
 
     private val _recommendProducts: MutableLiveData<List<ProductsItem.ProductItem>> =
         MutableLiveData()
@@ -35,14 +41,6 @@ class ShoppingCartRecommendViewModel(
     private var recentWatchingProducts: List<Product> = emptyList()
 
     init {
-        _totalPrice.addSource(_shoppingCartProductsToOrder) { it ->
-            _totalPrice.value = it.sumOf { item -> item.price }
-        }
-
-        _totalQuantity.addSource(_shoppingCartProductsToOrder) {
-            _totalQuantity.value = it.sumOf { item -> item.quantity }
-        }
-
         initRecentWatchingProducts()
     }
 
@@ -73,7 +71,7 @@ class ShoppingCartRecommendViewModel(
             recentWatchingProducts
                 .filter { !cartProductIds.contains(it.id) }
                 .map { ProductsItem.ProductItem(product = it) }
-                .take(10)
+                .take(RECOMMEND_PRODUCTS_SIZE)
         _recommendProducts.value = recommended
     }
 
@@ -125,7 +123,8 @@ class ShoppingCartRecommendViewModel(
                             quantity = uploaded.quantity,
                         )
 
-                    val currentList = _shoppingCartProductsToOrder.value.orEmpty().toMutableList()
+                    val currentList =
+                        _shoppingCartProductsToOrder.value.orEmpty().toMutableList()
 
                     val existingIndex =
                         currentList.indexOfFirst { it.product.id == productToOrder.product.id }
@@ -187,5 +186,6 @@ class ShoppingCartRecommendViewModel(
 
     companion object {
         private const val MAX_RECENT_PRODUCT_LOAD_SIZE = Int.MAX_VALUE
+        private const val RECOMMEND_PRODUCTS_SIZE = 10
     }
 }
