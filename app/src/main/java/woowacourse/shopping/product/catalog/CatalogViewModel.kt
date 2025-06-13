@@ -48,21 +48,28 @@ class CatalogViewModel(
 
     fun fetchTotalCount() {
         viewModelScope.launch {
-            val count = cartProductRepository.getTotalElements()
-            _cartItemCount.postValue(count)
+            runCatching {
+                cartProductRepository.getTotalElements()
+            }.onSuccess { count ->
+                _cartItemCount.postValue(count)
+            }
         }
     }
 
     fun increaseQuantity(product: ProductUiModel) {
         if (product.quantity == 0) {
             viewModelScope.launch {
-                val product = cartProductRepository.insertCartProduct(product.copy(quantity = 1))
-                _updatedItem.postValue(product)
+                runCatching {
+                    val product =
+                        cartProductRepository.insertCartProduct(product.copy(quantity = 1))
+                    _updatedItem.postValue(product)
+                }
             }
         } else {
             viewModelScope.launch {
-                val result = cartProductRepository.updateProduct(product, product.quantity + 1)
-                if (result == true) {
+                runCatching {
+                    cartProductRepository.updateProduct(product, product.quantity + 1)
+                }.onSuccess {
                     _updatedItem.postValue(product.copy(quantity = product.quantity + 1))
                 }
             }
@@ -73,16 +80,17 @@ class CatalogViewModel(
     fun decreaseQuantity(product: ProductUiModel) {
         if (product.quantity == 1) {
             viewModelScope.launch {
-                val result =
+                runCatching {
                     cartProductRepository.deleteCartProduct(product)
-                if (result == true) {
+                }.onSuccess {
                     _updatedItem.postValue(product.copy(quantity = 0))
                 }
             }
         } else {
             viewModelScope.launch {
-                val result = cartProductRepository.updateProduct(product, product.quantity - 1)
-                if (result == true) {
+                runCatching {
+                    cartProductRepository.updateProduct(product, product.quantity - 1)
+                }.onSuccess {
                     _updatedItem.postValue(product.copy(quantity = product.quantity - 1))
                 }
             }
@@ -125,6 +133,7 @@ class CatalogViewModel(
                 page.value ?: 0,
                 size,
             )
+
             val totalElements = cartProductRepository.getTotalElements()
             val cartProducts = cartProductRepository.getCartProducts(totalElements)
             val cartProductMap: Map<Int, ProductUiModel> =

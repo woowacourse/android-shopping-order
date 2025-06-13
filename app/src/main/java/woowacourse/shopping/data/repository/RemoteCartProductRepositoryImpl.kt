@@ -8,6 +8,7 @@ import woowacourse.shopping.data.dto.cartitem.UpdateCartItemRequest
 import woowacourse.shopping.data.service.CartItemService
 import woowacourse.shopping.data.service.RetrofitProductService
 import woowacourse.shopping.product.catalog.ProductUiModel
+import woowacourse.shopping.util.toResult
 
 class RemoteCartProductRepositoryImpl : CartProductRepository {
     val retrofitService = RetrofitProductService.INSTANCE.create(CartItemService::class.java)
@@ -17,33 +18,25 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
     ): ProductUiModel {
         val response = retrofitService
             .postCartItems(
-                request =
-                    UpdateCartItemRequest(
-                        productId = cartProduct.id,
-                        quantity = cartProduct.quantity,
-                    ),
-            )
-
-        if (!response.isSuccessful) {
-            Log.d("error", "error : $response")
-        }
+                request = UpdateCartItemRequest(
+                    productId = cartProduct.id,
+                    quantity = cartProduct.quantity,
+                ),
+            ).toResult().getOrThrow()
 
         val locationHeader = response.headers()["location"]
         val id = locationHeader?.substringAfterLast("/")?.toIntOrNull()
+
         return cartProduct.copy(cartItemId = id)
     }
+
+
 
     override suspend fun deleteCartProduct(
         cartProduct: ProductUiModel,
     ): Boolean {
-        val response = retrofitService.deleteCartItem(cartItemId = cartProduct.cartItemId ?: 0)
-
-        if (!response.isSuccessful) {
-            Log.d("error", "error : $response")
-            return false
-        }
-
-        return true
+        val response = retrofitService.deleteCartItem(cartItemId = cartProduct.cartItemId ?: 0).toResult().getOrThrow().let { true }
+        return response
     }
 
     override suspend fun getCartProductsInRange(
@@ -53,11 +46,7 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
         val response = retrofitService.requestCartItems(
             page = currentPage,
             size = pageSize
-        )
-
-        if (!response.isSuccessful) {
-            Log.d("error", "error : $response")
-        }
+        ).toResult().getOrThrow()
 
         val content: List<Content> = response.body()?.content ?: return emptyList()
         val products: List<ProductUiModel> =
@@ -83,23 +72,12 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
             .patchCartItemQuantity(
                 cartItemId = cartProduct.cartItemId ?: 0,
                 quantity = Quantity(quantity),
-            )
-
-        if (!response.isSuccessful) {
-            Log.d("error", "error : $response")
-            return false
-        }
-
-        return true
+            ).toResult().getOrThrow().let { true }
+        return response
     }
 
     override suspend fun getCartItemSize(): Int {
-        val response = retrofitService.getCartItemsCount()
-
-
-        if (!response.isSuccessful) {
-            Log.d("error", "error : $response")
-        }
+        val response = retrofitService.getCartItemsCount().toResult().getOrThrow()
 
         val body: Quantity = response.body() ?: return 0
         return body.value
@@ -109,11 +87,7 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
         val response = retrofitService.requestCartItems(
             page = 0,
             size = 1,
-        )
-
-        if (!response.isSuccessful) {
-            Log.d("error", "error : $response")
-        }
+        ).toResult().getOrThrow()
 
         val body: ProductResponse = response.body() ?: return 0
         val totalElements = body.totalElements.toInt()
@@ -127,11 +101,7 @@ class RemoteCartProductRepositoryImpl : CartProductRepository {
             .requestCartItems(
                 page = 0,
                 size = totalElements,
-            )
-
-        if (!response.isSuccessful) {
-            Log.d("error", "error : $response")
-        }
+            ).toResult().getOrThrow()
 
         val body: ProductResponse = response.body() ?: return emptyList()
         val content: List<Content> = body.content
