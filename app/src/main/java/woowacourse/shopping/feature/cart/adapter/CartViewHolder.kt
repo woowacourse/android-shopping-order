@@ -15,16 +15,16 @@ class CartViewHolder(
         binding.cartClickListener = cartClickListener
     }
 
-    fun bind(cart: Cart) {
+    fun bind(cart: CartGoodsItem) {
         binding.cart = cart
         binding.customCartQuantity.setClickListener(
             object : CustomCartQuantity.CartQuantityClickListener {
                 override fun onAddClick() {
-                    cartClickListener.addToCart(cart)
+                    cartClickListener.addToCart(cart.cart)
                 }
 
                 override fun onRemoveClick() {
-                    cartClickListener.removeFromCart(cart)
+                    cartClickListener.removeFromCart(cart.cart)
                 }
             },
         )

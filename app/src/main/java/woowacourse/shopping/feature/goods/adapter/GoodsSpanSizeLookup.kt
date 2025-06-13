@@ -8,8 +8,11 @@ class GoodsSpanSizeLookup(
 ) : GridLayoutManager.SpanSizeLookup() {
     override fun getSpanSize(position: Int): Int =
         when (ItemViewType.from(adapter.getItemViewType(position))) {
-            ItemViewType.HISTORY -> 2
+            ItemViewType.HISTORY,
+            ItemViewType.LOAD_MORE,
+            ItemViewType.DIVIDER,
+            -> 2
+
             ItemViewType.GOODS -> 1
-            ItemViewType.LOAD_MORE -> 2
         }
 }

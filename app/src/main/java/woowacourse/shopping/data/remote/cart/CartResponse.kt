@@ -2,6 +2,8 @@ package woowacourse.shopping.data.remote.cart
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.util.toDomain
 
 @Serializable
 data class CartResponse(
@@ -77,4 +79,13 @@ data class CartResponse(
         @SerialName("unsorted")
         val unsorted: Boolean,
     )
+
+    fun toDomain(): List<Cart> =
+        content.map {
+            Cart(
+                id = it.id,
+                product = it.product.toDomain(),
+                quantity = it.quantity,
+            )
+        }
 }

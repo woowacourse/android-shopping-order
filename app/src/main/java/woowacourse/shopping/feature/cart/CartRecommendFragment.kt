@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartRecommendBinding
 import woowacourse.shopping.feature.cart.adapter.RecommendAdapter
+import woowacourse.shopping.feature.order.OrderActivity
 import kotlin.getValue
 
 class CartRecommendFragment : Fragment() {
@@ -35,5 +36,16 @@ class CartRecommendFragment : Fragment() {
                 false,
             )
         return binding.root
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        binding.tvOrderButton.setOnClickListener {
+            viewModel.carts.value?.let {
+                OrderActivity.newIntent(requireContext(), it)
+            }
+        }
     }
 }

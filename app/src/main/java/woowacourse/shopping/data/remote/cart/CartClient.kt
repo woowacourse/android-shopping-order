@@ -10,6 +10,9 @@ import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
 
 object CartClient {
+    val service: CartService by lazy {
+        retrofit.create(CartService::class.java)
+    }
     private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient
             .Builder()
@@ -32,9 +35,4 @@ object CartClient {
             .addConverterFactory(Json.asConverterFactory(contentType))
             .build()
     }
-    private val service: CartService by lazy {
-        retrofit.create(CartService::class.java)
-    }
-
-    fun getRetrofitService(): CartService = service
 }
