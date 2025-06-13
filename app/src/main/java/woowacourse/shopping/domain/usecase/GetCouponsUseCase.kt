@@ -1,7 +1,6 @@
 package woowacourse.shopping.domain.usecase
 
 import woowacourse.shopping.domain.model.Coupon
-import woowacourse.shopping.domain.model.Coupon.Companion.isAvailable
 import woowacourse.shopping.domain.model.Products
 import woowacourse.shopping.domain.repository.CouponRepository
 
