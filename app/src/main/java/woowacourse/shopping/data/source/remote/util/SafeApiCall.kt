@@ -10,7 +10,7 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> retrofit2.Response<T>): Resul
         } else {
             Result.failure(HttpException(response))
         }
-    } catch (e: HttpException) {
+    } catch (e: Exception) {
         Result.failure(e)
     }
 }
