@@ -2,11 +2,12 @@ package woowacourse.shopping.data.mapper
 
 import woowacourse.shopping.data.model.response.CouponsResponse
 import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.CouponDiscountType
 import java.time.LocalTime
 
 fun CouponsResponse.CouponResponseItem.toDomain(): Coupon =
-    when (this.discountType) {
-        "fixed" ->
+    when (CouponDiscountType.from(discountType)) {
+        CouponDiscountType.FIXED_DISCOUNT ->
             Coupon.FixedDiscount(
                 id = id,
                 code = code,
@@ -18,7 +19,7 @@ fun CouponsResponse.CouponResponseItem.toDomain(): Coupon =
                         ?: throw IllegalArgumentException("minimumOrderAmount is required"),
             )
 
-        "buyXgetY" ->
+        CouponDiscountType.BUY_X_GET_Y_FREE ->
             Coupon.BuyXGetYFree(
                 id = id,
                 code = code,
@@ -32,7 +33,7 @@ fun CouponsResponse.CouponResponseItem.toDomain(): Coupon =
                         ?: throw IllegalArgumentException("getQuantity is required"),
             )
 
-        "freeShipping" ->
+        CouponDiscountType.FREE_SHIPPING_OVER ->
             Coupon.FreeShippingOver(
                 id = id,
                 code = code,
@@ -43,7 +44,7 @@ fun CouponsResponse.CouponResponseItem.toDomain(): Coupon =
                         ?: throw IllegalArgumentException("minimumOrderAmount is required"),
             )
 
-        "percentage" ->
+        CouponDiscountType.PERCENT_DISCOUNT ->
             Coupon.PercentDiscount(
                 id = id,
                 code = code,
@@ -56,6 +57,4 @@ fun CouponsResponse.CouponResponseItem.toDomain(): Coupon =
                         LocalTime.parse(availableTime?.end),
                     ),
             )
-
-        else -> throw IllegalArgumentException()
     }
