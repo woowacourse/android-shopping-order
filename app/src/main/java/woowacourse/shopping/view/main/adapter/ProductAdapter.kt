@@ -3,10 +3,10 @@ package woowacourse.shopping.view.main.adapter
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.core.base.BaseViewHolder
 import woowacourse.shopping.view.core.handler.CartQuantityHandler
 import woowacourse.shopping.view.main.adapter.recent.RecentProductViewHolder
-import woowacourse.shopping.view.main.state.HistoryState
 import woowacourse.shopping.view.main.state.LoadState
 import woowacourse.shopping.view.main.state.ProductState
 import woowacourse.shopping.view.main.state.ProductUiState
@@ -16,7 +16,7 @@ class ProductAdapter(
     private val handler: ProductAdapterEventHandler,
 ) : RecyclerView.Adapter<BaseViewHolder<ViewBinding>>() {
     private val items: MutableList<ProductRvItems> = items.toMutableList()
-    private var historyItemsCache: List<HistoryState> = emptyList()
+    private var historyItemsCache: List<Product> = emptyList()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -64,7 +64,7 @@ class ProductAdapter(
         generateLoad(newUiState.load)
     }
 
-    private fun updateHistorySection(newHistories: List<HistoryState>) {
+    private fun updateHistorySection(newHistories: List<Product>) {
         if (newHistories == historyItemsCache) return
 
         val recentIndex = items.indexOfFirst { it is ProductRvItems.RecentProductItem }

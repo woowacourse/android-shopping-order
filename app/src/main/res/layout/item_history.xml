@@ -5,7 +5,7 @@
     <data>
         <variable
             name="model"
-            type="woowacourse.shopping.view.main.state.HistoryState" />
+            type="woowacourse.shopping.domain.product.Product" />
 
         <variable
             name="eventHandler"
@@ -14,7 +14,7 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:onClick="@{() -> eventHandler.onClickHistory(model.productId)}"
+        android:onClick="@{() -> eventHandler.onClickHistory(model.id)}"
         android:layout_marginStart="10dp"
         android:layout_width="98dp"
         android:layout_height="wrap_content">
@@ -24,12 +24,12 @@
             android:layout_width="98dp"
             android:layout_height="98dp"
             android:scaleType="centerCrop"
-            setImage="@{model.imageUrl}"
+            setImage="@{model.imgUrl}"
             tools:srcCompat="@tools:sample/avatars" />
 
         <TextView
             android:id="@+id/textView"
-            android:text="@{model.productName}"
+            android:text="@{model.name}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"

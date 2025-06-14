@@ -11,29 +11,34 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
-import retrofit2.HttpException
 import woowacourse.shopping.App
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityCartBinding
+import woowacourse.shopping.domain.cart.ShoppingCarts
 import woowacourse.shopping.view.cart.carts.CartListFragment
 import woowacourse.shopping.view.cart.recommend.RecommendFragment
 import woowacourse.shopping.view.cart.vm.CartViewModel
 import woowacourse.shopping.view.cart.vm.CartViewModelFactory
 import woowacourse.shopping.view.core.ext.showToast
+import woowacourse.shopping.view.core.handler.NetworkExceptionHandler
+import woowacourse.shopping.view.order.OrderActivity
 
 class CartActivity : AppCompatActivity() {
+    private lateinit var networkDelegator: NetworkExceptionHandler
+
     private lateinit var binding: ActivityCartBinding
     private val viewModel: CartViewModel by viewModels {
         val container = (application as App).container
         CartViewModelFactory(
-            container.cartRepository,
-            container.productRepository,
+            container.repositoryModule.defaultCartRepository,
+            container.repositoryModule.defaultProductRepository,
         )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_cart)
+        networkDelegator = NetworkExceptionHandler(this)
         val category = intent.getStringExtra(EXTRA_CATEGORY)
         viewModel.setCategory(category)
 
@@ -67,24 +72,20 @@ class CartActivity : AppCompatActivity() {
                 is CartUiEvent.ShowCannotIncrease -> {
                     showToast(getString(R.string.text_over_quantity).format(event.quantity))
                 }
-                CartUiEvent.ChangeScreen -> changeFragment()
+
+                is CartUiEvent.ChangeScreen -> changeFragment(event.orders)
                 is CartUiEvent.ShowErrorMessage -> {
-                    val messageResId = getErrorMessage(event.throwable)
-                    showToast(getString(messageResId))
+                    networkDelegator.showErrorMessage(event.throwable)
+                }
+
+                CartUiEvent.ShowNotHasPurchaseCart -> {
+                    showToast(getString(R.string.text_not_has_purchase_cart))
                 }
             }
         }
     }
 
-    private fun getErrorMessage(throwable: Throwable): Int {
-        return when (throwable) {
-            is NullPointerException -> R.string.error_text_null_result
-            is HttpException -> R.string.error_text_network_error
-            else -> R.string.error_text_unknown
-        }
-    }
-
-    private fun changeFragment() {
+    private fun changeFragment(orders: ShoppingCarts?) {
         when (supportFragmentManager.findFragmentById(R.id.fragment_container_view)) {
             is CartListFragment -> {
                 supportFragmentManager.commit {
@@ -92,7 +93,9 @@ class CartActivity : AppCompatActivity() {
                 }
             }
 
-            is RecommendFragment -> {}
+            is RecommendFragment -> {
+                orders?.let { startActivity(OrderActivity.newIntent(this, it)) }
+            }
         }
     }
 

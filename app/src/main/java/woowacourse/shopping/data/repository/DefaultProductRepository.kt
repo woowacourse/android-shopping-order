@@ -1,26 +1,18 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.datasource.ProductsDataSource
+import woowacourse.shopping.data.datasource.remote.RemoteProductsDataSource
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class DefaultProductRepository(
-    private val productDataSource: ProductsDataSource,
+    private val remoteProductDataSource: RemoteProductsDataSource,
 ) : ProductRepository {
-    override fun loadSinglePage(
+    override suspend fun loadSinglePage(
         category: String?,
         page: Int?,
         pageSize: Int?,
-        callback: (Result<ProductSinglePage>) -> Unit,
-    ) {
-        productDataSource.singlePage(category, page, pageSize) { callback(it) }
-    }
+    ): Result<ProductSinglePage> = remoteProductDataSource.singlePage(category, page, pageSize)
 
-    override fun loadProduct(
-        productId: Long,
-        callback: (Result<Product>) -> Unit,
-    ) {
-        productDataSource.getProduct(productId) { callback(it) }
-    }
+    override suspend fun loadProduct(productId: Long): Result<Product> = remoteProductDataSource.getProduct(productId)
 }

@@ -1,25 +1,26 @@
 package woowacourse.shopping.view.main.state
 
 import woowacourse.shopping.domain.Quantity
-import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.cart.ShoppingCarts
+import woowacourse.shopping.domain.product.Product
 
 data class ProductUiState(
     val productItems: List<ProductState> = emptyList(),
-    val historyItems: List<HistoryState> = emptyList(),
+    val historyItems: List<Product> = emptyList(),
+    val sumOfCartQuantity: Int = 0,
     val load: LoadState = LoadState.CannotLoad,
     val isFetching: Boolean = true,
 ) {
+    val lastSeenProductId = historyItems.firstOrNull()?.id
+
+    val lastSeenProductCategory = historyItems.firstOrNull()?.category
+
     val productItemSize: Int
         get() = productItems.size
 
-    val lastSeenProductId
-        get() = historyItems.firstOrNull()?.productId
-
-    val lastSeenProductCategory
-        get() = historyItems.firstOrNull()?.category
-
-    val sumOfCartQuantity
-        get() = productItems.sumOf { it.cartQuantity.value }
+    fun modifySumOfCartQuantity(quantity: Int): ProductUiState {
+        return copy(sumOfCartQuantity = quantity)
+    }
 
     fun modifyUiState(newState: ProductState): ProductUiState {
         val targetIndex = targetIndex(newState.item.id)
@@ -29,12 +30,12 @@ data class ProductUiState(
         return copy(productItems = mutableItems)
     }
 
-    fun modifyQuantity(carts: List<ShoppingCart>): ProductUiState {
+    fun modifyQuantity(carts: ShoppingCarts): ProductUiState {
         val result =
             productItems.map { product ->
                 val productId = product.productId
 
-                carts.find { it.productId == productId }?.let { cart ->
+                carts.shoppingCarts.find { it.productId == productId }?.let { cart ->
                     product.modifyQuantity(cart.quantity)
                 } ?: run {
                     product.copy(cartQuantity = Quantity(0))

@@ -5,12 +5,11 @@ import woowacourse.shopping.domain.cart.ShoppingCart
 import woowacourse.shopping.domain.product.Product
 
 data class ProductState(
-    val cartId: Long? = null,
+    val cartId: Long? = NOT_IN_CART,
     val item: Product,
     val cartQuantity: Quantity,
 ) {
-    val productId: Long
-        get() = item.id
+    val productId: Long = item.id
 
     val hasCartQuantity: Boolean
         get() = cartQuantity.hasQuantity()
@@ -35,6 +34,8 @@ data class ProductState(
     }
 
     companion object {
+        val NOT_IN_CART = null
+
         fun of(
             cart: ShoppingCart?,
             product: Product,

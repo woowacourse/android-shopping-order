@@ -1,46 +1,23 @@
 package woowacourse.shopping
 
 import android.content.Context
-import woowacourse.shopping.data.ApiCallbackHandler
-import woowacourse.shopping.data.datasource.CartDataSource
-import woowacourse.shopping.data.datasource.HistoryDataSource
-import woowacourse.shopping.data.datasource.ProductsDataSource
+import woowacourse.shopping.data.NetworkResultHandler
 import woowacourse.shopping.data.db.PetoMarketDatabase
-import woowacourse.shopping.data.network.RetrofitProvider
-import woowacourse.shopping.data.network.service.CartService
-import woowacourse.shopping.data.network.service.ProductService
-import woowacourse.shopping.data.repository.DefaultCartRepository
-import woowacourse.shopping.data.repository.DefaultHistoryRepository
-import woowacourse.shopping.data.repository.DefaultProductRepository
-import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.HistoryRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.view.loader.HistoryLoader
+import woowacourse.shopping.data.di.DataSourceModule
+import woowacourse.shopping.data.di.DatabaseModule
+import woowacourse.shopping.data.di.NetworkModule
+import woowacourse.shopping.data.di.RepositoryModule
+import woowacourse.shopping.data.di.RetrofitModule
 
 class AppContainer(
     context: Context,
 ) {
-    private val callBackHandler = ApiCallbackHandler()
+    private val networkResultHandler = NetworkResultHandler()
     private val db = PetoMarketDatabase.getInstance(context)
 
-    private val historyDao = db.historyDao()
+    private val networkModule = NetworkModule(RetrofitModule())
+    private val databaseModule = DatabaseModule(db)
+    private val dataSourceModule = DataSourceModule(databaseModule, networkModule, networkResultHandler)
 
-    private val historyDataSource = HistoryDataSource(historyDao)
-
-    private val productService: ProductService = RetrofitProvider.productService
-
-    private val cartService: CartService = RetrofitProvider.cartService
-
-    private val cartDataSource = CartDataSource(cartService, callBackHandler)
-
-    private val productsDataSource = ProductsDataSource(productService, callBackHandler)
-
-    val productRepository: ProductRepository =
-        DefaultProductRepository(productsDataSource)
-
-    val historyRepository: HistoryRepository = DefaultHistoryRepository(historyDataSource)
-
-    val cartRepository: CartRepository = DefaultCartRepository(cartDataSource)
-
-    val historyLoader = HistoryLoader(productRepository, historyRepository)
+    val repositoryModule = RepositoryModule(dataSourceModule)
 }

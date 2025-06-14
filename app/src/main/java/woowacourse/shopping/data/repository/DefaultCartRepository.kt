@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.datasource.CartDataSource
+import woowacourse.shopping.data.datasource.remote.RemoteCartDataSource
 import woowacourse.shopping.data.network.request.toRequest
 import woowacourse.shopping.domain.Quantity
 import woowacourse.shopping.domain.cart.Cart
@@ -8,35 +8,21 @@ import woowacourse.shopping.domain.cart.CartsSinglePage
 import woowacourse.shopping.domain.repository.CartRepository
 
 class DefaultCartRepository(
-    private val dataSource: CartDataSource,
+    private val remoteCartDataSource: RemoteCartDataSource,
 ) : CartRepository {
-    override fun addCart(
-        cart: Cart,
-        callback: (Result<String>) -> Unit,
-    ) {
-        dataSource.addCart(cart.toRequest()) { callback(it) }
-    }
+    override suspend fun addCart(cart: Cart): Result<Long> = remoteCartDataSource.addCart(cart.toRequest())
 
-    override fun loadSinglePage(
+    override suspend fun loadSinglePage(
         page: Int?,
         pageSize: Int?,
-        callback: (Result<CartsSinglePage>) -> Unit,
-    ) {
-        dataSource.singlePage(page, pageSize) { callback(it) }
-    }
+    ): Result<CartsSinglePage> = remoteCartDataSource.singlePage(page, pageSize)
 
-    override fun updateQuantity(
+    override suspend fun updateQuantity(
         cartId: Long,
         quantity: Quantity,
-        callback: (Result<Unit>) -> Unit,
-    ) {
-        dataSource.updateCartQuantity(cartId, quantity.value) { callback(it) }
-    }
+    ): Result<Unit> = remoteCartDataSource.updateCartQuantity(cartId, quantity.value)
 
-    override fun deleteCart(
-        cartId: Long,
-        callback: (Result<Unit>) -> Unit,
-    ) {
-        dataSource.deleteCart(cartId) { callback(it) }
-    }
+    override suspend fun deleteCart(cartId: Long): Result<Unit> = remoteCartDataSource.deleteCart(cartId)
+
+    override suspend fun cartQuantity(): Result<Int> = remoteCartDataSource.cartQuantity()
 }

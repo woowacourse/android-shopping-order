@@ -7,22 +7,17 @@ import woowacourse.shopping.view.main.state.ProductState
 
 data class DetailUiState(
     val product: ProductState,
-    val lastSeenProduct: Product?,
+    val lastSeenProduct: Product? = null,
 ) {
-    val category: String
-        get() = product.item.category
+    val category: String = product.item.category
 
-    val cartQuantity: Quantity
-        get() = product.cartQuantity
+    val cartQuantity: Quantity = product.cartQuantity
 
-    val productId: Long
-        get() = product.productId
+    val productId: Long = product.productId
 
-    val productPrice: Int
-        get() = product.item.priceValue * product.cartQuantity.value
+    val productPrice: Int = product.item.priceValue * product.cartQuantity.value
 
-    val hasLastSeenProduct: Boolean
-        get() = lastSeenProduct != null
+    val hasLastSeenProduct: Boolean = lastSeenProduct != null
 
     fun addQuantity(quantity: Quantity): Quantity {
         return quantity + cartQuantity.value

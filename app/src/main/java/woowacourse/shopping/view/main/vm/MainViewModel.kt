@@ -1,46 +1,41 @@
 package woowacourse.shopping.view.main.vm
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.cart.Cart
-import woowacourse.shopping.domain.cart.ShoppingCart
+import woowacourse.shopping.domain.cart.ShoppingCarts
+import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.ProductSinglePage
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.HistoryRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.view.core.common.withState
 import woowacourse.shopping.view.core.event.MutableSingleLiveData
 import woowacourse.shopping.view.core.event.SingleLiveData
-import woowacourse.shopping.view.core.ext.addSourceList
-import woowacourse.shopping.view.loader.HistoryLoader
 import woowacourse.shopping.view.main.MainUiEvent
 import woowacourse.shopping.view.main.adapter.ProductAdapterEventHandler
-import woowacourse.shopping.view.main.state.HistoryState
 import woowacourse.shopping.view.main.state.LoadState
 import woowacourse.shopping.view.main.state.ProductState
+import woowacourse.shopping.view.main.state.ProductState.Companion.NOT_IN_CART
 import woowacourse.shopping.view.main.state.ProductUiState
 
 class MainViewModel(
-    private val historyLoader: HistoryLoader,
+    private val historyRepository: HistoryRepository,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel() {
-    private val productItems = MutableLiveData<List<ProductState>>(emptyList())
-    private val historyItems = MutableLiveData<List<HistoryState>>(emptyList())
-    private val loadState = MutableLiveData<LoadState>()
-
-    private val _uiState =
-        MediatorLiveData(ProductUiState()).apply {
-            addSourceList(productItems, historyItems, loadState) { combine() }
-        }
+    private val _uiState = MutableLiveData(ProductUiState())
     val uiState: LiveData<ProductUiState> get() = _uiState
 
     private val _uiEvent = MutableSingleLiveData<MainUiEvent>()
     val uiEvent: SingleLiveData<MainUiEvent> get() = _uiEvent
 
     init {
-        loadPage()
+        fetchProducts(INITIAL_PAGE)
+        fetchCartQuantity()
     }
 
     fun loadPage() =
@@ -50,39 +45,67 @@ class MainViewModel(
         }
 
     private fun fetchProducts(pageIndex: Int) {
-        productRepository.loadSinglePage(page = pageIndex, pageSize = PAGE_SIZE) { result ->
-            result.onSuccess { productPage ->
-                cartRepository.loadSinglePage(pageIndex, PAGE_SIZE) { cartResult ->
-                    cartResult.onSuccess { cartPage ->
-                        applyMergedUiState(productPage, cartPage.carts)
-                    }.onFailure(::handleFailure)
-                }
-            }.onFailure(::handleFailure)
+        viewModelScope.launch {
+            val productResult =
+                productRepository.loadSinglePage(page = pageIndex, pageSize = PAGE_SIZE)
+            val cartResult = cartRepository.loadSinglePage(ALL_PAGE_INDEX, ALL_PAGE_SIZE)
+
+            productResult.onSuccess { productPage ->
+                cartResult.onSuccess { cartPage ->
+                    applyMergedUiState(productPage, cartPage.carts)
+                }.onFailure(::handleFailure)
+            }
         }
     }
 
     private fun applyMergedUiState(
         productPage: ProductSinglePage,
-        carts: List<ShoppingCart>,
-    ) {
+        carts: ShoppingCarts,
+    ) = withState(_uiState.value) { state ->
         val newProducts = generateProductStates(productPage, carts)
-        historyLoader { result ->
-            result.onSuccess {
-                historyItems.postValue(it)
-                productItems.postValue(newProducts)
-                loadState.postValue(LoadState.of(productPage.hasNextPage))
-            }.onFailure(::handleFailure)
+        viewModelScope.launch {
+            val newHistory = generateHistoryProductStates()
+            updateUiState {
+                state.copy(
+                    productItems = newProducts,
+                    historyItems = newHistory,
+                    load = LoadState.of(productPage.hasNextPage),
+                    isFetching = false,
+                )
+            }
+            toggleFetching()
         }
-        toggleFetching()
+    }
+
+    private fun fetchCartQuantity() {
+        viewModelScope.launch {
+            cartRepository.cartQuantity()
+                .onSuccess { updateUiState { modifySumOfCartQuantity(it) } }
+                .onFailure(::handleFailure)
+        }
+    }
+
+    private suspend fun generateHistoryProductStates(): List<Product> {
+        val historyProducts = mutableListOf<Product>()
+        val histories = historyRepository.getHistories()
+        if (histories.isEmpty()) return emptyList()
+
+        histories.forEach {
+            productRepository.loadProduct(it)
+                .onSuccess { product -> historyProducts.add(product) }
+                .onFailure(::handleFailure)
+        }
+        return historyProducts
     }
 
     private fun generateProductStates(
         productPage: ProductSinglePage,
-        carts: List<ShoppingCart>,
+        carts: ShoppingCarts,
     ): List<ProductState> {
         val newStates =
             productPage.products.map { product ->
-                val cart = carts.find { it.productId == product.id }
+                val cart = carts.findProduct(product.id)
+
                 ProductState.of(cart, product)
             }
         return _uiState.value?.productItems.orEmpty() + newStates
@@ -92,71 +115,94 @@ class MainViewModel(
         withState(_uiState.value) { state ->
             val updated = state.increaseCartQuantity(productId)
             val request = Cart(updated.cartQuantity, productId)
-
-            if (updated.cartId == null) {
-                cartRepository.addCart(request) {
-                    it.onSuccess { newId ->
-                        updateUiState { modifyUiState(updated.copy(cartId = newId.toLong())) }
-                    }.onFailure(::handleFailure)
+            viewModelScope.launch {
+                if (updated.cartId == NOT_IN_CART) {
+                    addToCart(request, updated)
+                } else {
+                    cartRepository.updateQuantity(updated.cartId, updated.cartQuantity)
+                        .onSuccess { updateUiState { modifyUiState(updated) } }
+                        .onFailure(::handleFailure)
                 }
-            } else {
-                cartRepository.updateQuantity(updated.cartId, updated.cartQuantity) {
-                    updateUiState { modifyUiState(updated) }
-                }
+                fetchCartQuantity()
             }
         }
+
+    private suspend fun addToCart(
+        cart: Cart,
+        updated: ProductState,
+    ) {
+        cartRepository.addCart(cart)
+            .onSuccess { newId ->
+                updateUiState { modifyUiState(updated.copy(cartId = newId)) }
+            }.onFailure(::handleFailure)
+    }
 
     fun decreaseCartQuantity(productId: Long) =
         withState(_uiState.value) { state ->
             val updated = state.decreaseCartQuantity(productId)
             val cartId = updated.cartId ?: return
 
-            if (updated.hasCartQuantity) {
-                cartRepository.updateQuantity(cartId, updated.cartQuantity) {
-                    it
-                        .onSuccess { updateUiState { modifyUiState(updated) } }
-                        .onFailure(::handleFailure)
+            viewModelScope.launch {
+                if (updated.hasCartQuantity) {
+                    updateQuantity(cartId, updated)
+                } else {
+                    deleteCart(cartId, updated)
                 }
-            } else {
-                cartRepository.deleteCart(cartId) {
-                    it
-                        .onSuccess {
-                            updateUiState { modifyUiState(updated.copy(cartId = null)) }
-                        }.onFailure(::handleFailure)
-                }
+                fetchCartQuantity()
             }
         }
 
+    private suspend fun updateQuantity(
+        cartId: Long,
+        updated: ProductState,
+    ) {
+        cartRepository.updateQuantity(cartId, updated.cartQuantity)
+            .onSuccess { updateUiState { modifyUiState(updated) } }
+            .onFailure(::handleFailure)
+    }
+
+    private suspend fun deleteCart(
+        cartId: Long,
+        updated: ProductState,
+    ) {
+        cartRepository.deleteCart(cartId)
+            .onSuccess {
+                updateUiState { modifyUiState(updated.copy(cartId = NOT_IN_CART)) }
+            }.onFailure(::handleFailure)
+    }
+
     fun syncHistory() =
         withState(_uiState.value) {
-            historyLoader {
-                it.onSuccess { history ->
-                    updateUiState { copy(historyItems = history) }
-                }.onFailure(::handleFailure)
+            viewModelScope.launch {
+                val histories = generateHistoryProductStates()
+                updateUiState { copy(historyItems = histories) }
             }
         }
 
     fun syncCartQuantities() =
         withState(_uiState.value) {
-            cartRepository.loadSinglePage(null, null) {
-                it.onSuccess { result ->
-                    updateUiState { modifyQuantity(result.carts) }
-                }.onFailure(::handleFailure)
+            viewModelScope.launch {
+                cartRepository.loadSinglePage(ALL_PAGE_INDEX, ALL_PAGE_SIZE)
+                    .onSuccess { result ->
+                        updateUiState { modifyQuantity(result.carts) }
+                    }.onFailure(::handleFailure)
             }
+
+            fetchCartQuantity()
         }
 
     private fun navigateToDetail(productId: Long) =
         withState(_uiState.value) { state ->
-            _uiEvent.postValue(MainUiEvent.NavigateToDetail(productId, state.lastSeenProductId))
+            _uiEvent.setValue(MainUiEvent.NavigateToDetail(productId, state.lastSeenProductId))
         }
 
     fun handleNavigateToCart() =
         withState(_uiState.value) { state ->
-            _uiEvent.postValue(MainUiEvent.NavigateToCart(state.lastSeenProductCategory))
+            _uiEvent.setValue(MainUiEvent.NavigateToCart(state.lastSeenProductCategory))
         }
 
     private fun toggleFetching() {
-        _uiState.postValue(_uiState.value?.fetchToggleState())
+        _uiState.value = _uiState.value?.fetchToggleState()
     }
 
     private fun updateUiState(transform: ProductUiState.() -> ProductUiState) {
@@ -165,19 +211,6 @@ class MainViewModel(
 
     private fun handleFailure(throwable: Throwable) {
         _uiEvent.setValue(MainUiEvent.ShowErrorMessage(throwable))
-    }
-
-    private fun combine() {
-        val products = productItems.value ?: return
-        val history = historyItems.value ?: return
-        val load = loadState.value ?: return
-
-        _uiState.value =
-            ProductUiState(
-                productItems = products,
-                historyItems = history,
-                load = load,
-            )
     }
 
     val productEventHandler =
@@ -198,5 +231,7 @@ class MainViewModel(
     companion object {
         private const val INITIAL_PAGE = 0
         private const val PAGE_SIZE = 20
+        private val ALL_PAGE_INDEX = null
+        private val ALL_PAGE_SIZE = null
     }
 }

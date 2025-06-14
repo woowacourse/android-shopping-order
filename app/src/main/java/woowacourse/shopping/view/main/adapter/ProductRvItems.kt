@@ -1,20 +1,20 @@
 package woowacourse.shopping.view.main.adapter
 
-import woowacourse.shopping.view.main.state.HistoryState
+import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.view.main.state.ProductState
 
 sealed class ProductRvItems(val viewType: ViewType) {
     data class RecentProductItem(
-        val items: List<HistoryState>,
+        val items: List<Product>,
     ) : ProductRvItems(ViewType.VIEW_TYPE_RECENT_PRODUCT)
 
-    object DividerItem : ProductRvItems(ViewType.VIEW_TYPE_DIVIDER)
+    data object DividerItem : ProductRvItems(ViewType.VIEW_TYPE_DIVIDER)
 
     data class ProductItem(
         val data: ProductState,
     ) : ProductRvItems(ViewType.VIEW_TYPE_PRODUCT)
 
-    object LoadItem : ProductRvItems(ViewType.VIEW_TYPE_LOAD)
+    data object LoadItem : ProductRvItems(ViewType.VIEW_TYPE_LOAD)
 
     enum class ViewType {
         VIEW_TYPE_RECENT_PRODUCT,

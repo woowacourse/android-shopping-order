@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 interface HistoryRepository {
-    fun getHistories(onResult: (List<Long>) -> Unit)
+    suspend fun getHistories(): List<Long>
 
-    fun saveHistory(productId: Long)
+    suspend fun saveHistory(productId: Long)
 }
