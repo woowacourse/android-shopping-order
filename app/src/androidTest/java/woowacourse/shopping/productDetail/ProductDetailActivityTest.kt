@@ -15,7 +15,6 @@ import woowacourse.shopping.view.productDetail.ProductDetailActivity
 
 class ProductDetailActivityTest {
     private lateinit var intent: Intent
-    private lateinit var scenario: ActivityScenario<ProductDetailActivity>
 
     @Before
     fun setup() {
@@ -27,8 +26,6 @@ class ProductDetailActivityTest {
                 putExtra("woowacourse.shopping.EXTRA_PRODUCT_ID", PRODUCT_AIR_FORCE.id)
             }
         ActivityScenario.launch<ProductDetailActivity>(intent)
-
-        scenario = ActivityScenario.launch(intent)
     }
 
     @Test

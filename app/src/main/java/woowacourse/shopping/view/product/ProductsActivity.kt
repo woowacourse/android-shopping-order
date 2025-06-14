@@ -1,5 +1,7 @@
 package woowacourse.shopping.view.product
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
@@ -36,7 +38,7 @@ class ProductsActivity :
             when (result.resultCode) {
                 ResultFrom.PRODUCT_DETAIL_BACK.RESULT_OK -> {
                     val updateItem: Product? =
-                        result.data?.getSerializableExtraData("updateProduct")
+                        result.data?.getSerializableExtraData(RESULT_UPDATED_ITEM_KEY)
                     if (updateItem != null) {
                         viewModel.updateShoppingCartQuantity()
                         viewModel.updateProducts()
@@ -46,14 +48,14 @@ class ProductsActivity :
 
                 ResultFrom.SHOPPING_CART_BACK.RESULT_OK -> {
                     val hasUpdatedItems: Boolean? =
-                        result.data?.getSerializableExtraData("updateProducts")
+                        result.data?.getSerializableExtraData(RESULT_UPDATED_ITEMS_KEY)
                     if (hasUpdatedItems != null && hasUpdatedItems) viewModel.updateProducts()
                     viewModel.updateShoppingCartQuantity()
                 }
 
                 ResultFrom.PRODUCT_RECENT_WATCHING_CLICK.RESULT_OK -> {
                     val recentProduct: Product =
-                        result.data?.getSerializableExtraData("recentProduct")
+                        result.data?.getSerializableExtraData(RESULT_RECENT_PRODUCT_KEY)
                             ?: return@registerForActivityResult
                     navigateToRecentProduct(recentProduct)
                 }
@@ -61,7 +63,16 @@ class ProductsActivity :
         }
 
     private fun navigateToRecentProduct(product: Product) {
-        activityResultLauncher.launch(ProductDetailActivity.newIntent(this, product.id))
+        val productItem = viewModel.getProductItem(product)
+        activityResultLauncher.launch(
+            ProductDetailActivity.newIntent(
+                context = this,
+                shoppingCartId = productItem.shoppingCartId,
+                quantity = productItem.selectedQuantity,
+                productId = product.id,
+                isLastWatching = true,
+            ),
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -201,5 +212,16 @@ class ProductsActivity :
     override fun onMinusShoppingCartClick(quantityTarget: QuantityTarget) {
         val item = quantityTarget as ProductsItem.ProductItem
         viewModel.minusProductToShoppingCart(item, item.selectedQuantity)
+    }
+
+    companion object {
+        const val RESULT_UPDATED_ITEM_KEY = "updateProduct"
+        const val RESULT_UPDATED_ITEMS_KEY = "updateProducts"
+        const val RESULT_RECENT_PRODUCT_KEY = "recentProduct"
+
+        fun newIntent(context: Context): Intent =
+            Intent(context, ProductsActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
     }
 }

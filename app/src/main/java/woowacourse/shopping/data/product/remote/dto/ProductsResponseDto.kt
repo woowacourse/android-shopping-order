@@ -2,7 +2,6 @@ package woowacourse.shopping.data.product.remote.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import woowacourse.shopping.domain.product.Product
 
 @Serializable
 data class ProductsResponseDto(
@@ -28,6 +27,4 @@ data class ProductsResponseDto(
     val totalElements: Int,
     @SerialName("totalPages")
     val totalPages: Int,
-) {
-    fun toDomain(): List<Product> = products.map(ProductResponseDto::toDomain)
-}
+)

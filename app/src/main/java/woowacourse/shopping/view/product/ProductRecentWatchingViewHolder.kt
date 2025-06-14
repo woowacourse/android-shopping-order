@@ -7,15 +7,19 @@ import woowacourse.shopping.databinding.ItemProductRecentWatchingBinding
 import woowacourse.shopping.view.product.RecentProductViewHolder.ProductRecentMoreWatchingClickListener
 
 class ProductRecentWatchingViewHolder(
-    private val binding: ItemProductRecentWatchingBinding,
-    private val productListener: ProductRecentMoreWatchingClickListener,
+    binding: ItemProductRecentWatchingBinding,
+    productListener: ProductRecentMoreWatchingClickListener,
 ) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(recentWatchingItem: ProductsItem.RecentWatchingItem) {
-        val adapter = RecentProductAdapter(recentWatchingItem, productListener)
+    private val recentProductAdapter = RecentProductAdapter(productListener)
 
+    init {
         binding.productRecentWatching.apply {
-            this.adapter = adapter
+            adapter = recentProductAdapter
         }
+    }
+
+    fun bind(recentWatchingItem: ProductsItem.RecentWatchingItem) {
+        recentProductAdapter.submitList(recentWatchingItem.products)
     }
 
     companion object {

@@ -36,4 +36,22 @@
     <string name="shopping_cart_recommend_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
     <string name="shopping_cart_recommend_title">이런 상품은 어떠세요?</string>
 
+    <!-- 주문 페이지 -->
+    <string name="order_coupon_expiration_date">만료일: %1$s</string>
+    <string name="order_pay_title">결제하기</string>
+    <string name="order_available_coupon_title">적용 가능한 쿠폰</string>
+    <string name="order_coupon_notice_description">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="order_price_title">주문 금액</string>
+    <string name="order_coupon_discount_title">쿠폰 할인 금액</string>
+    <string name="order_shipping_fee_title">배송비</string>
+    <string name="order_pay_button">결제하기</string>
+    <string name="order_total_price_title">총 결제 금액</string>
+    <string name="order_get_coupon_failure_message">쿠폰을 불러오지 못했습니다.</string>
+    <string name="order_create_orders_success_message">주문이 완료됐습니다! 총알 배송갑니다. 🚀</string>
+    <string name="order_create_order_failure_message">주문이 실패했습니다. 잠시 후 다시 시도해주세요.</string>
+    <string name="coupon_price_discount_condition">최소 주문 금액: %1$s</string>
+    <string name="coupon_bonus_discount_condition">3개씩 담은 제품이 여러개인 경우, 1개당 금액이 가장 비싼 제품에 적용</string>
+    <string name="coupon_free_shipping_discount_condition">최소 주문 금액: %1$s</string>
+    <string name="coupon_percentage_discount_condition">사용 가능 시간: 오전%1$s부터 %2$s까지</string>
+    <string name="order_coupon_empty_message">적용 가능한 쿠폰이\n없습니다.</string>
 </resources>

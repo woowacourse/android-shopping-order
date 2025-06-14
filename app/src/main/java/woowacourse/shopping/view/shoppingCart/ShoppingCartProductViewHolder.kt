@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemShoppingCartProductBinding
 import woowacourse.shopping.view.common.ProductQuantityClickListener
-import woowacourse.shopping.view.shoppingCart.ShoppingCartItem.ShoppingCartProductItem
 
 class ShoppingCartProductViewHolder(
     private val binding: ItemShoppingCartProductBinding,
@@ -15,7 +14,7 @@ class ShoppingCartProductViewHolder(
         binding.shoppingCartProductClickListener = shoppingCartListener
     }
 
-    fun bind(item: ShoppingCartProductItem) {
+    fun bind(item: ShoppingCartItem) {
         binding.shoppingCartProductItem = item
         binding.shoppingCartQuantityComponent.quantity = item.shoppingCartProduct.quantity
     }
@@ -32,10 +31,10 @@ class ShoppingCartProductViewHolder(
     }
 
     interface ShoppingCartProductClickListener : ProductQuantityClickListener {
-        fun onRemoveButton(shoppingCartProductItem: ShoppingCartProductItem)
+        fun onRemoveButton(shoppingCartProductItem: ShoppingCartItem)
 
         fun onProductSelectedButton(
-            shoppingCartProductItem: ShoppingCartProductItem,
+            shoppingCartProductItem: ShoppingCartItem,
             isSelected: Boolean,
         )
     }

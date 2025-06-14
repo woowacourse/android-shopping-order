@@ -13,6 +13,7 @@ import woowacourse.shopping.domain.shoppingCart.ShoppingCartProduct
 import woowacourse.shopping.view.common.QuantityTarget
 import woowacourse.shopping.view.common.ResultFrom
 import woowacourse.shopping.view.common.getSerializableExtraData
+import woowacourse.shopping.view.order.OrderActivity
 import woowacourse.shopping.view.product.ProductsItem
 
 class ShoppingCartRecommendActivity :
@@ -77,7 +78,12 @@ class ShoppingCartRecommendActivity :
     }
 
     override fun onOrderButtonClick() {
-        // TOOD: 주문하기 api 연동
+        startActivity(
+            OrderActivity.newIntent(
+                this,
+                viewModel.shoppingCartProductsToOrder.toTypedArray(),
+            ),
+        )
     }
 
     companion object {

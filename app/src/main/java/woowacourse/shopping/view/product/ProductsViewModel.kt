@@ -3,6 +3,8 @@ package woowacourse.shopping.view.product
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.product.repository.DefaultProductsRepository
 import woowacourse.shopping.data.product.repository.ProductsRepository
 import woowacourse.shopping.data.shoppingCart.repository.DefaultShoppingCartRepository
@@ -44,8 +46,9 @@ class ProductsViewModel(
         val limit = LOAD_PRODUCTS_SIZE + 1
         val currentProducts: List<ProductsItem> = _products.value ?: emptyList()
 
-        productsRepository.getProducts(offset, limit) { result ->
-            result
+        viewModelScope.launch {
+            productsRepository
+                .getProducts(offset, limit)
                 .onSuccess { newProducts ->
                     loadable = newProducts.size == LOAD_PRODUCTS_SIZE + 1
                     val productsToShow = newProducts.take(LOAD_PRODUCTS_SIZE)
@@ -53,7 +56,7 @@ class ProductsViewModel(
                     updateProductsShoppingCartQuantity(productsToShow, currentProducts)
                     _isLoading.value = false
                 }.onFailure {
-                    _event.postValue(ProductsEvent.UPDATE_PRODUCT_FAILURE)
+                    _event.setValue(ProductsEvent.UPDATE_PRODUCT_FAILURE)
                     _isLoading.value = false
                 }
         }
@@ -63,10 +66,13 @@ class ProductsViewModel(
         productsToShow: List<Product>,
         currentProducts: List<ProductsItem>,
     ) {
-        var shoppingCartProducts = emptyList<ShoppingCartProduct>()
-        shoppingCartRepository.load(0, 20) { result ->
-            result
-                .onSuccess {
+        viewModelScope.launch {
+            var shoppingCartProducts = emptyList<ShoppingCartProduct>()
+            shoppingCartRepository
+                .load(
+                    LOAD_SHOPPING_CART_PAGE,
+                    LOAD_SHOPPING_CART_SIZE,
+                ).onSuccess {
                     shoppingCartProducts = it.shoppingCartItems
                     handleShoppingCartQuantitySuccess(
                         currentProducts,
@@ -88,12 +94,8 @@ class ProductsViewModel(
         productsToShow: List<Product>,
         shoppingCartProducts: List<ShoppingCartProduct>,
     ) {
-        val productsWithoutLoadItem =
-            if (currentProducts.lastOrNull() is LoadItem) {
-                currentProducts.dropLast(1)
-            } else {
-                currentProducts
-            }
+        val productsWithoutLoadItem: List<ProductsItem> =
+            currentProducts.filterNot { it is LoadItem }
 
         val updatedProductItems =
             productsToShow.map { product ->
@@ -120,8 +122,9 @@ class ProductsViewModel(
         updatedProductItems: List<ProductItem>,
         hasRecentWatching: Boolean,
     ) {
-        productsRepository.getRecentWatchingProducts(10) { result ->
-            result
+        viewModelScope.launch {
+            productsRepository
+                .getRecentWatchingProducts(LOAD_RECENT_WATCHING_PRODUCT_SIZE)
                 .onSuccess { recentWatchingProducts ->
                     var updatedProducts = productsWithoutLoadItem
                     if (hasRecentWatching) {
@@ -139,7 +142,7 @@ class ProductsViewModel(
                         productsWithoutLoadItem,
                         updatedProductItems,
                     )
-                    _event.postValue(ProductsEvent.UPDATE_RECENT_WATCHING_PRODUCTS_FAILURE)
+                    _event.setValue(ProductsEvent.UPDATE_RECENT_WATCHING_PRODUCTS_FAILURE)
                 }
         }
     }
@@ -173,14 +176,13 @@ class ProductsViewModel(
         recentWatchingItem: ProductsItem?,
     ) {
         if (productsWithoutLoadItem.isEmpty() || page != 1) {
-            _products.postValue(
+            _products.value =
                 buildList {
                     recentWatchingItem?.let { add(it) }
                     addAll(productsWithoutLoadItem)
                     addAll(updatedProductItems)
                     if (loadable) add(LoadItem)
-                },
-            )
+                }
             return
         }
 
@@ -194,33 +196,32 @@ class ProductsViewModel(
                 }
             }
 
-        _products.postValue(
+        _products.value =
             buildList {
                 recentWatchingItem?.let { add(it) }
                 addAll(mergedProducts)
                 if (loadable) add(LoadItem)
-            },
-        )
+            }
     }
 
     fun updateShoppingCartQuantity() {
-        shoppingCartRepository.fetchAllQuantity { result ->
-            result.onSuccess { quantity: Int ->
-                _shoppingCartQuantity.postValue(quantity)
+        viewModelScope.launch {
+            shoppingCartRepository.fetchAllQuantity().onSuccess { quantity: Int ->
+                _shoppingCartQuantity.value = quantity
             }
         }
     }
 
     fun updateRecentWatching() {
-        productsRepository.getRecentWatchingProducts(10) { result ->
-            result
+        viewModelScope.launch {
+            productsRepository
+                .getRecentWatchingProducts(LOAD_RECENT_WATCHING_PRODUCT_SIZE)
                 .onSuccess { recentWatchingProducts: List<Product> ->
                     val recentWatchingItem =
                         if (recentWatchingProducts.isEmpty()) {
                             null
                         } else {
-                            val items =
-                                recentWatchingProducts.map { ProductItem(product = it) }
+                            val items = recentWatchingProducts.map { ProductItem(product = it) }
                             RecentWatchingItem(items)
                         }
 
@@ -234,9 +235,9 @@ class ProductsViewModel(
                             addAll(withoutOldRecentWatching)
                         }
 
-                    _products.postValue(updatedProducts)
+                    _products.value = updatedProducts
                 }.onFailure {
-                    _event.postValue(ProductsEvent.UPDATE_RECENT_WATCHING_PRODUCTS_FAILURE)
+                    _event.setValue(ProductsEvent.UPDATE_RECENT_WATCHING_PRODUCTS_FAILURE)
                 }
         }
     }
@@ -245,17 +246,19 @@ class ProductsViewModel(
         productItem: ProductItem,
         quantity: Int,
     ) {
-        if (productItem.shoppingCartId == null) {
-            shoppingCartRepository.add(productItem.product, quantity + 1) { result ->
-                result
+        viewModelScope.launch {
+            if (productItem.shoppingCartId == null) {
+                shoppingCartRepository
+                    .add(productItem.product, quantity + 1)
                     .onSuccess {
-                        val currentProducts = products.value?.toMutableList() ?: return@add
+                        val currentProducts = products.value?.toMutableList() ?: return@launch
                         val index: Int =
                             currentProducts.indexOfFirst { it is ProductItem && it.product == productItem.product }
 
                         if (index != -1) {
-                            shoppingCartRepository.load(page - 1, LOAD_PRODUCTS_SIZE) { result ->
-                                result.onSuccess { shoppingCartProducts ->
+                            shoppingCartRepository
+                                .load(page - 1, LOAD_PRODUCTS_SIZE)
+                                .onSuccess { shoppingCartProducts ->
                                     val newShoppingCartId =
                                         shoppingCartProducts.shoppingCartItems
                                             .find {
@@ -272,21 +275,18 @@ class ProductsViewModel(
                                     currentProducts[index] = updatedItem
                                     _products.value = currentProducts
                                 }
-                            }
                         }
                         _shoppingCartQuantity.value = shoppingCartQuantity.value?.plus(1)
                     }.onFailure {
-                        _event.postValue(ProductsEvent.NOT_ADD_TO_SHOPPING_CART)
+                        _event.setValue(ProductsEvent.NOT_ADD_TO_SHOPPING_CART)
                     }
+                return@launch
             }
-            return
-        }
-        shoppingCartRepository.increaseQuantity(
-            productItem.shoppingCartId,
-            quantity + 1,
-        ) { result ->
-            result
-                .onSuccess {
+            shoppingCartRepository
+                .updateQuantity(
+                    productItem.shoppingCartId,
+                    quantity + 1,
+                ).onSuccess {
                     val currentProducts = products.value?.toMutableList() ?: return@onSuccess
                     val index: Int =
                         currentProducts.indexOfFirst { it is ProductItem && it.product == productItem.product }
@@ -300,7 +300,7 @@ class ProductsViewModel(
                     }
                     _shoppingCartQuantity.value = shoppingCartQuantity.value?.plus(1)
                 }.onFailure {
-                    _event.postValue(ProductsEvent.NOT_ADD_TO_SHOPPING_CART)
+                    _event.setValue(ProductsEvent.NOT_ADD_TO_SHOPPING_CART)
                 }
         }
     }
@@ -309,13 +309,13 @@ class ProductsViewModel(
         productItem: ProductItem,
         quantity: Int,
     ) {
-        shoppingCartRepository.decreaseQuantity(
-            productItem.shoppingCartId ?: return,
-            quantity - 1,
-        ) { result ->
-            result
-                .onSuccess {
-                    val currentProducts = products.value?.toMutableList() ?: return@decreaseQuantity
+        viewModelScope.launch {
+            shoppingCartRepository
+                .updateQuantity(
+                    productItem.shoppingCartId ?: return@launch,
+                    quantity - 1,
+                ).onSuccess {
+                    val currentProducts = products.value?.toMutableList() ?: return@onSuccess
                     val index: Int =
                         currentProducts.indexOfFirst { it is ProductItem && it.product == productItem.product }
 
@@ -324,11 +324,11 @@ class ProductsViewModel(
                         val updatedItem =
                             productItem.copy(selectedQuantity = productItem.selectedQuantity - 1)
                         currentProducts[index] = updatedItem
-                        _products.postValue(currentProducts)
+                        _products.value = currentProducts
                     }
-                    _shoppingCartQuantity.postValue(shoppingCartQuantity.value?.minus(1))
+                    _shoppingCartQuantity.value = shoppingCartQuantity.value?.minus(1)
                 }.onFailure {
-                    _event.postValue(ProductsEvent.NOT_MINUS_TO_SHOPPING_CART)
+                    _event.setValue(ProductsEvent.NOT_MINUS_TO_SHOPPING_CART)
                 }
         }
     }
@@ -338,8 +338,16 @@ class ProductsViewModel(
         updateProducts()
     }
 
+    fun getProductItem(product: Product): ProductItem =
+        products.value?.filterIsInstance<ProductItem>()?.find {
+            it.product == product
+        } ?: throw IllegalArgumentException("상품 목록에 해당 상품이 없습니다")
+
     companion object {
         private const val MINIMUM_PAGE = 1
         private const val LOAD_PRODUCTS_SIZE = 20
+        private const val LOAD_SHOPPING_CART_PAGE = 0
+        private const val LOAD_SHOPPING_CART_SIZE = 20
+        private const val LOAD_RECENT_WATCHING_PRODUCT_SIZE = 10
     }
 }

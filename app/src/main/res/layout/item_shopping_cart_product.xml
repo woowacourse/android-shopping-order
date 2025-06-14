@@ -11,7 +11,7 @@
 
         <variable
             name="shoppingCartProductItem"
-            type="woowacourse.shopping.view.shoppingCart.ShoppingCartItem.ShoppingCartProductItem" />
+            type="woowacourse.shopping.view.shoppingCart.ShoppingCartItem" />
 
     </data>
 

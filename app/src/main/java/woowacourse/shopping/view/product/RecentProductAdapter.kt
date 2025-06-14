@@ -1,24 +1,34 @@
 package woowacourse.shopping.view.product
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.view.product.RecentProductViewHolder.ProductRecentMoreWatchingClickListener
 
 class RecentProductAdapter(
-    private val recentWatchingItems: ProductsItem.RecentWatchingItem,
     private val productListener: ProductRecentMoreWatchingClickListener,
-) : RecyclerView.Adapter<RecentProductViewHolder>() {
+) : ListAdapter<ProductsItem.ProductItem, RecentProductViewHolder>(
+        object : DiffUtil.ItemCallback<ProductsItem.ProductItem>() {
+            override fun areItemsTheSame(
+                oldItem: ProductsItem.ProductItem,
+                newItem: ProductsItem.ProductItem,
+            ): Boolean = oldItem.product.id == newItem.product.id
+
+            override fun areContentsTheSame(
+                oldItem: ProductsItem.ProductItem,
+                newItem: ProductsItem.ProductItem,
+            ): Boolean = oldItem == newItem
+        },
+    ) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
     ): RecentProductViewHolder = RecentProductViewHolder.of(parent, productListener)
 
-    override fun getItemCount(): Int = recentWatchingItems.products.size
-
     override fun onBindViewHolder(
         holder: RecentProductViewHolder,
         position: Int,
     ) {
-        holder.bind(recentWatchingItems.products[position])
+        holder.bind(getItem(position))
     }
 }

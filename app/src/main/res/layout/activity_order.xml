@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.view.order.OrderViewModel" />
+
+        <variable
+            name="orderListener"
+            type="woowacourse.shopping.view.order.OrderListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/orderRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/orderToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/gray_5"
+            android:gravity="center_vertical"
+            android:minHeight="?attr/actionBarSize"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/orderBackButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:onClick="@{() -> orderListener.onBackButtonClick()}"
+                android:padding="16dp"
+                android:src="@drawable/ic_back"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:text="@string/order_pay_title"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@id/orderBackButton"
+                app:layout_constraintStart_toEndOf="@id/orderBackButton"
+                app:layout_constraintTop_toTopOf="@id/orderBackButton" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/orderCouponTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="30dp"
+            android:text="@string/order_available_coupon_title"
+            android:textColor="@color/gray_3"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/orderToolbar" />
+
+        <TextView
+            android:id="@+id/orderCouponDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/order_coupon_notice_description"
+            android:textColor="@color/gray_5"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@id/orderCouponTitle"
+            app:layout_constraintTop_toBottomOf="@id/orderCouponTitle" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/orderCoupons"
+            android:layout_width="match_parent"
+            android:layout_height="218dp"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/orderCouponDescription"
+            tools:listitem="@layout/item_coupon" />
+
+        <TextView
+            android:id="@+id/orderCouponsEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="218dp"
+            android:layout_marginHorizontal="18dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/gray_e3"
+            android:gravity="center"
+            android:text="@string/order_coupon_empty_message"
+            android:textColor="@color/gray_3"
+            android:textSize="30sp"
+            android:visibility="@{viewModel.coupons.empty ? View.VISIBLE : View.GONE}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/orderCouponDescription" />
+
+        <View
+            android:id="@+id/orderCouponDivider"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:layout_marginTop="30dp"
+            android:background="@color/gray_eb"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/orderCoupons" />
+
+        <TextView
+            android:id="@+id/orderPriceTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/order_price_title"
+            android:textColor="@color/gray_3"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/orderCouponDivider" />
+
+        <TextView
+            android:id="@+id/orderPrice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="18dp"
+            android:gravity="end"
+            android:text="@{@string/product_price_format(viewModel.price)}"
+            android:textColor="@color/gray_3"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@id/orderPriceTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/orderPriceTitle"
+            app:layout_constraintTop_toTopOf="@id/orderPriceTitle"
+            tools:text="200,250원" />
+
+        <TextView
+            android:id="@+id/orderCouponDiscountTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/order_coupon_discount_title"
+            android:textColor="@color/gray_3"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/orderPriceTitle"
+            app:layout_constraintTop_toBottomOf="@id/orderPriceTitle" />
+
+        <TextView
+            android:id="@+id/orderCouponDiscount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="@{@string/product_price_format(viewModel.couponDiscount)}"
+            android:textColor="@color/gray_3"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@id/orderCouponDiscountTitle"
+            app:layout_constraintEnd_toEndOf="@id/orderPrice"
+            app:layout_constraintStart_toEndOf="@id/orderCouponDiscountTitle"
+            app:layout_constraintTop_toTopOf="@id/orderCouponDiscountTitle"
+            tools:text="-25,000원" />
+
+        <TextView
+            android:id="@+id/orderShippingFeeTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/order_shipping_fee_title"
+            android:textColor="@color/gray_3"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/orderCouponDiscountTitle"
+            app:layout_constraintTop_toBottomOf="@id/orderCouponDiscountTitle" />
+
+        <TextView
+            android:id="@+id/orderShippingFee"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="@{@string/product_price_format(viewModel.shippingFee.amount)}"
+            android:textColor="@color/gray_3"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@id/orderShippingFeeTitle"
+            app:layout_constraintEnd_toEndOf="@id/orderPrice"
+            app:layout_constraintStart_toEndOf="@id/orderShippingFeeTitle"
+            app:layout_constraintTop_toTopOf="@id/orderShippingFeeTitle"
+            tools:text="3,000원" />
+
+        <View
+            android:id="@+id/orderPriceDivider"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/gray_eb"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/orderShippingFee" />
+
+        <TextView
+            android:id="@+id/orderTotalPriceTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/order_total_price_title"
+            android:textColor="@color/gray_3"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/orderCouponDiscountTitle"
+            app:layout_constraintTop_toBottomOf="@id/orderPriceDivider" />
+
+        <TextView
+            android:id="@+id/orderTotalPrice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="@{@string/product_price_format(viewModel.totalPrice)}"
+            android:textColor="@color/gray_3"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@id/orderTotalPriceTitle"
+            app:layout_constraintEnd_toEndOf="@id/orderShippingFee"
+            app:layout_constraintStart_toEndOf="@id/orderTotalPriceTitle"
+            app:layout_constraintTop_toTopOf="@id/orderTotalPriceTitle"
+            tools:text="202,000원" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/mint"
+            android:gravity="center"
+            android:onClick="@{() -> orderListener.onOrderButtonClick()}"
+            android:paddingVertical="12dp"
+            android:text="@string/order_pay_button"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

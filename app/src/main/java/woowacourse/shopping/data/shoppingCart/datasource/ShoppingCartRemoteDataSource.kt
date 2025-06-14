@@ -6,27 +6,19 @@ import woowacourse.shopping.data.shoppingCart.remote.dto.CartItemRequestDto
 import woowacourse.shopping.data.shoppingCart.remote.dto.ShoppingCartItemsResponseDto
 
 interface ShoppingCartRemoteDataSource {
-    fun getCartCounts(onCallback: (Result<CartCountsResponseDto?>) -> Unit)
+    suspend fun getCartCounts(): CartCountsResponseDto
 
-    fun saveCartItem(
-        cartItemRequestDto: CartItemRequestDto,
-        onCallback: (Result<Unit>) -> Unit,
-    )
+    suspend fun saveCartItem(cartItemRequestDto: CartItemRequestDto)
 
-    fun updateCartItemQuantity(
+    suspend fun updateCartItemQuantity(
         shoppingCartId: Long,
         cartItemQuantityRequestDto: CartItemQuantityRequestDto,
-        onCallback: (Result<Unit>) -> Unit,
     )
 
-    fun getCartItems(
+    suspend fun getCartItems(
         page: Int,
         size: Int,
-        onCallback: (Result<ShoppingCartItemsResponseDto?>) -> Unit,
-    )
+    ): ShoppingCartItemsResponseDto
 
-    fun deleteCartItem(
-        shoppingCartId: Long,
-        onCallback: (Result<Unit>) -> Unit,
-    )
+    suspend fun deleteCartItem(shoppingCartId: Long)
 }

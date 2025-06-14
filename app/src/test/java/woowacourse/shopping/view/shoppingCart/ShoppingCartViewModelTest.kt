@@ -2,9 +2,9 @@ package woowacourse.shopping.view.shoppingCart
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import io.mockk.clearAllMocks
-import io.mockk.every
-import io.mockk.invoke
+import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.jupiter.api.AfterEach
@@ -12,9 +12,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.data.shoppingCart.repository.ShoppingCartRepository
-import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.view.common.CoroutinesTestExtension
 import woowacourse.shopping.view.common.InstantTaskExecutorExtension
 
+@ExperimentalCoroutinesApi
+@ExtendWith(CoroutinesTestExtension::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class ShoppingCartViewModelTest {
     @get:Rule
@@ -32,11 +34,10 @@ class ShoppingCartViewModelTest {
     @Test
     fun `장바구니 업데이트 실패 시 단발성 이벤트로 UPDATE_SHOPPING_CART_FAILURE 값을 가진다`() {
         // given:
-        every {
-            shoppingCartRepository.load(any(), any(), captureLambda())
-        } answers {
-            lambda<(Result<List<Product>>) -> Unit>().invoke(Result.failure(RuntimeException()))
-        }
+        coEvery { shoppingCartRepository.load(any(), any()) } returns
+            Result.failure(
+                RuntimeException(),
+            )
 
         // when:
         shoppingCartViewModel.updateShoppingCart()
