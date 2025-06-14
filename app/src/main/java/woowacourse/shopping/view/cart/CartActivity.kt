@@ -12,6 +12,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityShoppingCartBinding
+import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.view.recommend.RecommendActivity
 import woowacourse.shopping.view.showToast
 
@@ -66,11 +67,12 @@ class CartActivity :
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         binding.onOrder = {
+            val cartProductItems: Set<CartItemType.ProductItem> =
+                viewModel.selectedCartItems.value ?: emptySet()
+            val cartItems: List<CartItem> = cartProductItems.map { it.cartItem }
             val intent =
                 RecommendActivity.newIntent(
-                    this,
-                    viewModel.totalQuantity.value ?: error(""),
-                    viewModel.totalPrice.value ?: error(""),
+                    this, cartItems
                 )
             recommendActivityResultLauncher.launch(intent)
         }

@@ -1,0 +1,126 @@
+package woowacourse.shopping.domain.product
+
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import woowacourse.shopping.domain.cart.CartItem
+import woowacourse.shopping.domain.cart.Receipt
+import woowacourse.shopping.domain.coupon.FreeShippingCoupon
+import java.time.LocalDate
+import java.time.LocalDateTime
+
+class FreeShippingCouponTest {
+    private lateinit var freeShippingCoupon: FreeShippingCoupon
+
+    @BeforeEach
+    fun setUp() {
+        freeShippingCoupon = FreeShippingCoupon(
+            couponId = 1L,
+            description = "",
+            expirationDate = LocalDate.of(2025, 8, 31),
+            minimumOrderPrice = 50_000
+        )
+    }
+
+    @Test
+    fun `만료일이 넘지 않고 최소 금액 보다 많으면 쿠폰이 적용 가능하다`() {
+
+        val currentDateTime = LocalDateTime.of(2025, 6, 8, 20, 47)
+
+        val receipt = Receipt(
+            listOf(
+                CartItem(
+                    id = 1,
+                    product = Product(
+                        id = 1,
+                        name = "밥",
+                        price = 50_001,
+                        category = "식료품",
+                    ),
+                    quantity = 1
+                )
+            )
+        )
+
+        val actual = freeShippingCoupon.isAvailable(receipt, currentDateTime)
+        val expected = true
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `만료일이 넘었고 최소 금액 보다 많으면 쿠폰이 적용 불가능하다`() {
+
+        val currentDateTime = LocalDateTime.of(2025, 12, 1, 20, 47)
+
+        val receipt = Receipt(
+            listOf(
+                CartItem(
+                    id = 1,
+                    product = Product(
+                        id = 1,
+                        name = "밥",
+                        price = 50_001,
+                        category = "식료품",
+                    ),
+                    quantity = 1
+                )
+            )
+        )
+
+        val actual = freeShippingCoupon.isAvailable(receipt, currentDateTime)
+        val expected = false
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `만료일이 넘지 않고 최소 금액 보다 적으면 쿠폰이 적용 불가능하다`() {
+
+        val currentDateTime = LocalDateTime.of(2025, 6, 8, 20, 47)
+
+        val receipt = Receipt(
+            listOf(
+                CartItem(
+                    id = 1,
+                    product = Product(
+                        id = 1,
+                        name = "밥",
+                        price = 9_999,
+                        category = "식료품",
+                    ),
+                    quantity = 1
+                )
+            )
+        )
+
+        val actual = freeShippingCoupon.isAvailable(receipt, currentDateTime)
+        val expected = false
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `쿠폰을 적용하게 되면 배달비 만큼 할인된 금액이 나온다`() {
+        val receipt = Receipt(
+            listOf(
+                CartItem(
+                    id = 1,
+                    product = Product(
+                        id = 1,
+                        name = "밥",
+                        price = 9_999,
+                        category = "식료품",
+                    ),
+                    quantity = 1
+                )
+            ),
+            5000,
+        )
+
+        val actual = freeShippingCoupon.discountPrice(receipt)
+        val expected = 5000
+
+        assertThat(actual).isEqualTo(expected)
+    }
+}

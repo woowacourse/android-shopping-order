@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="couponItem"
+            type="woowacourse.shopping.view.receipt.CouponItem" />
+
+        <variable
+            name="receiptActions"
+            type="woowacourse.shopping.view.receipt.ReceiptActions" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_coupon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/background_shopping_cart_product"
+        android:paddingHorizontal="12dp"
+        android:paddingBottom="20dp">
+
+        <CheckBox
+            android:id="@+id/checkbox_coupon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:checked="true" />
+
+        <TextView
+            android:id="@+id/tv_coupon_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="@{couponItem.description}"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/checkbox_coupon"
+            app:layout_constraintStart_toEndOf="@id/checkbox_coupon"
+            app:layout_constraintTop_toTopOf="@id/checkbox_coupon"
+            tools:text="2개 구매 시 1개 무료 쿠폰" />
+
+        <TextView
+            android:id="@+id/tv_expiration_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@{@string/expirationDate(couponItem.expirationDate)}"
+            android:textColor="@color/gray_5"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@id/checkbox_coupon"
+            app:layout_constraintTop_toBottomOf="@id/tv_coupon_name"
+            tools:text="만료일: 2024년 11월 30일" />
+
+        <TextView
+            android:id="@+id/tv_minimum_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:text="@{@string/minimum_order_price(couponItem.minimumOrderPrice)}"
+            android:textColor="@color/gray_5"
+            android:textSize="14sp"
+            android:visibility="@{couponItem.minimumOrderPrice != null ? View.VISIBLE : View.GONE}"
+            app:layout_constraintStart_toStartOf="@id/checkbox_coupon"
+            app:layout_constraintTop_toBottomOf="@id/tv_expiration_date"
+            tools:text="최소 주문 금액: 100,000원" />
+
+        <TextView
+            android:id="@+id/tv_available_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:text="@{@string/receipt_available_time_format(couponItem.availableTime)}"
+            android:textColor="@color/gray_5"
+            android:textSize="14sp"
+            android:visibility="@{couponItem.availableTime != null ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/checkbox_coupon"
+            app:layout_constraintTop_toBottomOf="@id/tv_minimum_amount"
+            tools:text="사용 가능 시간: 04시 ~ 07시" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

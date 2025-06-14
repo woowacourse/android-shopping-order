@@ -1,6 +1,7 @@
 package woowacourse.shopping.di
 
 import woowacourse.shopping.data.cart.source.RemoteCartDataSource
+import woowacourse.shopping.data.coupon.source.RemoteCouponDataSource
 import woowacourse.shopping.data.product.source.LocalRecentViewedProductsDataSource
 import woowacourse.shopping.data.product.source.RemoteProductsDataSource
 
@@ -15,5 +16,9 @@ object DataSourceModule {
 
     val remoteCartDataSource by lazy {
         RemoteCartDataSource(NetworkModule.cartService)
+    }
+
+    val remoteCouponDataSource by lazy {
+        RemoteCouponDataSource(NetworkModule.couponService)
     }
 }

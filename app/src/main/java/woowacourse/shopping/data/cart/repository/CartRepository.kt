@@ -4,30 +4,24 @@ import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.cart.PagedCartItems
 
 interface CartRepository {
-    fun loadPagedCartItems(
+    suspend fun loadPagedCartItems(
         page: Int,
         size: Int,
-        onLoad: (Result<PagedCartItems>) -> Unit,
-    )
+    ): PagedCartItems
 
-    fun loadCart(onLoad: (Result<List<CartItem>>) -> Unit)
+    suspend fun loadCart(): List<CartItem>
 
-    fun addCartItem(
+    suspend fun addCartItem(
         productId: Long,
         quantity: Int,
-        onAdd: (Result<Unit>) -> Unit,
     )
 
-    fun remove(
-        cartItemId: Long,
-        onRemove: (Result<Unit>) -> Unit,
-    )
+    suspend fun remove(cartItemId: Long)
 
-    fun updateCartItemQuantity(
+    suspend fun updateCartItemQuantity(
         cartItemId: Long,
         quantity: Int,
-        onUpdate: (Result<Unit>) -> Unit,
     )
 
-    fun cartItemsSize(onResult: (Result<Int>) -> Unit)
+    suspend fun cartItemsSize(): Int
 }

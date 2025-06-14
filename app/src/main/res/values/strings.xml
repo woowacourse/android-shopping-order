@@ -46,4 +46,18 @@
     <string name="product_recommend_remove_shopping_cart_product_error_message">장바구니에 담긴 상품을 제거하는 데 실패했습니다.</string>
     <string name="product_recommend_patch_shopping_cart_error_message">장바구니 아이템을 수정하는 데 실패했습니다.</string>
 
+    <!-- 주문 페이지 -->
+    <string name="receipt_make_payment">결제하기</string>
+    <string name="applicable_coupons">적용 가능한 쿠폰</string>
+    <string name="appliable_one_coupon">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="order_price">주문금액</string>
+    <string name="coupon_discount_price">쿠폰 할인 금액</string>
+    <string name="shipping_price">배송비</string>
+    <string name="total_order_price">총 결제 금액</string>
+    <string name="minimum_order_price">최소 주문 금액: %,d원</string>
+    <string name="expirationDate">만료일: %s</string>
+    <string name="receipt_product_format">%,d원</string>
+    <string name="receipt_available_time_format">사용 가능 시간: %s</string>
+    <string name="receipt_load_coupon_items_error_message">쿠폰 목록을 불러오는데 실패했습니다. 인터넷을 확인해주세요.</string>
+
 </resources>

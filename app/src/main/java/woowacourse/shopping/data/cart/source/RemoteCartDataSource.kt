@@ -9,18 +9,45 @@ import woowacourse.shopping.data.product.entity.CartItemEntity
 class RemoteCartDataSource(
     private val cartService: CartService,
 ) : CartDataSource {
-    override fun pagedCartItems(
+    override suspend fun pagedCartItems(
         page: Int,
         size: Int,
     ): CartResponse? {
-        val response: CartResponse? = cartService.getCart(page = page, size = size).execute().body()
+        val response: CartResponse? = cartService.getCart(page = page, size = size)
 
         return response
     }
 
-    override fun cart(): List<CartItemEntity> {
-        val response: CartResponse? = cartService.getAllCart().execute().body()
+    override suspend fun cart(): List<CartItemEntity> {
+        val response: CartResponse? = cartService.getAllCart()
         return response?.content?.mapNotNull { it.toCartItemEntityOrNull() } ?: emptyList()
+    }
+
+    override suspend fun addCartItem(
+        productId: Long,
+        quantity: Int,
+    ) {
+        cartService.postCartItem(CartItemRequest(productId, quantity))
+    }
+
+    override suspend fun remove(cartItemId: Long) {
+        cartService.deleteShoppingCartItem(cartItemId)
+    }
+
+    override suspend fun updateCartItemQuantity(
+        cartItemId: Long,
+        newQuantity: Int,
+    ) {
+        cartService
+            .patchCartItemQuantity(
+                cartItemId,
+                CartItemQuantityRequest(newQuantity),
+            )
+    }
+
+    override suspend fun cartItemsSize(): Int {
+        val response = cartService.getCartItemQuantity()
+        return response?.quantity ?: 0
     }
 
     private fun CartResponse.Content.toCartItemEntityOrNull(): CartItemEntity? =
@@ -43,31 +70,4 @@ class RemoteCartDataSource(
                 quantity = quantity,
             )
         }
-
-    override fun addCartItem(
-        productId: Long,
-        quantity: Int,
-    ) {
-        cartService.postCartItem(CartItemRequest(productId, quantity)).execute()
-    }
-
-    override fun remove(cartItemId: Long) {
-        cartService.deleteShoppingCartItem(cartItemId).execute()
-    }
-
-    override fun updateCartItemQuantity(
-        cartItemId: Long,
-        newQuantity: Int,
-    ) {
-        cartService
-            .patchCartItemQuantity(
-                cartItemId,
-                CartItemQuantityRequest(newQuantity),
-            ).execute()
-    }
-
-    override fun cartItemsSize(): Int {
-        val response = cartService.getCartItemQuantity().execute().body()
-        return response?.quantity ?: 0
-    }
 }

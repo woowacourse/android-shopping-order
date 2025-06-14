@@ -4,24 +4,24 @@ import woowacourse.shopping.data.cart.dto.CartResponse
 import woowacourse.shopping.data.product.entity.CartItemEntity
 
 interface CartDataSource {
-    fun pagedCartItems(
+    suspend fun pagedCartItems(
         page: Int,
         size: Int,
     ): CartResponse?
 
-    fun cart(): List<CartItemEntity>
+    suspend fun cart(): List<CartItemEntity>
 
-    fun addCartItem(
+    suspend fun addCartItem(
         productId: Long,
         quantity: Int,
     )
 
-    fun remove(cartItemId: Long)
+    suspend fun remove(cartItemId: Long)
 
-    fun updateCartItemQuantity(
+    suspend fun updateCartItemQuantity(
         cartItemId: Long,
         newQuantity: Int,
     )
 
-    fun cartItemsSize(): Int
+    suspend fun cartItemsSize(): Int
 }

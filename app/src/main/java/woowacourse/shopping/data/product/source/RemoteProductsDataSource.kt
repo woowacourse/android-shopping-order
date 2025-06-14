@@ -9,22 +9,22 @@ import woowacourse.shopping.data.product.service.ProductService
 class RemoteProductsDataSource(
     private val productService: ProductService,
 ) : ProductsDataSource {
-    override fun pagedProducts(
+    override suspend fun pagedProducts(
         page: Int,
         size: Int,
     ): ProductsResponse? {
-        val response: ProductsResponse? = productService.getProducts(page, size).execute().body()
+        val response: ProductsResponse? = productService.getProducts(page, size)
         return response
     }
 
-    override fun getProductById(id: Long): ProductEntity? {
-        val response: ProductResponse? = productService.getProductById(id).execute().body()
+    override suspend fun getProductById(id: Long): ProductEntity? {
+        val response: ProductResponse? = productService.getProductById(id)
         return response.toEntityOrNull()
     }
 
-    override fun getProductsByCategory(category: String): List<ProductEntity> {
+    override suspend fun getProductsByCategory(category: String): List<ProductEntity> {
         val response: ProductsResponse? =
-            productService.getProductsByCategory(category).execute().body()
+            productService.getProductsByCategory(category)
 
         return response?.content?.mapNotNull {
             it.toEntityOrNull()

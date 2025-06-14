@@ -1,22 +1,24 @@
 package woowacourse.shopping.data.cart.repository
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.cart.dto.CartResponse
 import woowacourse.shopping.data.cart.source.CartDataSource
 import woowacourse.shopping.di.DataSourceModule
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.cart.PagedCartItems
 import woowacourse.shopping.domain.product.Product
-import kotlin.concurrent.thread
 
 class DefaultCartRepository(
     private val cartDataSource: CartDataSource = DataSourceModule.remoteCartDataSource,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : CartRepository {
-    override fun loadPagedCartItems(
+    override suspend fun loadPagedCartItems(
         page: Int,
         size: Int,
-        onLoad: (Result<PagedCartItems>) -> Unit,
-    ) {
-        {
+    ): PagedCartItems =
+        withContext(ioDispatcher) {
             val cartResponse: CartResponse? =
                 cartDataSource.pagedCartItems(page, size)
 
@@ -27,49 +29,42 @@ class DefaultCartRepository(
                 pageNumber = cartResponse?.pageable?.pageNumber,
                 totalPages = cartResponse?.totalPages,
             )
-        }.runAsync(onLoad)
-    }
+        }
 
-    override fun loadCart(onLoad: (Result<List<CartItem>>) -> Unit) {
-        { cartDataSource.cart().map { it.toDomain() } }.runAsync(onLoad)
-    }
+    override suspend fun loadCart(): List<CartItem> =
+        withContext(ioDispatcher) {
+            cartDataSource.cart().map { it.toDomain() }
+        }
 
-    override fun addCartItem(
+    override suspend fun addCartItem(
         productId: Long,
         quantity: Int,
-        onAdd: (Result<Unit>) -> Unit,
-    ) {
-        {
-            cartDataSource.addCartItem(
-                productId = productId,
-                quantity = quantity,
-            )
-        }.runAsync(onAdd)
+    ) = withContext(ioDispatcher) {
+        cartDataSource.addCartItem(
+            productId = productId,
+            quantity = quantity,
+        )
     }
 
-    override fun remove(
-        cartItemId: Long,
-        onRemove: (Result<Unit>) -> Unit,
-    ) {
-        { cartDataSource.remove(cartItemId) }.runAsync(onRemove)
-    }
+    override suspend fun remove(cartItemId: Long) =
+        withContext(ioDispatcher) {
+            cartDataSource.remove(cartItemId)
+        }
 
-    override fun updateCartItemQuantity(
+    override suspend fun updateCartItemQuantity(
         cartItemId: Long,
         quantity: Int,
-        onUpdate: (Result<Unit>) -> Unit,
-    ) {
-        {
-            cartDataSource.updateCartItemQuantity(
-                cartItemId = cartItemId,
-                newQuantity = quantity,
-            )
-        }.runAsync(onUpdate)
+    ) = withContext(ioDispatcher) {
+        cartDataSource.updateCartItemQuantity(
+            cartItemId = cartItemId,
+            newQuantity = quantity,
+        )
     }
 
-    override fun cartItemsSize(onResult: (Result<Int>) -> Unit) {
-        { cartDataSource.cartItemsSize() }.runAsync(onResult)
-    }
+    override suspend fun cartItemsSize(): Int =
+        withContext(ioDispatcher) {
+            cartDataSource.cartItemsSize()
+        }
 
     private fun CartResponse.Content.toDomainOrNull(): CartItem? =
         if (id == null ||
@@ -95,11 +90,4 @@ class DefaultCartRepository(
                 quantity = quantity,
             )
         }
-
-    private inline fun <T> (() -> T).runAsync(crossinline onResult: (Result<T>) -> Unit) {
-        thread {
-            val result = runCatching(this)
-            onResult(result)
-        }
-    }
 }

@@ -8,6 +8,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import woowacourse.shopping.data.AuthInterceptor
 import woowacourse.shopping.data.cart.service.CartService
+import woowacourse.shopping.data.coupon.service.CouponService
 import woowacourse.shopping.data.product.service.ProductService
 
 object NetworkModule {
@@ -32,4 +33,5 @@ object NetworkModule {
 
     val productService: ProductService by lazy { retrofit.create(ProductService::class.java) }
     val cartService: CartService by lazy { retrofit.create(CartService::class.java) }
+    val couponService: CouponService by lazy { retrofit.create(CouponService::class.java) }
 }
