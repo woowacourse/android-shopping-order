@@ -5,7 +5,7 @@ import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import woowacourse.shopping.presentation.model.CartItemUiModel
-import woowacourse.shopping.presentation.view.cart.cartItem.CartItemEventHandler
+import woowacourse.shopping.presentation.view.cart.cartitem.CartItemEventHandler
 
 @BindingAdapter("imageUrl")
 fun setImageBindingAdapter(
@@ -18,16 +18,15 @@ fun setImageBindingAdapter(
         .into(imageView)
 }
 
-@BindingAdapter("isChecked", "onCheckedChanged", "cartItem")
+@BindingAdapter(value = ["cartItem", "eventHandler"], requireAll = true)
 fun setOnCheckedChangedBindingAdapter(
     checkBox: CheckBox,
-    isChecked: Boolean,
-    eventHandler: CartItemEventHandler,
     cartItem: CartItemUiModel,
+    eventHandler: CartItemEventHandler,
 ) {
     checkBox.setOnCheckedChangeListener(null)
-    checkBox.isChecked = isChecked
-    checkBox.setOnCheckedChangeListener { _, checked ->
-        eventHandler.onProductSelectionToggle(cartItem, checked)
+    checkBox.isChecked = cartItem.isSelected
+    checkBox.setOnCheckedChangeListener { _, _ ->
+        eventHandler.onProductSelectionToggle(cartItem)
     }
 }

@@ -2,13 +2,15 @@ package woowacourse.shopping.presentation.view.cart
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCartBinding
-import woowacourse.shopping.presentation.view.cart.cartItem.CartItemFragment
-import woowacourse.shopping.presentation.view.cart.recommendation.CartRecommendationFragment
+import woowacourse.shopping.presentation.view.cart.cartitem.CartItemFragment
+import woowacourse.shopping.presentation.view.cart.recommendation.RecommendationFragment
+import woowacourse.shopping.presentation.view.checkout.CheckoutFragment
 import woowacourse.shopping.presentation.view.common.BaseFragment
 
 class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
@@ -24,11 +26,25 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
     private val cartEventHandler =
         object : CartEventHandler {
             override fun onPlaceOrder() {
-                childFragmentManager.commit {
-                    replace(R.id.cart_fragment_container, CartRecommendationFragment())
+                if (viewModel.canPlaceOrder.value != true) {
+                    Toast.makeText(activity, R.string.message_no_item_selected, Toast.LENGTH_LONG).show()
+                    return
                 }
-                viewModel.disableSelection()
-                viewModel.fetchRecommendedProducts()
+
+                if (viewModel.canSelectItems.value == true) {
+                    childFragmentManager.commit {
+                        replace(R.id.cart_fragment_container, RecommendationFragment())
+                    }
+                    viewModel.disableSelection()
+                    viewModel.fetchRecommendedProducts()
+                } else {
+                    parentFragmentManager.commit {
+                        setReorderingAllowed(true)
+                        val bundle = CheckoutFragment.newBundle(viewModel.selectedProductIds.value.orEmpty().toLongArray())
+                        replace(R.id.shopping_fragment_container, CheckoutFragment::class.java, bundle)
+                        addToBackStack(null)
+                    }
+                }
             }
 
             override fun onBatchSelect(isChecked: Boolean) {
@@ -51,7 +67,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
         super.onViewCreated(view, savedInstanceState)
         initBinding()
         initObserver()
-        requireActivity().onBackPressedDispatcher.addCallback(backCallback)
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backCallback)
     }
 
     override fun onDestroyView() {
@@ -78,6 +94,8 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
         viewModel.canSelectItems.observe(viewLifecycleOwner) {
             binding.canSelectItems = it
         }
+
+        viewModel.canPlaceOrder.observe(viewLifecycleOwner) {}
     }
 
     private fun navigateBack() {

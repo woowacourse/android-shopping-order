@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="java.time.format.DateTimeFormatter" />
+
+        <import type="android.view.View" />
+
+        <import type="android.widget.CheckBox" />
+
+        <variable
+            name="coupon"
+            type="woowacourse.shopping.presentation.model.CouponUiModel" />
+
+        <variable
+            name="eventHandler"
+            type="woowacourse.shopping.presentation.view.checkout.CheckoutEventHandler" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_margin="10dp"
+        android:background="@drawable/shape_bg_border"
+        android:padding="10dp">
+
+        <CheckBox
+            android:id="@+id/checkbox"
+            android:layout_width="20dp"
+            android:layout_height="0dp"
+            android:checked="@{coupon.selected}"
+            android:gravity="center"
+            android:onClick="@{(view) -> eventHandler.onToggleSelection(coupon, ((CheckBox) view).isChecked)}"
+            app:layout_constraintBottom_toBottomOf="@id/coupon_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/coupon_title" />
+
+        <TextView
+            android:id="@+id/coupon_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{coupon.coupon.info.description}"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/checkbox"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="5,000원 할인 쿠폰" />
+
+        <TextView
+            android:id="@+id/expiration_date_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/expiration_date_description"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/coupon_title" />
+
+        <TextView
+            android:id="@+id/expiration_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@{coupon.coupon.info.expirationDate.format(DateTimeFormatter.ofPattern(@string/date_formatter_pattern))}"
+            android:textSize="12sp"
+            app:layout_constraintStart_toEndOf="@id/expiration_date_description"
+            app:layout_constraintTop_toBottomOf="@id/coupon_title"
+            tools:text="2024년 11월 30일" />
+
+        <TextView
+            android:id="@+id/minimum_price_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/minimum_price_description"
+            android:textSize="12sp"
+            android:visibility="@{coupon.coupon.info.minimumAmount == null ? View.GONE : View.VISIBLE}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/expiration_date_description" />
+
+        <TextView
+            android:id="@+id/minimum_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@{@string/product_price_format(coupon.coupon.info.minimumAmount)}"
+            android:textSize="12sp"
+            android:visibility="@{coupon.coupon.info.minimumAmount == null ? View.GONE : View.VISIBLE}"
+            app:layout_constraintStart_toEndOf="@id/minimum_price_description"
+            app:layout_constraintTop_toBottomOf="@id/expiration_date_description"
+            tools:text="100,000원" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

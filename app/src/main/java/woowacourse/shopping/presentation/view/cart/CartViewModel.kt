@@ -5,11 +5,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import woowacourse.shopping.data.RepositoryProvider
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
+import kotlinx.coroutines.launch
+import woowacourse.shopping.data.repository.RepositoryProvider
+import woowacourse.shopping.data.repository.cart.CartRepository
+import woowacourse.shopping.data.repository.product.ProductRepository
+import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.Product
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toCartItem
@@ -41,172 +44,178 @@ class CartViewModel(
     private var _isLastPage = MutableLiveData<Boolean>()
     val isLastPage: LiveData<Boolean> = _isLastPage
 
-    val totalPrice: LiveData<Int> =
-        _cartItems.map { cartItems ->
-            cartItems
-                .filter { cartItem -> cartItem.isSelected }
-                .sumOf { selectedItem -> selectedItem.cartItem.totalPrice }
-        }
+    private val _totalPrice = MutableLiveData<Long>(0)
+    val totalPrice: LiveData<Long> = _totalPrice
 
-    val totalCount: LiveData<Int> =
-        _cartItems.map { cartItems ->
-            cartItems
-                .filter { cartItem -> cartItem.isSelected }
-                .sumOf { selectedItem -> selectedItem.cartItem.quantity }
-        }
+    private val _totalCount = MutableLiveData<Int>(0)
+    val totalCount: LiveData<Int> = _totalCount
 
-    val allSelected: LiveData<Boolean> =
-        _cartItems.map { cartItems ->
-            cartItems.all { cartItem -> cartItem.isSelected }
-        }
+    private val _allSelected = MutableLiveData<Boolean>(false)
+    val allSelected: LiveData<Boolean> = _allSelected
+
+    private val _selectedProductIds = MutableLiveData<Set<Long>>()
+    val selectedProductIds: LiveData<Set<Long>> = _selectedProductIds
+
+    val canPlaceOrder: LiveData<Boolean> =
+        _selectedProductIds.map { selectedProductIds -> selectedProductIds.isNotEmpty() }
 
     private val _canSelectItems = MutableLiveData(true)
     val canSelectItems: LiveData<Boolean> = _canSelectItems
 
-    private val selectionStatus = mutableMapOf<Long, Boolean>()
-
     private var isProcessingRequest = false
 
     fun loadPageOfShoppingCart(indexOffset: Int = 0) {
-        val newPageIndex = ((_pageIndex.value ?: 0) + indexOffset).coerceAtLeast(0)
-        cartRepository.loadPageOfCartItems(
-            pageIndex = newPageIndex,
-            pageSize = PAGE_SIZE,
-        ) { products, isFirstPage, isLastPage ->
+        viewModelScope.launch {
+            val newPageIndex = ((_pageIndex.value ?: 0) + indexOffset).coerceAtLeast(0)
+            val page =
+                cartRepository.loadPageOfCartItems(
+                    pageIndex = newPageIndex,
+                    pageSize = PAGE_SIZE,
+                )
             val updatedItems =
-                products.map { product ->
+                page.items.map { product ->
                     product
                         .toCartItemUiModel()
-                        .copy(isSelected = selectionStatus[product.cartId] ?: false)
+                        .copy(
+                            isSelected =
+                                _selectedProductIds.value.orEmpty()
+                                    .contains(product.product.id),
+                        )
                 }
             _cartItems.postValue(updatedItems)
             _pageIndex.postValue(newPageIndex)
-            _isFirstPage.postValue(isFirstPage)
-            _isLastPage.postValue(isLastPage)
+            _isFirstPage.postValue(page.isFirst)
+            _isLastPage.postValue(page.isLast)
         }
     }
 
     fun increaseQuantity(product: ProductUiModel) {
-        if (isProcessingRequest) return
+        viewModelScope.launch {
+            if (isProcessingRequest) return@launch
 
-        isProcessingRequest = true
-        val cartItem = product.toCartItem()
-        if (product.quantity == 0) {
-            addToCart(cartItem.toCartItemUiModel())
-            isProcessingRequest = false
-            return
-        }
+            isProcessingRequest = true
+            val cartItem = product.toCartItem()
+            if (product.quantity == 0) {
+                addToCart(cartItem.toCartItemUiModel())
+                isProcessingRequest = false
+                return@launch
+            }
 
-        cartRepository.increaseQuantity(cartItem) {
-            val updatedItem =
+            cartRepository.increaseQuantity(cartItem)
+            _itemUpdateEvent.value =
                 CartItemUiModel(
                     cartItem.copy(quantity = cartItem.quantity + 1),
-                    isSelected = selectionStatus[cartItem.cartId] ?: false,
+                    isSelected = _selectedProductIds.value.orEmpty().contains(product.id),
                 )
-            updateCartItems(updatedItem)
+            updateSelectionInfo()
+            loadPageOfShoppingCart()
+
             isProcessingRequest = false
         }
     }
 
     fun decreaseQuantity(product: ProductUiModel) {
-        val cartItem = product.toCartItem()
-        if (cartItem.quantity == 1) {
-            removeFromCart(cartItem.toCartItemUiModel())
-            return
-        }
+        viewModelScope.launch {
+            if (isProcessingRequest) return@launch
 
-        if (isProcessingRequest) return
-        isProcessingRequest = true
-        cartRepository.decreaseQuantity(cartItem) {
-            val updatedItem =
+            isProcessingRequest = true
+            val cartItem = product.toCartItem()
+            if (cartItem.quantity == 1) {
+                removeFromCart(cartItem.toCartItemUiModel())
+                isProcessingRequest = false
+                return@launch
+            }
+
+            cartRepository.decreaseQuantity(cartItem)
+            _itemUpdateEvent.value =
                 CartItemUiModel(
                     cartItem.copy(quantity = cartItem.quantity - 1),
-                    isSelected = selectionStatus[cartItem.cartId] ?: false,
+                    isSelected = _selectedProductIds.value.orEmpty().contains(product.id),
                 )
-            updateCartItems(updatedItem)
+            updateSelectionInfo()
+            loadPageOfShoppingCart()
+
             isProcessingRequest = false
         }
     }
 
-    private fun addToCart(cartItem: CartItemUiModel) {
+    private suspend fun addToCart(cartItem: CartItemUiModel) {
         val newItem = cartItem.cartItem.copy(quantity = 1)
-        cartRepository.addCartItem(newItem) { addedItem ->
-            if (addedItem != null) {
-                _cartItems.postValue(_cartItems.value?.plus(cartItem.copy(cartItem = newItem)))
-                _itemUpdateEvent.postValue(addedItem.toCartItemUiModel().copy(isSelected = true))
-                setCartItemSelection(addedItem.toCartItemUiModel(), true)
+        _cartItems.postValue(_cartItems.value?.plus(cartItem.copy(cartItem = newItem)))
+        cartRepository.addCartItem(newItem)?.toCartItemUiModel()
+            ?.let { addedItem ->
+                _itemUpdateEvent.postValue(addedItem)
+                toggleCartItemSelection(addedItem)
             }
-        }
     }
 
     fun removeFromCart(cartItem: CartItemUiModel) {
-        val removedItem = cartItem.cartItem.copy(quantity = 0)
-        cartRepository.deleteCartItem(removedItem.cartId) {
+        viewModelScope.launch {
+            val removedItem = cartItem.cartItem.copy(quantity = 0)
+            cartRepository.deleteCartItem(removedItem.cartId)
             _cartItems.postValue(
-                _cartItems.value?.filterNot { cartItem ->
-                    cartItem.cartItem.cartId == removedItem.cartId
+                _cartItems.value?.filterNot { item ->
+                    item.cartItem.cartId == removedItem.cartId
                 },
             )
             _itemDeleteEvent.postValue(removedItem.cartId)
-            selectionStatus.remove(removedItem.cartId)
-            fetchRecommendedProducts()
+            _itemUpdateEvent.postValue(removedItem.toCartItemUiModel().copy(isSelected = false))
+            _selectedProductIds.value =
+                _selectedProductIds.value.orEmpty().toMutableSet()
+                    .apply { remove(removedItem.product.id) }
+            updateSelectionInfo()
         }
     }
 
-    private fun updateCartItems(modifiedCartItem: CartItemUiModel) {
-        val newCartItems =
-            _cartItems.value.orEmpty().map { cartItem ->
-                if (modifiedCartItem.cartItem.cartId == cartItem.cartItem.cartId) {
-                    modifiedCartItem
-                } else {
-                    cartItem
+    fun toggleCartItemSelection(cartItem: CartItemUiModel) {
+        viewModelScope.launch {
+            _selectedProductIds.value =
+                _selectedProductIds.value.orEmpty().toMutableSet().apply {
+                    if (cartItem.isSelected) {
+                        remove(cartItem.cartItem.product.id)
+                    } else {
+                        add(cartItem.cartItem.product.id)
+                    }
                 }
-            }
-        _cartItems.postValue(newCartItems)
-        _itemUpdateEvent.postValue(modifiedCartItem)
-    }
-
-    fun setCartItemSelection(
-        cartItem: CartItemUiModel,
-        isSelected: Boolean,
-    ) {
-        selectionStatus[cartItem.cartItem.cartId] = isSelected
-        updateSelectionInfo()
+            _itemUpdateEvent.postValue(cartItem.copy(isSelected = !cartItem.isSelected))
+            updateSelectionInfo()
+        }
     }
 
     fun selectAllCartItems(selectAll: Boolean) {
-        cartRepository.loadAllCartItems { allItems ->
-            _cartItems.postValue(
-                allItems.map { cartItem ->
-                    selectionStatus[cartItem.cartId] = selectAll
-                    cartItem.toCartItemUiModel().copy(isSelected = selectAll)
-                },
-            )
+        viewModelScope.launch {
+            _selectedProductIds.value =
+                if (selectAll) {
+                    cartRepository.loadAllCartItems().map { cartItem -> cartItem.product.id }
+                        .toSet()
+                } else {
+                    emptySet()
+                }
             loadPageOfShoppingCart()
+            updateSelectionInfo()
         }
+    }
+
+    private suspend fun updateSelectionInfo() {
+        val allCartItems = cartRepository.loadAllCartItems()
+        val selectedCartItems =
+            allCartItems.filter { cartItem ->
+                _selectedProductIds.value.orEmpty().contains(cartItem.product.id)
+            }
+        _totalCount.value = selectedCartItems.size
+        _totalPrice.value = selectedCartItems.sumOf(CartItem::totalPrice)
+        _allSelected.value =
+            selectedCartItems.isNotEmpty() && allCartItems.size == selectedCartItems.size
     }
 
     fun disableSelection() {
         _canSelectItems.value = false
     }
 
-    private fun updateSelectionInfo() {
-        cartRepository.loadAllCartItems { cartItems ->
-            val selectedItemIds = selectionStatus.filter { it.value }.map { it.key }.toSet()
-            _cartItems.postValue(
-                cartItems.map { cartItem ->
-                    if (cartItem.cartId in selectedItemIds) {
-                        cartItem.toCartItemUiModel().copy(isSelected = true)
-                    } else {
-                        cartItem.toCartItemUiModel()
-                    }
-                },
-            )
-        }
-    }
-
     fun fetchRecommendedProducts() {
-        productRepository.loadRecommendedProducts(RECOMMENDED_PRODUCTS_SIZE) { recommendedProducts ->
+        viewModelScope.launch {
+            val recommendedProducts =
+                productRepository.loadRecommendedProducts(RECOMMENDED_PRODUCTS_SIZE)
             _recommendedProducts.postValue(recommendedProducts.map(Product::toProductUiModel))
         }
     }

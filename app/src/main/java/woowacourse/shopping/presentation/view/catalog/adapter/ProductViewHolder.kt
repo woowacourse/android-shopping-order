@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemProductBinding
 import woowacourse.shopping.presentation.view.catalog.CatalogEventHandler
+import woowacourse.shopping.presentation.view.catalog.CatalogItem
 import woowacourse.shopping.presentation.view.common.ItemCounterEventHandler
 
 class ProductViewHolder private constructor(

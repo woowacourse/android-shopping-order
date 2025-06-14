@@ -10,8 +10,8 @@ import woowacourse.shopping.R
 import woowacourse.shopping.databinding.FragmentCatalogBinding
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.view.cart.CartFragment
+import woowacourse.shopping.presentation.view.catalog.CatalogItem.CatalogType
 import woowacourse.shopping.presentation.view.catalog.adapter.CatalogAdapter
-import woowacourse.shopping.presentation.view.catalog.adapter.CatalogItem.CatalogType
 import woowacourse.shopping.presentation.view.common.BaseFragment
 import woowacourse.shopping.presentation.view.common.ItemCounterEventHandler
 import woowacourse.shopping.presentation.view.detail.DetailFragment

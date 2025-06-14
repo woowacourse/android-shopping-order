@@ -1,8 +1,8 @@
 package woowacourse.shopping.fixture
 
-import woowacourse.shopping.domain.model.CartItem
-import woowacourse.shopping.domain.model.Price
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.CartItem
+import woowacourse.shopping.domain.Price
+import woowacourse.shopping.domain.Product
 
 val dummyCartItemFixture =
     listOf(

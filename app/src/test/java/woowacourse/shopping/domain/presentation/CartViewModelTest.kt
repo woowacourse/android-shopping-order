@@ -4,8 +4,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import woowacourse.shopping.domain.CartItem
 import woowacourse.shopping.domain.fixture.dummyProductUiModelFixture
-import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.repository.FakeCartRepository
 import woowacourse.shopping.domain.util.InstantTaskExecutorExtension
 import woowacourse.shopping.domain.util.getOrAwaitValue

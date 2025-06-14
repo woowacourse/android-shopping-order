@@ -7,21 +7,25 @@
 
     <ImageView
         android:id="@+id/image_view_shimmer"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/gray_88"
         android:contentDescription="@null"
         app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/text_view_shimmer_title"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="32dp"
         android:background="@color/gray_88"
         android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/image_view_shimmer" />
 
     <TextView
@@ -34,5 +38,4 @@
         app:layout_constraintEnd_toEndOf="@id/text_view_shimmer_title"
         app:layout_constraintStart_toStartOf="@id/text_view_shimmer_title"
         app:layout_constraintTop_toBottomOf="@id/text_view_shimmer_title" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

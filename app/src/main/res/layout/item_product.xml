@@ -25,11 +25,13 @@
         <ImageView
             android:id="@+id/image_view_product"
             imageUrl="@{product.imageUrl}"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/gray_88"
             android:contentDescription="@null"
             app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatImageButton
@@ -49,7 +51,7 @@
         <include
             android:id="@+id/category_item_counter"
             layout="@layout/view_select_quantity"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="12dp"
             android:layout_marginBottom="16dp"
@@ -60,10 +62,9 @@
             app:product="@{product}"
             app:quantity="@{product.quantity}" />
 
-
         <TextView
             android:id="@+id/text_view_product_name"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
             android:layout_marginTop="8dp"
@@ -73,13 +74,15 @@
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/image_view_product"
             tools:text="나이키 에어포스 1" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@{String.format(@string/product_price_format, product.price)}"
+            android:text="@{@string/product_price_format(product.price)}"
             android:textColor="@color/gray_55"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"

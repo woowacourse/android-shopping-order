@@ -101,4 +101,5 @@ dependencies {
     androidTestRuntimeOnly(libs.mannodermaus.junit5.runner)
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.shimmer)
+    implementation(libs.kotlinx.coroutines.android)
 }

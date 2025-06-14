@@ -15,28 +15,27 @@
 
         <variable
             name="eventHandler"
-            type="woowacourse.shopping.presentation.view.cart.cartItem.CartItemEventHandler" />
+            type="woowacourse.shopping.presentation.view.cart.cartitem.CartItemEventHandler" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:background="@drawable/shape_cart_item"
+        android:background="@drawable/shape_bg_border"
         android:paddingHorizontal="12dp"
         android:paddingVertical="16dp">
 
-<CheckBox
-    android:id="@+id/checkbox"
-    cartItem="@{cartItem}"
-    isChecked="@{cartItem.isSelected}"
-    onCheckedChanged="@{eventHandler}"
-    android:layout_width="40dp"
-    android:layout_height="0dp"
-    android:gravity="center"
-    app:layout_constraintBottom_toBottomOf="@id/cart_item_name"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+        <CheckBox
+            android:id="@+id/checkbox"
+            cartItem="@{cartItem}"
+            eventHandler="@{eventHandler}"
+            android:layout_width="40dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="@id/cart_item_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/btn_remove_cart"
@@ -92,7 +91,7 @@
             android:id="@+id/text_view_price"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@{String.format(@string/product_price_format, cartItem.cartItem.totalPrice)}"
+            android:text="@{@string/product_price_format(cartItem.cartItem.totalPrice)}"
             android:textAlignment="textEnd"
             android:textColor="@color/gray_55"
             android:textSize="20sp"

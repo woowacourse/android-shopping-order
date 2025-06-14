@@ -6,11 +6,9 @@ import androidx.recyclerview.widget.ListAdapter
 import woowacourse.shopping.presentation.model.CartItemUiModel
 import woowacourse.shopping.presentation.model.ProductUiModel
 import woowacourse.shopping.presentation.model.toProductUiModel
-import woowacourse.shopping.presentation.view.cart.recommendation.RecommendEventHandler
 import woowacourse.shopping.presentation.view.common.ItemCounterEventHandler
 
 class RecommendationAdapter(
-    private val recommendEventHandler: RecommendEventHandler,
     private val itemCounterEventHandler: ItemCounterEventHandler,
 ) : ListAdapter<ProductUiModel, RecommendationViewHolder>(
         object : DiffUtil.ItemCallback<ProductUiModel>() {
@@ -28,7 +26,7 @@ class RecommendationAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): RecommendationViewHolder = RecommendationViewHolder.from(parent, recommendEventHandler, itemCounterEventHandler)
+    ): RecommendationViewHolder = RecommendationViewHolder.from(parent, itemCounterEventHandler)
 
     override fun onBindViewHolder(
         holder: RecommendationViewHolder,

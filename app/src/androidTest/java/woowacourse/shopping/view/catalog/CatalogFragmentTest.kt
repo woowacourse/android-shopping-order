@@ -14,9 +14,9 @@ import org.hamcrest.Matchers.allOf
 import org.junit.Before
 import org.junit.Test
 import woowacourse.shopping.R
-import woowacourse.shopping.data.RepositoryProvider
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.data.repository.RepositoryProvider
+import woowacourse.shopping.data.repository.product.ProductRepository
+import woowacourse.shopping.domain.Product
 import woowacourse.shopping.fixture.dummyProductsFixture
 import woowacourse.shopping.presentation.view.catalog.CatalogFragment
 import woowacourse.shopping.util.nthChildOf
