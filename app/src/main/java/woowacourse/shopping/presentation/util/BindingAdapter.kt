@@ -10,6 +10,9 @@ import woowacourse.shopping.R
 import woowacourse.shopping.presentation.cart.event.CartEventHandler
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
 import woowacourse.shopping.presentation.recommend.RecommendAdapter
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @BindingAdapter("loadImage")
 fun loadImage(
@@ -60,4 +63,22 @@ fun View.visibleIfNotSameProduct(
 @BindingAdapter("recommendProducts")
 fun RecyclerView.setRecommendProducts(products: List<ProductUiModel>?) {
     (adapter as? RecommendAdapter)?.setItems(products.orEmpty())
+}
+
+@BindingAdapter("expiredDate")
+fun TextView.setExpiredDate(date: LocalDate) {
+    val formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일", Locale.getDefault())
+    this.text = context.getString(R.string.text_expired_date, date.format(formatter))
+}
+
+@BindingAdapter("minimumAmount")
+fun TextView.setMinimumAmount(amount: Int?) {
+    if (amount == null) return
+    val amountText = context.getString(R.string.format_price, amount)
+    this.text = context.getString(R.string.text_minimum_amount, amountText)
+}
+
+@BindingAdapter("amount")
+fun TextView.setAmount(amount: Int) {
+    this.text = context.getString(R.string.format_price, amount)
 }

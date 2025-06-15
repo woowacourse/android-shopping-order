@@ -4,18 +4,22 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.launch
 import woowacourse.shopping.RepositoryProvider
-import woowacourse.shopping.domain.repository.CartItemRepository
+import woowacourse.shopping.domain.repository.CartItemsRepository
 import woowacourse.shopping.domain.repository.ProductsRepository
 import woowacourse.shopping.domain.repository.ViewedItemRepository
 import woowacourse.shopping.presentation.product.catalog.ProductUiModel
+import woowacourse.shopping.presentation.product.catalog.toDomain
+import woowacourse.shopping.presentation.product.catalog.toUiModel
 import woowacourse.shopping.presentation.util.SingleLiveEvent
 
 class DetailViewModel(
     private val productsRepository: ProductsRepository,
-    private val cartItemRepository: CartItemRepository,
+    private val cartItemRepository: CartItemsRepository,
     private val viewedRepository: ViewedItemRepository,
 ) : ViewModel() {
     private val _product = MutableLiveData<ProductUiModel>()
@@ -27,40 +31,42 @@ class DetailViewModel(
     private val _lastViewed = MutableLiveData<ProductUiModel?>()
     val lastViewed: LiveData<ProductUiModel?> = _lastViewed
 
-    fun setProduct(
-        id: Long,
-        onInserted: () -> Unit = {},
-    ) {
-        productsRepository.getProductById(id) { result ->
-            result
-                .onSuccess { product ->
-                    val loadedProduct = product.copy(quantity = 1)
-                    _product.postValue(loadedProduct)
+    fun setProduct(id: Long) {
+        viewModelScope.launch {
+            val product =
+                productsRepository.getProductById(id)
+                    .mapCatching { it.toUiModel() }
+                    .getOrNull()
+            val loadedProduct = product?.copy(quantity = 1)
+            _product.value = loadedProduct
 
-                    viewedRepository.insertViewedItem(loadedProduct) {
-                        onInserted()
-                    }
-                }
+            loadedProduct?.let {
+                viewedRepository.insertViewedItem(it.toDomain())
+            }
         }
     }
 
     fun addToCart() {
-        val product = _product.value ?: return
-        cartItemRepository.addCartItemQuantity(product.id, product.quantity) { result ->
-            result
-                .onSuccess {
-                    _uiState.postValue(CartEvent.ADD_TO_CART_SUCCESS)
-                }
+        viewModelScope.launch {
+            val product = _product.value ?: return@launch
+            cartItemRepository.addCartItemQuantity(product.id, product.quantity)
                 .onFailure {
-                    _uiState.postValue(CartEvent.ADD_TO_CART_FAILURE)
+                    _uiState.value = CartEvent.ADD_TO_CART_FAILURE
                 }
         }
     }
 
     fun loadLastViewedItem(currentProductId: Long) {
-        viewedRepository.getLastViewedItem { lastViewedItem ->
-            val filtered = if (lastViewedItem?.id == currentProductId) null else lastViewedItem
-            _lastViewed.postValue(filtered)
+        viewModelScope.launch {
+            val item =
+                viewedRepository.getLastViewedItem()
+                    .mapCatching { it?.toUiModel() }
+                    .getOrNull()
+
+            if (item != null) {
+                val filtered = if (item.id == currentProductId) null else item
+                _lastViewed.value = filtered
+            }
         }
     }
 

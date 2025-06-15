@@ -10,6 +10,7 @@
     <color name="mint_blue">#04C09E</color>
     <color name="gray">#AAAAAA</color>
     <color name="gray_5">#555555</color>
+    <color name="light_gray">#FFEBEBEB</color>
     <color name="catalog_divider_background">#EBEBEB</color>
     <color name="skeleton_background">#E2E2E2</color>
     <color name="skeleton_cart_background">#F3F3F3</color>

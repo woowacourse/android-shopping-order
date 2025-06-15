@@ -2,38 +2,50 @@ package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.model.ViewedItem
 import woowacourse.shopping.data.source.local.recent.ViewedItemDao
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ViewedItemRepository
-import woowacourse.shopping.mapper.toUiModel
-import woowacourse.shopping.mapper.toViewedItem
-import woowacourse.shopping.presentation.product.catalog.ProductUiModel
-import kotlin.concurrent.thread
 
 class ViewedItemRepositoryImpl(
     private val dao: ViewedItemDao,
 ) : ViewedItemRepository {
-    override fun insertViewedItem(
-        product: ProductUiModel,
-        onComplete: () -> Unit,
-    ) {
-        thread {
-            dao.insertViewedProduct(product.toViewedItem())
-            onComplete()
+    override suspend fun insertViewedItem(product: Product): Result<Unit> =
+        runCatching {
+            dao.insertViewedProduct(product.toEntity())
         }
-    }
 
-    override fun getViewedItems(callback: (List<ProductUiModel>) -> Unit) {
-        thread {
-            val recentItems: List<ViewedItem> = dao.getRecentViewedItems()
-            val uiModels = recentItems.map { it.toUiModel() }
-            callback(uiModels)
+    override suspend fun getViewedItems(): Result<List<Product>?> =
+        runCatching {
+            val items = dao.getRecentViewedItems(RECENT_VIEWED_ITEMS_COUNT)
+            items?.map { it.toDomain() }
         }
-    }
 
-    override fun getLastViewedItem(callback: (ProductUiModel?) -> Unit) {
-        thread {
-            val lastViewed = dao.getLastViewedItem()
-            val uiModel = lastViewed?.toUiModel()
-            callback(uiModel)
+    override suspend fun getLastViewedItem(): Result<Product?> =
+        runCatching {
+            dao.getRecentViewedItems(LAST_VIEWED_ITEM_COUNT)
+                ?.firstOrNull()
+                ?.toDomain()
         }
+
+    private fun Product.toEntity() =
+        ViewedItem(
+            id = this.id,
+            imageUrl = this.imageUrl,
+            name = this.name,
+            price = this.price,
+            category = this.category,
+        )
+
+    private fun ViewedItem.toDomain() =
+        Product(
+            id = this.id,
+            name = this.name,
+            price = this.price,
+            imageUrl = this.imageUrl,
+            category = this.category,
+        )
+
+    companion object {
+        private const val RECENT_VIEWED_ITEMS_COUNT = 10
+        private const val LAST_VIEWED_ITEM_COUNT = 1
     }
 }

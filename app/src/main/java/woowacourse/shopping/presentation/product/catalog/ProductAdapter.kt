@@ -1,6 +1,8 @@
 package woowacourse.shopping.presentation.product.catalog
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.presentation.product.ProductQuantityHandler
 import woowacourse.shopping.presentation.product.catalog.event.CatalogEventHandler
@@ -8,10 +10,9 @@ import woowacourse.shopping.presentation.product.catalog.viewHolder.LoadButtonVi
 import woowacourse.shopping.presentation.product.catalog.viewHolder.ProductViewHolder
 
 class ProductAdapter(
-    private var products: List<ProductUiModel>,
     private val catalogHandler: CatalogEventHandler,
     private val quantityHandler: ProductQuantityHandler,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : ListAdapter<ProductUiModel, RecyclerView.ViewHolder>(DiffCallback) {
     private var showLoadMoreButton = false
 
     override fun onCreateViewHolder(
@@ -28,10 +29,8 @@ class ProductAdapter(
         holder: RecyclerView.ViewHolder,
         position: Int,
     ) {
-        when (holder) {
-            is ProductViewHolder -> {
-                holder.bind(products[position])
-            }
+        if (getItemViewType(position) == PRODUCT) {
+            (holder as ProductViewHolder).bind(getItem(position))
         }
     }
 
@@ -42,48 +41,37 @@ class ProductAdapter(
             PRODUCT
         }
 
-    fun setData(newProducts: List<ProductUiModel>) {
-        val oldList = products
-        val updatedList = oldList + newProducts
-        val oldSize = oldList.size
-
-        products = updatedList
-
-        newProducts.forEachIndexed { index, newItem ->
-            val globalIndex = oldSize + index
-            notifyItemInserted(globalIndex)
-        }
-    }
-
-    override fun getItemCount(): Int = products.size + if (showLoadMoreButton) 1 else 0
+    override fun getItemCount(): Int = currentList.size + if (showLoadMoreButton) 1 else 0
 
     fun setLoadButtonVisible(visible: Boolean) {
         val previous = showLoadMoreButton
         showLoadMoreButton = visible
         if (previous != visible) {
             if (visible) {
-                notifyItemInserted(products.size)
+                notifyItemInserted(currentList.size)
             } else {
-                notifyItemRemoved(products.size)
+                notifyItemRemoved(currentList.size)
             }
         }
     }
 
-    fun updateProduct(updated: ProductUiModel) {
-        val index = products.indexOfFirst { it.id == updated.id }
-        if (index != -1) {
-            products =
-                products.toMutableList().apply {
-                    this[index] = updated
-                }
-            notifyItemChanged(index)
-        }
-    }
-
-    fun isLoadMoreButtonPosition(position: Int): Boolean = showLoadMoreButton && position == products.size
+    fun isLoadMoreButtonPosition(position: Int): Boolean = showLoadMoreButton && position == currentList.size
 
     companion object {
         private const val PRODUCT = 1
         private const val LOAD_BUTTON = 2
+
+        private val DiffCallback =
+            object : DiffUtil.ItemCallback<ProductUiModel>() {
+                override fun areContentsTheSame(
+                    oldItem: ProductUiModel,
+                    newItem: ProductUiModel,
+                ): Boolean = oldItem == newItem
+
+                override fun areItemsTheSame(
+                    oldItem: ProductUiModel,
+                    newItem: ProductUiModel,
+                ): Boolean = oldItem.id == newItem.id
+            }
     }
 }
