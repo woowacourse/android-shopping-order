@@ -16,13 +16,23 @@ data class FreeshippingCoupon(
         order: Carts,
         payment: Int,
     ): Boolean {
-        TODO("Not yet implemented")
+        if (isExpired(today.toLocalDate())) return false
+
+        if (payment < minimumAmount) return false
+
+        return true
     }
 
     override fun applyToPayment(
         origin: Payment,
         order: Carts,
     ): Payment {
-        TODO("Not yet implemented")
+        val newTotalPayment = origin.originPayment + 0
+
+        return origin.copy(
+            couponDiscount = 0,
+            deliveryFee = 0,
+            totalPayment = newTotalPayment,
+        )
     }
 }
