@@ -5,13 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.product.ProductRepository
+import woowacourse.shopping.data.remote.product.ProductResponse
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.feature.cart.adapter.CartGoodsItem
 import woowacourse.shopping.util.toDomain
@@ -74,17 +73,28 @@ class CartViewModel(
 
     fun toggleCheck(cart: Cart) {
         val currentList = selectedItems.value ?: emptyList()
-        if (currentList.contains(cart)) {
-            selectedItems.value = currentList.minus(cart)
-            _totalCheckedItemsCount.value = _totalCheckedItemsCount.value?.minus(cart.quantity)
-            _checkedItemsPrice.value =
-                _checkedItemsPrice.value?.minus(cart.product.price * cart.quantity)
-        } else {
-            selectedItems.value = currentList.plus(cart)
-            _totalCheckedItemsCount.value = _totalCheckedItemsCount.value?.plus(cart.quantity)
-            _checkedItemsPrice.value =
-                _checkedItemsPrice.value?.plus(cart.product.price * cart.quantity)
-        }
+        val isCurrentlySelected = currentList.contains(cart)
+
+        selectedItems.value =
+            if (isCurrentlySelected) {
+                currentList - cart
+            } else {
+                currentList + cart
+            }
+
+        updateCheckedItemsInfo(cart, !isCurrentlySelected)
+    }
+
+    private fun updateCheckedItemsInfo(
+        cart: Cart,
+        isAdding: Boolean,
+    ) {
+        val multiplier = if (isAdding) 1 else -1
+        val quantityChange = cart.quantity * multiplier
+        val priceChange = cart.product.price * cart.quantity * multiplier
+
+        _totalCheckedItemsCount.value = (_totalCheckedItemsCount.value ?: 0) + quantityChange
+        _checkedItemsPrice.value = (_checkedItemsPrice.value ?: 0) + priceChange
     }
 
     fun changeAllChecked() {
@@ -104,7 +114,20 @@ class CartViewModel(
     }
 
     fun delete(cart: Cart) {
-        val currentList = carts.value ?: return
+        adjustPageIfNeeded()
+        viewModelScope.launch {
+            cartRepository
+                .deleteCart(cart.id)
+                .onSuccess {
+                    removeCartFromList(cart)
+                    fetchTotalItemsCount()
+                }.onFailure {
+                    Log.e("CartViewModel", "장바구니 삭제 실패")
+                }
+        }
+    }
+
+    private fun adjustPageIfNeeded() {
         val total = totalItemsCount.value ?: 0
         val endPage = ((total - 1) / PAGE_SIZE) + 1
 
@@ -112,76 +135,53 @@ class CartViewModel(
             currentPage--
             _page.value = currentPage
         }
-
-        viewModelScope.launch {
-            cartRepository
-                .deleteCart(cart.id)
-                .onSuccess {
-                    val updatedList =
-                        _carts.value?.filter { it.cart.id != cart.id } ?: emptyList()
-                    _carts.value = updatedList
-                    fetchTotalItemsCount()
-                }.onFailure {
-                    Log.e("DeleteCartTest", "장바구니 삭제 실패")
-                }
-        }
     }
 
-    fun addToCart(cart: Cart) {
-        val currentList = carts.value ?: return
-        viewModelScope.launch {
-            cartRepository
-                .updateCart(
-                    id = cart.id,
-                    cartQuantity = CartQuantity(cart.quantity + 1),
-                ).onSuccess {
-                    val updatedList =
-                        _carts.value?.map {
-                            val updatedCart = it.cart
-                            if (updatedCart.product.id == cart.product.id) {
-                                val updated = updatedCart.updateQuantity(updatedCart.quantity + 1)
-                                it.copy(cart = updated)
-                            } else {
-                                it
-                            }
-                        } ?: emptyList()
-                    _carts.postValue(updatedList)
-                    fetchTotalItemsCount()
-                }.onFailure {
-                    Log.e("addCartTest", "장바구니 추가 실패")
-                }
-        }
+    private fun removeCartFromList(cart: Cart) {
+        val updatedList = _carts.value?.filter { it.cart.id != cart.id } ?: emptyList()
+        _carts.value = updatedList
     }
+
+    fun addToCart(cart: Cart) = updateCartQuantity(cart, cart.quantity + 1)
 
     fun removeFromCart(cart: Cart) {
-        val currentList = carts.value ?: return
-        viewModelScope.launch {
-            if (cart.quantity == 1) {
-                delete(cart)
-            } else {
-                cartRepository
-                    .updateCart(
-                        id = cart.id,
-                        cartQuantity = CartQuantity(cart.quantity - 1),
-                    ).onSuccess {
-                        val updatedList =
-                            _carts.value?.map {
-                                val updatedCart = it.cart
-                                if (updatedCart.product.id == cart.product.id) {
-                                    val updated =
-                                        updatedCart.updateQuantity(updatedCart.quantity - 1)
-                                    it.copy(cart = updated)
-                                } else {
-                                    it
-                                }
-                            } ?: emptyList()
-                        _carts.value = updatedList
-                        fetchTotalItemsCount()
-                    }.onFailure {
-                        Log.e("RemoveCartTest", "장바구니 삭제 실패")
-                    }
-            }
+        if (cart.quantity == 1) {
+            delete(cart)
+        } else {
+            updateCartQuantity(cart, cart.quantity - 1)
         }
+    }
+
+    private fun updateCartQuantity(
+        cart: Cart,
+        newQuantity: Int,
+    ) {
+        viewModelScope.launch {
+            cartRepository
+                .updateCart(cart.id, CartQuantity(newQuantity))
+                .onSuccess {
+                    updateCartInList(cart, newQuantity)
+                    fetchTotalItemsCount()
+                }.onFailure {
+                    Log.e("CartViewModel", "장바구니 수량 업데이트 실패")
+                }
+        }
+    }
+
+    private fun updateCartInList(
+        cart: Cart,
+        newQuantity: Int,
+    ) {
+        val updatedList =
+            _carts.value?.map { cartItem ->
+                if (cartItem.cart.product.id == cart.product.id) {
+                    val updatedCart = cartItem.cart.updateQuantity(newQuantity)
+                    cartItem.copy(cart = updatedCart)
+                } else {
+                    cartItem
+                }
+            } ?: emptyList()
+        _carts.value = updatedList
     }
 
     private fun fetchTotalItemsCount() {
@@ -196,80 +196,78 @@ class CartViewModel(
         }
     }
 
-    private fun loadCarts() {
+    fun loadCarts() {
         viewModelScope.launch {
             _isLoading.value = true
             cartRepository
-                .fetchCart(currentPage, 5)
+                .fetchCart(currentPage, PAGE_SIZE)
                 .onSuccess { response ->
                     response?.let {
                         val cartList =
-                            response.content.map {
+                            it.content.map { cartItem ->
                                 CartGoodsItem(
                                     Cart(
-                                        id = it.id,
-                                        product = it.product.toDomain(),
-                                        quantity = it.quantity,
+                                        id = cartItem.id,
+                                        product = cartItem.product.toDomain(),
+                                        quantity = cartItem.quantity,
                                     ),
                                 )
                             }
-
                         _carts.value = cartList
-
-                        _page.value = response.number
-                        updatePageButtonStates(
-                            response.first,
-                            response.last,
-                            response.totalElements.toInt(),
-                        )
-                        _isLoading.value = false
-                        Log.d("dasd", "${_isLoading.value}")
+                        _page.value = it.number
+                        updatePageButtonStates(it.first, it.last, it.totalElements.toInt())
                     }
-                }.onFailure {
-                    Log.e("loadProductsInRange", "API 요청 실패", it)
-                    _isLoading.value = false
+                }.onFailure { e ->
+                    Log.e("CartViewModel", "장바구니 로딩 실패", e)
                 }
-            _page.value = currentPage
+            _isLoading.value = false
         }
     }
 
     fun loadProductsByCategory() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val latestProduct = historyRepository.findLatest()
-            cartRepository
-                .fetchAllCart()
-                .onSuccess { cartResponse ->
-                    val cartProductIds = cartResponse?.content?.map { it.product.id }
+        viewModelScope.launch {
+            val latestProductId = historyRepository.findLatest()?.id ?: 0
 
-                    productRepository
-                        .fetchAllProducts()
-                        .onSuccess { response ->
-                            val matchedProduct =
-                                response?.content?.find { it.id.toInt() == latestProduct?.id }
-                            val category = matchedProduct?.category
+            val cartResult = cartRepository.fetchAllCart()
+            val productResult = productRepository.fetchAllProducts()
 
-                            val recommendProducts =
-                                response
-                                    ?.content
-                                    ?.filter {
-                                        it.category == category &&
-                                            it.id.toInt() != latestProduct?.id &&
-                                            cartProductIds?.contains(it.id) != true
-                                    }?.take(10)
+            if (cartResult.isSuccess && productResult.isSuccess) {
+                val cartProducts = cartResult.getOrNull()?.content ?: emptyList()
+                val cartProductIds = cartProducts.map { it.product.id }
+                val allProducts = productResult.getOrNull()?.content ?: emptyList()
 
-                            withContext(Dispatchers.Main) {
-                                _recommendItems.value =
-                                    recommendProducts?.map {
-                                        Cart(id = 0, product = it.toDomain(), quantity = 0)
-                                    }
-                            }
-                        }.onFailure {
-                            Log.e("loadProductsInRange", "상품 요청 실패", it)
-                        }
-                }.onFailure {
-                    Log.e("loadProductsInRange", "장바구니 요청 실패", it)
-                }
+                generateRecommendProducts(
+                    lastProductId = latestProductId,
+                    allProducts = allProducts,
+                    cartProductIds = cartProductIds,
+                )
+            } else {
+                cartResult.exceptionOrNull()?.let { Log.e("CartViewModel", "장바구니 전체 조회 실패", it) }
+                productResult.exceptionOrNull()?.let { Log.e("CartViewModel", "전체 상품 조회 실패", it) }
+            }
         }
+    }
+
+    private fun generateRecommendProducts(
+        lastProductId: Int,
+        allProducts: List<ProductResponse.Content>,
+        cartProductIds: List<Long>,
+    ) {
+        val matchedProduct = allProducts.find { it.id.toInt() == lastProductId }
+        val category = matchedProduct?.category
+
+        val recommendProducts =
+            allProducts
+                .filter {
+                    it.category == category &&
+                        it.id.toInt() != lastProductId &&
+                        !cartProductIds.contains(it.id)
+                }.take(10)
+
+        _recommendItems.value =
+            recommendProducts.map {
+                Cart(id = 0, product = it.toDomain(), quantity = 0)
+            }
     }
 
     companion object {
