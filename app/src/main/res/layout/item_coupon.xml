@@ -5,7 +5,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <variable
+            name="coupon"
+            type="woowacourse.shopping.feature.order.CouponState" />
 
+        <variable
+            name="listener"
+            type="woowacourse.shopping.feature.order.CouponClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -21,8 +27,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:checked="false"
-        android:onClick="@{}"
+        android:checked="@{coupon.checked}"
+        android:onClick="@{() -> listener.onCouponClick(coupon.item.id)}"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -35,7 +41,7 @@
             android:layout_marginEnd="60dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{}"
+            android:text="@{coupon.item.description}"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -49,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginStart="16dp"
-            android:text="@{}"
+            app:expirationDate="@{coupon.item.expirationDate}"
             android:textColor="@color/gray_700"
             android:textSize="12sp"
             app:layout_constraintTop_toBottomOf="@id/tv_cart_item_name"
@@ -62,7 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginStart="16dp"
-            android:text=""
+            app:minimumOrderPriceText="@{coupon.item}"
             android:textSize="12sp"
             android:textColor="@color/gray_700"
             app:layout_constraintTop_toBottomOf="@id/tv_expiration_date"

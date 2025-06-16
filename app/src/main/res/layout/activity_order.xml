@@ -4,7 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <variable
+            name="couponAdapter"
+            type="woowacourse.shopping.feature.order.CouponAdapter" />
 
+        <variable
+            name="viewModel"
+            type="woowacourse.shopping.feature.order.OrderViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -30,7 +36,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="18dp"
-                    android:layout_marginTop="86dp"
+                    android:layout_marginTop="20dp"
                     android:text="@string/coupon_usable_coupon_title"
                     android:textColor="@color/black"
                     android:textSize="24sp"
@@ -52,6 +58,7 @@
                     android:id="@+id/rv_coupons"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:adapter="@{couponAdapter}"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -84,7 +91,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="21dp"
                     android:layout_marginEnd="18dp"
-                    android:text=""
+                    app:priceText="@{viewModel.uiState.payment.originPayment}"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -109,6 +116,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="18dp"
+                    app:priceText="@{viewModel.uiState.payment.couponDiscount}"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -140,6 +148,7 @@
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
+                    app:priceText="@{viewModel.uiState.payment.deliveryFee}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_coupon_discount_title"
                     tools:text="3000원" />
@@ -170,6 +179,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="18dp"
                     android:textColor="@color/black"
+                    app:priceText="@{viewModel.uiState.payment.totalPayment}"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
