@@ -13,7 +13,6 @@ import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.Cart
-import woowacourse.shopping.domain.model.Carts
 import woowacourse.shopping.feature.cart.adapter.CartGoodsItem
 import woowacourse.shopping.util.toDomain
 import woowacourse.shopping.util.updateQuantity
@@ -37,8 +36,8 @@ class CartViewModel(
     private val _page = MutableLiveData(currentPage)
     val page: LiveData<Int> get() = _page
 
-    private val _carts = MutableLiveData<Carts>() // private val _carts = MutableLiveData<List<CartGoodsItem>>()이 원래 선언되어 있던것
-    val carts: LiveData<Carts> get() = _carts
+    private val _carts = MutableLiveData<List<CartGoodsItem>>()
+    val carts: LiveData<List<CartGoodsItem>> get() = _carts
 
     private val _totalCheckedItemsCount = MutableLiveData(0)
     val totalCheckedItemsCount: LiveData<Int> get() = _totalCheckedItemsCount
@@ -89,9 +88,9 @@ class CartViewModel(
     }
 
     fun changeAllChecked() {
-        val currentList = carts.value ?: return
-        val newState = currentList.carts.map { it.copy(isChecked = !it.isChecked) }
-        _carts.value = currentList.copy(carts = newState)
+        val currentList = carts.value ?: emptyList()
+        val newState = currentList.map { it.copy(isChecked = !it.isChecked) }
+        _carts.value = newState
     }
 
     fun updatePageButtonStates(
@@ -118,8 +117,9 @@ class CartViewModel(
             cartRepository
                 .deleteCart(cart.id)
                 .onSuccess {
-                    val updatedList = currentList.carts.filter { it.cart.id != cart.id }
-                    _carts.value = currentList.copy(carts = updatedList)
+                    val updatedList =
+                        _carts.value?.filter { it.cart.id != cart.id } ?: emptyList()
+                    _carts.value = updatedList
                     fetchTotalItemsCount()
                 }.onFailure {
                     Log.e("DeleteCartTest", "장바구니 삭제 실패")
@@ -136,7 +136,7 @@ class CartViewModel(
                     cartQuantity = CartQuantity(cart.quantity + 1),
                 ).onSuccess {
                     val updatedList =
-                        currentList.carts.map {
+                        _carts.value?.map {
                             val updatedCart = it.cart
                             if (updatedCart.product.id == cart.product.id) {
                                 val updated = updatedCart.updateQuantity(updatedCart.quantity + 1)
@@ -144,8 +144,8 @@ class CartViewModel(
                             } else {
                                 it
                             }
-                        }
-                    _carts.postValue(currentList.copy(carts = updatedList))
+                        } ?: emptyList()
+                    _carts.postValue(updatedList)
                     fetchTotalItemsCount()
                 }.onFailure {
                     Log.e("addCartTest", "장바구니 추가 실패")
@@ -165,7 +165,7 @@ class CartViewModel(
                         cartQuantity = CartQuantity(cart.quantity - 1),
                     ).onSuccess {
                         val updatedList =
-                            currentList.carts.map {
+                            _carts.value?.map {
                                 val updatedCart = it.cart
                                 if (updatedCart.product.id == cart.product.id) {
                                     val updated =
@@ -174,8 +174,8 @@ class CartViewModel(
                                 } else {
                                     it
                                 }
-                            }
-                        _carts.value = currentList.copy(carts = updatedList)
+                            } ?: emptyList()
+                        _carts.value = updatedList
                         fetchTotalItemsCount()
                     }.onFailure {
                         Log.e("RemoveCartTest", "장바구니 삭제 실패")
@@ -197,7 +197,6 @@ class CartViewModel(
     }
 
     private fun loadCarts() {
-        val currentList = carts.value ?: return
         viewModelScope.launch {
             _isLoading.value = true
             cartRepository
@@ -215,7 +214,7 @@ class CartViewModel(
                                 )
                             }
 
-                        _carts.value = currentList.copy(carts = cartList)
+                        _carts.value = cartList
 
                         _page.value = response.number
                         updatePageButtonStates(
@@ -224,6 +223,7 @@ class CartViewModel(
                             response.totalElements.toInt(),
                         )
                         _isLoading.value = false
+                        Log.d("dasd", "${_isLoading.value}")
                     }
                 }.onFailure {
                     Log.e("loadProductsInRange", "API 요청 실패", it)

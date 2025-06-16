@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import woowacourse.shopping.R
+import woowacourse.shopping.application.ShoppingApplication
 import woowacourse.shopping.databinding.FragmentCartProductBinding
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.feature.cart.adapter.CartAdapter
@@ -17,7 +18,14 @@ import woowacourse.shopping.feature.model.ResultCode
 
 class CartProductFragment : Fragment() {
     private lateinit var binding: FragmentCartProductBinding
-    private val viewModel: CartViewModel by activityViewModels<CartViewModel>()
+    private val viewModel: CartViewModel by activityViewModels {
+        val app = (requireActivity().application as ShoppingApplication)
+        CartViewModelFactory(
+            app.cartRepository,
+            app.productRepository,
+            app.historyRepository,
+        )
+    }
     private lateinit var adapter: CartAdapter
 
     override fun onCreateView(
@@ -25,7 +33,8 @@ class CartProductFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_cart_product, container, false)
+        binding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_cart_product, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         setupAdapter()

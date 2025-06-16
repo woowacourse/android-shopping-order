@@ -9,8 +9,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.databinding.ActivityOrderBinding
-import woowacourse.shopping.domain.model.Carts
 import woowacourse.shopping.feature.cart.CartActivity
+import woowacourse.shopping.feature.cart.adapter.CartGoodsItem
 
 class OrderActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOrderBinding
@@ -30,10 +30,10 @@ class OrderActivity : AppCompatActivity() {
     companion object {
         fun newIntent(
             context: Context,
-            carts: Carts,
+            carts: List<CartGoodsItem>,
         ): Intent =
             Intent(context, CartActivity::class.java).apply {
-                putExtra(EXTRA_CARTS, carts)
+                putExtra(EXTRA_CARTS, ArrayList(carts))
             }
 
         const val EXTRA_CARTS = "carts"
