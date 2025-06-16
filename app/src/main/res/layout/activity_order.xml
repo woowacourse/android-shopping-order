@@ -121,6 +121,7 @@
                     android:id="@+id/tv_shipping_fee_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@string/coupon_shipping_fee_title"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -128,7 +129,7 @@
                     app:layout_constraintStart_toStartOf="@+id/tv_coupon_discount_title"
                     app:layout_constraintTop_toTopOf="@+id/tv_shipping_fee"
                     app:layout_constraintVertical_bias="0.0"
-                    tools:text="배송비" />
+                    />
 
                 <TextView
                     android:id="@+id/tv_shipping_fee"
@@ -136,7 +137,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="18dp"
-                    android:text="@string/coupon_shipping_fee_title"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
