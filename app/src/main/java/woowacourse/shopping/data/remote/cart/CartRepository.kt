@@ -32,7 +32,6 @@ class CartRepository(
     suspend fun addToCart(cartRequest: CartRequest): Result<Long> =
         runCatching {
             val response = cartService.addToCart(cartRequest = cartRequest)
-            if (!response.isSuccessful) throw HttpException(response)
 
             val locationHeader =
                 response
