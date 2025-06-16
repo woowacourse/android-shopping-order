@@ -3,18 +3,18 @@ package woowacourse.shopping.feature.goods.adapter
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.feature.goods.GoodsProduct
 
-sealed class GoodsRvItems(
+sealed class ProductFeedItem(
     val viewType: ItemViewType,
 ) {
     data class HistoryItem(
         val items: List<Product>,
-    ) : GoodsRvItems(ItemViewType.HISTORY)
+    ) : ProductFeedItem(ItemViewType.HISTORY)
 
-    data object DividerItem : GoodsRvItems(ItemViewType.DIVIDER)
+    data object DividerItem : ProductFeedItem(ItemViewType.DIVIDER)
 
     data class GoodsItem(
         val item: GoodsProduct,
-    ) : GoodsRvItems(ItemViewType.GOODS)
+    ) : ProductFeedItem(ItemViewType.GOODS)
 
-    data object LoadMoreItem : GoodsRvItems(ItemViewType.LOAD_MORE)
+    data object LoadMoreItem : ProductFeedItem(ItemViewType.LOAD_MORE)
 }

@@ -6,13 +6,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemHistoryContainerBinding
 import woowacourse.shopping.feature.goods.adapter.GoodsClickListener
-import woowacourse.shopping.feature.goods.adapter.GoodsRvItems
+import woowacourse.shopping.feature.goods.adapter.ProductFeedItem
 
 class HistoryContainerViewHolder(
     private val binding: ItemHistoryContainerBinding,
     private val goodsClickListener: GoodsClickListener,
 ) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(model: GoodsRvItems.HistoryItem) {
+    fun bind(model: ProductFeedItem.HistoryItem) {
         val adapter = HistoryAdapter(goodsClickListener)
         adapter.submitList(model.items)
         binding.rvHistory.adapter = adapter

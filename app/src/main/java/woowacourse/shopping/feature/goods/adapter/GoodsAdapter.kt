@@ -8,7 +8,7 @@ import woowacourse.shopping.feature.goods.adapter.history.HistoryContainerViewHo
 
 class GoodsAdapter(
     private val goodsClickListener: GoodsClickListener,
-) : ListAdapter<GoodsRvItems, RecyclerView.ViewHolder>(GoodsDiffUtil) {
+) : ListAdapter<woowacourse.shopping.feature.goods.adapter.ProductFeedItem, RecyclerView.ViewHolder>(GoodsDiffUtil) {
     override fun getItemViewType(position: Int): Int = getItem(position).viewType.type
 
     override fun onCreateViewHolder(
@@ -23,18 +23,18 @@ class GoodsAdapter(
         }
 
     fun addItems(items: GoodsItems) {
-        val newItems = mutableListOf<GoodsRvItems>()
+        val newItems = mutableListOf<woowacourse.shopping.feature.goods.adapter.ProductFeedItem>()
 
         if (items.historyItems.isNotEmpty()) {
-            val newHistoryItem = GoodsRvItems.HistoryItem(items.historyItems)
+            val newHistoryItem = ProductFeedItem.HistoryItem(items.historyItems)
             newItems.add(newHistoryItem)
-            newItems.add(GoodsRvItems.DividerItem)
+            newItems.add(ProductFeedItem.DividerItem)
         }
 
-        val newGoodsItems = items.goodsItems.map { GoodsRvItems.GoodsItem(it) }
+        val newGoodsItems = items.goodsItems.map { ProductFeedItem.GoodsItem(it) }
         newItems.addAll(newGoodsItems)
 
-        if (items.hasNextPage) newItems.add(GoodsRvItems.LoadMoreItem)
+        if (items.hasNextPage) newItems.add(ProductFeedItem.LoadMoreItem)
 
         submitList(newItems)
     }
@@ -44,10 +44,10 @@ class GoodsAdapter(
         position: Int,
     ) {
         when (val item = getItem(position)) {
-            is GoodsRvItems.HistoryItem -> (holder as HistoryContainerViewHolder).bind(item)
-            GoodsRvItems.DividerItem -> Unit
-            is GoodsRvItems.GoodsItem -> (holder as GoodsViewHolder).bind(item)
-            GoodsRvItems.LoadMoreItem -> (holder as LoadMoreViewHolder).bind()
+            is ProductFeedItem.HistoryItem -> (holder as HistoryContainerViewHolder).bind(item)
+            ProductFeedItem.DividerItem -> Unit
+            is ProductFeedItem.GoodsItem -> (holder as GoodsViewHolder).bind(item)
+            ProductFeedItem.LoadMoreItem -> (holder as LoadMoreViewHolder).bind()
         }
     }
 }

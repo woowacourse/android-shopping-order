@@ -10,7 +10,7 @@ class GoodsViewHolder(
     private val binding: ItemGoodsBinding,
     private val goodsClickListener: GoodsClickListener,
 ) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(model: GoodsRvItems.GoodsItem) {
+    fun bind(model: ProductFeedItem.GoodsItem) {
         val item = model.item
 
         binding.model = item
