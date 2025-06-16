@@ -7,12 +7,11 @@ data class Carts(
     val carts: List<CartGoodsItem>,
     val totalQuantity: Int,
 ) : Serializable {
-    val buyCarts: List<Cart>
-        get() = carts.filter { it.isChecked }.map { it.cart }
+    val buyCarts: List<Cart> =
+        carts.filter { it.isChecked }.map { it.cart }
 
     fun findTargetProductForBogo(standardQuantity: Int): Int =
-        carts
-            .map { it.cart }
+        buyCarts
             .filter { it.quantity >= standardQuantity }
             .maxByOrNull { it.product.price }
             ?.product
