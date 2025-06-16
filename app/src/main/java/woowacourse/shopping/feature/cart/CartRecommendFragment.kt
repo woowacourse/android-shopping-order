@@ -44,7 +44,7 @@ class CartRecommendFragment : Fragment() {
     ) {
         binding.tvOrderButton.setOnClickListener {
             viewModel.carts.value?.let {
-                OrderActivity.newIntent(requireContext(), it)
+                startActivity(OrderActivity.newIntent(requireContext(), it))
             }
         }
     }
