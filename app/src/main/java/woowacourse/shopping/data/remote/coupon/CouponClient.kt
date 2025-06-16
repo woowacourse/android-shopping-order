@@ -9,11 +9,10 @@ import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.remote.cart.HeaderInterceptor
-import woowacourse.shopping.data.remote.order.OrderService
 
 object CouponClient {
-    val service: OrderService by lazy {
-        retrofit.create(OrderService::class.java)
+    val service: CouponService by lazy {
+        retrofit.create(CouponService::class.java)
     }
     private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient
