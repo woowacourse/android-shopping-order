@@ -17,13 +17,22 @@ data class FixedCoupon(
         order: Carts,
         payment: Int,
     ): Boolean {
-        TODO("Not yet implemented")
+        if (isExpired(today.toLocalDate())) return false
+
+        if (payment < minimumAmount) return false
+
+        return true
     }
 
     override fun applyToPayment(
         origin: Payment,
         order: Carts,
     ): Payment {
-        TODO("Not yet implemented")
+        val newTotalPayment = (origin.originPayment - discount) + origin.deliveryFee
+
+        return origin.copy(
+            couponDiscount = -discount,
+            totalPayment = newTotalPayment.coerceAtLeast(0),
+        )
     }
 }
