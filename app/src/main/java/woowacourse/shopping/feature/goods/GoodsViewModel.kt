@@ -5,9 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
@@ -54,9 +52,7 @@ class GoodsViewModel(
 
     private suspend fun loadHistory() {
         val history =
-            withContext(Dispatchers.IO) {
-                historyRepository.getAll()
-            }
+            historyRepository.getAll()
         val currentGoodsState = _goodsItems.value ?: GoodsItems()
         _goodsItems.value = currentGoodsState.copy(historyItems = history)
     }
