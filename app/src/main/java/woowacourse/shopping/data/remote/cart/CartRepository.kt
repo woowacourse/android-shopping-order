@@ -1,32 +1,25 @@
 package woowacourse.shopping.data.remote.cart
 
-import retrofit2.HttpException
-import retrofit2.Response
-
 class CartRepository(
     private val cartService: CartService,
 ) {
     suspend fun fetchAllCart(): Result<CartResponse?> =
-        runCatching {
+        try {
             val response = cartService.requestCart(page = null, size = null)
-            if (response.isSuccessful) {
-                response.body()
-            } else {
-                throw HttpException(response)
-            }
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
 
     suspend fun fetchCart(
         page: Int?,
         size: Int?,
     ): Result<CartResponse?> =
-        runCatching {
+        try {
             val response = cartService.requestCart(page = page, size = size)
-            if (response.isSuccessful) {
-                response.body()
-            } else {
-                throw HttpException(response)
-            }
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
 
     suspend fun addToCart(cartRequest: CartRequest): Result<Long> =
@@ -43,36 +36,30 @@ class CartRepository(
             locationHeader
         }
 
-    suspend fun deleteCart(id: Long): Result<Response<Unit>> =
-        runCatching {
-            val response = cartService.deleteFromCart(id = id)
-            if (response.isSuccessful) {
-                response
-            } else {
-                throw HttpException(response)
-            }
+    suspend fun deleteCart(id: Long): Result<Unit> =
+        try {
+            cartService.deleteFromCart(id = id)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
 
     suspend fun updateCart(
         id: Long,
         cartQuantity: CartQuantity,
-    ): Result<Response<Unit>> =
-        runCatching {
-            val response = cartService.updateCart(id = id, cartQuantity = cartQuantity)
-            if (response.isSuccessful) {
-                response
-            } else {
-                throw HttpException(response)
-            }
+    ): Result<Unit> =
+        try {
+            cartService.updateCart(id = id, cartQuantity = cartQuantity)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
 
     suspend fun getCartCounts(): Result<CartQuantity> =
-        runCatching {
+        try {
             val response = cartService.getCartCounts()
-            if (response.isSuccessful) {
-                response.body() ?: throw HttpException(response)
-            } else {
-                throw HttpException(response)
-            }
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
 }

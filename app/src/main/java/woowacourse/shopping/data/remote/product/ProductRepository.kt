@@ -1,37 +1,29 @@
 package woowacourse.shopping.data.remote.product
 
-import retrofit2.HttpException
-
 class ProductRepository(
     private val productService: ProductService,
 ) {
     suspend fun fetchProducts(page: Int): Result<ProductResponse?> =
-        runCatching {
+        try {
             val response = productService.requestGoods(page = page)
-            if (response.isSuccessful) {
-                response.body()
-            } else {
-                throw HttpException(response)
-            }
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
 
     suspend fun fetchAllProducts(): Result<ProductResponse?> =
-        runCatching {
+        try {
             val response = productService.requestGoods(size = Int.MAX_VALUE)
-            if (response.isSuccessful) {
-                response.body()
-            } else {
-                throw HttpException(response)
-            }
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
 
     suspend fun requestProductDetails(productId: Long): Result<ProductDetailResponse?> =
-        runCatching {
+        try {
             val response = productService.requestProductDetails(productId = productId)
-            if (response.isSuccessful) {
-                response.body()
-            } else {
-                throw HttpException(response)
-            }
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
 }

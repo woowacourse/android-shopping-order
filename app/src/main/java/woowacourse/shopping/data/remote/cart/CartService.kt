@@ -16,7 +16,7 @@ interface CartService {
         @Header("accept") accept: String = "*/*",
         @Query("page") page: Int?,
         @Query("size") size: Int?,
-    ): Response<CartResponse>
+    ): CartResponse
 
     @POST("/cart-items")
     suspend fun addToCart(
@@ -40,5 +40,5 @@ interface CartService {
     @GET("/cart-items/counts")
     suspend fun getCartCounts(
         @Header("accept") accept: String = "*/*",
-    ): Response<CartQuantity>
+    ): CartQuantity
 }
