@@ -97,7 +97,7 @@ class CartViewModel(
         _checkedItemsPrice.value = (_checkedItemsPrice.value ?: 0) + priceChange
     }
 
-    fun changeAllChecked() {
+    fun toggleAllItemsChecked() {
         val currentList = carts.value ?: emptyList()
         val newState = currentList.map { it.copy(isChecked = !it.isChecked) }
         _carts.value = newState
