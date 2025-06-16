@@ -44,6 +44,10 @@
     <string name="coupon_discount_price">-%,d원</string>
     <string name="coupon_total_price_title">총 결제 금액</string>
     <string name="coupon_complete_order_message">주문이 완료되었습니다!</string>
+    <string name="coupon_minimum_price">최소 주문 금액 %,d원</string>
+
+    <string name="date_format_full">yyyy년 M월 d일</string>
+    <string name="text_expiration_date_day">만료일 : %s</string>
 
 
 </resources>
