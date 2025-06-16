@@ -14,7 +14,7 @@ data class FixedCoupon(
 ) : Coupon {
     override fun isUsable(
         today: LocalDateTime,
-        order: Carts,
+        order: List<Cart>,
         payment: Int,
     ): Boolean {
         if (isExpired(today.toLocalDate())) return false
@@ -26,7 +26,7 @@ data class FixedCoupon(
 
     override fun applyToPayment(
         origin: Payment,
-        order: Carts,
+        order: List<Cart>,
     ): Payment {
         val newTotalPayment = (origin.originPayment - discount) + origin.deliveryFee
 

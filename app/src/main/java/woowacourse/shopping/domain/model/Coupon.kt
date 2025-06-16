@@ -12,13 +12,13 @@ sealed interface Coupon {
 
     fun isUsable(
         today: LocalDateTime,
-        order: Carts,
+        order: List<Cart>,
         payment: Int,
     ): Boolean
 
     fun applyToPayment(
         origin: Payment,
-        order: Carts,
+        order: List<Cart>,
     ): Payment
 
     fun isExpired(standardDate: LocalDate) = expirationDate.isBefore((standardDate))

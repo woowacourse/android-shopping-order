@@ -17,7 +17,7 @@ data class MiracleSaleCoupon(
 ) : Coupon {
     override fun isUsable(
         today: LocalDateTime,
-        order: Carts,
+        order: List<Cart>,
         payment: Int,
     ): Boolean {
         if (isExpired(today.toLocalDate())) return false
@@ -41,7 +41,7 @@ data class MiracleSaleCoupon(
 
     override fun applyToPayment(
         origin: Payment,
-        order: Carts,
+        order: List<Cart>,
     ): Payment {
         val discountAmount = (origin.originPayment * (discount / 100.0)).toInt()
 

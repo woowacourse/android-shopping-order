@@ -13,7 +13,7 @@ data class FreeshippingCoupon(
 ) : Coupon {
     override fun isUsable(
         today: LocalDateTime,
-        order: Carts,
+        order: List<Cart>,
         payment: Int,
     ): Boolean {
         if (isExpired(today.toLocalDate())) return false
@@ -25,7 +25,7 @@ data class FreeshippingCoupon(
 
     override fun applyToPayment(
         origin: Payment,
-        order: Carts,
+        order: List<Cart>,
     ): Payment {
         val newTotalPayment = origin.originPayment + 0
 
