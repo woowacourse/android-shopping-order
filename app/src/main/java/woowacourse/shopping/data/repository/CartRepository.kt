@@ -3,22 +3,19 @@ package woowacourse.shopping.data.repository
 import woowacourse.shopping.product.catalog.ProductUiModel
 
 interface CartRepository {
-    fun getTotalProductsCount(callback: (Int) -> Unit)
+    suspend fun getTotalProductsCount(): Int
 
-    fun updateCartProduct(
+    suspend fun updateCartProduct(
         cartProduct: ProductUiModel,
         newCount: Int,
-        callback: (Boolean) -> Unit,
-    )
+    ): Boolean
 
-    fun deleteCartProduct(
+    suspend fun deleteCartProduct(
         cartProduct: ProductUiModel,
-        callback: (Boolean) -> Unit,
-    )
+    ): Boolean
 
-    fun getCartProductsInRange(
+    suspend fun getCartProductsInRange(
         currentPage: Int,
         pageSize: Int,
-        callback: (List<ProductUiModel>) -> Unit,
-    )
+    ): List<ProductUiModel>
 }

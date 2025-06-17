@@ -3,6 +3,8 @@ package woowacourse.shopping.cart.recoomendation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRecommendationRepository
 import woowacourse.shopping.product.catalog.ProductUiModel
 
@@ -21,12 +23,25 @@ class RecommendationFragmentViewModel(
     private val _updatedItem = MutableLiveData<ProductUiModel>()
     val updatedItem: LiveData<ProductUiModel> = _updatedItem
 
+    private val _isMovePay = MutableLiveData<Unit>()
+    val isMovePay: LiveData<Unit> get() = _isMovePay
+
     init {
         loadRecentlyViewedProduct()
     }
 
+    fun orderProduct(): List<ProductUiModel> {
+        return _recommendedProducts.value?.filter { it.isChecked == true } ?: emptyList()
+    }
+
+    fun movePay() {
+        if (_selectedProductsCount.value == 0) return
+        _isMovePay.value = Unit
+    }
+
     fun loadRecentlyViewedProduct() {
-        cartRecommendationRepository.getRecommendedProducts { products ->
+        viewModelScope.launch {
+            val products = cartRecommendationRepository.getRecommendedProducts()
             _recommendedProducts.postValue(
                 products,
             )
@@ -34,7 +49,8 @@ class RecommendationFragmentViewModel(
     }
 
     fun fetchTotalCount() {
-        cartRecommendationRepository.getSelectedProductsCount { count ->
+        viewModelScope.launch {
+            val count = cartRecommendationRepository.getSelectedProductsCount()
             _selectedProductsCount.postValue(count)
         }
     }
@@ -50,16 +66,18 @@ class RecommendationFragmentViewModel(
         when (product.quantity) {
             INITIAL_PRODUCT_COUNT -> {
                 val newProduct = product.copy(quantity = A_COUNT)
-                cartRecommendationRepository.insertCartProduct(newProduct) { product ->
+                viewModelScope.launch {
+                    val product = cartRecommendationRepository.insertCartProduct(newProduct)
                     updateItem(product)
                 }
             }
 
             else -> {
-                cartRecommendationRepository.updateCartProduct(
-                    product,
-                    product.quantity + A_COUNT,
-                ) { success ->
+                viewModelScope.launch {
+                    val success = cartRecommendationRepository.updateCartProduct(
+                        product,
+                        product.quantity + A_COUNT,
+                    )
                     if (success) {
                         val newProduct = product.copy(quantity = product.quantity + A_COUNT)
                         updateItem(newProduct)
@@ -73,7 +91,8 @@ class RecommendationFragmentViewModel(
         when (product.quantity) {
             A_COUNT -> {
                 val newProduct = product.copy(quantity = INITIAL_PRODUCT_COUNT)
-                cartRecommendationRepository.deleteCartProduct(product) { success ->
+                viewModelScope.launch {
+                    val success = cartRecommendationRepository.deleteCartProduct(product)
                     if (success) {
                         updateItem(newProduct)
                     }
@@ -82,10 +101,11 @@ class RecommendationFragmentViewModel(
 
             else -> {
                 val newProduct = product.copy(quantity = product.quantity - A_COUNT)
-                cartRecommendationRepository.updateCartProduct(
-                    product,
-                    product.quantity - A_COUNT,
-                ) { success ->
+                viewModelScope.launch {
+                    val success = cartRecommendationRepository.updateCartProduct(
+                        product,
+                        product.quantity - A_COUNT,
+                    )
                     if (success) {
                         updateItem(newProduct)
                     }

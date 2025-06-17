@@ -10,53 +10,39 @@ class CartRecommendationRepositoryImpl(
     private val catalogProductDataSource: CatalogProductDataSource,
     private val recentlyViewProductDataSource: RecentlyViewedProductDataSource,
 ) : CartRecommendationRepository {
-    override fun getRecommendedProducts(callback: (List<ProductUiModel>) -> Unit) {
-        recentlyViewProductDataSource.getLatestViewedProduct { id ->
-            catalogProductDataSource.getProduct(id) { categoryProduct ->
-                val category = categoryProduct.category ?: ""
-                catalogProductDataSource.getRecommendedProducts(
-                    category,
-                    ZERO,
-                    TOTAL_RECOMMENDATION_PRODUCTS_COUNT,
-                ) { products ->
-                    callback(products)
-                }
-            }
-        }
+    override suspend fun getRecommendedProducts(): List<ProductUiModel> {
+        val id = recentlyViewProductDataSource.getLatestViewedProduct()
+        val categoryProduct = catalogProductDataSource.getProduct(id)
+        val category = categoryProduct?.category ?: ""
+        val products = catalogProductDataSource.getRecommendedProducts(
+            category,
+            ZERO,
+            TOTAL_RECOMMENDATION_PRODUCTS_COUNT,
+        )
+        return products
     }
 
-    override fun getSelectedProductsCount(callback: (Int) -> Unit) {
-        cartProductDataSource.getTotalElements { count ->
-            callback(count)
-        }
+    override suspend fun getSelectedProductsCount(): Int {
+        return cartProductDataSource.getTotalElements()
     }
 
-    override fun insertCartProduct(
+    override suspend fun insertCartProduct(
         cartProduct: ProductUiModel,
-        callback: (ProductUiModel) -> Unit,
-    ) {
-        cartProductDataSource.insertCartProduct(cartProduct) { product ->
-            callback(product)
-        }
-    }
+    ): ProductUiModel =
+        cartProductDataSource.insertCartProduct(cartProduct)
 
-    override fun updateCartProduct(
+
+    override suspend fun updateCartProduct(
         cartProduct: ProductUiModel,
         newCount: Int,
-        callback: (Boolean) -> Unit,
-    ) {
-        cartProductDataSource.updateProduct(cartProduct, newCount) { result ->
-            callback(result)
-        }
+    ): Boolean {
+        return cartProductDataSource.updateProduct(cartProduct, newCount)
     }
 
-    override fun deleteCartProduct(
+    override suspend fun deleteCartProduct(
         cartProduct: ProductUiModel,
-        callback: (Boolean) -> Unit,
-    ) {
-        cartProductDataSource.deleteCartProduct(cartProduct) { result ->
-            callback(result)
-        }
+    ): Boolean {
+        return cartProductDataSource.deleteCartProduct(cartProduct)
     }
 
     companion object {

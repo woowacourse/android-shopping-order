@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="position"
+            type="int" />
+
+        <variable
+            name="isChecked"
+            type="Boolean" />
+
+        <variable
+            name="onCheckClick"
+            type="kotlin.jvm.functions.Function2" />
+
+        <variable
+            name="coupon"
+            type="woowacourse.shopping.domain.Coupon" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:background="@drawable/cart_item_background">
+
+        <CheckBox
+            android:id="@+id/checkbox_selected_coupon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="6dp"
+            android:checked="@{isChecked}"
+            android:onClick="@{() -> onCheckClick.invoke(coupon, position)}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            style="@style/PayCouponTitleStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@{coupon.description}"
+            app:layout_constraintStart_toEndOf="@id/checkbox_selected_coupon"
+            app:layout_constraintTop_toTopOf="@id/checkbox_selected_coupon" />
+
+        <TextView
+            android:id="@+id/textview_coupon_expire"
+            style="@style/PayCouponSubTitleStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            app:couponExpirationDate="@{coupon.expirationDate}"
+            app:layout_constraintStart_toStartOf="@id/checkbox_selected_coupon"
+            app:layout_constraintTop_toBottomOf="@id/checkbox_selected_coupon" />
+
+        <TextView
+            android:id="@+id/textview_coupon_condition"
+            style="@style/PayCouponSubTitleStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="18dp"
+            android:text="@{@string/coupon_minimum_amount(coupon.minimumAmount)}"
+            app:layout_constraintStart_toStartOf="@id/checkbox_selected_coupon"
+            app:layout_constraintTop_toBottomOf="@id/textview_coupon_expire" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

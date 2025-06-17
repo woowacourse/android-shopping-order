@@ -6,39 +6,28 @@ import woowacourse.shopping.product.catalog.ProductUiModel
 class CartRepositoryImpl(
     private val cartProductDataSource: CartProductDataSource,
 ) : CartRepository {
-    override fun getTotalProductsCount(callback: (Int) -> Unit) {
-        cartProductDataSource.getTotalElements { count ->
-            callback(count)
-        }
+    override suspend fun getTotalProductsCount(): Int {
+        return cartProductDataSource.getTotalElements()
     }
 
-    override fun updateCartProduct(
+    override suspend fun updateCartProduct(
         cartProduct: ProductUiModel,
         newCount: Int,
-        callback: (Boolean) -> Unit,
-    ) {
-        cartProductDataSource.updateProduct(cartProduct, newCount) { result ->
-            callback(result)
-        }
+    ): Boolean {
+        return cartProductDataSource.updateProduct(cartProduct, newCount)
     }
 
-    override fun deleteCartProduct(
+    override suspend fun deleteCartProduct(
         cartProduct: ProductUiModel,
-        callback: (Boolean) -> Unit,
-    ) {
-        cartProductDataSource.deleteCartProduct(cartProduct) { result ->
-            callback(result)
-        }
+    ): Boolean {
+        return cartProductDataSource.deleteCartProduct(cartProduct)
     }
 
-    override fun getCartProductsInRange(
+    override suspend fun getCartProductsInRange(
         currentPage: Int,
         pageSize: Int,
-        callback: (List<ProductUiModel>) -> Unit,
-    ) {
-        cartProductDataSource.getCartProductsInRange(currentPage, pageSize) { products ->
-            callback(products)
-        }
+    ): List<ProductUiModel> {
+        return cartProductDataSource.getCartProductsInRange(currentPage, pageSize)
     }
 
     companion object {
