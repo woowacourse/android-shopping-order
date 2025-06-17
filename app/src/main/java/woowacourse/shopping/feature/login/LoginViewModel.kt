@@ -2,16 +2,19 @@ package woowacourse.shopping.feature.login
 
 import androidx.databinding.ObservableField
 import androidx.lifecycle.ViewModel
-import woowacourse.shopping.data.carts.repository.CartRepository
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import woowacourse.shopping.data.account.AccountRepository
+import woowacourse.shopping.data.account.BasicKeyAuthorizationResult
 import woowacourse.shopping.domain.model.Authorization
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
 
 class LoginViewModel(
-    private val cartRepository: CartRepository,
+    private val accountRepository: AccountRepository,
 ) : ViewModel() {
-    private val _loginSuccessEvent = MutableSingleLiveData<String>()
-    val loginSuccessEvent: SingleLiveData<String> get() = _loginSuccessEvent
+    private val _loginSuccessEvent = MutableSingleLiveData<Unit>()
+    val loginSuccessEvent: SingleLiveData<Unit> get() = _loginSuccessEvent
     private val _loginErrorEvent = MutableSingleLiveData<LoginError>()
     val loginErrorEvent: SingleLiveData<LoginError> get() = _loginErrorEvent
     val id = ObservableField<String>("")
@@ -20,17 +23,34 @@ class LoginViewModel(
     fun login() {
         val idValue = id.get() ?: ""
         val pwValue = pw.get() ?: ""
-        cartRepository.checkValidBasicKey(
-            Authorization.getBasicKey(idValue, pwValue),
-            { response ->
-                when (response) {
-                    200 -> _loginSuccessEvent.postValue(Authorization.getBasicKey(idValue, pwValue))
-                    else -> _loginErrorEvent.postValue(LoginError.NotFound)
+        Authorization.setBasicKeyByIdPw(idValue, pwValue)
+        viewModelScope.launch {
+            val result =
+                accountRepository.checkValidBasicKey(
+                    Authorization.basicKey,
+                )
+            when (result) {
+                BasicKeyAuthorizationResult.LoginSuccess -> {
+                    Authorization.setLoginStatus(true)
+                    saveBasicKey()
                 }
-            },
-            {
-                _loginErrorEvent.postValue(LoginError.Network)
-            },
-        )
+
+                else -> {
+                    _loginErrorEvent.setValue(LoginError.NotFound)
+                    Authorization.setLoginStatus(false)
+                }
+            }
+        }
+    }
+
+    private fun saveBasicKey() {
+        viewModelScope.launch {
+            val result = accountRepository.saveBasicKey()
+
+            when {
+                result.isSuccess -> _loginSuccessEvent.setValue(Unit)
+                result.isFailure -> _loginErrorEvent.postValue(LoginError.NotFound)
+            }
+        }
     }
 }

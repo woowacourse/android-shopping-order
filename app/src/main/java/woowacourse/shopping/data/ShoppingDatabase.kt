@@ -7,15 +7,12 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import woowacourse.shopping.BuildConfig
-import woowacourse.shopping.data.carts.CartDao
 import woowacourse.shopping.data.carts.CartEntity
 import woowacourse.shopping.data.goods.RecentSeenGoodsDao
 import woowacourse.shopping.data.goods.RecentSeenGoodsEntity
 
 @Database(entities = [CartEntity::class, RecentSeenGoodsEntity::class], version = 3)
 abstract class ShoppingDatabase : RoomDatabase() {
-    abstract fun cartDao(): CartDao
-
     abstract fun recentSeenGoodsDao(): RecentSeenGoodsDao
 
     companion object {

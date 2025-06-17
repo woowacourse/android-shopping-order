@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.cart.adapter
+package woowacourse.shopping.feature.cart.cartdetail.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,9 +8,10 @@ import woowacourse.shopping.databinding.ItemCartBinding
 import woowacourse.shopping.databinding.ItemCartSkeletonBinding
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.feature.QuantityChangeListener
+import woowacourse.shopping.feature.cart.cartdetail.CartItemClickHandler
 
 class CartAdapter(
-    private val cartClickListener: CartViewHolder.CartClickListener,
+    private val cartItemClickHandler: CartItemClickHandler,
     private val quantityChangeListener: QuantityChangeListener,
 ) : ListAdapter<CartListItem, RecyclerView.ViewHolder>(CartDiffCallback()) {
     fun showSkeleton(count: Int = 5) {
@@ -21,14 +22,6 @@ class CartAdapter(
     fun setCartItems(cartItems: List<CartItem>) {
         val newItems = cartItems.map { CartListItem.CartData(it) }
         submitList(newItems)
-    }
-
-    fun removeItem(removeCartItem: CartItem) {
-        val currentList = currentList.toMutableList()
-        currentList.removeIf {
-            it is CartListItem.CartData && it.cartItem.goods.id == removeCartItem.goods.id
-        }
-        submitList(currentList)
     }
 
     override fun getItemViewType(position: Int): Int =
@@ -46,11 +39,11 @@ class CartAdapter(
         return when (viewType) {
             TYPE_SKELETON -> {
                 val binding = ItemCartSkeletonBinding.inflate(inflater, parent, false)
-                SkeletonViewHolder(binding)
+                CartItemSkeletonViewHolder(binding)
             }
             TYPE_CART_ITEM -> {
                 val binding = ItemCartBinding.inflate(inflater, parent, false)
-                binding.cartClickListener = cartClickListener
+                binding.cartItemClickHandler = cartItemClickHandler
                 binding.quantityChangeListener = quantityChangeListener
                 CartViewHolder(binding)
             }

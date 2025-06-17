@@ -1,14 +1,17 @@
 package woowacourse.shopping.feature.goodsdetails
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.R
-import woowacourse.shopping.data.carts.CartUpdateError
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.repository.CartRepository
 import woowacourse.shopping.data.goods.repository.GoodsRepository
+import woowacourse.shopping.data.util.api.ApiResult
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Goods
 import woowacourse.shopping.feature.GoodsUiModel
@@ -33,7 +36,8 @@ class GoodsDetailsViewModel(
     val clickMostRecentlyGoodsEvent: SingleLiveData<Goods> get() = _clickMostRecentlyGoodsEvent
 
     fun initMostRecentlyViewedGoods() {
-        goodsRepository.fetchMostRecentGoods { goods ->
+        viewModelScope.launch {
+            val goods = goodsRepository.fetchMostRecentGoods()
             goods?.let {
                 if (goodsUiModel.id != goods.id) _mostRecentlyViewedGoods.postValue(it)
             }
@@ -57,26 +61,52 @@ class GoodsDetailsViewModel(
 
     fun addOrUpdateQuantityToCart() {
         cartItem.value?.let { item ->
-            cartRepository.updateQuantity(
-                cartId,
-                CartQuantity(item.quantity),
-                {
-                    alertMessageEvent(R.string.goods_detail_cart_update_complete_toast_message, item.quantity)
-                },
-                { cartUpdateError ->
-                    if (cartUpdateError is CartUpdateError.NotFound) {
-                        addCartItem(item)
-                    }
-                },
-            )
+            viewModelScope.launch {
+                if (cartId == NULL_CART_ID) {
+                    addCartItem(item)
+                } else {
+                    updateCartItem(item)
+                }
+            }
+        }
+    }
+
+    private suspend fun updateCartItem(item: CartItem) {
+        val result = cartRepository.updateQuantity(cartId, CartQuantity(item.quantity))
+        when (result) {
+            is ApiResult.Success -> {
+                alertMessageEvent(
+                    R.string.goods_detail_cart_update_complete_toast_message,
+                    item.quantity,
+                )
+            }
+
+            is ApiResult.Error -> {
+                _alertEvent.setValue(
+                    GoodsDetailsAlertMessage.ResourceId(
+                        R.string.goods_detail_cart_update_error_toast_message,
+                    ),
+                )
+            }
         }
     }
 
     private fun addCartItem(item: CartItem) {
-        cartRepository.addCartItem(item.goods, item.quantity, { resultCode: Int, cartId: Int ->
-            alertMessageEvent(R.string.goods_detail_cart_insert_complete_toast_message, item.quantity)
-            this.cartId = cartId
-        }, {})
+        viewModelScope.launch {
+            val result = cartRepository.addCartItem(item.goods, item.quantity)
+            when (result) {
+                is ApiResult.Error ->
+                    _alertEvent.setValue(
+                        GoodsDetailsAlertMessage.ResourceId(
+                            R.string.goods_detail_cart_insert_error_toast_message,
+                        ),
+                    )
+                is ApiResult.Success -> {
+                    alertMessageEvent(R.string.goods_detail_cart_insert_complete_toast_message, item.quantity)
+                    cartId = result.data.cartId
+                }
+            }
+        }
     }
 
     private fun alertMessageEvent(
@@ -85,7 +115,7 @@ class GoodsDetailsViewModel(
         quantity: Int,
     ) {
         _alertEvent.setValue(
-            GoodsDetailsAlertMessage(
+            GoodsDetailsAlertMessage.ResourceIdWithQuantity(
                 messageId,
                 quantity,
             ),
@@ -99,6 +129,17 @@ class GoodsDetailsViewModel(
     }
 
     fun loggingRecentViewedGoods(goods: Goods) {
-        goodsRepository.loggingRecentGoods(goods) {}
+        viewModelScope.launch {
+            try {
+                goodsRepository.loggingRecentGoods(goods)
+            } catch (e: Exception) {
+                Log.w(TAG, "최근 본 항목 기록 실패 ${goods.name}", e)
+            }
+        }
+    }
+
+    companion object {
+        const val NULL_CART_ID = -1
+        private val TAG: String = GoodsDetailsViewModel::class.java.simpleName
     }
 }

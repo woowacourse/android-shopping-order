@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.cart.adapter
+package woowacourse.shopping.feature.cart.cartdetail.adapter
 
 import androidx.recyclerview.widget.RecyclerView
 import woowacourse.shopping.databinding.ItemCartBinding
@@ -9,14 +9,5 @@ class CartViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(cartItem: CartItem) {
         binding.cartItem = cartItem
-    }
-
-    interface CartClickListener {
-        fun onCartItemDelete(cartItem: CartItem)
-
-        fun onCartItemChecked(
-            cartItem: CartItem,
-            changeCheck: Boolean,
-        )
     }
 }

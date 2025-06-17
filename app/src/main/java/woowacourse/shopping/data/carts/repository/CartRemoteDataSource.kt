@@ -1,55 +1,32 @@
 package woowacourse.shopping.data.carts.repository
 
-import woowacourse.shopping.data.carts.CartFetchError
-import woowacourse.shopping.data.carts.CartUpdateError
+import woowacourse.shopping.data.carts.AddItemResult
 import woowacourse.shopping.data.carts.dto.CartQuantity
 import woowacourse.shopping.data.carts.dto.CartResponse
+import woowacourse.shopping.data.util.api.ApiResult
 
 interface CartRemoteDataSource {
-    fun fetchCartItemSize(onComplete: (Int) -> Unit)
-
-    fun fetchCartItemByPage(
+    suspend fun fetchCartItemByPage(
         page: Int,
         size: Int,
-        onSuccess: (CartResponse) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    )
+    ): ApiResult<CartResponse>
 
-    fun fetchCartItemByOffset(
+    suspend fun fetchCartItemByOffset(
         limit: Int,
         offset: Int,
-        onSuccess: (CartResponse) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    )
+    ): ApiResult<CartResponse>
 
-    fun fetchCartCount(
-        onSuccess: (Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    )
+    suspend fun fetchAuthCode(validKey: String): ApiResult<Int>
 
-    fun fetchAuthCode(
-        validKey: String,
-        onResponse: (Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    )
-
-    fun updateCartItemCount(
+    suspend fun updateCartItemCount(
         cartId: Int,
         cartQuantity: CartQuantity,
-        onSuccess: (resultCode: Int) -> Unit,
-        onFailure: (CartUpdateError) -> Unit,
-    )
+    ): ApiResult<Int>
 
-    fun deleteItem(
-        cartId: Int,
-        onSuccess: (Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    )
+    suspend fun deleteItem(cartId: Int): ApiResult<Int>
 
-    fun addItem(
+    suspend fun addItem(
         itemId: Int,
         itemCount: Int,
-        onSuccess: (resultCode: Int, cartId: Int) -> Unit,
-        onFailure: (CartFetchError) -> Unit,
-    )
+    ): ApiResult<AddItemResult>
 }

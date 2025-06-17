@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.android.junit5)
     alias(libs.plugins.kotlin.android)
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0-RC"
+    alias(libs.plugins.kotlinSerialization)
     id("kotlin-kapt")
     id("kotlin-parcelize")
 }
@@ -86,6 +86,7 @@ dependencies {
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.androidx.core.testing)
     testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestRuntimeOnly(libs.mannodermaus.junit5.runner)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
