@@ -34,5 +34,20 @@
     <string name="fragment_cart_recommend_title">이런 상품은 어떠세요?</string>
     <string name="fragment_cart_recommend_guide">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
 
+    <!-- CouponsActivity -->
+    <string name="coupon_usable_coupon_title">적용 가능한 쿠폰</string>
+    <string name="coupon_usable_coupon_description">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="coupon_order_price_title">주문 금액</string>
+    <string name="coupon_coupon_discount_title">쿠폰 할인 금액</string>
+    <string name="coupon_shipping_fee_title">배송비</string>
+    <string name="coupon_price">%,d원</string>
+    <string name="coupon_discount_price">-%,d원</string>
+    <string name="coupon_total_price_title">총 결제 금액</string>
+    <string name="coupon_complete_order_message">주문이 완료되었습니다!</string>
+    <string name="coupon_minimum_price">최소 주문 금액 %,d원</string>
+
+    <string name="date_format_full">yyyy년 M월 d일</string>
+    <string name="text_expiration_date_day">만료일 : %s</string>
+
 
 </resources>

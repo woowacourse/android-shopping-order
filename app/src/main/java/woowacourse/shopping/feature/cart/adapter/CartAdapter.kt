@@ -1,20 +1,11 @@
 package woowacourse.shopping.feature.cart.adapter
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
-import woowacourse.shopping.domain.model.Cart
+import androidx.recyclerview.widget.ListAdapter
 
 class CartAdapter(
     private val cartClickListener: CartViewHolder.CartClickListener,
-) : RecyclerView.Adapter<CartViewHolder>() {
-    private val items: MutableList<Cart> = mutableListOf()
-
-    fun setItems(newItems: List<Cart>) {
-        items.clear()
-        items.addAll(newItems)
-        notifyDataSetChanged()
-    }
-
+) : ListAdapter<CartGoodsItem, CartViewHolder>(CartDiffUtil()) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -24,9 +15,7 @@ class CartAdapter(
         holder: CartViewHolder,
         position: Int,
     ) {
-        val item: Cart = items[position]
+        val item: CartGoodsItem = getItem(position)
         holder.bind(item)
     }
-
-    override fun getItemCount(): Int = items.size
 }

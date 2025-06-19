@@ -8,8 +8,10 @@ import com.bumptech.glide.Glide
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.feature.cart.adapter.CartAdapter
+import woowacourse.shopping.feature.cart.adapter.CartGoodsItem
 import woowacourse.shopping.feature.cart.adapter.RecommendAdapter
 import woowacourse.shopping.feature.goods.adapter.GoodsAdapter
+import woowacourse.shopping.feature.goods.adapter.ProductFeedItem
 
 @BindingAdapter("imgUrl")
 fun ImageView.loadImageFromUrl(url: String?) {
@@ -24,20 +26,25 @@ fun ImageView.loadImageFromUrl(url: String?) {
 }
 
 @BindingAdapter("cartItems")
-fun RecyclerView.bindCartItems(items: List<Cart>?) {
+fun RecyclerView.bindCartItems(items: List<CartGoodsItem>?) {
     if (adapter is CartAdapter && items != null) {
-        (adapter as CartAdapter).setItems(items)
+        (adapter as CartAdapter).submitList(items)
     }
+    if (adapter is RecommendAdapter && items != null) {
+        (adapter as RecommendAdapter).setItems(items.map { it.cart })
+    }
+}
+
+@BindingAdapter("recommendItems")
+fun RecyclerView.bindRecommendCartItems(items: List<Cart>?) {
     if (adapter is RecommendAdapter && items != null) {
         (adapter as RecommendAdapter).setItems(items)
     }
 }
 
 @BindingAdapter("items")
-fun RecyclerView.bindItems(items: List<Any>?) {
-    if (adapter is GoodsAdapter && items != null) {
-        (adapter as GoodsAdapter).setItems(items)
-    }
+fun RecyclerView.bindItems(items: List<ProductFeedItem>) {
+    (adapter as GoodsAdapter).submitList(items)
 }
 
 @BindingAdapter("visible")

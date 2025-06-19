@@ -1,20 +1,20 @@
 package woowacourse.shopping.feature.goods
 
-import android.os.Handler
-import android.os.Looper.getMainLooper
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.history.repository.HistoryRepository
 import woowacourse.shopping.data.remote.cart.CartQuantity
 import woowacourse.shopping.data.remote.cart.CartRepository
 import woowacourse.shopping.data.remote.cart.CartRequest
 import woowacourse.shopping.data.remote.product.ProductRepository
 import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.util.MutableSingleLiveData
 import woowacourse.shopping.util.SingleLiveData
-import woowacourse.shopping.util.replaceCartByProductId
 import woowacourse.shopping.util.toDomain
 
 class GoodsViewModel(
@@ -22,227 +22,223 @@ class GoodsViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
 ) : ViewModel() {
-    private val _items = MutableLiveData<List<Any>>()
-    val items: LiveData<List<Any>> get() = _items
-    private val products = MutableLiveData<List<Cart>>()
-    private val histories = MutableLiveData<List<Cart>>()
+    private val _goodsItems = MutableLiveData(GoodsItems())
+    val goodsItems: LiveData<GoodsItems> get() = _goodsItems
+
     private val _totalQuantity = MutableLiveData(0)
     val totalQuantity: LiveData<Int> get() = _totalQuantity
-    private val _hasNextPage = MutableLiveData(true)
-    val hasNextPage: LiveData<Boolean> get() = _hasNextPage
-    private val _navigateToCart = MutableSingleLiveData<Cart>()
-    val navigateToCart: SingleLiveData<Cart> get() = _navigateToCart
+
+    private val _navigateToCart = MutableSingleLiveData<Int>()
+    val navigateToCart: SingleLiveData<Int> get() = _navigateToCart
+
     private val _isSuccess = MutableSingleLiveData<Unit>()
     val isSuccess: SingleLiveData<Unit> get() = _isSuccess
+
     private val _isFail = MutableSingleLiveData<Unit>()
     val isFail: SingleLiveData<Unit> get() = _isFail
-    private val _isLoading = MutableLiveData<Boolean>(true)
+
+    private val _isLoading = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
+
     private var page: Int = INITIAL_PAGE
 
     init {
-        loadProducts()
-        loadHistories()
-        getCartCounts()
+        viewModelScope.launch {
+            loadHistory()
+            loadProducts()
+            fetchCartCounts()
+        }
+    }
+
+    private suspend fun loadHistory() {
+        val history =
+            historyRepository.getAll()
+        val currentGoodsState = _goodsItems.value ?: GoodsItems()
+        _goodsItems.value = currentGoodsState.copy(historyItems = history)
+    }
+
+    private suspend fun loadProducts() {
+        _isLoading.value = true
+        val currentList = _goodsItems.value
+
+        val cartsResult = cartRepository.fetchAllCart()
+        val productsResult = productRepository.fetchProducts(page++)
+
+        if (productsResult.isSuccess && cartsResult.isSuccess) {
+            val products = productsResult.getOrNull() ?: return
+            val carts = cartsResult.getOrNull() ?: return
+
+            val goodsItems = matchCartQuantity(products.toDomain(), carts.toDomain())
+            val newGoodsItems = currentList?.goodsItems.orEmpty() + goodsItems
+
+            _goodsItems.value =
+                currentList?.copy(
+                    goodsItems = newGoodsItems,
+                    hasNextPage = products.last.not(),
+                )
+        } else {
+            if (productsResult.isFailure) {
+                Log.e("loadProducts", "상품 API 실패", productsResult.exceptionOrNull())
+            }
+            if (cartsResult.isFailure) {
+                Log.e("loadProducts", "장바구니 API 실패", cartsResult.exceptionOrNull())
+            }
+        }
+        _isLoading.value = false
     }
 
     fun addPage() {
         page++
-        loadProducts()
+        viewModelScope.launch { loadProducts() }
     }
 
-    fun addToCart(cart: Cart) {
-        val newQuantity = cart.quantity + 1
+    fun addToCart(productId: Int) {
+        viewModelScope.launch {
+            val currentItems = _goodsItems.value?.goodsItems ?: return@launch
 
-        if (cart.quantity == 0) {
-            val cartRequest =
-                CartRequest(
-                    productId = cart.product.id,
-                    quantity = newQuantity,
-                )
+            cartRepository
+                .addToCart(CartRequest(productId, 1))
+                .onSuccess { newCartId ->
+                    val modifiedIndex = currentItems.indexOfFirst { it.product.id == productId }
+                    val modifiedItem = currentItems[modifiedIndex]
+                    val newList = currentItems.toMutableList()
+                    newList[modifiedIndex] = modifiedItem.copy(cartId = newCartId, quantity = 1)
 
-            cartRepository.addToCart(cartRequest) { result ->
-                result
-                    .onSuccess { response ->
-                        val locationHeader = response.headers()["Location"]
-                        val newId = locationHeader?.substringAfterLast("/")?.toLongOrNull() ?: 0
-                        val updatedCart = cart.copy(id = newId, quantity = newQuantity)
+                    _goodsItems.value = _goodsItems.value?.copy(goodsItems = newList)
 
-                        updateItems(updatedCart)
-                        getCartCounts()
-                        _isSuccess.setValue(Unit)
-                    }.onFailure {
-                        _isFail.setValue(Unit)
-                    }
-            }
-        } else {
-            cartRepository.updateCart(
-                id = cart.id,
-                cartQuantity = CartQuantity(newQuantity),
-            ) { result ->
-                result
-                    .onSuccess {
-                        val updatedCart = cart.copy(quantity = newQuantity)
-                        updateItems(updatedCart)
-                        getCartCounts()
-                        _isSuccess.setValue(Unit)
-                    }.onFailure { error ->
-                        _isFail.setValue(Unit)
-                    }
-            }
-        }
-    }
-
-    fun removeFromCart(cart: Cart) {
-        if (cart.quantity == 1) {
-            cartRepository.deleteCart(cart.id) { result ->
-                result
-                    .onSuccess {
-                        val updatedCart = cart.copy(id = 0, quantity = cart.quantity - 1)
-                        updateItems(updatedCart)
-                        getCartCounts()
-                    }.onFailure { error ->
-                        _isFail.setValue(Unit)
-                    }
-            }
-        } else {
-            cartRepository.updateCart(
-                id = cart.id,
-                cartQuantity = CartQuantity(cart.quantity - 1),
-            ) { result ->
-                result
-                    .onSuccess {
-                        val updatedCart = cart.copy(quantity = cart.quantity - 1)
-                        updateItems(updatedCart)
-                        getCartCounts()
-                    }.onFailure { error ->
-                        _isFail.setValue(Unit)
-                    }
-            }
-        }
-        getCartCounts()
-    }
-
-    fun refreshHistoryOnly() {
-        historyRepository.getAll { histories ->
-            val currentItems = _items.value.orEmpty().toMutableList()
-
-            val updatedItems =
-                if (currentItems.firstOrNull() is List<*>) {
-                    val cartsOnly = currentItems.drop(1)
-                    listOf(histories) + cartsOnly
-                } else {
-                    listOf(histories) + currentItems
+                    fetchCartCounts()
+                }.onFailure {
+                    _isFail.setValue(Unit)
                 }
-
-            _items.postValue(updatedItems)
         }
     }
 
-    fun findCartFromHistory(cart: Cart) {
-        val cart =
-            _items.value
-                ?.filterIsInstance<Cart>()
-                ?.find { it.product.id == cart.product.id }
-        if (cart != null) {
-            _navigateToCart.setValue(cart)
+    fun increaseQuantity(item: GoodsProduct) {
+        val cartId = item.cartId ?: 0L
+        val newQuantity = item.quantity + 1
+
+        viewModelScope.launch {
+            updateCartQuantity(cartId, newQuantity, item)
         }
     }
 
-    fun updateItemQuantity(
-        id: Int,
-        quantity: Int,
+    fun decreaseQuantity(item: GoodsProduct) {
+        val cartId = item.cartId ?: 0L
+        val newQuantity = item.quantity - 1
+
+        viewModelScope.launch {
+            if (newQuantity == 0) {
+                deleteCart(cartId, item)
+            } else {
+                updateCartQuantity(cartId, newQuantity, item)
+            }
+            fetchCartCounts()
+        }
+    }
+
+    private fun deleteCart(
+        cartId: Long,
+        item: GoodsProduct,
     ) {
-        val currentItems = _items.value.orEmpty().toMutableList()
+        val newItems = _goodsItems.value?.goodsItems?.toMutableList() ?: mutableListOf()
 
-        val index = currentItems.indexOfFirst { it is Cart && it.product.id == id }
+        viewModelScope.launch {
+            cartRepository
+                .deleteCart(cartId)
+                .onSuccess {
+                    val updatedCart = item.copy(cartId = null, quantity = 0)
+                    val modifiedIndex = newItems.indexOfFirst { it.cartId == cartId }
+                    newItems[modifiedIndex] = updatedCart
 
-        if (index != -1) {
-            val oldItem = currentItems[index] as Cart
-            val updatedItem = oldItem.copy(quantity = quantity)
-
-            currentItems[index] = updatedItem
-            _items.value = currentItems
-
-            val total = currentItems.filterIsInstance<Cart>().sumOf { it.quantity }
-            _totalQuantity.value = total
+                    _goodsItems.value = _goodsItems.value?.copy(goodsItems = newItems)
+                }.onFailure { error ->
+                    _isFail.setValue(Unit)
+                }
         }
     }
 
-    private fun updateItems(updatedCart: Cart) {
-        val updatedItems =
-            _items.value?.replaceCartByProductId(updatedCart) ?: listOf(updatedCart)
-        _items.value = updatedItems
+    private suspend fun updateCartQuantity(
+        cartId: Long,
+        newQuantity: Int,
+        item: GoodsProduct,
+    ) {
+        val newItems = _goodsItems.value?.goodsItems?.toMutableList() ?: mutableListOf()
+
+        cartRepository
+            .updateCart(
+                id = cartId,
+                cartQuantity = CartQuantity(newQuantity),
+            ).onSuccess {
+                val updatedCart = item.copy(quantity = newQuantity)
+                val modifiedIndex = newItems.indexOfFirst { it.cartId == cartId }
+                newItems[modifiedIndex] = updatedCart
+
+                _goodsItems.value = _goodsItems.value?.copy(goodsItems = newItems)
+            }.onFailure {
+                _isFail.setValue(Unit)
+            }
+        fetchCartCounts()
     }
 
-    private fun loadProducts() {
-        _isLoading.postValue(true)
-        Handler(getMainLooper()).postDelayed({
-            cartRepository.fetchAllCart(
-                onSuccess = { cartList ->
-                    val cartByProductId = cartList.content.associateBy { it.product.id }
+    private fun matchCartQuantity(
+        products: List<Product>,
+        carts: List<Cart>,
+    ): List<GoodsProduct> =
+        products.map {
+            val cart = carts.find { cart -> cart.product.id == it.id }
+            val result =
+                if (cart == null) {
+                    GoodsProduct(product = it)
+                } else {
+                    GoodsProduct(cart.id, it, cart.quantity)
+                }
+            result
+        }
 
-                    productRepository.fetchProducts(
-                        onSuccess = { response ->
-                            val newCarts =
-                                response.content.map { product ->
-                                    val matchedCart = cartByProductId[product.id]
-                                    Cart(
-                                        id = matchedCart?.id?.toLong() ?: 0,
-                                        product = product.toDomain(),
-                                        quantity = matchedCart?.quantity ?: 0,
-                                    )
-                                }
+    private suspend fun fetchQuantity() {
+        val currentItems = _goodsItems.value?.goodsItems ?: return
 
-                            val currentProducts = products.value.orEmpty()
-                            val combinedCarts = currentProducts + newCarts
-                            products.value = combinedCarts
+        cartRepository
+            .fetchAllCart()
+            .onSuccess { response ->
+                val carts = response?.toDomain() ?: return
+                val result =
+                    currentItems
+                        .map {
+                            val cart = carts.find { cart -> cart.id == it.cartId }
+                            if (cart != null) {
+                                it.copy(quantity = cart.quantity)
+                            } else {
+                                it.copy(cartId = null, quantity = 0)
+                            }
+                        }
 
-                            _hasNextPage.value = !response.last
-
-                            refreshItems()
-                            _isLoading.postValue(false)
-                        },
-                        onError = {
-                            Log.e("loadProductsInRange", "상품 API 실패", it)
-                            _isLoading.postValue(false)
-                        },
-                        page = page,
-                    )
-                },
-                onError = {
-                    Log.e("loadProductsInRange", "장바구니 API 실패", it)
-                    _isLoading.postValue(false)
-                },
-            )
-        }, 1000) // 스켈레톤 UI 테스트를 위한 딜레이입니다.
+                _goodsItems.value = _goodsItems.value?.copy(goodsItems = result)
+            }.onFailure {}
     }
 
-    private fun loadHistories() {
-        historyRepository.getAll { allHistories ->
-            histories.postValue(allHistories)
-            refreshItems()
+    fun findCartFromHistory(productId: Int) {
+        _navigateToCart.setValue(productId)
+    }
+
+    private fun fetchCartCounts() {
+        viewModelScope.launch {
+            cartRepository
+                .getCartCounts()
+                .onSuccess { totalCount ->
+                    _totalQuantity.value = totalCount.quantity
+                }.onFailure {
+                    Log.e("GoodsViewModel", "장바구니 개수 조회 실패", it)
+                }
         }
     }
 
-    private fun refreshItems() {
-        val historyList = histories.value.orEmpty()
-        val productList = products.value.orEmpty()
-
-        val combined: MutableList<Any> = mutableListOf()
-        if (historyList.isNotEmpty()) combined.add(historyList)
-        combined.addAll(productList)
-
-        _items.postValue(combined)
-    }
-
-    private fun getCartCounts() {
-        cartRepository.getCartCounts(
-            onSuccess = { totalCount ->
-                _totalQuantity.value = totalCount.toInt()
-            },
-            onError = { Log.e("GoodsViewModel", "장바구니 개수 조회 실패", it) },
-        )
+    fun syncData() {
+        viewModelScope.launch {
+            fetchQuantity()
+            loadHistory()
+            fetchCartCounts()
+        }
     }
 
     companion object {

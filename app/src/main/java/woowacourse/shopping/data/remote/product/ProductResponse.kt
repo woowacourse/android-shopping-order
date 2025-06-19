@@ -1,8 +1,10 @@
 package woowacourse.shopping.data.remote.product
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import woowacourse.shopping.domain.model.Product
+import kotlin.text.category
+import kotlin.text.toInt
 
 @Serializable
 data class ProductResponse(
@@ -27,7 +29,7 @@ data class ProductResponse(
     @SerialName("totalElements")
     val totalElements: Long,
     @SerialName("totalPages")
-    val totalPages: Int
+    val totalPages: Int,
 ) {
     @Serializable
     data class Content(
@@ -40,7 +42,7 @@ data class ProductResponse(
         @SerialName("name")
         val name: String,
         @SerialName("price")
-        val price: Int
+        val price: Int,
     )
 
     @Serializable
@@ -56,7 +58,7 @@ data class ProductResponse(
         @SerialName("sort")
         val sort: Sort,
         @SerialName("unpaged")
-        val unpaged: Boolean
+        val unpaged: Boolean,
     )
 
     @Serializable
@@ -66,6 +68,16 @@ data class ProductResponse(
         @SerialName("sorted")
         val sorted: Boolean,
         @SerialName("unsorted")
-        val unsorted: Boolean
-    )
+        val unsorted: Boolean,
+    )fun toDomain(): List<Product> {
+        return content.map {
+            Product(
+                id = it.id.toInt(),
+                name = it.name,
+                imageUrl = it.imageUrl,
+                price = it.price,
+                category = it.category,
+            )
+        }
+    }
 }

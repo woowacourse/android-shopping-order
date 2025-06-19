@@ -1,5 +1,7 @@
 package woowacourse.shopping.feature.cart
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -11,7 +13,12 @@ import woowacourse.shopping.databinding.ActivityCartBinding
 class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
     private val viewModel: CartViewModel by viewModels {
-        (application as ShoppingApplication).cartFactory
+        val app = (application as ShoppingApplication)
+        CartViewModelFactory(
+            app.cartRepository,
+            app.productRepository,
+            app.historyRepository,
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,5 +40,9 @@ class CartActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) finish()
         return super.onOptionsItemSelected(item)
+    }
+
+    companion object {
+        fun newIntent(context: Context): Intent = Intent(context, CartActivity::class.java)
     }
 }
