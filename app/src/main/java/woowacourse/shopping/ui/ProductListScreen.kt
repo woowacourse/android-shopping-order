@@ -9,7 +9,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -114,21 +113,33 @@ private fun ProductItem(
 ) {
     Column(
         modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        AsyncImage(
-            model = product.imageUrl,
-            contentDescription = stringResource(
-                R.string.product_image_content_description,
-                product.getTitle()
-            ),
-            contentScale = ContentScale.Crop,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(154.dp)
-                    .padding(bottom = 8.dp)
-                    .background(MaterialTheme.colorScheme.surfaceContainer),
-        )
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.BottomEnd,
+        ) {
+            AsyncImage(
+                model = product.imageUrl,
+                contentDescription = stringResource(
+                    R.string.product_image_content_description,
+                    product.getTitle(),
+                ),
+                contentScale = ContentScale.Crop,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(154.dp)
+                        .background(MaterialTheme.colorScheme.surfaceContainer),
+            )
+            AddQuantityButton(
+                quantity = quantity,
+                onAddToCartClick = onAddToCartClick,
+                onQuantityPlusClick = onQuantityPlusClick,
+                onQuantityMinusClick = onQuantityMinusClick,
+                modifier = Modifier.padding(8.dp),
+            )
+        }
         Text(
             text = product.getTitle(),
             style = MaterialTheme.typography.titleLarge,
@@ -148,29 +159,37 @@ private fun ProductItem(
                     horizontal = 7.5.dp,
                 ),
         )
-        if (quantity == 0) {
+    }
+}
+
+@Composable
+private fun AddQuantityButton(
+    quantity: Int,
+    onAddToCartClick: () -> Unit,
+    onQuantityPlusClick: () -> Unit,
+    onQuantityMinusClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    if (quantity == 0) {
+        Box(
+            modifier = modifier.fillMaxWidth(),
+            contentAlignment = Alignment.BottomEnd,
+        ) {
             ShoppingCardAddBox(
                 onShoppingCartAddClick = onAddToCartClick,
-                modifier =
-                    Modifier
-                        .padding(
-                            start = 7.5.dp,
-                            top = 8.dp,
-                        )
-                        .size(36.dp),
+                modifier = Modifier.size(36.dp),
             )
-        } else {
+        }
+    } else {
+        Box(
+            modifier = modifier.fillMaxWidth(),
+            contentAlignment = Alignment.BottomCenter,
+        ) {
             ProductQuantityBox(
                 onQuantityPlusClick = onQuantityPlusClick,
                 onQuantityMinusClick = onQuantityMinusClick,
                 quantity = quantity,
-                modifier =
-                    Modifier
-                        .padding(
-                            start = 7.5.dp,
-                            top = 8.dp,
-                        )
-                        .width(104.dp),
+                modifier = Modifier,
             )
         }
     }
@@ -186,34 +205,31 @@ private fun ProductListTopBar(
     TopAppBar(
         title = { Text(text = stringResource(R.string.app_name)) },
         actions = {
+            Box {
                 IconButton(onClick = onNavigateToCartClick) {
-                    Row(
-                        modifier = modifier,
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
                     Image(
                         painter = painterResource(R.drawable.shopping_cart_icon),
                         contentDescription = stringResource(R.string.cart_icon_description),
                         modifier = Modifier.size(22.dp),
                     )
-                    if (shoppingCartTotalCount > 0) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier =
-                                Modifier
-                                    .size(18.dp)
-                                    .background(
-                                        color = MaterialTheme.colorScheme.primary,
-                                        shape = CircleShape,
-                                    ),
-                        ) {
-                            Text(
-                                text = shoppingCartTotalCount.coerceAtMost(99).toString(),
-                                color = MaterialTheme.colorScheme.onSurface,
-                                style = MaterialTheme.typography.labelSmall,
-                            )
-                        }
+                }
+                if (shoppingCartTotalCount > 0) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier =
+                            Modifier
+                                .align(Alignment.TopEnd)
+                                .size(18.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = CircleShape,
+                                ),
+                    ) {
+                        Text(
+                            text = shoppingCartTotalCount.coerceAtMost(99).toString(),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.labelSmall,
+                        )
                     }
                 }
             }
@@ -238,7 +254,7 @@ private fun ProductItemPreview() {
                 price = Price(99_800),
                 imageUrl = "https://img.dongwonmall.com/dwmall/static_root/model_img/main/153/15327_1_a.jpg?f=webp&q=80",
             ),
-        quantity = 0,
+        quantity = 4,
         onAddToCartClick = {},
         onQuantityPlusClick = {},
         onQuantityMinusClick = {},

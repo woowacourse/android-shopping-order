@@ -1,16 +1,19 @@
 package woowacourse.shopping.ui.component
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -22,41 +25,57 @@ fun ProductQuantityBox(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.Center,
+        modifier = modifier
+            .width(104.dp)
+            .height(36.dp)
+            .clip(RoundedCornerShape(4.dp))
+            .background(MaterialTheme.colorScheme.background),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Button(
+        QuantityAction(
+            text = "-",
             onClick = onQuantityMinusClick,
-            contentPadding = PaddingValues(0.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background)
-        ) {
-            Text(
-                "-",
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-
-        Text(
-            text = quantity.toString(),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier =
-                Modifier.padding(
-                    horizontal = 7.5.dp,
-                ),
+            modifier = Modifier
+                .width(32.dp)
+                .fillMaxHeight(),
         )
 
-        Button(
-            onClick = onQuantityPlusClick,
-            contentPadding = PaddingValues(0.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background)
-
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .width(40.dp)
+                .fillMaxHeight(),
         ) {
             Text(
-                "+",
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                text = quantity.toString(),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+
+        QuantityAction(
+            text = "+",
+            onClick = onQuantityPlusClick,
+            modifier = Modifier
+                .width(32.dp)
+                .fillMaxHeight(),
+        )
+    }
+}
+
+@Composable
+private fun QuantityAction(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.clickable(onClick = onClick),
+    ) {
+        Text(
+            text = text,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

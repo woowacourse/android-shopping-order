@@ -115,11 +115,13 @@ private fun ShoppingCartItems(
                 .fillMaxWidth()
                 .clip(
                     RoundedCornerShape(4.dp),
-                ).border(
+                )
+                .border(
                     color = MaterialTheme.colorScheme.outline,
                     width = 1.dp,
                     shape = RoundedCornerShape(4.dp),
-                ).padding(12.dp),
+                )
+                .padding(12.dp),
     ) {
         val product = shoppingCartItem.product
         Row(
@@ -145,8 +147,7 @@ private fun ShoppingCartItems(
         Row(
             modifier =
                 Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp),
+                    .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.Bottom,
         ) {
@@ -158,19 +159,26 @@ private fun ShoppingCartItems(
                     Modifier
                         .width(136.dp)
                         .height(72.dp)
-                        .padding(bottom = 8.dp)
                         .background(MaterialTheme.colorScheme.surfaceContainer),
             )
-            Text(
-                text = DecimalFormat(stringResource(R.string.price_format_pattern)).format(quantityPrice),
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.End,
+            ) {
+                ProductQuantityBox(
+                    onQuantityPlusClick = { onIncreaseShoppingItemQuantityClick(shoppingCartItem) },
+                    onQuantityMinusClick = { onDecreaseShoppingItemQuantityClick(shoppingCartItem) },
+                    quantity = shoppingCartItem.getQuantity(),
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+                Text(
+                    text = DecimalFormat(stringResource(R.string.price_format_pattern)).format(
+                        quantityPrice
+                    ),
+                )
+            }
         }
-        ProductQuantityBox(
-            onQuantityPlusClick = { onIncreaseShoppingItemQuantityClick(shoppingCartItem) },
-            onQuantityMinusClick = { onDecreaseShoppingItemQuantityClick(shoppingCartItem) },
-            quantity = shoppingCartItem.getQuantity(),
-            modifier = Modifier.padding(top = 8.dp),
-        )
     }
 }
 
