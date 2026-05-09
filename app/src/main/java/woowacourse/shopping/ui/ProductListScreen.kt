@@ -38,17 +38,17 @@ import woowacourse.shopping.R
 import woowacourse.shopping.model.Price
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductTitle
+import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.ui.component.ProductQuantityBox
 import woowacourse.shopping.ui.component.ShoppingCardAddBox
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 @Composable
 fun ProductListScreen(
-    products: List<Product>,
-    quantityByProductId: Map<Long, Int>,
-    onAddToCartClick: (Product) -> Unit,
-    onQuantityPlusClick: (Product) -> Unit,
-    onQuantityMinusClick: (Product) -> Unit,
+    shoppingItems: List<ShoppingItem>,
+    onAddToCartClick: (ShoppingItem) -> Unit,
+    onQuantityPlusClick: (ShoppingItem) -> Unit,
+    onQuantityMinusClick: (ShoppingItem) -> Unit,
     onNavigateToCartClick: () -> Unit,
     onProductClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -69,20 +69,20 @@ fun ProductListScreen(
             modifier = Modifier.padding(10.dp),
         ) {
             items(
-                items = products,
-                key = { it.id },
-            ) { product ->
+                items = shoppingItems,
+                key = { it.getProductId() },
+            ) { shoppingItem ->
                 ProductItem(
-                    product = product,
-                    quantity = quantityByProductId[product.id] ?: 0,
-                    onAddToCartClick = { onAddToCartClick(product) },
-                    onQuantityPlusClick = { onQuantityPlusClick(product) },
-                    onQuantityMinusClick = { onQuantityMinusClick(product) },
+                    product = shoppingItem.getProduct(),
+                    quantity = shoppingItem.getQuantity(),
+                    onAddToCartClick = { onAddToCartClick(shoppingItem) },
+                    onQuantityPlusClick = { onQuantityPlusClick(shoppingItem) },
+                    onQuantityMinusClick = { onQuantityMinusClick(shoppingItem) },
                     modifier =
                         Modifier
                             .fillMaxWidth()
                             .padding(10.dp)
-                            .clickable { onProductClick(product.id) },
+                            .clickable { onProductClick(shoppingItem.getProductId()) },
                 )
             }
 
@@ -219,8 +219,7 @@ private fun ProductItemPreview() {
 private fun ProductListScreenPreview() {
     AndroidShoppingTheme {
         ProductListScreen(
-            products = emptyList(),
-            quantityByProductId = emptyMap(),
+            shoppingItems = emptyList(),
             onAddToCartClick = {},
             onQuantityPlusClick = {},
             onQuantityMinusClick = {},

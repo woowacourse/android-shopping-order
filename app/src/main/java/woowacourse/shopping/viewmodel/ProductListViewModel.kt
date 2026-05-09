@@ -3,33 +3,30 @@ package woowacourse.shopping.viewmodel
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.StateFlow
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.repository.ProductRepository
-import woowacourse.shopping.repository.QuantityRepository
+import woowacourse.shopping.model.ShoppingItem
+import woowacourse.shopping.repository.ShoppingItemRepository
 import woowacourse.shopping.repository.ShoppingCartRepository
 
 class ProductListViewModel(
-    private val productRepository: ProductRepository = ShoppingApplication.productRepository,
     private val shoppingCartRepository: ShoppingCartRepository = ShoppingApplication.shoppingCartRepository,
-    private val quantityRepository: QuantityRepository = ShoppingApplication.quantityRepository,
+    private val shoppingItemRepository: ShoppingItemRepository = ShoppingApplication.shoppingItemRepository,
 ) : ViewModel() {
-    val quantityByProductId: StateFlow<Map<Long, Int>> = quantityRepository.quantities
 
-    fun getProducts(): List<Product> = productRepository.getProducts()
+    val shoppingItems: StateFlow<List<ShoppingItem>> = shoppingItemRepository.shoppingItems
 
-    fun addProductToCart(product: Product) {
-        shoppingCartRepository.add(product)
-        quantityRepository.plusQuantity(product.id)
+    fun addProductToCart(shoppingItem: ShoppingItem) {
+        shoppingCartRepository.add(shoppingItem.getProduct())
+        shoppingItemRepository.plusQuantity(shoppingItem.getProductId())
     }
 
-    fun increaseProductQuantity(productId: Long) {
-        quantityRepository.plusQuantity(productId)
+    fun increaseProductQuantity(shoppingItem: ShoppingItem) {
+        shoppingItemRepository.plusQuantity(shoppingItem.getProductId())
     }
 
-    fun decreaseProductQuantity(productId: Long) {
-        if (quantityRepository.getQuantity(productId) == 0) {
+    fun decreaseProductQuantity(shoppingItem: ShoppingItem) {
+        if (shoppingItem.getQuantity() == 0) {
             return
         }
-        quantityRepository.minusQuantity(productId)
+        shoppingItemRepository.minusQuantity(shoppingItem.getProductId())
     }
 }

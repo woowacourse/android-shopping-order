@@ -1,11 +1,11 @@
 package woowacourse.shopping.ui.pagination
 
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.ShoppingItem
 
 class ProductPageStateHolder(
-    products: List<Product>,
+    shoppingItems: List<ShoppingItem>,
     initialPage: Int = 0,
-) : PageStateHolder<Product>(products) {
+) : PageStateHolder<ShoppingItem>(shoppingItems) {
     init {
         restoreCurrentPage(initialPage)
     }

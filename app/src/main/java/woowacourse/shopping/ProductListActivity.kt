@@ -28,27 +28,26 @@ class ProductListActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val quantityByProductId by productListViewModel.quantityByProductId.collectAsState()
+            val shoppingItems by productListViewModel.shoppingItems.collectAsState()
             var savedCurrentPage by rememberSaveable { mutableIntStateOf(0) }
             AndroidShoppingTheme {
                 val productPageStateHolder =
-                    remember {
+                    remember(shoppingItems, savedCurrentPage) {
                         ProductPageStateHolder(
-                            products = productListViewModel.getProducts(),
+                            shoppingItems = shoppingItems,
                             initialPage = savedCurrentPage,
                         )
                     }
                 ProductListScreen(
-                    products = productPageStateHolder.getItems(),
-                    quantityByProductId = quantityByProductId,
-                    onAddToCartClick = { product ->
-                        productListViewModel.addProductToCart(product)
+                    shoppingItems = productPageStateHolder.getItems(),
+                    onAddToCartClick = { shoppingItem ->
+                        productListViewModel.addProductToCart(shoppingItem)
                     },
-                    onQuantityPlusClick = { product ->
-                        productListViewModel.increaseProductQuantity(product.id)
+                    onQuantityPlusClick = { shoppingItem ->
+                        productListViewModel.increaseProductQuantity(shoppingItem)
                     },
-                    onQuantityMinusClick = { product ->
-                        productListViewModel.decreaseProductQuantity(product.id)
+                    onQuantityMinusClick = { shoppingItem ->
+                        productListViewModel.decreaseProductQuantity(shoppingItem)
                     },
                     onProductClick = { productId ->
                         DetailProductActivity.start(this, productId)
