@@ -26,7 +26,7 @@ fun ProductQuantityBox(
         modifier = modifier
     ) {
         Button(
-            onClick = onQuantityPlusClick,
+            onClick = onQuantityMinusClick,
             contentPadding = PaddingValues(0.dp)
         ) {
             Text(
@@ -44,11 +44,11 @@ fun ProductQuantityBox(
         )
 
         Button(
-            onClick = onQuantityMinusClick,
+            onClick = onQuantityPlusClick,
             contentPadding = PaddingValues(0.dp)
         ) {
             Text(
-                "-"
+                "+"
             )
         }
     }
