@@ -7,7 +7,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,6 +20,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -46,6 +50,7 @@ import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 @Composable
 fun ProductListScreen(
     shoppingItems: List<ShoppingItem>,
+    shoppingCartTotalCount: Int,
     onAddToCartClick: (ShoppingItem) -> Unit,
     onQuantityPlusClick: (ShoppingItem) -> Unit,
     onQuantityMinusClick: (ShoppingItem) -> Unit,
@@ -57,6 +62,7 @@ fun ProductListScreen(
     Scaffold(
         topBar = {
             ProductListTopBar(
+                shoppingCartTotalCount = shoppingCartTotalCount,
                 onNavigateToCartClick = onNavigateToCartClick,
             )
         },
@@ -173,18 +179,43 @@ private fun ProductItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProductListTopBar(
+    shoppingCartTotalCount: Int,
     onNavigateToCartClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TopAppBar(
         title = { Text(text = stringResource(R.string.app_name)) },
         actions = {
-            IconButton(onClick = onNavigateToCartClick) {
-                Image(
-                    painter = painterResource(R.drawable.shopping_cart_icon),
-                    contentDescription = stringResource(R.string.cart_icon_description),
-                    modifier = Modifier.size(22.dp),
-                )
+                IconButton(onClick = onNavigateToCartClick) {
+                    Row(
+                        modifier = modifier,
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                    Image(
+                        painter = painterResource(R.drawable.shopping_cart_icon),
+                        contentDescription = stringResource(R.string.cart_icon_description),
+                        modifier = Modifier.size(22.dp),
+                    )
+                    if (shoppingCartTotalCount > 0) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier =
+                                Modifier
+                                    .size(18.dp)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.primary,
+                                        shape = CircleShape,
+                                    ),
+                        ) {
+                            Text(
+                                text = shoppingCartTotalCount.coerceAtMost(99).toString(),
+                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.labelSmall,
+                            )
+                        }
+                    }
+                }
             }
         },
         colors =
@@ -220,6 +251,7 @@ private fun ProductListScreenPreview() {
     AndroidShoppingTheme {
         ProductListScreen(
             shoppingItems = emptyList(),
+            shoppingCartTotalCount = 99,
             onAddToCartClick = {},
             onQuantityPlusClick = {},
             onQuantityMinusClick = {},

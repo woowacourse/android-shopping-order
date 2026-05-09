@@ -14,6 +14,9 @@ class ProductListViewModel(
 
     val shoppingItems: StateFlow<List<ShoppingItem>> = shoppingItemRepository.shoppingItems
 
+    fun getShoppingCartTotalCount(shoppingItems: List<ShoppingItem>): Int =
+        shoppingItems.sumOf { shoppingItem -> shoppingItem.getQuantity() }
+
     fun addProductToCart(shoppingItem: ShoppingItem) {
         val productId = shoppingItem.getProductId()
         val sourceItem = shoppingItemRepository.getShoppingItemOrNull(productId) ?: return

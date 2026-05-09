@@ -40,6 +40,7 @@ class ProductListActivity : ComponentActivity() {
                     }
                 ProductListScreen(
                     shoppingItems = productPageStateHolder.getItems(),
+                    shoppingCartTotalCount = productListViewModel.getShoppingCartTotalCount(shoppingItems),
                     onAddToCartClick = { shoppingItem ->
                         productListViewModel.addProductToCart(shoppingItem)
                     },

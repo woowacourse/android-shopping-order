@@ -49,6 +49,7 @@ import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 @Composable
 fun ShoppingCartScreen(
     shoppingCartItems: List<ShoppingCartItem>,
+    getQuantityPrice: (ShoppingCartItem) -> Int,
     onBackClick: () -> Unit,
     onRemoveShoppingItemClick: (ShoppingCartItem) -> Unit,
     onIncreaseShoppingItemQuantityClick: (ShoppingCartItem) -> Unit,
@@ -86,6 +87,7 @@ fun ShoppingCartScreen(
                 shoppingCartItems.forEach { shoppingCartItem ->
                     ShoppingCartItems(
                         shoppingCartItem = shoppingCartItem,
+                        quantityPrice = getQuantityPrice(shoppingCartItem),
                         onRemoveShoppingItemClick = onRemoveShoppingItemClick,
                         onIncreaseShoppingItemQuantityClick = onIncreaseShoppingItemQuantityClick,
                         onDecreaseShoppingItemQuantityClick = onDecreaseShoppingItemQuantityClick,
@@ -101,6 +103,7 @@ fun ShoppingCartScreen(
 @Composable
 private fun ShoppingCartItems(
     shoppingCartItem: ShoppingCartItem,
+    quantityPrice: Int,
     onRemoveShoppingItemClick: (ShoppingCartItem) -> Unit,
     onIncreaseShoppingItemQuantityClick: (ShoppingCartItem) -> Unit,
     onDecreaseShoppingItemQuantityClick: (ShoppingCartItem) -> Unit,
@@ -159,7 +162,7 @@ private fun ShoppingCartItems(
                         .background(MaterialTheme.colorScheme.surfaceContainer),
             )
             Text(
-                text = DecimalFormat(stringResource(R.string.price_format_pattern)).format(product.getPrice()),
+                text = DecimalFormat(stringResource(R.string.price_format_pattern)).format(quantityPrice),
             )
         }
         ProductQuantityBox(
@@ -221,6 +224,7 @@ private fun ShoppingCartScreenPreview() {
                         shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""),4),
                     ),
                 ),
+            getQuantityPrice = { shoppingCartItem -> shoppingCartItem.getProductQuantityPrice() },
             onBackClick = { },
             onRemoveShoppingItemClick = {},
             onIncreaseShoppingItemQuantityClick = {},
@@ -238,6 +242,7 @@ private fun ShoppingCartItemsPreview() {
                 id = 1,
                 shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""),4),
             ),
+        quantityPrice = 399_200,
         onRemoveShoppingItemClick = {},
         onIncreaseShoppingItemQuantityClick = {},
         onDecreaseShoppingItemQuantityClick = {},

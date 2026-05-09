@@ -42,6 +42,9 @@ class ShoppingCartItemViewModel(
         syncShoppingCartItems()
     }
 
+    fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int =
+        shoppingCartItem.getProductQuantityPrice()
+
     private fun syncShoppingCartItems() {
         _shoppingCartItems.value = shoppingCartRepository.getShoppingItems().toList()
     }
@@ -60,5 +63,4 @@ class ShoppingCartItemViewModel(
             shoppingItemRepository.minusQuantity(productId)
         }
     }
-
 }

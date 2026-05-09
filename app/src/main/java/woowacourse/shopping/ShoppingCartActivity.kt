@@ -50,6 +50,7 @@ class ShoppingCartActivity : ComponentActivity() {
                 val pageItems = shoppingCartPageStateHolder.getItems()
                 ShoppingCartScreen(
                     shoppingCartItems = pageItems,
+                    getQuantityPrice = shoppingCartItemViewModel::getQuantityPrice,
                     onBackClick = this::finish,
                     onRemoveShoppingItemClick = { shoppingCartItem ->
                         shoppingCartItemViewModel.removeShoppingItem(shoppingCartItem)

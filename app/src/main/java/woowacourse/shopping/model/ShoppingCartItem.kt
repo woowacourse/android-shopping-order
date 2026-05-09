@@ -9,6 +9,8 @@ class ShoppingCartItem(
 
     fun getQuantity(): Int = shoppingItem.getQuantity()
 
+    fun getProductQuantityPrice(): Int = shoppingItem.getProductQuantityPrice()
+
     override fun equals(other: Any?): Boolean {
         if (other !is ShoppingCartItem) return false
         return id == other.id
