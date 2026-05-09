@@ -42,6 +42,8 @@ import woowacourse.shopping.model.Price
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductTitle
 import woowacourse.shopping.model.ShoppingCartItem
+import woowacourse.shopping.model.ShoppingItem
+import woowacourse.shopping.ui.component.ProductQuantityBox
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 @Composable
@@ -49,6 +51,8 @@ fun ShoppingCartScreen(
     shoppingCartItems: List<ShoppingCartItem>,
     onBackClick: () -> Unit,
     onRemoveShoppingItemClick: (ShoppingCartItem) -> Unit,
+    onIncreaseShoppingItemQuantityClick: (ShoppingCartItem) -> Unit,
+    onDecreaseShoppingItemQuantityClick: (ShoppingCartItem) -> Unit,
     modifier: Modifier = Modifier,
     bottomContent: @Composable () -> Unit = {},
 ) {
@@ -83,6 +87,8 @@ fun ShoppingCartScreen(
                     ShoppingCartItems(
                         shoppingCartItem = shoppingCartItem,
                         onRemoveShoppingItemClick = onRemoveShoppingItemClick,
+                        onIncreaseShoppingItemQuantityClick = onIncreaseShoppingItemQuantityClick,
+                        onDecreaseShoppingItemQuantityClick = onDecreaseShoppingItemQuantityClick,
                     )
                 }
             }
@@ -96,6 +102,8 @@ fun ShoppingCartScreen(
 private fun ShoppingCartItems(
     shoppingCartItem: ShoppingCartItem,
     onRemoveShoppingItemClick: (ShoppingCartItem) -> Unit,
+    onIncreaseShoppingItemQuantityClick: (ShoppingCartItem) -> Unit,
+    onDecreaseShoppingItemQuantityClick: (ShoppingCartItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -110,13 +118,14 @@ private fun ShoppingCartItems(
                     shape = RoundedCornerShape(4.dp),
                 ).padding(12.dp),
     ) {
+        val product = shoppingCartItem.product
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
-                shoppingCartItem.product.getTitle(),
+                text = product.getTitle(),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onBackground,
@@ -139,7 +148,7 @@ private fun ShoppingCartItems(
             verticalAlignment = Alignment.Bottom,
         ) {
             AsyncImage(
-                model = shoppingCartItem.product.imageUrl,
+                model = product.imageUrl,
                 contentDescription = stringResource(R.string.product_image_description),
                 contentScale = ContentScale.Crop,
                 modifier =
@@ -150,9 +159,15 @@ private fun ShoppingCartItems(
                         .background(MaterialTheme.colorScheme.surfaceContainer),
             )
             Text(
-                text = DecimalFormat(stringResource(R.string.price_format_pattern)).format(shoppingCartItem.product.getPrice()),
+                text = DecimalFormat(stringResource(R.string.price_format_pattern)).format(product.getPrice()),
             )
         }
+        ProductQuantityBox(
+            onQuantityPlusClick = { onIncreaseShoppingItemQuantityClick(shoppingCartItem) },
+            onQuantityMinusClick = { onDecreaseShoppingItemQuantityClick(shoppingCartItem) },
+            quantity = shoppingCartItem.getQuantity(),
+            modifier = Modifier.padding(top = 8.dp),
+        )
     }
 }
 
@@ -195,19 +210,21 @@ private fun ShoppingCartScreenPreview() {
                 listOf(
                     ShoppingCartItem(
                         id = 1,
-                        product = Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""),
+                        shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""),4),
                     ),
                     ShoppingCartItem(
-                        id = 1,
-                        product = Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""),
+                        id = 2,
+                        shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""),4),
                     ),
                     ShoppingCartItem(
-                        id = 1,
-                        product = Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""),
+                        id = 3,
+                        shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""),4),
                     ),
                 ),
             onBackClick = { },
-            onRemoveShoppingItemClick = { },
+            onRemoveShoppingItemClick = {},
+            onIncreaseShoppingItemQuantityClick = {},
+            onDecreaseShoppingItemQuantityClick = {},
         )
     }
 }
@@ -219,8 +236,10 @@ private fun ShoppingCartItemsPreview() {
         shoppingCartItem =
             ShoppingCartItem(
                 id = 1,
-                product = Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""),
+                shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""),4),
             ),
         onRemoveShoppingItemClick = {},
+        onIncreaseShoppingItemQuantityClick = {},
+        onDecreaseShoppingItemQuantityClick = {},
     )
 }

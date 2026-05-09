@@ -1,10 +1,10 @@
 package woowacourse.shopping.repository
 
-import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ShoppingCartItem
+import woowacourse.shopping.model.ShoppingItem
 
 interface ShoppingCartRepository {
-    fun add(product: Product)
+    fun add(shoppingItem: ShoppingItem)
 
     fun remove(shoppingCartItem: ShoppingCartItem)
 
