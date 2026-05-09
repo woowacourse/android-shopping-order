@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -37,13 +38,17 @@ import woowacourse.shopping.R
 import woowacourse.shopping.model.Price
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductTitle
-import woowacourse.shopping.preparedProducts
-import woowacourse.shopping.repository.MemoryProductRepository
+import woowacourse.shopping.ui.component.ProductQuantityBox
+import woowacourse.shopping.ui.component.ShoppingCardAddBox
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 @Composable
 fun ProductListScreen(
     products: List<Product>,
+    quantityByProductId: Map<Long, Int>,
+    onAddToCartClick: (Product) -> Unit,
+    onQuantityPlusClick: (Product) -> Unit,
+    onQuantityMinusClick: (Product) -> Unit,
     onNavigateToCartClick: () -> Unit,
     onProductClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -69,6 +74,10 @@ fun ProductListScreen(
             ) { product ->
                 ProductItem(
                     product = product,
+                    quantity = quantityByProductId[product.id] ?: 0,
+                    onAddToCartClick = { onAddToCartClick(product) },
+                    onQuantityPlusClick = { onQuantityPlusClick(product) },
+                    onQuantityMinusClick = { onQuantityMinusClick(product) },
                     modifier =
                         Modifier
                             .fillMaxWidth()
@@ -91,6 +100,10 @@ fun ProductListScreen(
 @Composable
 private fun ProductItem(
     product: Product,
+    quantity: Int,
+    onAddToCartClick: () -> Unit,
+    onQuantityPlusClick: () -> Unit,
+    onQuantityMinusClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -98,7 +111,10 @@ private fun ProductItem(
     ) {
         AsyncImage(
             model = product.imageUrl,
-            contentDescription = stringResource(R.string.product_image_content_description, product.getTitle()),
+            contentDescription = stringResource(
+                R.string.product_image_content_description,
+                product.getTitle()
+            ),
             contentScale = ContentScale.Crop,
             modifier =
                 Modifier
@@ -126,6 +142,31 @@ private fun ProductItem(
                     horizontal = 7.5.dp,
                 ),
         )
+        if (quantity == 0) {
+            ShoppingCardAddBox(
+                onShoppingCartAddClick = onAddToCartClick,
+                modifier =
+                    Modifier
+                        .padding(
+                            start = 7.5.dp,
+                            top = 8.dp,
+                        )
+                        .size(36.dp),
+            )
+        } else {
+            ProductQuantityBox(
+                onQuantityPlusClick = onQuantityPlusClick,
+                onQuantityMinusClick = onQuantityMinusClick,
+                quantity = quantity,
+                modifier =
+                    Modifier
+                        .padding(
+                            start = 7.5.dp,
+                            top = 8.dp,
+                        )
+                        .width(104.dp),
+            )
+        }
     }
 }
 
@@ -166,6 +207,10 @@ private fun ProductItemPreview() {
                 price = Price(99_800),
                 imageUrl = "https://img.dongwonmall.com/dwmall/static_root/model_img/main/153/15327_1_a.jpg?f=webp&q=80",
             ),
+        quantity = 0,
+        onAddToCartClick = {},
+        onQuantityPlusClick = {},
+        onQuantityMinusClick = {},
     )
 }
 
@@ -174,9 +219,13 @@ private fun ProductItemPreview() {
 private fun ProductListScreenPreview() {
     AndroidShoppingTheme {
         ProductListScreen(
-            products = MemoryProductRepository(preparedProducts).getProducts(),
-            onProductClick = {},
+            products = emptyList(),
+            quantityByProductId = emptyMap(),
+            onAddToCartClick = {},
+            onQuantityPlusClick = {},
+            onQuantityMinusClick = {},
             onNavigateToCartClick = {},
+            onProductClick = {},
         )
     }
 }

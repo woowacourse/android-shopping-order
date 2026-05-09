@@ -6,7 +6,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -16,26 +18,38 @@ import woowacourse.shopping.ui.ProductListScreen
 import woowacourse.shopping.ui.component.MoreButton
 import woowacourse.shopping.ui.pagination.ProductPageStateHolder
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
+import woowacourse.shopping.viewmodel.ProductListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 class ProductListActivity : ComponentActivity() {
-    private val productRepository = ShoppingApplication.productRepository
+    private val productListViewModel: ProductListViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val quantityByProductId by productListViewModel.quantityByProductId.collectAsState()
             var savedCurrentPage by rememberSaveable { mutableIntStateOf(0) }
             AndroidShoppingTheme {
                 val productPageStateHolder =
                     remember {
                         ProductPageStateHolder(
-                            products = productRepository.getProducts(),
+                            products = productListViewModel.getProducts(),
                             initialPage = savedCurrentPage,
                         )
                     }
                 ProductListScreen(
                     products = productPageStateHolder.getItems(),
+                    quantityByProductId = quantityByProductId,
+                    onAddToCartClick = { product ->
+                        productListViewModel.addProductToCart(product)
+                    },
+                    onQuantityPlusClick = { product ->
+                        productListViewModel.increaseProductQuantity(product.id)
+                    },
+                    onQuantityMinusClick = { product ->
+                        productListViewModel.decreaseProductQuantity(product.id)
+                    },
                     onProductClick = { productId ->
                         DetailProductActivity.start(this, productId)
                     },
