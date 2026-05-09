@@ -7,42 +7,44 @@ import woowacourse.shopping.model.ShoppingItem
 class MemoryShoppingItemRepository(
     shoppingItems: List<ShoppingItem>,
 ) : ShoppingItemRepository {
-    private val items: MutableList<ShoppingItem> =
-        shoppingItems.map { item -> item.copyItem() }.toMutableList()
-    private val _shoppingItems = MutableStateFlow(emptyList<ShoppingItem>())
+    private val shoppingItemByProductId: MutableMap<Long, ShoppingItem> =
+        shoppingItems.associateBy { shoppingItem -> shoppingItem.getProductId() }.toMutableMap()
+
+    private val _shoppingItems = MutableStateFlow(createSnapshot())
     override val shoppingItems: StateFlow<List<ShoppingItem>> = _shoppingItems
 
-    init {
-        publishSnapshot()
-    }
+    override fun getShoppingItemOrNull(productId: Long): ShoppingItem? =
+        shoppingItemByProductId[productId]
 
-    override fun getQuantity(productId: Long): Int = findItem(productId)?.getQuantity() ?: 0
+    override fun getQuantity(productId: Long): Int = getShoppingItem(productId).getQuantity()
 
     override fun plusQuantity(productId: Long) {
-        val item = findItem(productId) ?: return
-        item.plusQuantity()
-        publishSnapshot()
+        getShoppingItem(productId).plusQuantity()
+        syncShoppingItems()
     }
 
     override fun minusQuantity(productId: Long) {
-        val item = findItem(productId) ?: return
-        if (item.getQuantity() == 0) {
+        val shoppingItem = getShoppingItem(productId)
+        if (shoppingItem.getQuantity() == 0) {
             return
         }
-        item.minusQuantity()
-        publishSnapshot()
+        shoppingItem.minusQuantity()
+        syncShoppingItems()
     }
 
-    private fun findItem(productId: Long): ShoppingItem? =
-        items.find { item -> item.getProductId() == productId }
+    private fun getShoppingItem(productId: Long): ShoppingItem =
+        shoppingItemByProductId[productId]
+            ?: throw IllegalArgumentException("해당 상품을 찾을 수 없습니다.")
 
-    private fun publishSnapshot() {
-        _shoppingItems.value = items.map { item -> item.copyItem() }
+    private fun syncShoppingItems() {
+        _shoppingItems.value = createSnapshot()
     }
 
-    private fun ShoppingItem.copyItem(): ShoppingItem =
-        ShoppingItem(
-            product = getProduct(),
-            quantity = getQuantity(),
-        )
+    private fun createSnapshot(): List<ShoppingItem> =
+        shoppingItemByProductId.values.map { shoppingItem ->
+            ShoppingItem(
+                product = shoppingItem.getProduct(),
+                quantity = shoppingItem.getQuantity(),
+            )
+        }
 }
