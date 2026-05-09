@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,16 +22,18 @@ fun ProductQuantityBox(
     modifier: Modifier = Modifier,
 ) {
     Row(
+        modifier = modifier,
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
     ) {
         Button(
             onClick = onQuantityMinusClick,
-            contentPadding = PaddingValues(0.dp)
+            contentPadding = PaddingValues(0.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background)
         ) {
             Text(
-                "-"
+                "-",
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
@@ -45,10 +48,13 @@ fun ProductQuantityBox(
 
         Button(
             onClick = onQuantityPlusClick,
-            contentPadding = PaddingValues(0.dp)
+            contentPadding = PaddingValues(0.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background)
+
         ) {
             Text(
-                "+"
+                "+",
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
