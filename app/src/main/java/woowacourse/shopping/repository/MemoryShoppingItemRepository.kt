@@ -7,24 +7,23 @@ import woowacourse.shopping.model.ShoppingItem
 class MemoryShoppingItemRepository(
     shoppingItems: List<ShoppingItem>,
 ) : ShoppingItemRepository {
-    private val shoppingItemByProductId: MutableMap<Long, ShoppingItem> =
-        shoppingItems.associateBy { shoppingItem -> shoppingItem.getProductId() }.toMutableMap()
+    private val items: MutableList<ShoppingItem> = shoppingItems.toMutableList()
 
     private val _shoppingItems = MutableStateFlow(createSnapshot())
     override val shoppingItems: StateFlow<List<ShoppingItem>> = _shoppingItems
 
     override fun getShoppingItemOrNull(productId: Long): ShoppingItem? =
-        shoppingItemByProductId[productId]
+        findShoppingItem(productId)
 
-    override fun getQuantity(productId: Long): Int = getShoppingItem(productId).getQuantity()
+    override fun getQuantity(productId: Long): Int = findRequiredShoppingItem(productId).getQuantity()
 
-    override fun plusQuantity(productId: Long) {
-        getShoppingItem(productId).plusQuantity()
+    override fun plusQuantity(productId: Long, amount: Int) {
+        findRequiredShoppingItem(productId).plusQuantity(amount)
         syncShoppingItems()
     }
 
     override fun minusQuantity(productId: Long) {
-        val shoppingItem = getShoppingItem(productId)
+        val shoppingItem = findRequiredShoppingItem(productId)
         if (shoppingItem.getQuantity() == 0) {
             return
         }
@@ -32,16 +31,19 @@ class MemoryShoppingItemRepository(
         syncShoppingItems()
     }
 
-    private fun getShoppingItem(productId: Long): ShoppingItem =
-        shoppingItemByProductId[productId]
+    private fun findRequiredShoppingItem(productId: Long): ShoppingItem =
+        findShoppingItem(productId)
             ?: throw IllegalArgumentException("해당 상품을 찾을 수 없습니다.")
+
+    private fun findShoppingItem(productId: Long): ShoppingItem? =
+        items.find { shoppingItem -> shoppingItem.getProductId() == productId }
 
     private fun syncShoppingItems() {
         _shoppingItems.value = createSnapshot()
     }
 
     private fun createSnapshot(): List<ShoppingItem> =
-        shoppingItemByProductId.values.map { shoppingItem ->
+        items.map { shoppingItem ->
             ShoppingItem(
                 product = shoppingItem.getProduct(),
                 quantity = shoppingItem.getQuantity(),

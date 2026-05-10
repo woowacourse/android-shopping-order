@@ -13,8 +13,8 @@ class ShoppingItem(
 
     fun getQuantity(): Int = quantity
 
-    fun plusQuantity() {
-        quantity += 1
+    fun plusQuantity(amount: Int = 1) {
+        quantity += amount
     }
 
     fun minusQuantity() {
@@ -24,5 +24,9 @@ class ShoppingItem(
         quantity -= 1
     }
 
-    fun getProductQuantityPrice(): Int = product.getPrice() * quantity
+    fun getProductQuantityPrice(): Int = getProductQuantityPrice(quantity)
+
+    fun getProductQuantityPrice(quantity: Int): Int {
+        return product.getPrice() * quantity
+    }
 }

@@ -25,16 +25,11 @@ class DetailProductViewModel(
         val productId = shoppingItem.getProductId()
         val sourceItem = shoppingItemRepository.getShoppingItemOrNull(productId) ?: return
         shoppingCartRepository.add(sourceItem)
-        repeat(selectedQuantity) {
-            shoppingItemRepository.plusQuantity(productId)
-        }
+        shoppingItemRepository.plusQuantity(productId, selectedQuantity)
     }
 
     fun quantityPrice(
         shoppingItem: ShoppingItem,
         selectedQuantity: Int,
-    ): Int {
-        val productPrice = shoppingItem.getProduct().getPrice()
-        return productPrice * selectedQuantity
-    }
+    ): Int = shoppingItem.getProductQuantityPrice(selectedQuantity)
 }
