@@ -26,7 +26,9 @@ interface ShoppingItemDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(shoppingItems: List<ShoppingItemEntity>)
 
-    @Query("SELECT COUNT(*) FROM shopping_items")
-    suspend fun count(): Int
-}
+    @Query("DELETE FROM shopping_items")
+    suspend fun deleteAll(): Int
 
+    @Query("DELETE FROM shopping_items WHERE product_id NOT IN (:productIds)")
+    suspend fun deleteByProductIdsNotIn(productIds: List<Long>): Int
+}

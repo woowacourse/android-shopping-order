@@ -1,15 +1,27 @@
 package woowacourse.shopping
 
 import android.app.Application
-import kotlinx.coroutines.runBlocking
+import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import woowacourse.shopping.backend.MockShoppingBackendServer
+import woowacourse.shopping.backend.OkHttpProductBackendDataSource
+import woowacourse.shopping.backend.ShoppingItemsRemoteSyncer
 import woowacourse.shopping.repository.RoomShoppingCartRepository
 import woowacourse.shopping.repository.RoomShoppingItemRepository
 import woowacourse.shopping.repository.ShoppingCartRepository
 import woowacourse.shopping.repository.ShoppingItemRepository
 import woowacourse.shopping.storage.room.ShoppingDatabase
-import woowacourse.shopping.storage.room.toEntity
 
 class ShoppingApplication : Application() {
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val httpClient = OkHttpClient()
+    private lateinit var mockShoppingBackendServer: MockShoppingBackendServer
+
     companion object {
         lateinit var shoppingItemRepository: ShoppingItemRepository
             private set
@@ -21,19 +33,34 @@ class ShoppingApplication : Application() {
         super.onCreate()
 
         val shoppingDatabase = ShoppingDatabase.create(this)
-        seedShoppingItemsIfNeeded(shoppingDatabase)
-
         shoppingItemRepository = RoomShoppingItemRepository(shoppingDatabase.shoppingItemDao())
         shoppingCartRepository = RoomShoppingCartRepository(shoppingDatabase.shoppingCartDao())
+
+        applicationScope.launch {
+            runCatching {
+                mockShoppingBackendServer = MockShoppingBackendServer()
+                val productBackendDataSource =
+                    OkHttpProductBackendDataSource(
+                        client = httpClient,
+                        baseUrl = mockShoppingBackendServer.start(),
+                    )
+                val shoppingItemsRemoteSyncer =
+                    ShoppingItemsRemoteSyncer(
+                        shoppingItemDao = shoppingDatabase.shoppingItemDao(),
+                        productBackendDataSource = productBackendDataSource,
+                    )
+                shoppingItemsRemoteSyncer.sync()
+            }.onFailure { throwable ->
+                Log.e("ShoppingApplication", "서버-로컬 동기화 실패", throwable)
+            }
+        }
     }
 
-    private fun seedShoppingItemsIfNeeded(shoppingDatabase: ShoppingDatabase) {
-        runBlocking {
-            val shoppingItemDao = shoppingDatabase.shoppingItemDao()
-            if (shoppingItemDao.count() > 0) {
-                return@runBlocking
-            }
-            shoppingItemDao.insertAll(preparedProducts.map { shoppingItem -> shoppingItem.toEntity() })
+    override fun onTerminate() {
+        super.onTerminate()
+        applicationScope.cancel()
+        if (::mockShoppingBackendServer.isInitialized) {
+            mockShoppingBackendServer.shutdown()
         }
     }
 }
