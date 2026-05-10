@@ -37,12 +37,12 @@ class ShoppingCartActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val shoppingCartItems by shoppingCartItemViewModel.shoppingCartItems.collectAsState()
-            val shoppingItemsTrigger by shoppingCartItemViewModel.shoppingItems.collectAsState()
+            val shoppingCartItemsState by shoppingCartItemViewModel.shoppingCartItems.collectAsState()
+            val shoppingCartItems = shoppingCartItemsState.items
             var savedCurrentPage by rememberSaveable { mutableIntStateOf(0) }
             AndroidShoppingTheme {
                 val shoppingCartPageStateHolder =
-                    remember(shoppingCartItems, shoppingItemsTrigger, savedCurrentPage) {
+                    remember(shoppingCartItemsState, savedCurrentPage) {
                         ShoppingCartPageStateHolder(shoppingCartItems).apply {
                             restoreCurrentPage(savedCurrentPage)
                         }
@@ -54,17 +54,14 @@ class ShoppingCartActivity : ComponentActivity() {
                     onBackClick = this::finish,
                     onRemoveShoppingItemClick = { shoppingCartItem ->
                         shoppingCartItemViewModel.removeShoppingItem(shoppingCartItem)
-                        shoppingCartPageStateHolder.updateItems(shoppingCartItems)
                         savedCurrentPage = shoppingCartPageStateHolder.currentPage
                     },
                     onIncreaseShoppingItemQuantityClick = { shoppingCartItem ->
                         shoppingCartItemViewModel.increaseShoppingItemQuantity(shoppingCartItem)
-                        shoppingCartPageStateHolder.updateItems(shoppingCartItems)
                         savedCurrentPage = shoppingCartPageStateHolder.currentPage
                     },
                     onDecreaseShoppingItemQuantityClick = { shoppingCartItem ->
                         shoppingCartItemViewModel.decreaseShoppingItemQuantity(shoppingCartItem)
-                        shoppingCartPageStateHolder.updateItems(shoppingCartItems)
                         savedCurrentPage = shoppingCartPageStateHolder.currentPage
                     },
                 ) {

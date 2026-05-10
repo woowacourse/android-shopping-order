@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.model.ShoppingCartItem
-import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.repository.ShoppingCartRepository
 import woowacourse.shopping.repository.ShoppingItemRepository
 
@@ -13,11 +12,14 @@ class ShoppingCartItemViewModel(
     private val shoppingCartRepository: ShoppingCartRepository = ShoppingApplication.shoppingCartRepository,
     private val shoppingItemRepository: ShoppingItemRepository = ShoppingApplication.shoppingItemRepository,
 ) : ViewModel() {
-    private val _shoppingCartItems: MutableStateFlow<List<ShoppingCartItem>> =
-        MutableStateFlow(shoppingCartRepository.getShoppingItems().toList())
-    val shoppingCartItems: StateFlow<List<ShoppingCartItem>> = _shoppingCartItems
-
-    val shoppingItems: StateFlow<List<ShoppingItem>> = shoppingItemRepository.shoppingItems
+    private val _shoppingCartItemsState: MutableStateFlow<ShoppingCartItemsState> =
+        MutableStateFlow(
+            ShoppingCartItemsState(
+                revision = 0L,
+                items = shoppingCartRepository.getShoppingItems().toList(),
+            ),
+        )
+    val shoppingCartItems: StateFlow<ShoppingCartItemsState> = _shoppingCartItemsState
 
     fun removeShoppingItem(shoppingCartItem: ShoppingCartItem) {
         shoppingCartRepository.remove(shoppingCartItem)
@@ -46,7 +48,13 @@ class ShoppingCartItemViewModel(
         shoppingCartItem.getProductQuantityPrice()
 
     private fun syncShoppingCartItems() {
-        _shoppingCartItems.value = shoppingCartRepository.getShoppingItems().toList()
+        val latestShoppingCartItems = shoppingCartRepository.getShoppingItems().toList()
+        val currentRevision = _shoppingCartItemsState.value.revision
+        _shoppingCartItemsState.value =
+            ShoppingCartItemsState(
+                revision = currentRevision + 1,
+                items = latestShoppingCartItems,
+            )
     }
 
     private fun removeShoppingCartItemByProductId(productId: Long) {
@@ -65,4 +73,9 @@ class ShoppingCartItemViewModel(
         }
         shoppingItemRepository.minusQuantity(productId, currentQuantity)
     }
+
+    data class ShoppingCartItemsState(
+        val revision: Long,
+        val items: List<ShoppingCartItem>,
+    )
 }
