@@ -12,5 +12,5 @@ interface ShoppingItemRepository {
 
     fun plusQuantity(productId: Long, amount: Int = 1)
 
-    fun minusQuantity(productId: Long)
+    fun minusQuantity(productId: Long, amount: Int = 1)
 }

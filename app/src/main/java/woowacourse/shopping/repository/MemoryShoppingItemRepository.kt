@@ -22,12 +22,8 @@ class MemoryShoppingItemRepository(
         syncShoppingItems()
     }
 
-    override fun minusQuantity(productId: Long) {
-        val shoppingItem = findRequiredShoppingItem(productId)
-        if (shoppingItem.getQuantity() == 0) {
-            return
-        }
-        shoppingItem.minusQuantity()
+    override fun minusQuantity(productId: Long, amount: Int) {
+        findRequiredShoppingItem(productId).minusQuantity(amount)
         syncShoppingItems()
     }
 

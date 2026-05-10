@@ -17,11 +17,11 @@ class ShoppingItem(
         quantity += amount
     }
 
-    fun minusQuantity() {
-        if (quantity == 0) {
+    fun minusQuantity(amount: Int = 1) {
+        if (quantity - amount < 0) {
             throw IllegalArgumentException("상품의 수량은 0보다 작을 수 없습니다.")
         }
-        quantity -= 1
+        quantity -= amount
     }
 
     fun getProductQuantityPrice(): Int = getProductQuantityPrice(quantity)

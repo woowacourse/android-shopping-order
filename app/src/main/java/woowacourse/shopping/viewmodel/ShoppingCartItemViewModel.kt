@@ -59,8 +59,10 @@ class ShoppingCartItemViewModel(
     }
 
     private fun resetQuantity(productId: Long) {
-        while (shoppingItemRepository.getQuantity(productId) > 0) {
-            shoppingItemRepository.minusQuantity(productId)
+        val currentQuantity = shoppingItemRepository.getQuantity(productId)
+        if (currentQuantity == 0) {
+            return
         }
+        shoppingItemRepository.minusQuantity(productId, currentQuantity)
     }
 }
