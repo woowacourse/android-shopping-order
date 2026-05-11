@@ -15,12 +15,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -49,12 +53,15 @@ import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 @Composable
 fun ProductListScreen(
     shoppingItems: List<ShoppingItem>,
+    recentViewedShoppingItems: List<ShoppingItem>,
     shoppingCartTotalCount: Int,
+    isNetworkConnected: Boolean,
     onAddToCartClick: (ShoppingItem) -> Unit,
     onQuantityPlusClick: (ShoppingItem) -> Unit,
     onQuantityMinusClick: (ShoppingItem) -> Unit,
     onNavigateToCartClick: () -> Unit,
     onProductClick: (Long) -> Unit,
+    onRecentViewedProductClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     bottomContent: (@Composable () -> Unit)? = null,
 ) {
@@ -71,8 +78,22 @@ fun ProductListScreen(
             columns = GridCells.Fixed(2),
             contentPadding = innerPadding,
             horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(10.dp),
         ) {
+            if (!isNetworkConnected) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    OfflineBanner()
+                }
+            }
+
+            if (recentViewedShoppingItems.isNotEmpty()) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    RecentViewedSection(
+                        recentViewedShoppingItems = recentViewedShoppingItems,
+                        onRecentViewedProductClick = onRecentViewedProductClick,
+                    )
+                }
+            }
+
             items(
                 items = shoppingItems,
                 key = { it.getProductId() },
@@ -99,6 +120,113 @@ fun ProductListScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun OfflineBanner(
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.errorContainer)
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = stringResource(R.string.network_disconnected_message),
+            color = MaterialTheme.colorScheme.onErrorContainer,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+    }
+}
+
+@Composable
+private fun RecentViewedSection(
+    recentViewedShoppingItems: List<ShoppingItem>,
+    onRecentViewedProductClick: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background),
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.recent_viewed_section_title),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(
+                    items = recentViewedShoppingItems,
+                    key = { shoppingItem -> shoppingItem.getProductId() },
+                ) { shoppingItem ->
+                    RecentViewedItem(
+                        shoppingItem = shoppingItem,
+                        onRecentViewedProductClick = onRecentViewedProductClick,
+                    )
+                }
+            }
+        }
+        HorizontalDivider(
+            thickness = 7.dp,
+            color = MaterialTheme.colorScheme.outline,
+        )
+    }
+}
+
+@Composable
+private fun RecentViewedItem(
+    shoppingItem: ShoppingItem,
+    onRecentViewedProductClick: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val product = shoppingItem.getProduct()
+    Column(
+        modifier =
+            modifier
+                .width(112.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.background,
+                    shape = RoundedCornerShape(8.dp),
+                )
+                .clickable { onRecentViewedProductClick(product.id) }
+                .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        AsyncImage(
+            model = product.imageUrl,
+            contentDescription = stringResource(
+                R.string.product_image_content_description,
+                product.getTitle()
+            ),
+            contentScale = ContentScale.Crop,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(72.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.background,
+                        shape = RoundedCornerShape(6.dp),
+                    ),
+        )
+        Text(
+            text = product.getTitle(),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.bodySmall,
+        )
     }
 }
 
@@ -245,6 +373,35 @@ private fun ProductListTopBar(
 
 @Composable
 @Preview(showBackground = true)
+private fun RecentViewedSectionPreview() {
+    RecentViewedSection(
+        recentViewedShoppingItems = listOf(
+            ShoppingItem(
+                Product(
+                    id = 2,
+                    title = ProductTitle("동원 스위트콘"),
+                    price = Price(99_800),
+                    imageUrl = "https://img.dongwonmall.com/dwmall/static_root/model_img/main/153/15327_1_a.jpg?f=webp&q=80",
+                ),
+                quantity = 4,
+            ),
+            ShoppingItem(
+                Product(
+                    id = 1,
+                    title = ProductTitle("동원 스위트콘"),
+                    price = Price(99_800),
+                    imageUrl = "https://img.dongwonmall.com/dwmall/static_root/model_img/main/153/15327_1_a.jpg?f=webp&q=80",
+                ),
+                quantity = 4,
+            ),
+        ),
+        onRecentViewedProductClick = {},
+    )
+}
+
+
+@Composable
+@Preview(showBackground = true)
 private fun ProductItemPreview() {
     ProductItem(
         product =
@@ -267,12 +424,15 @@ private fun ProductListScreenPreview() {
     AndroidShoppingTheme {
         ProductListScreen(
             shoppingItems = emptyList(),
+            recentViewedShoppingItems = emptyList(),
             shoppingCartTotalCount = 99,
+            isNetworkConnected = true,
             onAddToCartClick = {},
             onQuantityPlusClick = {},
             onQuantityMinusClick = {},
             onNavigateToCartClick = {},
             onProductClick = {},
+            onRecentViewedProductClick = {},
         )
     }
 }

@@ -1,72 +1,89 @@
 package woowacourse.shopping.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.model.ShoppingCartItem
 import woowacourse.shopping.repository.ShoppingCartRepository
 import woowacourse.shopping.repository.ShoppingItemRepository
+import woowacourse.shopping.ui.pagination.ShoppingCartPageStateHolder
 
 class ShoppingCartItemViewModel(
     private val shoppingCartRepository: ShoppingCartRepository = ShoppingApplication.shoppingCartRepository,
     private val shoppingItemRepository: ShoppingItemRepository = ShoppingApplication.shoppingItemRepository,
 ) : ViewModel() {
+    private val shoppingCartPageStateHolder = ShoppingCartPageStateHolder(shoppingCartItems = emptyList())
+
     private val _shoppingCartItemsState: MutableStateFlow<ShoppingCartItemsState> =
-        MutableStateFlow(
-            ShoppingCartItemsState(
-                revision = 0L,
-                items = shoppingCartRepository.getShoppingItems().toList(),
-            ),
-        )
+        MutableStateFlow(createShoppingCartItemsState(emptyList()))
     val shoppingCartItems: StateFlow<ShoppingCartItemsState> = _shoppingCartItemsState
 
+    init {
+        launchNow {
+            val initialItems = shoppingCartRepository.getShoppingItems().toList()
+            shoppingCartPageStateHolder.updateItems(initialItems)
+            _shoppingCartItemsState.value = createShoppingCartItemsState(initialItems)
+        }
+    }
+
+    fun moveToPreviousPage() {
+        updatePage(_shoppingCartItemsState.value.currentPage - 1)
+    }
+
+    fun moveToNextPage() {
+        updatePage(_shoppingCartItemsState.value.currentPage + 1)
+    }
+
     fun removeShoppingItem(shoppingCartItem: ShoppingCartItem) {
-        shoppingCartRepository.remove(shoppingCartItem)
-        resetQuantity(shoppingCartItem.product.id)
-        syncShoppingCartItems()
+        launchNow {
+            shoppingCartRepository.remove(shoppingCartItem)
+            resetQuantity(shoppingCartItem.product.id)
+            syncShoppingCartItems()
+        }
     }
 
     fun increaseShoppingItemQuantity(shoppingCartItem: ShoppingCartItem) {
-        shoppingItemRepository.plusQuantity(shoppingCartItem.product.id)
-        syncShoppingCartItems()
+        launchNow {
+            shoppingItemRepository.plusQuantity(shoppingCartItem.product.id)
+            syncShoppingCartItems()
+        }
     }
 
     fun decreaseShoppingItemQuantity(shoppingCartItem: ShoppingCartItem) {
-        val productId = shoppingCartItem.product.id
-        if (shoppingItemRepository.getQuantity(productId) == 0) {
-            return
+        launchNow {
+            val productId = shoppingCartItem.product.id
+            val currentQuantity = shoppingItemRepository.getQuantity(productId)
+            if (currentQuantity == 0) {
+                return@launchNow
+            }
+            shoppingItemRepository.minusQuantity(productId)
+            if (currentQuantity == 1) {
+                shoppingCartRepository.removeByProductId(productId)
+            }
+            syncShoppingCartItems()
         }
-        shoppingItemRepository.minusQuantity(productId)
-        if (shoppingItemRepository.getQuantity(productId) == 0) {
-            removeShoppingCartItemByProductId(productId)
-        }
-        syncShoppingCartItems()
     }
 
     fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int =
         shoppingCartItem.getProductQuantityPrice()
 
-    private fun syncShoppingCartItems() {
+    private suspend fun syncShoppingCartItems() {
         val latestShoppingCartItems = shoppingCartRepository.getShoppingItems().toList()
-        val currentRevision = _shoppingCartItemsState.value.revision
-        _shoppingCartItemsState.value =
-            ShoppingCartItemsState(
-                revision = currentRevision + 1,
-                items = latestShoppingCartItems,
-            )
+        shoppingCartPageStateHolder.updateItems(latestShoppingCartItems)
+        _shoppingCartItemsState.value = createShoppingCartItemsState(latestShoppingCartItems)
     }
 
-    private fun removeShoppingCartItemByProductId(productId: Long) {
-        val targetItem =
-            shoppingCartRepository
-                .getShoppingItems()
-                .find { shoppingCartItem -> shoppingCartItem.product.id == productId }
-                ?: return
-        shoppingCartRepository.remove(targetItem)
+    private fun updatePage(page: Int) {
+        shoppingCartPageStateHolder.restoreCurrentPage(page)
+        val currentItems = _shoppingCartItemsState.value.items
+        _shoppingCartItemsState.value = createShoppingCartItemsState(currentItems)
     }
 
-    private fun resetQuantity(productId: Long) {
+    private suspend fun resetQuantity(productId: Long) {
         val currentQuantity = shoppingItemRepository.getQuantity(productId)
         if (currentQuantity == 0) {
             return
@@ -74,8 +91,33 @@ class ShoppingCartItemViewModel(
         shoppingItemRepository.minusQuantity(productId, currentQuantity)
     }
 
+    private fun createShoppingCartItemsState(
+        items: List<ShoppingCartItem>,
+    ): ShoppingCartItemsState {
+        return ShoppingCartItemsState(
+            items = items,
+            pagedItems = shoppingCartPageStateHolder.getItems(),
+            currentPage = shoppingCartPageStateHolder.currentPage,
+            canMoveToPreviousPage = shoppingCartPageStateHolder.canMoveToPreviousPage(),
+            canMoveToNextPage = shoppingCartPageStateHolder.canMoveToNextPage(),
+        )
+    }
+
+    private fun launchNow(block: suspend () -> Unit) {
+        viewModelScope.launch(start = CoroutineStart.UNDISPATCHED) {
+            block()
+        }
+    }
+
     data class ShoppingCartItemsState(
-        val revision: Long,
         val items: List<ShoppingCartItem>,
+        val pagedItems: List<ShoppingCartItem> = emptyList(),
+        val currentPage: Int = INITIAL_PAGE,
+        val canMoveToPreviousPage: Boolean = false,
+        val canMoveToNextPage: Boolean = false,
     )
+
+    companion object {
+        private const val INITIAL_PAGE = 0
+    }
 }

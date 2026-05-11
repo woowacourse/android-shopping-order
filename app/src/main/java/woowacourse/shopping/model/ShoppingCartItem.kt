@@ -4,6 +4,8 @@ class ShoppingCartItem(
     private val id: Long,
     private val shoppingItem: ShoppingItem,
 ) {
+    fun getId(): Long = id
+
     val product: Product
         get() = shoppingItem.getProduct()
 
