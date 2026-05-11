@@ -9,23 +9,19 @@ class ShoppingItemsRemoteSyncer(
     private val productBackendDataSource: ProductBackendDataSource,
 ) {
     suspend fun sync() {
-        val serverShoppingItems =
-            productBackendDataSource
-                .fetchProducts()
-        val mergedShoppingItemEntities =
-            serverShoppingItems.map { shoppingItem ->
-                val currentQuantity =
-                    shoppingItemDao.getQuantityOrNull(shoppingItem.getProductId()) ?: 0
-                shoppingItem.toEntityWithQuantity(currentQuantity)
+        val syncedItems =
+            productBackendDataSource.fetchProducts().map { shoppingItem ->
+                val preservedQuantity = shoppingItemDao.getQuantityOrNull(shoppingItem.getProductId()) ?: 0
+                shoppingItem.toEntityWithQuantity(preservedQuantity)
             }
 
-        if (mergedShoppingItemEntities.isEmpty()) {
+        if (syncedItems.isEmpty()) {
             shoppingItemDao.deleteAll()
             return
         }
 
-        shoppingItemDao.insertAll(mergedShoppingItemEntities)
-        shoppingItemDao.deleteByProductIdsNotIn(mergedShoppingItemEntities.map { entity -> entity.productId })
+        shoppingItemDao.insertAll(syncedItems)
+        shoppingItemDao.deleteByProductIdsNotIn(syncedItems.map { entity -> entity.productId })
     }
 
     private fun ShoppingItem.toEntityWithQuantity(quantity: Int): ShoppingItemEntity =

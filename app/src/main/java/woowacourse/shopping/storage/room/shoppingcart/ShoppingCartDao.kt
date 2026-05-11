@@ -4,15 +4,29 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import woowacourse.shopping.storage.room.ShoppingCartItemRow
 
 @Dao
 interface ShoppingCartDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(shoppingCartEntity: ShoppingCartEntity): Long
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertAll(shoppingCartEntities: List<ShoppingCartEntity>)
+
     @Query("DELETE FROM shopping_cart_items WHERE id = :id")
     suspend fun deleteById(id: Long): Int
+
+    @Query("DELETE FROM shopping_cart_items WHERE product_id = :productId")
+    suspend fun deleteByProductId(productId: Long): Int
+
+    @Query("SELECT EXISTS(SELECT 1 FROM shopping_cart_items WHERE product_id = :productId)")
+    suspend fun existsByProductId(productId: Long): Boolean
+
+    @Query("SELECT product_id FROM shopping_cart_items")
+    suspend fun getProductIds(): List<Long>
+
+    @Query("DELETE FROM shopping_cart_items WHERE product_id IN (:productIds)")
+    suspend fun deleteByProductIds(productIds: List<Long>): Int
 
     @Query(
         """
@@ -24,8 +38,19 @@ interface ShoppingCartDao {
                s.quantity AS quantity
         FROM shopping_cart_items c
         INNER JOIN shopping_items s ON s.product_id = c.product_id
+        WHERE s.quantity > 0
         ORDER BY c.id
         """,
     )
     suspend fun getShoppingCartItemRows(): List<ShoppingCartItemRow>
+
+    @Query(
+        """
+        SELECT COALESCE(SUM(s.quantity), 0)
+        FROM shopping_cart_items c
+        INNER JOIN shopping_items s ON s.product_id = c.product_id
+        WHERE s.quantity > 0
+        """,
+    )
+    suspend fun getTotalQuantity(): Int
 }

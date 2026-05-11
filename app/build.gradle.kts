@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.androidx.material3)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner.junit5)
+    testImplementation("org.json:json:20240303")
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
@@ -64,6 +65,7 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.datastore.preferences)
     kapt(libs.androidx.room.compiler)
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")

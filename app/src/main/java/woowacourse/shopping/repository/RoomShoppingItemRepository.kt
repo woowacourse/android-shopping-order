@@ -7,10 +7,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.runBlocking
 import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.storage.room.shoppingItem.ShoppingItemDao
-import woowacourse.shopping.storage.room.toDomain
+import woowacourse.shopping.storage.room.shoppingItem.toDomain
 
 class RoomShoppingItemRepository(
     private val shoppingItemDao: ShoppingItemDao,
@@ -22,48 +21,43 @@ class RoomShoppingItemRepository(
             .map { entities -> entities.map { entity -> entity.toDomain() } }
             .stateIn(scope, SharingStarted.Eagerly, emptyList())
 
-    override fun getShoppingItemOrNull(productId: Long): ShoppingItem? =
-        runBlocking {
-            shoppingItemDao.getByProductId(productId)?.toDomain()
-        }
+    override suspend fun getShoppingItemOrNull(productId: Long): ShoppingItem? =
+        shoppingItemDao.getByProductId(productId)?.toDomain()
 
-    override fun getQuantity(productId: Long): Int =
-        runBlocking {
+    override suspend fun getQuantity(productId: Long): Int =
+        shoppingItemDao.getQuantityOrNull(productId)
+            ?: throw IllegalArgumentException("해당 상품을 찾을 수 없습니다.")
+
+    override suspend fun plusQuantity(productId: Long, amount: Int) {
+        validateAmount(amount, "상품의 수량 증가값은 음수일 수 없습니다.")
+        if (amount == 0) return
+        updateQuantityByDelta(productId, amount)
+    }
+
+    override suspend fun minusQuantity(productId: Long, amount: Int) {
+        validateAmount(amount, "상품의 수량 감소값은 음수일 수 없습니다.")
+        if (amount == 0) return
+        updateQuantityByDelta(productId, -amount)
+    }
+
+    private fun validateAmount(
+        amount: Int,
+        message: String,
+    ) {
+        require(amount >= 0) { message }
+    }
+
+    private suspend fun updateQuantityByDelta(
+        productId: Long,
+        delta: Int,
+    ) {
+        val currentQuantity =
             shoppingItemDao.getQuantityOrNull(productId)
                 ?: throw IllegalArgumentException("해당 상품을 찾을 수 없습니다.")
+        val updatedQuantity = currentQuantity + delta
+        if (updatedQuantity < 0) {
+            throw IllegalArgumentException("상품의 수량은 0보다 작을 수 없습니다.")
         }
-
-    override fun plusQuantity(productId: Long, amount: Int) {
-        if (amount < 0) {
-            throw IllegalArgumentException("상품의 수량 증가값은 음수일 수 없습니다.")
-        }
-        if (amount == 0) {
-            return
-        }
-        runBlocking {
-            val currentQuantity =
-                shoppingItemDao.getQuantityOrNull(productId)
-                    ?: throw IllegalArgumentException("해당 상품을 찾을 수 없습니다.")
-            shoppingItemDao.updateQuantity(productId, currentQuantity + amount)
-        }
-    }
-
-    override fun minusQuantity(productId: Long, amount: Int) {
-        if (amount < 0) {
-            throw IllegalArgumentException("상품의 수량 감소값은 음수일 수 없습니다.")
-        }
-        if (amount == 0) {
-            return
-        }
-        runBlocking {
-            val currentQuantity =
-                shoppingItemDao.getQuantityOrNull(productId)
-                    ?: throw IllegalArgumentException("해당 상품을 찾을 수 없습니다.")
-            if (currentQuantity < amount) {
-                throw IllegalArgumentException("상품의 수량은 0보다 작을 수 없습니다.")
-            }
-            shoppingItemDao.updateQuantity(productId, currentQuantity - amount)
-        }
+        shoppingItemDao.updateQuantity(productId, updatedQuantity)
     }
 }
-
