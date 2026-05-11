@@ -44,9 +44,6 @@ class ProductListViewModel(
         updateUiState()
     }
 
-    fun getShoppingCartTotalCount(): Int =
-        shoppingItems.value.sumOf { shoppingItem -> shoppingItem.getQuantity() }
-
     fun addProductToCart(shoppingItem: ShoppingItem) {
         launchNow {
             val productId = shoppingItem.getProductId()

@@ -84,8 +84,6 @@ class DetailProductViewModel(
         )
     }
 
-    fun defaultQuantity(): Int = DEFAULT_QUANTITY
-
     fun addProductToCart(
         shoppingItem: ShoppingItem,
         selectedQuantity: Int,
@@ -103,10 +101,6 @@ class DetailProductViewModel(
 
     fun visitProduct(productId: Long) {
         visitStore.visit(productId)
-    }
-
-    fun removeRecentViewedProduct(productId: Long) {
-        visitStore.removeVisitedProduct(productId)
     }
 
     private fun updateUiState() {
