@@ -27,12 +27,9 @@ class RoomShoppingCartRepository(
     override suspend fun getShoppingItems(): List<ShoppingCartItem> =
         shoppingCartDao.getShoppingCartItemRows().map { shoppingCartItemRow -> shoppingCartItemRow.toDomain() }
 
-    override suspend fun containsProduct(productId: Long): Boolean =
-        shoppingCartDao.existsByProductId(productId)
+    override suspend fun containsProduct(productId: Long): Boolean = shoppingCartDao.existsByProductId(productId)
 
-    override suspend fun removeByProductId(productId: Long): Boolean =
-        shoppingCartDao.deleteByProductId(productId) > 0
+    override suspend fun removeByProductId(productId: Long): Boolean = shoppingCartDao.deleteByProductId(productId) > 0
 
-    override suspend fun getTotalQuantity(): Int =
-        shoppingCartDao.getTotalQuantity()
+    override suspend fun getTotalQuantity(): Int = shoppingCartDao.getTotalQuantity()
 }

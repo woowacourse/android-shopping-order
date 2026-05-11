@@ -18,24 +18,24 @@ class ShoppingCartItemViewModel(
 ) : ViewModel() {
     private val shoppingCartPageStateHolder = ShoppingCartPageStateHolder(shoppingCartItems = emptyList())
 
-    private val _shoppingCartItemsState: MutableStateFlow<ShoppingCartItemsState> =
+    private val _shoppingCartItems: MutableStateFlow<ShoppingCartItemsState> =
         MutableStateFlow(createShoppingCartItemsState(emptyList()))
-    val shoppingCartItems: StateFlow<ShoppingCartItemsState> = _shoppingCartItemsState
+    val shoppingCartItems: StateFlow<ShoppingCartItemsState> = _shoppingCartItems
 
     init {
         launchNow {
             val initialItems = shoppingCartRepository.getShoppingItems().toList()
             shoppingCartPageStateHolder.updateItems(initialItems)
-            _shoppingCartItemsState.value = createShoppingCartItemsState(initialItems)
+            _shoppingCartItems.value = createShoppingCartItemsState(initialItems)
         }
     }
 
     fun moveToPreviousPage() {
-        updatePage(_shoppingCartItemsState.value.currentPage - 1)
+        updatePage(_shoppingCartItems.value.currentPage - 1)
     }
 
     fun moveToNextPage() {
-        updatePage(_shoppingCartItemsState.value.currentPage + 1)
+        updatePage(_shoppingCartItems.value.currentPage + 1)
     }
 
     fun removeShoppingItem(shoppingCartItem: ShoppingCartItem) {
@@ -68,19 +68,18 @@ class ShoppingCartItemViewModel(
         }
     }
 
-    fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int =
-        shoppingCartItem.getProductQuantityPrice()
+    fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int = shoppingCartItem.getProductQuantityPrice()
 
     private suspend fun syncShoppingCartItems() {
         val latestShoppingCartItems = shoppingCartRepository.getShoppingItems().toList()
         shoppingCartPageStateHolder.updateItems(latestShoppingCartItems)
-        _shoppingCartItemsState.value = createShoppingCartItemsState(latestShoppingCartItems)
+        _shoppingCartItems.value = createShoppingCartItemsState(latestShoppingCartItems)
     }
 
     private fun updatePage(page: Int) {
         shoppingCartPageStateHolder.restoreCurrentPage(page)
-        val currentItems = _shoppingCartItemsState.value.items
-        _shoppingCartItemsState.value = createShoppingCartItemsState(currentItems)
+        val currentItems = _shoppingCartItems.value.items
+        _shoppingCartItems.value = createShoppingCartItemsState(currentItems)
     }
 
     private suspend fun resetQuantity(productId: Long) {
@@ -91,17 +90,14 @@ class ShoppingCartItemViewModel(
         shoppingItemRepository.minusQuantity(productId, currentQuantity)
     }
 
-    private fun createShoppingCartItemsState(
-        items: List<ShoppingCartItem>,
-    ): ShoppingCartItemsState {
-        return ShoppingCartItemsState(
+    private fun createShoppingCartItemsState(items: List<ShoppingCartItem>): ShoppingCartItemsState =
+        ShoppingCartItemsState(
             items = items,
             pagedItems = shoppingCartPageStateHolder.getItems(),
             currentPage = shoppingCartPageStateHolder.currentPage,
             canMoveToPreviousPage = shoppingCartPageStateHolder.canMoveToPreviousPage(),
             canMoveToNextPage = shoppingCartPageStateHolder.canMoveToNextPage(),
         )
-    }
 
     private fun launchNow(block: suspend () -> Unit) {
         viewModelScope.launch(start = CoroutineStart.UNDISPATCHED) {

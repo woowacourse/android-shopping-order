@@ -10,7 +10,13 @@ interface ShoppingItemRepository {
 
     suspend fun getQuantity(productId: Long): Int
 
-    suspend fun plusQuantity(productId: Long, amount: Int = 1)
+    suspend fun plusQuantity(
+        productId: Long,
+        amount: Int = 1,
+    )
 
-    suspend fun minusQuantity(productId: Long, amount: Int = 1)
+    suspend fun minusQuantity(
+        productId: Long,
+        amount: Int = 1,
+    )
 }

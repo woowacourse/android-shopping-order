@@ -1,8 +1,8 @@
 package woowacourse.shopping.backend
 
 import woowacourse.shopping.model.ShoppingItem
-import woowacourse.shopping.storage.room.shoppingItem.ShoppingItemEntity
 import woowacourse.shopping.storage.room.shoppingItem.ShoppingItemDao
+import woowacourse.shopping.storage.room.shoppingItem.ShoppingItemEntity
 
 class ShoppingItemsRemoteSyncer(
     private val shoppingItemDao: ShoppingItemDao,

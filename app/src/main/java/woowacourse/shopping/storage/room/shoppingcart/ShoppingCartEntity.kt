@@ -28,4 +28,3 @@ data class ShoppingCartEntity(
     @ColumnInfo(name = "product_id")
     val productId: Long,
 )
-

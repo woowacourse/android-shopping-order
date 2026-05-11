@@ -1,11 +1,13 @@
+@file:Suppress("FunctionName")
+
 package woowacourse.shopping.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -25,26 +27,29 @@ fun ProductQuantityBox(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .width(104.dp)
-            .height(36.dp)
-            .clip(RoundedCornerShape(4.dp))
-            .background(MaterialTheme.colorScheme.background),
+        modifier =
+            modifier
+                .width(104.dp)
+                .height(36.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(MaterialTheme.colorScheme.background),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         QuantityAction(
             text = "-",
             onClick = onQuantityMinusClick,
-            modifier = Modifier
-                .width(32.dp)
-                .fillMaxHeight(),
+            modifier =
+                Modifier
+                    .width(32.dp)
+                    .fillMaxHeight(),
         )
 
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .width(40.dp)
-                .fillMaxHeight(),
+            modifier =
+                Modifier
+                    .width(40.dp)
+                    .fillMaxHeight(),
         ) {
             Text(
                 text = quantity.toString(),
@@ -55,9 +60,10 @@ fun ProductQuantityBox(
         QuantityAction(
             text = "+",
             onClick = onQuantityPlusClick,
-            modifier = Modifier
-                .width(32.dp)
-                .fillMaxHeight(),
+            modifier =
+                Modifier
+                    .width(32.dp)
+                    .fillMaxHeight(),
         )
     }
 }

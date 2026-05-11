@@ -12,9 +12,7 @@ class ProductPageStateHolder(
 
     override val pageItemSize: Int = 20
 
-    override fun getPageRange(): IntRange {
-        return initialPage..getExclusiveEndPage()
-    }
+    override fun getPageRange(): IntRange = initialPage..getExclusiveEndPage()
 
     fun nextPage() {
         updateCurrentPage(currentPage + 1)

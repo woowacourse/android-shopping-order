@@ -124,9 +124,7 @@ fun ProductListScreen(
 }
 
 @Composable
-private fun OfflineBanner(
-    modifier: Modifier = Modifier,
-) {
+private fun OfflineBanner(modifier: Modifier = Modifier) {
     Box(
         modifier =
             modifier
@@ -199,17 +197,17 @@ private fun RecentViewedItem(
                 .background(
                     color = MaterialTheme.colorScheme.background,
                     shape = RoundedCornerShape(8.dp),
-                )
-                .clickable { onRecentViewedProductClick(product.id) }
+                ).clickable { onRecentViewedProductClick(product.id) }
                 .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         AsyncImage(
             model = product.imageUrl,
-            contentDescription = stringResource(
-                R.string.product_image_content_description,
-                product.getTitle()
-            ),
+            contentDescription =
+                stringResource(
+                    R.string.product_image_content_description,
+                    product.getTitle(),
+                ),
             contentScale = ContentScale.Crop,
             modifier =
                 Modifier
@@ -249,10 +247,11 @@ private fun ProductItem(
         ) {
             AsyncImage(
                 model = product.imageUrl,
-                contentDescription = stringResource(
-                    R.string.product_image_content_description,
-                    product.getTitle(),
-                ),
+                contentDescription =
+                    stringResource(
+                        R.string.product_image_content_description,
+                        product.getTitle(),
+                    ),
                 contentScale = ContentScale.Crop,
                 modifier =
                     Modifier
@@ -375,30 +374,30 @@ private fun ProductListTopBar(
 @Preview(showBackground = true)
 private fun RecentViewedSectionPreview() {
     RecentViewedSection(
-        recentViewedShoppingItems = listOf(
-            ShoppingItem(
-                Product(
-                    id = 2,
-                    title = ProductTitle("동원 스위트콘"),
-                    price = Price(99_800),
-                    imageUrl = "https://img.dongwonmall.com/dwmall/static_root/model_img/main/153/15327_1_a.jpg?f=webp&q=80",
+        recentViewedShoppingItems =
+            listOf(
+                ShoppingItem(
+                    Product(
+                        id = 2,
+                        title = ProductTitle("동원 스위트콘"),
+                        price = Price(99_800),
+                        imageUrl = "https://img.dongwonmall.com/dwmall/static_root/model_img/main/153/15327_1_a.jpg?f=webp&q=80",
+                    ),
+                    quantity = 4,
                 ),
-                quantity = 4,
-            ),
-            ShoppingItem(
-                Product(
-                    id = 1,
-                    title = ProductTitle("동원 스위트콘"),
-                    price = Price(99_800),
-                    imageUrl = "https://img.dongwonmall.com/dwmall/static_root/model_img/main/153/15327_1_a.jpg?f=webp&q=80",
+                ShoppingItem(
+                    Product(
+                        id = 1,
+                        title = ProductTitle("동원 스위트콘"),
+                        price = Price(99_800),
+                        imageUrl = "https://img.dongwonmall.com/dwmall/static_root/model_img/main/153/15327_1_a.jpg?f=webp&q=80",
+                    ),
+                    quantity = 4,
                 ),
-                quantity = 4,
             ),
-        ),
         onRecentViewedProductClick = {},
     )
 }
-
 
 @Composable
 @Preview(showBackground = true)

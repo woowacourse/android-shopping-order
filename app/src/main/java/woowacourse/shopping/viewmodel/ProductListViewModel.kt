@@ -10,8 +10,8 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.network.NetworkStatusMonitor
-import woowacourse.shopping.repository.ShoppingItemRepository
 import woowacourse.shopping.repository.ShoppingCartRepository
+import woowacourse.shopping.repository.ShoppingItemRepository
 import woowacourse.shopping.storage.datastore.VisitStore
 import woowacourse.shopping.ui.pagination.ProductPageStateHolder
 

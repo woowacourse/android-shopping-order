@@ -105,7 +105,7 @@ fun DetailProductScreen(
                         .fillMaxWidth()
                         .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = DecimalFormat(stringResource(R.string.price_format_pattern)).format(quantityPrice),
@@ -120,8 +120,7 @@ fun DetailProductScreen(
                             .padding(
                                 start = 7.5.dp,
                                 top = 8.dp,
-                            )
-                            .width(104.dp),
+                            ).width(104.dp),
                 )
             }
             if (lastViewedShoppingItem != null &&
@@ -208,7 +207,6 @@ private fun DetailProductTopBar(
     )
 }
 
-
 @Composable
 @Preview(showBackground = true)
 private fun LastViewedProductSectionPreview() {
@@ -244,16 +242,17 @@ private fun DetailProductScreenPreview() {
                         ),
                     quantity = 0,
                 ),
-            lastViewedShoppingItem = ShoppingItem(
-                product =
-                    Product(
-                        id = 1,
-                        title = ProductTitle("동원 스위트콘"),
-                        price = Price(99_800),
-                        imageUrl = "https://img.dongwonmall.com/dwmall/static_root/model_img/main/153/15327_1_a.jpg?f=webp&q=80",
-                    ),
-                quantity = 0,
-            ),
+            lastViewedShoppingItem =
+                ShoppingItem(
+                    product =
+                        Product(
+                            id = 1,
+                            title = ProductTitle("동원 스위트콘"),
+                            price = Price(99_800),
+                            imageUrl = "https://img.dongwonmall.com/dwmall/static_root/model_img/main/153/15327_1_a.jpg?f=webp&q=80",
+                        ),
+                    quantity = 0,
+                ),
             onAddToCartClick = {},
             onLastViewedProductClick = {},
             onBackClick = {},

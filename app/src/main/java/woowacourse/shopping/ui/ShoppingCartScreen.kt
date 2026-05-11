@@ -115,13 +115,11 @@ private fun ShoppingCartItems(
                 .fillMaxWidth()
                 .clip(
                     RoundedCornerShape(4.dp),
-                )
-                .border(
+                ).border(
                     color = MaterialTheme.colorScheme.outline,
                     width = 1.dp,
                     shape = RoundedCornerShape(4.dp),
-                )
-                .padding(12.dp),
+                ).padding(12.dp),
     ) {
         val product = shoppingCartItem.product
         Row(
@@ -173,9 +171,10 @@ private fun ShoppingCartItems(
                     modifier = Modifier.padding(top = 8.dp),
                 )
                 Text(
-                    text = DecimalFormat(stringResource(R.string.price_format_pattern)).format(
-                        quantityPrice
-                    ),
+                    text =
+                        DecimalFormat(stringResource(R.string.price_format_pattern)).format(
+                            quantityPrice,
+                        ),
                 )
             }
         }
@@ -221,15 +220,15 @@ private fun ShoppingCartScreenPreview() {
                 listOf(
                     ShoppingCartItem(
                         id = 1,
-                        shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""),4),
+                        shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""), 4),
                     ),
                     ShoppingCartItem(
                         id = 2,
-                        shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""),4),
+                        shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""), 4),
                     ),
                     ShoppingCartItem(
                         id = 3,
-                        shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""),4),
+                        shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""), 4),
                     ),
                 ),
             getQuantityPrice = { shoppingCartItem -> shoppingCartItem.getProductQuantityPrice() },
@@ -248,7 +247,7 @@ private fun ShoppingCartItemsPreview() {
         shoppingCartItem =
             ShoppingCartItem(
                 id = 1,
-                shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""),4),
+                shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""), 4),
             ),
         quantityPrice = 399_200,
         onRemoveShoppingItemClick = {},

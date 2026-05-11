@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package woowacourse.shopping.ui.component
 
 import androidx.compose.foundation.background
@@ -20,26 +22,27 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ShoppingCardAddBox(
     onShoppingCartAddClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier
-            .clip(RoundedCornerShape(50.dp))
-            .size(48.dp)
-            .background(MaterialTheme.colorScheme.background)
+        modifier =
+            modifier
+                .clip(RoundedCornerShape(50.dp))
+                .size(48.dp)
+                .background(MaterialTheme.colorScheme.background),
     ) {
         Button(
             onClick = onShoppingCartAddClick,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.onBackground
-            ),
-            contentPadding = PaddingValues(0.dp)
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.onBackground,
+                ),
+            contentPadding = PaddingValues(0.dp),
         ) {
             Text(
                 text = "+",
-
             )
         }
     }
@@ -49,6 +52,6 @@ fun ShoppingCardAddBox(
 @Preview()
 private fun ShoppingCardAddBoxPreview() {
     ShoppingCardAddBox(
-        onShoppingCartAddClick = {}
+        onShoppingCartAddClick = {},
     )
 }
