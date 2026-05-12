@@ -9,13 +9,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.model.Product
 import woowacourse.shopping._archive.network.NetworkMonitor
+import woowacourse.shopping.model.Product
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
 import woowacourse.shopping.ui.common.paging.Pager
-import java.util.UUID
 
 class ShoppingViewModel(
     networkMonitor: NetworkMonitor,
@@ -162,7 +161,7 @@ class ShoppingViewModel(
 
     private suspend fun mapToProductUiModels(products: List<Product>): List<ProductUiModel> {
         val cartItems = cartRepo.getAllCartItems()
-        val cartQuantityMap: Map<UUID, Int> =
+        val cartQuantityMap: Map<Long, Int> =
             cartItems.items.associate {
                 it.product.id to it.quantity
             }

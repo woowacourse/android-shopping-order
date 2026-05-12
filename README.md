@@ -18,9 +18,9 @@
 - [ ] 인증 헤더 자동 주입 Interceptor 구현
     - [ ] 저장된 인증 정보를 읽어 `Authorization: Basic ...` 헤더 추가
     - [ ] 인증 정보가 없는 경우 처리 정책 수립
-- [ ] 상품 목록 API 연동
-    - [ ] DTO ↔ Domain Model 매퍼 작성
-    - [ ] Repository 추상화 및 Remote DataSource 구현
+- [x] 상품 목록 API 연동
+    - [x] DTO ↔ Domain Model 매퍼 작성
+    - [x] Repository 추상화 및 Remote DataSource 구현
 - [ ] 장바구니 API 연동
     - [ ] 장바구니 조회 / 담기 / 수량 변경 / 삭제 구현
     - [ ] 서버 응답을 도메인 모델로 변환

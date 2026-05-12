@@ -1,5 +1,6 @@
 package woowacourse.shopping.model
 
+
 @JvmInline
 value class Money(
     val value: Int,

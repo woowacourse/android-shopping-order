@@ -6,9 +6,8 @@ import woowacourse.shopping._archive.network.NetworkClient
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.repository.ProductRepository
-import java.util.UUID
 
-class NetworkProductRepository(
+class LegacyNetworkProductRepository(
     private val networkClient: NetworkClient,
 ) : ProductRepository {
     private var cachedProducts: List<Product>? = null
@@ -29,7 +28,7 @@ class NetworkProductRepository(
         return currentIndex < total - 1
     }
 
-    override suspend fun findProduct(id: UUID): Product? =
+    override suspend fun findProduct(id: Long): Product? =
         fetchAndParseProducts().find { it.id == id }
 
     private suspend fun fetchAndParseProducts(): List<Product> {
@@ -45,7 +44,7 @@ class NetworkProductRepository(
 
             products.add(
                 Product(
-                    id = UUID.fromString(jsonObject.getString("id")),
+                    id = jsonObject.getLong("id"),
                     name = jsonObject.getString("name"),
                     price = Money(jsonObject.getInt("price")),
                     imageUrl = jsonObject.getString("imageUrl"),
