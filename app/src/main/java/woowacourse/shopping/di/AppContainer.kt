@@ -7,6 +7,7 @@ import woowacourse.shopping.network.NetworkClient
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
+import woowacourse.shopping.repository.inmemory.InMemoryUserRepository
 import woowacourse.shopping.repository.network.NetworkProductRepository
 import woowacourse.shopping.repository.room.RoomCartRepository
 import woowacourse.shopping.repository.room.RoomRecentProductRepository

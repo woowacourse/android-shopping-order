@@ -12,10 +12,7 @@
       - 코틀린에 친화적이어서 default value 를 인식 가능하고, Null-Safety 같은 특징을 준수한다.  
       - Moshi 와 비교했을 때 일반적인 모델, 크기가 큰 모델, Sealed class로 나눠서 분석했을 때 Serializer 생성, 직렬화, 역직렬화 시간이 덜 걸렸다.  
     - [ ] Retrofit Converter 등록
-- [ ] 사용자 인증 정보 저장소 구현
-    - [ ] EncryptedSharedPreferences 또는 DataStore(Encrypted) 선정
-    - [ ] 아이디/비밀번호 Base64 인코딩 후 저장
-    - [ ] 인증 정보 저장/조회/삭제 인터페이스 정의
+- [x] 사용자 인증 정보 저장소 구현
 
 ### 도메인 로직 / 데이터 계층
 - [ ] 인증 헤더 자동 주입 Interceptor 구현
