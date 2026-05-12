@@ -96,7 +96,12 @@ class ProductListViewModel(
         try {
             block()
         } catch (e: ProductNotFoundException) {
-            _event.trySend(ProductListEvent.FatalError(e.message ?: "알 수 없는 오류가 발생했습니다."))
+            _event.trySend(
+                ProductListEvent.FatalError(
+                    e.message
+                        ?: "알 수 없는 오류가 발생했습니다.",
+                ),
+            )
         }
     }
 
@@ -136,7 +141,7 @@ class ProductListViewModel(
     }
 
     private suspend fun fetchAndAppendProducts(pageSize: Int) {
-        val result = productRepository.loadProducts(products.size, pageSize)
+        val result = productRepository.loadProducts(products.size, pageSize, emptyList())
         products = products + result
 
         _uiState.update {

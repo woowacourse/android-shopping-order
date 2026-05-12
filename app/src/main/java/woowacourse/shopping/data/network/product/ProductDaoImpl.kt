@@ -23,6 +23,7 @@ class ProductDaoImpl(
     override suspend fun findAllProduct(
         startIndex: Int,
         pageSize: Int,
+        sort: List<String>,
     ): List<Product> {
         val url = baseUrl.newBuilder()
             .addPathSegment("products")

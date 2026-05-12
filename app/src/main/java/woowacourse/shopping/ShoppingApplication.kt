@@ -15,6 +15,7 @@ import woowacourse.shopping.data.repository.cart.RecentProductRepositoryImpl
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
+import woowacourse.shopping.data.source.product.ProductDataSourceImpl
 
 class ShoppingApplication : Application() {
     lateinit var productRepository: ProductRepository
@@ -52,10 +53,12 @@ class ShoppingApplication : Application() {
         ).build()
 
         val product: ProductRepository = ProductRepositoryImpl(
-            productDao = ProductDaoImpl(
-                client = client,
-                baseUrl = "http://localhost:12345/".toHttpUrl(),
-                json = json,
+            dataSource = ProductDataSourceImpl(
+                productDao = ProductDaoImpl(
+                    client = client,
+                    baseUrl = "http://localhost:12345/".toHttpUrl(),
+                    json = json,
+                ),
             ),
         )
         val cart: CartRepository = CartRepositoryImpl(

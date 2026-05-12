@@ -1,8 +1,8 @@
-package woowacourse.shopping.data.repository.product
+package woowacourse.shopping.data.source.product
 
 import woowacourse.shopping.domain.Product
 
-interface ProductRepository {
+interface ProductDataSource {
     suspend fun loadProducts(
         startIndex: Int,
         pageSize: Int,
