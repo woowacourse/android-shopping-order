@@ -6,7 +6,7 @@
 - [ ] 네트워크 통신 환경 구성
     - [ ] Retrofit 의존성 추가
     - [ ] BaseUrl 상수 분리
-    - [ ] HTTP 네트워크 보안 설정 허용
+    - [x] HTTP 네트워크 보안 설정 허용
 - [ ] JSON 직렬화 라이브러리 선정 및 설정
     - [ ] org.json / Kotlinx Serialization / Gson / Moshi 중 선택
     - [ ] 선택 사유를 PR에 명시 (성능, Kotlin 친화성, 학습 비용 등)
