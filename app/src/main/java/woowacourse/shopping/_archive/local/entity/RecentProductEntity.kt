@@ -1,4 +1,4 @@
-package woowacourse.shopping.local.entity
+package woowacourse.shopping._archive.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

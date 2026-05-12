@@ -1,7 +1,7 @@
 package woowacourse.shopping.repository.room
 
-import woowacourse.shopping.local.dao.CartDao
-import woowacourse.shopping.local.entity.CartEntity
+import woowacourse.shopping._archive.local.dao.CartDao
+import woowacourse.shopping._archive.local.entity.CartEntity
 import woowacourse.shopping.model.Cart
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Product

@@ -1,7 +1,7 @@
 package woowacourse.shopping.repository.room
 
-import woowacourse.shopping.local.dao.RecentProductDao
-import woowacourse.shopping.local.entity.RecentProductEntity
+import woowacourse.shopping._archive.local.dao.RecentProductDao
+import woowacourse.shopping._archive.local.entity.RecentProductEntity
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.Products
 import woowacourse.shopping.repository.ProductRepository

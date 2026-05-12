@@ -1,13 +1,12 @@
-package woowacourse.shopping.di
+package woowacourse.shopping._archive.di
 
 import android.content.Context
 import androidx.room.Room
-import woowacourse.shopping.local.Database
-import woowacourse.shopping.network.NetworkClient
+import woowacourse.shopping._archive.local.Database
+import woowacourse.shopping._archive.network.NetworkClient
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
-import woowacourse.shopping.repository.inmemory.InMemoryUserRepository
 import woowacourse.shopping.repository.network.NetworkProductRepository
 import woowacourse.shopping.repository.room.RoomCartRepository
 import woowacourse.shopping.repository.room.RoomRecentProductRepository
