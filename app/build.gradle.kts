@@ -76,4 +76,7 @@ dependencies {
     implementation(libs.okhttp)
     testImplementation(libs.okhttp3.mockwebserver)
     implementation(libs.okhttp3.mockwebserver)
+    implementation(libs.retrofit)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
 }

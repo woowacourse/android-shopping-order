@@ -4,12 +4,13 @@
 
 ### 환경 및 인프라 설정
 - [ ] 네트워크 통신 환경 구성
-    - [ ] Retrofit 의존성 추가
+    - [x] Retrofit 의존성 추가
     - [ ] BaseUrl 상수 분리
     - [x] HTTP 네트워크 보안 설정 허용
 - [ ] JSON 직렬화 라이브러리 선정 및 설정
-    - [ ] org.json / Kotlinx Serialization / Gson / Moshi 중 선택
-    - [ ] 선택 사유를 PR에 명시 (성능, Kotlin 친화성, 학습 비용 등)
+    - [x] Kotlinx Serialization 선택 
+      - 코틀린에 친화적이어서 default value 를 인식 가능하고, Null-Safety 같은 특징을 준수한다.  
+      - Moshi 와 비교했을 때 일반적인 모델, 크기가 큰 모델, Sealed class로 나눠서 분석했을 때 Serializer 생성, 직렬화, 역직렬화 시간이 덜 걸렸다.  
     - [ ] Retrofit Converter 등록
 - [ ] 사용자 인증 정보 저장소 구현
     - [ ] EncryptedSharedPreferences 또는 DataStore(Encrypted) 선정
