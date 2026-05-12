@@ -7,7 +7,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import woowacourse.shopping.data.local.RecentProductDatabase
 import woowacourse.shopping.data.local.ShoppingDatabase
-import woowacourse.shopping.data.network.product.ProductDaoImpl
+import woowacourse.shopping.data.network.product.ProductServerDaoImpl
 import woowacourse.shopping.data.network.startMockWebServer
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
@@ -54,9 +54,9 @@ class ShoppingApplication : Application() {
 
         val product: ProductRepository = ProductRepositoryImpl(
             dataSource = ProductDataSourceImpl(
-                productDao = ProductDaoImpl(
+                productDao = ProductServerDaoImpl(
                     client = client,
-                    baseUrl = "http://localhost:12345/".toHttpUrl(),
+                    baseUrl = "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/".toHttpUrl(),
                     json = json,
                 ),
             ),
