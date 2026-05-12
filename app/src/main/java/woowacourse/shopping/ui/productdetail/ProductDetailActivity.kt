@@ -17,8 +17,6 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping._archive.di.AppContainer
 import woowacourse.shopping.ui.common.theme.ShoppingTheme
-import java.util.UUID
-
 class ProductDetailActivity : ComponentActivity() {
     val productRepo = AppContainer.productRepository
     val cartRepo = AppContainer.cartRepository
@@ -28,8 +26,8 @@ class ProductDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val receivedProductId: String =
-            intent.getStringExtra(EXTRA_PRODUCT_ID)
+        val receivedProductId: Long =
+            intent.getLongExtra(EXTRA_PRODUCT_ID, -1L).takeIf { it != -1L }
                 ?: error("ProductDetailActivity를 실행하려면 반드시 Intent에 Product ID 데이터가 포함되어야 합니다.")
         enableEdgeToEdge()
         setContent {
@@ -50,7 +48,7 @@ class ProductDetailActivity : ComponentActivity() {
                                             productRepo = productRepo,
                                             cartRepo = cartRepo,
                                             recentProductRepo = recentProductRepo,
-                                            productId = UUID.fromString(receivedProductId),
+                                            productId = receivedProductId,
                                         ) as T
                                     }
                                 },
@@ -80,11 +78,11 @@ class ProductDetailActivity : ComponentActivity() {
 
         fun newIntent(
             context: Context,
-            productId: UUID,
+            productId: Long,
             isFromBanner: Boolean = false,
         ): Intent =
             Intent(context, ProductDetailActivity::class.java).apply {
-                putExtra(EXTRA_PRODUCT_ID, productId.toString())
+                putExtra(EXTRA_PRODUCT_ID, productId)
                 putExtra(EXTRA_IS_FROM_BANNER, isFromBanner)
             }
     }

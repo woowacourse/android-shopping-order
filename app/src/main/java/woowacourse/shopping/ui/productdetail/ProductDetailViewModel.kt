@@ -10,14 +10,12 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
-import java.util.UUID
-
 class ProductDetailViewModel(
     savedStateHandle: SavedStateHandle,
     private val productRepo: ProductRepository,
     private val cartRepo: CartRepository,
     private val recentProductRepo: RecentProductRepository,
-    private val productId: UUID,
+    private val productId: Long,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductDetailUiState())
     val uiState = _uiState.asStateFlow()

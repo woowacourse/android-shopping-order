@@ -6,7 +6,6 @@ import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.Products
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
-import java.util.UUID
 
 class RoomRecentProductRepository(
     private val recentProductDao: RecentProductDao,
@@ -25,7 +24,7 @@ class RoomRecentProductRepository(
         return productRepository.findProduct(productId)
     }
 
-    override suspend fun add(productId: UUID) {
+    override suspend fun add(productId: Long) {
         recentProductDao.insert(RecentProductEntity(productId = productId, viewedAt = System.currentTimeMillis()))
         recentProductDao.deleteOldItems()
     }

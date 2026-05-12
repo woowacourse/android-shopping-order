@@ -5,7 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import woowacourse.shopping._archive.local.entity.CartEntity
-import java.util.UUID
 
 @Dao
 interface CartDao {
@@ -17,15 +16,15 @@ interface CartDao {
 
     @Query("UPDATE cart_items SET quantity = :quantity WHERE productId = :productId")
     suspend fun updateQuantity(
-        productId: UUID,
+        productId: Long,
         quantity: Int,
     )
 
     @Query("DELETE FROM cart_items WHERE productId = :id")
-    suspend fun deleteById(id: UUID)
+    suspend fun deleteById(id: Long)
 
     @Query("SELECT * FROM cart_items WHERE productId = :id")
-    suspend fun getCartItemById(id: UUID): CartEntity?
+    suspend fun getCartItemById(id: Long): CartEntity?
 
     @Query("SELECT * FROM cart_items ORDER BY productId ASC LIMIT :count OFFSET :fromIndex")
     suspend fun getPagedEntities(fromIndex: Int, count: Int): List<CartEntity>
