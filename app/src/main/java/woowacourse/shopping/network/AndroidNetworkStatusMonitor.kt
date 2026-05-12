@@ -20,28 +20,33 @@ class AndroidNetworkStatusMonitor(
 ) : NetworkStatusMonitor {
     private val connectivityManager: ConnectivityManager =
         context.getSystemService(ConnectivityManager::class.java)
+    private val initialConnectionState: Boolean = connectivityManager.hasInternetConnection()
 
     override val isConnected: StateFlow<Boolean> =
         callbackFlow {
+            fun emitCurrentConnectionState() {
+                trySend(connectivityManager.hasInternetConnection())
+            }
+
             val callback =
                 object : ConnectivityManager.NetworkCallback() {
                     override fun onAvailable(network: Network) {
-                        trySend(connectivityManager.hasInternetConnection())
+                        emitCurrentConnectionState()
                     }
 
                     override fun onLost(network: Network) {
-                        trySend(connectivityManager.hasInternetConnection())
+                        emitCurrentConnectionState()
                     }
 
                     override fun onCapabilitiesChanged(
                         network: Network,
                         networkCapabilities: NetworkCapabilities,
                     ) {
-                        trySend(connectivityManager.hasInternetConnection())
+                        emitCurrentConnectionState()
                     }
                 }
 
-            trySend(connectivityManager.hasInternetConnection())
+            emitCurrentConnectionState()
             connectivityManager.registerDefaultNetworkCallback(callback)
 
             awaitClose {
@@ -51,7 +56,7 @@ class AndroidNetworkStatusMonitor(
             .stateIn(
                 scope = scope,
                 started = SharingStarted.Eagerly,
-                initialValue = connectivityManager.hasInternetConnection(),
+                initialValue = initialConnectionState,
             )
 
     private fun ConnectivityManager.hasInternetConnection(): Boolean {

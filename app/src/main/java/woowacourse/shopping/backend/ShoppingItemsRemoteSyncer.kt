@@ -1,18 +1,24 @@
 package woowacourse.shopping.backend
 
-import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.storage.room.shoppingItem.ShoppingItemDao
 import woowacourse.shopping.storage.room.shoppingItem.ShoppingItemEntity
 
 class ShoppingItemsRemoteSyncer(
     private val shoppingItemDao: ShoppingItemDao,
-    private val productBackendDataSource: ProductBackendDataSource,
+    private val productBackendDataSource: OkHttpProductBackendDataSource,
 ) {
     suspend fun sync() {
         val syncedItems =
             productBackendDataSource.fetchProducts().map { shoppingItem ->
                 val preservedQuantity = shoppingItemDao.getQuantityOrNull(shoppingItem.getProductId()) ?: 0
-                shoppingItem.toEntityWithQuantity(preservedQuantity)
+                val product = shoppingItem.getProduct()
+                ShoppingItemEntity(
+                    productId = shoppingItem.getProductId(),
+                    title = product.getTitle(),
+                    price = product.getPrice(),
+                    imageUrl = product.imageUrl,
+                    quantity = preservedQuantity,
+                )
             }
 
         if (syncedItems.isEmpty()) {
@@ -23,13 +29,4 @@ class ShoppingItemsRemoteSyncer(
         shoppingItemDao.insertAll(syncedItems)
         shoppingItemDao.deleteByProductIdsNotIn(syncedItems.map { entity -> entity.productId })
     }
-
-    private fun ShoppingItem.toEntityWithQuantity(quantity: Int): ShoppingItemEntity =
-        ShoppingItemEntity(
-            productId = getProductId(),
-            title = getProduct().getTitle(),
-            price = getProduct().getPrice(),
-            imageUrl = getProduct().imageUrl,
-            quantity = quantity,
-        )
 }

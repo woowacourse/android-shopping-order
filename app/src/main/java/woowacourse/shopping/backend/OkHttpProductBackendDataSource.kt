@@ -13,8 +13,8 @@ import java.io.IOException
 class OkHttpProductBackendDataSource(
     private val client: OkHttpClient,
     private val baseUrl: HttpUrl,
-) : ProductBackendDataSource {
-    override suspend fun fetchProducts(): List<ShoppingItem> {
+) {
+    suspend fun fetchProducts(): List<ShoppingItem> {
         val request =
             Request
                 .Builder()

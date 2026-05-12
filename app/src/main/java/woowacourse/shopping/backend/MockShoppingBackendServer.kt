@@ -11,8 +11,7 @@ import woowacourse.shopping.model.Product
 
 class MockShoppingBackendServer {
     private val mockWebServer = MockWebServer()
-    private val products: List<Product> = MockProductSeedData.products
-    private val productsJson: String = products.toProductsJson()
+    private val productsJson: String = MockProductSeedData.products.toProductsJson()
 
     fun start(port: Int? = null): HttpUrl {
         mockWebServer.dispatcher = createDispatcher()
@@ -30,21 +29,18 @@ class MockShoppingBackendServer {
 
     private fun createDispatcher(): Dispatcher =
         object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest): MockResponse {
-                val path = request.path?.substringBefore("?")
-                return when (path) {
-                    "/products" -> jsonResponse(productsJson)
-                    null -> MockResponse().setResponseCode(400)
+            override fun dispatch(request: RecordedRequest): MockResponse =
+                when (request.path?.substringBefore("?")) {
+                    "/products" -> productsResponse()
                     else -> MockResponse().setResponseCode(404)
                 }
-            }
         }
 
-    private fun jsonResponse(body: String): MockResponse =
+    private fun productsResponse(): MockResponse =
         MockResponse()
             .setHeader("Content-Type", "application/json")
             .setResponseCode(200)
-            .setBody(body)
+            .setBody(productsJson)
 
     private fun List<Product>.toProductsJson(): String =
         JSONArray()
