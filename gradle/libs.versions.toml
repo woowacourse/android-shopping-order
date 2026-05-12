@@ -3,6 +3,7 @@ agp = "8.13.2"
 coilCompose = "3.4.0"
 coilNetworkOkhttp = "3.4.0"
 converterGson = "3.0.0"
+converterKotlinxSerialization = "latest.version"
 gson = "2.14.0"
 json = "20251224"
 kotlin = "2.3.0"
@@ -46,6 +47,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
+converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "converterKotlinxSerialization" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 json = { module = "org.json:json", version.ref = "json" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit-jupiter" }
