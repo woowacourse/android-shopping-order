@@ -11,6 +11,7 @@ import okhttp3.OkHttpClient
 import woowacourse.shopping.backend.MockShoppingBackendServer
 import woowacourse.shopping.backend.OkHttpProductBackendDataSource
 import woowacourse.shopping.backend.ShoppingItemsRemoteSyncer
+import woowacourse.shopping.retrofit.RetrofitService
 import woowacourse.shopping.storage.room.ShoppingDatabase
 import woowacourse.shopping.storage.room.shoppingItem.ShoppingItemDao
 import woowacourse.shopping.storage.room.shoppingcart.ShoppingCartDao
@@ -34,6 +35,7 @@ class ShoppingApplication : Application() {
         val daos = createDaos()
         appContainer = createAppContainer(daos)
         launchStartupSync(daos)
+        RetrofitService.apiService
     }
 
     override fun onTerminate() {
