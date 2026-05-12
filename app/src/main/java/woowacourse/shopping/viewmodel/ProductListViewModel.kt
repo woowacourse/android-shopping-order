@@ -21,17 +21,13 @@ class ProductListViewModel(
     private val visitStore: VisitStore = ShoppingApplication.visitStore,
     private val networkStatusMonitor: NetworkStatusMonitor = ShoppingApplication.networkStatusMonitor,
 ) : ViewModel() {
-    val shoppingItems: StateFlow<List<ShoppingItem>> = shoppingItemRepository.shoppingItems
-    val recentVisitedProductIds: StateFlow<List<Long>> = visitStore.recentVisitedProductIds
-    val isNetworkConnected: StateFlow<Boolean> = networkStatusMonitor.isConnected
-
     private val _uiState = MutableStateFlow(ProductListUiState())
     val uiState: StateFlow<ProductListUiState> = _uiState.asStateFlow()
 
     private val productPageStateHolder = ProductPageStateHolder(shoppingItems = emptyList())
-    private var allShoppingItems: List<ShoppingItem> = shoppingItems.value
-    private var recentViewedProductIds: List<Long> = recentVisitedProductIds.value
-    private var networkConnected: Boolean = isNetworkConnected.value
+    private var allShoppingItems: List<ShoppingItem> = shoppingItemRepository.shoppingItems.value
+    private var recentViewedProductIds: List<Long> = visitStore.recentVisitedProductIds.value
+    private var networkConnected: Boolean = networkStatusMonitor.isConnected.value
 
     init {
         productPageStateHolder.updateItems(allShoppingItems)
@@ -85,20 +81,20 @@ class ProductListViewModel(
 
     private fun observeSources() {
         viewModelScope.launch {
-            shoppingItems.collect { latestShoppingItems ->
+            shoppingItemRepository.shoppingItems.collect { latestShoppingItems ->
                 allShoppingItems = latestShoppingItems
                 productPageStateHolder.updateItems(latestShoppingItems)
                 updateUiState()
             }
         }
         viewModelScope.launch {
-            recentVisitedProductIds.collect { latestRecentViewedIds ->
+            visitStore.recentVisitedProductIds.collect { latestRecentViewedIds ->
                 recentViewedProductIds = latestRecentViewedIds
                 updateUiState()
             }
         }
         viewModelScope.launch {
-            isNetworkConnected.collect { isConnected ->
+            networkStatusMonitor.isConnected.collect { isConnected ->
                 networkConnected = isConnected
                 updateUiState()
             }
@@ -119,7 +115,6 @@ class ProductListViewModel(
                 recentViewedShoppingItems = recentViewedProductIds.mapNotNull { productId -> shoppingItemByProductId[productId] },
                 shoppingCartTotalCount = allShoppingItems.sumOf { shoppingItem -> shoppingItem.getQuantity() },
                 isNetworkConnected = networkConnected,
-                currentPage = productPageStateHolder.currentPage,
                 canLoadNextPage = productPageStateHolder.canMoveToNextPage(),
             )
     }
@@ -129,11 +124,6 @@ class ProductListViewModel(
         val recentViewedShoppingItems: List<ShoppingItem> = emptyList(),
         val shoppingCartTotalCount: Int = 0,
         val isNetworkConnected: Boolean = true,
-        val currentPage: Int = INITIAL_PAGE,
         val canLoadNextPage: Boolean = false,
     )
-
-    companion object {
-        private const val INITIAL_PAGE = 0
-    }
 }

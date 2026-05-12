@@ -34,14 +34,6 @@ class DataStoreVisitStore(
         }
     }
 
-    override fun removeVisitedProduct(productId: Long) {
-        scope.launch {
-            updateRecentVisitedProductIds { currentProductIds ->
-                currentProductIds.filterNot { id -> id == productId }
-            }
-        }
-    }
-
     private suspend fun updateRecentVisitedProductIds(transform: (List<Long>) -> List<Long>) {
         context.visitDataStore.edit { preferences ->
             val currentProductIds = parseProductIds(preferences[recentVisitedProductIdsKey])

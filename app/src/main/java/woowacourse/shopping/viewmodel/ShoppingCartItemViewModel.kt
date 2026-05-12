@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.model.ShoppingCartItem
@@ -20,11 +21,11 @@ class ShoppingCartItemViewModel(
 
     private val _shoppingCartItems: MutableStateFlow<ShoppingCartItemsState> =
         MutableStateFlow(createShoppingCartItemsState(emptyList()))
-    val shoppingCartItems: StateFlow<ShoppingCartItemsState> = _shoppingCartItems
+    val shoppingCartItems: StateFlow<ShoppingCartItemsState> = _shoppingCartItems.asStateFlow()
 
     init {
         launchNow {
-            val initialItems = shoppingCartRepository.getShoppingItems().toList()
+            val initialItems = shoppingCartRepository.getShoppingItems()
             shoppingCartPageStateHolder.updateItems(initialItems)
             _shoppingCartItems.value = createShoppingCartItemsState(initialItems)
         }
@@ -71,7 +72,7 @@ class ShoppingCartItemViewModel(
     fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int = shoppingCartItem.getProductQuantityPrice()
 
     private suspend fun syncShoppingCartItems() {
-        val latestShoppingCartItems = shoppingCartRepository.getShoppingItems().toList()
+        val latestShoppingCartItems = shoppingCartRepository.getShoppingItems()
         shoppingCartPageStateHolder.updateItems(latestShoppingCartItems)
         _shoppingCartItems.value = createShoppingCartItemsState(latestShoppingCartItems)
     }

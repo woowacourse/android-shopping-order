@@ -43,14 +43,4 @@ interface ShoppingCartDao {
         """,
     )
     suspend fun getShoppingCartItemRows(): List<ShoppingCartItemRow>
-
-    @Query(
-        """
-        SELECT COALESCE(SUM(s.quantity), 0)
-        FROM shopping_cart_items c
-        INNER JOIN shopping_items s ON s.product_id = c.product_id
-        WHERE s.quantity > 0
-        """,
-    )
-    suspend fun getTotalQuantity(): Int
 }

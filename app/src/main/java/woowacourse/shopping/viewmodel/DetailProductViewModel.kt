@@ -18,13 +18,10 @@ class DetailProductViewModel(
     private val shoppingItemRepository: ShoppingItemRepository = ShoppingApplication.shoppingItemRepository,
     private val visitStore: VisitStore = ShoppingApplication.visitStore,
 ) : ViewModel() {
-    val shoppingItems: StateFlow<List<ShoppingItem>> = shoppingItemRepository.shoppingItems
-    val recentVisitedProductIds: StateFlow<List<Long>> = visitStore.recentVisitedProductIds
-
     private val _uiState = MutableStateFlow(DetailProductUiState())
     val uiState: StateFlow<DetailProductUiState> = _uiState.asStateFlow()
 
-    private var cachedShoppingItems: List<ShoppingItem> = shoppingItems.value
+    private var cachedShoppingItems: List<ShoppingItem> = shoppingItemRepository.shoppingItems.value
     private var selectedProductId: Long? = null
     private var selectedQuantity: Int = DEFAULT_QUANTITY
     private var showLastViewedSection: Boolean = true
@@ -33,7 +30,7 @@ class DetailProductViewModel(
     init {
         updateUiState()
         viewModelScope.launch {
-            shoppingItems.collect { latestShoppingItems ->
+            shoppingItemRepository.shoppingItems.collect { latestShoppingItems ->
                 cachedShoppingItems = latestShoppingItems
                 updateUiState()
             }
@@ -45,7 +42,7 @@ class DetailProductViewModel(
         showLastViewed: Boolean = true,
     ) {
         showLastViewedSection = showLastViewed
-        val recentProductIds = recentVisitedProductIds.value
+        val recentProductIds = visitStore.recentVisitedProductIds.value
         lastViewedProductId =
             if (showLastViewed) {
                 resolveLastViewedProductId(
@@ -59,7 +56,7 @@ class DetailProductViewModel(
             selectedProductId = productId
             selectedQuantity = DEFAULT_QUANTITY
         }
-        visitProduct(productId)
+        visitStore.visit(productId)
         updateUiState()
     }
 
@@ -97,10 +94,6 @@ class DetailProductViewModel(
             shoppingCartRepository.add(sourceItem)
             shoppingItemRepository.plusQuantity(productId, selectedQuantity)
         }
-    }
-
-    fun visitProduct(productId: Long) {
-        visitStore.visit(productId)
     }
 
     private fun updateUiState() {

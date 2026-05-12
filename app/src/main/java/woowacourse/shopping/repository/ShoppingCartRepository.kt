@@ -20,6 +20,4 @@ interface ShoppingCartRepository {
         remove(targetItem)
         return true
     }
-
-    suspend fun getTotalQuantity(): Int = getShoppingItems().sumOf { shoppingCartItem -> shoppingCartItem.getQuantity() }
 }
