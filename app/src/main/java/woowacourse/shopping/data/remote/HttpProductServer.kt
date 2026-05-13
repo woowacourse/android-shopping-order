@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.network
+package woowacourse.shopping.data.remote
 
 import okhttp3.mockwebserver.MockWebServer
 

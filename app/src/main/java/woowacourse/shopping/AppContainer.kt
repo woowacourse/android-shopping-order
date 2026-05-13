@@ -3,9 +3,9 @@ package woowacourse.shopping
 import android.content.Context
 import okhttp3.OkHttpClient
 import woowacourse.shopping.data.localdb.ShoppingDB
-import woowacourse.shopping.data.network.HttpProductServer
-import woowacourse.shopping.data.network.NetworkManager
-import woowacourse.shopping.data.network.NetworkObserver
+import woowacourse.shopping.data.remote.HttpProductServer
+import woowacourse.shopping.data.remote.NetworkManager
+import woowacourse.shopping.data.remote.NetworkObserver
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.HttpProductRepository
 import woowacourse.shopping.data.repository.ProductRepository

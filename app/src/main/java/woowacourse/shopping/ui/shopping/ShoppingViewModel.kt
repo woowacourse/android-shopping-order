@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.localdb.mapper.toDomain
-import woowacourse.shopping.data.network.NetworkObserver
+import woowacourse.shopping.data.remote.NetworkObserver
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.CartResult
 import woowacourse.shopping.data.repository.ProductRepository
