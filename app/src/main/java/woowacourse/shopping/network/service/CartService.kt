@@ -16,8 +16,8 @@ interface CartService {
     @GET("cart-items")
     suspend fun getCartItems(
         @Header("Authorization") auth: String,
-        @Query("page") page: Int = 0,
-        @Query("size") size: Int = 5,
+        @Query("page") pageIndex: Int = 0,
+        @Query("size") size: Int = Int.MAX_VALUE,
     ): CartResponse
 
     @POST("cart-items")

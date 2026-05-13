@@ -21,12 +21,14 @@ fun CartBody(
     showPagination: Boolean,
     currentPage: Int,
     totalPages: Int,
+    selectedItemIds: Set<Long>,
     modifier: Modifier = Modifier,
     onDeleteClick: (CartItem) -> Unit,
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
     onAddClick: (CartItem) -> Unit,
     onRemoveClick: (CartItem) -> Unit,
+    onCheckedChange: (CartItem, Boolean) -> Unit,
 ) {
     val cartItems = cart.items
 
@@ -38,6 +40,8 @@ fun CartBody(
         items(items = cartItems, key = { it.product.id }) { cartItem ->
             CartItemUnit(
                 cartItem = cartItem,
+                isChecked = selectedItemIds.contains(cartItem.id),
+                onCheckedChange = { isChecked -> onCheckedChange(cartItem, isChecked) },
                 onDeleteClick = { onDeleteClick(cartItem) },
                 onAddClick = { onAddClick(cartItem) },
                 onRemoveClick = { onRemoveClick(cartItem) },
@@ -81,5 +85,7 @@ private fun CartBodyPreview() {
         onNextClick = {},
         onAddClick = {},
         onRemoveClick = {},
+        onCheckedChange = { _, _ -> },
+        selectedItemIds = setOf(),
     )
 }

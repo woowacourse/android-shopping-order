@@ -32,12 +32,18 @@ fun CartScreen(
             currentPage = uiState.currentPage,
             totalPages = uiState.totalPages,
             showPagination = uiState.showPagination,
+            selectedItemIds = uiState.selectedItemIds,
             onBackClick = onBackClick,
             onDeleteClick = { viewModel.delete(it.product) },
             onPreviousClick = { viewModel.previousPage() },
             onNextClick = { viewModel.nextPage() },
             onAddClick = { viewModel.increase(it.product) },
             onRemoveClick = { viewModel.decrease(it.product) },
+            onCheckedChange = { id, isChecked ->
+                viewModel.toggleItemSelection(
+                    id.id ?: throw IllegalArgumentException(), isChecked
+                )
+            },
         )
 
         if (uiState.isLoading) CartScreenSkeleton()
@@ -50,6 +56,7 @@ fun CartScreen(
     currentPage: Int,
     totalPages: Int,
     showPagination: Boolean,
+    selectedItemIds: Set<Long>,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
     onDeleteClick: (CartItem) -> Unit,
@@ -57,6 +64,7 @@ fun CartScreen(
     onNextClick: () -> Unit,
     onAddClick: (CartItem) -> Unit,
     onRemoveClick: (CartItem) -> Unit,
+    onCheckedChange: (CartItem, Boolean) -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -77,6 +85,8 @@ fun CartScreen(
             onNextClick = onNextClick,
             onAddClick = onAddClick,
             onRemoveClick = onRemoveClick,
+            onCheckedChange = onCheckedChange,
+            selectedItemIds = selectedItemIds,
         )
     }
 }
@@ -106,6 +116,8 @@ private fun CartScreenPreview1() {
         onNextClick = {},
         onAddClick = {},
         onRemoveClick = {},
+        onCheckedChange = { _, _ -> },
+        selectedItemIds = setOf(),
     )
 }
 
@@ -126,5 +138,7 @@ private fun CartScreenPreview2() {
         onNextClick = {},
         onAddClick = {},
         onRemoveClick = {},
+        onCheckedChange = { _, _ -> },
+        selectedItemIds = setOf(),
     )
 }

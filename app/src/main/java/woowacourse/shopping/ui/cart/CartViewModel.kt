@@ -75,6 +75,17 @@ class CartViewModel(
         }
     }
 
+    fun toggleItemSelection(itemId: Long, isSelected: Boolean) {
+        _uiState.update { state ->
+            val newSelectedIds = if(isSelected) {
+                state.selectedItemIds + itemId
+            } else {
+                state.selectedItemIds - itemId
+            }
+            state.copy(selectedItemIds = newSelectedIds)
+        }
+    }
+
     private fun loadData() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
@@ -93,7 +104,7 @@ class CartViewModel(
 
         val items =
             cartRepo.getPagedItems(
-                fromIndex = pager.getOffset(validCurrentPage),
+                page = validCurrentPage,
                 count = pageSize,
             )
 

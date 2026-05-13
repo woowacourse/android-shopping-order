@@ -33,14 +33,17 @@ import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.ui.common.component.QuantityControlButton
 import woowacourse.shopping.ui.common.component.ShoppingImage
+import woowacourse.shopping.ui.common.theme.Gray5
 
 @Composable
 fun CartItemUnit(
     cartItem: CartItem,
+    isChecked: Boolean,
     modifier: Modifier = Modifier,
     onDeleteClick: () -> Unit,
     onAddClick: () -> Unit,
     onRemoveClick: () -> Unit,
+    onCheckedChange: (Boolean) -> Unit,
 ) {
     Column(
         modifier =
@@ -51,7 +54,12 @@ fun CartItemUnit(
                 .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
                 .padding(18.dp),
     ) {
-        CartItemHeader(cartItem = cartItem, onClick = onDeleteClick)
+        CartItemHeader(
+            cartItem = cartItem,
+            onClick = onDeleteClick,
+            onCheckedChange = onCheckedChange,
+            isChecked = isChecked
+        )
 
         Spacer(Modifier.size(20.dp))
 
@@ -66,23 +74,30 @@ fun CartItemUnit(
 @Composable
 private fun CartItemHeader(
     cartItem: CartItem,
-    modifier: Modifier = Modifier,
+    isChecked: Boolean,
     onClick: () -> Unit,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier =
             modifier
                 .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        CartCheckbox(
+            checked = isChecked,
+            onCheckedChange = onCheckedChange,
+        )
+        Spacer(modifier = Modifier.size(8.dp))
         Text(
             text = cartItem.product.name,
-            color = Color.DarkGray,
+            color = Gray5,
             fontSize = 18.sp,
             fontWeight = FontWeight.W700,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
         )
         Icon(
             imageVector = Icons.Default.Close,
@@ -153,7 +168,14 @@ private fun CartItemUnitPreview() {
             ),
             quantity = 2,
         )
-    CartItemUnit(cartItem = cartItem, onDeleteClick = {}, onAddClick = {}, onRemoveClick = {})
+    CartItemUnit(
+        cartItem = cartItem,
+        onDeleteClick = {},
+        onAddClick = {},
+        onRemoveClick = {},
+        onCheckedChange = {},
+        isChecked = true
+    )
 }
 
 @Preview(showBackground = true, name = "이름과 닫기아이콘")
@@ -168,7 +190,12 @@ private fun CartItemHeaderPreview() {
             ),
             quantity = 2,
         )
-    CartItemHeader(cartItem = cartItem, onClick = {})
+    CartItemHeader(
+        cartItem = cartItem,
+        onClick = {},
+        onCheckedChange = {},
+        isChecked = false
+    )
 }
 
 @Preview(showBackground = true, name = "사진과 수량, 금액")
