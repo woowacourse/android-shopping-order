@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.mapper
 
-import woowacourse.shopping.data.remote.dto.Content
 import woowacourse.shopping.data.remote.dto.ProductResponseDto
 import woowacourse.shopping.data.remote.dto.ProductsResponseDto
 import woowacourse.shopping.domain.product.Category
@@ -16,20 +15,11 @@ fun ProductsResponseDto.toDomain(): Products =
         isLast = this.last,
     )
 
-fun Content.toDomain(): Product =
-    Product(
-        id = this.id,
-        imageUrl = ImageUrl(this.imageUrl),
-        name = ProductName(this.name),
-        price = Price(this.price),
-        category = Category(this.category),
-    )
-
 fun ProductResponseDto.toDomain(): Product =
     Product(
         id = this.id,
+        imageUrl = ImageUrl(this.imageUrl),
         name = ProductName(this.name),
         price = Price(this.price),
-        imageUrl = ImageUrl(this.imageUrl),
         category = Category(this.category),
     )

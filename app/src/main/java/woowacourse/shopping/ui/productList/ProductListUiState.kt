@@ -11,7 +11,7 @@ sealed interface ProductListUiState {
         val recentProducts: List<Product> = emptyList(),
         val quantitiesByProductId: Map<Int, Int> = emptyMap(),
         val canLoadMore: Boolean,
-        val isLoadingMore: Boolean = false,
+        val isLoadingMore: Boolean = false, // TODO: 지워야함!
         val totalCartCount: Int = 0,
     ) : ProductListUiState
 
