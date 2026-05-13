@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OrderInfo(
-    val orderItemIds: List<Long>,
+    val cartItemIds: List<Long>,
 )
