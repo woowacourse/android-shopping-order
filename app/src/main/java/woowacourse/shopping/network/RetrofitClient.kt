@@ -9,13 +9,12 @@ import woowacourse.shopping.ShoppingApplication.Companion.baseUrl
 import woowacourse.shopping.network.service.ProductService
 
 object RetrofitClient {
-    val json = Json {
+    private val json = Json {
         ignoreUnknownKeys = true
         coerceInputValues = true
     }
-    val httpClient = OkHttpClient.Builder()
+    private val httpClient = OkHttpClient.Builder()
         .build()
-
     val productService = Retrofit.Builder()
         .baseUrl(baseUrl)
         .client(httpClient)

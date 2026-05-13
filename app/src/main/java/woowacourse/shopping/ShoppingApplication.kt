@@ -1,7 +1,7 @@
 package woowacourse.shopping
 
 import android.app.Application
-import woowacourse.shopping._archive.di.AppContainer
+import woowacourse.shopping.di.AppContainer
 
 class ShoppingApplication : Application() {
     override fun onCreate() {

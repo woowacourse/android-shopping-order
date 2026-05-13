@@ -5,7 +5,7 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
-import woowacourse.shopping._archive.di.AppContainer
+import woowacourse.shopping.di.AppContainer
 import kotlin.concurrent.thread
 
 class LegacyShoppingApplication : Application() {

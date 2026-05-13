@@ -15,7 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
-import woowacourse.shopping._archive.di.AppContainer
+import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.ui.common.theme.ShoppingTheme
 class ProductDetailActivity : ComponentActivity() {
     val productRepo = AppContainer.productRepository

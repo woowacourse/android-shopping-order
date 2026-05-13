@@ -1,31 +1,27 @@
-package woowacourse.shopping._archive.di
+package woowacourse.shopping.di
 
 import android.content.Context
 import androidx.room.Room
 import woowacourse.shopping._archive.local.Database
-import woowacourse.shopping._archive.network.NetworkClient
 import woowacourse.shopping.network.RetrofitClient
-import woowacourse.shopping.network.service.ProductService
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
-import woowacourse.shopping.repository.network.LegacyNetworkProductRepository
-import woowacourse.shopping.repository.network.RetrofitRepository
-import woowacourse.shopping.repository.room.RoomCartRepository
+import woowacourse.shopping.repository.inmemory.InMemoryUserRepository
+import woowacourse.shopping.repository.network.RetrofitCartRepository
+import woowacourse.shopping.repository.network.RetrofitProductRepository
 import woowacourse.shopping.repository.room.RoomRecentProductRepository
 
 object AppContainer {
     private lateinit var database: Database
-
-    val networkClient = NetworkClient()
+    val user = InMemoryUserRepository.STARTER
+    val networkClient = RetrofitClient
     val productRepository: ProductRepository =
-        RetrofitRepository(RetrofitClient.productService)
-    val cartRepository: CartRepository by lazy {
-        RoomCartRepository(
-            cartDao = database.cartDao(),
-            productRepository = productRepository,
-        )
-    }
+        RetrofitProductRepository(networkClient.productService)
+    val cartRepository: CartRepository = RetrofitCartRepository(
+        user = user,
+        service = networkClient.cartService
+    )
     val recentProductRepository: RecentProductRepository by lazy {
         RoomRecentProductRepository(
             recentProductDao = database.recentProductDao(),
@@ -43,4 +39,6 @@ object AppContainer {
                 ).fallbackToDestructiveMigration(false)
                 .build()
     }
+
+
 }

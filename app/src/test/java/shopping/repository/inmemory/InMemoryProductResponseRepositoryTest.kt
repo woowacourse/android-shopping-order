@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-class InMemoryProductRepositoryTest {
+class InMemoryProductResponseRepositoryTest {
     @Test
     fun `특정 오프셋과 사이즈(20개)를 요청했을 때, 정확히 해당 구간의 데이터를 반환한다`() =
         runTest {
