@@ -2,15 +2,14 @@ package woowacourse.shopping.di
 
 import android.content.Context
 import androidx.room.Room
-import woowacourse.shopping.data.datasource.cart.CartLocalDataSource
-import woowacourse.shopping.data.datasource.cart.CartLocalDataSourceImpl
+import woowacourse.shopping.data.datasource.cart.CartRemoteDataSource
+import woowacourse.shopping.data.datasource.cart.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.product.ProductAPIDataSource
 import woowacourse.shopping.data.datasource.product.ProductDataSource
-import woowacourse.shopping.data.datasource.product.RemoteProductDataSource
 import woowacourse.shopping.data.datasource.recent.RecentProductDataSource
 import woowacourse.shopping.data.datasource.recent.RoomRecentProductDataSource
 import woowacourse.shopping.data.local.ShoppingDatabase
-import woowacourse.shopping.data.mock.MockWebServerProvider
-import woowacourse.shopping.data.remote.HttpClientProvider
+import woowacourse.shopping.data.remote.RetrofitProvider
 import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.repository.product.RemoteProductRepository
 import woowacourse.shopping.data.repository.recent.LocalRecentProductRepository
@@ -30,15 +29,19 @@ class AppContainer(
             ).fallbackToDestructiveMigration(dropAllTables = true)
             .build()
 
-    private val cartLocalDataSource: CartLocalDataSource = CartLocalDataSourceImpl(database.cartItemDao())
-    private val productDataSource: ProductDataSource =
-        RemoteProductDataSource(
-            client = HttpClientProvider.okHttpClient,
-            baseUrlProvider = { MockWebServerProvider.baseUrl },
+    private val cartDataSource: CartRemoteDataSource =
+        CartRemoteDataSourceImpl(
+            RetrofitProvider.cartApi,
         )
-    private val recentProductDataSource: RecentProductDataSource = RoomRecentProductDataSource(database.recentProductDao())
+    private val productDataSource: ProductDataSource =
+        ProductAPIDataSource(
+            RetrofitProvider.productApi,
+        )
+    private val recentProductDataSource: RecentProductDataSource =
+        RoomRecentProductDataSource(database.recentProductDao())
 
-    val cartRepository: CartRepository = CartRepositoryImpl(cartLocalDataSource)
+    val cartRepository: CartRepository = CartRepositoryImpl(cartDataSource)
     val productRepository: ProductRepository = RemoteProductRepository(productDataSource)
-    val recentProductRepository: RecentProductRepository = LocalRecentProductRepository(recentProductDataSource)
+    val recentProductRepository: RecentProductRepository =
+        LocalRecentProductRepository(recentProductDataSource)
 }
