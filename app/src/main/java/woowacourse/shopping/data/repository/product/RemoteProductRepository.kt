@@ -12,12 +12,10 @@ class RemoteProductRepository(
     override suspend fun getProducts(
         page: Int,
         pageSize: Int,
-    ): List<Product> = fetchAllProducts().getPage(page, pageSize)
+    ): Products {
+        val result = productDataSource.getProducts(page, pageSize)
+        return result.toDomain()
+    }
 
     override suspend fun getProduct(id: Int): Product? = productDataSource.getProduct(id)?.toDomain()
-
-    private suspend fun fetchAllProducts(): Products =
-        Products(
-            productDataSource.getProducts().map { it.toDomain() },
-        )
 }
