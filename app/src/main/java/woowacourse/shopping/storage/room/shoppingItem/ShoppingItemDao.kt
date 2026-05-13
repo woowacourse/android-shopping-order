@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ShoppingItemDao {
+    @Query("SELECT * FROM shopping_items")
+    suspend fun getAll(): List<ShoppingItemEntity>
+
     @Query("SELECT * FROM shopping_items ORDER BY product_id")
     fun observeAll(): Flow<List<ShoppingItemEntity>>
 
