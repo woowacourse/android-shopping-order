@@ -4,6 +4,8 @@ import woowacourse.shopping.domain.product.Product
 
 class CartItems(
     val values: List<CartItem> = emptyList(),
+    val isLast: Boolean = false,
+    val isFirst:Boolean = true,
 ) {
     val totalQuantity: Int
         get() = values.sumOf { it.quantity.value }
@@ -19,7 +21,8 @@ class CartItems(
         return if (existing == null) {
             CartItems(values + CartItem(product, quantity))
         } else {
-            val updated = existing.copy(quantity = Quantity(existing.quantity.value + quantity.value))
+            val updated =
+                existing.copy(quantity = Quantity(existing.quantity.value + quantity.value))
             CartItems(values.map { if (it.isSameProduct(product.id)) updated else it })
         }
     }
@@ -39,9 +42,11 @@ class CartItems(
         }
     }
 
-    fun remove(productId: Int): CartItems = CartItems(values.filter { !it.isSameProduct(productId) })
+    fun remove(productId: Int): CartItems =
+        CartItems(values.filter { !it.isSameProduct(productId) })
 
-    fun findQuantity(productId: Int): Quantity = findByProductId(productId)?.quantity ?: Quantity.ZERO
+    fun findQuantity(productId: Int): Quantity =
+        findByProductId(productId)?.quantity ?: Quantity.ZERO
 
     fun contains(productId: Int): Boolean = findByProductId(productId) != null
 
@@ -56,7 +61,8 @@ class CartItems(
 
     fun size(): Int = values.size
 
-    private fun findByProductId(productId: Int): CartItem? = values.firstOrNull { it.isSameProduct(productId) }
+    private fun findByProductId(productId: Int): CartItem? =
+        values.firstOrNull { it.isSameProduct(productId) }
 
     private fun replace(
         target: CartItem,

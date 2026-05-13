@@ -9,13 +9,14 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.remote.dto.CartItemDto
+import woowacourse.shopping.data.remote.dto.CartResponseDto
 
 interface CartApi {
     @GET("cart-items")
     suspend fun getCartItems(
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): List<CartItemDto>
+    ): CartResponseDto
 
     @GET("cart-items/counts")
     suspend fun getCartItemsCount(): Int

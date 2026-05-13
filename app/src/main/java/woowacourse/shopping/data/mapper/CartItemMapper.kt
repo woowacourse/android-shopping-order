@@ -1,14 +1,22 @@
 package woowacourse.shopping.data.mapper
 
 import woowacourse.shopping.data.remote.dto.CartItemDto
+import woowacourse.shopping.data.remote.dto.CartResponseDto
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.cart.CartItems
 import woowacourse.shopping.domain.cart.Quantity
 
-fun List<CartItemDto>.toDomain(): CartItems =
+fun CartResponseDto.toDomain(): CartItems =
     CartItems(
-        values = map { it.toDomain() },
+        values = content.toDomain(),
+        isLast = last,
+        isFirst = first
     )
+
+fun List<CartItemDto>.toDomain(): List<CartItem> {
+
+    return map { it.toDomain() }
+}
 
 fun CartItemDto.toDomain(): CartItem =
     CartItem(
