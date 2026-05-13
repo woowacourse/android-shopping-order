@@ -13,8 +13,7 @@ fun RecentProductEntity.toDomain(): Product =
         imageUrl = ImageUrl(imageUrl),
         name = ProductName(name),
         price = Price(price),
-        category = Category(category)
-
+        category = Category(category),
     )
 
 fun Product.toRecentProductEntity(viewedAt: Long): RecentProductEntity =

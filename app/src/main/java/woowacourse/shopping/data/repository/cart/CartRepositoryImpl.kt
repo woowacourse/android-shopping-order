@@ -17,9 +17,7 @@ class CartRepositoryImpl(
 
     override suspend fun getCartItemsCount(): Int = cartRemoteDataSource.getCartItemsCount()
 
-    override suspend fun getAllCartItems(): CartItems {
-        return cartRemoteDataSource.getCartItems(0, Int.MAX_VALUE).toDomain()
-    }
+    override suspend fun getAllCartItems(): CartItems = cartRemoteDataSource.getCartItems(0, Int.MAX_VALUE).toDomain()
 
     override suspend fun addProduct(
         product: Product,

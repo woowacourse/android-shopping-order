@@ -10,13 +10,10 @@ fun CartResponseDto.toDomain(): CartItems =
     CartItems(
         values = content.toDomain(),
         isLast = last,
-        isFirst = first
+        isFirst = first,
     )
 
-fun List<CartItemDto>.toDomain(): List<CartItem> {
-
-    return map { it.toDomain() }
-}
+fun List<CartItemDto>.toDomain(): List<CartItem> = map { it.toDomain() }
 
 fun CartItemDto.toDomain(): CartItem =
     CartItem(

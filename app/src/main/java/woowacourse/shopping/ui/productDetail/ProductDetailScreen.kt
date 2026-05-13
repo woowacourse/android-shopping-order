@@ -44,7 +44,6 @@ import woowacourse.shopping.constant.Format.formatPrice
 import woowacourse.shopping.constant.ShoppingColor.APP_BAR_COLOR
 import woowacourse.shopping.constant.ShoppingColor.CART_ADD_BUTTON_COLOR
 import woowacourse.shopping.constant.ShoppingColor.PRODUCT_DETAIL_BACKGROUND_COLOR
-import woowacourse.shopping.data.mock.MockProductSeedData
 import woowacourse.shopping.domain.product.Category
 import woowacourse.shopping.domain.product.ImageUrl
 import woowacourse.shopping.domain.product.Price
@@ -461,17 +460,19 @@ private fun CardAddButton(
 @Composable
 fun ProductDetailScreenPreview() {
     ProductDetailScreenContent(
-        uiState = ProductDetailUiState.Success(
-            product = Product(
-                id = 1,
-                name = ProductName("상품명"),
-                imageUrl = ImageUrl("https://example.com/image.jpg"),
-                price = Price(10000),
-                category = Category("카테고리"),
+        uiState =
+            ProductDetailUiState.Success(
+                product =
+                    Product(
+                        id = 1,
+                        name = ProductName("상품명"),
+                        imageUrl = ImageUrl("https://example.com/image.jpg"),
+                        price = Price(10000),
+                        category = Category("카테고리"),
+                    ),
+                selectedQuantity = 1,
+                lastViewedProduct = null,
             ),
-            selectedQuantity = 1,
-            lastViewedProduct = null,
-        ),
         onCloseClick = {},
         onClickIncrease = {},
         onClickDecrease = {},
