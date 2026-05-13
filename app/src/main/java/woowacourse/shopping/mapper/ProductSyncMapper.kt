@@ -14,6 +14,7 @@ fun ApiProduct.toDomainProduct(): Product =
         title = ProductTitle(name),
         price = Price(price),
         imageUrl = imageUrl,
+        category = category,
     )
 
 fun Pageable.toDomainProduct(): Product =
@@ -22,11 +23,12 @@ fun Pageable.toDomainProduct(): Product =
         title = ProductTitle(name),
         price = Price(price),
         imageUrl = imageUrl,
+        category = category,
     )
 
 fun ProductResponse.toDomainProducts(): List<Product> = content.map { product -> product.toDomainProduct() }
 
-fun Product.toApiProduct(category: String = DEFAULT_CATEGORY): ApiProduct =
+fun Product.toApiProduct(category: String = this.category): ApiProduct =
     ApiProduct(
         category = category,
         id = id,
@@ -40,5 +42,3 @@ fun Product.toShoppingItem(quantity: Int = 0): ShoppingItem =
         product = this,
         quantity = quantity,
     )
-
-private const val DEFAULT_CATEGORY = "UNKNOWN"

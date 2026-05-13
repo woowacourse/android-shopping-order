@@ -12,7 +12,7 @@ class ShoppingCartRetrofitRepository(
     fun requestCartItems(
         page: Int = DEFAULT_PAGE,
         size: Int = DEFAULT_SIZE,
-        sort: List<String> = DEFAULT_SORT,
+        sort: List<String>? = null,
     ): Call<ShoppingCartResponse> =
         apiService.requestCartItems(
             page = page,
@@ -44,6 +44,5 @@ class ShoppingCartRetrofitRepository(
     companion object {
         private const val DEFAULT_PAGE = 0
         private const val DEFAULT_SIZE = 5
-        private val DEFAULT_SORT = listOf("id,asc")
     }
 }

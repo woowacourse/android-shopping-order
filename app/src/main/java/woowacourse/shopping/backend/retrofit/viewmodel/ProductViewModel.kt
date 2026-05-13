@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.backend.retrofit.awaitBody
+import woowacourse.shopping.backend.retrofit.awaitSuccess
 import woowacourse.shopping.backend.retrofit.repository.ProductRetrofitRepository
 import woowacourse.shopping.mapper.toApiProduct
 import woowacourse.shopping.mapper.toDomainProduct
@@ -69,7 +70,7 @@ class ProductViewModel(
                 productRetrofitRepository
                     .addProduct(
                         product = product.toApiProduct(),
-                    ).awaitBody(errorPrefix = "상품 추가 실패")
+                    ).awaitSuccess(errorPrefix = "상품 추가 실패")
             }
         }
     }
@@ -80,7 +81,7 @@ class ProductViewModel(
                 productRetrofitRepository
                     .deleteProduct(
                         id = id,
-                    ).awaitBody(errorPrefix = "상품 삭제 실패")
+                    ).awaitSuccess(errorPrefix = "상품 삭제 실패")
             }
         }
     }

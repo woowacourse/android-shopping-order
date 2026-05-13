@@ -30,5 +30,5 @@ fun ShoppingCartResponse.toDomainShoppingCartItems(): List<ShoppingCartItem> = c
 
 fun List<ShoppingCartItem>.toOrderInfo(): OrderInfo =
     OrderInfo(
-        orderItemIds = map { shoppingCartItem -> shoppingCartItem.getId() },
+        cartItemIds = map { shoppingCartItem -> shoppingCartItem.getId() },
     )
