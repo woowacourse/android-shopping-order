@@ -82,6 +82,7 @@ fun CartScreen(
                 onDeleteItem(it)
             },
             cartItems = uiState.items,
+            isLoading = uiState.isLoading,
             errorMessage = uiState.errorMessage,
             modifier =
                 Modifier
@@ -96,6 +97,7 @@ private fun CartContent(
     onQuantityChange: (String, Int) -> Unit,
     onDeleteItem: (String) -> Unit,
     cartItems: ImmutableList<CartItemUiModel>,
+    isLoading: Boolean,
     errorMessage: String?,
     modifier: Modifier = Modifier,
 ) {
@@ -111,25 +113,32 @@ private fun CartContent(
                     modifier = Modifier.padding(16.dp),
                 )
             }
-        }
-
-        items(
-            items = cartItems,
-            key = { it.product.id },
-        ) { item ->
-            val product = item.product
-            CartCard(
-                productName = product.name,
-                price = product.price,
-                imageUrl = product.imageUrl,
-                quantity = item.quantity,
-                onQuantityChange = { quantity ->
-                    onQuantityChange(product.id, quantity)
-                },
-                onDeleteItem = {
-                    onDeleteItem(product.id)
-                },
-            )
+        } else if (isLoading) {
+            items(count = 2) {
+                CartCardSkeleton(
+                    modifier = Modifier
+                        .padding(horizontal = 18.dp, vertical = 12.dp)
+                )
+            }
+        } else {
+            items(
+                items = cartItems,
+                key = { it.product.id },
+            ) { item ->
+                val product = item.product
+                CartCard(
+                    productName = product.name,
+                    price = product.price,
+                    imageUrl = product.imageUrl,
+                    quantity = item.quantity,
+                    onQuantityChange = { quantity ->
+                        onQuantityChange(product.id, quantity)
+                    },
+                    onDeleteItem = {
+                        onDeleteItem(product.id)
+                    },
+                )
+            }
         }
     }
 }
@@ -178,6 +187,7 @@ private fun CartContentPreview() {
                     totalPrice = 1000,
                 ),
             ).toImmutableList(),
+        isLoading = true,
         errorMessage = null,
     )
 }

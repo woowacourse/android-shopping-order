@@ -8,6 +8,7 @@ data class CartUiState(
     val items: ImmutableList<CartItemUiModel> = persistentListOf(),
     val page: Int = 0,
     val isCanMoveNext: Boolean = false,
+    val isLoading: Boolean = true,
     val totalCartSize: Int = 0,
     val totalPrice: Int = 0,
     val errorMessage: String? = null,
