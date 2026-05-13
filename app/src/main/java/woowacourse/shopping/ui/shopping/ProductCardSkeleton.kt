@@ -16,42 +16,45 @@ import androidx.compose.ui.unit.dp
 import woowacourse.shopping.ui.theme.Gray20
 
 @Composable
-fun ProductCardSkeleton(
-    modifier: Modifier = Modifier,
-) {
+fun ProductCardSkeleton(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .background(Gray20),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+                    .background(Gray20),
         )
 
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 14.dp)
-                .height(14.dp)
-                .background(Gray20)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(end = 14.dp)
+                    .height(14.dp)
+                    .background(Gray20),
         )
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 36.dp)
-                .height(14.dp)
-                .background(Gray20)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(end = 36.dp)
+                    .height(14.dp)
+                    .background(Gray20),
         )
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 private fun ProductCardSkeletonPreview() {
     ProductCardSkeleton(
-        modifier = Modifier
-            .height(206.dp)
-            .width(154.dp)
+        modifier =
+            Modifier
+                .height(206.dp)
+                .width(154.dp),
     )
 }

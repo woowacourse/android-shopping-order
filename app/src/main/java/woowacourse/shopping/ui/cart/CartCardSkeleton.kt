@@ -15,9 +15,7 @@ import woowacourse.shopping.ui.theme.Gray10
 import woowacourse.shopping.ui.theme.Gray20
 
 @Composable
-fun CartCardSkeleton(
-    modifier: Modifier = Modifier,
-) {
+fun CartCardSkeleton(modifier: Modifier = Modifier) {
     Column(
         modifier =
             modifier
@@ -27,25 +25,28 @@ fun CartCardSkeleton(
         verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(26.dp)
-                .padding(end = 90.dp)
-                .background(Gray20)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(26.dp)
+                    .padding(end = 90.dp)
+                    .background(Gray20),
         )
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(72.dp)
-                .padding(end = 176.dp)
-                .background(Gray20)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(72.dp)
+                    .padding(end = 176.dp)
+                    .background(Gray20),
         )
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 private fun CartCardSkeletonPreview() {
     CartCardSkeleton(
-        modifier = Modifier.padding(10.dp)
+        modifier = Modifier.padding(10.dp),
     )
 }
