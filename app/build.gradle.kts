@@ -78,4 +78,7 @@ dependencies {
     implementation(libs.mockwebserver)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit.kotlinx.serialization.converter)
 }
