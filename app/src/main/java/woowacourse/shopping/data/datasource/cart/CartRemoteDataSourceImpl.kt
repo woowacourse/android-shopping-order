@@ -3,7 +3,7 @@ package woowacourse.shopping.data.datasource.cart
 import woowacourse.shopping.data.remote.api.AddCartItemRequest
 import woowacourse.shopping.data.remote.api.CartApi
 import woowacourse.shopping.data.remote.api.UpdateCartItemRequest
-import woowacourse.shopping.data.remote.dto.CartItemDto
+import woowacourse.shopping.data.remote.dto.CartResponseDto
 
 class CartRemoteDataSourceImpl(
     private val cartApi: CartApi,
@@ -11,7 +11,7 @@ class CartRemoteDataSourceImpl(
     override suspend fun getCartItems(
         page: Int,
         size: Int,
-    ): List<CartItemDto> = cartApi.getCartItems(page, size)
+    ): CartResponseDto = cartApi.getCartItems(page, size)
 
     override suspend fun getCartItemsCount(): Int = cartApi.getCartItemsCount()
 

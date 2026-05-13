@@ -1,12 +1,12 @@
 package woowacourse.shopping.data.datasource.cart
 
-import woowacourse.shopping.data.remote.dto.CartItemDto
+import woowacourse.shopping.data.remote.dto.CartResponseDto
 
 interface CartRemoteDataSource {
     suspend fun getCartItems(
         page: Int,
         size: Int,
-    ): List<CartItemDto>
+    ): CartResponseDto
 
     suspend fun getCartItemsCount(): Int
 
