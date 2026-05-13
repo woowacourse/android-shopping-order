@@ -34,6 +34,7 @@ import woowacourse.shopping.presentation.shopping.ui.components.CartIcon
 import woowacourse.shopping.presentation.shopping.ui.components.LoadButton
 import woowacourse.shopping.presentation.shopping.ui.components.ProductCard
 import woowacourse.shopping.presentation.shopping.ui.components.RecentSection
+import woowacourse.shopping.presentation.shopping.ui.components.SkeletonProductCard
 
 @Composable
 fun ShoppingScreen(
@@ -94,6 +95,7 @@ fun ShoppingScreen(
                 onDecrease = { onDecrease(it) },
                 onUpsertRecentProduct = { onUpsertRecentProduct(it) },
                 recentProducts = uiState.recentProducts.toImmutableList(),
+                isLoading = uiState.isLoading,
             )
         }
     }
@@ -109,6 +111,7 @@ private fun ShoppingContents(
     onUpsertRecentProduct: (Long) -> Unit,
     recentProducts: ImmutableList<ProductUiModel>,
     isCanLoadMore: Boolean,
+    isLoading: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -139,13 +142,17 @@ private fun ShoppingContents(
                 items = items,
                 key = { it.product.id },
             ) { item ->
-                ProductCard(
-                    product = item.product,
-                    quantity = item.quantity,
-                    onClick = { onProductCardClick(item.product.id) },
-                    onIncrease = { onIncrease(item.product.id) },
-                    onDecrease = { onDecrease(item.product.id) },
-                )
+                if (isLoading) {
+                    SkeletonProductCard()
+                } else {
+                    ProductCard(
+                        product = item.product,
+                        quantity = item.quantity,
+                        onClick = { onProductCardClick(item.product.id) },
+                        onIncrease = { onIncrease(item.product.id) },
+                        onDecrease = { onDecrease(item.product.id) },
+                    )
+                }
             }
             if (isCanLoadMore) {
                 item(
