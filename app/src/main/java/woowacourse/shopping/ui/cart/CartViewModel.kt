@@ -6,15 +6,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.domain.cart.Cart
 import woowacourse.shopping.domain.repository.CartRepository
-import kotlin.math.ceil
-import kotlin.math.max
 
 class CartViewModel(
     private val cartRepository: CartRepository,
@@ -23,77 +19,125 @@ class CartViewModel(
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
 
     private var currentPage = 0
-    private val cartStateFlow: StateFlow<Cart> =
-        cartRepository.cartFlow.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = Cart(),
-        )
 
     init {
-        observeCart()
+        init()
     }
 
-    private fun observeCart() {
+    private fun init() {
         viewModelScope.launch {
-            cartStateFlow.collect { cart ->
-                updateUiState(cart)
+            _uiState.update { CartUiState.Loading }
+
+            val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
+
+            _uiState.update {
+                CartUiState.Success(
+                    cartItems = result.values,
+                    currentPage = currentPage,
+                    totalPages = 1,
+                    hasPrevious = !result.isFirst,
+                    hasNext = !result.isLast,
+                )
             }
         }
     }
 
     fun removeCartItem(productId: Int) {
         viewModelScope.launch {
+            _uiState.update { CartUiState.Loading }
             cartRepository.remove(productId)
+            val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
+
+            _uiState.update {
+                CartUiState.Success(
+                    cartItems = result.values,
+                    currentPage = currentPage,
+                    totalPages = 1,
+                    hasPrevious = !result.isFirst,
+                    hasNext = !result.isLast,
+                )
+            }
         }
     }
 
     fun increase(productId: Int) {
         viewModelScope.launch {
             cartRepository.increase(productId)
+
+            val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
+
+            _uiState.update {
+                CartUiState.Success(
+                    cartItems = result.values,
+                    currentPage = currentPage,
+                    totalPages = 1,
+                    hasPrevious = !result.isFirst,
+                    hasNext = !result.isLast,
+                )
+            }
         }
     }
 
     fun decrease(productId: Int) {
         viewModelScope.launch {
             cartRepository.decrease(productId)
+
+            val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
+
+            _uiState.update {
+                CartUiState.Success(
+                    cartItems = result.values,
+                    currentPage = currentPage,
+                    totalPages = 1,
+                    hasPrevious = !result.isFirst,
+                    hasNext = !result.isLast,
+                )
+            }
         }
     }
 
     fun goToNextPage() {
         val current = _uiState.value as? CartUiState.Success ?: return
         if (!current.hasNext) return
-        currentPage++
-        updateUiState(cartStateFlow.value)
+
+        viewModelScope.launch {
+            _uiState.update { CartUiState.Loading }
+            val nextPage = currentPage + 1
+            val result = cartRepository.getCartItems(nextPage, PAGE_SIZE)
+
+            currentPage = nextPage
+            _uiState.update {
+                CartUiState.Success(
+                    cartItems = result.values,
+                    currentPage = currentPage,
+                    totalPages = 1,
+                    hasPrevious = !result.isFirst,
+                    hasNext = !result.isLast,
+                )
+            }
+        }
     }
 
     fun goToPreviousPage() {
         val current = _uiState.value as? CartUiState.Success ?: return
         if (!current.hasPrevious) return
-        currentPage--
-        updateUiState(cartStateFlow.value)
-    }
 
-    private fun updateUiState(cart: Cart) {
-        if (cart.isEmpty) {
-            _uiState.value = CartUiState.Empty
-            return
+        viewModelScope.launch {
+            _uiState.update { CartUiState.Loading }
+            val prevPage = currentPage - 1
+            val result = cartRepository.getCartItems(prevPage, PAGE_SIZE)
+
+            currentPage = prevPage
+            _uiState.update {
+                CartUiState.Success(
+                    cartItems = result.values,
+                    currentPage = currentPage,
+                    totalPages = 1,
+                    hasPrevious = !result.isFirst,
+                    hasNext = !result.isLast,
+                )
+            }
         }
-
-        val totalPages = max(1, ceil(cart.cartItems.size().toDouble() / PAGE_SIZE).toInt())
-        if (currentPage >= totalPages) currentPage = totalPages - 1
-        if (currentPage < 0) currentPage = 0
-
-        val pageItems = cart.getPage(currentPage, PAGE_SIZE)
-
-        _uiState.value =
-            CartUiState.Success(
-                cartItems = pageItems,
-                currentPage = currentPage,
-                totalPages = totalPages,
-                hasPrevious = currentPage > 0,
-                hasNext = currentPage < totalPages - 1,
-            )
     }
 
     companion object {
