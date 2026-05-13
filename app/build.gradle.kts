@@ -1,3 +1,6 @@
+import java.util.Properties
+import org.gradle.api.GradleException
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,6 +10,24 @@ plugins {
 
     alias(libs.plugins.kotlin.serialization)
 }
+
+val localProperties =
+    Properties().apply {
+        val file = rootProject.file("local.properties")
+        if (file.exists()) {
+            file.inputStream().use(::load)
+        }
+    }
+
+fun readLocalProperty(key: String): String = localProperties.getProperty(key).orEmpty()
+
+fun requireLocalProperty(key: String): String =
+    readLocalProperty(key).ifBlank {
+        throw GradleException("local.properties에 `$key`를 설정해야 합니다.")
+    }
+
+fun String.asBuildConfigString(): String =
+    "\"" + replace("\\", "\\\\").replace("\"", "\\\"") + "\""
 
 android {
     namespace = "woowacourse.shopping"
@@ -19,6 +40,12 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val authUserId = requireLocalProperty("auth.userId")
+        val authPassword = requireLocalProperty("auth.password")
+
+        buildConfigField("String", "AUTH_USER_ID", authUserId.asBuildConfigString())
+        buildConfigField("String", "AUTH_PASSWORD", authPassword.asBuildConfigString())
     }
 
     buildTypes {

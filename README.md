@@ -16,11 +16,11 @@
 - [x] 기존에 작성한 테스트가 깨지지 않도록 유지한다.
 
 ### 사용자 인증 정보 관리
-- [ ] `local.properties`를 통해 사용자 인증 정보를 관리한다.
-- [ ] `build.gradle.kts`에서 인증 정보를 읽어 `BuildConfig`로 주입한다.
-- [ ] 앱 코드에서 `BuildConfig` 기반으로 인증 정보를 사용할 수 있도록 구성한다.
-- [ ] Basic Authentication 헤더를 생성할 수 있도록 구현한다.
-- [ ] 인증 정보를 네트워크 계층에서 활용할 수 있도록 구조를 구성한다.
+- [x] `local.properties`를 통해 사용자 인증 정보를 관리한다.
+- [x] `build.gradle.kts`에서 인증 정보를 읽어 `BuildConfig`로 주입한다.
+- [x] 앱 코드에서 `BuildConfig` 기반으로 인증 정보를 사용할 수 있도록 구성한다.
+- [x] Basic Authentication 헤더를 생성할 수 있도록 구현한다.
+- [x] 인증 정보를 네트워크 계층에서 활용할 수 있도록 구조를 구성한다.
 
 ### JSON 직렬화 라이브러리 선택
 - [x] 서버 통신을 위한 JSON 직렬화 라이브러리를 선택한다.

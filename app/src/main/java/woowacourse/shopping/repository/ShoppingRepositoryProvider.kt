@@ -5,6 +5,9 @@ import okhttp3.OkHttpClient
 import woowacourse.shopping.local.ShoppingDatabase
 import woowacourse.shopping.network.ConnectivityManagerNetworkMonitor
 import woowacourse.shopping.network.NetworkMonitor
+import woowacourse.shopping.network.auth.AppAuthConfig
+import woowacourse.shopping.network.auth.BasicAuthHeaderFactory
+import woowacourse.shopping.network.auth.BasicAuthInterceptor
 import woowacourse.shopping.repository.http.HttpProductRepository
 import woowacourse.shopping.repository.room.RoomCartRepository
 import woowacourse.shopping.repository.room.RoomRecentProductRepository
@@ -13,7 +16,15 @@ object ShoppingRepositoryProvider {
     private const val PRODUCT_API_BASE_URL =
         "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/"
 
-    private val httpClient: OkHttpClient = OkHttpClient()
+    private val httpClient: OkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .addInterceptor(
+                BasicAuthInterceptor {
+                    BasicAuthHeaderFactory.create(AppAuthConfig.credentials)
+                },
+            )
+            .build()
+    }
 
     lateinit var productRepository: ProductRepository
         private set
