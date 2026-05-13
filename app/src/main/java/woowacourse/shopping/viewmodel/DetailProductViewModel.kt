@@ -3,7 +3,6 @@ package woowacourse.shopping.viewmodel
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -69,7 +68,7 @@ class DetailProductViewModel(
             selectedProductId = productId
             selectedQuantity = DEFAULT_QUANTITY
         }
-        launchNow {
+        viewModelScope.launch {
             visitStore.visit(productId)
         }
         publishUiState()
@@ -90,7 +89,7 @@ class DetailProductViewModel(
 
     fun addSelectedProductToCart() {
         val shoppingItem = uiState.value.shoppingItem ?: return
-        launchNow {
+        viewModelScope.launch {
             addSelectedProductQuantityToCart(
                 productId = shoppingItem.getProductId(),
                 quantity = selectedQuantity,
@@ -105,8 +104,7 @@ class DetailProductViewModel(
         if (quantity < 1) {
             return
         }
-        val sourceItem = shoppingItemRepository.getShoppingItemOrNull(productId) ?: return
-        shoppingCartRepository.add(sourceItem)
+        shoppingCartRepository.addIfAbsent(productId)
         shoppingItemRepository.plusQuantity(productId, quantity)
     }
 
@@ -128,12 +126,6 @@ class DetailProductViewModel(
             selectedQuantity = safeQuantity,
             quantityPrice = currentShoppingItem?.getProductQuantityPrice(safeQuantity) ?: 0,
         )
-    }
-
-    private fun launchNow(block: suspend () -> Unit) {
-        viewModelScope.launch(start = CoroutineStart.UNDISPATCHED) {
-            block()
-        }
     }
 
     private fun resolveLastViewedProductId(

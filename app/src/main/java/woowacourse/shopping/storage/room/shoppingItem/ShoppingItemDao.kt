@@ -11,9 +11,6 @@ interface ShoppingItemDao {
     @Query("SELECT * FROM shopping_items ORDER BY product_id")
     fun observeAll(): Flow<List<ShoppingItemEntity>>
 
-    @Query("SELECT * FROM shopping_items WHERE product_id = :productId LIMIT 1")
-    suspend fun getByProductId(productId: Long): ShoppingItemEntity?
-
     @Query("SELECT quantity FROM shopping_items WHERE product_id = :productId LIMIT 1")
     suspend fun getQuantityOrNull(productId: Long): Int?
 

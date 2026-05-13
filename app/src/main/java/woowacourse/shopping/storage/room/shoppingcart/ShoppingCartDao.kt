@@ -19,9 +19,6 @@ interface ShoppingCartDao {
     @Query("DELETE FROM shopping_cart_items WHERE product_id = :productId")
     suspend fun deleteByProductId(productId: Long): Int
 
-    @Query("SELECT EXISTS(SELECT 1 FROM shopping_cart_items WHERE product_id = :productId)")
-    suspend fun existsByProductId(productId: Long): Boolean
-
     @Query("SELECT product_id FROM shopping_cart_items")
     suspend fun getProductIds(): List<Long>
 

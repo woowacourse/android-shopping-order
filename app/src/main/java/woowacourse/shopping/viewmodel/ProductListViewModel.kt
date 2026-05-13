@@ -2,7 +2,6 @@ package woowacourse.shopping.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -58,23 +57,23 @@ class ProductListViewModel(
     }
 
     fun addProductToCart(shoppingItem: ShoppingItem) {
-        launchNow {
+        viewModelScope.launch {
             increaseQuantity(shoppingItem.getProductId())
         }
     }
 
     fun increaseProductQuantity(shoppingItem: ShoppingItem) {
-        launchNow {
+        viewModelScope.launch {
             increaseQuantity(shoppingItem.getProductId())
         }
     }
 
     fun decreaseProductQuantity(shoppingItem: ShoppingItem) {
-        launchNow {
+        viewModelScope.launch {
             val productId = shoppingItem.getProductId()
             val currentQuantity = shoppingItemRepository.getQuantity(productId)
             if (currentQuantity == 0) {
-                return@launchNow
+                return@launch
             }
             shoppingItemRepository.minusQuantity(productId)
             if (currentQuantity == 1) {
@@ -83,16 +82,8 @@ class ProductListViewModel(
         }
     }
 
-    private suspend fun ensureShoppingCartContains(productId: Long) {
-        if (shoppingCartRepository.containsProduct(productId)) {
-            return
-        }
-        val sourceItem = shoppingItemRepository.getShoppingItemOrNull(productId) ?: return
-        shoppingCartRepository.add(sourceItem)
-    }
-
     private suspend fun increaseQuantity(productId: Long) {
-        ensureShoppingCartContains(productId)
+        shoppingCartRepository.addIfAbsent(productId)
         shoppingItemRepository.plusQuantity(productId)
     }
 
@@ -115,12 +106,6 @@ class ProductListViewModel(
                 networkConnected = isConnected
                 publishUiState()
             }
-        }
-    }
-
-    private fun launchNow(block: suspend () -> Unit) {
-        viewModelScope.launch(start = CoroutineStart.UNDISPATCHED) {
-            block()
         }
     }
 

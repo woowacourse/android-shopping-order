@@ -2,7 +2,6 @@ package woowacourse.shopping.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -29,7 +28,7 @@ class ShoppingCartItemViewModel(
     val shoppingCartItems: StateFlow<ShoppingCartItemsState> = _shoppingCartItems.asStateFlow()
 
     init {
-        launchNow {
+        viewModelScope.launch {
             val initialItems = shoppingCartRepository.getShoppingItems()
             shoppingCartPageStateHolder.updateItems(initialItems)
             _shoppingCartItems.value = createShoppingCartItemsState(initialItems)
@@ -51,7 +50,7 @@ class ShoppingCartItemViewModel(
     }
 
     fun removeShoppingItem(shoppingCartItem: ShoppingCartItem) {
-        launchNow {
+        viewModelScope.launch {
             shoppingCartRepository.remove(shoppingCartItem)
             resetQuantity(shoppingCartItem.product.id)
             syncShoppingCartItems()
@@ -59,18 +58,18 @@ class ShoppingCartItemViewModel(
     }
 
     fun increaseShoppingItemQuantity(shoppingCartItem: ShoppingCartItem) {
-        launchNow {
+        viewModelScope.launch {
             shoppingItemRepository.plusQuantity(shoppingCartItem.product.id)
             syncShoppingCartItems()
         }
     }
 
     fun decreaseShoppingItemQuantity(shoppingCartItem: ShoppingCartItem) {
-        launchNow {
+        viewModelScope.launch {
             val productId = shoppingCartItem.product.id
             val currentQuantity = shoppingItemRepository.getQuantity(productId)
             if (currentQuantity == 0) {
-                return@launchNow
+                return@launch
             }
             shoppingItemRepository.minusQuantity(productId)
             if (currentQuantity == 1) {
@@ -109,12 +108,6 @@ class ShoppingCartItemViewModel(
             canMoveToPreviousPage = shoppingCartPageStateHolder.canMoveToPreviousPage(),
             canMoveToNextPage = shoppingCartPageStateHolder.canMoveToNextPage(),
         )
-
-    private fun launchNow(block: suspend () -> Unit) {
-        viewModelScope.launch(start = CoroutineStart.UNDISPATCHED) {
-            block()
-        }
-    }
 
     data class ShoppingCartItemsState(
         val items: List<ShoppingCartItem>,

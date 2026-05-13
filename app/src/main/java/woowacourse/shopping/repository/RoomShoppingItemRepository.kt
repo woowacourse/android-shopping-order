@@ -19,8 +19,6 @@ class RoomShoppingItemRepository(
             .map { entities -> entities.map { entity -> entity.toDomain() } }
             .stateIn(scope, SharingStarted.Eagerly, emptyList())
 
-    override suspend fun getShoppingItemOrNull(productId: Long): ShoppingItem? = shoppingItemDao.getByProductId(productId)?.toDomain()
-
     override suspend fun getQuantity(productId: Long): Int =
         shoppingItemDao.getQuantityOrNull(productId)
             ?: throw IllegalArgumentException("해당 상품을 찾을 수 없습니다.")

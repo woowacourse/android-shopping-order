@@ -6,8 +6,6 @@ import woowacourse.shopping.model.ShoppingItem
 interface ShoppingItemRepository {
     val shoppingItems: StateFlow<List<ShoppingItem>>
 
-    suspend fun getShoppingItemOrNull(productId: Long): ShoppingItem?
-
     suspend fun getQuantity(productId: Long): Int
 
     suspend fun plusQuantity(
