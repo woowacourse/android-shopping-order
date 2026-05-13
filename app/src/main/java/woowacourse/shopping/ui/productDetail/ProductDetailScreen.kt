@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.productDetail
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,10 +44,12 @@ import woowacourse.shopping.constant.Format.formatPrice
 import woowacourse.shopping.constant.ShoppingColor.APP_BAR_COLOR
 import woowacourse.shopping.constant.ShoppingColor.CART_ADD_BUTTON_COLOR
 import woowacourse.shopping.constant.ShoppingColor.PRODUCT_DETAIL_BACKGROUND_COLOR
-import woowacourse.shopping.data.preview.FakeCartRepository
-import woowacourse.shopping.data.preview.FakeProductRepository
-import woowacourse.shopping.data.preview.FakeRecentProductRepository
+import woowacourse.shopping.data.mock.MockProductSeedData
+import woowacourse.shopping.domain.product.Category
+import woowacourse.shopping.domain.product.ImageUrl
+import woowacourse.shopping.domain.product.Price
 import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.domain.product.ProductName
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -456,21 +457,25 @@ private fun CardAddButton(
     }
 }
 
-@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 fun ProductDetailScreenPreview() {
-    ProductDetailScreen(
-        viewModel =
-            ProductDetailViewModel(
-                productId = 1,
-                openedFromLastViewed = false,
-                productRepository = FakeProductRepository(),
-                cartRepository = FakeCartRepository(),
-                recentProductRepository = FakeRecentProductRepository(),
+    ProductDetailScreenContent(
+        uiState = ProductDetailUiState.Success(
+            product = Product(
+                id = 1,
+                name = ProductName("상품명"),
+                imageUrl = ImageUrl("https://example.com/image.jpg"),
+                price = Price(10000),
+                category = Category("카테고리"),
             ),
-        onAddToCartClick = {},
-        onLastViewedProductClick = {},
+            selectedQuantity = 1,
+            lastViewedProduct = null,
+        ),
         onCloseClick = {},
+        onClickIncrease = {},
+        onClickDecrease = {},
+        onAddToCartClick = {},
+        onLastViewedProductClick = { },
     )
 }
