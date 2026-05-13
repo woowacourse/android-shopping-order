@@ -12,6 +12,8 @@ interface CartRepository {
 
     suspend fun getCartItemsCount(): Int
 
+    suspend fun getAllCartItems(): CartItems
+
     suspend fun addProduct(
         product: Product,
         quantity: Quantity = Quantity.ONE,
