@@ -11,7 +11,9 @@ interface ProductApi {
     @GET("/products")
     suspend fun getProducts(
         @Query("category") category: String,
-        @Query("pageable") pageable: Pageable,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("sort") sort: List<String> = emptyList(),
     ): ProductsResponse
 
     @GET("/products/{id}")
