@@ -24,5 +24,6 @@ object MockProductResponseFactory {
             imageUrl = imageUrl.value,
             name = name.value,
             price = price.value,
+            category = category.value,
         )
 }
