@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.network.NetworkStatusMonitor
 import woowacourse.shopping.repository.ShoppingCartRepository
@@ -18,10 +17,10 @@ import woowacourse.shopping.storage.datastore.VisitStore
 import woowacourse.shopping.ui.pagination.ProductPageStateHolder
 
 class ProductListViewModel(
-    private val shoppingCartRepository: ShoppingCartRepository = ShoppingApplication.shoppingCartRepository,
-    private val shoppingItemRepository: ShoppingItemRepository = ShoppingApplication.shoppingItemRepository,
-    private val visitStore: VisitStore = ShoppingApplication.visitStore,
-    private val networkStatusMonitor: NetworkStatusMonitor = ShoppingApplication.networkStatusMonitor,
+    private val shoppingCartRepository: ShoppingCartRepository,
+    private val shoppingItemRepository: ShoppingItemRepository,
+    private val visitStore: VisitStore,
+    private val networkStatusMonitor: NetworkStatusMonitor,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductListUiState())
     val uiState: StateFlow<ProductListUiState> = _uiState.asStateFlow()

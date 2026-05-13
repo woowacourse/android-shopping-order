@@ -9,15 +9,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.model.ShoppingCartItem
 import woowacourse.shopping.repository.ShoppingCartRepository
 import woowacourse.shopping.repository.ShoppingItemRepository
 import woowacourse.shopping.ui.pagination.ShoppingCartPageStateHolder
 
 class ShoppingCartItemViewModel(
-    private val shoppingCartRepository: ShoppingCartRepository = ShoppingApplication.shoppingCartRepository,
-    private val shoppingItemRepository: ShoppingItemRepository = ShoppingApplication.shoppingItemRepository,
+    private val shoppingCartRepository: ShoppingCartRepository,
+    private val shoppingItemRepository: ShoppingItemRepository,
 ) : ViewModel() {
     private val shoppingCartPageStateHolder = ShoppingCartPageStateHolder(shoppingCartItems = emptyList())
     private val _event = MutableSharedFlow<ShoppingCartEvent>(extraBufferCapacity = 1)

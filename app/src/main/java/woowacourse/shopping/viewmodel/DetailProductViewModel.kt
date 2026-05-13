@@ -7,16 +7,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.repository.ShoppingCartRepository
 import woowacourse.shopping.repository.ShoppingItemRepository
 import woowacourse.shopping.storage.datastore.VisitStore
 
 class DetailProductViewModel(
-    private val shoppingCartRepository: ShoppingCartRepository = ShoppingApplication.shoppingCartRepository,
-    private val shoppingItemRepository: ShoppingItemRepository = ShoppingApplication.shoppingItemRepository,
-    private val visitStore: VisitStore = ShoppingApplication.visitStore,
+    private val shoppingCartRepository: ShoppingCartRepository,
+    private val shoppingItemRepository: ShoppingItemRepository,
+    private val visitStore: VisitStore,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DetailProductUiState())
     val uiState: StateFlow<DetailProductUiState> = _uiState.asStateFlow()

@@ -11,14 +11,6 @@ import okhttp3.OkHttpClient
 import woowacourse.shopping.backend.MockShoppingBackendServer
 import woowacourse.shopping.backend.OkHttpProductBackendDataSource
 import woowacourse.shopping.backend.ShoppingItemsRemoteSyncer
-import woowacourse.shopping.network.AndroidNetworkStatusMonitor
-import woowacourse.shopping.network.NetworkStatusMonitor
-import woowacourse.shopping.repository.RoomShoppingCartRepository
-import woowacourse.shopping.repository.RoomShoppingItemRepository
-import woowacourse.shopping.repository.ShoppingCartRepository
-import woowacourse.shopping.repository.ShoppingItemRepository
-import woowacourse.shopping.storage.datastore.DataStoreVisitStore
-import woowacourse.shopping.storage.datastore.VisitStore
 import woowacourse.shopping.storage.room.ShoppingDatabase
 import woowacourse.shopping.storage.room.shoppingItem.ShoppingItemDao
 import woowacourse.shopping.storage.room.shoppingcart.ShoppingCartDao
@@ -29,25 +21,18 @@ class ShoppingApplication : Application() {
     private val httpClient: OkHttpClient = OkHttpClient()
     private var mockShoppingBackendServer: MockShoppingBackendServer? = null
 
+    lateinit var appContainer: AppContainer
+        private set
+
     companion object {
         private const val LOG_TAG = "ShoppingApplication"
-
-        lateinit var shoppingItemRepository: ShoppingItemRepository
-            private set
-        lateinit var shoppingCartRepository: ShoppingCartRepository
-            private set
-        lateinit var visitStore: VisitStore
-            private set
-        lateinit var networkStatusMonitor: NetworkStatusMonitor
-            private set
     }
 
     override fun onCreate() {
         super.onCreate()
 
         val daos = createDaos()
-        initializeRepositories(daos)
-        initializeStores()
+        appContainer = createAppContainer(daos)
         launchStartupSync(daos)
     }
 
@@ -66,15 +51,13 @@ class ShoppingApplication : Application() {
         )
     }
 
-    private fun initializeRepositories(daos: DatabaseDaos) {
-        shoppingItemRepository = RoomShoppingItemRepository(daos.shoppingItemDao, applicationScope)
-        shoppingCartRepository = RoomShoppingCartRepository(daos.shoppingCartDao)
-    }
-
-    private fun initializeStores() {
-        visitStore = DataStoreVisitStore(this, applicationScope)
-        networkStatusMonitor = AndroidNetworkStatusMonitor(this, applicationScope)
-    }
+    private fun createAppContainer(daos: DatabaseDaos): AppContainer =
+        AppContainer(
+            context = this,
+            shoppingItemDao = daos.shoppingItemDao,
+            shoppingCartDao = daos.shoppingCartDao,
+            applicationScope = applicationScope,
+        )
 
     private fun launchStartupSync(daos: DatabaseDaos) {
         applicationScope.launch {

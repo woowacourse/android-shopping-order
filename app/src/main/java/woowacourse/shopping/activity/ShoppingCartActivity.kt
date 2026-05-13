@@ -13,14 +13,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.ShoppingCartScreen
 import woowacourse.shopping.ui.component.PageNavigation
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 import woowacourse.shopping.viewmodel.ShoppingCartItemViewModel
+import woowacourse.shopping.viewmodel.ViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 class ShoppingCartActivity : ComponentActivity() {
-    private val shoppingCartItemViewModel: ShoppingCartItemViewModel by viewModels()
+    private val shoppingCartItemViewModel: ShoppingCartItemViewModel by viewModels {
+        ViewModelFactory((application as ShoppingApplication).appContainer)
+    }
 
     companion object {
         fun start(context: Context) {

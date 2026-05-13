@@ -14,12 +14,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import woowacourse.shopping.R
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.DetailProductScreen
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 import woowacourse.shopping.viewmodel.DetailProductViewModel
+import woowacourse.shopping.viewmodel.ViewModelFactory
 
 class DetailProductActivity : ComponentActivity() {
-    private val detailProductViewModel: DetailProductViewModel by viewModels()
+    private val detailProductViewModel: DetailProductViewModel by viewModels {
+        ViewModelFactory((application as ShoppingApplication).appContainer)
+    }
 
     companion object {
         fun start(

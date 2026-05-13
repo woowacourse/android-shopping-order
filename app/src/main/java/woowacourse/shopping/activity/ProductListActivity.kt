@@ -10,13 +10,17 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.ProductListScreen
 import woowacourse.shopping.ui.component.MoreButton
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 import woowacourse.shopping.viewmodel.ProductListViewModel
+import woowacourse.shopping.viewmodel.ViewModelFactory
 
 class ProductListActivity : ComponentActivity() {
-    private val productListViewModel: ProductListViewModel by viewModels()
+    private val productListViewModel: ProductListViewModel by viewModels {
+        ViewModelFactory((application as ShoppingApplication).appContainer)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
