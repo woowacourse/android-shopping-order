@@ -1,5 +1,8 @@
-package woowacourse.shopping.retrofit.dto
+package woowacourse.shopping.backend.retrofit.dto
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ProductResponse(
     val totalElements: Long,
     val totalPages: Int,
@@ -11,5 +14,5 @@ data class ProductResponse(
     val first: Boolean,
     val last: Boolean,
     val numberOfElements: Int,
-    val empty: Boolean
+    val empty: Boolean,
 )

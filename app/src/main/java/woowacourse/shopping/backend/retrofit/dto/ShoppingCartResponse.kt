@@ -1,5 +1,8 @@
-package woowacourse.shopping.retrofit.dto
+package woowacourse.shopping.backend.retrofit.dto
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ShoppingCartResponse(
     val content: List<Content>,
     val empty: Boolean,
@@ -11,5 +14,5 @@ data class ShoppingCartResponse(
     val size: Int,
     val sort: Sort,
     val totalElements: Long,
-    val totalPages: Int
+    val totalPages: Int,
 )

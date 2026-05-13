@@ -1,5 +1,8 @@
-package woowacourse.shopping.retrofit.dto
+package woowacourse.shopping.backend.retrofit.dto
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Pageable(
     val id: Long,
     val name: String,
