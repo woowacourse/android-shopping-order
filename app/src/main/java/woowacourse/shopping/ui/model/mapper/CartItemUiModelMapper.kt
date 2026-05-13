@@ -5,6 +5,7 @@ import woowacourse.shopping.ui.model.CartItemUiModel
 
 fun CartItem.toUiModel(): CartItemUiModel =
     CartItemUiModel(
+        id = id,
         product = product.toUiModel(),
         quantity = quantity,
         totalPrice = getTotalPrice().amount,
