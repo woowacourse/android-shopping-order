@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 class ProductsTest {
     private val product1 =
         Product(
+            id = 1L,
             name = "새우깡",
             price = Money(3100),
             imageUrl = "",
@@ -15,6 +16,7 @@ class ProductsTest {
 
     private val product2 =
         Product(
+            id = 2L,
             name = "아이셔",
             price = Money(1300),
             imageUrl = "",

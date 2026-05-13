@@ -1,7 +1,6 @@
 package woowacourse.shopping.repository
 
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.model.Products
 
 interface ProductRepository {
@@ -14,5 +13,5 @@ interface ProductRepository {
 
     suspend fun hasNext(current: Int): Boolean
 
-    suspend fun findAllByIds(ids: Set<ProductId>): Map<ProductId, Product>
+    suspend fun findAllByIds(ids: Set<Long>): Map<Long, Product>
 }

@@ -8,8 +8,8 @@ import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.network.auth.AppAuthConfig
 import woowacourse.shopping.network.auth.BasicAuthHeaderFactory
 import woowacourse.shopping.network.auth.BasicAuthInterceptor
+import woowacourse.shopping.repository.http.HttpCartRepository
 import woowacourse.shopping.repository.http.HttpProductRepository
-import woowacourse.shopping.repository.room.RoomCartRepository
 import woowacourse.shopping.repository.room.RoomRecentProductRepository
 
 object ShoppingRepositoryProvider {
@@ -54,7 +54,12 @@ object ShoppingRepositoryProvider {
                 client = httpClient,
                 baseUrl = PRODUCT_API_BASE_URL,
             )
-        cartRepository = RoomCartRepository(database.cartItemDao())
+        cartRepository =
+            HttpCartRepository(
+                client = httpClient,
+                baseUrl = PRODUCT_API_BASE_URL,
+            )
+
         recentProductRepository = RoomRecentProductRepository(database.recentProductDao())
         networkMonitor = ConnectivityManagerNetworkMonitor(context)
     }

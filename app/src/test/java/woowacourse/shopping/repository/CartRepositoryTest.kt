@@ -9,14 +9,12 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Product
 
 class CartRepositoryTest {
     private lateinit var repo: CartRepository
 
     private val product1: Product = CartRepositoryFixture.shrimpCracker
-    private val product2: Product = CartRepositoryFixture.sourCandy
 
     @BeforeEach
     fun setUp() {
@@ -24,49 +22,52 @@ class CartRepositoryTest {
     }
 
     @Test
-    fun `정상적인 상품 객체를 장바구니에 추가하면, 장바구니 내부 목록에 해당 상품이 올바르게 반영된다`() =
+    fun `정상적인 상품 객체의 최종 수량을 설정하면 장바구니 목록에 해당 상품이 반영된다`() =
         runBlocking {
-            repo.add(product1.id)
+            repo.setQuantity(product1.id, 2)
 
-            val actual = repo.getCartItems(0, repo.count())
+            val actual = repo.getCartItemsByProductIds(setOf(product1.id))
 
-            assertTrue(actual.any { it.productId == product1.id })
+            assertTrue(actual.any { it.productId == product1.id && it.quantity == 2 })
         }
 
     @Test
-    fun `장바구니에 존재하는 상품을 삭제 요청하면, 목록에서 해당 상품이 정상적으로 제거된다`() =
+    fun `장바구니에 존재하는 상품 수량을 0으로 설정하면 목록에서 제거된다`() =
         runBlocking {
-            repo.add(product1.id)
-            repo.delete(product1.id)
+            repo.setQuantity(product1.id, 1)
+            repo.setQuantity(product1.id, 0)
 
-            val actual = repo.getCartItems(0, repo.count())
+            val actual = repo.getCartItemsByProductIds(setOf(product1.id))
 
             assertFalse(actual.any { it.productId == product1.id })
         }
 
     @Test
-    fun `존재하지 않는 상품의 삭제를 시도할 경우, 상태가 변경되지 않거나 올바르게 무시,예외 처리된다`(): Unit =
+    fun `존재하지 않는 상품 수량을 0으로 설정하면 상태 변경 없이 무시된다`() =
         runBlocking {
-            assertThrows<IllegalArgumentException> { runBlocking { repo.delete(product1.id) } }
+            repo.setQuantity(product1.id, 0)
+
+            val actual = repo.getCartItemsByProductIds(setOf(product1.id))
+
+            assertEquals(emptyList<woowacourse.shopping.model.CartItem>(), actual)
         }
 
     @Test
-    fun `전체 데이터 개수보다 큰 오프셋을 요청했을 때 빈 결과를 반환한다`() =
+    fun `전체 데이터 개수보다 큰 페이지를 요청했을 때 빈 결과를 반환한다`() =
         runBlocking {
-            repo.add(product1.id)
+            repo.setQuantity(product1.id, 1)
 
-            val actual = repo.getCartItems(repo.count() + 1, 20)
+            val actual = repo.getCartPage(page = repo.count() + 1, size = 20)
 
-            assertEquals(emptyList<CartItem>(), actual)
+            assertEquals(emptyList<woowacourse.shopping.repository.cart.CartPageItem>(), actual.items)
         }
 
     @Test
-    fun `음수 limit을 요청했을 때 빈 결과를 반환한다`() =
-        runBlocking {
-            repo.add(product1.id)
-
-            val actual = repo.getCartItems(0, -1)
-
-            assertEquals(emptyList<CartItem>(), actual)
+    fun `음수 수량을 설정하면 예외가 발생한다`() {
+        assertThrows<IllegalArgumentException> {
+            runBlocking {
+                repo.setQuantity(product1.id, -1)
+            }
         }
+    }
 }

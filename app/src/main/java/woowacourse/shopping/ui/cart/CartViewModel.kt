@@ -2,18 +2,20 @@ package woowacourse.shopping.ui.cart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
 
 private const val PAGE_SIZE = 5
+private const val CART_SYNC_DELAY_MILLIS = 400L
 
 class CartViewModel(
     private val productRepository: ProductRepository = ShoppingRepositoryProvider.productRepository,
@@ -22,6 +24,8 @@ class CartViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState(cartListState = CartListUiState.Loading))
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
+
+    private val syncJobs = mutableMapOf<Long, Job>()
 
     init {
         observeNetworkState()
@@ -50,8 +54,7 @@ class CartViewModel(
                 )
             }
             runCatching {
-                val totalCount = cartRepository.count()
-                updatePage(page, totalCount)
+                updatePage(page)
             }.onFailure { throwable ->
                 _uiState.update { currentState ->
                     currentState.copy(
@@ -62,20 +65,15 @@ class CartViewModel(
         }
     }
 
-    private suspend fun updatePage(
-        page: Int,
-        totalCount: Int,
-    ) {
-        val totalPages = calculateTotalPages(totalCount)
-        val currentPage = page.coerceIn(1, maxOf(totalPages, 1))
-        val fromIndex = (currentPage - 1) * PAGE_SIZE
-
-        val cartItems = cartRepository.getCartItems(fromIndex, PAGE_SIZE)
-        val productMap = productRepository.findAllByIds(cartItems.map { it.productId }.toSet())
+    private suspend fun updatePage(page: Int) {
+        val requestedPage = page.coerceAtLeast(1)
+        val cartPageResult = cartRepository.getCartPage(page = requestedPage - 1, size = PAGE_SIZE)
+        val currentPage = if (cartPageResult.totalPages == 0) 1 else cartPageResult.page + 1
+        val productMap = productRepository.findAllByIds(cartPageResult.items.map { it.productId }.toSet())
 
         val items =
-            CartItemUiModelMapper.toUiModels(
-                cartItems = cartItems,
+            CartItemUiModelMapper.toUiModelsFromCartPage(
+                cartItems = cartPageResult.items,
                 productsById = productMap,
                 deselectedProductIds = _uiState.value.deselectedProductIds,
             )
@@ -86,42 +84,23 @@ class CartViewModel(
                     CartListUiState.Content(
                         items = items,
                         currentPage = currentPage,
-                        totalPages = totalPages,
+                        totalPages = cartPageResult.totalPages,
                         hasPrevious = currentPage > 1,
-                        hasNext = currentPage < totalPages,
+                        hasNext = currentPage < cartPageResult.totalPages,
                     ),
             )
         }
     }
 
-    fun delete(productId: ProductId) {
-        if (_uiState.value.cartListState is CartListUiState.Loading) return
+    fun delete(productId: Long) {
+        if (!updateLocalQuantity(productId, targetQuantity = 0)) return
 
-        viewModelScope.launch {
-            runCatching {
-                cartRepository.delete(productId)
-                clearDeselection(productId)
-
-                val remainingCount = cartRepository.count()
-                val totalPages = calculateTotalPages(remainingCount)
-
-                val currentContent = _uiState.value.cartListState as? CartListUiState.Content ?: return@runCatching
-
-                val nextPage = currentContent.currentPage.coerceAtMost(maxOf(totalPages, 1))
-
-                updatePage(nextPage, remainingCount)
-            }.onFailure { throwable ->
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        cartListState = CartListUiState.Error(throwable.message),
-                    )
-                }
-            }
-        }
+        clearDeselection(productId)
+        scheduleCartSync(productId)
     }
 
     fun toggleItemSelection(
-        productId: ProductId,
+        productId: Long,
         isSelected: Boolean,
     ) {
         _uiState.update { currentState ->
@@ -137,56 +116,88 @@ class CartViewModel(
         refreshVisibleSelections()
     }
 
-    fun increaseQuantity(productId: ProductId) {
-        if (_uiState.value.cartListState is CartListUiState.Loading) return
-
-        viewModelScope.launch {
-            runCatching {
-                cartRepository.add(productId)
-                updateCurrentPage()
-            }.onFailure { throwable ->
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        cartListState = CartListUiState.Error(throwable.message),
-                    )
-                }
-            }
-        }
-    }
-
-    fun decreaseQuantity(productId: ProductId) {
-        if (_uiState.value.cartListState is CartListUiState.Loading) return
-
-        viewModelScope.launch {
-            runCatching {
-                cartRepository.delete(productId)
-                updateCurrentPage()
-            }.onFailure { throwable ->
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        cartListState = CartListUiState.Error(throwable.message),
-                    )
-                }
-            }
-        }
-    }
-
-    private fun calculateTotalPages(totalCount: Int): Int {
-        if (totalCount == 0) return 0
-        return (totalCount - 1) / PAGE_SIZE + 1
-    }
-
-    private suspend fun updateCurrentPage() {
+    fun increaseQuantity(productId: Long) {
         val contentState = _uiState.value.cartListState as? CartListUiState.Content ?: return
+        val item = contentState.items.firstOrNull { it.productId == productId } ?: return
 
-        val remainingCount = cartRepository.count()
-        val totalPages = calculateTotalPages(remainingCount)
-        val nextPage = contentState.currentPage.coerceAtMost(maxOf(totalPages, 1))
-
-        updatePage(nextPage, remainingCount)
+        if (!updateLocalQuantity(productId, targetQuantity = item.quantity + 1)) return
+        scheduleCartSync(productId)
     }
 
-    private fun clearDeselection(productId: ProductId) {
+    fun decreaseQuantity(productId: Long) {
+        val contentState = _uiState.value.cartListState as? CartListUiState.Content ?: return
+        val item = contentState.items.firstOrNull { it.productId == productId } ?: return
+        val targetQuantity = (item.quantity - 1).coerceAtLeast(0)
+
+        if (!updateLocalQuantity(productId, targetQuantity = targetQuantity)) return
+        if (targetQuantity == 0) {
+            clearDeselection(productId)
+        }
+        scheduleCartSync(productId)
+    }
+
+    private fun updateLocalQuantity(
+        productId: Long,
+        targetQuantity: Int,
+    ): Boolean {
+        val contentState = _uiState.value.cartListState as? CartListUiState.Content ?: return false
+        var changed = false
+
+        val updatedItems =
+            contentState.items.mapNotNull { item ->
+                if (item.productId != productId) return@mapNotNull item
+                if (item.quantity == targetQuantity) return@mapNotNull item
+
+                changed = true
+                if (targetQuantity == 0) {
+                    null
+                } else {
+                    item.copy(quantity = targetQuantity)
+                }
+            }
+
+        if (!changed) return false
+
+        _uiState.update { current ->
+            val latestContent = current.cartListState as? CartListUiState.Content ?: return@update current
+            current.copy(
+                cartListState = latestContent.copy(items = updatedItems),
+            )
+        }
+        return true
+    }
+
+    private fun scheduleCartSync(productId: Long) {
+        syncJobs.remove(productId)?.cancel()
+
+        syncJobs[productId] =
+            viewModelScope.launch {
+                delay(CART_SYNC_DELAY_MILLIS)
+
+                val currentPage = (_uiState.value.cartListState as? CartListUiState.Content)?.currentPage ?: 1
+                val targetQuantity =
+                    (_uiState.value.cartListState as? CartListUiState.Content)
+                        ?.items
+                        ?.firstOrNull { it.productId == productId }
+                        ?.quantity ?: 0
+
+                runCatching {
+                    cartRepository.setQuantity(productId, targetQuantity)
+                    updatePage(currentPage)
+                }.onFailure { throwable ->
+                    updatePage(currentPage)
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            cartListState = CartListUiState.Error(throwable.message),
+                        )
+                    }
+                }
+
+                syncJobs.remove(productId)
+            }
+    }
+
+    private fun clearDeselection(productId: Long) {
         _uiState.update { currentState ->
             currentState.copy(
                 deselectedProductIds = currentState.deselectedProductIds - productId,

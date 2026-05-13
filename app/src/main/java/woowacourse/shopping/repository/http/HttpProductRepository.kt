@@ -12,9 +12,9 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.model.Products
 import woowacourse.shopping.repository.ProductRepository
+import woowacourse.shopping.repository.http.api.ProductApiService
 import java.io.IOException
 
 private const val NETWORK_PAGE_SIZE = 20
@@ -83,7 +83,7 @@ class HttpProductRepository(
             current < size - 1
         }
 
-    override suspend fun findAllByIds(ids: Set<ProductId>): Map<ProductId, Product> =
+    override suspend fun findAllByIds(ids: Set<Long>): Map<Long, Product> =
         withContext(Dispatchers.IO) {
             if (ids.isEmpty()) return@withContext emptyMap()
 
@@ -131,11 +131,11 @@ class HttpProductRepository(
         }
     }
 
-    private suspend fun fetchProductById(productId: ProductId): Product? {
+    private suspend fun fetchProductById(productId: Long): Product? {
         val responseBody =
             executeRequest(
                 errorMessage = "상품 상세 API 호출에 실패했습니다.",
-                request = { productApiService.getProduct(id = productId.value) },
+                request = { productApiService.getProduct(id = productId) },
             )
 
         val product =

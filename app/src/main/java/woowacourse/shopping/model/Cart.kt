@@ -9,7 +9,7 @@ data class Cart(
         }
     }
 
-    fun add(productId: ProductId): Cart {
+    fun add(productId: Long): Cart {
         val newItems = items.toMutableList()
         val index = newItems.indexOfFirst { it.productId == productId }
 
@@ -22,7 +22,7 @@ data class Cart(
         return Cart(newItems)
     }
 
-    fun delete(productId: ProductId): Cart {
+    fun delete(productId: Long): Cart {
         val newItems = items.toMutableList()
         val index = newItems.indexOfFirst { it.productId == productId }
 
@@ -32,6 +32,33 @@ data class Cart(
 
         if (updatedItem == null) {
             newItems.removeAt(index)
+        } else {
+            newItems[index] = updatedItem
+        }
+
+        return Cart(newItems)
+    }
+
+    fun setQuantity(
+        productId: Long,
+        quantity: Int,
+    ): Cart {
+        require(quantity >= 0) { "장바구니 수량은 0개 이상이어야 합니다." }
+
+        val newItems = items.toMutableList()
+        val index = newItems.indexOfFirst { it.productId == productId }
+
+        if (quantity == 0) {
+            if (index != -1) {
+                newItems.removeAt(index)
+            }
+            return Cart(newItems)
+        }
+
+        val updatedItem = CartItem(productId = productId, quantity = quantity)
+
+        if (index == -1) {
+            newItems.add(updatedItem)
         } else {
             newItems[index] = updatedItem
         }

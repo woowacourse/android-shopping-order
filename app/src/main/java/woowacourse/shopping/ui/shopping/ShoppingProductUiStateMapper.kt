@@ -1,12 +1,11 @@
 package woowacourse.shopping.ui.shopping
 
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.ProductId
 
 object ShoppingProductUiStateMapper {
     fun toUiStates(
         products: List<Product>,
-        quantityByProductId: Map<ProductId, Int>,
+        quantityByProductId: Map<Long, Int>,
     ): List<ShoppingProductUiState> =
         products.map { product ->
             ShoppingProductUiState(

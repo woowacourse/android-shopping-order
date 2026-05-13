@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.repository.http.HttpProductRepository
 import woowacourse.shopping.repository.http.ProductNetworkException
 import woowacourse.shopping.repository.http.ProductParsingException
@@ -55,7 +54,7 @@ class HttpProductRepositoryTest {
             assertEquals("0", request.requestUrl?.queryParameter("page"))
             assertEquals("20", request.requestUrl?.queryParameter("size"))
             assertEquals(2, actual.size)
-            assertEquals(ProductId.fromRemoteId(1L), actual.first().id)
+            assertEquals((1L), actual.first().id)
             assertEquals("상품1", actual.first().name)
         }
 
@@ -74,7 +73,7 @@ class HttpProductRepositoryTest {
 
             assertEquals(1, mockWebServer.requestCount)
             assertEquals(1, actual.size)
-            assertEquals(ProductId.fromRemoteId(2L), actual.first().id)
+            assertEquals((2L), actual.first().id)
             assertEquals("상품2", actual.first().name)
         }
 
@@ -88,12 +87,12 @@ class HttpProductRepositoryTest {
                     .setBody(productJson),
             )
 
-            val actual = repository.findAllByIds(setOf(ProductId.fromRemoteId(1L)))
+            val actual = repository.findAllByIds(setOf((1L)))
             val request = mockWebServer.takeRequest()
 
             assertTrue(request.path?.endsWith("/products/1") == true)
-            assertEquals(setOf(ProductId.fromRemoteId(1L)), actual.keys)
-            assertEquals("치킨", actual[ProductId.fromRemoteId(1L)]?.name)
+            assertEquals(setOf((1L)), actual.keys)
+            assertEquals("치킨", actual[(1L)]?.name)
         }
 
     @Test
@@ -142,7 +141,7 @@ class HttpProductRepositoryTest {
 
         val actual =
             assertThrows<ProductResponseException> {
-                runBlocking { repository.findAllByIds(setOf(ProductId.fromRemoteId(1L))) }
+                runBlocking { repository.findAllByIds(setOf((1L))) }
             }
 
         assertEquals(500, actual.code)
@@ -176,7 +175,7 @@ class HttpProductRepositoryTest {
 
         val actual =
             assertThrows<ProductParsingException> {
-                runBlocking { repository.findAllByIds(setOf(ProductId.fromRemoteId(1L))) }
+                runBlocking { repository.findAllByIds(setOf((1L))) }
             }
 
         assertTrue(actual.message?.contains("응답") == true)
@@ -250,7 +249,7 @@ class HttpProductRepositoryTest {
                     ),
             )
 
-            val targetId = ProductId.fromRemoteId(9007199254740991L)
+            val targetId = (9007199254740991L)
             val actual = repository.findAllByIds(setOf(targetId))
 
             assertEquals(setOf(targetId), actual.keys)
@@ -270,7 +269,7 @@ class HttpProductRepositoryTest {
             val actual = repository.getProducts(fromIndex = 0, limit = 1).toList()
 
             assertEquals(1, actual.size)
-            assertEquals(ProductId.fromRemoteId(9007199254740991L), actual.first().id)
+            assertEquals((9007199254740991L), actual.first().id)
         }
 
     @Test

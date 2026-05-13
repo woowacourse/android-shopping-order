@@ -130,6 +130,7 @@ private fun ProductUnitLongNamePreview() {
             ShoppingProductUiState(
                 product =
                     Product(
+                        id = 0L,
                         name = "정말정말 엄청나게 긴 이름을 가지고 있는 상품",
                         price = Money(1000),
                         imageUrl = "",

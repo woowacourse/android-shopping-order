@@ -1,14 +1,13 @@
 package woowacourse.shopping.repository
 
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.model.Products
 
 class FakeProductRepository(
     products: List<Product>,
 ) : ProductRepository {
     private val products = Products(products)
-    private val productMap: Map<ProductId, Product> = products.associateBy { it.id }
+    private val productMap: Map<Long, Product> = products.associateBy { it.id }
 
     override val size: Int
         get() = products.count()
@@ -26,7 +25,7 @@ class FakeProductRepository(
 
     override suspend fun hasNext(current: Int): Boolean = current < products.toList().lastIndex
 
-    override suspend fun findAllByIds(ids: Set<ProductId>): Map<ProductId, Product> =
+    override suspend fun findAllByIds(ids: Set<Long>): Map<Long, Product> =
         ids
             .mapNotNull { id ->
                 productMap[id]?.let { id to it }

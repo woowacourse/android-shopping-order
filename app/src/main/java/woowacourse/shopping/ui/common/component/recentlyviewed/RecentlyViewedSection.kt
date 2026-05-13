@@ -48,7 +48,7 @@ fun RecentlyViewedProducts(
     ) {
         items(
             items = products,
-            key = { it.id.value.toString() },
+            key = { it.id.toString() },
         ) { product ->
             RecentlyViewedItem(
                 product = product,

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class CartTest {
-    private val productId = ProductId(1L)
+    private val productId = (1L)
 
     @Test
     fun `수량이 1 이상인 항목으로 장바구니를 생성할 수 있다`() {

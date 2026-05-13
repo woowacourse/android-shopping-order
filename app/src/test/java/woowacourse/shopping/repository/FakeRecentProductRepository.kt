@@ -1,6 +1,5 @@
 package woowacourse.shopping.repository
 
-import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.model.RecentProduct
 
 class FakeRecentProductRepository : RecentProductRepository {
@@ -10,7 +9,7 @@ class FakeRecentProductRepository : RecentProductRepository {
 
     private val recentProducts = mutableListOf<RecentProduct>()
 
-    override suspend fun recordView(productId: ProductId) {
+    override suspend fun recordView(productId: Long) {
         recentProducts.removeAll { it.productId == productId }
         recentProducts.add(
             RecentProduct(
@@ -29,7 +28,7 @@ class FakeRecentProductRepository : RecentProductRepository {
             .take(safeLimit)
     }
 
-    override suspend fun getLatestViewedProductExcluding(productId: ProductId): RecentProduct? =
+    override suspend fun getLatestViewedProductExcluding(productId: Long): RecentProduct? =
         recentProducts
             .asReversed()
             .firstOrNull { it.productId != productId }

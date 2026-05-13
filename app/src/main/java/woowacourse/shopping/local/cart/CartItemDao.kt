@@ -32,10 +32,10 @@ interface CartItemDao {
     suspend fun getCartItemsByProductIds(productIds: Set<Long>): List<CartItemEntity>
 
     @Query("SELECT * FROM cart_items WHERE productId = :productId LIMIT 1")
-    suspend fun findByProductId(productId: Long): CartItemEntity?
+    suspend fun findBy(productId: Long): CartItemEntity?
 
     @Query("DELETE FROM cart_items WHERE productId = :productId")
-    suspend fun deleteByProductId(productId: Long)
+    suspend fun deleteBy(productId: Long)
 
     @Query("SELECT COUNT(*) FROM cart_items")
     suspend fun count(): Int

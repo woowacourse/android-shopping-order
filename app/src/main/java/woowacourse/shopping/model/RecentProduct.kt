@@ -1,7 +1,7 @@
 package woowacourse.shopping.model
 
 data class RecentProduct(
-    val productId: ProductId,
+    val productId: Long,
     val viewedAtMillis: Long,
 ) {
     init {

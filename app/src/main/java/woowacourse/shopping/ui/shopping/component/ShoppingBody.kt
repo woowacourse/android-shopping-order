@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.repository.inmemory.InMemoryProductRepository
 import woowacourse.shopping.ui.common.component.recentlyviewed.RecentlyViewedSection
 import woowacourse.shopping.ui.shopping.ProductListUiState
@@ -37,9 +36,9 @@ fun ShoppingBody(
     modifier: Modifier = Modifier,
     onProductClick: (Product) -> Unit,
     onMoreClick: () -> Unit,
-    onAddToCart: (ProductId) -> Unit,
-    onIncreaseQuantity: (ProductId) -> Unit,
-    onDecreaseQuantity: (ProductId) -> Unit,
+    onAddToCart: (Long) -> Unit,
+    onIncreaseQuantity: (Long) -> Unit,
+    onDecreaseQuantity: (Long) -> Unit,
 ) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 154.dp),
@@ -76,7 +75,7 @@ fun ShoppingBody(
                 items(
                     items = productListState.products,
                     key = {
-                        it.product.id.value
+                        it.product.id
                             .toString()
                     },
                 ) { product ->

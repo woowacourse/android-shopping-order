@@ -1,19 +1,17 @@
 package woowacourse.shopping.repository
 
 import woowacourse.shopping.model.CartItem
-import woowacourse.shopping.model.ProductId
+import woowacourse.shopping.repository.cart.CartPageResult
 
 interface CartRepository {
-    suspend fun add(item: ProductId)
+    suspend fun setQuantity(
+        productId: Long,
+        quantity: Int,
+    )
 
-    suspend fun delete(item: ProductId)
+    suspend fun getCartPage(page: Int, size: Int): CartPageResult
 
-    suspend fun getCartItems(
-        fromIndex: Int,
-        limit: Int,
-    ): List<CartItem>
-
-    suspend fun getCartItemsByProductIds(productIds: Set<ProductId>): List<CartItem>
+    suspend fun getCartItemsByProductIds(productIds: Set<Long>): List<CartItem>
 
     suspend fun count(): Int
 }

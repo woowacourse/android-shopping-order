@@ -3,61 +3,75 @@ package woowacourse.shopping.repository.room
 import woowacourse.shopping.local.cart.CartItemDao
 import woowacourse.shopping.local.cart.CartItemEntity
 import woowacourse.shopping.model.CartItem
-import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.repository.CartRepository
+import woowacourse.shopping.repository.cart.CartPageItem
+import woowacourse.shopping.repository.cart.CartPageResult
 
 class RoomCartRepository(
     private val cartItemDao: CartItemDao,
 ) : CartRepository {
-    override suspend fun add(item: ProductId) {
-        val productId = item.value
-        val existingItem = cartItemDao.findByProductId(productId)
+    override suspend fun setQuantity(
+        productId: Long,
+        quantity: Int,
+    ) {
+        require(quantity >= 0) { "수량은 0 이상이어야 합니다." }
+
+        val existingItem = cartItemDao.findBy(productId)
+
+        if (quantity == 0) {
+            cartItemDao.deleteBy(productId)
+            return
+        }
 
         if (existingItem == null) {
             cartItemDao.upsert(
                 CartItemEntity(
                     productId = productId,
-                    quantity = 1,
+                    quantity = quantity,
                     createdAtMillis = System.currentTimeMillis(),
                 ),
             )
             return
         }
 
-        cartItemDao.upsert(existingItem.copy(quantity = existingItem.quantity + 1))
+        cartItemDao.upsert(existingItem.copy(quantity = quantity))
     }
 
-    override suspend fun delete(item: ProductId) {
-        val productId = item.value
-        val existingItem =
-            cartItemDao.findByProductId(productId)
-                ?: throw CartItemNotFoundException(item)
+    override suspend fun getCartPage(page: Int, size: Int): CartPageResult {
+        val safePage = page.coerceAtLeast(0)
+        val safeSize = size.coerceAtLeast(0)
+        val totalElements = cartItemDao.count()
+        val fromIndex = safePage * safeSize
+        val items =
+            cartItemDao
+                .getCartItems(fromIndex, safeSize)
+                .map { item ->
+                    CartPageItem(
+                        cartItemId = item.productId,
+                        productId = (item.productId),
+                        quantity = item.quantity,
+                    )
+                }
+        val totalPages =
+            if (safeSize == 0 || totalElements == 0) {
+                0
+            } else {
+                (totalElements - 1) / safeSize + 1
+            }
 
-        if (existingItem.quantity == 1) {
-            cartItemDao.deleteByProductId(productId)
-            return
-        }
-
-        cartItemDao.upsert(existingItem.copy(quantity = existingItem.quantity - 1))
+        return CartPageResult(
+            items = items,
+            totalElements = totalElements,
+            totalPages = totalPages,
+            page = safePage,
+        )
     }
 
-    override suspend fun getCartItems(
-        fromIndex: Int,
-        limit: Int,
-    ): List<CartItem> {
-        val safeFrom = fromIndex.coerceAtLeast(0)
-        val safeLimit = limit.coerceAtLeast(0)
-
-        return cartItemDao
-            .getCartItems(safeFrom, safeLimit)
-            .map(CartItemEntity::toDomain)
-    }
-
-    override suspend fun getCartItemsByProductIds(productIds: Set<ProductId>): List<CartItem> {
+    override suspend fun getCartItemsByProductIds(productIds: Set<Long>): List<CartItem> {
         if (productIds.isEmpty()) return emptyList()
 
         return cartItemDao
-            .getCartItemsByProductIds(productIds.map { it.value }.toSet())
+            .getCartItemsByProductIds(productIds.toSet())
             .map(CartItemEntity::toDomain)
     }
 

@@ -2,31 +2,51 @@ package woowacourse.shopping.repository
 
 import woowacourse.shopping.model.Cart
 import woowacourse.shopping.model.CartItem
-import woowacourse.shopping.model.ProductId
 
 class FakeCartRepository : CartRepository {
     private var cart = Cart(emptyList())
 
-    override suspend fun add(item: ProductId) {
-        cart = cart.add(item)
+    override suspend fun setQuantity(
+        productId: Long,
+        quantity: Int,
+    ) {
+        cart = cart.setQuantity(productId, quantity)
     }
 
-    override suspend fun delete(item: ProductId) {
-        cart = cart.delete(item)
+    override suspend fun getCartPage(
+        page: Int,
+        size: Int,
+    ): woowacourse.shopping.repository.cart.CartPageResult {
+        val safePage = page.coerceAtLeast(0)
+        val safeSize = size.coerceAtLeast(0)
+        val totalElements = cart.items.size
+        val fromIndex = safePage * safeSize
+        val safeFrom = fromIndex.coerceIn(0, totalElements)
+        val safeTo = minOf(safeFrom + safeSize, totalElements)
+        val items =
+            cart.items.subList(safeFrom, safeTo).map {
+                woowacourse.shopping.repository.cart.CartPageItem(
+                    cartItemId = it.productId,
+                    productId = it.productId,
+                    quantity = it.quantity,
+                )
+            }
+        val totalPages =
+            if (safeSize == 0 || totalElements == 0) {
+                0
+            } else {
+                (totalElements - 1) / safeSize + 1
+            }
+
+        return woowacourse.shopping.repository.cart.CartPageResult(
+            items = items,
+            totalElements = totalElements,
+            totalPages = totalPages,
+            page = safePage,
+        )
     }
 
-    override suspend fun getCartItems(
-        fromIndex: Int,
-        limit: Int,
-    ): List<CartItem> {
-        val safeFrom = fromIndex.coerceIn(0, cart.items.size)
-        val safeLimit = limit.coerceAtLeast(0)
-        val safeTo = minOf(safeFrom + safeLimit, cart.items.size)
-
-        return cart.items.subList(safeFrom, safeTo)
-    }
-
-    override suspend fun getCartItemsByProductIds(productIds: Set<ProductId>): List<CartItem> =
+    override suspend fun getCartItemsByProductIds(productIds: Set<Long>): List<CartItem> =
         cart.items.filter { it.productId in productIds }
 
     override suspend fun count(): Int = cart.count()

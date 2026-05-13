@@ -10,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.repository.inmemory.InMemoryProductRepository
 import woowacourse.shopping.ui.cart.CartItemUiModel
 
@@ -21,10 +20,10 @@ fun CartItemBody(
     currentPage: Int,
     totalPages: Int,
     modifier: Modifier = Modifier,
-    onItemCheckedChange: (ProductId, Boolean) -> Unit,
-    onDeleteClick: (ProductId) -> Unit,
-    onIncreaseQuantity: (ProductId) -> Unit,
-    onDecreaseQuantity: (ProductId) -> Unit,
+    onItemCheckedChange: (Long, Boolean) -> Unit,
+    onDeleteClick: (Long) -> Unit,
+    onIncreaseQuantity: (Long) -> Unit,
+    onDecreaseQuantity: (Long) -> Unit,
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
 ) {
@@ -33,7 +32,7 @@ fun CartItemBody(
         verticalArrangement = Arrangement.spacedBy(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        items(items = items, key = { it.productId.value.toString() }) { item ->
+        items(items = items, key = { it.productId.toString() }) { item ->
             CartItemUnit(
                 item = item,
                 onCheckedChange = { isChecked -> onItemCheckedChange(item.productId, isChecked) },
@@ -65,6 +64,7 @@ private fun CartItemBodyPreview() {
         items =
             listOf(
                 CartItemUiModel(
+                    cartItemId = InMemoryProductRepository.APPLE.id,
                     productId = InMemoryProductRepository.APPLE.id,
                     name = InMemoryProductRepository.APPLE.name,
                     imageUrl = InMemoryProductRepository.APPLE.imageUrl,
@@ -72,6 +72,7 @@ private fun CartItemBodyPreview() {
                     quantity = 2,
                 ),
                 CartItemUiModel(
+                    cartItemId = InMemoryProductRepository.BBOYAMI.id,
                     productId = InMemoryProductRepository.BBOYAMI.id,
                     name = InMemoryProductRepository.BBOYAMI.name,
                     imageUrl = InMemoryProductRepository.BBOYAMI.imageUrl,

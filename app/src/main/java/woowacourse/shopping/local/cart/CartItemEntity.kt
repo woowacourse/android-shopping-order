@@ -3,7 +3,6 @@ package woowacourse.shopping.local.cart
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import woowacourse.shopping.model.CartItem
-import woowacourse.shopping.model.ProductId
 
 @Entity(tableName = "cart_items")
 data class CartItemEntity(
@@ -13,7 +12,7 @@ data class CartItemEntity(
 ) {
     fun toDomain(): CartItem =
         CartItem(
-            productId = ProductId(productId),
+            productId = (productId),
             quantity = quantity,
         )
 
@@ -23,7 +22,7 @@ data class CartItemEntity(
             createdAtMillis: Long,
         ): CartItemEntity =
             CartItemEntity(
-                productId = cartItem.productId.value,
+                productId = cartItem.productId,
                 quantity = cartItem.quantity,
                 createdAtMillis = createdAtMillis,
             )

@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.repository.inmemory.InMemoryProductRepository
 import woowacourse.shopping.ui.cart.component.CartBottomBar
 import woowacourse.shopping.ui.cart.component.CartHeader
@@ -25,11 +24,11 @@ fun CartScreen(
     isNetworkConnected: Boolean,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
-    onOrderClick: (Set<ProductId>) -> Unit,
-    onItemCheckedChange: (ProductId, Boolean) -> Unit,
-    onDeleteClick: (ProductId) -> Unit,
-    onIncreaseQuantity: (ProductId) -> Unit,
-    onDecreaseQuantity: (ProductId) -> Unit,
+    onOrderClick: (Set<Long>) -> Unit,
+    onItemCheckedChange: (Long, Boolean) -> Unit,
+    onDeleteClick: (Long) -> Unit,
+    onIncreaseQuantity: (Long) -> Unit,
+    onDecreaseQuantity: (Long) -> Unit,
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
 ) {
@@ -115,6 +114,7 @@ private fun CartScreenPreview() {
     val items =
         listOf(
             CartItemUiModel(
+                cartItemId = InMemoryProductRepository.APPLE.id,
                 productId = InMemoryProductRepository.APPLE.id,
                 name = InMemoryProductRepository.APPLE.name,
                 imageUrl = InMemoryProductRepository.APPLE.imageUrl,
@@ -122,6 +122,7 @@ private fun CartScreenPreview() {
                 quantity = 2,
             ),
             CartItemUiModel(
+                cartItemId = InMemoryProductRepository.BBOYAMI.id,
                 productId = InMemoryProductRepository.BBOYAMI.id,
                 name = InMemoryProductRepository.BBOYAMI.name,
                 imageUrl = InMemoryProductRepository.BBOYAMI.imageUrl,

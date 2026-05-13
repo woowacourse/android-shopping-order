@@ -32,6 +32,7 @@ class CartItemUiModelMapperTest {
         assertEquals(
             listOf(
                 CartItemUiModel(
+                    cartItemId = product1.id,
                     productId = product1.id,
                     name = product1.name,
                     imageUrl = product1.imageUrl,
@@ -39,6 +40,7 @@ class CartItemUiModelMapperTest {
                     quantity = 2,
                 ),
                 CartItemUiModel(
+                    cartItemId = product2.id,
                     productId = product2.id,
                     name = product2.name,
                     imageUrl = product2.imageUrl,
@@ -67,6 +69,7 @@ class CartItemUiModelMapperTest {
         assertEquals(
             listOf(
                 CartItemUiModel(
+                    cartItemId = product1.id,
                     productId = product1.id,
                     name = product1.name,
                     imageUrl = product1.imageUrl,

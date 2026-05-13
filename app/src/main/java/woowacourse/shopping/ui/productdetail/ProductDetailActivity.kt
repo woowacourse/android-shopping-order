@@ -14,7 +14,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.ui.theme.ShoppingTheme
 class ProductDetailActivity : ComponentActivity() {
     private val viewModel: ProductDetailViewModel by viewModels()
@@ -24,12 +23,12 @@ class ProductDetailActivity : ComponentActivity() {
 
         fun startActivity(
             context: Context,
-            productId: ProductId,
+            productId: Long,
         ) {
             val intent =
                 Intent(context, ProductDetailActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    putExtra(PUT_EXTRA_KEY_PRODUCT_ID, productId.value)
+                    putExtra(PUT_EXTRA_KEY_PRODUCT_ID, productId)
                 }
             context.startActivity(intent)
         }
@@ -37,7 +36,7 @@ class ProductDetailActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val receivedProductId = parseProductId(intent)
+        val receivedProductId = parse(intent)
         if (receivedProductId == null) {
             finish()
             return
@@ -75,9 +74,9 @@ class ProductDetailActivity : ComponentActivity() {
         }
     }
 
-    private fun parseProductId(intent: Intent): ProductId? =
+    private fun parse(intent: Intent): Long? =
         if (intent.hasExtra(PUT_EXTRA_KEY_PRODUCT_ID)) {
-            ProductId(intent.getLongExtra(PUT_EXTRA_KEY_PRODUCT_ID, 0L))
+            (intent.getLongExtra(PUT_EXTRA_KEY_PRODUCT_ID, 0L))
         } else {
             null
         }

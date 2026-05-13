@@ -168,6 +168,7 @@ private fun CartItemUnitPreview() {
     CartItemUnit(
         item =
             CartItemUiModel(
+                cartItemId = InMemoryProductRepository.APPLE.id,
                 productId = InMemoryProductRepository.APPLE.id,
                 name = InMemoryProductRepository.APPLE.name,
                 imageUrl = InMemoryProductRepository.APPLE.imageUrl,
@@ -187,6 +188,7 @@ private fun NameAndCloseIconPreview() {
     NameAndCloseIcon(
         item =
             CartItemUiModel(
+                cartItemId = InMemoryProductRepository.APPLE.id,
                 productId = InMemoryProductRepository.APPLE.id,
                 name = InMemoryProductRepository.APPLE.name,
                 imageUrl = InMemoryProductRepository.APPLE.imageUrl,
@@ -204,6 +206,7 @@ private fun ImageAndPricePreview() {
     ImageAndPrice(
         item =
             CartItemUiModel(
+                cartItemId = InMemoryProductRepository.APPLE.id,
                 productId = InMemoryProductRepository.APPLE.id,
                 name = InMemoryProductRepository.APPLE.name,
                 imageUrl = InMemoryProductRepository.APPLE.imageUrl,

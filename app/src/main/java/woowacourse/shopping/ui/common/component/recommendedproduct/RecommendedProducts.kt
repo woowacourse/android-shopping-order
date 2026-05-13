@@ -21,7 +21,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.repository.inmemory.InMemoryProductRepository
 import woowacourse.shopping.ui.shopping.ShoppingProductUiState
 import woowacourse.shopping.ui.shopping.component.ProductUnit
@@ -32,9 +31,9 @@ fun RecommendedProducts(
     recommendedProducts: List<ShoppingProductUiState>,
     isLoading: Boolean,
     onProductClick: (Product) -> Unit,
-    onAddToCart: (ProductId) -> Unit,
-    onIncreaseQuantity: (ProductId) -> Unit,
-    onDecreaseQuantity: (ProductId) -> Unit,
+    onAddToCart: (Long) -> Unit,
+    onIncreaseQuantity: (Long) -> Unit,
+    onDecreaseQuantity: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -69,7 +68,7 @@ fun RecommendedProducts(
             ) {
                 items(
                     items = recommendedProducts,
-                    key = { it.product.id.value.toString() },
+                    key = { it.product.id.toString() },
                 ) { product ->
                     ProductUnit(
                         product = product,

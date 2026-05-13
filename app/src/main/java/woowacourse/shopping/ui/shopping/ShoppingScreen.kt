@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.repository.inmemory.InMemoryProductRepository
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
 import woowacourse.shopping.ui.shopping.component.ShoppingBody
@@ -24,9 +23,9 @@ fun ShoppingScreen(
     onCartClick: () -> Unit,
     onProductClick: (Product) -> Unit,
     onMoreClick: () -> Unit,
-    onAddToCart: (ProductId) -> Unit,
-    onIncreaseQuantity: (ProductId) -> Unit,
-    onDecreaseQuantity: (ProductId) -> Unit,
+    onAddToCart: (Long) -> Unit,
+    onIncreaseQuantity: (Long) -> Unit,
+    onDecreaseQuantity: (Long) -> Unit,
 ) {
     Column(
         modifier = modifier,

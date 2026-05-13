@@ -2,7 +2,6 @@ package woowacourse.shopping.repository.room
 
 import woowacourse.shopping.local.recent.RecentProductDao
 import woowacourse.shopping.local.recent.RecentProductEntity
-import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.model.RecentProduct
 import woowacourse.shopping.repository.RecentProductRepository
 
@@ -13,7 +12,7 @@ class RoomRecentProductRepository(
         private const val MAX_RECENT_PRODUCTS = 10
     }
 
-    override suspend fun recordView(productId: ProductId) {
+    override suspend fun recordView(productId: Long) {
         recentProductDao.upsert(
             RecentProductEntity.fromDomain(
                 RecentProduct(
@@ -30,8 +29,8 @@ class RoomRecentProductRepository(
             .getRecentProducts(limit.coerceAtLeast(0))
             .map(RecentProductEntity::toDomain)
 
-    override suspend fun getLatestViewedProductExcluding(productId: ProductId): RecentProduct? =
+    override suspend fun getLatestViewedProductExcluding(productId: Long): RecentProduct? =
         recentProductDao
-            .getLatestViewedProductExcluding(productId.value)
+            .getLatestViewedProductExcluding(productId)
             ?.toDomain()
 }

@@ -2,7 +2,6 @@ package woowacourse.shopping.local.recent
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.model.RecentProduct
 
 @Entity(tableName = "recent_products")
@@ -12,14 +11,14 @@ data class RecentProductEntity(
 ) {
     fun toDomain(): RecentProduct =
         RecentProduct(
-            productId = ProductId(productId),
+            productId = (productId),
             viewedAtMillis = viewedAtMillis,
         )
 
     companion object {
         fun fromDomain(recentProduct: RecentProduct): RecentProductEntity =
             RecentProductEntity(
-                productId = recentProduct.productId.value,
+                productId = recentProduct.productId,
                 viewedAtMillis = recentProduct.viewedAtMillis,
             )
     }
