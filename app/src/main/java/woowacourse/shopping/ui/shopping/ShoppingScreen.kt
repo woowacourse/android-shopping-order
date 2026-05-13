@@ -94,6 +94,7 @@ fun ShoppingScreen(
                 cartQuantities = uiState.cartQuantities,
                 modifier = Modifier.padding(innerPadding),
                 onLoad = onLoad,
+                isLoading = uiState.isLoading,
                 onProductClick = onProductClick,
                 onQuantityChange = onQuantityChange,
                 isCanLoadMore = uiState.canLoadMore,
@@ -115,6 +116,7 @@ private fun ShoppingContents(
     recentItems: ImmutableList<ProductUiModel>,
     cartQuantities: Map<String, Int>,
     onLoad: () -> Unit,
+    isLoading: Boolean,
     isCanLoadMore: Boolean,
     onProductClick: (String) -> Unit,
     onQuantityChange: (String, Int) -> Unit,
@@ -138,30 +140,36 @@ private fun ShoppingContents(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.padding(top = 20.dp, start = 20.dp, end = 20.dp),
         ) {
-            items(
-                items = products,
-                key = { product -> product.id },
-            ) { product ->
-                ProductCard(
-                    imageUrl = product.imageUrl,
-                    productName = product.name,
-                    price = product.price,
-                    quantity = cartQuantities[product.id] ?: 0,
-                    onClick = {
-                        onProductClick(product.id)
-                    },
-                    onQuantityChange = { quantity ->
-                        onQuantityChange(product.id, quantity)
-                    },
-                )
-            }
-            if (isCanLoadMore) {
-                item(
-                    span = { GridItemSpan(2) },
-                ) {
-                    LoadButton(
-                        onClick = onLoad,
+            if (isLoading) {
+                items(count = 6) {
+                    ProductCardSkeleton()
+                }
+            } else {
+                items(
+                    items = products,
+                    key = { product -> product.id },
+                ) { product ->
+                    ProductCard(
+                        imageUrl = product.imageUrl,
+                        productName = product.name,
+                        price = product.price,
+                        quantity = cartQuantities[product.id] ?: 0,
+                        onClick = {
+                            onProductClick(product.id)
+                        },
+                        onQuantityChange = { quantity ->
+                            onQuantityChange(product.id, quantity)
+                        },
                     )
+                }
+                if (isCanLoadMore) {
+                    item(
+                        span = { GridItemSpan(2) },
+                    ) {
+                        LoadButton(
+                            onClick = onLoad,
+                        )
+                    }
                 }
             }
         }
