@@ -1,5 +1,8 @@
 package woowacourse.shopping.data.remote.dto
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ProductsResponseDto(
     val totalElements: Long,
     val totalPages: Int,

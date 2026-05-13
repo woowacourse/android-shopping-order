@@ -1,5 +1,8 @@
 package woowacourse.shopping.data.remote.dto
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Content(
     val id: Long,
     val name: String,
