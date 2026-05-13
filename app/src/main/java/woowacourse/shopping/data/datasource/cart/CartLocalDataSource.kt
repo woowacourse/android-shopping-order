@@ -3,8 +3,8 @@ package woowacourse.shopping.data.datasource.cart
 import kotlinx.coroutines.flow.Flow
 import woowacourse.shopping.data.local.cart.CartItemEntity
 
-interface CartDataSource {
-    val cartItems: Flow<List<CartItemEntity>>
+interface CartLocalDataSource {
+    fun getCartItems(): Flow<List<CartItemEntity>>
 
     suspend fun getCartItem(productId: Int): CartItemEntity?
 

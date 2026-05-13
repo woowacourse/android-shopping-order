@@ -1,13 +1,12 @@
 package woowacourse.shopping.data.datasource.cart
 
-import kotlinx.coroutines.flow.Flow
 import woowacourse.shopping.data.local.cart.CartItemDao
 import woowacourse.shopping.data.local.cart.CartItemEntity
 
-class RoomCartDataSource(
+class CartLocalDataSourceImpl(
     private val cartItemDao: CartItemDao,
-) : CartDataSource {
-    override val cartItems: Flow<List<CartItemEntity>> = cartItemDao.getCartItems()
+) : CartLocalDataSource {
+    override fun getCartItems() = cartItemDao.getCartItems()
 
     override suspend fun getCartItem(productId: Int) = cartItemDao.getCartItem(productId)
 
