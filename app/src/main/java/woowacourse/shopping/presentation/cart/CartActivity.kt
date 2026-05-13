@@ -54,6 +54,9 @@ class CartActivity : ComponentActivity() {
                     onDeleteItem = { viewModel.deleteItem(it) },
                     onIncrease = { viewModel.increase(it) },
                     onDecrease = { viewModel.decrease(it) },
+                    onSelected = { viewModel.selectItem(it) },
+                    onOrderClick = {},
+                    onSelectAll = {},
                 )
             }
         }

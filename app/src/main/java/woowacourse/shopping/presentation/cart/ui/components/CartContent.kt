@@ -15,6 +15,7 @@ import woowacourse.shopping.presentation.common.model.ProductUiModel
 @Composable
 fun CartContent(
     isLoading: Boolean,
+    onSelected: (Long) -> Unit,
     onDeleteItem: (Long) -> Unit,
     onIncrease: (Long) -> Unit,
     onDecrease: (Long) -> Unit,
@@ -47,6 +48,8 @@ fun CartContent(
                     onDecrease = {
                         onDecrease(product.id)
                     },
+                    isSelected = item.isSelected,
+                    onSelectProduct = { onSelected(item.product.id) },
                 )
             }
         }
@@ -58,6 +61,7 @@ fun CartContent(
 private fun CartContentPreview() {
     CartContent(
         isLoading = false,
+        onSelected = {},
         onDeleteItem = {},
         onIncrease = {},
         onDecrease = {},

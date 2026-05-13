@@ -79,12 +79,26 @@ class CartViewModel(
         viewModelScope.launch { refreshCart() }
     }
 
+    fun selectItem(productId: Long) {
+        _uiState.update {
+            it.copy(
+                currentCartItems =
+                    it.currentCartItems.map { item ->
+                        if (item.product.id == productId) {
+                            item.copy(isSelected = item.isSelected.not())
+                        } else {
+                            item
+                        }
+                    },
+            )
+        }
+    }
+
     private suspend fun loadCartItems(providedCart: Cart? = null) {
         if (uiState.value.isLoading) return
         _uiState.update {
             it.copy(isLoading = true)
         }
-
         try {
             val cart = providedCart ?: cartRepository.getCart()
             val items = cart.items.map { it.toUiModel() }

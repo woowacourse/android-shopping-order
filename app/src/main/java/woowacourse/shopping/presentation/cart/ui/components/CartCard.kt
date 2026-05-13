@@ -39,6 +39,8 @@ fun CartCard(
     quantity: Int,
     onIncrease: () -> Unit,
     onDecrease: () -> Unit,
+    isSelected: Boolean,
+    onSelectProduct: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -56,13 +58,21 @@ fun CartCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(
-                text = productName,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                lineHeight = 24.sp,
-                color = Color.Black,
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                CartCheckBox(
+                    isSelected,
+                    onSelectProduct,
+                )
+                Text(
+                    text = productName,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 24.sp,
+                    color = Color.Black,
+                )
+            }
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = "삭제",
@@ -114,9 +124,11 @@ fun CartCard(
 
 @Preview(showBackground = true)
 @Composable
-private fun CartCartPreview() {
+private fun CheckCartCardPreview() {
     AndroidshoppingTheme {
         CartCard(
+            onSelectProduct = {},
+            isSelected = true,
             onDeleteItem = {},
             productName = "Test",
             imageUrl = "",

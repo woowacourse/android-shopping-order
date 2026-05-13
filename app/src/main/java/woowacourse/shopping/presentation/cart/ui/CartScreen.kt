@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.cart.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -25,9 +25,11 @@ import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.toImmutableList
 import woowacourse.shopping.R
 import woowacourse.shopping.presentation.cart.model.CartUiState
+import woowacourse.shopping.presentation.cart.ui.components.CartBottomBar
 import woowacourse.shopping.presentation.cart.ui.components.CartContent
 import woowacourse.shopping.presentation.cart.ui.components.CartPageSection
 import woowacourse.shopping.presentation.common.components.ShoppingAppBar
+import woowacourse.shopping.util.formattedPrice
 
 @Composable
 fun CartScreen(
@@ -35,9 +37,12 @@ fun CartScreen(
     onBack: () -> Unit,
     onNextPage: () -> Unit,
     onPreviousPage: () -> Unit,
+    onSelected: (Long) -> Unit,
     onDeleteItem: (Long) -> Unit,
     onIncrease: (Long) -> Unit,
     onDecrease: (Long) -> Unit,
+    onOrderClick: () -> Unit,
+    onSelectAll: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -66,12 +71,21 @@ fun CartScreen(
             )
         },
         bottomBar = {
-            if (uiState.isShowPageSection) {
-                CartPageSection(
-                    page = uiState.page + 1,
-                    onNext = { onNextPage() },
-                    onPrevious = { onPreviousPage() },
-                    isCanMoveNext = uiState.isCanMoveNext,
+            Column {
+                if (uiState.isShowPageSection) {
+                    CartPageSection(
+                        page = uiState.page + 1,
+                        onNext = { onNextPage() },
+                        onPrevious = { onPreviousPage() },
+                        isCanMoveNext = uiState.isCanMoveNext,
+                    )
+                }
+                CartBottomBar(
+                    purchaseItemCount = 5,
+                    totalPrice = formattedPrice(5000),
+                    isSelectAll = true,
+                    onOrderClick = { onOrderClick() },
+                    onClickCheckBox = { onSelectAll() },
                 )
             }
         },
@@ -83,9 +97,9 @@ fun CartScreen(
                     .fillMaxSize()
                     .padding(innerPadding),
         ) {
-            if (uiState.isLoading) CircularProgressIndicator()
             CartContent(
                 isLoading = uiState.isLoading,
+                onSelected = { onSelected(it) },
                 onDeleteItem = { onDeleteItem(it) },
                 cartItems = uiState.currentCartItems.toImmutableList(),
                 onIncrease = { onIncrease(it) },
@@ -100,12 +114,20 @@ fun CartScreen(
 @Composable
 private fun CartScreenPreview() {
     CartScreen(
-        uiState = CartUiState(),
+        uiState =
+            CartUiState(
+                totalPrice = 5_000,
+                totalQuantity = 5,
+                isSelectAll = true,
+            ),
         onBack = {},
         onDecrease = {},
         onIncrease = {},
         onDeleteItem = {},
         onNextPage = {},
         onPreviousPage = {},
+        onSelected = {},
+        onOrderClick = {},
+        onSelectAll = {},
     )
 }
