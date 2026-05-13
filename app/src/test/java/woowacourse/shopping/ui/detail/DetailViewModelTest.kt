@@ -155,7 +155,6 @@ private class TestCartItemDao : CartItemDao {
     }
 
     override suspend fun getTotalCount(): Int = items.value.size
-
 }
 
 private class TestRecentItemDao : RecentItemDao {

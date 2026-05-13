@@ -141,7 +141,6 @@ private class TestCartItemDao : CartItemDao {
     }
 
     override suspend fun getTotalCount(): Int = items.value.size
-
 }
 
 private class FakeProductRepository(
@@ -152,8 +151,7 @@ private class FakeProductRepository(
         limit: Int,
     ): ImmutableList<Product> = products.drop(offset).take(limit).toImmutableList()
 
-    override suspend fun getProductById(id: String): Product =
-        products.firstOrNull { it.id == id } ?: throw IllegalArgumentException()
+    override suspend fun getProductById(id: String): Product = products.firstOrNull { it.id == id } ?: throw IllegalArgumentException()
 }
 
 private fun createProducts(size: Int): List<Product> = (1..size).map { createProduct(id = it.toString()) }

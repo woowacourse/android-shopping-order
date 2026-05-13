@@ -131,7 +131,6 @@ class RecentItemRepositoryTest {
             limit: Int,
         ): ImmutableList<Product> = products.drop(offset).take(limit).toImmutableList()
 
-        override suspend fun getProductById(id: String): Product =
-            products.firstOrNull { it.id == id } ?: throw IllegalArgumentException()
+        override suspend fun getProductById(id: String): Product = products.firstOrNull { it.id == id } ?: throw IllegalArgumentException()
     }
 }
