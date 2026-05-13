@@ -6,6 +6,7 @@ import woowacourse.shopping.data.source.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.source.remote.dto.toDomain
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
+import kotlin.collections.map
 
 class RemoteProductRepository(
     private val remoteDataSource: ProductRemoteDataSource = ProductRemoteDataSource(),
@@ -20,6 +21,4 @@ class RemoteProductRepository(
             .toImmutableList()
 
     override suspend fun getProductById(id: Long): Product = remoteDataSource.fetchProductById(id).toDomain()
-
-    override suspend fun getProductsByIds(ids: List<Long>): List<Product> = remoteDataSource.fetchProductsByIds(ids).map { it.toDomain() }
 }

@@ -10,6 +10,4 @@ interface ProductRepository {
     ): ImmutableList<Product>
 
     suspend fun getProductById(id: Long): Product
-
-    suspend fun getProductsByIds(ids: List<Long>): List<Product>
 }

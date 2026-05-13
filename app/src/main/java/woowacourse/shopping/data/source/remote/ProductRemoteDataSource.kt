@@ -1,94 +1,43 @@
 package woowacourse.shopping.data.source.remote
 
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
+import okhttp3.MediaType.Companion.toMediaType
+import retrofit2.Retrofit
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import woowacourse.shopping.data.source.remote.api.ProductService
+import woowacourse.shopping.data.source.remote.dto.Content
 import woowacourse.shopping.data.source.remote.dto.ProductResponse
-import woowacourse.shopping.data.source.remote.mock.MockServer
-import java.io.IOException
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
+import kotlin.jvm.java
 
 class ProductRemoteDataSource(
-    private val client: OkHttpClient = HttpClient.instance,
-    private val baseUrlProvider: suspend () -> String = { MockServer.baseUrl() },
+    private val baseUrl: String = "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com",
     private val json: Json = Json { ignoreUnknownKeys = true },
 ) {
+    private val productService =
+        Retrofit
+            .Builder()
+            .baseUrl(baseUrl)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+            .create(ProductService::class.java)
+
     suspend fun fetchProducts(
         offset: Int,
         limit: Int,
-    ): List<ProductResponse> {
-        val url =
-            baseUrlProvider()
-                .toHttpUrl()
-                .newBuilder()
-                .addPathSegment("products")
-                .addQueryParameter("offset", offset.toString())
-                .addQueryParameter("limit", limit.toString())
-                .build()
-        val body = execute(Request.Builder().url(url).build())
-        return json.decodeFromString(ListSerializer(ProductResponse.serializer()), body)
-    }
+    ): List<Content> =
+        withContext(Dispatchers.IO) {
+            val response =
+                productService.requestProducts(
+                    page = offset / limit,
+                    size = limit,
+                )
+            response.content
+        }
 
-    suspend fun fetchProductById(id: Long): ProductResponse {
-        val url =
-            baseUrlProvider()
-                .toHttpUrl()
-                .newBuilder()
-                .addPathSegment("products")
-                .addPathSegment(id.toString())
-                .build()
-
-        val body = execute(Request.Builder().url(url).build())
-        return json.decodeFromString(ProductResponse.serializer(), body)
-    }
-
-    suspend fun fetchProductsByIds(ids: List<Long>): List<ProductResponse> {
-        if (ids.isEmpty()) return emptyList()
-        val url =
-            baseUrlProvider()
-                .toHttpUrl()
-                .newBuilder()
-                .addPathSegment("products")
-                .addQueryParameter("ids", ids.joinToString(","))
-                .build()
-        val body = execute(Request.Builder().url(url).build())
-        return json.decodeFromString(ListSerializer(ProductResponse.serializer()), body)
-    }
-
-    private suspend fun execute(request: Request): String =
-        suspendCancellableCoroutine { cont ->
-            val call = client.newCall(request)
-            cont.invokeOnCancellation { runCatching { call.cancel() } }
-            call.enqueue(
-                object : Callback {
-                    override fun onFailure(
-                        call: Call,
-                        e: IOException,
-                    ) {
-                        cont.resumeWithException(e)
-                    }
-
-                    override fun onResponse(
-                        call: Call,
-                        response: Response,
-                    ) {
-                        response.use {
-                            if (!it.isSuccessful) {
-                                cont.resumeWithException(IOException("HTTP ${it.code}"))
-                                return
-                            }
-                            val body = it.body?.string().orEmpty()
-                            cont.resume(body)
-                        }
-                    }
-                },
-            )
+    suspend fun fetchProductById(id: Long): ProductResponse =
+        withContext(Dispatchers.IO) {
+            productService.requestProduct(id = id)
         }
 }
