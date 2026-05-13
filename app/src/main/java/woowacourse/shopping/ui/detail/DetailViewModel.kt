@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentItemRepository
@@ -55,10 +56,13 @@ class DetailViewModel(
                         recentItem = lastViewedItem?.takeIf { it.id != id }?.toUiModel(),
                         totalPrice = product.getPrice() * quantity,
                     )
-            } catch (e: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 _event.send(DetailEvent.ShowProductNotFoundMessage)
                 _event.send(DetailEvent.NavigateBack)
-            } catch (e: IOException) {
+            } catch (_: IOException) {
+                _event.send(DetailEvent.ShowProductLoadFailureMessage)
+                _event.send(DetailEvent.NavigateBack)
+            } catch (_: HttpException) {
                 _event.send(DetailEvent.ShowProductLoadFailureMessage)
                 _event.send(DetailEvent.NavigateBack)
             }
@@ -79,11 +83,13 @@ class DetailViewModel(
         viewModelScope.launch {
             try {
                 val product = productRepository.getProductById(id)
-                cartRepository.setQuantity(product.id, _uiState.value.quantity)
+                cartRepository.setCartItem(product.id, _uiState.value.quantity)
                 _event.send(DetailEvent.NavigateToCart)
-            } catch (e: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 _event.send(DetailEvent.ShowAddCartFailureMessage)
-            } catch (e: IOException) {
+            } catch (_: IOException) {
+                _event.send(DetailEvent.ShowAddCartFailureMessage)
+            } catch (_: HttpException) {
                 _event.send(DetailEvent.ShowAddCartFailureMessage)
             }
         }
