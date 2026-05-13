@@ -14,6 +14,7 @@ import woowacourse.shopping.presentation.common.model.ProductUiModel
 
 @Composable
 fun CartContent(
+    isLoading: Boolean,
     onDeleteItem: (Long) -> Unit,
     onIncrease: (Long) -> Unit,
     onDecrease: (Long) -> Unit,
@@ -28,22 +29,26 @@ fun CartContent(
             items = cartItems,
             key = { it.product.id },
         ) { item ->
-            val product = item.product
-            CartCard(
-                productName = product.name,
-                price = item.totalPrice,
-                imageUrl = product.imageUrl,
-                quantity = item.quantity,
-                onDeleteItem = {
-                    onDeleteItem(product.id)
-                },
-                onIncrease = {
-                    onIncrease(product.id)
-                },
-                onDecrease = {
-                    onDecrease(product.id)
-                },
-            )
+            if (isLoading) {
+                SkeletonCartCard()
+            } else {
+                val product = item.product
+                CartCard(
+                    productName = product.name,
+                    price = item.totalPrice,
+                    imageUrl = product.imageUrl,
+                    quantity = item.quantity,
+                    onDeleteItem = {
+                        onDeleteItem(product.id)
+                    },
+                    onIncrease = {
+                        onIncrease(product.id)
+                    },
+                    onDecrease = {
+                        onDecrease(product.id)
+                    },
+                )
+            }
         }
     }
 }
@@ -52,6 +57,7 @@ fun CartContent(
 @Composable
 private fun CartContentPreview() {
     CartContent(
+        isLoading = false,
         onDeleteItem = {},
         onIncrease = {},
         onDecrease = {},

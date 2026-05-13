@@ -85,6 +85,7 @@ fun CartScreen(
         ) {
             if (uiState.isLoading) CircularProgressIndicator()
             CartContent(
+                isLoading = uiState.isLoading,
                 onDeleteItem = { onDeleteItem(it) },
                 cartItems = uiState.currentCartItems.toImmutableList(),
                 onIncrease = { onIncrease(it) },
