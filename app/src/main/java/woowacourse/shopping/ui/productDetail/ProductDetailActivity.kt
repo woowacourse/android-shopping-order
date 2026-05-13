@@ -40,6 +40,7 @@ class ProductDetailActivity : ComponentActivity() {
                 )
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                 ProductDetailScreen(
+                    onCloseClick = { finish() },
                     modifier = Modifier.padding(innerPadding),
                     viewModel = viewModel,
                     onAddToCartClick = {

@@ -1,7 +1,6 @@
 package woowacourse.shopping.ui.productDetail
 
 import android.annotation.SuppressLint
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -54,14 +53,37 @@ import woowacourse.shopping.domain.product.Product
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetailScreen(
-    modifier: Modifier = Modifier,
+    onCloseClick: () -> Unit,
     viewModel: ProductDetailViewModel,
+    modifier: Modifier = Modifier,
     onAddToCartClick: () -> Unit = {},
     onLastViewedProductClick: (Product) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val activity = LocalActivity.current
 
+    ProductDetailScreenContent(
+        modifier = modifier,
+        uiState = uiState,
+        onCloseClick = onCloseClick,
+        onClickIncrease = viewModel::increaseSelected,
+        onClickDecrease = viewModel::decreaseSelected,
+        onAddToCartClick = {
+            onAddToCartClick()
+        },
+        onLastViewedProductClick = onLastViewedProductClick,
+    )
+}
+
+@Composable
+private fun ProductDetailScreenContent(
+    uiState: ProductDetailUiState,
+    onCloseClick: () -> Unit,
+    onClickIncrease: () -> Unit,
+    onClickDecrease: () -> Unit,
+    modifier: Modifier = Modifier,
+    onAddToCartClick: () -> Unit = {},
+    onLastViewedProductClick: (Product) -> Unit = {},
+) {
     Column(
         modifier = modifier,
     ) {
@@ -71,11 +93,11 @@ fun ProductDetailScreen(
                     .fillMaxWidth()
                     .height(56.dp),
             onCloseClick = {
-                activity?.finish()
+                onCloseClick()
             },
         )
 
-        when (val state = uiState) {
+        when (uiState) {
             is ProductDetailUiState.Loading -> {
                 LoadingContent(modifier = Modifier.weight(1f))
             }
@@ -86,13 +108,13 @@ fun ProductDetailScreen(
                         Modifier
                             .background(Color.White)
                             .weight(1f),
-                    imageUrl = state.product.imageUrl.value,
-                    productName = state.product.name.value,
-                    price = state.product.price.value,
-                    selectedQuantity = state.selectedQuantity,
-                    lastViewedProduct = state.lastViewedProduct,
-                    onIncrease = viewModel::increaseSelected,
-                    onDecrease = viewModel::decreaseSelected,
+                    imageUrl = uiState.product.imageUrl.value,
+                    productName = uiState.product.name.value,
+                    price = uiState.product.price.value,
+                    selectedQuantity = uiState.selectedQuantity,
+                    lastViewedProduct = uiState.lastViewedProduct,
+                    onIncrease = onClickIncrease,
+                    onDecrease = onClickDecrease,
                     onLastViewedProductClick = onLastViewedProductClick,
                 )
 
@@ -110,7 +132,7 @@ fun ProductDetailScreen(
             is ProductDetailUiState.Error -> {
                 ErrorContent(
                     modifier = Modifier.weight(1f),
-                    message = state.throwable.message ?: "상품 정보를 불러오지 못했어요.",
+                    message = uiState.throwable.message ?: "상품 정보를 불러오지 못했어요.",
                 )
             }
         }
@@ -449,5 +471,6 @@ fun ProductDetailScreenPreview() {
             ),
         onAddToCartClick = {},
         onLastViewedProductClick = {},
+        onCloseClick = {},
     )
 }

@@ -27,6 +27,7 @@ class CartActivity : ComponentActivity() {
                 CartScreen(
                     viewModel = viewModel,
                     modifier = Modifier.padding(innerPadding),
+                    onClickClose = { finish() },
                 )
             }
         }

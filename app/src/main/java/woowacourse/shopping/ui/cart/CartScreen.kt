@@ -1,7 +1,6 @@
 package woowacourse.shopping.ui.cart
 
 import android.annotation.SuppressLint
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -53,17 +52,39 @@ import woowacourse.shopping.constant.Format.formatPrice
 import woowacourse.shopping.constant.ShoppingColor.APP_BAR_COLOR
 import woowacourse.shopping.constant.ShoppingColor.CART_PAGE_BUTTON_ACTIVE_COLOR
 import woowacourse.shopping.constant.ShoppingColor.CART_PAGE_BUTTON_INACTIVE_COLOR
-import woowacourse.shopping.data.preview.FakeCartRepository
 import woowacourse.shopping.domain.cart.CartItem
 
 @Composable
 fun CartScreen(
-    modifier: Modifier = Modifier,
     viewModel: CartViewModel,
+    onClickClose: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val activity = LocalActivity.current
 
+    CartScreenContent(
+        modifier = modifier,
+        uiState = uiState,
+        onClickClose = { onClickClose() },
+        onClickRemoveItem = viewModel::removeCartItem,
+        onClickIncrease = viewModel::increase,
+        onClickDecrease = viewModel::decrease,
+        onClickGoToPreviousPage = viewModel::goToPreviousPage,
+        onClickGoToNextPage = viewModel::goToNextPage,
+    )
+}
+
+@Composable
+private fun CartScreenContent(
+    uiState: CartUiState,
+    modifier: Modifier = Modifier,
+    onClickClose: () -> Unit,
+    onClickRemoveItem: (Int) -> Unit,
+    onClickIncrease: (Int) -> Unit,
+    onClickDecrease: (Int) -> Unit,
+    onClickGoToPreviousPage: () -> Unit,
+    onClickGoToNextPage: () -> Unit,
+) {
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
@@ -73,11 +94,11 @@ fun CartScreen(
                     .fillMaxWidth()
                     .height(56.dp),
             onClick = {
-                activity?.finish()
+                onClickClose()
             },
         )
 
-        when (val state = uiState) {
+        when (uiState) {
             is CartUiState.Loading -> {
                 LoadingContent(modifier = Modifier.weight(1f))
             }
@@ -88,20 +109,20 @@ fun CartScreen(
 
             is CartUiState.Success -> {
                 CartItemList(
-                    cartItems = state.cartItems,
+                    cartItems = uiState.cartItems,
                     modifier = Modifier.weight(1f),
-                    onRemoveClick = { productId -> viewModel.removeCartItem(productId) },
-                    onIncrease = { productId -> viewModel.increase(productId) },
-                    onDecrease = { productId -> viewModel.decrease(productId) },
+                    onRemoveClick = { productId -> onClickRemoveItem(productId) },
+                    onIncrease = { productId -> onClickIncrease(productId) },
+                    onDecrease = { productId -> onClickDecrease(productId) },
                 )
 
-                if (state.showPageNavigator) {
+                if (uiState.showPageNavigator) {
                     PageNavigator(
-                        currentPage = state.currentPage,
-                        hasPrevious = state.hasPrevious,
-                        hasNext = state.hasNext,
-                        onPreviousClick = { viewModel.goToPreviousPage() },
-                        onNextClick = { viewModel.goToNextPage() },
+                        currentPage = uiState.currentPage,
+                        hasPrevious = uiState.hasPrevious,
+                        hasNext = uiState.hasNext,
+                        onPreviousClick = { onClickGoToPreviousPage() },
+                        onNextClick = { onClickGoToNextPage() },
                         modifier =
                             Modifier
                                 .fillMaxWidth()
@@ -113,7 +134,7 @@ fun CartScreen(
             is CartUiState.Error -> {
                 ErrorContent(
                     modifier = Modifier.weight(1f),
-                    message = state.throwable.message ?: "장바구니를 불러오지 못했어요.",
+                    message = uiState.throwable.message ?: "장바구니를 불러오지 못했어요.",
                 )
             }
         }
@@ -424,7 +445,21 @@ private fun ProductImage(
 @Preview(showBackground = true)
 @Composable
 private fun CartScreenPreview() {
-    CartScreen(
-        viewModel = CartViewModel(FakeCartRepository()),
+    CartScreenContent(
+        modifier = Modifier.fillMaxSize(),
+        uiState =
+            CartUiState.Success(
+                cartItems = emptyList(),
+                currentPage = 0,
+                totalPages = 0,
+                hasPrevious = false,
+                hasNext = false,
+            ),
+        onClickClose = {},
+        onClickRemoveItem = {},
+        onClickIncrease = {},
+        onClickDecrease = {},
+        onClickGoToPreviousPage = {},
+        onClickGoToNextPage = {},
     )
 }

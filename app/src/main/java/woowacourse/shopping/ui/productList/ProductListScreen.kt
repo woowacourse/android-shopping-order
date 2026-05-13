@@ -46,9 +46,6 @@ import coil3.compose.AsyncImage
 import woowacourse.shopping.R
 import woowacourse.shopping.constant.Format.formatPrice
 import woowacourse.shopping.constant.ShoppingColor.APP_BAR_COLOR
-import woowacourse.shopping.data.preview.FakeCartRepository
-import woowacourse.shopping.data.preview.FakeProductRepository
-import woowacourse.shopping.data.preview.FakeRecentProductRepository
 import woowacourse.shopping.domain.product.Product
 import androidx.compose.foundation.lazy.grid.items as lazyGridItems
 import androidx.compose.foundation.lazy.items as lazyRowItems
@@ -64,6 +61,31 @@ fun ProductListScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cartCount = (uiState as? ProductListUiState.Success)?.totalCartCount ?: 0
 
+    ProductListScreenContent(
+        modifier = modifier,
+        uiState = uiState,
+        cartCount = cartCount,
+        onAddClick = viewModel::addProduct,
+        onIncrease = viewModel::increase,
+        onDecrease = viewModel::decrease,
+        onMoreClick = viewModel::moreProducts,
+        onCartClick = onCartClick,
+        onProductClick = onProductClick,
+    )
+}
+
+@Composable
+fun ProductListScreenContent(
+    modifier: Modifier = Modifier,
+    uiState: ProductListUiState,
+    cartCount: Int,
+    onAddClick: (Product) -> Unit,
+    onIncrease: (Int) -> Unit,
+    onDecrease: (Int) -> Unit,
+    onMoreClick: () -> Unit,
+    onCartClick: () -> Unit = {},
+    onProductClick: (Product) -> Unit = {},
+) {
     Column(modifier = modifier) {
         ProductListTopAppBar(
             modifier =
@@ -74,7 +96,7 @@ fun ProductListScreen(
             onClick = onCartClick,
         )
 
-        when (val state = uiState) {
+        when (uiState) {
             is ProductListUiState.Loading -> {
                 LoadingContent(modifier = Modifier.fillMaxSize())
             }
@@ -85,23 +107,23 @@ fun ProductListScreen(
                         Modifier
                             .fillMaxSize()
                             .padding(20.dp),
-                    visibleProducts = state.products,
-                    recentProducts = state.recentProducts,
-                    quantitiesByProductId = state.quantitiesByProductId,
-                    canLoadMore = state.canLoadMore,
-                    isLoadingMore = state.isLoadingMore,
+                    visibleProducts = uiState.products,
+                    recentProducts = uiState.recentProducts,
+                    quantitiesByProductId = uiState.quantitiesByProductId,
+                    canLoadMore = uiState.canLoadMore,
+                    isLoadingMore = uiState.isLoadingMore,
                     onProductClick = onProductClick,
-                    onAddClick = { product -> viewModel.addProduct(product) },
-                    onIncrease = { productId -> viewModel.increase(productId) },
-                    onDecrease = { productId -> viewModel.decrease(productId) },
-                    onMoreClick = { viewModel.moreProducts() },
+                    onAddClick = { product -> onAddClick(product) },
+                    onIncrease = { productId -> onIncrease(productId) },
+                    onDecrease = { productId -> onDecrease(productId) },
+                    onMoreClick = { onMoreClick() },
                 )
             }
 
             is ProductListUiState.Error -> {
                 ErrorContent(
                     modifier = Modifier.fillMaxSize(),
-                    message = state.message,
+                    message = uiState.message,
                 )
             }
         }
@@ -555,12 +577,21 @@ private fun StepperSign(
 @Preview(showBackground = true)
 @Composable
 fun ProductListScreenPreview() {
-    ProductListScreen(
-        viewModel =
-            ProductListViewModel(
-                productRepository = FakeProductRepository(),
-                cartRepository = FakeCartRepository(),
-                recentProductRepository = FakeRecentProductRepository(),
+    ProductListScreenContent(
+        modifier = Modifier.fillMaxSize(),
+        uiState =
+            ProductListUiState.Success(
+                products = emptyList(),
+                recentProducts = emptyList(),
+                quantitiesByProductId = emptyMap(),
+                canLoadMore = true,
+                isLoadingMore = false,
+                totalCartCount = 0,
             ),
+        cartCount = 0,
+        onAddClick = {},
+        onIncrease = {},
+        onDecrease = {},
+        onMoreClick = {},
     )
 }
