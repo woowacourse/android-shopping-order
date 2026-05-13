@@ -116,8 +116,9 @@ private fun CartContent(
         } else if (isLoading) {
             items(count = 2) {
                 CartCardSkeleton(
-                    modifier = Modifier
-                        .padding(horizontal = 18.dp, vertical = 12.dp)
+                    modifier =
+                        Modifier
+                            .padding(horizontal = 18.dp, vertical = 12.dp),
                 )
             }
         } else {
@@ -135,7 +136,7 @@ private fun CartContent(
                         onQuantityChange(product.id, quantity)
                     },
                     onDeleteItem = {
-                        onDeleteItem(product.id)
+                        onDeleteItem(item.id)
                     },
                 )
             }
@@ -174,6 +175,7 @@ private fun CartContentPreview() {
                         ),
                     quantity = 1,
                     totalPrice = 1000,
+                    id = "",
                 ),
                 CartItemUiModel(
                     product =
@@ -185,6 +187,7 @@ private fun CartContentPreview() {
                         ),
                     quantity = 1,
                     totalPrice = 1000,
+                    id = "",
                 ),
             ).toImmutableList(),
         isLoading = true,

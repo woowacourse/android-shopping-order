@@ -11,91 +11,65 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.localdb.mapper.toDomain
 import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.CartResult
-import woowacourse.shopping.data.repository.ProductRepository
-import woowacourse.shopping.model.Cart
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.ui.model.mapper.toUiModel
 
 class CartViewModel(
     private val cartRepository: CartRepository,
-    private val productRepository: ProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
-    private var page = 0
-    private var cart = Cart()
 
     init {
-        observeCart()
-    }
-
-    private fun observeCart() {
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            cartRepository.observeCartItems().collect { entities ->
-                val result =
-                    runCatching {
-                        Cart(
-                            items =
-                                entities.map { entity ->
-                                    val product = productRepository.getProductById(entity.id)
-                                    entity.toDomain(product)
-                                },
-                        )
-                    }.fold(
-                        onSuccess = { CartResult.Success(it) },
-                        onFailure = { CartResult.Failure(it) },
-                    )
-
-                when (result) {
-                    is CartResult.Success -> {
-                        cart = result.cart
-                        updateUiState()
-                        _uiState.update { it.copy(isLoading = false) }
-                    }
-
-                    is CartResult.Failure -> {
-                        _uiState.value =
-                            _uiState.value.copy(
-                                errorMessage = "장바구니 상품 정보를 불러오지 못했습니다.",
-                            )
-                        _uiState.update { it.copy(isLoading = false) }
-                    }
-                }
-            }
+            getCartItemsByPage()
         }
+        _uiState.update { it.copy(isLoading = false) }
     }
 
-    private fun updateUiState() {
-        val cartPage = cart.getPage(page = page, pageSize = 5)
-        page = cartPage.page
-        _uiState.value =
-            _uiState.value.copy(
-                items = cartPage.items.map { it.toUiModel() }.toImmutableList(),
-                page = cartPage.page,
-                isCanMoveNext = cartPage.isCanMoveNext,
-                totalCartSize = cart.getTotalSize(),
-                totalPrice = cart.calculateTotalPrice(),
-                errorMessage = null,
-            )
+    private suspend fun getCartItemsByPage() {
+            val cartItems = cartRepository.getCartItemsByPage(page = uiState.value.page, size = PAGE_SIZE)
+
+            _uiState.update {
+                it.copy(
+                    items =
+                        cartItems
+                            .map { cartItem ->
+                                cartItem.toUiModel()
+                            }.toImmutableList(),
+                )
+            }
     }
 
     fun nextPage() {
-        page++
-        updateUiState()
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    page = uiState.value.page + 1
+                )
+            }
+            getCartItemsByPage()
+        }
     }
 
     fun previousPage() {
-        page--
-        updateUiState()
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    page = uiState.value.page - 1
+                )
+            }
+            getCartItemsByPage()
+        }
     }
 
-    fun deleteItem(productId: String) {
+    fun deleteItem(cartId: String) {
         viewModelScope.launch {
-            cartRepository.deleteItem(productId)
+            cartRepository.deleteItem(cartId)
+
+            getCartItemsByPage()
         }
     }
 
@@ -104,46 +78,28 @@ class CartViewModel(
         quantity: Int,
     ) {
         viewModelScope.launch {
-            cartRepository.updateQuantity(productId, quantity = quantity)
+            cartRepository.setCartItem(productId, quantity = quantity)
+
+            getCartItemsByPage()
         }
     }
 
     companion object {
+        private const val PAGE_SIZE = 5
+
         fun provideFactory(
             cartRepository: CartRepository,
-            productRepository: ProductRepository,
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
                     CartViewModel(
                         cartRepository = cartRepository,
-                        productRepository = productRepository,
                     )
                 }
             }
     }
 }
 
-private fun Cart.getPage(
-    page: Int,
-    pageSize: Int,
-): CartPage {
-    val lastPage =
-        if (items.isEmpty()) {
-            0
-        } else {
-            items.lastIndex / pageSize
-        }
-    val currentPage = page.coerceIn(0, lastPage)
-    val fromIndex = currentPage * pageSize
-    val toIndex = minOf(fromIndex + pageSize, items.size)
-
-    return CartPage(
-        items = items.subList(fromIndex, toIndex),
-        page = currentPage,
-        isCanMoveNext = toIndex < items.size,
-    )
-}
 
 private data class CartPage(
     val items: List<CartItem>,
