@@ -21,9 +21,4 @@ class FakeProductRepository(
     }
 
     override suspend fun getProductById(id: Long): Product = products.first { it.id == id }
-
-    override suspend fun getProductsByIds(ids: List<Long>): List<Product> {
-        if (shouldFail) throw IOException()
-        return products.filter { it.id in ids }
-    }
 }
