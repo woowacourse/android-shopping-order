@@ -1,8 +1,10 @@
 package woowacourse.shopping.domain.product
 
 class Products(
-    private val value: List<Product>,
+    val items: List<Product>,
+    val isLast: Boolean,
 ) {
+    // TODO: 제거
     fun getPage(
         page: Int,
         pageSize: Int,
@@ -11,9 +13,9 @@ class Products(
         require(pageSize > 0) { "pageSize는 1 이상이어야 합니다. pageSize=$pageSize" }
 
         val fromIndex = page * pageSize
-        if (fromIndex >= value.size) return emptyList()
+        if (fromIndex >= items.size) return emptyList()
 
-        val toIndex = minOf(fromIndex + pageSize, value.size)
-        return value.subList(fromIndex, toIndex)
+        val toIndex = minOf(fromIndex + pageSize, items.size)
+        return items.subList(fromIndex, toIndex)
     }
 }
