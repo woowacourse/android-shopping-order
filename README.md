@@ -15,9 +15,7 @@
 - [x] 사용자 인증 정보 저장소 구현
 
 ### 도메인 로직 / 데이터 계층
-- [ ] 인증 헤더 자동 주입 Interceptor 구현
-    - [ ] 저장된 인증 정보를 읽어 `Authorization: Basic ...` 헤더 추가
-    - [ ] 인증 정보가 없는 경우 처리 정책 수립
+- [x] 저장된 인증 정보를 읽어 `Authorization: Basic ...` 헤더 추가
 - [x] 상품 목록 API 연동
     - [x] DTO ↔ Domain Model 매퍼 작성
     - [x] Repository 추상화 및 Remote DataSource 구현
