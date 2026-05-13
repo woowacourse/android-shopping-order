@@ -26,15 +26,21 @@ class CartRepositoryImpl(
         cartRemoteDataSource.addCartItem(product.id, quantity.value)
     }
 
-    override suspend fun increase(productId: Int) {
-        cartRemoteDataSource.updateCartItem(productId, 1)
+    override suspend fun increase(
+        cartId: Int,
+        quantity: Int,
+    ) {
+        cartRemoteDataSource.updateCartItem(cartId, quantity)
     }
 
-    override suspend fun decrease(productId: Int) {
-        cartRemoteDataSource.updateCartItem(productId, -1)
+    override suspend fun decrease(
+        cartId: Int,
+        quantity: Int,
+    ) {
+        cartRemoteDataSource.updateCartItem(cartId, quantity)
     }
 
-    override suspend fun remove(productId: Int) {
-        cartRemoteDataSource.deleteCartItem(productId)
+    override suspend fun remove(cartId: Int) {
+        cartRemoteDataSource.deleteCartItem(cartId)
     }
 }

@@ -3,6 +3,7 @@ package woowacourse.shopping.domain.cart
 import woowacourse.shopping.domain.product.Product
 
 data class CartItem(
+    val id: Int,
     val product: Product,
     val quantity: Quantity = Quantity.ONE,
 ) {

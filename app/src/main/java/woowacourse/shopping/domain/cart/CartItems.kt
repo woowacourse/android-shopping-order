@@ -1,31 +1,16 @@
 package woowacourse.shopping.domain.cart
 
-import woowacourse.shopping.domain.product.Product
-
 class CartItems(
     val values: List<CartItem> = emptyList(),
     val isLast: Boolean = false,
     val isFirst: Boolean = true,
+    val totalPages: Int = 1,
 ) {
     val totalQuantity: Int
         get() = values.sumOf { it.quantity.value }
 
     val totalPrice: Int
         get() = values.sumOf { it.totalPrice }
-
-    fun addProduct(
-        product: Product,
-        quantity: Quantity = Quantity.ONE,
-    ): CartItems {
-        val existing = values.find { it.isSameProduct(product.id) }
-        return if (existing == null) {
-            CartItems(values + CartItem(product, quantity))
-        } else {
-            val updated =
-                existing.copy(quantity = Quantity(existing.quantity.value + quantity.value))
-            CartItems(values.map { if (it.isSameProduct(product.id)) updated else it })
-        }
-    }
 
     fun increase(productId: Int): CartItems {
         val target = findByProductId(productId) ?: return this

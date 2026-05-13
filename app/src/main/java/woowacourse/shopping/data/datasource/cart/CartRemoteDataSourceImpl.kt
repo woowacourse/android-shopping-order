@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.datasource.cart
 
+import android.util.Log
 import woowacourse.shopping.data.remote.api.AddCartItemRequest
 import woowacourse.shopping.data.remote.api.CartApi
 import woowacourse.shopping.data.remote.api.UpdateCartItemRequest
@@ -25,5 +26,8 @@ class CartRemoteDataSourceImpl(
     override suspend fun updateCartItem(
         id: Int,
         quantity: Int,
-    ) = cartApi.updateCartItem(id, UpdateCartItemRequest(quantity))
+    ) {
+        Log.d("CartRemoteDataSourceImpl", "updateCartItem: $id")
+        cartApi.updateCartItem(id, UpdateCartItemRequest(quantity))
+    }
 }

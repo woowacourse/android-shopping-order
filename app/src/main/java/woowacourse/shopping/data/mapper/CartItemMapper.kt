@@ -11,12 +11,14 @@ fun CartResponseDto.toDomain(): CartItems =
         values = content.toDomain(),
         isLast = last,
         isFirst = first,
+        totalPages = totalPages,
     )
 
 fun List<CartItemDto>.toDomain(): List<CartItem> = map { it.toDomain() }
 
 fun CartItemDto.toDomain(): CartItem =
     CartItem(
+        id = id,
         product = product.toDomain(),
         quantity = Quantity(quantity),
     )
