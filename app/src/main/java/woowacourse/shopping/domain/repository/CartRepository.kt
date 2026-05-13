@@ -1,9 +1,17 @@
 package woowacourse.shopping.domain.repository
 
+import woowacourse.shopping.domain.cart.CartItems
 import woowacourse.shopping.domain.cart.Quantity
 import woowacourse.shopping.domain.product.Product
 
 interface CartRepository {
+    suspend fun getCartItems(
+        page: Int,
+        size: Int,
+    ): CartItems
+
+    suspend fun getCartItemsCount(): Int
+
     suspend fun addProduct(
         product: Product,
         quantity: Quantity = Quantity.ONE,
