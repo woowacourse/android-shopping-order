@@ -9,7 +9,7 @@ import woowacourse.shopping.data.local.recent.RecentProductEntity
 
 @Database(
     entities = [RecentProductEntity::class, CartItemEntity::class],
-    version = 4,
+    version = 5,
     exportSchema = false,
 )
 abstract class ShoppingDatabase : RoomDatabase() {

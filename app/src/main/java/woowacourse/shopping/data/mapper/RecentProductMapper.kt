@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.mapper
 
 import woowacourse.shopping.data.local.recent.RecentProductEntity
+import woowacourse.shopping.domain.product.Category
 import woowacourse.shopping.domain.product.ImageUrl
 import woowacourse.shopping.domain.product.Price
 import woowacourse.shopping.domain.product.Product
@@ -12,6 +13,8 @@ fun RecentProductEntity.toDomain(): Product =
         imageUrl = ImageUrl(imageUrl),
         name = ProductName(name),
         price = Price(price),
+        category = Category(category)
+
     )
 
 fun Product.toRecentProductEntity(viewedAt: Long): RecentProductEntity =
@@ -20,5 +23,6 @@ fun Product.toRecentProductEntity(viewedAt: Long): RecentProductEntity =
         name = name.value,
         price = price.value,
         imageUrl = imageUrl.value,
+        category = category.value,
         viewedAt = viewedAt,
     )
