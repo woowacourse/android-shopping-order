@@ -39,7 +39,6 @@ class OkHttpProductBackendDataSource(
                 productJson
                     .optString("name", productJson.optString("title"))
                     .trim()
-            require(productTitle.isNotEmpty()) { "상품 제목(name/title)은 비어 있을 수 없습니다." }
             ShoppingItem(
                 product =
                     Product(

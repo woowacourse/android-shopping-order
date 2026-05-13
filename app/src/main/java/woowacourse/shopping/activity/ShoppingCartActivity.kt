@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import woowacourse.shopping.ui.ShoppingCartScreen
@@ -33,11 +34,18 @@ class ShoppingCartActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val shoppingCartItemsState by shoppingCartItemViewModel.shoppingCartItems.collectAsStateWithLifecycle()
+            LaunchedEffect(Unit) {
+                shoppingCartItemViewModel.event.collect { event ->
+                    when (event) {
+                        ShoppingCartItemViewModel.ShoppingCartEvent.NavigateBack -> finish()
+                    }
+                }
+            }
             AndroidShoppingTheme {
                 ShoppingCartScreen(
                     shoppingCartItems = shoppingCartItemsState.pagedItems,
                     getQuantityPrice = shoppingCartItemViewModel::getQuantityPrice,
-                    onBackClick = this::finish,
+                    onBackClick = shoppingCartItemViewModel::onBackClick,
                     onRemoveShoppingItemClick = { shoppingCartItem ->
                         shoppingCartItemViewModel.removeShoppingItem(shoppingCartItem)
                     },

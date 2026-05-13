@@ -3,8 +3,11 @@ package woowacourse.shopping.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
@@ -18,6 +21,8 @@ class ShoppingCartItemViewModel(
     private val shoppingItemRepository: ShoppingItemRepository = ShoppingApplication.shoppingItemRepository,
 ) : ViewModel() {
     private val shoppingCartPageStateHolder = ShoppingCartPageStateHolder(shoppingCartItems = emptyList())
+    private val _event = MutableSharedFlow<ShoppingCartEvent>(extraBufferCapacity = 1)
+    val event: SharedFlow<ShoppingCartEvent> = _event.asSharedFlow()
 
     private val _shoppingCartItems: MutableStateFlow<ShoppingCartItemsState> =
         MutableStateFlow(createShoppingCartItemsState(emptyList()))
@@ -32,11 +37,17 @@ class ShoppingCartItemViewModel(
     }
 
     fun moveToPreviousPage() {
-        updatePage(_shoppingCartItems.value.currentPage - 1)
+        shoppingCartPageStateHolder.beforePage()
+        publishCurrentPageState()
     }
 
     fun moveToNextPage() {
-        updatePage(_shoppingCartItems.value.currentPage + 1)
+        shoppingCartPageStateHolder.nextPage()
+        publishCurrentPageState()
+    }
+
+    fun onBackClick() {
+        _event.tryEmit(ShoppingCartEvent.NavigateBack)
     }
 
     fun removeShoppingItem(shoppingCartItem: ShoppingCartItem) {
@@ -77,8 +88,7 @@ class ShoppingCartItemViewModel(
         _shoppingCartItems.value = createShoppingCartItemsState(latestShoppingCartItems)
     }
 
-    private fun updatePage(page: Int) {
-        shoppingCartPageStateHolder.restoreCurrentPage(page)
+    private fun publishCurrentPageState() {
         val currentItems = _shoppingCartItems.value.items
         _shoppingCartItems.value = createShoppingCartItemsState(currentItems)
     }
@@ -116,5 +126,9 @@ class ShoppingCartItemViewModel(
 
     companion object {
         private const val INITIAL_PAGE = 0
+    }
+
+    sealed interface ShoppingCartEvent {
+        data object NavigateBack : ShoppingCartEvent
     }
 }

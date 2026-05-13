@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import woowacourse.shopping.ui.ProductListScreen
@@ -22,6 +23,21 @@ class ProductListActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val uiState by productListViewModel.uiState.collectAsStateWithLifecycle()
+            LaunchedEffect(Unit) {
+                productListViewModel.event.collect { event ->
+                    when (event) {
+                        is ProductListViewModel.ProductListEvent.NavigateToDetailProduct ->
+                            DetailProductActivity.start(
+                                context = this@ProductListActivity,
+                                productId = event.productId,
+                                showLastViewed = event.showLastViewed,
+                            )
+
+                        ProductListViewModel.ProductListEvent.NavigateToShoppingCart ->
+                            ShoppingCartActivity.start(this@ProductListActivity)
+                    }
+                }
+            }
             AndroidShoppingTheme {
                 ProductListScreen(
                     shoppingItems = uiState.shoppingItems,
@@ -37,15 +53,9 @@ class ProductListActivity : ComponentActivity() {
                     onQuantityMinusClick = { shoppingItem ->
                         productListViewModel.decreaseProductQuantity(shoppingItem)
                     },
-                    onProductClick = { productId ->
-                        DetailProductActivity.start(this, productId)
-                    },
-                    onRecentViewedProductClick = { productId ->
-                        DetailProductActivity.start(this, productId)
-                    },
-                    onNavigateToCartClick = {
-                        ShoppingCartActivity.start(this)
-                    },
+                    onProductClick = productListViewModel::onProductClick,
+                    onRecentViewedProductClick = productListViewModel::onRecentViewedProductClick,
+                    onNavigateToCartClick = productListViewModel::onNavigateToCartClick,
                     bottomContent =
                         if (uiState.canLoadNextPage) {
                             {

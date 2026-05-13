@@ -1,5 +1,6 @@
 package woowacourse.shopping.viewmodel
 
+import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineStart
@@ -37,7 +38,19 @@ class DetailProductViewModel(
         }
     }
 
-    fun initialize(
+    fun initializeFromIntentExtras(extras: Bundle?) {
+        val productId = extras?.getLong(EXTRA_PRODUCT_ID, INVALID_PRODUCT_ID) ?: INVALID_PRODUCT_ID
+        if (productId == INVALID_PRODUCT_ID) {
+            return
+        }
+        val showLastViewed = extras?.getBoolean(EXTRA_SHOW_LAST_VIEWED, true) ?: true
+        initialize(
+            productId = productId,
+            showLastViewed = showLastViewed,
+        )
+    }
+
+    private fun initialize(
         productId: Long,
         showLastViewed: Boolean = true,
     ) {
@@ -75,25 +88,24 @@ class DetailProductViewModel(
 
     fun addSelectedProductToCart() {
         val shoppingItem = uiState.value.shoppingItem ?: return
-        addProductToCart(
-            shoppingItem = shoppingItem,
-            selectedQuantity = selectedQuantity,
-        )
+        launchNow {
+            addSelectedProductQuantityToCart(
+                productId = shoppingItem.getProductId(),
+                quantity = selectedQuantity,
+            )
+        }
     }
 
-    fun addProductToCart(
-        shoppingItem: ShoppingItem,
-        selectedQuantity: Int,
+    private suspend fun addSelectedProductQuantityToCart(
+        productId: Long,
+        quantity: Int,
     ) {
-        launchNow {
-            if (selectedQuantity < 1) {
-                return@launchNow
-            }
-            val productId = shoppingItem.getProductId()
-            val sourceItem = shoppingItemRepository.getShoppingItemOrNull(productId) ?: return@launchNow
-            shoppingCartRepository.add(sourceItem)
-            shoppingItemRepository.plusQuantity(productId, selectedQuantity)
+        if (quantity < 1) {
+            return
         }
+        val sourceItem = shoppingItemRepository.getShoppingItemOrNull(productId) ?: return
+        shoppingCartRepository.add(sourceItem)
+        shoppingItemRepository.plusQuantity(productId, quantity)
     }
 
     private fun updateUiState() {
@@ -142,6 +154,9 @@ class DetailProductViewModel(
     )
 
     companion object {
+        const val EXTRA_PRODUCT_ID = "productId"
+        const val EXTRA_SHOW_LAST_VIEWED = "showLastViewed"
         private const val DEFAULT_QUANTITY = 1
+        private const val INVALID_PRODUCT_ID = -1L
     }
 }

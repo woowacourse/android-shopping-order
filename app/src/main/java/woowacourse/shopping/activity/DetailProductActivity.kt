@@ -10,7 +10,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.material3.Text
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -23,18 +22,14 @@ class DetailProductActivity : ComponentActivity() {
     private val detailProductViewModel: DetailProductViewModel by viewModels()
 
     companion object {
-        private const val EXTRA_PRODUCT_ID = "productId"
-        private const val EXTRA_SHOW_LAST_VIEWED = "showLastViewed"
-        private const val INVALID_PRODUCT_ID = -1L
-
         fun start(
             context: Context,
             productId: Long,
             showLastViewed: Boolean = true,
         ) {
             val intent = Intent(context, DetailProductActivity::class.java)
-            intent.putExtra(EXTRA_PRODUCT_ID, productId)
-            intent.putExtra(EXTRA_SHOW_LAST_VIEWED, showLastViewed)
+            intent.putExtra(DetailProductViewModel.EXTRA_PRODUCT_ID, productId)
+            intent.putExtra(DetailProductViewModel.EXTRA_SHOW_LAST_VIEWED, showLastViewed)
             context.startActivity(intent)
         }
     }
@@ -42,18 +37,9 @@ class DetailProductActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val productId = intent.getLongExtra(EXTRA_PRODUCT_ID, INVALID_PRODUCT_ID)
-        val showLastViewed = intent.getBooleanExtra(EXTRA_SHOW_LAST_VIEWED, true)
+        detailProductViewModel.initializeFromIntentExtras(intent.extras)
         setContent {
             val uiState by detailProductViewModel.uiState.collectAsStateWithLifecycle()
-            LaunchedEffect(productId, showLastViewed) {
-                if (productId != INVALID_PRODUCT_ID) {
-                    detailProductViewModel.initialize(
-                        productId = productId,
-                        showLastViewed = showLastViewed,
-                    )
-                }
-            }
             AndroidShoppingTheme {
                 val shoppingItem = uiState.shoppingItem
                 if (shoppingItem != null) {

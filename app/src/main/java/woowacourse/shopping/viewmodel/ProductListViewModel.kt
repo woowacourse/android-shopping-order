@@ -3,8 +3,11 @@ package woowacourse.shopping.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
@@ -23,6 +26,8 @@ class ProductListViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductListUiState())
     val uiState: StateFlow<ProductListUiState> = _uiState.asStateFlow()
+    private val _event = MutableSharedFlow<ProductListEvent>(extraBufferCapacity = 1)
+    val event: SharedFlow<ProductListEvent> = _event.asSharedFlow()
 
     private val productPageStateHolder = ProductPageStateHolder(shoppingItems = emptyList())
     private var allShoppingItems: List<ShoppingItem> = shoppingItemRepository.shoppingItems.value
@@ -40,20 +45,27 @@ class ProductListViewModel(
         updateUiState()
     }
 
+    fun onProductClick(productId: Long) {
+        _event.tryEmit(ProductListEvent.NavigateToDetailProduct(productId))
+    }
+
+    fun onRecentViewedProductClick(productId: Long) {
+        _event.tryEmit(ProductListEvent.NavigateToDetailProduct(productId))
+    }
+
+    fun onNavigateToCartClick() {
+        _event.tryEmit(ProductListEvent.NavigateToShoppingCart)
+    }
+
     fun addProductToCart(shoppingItem: ShoppingItem) {
         launchNow {
-            val productId = shoppingItem.getProductId()
-            val sourceItem = shoppingItemRepository.getShoppingItemOrNull(productId) ?: return@launchNow
-            shoppingCartRepository.add(sourceItem)
-            shoppingItemRepository.plusQuantity(productId)
+            increaseQuantity(shoppingItem.getProductId())
         }
     }
 
     fun increaseProductQuantity(shoppingItem: ShoppingItem) {
         launchNow {
-            val productId = shoppingItem.getProductId()
-            ensureShoppingCartContains(productId)
-            shoppingItemRepository.plusQuantity(productId)
+            increaseQuantity(shoppingItem.getProductId())
         }
     }
 
@@ -77,6 +89,11 @@ class ProductListViewModel(
         }
         val sourceItem = shoppingItemRepository.getShoppingItemOrNull(productId) ?: return
         shoppingCartRepository.add(sourceItem)
+    }
+
+    private suspend fun increaseQuantity(productId: Long) {
+        ensureShoppingCartContains(productId)
+        shoppingItemRepository.plusQuantity(productId)
     }
 
     private fun observeSources() {
@@ -126,4 +143,13 @@ class ProductListViewModel(
         val isNetworkConnected: Boolean = true,
         val canLoadNextPage: Boolean = false,
     )
+
+    sealed interface ProductListEvent {
+        data class NavigateToDetailProduct(
+            val productId: Long,
+            val showLastViewed: Boolean = true,
+        ) : ProductListEvent
+
+        data object NavigateToShoppingCart : ProductListEvent
+    }
 }

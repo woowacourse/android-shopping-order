@@ -1,8 +1,6 @@
 package woowacourse.shopping.repository
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -13,7 +11,7 @@ import woowacourse.shopping.storage.room.shoppingItem.toDomain
 
 class RoomShoppingItemRepository(
     private val shoppingItemDao: ShoppingItemDao,
-    scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO),
+    scope: CoroutineScope,
 ) : ShoppingItemRepository {
     override val shoppingItems: StateFlow<List<ShoppingItem>> =
         shoppingItemDao
@@ -31,7 +29,6 @@ class RoomShoppingItemRepository(
         productId: Long,
         amount: Int,
     ) {
-        validateAmount(amount, "상품의 수량 증가값은 음수일 수 없습니다.")
         if (amount == 0) return
         updateQuantityByDelta(productId, amount)
     }
@@ -40,16 +37,8 @@ class RoomShoppingItemRepository(
         productId: Long,
         amount: Int,
     ) {
-        validateAmount(amount, "상품의 수량 감소값은 음수일 수 없습니다.")
         if (amount == 0) return
         updateQuantityByDelta(productId, -amount)
-    }
-
-    private fun validateAmount(
-        amount: Int,
-        message: String,
-    ) {
-        require(amount >= 0) { message }
     }
 
     private suspend fun updateQuantityByDelta(
