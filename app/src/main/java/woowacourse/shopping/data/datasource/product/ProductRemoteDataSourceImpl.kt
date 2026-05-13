@@ -4,9 +4,9 @@ import woowacourse.shopping.data.remote.api.ProductApi
 import woowacourse.shopping.data.remote.dto.ProductResponseDto
 import woowacourse.shopping.data.remote.dto.ProductsResponseDto
 
-class ProductAPIDataSource(
+class ProductRemoteDataSourceImpl(
     private val productApi: ProductApi,
-) : ProductDataSource {
+) : ProductRemoteDataSource {
     override suspend fun getProducts(
         page: Int,
         size: Int,

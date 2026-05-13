@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import woowacourse.shopping.data.datasource.cart.CartRemoteDataSource
 import woowacourse.shopping.data.datasource.cart.CartRemoteDataSourceImpl
-import woowacourse.shopping.data.datasource.product.ProductAPIDataSource
-import woowacourse.shopping.data.datasource.product.ProductDataSource
+import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
+import woowacourse.shopping.data.datasource.product.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.recent.RecentProductDataSource
 import woowacourse.shopping.data.datasource.recent.RoomRecentProductDataSource
 import woowacourse.shopping.data.local.ShoppingDatabase
@@ -33,15 +33,15 @@ class AppContainer(
         CartRemoteDataSourceImpl(
             RetrofitProvider.cartApi,
         )
-    private val productDataSource: ProductDataSource =
-        ProductAPIDataSource(
+    private val productRemoteDataSource: ProductRemoteDataSource =
+        ProductRemoteDataSourceImpl(
             RetrofitProvider.productApi,
         )
     private val recentProductDataSource: RecentProductDataSource =
         RoomRecentProductDataSource(database.recentProductDao())
 
     val cartRepository: CartRepository = CartRepositoryImpl(cartDataSource)
-    val productRepository: ProductRepository = RemoteProductRepository(productDataSource)
+    val productRepository: ProductRepository = RemoteProductRepository(productRemoteDataSource)
     val recentProductRepository: RecentProductRepository =
         LocalRecentProductRepository(recentProductDataSource)
 }
