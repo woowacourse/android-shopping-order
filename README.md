@@ -10,19 +10,19 @@
 
 #### 프로그래밍 요구사항
 
-- [ ] 서버를 연동한다
+- [x] 서버를 연동한다
 - [ ] 기존에 작성한 테스트가 깨지면 안 된다
 - [ ] 사용자 인증 정보를 저장한다 (적절한 저장 방법을 선택한다)
 - [ ] 서버 통신을 위한 JSON 직렬화 라이브러리를 선택하고 PR 에 선택 이유를 남긴다
 
 #### 결정 사항 / TODO
 
-- [ ] HTTP Client: **Retrofit** 도입
-- [ ] JSON 직렬화 라이브러리 선택 (후보: kotlinx-serialization / Moshi / Gson) — 선택 후 PR 에 이유 기재
-- [ ] 사용자 인증 정보 저장 방식 선택 (후보: EncryptedSharedPreferences / DataStore 등)
-- [ ] DataSource 계층 구성
-    - [ ] 기존 MockData DataSource
-    - [ ] Retrofit DataSource
+- [x] HTTP Client: **Retrofit** 도입
+- [x] JSON 직렬화 라이브러리 선택 (kotlinx-serialization 선택) — 선택 후 PR 에 이유 기재
+- [x] 사용자 인증 정보 저장 방식 선택 (DataStore 선택)
+- [x] DataSource 계층 구성
+    - [x] 기존 MockData DataSource
+    - [x] Retrofit DataSource
 
 #### 서버 연동 목록
 

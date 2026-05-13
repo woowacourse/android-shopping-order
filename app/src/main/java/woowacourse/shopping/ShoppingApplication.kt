@@ -16,7 +16,8 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.data.local.RecentProductDatabase
-import woowacourse.shopping.data.network.cart.CartServerDaoImpl
+import woowacourse.shopping.data.network.cart.CartRetrofitDaoImpl
+import woowacourse.shopping.data.network.cart.RetrofitCartService
 import woowacourse.shopping.data.network.product.ProductRetrofitDaoImpl
 import woowacourse.shopping.data.network.product.RetrofitProductService
 import woowacourse.shopping.data.network.startMockWebServer
@@ -101,11 +102,17 @@ class ShoppingApplication : Application() {
                 ),
             ),
         )
+
+        val retrofitCartService = Retrofit.Builder()
+            .baseUrl("http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/")
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .client(client)
+            .build()
+            .create(RetrofitCartService::class.java)
+
         val cart: CartRepository = CartRepositoryImpl(
-            cartServerDao = CartServerDaoImpl(
-                client = client,
-                baseUrl = baseUrl,
-                json = json,
+            cartServerDao = CartRetrofitDaoImpl(
+                retrofitCartService = retrofitCartService,
             ),
             productRepository = product,
         )
