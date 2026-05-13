@@ -60,7 +60,7 @@ class CartViewModel(
 
     fun nextPage() {
         val currentPage = _uiState.value.currentPage
-        val totalCount = _uiState.value.totalItemCount
+        val totalCount = _uiState.value.totalCartItemCount
         if (pager.hasNext(currentPage, totalCount)) {
             _uiState.update { it.copy(currentPage = currentPage + 1) }
             loadData()
@@ -77,13 +77,42 @@ class CartViewModel(
 
     fun toggleItemSelection(itemId: Long, isSelected: Boolean) {
         _uiState.update { state ->
-            val newSelectedIds = if(isSelected) {
-                state.selectedItemIds + itemId
+            if (isSelected) {
+                state.copy(selectedItemIds = state.selectedItemIds + itemId)
             } else {
-                state.selectedItemIds - itemId
+                state.copy(selectedItemIds = state.selectedItemIds - itemId, isAllSelected = false)
             }
-            state.copy(selectedItemIds = newSelectedIds)
         }
+        loadData()
+    }
+
+    fun toggleAllItemsSelection(isSelected: Boolean) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            try {
+                val cartItems = cartRepo.getAllCartItems()
+                val allIds = cartItems.items.map {
+                    it.id
+                        ?: throw IllegalArgumentException("아이템에 id(${it.id})가 없습니다.")
+                }.toSet()
+
+                if (isSelected) _uiState.update {
+                    it.copy(
+                        selectedItemIds = allIds,
+                        isAllSelected = true
+                    )
+                }
+                else _uiState.update {
+                    it.copy(
+                        selectedItemIds = emptySet(),
+                        isAllSelected = false
+                    )
+                }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+        loadData()
     }
 
     private fun loadData() {
@@ -98,23 +127,45 @@ class CartViewModel(
     }
 
     private suspend fun refreshData() {
-        val totalCount = cartRepo.getSize()
-        val totalPages = pager.getTotalPages(totalCount)
+        val totalCartItemCount = cartRepo.getSize()
+        val totalPages = pager.getTotalPages(totalCartItemCount)
         val validCurrentPage = _uiState.value.currentPage.coerceIn(1, totalPages)
-
-        val items =
-            cartRepo.getPagedItems(
-                page = validCurrentPage,
-                count = pageSize,
-            )
+        val totalPrice = calculatePrice()
+        val totalSelectedCount = calculateTotalSelectedCount()
+        val items = cartRepo.getPagedItems(
+            page = validCurrentPage,
+            count = pageSize,
+        )
 
         _uiState.update {
             it.copy(
                 currentPage = validCurrentPage,
                 pagedItems = items,
-                totalItemCount = totalCount,
+                totalCartItemCount = totalCartItemCount,
                 pageSize = pageSize,
+                totalPrice = totalPrice,
+                totalSelectedCount = totalSelectedCount
             )
         }
+    }
+
+    private suspend fun calculatePrice(): Long {
+        val cart = cartRepo.getAllCartItems()
+        if (cart.items.isEmpty()) return 0
+        val selectedItems = _uiState.value.selectedItemIds.map { itemId ->
+            cart.items.find { it.id == itemId }
+                ?: throw IllegalArgumentException("선택한 상품 아이디($itemId)로 장바구니에서 아이템을 조회할 수 없습니다.")
+        }
+        return selectedItems.sumOf { it.totalPrice.value }
+    }
+
+    private suspend fun calculateTotalSelectedCount(): Int {
+        val cart = cartRepo.getAllCartItems()
+        if (cart.items.isEmpty()) return 0
+        val selectedItems = _uiState.value.selectedItemIds.map { itemId ->
+            cart.items.find { it.id == itemId }
+                ?: throw IllegalArgumentException("선택한 상품 아이디($itemId)로 장바구니에서 아이템을 조회할 수 없습니다.")
+        }
+        return selectedItems.sumOf { it.quantity }
     }
 }

@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.cart
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -15,6 +16,7 @@ import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.ui.cart.component.CartBody
+import woowacourse.shopping.ui.cart.component.CartBottomBar
 import woowacourse.shopping.ui.cart.component.CartHeader
 import woowacourse.shopping.ui.cart.component.CartScreenSkeleton
 
@@ -39,11 +41,16 @@ fun CartScreen(
             onNextClick = { viewModel.nextPage() },
             onAddClick = { viewModel.increase(it.product) },
             onRemoveClick = { viewModel.decrease(it.product) },
-            onCheckedChange = { id, isChecked ->
+            onCheckedChange = { id, isSelected ->
                 viewModel.toggleItemSelection(
-                    id.id ?: throw IllegalArgumentException(), isChecked
+                    id.id ?: throw IllegalArgumentException(), isSelected
                 )
             },
+            selectedItemCount = uiState.totalSelectedCount,
+            totalPrice = uiState.totalPrice,
+            onAllCheckboxChanged = { isSelected -> viewModel.toggleAllItemsSelection(isSelected) },
+            checked = uiState.isAllSelected,
+            modifier = Modifier,
         )
 
         if (uiState.isLoading) CartScreenSkeleton()
@@ -57,6 +64,9 @@ fun CartScreen(
     totalPages: Int,
     showPagination: Boolean,
     selectedItemIds: Set<Long>,
+    selectedItemCount: Int,
+    totalPrice: Long,
+    checked: Boolean,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
     onDeleteClick: (CartItem) -> Unit,
@@ -65,6 +75,7 @@ fun CartScreen(
     onAddClick: (CartItem) -> Unit,
     onRemoveClick: (CartItem) -> Unit,
     onCheckedChange: (CartItem, Boolean) -> Unit,
+    onAllCheckboxChanged: (Boolean) -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -88,6 +99,15 @@ fun CartScreen(
             onCheckedChange = onCheckedChange,
             selectedItemIds = selectedItemIds,
         )
+
+        CartBottomBar(
+            useCheckbox = true,
+            count = selectedItemCount,
+            checked = checked,
+            price = totalPrice,
+            onCheckedChanged = onAllCheckboxChanged,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
@@ -106,18 +126,22 @@ private fun CartScreenPreview1() {
 
     CartScreen(
         cart = cart,
-        onBackClick = {},
-        onDeleteClick = {},
         currentPage = 1,
         totalPages = 2,
         showPagination = true,
+        selectedItemIds = emptySet(),
+        selectedItemCount = 4,
+        totalPrice = 50000,
+        checked = true,
         modifier = Modifier,
+        onBackClick = {},
+        onDeleteClick = {},
         onPreviousClick = {},
         onNextClick = {},
         onAddClick = {},
         onRemoveClick = {},
         onCheckedChange = { _, _ -> },
-        selectedItemIds = setOf(),
+        onAllCheckboxChanged = {},
     )
 }
 
@@ -128,17 +152,21 @@ private fun CartScreenPreview2() {
 
     CartScreen(
         cart = cart,
+        currentPage = 1,
+        totalPages = 2,
+        showPagination = false,
+        selectedItemIds = emptySet(),
+        selectedItemCount = 0,
+        totalPrice = 0,
+        checked = false,
+        modifier = Modifier,
         onBackClick = {},
         onDeleteClick = {},
-        currentPage = 1,
-        totalPages = 1,
-        showPagination = false,
-        modifier = Modifier,
         onPreviousClick = {},
         onNextClick = {},
         onAddClick = {},
         onRemoveClick = {},
         onCheckedChange = { _, _ -> },
-        selectedItemIds = setOf(),
+        onAllCheckboxChanged = {},
     )
 }
