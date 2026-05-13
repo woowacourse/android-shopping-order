@@ -3,11 +3,21 @@ package woowacourse.shopping.ui.shopping
 import woowacourse.shopping.model.Product
 
 data class ShoppingUiState(
-    val products: List<ShoppingProductUiState> = emptyList(),
+    val productListState: ProductListUiState = ProductListUiState.Loading,
     val recentProducts: List<Product> = emptyList(),
     val cartQuantity: Int = 0,
-    val hasNext: Boolean = false,
-    val isLoading: Boolean = false,
     val isNetworkConnected: Boolean = true,
-    val errorMessage: String? = null,
 )
+
+sealed interface ProductListUiState {
+    data object Loading : ProductListUiState
+
+    data class Content(
+        val products: List<ShoppingProductUiState>,
+        val hasNext: Boolean,
+    ) : ProductListUiState
+
+    data class Error(
+        val message: String?,
+    ) : ProductListUiState
+}

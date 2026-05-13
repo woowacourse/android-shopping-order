@@ -24,7 +24,7 @@ class ShoppingViewModel(
     private val recentProductRepository: RecentProductRepository = ShoppingRepositoryProvider.recentProductRepository,
     private val networkMonitor: NetworkMonitor = ShoppingRepositoryProvider.networkMonitor,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(ShoppingUiState(isLoading = true))
+    private val _uiState = MutableStateFlow(ShoppingUiState(productListState = ProductListUiState.Loading))
     val uiState: StateFlow<ShoppingUiState> = _uiState.asStateFlow()
 
     private var visibleCount = PAGE_SIZE
@@ -35,16 +35,18 @@ class ShoppingViewModel(
     }
 
     fun reloadVisibleState() {
-        if (_uiState.value.isLoading) return
+        if (_uiState.value.productListState is ProductListUiState.Loading) return
+
         viewModelScope.launch {
             runCatching {
                 refreshRecentProducts()
                 refreshCartState()
             }.onFailure { throwable ->
-                _uiState.value =
-                    _uiState.value.copy(
-                        errorMessage = throwable.message,
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        productListState = ProductListUiState.Error(throwable.message),
                     )
+                }
             }
         }
     }
@@ -56,30 +58,34 @@ class ShoppingViewModel(
     }
 
     suspend fun refreshProducts() {
-        _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
-
+        _uiState.update { currentState ->
+            currentState.copy(
+                productListState = ProductListUiState.Loading,
+            )
+        }
         runCatching {
             val visibleProducts = productRepository.getProducts(0, visibleCount).toList()
             val hasNext = productRepository.hasNext(visibleProducts.count() - 1)
             val cartState = createCartState(visibleProducts)
             val restoredRecentProducts = getRecentProducts()
 
-            _uiState.value =
-                ShoppingUiState(
-                    products = cartState.products,
+            _uiState.update { currentState ->
+                currentState.copy(
+                    productListState =
+                        ProductListUiState.Content(
+                            products = cartState.products,
+                            hasNext = hasNext,
+                        ),
                     recentProducts = restoredRecentProducts,
                     cartQuantity = cartState.cartQuantity,
-                    hasNext = hasNext,
-                    isLoading = false,
-                    isNetworkConnected = _uiState.value.isNetworkConnected,
-                    errorMessage = null,
                 )
+            }
         }.onFailure { throwable ->
-            _uiState.value =
-                _uiState.value.copy(
-                    isLoading = false,
-                    errorMessage = throwable.message,
+            _uiState.update { currentState ->
+                currentState.copy(
+                    productListState = ProductListUiState.Error(throwable.message),
                 )
+            }
         }
     }
 
@@ -87,20 +93,25 @@ class ShoppingViewModel(
         _uiState.update { currentState ->
             currentState.copy(
                 recentProducts = getRecentProducts(),
-                errorMessage = null,
             )
         }
     }
 
     private suspend fun refreshCartState() {
-        val visibleProducts = _uiState.value.products.map { it.product }
+        val currentProductListState = _uiState.value.productListState
+        val contentState = currentProductListState as? ProductListUiState.Content ?: return
+
+        val visibleProducts = contentState.products.map { it.product }
         val cartState = createCartState(visibleProducts)
 
         _uiState.update { currentState ->
+            val lastestContent = currentState.productListState as? ProductListUiState.Content ?: return@update currentState
             currentState.copy(
-                products = cartState.products,
+                productListState =
+                    lastestContent.copy(
+                        products = cartState.products,
+                    ),
                 cartQuantity = cartState.cartQuantity,
-                errorMessage = null,
             )
         }
     }
@@ -138,8 +149,9 @@ class ShoppingViewModel(
     )
 
     fun loadMore() {
-        val currentState = _uiState.value
-        if (currentState.isLoading || !currentState.hasNext) return
+        val contentState = _uiState.value.productListState as? ProductListUiState.Content ?: return
+        if (!contentState.hasNext) return
+
         visibleCount = minOf(visibleCount + PAGE_SIZE, productRepository.size)
         loadProducts()
     }
@@ -147,33 +159,35 @@ class ShoppingViewModel(
     fun addToCart(productId: ProductId) = increaseQuantity(productId)
 
     fun increaseQuantity(productId: ProductId) {
-        if (_uiState.value.isLoading) return
+        if (_uiState.value.productListState is ProductListUiState.Loading) return
+
         viewModelScope.launch {
             runCatching {
                 cartRepository.add(productId)
-                refreshProducts()
+                refreshCartState()
             }.onFailure { throwable ->
-                _uiState.value =
-                    _uiState.value.copy(
-                        isLoading = false,
-                        errorMessage = throwable.message,
+                _uiState.update { current ->
+                    current.copy(
+                        productListState = ProductListUiState.Error(throwable.message),
                     )
+                }
             }
         }
     }
 
     fun decreaseQuantity(productId: ProductId) {
-        if (_uiState.value.isLoading) return
+        if (_uiState.value.productListState is ProductListUiState.Loading) return
+
         viewModelScope.launch {
             runCatching {
                 cartRepository.delete(productId)
-                refreshProducts()
+                refreshCartState()
             }.onFailure { throwable ->
-                _uiState.value =
-                    _uiState.value.copy(
-                        isLoading = false,
-                        errorMessage = throwable.message,
+                _uiState.update { current ->
+                    current.copy(
+                        productListState = ProductListUiState.Error(throwable.message),
                     )
+                }
             }
         }
     }

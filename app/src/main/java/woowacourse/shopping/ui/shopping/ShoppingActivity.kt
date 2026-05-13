@@ -33,13 +33,10 @@ class ShoppingActivity : ComponentActivity() {
             ShoppingTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     ShoppingScreen(
-                        products = uiState.products,
+                        productListState = uiState.productListState,
                         recentProducts = uiState.recentProducts,
                         cartQuantity = uiState.cartQuantity,
-                        hasNext = uiState.hasNext,
-                        isLoading = uiState.isLoading,
                         isNetworkConnected = uiState.isNetworkConnected,
-                        errorMessage = uiState.errorMessage,
                         modifier = Modifier.padding(innerPadding),
                         onCartClick = {
                             startActivity(Intent(this, CartActivity::class.java))

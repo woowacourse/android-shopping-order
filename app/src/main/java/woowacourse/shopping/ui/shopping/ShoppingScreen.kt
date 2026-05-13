@@ -16,13 +16,10 @@ import woowacourse.shopping.ui.shopping.component.ShoppingHeader
 
 @Composable
 fun ShoppingScreen(
-    products: List<ShoppingProductUiState>,
+    productListState: ProductListUiState,
     recentProducts: List<Product>,
     cartQuantity: Int,
-    hasNext: Boolean,
-    isLoading: Boolean,
     isNetworkConnected: Boolean,
-    errorMessage: String?,
     modifier: Modifier = Modifier,
     onCartClick: () -> Unit,
     onProductClick: (Product) -> Unit,
@@ -45,11 +42,8 @@ fun ShoppingScreen(
         }
 
         ShoppingBody(
-            products = products,
+            productListState = productListState,
             recentProducts = recentProducts,
-            showMoreButton = hasNext,
-            isLoading = isLoading,
-            errorMessage = errorMessage,
             modifier =
                 Modifier
                     .padding(20.dp)
@@ -67,19 +61,20 @@ fun ShoppingScreen(
 @Composable
 private fun ShoppingScreenPreview() {
     ShoppingScreen(
-        products =
-            InMemoryProductRepository.products.toList().take(6).mapIndexed { index, product ->
-                ShoppingProductUiState(
-                    product = product,
-                    quantity = if (index < 2) 0 else 1,
-                )
-            },
+        productListState =
+            ProductListUiState.Content(
+                products =
+                    InMemoryProductRepository.products.toList().take(6).mapIndexed { index, product ->
+                        ShoppingProductUiState(
+                            product = product,
+                            quantity = if (index < 2) 0 else 1,
+                        )
+                    },
+                hasNext = true,
+            ),
         recentProducts = InMemoryProductRepository.products.take(4),
         cartQuantity = 4,
-        hasNext = true,
-        isLoading = false,
         isNetworkConnected = true,
-        errorMessage = null,
         onCartClick = {},
         onProductClick = {},
         onMoreClick = {},
