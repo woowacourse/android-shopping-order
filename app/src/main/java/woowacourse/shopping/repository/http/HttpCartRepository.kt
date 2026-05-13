@@ -15,6 +15,7 @@ import woowacourse.shopping.repository.cart.CartPageResult
 import woowacourse.shopping.repository.http.api.CartApiService
 import woowacourse.shopping.repository.http.dto.CartItemQuantityUpdateRequestDto
 import woowacourse.shopping.repository.http.dto.CartItemRequestDto
+import woowacourse.shopping.repository.http.dto.OrderRequestDto
 
 private val NETWORK_JSON =
     Json {
@@ -40,6 +41,16 @@ class HttpCartRepository(
             requireNotNull(baseUrl.toHttpUrlOrNull()) { "유효한 cart API baseUrl이 필요합니다." }
         },
     )
+
+    override suspend fun createOrder(cartItemIds: List<Long>) {
+        if (cartItemIds.isEmpty()) return
+
+        execute("주문 API 호출에 실패했습니다.") {
+            cartApiService.createOrder(
+                OrderRequestDto(cartItemIds = cartItemIds),
+            )
+        }
+    }
 
     override suspend fun getCartPage(page: Int, size: Int): CartPageResult {
         val body =

@@ -4,6 +4,8 @@ import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.repository.cart.CartPageResult
 
 interface CartRepository {
+    suspend fun createOrder(cartItemIds: List<Long>)
+
     suspend fun setQuantity(
         productId: Long,
         quantity: Int,

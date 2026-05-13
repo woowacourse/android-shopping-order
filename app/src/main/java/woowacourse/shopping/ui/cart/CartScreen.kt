@@ -24,7 +24,7 @@ fun CartScreen(
     isNetworkConnected: Boolean,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
-    onOrderClick: (Set<Long>) -> Unit,
+    onOrderClick: () -> Unit,
     onItemCheckedChange: (Long, Boolean) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onIncreaseQuantity: (Long) -> Unit,
@@ -34,7 +34,6 @@ fun CartScreen(
 ) {
     val cartItems = (cartListState as? CartListUiState.Content)?.items.orEmpty()
     val selectedItems = cartItems.filter { it.isSelected }
-    val selectedProductIds = selectedItems.map { it.productId }.toSet()
     val totalPrice = selectedItems.sumOf { it.price * it.quantity }
     val isAllSelected = cartItems.isNotEmpty() && cartItems.all { it.isSelected }
 
@@ -93,7 +92,7 @@ fun CartScreen(
         CartBottomBar(
             totalPrice = formatPrice(totalPrice),
             selectedCount = selectedItems.size,
-            onOrderClick = { onOrderClick(selectedProductIds) },
+            onOrderClick = onOrderClick,
             modifier = Modifier.fillMaxWidth(),
             showSelectAll = cartItems.isNotEmpty(),
             isAllSelected = isAllSelected,

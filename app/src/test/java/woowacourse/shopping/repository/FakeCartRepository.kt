@@ -6,6 +6,12 @@ import woowacourse.shopping.model.CartItem
 class FakeCartRepository : CartRepository {
     private var cart = Cart(emptyList())
 
+    override suspend fun createOrder(cartItemIds: List<Long>) {
+        cartItemIds.forEach { cartItemId ->
+            cart = cart.setQuantity(cartItemId, 0)
+        }
+    }
+
     override suspend fun setQuantity(
         productId: Long,
         quantity: Int,
