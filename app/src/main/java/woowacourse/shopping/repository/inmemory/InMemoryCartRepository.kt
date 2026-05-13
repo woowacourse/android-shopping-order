@@ -58,13 +58,13 @@ class InMemoryCartRepository(
     }
 
     override suspend fun getPagedItems(
-        fromIndex: Int,
+        page: Int,
         count: Int,
     ): List<CartItem> {
         require(count >= 0) { "count는 0 이상의 수여야 합니다." }
-        require(fromIndex in 0..value.size) { "$fromIndex 는 장바구니 내 전체 아이템 개수보다 많을 수 없습니다." }
+        require(page in 0..value.size) { "$page 는 장바구니 내 전체 아이템 개수보다 많을 수 없습니다." }
 
-        return value.drop(fromIndex).take(count)
+        return value.drop(page).take(count)
     }
 
     override suspend fun getSize(): Int = value.size

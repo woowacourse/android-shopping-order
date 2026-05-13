@@ -98,12 +98,12 @@ class RetrofitCartRepository(
     }
 
     override suspend fun getPagedItems(
-        fromIndex: Int,
+        page: Int,
         count: Int
     ): List<CartItem> {
         val response = service.getCartItems(
             encoder.getHeader(),
-            page = fromIndex,
+            pageIndex = page - 1,
             size = count
         )
 
@@ -120,6 +120,4 @@ class RetrofitCartRepository(
 
     override suspend fun getCartCount(): Int =
         service.getTotalCount(auth = encoder.getHeader()).quantity
-
-
 }

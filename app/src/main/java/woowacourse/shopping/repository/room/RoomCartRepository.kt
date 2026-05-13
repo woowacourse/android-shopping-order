@@ -56,13 +56,13 @@ class RoomCartRepository(
     }
 
     override suspend fun getPagedItems(
-        fromIndex: Int,
+        page: Int,
         count: Int,
     ): List<CartItem> {
-        require(fromIndex >= 0) { "$fromIndex 는 0 이상의 정수여야 합니다." }
+        require(page >= 0) { "$page 는 0 이상의 정수여야 합니다." }
         require(count >= 0) { "count는 0 이상의 정수여야 합니다." }
 
-        val pagedEntities = cartDao.getPagedEntities(fromIndex, count)
+        val pagedEntities = cartDao.getPagedEntities(page, count)
 
         return pagedEntities.mapNotNull { entity ->
             val product = productRepository.findProduct(entity.productId)

@@ -26,7 +26,7 @@ class InMemoryCartRepositoryTest {
             assertTrue(repo.getSize() == 1)
             assertTrue(
                 repo
-                    .getPagedItems(fromIndex = 0, count = 1)
+                    .getPagedItems(page = 0, count = 1)
                     .first()
                     .product.name == "새우깡",
             )

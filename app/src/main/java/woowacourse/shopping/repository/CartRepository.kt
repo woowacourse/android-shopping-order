@@ -19,7 +19,7 @@ interface CartRepository {
     suspend fun delete(item: Product)
 
     suspend fun getPagedItems(
-        fromIndex: Int,
+        page: Int,
         count: Int,
     ): List<CartItem>
 
