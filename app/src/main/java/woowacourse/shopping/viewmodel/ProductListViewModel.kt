@@ -36,13 +36,13 @@ class ProductListViewModel(
 
     init {
         productPageStateHolder.updateItems(allShoppingItems)
-        updateUiState()
+        publishUiState()
         observeSources()
     }
 
     fun loadNextPage() {
         productPageStateHolder.nextPage()
-        updateUiState()
+        publishUiState()
     }
 
     fun onProductClick(productId: Long) {
@@ -101,19 +101,19 @@ class ProductListViewModel(
             shoppingItemRepository.shoppingItems.collect { latestShoppingItems ->
                 allShoppingItems = latestShoppingItems
                 productPageStateHolder.updateItems(latestShoppingItems)
-                updateUiState()
+                publishUiState()
             }
         }
         viewModelScope.launch {
             visitStore.recentVisitedProductIds.collect { latestRecentViewedIds ->
                 recentViewedProductIds = latestRecentViewedIds
-                updateUiState()
+                publishUiState()
             }
         }
         viewModelScope.launch {
             networkStatusMonitor.isConnected.collect { isConnected ->
                 networkConnected = isConnected
-                updateUiState()
+                publishUiState()
             }
         }
     }
@@ -124,16 +124,19 @@ class ProductListViewModel(
         }
     }
 
-    private fun updateUiState() {
+    private fun publishUiState() {
+        _uiState.value = createUiState()
+    }
+
+    private fun createUiState(): ProductListUiState {
         val shoppingItemByProductId = allShoppingItems.associateBy { shoppingItem -> shoppingItem.getProductId() }
-        _uiState.value =
-            ProductListUiState(
-                shoppingItems = productPageStateHolder.getItems(),
-                recentViewedShoppingItems = recentViewedProductIds.mapNotNull { productId -> shoppingItemByProductId[productId] },
-                shoppingCartTotalCount = allShoppingItems.sumOf { shoppingItem -> shoppingItem.getQuantity() },
-                isNetworkConnected = networkConnected,
-                canLoadNextPage = productPageStateHolder.canMoveToNextPage(),
-            )
+        return ProductListUiState(
+            shoppingItems = productPageStateHolder.getItems(),
+            recentViewedShoppingItems = recentViewedProductIds.mapNotNull { productId -> shoppingItemByProductId[productId] },
+            shoppingCartTotalCount = allShoppingItems.sumOf { shoppingItem -> shoppingItem.getQuantity() },
+            isNetworkConnected = networkConnected,
+            canLoadNextPage = productPageStateHolder.canMoveToNextPage(),
+        )
     }
 
     data class ProductListUiState(
