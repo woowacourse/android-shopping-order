@@ -1,6 +1,7 @@
 package woowacourse.shopping.feature.productlist
 
 import android.R.attr.name
+import android.R.attr.text
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -40,6 +41,7 @@ import woowacourse.shopping.feature.common.ProductQuantitySelector
 
 @Composable
 fun ProductItem(
+    isLoading: Boolean,
     imageUrl: String,
     name: String,
     price: String,
@@ -49,40 +51,51 @@ fun ProductItem(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        Box {
+        Box(
+            modifier = Modifier.then(
+                if (isLoading) {
+                    Modifier.background(color = Color.LightGray)
+                } else {
+                    Modifier
+                },
+            ),
+        ) {
             PreviewableAsyncImage(
                 imageUrl = imageUrl,
                 description = name,
-                modifier = Modifier.aspectRatio(1f),
+                isLoading = isLoading,
+                modifier = Modifier
+                    .aspectRatio(1f),
             )
-            AnimatedContent(
-                targetState = quantity == 0,
-                transitionSpec = {
-                    (fadeIn(tween(200)) + scaleIn(initialScale = 0.8f)) togetherWith
-                        (fadeOut(tween(150)) + scaleOut(targetScale = 0.8f))
-                },
-                label = "quantity-control",
-                modifier = Modifier.align(Alignment.BottomEnd),
-            ) { isEmpty ->
-                if (isEmpty) {
-                    ProductInitialAddButton(
-                        modifier = Modifier
-                            .size(45.dp)
-                            .padding(bottom = 4.dp, end = 4.dp)
-                            .clickable(onClick = onIncrease),
-                    )
-                } else {
-                    ProductQuantitySelector(
-                        quantity = quantity,
-                        onIncrease = onIncrease,
-                        onDecrease = onDecrease,
-                        modifier = Modifier
-                            .height(42.dp)
-                            .fillMaxWidth()
-                            .padding(bottom = 6.dp, start = 4.dp, end = 4.dp),
-                    )
+            if (isLoading.not())
+                AnimatedContent(
+                    targetState = quantity == 0,
+                    transitionSpec = {
+                        (fadeIn(tween(200)) + scaleIn(initialScale = 0.8f)) togetherWith
+                            (fadeOut(tween(150)) + scaleOut(targetScale = 0.8f))
+                    },
+                    label = "quantity-control",
+                    modifier = Modifier.align(Alignment.BottomEnd),
+                ) { isEmpty ->
+                    if (isEmpty) {
+                        ProductInitialAddButton(
+                            modifier = Modifier
+                                .size(45.dp)
+                                .padding(bottom = 4.dp, end = 4.dp)
+                                .clickable(onClick = onIncrease),
+                        )
+                    } else {
+                        ProductQuantitySelector(
+                            quantity = quantity,
+                            onIncrease = onIncrease,
+                            onDecrease = onDecrease,
+                            modifier = Modifier
+                                .height(42.dp)
+                                .fillMaxWidth()
+                                .padding(bottom = 6.dp, start = 4.dp, end = 4.dp),
+                        )
+                    }
                 }
-            }
         }
         Spacer(modifier = Modifier.height(9.dp))
         Text(
@@ -92,13 +105,18 @@ fun ProductItem(
             lineHeight = 24.sp,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.fillMaxWidth(),
+            color = if (isLoading) Color.Transparent else Color.Unspecified,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(if (isLoading) Color.LightGray else Color.Transparent),
         )
+        Spacer(modifier = Modifier.height(9.dp))
         Text(
             text = price,
             fontWeight = FontWeight.W400,
             fontSize = 16.sp,
-            color = Color(0xff555555),
+            color = if (isLoading) Color.Transparent else Color(0xff555555),
+            modifier = Modifier.background(if (isLoading) Color.LightGray else Color.Transparent),
         )
         Spacer(modifier = Modifier.height(12.dp))
     }
@@ -108,6 +126,7 @@ fun ProductItem(
 @Composable
 private fun PreviewProduct() {
     ProductItem(
+        isLoading = true,
         imageUrl = "asd",
         name = "Pet보틀-정사각형 50000ml",
         price = "12,000원",

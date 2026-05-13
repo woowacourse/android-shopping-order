@@ -54,8 +54,8 @@ fun ProductListScreen(
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                vm.cartRefresh()
-                vm.loadRecentProducts()
+                // vm.cartRefresh()
+                // vm.loadRecentProducts()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -106,6 +106,7 @@ fun ProductListScreen(
                     }
 
                     ProductList(
+                        isLoading = state.isLoading,
                         products = state.productUiModels,
                         onProductClick = {
                             vm.insertRecentProduct(it.id)
@@ -122,9 +123,6 @@ fun ProductListScreen(
                         isEnd = state.isEnd,
                         modifier = Modifier.padding(20.dp),
                     )
-                }
-                if (state.isLoading) {
-                    LoadingIndicator()
                 }
             }
         }

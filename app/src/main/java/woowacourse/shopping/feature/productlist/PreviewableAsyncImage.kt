@@ -16,6 +16,7 @@ import woowacourse.shopping.R
 fun PreviewableAsyncImage(
     imageUrl: String,
     description: String,
+    isLoading: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     AsyncImage(
@@ -27,8 +28,8 @@ fun PreviewableAsyncImage(
         contentScale = ContentScale.Crop,
         modifier = modifier
             .fillMaxWidth(),
-        error =
-        painterResource(R.drawable.ic_launcher_background),
+        error = if (isLoading) null
+        else painterResource(R.drawable.ic_launcher_background),
     )
 }
 
@@ -38,5 +39,6 @@ private fun PreviewableAsyncImagePreview() {
     PreviewableAsyncImage(
         imageUrl = "",
         description = "더미 이미지",
+        isLoading = true,
     )
 }

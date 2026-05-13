@@ -41,7 +41,7 @@ class CartRetrofitDaoImpl(
         val response = retrofitCartService
             .insertCartItem(
                 cartItemInsertDto = CartItemInsertDto(
-                    productId = item.id.toLong(),
+                    productId = item.product.id.toLong(),
                     quantity = item.quantity,
                 ),
             )
@@ -59,9 +59,6 @@ class CartRetrofitDaoImpl(
             .execute()
 
         check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
-
-        val body = response.body()
-            ?: error("empty body")
     }
 
     override suspend fun deleteById(id: String) = withContext(Dispatchers.IO) {
@@ -70,8 +67,5 @@ class CartRetrofitDaoImpl(
             .execute()
 
         check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
-
-        val body = response.body()
-            ?: error("empty body")
     }
 }

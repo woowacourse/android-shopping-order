@@ -26,6 +26,7 @@ import woowacourse.shopping.feature.common.state.ProductUiModel
 
 @Composable
 fun ProductList(
+    isLoading: Boolean,
     products: List<ProductUiModel>,
     onProductClick: (ProductUiModel) -> Unit,
     onLoading: () -> Unit,
@@ -40,44 +41,63 @@ fun ProductList(
         modifier = modifier
             .fillMaxWidth(),
     ) {
-        items(
-            key = { it.id },
-            items = products,
-        ) {
-            ProductItem(
-                imageUrl = it.imageUrl,
-                name = it.name,
-                price = it.formattedPrice(it.quantity),
-                quantity = it.quantity,
-                onIncrease = { onIncrease(it.id) },
-                onDecrease = { onDecrease(it.id) },
-                modifier = Modifier.clickable(
-                    onClick = {
-                        onProductClick(it)
-                    },
-                ),
-            )
-        }
-        if (isEnd.not())
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            onLoading()
+        if (isLoading) {
+            items(20) {
+                ProductItem(
+                    isLoading = isLoading,
+                    imageUrl = "",
+                    name = "ㅁㄴㅇㅂㅈㄷ",
+                    price = "10000",
+                    quantity = 0,
+                    onIncrease = { },
+                    onDecrease = { },
+                    modifier = Modifier.clickable(
+                        onClick = {
                         },
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowDownward,
-                        contentDescription = stringResource(R.string.load_more_description),
-                        modifier = Modifier
-                            .padding(12.dp)
-                            .size(24.dp)
-                            .align(Alignment.Center),
-                        tint = Color(0xFF555555),
-                    )
-                }
+                    ),
+                )
             }
+        } else {
+            items(
+                key = { it.id },
+                items = products,
+            ) {
+                ProductItem(
+                    isLoading = isLoading,
+                    imageUrl = it.imageUrl,
+                    name = it.name,
+                    price = it.formattedPrice(it.quantity),
+                    quantity = it.quantity,
+                    onIncrease = { onIncrease(it.id) },
+                    onDecrease = { onDecrease(it.id) },
+                    modifier = Modifier.clickable(
+                        onClick = {
+                            onProductClick(it)
+                        },
+                    ),
+                )
+            }
+            if (isEnd.not())
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onLoading()
+                            },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowDownward,
+                            contentDescription = stringResource(R.string.load_more_description),
+                            modifier = Modifier
+                                .padding(12.dp)
+                                .size(24.dp)
+                                .align(Alignment.Center),
+                            tint = Color(0xFF555555),
+                        )
+                    }
+                }
+        }
     }
 }
 
@@ -85,6 +105,7 @@ fun ProductList(
 @Composable
 private fun ProductListPreview() {
     ProductList(
+        isLoading = false,
         products = emptyList(),
         onProductClick = { },
         onLoading = { },
