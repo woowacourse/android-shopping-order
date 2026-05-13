@@ -8,7 +8,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import woowacourse.shopping.data.local.RecentProductDatabase
 import woowacourse.shopping.data.network.cart.CartServerDaoImpl
-import woowacourse.shopping.data.network.product.ProductServerDaoImpl
+import woowacourse.shopping.data.network.product.dto.ProductServerDaoImpl
 import woowacourse.shopping.data.network.startMockWebServer
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.cart.CartRepositoryImpl

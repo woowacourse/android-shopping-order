@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.network.product
+package woowacourse.shopping.data.network.product.dto
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -6,6 +6,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import woowacourse.shopping.data.network.product.ProductDao
 import woowacourse.shopping.domain.Product
 
 class ProductServerDaoImpl(

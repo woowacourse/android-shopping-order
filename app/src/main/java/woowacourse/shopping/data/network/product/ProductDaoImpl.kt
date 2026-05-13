@@ -13,6 +13,7 @@ import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import woowacourse.shopping.data.network.product.dto.ProductDto
 import woowacourse.shopping.domain.Product
 
 class ProductDaoImpl(
