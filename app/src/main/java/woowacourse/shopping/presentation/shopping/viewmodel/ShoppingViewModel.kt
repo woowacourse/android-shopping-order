@@ -68,7 +68,9 @@ class ShoppingViewModel(
 
     fun decrease(id: Long) {
         viewModelScope.launch {
-            cartRepository.decrease(id)
+            val cartItem = cartRepository.getCart().items.find { it.product.id == id } ?: return@launch
+            cartRepository.changeCartItem(id, cartItem.decrease().quantity)
+
             loadCartItemQuantities()
         }
     }

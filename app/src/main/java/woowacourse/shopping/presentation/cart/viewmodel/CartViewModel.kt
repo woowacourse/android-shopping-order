@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.cart.viewmodel
 
+import android.nfc.tech.MifareUltralight.PAGE_SIZE
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
@@ -11,7 +12,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.RepositoryProvider
-import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.RemoveItemResult
 import woowacourse.shopping.domain.repository.CartRepository
@@ -41,6 +41,7 @@ class CartViewModel(
                     loadCartItems(result.cart)
                     _uiEvents.send(CartEvent.DeleteSuccess)
                 }
+
                 is RemoveItemResult.NotFoundItem -> {
                     _uiEvents.send(CartEvent.DeleteNotFound)
                 }
@@ -50,23 +51,22 @@ class CartViewModel(
 
     fun increase(productId: Long) {
         viewModelScope.launch {
-            when (val result = cartRepository.addItem(productId)) {
-                is AddItemResult.NewAdded -> loadCartItems(result.cart)
-                is AddItemResult.Incremented -> loadCartItems(result.cart)
-            }
+            val cartItem = cartRepository.getCart().items.find { it.product.id == productId }
+            if (cartItem == null) return@launch
+
+            val updatedCart = cartRepository.changeCartItem(productId, cartItem.quantity + 1)
+
+            loadCartItems(updatedCart)
         }
     }
 
     fun decrease(productId: Long) {
         viewModelScope.launch {
-            when (val result = cartRepository.decrease(productId)) {
-                is RemoveItemResult.Success -> {
-                    loadCartItems(result.cart)
-                }
-                is RemoveItemResult.NotFoundItem -> {
-                    _uiEvents.send(CartEvent.DeleteNotFound)
-                }
-            }
+            val cartItem = cartRepository.getCart().items.find { it.product.id == productId }
+            if (cartItem == null) return@launch
+
+            val updatedCart = cartRepository.changeCartItem(productId, cartItem.quantity - 1)
+            loadCartItems(updatedCart)
         }
     }
 

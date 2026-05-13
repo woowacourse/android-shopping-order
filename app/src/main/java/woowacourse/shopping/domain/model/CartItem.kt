@@ -10,4 +10,14 @@ data class CartItem(
     }
 
     fun getTotalPrice(): Money = product.price * quantity
+
+    fun decrease(): CartItem {
+        if (quantity == 1) return this
+        return copy(quantity = quantity - 1)
+    }
+
+    fun increase(): CartItem {
+        if (quantity == 99) return this
+        return copy(quantity = quantity + 1)
+    }
 }

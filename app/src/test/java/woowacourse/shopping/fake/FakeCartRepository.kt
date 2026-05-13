@@ -35,8 +35,8 @@ class FakeCartRepository(
         }
     }
 
-    override suspend fun deleteItem(id: Long): RemoveItemResult =
-        if (items.remove(id) != null) {
+    override suspend fun deleteItem(productId: Long): RemoveItemResult =
+        if (items.remove(productId) != null) {
             RemoveItemResult.Success(getCart())
         } else {
             RemoveItemResult.NotFoundItem
@@ -50,5 +50,5 @@ class FakeCartRepository(
 
     override suspend fun getAllQuantities(): Map<Long, Int> = items.toMap()
 
-    override suspend fun getQuantity(id: Long): Int = items[id] ?: 1
+    override suspend fun getQuantity(productId: Long): Int = items[productId] ?: 1
 }

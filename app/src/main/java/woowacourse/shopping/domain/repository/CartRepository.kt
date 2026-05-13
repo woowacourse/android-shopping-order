@@ -1,6 +1,5 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.RemoveItemResult
 
@@ -12,13 +11,16 @@ interface CartRepository {
     suspend fun addItem(
         id: Long,
         quantity: Int = 1,
-    ): AddItemResult
+    )
 
-    suspend fun deleteItem(id: Long): RemoveItemResult
-
-    suspend fun decrease(id: Long): RemoveItemResult
+    suspend fun deleteItem(productId: Long): RemoveItemResult
 
     suspend fun getAllQuantities(): Map<Long, Int>
 
-    suspend fun getQuantity(id: Long): Int
+    suspend fun getQuantity(productId: Long): Int
+
+    suspend fun changeCartItem(
+        productId: Long,
+        amount: Int,
+    ): Cart
 }

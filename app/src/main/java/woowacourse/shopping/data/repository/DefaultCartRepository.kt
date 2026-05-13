@@ -3,7 +3,6 @@ package woowacourse.shopping.data.repository
 import woowacourse.shopping.data.source.local.cart.CartDao
 import woowacourse.shopping.data.source.remote.CartRemoteDataSource
 import woowacourse.shopping.data.source.remote.dto.cart.CartContent
-import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Money
@@ -16,7 +15,7 @@ class DefaultCartRepository(
     private val cartDao: CartDao,
     private val remoteDataSource: CartRemoteDataSource,
 ) : CartRepository {
-    private suspend fun getCartContents(): List<CartContent> = remoteDataSource.getCartItems(0, 10000)
+    private suspend fun getCartContents(): List<CartContent> = remoteDataSource.getCartItems(0, 20)
 
     override suspend fun getCart(): Cart {
         val cartContents = getCartContents()
@@ -46,36 +45,36 @@ class DefaultCartRepository(
     override suspend fun addItem(
         id: Long,
         quantity: Int,
-    ): AddItemResult {
+    ) {
         remoteDataSource.addItem(
             id = id,
             quantity = quantity,
         )
-        val before = cartDao.findById(id)
-        cartDao.addOrIncrement(id, quantity)
-        val cart = getCart()
-        return if (before == null) {
-            AddItemResult.NewAdded(cart)
-        } else {
-            AddItemResult.Incremented(cart)
-        }
     }
 
     override suspend fun getTotalCartSize(): Int = cartDao.getTotalCartSize()
 
-    override suspend fun deleteItem(id: Long): RemoveItemResult {
-        val cartContent = getCartContents().find { it.product.id == id } ?: return RemoveItemResult.NotFoundItem
+    override suspend fun deleteItem(productId: Long): RemoveItemResult {
+        val cartContent = getCartContents().find { it.product.id == productId } ?: return RemoveItemResult.NotFoundItem
         remoteDataSource.deleteItem(cartContent.id)
         return RemoveItemResult.Success(getCart())
     }
 
-    override suspend fun decrease(id: Long): RemoveItemResult {
-        val existing = cartDao.findById(id) ?: return RemoveItemResult.NotFoundItem
-        cartDao.deleteOrDecrement(existing.productId)
-        return RemoveItemResult.Success(getCart())
+    override suspend fun getAllQuantities(): Map<Long, Int> =
+        getCart().items.associate { item ->
+            item.product.id to item.quantity
+        }
+
+    override suspend fun getQuantity(productId: Long): Int = getCart().items.find { it.product.id == productId }?.quantity ?: 1
+
+    override suspend fun changeCartItem(
+        productId: Long,
+        amount: Int,
+    ): Cart {
+        val cartContent = getCartContents().find { it.product.id == productId }
+        if (cartContent != null) {
+            remoteDataSource.changeQuantity(cartContent.id, amount)
+        }
+        return getCart()
     }
-
-    override suspend fun getAllQuantities(): Map<Long, Int> = cartDao.getAll().associate { it.productId to it.quantity }
-
-    override suspend fun getQuantity(id: Long): Int = cartDao.findById(id)?.quantity ?: 1
 }

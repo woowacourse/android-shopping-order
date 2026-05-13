@@ -11,6 +11,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.data.source.remote.api.AddItemRequestBody
 import woowacourse.shopping.data.source.remote.api.CartService
+import woowacourse.shopping.data.source.remote.api.QuantityRequestBody
 import woowacourse.shopping.data.source.remote.dto.cart.CartContent
 import woowacourse.shopping.di.RepositoryProvider
 import woowacourse.shopping.di.RepositoryProvider.authRepository
@@ -82,6 +83,33 @@ class CartRemoteDataSource(
                 cartService.requestDeleteItem(
                     basicToken = "Basic ${authRepository.getAuthToken}",
                     id = id,
+                )
+            } catch (err: HttpException) {
+                when (err.code()) {
+                    400 -> Log.e("cartItem", "Bad Request: $err")
+                    401 -> Log.e("cartItem", "Unauthorized")
+                    403 -> Log.e("cartItem", "Forbidden")
+                    404 -> Log.e("cartItem", "Not Found")
+                    500 -> Log.e("cartItem", "Internal Server Error")
+                }
+            } catch (err: IOException) {
+                Log.e("cartItem", "Network Error : $err")
+            } catch (err: Exception) {
+                Log.e("cartItem", "Unknown Error : $err")
+            }
+        }
+    }
+
+    suspend fun changeQuantity(
+        id: Long,
+        quantity: Int,
+    ) {
+        withContext(Dispatchers.IO) {
+            try {
+                cartService.requestChangeQuantity(
+                    basicToken = "Basic ${authRepository.getAuthToken}",
+                    id = id,
+                    quantity = QuantityRequestBody(quantity),
                 )
             } catch (err: HttpException) {
                 when (err.code()) {
