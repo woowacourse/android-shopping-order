@@ -65,13 +65,21 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
+    // okhttp
     implementation(libs.okhttp)
+
+    // serialization
     implementation(libs.kotlinx.serialization.json)
 
     debugImplementation(libs.okhttp.mockwebserver)
     testImplementation("org.assertj:assertj-core:3.27.3")
+
+    // retrofit
+    implementation(libs.retrofit)
 }

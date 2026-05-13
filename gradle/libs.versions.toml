@@ -14,6 +14,7 @@ coil-compose = "3.4.0"
 coil-network-okhttp = "3.4.0"
 material-icons-extended = "1.7.3"
 ksp = "2.3.6"
+retrofit = "3.0.0"
 room = "2.8.3"
 kotlinx-serialization = "1.11.0"
 okhttp = "4.12.0"
@@ -42,6 +43,7 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "okhttp" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
