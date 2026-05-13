@@ -45,8 +45,8 @@ class ShoppingActivity : ComponentActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.loadRecentItems()
+    override fun onRestart() {
+        super.onRestart()
+        viewModel.loadProducts()
     }
 }

@@ -91,7 +91,6 @@ fun ShoppingScreen(
             ShoppingContents(
                 products = uiState.products,
                 recentItems = uiState.recentItems,
-                cartQuantities = uiState.cartQuantities,
                 modifier = Modifier.padding(innerPadding),
                 onLoad = onLoad,
                 isLoading = uiState.isLoading,
@@ -114,7 +113,6 @@ fun ShoppingScreen(
 private fun ShoppingContents(
     products: ImmutableList<ProductUiModel>,
     recentItems: ImmutableList<ProductUiModel>,
-    cartQuantities: Map<String, Int>,
     onLoad: () -> Unit,
     isLoading: Boolean,
     isCanLoadMore: Boolean,
@@ -153,7 +151,7 @@ private fun ShoppingContents(
                         imageUrl = product.imageUrl,
                         productName = product.name,
                         price = product.price,
-                        quantity = cartQuantities[product.id] ?: 0,
+                        quantity = product.quantity ?: 0,
                         onClick = {
                             onProductClick(product.id)
                         },
