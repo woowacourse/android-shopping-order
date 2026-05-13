@@ -5,23 +5,36 @@ import woowacourse.shopping.data.source.remote.CartRemoteDataSource
 import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItem
+import woowacourse.shopping.domain.model.Money
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductName
 import woowacourse.shopping.domain.model.RemoveItemResult
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
 
-class LocalCartRepository(
+class DefaultCartRepository(
     private val cartDao: CartDao,
-    private val productRepository: ProductRepository,
     private val remoteDataSource: CartRemoteDataSource,
 ) : CartRepository {
     override suspend fun getCart(): Cart {
-        val rows = cartDao.getAll()
+        val rows = remoteDataSource.getCartItems(0, 10000)
 
         val items =
-            rows.mapNotNull { row ->
-                runCatching { productRepository.getProductById(row.productId) }
-                    .getOrNull()
-                    ?.let { CartItem(it, row.quantity) }
+            rows.map {
+                CartItem(
+                    Product(
+                        id = it.product.id,
+                        name =
+                            ProductName(
+                                it.product.name,
+                            ),
+                        price =
+                            Money(
+                                it.product.price.toLong(),
+                            ),
+                        imageUrl = it.product.imageUrl,
+                    ),
+                    it.quantity,
+                )
             }
 
         return Cart(items)

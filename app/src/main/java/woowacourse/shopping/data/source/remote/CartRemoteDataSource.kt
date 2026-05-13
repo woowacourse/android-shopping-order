@@ -11,7 +11,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.data.source.remote.api.AddItemRequestBody
 import woowacourse.shopping.data.source.remote.api.CartService
+import woowacourse.shopping.data.source.remote.dto.cart.CartContent
 import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.RepositoryProvider.authRepository
 import woowacourse.shopping.domain.repository.AuthRepository
 import kotlin.jvm.java
 
@@ -27,6 +29,26 @@ class CartRemoteDataSource(
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(CartService::class.java)
+
+    suspend fun getCartItems(
+        offset: Int,
+        limit: Int,
+    ): List<CartContent> =
+        withContext(Dispatchers.IO) {
+            try {
+                val response =
+                    cartService.requestItems(
+                        basicToken = "Basic ${authRepository.getAuthToken}",
+                        page = offset,
+                        size = limit,
+                    )
+                Log.d("cartItem", "${response.cartContent}")
+                response.cartContent
+            } catch (err: Exception) {
+                Log.e("cartItem", "Unknown Error : $err")
+                emptyList()
+            }
+        }
 
     suspend fun addItem(
         id: Long,

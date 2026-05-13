@@ -7,7 +7,7 @@ import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.data.repository.LocalCartRepository
+import woowacourse.shopping.data.repository.DefaultCartRepository
 import woowacourse.shopping.data.source.local.cart.CartDao
 import woowacourse.shopping.data.source.local.cart.CartEntity
 import woowacourse.shopping.domain.model.AddItemResult
@@ -17,17 +17,17 @@ import woowacourse.shopping.domain.model.ProductName
 import woowacourse.shopping.domain.model.RemoveItemResult
 import woowacourse.shopping.domain.repository.ProductRepository
 
-class LocalCartRepositoryTest {
+class DefaultCartRepositoryTest {
     private val cartDao: CartDao = mockk()
     private val productRepository: ProductRepository = mockk()
-    private lateinit var repository: LocalCartRepository
+    private lateinit var repository: DefaultCartRepository
 
     private val productId = 1L
     private val product = Product(productId, ProductName("상품"), Money(1400), "")
 
     @BeforeEach
     fun setUp() {
-        repository = LocalCartRepository(cartDao, productRepository)
+        repository = DefaultCartRepository(cartDao, productRepository)
     }
 
     @Test

@@ -2,7 +2,7 @@ package woowacourse.shopping.di
 
 import android.content.Context
 import androidx.room.Room
-import woowacourse.shopping.data.repository.LocalCartRepository
+import woowacourse.shopping.data.repository.DefaultCartRepository
 import woowacourse.shopping.data.repository.LocalRecentProductRepository
 import woowacourse.shopping.data.repository.RemoteProductRepository
 import woowacourse.shopping.data.source.local.ShoppingDatabase
@@ -17,17 +17,16 @@ object RepositoryProvider {
 
     val productRepository: ProductRepository = RemoteProductRepository()
     val cartRepository: CartRepository by lazy {
-        LocalCartRepository(
-            database.cartDao(),
-            productRepository,
-            CartRemoteDataSource(),
+        DefaultCartRepository(
+            cartDao = database.cartDao(),
+            remoteDataSource = CartRemoteDataSource(),
         )
     }
 
     val recentProductRepository: RecentProductRepository by lazy {
         LocalRecentProductRepository(
-            database.recentProductDao(),
-            productRepository,
+            recentProductDao = database.recentProductDao(),
+            productRepository = productRepository,
         )
     }
 
