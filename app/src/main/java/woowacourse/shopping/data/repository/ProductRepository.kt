@@ -7,7 +7,7 @@ interface ProductRepository {
     suspend fun getProducts(
         page: Int,
         size: Int,
-    ): ImmutableList<Product>
+    ): ProductResponseResult
 
     suspend fun getProductById(id: String): Product
 }

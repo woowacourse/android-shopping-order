@@ -5,7 +5,7 @@ import kotlinx.collections.immutable.toImmutableList
 import woowacourse.shopping.data.remote.api.ProductApi
 import woowacourse.shopping.data.remote.dto.request.Pageable
 import woowacourse.shopping.data.remote.dto.response.product.ProductResponse
-import woowacourse.shopping.data.remote.dto.response.products.Content
+import woowacourse.shopping.data.remote.dto.response.products.ProductDto
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductName
@@ -15,39 +15,43 @@ class ProductRepositoryImpl(
 ) : ProductRepository {
     override suspend fun getProducts(
         page: Int,
-        size: Int
-    ): ImmutableList<Product> {
-        return api.getProducts(
-            category = "도서",
-            pageable = Pageable(
+        size: Int,
+    ): ProductResponseResult {
+
+        val apiResult = api
+            .getProducts(
+                category = "도서",
                 page = page,
                 size = size,
-                sort = emptyList()
             )
-        ).content
-            .map { it.toDomain() }
-            .toImmutableList()
+
+        val products = apiResult.content.map { it.toDomain() }
+        val lastPage = apiResult.last
+
+        return ProductResponseResult(products.toImmutableList(), lastPage)
     }
 
-    override suspend fun getProductById(id: String): Product {
-        return api.getProductById(id.toLong()).toDomain()
-    }
+    override suspend fun getProductById(id: String): Product = api.getProductById(id.toLong()).toDomain()
 
-    private fun Content.toDomain(): Product {
-        return Product(
+    private fun ProductDto.toDomain(): Product =
+        Product(
             id = id.toString(),
             name = ProductName(name),
             price = Money(price),
-            imageUrl = imageUrl
+            imageUrl = imageUrl,
         )
-    }
 
-    private fun ProductResponse.toDomain(): Product {
-        return Product(
+    private fun ProductResponse.toDomain(): Product =
+        Product(
             id = id.toString(),
             name = ProductName(name),
             price = Money(price),
-            imageUrl = imageUrl
+            imageUrl = imageUrl,
         )
-    }
 }
+
+
+data class ProductResponseResult(
+    val products: ImmutableList<Product>,
+    val isLastPage: Boolean,
+)
