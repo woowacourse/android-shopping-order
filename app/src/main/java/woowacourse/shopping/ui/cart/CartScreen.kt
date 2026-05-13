@@ -111,9 +111,9 @@ private fun CartScreenContent(
                 CartItemList(
                     cartItems = uiState.cartItems,
                     modifier = Modifier.weight(1f),
-                    onRemoveClick = { productId -> onClickRemoveItem(productId) },
-                    onIncrease = { productId -> onClickIncrease(productId) },
-                    onDecrease = { productId -> onClickDecrease(productId) },
+                    onRemoveClick = { cartId -> onClickRemoveItem(cartId) },
+                    onIncrease = { cartId -> onClickIncrease(cartId) },
+                    onDecrease = { cartId -> onClickDecrease(cartId) },
                 )
 
                 if (uiState.showPageNavigator) {
@@ -197,7 +197,7 @@ private fun CartItemList(
     ) {
         items(
             items = cartItems,
-            key = { it.product.id },
+            key = { it.id },
         ) { cartItem ->
             CartItemCard(
                 modifier =
@@ -206,13 +206,13 @@ private fun CartItemList(
                         .padding(top = 8.dp, start = 16.dp, end = 16.dp),
                 cartItem = cartItem,
                 onRemoveClick = {
-                    onRemoveClick(cartItem.product.id)
+                    onRemoveClick(cartItem.id)
                 },
                 onIncrease = {
-                    onIncrease(cartItem.product.id)
+                    onIncrease(cartItem.id)
                 },
                 onDecrease = {
-                    onDecrease(cartItem.product.id)
+                    onDecrease(cartItem.id)
                 },
             )
         }

@@ -52,14 +52,20 @@ class ProductListViewModel(
 
     fun increase(productId: Int) {
         viewModelScope.launch {
-            cartRepository.increase(productId)
+            val target =
+                cartFlow.value.cartItems.values
+                    .find { it.product.id == productId } ?: return@launch
+            cartRepository.increase(target.id, target.quantity.value + 1)
             refreshCart()
         }
     }
 
     fun decrease(productId: Int) {
         viewModelScope.launch {
-            cartRepository.decrease(productId)
+            val target =
+                cartFlow.value.cartItems.values
+                    .find { it.product.id == productId } ?: return@launch
+            cartRepository.decrease(target.id, target.quantity.value - 1)
             refreshCart()
         }
     }

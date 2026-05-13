@@ -34,7 +34,7 @@ class CartViewModel(
                 CartUiState.Success(
                     cartItems = result.values,
                     currentPage = currentPage,
-                    totalPages = 1,
+                    totalPages = result.totalPages,
                     hasPrevious = !result.isFirst,
                     hasNext = !result.isLast,
                 )
@@ -42,17 +42,17 @@ class CartViewModel(
         }
     }
 
-    fun removeCartItem(productId: Int) {
+    fun removeCartItem(cartId: Int) {
         viewModelScope.launch {
             _uiState.update { CartUiState.Loading }
-            cartRepository.remove(productId)
+            cartRepository.remove(cartId)
             val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
 
             _uiState.update {
                 CartUiState.Success(
                     cartItems = result.values,
                     currentPage = currentPage,
-                    totalPages = 1,
+                    totalPages = result.totalPages,
                     hasPrevious = !result.isFirst,
                     hasNext = !result.isLast,
                 )
@@ -60,9 +60,12 @@ class CartViewModel(
         }
     }
 
-    fun increase(productId: Int) {
+    fun increase(cartId: Int) {
         viewModelScope.launch {
-            cartRepository.increase(productId)
+            val uiState = _uiState.value as? CartUiState.Success ?: return@launch
+
+            val target = uiState.cartItems.find { it.id == cartId } ?: return@launch
+            cartRepository.increase(cartId, target.quantity.value + 1)
 
             val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
 
@@ -70,7 +73,7 @@ class CartViewModel(
                 CartUiState.Success(
                     cartItems = result.values,
                     currentPage = currentPage,
-                    totalPages = 1,
+                    totalPages = result.totalPages,
                     hasPrevious = !result.isFirst,
                     hasNext = !result.isLast,
                 )
@@ -78,9 +81,12 @@ class CartViewModel(
         }
     }
 
-    fun decrease(productId: Int) {
+    fun decrease(cartId: Int) {
         viewModelScope.launch {
-            cartRepository.decrease(productId)
+            val uiState = _uiState.value as? CartUiState.Success ?: return@launch
+
+            val target = uiState.cartItems.find { it.id == cartId } ?: return@launch
+            cartRepository.decrease(cartId, target.quantity.value - 1)
 
             val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
 
@@ -88,7 +94,7 @@ class CartViewModel(
                 CartUiState.Success(
                     cartItems = result.values,
                     currentPage = currentPage,
-                    totalPages = 1,
+                    totalPages = result.totalPages,
                     hasPrevious = !result.isFirst,
                     hasNext = !result.isLast,
                 )
@@ -110,7 +116,7 @@ class CartViewModel(
                 CartUiState.Success(
                     cartItems = result.values,
                     currentPage = currentPage,
-                    totalPages = 1,
+                    totalPages = result.totalPages,
                     hasPrevious = !result.isFirst,
                     hasNext = !result.isLast,
                 )
@@ -132,7 +138,7 @@ class CartViewModel(
                 CartUiState.Success(
                     cartItems = result.values,
                     currentPage = currentPage,
-                    totalPages = 1,
+                    totalPages = result.totalPages,
                     hasPrevious = !result.isFirst,
                     hasNext = !result.isLast,
                 )
