@@ -2,6 +2,7 @@ package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.source.local.cart.CartDao
 import woowacourse.shopping.data.source.remote.CartRemoteDataSource
+import woowacourse.shopping.data.source.remote.dto.cart.CartContent
 import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItem
@@ -15,11 +16,13 @@ class DefaultCartRepository(
     private val cartDao: CartDao,
     private val remoteDataSource: CartRemoteDataSource,
 ) : CartRepository {
+    private suspend fun getCartContents(): List<CartContent> = remoteDataSource.getCartItems(0, 10000)
+
     override suspend fun getCart(): Cart {
-        val rows = remoteDataSource.getCartItems(0, 10000)
+        val cartContents = getCartContents()
 
         val items =
-            rows.map {
+            cartContents.map {
                 CartItem(
                     Product(
                         id = it.product.id,
@@ -61,12 +64,9 @@ class DefaultCartRepository(
     override suspend fun getTotalCartSize(): Int = cartDao.getTotalCartSize()
 
     override suspend fun deleteItem(id: Long): RemoveItemResult {
-        val isDeleted = cartDao.deleteItem(id)
-        return if (isDeleted > 0) {
-            RemoveItemResult.Success(getCart())
-        } else {
-            RemoveItemResult.NotFoundItem
-        }
+        val cartContent = getCartContents().find { it.product.id == id } ?: return RemoveItemResult.NotFoundItem
+        remoteDataSource.deleteItem(cartContent.id)
+        return RemoveItemResult.Success(getCart())
     }
 
     override suspend fun decrease(id: Long): RemoveItemResult {

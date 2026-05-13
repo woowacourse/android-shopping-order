@@ -75,4 +75,27 @@ class CartRemoteDataSource(
             }
         }
     }
+
+    suspend fun deleteItem(id: Long) {
+        withContext(Dispatchers.IO) {
+            try {
+                cartService.requestDeleteItem(
+                    basicToken = "Basic ${authRepository.getAuthToken}",
+                    id = id,
+                )
+            } catch (err: HttpException) {
+                when (err.code()) {
+                    400 -> Log.e("cartItem", "Bad Request: $err")
+                    401 -> Log.e("cartItem", "Unauthorized")
+                    403 -> Log.e("cartItem", "Forbidden")
+                    404 -> Log.e("cartItem", "Not Found")
+                    500 -> Log.e("cartItem", "Internal Server Error")
+                }
+            } catch (err: IOException) {
+                Log.e("cartItem", "Network Error : $err")
+            } catch (err: Exception) {
+                Log.e("cartItem", "Unknown Error : $err")
+            }
+        }
+    }
 }
