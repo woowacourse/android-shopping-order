@@ -65,7 +65,7 @@ fun ShoppingBody(
             }
         }
 
-        when(productListState) {
+        when (productListState) {
             ProductListUiState.Loading -> {
                 items(6) {
                     ProductUnitSkeleton()
@@ -75,7 +75,10 @@ fun ShoppingBody(
             is ProductListUiState.Content -> {
                 items(
                     items = productListState.products,
-                    key = { it.product.id.value.toString() }
+                    key = {
+                        it.product.id.value
+                            .toString()
+                    },
                 ) { product ->
                     ProductUnit(
                         product = product,
@@ -86,7 +89,7 @@ fun ShoppingBody(
                     )
                 }
 
-                if(productListState.hasNext) {
+                if (productListState.hasNext) {
                     item(span = { GridItemSpan(maxLineSpan) }) {
                         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                             MoreButton(
@@ -119,9 +122,7 @@ fun ShoppingBody(
 }
 
 @Composable
-private fun ProductUnitSkeleton(
-    modifier: Modifier = Modifier,
-) {
+private fun ProductUnitSkeleton(modifier: Modifier = Modifier) {
     Column(
         modifier =
             modifier
@@ -154,7 +155,6 @@ private fun ProductUnitSkeleton(
         )
     }
 }
-
 
 @Composable
 @Preview(showBackground = true)

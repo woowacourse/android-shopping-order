@@ -26,11 +26,7 @@ class CartActivity : ComponentActivity() {
             ShoppingTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     CartScreen(
-                        items = uiState.items,
-                        currentPage = uiState.currentPage,
-                        totalPages = uiState.totalPages,
-                        showPagination = uiState.totalPages > 1,
-                        isLoading = uiState.isLoading,
+                        cartListState = uiState.cartListState,
                         isNetworkConnected = uiState.isNetworkConnected,
                         modifier = Modifier.padding(innerPadding),
                         onBackClick = ::finish,

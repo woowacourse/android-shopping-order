@@ -20,7 +20,7 @@ class CartViewModel(
     private val cartRepository: CartRepository = ShoppingRepositoryProvider.cartRepository,
     private val networkMonitor: NetworkMonitor = ShoppingRepositoryProvider.networkMonitor,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(CartUiState(isLoading = true))
+    private val _uiState = MutableStateFlow(CartUiState(cartListState = CartListUiState.Loading))
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
 
     init {
@@ -29,91 +29,35 @@ class CartViewModel(
     }
 
     fun loadPreviousPage() {
-        val currentPage = _uiState.value.currentPage
-        if (_uiState.value.isLoading || currentPage <= 1) return
-        loadPage(currentPage - 1)
+        val contentState = _uiState.value.cartListState as? CartListUiState.Content ?: return
+        if (!contentState.hasPrevious) return
+
+        loadPage(contentState.currentPage - 1)
     }
 
     fun loadNextPage() {
-        val currentPage = _uiState.value.currentPage
-        if (_uiState.value.isLoading || !_uiState.value.hasNext) return
-        loadPage(currentPage + 1)
-    }
+        val contentState = _uiState.value.cartListState as? CartListUiState.Content ?: return
+        if (!contentState.hasNext) return
 
-    fun delete(productId: ProductId) {
-        if (_uiState.value.isLoading) return
-
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
-
-            runCatching {
-                cartRepository.delete(productId)
-
-                val remainingCount = cartRepository.count()
-                val totalPages = calculateTotalPages(remainingCount)
-                val nextPage = _uiState.value.currentPage.coerceAtMost(maxOf(totalPages, 1))
-
-                updatePage(nextPage, remainingCount)
-            }.onFailure { throwable ->
-                _uiState.value =
-                    _uiState.value.copy(
-                        isLoading = false,
-                        errorMessage = throwable.message,
-                    )
-            }
-        }
-    }
-
-    fun increaseQuantity(productId: ProductId) {
-        if (_uiState.value.isLoading) return
-
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
-            runCatching {
-                cartRepository.add(productId)
-                updateCurrentPage()
-            }.onFailure { throwable ->
-                _uiState.value =
-                    _uiState.value.copy(
-                        isLoading = false,
-                        errorMessage = throwable.message,
-                    )
-            }
-        }
-    }
-
-    fun decreaseQuantity(productId: ProductId) {
-        if (_uiState.value.isLoading) return
-
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
-            runCatching {
-                cartRepository.delete(productId)
-                updateCurrentPage()
-            }.onFailure { throwable ->
-                _uiState.value =
-                    _uiState.value.copy(
-                        isLoading = false,
-                        errorMessage = throwable.message,
-                    )
-            }
-        }
+        loadPage(contentState.currentPage + 1)
     }
 
     private fun loadPage(page: Int) {
-        if (_uiState.value.isLoading && _uiState.value.items.isNotEmpty()) return
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
-
+            _uiState.update { currentState ->
+                currentState.copy(
+                    cartListState = CartListUiState.Loading,
+                )
+            }
             runCatching {
                 val totalCount = cartRepository.count()
                 updatePage(page, totalCount)
             }.onFailure { throwable ->
-                _uiState.value =
-                    _uiState.value.copy(
-                        isLoading = false,
-                        errorMessage = throwable.message,
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        cartListState = CartListUiState.Error(throwable.message),
                     )
+                }
             }
         }
     }
@@ -135,16 +79,77 @@ class CartViewModel(
                 productsById = productMap,
             )
 
-        _uiState.value =
-            _uiState.value.copy(
-                items = items,
-                currentPage = currentPage,
-                totalPages = totalPages,
-                hasPrevious = currentPage > 1,
-                hasNext = currentPage < totalPages,
-                isLoading = false,
-                errorMessage = null,
+        _uiState.update { currentState ->
+            currentState.copy(
+                cartListState =
+                    CartListUiState.Content(
+                        items = items,
+                        currentPage = currentPage,
+                        totalPages = totalPages,
+                        hasPrevious = currentPage > 1,
+                        hasNext = currentPage < totalPages,
+                    ),
             )
+        }
+    }
+
+    fun delete(productId: ProductId) {
+        if (_uiState.value.cartListState is CartListUiState.Loading) return
+
+        viewModelScope.launch {
+            runCatching {
+                cartRepository.delete(productId)
+
+                val remainingCount = cartRepository.count()
+                val totalPages = calculateTotalPages(remainingCount)
+
+                val currentContent = _uiState.value.cartListState as? CartListUiState.Content ?: return@runCatching
+
+                val nextPage = currentContent.currentPage.coerceAtMost(maxOf(totalPages, 1))
+
+                updatePage(nextPage, remainingCount)
+            }.onFailure { throwable ->
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        cartListState = CartListUiState.Error(throwable.message),
+                    )
+                }
+            }
+        }
+    }
+
+    fun increaseQuantity(productId: ProductId) {
+        if (_uiState.value.cartListState is CartListUiState.Loading) return
+
+        viewModelScope.launch {
+            runCatching {
+                cartRepository.add(productId)
+                updateCurrentPage()
+            }.onFailure { throwable ->
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        cartListState = CartListUiState.Error(throwable.message),
+                    )
+                }
+            }
+        }
+    }
+
+    fun decreaseQuantity(productId: ProductId) {
+        if (_uiState.value.cartListState is CartListUiState.Loading) return
+
+        viewModelScope.launch {
+            runCatching {
+                cartRepository.delete(productId)
+                updateCurrentPage()
+            }.onFailure { throwable ->
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        cartListState = CartListUiState.Error(throwable.message),
+                    )
+                }
+            }
+        }
     }
 
     private fun calculateTotalPages(totalCount: Int): Int {
@@ -153,9 +158,11 @@ class CartViewModel(
     }
 
     private suspend fun updateCurrentPage() {
+        val contentState = _uiState.value.cartListState as? CartListUiState.Content ?: return
+
         val remainingCount = cartRepository.count()
         val totalPages = calculateTotalPages(remainingCount)
-        val nextPage = _uiState.value.currentPage.coerceAtMost(maxOf(totalPages, 1))
+        val nextPage = contentState.currentPage.coerceAtMost(maxOf(totalPages, 1))
 
         updatePage(nextPage, remainingCount)
     }

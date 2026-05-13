@@ -1,12 +1,22 @@
 package woowacourse.shopping.ui.cart
 
 data class CartUiState(
-    val items: List<CartItemUiModel> = emptyList(),
-    val currentPage: Int = 1,
-    val totalPages: Int = 0,
-    val hasPrevious: Boolean = false,
-    val hasNext: Boolean = false,
-    val isLoading: Boolean = false,
+    val cartListState: CartListUiState = CartListUiState.Loading,
     val isNetworkConnected: Boolean = true,
-    val errorMessage: String? = null,
 )
+
+sealed interface CartListUiState {
+    data object Loading : CartListUiState
+
+    data class Content(
+        val items: List<CartItemUiModel>,
+        val currentPage: Int,
+        val totalPages: Int,
+        val hasPrevious: Boolean,
+        val hasNext: Boolean,
+    ) : CartListUiState
+
+    data class Error(
+        val message: String?,
+    ) : CartListUiState
+}

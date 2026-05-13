@@ -2,8 +2,11 @@ package woowacourse.shopping.ui.cart
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -12,15 +15,12 @@ import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.repository.inmemory.InMemoryProductRepository
 import woowacourse.shopping.ui.cart.component.CartHeader
 import woowacourse.shopping.ui.cart.component.CartItemBody
+import woowacourse.shopping.ui.cart.component.CartItemSkeletonBody
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
 
 @Composable
 fun CartScreen(
-    items: List<CartItemUiModel>,
-    currentPage: Int,
-    totalPages: Int,
-    showPagination: Boolean,
-    isLoading: Boolean,
+    cartListState: CartListUiState,
     isNetworkConnected: Boolean,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
@@ -39,26 +39,49 @@ fun CartScreen(
             NetworkStatusBanner(modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp))
         }
 
-        if (isLoading && items.isEmpty()) {
-            CircularProgressIndicator(modifier = Modifier.padding(20.dp))
-            return
-        }
+        when (cartListState) {
+            CartListUiState.Loading -> {
+                CartItemSkeletonBody(
+                    modifier =
+                        Modifier
+                            .padding(top = 8.dp, start = 18.dp, end = 18.dp)
+                            .weight(1f),
+                )
+            }
 
-        CartItemBody(
-            items = items,
-            showPagination = showPagination,
-            currentPage = currentPage,
-            totalPages = totalPages,
-            modifier =
-                Modifier
-                    .padding(top = 8.dp, start = 18.dp, end = 18.dp)
-                    .weight(1f),
-            onDeleteClick = onDeleteClick,
-            onIncreaseQuantity = onIncreaseQuantity,
-            onDecreaseQuantity = onDecreaseQuantity,
-            onPreviousClick = onPreviousClick,
-            onNextClick = onNextClick,
-        )
+            is CartListUiState.Content -> {
+                CartItemBody(
+                    items = cartListState.items,
+                    showPagination = cartListState.totalPages > 1,
+                    currentPage = cartListState.currentPage,
+                    totalPages = cartListState.totalPages,
+                    modifier =
+                        Modifier
+                            .padding(top = 8.dp, start = 18.dp, end = 18.dp)
+                            .weight(1f),
+                    onDeleteClick = onDeleteClick,
+                    onIncreaseQuantity = onIncreaseQuantity,
+                    onDecreaseQuantity = onDecreaseQuantity,
+                    onPreviousClick = onPreviousClick,
+                    onNextClick = onNextClick,
+                )
+            }
+
+            is CartListUiState.Error -> {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.errorContainer,
+                    shape = MaterialTheme.shapes.medium,
+                ) {
+                    Text(
+                        text = cartListState.message ?: "상품을 불러오지 못했습니다.",
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(16.dp),
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -83,11 +106,44 @@ private fun CartScreenPreview() {
             ),
         )
     CartScreen(
-        items = items,
-        currentPage = 1,
-        totalPages = 1,
-        showPagination = false,
-        isLoading = false,
+        cartListState =
+            CartListUiState.Content(
+                items = items,
+                currentPage = 1,
+                totalPages = 1,
+                hasPrevious = false,
+                hasNext = false,
+            ),
+        isNetworkConnected = true,
+        onBackClick = {},
+        onDeleteClick = {},
+        onIncreaseQuantity = {},
+        onDecreaseQuantity = {},
+        onPreviousClick = {},
+        onNextClick = {},
+    )
+}
+
+@Composable
+@Preview(showBackground = true, name = "장바구니 로딩")
+private fun CartScreenLoadingPreview() {
+    CartScreen(
+        cartListState = CartListUiState.Loading,
+        isNetworkConnected = true,
+        onBackClick = {},
+        onDeleteClick = {},
+        onIncreaseQuantity = {},
+        onDecreaseQuantity = {},
+        onPreviousClick = {},
+        onNextClick = {},
+    )
+}
+
+@Composable
+@Preview(showBackground = true, name = "장바구니 에러")
+private fun CartScreenErrorPreview() {
+    CartScreen(
+        cartListState = CartListUiState.Error("장바구니를 불러오지 못했습니다."),
         isNetworkConnected = true,
         onBackClick = {},
         onDeleteClick = {},
