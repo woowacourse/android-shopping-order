@@ -34,6 +34,7 @@ import woowacourse.shopping.util.formattedPrice
 @Composable
 fun CartScreen(
     uiState: CartUiState,
+    isSelectedAll: Boolean,
     onBack: () -> Unit,
     onNextPage: () -> Unit,
     onPreviousPage: () -> Unit,
@@ -81,9 +82,9 @@ fun CartScreen(
                     )
                 }
                 CartBottomBar(
-                    purchaseItemCount = 5,
-                    totalPrice = formattedPrice(5000),
-                    isSelectAll = true,
+                    purchaseItemCount = uiState.totalQuantity,
+                    totalPrice = formattedPrice(uiState.totalPrice),
+                    isSelectAll = isSelectedAll,
                     onOrderClick = { onOrderClick() },
                     onClickCheckBox = { onSelectAll() },
                 )
@@ -114,6 +115,7 @@ fun CartScreen(
 @Composable
 private fun CartScreenPreview() {
     CartScreen(
+        isSelectedAll = true,
         uiState =
             CartUiState(
                 totalPrice = 5_000,

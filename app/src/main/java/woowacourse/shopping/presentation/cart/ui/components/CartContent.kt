@@ -76,6 +76,7 @@ private fun CartContentPreview() {
                             price = 1000,
                         ),
                     quantity = 1,
+                    isSelected = true,
                 ),
                 CartItemUiModel(
                     product =
@@ -86,6 +87,7 @@ private fun CartContentPreview() {
                             price = 1000,
                         ),
                     quantity = 1,
+                    isSelected = true,
                 ),
             ).toImmutableList(),
     )

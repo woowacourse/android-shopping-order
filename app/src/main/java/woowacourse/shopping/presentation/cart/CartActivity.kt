@@ -48,6 +48,7 @@ class CartActivity : ComponentActivity() {
 
                 CartScreen(
                     uiState = uiState,
+                    isSelectedAll = uiState.isSelectAll,
                     onBack = { finish() },
                     onNextPage = { viewModel.nextPage() },
                     onPreviousPage = { viewModel.previousPage() },
@@ -56,7 +57,7 @@ class CartActivity : ComponentActivity() {
                     onDecrease = { viewModel.decrease(it) },
                     onSelected = { viewModel.selectItem(it) },
                     onOrderClick = {},
-                    onSelectAll = {},
+                    onSelectAll = { viewModel.toggleSelectAll() },
                 )
             }
         }

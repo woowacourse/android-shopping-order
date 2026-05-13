@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.cart.viewmodel
 
+import android.nfc.tech.MifareUltralight.PAGE_SIZE
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.RepositoryProvider
 import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.PaymentItems
 import woowacourse.shopping.domain.model.RemoveItemResult
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.cart.model.CartUiState
@@ -24,6 +26,8 @@ class CartViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
+
+    private var paymentItems = PaymentItems(emptySet())
 
     private val _uiEvents = Channel<CartEvent>(Channel.BUFFERED)
     val uiEvents: Flow<CartEvent> = _uiEvents.receiveAsFlow()
@@ -80,28 +84,78 @@ class CartViewModel(
     }
 
     fun selectItem(productId: Long) {
-        _uiState.update {
-            it.copy(
-                currentCartItems =
-                    it.currentCartItems.map { item ->
-                        if (item.product.id == productId) {
-                            item.copy(isSelected = item.isSelected.not())
-                        } else {
-                            item
-                        }
-                    },
-            )
+        viewModelScope.launch {
+            val cart = cartRepository.getCart()
+            val cartItem =
+                cart.items
+                    .find { it.product.id == productId } ?: return@launch
+
+            paymentItems =
+                if (paymentItems.isContain(productId)) {
+                    paymentItems.remove(productId)
+                } else {
+                    paymentItems.add(cartItem)
+                }
+
+            _uiState.update {
+                it.copy(
+                    currentCartItems =
+                        it.currentCartItems.map { item ->
+                            if (item.product.id == productId) {
+                                item.copy(isSelected = !item.isSelected)
+                            } else {
+                                item
+                            }
+                        },
+                )
+            }
+            syncPaymentDerivedState(cart)
+        }
+    }
+
+    fun toggleSelectAll() {
+        viewModelScope.launch {
+            val cart = cartRepository.getCart()
+            paymentItems =
+                if (uiState.value.isSelectAll) {
+                    PaymentItems(emptySet())
+                } else {
+                    PaymentItems(cart.items.toSet())
+                }
+            _uiState.update { state ->
+                state.copy(
+                    currentCartItems =
+                        state.currentCartItems.map {
+                            it.copy(isSelected = paymentItems.isContain(it.product.id))
+                        },
+                )
+            }
+            syncPaymentDerivedState(cart)
         }
     }
 
     private suspend fun loadCartItems(providedCart: Cart? = null) {
         if (uiState.value.isLoading) return
-        _uiState.update {
-            it.copy(isLoading = true)
-        }
+        _uiState.update { it.copy(isLoading = true) }
         try {
             val cart = providedCart ?: cartRepository.getCart()
-            val items = cart.items.map { it.toUiModel() }
+
+            val selectedIds =
+                cart.items
+                    .map { it.product.id }
+                    .filter { paymentItems.isContain(it) }
+                    .toSet()
+            paymentItems =
+                PaymentItems(
+                    cart.items.filter { it.product.id in selectedIds }.toSet(),
+                )
+
+            val items =
+                cart.items.map {
+                    it.toUiModel(
+                        isSelected = paymentItems.isContain(it.product.id),
+                    )
+                }
             val maxPage = if (items.isEmpty()) 0 else (items.size - 1) / PAGE_SIZE
 
             _uiState.update {
@@ -116,10 +170,23 @@ class CartViewModel(
                     isShowPageSection = items.size > PAGE_SIZE,
                 )
             }
+            syncPaymentDerivedState(cart)
         } finally {
             _uiState.update {
                 it.copy(isLoading = false)
             }
+        }
+    }
+
+    private fun syncPaymentDerivedState(cart: Cart) {
+        _uiState.update {
+            it.copy(
+                totalPrice = paymentItems.totalPrice,
+                totalQuantity = paymentItems.totalQuantity,
+                isSelectAll =
+                    cart.items.isNotEmpty() &&
+                        cart.items.all { item -> paymentItems.isContain(item.product.id) },
+            )
         }
     }
 
