@@ -73,4 +73,5 @@ dependencies {
     testImplementation(libs.json)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.assertj.core)
+    implementation(libs.androidx.datastore.preferences)
 }
