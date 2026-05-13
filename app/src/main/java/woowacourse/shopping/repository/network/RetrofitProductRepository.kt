@@ -3,6 +3,7 @@ package woowacourse.shopping.repository.network
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.network.dto.ProductResponse
+import woowacourse.shopping.network.dto.toDomain
 import woowacourse.shopping.network.service.ProductService
 import woowacourse.shopping.repository.ProductRepository
 
@@ -31,13 +32,7 @@ class RetrofitProductRepository(
         lateinit var response: ProductResponse
         try {
             response = service.getProduct(id = id)
-            return Product(
-                id = response.id,
-                name = response.name,
-                price = Money(response.price),
-                imageUrl = response.imageUrl,
-                category = response.category,
-            )
+            return response.toDomain()
         } catch (_: Exception) {
             return null
         }
