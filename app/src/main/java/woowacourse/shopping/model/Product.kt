@@ -5,6 +5,7 @@ class Product(
     private val title: ProductTitle,
     private val price: Price,
     val imageUrl: String,
+    val category: String = UNKNOWN_CATEGORY,
 ) {
     override fun equals(other: Any?): Boolean {
         if (other !is Product) return false
@@ -16,4 +17,8 @@ class Product(
     fun getPrice(): Int = price.toInt()
 
     fun getTitle(): String = title.toString()
+
+    companion object {
+        private const val UNKNOWN_CATEGORY = "UNKNOWN"
+    }
 }
