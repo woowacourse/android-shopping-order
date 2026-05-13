@@ -92,7 +92,7 @@ private fun CartScreenPreview1() {
             Product(name = "4번", price = Money(1000), imageUrl = ""),
             Product(name = "5번", price = Money(1000), imageUrl = ""),
         )
-    val cart = Cart(products.map { CartItem(it, 1) })
+    val cart = Cart(products.map { CartItem(product = it, quantity = 1) })
 
     CartScreen(
         cart = cart,

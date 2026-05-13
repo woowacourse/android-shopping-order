@@ -146,12 +146,12 @@ private fun CartItemBody(
 private fun CartItemUnitPreview() {
     val cartItem =
         CartItem(
-            Product(
+            product = Product(
                 name = "스피또",
                 price = Money(1000),
                 imageUrl = "",
             ),
-            2,
+            quantity = 2,
         )
     CartItemUnit(cartItem = cartItem, onDeleteClick = {}, onAddClick = {}, onRemoveClick = {})
 }
@@ -161,12 +161,12 @@ private fun CartItemUnitPreview() {
 private fun CartItemHeaderPreview() {
     val cartItem =
         CartItem(
-            Product(
+            product = Product(
                 name = "스피또",
                 price = Money(1000),
                 imageUrl = "",
             ),
-            2,
+            quantity = 2,
         )
     CartItemHeader(cartItem = cartItem, onClick = {})
 }
@@ -176,12 +176,12 @@ private fun CartItemHeaderPreview() {
 private fun CartItemBodyPreview() {
     val cartItem =
         CartItem(
-            Product(
+            product = Product(
                 name = "스피또",
                 price = Money(1000),
                 imageUrl = "",
             ),
-            2,
+            quantity = 2,
         )
     CartItemBody(
         cartItem = cartItem,

@@ -69,8 +69,8 @@ private fun CartBodyPreview() {
         cart =
             Cart(
                 listOf(
-                    CartItem(product1, 1),
-                    CartItem(product2, 3),
+                    CartItem(product = product1, quantity = 1),
+                    CartItem(product = product2, quantity = 3),
                 ),
             ),
         onDeleteClick = {},
