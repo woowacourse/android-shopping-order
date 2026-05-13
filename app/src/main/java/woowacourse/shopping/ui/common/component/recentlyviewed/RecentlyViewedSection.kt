@@ -30,20 +30,33 @@ fun RecentlyViewedSection(
             style = ShoppingTypography.sectionTitle,
         )
         Spacer(modifier = Modifier.size(12.dp))
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            items(
-                items = products,
-                key = { it.id.value.toString() },
-            ) { product ->
-                RecentlyViewedItem(
-                    product = product,
-                    onClick = { onProductClick(product) },
-                )
-            }
+        RecentlyViewedProducts(
+            products = products,
+            onProductClick = onProductClick
+        )
+    }
+}
+
+@Composable
+fun RecentlyViewedProducts(
+    products: List<Product>,
+    modifier: Modifier = Modifier,
+    onProductClick: (Product) -> Unit
+) {
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        items(
+            items = products,
+            key = { it.id.value.toString() },
+        ) { product ->
+            RecentlyViewedItem(
+                product = product,
+                onClick = { onProductClick(product) },
+            )
         }
     }
+
 }
 
 @Preview

@@ -88,6 +88,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.okhttp)
+    implementation(libs.androidx.compose.ui.graphics)
     ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner.junit5)

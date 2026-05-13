@@ -30,6 +30,8 @@ class CartActivity : ComponentActivity() {
                         isNetworkConnected = uiState.isNetworkConnected,
                         modifier = Modifier.padding(innerPadding),
                         onBackClick = ::finish,
+                        onOrderClick = {},
+                        onItemCheckedChange = viewModel::toggleItemSelection,
                         onDeleteClick = viewModel::delete,
                         onIncreaseQuantity = viewModel::increaseQuantity,
                         onDecreaseQuantity = viewModel::decreaseQuantity,

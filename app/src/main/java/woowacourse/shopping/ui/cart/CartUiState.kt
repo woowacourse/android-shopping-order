@@ -1,8 +1,11 @@
 package woowacourse.shopping.ui.cart
 
+import woowacourse.shopping.model.ProductId
+
 data class CartUiState(
     val cartListState: CartListUiState = CartListUiState.Loading,
     val isNetworkConnected: Boolean = true,
+    val deselectedProductIds: Set<ProductId> = emptySet(),
 )
 
 sealed interface CartListUiState {

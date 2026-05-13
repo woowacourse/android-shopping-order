@@ -8,6 +8,7 @@ object CartItemUiModelMapper {
     fun toUiModels(
         cartItems: List<CartItem>,
         productsById: Map<ProductId, Product>,
+        deselectedProductIds: Set<ProductId> = emptySet(),
     ): List<CartItemUiModel> =
         cartItems.mapNotNull { cartItem ->
             val product = productsById[cartItem.productId] ?: return@mapNotNull null
@@ -18,6 +19,7 @@ object CartItemUiModelMapper {
                 imageUrl = product.imageUrl,
                 price = product.price.value,
                 quantity = cartItem.quantity,
+                isSelected = cartItem.productId !in deselectedProductIds,
             )
         }
 }

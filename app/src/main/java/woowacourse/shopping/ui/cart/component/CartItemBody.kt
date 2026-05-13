@@ -21,6 +21,7 @@ fun CartItemBody(
     currentPage: Int,
     totalPages: Int,
     modifier: Modifier = Modifier,
+    onItemCheckedChange: (ProductId, Boolean) -> Unit,
     onDeleteClick: (ProductId) -> Unit,
     onIncreaseQuantity: (ProductId) -> Unit,
     onDecreaseQuantity: (ProductId) -> Unit,
@@ -35,6 +36,7 @@ fun CartItemBody(
         items(items = items, key = { it.productId.value.toString() }) { item ->
             CartItemUnit(
                 item = item,
+                onCheckedChange = { isChecked -> onItemCheckedChange(item.productId, isChecked) },
                 onDeleteClick = { onDeleteClick(item.productId) },
                 onIncreaseQuantity = { onIncreaseQuantity(item.productId) },
                 onDecreaseQuantity = { onDecreaseQuantity(item.productId) },
@@ -77,6 +79,7 @@ private fun CartItemBodyPreview() {
                     quantity = 1,
                 ),
             ),
+        onItemCheckedChange = { _, _ -> },
         onDeleteClick = {},
         onIncreaseQuantity = {},
         onDecreaseQuantity = {},

@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -40,6 +41,7 @@ import woowacourse.shopping.ui.theme.ShoppingColors
 fun CartItemUnit(
     item: CartItemUiModel,
     modifier: Modifier = Modifier,
+    onCheckedChange: (Boolean) -> Unit,
     onDeleteClick: () -> Unit,
     onIncreaseQuantity: () -> Unit,
     onDecreaseQuantity: () -> Unit,
@@ -53,7 +55,11 @@ fun CartItemUnit(
                 .border(1.dp, ShoppingColors.Gray2, RoundedCornerShape(4.dp))
                 .padding(18.dp),
     ) {
-        NameAndCloseIcon(item = item, onClick = onDeleteClick)
+        NameAndCloseIcon(
+            item = item,
+            onCheckedChange = onCheckedChange,
+            onClick = onDeleteClick,
+        )
 
         Spacer(Modifier.size(20.dp))
 
@@ -69,15 +75,21 @@ fun CartItemUnit(
 private fun NameAndCloseIcon(
     item: CartItemUiModel,
     modifier: Modifier = Modifier,
+    onCheckedChange: (Boolean) -> Unit,
     onClick: () -> Unit,
 ) {
     Row(
         modifier =
             modifier
                 .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        CartCheckbox(
+            checked = item.isSelected,
+            onCheckedChange = onCheckedChange,
+            modifier = Modifier.padding(end = 12.dp),
+        )
+
         Text(
             text = item.name,
             color = ShoppingColors.Gray4,
@@ -85,12 +97,20 @@ private fun NameAndCloseIcon(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        Icon(
-            imageVector = Icons.Default.Close,
-            contentDescription = stringResource(R.string.content_description_close),
-            modifier = Modifier.clickable(onClick = onClick),
-            tint = ShoppingColors.Gray2,
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(R.string.content_description_close),
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .clickable(onClick = onClick),
+                tint = ShoppingColors.Gray2,
+            )
+        }
     }
 }
 
@@ -154,6 +174,7 @@ private fun CartItemUnitPreview() {
                 price = InMemoryProductRepository.APPLE.price.value,
                 quantity = 2,
             ),
+        onCheckedChange = {},
         onDeleteClick = {},
         onIncreaseQuantity = {},
         onDecreaseQuantity = {},
@@ -172,6 +193,7 @@ private fun NameAndCloseIconPreview() {
                 price = InMemoryProductRepository.APPLE.price.value,
                 quantity = 2,
             ),
+        onCheckedChange = {},
         onClick = {},
     )
 }

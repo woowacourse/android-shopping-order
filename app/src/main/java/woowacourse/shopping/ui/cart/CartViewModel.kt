@@ -77,6 +77,7 @@ class CartViewModel(
             CartItemUiModelMapper.toUiModels(
                 cartItems = cartItems,
                 productsById = productMap,
+                deselectedProductIds = _uiState.value.deselectedProductIds,
             )
 
         _uiState.update { currentState ->
@@ -99,6 +100,7 @@ class CartViewModel(
         viewModelScope.launch {
             runCatching {
                 cartRepository.delete(productId)
+                clearDeselection(productId)
 
                 val remainingCount = cartRepository.count()
                 val totalPages = calculateTotalPages(remainingCount)
@@ -116,6 +118,23 @@ class CartViewModel(
                 }
             }
         }
+    }
+
+    fun toggleItemSelection(
+        productId: ProductId,
+        isSelected: Boolean,
+    ) {
+        _uiState.update { currentState ->
+            val updatedDeselectedProductIds =
+                if (isSelected) {
+                    currentState.deselectedProductIds - productId
+                } else {
+                    currentState.deselectedProductIds + productId
+                }
+
+            currentState.copy(deselectedProductIds = updatedDeselectedProductIds)
+        }
+        refreshVisibleSelections()
     }
 
     fun increaseQuantity(productId: ProductId) {
@@ -165,6 +184,31 @@ class CartViewModel(
         val nextPage = contentState.currentPage.coerceAtMost(maxOf(totalPages, 1))
 
         updatePage(nextPage, remainingCount)
+    }
+
+    private fun clearDeselection(productId: ProductId) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                deselectedProductIds = currentState.deselectedProductIds - productId,
+            )
+        }
+    }
+
+    private fun refreshVisibleSelections() {
+        val contentState = _uiState.value.cartListState as? CartListUiState.Content ?: return
+        val deselectedProductIds = _uiState.value.deselectedProductIds
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                cartListState =
+                    contentState.copy(
+                        items =
+                            contentState.items.map { item ->
+                                item.copy(isSelected = item.productId !in deselectedProductIds)
+                            },
+                    ),
+            )
+        }
     }
 
     private fun observeNetworkState() {

@@ -8,4 +8,5 @@ data class CartItemUiModel(
     val imageUrl: String,
     val price: Int,
     val quantity: Int,
+    val isSelected: Boolean = true,
 )
