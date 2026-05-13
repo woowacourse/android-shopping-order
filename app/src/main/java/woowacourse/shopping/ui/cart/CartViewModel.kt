@@ -9,6 +9,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.localdb.mapper.toDomain
 import woowacourse.shopping.data.repository.CartRepository
@@ -33,6 +34,7 @@ class CartViewModel(
 
     private fun observeCart() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
             cartRepository.observeCartItems().collect { entities ->
                 val result =
                     runCatching {
@@ -52,6 +54,7 @@ class CartViewModel(
                     is CartResult.Success -> {
                         cart = result.cart
                         updateUiState()
+                        _uiState.update { it.copy(isLoading = false) }
                     }
 
                     is CartResult.Failure -> {
@@ -59,6 +62,7 @@ class CartViewModel(
                             _uiState.value.copy(
                                 errorMessage = "장바구니 상품 정보를 불러오지 못했습니다.",
                             )
+                        _uiState.update { it.copy(isLoading = false) }
                     }
                 }
             }
@@ -117,7 +121,7 @@ class CartViewModel(
                     )
                 }
             }
-        }
+    }
 }
 
 private fun Cart.getPage(
