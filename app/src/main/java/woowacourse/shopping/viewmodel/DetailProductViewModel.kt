@@ -29,11 +29,11 @@ class DetailProductViewModel(
     private var lastViewedProductId: Long? = null
 
     init {
-        updateUiState()
+        publishUiState()
         viewModelScope.launch {
             shoppingItemRepository.shoppingItems.collect { latestShoppingItems ->
                 cachedShoppingItems = latestShoppingItems
-                updateUiState()
+                publishUiState()
             }
         }
     }
@@ -69,13 +69,15 @@ class DetailProductViewModel(
             selectedProductId = productId
             selectedQuantity = DEFAULT_QUANTITY
         }
-        visitStore.visit(productId)
-        updateUiState()
+        launchNow {
+            visitStore.visit(productId)
+        }
+        publishUiState()
     }
 
     fun increaseSelectedQuantity() {
         selectedQuantity += 1
-        updateUiState()
+        publishUiState()
     }
 
     fun decreaseSelectedQuantity() {
@@ -83,7 +85,7 @@ class DetailProductViewModel(
             return
         }
         selectedQuantity -= 1
-        updateUiState()
+        publishUiState()
     }
 
     fun addSelectedProductToCart() {
@@ -108,7 +110,11 @@ class DetailProductViewModel(
         shoppingItemRepository.plusQuantity(productId, quantity)
     }
 
-    private fun updateUiState() {
+    private fun publishUiState() {
+        _uiState.value = createUiState()
+    }
+
+    private fun createUiState(): DetailProductUiState {
         val shoppingItemByProductId = cachedShoppingItems.associateBy { shoppingItem -> shoppingItem.getProductId() }
         val currentShoppingItem = selectedProductId?.let { productId -> shoppingItemByProductId[productId] }
         val safeQuantity = selectedQuantity.coerceAtLeast(DEFAULT_QUANTITY)
@@ -116,13 +122,12 @@ class DetailProductViewModel(
             lastViewedProductId
                 ?.takeIf { showLastViewedSection && it != selectedProductId }
                 ?.let { productId -> shoppingItemByProductId[productId] }
-        _uiState.value =
-            DetailProductUiState(
-                shoppingItem = currentShoppingItem,
-                lastViewedShoppingItem = resolvedLastViewedShoppingItem,
-                selectedQuantity = safeQuantity,
-                quantityPrice = currentShoppingItem?.getProductQuantityPrice(safeQuantity) ?: 0,
-            )
+        return DetailProductUiState(
+            shoppingItem = currentShoppingItem,
+            lastViewedShoppingItem = resolvedLastViewedShoppingItem,
+            selectedQuantity = safeQuantity,
+            quantityPrice = currentShoppingItem?.getProductQuantityPrice(safeQuantity) ?: 0,
+        )
     }
 
     private fun launchNow(block: suspend () -> Unit) {
