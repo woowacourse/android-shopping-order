@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.remote
 
 import kotlinx.serialization.json.Json
+import okhttp3.Credentials
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -29,7 +30,15 @@ object RetrofitProvider {
         OkHttpClient
             .Builder()
             .addInterceptor(loggingInterceptor)
-            .connectTimeout(30, TimeUnit.SECONDS)
+            .addInterceptor { chain ->
+                val request =
+                    chain
+                        .request()
+                        .newBuilder()
+                        .header("Authorization", Credentials.basic("BaekCCI", "password"))
+                        .build()
+                chain.proceed(request)
+            }.connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .build()
