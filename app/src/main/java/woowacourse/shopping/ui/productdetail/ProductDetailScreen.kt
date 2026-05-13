@@ -51,7 +51,7 @@ fun ProductDetailScreen(
 @Composable
 fun ProductDetailScreen(
     product: Product,
-    totalPrice: Int,
+    totalPrice: Long,
     count: Int,
     lastViewedProduct: Product?,
     modifier: Modifier = Modifier,

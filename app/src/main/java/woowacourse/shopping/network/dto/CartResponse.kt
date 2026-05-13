@@ -7,16 +7,16 @@ import woowacourse.shopping.model.CartItem
 @Serializable
 data class CartResponse(
     val content: List<CartItemResponse>,
-    val empty: Boolean,
-    val first: Boolean,
-    val last: Boolean,
-    val number: Int,
-    val numberOfElements: Int,
     val pageable: PageableResponse,
-    val size: Int,
-    val sort: SortResponse,
     val totalElements: Long,
-    val totalPages: Int
+    val totalPages: Int,
+    val last: Boolean,
+    val size: Int,
+    val number: Int,
+    val sort: SortResponse,
+    val numberOfElements: Int,
+    val first: Boolean,
+    val empty: Boolean,
 )
 
 fun CartResponse.toDomain(): Cart {

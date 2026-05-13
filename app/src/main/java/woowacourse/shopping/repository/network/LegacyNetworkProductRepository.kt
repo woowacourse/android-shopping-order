@@ -46,7 +46,7 @@ class LegacyNetworkProductRepository(
                 Product(
                     id = jsonObject.getLong("id"),
                     name = jsonObject.getString("name"),
-                    price = Money(jsonObject.getInt("price")),
+                    price = Money(jsonObject.getLong("price")),
                     imageUrl = jsonObject.getString("imageUrl"),
                 ),
             )

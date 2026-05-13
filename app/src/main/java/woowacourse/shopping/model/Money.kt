@@ -3,7 +3,7 @@ package woowacourse.shopping.model
 
 @JvmInline
 value class Money(
-    val value: Int,
+    val value: Long,
 ) {
     init {
         require(value >= 0) { "금액은 0 이상이어야 합니다." }

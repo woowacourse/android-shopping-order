@@ -24,4 +24,6 @@ interface CartRepository {
     ): List<CartItem>
 
     suspend fun getSize(): Int
+
+    suspend fun getCartCount(): Int
 }

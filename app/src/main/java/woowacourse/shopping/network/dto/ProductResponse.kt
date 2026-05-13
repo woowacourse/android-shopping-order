@@ -8,7 +8,7 @@ import woowacourse.shopping.model.Product
 data class ProductResponse(
     val id: Long,
     val name: String,
-    val price: Int,
+    val price: Long,
     val imageUrl: String,
     val category: String
 )

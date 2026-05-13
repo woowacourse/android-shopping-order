@@ -29,7 +29,7 @@ import woowacourse.shopping.ui.common.component.ShoppingImage
 @Composable
 fun ProductDetailBody(
     product: Product,
-    totalPrice: Int,
+    totalPrice: Long,
     count: Int,
     lastViewedProduct: Product?,
     modifier: Modifier = Modifier,
@@ -84,7 +84,7 @@ fun ProductDetailBody(
 @Composable
 private fun ProductOption(
     productName: String,
-    price: Int,
+    price: Long,
     count: Int,
     modifier: Modifier = Modifier,
     onIncreaseClick: () -> Unit,

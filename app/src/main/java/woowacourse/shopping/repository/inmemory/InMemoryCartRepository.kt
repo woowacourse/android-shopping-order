@@ -68,4 +68,7 @@ class InMemoryCartRepository(
     }
 
     override suspend fun getSize(): Int = value.size
+    override suspend fun getCartCount(): Int {
+        TODO("Not yet implemented")
+    }
 }
