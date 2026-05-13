@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.cart.viewmodel
 
-import android.nfc.tech.MifareUltralight.PAGE_SIZE
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
@@ -17,6 +16,7 @@ import woowacourse.shopping.domain.model.RemoveItemResult
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.cart.model.CartUiState
 import woowacourse.shopping.presentation.cart.model.toUiModel
+import woowacourse.shopping.presentation.common.addToCartUseCase
 import kotlin.math.min
 
 class CartViewModel(
@@ -51,12 +51,7 @@ class CartViewModel(
 
     fun increase(productId: Long) {
         viewModelScope.launch {
-            val cartItem = cartRepository.getCart().items.find { it.product.id == productId }
-            if (cartItem == null) return@launch
-
-            val updatedCart = cartRepository.changeCartItem(productId, cartItem.quantity + 1)
-
-            loadCartItems(updatedCart)
+            loadCartItems(addToCartUseCase(cartRepository, productId))
         }
     }
 
@@ -65,7 +60,7 @@ class CartViewModel(
             val cartItem = cartRepository.getCart().items.find { it.product.id == productId }
             if (cartItem == null) return@launch
 
-            val updatedCart = cartRepository.changeCartItem(productId, cartItem.quantity - 1)
+            val updatedCart = cartRepository.changeCartItem(productId, cartItem.decrease().quantity)
             loadCartItems(updatedCart)
         }
     }

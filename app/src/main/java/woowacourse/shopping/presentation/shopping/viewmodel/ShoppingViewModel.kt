@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okio.IOException
 import woowacourse.shopping.di.RepositoryProvider
-import woowacourse.shopping.di.RepositoryProvider.productRepository
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.presentation.common.addToCartUseCase
 import woowacourse.shopping.presentation.common.model.ProductUiModel
 import woowacourse.shopping.presentation.common.model.toUiModel
 import woowacourse.shopping.presentation.shopping.model.ShoppingItemUiModel
@@ -61,14 +61,15 @@ class ShoppingViewModel(
 
     fun increase(id: Long) {
         viewModelScope.launch {
-            cartRepository.addItem(id)
+            addToCartUseCase(cartRepository, id)
             loadCartItemQuantities()
         }
     }
 
     fun decrease(id: Long) {
         viewModelScope.launch {
-            val cartItem = cartRepository.getCart().items.find { it.product.id == id } ?: return@launch
+            val cartItem =
+                cartRepository.getCart().items.find { it.product.id == id } ?: return@launch
             cartRepository.changeCartItem(id, cartItem.decrease().quantity)
 
             loadCartItemQuantities()

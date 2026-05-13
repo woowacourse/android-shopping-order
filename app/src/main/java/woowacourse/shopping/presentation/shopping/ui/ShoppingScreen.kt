@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import woowacourse.shopping.R
-import woowacourse.shopping.presentation.common.ShoppingAppBar
+import woowacourse.shopping.presentation.common.components.ShoppingAppBar
 import woowacourse.shopping.presentation.common.model.ProductUiModel
 import woowacourse.shopping.presentation.shopping.model.ShoppingItemUiModel
 import woowacourse.shopping.presentation.shopping.model.ShoppingUiState

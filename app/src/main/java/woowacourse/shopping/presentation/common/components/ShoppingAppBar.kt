@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.common
+package woowacourse.shopping.presentation.common.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row

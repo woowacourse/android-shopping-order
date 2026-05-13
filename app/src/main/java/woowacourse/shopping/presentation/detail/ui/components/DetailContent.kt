@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import woowacourse.shopping.presentation.common.QuantityCounter
+import woowacourse.shopping.presentation.common.components.QuantityCounter
 import woowacourse.shopping.ui.theme.Gray40
 import woowacourse.shopping.util.formattedPrice
 

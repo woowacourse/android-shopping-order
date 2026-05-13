@@ -107,7 +107,7 @@ class DetailViewModelTest {
     @Test
     fun `addToCart는 cartRepository에 상품을 추가한다`() =
         runTest {
-            viewModel.addToCart(id = 1L, quantity = 3)
+            viewModel.addToCart(id = 1L)
 
             assertThat(cartRepository.getQuantity(1L)).isEqualTo(3)
         }

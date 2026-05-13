@@ -16,8 +16,8 @@ data class CartItem(
         return copy(quantity = quantity - 1)
     }
 
-    fun increase(): CartItem {
-        if (quantity == 99) return this
-        return copy(quantity = quantity + 1)
+    fun increase(quantity: Int = 1): CartItem {
+        if (this.quantity + quantity >= 100) return this
+        return copy(quantity = this.quantity + quantity)
     }
 }

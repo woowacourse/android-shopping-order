@@ -27,7 +27,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.presentation.cart.model.CartUiState
 import woowacourse.shopping.presentation.cart.ui.components.CartContent
 import woowacourse.shopping.presentation.cart.ui.components.CartPageSection
-import woowacourse.shopping.presentation.common.ShoppingAppBar
+import woowacourse.shopping.presentation.common.components.ShoppingAppBar
 
 @Composable
 fun CartScreen(

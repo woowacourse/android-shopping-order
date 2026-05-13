@@ -11,12 +11,11 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.RepositoryProvider
-import woowacourse.shopping.di.RepositoryProvider.cartRepository
-import woowacourse.shopping.di.RepositoryProvider.productRepository
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.presentation.common.addToCartUseCase
 import woowacourse.shopping.presentation.common.model.toUiModel
 import woowacourse.shopping.presentation.detail.model.DetailUiState
 
@@ -96,14 +95,10 @@ class DetailViewModel(
 
     fun addToCart(
         id: Long,
-        quantity: Int,
+        quantity: Int = 1,
     ) {
         viewModelScope.launch {
-            val product =
-                loadedProduct ?: productRepository.getProductById(id).also {
-                    loadedProduct = it
-                }
-            cartRepository.addItem(product.id, quantity)
+            addToCartUseCase(cartRepository, id, quantity)
             _uiEvents.send(DetailEvent.NavigateToCart)
         }
     }

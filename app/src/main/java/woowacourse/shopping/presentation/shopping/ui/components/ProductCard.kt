@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import woowacourse.shopping.R
-import woowacourse.shopping.presentation.common.QuantityCounter
+import woowacourse.shopping.presentation.common.components.QuantityCounter
 import woowacourse.shopping.presentation.common.model.ProductUiModel
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 import woowacourse.shopping.ui.theme.Gray50

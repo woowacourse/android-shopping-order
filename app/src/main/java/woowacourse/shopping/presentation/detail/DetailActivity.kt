@@ -80,7 +80,12 @@ class DetailActivity : ComponentActivity() {
                                 finish()
                             },
                             onBack = { finish() },
-                            onAddToCart = { viewModel.addToCart(id, state.quantity) },
+                            onAddToCart = {
+                                viewModel.addToCart(
+                                    id = id,
+                                    quantity = state.quantity,
+                                )
+                            },
                             onIncrease = { viewModel.increase() },
                             onDecrease = { viewModel.decrease() },
                         )
