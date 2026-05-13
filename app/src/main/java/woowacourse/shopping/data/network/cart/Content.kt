@@ -24,6 +24,7 @@ data class Content(
                 id = product.id.toString(),
             ),
             quantity = this.quantity,
+            id = this.id.toString(),
         )
     }
 }

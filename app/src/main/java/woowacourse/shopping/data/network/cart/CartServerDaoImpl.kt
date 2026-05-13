@@ -84,7 +84,7 @@ class CartServerDaoImpl(
     override suspend fun update(item: CartContent) = withContext(Dispatchers.IO) {
         val url = baseUrl.newBuilder()
             .addPathSegment("cart-items")
-            .addPathSegment(item.productId)
+            .addPathSegment(item.id)
             .build()
 
         val jsonBody = Quantity(item.quantity)
