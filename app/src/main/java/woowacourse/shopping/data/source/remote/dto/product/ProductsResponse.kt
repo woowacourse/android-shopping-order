@@ -1,12 +1,14 @@
-package woowacourse.shopping.data.source.remote.dto
+package woowacourse.shopping.data.source.remote.dto.product
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import woowacourse.shopping.data.source.remote.dto.Pageable
+import woowacourse.shopping.data.source.remote.dto.Sort
 
 @Serializable
 data class ProductsResponse(
     @SerialName("content")
-    val content: List<Content>,
+    val content: List<ProductContent>,
     @SerialName("empty")
     val empty: Boolean,
     @SerialName("first")

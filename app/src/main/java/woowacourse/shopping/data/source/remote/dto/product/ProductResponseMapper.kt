@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.source.remote.dto
+package woowacourse.shopping.data.source.remote.dto.product
 
 import woowacourse.shopping.domain.model.Money
 import woowacourse.shopping.domain.model.Product

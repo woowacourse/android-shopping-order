@@ -7,8 +7,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.data.source.remote.api.ProductService
-import woowacourse.shopping.data.source.remote.dto.Content
-import woowacourse.shopping.data.source.remote.dto.ProductResponse
+import woowacourse.shopping.data.source.remote.dto.product.ProductContent
+import woowacourse.shopping.data.source.remote.dto.product.ProductResponse
 import kotlin.jvm.java
 
 class ProductRemoteDataSource(
@@ -26,7 +26,7 @@ class ProductRemoteDataSource(
     suspend fun fetchProducts(
         offset: Int,
         limit: Int,
-    ): List<Content> =
+    ): List<ProductContent> =
         withContext(Dispatchers.IO) {
             val response =
                 productService.requestProducts(

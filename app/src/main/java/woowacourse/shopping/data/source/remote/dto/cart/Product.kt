@@ -1,10 +1,10 @@
-package woowacourse.shopping.data.source.remote.dto
+package woowacourse.shopping.data.source.remote.dto.cart
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ProductResponse(
+data class Product(
     @SerialName("category")
     val category: String,
     @SerialName("id")

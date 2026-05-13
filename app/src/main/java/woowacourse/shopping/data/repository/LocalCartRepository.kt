@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.source.local.cart.CartDao
+import woowacourse.shopping.data.source.remote.CartRemoteDataSource
 import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItem
@@ -11,6 +12,7 @@ import woowacourse.shopping.domain.repository.ProductRepository
 class LocalCartRepository(
     private val cartDao: CartDao,
     private val productRepository: ProductRepository,
+    private val remoteDataSource: CartRemoteDataSource,
 ) : CartRepository {
     override suspend fun getCart(): Cart {
         val rows = cartDao.getAll()
@@ -29,6 +31,10 @@ class LocalCartRepository(
         id: Long,
         quantity: Int,
     ): AddItemResult {
+        remoteDataSource.addItem(
+            id = id,
+            quantity = quantity,
+        )
         val before = cartDao.findById(id)
         cartDao.addOrIncrement(id, quantity)
         val cart = getCart()
