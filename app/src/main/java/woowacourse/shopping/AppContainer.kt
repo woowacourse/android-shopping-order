@@ -41,4 +41,10 @@ class AppContainer(
             context = context,
             scope = applicationScope,
         )
+
+    val remoteShoppingStateSyncer: RemoteShoppingStateSyncer =
+        RemoteShoppingStateSyncer(
+            shoppingCartRepository = shoppingCartRepository,
+            shoppingItemRepository = shoppingItemRepository,
+        )
 }

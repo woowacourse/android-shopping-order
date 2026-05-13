@@ -1,10 +1,15 @@
 package woowacourse.shopping.repository
 
 import kotlinx.coroutines.flow.StateFlow
+import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ShoppingItem
 
 interface ShoppingItemRepository {
     val shoppingItems: StateFlow<List<ShoppingItem>>
+
+    suspend fun upsertProduct(product: Product)
+
+    suspend fun replaceProducts(products: List<Product>)
 
     suspend fun getQuantity(productId: Long): Int
 

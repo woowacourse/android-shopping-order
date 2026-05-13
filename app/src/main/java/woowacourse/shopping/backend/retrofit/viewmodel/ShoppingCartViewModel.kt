@@ -1,5 +1,6 @@
 package woowacourse.shopping.backend.retrofit.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -7,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import woowacourse.shopping.backend.retrofit.awaitBody
+import woowacourse.shopping.backend.retrofit.awaitSuccess
 import woowacourse.shopping.backend.retrofit.dto.CartRequest
 import woowacourse.shopping.backend.retrofit.repository.ShoppingCartRetrofitRepository
 import woowacourse.shopping.mapper.toCartQuantity
@@ -19,12 +21,18 @@ class ShoppingCartViewModel(
     private val _shoppingCartItems = MutableStateFlow<List<ShoppingCartItem>>(emptyList())
     val shoppingCartItems: StateFlow<List<ShoppingCartItem>> = _shoppingCartItems.asStateFlow()
 
+    private val _hasLoadedCartItems = MutableStateFlow(false)
+    val hasLoadedCartItems: StateFlow<Boolean> = _hasLoadedCartItems.asStateFlow()
+
     fun requestCartItems() {
         viewModelScope.launch {
             runCatching {
                 loadCartItems()
             }.onSuccess { loadedItems ->
                 _shoppingCartItems.value = loadedItems
+                _hasLoadedCartItems.value = true
+            }.onFailure { throwable ->
+                Log.e(LOG_TAG, "requestCartItems 실패", throwable)
             }
         }
     }
@@ -42,18 +50,21 @@ class ShoppingCartViewModel(
                     shoppingCartRetrofitRepository
                         .addCartItem(
                             product = CartRequest(productId = productId, quantity = amount),
-                        ).awaitBody(errorPrefix = "장바구니 추가 실패")
+                        ).awaitSuccess(errorPrefix = "장바구니 추가 실패")
                 } else {
                     val updatedQuantity = targetItem.getQuantity() + amount
                     shoppingCartRetrofitRepository
                         .updateQuantityCartItem(
                             id = targetItem.getId().toInt(),
                             product = updatedQuantity.toCartQuantity(),
-                        ).awaitBody(errorPrefix = "장바구니 수량 수정 실패")
+                        ).awaitSuccess(errorPrefix = "장바구니 수량 수정 실패")
                 }
                 loadCartItems()
             }.onSuccess { latestItems ->
                 _shoppingCartItems.value = latestItems
+                _hasLoadedCartItems.value = true
+            }.onFailure { throwable ->
+                Log.e(LOG_TAG, "addOrIncreaseByProductId 실패 productId=$productId, amount=$amount", throwable)
             }
         }
     }
@@ -68,17 +79,20 @@ class ShoppingCartViewModel(
                     shoppingCartRetrofitRepository
                         .deleteCartItem(
                             id = targetItem.getId().toInt(),
-                        ).awaitBody(errorPrefix = "장바구니 삭제 실패")
+                        ).awaitSuccess(errorPrefix = "장바구니 삭제 실패")
                 } else {
                     shoppingCartRetrofitRepository
                         .updateQuantityCartItem(
                             id = targetItem.getId().toInt(),
                             product = updatedQuantity.toCartQuantity(),
-                        ).awaitBody(errorPrefix = "장바구니 수량 수정 실패")
+                        ).awaitSuccess(errorPrefix = "장바구니 수량 수정 실패")
                 }
                 loadCartItems()
             }.onSuccess { latestItems ->
                 _shoppingCartItems.value = latestItems
+                _hasLoadedCartItems.value = true
+            }.onFailure { throwable ->
+                Log.e(LOG_TAG, "decreaseByProductId 실패 productId=$productId", throwable)
             }
         }
     }
@@ -89,10 +103,13 @@ class ShoppingCartViewModel(
                 shoppingCartRetrofitRepository
                     .deleteCartItem(
                         id = shoppingCartItem.getId().toInt(),
-                    ).awaitBody(errorPrefix = "장바구니 삭제 실패")
+                    ).awaitSuccess(errorPrefix = "장바구니 삭제 실패")
                 loadCartItems()
             }.onSuccess { latestItems ->
                 _shoppingCartItems.value = latestItems
+                _hasLoadedCartItems.value = true
+            }.onFailure { throwable ->
+                Log.e(LOG_TAG, "removeShoppingItem 실패 id=${shoppingCartItem.getId()}", throwable)
             }
         }
     }
@@ -115,7 +132,7 @@ class ShoppingCartViewModel(
             .requestCartItems(
                 page = DEFAULT_PAGE,
                 size = DEFAULT_SIZE,
-                sort = DEFAULT_SORT,
+                sort = null,
             ).awaitBody(errorPrefix = "장바구니 조회 실패")
             .toDomainShoppingCartItems()
 
@@ -128,9 +145,9 @@ class ShoppingCartViewModel(
         }
 
     private companion object {
+        private const val LOG_TAG = "ShoppingCartViewModel"
         private const val DEFAULT_PAGE = 0
         private const val DEFAULT_SIZE = 100
         private const val DEFAULT_QUANTITY = 1
-        private val DEFAULT_SORT = listOf("id,asc")
     }
 }
