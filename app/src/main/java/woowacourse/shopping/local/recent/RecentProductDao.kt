@@ -27,7 +27,7 @@ interface RecentProductDao {
         LIMIT 1
         """,
     )
-    suspend fun getLatestViewedProductExcluding(productId: String): RecentProductEntity?
+    suspend fun getLatestViewedProductExcluding(productId: Long): RecentProductEntity?
 
     @Query(
         """

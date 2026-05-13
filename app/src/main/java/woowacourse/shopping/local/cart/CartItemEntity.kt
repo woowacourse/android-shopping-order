@@ -4,17 +4,16 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.ProductId
-import java.util.UUID
 
 @Entity(tableName = "cart_items")
 data class CartItemEntity(
-    @PrimaryKey val productId: String,
+    @PrimaryKey val productId: Long,
     val quantity: Int,
     val createdAtMillis: Long,
 ) {
     fun toDomain(): CartItem =
         CartItem(
-            productId = ProductId(UUID.fromString(productId)),
+            productId = ProductId(productId),
             quantity = quantity,
         )
 
@@ -24,7 +23,7 @@ data class CartItemEntity(
             createdAtMillis: Long,
         ): CartItemEntity =
             CartItemEntity(
-                productId = cartItem.productId.value.toString(),
+                productId = cartItem.productId.value,
                 quantity = cartItem.quantity,
                 createdAtMillis = createdAtMillis,
             )

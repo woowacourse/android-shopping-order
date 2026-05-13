@@ -32,6 +32,6 @@ class RoomRecentProductRepository(
 
     override suspend fun getLatestViewedProductExcluding(productId: ProductId): RecentProduct? =
         recentProductDao
-            .getLatestViewedProductExcluding(productId.value.toString())
+            .getLatestViewedProductExcluding(productId.value)
             ?.toDomain()
 }

@@ -10,7 +10,7 @@ class RoomCartRepository(
     private val cartItemDao: CartItemDao,
 ) : CartRepository {
     override suspend fun add(item: ProductId) {
-        val productId = item.value.toString()
+        val productId = item.value
         val existingItem = cartItemDao.findByProductId(productId)
 
         if (existingItem == null) {
@@ -28,7 +28,7 @@ class RoomCartRepository(
     }
 
     override suspend fun delete(item: ProductId) {
-        val productId = item.value.toString()
+        val productId = item.value
         val existingItem =
             cartItemDao.findByProductId(productId)
                 ?: throw CartItemNotFoundException(item)
@@ -57,7 +57,7 @@ class RoomCartRepository(
         if (productIds.isEmpty()) return emptyList()
 
         return cartItemDao
-            .getCartItemsByProductIds(productIds.map { it.value.toString() }.toSet())
+            .getCartItemsByProductIds(productIds.map { it.value }.toSet())
             .map(CartItemEntity::toDomain)
     }
 

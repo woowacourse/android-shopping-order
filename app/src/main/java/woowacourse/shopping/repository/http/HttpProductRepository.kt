@@ -2,22 +2,37 @@ package woowacourse.shopping.repository.http
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import okhttp3.Request
-import org.json.JSONArray
-import org.json.JSONObject
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.model.Products
 import woowacourse.shopping.repository.ProductRepository
 import java.io.IOException
 
+private const val NETWORK_PAGE_SIZE = 20
+private val NETWORK_JSON =
+    Json {
+        ignoreUnknownKeys = true
+    }
+
 class HttpProductRepository(
-    private val client: OkHttpClient,
-    private val baseUrlProvider: () -> HttpUrl,
+    private val productApiService: ProductApiService,
 ) : ProductRepository {
+    constructor(
+        client: OkHttpClient,
+        baseUrlProvider: () -> HttpUrl,
+    ) : this(
+        productApiService = createProductApiService(client, baseUrlProvider),
+    )
+
     constructor(
         client: OkHttpClient,
         baseUrl: String,
@@ -31,26 +46,41 @@ class HttpProductRepository(
     @Volatile
     private var cachedProducts: List<Product> = emptyList()
 
+    @Volatile
+    private var totalCount: Long = 0L
+
+    @Volatile
+    private var nextPage: Int = 0
+
+    @Volatile
+    private var lastPageLoaded: Boolean = false
+
     override val size: Int
-        get() = cachedProducts.size
+        get() = maxOf(totalCount.coerceAtMost(Int.MAX_VALUE.toLong()), cachedProducts.size.toLong()).toInt()
 
     override suspend fun getProducts(
         fromIndex: Int,
         limit: Int,
     ): Products =
         withContext(Dispatchers.IO) {
-            val allProducts = getCachedOrFetchProducts()
-            val safeFrom = fromIndex.coerceIn(0, allProducts.size)
+            val safeFrom = fromIndex.coerceAtLeast(0)
             val safeLimit = limit.coerceAtLeast(0)
-            val safeTo = minOf(safeFrom + safeLimit, allProducts.size)
+            val untilExclusive = safeFrom + safeLimit
 
-            Products(allProducts.subList(safeFrom, safeTo))
+            ensureProductsLoaded(untilExclusive)
+
+            val safeTo = minOf(untilExclusive, cachedProducts.size)
+            if (safeFrom >= safeTo) return@withContext Products(emptyList())
+
+            Products(cachedProducts.subList(safeFrom, safeTo))
         }
 
     override suspend fun hasNext(current: Int): Boolean =
         withContext(Dispatchers.IO) {
-            val allProducts = getCachedOrFetchProducts()
-            current < allProducts.lastIndex
+            if (current < 0) return@withContext false
+
+            ensureProductsLoaded(current + 2)
+            current < size - 1
         }
 
     override suspend fun findAllByIds(ids: Set<ProductId>): Map<ProductId, Product> =
@@ -66,85 +96,98 @@ class HttpProductRepository(
                 }
             }
 
+            cachedProducts = cachedProductsById.values.toList()
+
             ids
                 .mapNotNull { productId ->
                     cachedProductsById[productId]?.let { productId to it }
                 }.toMap()
         }
 
-    private fun fetchAllProducts(): List<Product> {
-        val body = executeRequest(pathSegments = listOf("products"))
+    private suspend fun ensureProductsLoaded(untilExclusive: Int) {
+        if (untilExclusive <= cachedProducts.size || lastPageLoaded) return
 
-        val products =
-            runCatching {
-                val jsonArray = JSONArray(body)
-                List(jsonArray.length()) { index ->
-                    ProductResponseDto.fromJson(jsonArray.getJSONObject(index)).toDomain()
+        while (cachedProducts.size < untilExclusive && !lastPageLoaded) {
+            val responseBody =
+                executeRequest(
+                    errorMessage = "상품 목록 API 호출에 실패했습니다.",
+                    request = { productApiService.getProducts(page = nextPage, size = NETWORK_PAGE_SIZE) },
+                )
+
+            val fetchedProducts =
+                runCatching {
+                    responseBody
+                        .content
+                        .orEmpty()
+                        .map { it.toDomain() }
+                }.getOrElse { throwable ->
+                    throw ProductParsingException("상품 목록 응답을 파싱할 수 없습니다.", throwable)
                 }
-            }.getOrElse { throwable ->
-                throw ProductParsingException("상품 목록 응답을 파싱할 수 없습니다.", throwable)
-            }
 
-        cachedProducts = products
-        return products
+            cachedProducts = cachedProducts + fetchedProducts
+            totalCount = responseBody.totalElements ?: cachedProducts.size.toLong()
+            lastPageLoaded = responseBody.last ?: fetchedProducts.isEmpty()
+            nextPage += 1
+        }
     }
 
-    private fun getCachedOrFetchProducts(): List<Product> {
-        if (cachedProducts.isNotEmpty()) return cachedProducts
-
-        return fetchAllProducts()
-    }
-
-    private fun fetchProductById(productId: ProductId): Product? {
-        val remoteId = productId.toRemoteIdOrNull() ?: return null
-        val body = executeRequest(pathSegments = listOf("products", remoteId.toString()))
+    private suspend fun fetchProductById(productId: ProductId): Product? {
+        val responseBody =
+            executeRequest(
+                errorMessage = "상품 상세 API 호출에 실패했습니다.",
+                request = { productApiService.getProduct(id = productId.value) },
+            )
 
         val product =
             runCatching {
-                ProductResponseDto.fromJson(JSONObject(body)).toDomain()
+                responseBody.toDomain()
             }.getOrElse { throwable ->
                 throw ProductParsingException("상품 상세 응답을 파싱할 수 없습니다.", throwable)
             }
 
         cachedProducts = (cachedProducts + product).distinctBy { it.id }
+        totalCount = maxOf(totalCount, cachedProducts.size.toLong())
         return product
     }
 
-    private fun executeRequest(pathSegments: List<String>): String {
-        val url =
-            baseUrlProvider()
-                .newBuilder()
-                .apply {
-                    pathSegments.forEach { addPathSegment(it) }
-                }.build()
+    private suspend fun <T> executeRequest(
+        errorMessage: String,
+        request: suspend () -> Response<T>,
+    ): T =
+        try {
+            val response = request()
 
-        val request =
-            Request
-                .Builder()
-                .url(url)
-                .get()
-                .build()
-
-        return try {
-            client.newCall(request).execute().use { response ->
-                val responseBody = response.body.string()
-
-                if (!response.isSuccessful) {
-                    throw ProductResponseException(
-                        code = response.code,
-                        message = "상품 API 호출에 실패했습니다. code=${response.code}",
-                    )
-                }
-
-                require(!responseBody.isNullOrBlank()) { "상품 API 응답 본문이 비어 있습니다." }
-                responseBody
+            if (!response.isSuccessful) {
+                throw ProductResponseException(
+                    code = response.code(),
+                    message = "$errorMessage code=${response.code()}",
+                )
             }
+
+            response.body()
+                ?: throw ProductParsingException(
+                    "상품 API 응답 본문이 비어 있습니다.",
+                    IllegalStateException("response body is null"),
+                )
         } catch (exception: ProductRemoteException) {
             throw exception
         } catch (exception: IOException) {
-            throw ProductNetworkException("상품 API 네트워크 호출에 실패했습니다.", exception)
-        } catch (exception: IllegalArgumentException) {
+            throw ProductNetworkException(errorMessage, exception)
+        } catch (exception: SerializationException) {
             throw ProductParsingException("상품 API 응답이 올바르지 않습니다.", exception)
         }
+
+    companion object {
+        private fun createProductApiService(
+            client: OkHttpClient,
+            baseUrlProvider: () -> HttpUrl,
+        ): ProductApiService =
+            Retrofit
+                .Builder()
+                .baseUrl(baseUrlProvider())
+                .client(client)
+                .addConverterFactory(NETWORK_JSON.asConverterFactory("application/json".toMediaType()))
+                .build()
+                .create(ProductApiService::class.java)
     }
 }

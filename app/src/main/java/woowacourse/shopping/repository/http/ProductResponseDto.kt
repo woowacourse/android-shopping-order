@@ -1,12 +1,13 @@
 package woowacourse.shopping.repository.http
 
-import org.json.JSONObject
+import kotlinx.serialization.Serializable
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductId
 
+@Serializable
 data class ProductResponseDto(
-    val id: Int,
+    val id: Long,
     val name: String,
     val price: Int,
     val imageUrl: String,
@@ -18,14 +19,11 @@ data class ProductResponseDto(
             price = Money(price),
             imageUrl = imageUrl,
         )
-
-    companion object {
-        fun fromJson(jsonObject: JSONObject): ProductResponseDto =
-            ProductResponseDto(
-                id = jsonObject.getInt("id"),
-                name = jsonObject.getString("name"),
-                price = jsonObject.getInt("price"),
-                imageUrl = jsonObject.getString("imageUrl"),
-            )
-    }
 }
+
+@Serializable
+data class ProductPageResponseDto(
+    val content: List<ProductResponseDto>? = null,
+    val totalElements: Long? = null,
+    val last: Boolean? = null,
+)

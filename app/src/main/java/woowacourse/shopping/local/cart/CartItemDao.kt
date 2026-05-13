@@ -29,13 +29,13 @@ interface CartItemDao {
         ORDER BY createdAtMillis ASC, productId ASC
         """,
     )
-    suspend fun getCartItemsByProductIds(productIds: Set<String>): List<CartItemEntity>
+    suspend fun getCartItemsByProductIds(productIds: Set<Long>): List<CartItemEntity>
 
     @Query("SELECT * FROM cart_items WHERE productId = :productId LIMIT 1")
-    suspend fun findByProductId(productId: String): CartItemEntity?
+    suspend fun findByProductId(productId: Long): CartItemEntity?
 
     @Query("DELETE FROM cart_items WHERE productId = :productId")
-    suspend fun deleteByProductId(productId: String)
+    suspend fun deleteByProductId(productId: Long)
 
     @Query("SELECT COUNT(*) FROM cart_items")
     suspend fun count(): Int

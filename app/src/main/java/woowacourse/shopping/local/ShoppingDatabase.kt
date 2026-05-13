@@ -11,7 +11,7 @@ import woowacourse.shopping.local.recent.RecentProductEntity
 
 @Database(
     entities = [CartItemEntity::class, RecentProductEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 abstract class ShoppingDatabase : RoomDatabase() {
@@ -31,7 +31,8 @@ abstract class ShoppingDatabase : RoomDatabase() {
                             context.applicationContext,
                             ShoppingDatabase::class.java,
                             "shopping.db",
-                        ).build()
+                        ).fallbackToDestructiveMigration(dropAllTables = true)
+                        .build()
                         .also { instance = it }
             }
     }

@@ -16,8 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import woowacourse.shopping.model.ProductId
 import woowacourse.shopping.ui.theme.ShoppingTheme
-import java.util.UUID
-
 class ProductDetailActivity : ComponentActivity() {
     private val viewModel: ProductDetailViewModel by viewModels()
 
@@ -31,7 +29,7 @@ class ProductDetailActivity : ComponentActivity() {
             val intent =
                 Intent(context, ProductDetailActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    putExtra(PUT_EXTRA_KEY_PRODUCT_ID, productId.value.toString())
+                    putExtra(PUT_EXTRA_KEY_PRODUCT_ID, productId.value)
                 }
             context.startActivity(intent)
         }
@@ -57,7 +55,7 @@ class ProductDetailActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val product = uiState.product ?: return@Scaffold
 
-                    ProductDetailScreen(
+                    woowacourse.shopping.ui.productdetail.ProductDetailScreen(
                         product = product,
                         lastViewedProduct = uiState.lastViewedProduct,
                         quantity = uiState.quantity,
@@ -66,8 +64,8 @@ class ProductDetailActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding),
                         onCloseClick = ::finish,
                         onAddToCart = viewModel::addToCart,
-                        onLastViewedProductClick = {
-                            ProductDetailActivity.startActivity(this, it.id)
+                        onLastViewedProductClick = { lastViewedProduct ->
+                            startActivity(this, lastViewedProduct.id)
                         },
                         onIncreaseQuantity = viewModel::increaseQuantity,
                         onDecreaseQuantity = viewModel::decreaseQuantity,
@@ -78,9 +76,9 @@ class ProductDetailActivity : ComponentActivity() {
     }
 
     private fun parseProductId(intent: Intent): ProductId? =
-        runCatching {
-            intent
-                .getStringExtra(PUT_EXTRA_KEY_PRODUCT_ID)
-                ?.let { ProductId(UUID.fromString(it)) }
-        }.getOrNull()
+        if (intent.hasExtra(PUT_EXTRA_KEY_PRODUCT_ID)) {
+            ProductId(intent.getLongExtra(PUT_EXTRA_KEY_PRODUCT_ID, 0L))
+        } else {
+            null
+        }
 }

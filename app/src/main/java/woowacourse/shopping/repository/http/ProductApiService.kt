@@ -1,0 +1,19 @@
+package woowacourse.shopping.repository.http
+
+import retrofit2.Response
+import retrofit2.http.GET
+import retrofit2.http.Path
+import retrofit2.http.Query
+
+interface ProductApiService {
+    @GET("products")
+    suspend fun getProducts(
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+    ): Response<ProductPageResponseDto>
+
+    @GET("products/{id}")
+    suspend fun getProduct(
+        @Path("id") id: Long,
+    ): Response<ProductResponseDto>
+}
