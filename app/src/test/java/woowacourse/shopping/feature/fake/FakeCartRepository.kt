@@ -13,9 +13,7 @@ class FakeCartRepository(
 
     override suspend fun loadCart(): Cart = Cart(contents.toList())
 
-    override suspend fun loadCartContents(): List<CartContent> = contents.toList()
-
-    override suspend fun loadCartSize(): Int = contents.size
+    override suspend fun loadTotalQuantity(): Int = contents.sumOf { it.quantity }
 
     override suspend fun increase(product: Product) {
         val index = indexOf(product.id)
@@ -39,9 +37,10 @@ class FakeCartRepository(
     }
 
     override suspend fun pagination(
-        startIndex: Int,
+        page: Int,
         pageSize: Int,
     ): List<CartContent> {
+        val startIndex = page * pageSize
         if (startIndex >= contents.size) return emptyList()
         val end = minOf(startIndex + pageSize, contents.size)
         return contents.subList(startIndex, end).toList()

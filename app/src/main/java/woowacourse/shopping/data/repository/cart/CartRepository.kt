@@ -6,15 +6,20 @@ import woowacourse.shopping.domain.Product
 
 interface CartRepository {
     suspend fun loadCart(): Cart
-    suspend fun loadCartContents(): List<CartContent>
-    suspend fun loadCartSize(): Int
-    suspend fun increase(product: Product)
-    suspend fun decrease(productId: String)
+
+    suspend fun loadTotalQuantity(): Int
+
     suspend fun pagination(
-        startIndex: Int,
+        page: Int,
         pageSize: Int,
     ): List<CartContent>
+
+    suspend fun increase(product: Product)
+
+    suspend fun decrease(productId: String)
+
     suspend fun remove(productId: String)
+
     suspend fun setProductQuantity(
         productId: String,
         quantity: Int,

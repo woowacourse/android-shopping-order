@@ -60,11 +60,6 @@ class CartViewModel(
         return cart
     }
 
-    private suspend fun getCartSize(): Int {
-        val cartSize = cartRepository.loadCartSize()
-        return cartSize
-    }
-
     fun isStartPage(): Boolean = uiState.value.page == 1
 
     fun isEndPage(): Boolean = uiState.value.page >= lastPage(initialPageSize)
@@ -107,11 +102,8 @@ class CartViewModel(
         page: Int,
         pageSize: Int = 5,
     ): List<ProductUiModel> {
-        val toIndex = minOf(page * pageSize, cart.cartContentsSizeOf())
-        val startIndex = (page - 1) * pageSize
-
         val cartContents = cartRepository
-            .pagination(startIndex, toIndex)
+            .pagination(page - 1, pageSize)
             .map(::toProductUiModel)
         return cartContents
     }

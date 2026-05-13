@@ -5,10 +5,13 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import woowacourse.shopping.domain.CartContent
+
+private val JSON_MEDIA_TYPE = "application/json".toMediaType()
 
 class CartServerDaoImpl(
     private val client: OkHttpClient,
@@ -67,7 +70,7 @@ class CartServerDaoImpl(
             .Builder()
             .url(url)
             .post(
-                body.toRequestBody(),
+                body.toRequestBody(JSON_MEDIA_TYPE),
             )
             .build()
 
@@ -88,7 +91,7 @@ class CartServerDaoImpl(
 
         val body = json.encodeToString(jsonBody)
 
-        val request = Request.Builder().url(url).patch(body.toRequestBody()).build()
+        val request = Request.Builder().url(url).patch(body.toRequestBody(JSON_MEDIA_TYPE)).build()
 
         client.newCall(request).execute().use { response ->
             check(response.isSuccessful) { "products 요청 실패: ${response.code}" }

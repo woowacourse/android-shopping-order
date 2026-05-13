@@ -10,6 +10,7 @@ class FakeProductRepository(
     override suspend fun loadProducts(
         startIndex: Int,
         pageSize: Int,
+        sort: List<String>,
     ): List<Product> {
         if (startIndex >= products.size) return emptyList()
         val end = minOf(startIndex + pageSize, products.size)

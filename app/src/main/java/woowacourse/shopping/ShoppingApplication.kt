@@ -3,10 +3,11 @@ package woowacourse.shopping
 import android.app.Application
 import androidx.room.Room
 import kotlinx.serialization.json.Json
+import okhttp3.Credentials
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import woowacourse.shopping.data.local.RecentProductDatabase
-import woowacourse.shopping.data.local.ShoppingDatabase
+import woowacourse.shopping.data.network.cart.CartServerDaoImpl
 import woowacourse.shopping.data.network.product.ProductServerDaoImpl
 import woowacourse.shopping.data.network.startMockWebServer
 import woowacourse.shopping.data.repository.cart.CartRepository
@@ -37,14 +38,18 @@ class ShoppingApplication : Application() {
     }
 
     private fun initDependencies() {
-        val client = OkHttpClient()
+        val credential = Credentials.basic("CommitTheKermit", "password")
+        val client = OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                val authorized = chain.request().newBuilder()
+                    .header("Authorization", credential)
+                    .build()
+                chain.proceed(authorized)
+            }
+            .build()
         val json = Json { ignoreUnknownKeys = true }
-
-        val shoppingDatabase = Room.databaseBuilder(
-            applicationContext,
-            ShoppingDatabase::class.java,
-            "shopping.db",
-        ).build()
+        val baseUrl =
+            "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/".toHttpUrl()
 
         val recentProductDatabase = Room.databaseBuilder(
             applicationContext,
@@ -56,13 +61,17 @@ class ShoppingApplication : Application() {
             dataSource = ProductDataSourceImpl(
                 productDao = ProductServerDaoImpl(
                     client = client,
-                    baseUrl = "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/".toHttpUrl(),
+                    baseUrl = baseUrl,
                     json = json,
                 ),
             ),
         )
         val cart: CartRepository = CartRepositoryImpl(
-            cartDao = shoppingDatabase.cartDao(),
+            cartServerDao = CartServerDaoImpl(
+                client = client,
+                baseUrl = baseUrl,
+                json = json,
+            ),
             productRepository = product,
         )
         val recent: RecentProductRepository =
