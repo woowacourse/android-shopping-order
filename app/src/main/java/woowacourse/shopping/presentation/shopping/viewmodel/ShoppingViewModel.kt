@@ -39,17 +39,18 @@ class ShoppingViewModel(
 
     fun loadCartItemQuantities() {
         viewModelScope.launch {
-            val quantities = cartRepository.getAllQuantities()
+            val products = productRepository.getProducts(0, 100000)
+            val cart = cartRepository.getCart()
             _uiState.update {
                 it.copy(
                     products =
-                        it.products.map { product ->
+                        products.map { product ->
                             ShoppingItemUiModel(
-                                product.product,
-                                quantities[product.product.id] ?: 0,
+                                product.toUiModel(),
+                                cart[product.id]?.quantity ?: 0,
                             )
                         },
-                    totalQuantity = quantities.values.sum(),
+                    totalQuantity = cart.totalQuantity,
                 )
             }
         }

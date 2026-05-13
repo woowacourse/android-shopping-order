@@ -12,7 +12,7 @@ suspend fun addToCartUseCase(
     if (item != null) {
         cartRepository.changeCartItem(productId, item.increase(quantity).quantity)
     } else {
-        cartRepository.addItem(productId)
+        cartRepository.addItem(productId, quantity)
     }
     return cartRepository.getCart()
 }

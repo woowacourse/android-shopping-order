@@ -18,7 +18,6 @@ object RepositoryProvider {
     val productRepository: ProductRepository = RemoteProductRepository()
     val cartRepository: CartRepository by lazy {
         DefaultCartRepository(
-            cartDao = database.cartDao(),
             remoteDataSource = CartRemoteDataSource(),
         )
     }
