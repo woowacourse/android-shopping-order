@@ -5,8 +5,8 @@ import woowacourse.shopping.model.Product
 
 interface ProductRepository {
     suspend fun getProducts(
-        offset: Int,
-        limit: Int,
+        page: Int,
+        size: Int,
     ): ImmutableList<Product>
 
     suspend fun getProductById(id: String): Product
