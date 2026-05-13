@@ -16,7 +16,7 @@ import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.ui.cart.component.CartBody
 import woowacourse.shopping.ui.cart.component.CartHeader
-import woowacourse.shopping.ui.common.component.ShoppingLoading
+import woowacourse.shopping.ui.cart.component.CartScreenSkeleton
 
 @Composable
 fun CartScreen(
@@ -40,7 +40,7 @@ fun CartScreen(
             onRemoveClick = { viewModel.decrease(it.product) },
         )
 
-        if (uiState.isLoading) ShoppingLoading()
+        if (uiState.isLoading) CartScreenSkeleton()
     }
 }
 

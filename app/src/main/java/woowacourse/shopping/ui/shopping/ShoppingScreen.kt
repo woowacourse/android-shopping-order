@@ -25,10 +25,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.Products
-import woowacourse.shopping.ui.common.component.ShoppingLoading
 import woowacourse.shopping.ui.shopping.component.ProductGroup
 import woowacourse.shopping.ui.shopping.component.RecentProductGroup
 import woowacourse.shopping.ui.shopping.component.ShoppingHeader
+import woowacourse.shopping.ui.shopping.component.ShoppingScreenSkeleton
 
 @Composable
 fun ShoppingScreen(
@@ -77,7 +77,7 @@ fun ShoppingScreen(
                 onRecentProductClick = onRecentProductClick,
             )
 
-            if (state.isLoading) ShoppingLoading()
+            if (state.isLoading) ShoppingScreenSkeleton()
         }
     }
 }
