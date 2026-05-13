@@ -35,7 +35,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.feature.cart.CartEvent
 import woowacourse.shopping.feature.cart.CartViewModel
 import woowacourse.shopping.feature.common.state.ProductUiModel
-import woowacourse.shopping.feature.productlist.LoadingIndicator
 
 @Composable
 fun CartScreen(
@@ -76,6 +75,7 @@ fun CartScreen(
                     .padding(innerPadding),
             ) {
                 CartItemList(
+                    isLoading = uiState.isLoading,
                     uiState.paginatedCartContents,
                     modifier = Modifier.weight(1f),
                     onDelete = viewModel::deleteCartItem,
@@ -91,9 +91,6 @@ fun CartScreen(
                     canMoveToNextPage = !viewModel.isEndPage(),
                 )
                 Spacer(modifier = Modifier.height(40.dp))
-            }
-            if (uiState.isLoading) {
-                LoadingIndicator()
             }
         }
     }
@@ -163,6 +160,7 @@ private fun PageButton(
 
 @Composable
 private fun CartItemList(
+    isLoading: Boolean,
     cartContents: List<ProductUiModel>,
     onDelete: (String) -> Unit,
     onIncrease: (String) -> Unit,
@@ -175,25 +173,46 @@ private fun CartItemList(
             .padding(horizontal = 18.dp, vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        items(
-            key = { it.id },
-            items = cartContents,
-        ) {
-            CartItem(
-                imageUrl = it.imageUrl,
-                name = it.name,
-                price = it.price,
-                quantity = it.quantity,
-                onDelete = {
-                    onDelete(it.id)
-                },
-                onIncrease = {
-                    onIncrease(it.id)
-                },
-                onDecrease = {
-                    onDecrease(it.id)
-                },
-            )
+        if (isLoading) {
+            items(
+                5,
+            ) {
+                CartItem(
+                    isLoading = isLoading,
+                    imageUrl = "",
+                    name = "qweasdzxc",
+                    price = 1000,
+                    quantity = 3,
+                    onDelete = {
+                    },
+                    onIncrease = {
+                    },
+                    onDecrease = {
+                    },
+                )
+            }
+        } else {
+            items(
+                key = { it.id },
+                items = cartContents,
+            ) {
+                CartItem(
+                    isLoading = isLoading,
+                    imageUrl = it.imageUrl,
+                    name = it.name,
+                    price = it.price,
+                    quantity = it.quantity,
+                    onDelete = {
+                        onDelete(it.id)
+                    },
+                    onIncrease = {
+                        onIncrease(it.id)
+                    },
+                    onDecrease = {
+                        onDecrease(it.id)
+                    },
+                )
+            }
         }
     }
 }
@@ -252,5 +271,6 @@ private fun CartItemListPreview() {
         onDelete = {},
         onIncrease = {},
         onDecrease = {},
+        isLoading = false,
     )
 }

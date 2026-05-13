@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -56,7 +55,6 @@ class ProductListViewModel(
     fun initialLoading() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            delay(5000)
             refreshCart()
             fetchAndAppendProducts(20)
             refreshRecentProducts()

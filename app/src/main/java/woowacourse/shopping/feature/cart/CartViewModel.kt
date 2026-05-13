@@ -138,7 +138,12 @@ class CartViewModel(
         try {
             block()
         } catch (e: ProductNotFoundException) {
-            _event.trySend(CartEvent.FatalError(e.message ?: "알 수 없는 오류가 발생했습니다."))
+            _event.trySend(
+                CartEvent.FatalError(
+                    e.message
+                        ?: "알 수 없는 오류가 발생했습니다.",
+                ),
+            )
         }
     }
 

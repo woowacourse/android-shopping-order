@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.cart.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,7 @@ import woowacourse.shopping.feature.productlist.PreviewableAsyncImage
 
 @Composable
 fun CartItem(
+    isLoading: Boolean,
     imageUrl: String,
     name: String,
     price: Int,
@@ -44,6 +46,11 @@ fun CartItem(
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier = modifier
+            .then(
+                if (isLoading) {
+                    Modifier.background(Color(0xfff3f3f3))
+                } else Modifier,
+            )
             .clip(RoundedCornerShape(4.dp))
             .border(
                 shape = RoundedCornerShape(4.dp),
@@ -62,17 +69,20 @@ fun CartItem(
                 text = name,
                 fontWeight = FontWeight.W700,
                 fontSize = 18.sp,
+                color = if (isLoading) Color.Transparent else Color.Unspecified,
+                modifier = Modifier.background(if (isLoading) Color.LightGray else Color.Unspecified),
             )
-            IconButton(
-                onClick = onDelete,
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.close),
-                    contentDescription = stringResource(R.string.close_description),
-                    tint = Color(0xffaaaaaa),
-                    modifier = Modifier.padding(end = 10.dp),
-                )
-            }
+            if (isLoading.not())
+                IconButton(
+                    onClick = onDelete,
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.close),
+                        contentDescription = stringResource(R.string.close_description),
+                        tint = Color(0xffaaaaaa),
+                        modifier = Modifier.padding(end = 10.dp),
+                    )
+                }
         }
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -80,28 +90,35 @@ fun CartItem(
             modifier = Modifier.fillMaxWidth(),
         ) {
             PreviewableAsyncImage(
+                isLoading = isLoading,
                 imageUrl = imageUrl,
                 description = name,
                 modifier = Modifier
-                    .size(width = 136.dp, height = 72.dp),
+                    .size(width = 136.dp, height = 72.dp)
+                    .then(
+                        if (isLoading)
+                            Modifier.background(Color.LightGray)
+                        else Modifier,
+                    ),
             )
-            Column(horizontalAlignment = Alignment.End) {
-                ProductQuantitySelector(
-                    quantity = quantity,
-                    onIncrease = onIncrease,
-                    onDecrease = onDecrease,
-                    modifier = Modifier
-                        .padding(end = 5.dp)
-                        .size(width = 126.dp, height = 42.dp),
-                )
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    text = DecimalPriceFormatter().format(price * quantity),
-                    fontWeight = FontWeight.W400,
-                    fontSize = 16.sp,
-                    color = Color(0xff555555),
-                )
-            }
+            if (isLoading.not())
+                Column(horizontalAlignment = Alignment.End) {
+                    ProductQuantitySelector(
+                        quantity = quantity,
+                        onIncrease = onIncrease,
+                        onDecrease = onDecrease,
+                        modifier = Modifier
+                            .padding(end = 5.dp)
+                            .size(width = 126.dp, height = 42.dp),
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text = DecimalPriceFormatter().format(price * quantity),
+                        fontWeight = FontWeight.W400,
+                        fontSize = 16.sp,
+                        color = Color(0xff555555),
+                    )
+                }
         }
     }
 }
@@ -110,6 +127,7 @@ fun CartItem(
 @Composable
 private fun CartItemPreview() {
     CartItem(
+        isLoading = true,
         imageUrl = "",
         name = "프리뷰",
         price = 1000,
