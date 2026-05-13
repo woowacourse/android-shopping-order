@@ -67,12 +67,12 @@ class ShoppingApplication : Application() {
     }
 
     private fun initializeRepositories(daos: DatabaseDaos) {
-        shoppingItemRepository = RoomShoppingItemRepository(daos.shoppingItemDao)
+        shoppingItemRepository = RoomShoppingItemRepository(daos.shoppingItemDao, applicationScope)
         shoppingCartRepository = RoomShoppingCartRepository(daos.shoppingCartDao)
     }
 
     private fun initializeStores() {
-        visitStore = DataStoreVisitStore(this)
+        visitStore = DataStoreVisitStore(this, applicationScope)
         networkStatusMonitor = AndroidNetworkStatusMonitor(this, applicationScope)
     }
 
