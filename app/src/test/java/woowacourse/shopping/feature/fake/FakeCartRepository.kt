@@ -15,10 +15,13 @@ class FakeCartRepository(
 
     override suspend fun loadTotalQuantity(): Int = contents.sumOf { it.quantity }
 
-    override suspend fun increase(product: Product) {
+    override suspend fun increase(
+        product: Product,
+        quantity: Int,
+    ) {
         val index = indexOf(product.id)
         if (index == -1) {
-            contents.add(CartContent(product, 1))
+            contents.add(CartContent(product, quantity))
         } else {
             val existing = contents[index]
             contents[index] = CartContent(existing.product, existing.quantity + 1)

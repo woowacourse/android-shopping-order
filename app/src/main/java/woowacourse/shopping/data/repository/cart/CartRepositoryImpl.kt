@@ -21,10 +21,13 @@ class CartRepositoryImpl(
         pageSize: Int,
     ): List<CartContent> = cartServerDao.pagination(page, pageSize, emptyList())
 
-    override suspend fun increase(product: Product) {
+    override suspend fun increase(
+        product: Product,
+        quantity: Int,
+    ) {
         val existing = loadAll().firstOrNull { it.hasProductId(product.id) }
         if (existing == null) {
-            cartServerDao.insert(CartContent(product, 1))
+            cartServerDao.insert(CartContent(product, quantity))
         } else {
             cartServerDao.update(
                 CartContent(existing.product, existing.quantity + 1, existing.id),

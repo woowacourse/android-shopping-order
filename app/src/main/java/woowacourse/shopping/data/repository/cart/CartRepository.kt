@@ -14,7 +14,10 @@ interface CartRepository {
         pageSize: Int,
     ): List<CartContent>
 
-    suspend fun increase(product: Product)
+    suspend fun increase(
+        product: Product,
+        quantity: Int = 1,
+    )
 
     suspend fun decrease(productId: String)
 

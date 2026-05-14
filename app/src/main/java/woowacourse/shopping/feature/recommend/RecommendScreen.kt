@@ -89,6 +89,7 @@ fun RecommendScreen(
                 }
                 TextButton(
                     onClick = {
+                        viewModel.order(contentIds)
                     },
                     modifier = Modifier
                         .width(122.dp)

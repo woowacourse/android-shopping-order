@@ -146,6 +146,25 @@ class RecommendViewModel(
         return contentIds.size + memoryTotalCount
     }
 
+    fun order(cartContentIds: List<String>) {
+        viewModelScope.launch {
+            val products = memoryCart.cartContents.map { it.product }
+            memoryCart.cartContents.forEach {
+                cartRepository.increase(it.product, quantity = it.quantity)
+            }
+
+            refreshCart()
+
+            val latestContents = serverCart.cartContents.filter { cartContent ->
+                products.map { it.id }.contains(cartContent.product.id)
+            }
+
+            orderRepository.orders(
+                cartItemIds = cartContentIds + latestContents.map { it.id },
+            )
+        }
+    }
+
     companion object {
         val Factory = viewModelFactory {
             initializer {
