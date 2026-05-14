@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +20,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,9 +33,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,10 +59,9 @@ fun ShoppingCartScreen(
     getQuantityPrice: (ShoppingCartItem) -> Int,
     onBackClick: () -> Unit,
     onRemoveShoppingItemClick: (ShoppingCartItem) -> Unit,
-    onToggleShoppingItemSelectionClick: (ShoppingCartItem) -> Unit,
+    onToggleShoppingItemSelectionClick: (Long, Boolean) -> Unit,
     onIncreaseShoppingItemQuantityClick: (ShoppingCartItem) -> Unit,
     onDecreaseShoppingItemQuantityClick: (ShoppingCartItem) -> Unit,
-    onOrderClick: () -> Unit,
     modifier: Modifier = Modifier,
     bottomContent: @Composable () -> Unit = {},
 ) {
@@ -102,6 +106,7 @@ fun ShoppingCartScreen(
                             selected = shoppingCartItem.getId() in state.selectedCartItemIds,
                             quantityPrice = getQuantityPrice(shoppingCartItem),
                             onRemoveShoppingItemClick = onRemoveShoppingItemClick,
+                            onToggleShoppingItemSelectionClick = onToggleShoppingItemSelectionClick,
                             onIncreaseShoppingItemQuantityClick = onIncreaseShoppingItemQuantityClick,
                             onDecreaseShoppingItemQuantityClick = onDecreaseShoppingItemQuantityClick,
                         )
@@ -116,9 +121,10 @@ fun ShoppingCartScreen(
 @Composable
 private fun ShoppingCartItems(
     shoppingCartItem: ShoppingCartItem,
-    selected : Boolean,
+    selected: Boolean,
     quantityPrice: Int,
     onRemoveShoppingItemClick: (ShoppingCartItem) -> Unit,
+    onToggleShoppingItemSelectionClick: (Long, Boolean) -> Unit,
     onIncreaseShoppingItemQuantityClick: (ShoppingCartItem) -> Unit,
     onDecreaseShoppingItemQuantityClick: (ShoppingCartItem) -> Unit,
     modifier: Modifier = Modifier,
@@ -143,12 +149,23 @@ private fun ShoppingCartItems(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(
-                text = product.getTitle(),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onBackground,
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f),
+            ) {
+                ShoppingCartCheckBox(
+                    checked = selected,
+                    onCheckedChange = { isChecked ->
+                        onToggleShoppingItemSelectionClick(shoppingCartItem.getId(), isChecked)
+                    },
+                )
+                Text(
+                    text = product.getTitle(),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+            }
             Image(
                 painter = painterResource(R.drawable.remove_icon),
                 contentDescription = stringResource(R.string.remove_item_description),
@@ -195,6 +212,101 @@ private fun ShoppingCartItems(
                 )
             }
         }
+    }
+}
+
+
+@Composable
+fun OrderButton(
+    shoppingCartItems: List<ShoppingCartItem>,
+    selectedShoppingCartItemIds: Set<Long>,
+    shoppingCartSelectItemCount: Int,
+    onToggleShoppingItemSelectionClick: (List<Long>, Boolean) -> Unit,
+    onOrderButtonClick: (List<Long>) -> Unit,
+    checked: Boolean,
+    orderComplete: Boolean,
+    totalPrice: Int,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(88.dp)
+            .background(MaterialTheme.colorScheme.surfaceContainer),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if( orderComplete ){
+            Column(
+                modifier = modifier,
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                ShoppingCartCheckBox(
+                    checked = checked,
+                    onCheckedChange = { isChecked ->
+                        onToggleShoppingItemSelectionClick(
+                            shoppingCartItems.map { shoppingCartItem -> shoppingCartItem.getId() },
+                            isChecked,
+                        )
+                    },
+                )
+                Text(
+                    text = "전체",
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        }
+        Text(
+            text = DecimalFormat(
+                stringResource(R.string.price_format_pattern)
+            ).format(totalPrice),
+            modifier = Modifier
+                .weight(2f)
+                .padding(end = 16.dp),
+            textAlign = TextAlign.End,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        Button(
+            onClick = { onOrderButtonClick(selectedShoppingCartItemIds.toList()) },
+            modifier = Modifier
+                .weight(1.5f)
+                .fillMaxHeight(),
+            shape = RectangleShape,
+            enabled = shoppingCartSelectItemCount > 0,
+        ) {
+            Text(text = "주문하기(${shoppingCartSelectItemCount})")
+        }
+    }
+}
+
+@Composable
+private fun ShoppingCartCheckBox(
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    checked: Boolean = false,
+) {
+    Checkbox(
+        checked = checked,
+        onCheckedChange = onCheckedChange,
+        modifier = modifier,
+    )
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun ShoppingCartOrderButtonPreview() {
+    AndroidShoppingTheme {
+        OrderButton(
+            shoppingCartItems = emptyList(),
+            selectedShoppingCartItemIds = emptySet(),
+            shoppingCartSelectItemCount = 3,
+            totalPrice = 3400000,
+            checked = true,
+            orderComplete = true,
+            onToggleShoppingItemSelectionClick = { _, _ -> },
+            onOrderButtonClick = {},
+        )
     }
 }
 
@@ -303,6 +415,7 @@ private fun ShoppingCartScreenPreview() {
             getQuantityPrice = { shoppingCartItem -> shoppingCartItem.getProductQuantityPrice() },
             onBackClick = {},
             onRemoveShoppingItemClick = {},
+            onToggleShoppingItemSelectionClick = { _, _ -> },
             onIncreaseShoppingItemQuantityClick = {},
             onDecreaseShoppingItemQuantityClick = {},
         )
@@ -324,7 +437,9 @@ private fun ShoppingCartItemsPreview() {
             ),
         quantityPrice = 399_200,
         onRemoveShoppingItemClick = {},
+        onToggleShoppingItemSelectionClick = { _, _ -> },
         onIncreaseShoppingItemQuantityClick = {},
         onDecreaseShoppingItemQuantityClick = {},
+        selected = true,
     )
 }

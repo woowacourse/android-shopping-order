@@ -21,6 +21,7 @@ class ShoppingCartViewModel(
     val shoppingCartItems: StateFlow<List<ShoppingCartItem>> = _shoppingCartItems.asStateFlow()
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
@@ -160,6 +161,35 @@ class ShoppingCartViewModel(
             _selectedCartItemIds.value.toMutableSet().apply {
                 if (!add(id)) remove(id)
             }
+    }
+
+    fun setShoppingCartItemSelection(
+        shoppingCartItemId: Long,
+        isSelected: Boolean,
+    ) {
+        val validIds = _shoppingCartItems.value.map { shoppingCartItem -> shoppingCartItem.getId() }.toSet()
+        if (shoppingCartItemId !in validIds) return
+        _selectedCartItemIds.value =
+            _selectedCartItemIds.value.toMutableSet().apply {
+                if (isSelected) {
+                    add(shoppingCartItemId)
+                } else {
+                    remove(shoppingCartItemId)
+                }
+            }
+    }
+
+    fun setShoppingCartItemsSelection(
+        shoppingCartItemIds: List<Long>,
+        isSelected: Boolean,
+    ) {
+        val validIds = _shoppingCartItems.value.map { shoppingCartItem -> shoppingCartItem.getId() }.toSet()
+        val targetIds = shoppingCartItemIds.toSet().intersect(validIds)
+        if (isSelected) {
+            _selectedCartItemIds.value = targetIds
+            return
+        }
+        _selectedCartItemIds.value = _selectedCartItemIds.value - targetIds
     }
 
     fun clearSelection() {

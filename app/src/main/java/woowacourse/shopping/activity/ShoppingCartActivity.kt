@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.backend.retrofit.viewmodel.ApiViewModelFactory
 import woowacourse.shopping.backend.retrofit.viewmodel.ShoppingCartViewModel
+import woowacourse.shopping.ui.OrderButton
 import woowacourse.shopping.ui.ShoppingCartScreen
 import woowacourse.shopping.ui.ShoppingCartState
 import woowacourse.shopping.ui.component.PageNavigation
@@ -89,7 +90,7 @@ class ShoppingCartActivity : ComponentActivity() {
                     isLoading = isLoading.value,
                     errorMessage = errorMessage.value,
                     currentPage = screenState.value.currentPage,
-                    selectedItemCount = shoppingCartItems.size,
+                    selectedItemCount = selectedItemCount,
                     canOrder = selectedItemCount > 0 && !isLoading.value,
                     canMoveToPreviousPage =
                         if (hasApiError) false else screenState.value.canMoveToPreviousPage,
@@ -106,6 +107,12 @@ class ShoppingCartActivity : ComponentActivity() {
                     onRemoveShoppingItemClick = { shoppingCartItem ->
                         shoppingCartViewModel.removeShoppingItem(shoppingCartItem)
                     },
+                    onToggleShoppingItemSelectionClick = { shoppingCartItemId, isSelected ->
+                        shoppingCartViewModel.setShoppingCartItemSelection(
+                            shoppingCartItemId = shoppingCartItemId,
+                            isSelected = isSelected,
+                        )
+                    },
                     onIncreaseShoppingItemQuantityClick = { shoppingCartItem ->
                         shoppingCartViewModel.increaseShoppingItemQuantity(shoppingCartItem)
                     },
@@ -119,6 +126,23 @@ class ShoppingCartActivity : ComponentActivity() {
                         canMoveToNextPage = if (hasApiError) false else screenState.value.canMoveToNextPage,
                         onBeforePageClick = shoppingCartItemViewModel::moveToPreviousPage,
                         onNextPageClick = shoppingCartItemViewModel::moveToNextPage,
+                    )
+                    OrderButton(
+                        shoppingCartItems = shoppingCartItems,
+                        selectedShoppingCartItemIds = selectedCartItemIds,
+                        shoppingCartSelectItemCount = selectedItemCount,
+                        onOrderButtonClick = { selectedShoppingCartItemIds ->
+                            if (selectedShoppingCartItemIds.isEmpty()) return@OrderButton
+                        },
+                        checked = shoppingCartItems.isNotEmpty() && selectedItemCount == shoppingCartItems.size,
+                        orderComplete = shoppingCartItems.isNotEmpty(),
+                        totalPrice = shoppingCartViewModel.getTotalCount(),
+                        onToggleShoppingItemSelectionClick = { shoppingCartItemIds, isSelected ->
+                            shoppingCartViewModel.setShoppingCartItemsSelection(
+                                shoppingCartItemIds = shoppingCartItemIds,
+                                isSelected = isSelected,
+                            )
+                        },
                     )
                 }
             }
