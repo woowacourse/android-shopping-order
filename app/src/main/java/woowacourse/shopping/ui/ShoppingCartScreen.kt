@@ -54,8 +54,10 @@ fun ShoppingCartScreen(
     getQuantityPrice: (ShoppingCartItem) -> Int,
     onBackClick: () -> Unit,
     onRemoveShoppingItemClick: (ShoppingCartItem) -> Unit,
+    onToggleShoppingItemSelectionClick: (ShoppingCartItem) -> Unit,
     onIncreaseShoppingItemQuantityClick: (ShoppingCartItem) -> Unit,
     onDecreaseShoppingItemQuantityClick: (ShoppingCartItem) -> Unit,
+    onOrderClick: () -> Unit,
     modifier: Modifier = Modifier,
     bottomContent: @Composable () -> Unit = {},
 ) {
@@ -97,6 +99,7 @@ fun ShoppingCartScreen(
                     shoppingCartItems.forEach { shoppingCartItem ->
                         ShoppingCartItems(
                             shoppingCartItem = shoppingCartItem,
+                            selected = shoppingCartItem.getId() in state.selectedCartItemIds,
                             quantityPrice = getQuantityPrice(shoppingCartItem),
                             onRemoveShoppingItemClick = onRemoveShoppingItemClick,
                             onIncreaseShoppingItemQuantityClick = onIncreaseShoppingItemQuantityClick,
@@ -113,6 +116,7 @@ fun ShoppingCartScreen(
 @Composable
 private fun ShoppingCartItems(
     shoppingCartItem: ShoppingCartItem,
+    selected : Boolean,
     quantityPrice: Int,
     onRemoveShoppingItemClick: (ShoppingCartItem) -> Unit,
     onIncreaseShoppingItemQuantityClick: (ShoppingCartItem) -> Unit,
@@ -125,11 +129,13 @@ private fun ShoppingCartItems(
                 .fillMaxWidth()
                 .clip(
                     RoundedCornerShape(4.dp),
-                ).border(
+                )
+                .border(
                     color = MaterialTheme.colorScheme.outline,
                     width = 1.dp,
                     shape = RoundedCornerShape(4.dp),
-                ).padding(12.dp),
+                )
+                .padding(12.dp),
     ) {
         val product = shoppingCartItem.product
         Row(

@@ -16,7 +16,10 @@ class OrderViewModel(
     private val _event = MutableSharedFlow<OrderEvent>(extraBufferCapacity = 1)
     val event: SharedFlow<OrderEvent> = _event.asSharedFlow()
 
-    fun order(orderInfo: OrderInfo) {
+    fun order(
+        orderInfo: OrderInfo,
+        onSuccess: (() -> Unit)? = null,
+    ) {
         viewModelScope.launch {
             runCatching {
                 orderRetrofitRepository
@@ -25,6 +28,7 @@ class OrderViewModel(
                     ).awaitCompletion(errorPrefix = "주문 실패")
             }.onSuccess {
                 _event.tryEmit(OrderEvent.Success)
+                onSuccess?.invoke()
             }.onFailure { throwable ->
                 _event.tryEmit(OrderEvent.Failure(throwable.message ?: "주문 실패"))
             }
