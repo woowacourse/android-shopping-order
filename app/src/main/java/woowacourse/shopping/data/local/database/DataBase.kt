@@ -18,9 +18,9 @@ val MIGRATION_4_5 =
             db.execSQL(
                 """
                 CREATE TABLE IF NOT EXISTS `purchase_products` (
-                    `id` TEXT NOT NULL,
+                    `productId` TEXT NOT NULL,
                     `count` INTEGER NOT NULL,
-                    PRIMARY KEY(`id`)
+                    PRIMARY KEY(`productId`)
                 )
                 """.trimIndent()
             )
@@ -28,9 +28,9 @@ val MIGRATION_4_5 =
             db.execSQL(
                 """                
                 CREATE TABLE IF NOT EXISTS `recently_viewed_products` (
-                    `id` TEXT NOT NULL,
+                    `productId` TEXT NOT NULL,
                     `time_stamp` INTEGER NOT NULL,
-                    PRIMARY KEY(`id`)
+                    PRIMARY KEY(`productId`)
                 )
                 """.trimIndent(),
             )
