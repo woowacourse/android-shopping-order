@@ -1,6 +1,12 @@
 package woowacourse.shopping
 
 import android.content.Context
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import okhttp3.Credentials
 import okhttp3.MediaType.Companion.toMediaType
@@ -8,6 +14,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import woowacourse.shopping.data.localdata.UserDataStore
 import woowacourse.shopping.data.localdb.ShoppingDB
 import woowacourse.shopping.data.remote.NetworkManager
 import woowacourse.shopping.data.remote.NetworkObserver
@@ -18,22 +25,23 @@ import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentItemRepository
-import java.util.concurrent.TimeUnit
-import kotlin.jvm.java
 
 class AppContainer(
-    context: Context,
+    private val context: Context,
 ) {
     private val database = ShoppingDB.getInstance(context)
 
-    private val okHttpClient: OkHttpClient by lazy {
-        OkHttpClient
-            .Builder()
-            .callTimeout(10L, TimeUnit.SECONDS)
-            .connectTimeout(10L, TimeUnit.SECONDS)
-            .readTimeout(10L, TimeUnit.SECONDS)
-            .writeTimeout(10L, TimeUnit.SECONDS)
-            .build()
+    val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    val userDataStore = UserDataStore(context)
+
+    init {
+        applicationScope.launch {
+            userDataStore.saveUser(
+                username = "byunghyunkim0",
+                password = "password",
+            )
+        }
     }
 
     val productRepository: ProductRepository by lazy {
@@ -64,11 +72,20 @@ class AppContainer(
         OkHttpClient
             .Builder()
             .addInterceptor { chain ->
+                val credential = runBlocking {
+                    val username = userDataStore.username.first()
+                    val password = userDataStore.password.first()
+
+                    Credentials.basic(username, password)
+                }
                 val request =
                     chain
                         .request()
                         .newBuilder()
-                        .header("Authorization", Credentials.basic("byunghyunkim0", "password"))
+                        .header(
+                            "Authorization",
+                            credential
+                        )
                         .build()
 
                 chain.proceed(request)

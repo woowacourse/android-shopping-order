@@ -3,6 +3,8 @@ agp = "8.13.2"
 assertjCore = "3.27.7"
 coilCompose = "3.4.0"
 coilNetworkOkhttp = "3.4.0"
+datastore = "1.2.1"
+datastorePreferences = "1.2.1"
 kotlin = "2.3.0"
 coreKtx = "1.18.0"
 espressoCore = "3.7.0"
@@ -30,6 +32,8 @@ ui = "1.11.1"
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }

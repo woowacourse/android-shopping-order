@@ -83,4 +83,5 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.logging.interceptor.v4120)
+    implementation(libs.androidx.datastore.preferences)
 }
