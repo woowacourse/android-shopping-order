@@ -66,6 +66,13 @@ fun CartScreen(
     }
     CartScreenContent(
         uiState = uiState,
+        onToRecommendIntent = {
+            onToRecommendIntent(
+                uiState.checkMap.entries.filter { it.value }.map {
+                    CartContentId(it.key)
+                },
+            )
+        },
         onCloseClick = onCloseClick,
         onDelete = viewModel::deleteCartItem,
         onIncrease = viewModel::increase,
@@ -77,12 +84,14 @@ fun CartScreen(
         onChecked = viewModel::cartItemCheck,
         onTotalCheck = viewModel::totalCheck,
         modifier = modifier,
+
     )
 }
 
 @Composable
 fun CartScreenContent(
     uiState: CartUiState,
+    onToRecommendIntent: () -> Unit,
     onChecked: (String) -> Unit,
     onTotalCheck: () -> Unit,
     onCloseClick: () -> Unit,
@@ -169,6 +178,7 @@ fun CartScreenContent(
                     }
                     TextButton(
                         onClick = {
+                            onToRecommendIntent()
                         },
                         modifier = Modifier
                             .width(122.dp)
@@ -217,5 +227,6 @@ private fun CartScreenContentPreview() {
         onCloseClick = {},
         onChecked = { _ -> },
         onTotalCheck = {},
+        onToRecommendIntent = {},
     )
 }
