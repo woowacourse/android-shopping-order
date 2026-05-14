@@ -312,7 +312,7 @@ private fun ShoppingCartOrderButtonPreview() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ShoppingCartTopBar(
+fun ShoppingCartTopBar(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
