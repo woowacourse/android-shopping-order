@@ -58,6 +58,7 @@ fun CartScreen(
     totalCount: Int,
     isChecked: (Long) -> Boolean,
     onSelectAllClick: () -> Unit,
+    onOrderClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -85,7 +86,7 @@ fun CartScreen(
         CartBottomBar(
             totalPrice = totalPrice,
             totalCount = totalCount,
-            onOrderClick = { /* Logic not connected */ },
+            onOrderClick = onOrderClick,
             showSelectAll = true,
             onSelectAllClick = onSelectAllClick
         )
@@ -318,5 +319,6 @@ private fun CartScreenPreview() {
         totalCount = 10000,
         isChecked = { true },
         onSelectAllClick = {  },
+        onOrderClick = {}
     )
 }

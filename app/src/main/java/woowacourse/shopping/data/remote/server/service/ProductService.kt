@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.remote.server.service
 
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.remote.server.dto.product.ProductResponse
@@ -18,10 +19,13 @@ interface ProductService {
         @Path("id") id: Long
     ) : ProductResponse
 
-    @GET("/products/")
+    @GET("products")
     suspend fun requestCategoryProducts(
+        @Query("category") category: String,
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 10,
-        @Query("category") category: String,
     ): ProductsResponse
+
+//    @POST("orders")
+//    suspend fun
 }

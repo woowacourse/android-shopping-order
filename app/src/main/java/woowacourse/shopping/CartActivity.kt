@@ -1,5 +1,6 @@
 package woowacourse.shopping
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -70,6 +71,10 @@ class CartActivity : ComponentActivity() {
                     totalCount = totalCount,
                     isChecked = { id -> checkedItemIds.contains(id) },
                     onSelectAllClick = { viewModel.onSelectAllClick() },
+                    onOrderClick = {
+                        val intent = Intent(this, RecommendationActivity::class.java)
+                        startActivity(intent)
+                    },
                     modifier =
                         Modifier
                             .fillMaxSize()
