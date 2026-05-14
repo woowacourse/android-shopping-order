@@ -49,11 +49,12 @@ class RecommendationViewModel(
 
     init {
         viewModelScope.launch {
-            val latestViewedProductId = recentlyViewedProductRepository.getLatestItem()
-            val product = productRepository.getProduct(lastViewProductId.first() ?: 0L)
-
-            _recommendedProducts.update {
-                Products(productRepository.getCategoryProducts(category = product.category))
+            val latestViewedProductId = recentlyViewedProductRepository.getLatestItem().first()
+            if (latestViewedProductId != null) {
+                val product = productRepository.getProduct(latestViewedProductId)
+                _recommendedProducts.update {
+                    Products(productRepository.getCategoryProducts(category = product.category))
+                }
             }
         }
 
