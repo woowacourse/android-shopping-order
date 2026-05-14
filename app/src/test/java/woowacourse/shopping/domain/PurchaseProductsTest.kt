@@ -10,8 +10,11 @@ class PurchaseProductsTest {
         val purchaseProducts = PurchaseProducts()
         val newPurchaseProduct =
             PurchaseProduct(
+                id = 1L,
                 product =
                     Product(
+                        category = "category",
+                        id = 1L,
                         imageUri = "uri",
                         name = "테스트 상품",
                         price = 1000,
@@ -26,15 +29,18 @@ class PurchaseProductsTest {
     fun `특정 PurchaseProduct의 count를 변경할 수 있다`() {
         val newPurchaseProduct =
             PurchaseProduct(
+                id = 1L,
                 product =
                     Product(
+                        category = "category",
+                        id = 1L,
                         imageUri = "uri",
                         name = "테스트 상품",
                         price = 1000,
                     ),
             )
 
-        val productsId = newPurchaseProduct.id()
+        val productsId = newPurchaseProduct.productId()
 
         val purchaseProducts =
             PurchaseProducts(
@@ -47,15 +53,18 @@ class PurchaseProductsTest {
                 updateAmount = 1,
             )
 
-        assertEquals(2, updatedPurchaseProducts.purchaseProducts.find { it.isSameID(productsId) }?.count)
+        assertEquals(2, updatedPurchaseProducts.purchaseProducts.find { it.isSameProductID(productsId) }?.count)
     }
 
     @Test
     fun `특정 PurchaseProduct를 제거할 수 있다`() {
         val purchaseProduct1 =
             PurchaseProduct(
+                id = 1L,
                 product =
                     Product(
+                        category = "category",
+                        id = 1L,
                         imageUri = "uri",
                         name = "테스트 상품1",
                         price = 1000,
@@ -64,15 +73,18 @@ class PurchaseProductsTest {
 
         val purchaseProduct2 =
             PurchaseProduct(
+                id = 2L,
                 product =
                     Product(
+                        category = "category",
+                        id = 2L,
                         imageUri = "uri",
                         name = "테스트 상품2",
                         price = 2000,
                     ),
             )
 
-        val product1Id = purchaseProduct1.id()
+        val product1Id = purchaseProduct1.productId()
 
         val purchaseProducts =
             PurchaseProducts(
@@ -91,8 +103,11 @@ class PurchaseProductsTest {
     fun `특정 PurchaseProduct의 총 가격을 알 수 있다`() {
         val newPurchaseProduct =
             PurchaseProduct(
+                id = 1L,
                 product =
                     Product(
+                        category = "category",
+                        id = 1L,
                         imageUri = "uri",
                         name = "테스트 상품",
                         price = 1000,
@@ -100,7 +115,7 @@ class PurchaseProductsTest {
                 count = 3,
             )
 
-        val productsId = newPurchaseProduct.id()
+        val productsId = newPurchaseProduct.productId()
 
         val purchaseProducts =
             PurchaseProducts(
@@ -114,8 +129,11 @@ class PurchaseProductsTest {
     fun `PurchaseProduct의 count의 총합을 알 수 있다`() {
         val newPurchaseProduct1 =
             PurchaseProduct(
+                id = 1L,
                 product =
                     Product(
+                        category = "category",
+                        id = 1L,
                         imageUri = "uri",
                         name = "테스트 상품1",
                         price = 1000,
@@ -124,8 +142,11 @@ class PurchaseProductsTest {
             )
         val newPurchaseProduct2 =
             PurchaseProduct(
+                id = 2L,
                 product =
                     Product(
+                        category = "category",
+                        id = 2L,
                         imageUri = "uri",
                         name = "테스트 상품2",
                         price = 2000,
@@ -134,8 +155,11 @@ class PurchaseProductsTest {
             )
         val newPurchaseProduct3 =
             PurchaseProduct(
+                id = 3L,
                 product =
                     Product(
+                        category = "category",
+                        id = 3L,
                         imageUri = "uri",
                         name = "테스트 상품3",
                         price = 3000,
@@ -159,15 +183,18 @@ class PurchaseProductsTest {
     fun `동일한 ID를 갖는 PurchaseProduct가 추가되면 기존에 담겨있던 객체의 count가 증가한다`() {
         val newPurchaseProduct =
             PurchaseProduct(
+                id = 1L,
                 product =
                     Product(
+                        category = "category",
+                        id = 1L,
                         imageUri = "uri",
                         name = "테스트 상품",
                         price = 1000,
                     ),
             )
 
-        val productId = newPurchaseProduct.id()
+        val productId = newPurchaseProduct.productId()
 
         val purchaseProducts =
             PurchaseProducts(
@@ -183,15 +210,18 @@ class PurchaseProductsTest {
     fun `특정 ID를 갖는 PurchaseProduct가 담겨있는지 알 수 있다`() {
         val newPurchaseProduct =
             PurchaseProduct(
+                id = 1L,
                 product =
                     Product(
+                        category = "category",
+                        id = 1L,
                         imageUri = "uri",
                         name = "테스트 상품",
                         price = 1000,
                     ),
             )
 
-        val productId = newPurchaseProduct.id()
+        val productId = newPurchaseProduct.productId()
 
         val purchaseProducts =
             PurchaseProducts(
@@ -205,15 +235,18 @@ class PurchaseProductsTest {
     fun `특정 ID를 갖는 PurchaseProduct의 count를 알 수 있다`() {
         val newPurchaseProduct =
             PurchaseProduct(
+                id = 1L,
                 product =
                     Product(
+                        category = "category",
+                        id = 1L,
                         imageUri = "uri",
                         name = "테스트 상품",
                         price = 1000,
                     ),
             )
 
-        val productId = newPurchaseProduct.id()
+        val productId = newPurchaseProduct.productId()
 
         val purchaseProducts =
             PurchaseProducts(

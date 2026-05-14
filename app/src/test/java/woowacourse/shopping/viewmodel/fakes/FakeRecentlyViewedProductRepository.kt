@@ -22,6 +22,6 @@ class FakeRecentlyViewedProductRepository : RecentlyViewedProductRepository {
         }
     }
 
-    override fun getLatestItem(): Flow<String?> =
+    override fun getLatestItem(): Flow<Long?> =
         MutableStateFlow(_history.value.firstOrNull()?.id)
 }

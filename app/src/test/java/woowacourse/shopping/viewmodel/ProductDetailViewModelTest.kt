@@ -12,8 +12,8 @@ import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.extension.RegisterExtension
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.ui.viewmodel.ProductDetailViewModel
+import woowacourse.shopping.viewmodel.fakes.FakeCartRepository
 import woowacourse.shopping.viewmodel.fakes.FakeProductRepository
-import woowacourse.shopping.viewmodel.fakes.FakePurchaseProductsRepository
 import woowacourse.shopping.viewmodel.fakes.FakeRecentlyViewedProductRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -24,26 +24,27 @@ class ProductDetailViewModelTest {
 
     private lateinit var viewModel: ProductDetailViewModel
     private lateinit var fakeProductRepository: FakeProductRepository
-    private lateinit var fakePurchaseProductsRepository: FakePurchaseProductsRepository
+    private lateinit var fakeCartRepository: FakeCartRepository
     private lateinit var fakeRecentlyViewedProductRepository: FakeRecentlyViewedProductRepository
-    private val testProductId = "1"
+    private val testProductId = 1L
     private val testProduct = Product(
         id = testProductId,
         imageUri = "테스트",
         name = "테스트",
-        price = 1000
+        price = 1000,
+        category = "asd"
     )
 
     @BeforeEach
     fun setUp() {
         fakeProductRepository = FakeProductRepository()
-        fakePurchaseProductsRepository = FakePurchaseProductsRepository()
+        fakeCartRepository = FakeCartRepository()
         fakeRecentlyViewedProductRepository = FakeRecentlyViewedProductRepository()
 
         fakeProductRepository.setProducts(listOf(testProduct))
 
         viewModel = ProductDetailViewModel(
-            purchaseProductsRepository = fakePurchaseProductsRepository,
+            cartRepository = fakeCartRepository,
             recentlyViewedProductRepository = fakeRecentlyViewedProductRepository,
             productRepository = fakeProductRepository,
             selectedProductId = testProductId,
@@ -61,7 +62,7 @@ class ProductDetailViewModelTest {
         val product = viewModel.selectedProduct.value
 
         assertNotNull(product)
-        assertEquals(testProductId, product.id)
+        assertEquals(testProductId, product?.id)
         assertEquals(testProduct, product)
     }
 

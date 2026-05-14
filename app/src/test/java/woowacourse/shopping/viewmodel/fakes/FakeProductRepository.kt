@@ -1,6 +1,6 @@
 package woowacourse.shopping.viewmodel.fakes
 
-import woowacourse.shopping.data.remote.repository.ProductRepository
+import woowacourse.shopping.data.remote.server.repository.ProductRepository
 import woowacourse.shopping.domain.Product
 
 class FakeProductRepository : ProductRepository {
@@ -16,5 +16,5 @@ class FakeProductRepository : ProductRepository {
         pageSize: Int,
     ): List<Product> = products
 
-    override suspend fun getProduct(id: String): Product = products.first { it.id == id }
+    override suspend fun getProduct(id: Long): Product = products.first { it.id == id }
 }

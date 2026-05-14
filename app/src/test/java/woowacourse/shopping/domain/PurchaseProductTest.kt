@@ -8,8 +8,11 @@ class PurchaseProductTest {
     fun `구매할 개수가 1 미만일 경우 예외가 발생한다`() {
         assertThrows<IllegalArgumentException> {
             PurchaseProduct(
+                id = 1L,
                 product =
                     Product(
+                        category = "category",
+                        id = 1L,
                         imageUri = "uri",
                         name = "테스트",
                         price = 1,
@@ -23,8 +26,11 @@ class PurchaseProductTest {
     fun `구매할 상품의 개수를 변경할 수 있다`() {
         val purchaseProduct =
             PurchaseProduct(
+                id = 1L,
                 product =
                     Product(
+                        category = "category",
+                        id = 1L,
                         imageUri = "uri",
                         name = "테스트",
                         price = 1,
@@ -40,8 +46,11 @@ class PurchaseProductTest {
     fun `구매할 개수에 따른 총 금액을 계산할 수 있다`() {
         val purchaseProduct =
             PurchaseProduct(
+                id = 1L,
                 product =
                     Product(
+                        category = "category",
+                        id = 1L,
                         imageUri = "uri",
                         name = "테스트",
                         price = 1,

@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.data.remote.mock.ProductWebServer
-import woowacourse.shopping.data.remote.repository.ProductRepository
-import woowacourse.shopping.data.remote.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.remote.server.repository.ProductRepository
+import woowacourse.shopping.data.remote.mock.MockProductRepositoryImpl
 
 class ProductWebServerTest {
     @Test
@@ -22,26 +22,26 @@ class ProductWebServerTest {
 
         // then
         assertEquals(5, products.size)
-        assertEquals("1", products[0].id)
+        assertEquals(1L, products[0].id)
     }
 
     @Test
     fun `특정 ID를 가진 상품의 상세 정보를 가져올 수 있다`() = runBlocking {
         // given
-        val targetId = "2"
+        val targetId = 2L
 
         // when
         val product = repository.getProduct(targetId)
 
         // then
-        assertEquals("2", product.id)
+        assertEquals(2L, product.id)
         assertEquals("무엘사", product.name)
     }
 
     @Test
     fun `존재하지 않는 상품을 요청하면 에러가 발생한다`() = runBlocking {
         // given
-        val invalidID = "invalidId"
+        val invalidID = -1L
 
         // when & then
         val result =
@@ -69,8 +69,7 @@ class ProductWebServerTest {
 
             ProductWebServer.isReady.first { it == true }
 
-            repository = ProductRepositoryImpl(client, ProductWebServer.baseUrl)
+            repository = MockProductRepositoryImpl(client, ProductWebServer.baseUrl)
         }
     }
-
 }

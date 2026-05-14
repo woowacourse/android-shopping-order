@@ -12,8 +12,8 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.PurchaseProduct
 import woowacourse.shopping.ui.viewmodel.ShoppingViewModel
+import woowacourse.shopping.viewmodel.fakes.FakeCartRepository
 import woowacourse.shopping.viewmodel.fakes.FakeProductRepository
-import woowacourse.shopping.viewmodel.fakes.FakePurchaseProductsRepository
 import woowacourse.shopping.viewmodel.fakes.FakeRecentlyViewedProductRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -25,16 +25,16 @@ class ShoppingViewModelTest {
     private lateinit var viewModel: ShoppingViewModel
     private lateinit var fakeProductRepository: FakeProductRepository
     private lateinit var fakeRecentlyViewedProductRepository: FakeRecentlyViewedProductRepository
-    private lateinit var fakePurchaseProductsRepository: FakePurchaseProductsRepository
+    private lateinit var fakeCartRepository: FakeCartRepository
 
     @BeforeEach
     fun initViewModel() {
-        fakePurchaseProductsRepository = FakePurchaseProductsRepository()
+        fakeCartRepository = FakeCartRepository()
         fakeRecentlyViewedProductRepository = FakeRecentlyViewedProductRepository()
         fakeProductRepository = FakeProductRepository()
 
         viewModel = ShoppingViewModel(
-            purchaseProductsRepository = fakePurchaseProductsRepository,
+            cartRepository = fakeCartRepository,
             recentlyViewedProductRepository = fakeRecentlyViewedProductRepository,
             productRepository = fakeProductRepository
         )
@@ -42,23 +42,24 @@ class ShoppingViewModelTest {
 
     @Test
     fun `상품 목록을 성공적으로 불러오면 products 상태가 갱신되어야 한다`() = runTest {
-        val products = listOf(Product(id = "1", name = "사과", price = 1000, imageUri = "uri"))
+        val products = listOf(Product(id = 1L, name = "사과", price = 1000, imageUri = "uri", category = "과일"))
         fakeProductRepository.setProducts(products)
 
         viewModel.fetchProducts(0)
 
         val actualProduct = viewModel.products
         assertEquals(1, actualProduct.value.size())
-        assertEquals("사과", actualProduct.value.findWithId("1")?.name)
+        assertEquals("사과", actualProduct.value.findWithId(1L)?.name)
     }
 
     @Test
     fun `장바구니에 상품을 추가하면 cart에 실시간으로 반영되어야 한다`() = runTest {
         val product = Product(
-            id = "1",
+            id = 1L,
             imageUri = "테스트",
             name = "테스트",
-            price = 1000
+            price = 1000,
+            category = "카테고리"
         )
 
         fakeProductRepository.setProducts(listOf(product))
@@ -68,10 +69,10 @@ class ShoppingViewModelTest {
         }
 
         viewModel.fetchProducts(0)
-        viewModel.addPurchaseProduct(PurchaseProduct(product, 2))
+        viewModel.addToCart(PurchaseProduct(1L, product, 2))
 
         val cart = viewModel.cart.value
-        val cartItem = cart.findById("1")
+        val cartItem = cart.findById(1L)
 
         assertEquals(2, cartItem?.count)
         assertEquals(2000, cartItem?.totalPrice())
@@ -80,12 +81,13 @@ class ShoppingViewModelTest {
     }
 
     @Test
-    fun `최근 보 상품에 상품을 추가하면 viewHistory의 상태가 변경된다`() = runTest {
+    fun `최근 본 상품에 상품을 추가하면 viewHistory의 상태가 변경된다`() = runTest {
         val product = Product(
-            id = "1",
+            id = 1L,
             imageUri = "테스트",
             name = "테스트",
-            price = 1000
+            price = 1000,
+            category = "카테고리"
         )
         fakeProductRepository.setProducts(listOf(product))
 
@@ -98,18 +100,19 @@ class ShoppingViewModelTest {
 
         val history = viewModel.recentlyViewedProducts.value
 
-        assertEquals("1", history.products[0].id)
+        assertEquals(1L, history.products[0].id)
         assertEquals("테스트", history.products[0].name)
         collectJob.cancel()
     }
 
     @Test
-    fun `특정 상품의 수얄을 변경하면 장바구니에 반영되어야 한다`() = runTest {
+    fun `특정 상품의 수량을 변경하면 장바구니에 반영되어야 한다`() = runTest {
         val product = Product(
-            id = "1",
+            id = 1L,
             imageUri = "테스트",
             name = "테스트",
-            price = 1000
+            price = 1000,
+            category = "카테고리"
         )
 
         fakeProductRepository.setProducts(listOf(product))
@@ -119,11 +122,13 @@ class ShoppingViewModelTest {
         }
 
         viewModel.fetchProducts(0)
-        viewModel.addPurchaseProduct(PurchaseProduct(product, 2))
-        viewModel.updateCountWithID("1", 3)
+
+        viewModel.addToCart(PurchaseProduct(1L, product, 2))
+
+        viewModel.updateCountWithID(1L, 3)
 
         val purchaseProducts = viewModel.cart.value
-        assertEquals(5, purchaseProducts.findById("1")?.count)
+        assertEquals(5, purchaseProducts.findById(1L)?.count)
         collectJob.cancel()
     }
 }

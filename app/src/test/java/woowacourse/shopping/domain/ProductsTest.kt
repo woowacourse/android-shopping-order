@@ -10,6 +10,8 @@ class ProductsTest {
         val products1 = Products()
         val newProduct =
             Product(
+                category = "category",
+                id = 1L,
                 imageUri = "image",
                 name = "twohander",
                 price = 10000,
@@ -23,6 +25,8 @@ class ProductsTest {
     fun `상품을 제거하면 해당 상품이 포함되지 않는다`() {
         val newProduct =
             Product(
+                category = "category",
+                id = 1L,
                 imageUri = "image",
                 name = "twohander",
                 price = 10000,
@@ -38,6 +42,8 @@ class ProductsTest {
     fun `상품을 id로 검색 한다`() {
         val newProduct =
             Product(
+                category = "category",
+                id = 1L,
                 imageUri = "image",
                 name = "twohander",
                 price = 10000,
@@ -54,12 +60,16 @@ class ProductsTest {
     fun `id 검색에 실패했다면 null을 반환한다`() {
         val newProduct =
             Product(
+                category = "category",
+                id = 1L,
                 imageUri = "image",
                 name = "twohander",
                 price = 10000,
             )
         val newProduct2 =
             Product(
+                category = "category",
+                id = 2L,
                 imageUri = "image",
                 name = "samuel",
                 price = 50,
