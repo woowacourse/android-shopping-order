@@ -2,17 +2,21 @@ package woowacourse.shopping.backend.retrofit.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.backend.retrofit.awaitBody
+import woowacourse.shopping.backend.retrofit.awaitCompletion
 import woowacourse.shopping.backend.retrofit.repository.ProductRetrofitRepository
 import woowacourse.shopping.mapper.toApiProduct
 import woowacourse.shopping.mapper.toDomainProduct
 import woowacourse.shopping.mapper.toDomainProducts
+import woowacourse.shopping.mapper.toShoppingItem
 import woowacourse.shopping.model.Product
+import woowacourse.shopping.ui.ProductListState
 
 class ProductViewModel(
     private val productRetrofitRepository: ProductRetrofitRepository,
@@ -22,12 +26,20 @@ class ProductViewModel(
     private val _productDetails = MutableStateFlow<Map<Long, Product>>(emptyMap())
     val productDetails: StateFlow<Map<Long, Product>> = _productDetails.asStateFlow()
 
+    private val _state = MutableStateFlow(ProductListState())
+    val state: StateFlow<ProductListState> = _state.asStateFlow()
+
     fun requestProduct(
         page: Int = DEFAULT_PAGE,
         size: Int = DEFAULT_SIZE,
         sort: List<String>? = DEFAULT_SORT,
         category: String? = null,
     ) {
+        _state.value = _state.value.copy(
+            isLoading = true,
+            errorMessage = null,
+        )
+
         viewModelScope.launch {
             runCatching {
                 productRetrofitRepository
@@ -38,11 +50,23 @@ class ProductViewModel(
                         category = category,
                     ).awaitBody(errorPrefix = "상품 조회 실패")
             }.onSuccess { response ->
+                //delay(1500)      // 스켈레톤 ui 확인을 위한 딜레이
                 val loadedProducts = response.toDomainProducts()
                 _products.value = loadedProducts
+
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    products = loadedProducts.map { it.toShoppingItem() },
+                    errorMessage = null,
+                )
                 _productDetails.update { cachedProducts ->
                     cachedProducts + loadedProducts.associateBy { product -> product.id }
                 }
+            }.onFailure {
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    errorMessage = "상품 목록을 불러오지 못했습니다."
+                )
             }
         }
     }
@@ -69,7 +93,7 @@ class ProductViewModel(
                 productRetrofitRepository
                     .addProduct(
                         product = product.toApiProduct(),
-                    ).awaitBody(errorPrefix = "상품 추가 실패")
+                    ).awaitCompletion(errorPrefix = "상품 추가 실패")
             }
         }
     }
@@ -80,7 +104,7 @@ class ProductViewModel(
                 productRetrofitRepository
                     .deleteProduct(
                         id = id,
-                    ).awaitBody(errorPrefix = "상품 삭제 실패")
+                    ).awaitCompletion(errorPrefix = "상품 삭제 실패")
             }
         }
     }

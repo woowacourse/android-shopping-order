@@ -3,7 +3,7 @@ package woowacourse.shopping.backend.retrofit.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import woowacourse.shopping.backend.retrofit.awaitBody
+import woowacourse.shopping.backend.retrofit.awaitCompletion
 import woowacourse.shopping.backend.retrofit.dto.OrderInfo
 import woowacourse.shopping.backend.retrofit.repository.OrderRetrofitRepository
 
@@ -16,7 +16,7 @@ class OrderViewModel(
                 orderRetrofitRepository
                     .order(
                         order = orderInfo,
-                    ).awaitBody(errorPrefix = "주문 실패")
+                    ).awaitCompletion(errorPrefix = "주문 실패")
             }
         }
     }
