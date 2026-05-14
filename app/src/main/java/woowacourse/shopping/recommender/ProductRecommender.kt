@@ -7,13 +7,16 @@ object ProductRecommender {
     const val MAX_PRODUCT_SIZE = 10
 
     fun recommendProduct(
-        lastViewedItem: Product,
+        lastViewedItem: Product?,
         allProductItems: List<Product>,
         allCartItem: List<CartItem>,
     ): List<Product> {
+        if (lastViewedItem == null) {
+            return getFilteredProducts(allProductItems, allCartItem)
+        }
         val filteredItems = filterByCategory(lastViewedItem, allProductItems)
 
-        if(filteredItems.isEmpty()) {
+        if (filteredItems.isEmpty()) {
             // 싱위 상품 반환
             return getFilteredProducts(allProductItems, allCartItem)
         }

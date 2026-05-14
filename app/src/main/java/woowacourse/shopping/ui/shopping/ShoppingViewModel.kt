@@ -14,6 +14,7 @@ import woowacourse.shopping.data.remote.NetworkMonitor
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
+import woowacourse.shopping.recommender.ProductRecommender
 import woowacourse.shopping.ui.common.model.ProductUiModel
 import woowacourse.shopping.ui.common.paging.Pager
 

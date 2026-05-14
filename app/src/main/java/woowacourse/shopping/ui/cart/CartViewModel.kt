@@ -9,10 +9,16 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.data.repository.ProductRepository
+import woowacourse.shopping.data.repository.RecentProductRepository
+import woowacourse.shopping.recommender.ProductRecommender
 import woowacourse.shopping.ui.common.paging.Pager
 
 class CartViewModel(
+    private val recentProductRepo: RecentProductRepository,
+    private val productRepo: ProductRepository,
     private val cartRepo: CartRepository,
+    private val orderRepo: OrderRepository,
     private val pageSize: Int,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
@@ -116,6 +122,42 @@ class CartViewModel(
         loadData()
     }
 
+    fun changeScreen() {
+        if (_uiState.value.isCartScreen && _uiState.value.selectedItemIds.isNotEmpty()) {
+            getRecommendProducts()
+            _uiState.update { it.copy(isCartScreen = false) }
+        } else {
+            _uiState.update { it.copy(isCartScreen = true) }
+        }
+    }
+
+    fun order(selectedIds: List<Long>) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            try {
+                orderRepo.requestOrder(selectedIds)
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
+    private fun getRecommendProducts() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            try {
+                val products = ProductRecommender.recommendProduct(
+                    lastViewedItem = recentProductRepo.getLastViewedProduct(),
+                    allProductItems = productRepo.getProducts(0, 50),
+                    allCartItem = cartRepo.getAllCartItems().items
+                )
+                _uiState.update { it.copy(recommendItems = products) }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
     private fun loadData() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
@@ -147,6 +189,10 @@ class CartViewModel(
                 totalPrice = totalPrice,
                 totalSelectedCount = totalSelectedCount
             )
+        }
+
+        if (_uiState.value.selectedItemIds.size == _uiState.value.totalCartItemCount) {
+            _uiState.update { it.copy(isAllSelected = true) }
         }
     }
 

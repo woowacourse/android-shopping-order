@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.cart
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +18,7 @@ import woowacourse.shopping.data.model.Products
 import woowacourse.shopping.ui.cart.component.CartBody
 import woowacourse.shopping.ui.cart.component.CartBottomBar
 import woowacourse.shopping.ui.cart.component.CartHeader
+import woowacourse.shopping.ui.cart.component.CartRecommendationBody
 import woowacourse.shopping.ui.cart.component.CartScreenSkeleton
 
 @Composable
@@ -26,36 +26,54 @@ fun CartScreen(
     viewModel: CartViewModel,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
+    onOrderClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Box(modifier = modifier.fillMaxSize()) {
-        CartScreen(
-            cart = Cart(uiState.pagedItems),
-            currentPage = uiState.currentPage,
-            totalPages = uiState.totalPages,
-            showPagination = uiState.showPagination,
-            selectedItemIds = uiState.selectedItemIds,
-            onBackClick = onBackClick,
-            onDeleteClick = { viewModel.delete(it.product) },
-            onPreviousClick = { viewModel.previousPage() },
-            onNextClick = { viewModel.nextPage() },
-            onAddClick = { viewModel.increase(it.product) },
-            onRemoveClick = { viewModel.decrease(it.product) },
-            onCheckedChange = { id, isSelected ->
-                viewModel.toggleItemSelection(
-                    id.id ?: throw IllegalArgumentException(), isSelected
-                )
-            },
-            selectedItemCount = uiState.totalSelectedCount,
-            totalPrice = uiState.totalPrice,
-            onAllCheckboxChanged = { isSelected -> viewModel.toggleAllItemsSelection(isSelected) },
-            checked = uiState.isAllSelected,
-            modifier = Modifier,
-        )
+    when (uiState.isCartScreen) {
+        true ->
+            CartScreen(
+                cart = Cart(uiState.pagedItems),
+                currentPage = uiState.currentPage,
+                totalPages = uiState.totalPages,
+                showPagination = uiState.showPagination,
+                selectedItemIds = uiState.selectedItemIds,
+                onBackClick = onBackClick,
+                onDeleteClick = { viewModel.delete(it.product) },
+                onPreviousClick = { viewModel.previousPage() },
+                onNextClick = { viewModel.nextPage() },
+                onAddClick = { viewModel.increase(it.product) },
+                onRemoveClick = { viewModel.decrease(it.product) },
+                onCheckedChange = { id, isSelected ->
+                    viewModel.toggleItemSelection(
+                        id.id ?: throw IllegalArgumentException(), isSelected
+                    )
+                },
+                selectedItemCount = uiState.totalSelectedCount,
+                totalPrice = uiState.totalPrice,
+                onAllCheckboxChanged = { isSelected -> viewModel.toggleAllItemsSelection(isSelected) },
+                checked = uiState.isAllSelected,
+                modifier = modifier,
+                onOrderClick = { viewModel.changeScreen() },
+            )
 
-        if (uiState.isLoading) CartScreenSkeleton()
+        false ->
+            RecommendScreen(
+                recommendedProducts = Products(uiState.recommendItems),
+                count = uiState.totalSelectedCount,
+                price = uiState.totalPrice,
+                modifier = modifier,
+                onBackClick = { viewModel.changeScreen() },
+                onIncreaseClick = {  },
+                onDecreaseClick = { },
+                onOrderClick = {
+                    viewModel.order(uiState.selectedItemIds.toList())
+                    onOrderClick()
+                },
+            )
     }
+
+    if (uiState.isLoading) CartScreenSkeleton()
 }
 
 @Composable
@@ -77,6 +95,7 @@ fun CartScreen(
     onRemoveClick: (CartItem) -> Unit,
     onCheckedChange: (CartItem, Boolean) -> Unit,
     onAllCheckboxChanged: (Boolean) -> Unit,
+    onOrderClick: () -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -107,7 +126,43 @@ fun CartScreen(
             checked = checked,
             price = totalPrice,
             onCheckedChanged = onAllCheckboxChanged,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            onOrderClick = onOrderClick
+        )
+    }
+}
+
+@Composable
+private fun RecommendScreen(
+    recommendedProducts: Products,
+    count: Int,
+    price: Long,
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit,
+    onIncreaseClick: (Product) -> Unit,
+    onDecreaseClick: (Product) -> Unit,
+    onOrderClick: () -> Unit
+) {
+    Column(
+        modifier = modifier
+    ) {
+        CartHeader(
+            modifier = Modifier,
+            onBackClick = onBackClick
+        )
+
+        CartRecommendationBody(
+            productItems = recommendedProducts,
+            modifier = Modifier.weight(1f),
+            onIncreaseClick = onIncreaseClick,
+            onDecreaseClick = onDecreaseClick
+        )
+
+        CartBottomBar(
+            count = count,
+            price = price,
+            modifier = Modifier.fillMaxWidth(),
+            onOrderClick = onOrderClick
         )
     }
 }
@@ -143,6 +198,7 @@ private fun CartScreenPreview1() {
         onRemoveClick = {},
         onCheckedChange = { _, _ -> },
         onAllCheckboxChanged = {},
+        onOrderClick = {}
     )
 }
 
@@ -169,5 +225,31 @@ private fun CartScreenPreview2() {
         onRemoveClick = {},
         onCheckedChange = { _, _ -> },
         onAllCheckboxChanged = {},
+        onOrderClick = {}
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun RecommendScreenPreview() {
+    val products = Products(
+        listOf(
+            Product(name = "1번", price = Money(1000), imageUrl = ""),
+            Product(name = "2번", price = Money(1000), imageUrl = ""),
+            Product(name = "3번", price = Money(1000), imageUrl = ""),
+            Product(name = "4번", price = Money(1000), imageUrl = ""),
+            Product(name = "5번", price = Money(1000), imageUrl = ""),
+        )
+    )
+
+    RecommendScreen(
+        recommendedProducts = products,
+        count = 4,
+        price = 5000,
+        modifier = Modifier,
+        onBackClick = {},
+        onIncreaseClick = {},
+        onDecreaseClick = {},
+        onOrderClick = {}
     )
 }

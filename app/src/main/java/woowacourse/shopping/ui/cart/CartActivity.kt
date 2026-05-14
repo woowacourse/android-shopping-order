@@ -36,6 +36,8 @@ class CartActivity : ComponentActivity() {
                                             cartRepo = container.cartRepository,
                                             orderRepo = container.orderRepository,
                                             pageSize = pageSize,
+                                            recentProductRepo = container.recentProductRepository,
+                                            productRepo = container.productRepository,
                                         ) as T
                                 },
                         )
@@ -44,6 +46,7 @@ class CartActivity : ComponentActivity() {
                         viewModel = viewModel,
                         modifier = Modifier.padding(innerPadding),
                         onBackClick = ::finish,
+                        onOrderClick = ::finish
                     )
                 }
             }

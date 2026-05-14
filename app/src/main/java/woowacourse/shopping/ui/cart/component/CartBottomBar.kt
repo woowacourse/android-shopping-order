@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.cart.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,12 +23,13 @@ import java.text.NumberFormat
 
 @Composable
 fun CartBottomBar(
-    useCheckbox: Boolean,
     count: Int,
-    checked: Boolean,
     price: Long,
     modifier: Modifier = Modifier,
-    onCheckedChanged: (Boolean) -> Unit
+    useCheckbox: Boolean = false,
+    checked: Boolean = false,
+    onOrderClick: () -> Unit,
+    onCheckedChanged: (Boolean) -> Unit = {},
 ) {
     val formatted = NumberFormat.getInstance().format(price)
 
@@ -49,6 +51,7 @@ fun CartBottomBar(
         OrderButton(
             count = count,
             modifier = Modifier,
+            onClick = onOrderClick
         )
     }
 }
@@ -129,11 +132,13 @@ private fun CheckboxForAll(
 private fun OrderButton(
     count: Int,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = modifier
             .size(width = 122.dp, height = 78.dp)
-            .background(PrimaryColor),
+            .background(PrimaryColor)
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -154,7 +159,8 @@ private fun CartBottomBarPreview() {
         checked = true,
         price = 3000,
         modifier = Modifier,
-        onCheckedChanged = {}
+        onCheckedChanged = {},
+        onOrderClick = {}
     )
 }
 
@@ -171,6 +177,7 @@ private fun CheckboxForAllPreview() {
 @Composable
 private fun OrderButtonPreview() {
     OrderButton(
-        count = 2
+        count = 2,
+        onClick = {}
     )
 }
