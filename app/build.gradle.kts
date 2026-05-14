@@ -65,6 +65,10 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
     implementation("com.squareup.okhttp3:mockwebserver3:5.3.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+    implementation("androidx.datastore:datastore-preferences:1.1.3")
 
     ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit.jupiter)
