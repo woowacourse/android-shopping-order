@@ -37,6 +37,8 @@ fun CartScreen(
     onNextPage: () -> Unit,
     onPreviousPage: () -> Unit,
     onQuantityChange: (String, Int) -> Unit,
+    isSelected: (String) -> Boolean,
+    onCheckedChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -84,6 +86,8 @@ fun CartScreen(
             cartItems = uiState.items,
             isLoading = uiState.isLoading,
             errorMessage = uiState.errorMessage,
+            isChecked = isSelected,
+            onCheckedChange = onCheckedChange,
             modifier =
                 Modifier
                     .fillMaxSize()
@@ -99,6 +103,8 @@ private fun CartContent(
     cartItems: ImmutableList<CartItemUiModel>,
     isLoading: Boolean,
     errorMessage: String?,
+    isChecked: (String) -> Boolean,
+    onCheckedChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -138,6 +144,8 @@ private fun CartContent(
                     onDeleteItem = {
                         onDeleteItem(item.id)
                     },
+                    isChecked = isChecked(item.id),
+                    onCheckedChange = { onCheckedChange(item.id) },
                 )
             }
         }
@@ -154,6 +162,8 @@ private fun CartScreenPreview() {
         onNextPage = {},
         onPreviousPage = {},
         onQuantityChange = { _, _ -> },
+        isSelected = { true },
+        onCheckedChange = { },
     )
 }
 
@@ -192,5 +202,7 @@ private fun CartContentPreview() {
             ).toImmutableList(),
         isLoading = true,
         errorMessage = null,
+        isChecked = { true },
+        onCheckedChange = { },
     )
 }

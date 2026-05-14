@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.cart
 
+import android.R.attr.contentDescription
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,14 +15,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,16 +37,19 @@ import woowacourse.shopping.ui.component.ProductAsyncImage
 import woowacourse.shopping.ui.component.QuantitySelector
 import woowacourse.shopping.ui.theme.Gray40
 import woowacourse.shopping.ui.theme.Gray50
+import woowacourse.shopping.ui.theme.Green40
 import woowacourse.shopping.ui.util.formattedPrice
 
 @Composable
 fun CartCard(
     onDeleteItem: () -> Unit,
     onQuantityChange: (Int) -> Unit,
+    onCheckedChange: () -> Unit,
     productName: String,
     imageUrl: String,
     price: Int,
     quantity: Int,
+    isChecked: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -57,13 +67,27 @@ fun CartCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(
-                text = productName,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                lineHeight = 24.sp,
-                color = Color.Black,
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = onCheckedChange
+                ) {
+                    Icon(
+                        imageVector = if (isChecked) Icons.Default.CheckBox
+                        else Icons.Default.CheckBoxOutlineBlank,
+                        contentDescription = "상품 선택 버튼",
+                        tint = if (isChecked) Green40 else Color.Unspecified
+                    )
+                }
+                Text(
+                    text = productName,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 24.sp,
+                    color = Color.Black,
+                )
+            }
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = "삭제",
@@ -123,5 +147,7 @@ fun CartCardPreview() {
         imageUrl = "Test",
         price = 1000,
         quantity = 1,
+        onCheckedChange = { },
+        isChecked = true,
     )
 }

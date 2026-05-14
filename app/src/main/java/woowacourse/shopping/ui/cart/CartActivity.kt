@@ -37,6 +37,8 @@ class CartActivity : ComponentActivity() {
                     onNextPage = viewModel::nextPage,
                     onPreviousPage = viewModel::previousPage,
                     onQuantityChange = viewModel::updateQuantity,
+                    isSelected = { viewModel.isSelected(it) },
+                    onCheckedChange = { viewModel.checkItem(it) }
                 )
             }
         }

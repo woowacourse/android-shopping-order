@@ -12,4 +12,5 @@ data class CartUiState(
     val totalCartSize: Int = 0,
     val totalPrice: Int = 0,
     val errorMessage: String? = null,
+    val selectedCartItems: ImmutableList<String> = persistentListOf()
 )

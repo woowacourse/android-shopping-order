@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.cart
 
+import android.nfc.tech.MifareUltralight.PAGE_SIZE
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -85,6 +86,25 @@ class CartViewModel(
 
             getCartItemsByPage()
         }
+    }
+
+    fun checkItem(cartItemId: String) {
+        val selectedItems =
+            if (_uiState.value.selectedCartItems.contains(cartItemId)) {
+                _uiState.value.selectedCartItems - cartItemId
+            } else {
+                _uiState.value.selectedCartItems + cartItemId
+            }.toImmutableList()
+
+        _uiState.update {
+            it.copy(
+                selectedCartItems = selectedItems
+            )
+        }
+    }
+
+    fun isSelected(cartItemId: String): Boolean {
+        return _uiState.value.selectedCartItems.contains(cartItemId)
     }
 
     companion object {
