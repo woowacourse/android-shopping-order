@@ -99,62 +99,6 @@ fun CartScreenContent(
         topBar = {
             CartAppBar(onCloseClick = onCloseClick)
         },
-        bottomBar = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(78.dp)
-                    .background(Color(0xff555555)),
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 20.dp),
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                    ) {
-                        Checkbox(
-                            checked = uiState.checkMap.all { it.value },
-                            onCheckedChange = {
-                                onTotalCheck()
-                            },
-                            colors = CheckboxDefaults.colors().copy(
-                                checkedBoxColor = Color(0xFF04C09E),
-                            ),
-                            modifier = Modifier.size(24.dp),
-                        )
-                        Text("전체", color = Color.White, fontSize = 12.sp)
-                    }
-                    Text(
-                        DecimalPriceFormatter().format(uiState.totalPrice),
-                        fontWeight = FontWeight.W700,
-                        fontSize = 18.sp,
-                        color = Color.White,
-                    )
-                }
-                TextButton(
-                    onClick = {
-                    },
-                    modifier = Modifier
-                        .width(122.dp)
-                        .fillMaxHeight()
-                        .background(Color(0xff04C09E)),
-                ) {
-                    Text(
-                        "주문하기(0)",
-                        fontWeight = FontWeight.W700,
-                        fontSize = 18.sp,
-                        color = Color.White,
-                    )
-                }
-            }
-        },
     ) { innerPadding ->
         Box {
             Column(
@@ -173,7 +117,7 @@ fun CartScreenContent(
                     onDecrease = onDecrease,
                     onChecked = onChecked,
                 )
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 PageNavigator(
                     page = uiState.page,
                     onLeftClick = onPrev,
@@ -181,7 +125,61 @@ fun CartScreenContent(
                     canMoveToPreviousPage = canPrev,
                     canMoveToNextPage = canNext,
                 )
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(78.dp)
+                        .background(Color(0xff555555)),
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 20.dp),
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                        ) {
+                            Checkbox(
+                                checked = uiState.checkMap.all { it.value },
+                                onCheckedChange = {
+                                    onTotalCheck()
+                                },
+                                colors = CheckboxDefaults.colors().copy(
+                                    checkedBoxColor = Color(0xFF04C09E),
+                                ),
+                                modifier = Modifier.size(24.dp),
+                            )
+                            Text("전체", color = Color.White, fontSize = 12.sp)
+                        }
+                        Text(
+                            DecimalPriceFormatter().format(uiState.totalPrice),
+                            fontWeight = FontWeight.W700,
+                            fontSize = 18.sp,
+                            color = Color.White,
+                        )
+                    }
+                    TextButton(
+                        onClick = {
+                        },
+                        modifier = Modifier
+                            .width(122.dp)
+                            .fillMaxHeight()
+                            .background(Color(0xff04C09E)),
+                    ) {
+                        Text(
+                            "주문하기(0)",
+                            fontWeight = FontWeight.W700,
+                            fontSize = 18.sp,
+                            color = Color.White,
+                        )
+                    }
+                }
             }
         }
     }
