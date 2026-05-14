@@ -3,7 +3,7 @@ package woowacourse.shopping.backend.retrofit.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PageableX(
+data class ShoppingCartPageable(
     val offset: Long,
     val pageNumber: Int,
     val pageSize: Int,

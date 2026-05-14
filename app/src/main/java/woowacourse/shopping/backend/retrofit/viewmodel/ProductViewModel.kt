@@ -16,7 +16,7 @@ import woowacourse.shopping.mapper.toDomainProduct
 import woowacourse.shopping.mapper.toDomainProducts
 import woowacourse.shopping.mapper.toShoppingItem
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.ui.ProductListState
+import woowacourse.shopping.ui.state.ProductListState
 
 class ProductViewModel(
     private val productRetrofitRepository: ProductRetrofitRepository,
@@ -51,7 +51,7 @@ class ProductViewModel(
                         category = category,
                     ).awaitBody(errorPrefix = "상품 조회 실패")
             }.onSuccess { response ->
-                 delay(3000)      // 스켈레톤 ui 확인을 위한 딜레이
+                delay(3000) // 스켈레톤 ui 확인을 위한 딜레이
                 val loadedProducts = response.toDomainProducts()
                 _products.value = loadedProducts
 

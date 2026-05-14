@@ -1,8 +1,9 @@
-package woowacourse.shopping.activity
+@file:Suppress("FunctionName")
+
+package woowacourse.shopping.ui.recomment
 
 import androidx.compose.runtime.Composable
 import woowacourse.shopping.model.ShoppingItem
-import woowacourse.shopping.ui.RecommentScreen
 
 @Composable
 internal fun ShoppingCartRecommendSection(

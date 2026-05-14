@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.AppContainer
+import woowacourse.shopping.ui.viewmodel.ShoppingCartRecommendViewModel
 
 class ScreenViewModelFactory(
     private val appContainer: AppContainer,

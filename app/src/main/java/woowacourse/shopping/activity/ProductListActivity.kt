@@ -16,8 +16,8 @@ import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.backend.retrofit.viewmodel.ApiViewModelFactory
 import woowacourse.shopping.backend.retrofit.viewmodel.ProductViewModel
 import woowacourse.shopping.backend.retrofit.viewmodel.ShoppingCartViewModel
-import woowacourse.shopping.ui.ProductListScreen
 import woowacourse.shopping.ui.component.MoreButton
+import woowacourse.shopping.ui.screen.ProductListScreen
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 import woowacourse.shopping.ui.viewmodel.ProductListViewModel
 import woowacourse.shopping.ui.viewmodel.ScreenViewModelFactory
