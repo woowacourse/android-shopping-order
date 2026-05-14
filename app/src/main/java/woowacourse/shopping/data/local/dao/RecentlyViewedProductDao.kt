@@ -14,8 +14,8 @@ interface RecentlyViewedProductDao {
     suspend fun insert(recentlyViewedProductEntity: RecentlyViewedProductEntity)
 
     @Query(
-        "DELETE FROM recently_viewed_products WHERE id NOT IN " +
-            "(SELECT id FROM recently_viewed_products ORDER BY time_stamp DESC LIMIT 10)",
+        "DELETE FROM recently_viewed_products WHERE product_id NOT IN " +
+            "(SELECT product_id FROM recently_viewed_products ORDER BY time_stamp DESC LIMIT 10)",
     )
     suspend fun removeOldData()
 
@@ -28,6 +28,6 @@ interface RecentlyViewedProductDao {
     @Query("SELECT * FROM recently_viewed_products ORDER BY time_stamp DESC")
     fun getAll(): Flow<List<RecentlyViewedProductEntity>?>
 
-    @Query("SELECT id FROM recently_viewed_products ORDER BY time_stamp DESC LIMIT 1")
+    @Query("SELECT product_id FROM recently_viewed_products ORDER BY time_stamp DESC LIMIT 1")
     fun getLatestItemId(): Flow<Long?>
 }

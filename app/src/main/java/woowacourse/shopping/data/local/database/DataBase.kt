@@ -18,7 +18,7 @@ val MIGRATION_5_6 =
             db.execSQL(
                 """                
                 CREATE TABLE IF NOT EXISTS `recently_viewed_products` (
-                    `productId` TEXT NOT NULL,
+                    `product_id` INTEGER NOT NULL,
                     `time_stamp` INTEGER NOT NULL,
                     PRIMARY KEY(`productId`)
                 )
@@ -29,7 +29,7 @@ val MIGRATION_5_6 =
 
 @Database(
     entities = [RecentlyViewedProductEntity::class],
-    version = 5,
+    version = 6,
 )
 abstract class DataBase : RoomDatabase() {
 
