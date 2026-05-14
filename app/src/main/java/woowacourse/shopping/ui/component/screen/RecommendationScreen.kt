@@ -42,7 +42,7 @@ fun CartRecommendationScreen(
     onAdd: (Long, Int) -> Unit,
     onMinus: (Long, Int) -> Unit,
     onDelete: (Long) -> Unit,
-    onItemClick: (Long) -> Unit,
+    onItemClick: (Product) -> Unit,
     isContainedInCart: (Long) -> Boolean,
     itemCount: (Long) -> Int,
     modifier: Modifier = Modifier,
@@ -107,7 +107,7 @@ private fun RecommendationBody(
     onAdd: (Long, Int) -> Unit,
     onMinus: (Long, Int) -> Unit,
     onDelete: (Long) -> Unit,
-    onItemClick: (Long) -> Unit,
+    onItemClick: (Product) -> Unit,
     isContainedInCart: (Long) -> Boolean,
     itemCount: (Long) -> Int,
 ) {
@@ -144,7 +144,7 @@ private fun RecommendationBody(
                     onAdd = { onAdd(product.id, 1) },
                     onMinus = { onMinus(product.id, -1) },
                     onDelete = { onDelete(product.id) },
-                    onClick = { onItemClick(product.id) }
+                    onClick = { onItemClick(product) }
                 )
             }
         }

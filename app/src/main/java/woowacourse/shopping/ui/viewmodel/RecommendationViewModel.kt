@@ -108,6 +108,12 @@ class RecommendationViewModel(
             }
         }
     }
+
+    fun updateHistory(product: Product) {
+        viewModelScope.launch {
+            recentlyViewedProductRepository.updateList(product)
+        }
+    }
 }
 
 class RecommendationViewModelFactory(
