@@ -37,12 +37,19 @@ fun CartRecommendationBody(
             modifier = Modifier.padding(start = 16.dp)
         )
         Spacer(Modifier.height(29.dp))
-        ItemRow(
-            products = productItems,
-            modifier = Modifier.padding(start = 12.dp),
-            onIncreaseClick = onIncreaseClick,
-            onDecreaseClick = onDecreaseClick
-        )
+
+        if (productItems.isNotEmpty()) {
+            ItemRow(
+                products = productItems,
+                modifier = Modifier.padding(start = 12.dp),
+                onIncreaseClick = onIncreaseClick,
+                onDecreaseClick = onDecreaseClick
+            )
+        } else {
+            Text(
+                text = "모든 상품을 담아서 추천 상품이 없습니다. 고객님 감사합니다.",
+            )
+        }
     }
 }
 

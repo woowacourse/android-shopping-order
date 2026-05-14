@@ -15,19 +15,20 @@ object ProductRecommender {
             return getFilteredProducts(allProductItems, allCartItem)
         }
         val filteredItems = filterByCategory(lastViewedItem, allProductItems)
-
         if (filteredItems.isEmpty()) {
-            // 싱위 상품 반환
             return getFilteredProducts(allProductItems, allCartItem)
         }
-        // 같은 카테고리 상품 반환
-        return getFilteredProducts(filteredItems, allCartItem)
+        val filteredByCategory =  getFilteredProducts(filteredItems, allCartItem)
+        if (filteredByCategory.isEmpty()) {
+            return getFilteredProducts(allProductItems, allCartItem)
+        }
+        return filteredByCategory
     }
 
     private fun filterByCategory(
         lastViewedItem: Product,
         allProductItems: List<Product>
-    ) = allProductItems.filter { it.category == lastViewedItem.category }
+    ) = allProductItems.filter { it.category == lastViewedItem.category } - lastViewedItem
 
     private fun getFilteredProducts(
         products: List<Product>,

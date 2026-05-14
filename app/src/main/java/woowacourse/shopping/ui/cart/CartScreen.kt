@@ -54,9 +54,10 @@ fun CartScreen(
                 onAllCheckboxChanged = { isSelected -> viewModel.toggleAllItemsSelection(isSelected) },
                 checked = uiState.isAllSelected,
                 modifier = modifier,
-                onOrderClick = { viewModel.changeScreen() },
+                onOrderClick = {
+                    viewModel.changeScreen()
+                },
             )
-
         false ->
             RecommendScreen(
                 recommendedProducts = uiState.recommendItems,
