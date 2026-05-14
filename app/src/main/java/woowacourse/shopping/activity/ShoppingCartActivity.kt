@@ -63,8 +63,8 @@ class ShoppingCartActivity : ComponentActivity() {
 
         setContent {
             val shoppingCartItems by shoppingCartViewModel.shoppingCartItems.collectAsStateWithLifecycle()
-            val selectedCartItemIds by shoppingCartViewModel.selectedCartItemIds.collectAsStateWithLifecycle()
-            val selectedItemCount = selectedCartItemIds.size
+            val selectedProductIds by shoppingCartViewModel.selectedProductIds.collectAsStateWithLifecycle()
+            val selectedItemCount = selectedProductIds.size
 
             val screenState =
                 shoppingCartItemViewModel.shoppingCartItems.collectAsStateWithLifecycle()
@@ -86,7 +86,7 @@ class ShoppingCartActivity : ComponentActivity() {
             val state =
                 ShoppingCartState(
                     items = visibleItems,
-                    selectedProductIds = selectedCartItemIds,
+                    selectedProductIds = selectedProductIds,
                     isLoading = isLoading.value,
                     errorMessage = errorMessage.value,
                     currentPage = screenState.value.currentPage,
@@ -108,9 +108,9 @@ class ShoppingCartActivity : ComponentActivity() {
                         shoppingCartItemViewModel.removeShoppingItem(shoppingCartItem)
                         shoppingCartViewModel.removeShoppingItem(shoppingCartItem)
                     },
-                    onToggleShoppingItemSelectionClick = { shoppingCartItemId, isSelected ->
-                        shoppingCartViewModel.setShoppingCartItemSelection(
-                            shoppingCartItemId = shoppingCartItemId,
+                    onToggleShoppingItemSelectionClick = { productId, isSelected ->
+                        shoppingCartViewModel.setShoppingCartProductSelection(
+                            productId = productId,
                             isSelected = isSelected,
                         )
                     },
@@ -130,17 +130,17 @@ class ShoppingCartActivity : ComponentActivity() {
                     )
                     OrderButton(
                         shoppingCartItems = shoppingCartItems,
-                        selectedShoppingCartItemIds = selectedCartItemIds,
+                        selectedProductIds = selectedProductIds,
                         shoppingCartSelectItemCount = selectedItemCount,
-                        onOrderButtonClick = { selectedShoppingCartItemIds ->
-                            if (selectedShoppingCartItemIds.isEmpty()) return@OrderButton
+                        onOrderButtonClick = { selectedProductIds ->
+                            if (selectedProductIds.isEmpty()) return@OrderButton
                         },
                         checked = shoppingCartItems.isNotEmpty() && selectedItemCount == shoppingCartItems.size,
                         orderComplete = shoppingCartItems.isNotEmpty(),
                         totalPrice = shoppingCartViewModel.getTotalPrice(shoppingCartItems),
-                        onToggleShoppingItemSelectionClick = { shoppingCartItemIds, isSelected ->
-                            shoppingCartViewModel.setShoppingCartItemsSelection(
-                                shoppingCartItemIds = shoppingCartItemIds,
+                        onToggleShoppingItemSelectionClick = { productIds, isSelected ->
+                            shoppingCartViewModel.setShoppingCartProductsSelection(
+                                productIds = productIds,
                                 isSelected = isSelected,
                             )
                         },

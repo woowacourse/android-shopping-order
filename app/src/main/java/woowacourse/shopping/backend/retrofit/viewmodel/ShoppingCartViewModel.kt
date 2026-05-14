@@ -26,8 +26,8 @@ class ShoppingCartViewModel(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
-    private val _selectedCartItemIds = MutableStateFlow<Set<Long>>(emptySet())
-    val selectedCartItemIds: StateFlow<Set<Long>> = _selectedCartItemIds.asStateFlow()
+    private val _selectedProductIds = MutableStateFlow<Set<Long>>(emptySet())
+    val selectedProductIds: StateFlow<Set<Long>> = _selectedProductIds.asStateFlow()
 
 
     fun requestCartItems() {
@@ -160,41 +160,41 @@ class ShoppingCartViewModel(
             shoppingCartItem.product.id == productId
         }
 
-    fun setShoppingCartItemSelection(
-        shoppingCartItemId: Long,
+    fun setShoppingCartProductSelection(
+        productId: Long,
         isSelected: Boolean,
     ) {
-        val validIds =
-            _shoppingCartItems.value.map { shoppingCartItem -> shoppingCartItem.getId() }.toSet()
-        if (shoppingCartItemId !in validIds) return
-        _selectedCartItemIds.value =
-            _selectedCartItemIds.value.toMutableSet().apply {
+        val validProductIds =
+            _shoppingCartItems.value.map { shoppingCartItem -> shoppingCartItem.product.id }.toSet()
+        if (productId !in validProductIds) return
+        _selectedProductIds.value =
+            _selectedProductIds.value.toMutableSet().apply {
                 if (isSelected) {
-                    add(shoppingCartItemId)
+                    add(productId)
                 } else {
-                    remove(shoppingCartItemId)
+                    remove(productId)
                 }
             }
     }
 
-    fun setShoppingCartItemsSelection(
-        shoppingCartItemIds: List<Long>,
+    fun setShoppingCartProductsSelection(
+        productIds: List<Long>,
         isSelected: Boolean,
     ) {
-        val validIds =
-            _shoppingCartItems.value.map { shoppingCartItem -> shoppingCartItem.getId() }.toSet()
-        val targetIds = shoppingCartItemIds.toSet().intersect(validIds)
+        val validProductIds =
+            _shoppingCartItems.value.map { shoppingCartItem -> shoppingCartItem.product.id }.toSet()
+        val targetProductIds = productIds.toSet().intersect(validProductIds)
         if (isSelected) {
-            _selectedCartItemIds.value = targetIds
+            _selectedProductIds.value = targetProductIds
             return
         }
-        _selectedCartItemIds.value = _selectedCartItemIds.value - targetIds
+        _selectedProductIds.value = _selectedProductIds.value - targetProductIds
     }
 
     private fun syncShoppingCartItems(shoppingCartItems: List<ShoppingCartItem>) {
         _shoppingCartItems.value = shoppingCartItems
-        val validIds = shoppingCartItems.map { it.getId() }.toSet()
-        _selectedCartItemIds.value = _selectedCartItemIds.value.intersect(validIds)
+        val validProductIds = shoppingCartItems.map { it.product.id }.toSet()
+        _selectedProductIds.value = _selectedProductIds.value.intersect(validProductIds)
     }
 
     private companion object {
