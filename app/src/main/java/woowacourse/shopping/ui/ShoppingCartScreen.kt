@@ -43,12 +43,14 @@ import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductTitle
 import woowacourse.shopping.model.ShoppingCartItem
 import woowacourse.shopping.model.ShoppingItem
+import woowacourse.shopping.ui.component.CartSkeletonItem
 import woowacourse.shopping.ui.component.ProductQuantityBox
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 @Composable
 fun ShoppingCartScreen(
     shoppingCartItems: List<ShoppingCartItem>,
+    state: ShoppingCartState,
     getQuantityPrice: (ShoppingCartItem) -> Int,
     onBackClick: () -> Unit,
     onRemoveShoppingItemClick: (ShoppingCartItem) -> Unit,
@@ -77,25 +79,33 @@ fun ShoppingCartScreen(
                     ),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Column(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                shoppingCartItems.forEach { shoppingCartItem ->
-                    ShoppingCartItems(
-                        shoppingCartItem = shoppingCartItem,
-                        quantityPrice = getQuantityPrice(shoppingCartItem),
-                        onRemoveShoppingItemClick = onRemoveShoppingItemClick,
-                        onIncreaseShoppingItemQuantityClick = onIncreaseShoppingItemQuantityClick,
-                        onDecreaseShoppingItemQuantityClick = onDecreaseShoppingItemQuantityClick,
-                    )
+            if (state.isLoading) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    CartSkeletonItem()
+                    CartSkeletonItem()
                 }
+            } else {
+                Column(
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    shoppingCartItems.forEach { shoppingCartItem ->
+                        ShoppingCartItems(
+                            shoppingCartItem = shoppingCartItem,
+                            quantityPrice = getQuantityPrice(shoppingCartItem),
+                            onRemoveShoppingItemClick = onRemoveShoppingItemClick,
+                            onIncreaseShoppingItemQuantityClick = onIncreaseShoppingItemQuantityClick,
+                            onDecreaseShoppingItemQuantityClick = onDecreaseShoppingItemQuantityClick,
+                        )
+                    }
+                }
+                bottomContent()
             }
-
-            bottomContent()
         }
     }
 }
@@ -115,11 +125,13 @@ private fun ShoppingCartItems(
                 .fillMaxWidth()
                 .clip(
                     RoundedCornerShape(4.dp),
-                ).border(
+                )
+                .border(
                     color = MaterialTheme.colorScheme.outline,
                     width = 1.dp,
                     shape = RoundedCornerShape(4.dp),
-                ).padding(12.dp),
+                )
+                .padding(12.dp),
     ) {
         val product = shoppingCartItem.product
         Row(
@@ -160,7 +172,8 @@ private fun ShoppingCartItems(
                         .background(MaterialTheme.colorScheme.surfaceContainer),
             )
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier =
+                    Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.End,
             ) {
@@ -220,19 +233,61 @@ private fun ShoppingCartScreenPreview() {
                 listOf(
                     ShoppingCartItem(
                         id = 1,
-                        shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""), 4),
+                        shoppingItem = ShoppingItem(
+                            Product(
+                                1,
+                                ProductTitle("동원 스위트콘"),
+                                Price(99_800),
+                                ""
+                            ), 4
+                        ),
                     ),
                     ShoppingCartItem(
                         id = 2,
-                        shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""), 4),
+                        shoppingItem = ShoppingItem(
+                            Product(
+                                1,
+                                ProductTitle("동원 스위트콘"),
+                                Price(99_800),
+                                ""
+                            ), 4
+                        ),
                     ),
                     ShoppingCartItem(
                         id = 3,
-                        shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""), 4),
+                        shoppingItem = ShoppingItem(
+                            Product(
+                                1,
+                                ProductTitle("동원 스위트콘"),
+                                Price(99_800),
+                                ""
+                            ), 4
+                        ),
                     ),
                 ),
+            state = ShoppingCartState(
+                items = listOf(
+                    ShoppingCartItem(
+                        id = 1L,
+                        shoppingItem = ShoppingItem(
+                            product = Product(
+                                id = 1L,
+                                title = ProductTitle("샘플 상품"),
+                                price = Price(12000),
+                                imageUrl = "https://example.com/image.jpg",
+                            ),
+                            quantity = 1,
+                        ),
+                    )
+                ),
+                isLoading = true,
+                errorMessage = null,
+                currentPage = 0,
+                canMoveToPreviousPage = false,
+                canMoveToNextPage = false,
+            ),
             getQuantityPrice = { shoppingCartItem -> shoppingCartItem.getProductQuantityPrice() },
-            onBackClick = { },
+            onBackClick = {},
             onRemoveShoppingItemClick = {},
             onIncreaseShoppingItemQuantityClick = {},
             onDecreaseShoppingItemQuantityClick = {},
@@ -247,7 +302,10 @@ private fun ShoppingCartItemsPreview() {
         shoppingCartItem =
             ShoppingCartItem(
                 id = 1,
-                shoppingItem = ShoppingItem(Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""), 4),
+                shoppingItem = ShoppingItem(
+                    Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""),
+                    4
+                ),
             ),
         quantityPrice = 399_200,
         onRemoveShoppingItemClick = {},
