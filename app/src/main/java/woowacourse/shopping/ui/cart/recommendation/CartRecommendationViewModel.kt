@@ -36,6 +36,7 @@ class CartRecommendationViewModel(
     private var baseOrderItemDataByProductId: Map<Long, OrderItemData> = emptyMap()
     private val recommendedOrderItemDataByProductId = linkedMapOf<Long, OrderItemData>()
     private var isSessionStarted = false
+    private var initialCartProductIds: Set<Long>? = null
 
     init {
         observeNetworkState()
@@ -51,6 +52,7 @@ class CartRecommendationViewModel(
             }
         recommendedOrderItemDataByProductId.clear()
         isSessionStarted = true
+        initialCartProductIds = null
 
         _uiState.update { currentState ->
             currentState.copy(
@@ -194,7 +196,7 @@ class CartRecommendationViewModel(
                 ?: return emptyList()
         if (latestViewedProduct.category.isBlank()) return emptyList()
 
-        val cartProductIds = resolveCartProductIds()
+        val cartProductIds = initialCartProductIds ?: resolveCartProductIds().also { initialCartProductIds = it }
         val fetchLimit = RECOMMENDED_PRODUCTS_LIMIT + cartProductIds.size
         val recommendedProducts =
             productRepository

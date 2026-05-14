@@ -277,7 +277,7 @@ class CartRecommendationViewModelTest {
                 viewModel.uiState.value.pendingOrder.cartItemIds
                     .toSet(),
             )
-            assertFalse(
+            assertTrue(
                 viewModel.uiState.value.recommendedProducts
                     .any { it.product.id == recommendedProduct.id },
             )
