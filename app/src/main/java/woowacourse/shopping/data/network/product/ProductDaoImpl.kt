@@ -25,6 +25,7 @@ class ProductDaoImpl(
         startIndex: Int,
         pageSize: Int,
         sort: List<String>,
+        category: String?,
     ): List<Product> {
         val url = baseUrl.newBuilder()
             .addPathSegment("products")

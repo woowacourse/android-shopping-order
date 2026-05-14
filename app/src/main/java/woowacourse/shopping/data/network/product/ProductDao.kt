@@ -8,6 +8,7 @@ interface ProductDao {
         startIndex: Int,
         pageSize: Int,
         sort: List<String>,
+        category: String?,
     ): List<Product>
 
     suspend fun findById(id: String): Product

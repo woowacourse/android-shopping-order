@@ -10,11 +10,13 @@ class ProductDataSourceImpl(
         startIndex: Int,
         pageSize: Int,
         sort: List<String>,
+        category: String?,
     ): List<Product> {
         return productDao.findAllProduct(
             startIndex = startIndex,
             pageSize = pageSize,
             sort = sort,
+            category = category,
         )
     }
 

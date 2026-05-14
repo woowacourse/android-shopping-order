@@ -11,9 +11,10 @@ class ProductRetrofitDaoImpl(
         startIndex: Int,
         pageSize: Int,
         sort: List<String>,
+        category: String?,
     ): List<Product> = withContext(Dispatchers.IO) {
         val response = retrofitProductService
-            .requestProducts(page = startIndex, size = pageSize)
+            .requestProducts(page = startIndex, size = pageSize, category = category)
             .execute()
 
         check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }

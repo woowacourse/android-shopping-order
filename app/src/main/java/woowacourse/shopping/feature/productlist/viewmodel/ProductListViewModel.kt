@@ -141,7 +141,7 @@ class ProductListViewModel(
     }
 
     private suspend fun fetchAndAppendProducts(pageSize: Int) {
-        val result = productRepository.loadProducts(products.size, pageSize, emptyList())
+        val result = productRepository.loadProducts(products.size, pageSize, emptyList(), null)
         products = products + result
 
         _uiState.update {

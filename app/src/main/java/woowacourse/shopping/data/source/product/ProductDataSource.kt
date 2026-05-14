@@ -7,6 +7,7 @@ interface ProductDataSource {
         startIndex: Int,
         pageSize: Int,
         sort: List<String>,
+        category: String?,
     ): List<Product>
 
     suspend fun getProduct(id: String): Product
