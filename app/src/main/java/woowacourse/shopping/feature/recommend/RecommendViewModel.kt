@@ -14,6 +14,7 @@ import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.order.OrderRepository
 import woowacourse.shopping.data.repository.product.ProductRepository
+import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartContent
 import woowacourse.shopping.domain.Product
@@ -30,6 +31,7 @@ class RecommendViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
+    private val recentProductRepository: RecentProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RecommendUiState())
     val uiState: StateFlow<RecommendUiState> = _uiState.asStateFlow()
@@ -54,11 +56,13 @@ class RecommendViewModel(
 
     fun loadRecommendList(pageSize: Int) {
         viewModelScope.launch {
+            val category = refreshRecentProducts()
+
             products = productRepository.loadProducts(
                 startIndex = products.size,
                 pageSize = pageSize,
                 sort = emptyList(),
-                category = "건담",
+                category = category,
             )
 
             _uiState.update {
@@ -165,6 +169,13 @@ class RecommendViewModel(
         }
     }
 
+    private suspend fun refreshRecentProducts(): String {
+        val recentProductIds = recentProductRepository.loadProducts()
+        val mostRecentProductId = recentProductIds.first()
+
+        return productRepository.getProduct(mostRecentProductId).category
+    }
+
     companion object {
         val Factory = viewModelFactory {
             initializer {
@@ -173,6 +184,7 @@ class RecommendViewModel(
                     app.productRepository,
                     app.cartRepository,
                     app.orderRepository,
+                    app.recentProductRepository,
                 )
             }
         }

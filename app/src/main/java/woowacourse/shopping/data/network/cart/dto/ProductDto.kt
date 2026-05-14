@@ -24,6 +24,7 @@ data class ProductDto(
             price = Money(this.price),
             imageUrl = this.imageUrl,
             id = this.id.toString(),
+            category = category,
         )
     }
 }
