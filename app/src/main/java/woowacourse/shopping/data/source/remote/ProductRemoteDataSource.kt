@@ -11,6 +11,14 @@ import woowacourse.shopping.data.source.remote.dto.product.ProductContent
 import woowacourse.shopping.data.source.remote.dto.product.ProductResponse
 import kotlin.jvm.java
 
+sealed interface FetchResult {
+    data class Success(
+        val products: List<ProductContent>,
+    ) : FetchResult
+
+    object Failed : FetchResult
+}
+
 class ProductRemoteDataSource(
     private val baseUrl: String = "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com",
     private val json: Json = Json { ignoreUnknownKeys = true },
@@ -28,12 +36,16 @@ class ProductRemoteDataSource(
         limit: Int,
     ): List<ProductContent> =
         withContext(Dispatchers.IO) {
-            val response =
-                productService.requestProducts(
-                    page = offset,
-                    size = limit,
-                )
-            response.content
+            try {
+                val response =
+                    productService.requestProducts(
+                        page = offset,
+                        size = limit,
+                    )
+                response.content
+            } catch (_: Exception) {
+                emptyList()
+            }
         }
 
     suspend fun fetchProductById(id: Long): ProductResponse =
