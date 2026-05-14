@@ -1,4 +1,4 @@
-package woowacourse.shopping.repository.http
+package woowacourse.shopping.repository.http.cart
 
 import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
@@ -12,10 +12,6 @@ import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.query.CartPageItem
 import woowacourse.shopping.repository.query.CartPageResult
-import woowacourse.shopping.repository.http.api.CartApiService
-import woowacourse.shopping.repository.http.dto.CartItemQuantityUpdateRequestDto
-import woowacourse.shopping.repository.http.dto.CartItemRequestDto
-import woowacourse.shopping.repository.http.dto.OrderRequestDto
 
 private val NETWORK_JSON =
     Json {
@@ -132,7 +128,7 @@ class HttpCartRepository(
 
     override suspend fun count(): Int = fetchCartItemPage(size = 1).totalElements.toInt()
 
-    private suspend fun findCartItemByProductId(productId: Long): woowacourse.shopping.repository.http.dto.CartItemResponseDto? {
+    private suspend fun findCartItemByProductId(productId: Long): CartItemResponseDto? {
         var page = 0
 
         while (true) {

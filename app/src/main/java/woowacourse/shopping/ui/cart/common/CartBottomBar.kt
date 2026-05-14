@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart.component
+package woowacourse.shopping.ui.cart.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

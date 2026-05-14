@@ -22,6 +22,7 @@ import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepositoryFixture
 import woowacourse.shopping.repository.FakeCartRepository
 import woowacourse.shopping.repository.FakeProductRepository
+import woowacourse.shopping.ui.cart.list.uistate.CartListUiState
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CartViewModelTest {

@@ -1,11 +1,9 @@
-package woowacourse.shopping.repository.http.api
+package woowacourse.shopping.repository.http.product
 
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.repository.http.dto.ProductPageResponseDto
-import woowacourse.shopping.repository.http.dto.ProductResponseDto
 
 interface ProductApiService {
     @GET("products")

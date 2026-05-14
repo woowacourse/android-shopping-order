@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart.list
+package woowacourse.shopping.ui.cart.list.uistate
 
 data class CartUiState(
     val cartListState: CartListUiState = CartListUiState.Loading,

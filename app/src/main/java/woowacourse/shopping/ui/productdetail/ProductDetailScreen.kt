@@ -10,9 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
 import woowacourse.shopping.ui.common.component.recentlyviewed.LastViewedProductCard
+import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.productdetail.component.CartAddButton
 import woowacourse.shopping.ui.productdetail.component.ProductDetailBody
 import woowacourse.shopping.ui.productdetail.component.ProductDetailHeader

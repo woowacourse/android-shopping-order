@@ -1,9 +1,6 @@
-package woowacourse.shopping.repository.http
+package woowacourse.shopping.repository.http.product
 
-sealed class RemoteException(
-    message: String,
-    cause: Throwable? = null,
-) : RuntimeException(message, cause)
+import woowacourse.shopping.repository.http.common.RemoteException
 
 sealed class ProductRemoteException(
     message: String,

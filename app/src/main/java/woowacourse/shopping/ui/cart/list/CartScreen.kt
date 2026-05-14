@@ -11,12 +11,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import woowacourse.shopping.ui.fixture.MockProducts
-import woowacourse.shopping.ui.cart.component.CartBottomBar
-import woowacourse.shopping.ui.cart.component.CartHeader
-import woowacourse.shopping.ui.cart.component.CartItemBody
-import woowacourse.shopping.ui.cart.component.CartItemSkeletonBody
+import woowacourse.shopping.ui.cart.common.CartBottomBar
+import woowacourse.shopping.ui.cart.common.CartHeader
+import woowacourse.shopping.ui.cart.list.component.CartItemBody
+import woowacourse.shopping.ui.cart.list.component.CartItemSkeletonBody
+import woowacourse.shopping.ui.cart.list.uistate.CartItemUiModel
+import woowacourse.shopping.ui.cart.list.uistate.CartListUiState
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
+import woowacourse.shopping.ui.fixture.MockProducts
 
 @Composable
 fun CartScreen(

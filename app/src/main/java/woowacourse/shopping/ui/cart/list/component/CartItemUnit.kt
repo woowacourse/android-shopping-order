@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart.component
+package woowacourse.shopping.ui.cart.list.component
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -31,10 +31,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import woowacourse.shopping.R
-import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.ShoppingTypography
-import woowacourse.shopping.ui.cart.list.CartItemUiModel
+import woowacourse.shopping.ui.cart.common.CartCheckbox
+import woowacourse.shopping.ui.cart.list.uistate.CartItemUiModel
 import woowacourse.shopping.ui.common.component.cartcontrol.QuantityStepper
+import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.theme.ShoppingColors
 
 @Composable

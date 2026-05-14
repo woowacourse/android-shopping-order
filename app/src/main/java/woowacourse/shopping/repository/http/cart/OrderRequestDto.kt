@@ -1,4 +1,4 @@
-package woowacourse.shopping.repository.http.dto
+package woowacourse.shopping.repository.http.cart
 
 import kotlinx.serialization.Serializable
 

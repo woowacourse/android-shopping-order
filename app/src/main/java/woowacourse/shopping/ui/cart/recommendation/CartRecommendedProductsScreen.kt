@@ -22,8 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.ui.cart.component.CartBottomBar
-import woowacourse.shopping.ui.cart.component.CartHeader
+import woowacourse.shopping.ui.cart.common.CartBottomBar
+import woowacourse.shopping.ui.cart.common.CartHeader
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
 import woowacourse.shopping.ui.shopping.ShoppingProductUiState
 import woowacourse.shopping.ui.shopping.component.ProductUnit

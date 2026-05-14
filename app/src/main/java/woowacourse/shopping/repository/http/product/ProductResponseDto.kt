@@ -1,4 +1,4 @@
-package woowacourse.shopping.repository.http.dto
+package woowacourse.shopping.repository.http.product
 
 import kotlinx.serialization.Serializable
 import woowacourse.shopping.model.Money
@@ -21,10 +21,3 @@ data class ProductResponseDto(
             category = category,
         )
 }
-
-@Serializable
-data class ProductPageResponseDto(
-    val content: List<ProductResponseDto>? = null,
-    val totalElements: Long? = null,
-    val last: Boolean? = null,
-)

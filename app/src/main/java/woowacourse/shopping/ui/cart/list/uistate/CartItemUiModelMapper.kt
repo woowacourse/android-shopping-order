@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart.list
+package woowacourse.shopping.ui.cart.list.uistate
 
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Product

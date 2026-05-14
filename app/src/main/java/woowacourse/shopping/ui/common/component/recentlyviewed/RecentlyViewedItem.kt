@@ -21,8 +21,8 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import woowacourse.shopping.R
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.ShoppingTypography
+import woowacourse.shopping.ui.fixture.MockProducts
 
 @Composable
 fun RecentlyViewedItem(

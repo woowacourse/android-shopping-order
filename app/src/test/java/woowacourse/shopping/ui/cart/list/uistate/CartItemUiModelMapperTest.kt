@@ -1,6 +1,6 @@
 @file:Suppress("NonAsciiCharacters")
 
-package woowacourse.shopping.ui.cart.list
+package woowacourse.shopping.ui.cart.list.uistate
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

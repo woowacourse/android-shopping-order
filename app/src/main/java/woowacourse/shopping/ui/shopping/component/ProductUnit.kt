@@ -24,10 +24,10 @@ import coil3.compose.AsyncImage
 import woowacourse.shopping.R
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.ShoppingTypography
 import woowacourse.shopping.ui.common.component.cartcontrol.AddToCartButton
 import woowacourse.shopping.ui.common.component.cartcontrol.QuantityStepper
+import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.shopping.ShoppingProductUiState
 import woowacourse.shopping.ui.theme.ShoppingColors
 

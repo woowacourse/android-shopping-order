@@ -55,7 +55,7 @@ class ProductDetailActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val product = uiState.product ?: return@Scaffold
 
-                    woowacourse.shopping.ui.productdetail.ProductDetailScreen(
+                    ProductDetailScreen(
                         product = product,
                         lastViewedProduct = uiState.lastViewedProduct,
                         quantity = uiState.quantity,

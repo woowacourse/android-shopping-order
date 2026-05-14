@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart.component
+package woowacourse.shopping.ui.cart.list.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
@@ -10,8 +10,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import woowacourse.shopping.ui.cart.list.uistate.CartItemUiModel
 import woowacourse.shopping.ui.fixture.MockProducts
-import woowacourse.shopping.ui.cart.list.CartItemUiModel
 
 @Composable
 fun CartItemBody(

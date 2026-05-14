@@ -1,4 +1,4 @@
-package woowacourse.shopping.repository.http.dto
+package woowacourse.shopping.repository.http.cart
 
 import kotlinx.serialization.Serializable
 
@@ -6,9 +6,4 @@ import kotlinx.serialization.Serializable
 data class CartItemRequestDto(
     val productId: Long,
     val quantity: Int = 1,
-)
-
-@Serializable
-data class CartItemQuantityUpdateRequestDto(
-    val quantity: Int,
 )
