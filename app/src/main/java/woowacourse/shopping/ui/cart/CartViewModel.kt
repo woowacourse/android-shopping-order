@@ -53,8 +53,11 @@ class CartViewModel(
                 totalPrice = totalPrice.amount,
                 recommendProducts =
                     loadRecommendProducts()
-                        .map { recentProduct -> recentProduct.toUiModel() }
-                        .toImmutableList(),
+                        .map { recentProduct ->
+                            recentProduct.toUiModel(
+                                quantity = cartRepository.getCartItemQuantity(recentProduct.id),
+                            )
+                        }.toImmutableList(),
             )
         }
     }
@@ -163,7 +166,9 @@ class CartViewModel(
                     isOrder = true,
                     recommendProducts =
                         loadRecommendProducts()
-                            .map { product ->
+                            .filter { product ->
+                                cartRepository.getCartItemQuantity(product.id) == null
+                            }.map { product ->
                                 product
                                     .toUiModel(quantity = cartRepository.getCartItemQuantity(product.id))
                             }.toImmutableList(),

@@ -26,6 +26,7 @@ import woowacourse.shopping.ui.util.formattedPrice
 
 @Composable
 fun CartBottomBar(
+    isOrder: Boolean,
     isAllChecked: Boolean,
     totalPrice: Long,
     totalCount: Int,
@@ -44,19 +45,20 @@ fun CartBottomBar(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            CartCheckBox(
-                onCheckedChange = {
-                    onAllCheckedChange()
-                },
-                isChecked = isAllChecked,
-            )
-
-            Text(
-                text = "전체",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.White,
-            )
+            if (!isOrder) {
+                CartCheckBox(
+                    onCheckedChange = {
+                        onAllCheckedChange()
+                    },
+                    isChecked = isAllChecked,
+                )
+                Text(
+                    text = "전체",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.White,
+                )
+            }
         }
 
         Spacer(modifier = Modifier.width(95.dp))
@@ -93,6 +95,7 @@ fun CartBottomBar(
 @Composable
 private fun CartBottomBarPreview() {
     CartBottomBar(
+        isOrder = true,
         onAllCheckedChange = { },
         isAllChecked = true,
         totalPrice = 1000,

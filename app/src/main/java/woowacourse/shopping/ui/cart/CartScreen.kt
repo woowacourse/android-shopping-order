@@ -67,6 +67,7 @@ fun CartScreen(
         },
         bottomBar = {
             CartBottomBar(
+                isOrder = uiState.isOrder,
                 isAllChecked = uiState.isAllChecked,
                 totalPrice = uiState.totalPrice,
                 totalCount = uiState.selectedCartItemCount,
