@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.ui.util.toUiModel
 
 class CartViewModel(
     private val cartRepository: CartRepository,
@@ -32,7 +33,7 @@ class CartViewModel(
 
             _uiState.update {
                 CartUiState.Success(
-                    cartItems = result.values,
+                    cartItems = result.values.toUiModel(emptySet()),
                     currentPage = currentPage,
                     totalPages = result.totalPages,
                     hasPrevious = !result.isFirst,
@@ -44,17 +45,23 @@ class CartViewModel(
 
     fun removeCartItem(cartId: Int) {
         viewModelScope.launch {
+            val currentState = _uiState.value as? CartUiState.Success ?: return@launch
+
             _uiState.update { CartUiState.Loading }
             cartRepository.remove(cartId)
+
+            val newSelected = currentState.selectedItems - cartId
+
             val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
 
             _uiState.update {
                 CartUiState.Success(
-                    cartItems = result.values,
+                    cartItems = result.values.toUiModel(newSelected),
                     currentPage = currentPage,
                     totalPages = result.totalPages,
                     hasPrevious = !result.isFirst,
                     hasNext = !result.isLast,
+                    selectedItems = newSelected,
                 )
             }
         }
@@ -62,20 +69,21 @@ class CartViewModel(
 
     fun increase(cartId: Int) {
         viewModelScope.launch {
-            val uiState = _uiState.value as? CartUiState.Success ?: return@launch
+            val currentState = _uiState.value as? CartUiState.Success ?: return@launch
 
-            val target = uiState.cartItems.find { it.id == cartId } ?: return@launch
-            cartRepository.increase(cartId, target.quantity.value + 1)
+            val target = currentState.cartItems.find { it.id == cartId } ?: return@launch
+            cartRepository.increase(cartId, target.quantity + 1)
 
             val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
 
             _uiState.update {
                 CartUiState.Success(
-                    cartItems = result.values,
+                    cartItems = result.values.toUiModel(currentState.selectedItems),
                     currentPage = currentPage,
                     totalPages = result.totalPages,
                     hasPrevious = !result.isFirst,
                     hasNext = !result.isLast,
+                    selectedItems = currentState.selectedItems,
                 )
             }
         }
@@ -83,22 +91,49 @@ class CartViewModel(
 
     fun decrease(cartId: Int) {
         viewModelScope.launch {
-            val uiState = _uiState.value as? CartUiState.Success ?: return@launch
+            val currentState = _uiState.value as? CartUiState.Success ?: return@launch
 
-            val target = uiState.cartItems.find { it.id == cartId } ?: return@launch
-            cartRepository.decrease(cartId, target.quantity.value - 1)
+            val target = currentState.cartItems.find { it.id == cartId } ?: return@launch
+            cartRepository.decrease(cartId, target.quantity - 1)
 
             val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
 
+            val newSelected =
+                if (target.quantity - 1 == 0 && currentState.selectedItems.contains(cartId)) {
+                    currentState.selectedItems - cartId
+                } else {
+                    currentState.selectedItems
+                }
+
             _uiState.update {
                 CartUiState.Success(
-                    cartItems = result.values,
+                    cartItems = result.values.toUiModel(newSelected),
                     currentPage = currentPage,
                     totalPages = result.totalPages,
                     hasPrevious = !result.isFirst,
                     hasNext = !result.isLast,
+                    selectedItems = newSelected,
                 )
             }
+        }
+    }
+
+    fun toggleSelection(id: Int) {
+        _uiState.update { state ->
+            val success = state as? CartUiState.Success ?: return@update state
+            val newSelected =
+                if (id in success.selectedItems) {
+                    success.selectedItems - id
+                } else {
+                    success.selectedItems + id
+                }
+            success.copy(
+                selectedItems = newSelected,
+                cartItems =
+                    success.cartItems.map {
+                        it.copy(isSelected = it.id in newSelected)
+                    },
+            )
         }
     }
 
@@ -114,11 +149,12 @@ class CartViewModel(
             currentPage = nextPage
             _uiState.update {
                 CartUiState.Success(
-                    cartItems = result.values,
+                    cartItems = result.values.toUiModel(current.selectedItems),
                     currentPage = currentPage,
                     totalPages = result.totalPages,
                     hasPrevious = !result.isFirst,
                     hasNext = !result.isLast,
+                    selectedItems = current.selectedItems,
                 )
             }
         }
@@ -136,11 +172,12 @@ class CartViewModel(
             currentPage = prevPage
             _uiState.update {
                 CartUiState.Success(
-                    cartItems = result.values,
+                    cartItems = result.values.toUiModel(current.selectedItems),
                     currentPage = currentPage,
                     totalPages = result.totalPages,
                     hasPrevious = !result.isFirst,
                     hasNext = !result.isLast,
+                    selectedItems = current.selectedItems,
                 )
             }
         }

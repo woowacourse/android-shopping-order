@@ -51,7 +51,6 @@ import woowacourse.shopping.constant.Format.formatPrice
 import woowacourse.shopping.constant.ShoppingColor.APP_BAR_COLOR
 import woowacourse.shopping.constant.ShoppingColor.CART_PAGE_BUTTON_ACTIVE_COLOR
 import woowacourse.shopping.constant.ShoppingColor.CART_PAGE_BUTTON_INACTIVE_COLOR
-import woowacourse.shopping.domain.cart.CartItem
 
 @Composable
 fun CartScreen(
@@ -178,7 +177,7 @@ private fun ErrorContent(
 
 @Composable
 private fun CartItemList(
-    cartItems: List<CartItem>,
+    cartItems: List<CartItemUiModel>,
     onRemoveClick: (Int) -> Unit,
     onIncrease: (Int) -> Unit,
     onDecrease: (Int) -> Unit,
@@ -253,7 +252,7 @@ private fun CartTopAppBar(
 @Composable
 private fun CartItemCard(
     modifier: Modifier = Modifier,
-    cartItem: CartItem,
+    cartItem: CartItemUiModel,
     onRemoveClick: () -> Unit,
     onIncrease: () -> Unit,
     onDecrease: () -> Unit,
@@ -306,7 +305,7 @@ private fun CartItemCard(
                     horizontalAlignment = Alignment.End,
                 ) {
                     QuantityStepper(
-                        quantity = cartItem.quantity.value,
+                        quantity = cartItem.quantity,
                         onIncrease = onIncrease,
                         onDecrease = onDecrease,
                     )
