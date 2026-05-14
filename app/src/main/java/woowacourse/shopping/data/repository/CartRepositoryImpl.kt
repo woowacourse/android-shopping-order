@@ -61,7 +61,7 @@ class CartRepositoryImpl(
         return cartItems.firstOrNull { it.product.id == productId }
     }
 
-    override suspend fun getCartItemQuantity(cartItemId: String): Int? = getCartItem(cartItemId)?.quantity
+    override suspend fun getCartItemQuantity(productId: String): Int? = getCartItem(productId)?.quantity
 
     override suspend fun setCartItem(
         productId: String,
@@ -123,6 +123,7 @@ class CartRepositoryImpl(
             name = ProductName(name),
             price = Money(price),
             imageUrl = imageUrl,
+            category = category,
         )
 }
 

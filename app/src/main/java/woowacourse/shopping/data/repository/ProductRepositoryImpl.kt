@@ -44,6 +44,7 @@ class ProductRepositoryImpl(
             name = ProductName(name),
             price = Money(price.toLong()),
             imageUrl = imageUrl,
+            category = category,
         )
 
     private fun ProductResponse.toDomain(): Product =
@@ -52,6 +53,7 @@ class ProductRepositoryImpl(
             name = ProductName(name),
             price = Money(price.toLong()),
             imageUrl = imageUrl,
+            category = category,
         )
 }
 

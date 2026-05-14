@@ -38,6 +38,7 @@ fun CartScreen(
     onQuantityChange: (String, Int) -> Unit,
     onCheckedChange: (String) -> Unit,
     isAllSelectClick: () -> Unit,
+    onOrderClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -70,30 +71,41 @@ fun CartScreen(
                 totalPrice = uiState.totalPrice,
                 totalCount = uiState.selectedCartItemCount,
                 onAllCheckedChange = isAllSelectClick,
-                onOrderClick = { },
+                onOrderClick = onOrderClick,
             )
         },
         modifier = modifier.systemBarsPadding(),
     ) { innerPadding ->
-        CartContent(
-            totalCartSize = uiState.totalCartCount,
-            page = uiState.page,
-            onNextPage = onNextPage,
-            onPreviousPage = onPreviousPage,
-            isCanMoveNext = uiState.isCanMoveNext,
-            onQuantityChange = onQuantityChange,
-            onDeleteItem = {
-                onDeleteItem(it)
-            },
-            cartItems = uiState.items,
-            isLoading = uiState.isLoading,
-            errorMessage = uiState.errorMessage,
-            onCheckedChange = onCheckedChange,
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-        )
+        if (uiState.isOrder) {
+            RecommendProductContent(
+                products = uiState.recommendProducts,
+                onQuantityChange = onQuantityChange,
+                modifier =
+                    Modifier
+                        .padding(innerPadding)
+                        .padding(start = 12.dp, end = 12.dp, top = 100.dp),
+            )
+        } else {
+            CartContent(
+                totalCartSize = uiState.totalCartCount,
+                page = uiState.page,
+                onNextPage = onNextPage,
+                onPreviousPage = onPreviousPage,
+                isCanMoveNext = uiState.isCanMoveNext,
+                onQuantityChange = onQuantityChange,
+                onDeleteItem = {
+                    onDeleteItem(it)
+                },
+                cartItems = uiState.items,
+                isLoading = uiState.isLoading,
+                errorMessage = uiState.errorMessage,
+                onCheckedChange = onCheckedChange,
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+            )
+        }
     }
 }
 
@@ -172,13 +184,14 @@ private fun CartContent(
 private fun CartScreenPreview() {
     CartScreen(
         uiState = CartUiState(),
-        onBackClick = {},
-        onDeleteItem = {},
-        onNextPage = {},
-        onPreviousPage = {},
+        onBackClick = { },
+        onDeleteItem = { },
+        onNextPage = { },
+        onPreviousPage = { },
         onQuantityChange = { _, _ -> },
         onCheckedChange = { },
         isAllSelectClick = { },
+        onOrderClick = { },
     )
 }
 

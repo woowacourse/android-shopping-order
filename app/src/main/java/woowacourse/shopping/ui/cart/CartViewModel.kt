@@ -12,10 +12,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.ProductRepository
+import woowacourse.shopping.data.repository.RecentItemRepository
+import woowacourse.shopping.model.Product
 import woowacourse.shopping.ui.model.mapper.toUiModel
 
 class CartViewModel(
     private val cartRepository: CartRepository,
+    private val recentItemRepository: RecentItemRepository,
+    private val productRepository: ProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
@@ -46,6 +51,10 @@ class CartViewModel(
                 totalCartCount = cartRepository.getCartItemsCount(),
                 totalCartQuantity = cartRepository.getTotalCartItemQuantity(),
                 totalPrice = totalPrice.amount,
+                recommendProducts =
+                    loadRecommendProducts()
+                        .map { recentProduct -> recentProduct.toUiModel() }
+                        .toImmutableList(),
             )
         }
     }
@@ -133,14 +142,50 @@ class CartViewModel(
         }
     }
 
+    suspend fun loadRecommendProducts(): List<Product> {
+        val productId = recentItemRepository.getLastViewedItem()?.id
+
+        return productId?.let {
+            val category = productRepository.getProductById(productId).category
+            productRepository
+                .getProducts(
+                    category = category,
+                    page = 0,
+                    size = 10,
+                ).products
+        } ?: emptyList()
+    }
+
+    fun setOrder() {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isOrder = true,
+                    recommendProducts =
+                        loadRecommendProducts()
+                            .map { product ->
+                                product
+                                    .toUiModel(quantity = cartRepository.getCartItemQuantity(product.id))
+                            }.toImmutableList(),
+                )
+            }
+        }
+    }
+
     companion object {
         private const val PAGE_SIZE = 5
 
-        fun provideFactory(cartRepository: CartRepository): ViewModelProvider.Factory =
+        fun provideFactory(
+            cartRepository: CartRepository,
+            recentItemRepository: RecentItemRepository,
+            productRepository: ProductRepository,
+        ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
                     CartViewModel(
                         cartRepository = cartRepository,
+                        recentItemRepository = recentItemRepository,
+                        productRepository = productRepository,
                     )
                 }
             }

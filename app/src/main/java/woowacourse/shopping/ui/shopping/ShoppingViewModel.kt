@@ -72,7 +72,7 @@ class ShoppingViewModel(
                             apiResult.products
                                 .map { product ->
                                     val quantity =
-                                        cartRepository.getCartItemQuantity(cartItemId = product.id)
+                                        cartRepository.getCartItemQuantity(productId = product.id)
                                     product.toUiModel(quantity = quantity)
                                 }.toImmutableList(),
                         cartSize = cartItemQuantity,

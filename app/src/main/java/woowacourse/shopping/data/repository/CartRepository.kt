@@ -15,7 +15,7 @@ interface CartRepository {
 
     suspend fun deleteItem(cartItemId: String)
 
-    suspend fun getCartItemQuantity(cartItemId: String): Int?
+    suspend fun getCartItemQuantity(productId: String): Int?
 
     suspend fun getTotalCartItemQuantity(): Int
 
