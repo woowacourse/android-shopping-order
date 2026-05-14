@@ -18,6 +18,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.data.local.RecentProductDatabase
 import woowacourse.shopping.data.network.cart.CartRetrofitDaoImpl
 import woowacourse.shopping.data.network.cart.RetrofitCartService
+import woowacourse.shopping.data.network.order.OrderService
 import woowacourse.shopping.data.network.product.ProductRetrofitDaoImpl
 import woowacourse.shopping.data.network.product.RetrofitProductService
 import woowacourse.shopping.data.network.startMockWebServer
@@ -26,10 +27,13 @@ import woowacourse.shopping.data.repository.auth.AuthRepositoryImpl
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.repository.cart.RecentProductRepositoryImpl
+import woowacourse.shopping.data.repository.order.OrderRepository
+import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
 import woowacourse.shopping.data.source.auth.AuthDataSourceImpl
+import woowacourse.shopping.data.source.order.OrderDaoImpl
 import woowacourse.shopping.data.source.product.ProductDataSourceImpl
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
@@ -40,6 +44,9 @@ class ShoppingApplication : Application() {
     lateinit var cartRepository: CartRepository
         private set
     lateinit var recentProductRepository: RecentProductRepository
+        private set
+
+    lateinit var orderRepository: OrderRepository
         private set
 
     override fun onCreate() {
@@ -119,8 +126,22 @@ class ShoppingApplication : Application() {
         val recent: RecentProductRepository =
             RecentProductRepositoryImpl(recentProductDatabase.recentProductDao())
 
+        val orderService = Retrofit.Builder()
+            .baseUrl("http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/")
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .client(client)
+            .build()
+            .create(OrderService::class.java)
+
+        val order: OrderRepository = OrderRepositoryImpl(
+            orderDao = OrderDaoImpl(
+                orderService = orderService,
+            ),
+        )
+
         productRepository = product
         cartRepository = cart
         recentProductRepository = recent
+        orderRepository = order
     }
 }
