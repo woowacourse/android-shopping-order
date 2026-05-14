@@ -74,21 +74,21 @@ fun DetailProductScreen(
         modifier = modifier.fillMaxSize(),
     ) { innerPadding ->
         Column(
-            modifier =
-                Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
         ) {
             AsyncImage(
                 model = product.imageUrl,
-                contentDescription = stringResource(R.string.product_image_content_description, product.getTitle()),
+                contentDescription = stringResource(
+                    R.string.product_image_content_description, product.getTitle()
+                ),
                 contentScale = ContentScale.Crop,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(360.dp)
-                        .background(MaterialTheme.colorScheme.surfaceContainer),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(360.dp)
+                    .background(MaterialTheme.colorScheme.surfaceContainer),
             )
             Text(
                 text = product.getTitle(),
@@ -100,32 +100,31 @@ fun DetailProductScreen(
             )
             HorizontalDivider()
             Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = DecimalFormat(stringResource(R.string.price_format_pattern)).format(quantityPrice),
+                    text = DecimalFormat(stringResource(R.string.price_format_pattern)).format(
+                        quantityPrice
+                    ),
                     color = MaterialTheme.colorScheme.onBackground,
                 )
                 ProductQuantityBox(
                     onQuantityPlusClick = onQuantityPlusClick,
                     onQuantityMinusClick = onQuantityMinusClick,
                     quantity = quantity,
-                    modifier =
-                        Modifier
-                            .padding(
-                                start = 7.5.dp,
-                                top = 8.dp,
-                            ).width(104.dp),
+                    modifier = Modifier
+                        .padding(
+                            start = 7.5.dp,
+                            top = 8.dp,
+                        )
+                        .width(104.dp),
                 )
             }
-            if (lastViewedShoppingItem != null &&
-                lastViewedShoppingItem.getProductId() != shoppingItem.getProductId()
-            ) {
+            if (lastViewedShoppingItem != null && lastViewedShoppingItem.getProductId() != shoppingItem.getProductId()) {
                 LastViewedProductSection(
                     shoppingItem = lastViewedShoppingItem,
                     onLastViewedProductClick = onLastViewedProductClick,
@@ -135,10 +134,9 @@ fun DetailProductScreen(
             Spacer(modifier = Modifier.weight(1f))
             Button(
                 onClick = onAddToCartClick,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
                 shape = RectangleShape,
             ) {
                 Text(stringResource(R.string.add_to_cart_button_text))
@@ -155,13 +153,12 @@ private fun LastViewedProductSection(
 ) {
     val product = shoppingItem.getProduct()
     Column(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .clip(shape = RoundedCornerShape(8.dp))
-                .border(1.dp, MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(8.dp))
-                .clickable { onLastViewedProductClick(product.id) }
-                .padding(16.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape = RoundedCornerShape(8.dp))
+            .border(1.dp, MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(8.dp))
+            .clickable { onLastViewedProductClick(product.id) }
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(
@@ -198,11 +195,10 @@ private fun DetailProductTopBar(
                 )
             }
         },
-        colors =
-            TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                titleContentColor = MaterialTheme.colorScheme.onSurface,
-            ),
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+        ),
         modifier = modifier,
     )
 }
@@ -211,17 +207,15 @@ private fun DetailProductTopBar(
 @Preview(showBackground = true)
 private fun LastViewedProductSectionPreview() {
     LastViewedProductSection(
-        shoppingItem =
-            ShoppingItem(
-                product =
-                    Product(
-                        id = 2,
-                        title = ProductTitle("오리온 카스타드"),
-                        price = Price(4_800),
-                        imageUrl = "https://img.dongwonmall.com/dwmall/static_root/model_img/main/153/15327_1_a.jpg?f=webp&q=80",
-                    ),
-                quantity = 0,
+        shoppingItem = ShoppingItem(
+            product = Product(
+                id = 2,
+                title = ProductTitle("오리온 카스타드"),
+                price = Price(4_800),
+                imageUrl = "https://img.dongwonmall.com/dwmall/static_root/model_img/main/153/15327_1_a.jpg?f=webp&q=80",
             ),
+            quantity = 0,
+        ),
         onLastViewedProductClick = {},
     )
 }
@@ -231,28 +225,24 @@ private fun LastViewedProductSectionPreview() {
 private fun DetailProductScreenPreview() {
     AndroidShoppingTheme {
         DetailProductScreen(
-            shoppingItem =
-                ShoppingItem(
-                    product =
-                        Product(
-                            id = 1,
-                            title = ProductTitle("동원 스위트콘"),
-                            price = Price(99_800),
-                            imageUrl = "https://img.dongwonmall.com/dwmall/static_root/model_img/main/153/15327_1_a.jpg?f=webp&q=80",
-                        ),
-                    quantity = 0,
+            shoppingItem = ShoppingItem(
+                product = Product(
+                    id = 1,
+                    title = ProductTitle("동원 스위트콘"),
+                    price = Price(99_800),
+                    imageUrl = "https://img.dongwonmall.com/dwmall/static_root/model_img/main/153/15327_1_a.jpg?f=webp&q=80",
                 ),
-            lastViewedShoppingItem =
-                ShoppingItem(
-                    product =
-                        Product(
-                            id = 1,
-                            title = ProductTitle("동원 스위트콘"),
-                            price = Price(99_800),
-                            imageUrl = "https://img.dongwonmall.com/dwmall/static_root/model_img/main/153/15327_1_a.jpg?f=webp&q=80",
-                        ),
-                    quantity = 0,
+                quantity = 0,
+            ),
+            lastViewedShoppingItem = ShoppingItem(
+                product = Product(
+                    id = 1,
+                    title = ProductTitle("동원 스위트콘"),
+                    price = Price(99_800),
+                    imageUrl = "https://img.dongwonmall.com/dwmall/static_root/model_img/main/153/15327_1_a.jpg?f=webp&q=80",
                 ),
+                quantity = 0,
+            ),
             onAddToCartClick = {},
             onLastViewedProductClick = {},
             onBackClick = {},
