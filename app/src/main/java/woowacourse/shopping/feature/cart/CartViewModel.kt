@@ -188,7 +188,8 @@ class CartViewModel(
         val productUiModels = _uiState.value.paginatedCartContents
         val totalPrice = productUiModels.sumOf { it.price * it.quantity }
 
-        val newCheckMap = productUiModels.map { it.id }.associateWith { true }
+        val check = _uiState.value.checkMap.all { it.value }.not()
+        val newCheckMap = productUiModels.map { it.id }.associateWith { check }
 
         _uiState.update { it.copy(checkMap = newCheckMap.toMap(), totalPrice = totalPrice) }
     }
