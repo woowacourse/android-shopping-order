@@ -27,7 +27,10 @@ interface CartDao {
     suspend fun getCartItemById(id: Long): CartEntity?
 
     @Query("SELECT * FROM cart_items ORDER BY productId ASC LIMIT :count OFFSET :fromIndex")
-    suspend fun getPagedEntities(fromIndex: Int, count: Int): List<CartEntity>
+    suspend fun getPagedEntities(
+        fromIndex: Int,
+        count: Int,
+    ): List<CartEntity>
 
     @Query("SELECT COUNT(*) FROM cart_items")
     suspend fun getSize(): Int

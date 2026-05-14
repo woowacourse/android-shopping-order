@@ -10,7 +10,7 @@ interface ProductService {
     @GET("products")
     suspend fun getProducts(
         @Query("page") page: Int = 0,
-        @Query("size") size: Int = 100
+        @Query("size") size: Int = 100,
     ): ProductsResponse
 
     @GET("products/{id}")

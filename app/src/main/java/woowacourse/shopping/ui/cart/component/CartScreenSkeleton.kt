@@ -17,19 +17,18 @@ import androidx.compose.ui.unit.dp
 import com.valentinilk.shimmer.shimmer
 
 @Composable
-fun CartScreenSkeleton(
-    modifier: Modifier = Modifier
-) {
+fun CartScreenSkeleton(modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         CartHeader { }
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 18.dp, end = 18.dp, top = 24.dp)
-                .shimmer(),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(start = 18.dp, end = 18.dp, top = 24.dp)
+                    .shimmer(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             repeat(5) {
                 CartItem()
@@ -39,27 +38,28 @@ fun CartScreenSkeleton(
 }
 
 @Composable
-private fun CartItem(
-    modifier: Modifier = Modifier
-) {
+private fun CartItem(modifier: Modifier = Modifier) {
     Box(
-        modifier = modifier
-            .size(width = 324.dp, height = 152.dp)
-            .background(Color(0xFFF3F3F3))
+        modifier =
+            modifier
+                .size(width = 324.dp, height = 152.dp)
+                .background(Color(0xFFF3F3F3)),
     ) {
         Column(
-            modifier = Modifier.padding(top = 17.88.dp, bottom = 17.88.dp, start = 15.dp)
+            modifier = Modifier.padding(top = 17.88.dp, bottom = 17.88.dp, start = 15.dp),
         ) {
             Box(
-                modifier = Modifier
-                    .size(width = 220.dp, height = 25.38.dp)
-                    .background(Color(0xFFE2E2E2))
+                modifier =
+                    Modifier
+                        .size(width = 220.dp, height = 25.38.dp)
+                        .background(Color(0xFFE2E2E2)),
             )
             Spacer(Modifier.size(18.88.dp))
             Box(
-                modifier = Modifier
-                    .size(width = 134.dp, height = 71.53.dp)
-                    .background(Color(0xFFE2E2E2))
+                modifier =
+                    Modifier
+                        .size(width = 134.dp, height = 71.53.dp)
+                        .background(Color(0xFFE2E2E2)),
             )
         }
     }

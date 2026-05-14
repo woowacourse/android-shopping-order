@@ -14,7 +14,7 @@ data class CartUiState(
     val isAllSelected: Boolean = false,
     val totalSelectedCount: Int = 0,
     val isCartScreen: Boolean = true,
-    val recommendItems: List<ProductUiModel> = emptyList()
+    val recommendItems: List<ProductUiModel> = emptyList(),
 ) {
     val totalPages: Int get() = (totalCartItemCount - 1) / pageSize + 1
     val showPagination: Boolean get() = totalCartItemCount > pageSize

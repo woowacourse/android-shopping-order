@@ -17,6 +17,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.common.theme.ShoppingTheme
+
 class ProductDetailActivity : ComponentActivity() {
     private val container by lazy {
         (application as ShoppingApplication).appContainer

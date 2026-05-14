@@ -46,7 +46,7 @@ class CartActivity : ComponentActivity() {
                         viewModel = viewModel,
                         modifier = Modifier.padding(innerPadding),
                         onBackClick = ::finish,
-                        onOrderClick = ::finish
+                        onOrderClick = ::finish,
                     )
                 }
             }

@@ -34,24 +34,26 @@ fun CartBottomBar(
     val formatted = NumberFormat.getInstance().format(price)
 
     Row(
-        modifier = modifier.size(width = 360.dp, height = 78.dp)
+        modifier = modifier.size(width = 360.dp, height = 78.dp),
     ) {
         if (useCheckbox) {
             CheckboxAndPrice(
                 checked = checked,
                 price = formatted,
                 modifier = Modifier.weight(1f),
-                onCheckedChanged = onCheckedChanged
+                onCheckedChanged = onCheckedChanged,
             )
-        } else Price(
-            price = formatted,
-            modifier = Modifier.weight(1f)
-        )
+        } else {
+            Price(
+                price = formatted,
+                modifier = Modifier.weight(1f),
+            )
+        }
 
         OrderButton(
             count = count,
             modifier = Modifier,
-            onClick = onOrderClick
+            onClick = onOrderClick,
         )
     }
 }
@@ -64,12 +66,13 @@ private fun CheckboxAndPrice(
     onCheckedChanged: (Boolean) -> Unit,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color(0xFF555555))
-            .padding(start = 14.dp, end = 12.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .background(Color(0xFF555555))
+                .padding(start = 14.dp, end = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         CheckboxForAll(
             checked = checked,
@@ -90,11 +93,12 @@ private fun Price(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color(0xFF555555))
-            .padding(start = 14.dp, end = 12.dp),
-        contentAlignment = Alignment.CenterEnd
+        modifier =
+            modifier
+                .fillMaxSize()
+                .background(Color(0xFF555555))
+                .padding(start = 14.dp, end = 12.dp),
+        contentAlignment = Alignment.CenterEnd,
     ) {
         Text(
             text = "${price}원",
@@ -113,7 +117,7 @@ private fun CheckboxForAll(
 ) {
     Column(
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         CartCheckbox(
             checked = checked,
@@ -123,7 +127,7 @@ private fun CheckboxForAll(
             text = "전체",
             fontSize = 12.sp,
             fontWeight = FontWeight.W500,
-            color = Color.White
+            color = Color.White,
         )
     }
 }
@@ -135,17 +139,18 @@ private fun OrderButton(
     onClick: () -> Unit,
 ) {
     Box(
-        modifier = modifier
-            .size(width = 122.dp, height = 78.dp)
-            .background(PrimaryColor)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
+        modifier =
+            modifier
+                .size(width = 122.dp, height = 78.dp)
+                .background(PrimaryColor)
+                .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
     ) {
         Text(
             text = "주문하기($count)",
             fontSize = 18.sp,
             fontWeight = FontWeight.W700,
-            color = Color.White
+            color = Color.White,
         )
     }
 }
@@ -160,7 +165,7 @@ private fun CartBottomBarPreview() {
         price = 3000,
         modifier = Modifier,
         onCheckedChanged = {},
-        onOrderClick = {}
+        onOrderClick = {},
     )
 }
 
@@ -169,7 +174,7 @@ private fun CartBottomBarPreview() {
 private fun CheckboxForAllPreview() {
     CheckboxForAll(
         checked = true,
-        onCheckedChanged = {}
+        onCheckedChanged = {},
     )
 }
 
@@ -178,6 +183,6 @@ private fun CheckboxForAllPreview() {
 private fun OrderButtonPreview() {
     OrderButton(
         count = 2,
-        onClick = {}
+        onClick = {},
     )
 }

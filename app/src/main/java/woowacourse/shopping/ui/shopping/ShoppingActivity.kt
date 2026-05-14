@@ -15,8 +15,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.remote.NetworkMonitor
 import woowacourse.shopping.ui.cart.CartActivity
-import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.common.theme.ShoppingTheme
+import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 
 class ShoppingActivity : ComponentActivity() {
     private val container by lazy {

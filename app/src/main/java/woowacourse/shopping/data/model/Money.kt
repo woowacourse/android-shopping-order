@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.model
 
-
 @JvmInline
 value class Money(
     val value: Long,

@@ -9,5 +9,5 @@ data class PageableResponse(
     val sort: SortResponse,
     val offset: Int,
     val paged: Boolean,
-    val unpaged: Boolean
+    val unpaged: Boolean,
 )
