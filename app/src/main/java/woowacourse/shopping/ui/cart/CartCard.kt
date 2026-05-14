@@ -67,20 +67,10 @@ fun CartCard(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                IconButton(
-                    onClick = onCheckedChange,
-                ) {
-                    Icon(
-                        imageVector =
-                            if (isChecked) {
-                                Icons.Default.CheckBox
-                            } else {
-                                Icons.Default.CheckBoxOutlineBlank
-                            },
-                        contentDescription = "상품 선택 버튼",
-                        tint = if (isChecked) Green40 else Color.Unspecified,
-                    )
-                }
+                CartCheckBox(
+                    onCheckedChange = onCheckedChange,
+                    isChecked = isChecked,
+                )
                 Text(
                     text = productName,
                     fontSize = 18.sp,
