@@ -176,7 +176,7 @@ fun CartScreenContent(
                             .background(Color(0xff04C09E)),
                     ) {
                         Text(
-                            "주문하기(0)",
+                            "주문하기(${uiState.checkMap.count { it.value }})",
                             fontWeight = FontWeight.W700,
                             fontSize = 18.sp,
                             color = Color.White,
