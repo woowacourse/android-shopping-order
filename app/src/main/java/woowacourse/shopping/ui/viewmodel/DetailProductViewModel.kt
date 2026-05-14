@@ -21,16 +21,22 @@ class DetailProductViewModel(
     val uiState: StateFlow<DetailProductUiState> = _uiState.asStateFlow()
 
     private var cachedShoppingItems: List<ShoppingItem> = shoppingItemRepository.shoppingItems.value
+    private var recentViewedProductIds: List<Long> = visitStore.recentVisitedProductIds.value
     private var selectedProductId: Long? = null
     private var selectedQuantity: Int = DEFAULT_QUANTITY
     private var showLastViewedSection: Boolean = true
-    private var lastViewedProductId: Long? = null
 
     init {
         publishUiState()
         viewModelScope.launch {
             shoppingItemRepository.shoppingItems.collect { latestShoppingItems ->
                 cachedShoppingItems = latestShoppingItems
+                publishUiState()
+            }
+        }
+        viewModelScope.launch {
+            visitStore.recentVisitedProductIds.collect { latestRecentViewedProductIds ->
+                recentViewedProductIds = latestRecentViewedProductIds
                 publishUiState()
             }
         }
@@ -53,16 +59,6 @@ class DetailProductViewModel(
         showLastViewed: Boolean = true,
     ) {
         showLastViewedSection = showLastViewed
-        val recentProductIds = visitStore.recentVisitedProductIds.value
-        lastViewedProductId =
-            if (showLastViewed) {
-                resolveLastViewedProductId(
-                    productId = productId,
-                    recentProductIds = recentProductIds,
-                )
-            } else {
-                null
-            }
         if (selectedProductId != productId) {
             selectedProductId = productId
             selectedQuantity = DEFAULT_QUANTITY
@@ -115,6 +111,13 @@ class DetailProductViewModel(
         val shoppingItemByProductId = cachedShoppingItems.associateBy { shoppingItem -> shoppingItem.getProductId() }
         val currentShoppingItem = selectedProductId?.let { productId -> shoppingItemByProductId[productId] }
         val safeQuantity = selectedQuantity.coerceAtLeast(DEFAULT_QUANTITY)
+        val lastViewedProductId =
+            selectedProductId?.let { productId ->
+                resolveLastViewedProductId(
+                    productId = productId,
+                    recentProductIds = recentViewedProductIds,
+                )
+            }
         val resolvedLastViewedShoppingItem =
             lastViewedProductId
                 ?.takeIf { showLastViewedSection && it != selectedProductId }

@@ -28,9 +28,10 @@ class ShoppingCartItemViewModel(
 
     init {
         viewModelScope.launch {
-            val initialItems = shoppingCartRepository.getShoppingItems()
-            shoppingCartPageStateHolder.updateItems(initialItems)
-            _shoppingCartItems.value = createShoppingCartItemsState(initialItems)
+            shoppingCartRepository.observeShoppingItems().collect { latestShoppingCartItems ->
+                shoppingCartPageStateHolder.updateItems(latestShoppingCartItems)
+                _shoppingCartItems.value = createShoppingCartItemsState(latestShoppingCartItems)
+            }
         }
     }
 
@@ -52,14 +53,12 @@ class ShoppingCartItemViewModel(
         viewModelScope.launch {
             shoppingCartRepository.remove(shoppingCartItem)
             resetQuantity(shoppingCartItem.product.id)
-            syncShoppingCartItems()
         }
     }
 
     fun increaseShoppingItemQuantity(shoppingCartItem: ShoppingCartItem) {
         viewModelScope.launch {
             shoppingItemRepository.plusQuantity(shoppingCartItem.product.id)
-            syncShoppingCartItems()
         }
     }
 
@@ -74,22 +73,13 @@ class ShoppingCartItemViewModel(
             if (currentQuantity == 1) {
                 shoppingCartRepository.removeByProductId(productId)
             }
-            syncShoppingCartItems()
         }
     }
 
     fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int = shoppingCartItem.getProductQuantityPrice()
 
     fun refresh() {
-        viewModelScope.launch {
-            syncShoppingCartItems()
-        }
-    }
-
-    private suspend fun syncShoppingCartItems() {
-        val latestShoppingCartItems = shoppingCartRepository.getShoppingItems()
-        shoppingCartPageStateHolder.updateItems(latestShoppingCartItems)
-        _shoppingCartItems.value = createShoppingCartItemsState(latestShoppingCartItems)
+        publishCurrentPageState()
     }
 
     private fun publishCurrentPageState() {
