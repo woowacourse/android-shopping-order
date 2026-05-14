@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.cart
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -17,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -39,6 +41,7 @@ fun CartScreen(
     onQuantityChange: (String, Int) -> Unit,
     isSelected: (String) -> Boolean,
     onCheckedChange: (String) -> Unit,
+    isAllSelectClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -66,13 +69,26 @@ fun CartScreen(
             )
         },
         bottomBar = {
-            if (uiState.totalCartSize > 5) {
-                CartPageSection(
-                    page = uiState.page + 1,
-                    onNext = { onNextPage() },
-                    onPrevious = { onPreviousPage() },
-                    isCanMoveNext = uiState.isCanMoveNext,
-                    modifier = Modifier.navigationBarsPadding(),
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                if (uiState.totalCartSize > 5) {
+                    CartPageSection(
+                        page = uiState.page + 1,
+                        onNext = { onNextPage() },
+                        onPrevious = { onPreviousPage() },
+                        isCanMoveNext = uiState.isCanMoveNext,
+                        modifier = Modifier.navigationBarsPadding(),
+                    )
+                }
+
+                CartBottomBar(
+                    isAllChecked = uiState.isAllChecked,
+                    totalPrice = uiState.totalPrice,
+                    totalCount = uiState.selectedCartItemCount,
+                    onAllCheckedChange = isAllSelectClick,
+                    onOrderClick = { },
                 )
             }
         },
@@ -164,6 +180,7 @@ private fun CartScreenPreview() {
         onQuantityChange = { _, _ -> },
         isSelected = { true },
         onCheckedChange = { },
+        isAllSelectClick = { },
     )
 }
 

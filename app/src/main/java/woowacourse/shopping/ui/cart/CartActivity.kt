@@ -39,6 +39,7 @@ class CartActivity : ComponentActivity() {
                     onQuantityChange = viewModel::updateQuantity,
                     isSelected = { viewModel.isSelected(it) },
                     onCheckedChange = { viewModel.checkItem(it) },
+                    isAllSelectClick = viewModel::isAllSelectClick,
                 )
             }
         }
