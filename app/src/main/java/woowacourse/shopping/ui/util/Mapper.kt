@@ -3,9 +3,12 @@ package woowacourse.shopping.ui.util
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.ui.cart.CartItemUiModel
 
-fun List<CartItem>.toUiModel(selectedItems: Set<Int>): List<CartItemUiModel> =
+fun List<CartItem>.toUiModel(
+    selectedItems: Set<Int>,
+    isAllSelected: Boolean,
+): List<CartItemUiModel> =
     this.map { cartItem ->
-        val isSelected = selectedItems.contains(cartItem.id)
+        val isSelected = if (isAllSelected) true else selectedItems.contains(cartItem.id)
         cartItem.toUiModel(isSelected)
     }
 
