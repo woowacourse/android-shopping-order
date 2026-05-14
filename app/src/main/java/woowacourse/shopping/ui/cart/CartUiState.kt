@@ -1,18 +1,17 @@
 package woowacourse.shopping.ui.cart
 
-import woowacourse.shopping.domain.cart.CartItem
-
 sealed interface CartUiState {
     data object Loading : CartUiState
 
     data object Empty : CartUiState
 
     data class Success(
-        val cartItems: List<CartItem>,
+        val cartItems: List<CartItemUiModel>,
         val currentPage: Int,
         val totalPages: Int,
         val hasPrevious: Boolean,
         val hasNext: Boolean,
+        val selectedItems: Set<Int> = emptySet(),
     ) : CartUiState {
         val showPageNavigator: Boolean
             get() = totalPages > 1
