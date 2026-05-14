@@ -1,7 +1,11 @@
 package woowacourse.shopping
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -12,6 +16,8 @@ import woowacourse.shopping.backend.MockShoppingBackendServer
 import woowacourse.shopping.backend.OkHttpProductBackendDataSource
 import woowacourse.shopping.backend.ShoppingItemsRemoteSyncer
 import woowacourse.shopping.backend.retrofit.RetrofitService
+import woowacourse.shopping.repository.AuthHeaderProvider
+import woowacourse.shopping.storage.datastore.AuthDataStore
 import woowacourse.shopping.storage.room.ShoppingDatabase
 import woowacourse.shopping.storage.room.shoppingItem.ShoppingItemDao
 import woowacourse.shopping.storage.room.shoppingcart.ShoppingCartDao
@@ -22,6 +28,16 @@ class ShoppingApplication : Application() {
     private val httpClient: OkHttpClient = OkHttpClient()
     private var mockShoppingBackendServer: MockShoppingBackendServer? = null
 
+    private val Context.authDataStore: DataStore<Preferences> by preferencesDataStore(
+        name = "auth_datastore"
+    )
+    lateinit var authDataStore: AuthDataStore
+        private set
+    lateinit var authHeaderProvider: AuthHeaderProvider
+        private set
+    lateinit var retrofitService: RetrofitService
+        private set
+
     lateinit var appContainer: AppContainer
         private set
 
@@ -30,14 +46,24 @@ class ShoppingApplication : Application() {
     }
 
     override fun onCreate() {
+        authDataStore = AuthDataStore(applicationContext.authDataStore)
+        authHeaderProvider = AuthHeaderProvider(authDataStore)
+        retrofitService = RetrofitService(authHeaderProvider)
         super.onCreate()
+
+        applicationScope.launch {
+            authDataStore.saveAuthInfo(
+                username = "chohs4164",
+                password = "password",
+            )
+        }
 
         val daos = createDaos()
         appContainer = createAppContainer(daos)
         launchStartupSync(daos)
-        RetrofitService.productApiService
-        RetrofitService.orderApiService
-        RetrofitService.shoppingCartApiService
+        RetrofitService(authHeaderProvider).productApiService
+        RetrofitService(authHeaderProvider).orderApiService
+        RetrofitService(authHeaderProvider).shoppingCartApiService
     }
 
     override fun onTerminate() {
@@ -96,7 +122,8 @@ class ShoppingApplication : Application() {
         shoppingCartDao: ShoppingCartDao,
     ) {
         runCatching {
-            val positiveQuantityProductIds = shoppingItemDao.getProductIdsWithPositiveQuantity().toSet()
+            val positiveQuantityProductIds =
+                shoppingItemDao.getProductIdsWithPositiveQuantity().toSet()
             val shoppingCartProductIds = shoppingCartDao.getProductIds().toSet()
 
             val productIdsToInsert = positiveQuantityProductIds - shoppingCartProductIds

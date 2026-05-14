@@ -6,4 +6,7 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="false">127.0.0.1</domain>
     </domain-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com</domain>
+    </domain-config>
 </network-security-config>
