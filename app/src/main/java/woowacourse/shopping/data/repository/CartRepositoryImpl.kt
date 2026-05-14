@@ -3,7 +3,6 @@ package woowacourse.shopping.data.repository
 import android.util.Log
 import woowacourse.shopping.data.remote.api.CartApi
 import woowacourse.shopping.data.remote.dto.request.AddCartRequestBody
-import woowacourse.shopping.data.remote.dto.request.Pageable
 import woowacourse.shopping.data.remote.dto.request.UpdateCartRequestBody
 import woowacourse.shopping.data.remote.dto.response.cart.CartDto
 import woowacourse.shopping.data.remote.dto.response.cart.CartProductDto
@@ -32,15 +31,18 @@ class CartRepositoryImpl(
     override suspend fun getCartItemsByPage(
         page: Int,
         size: Int,
-    ): List<CartItem> =
-        api
+    ): CartResponseResult {
+        val apiResult = api
             .getCartItems(
                 page = page,
                 size = size,
-            ).content
-            .map {
-                it.toDomain()
-            }
+            )
+
+        val cartItems = apiResult.content.map { it.toDomain() }
+        val lastPage = apiResult.last
+
+        return CartResponseResult(cartItems, lastPage)
+    }
 
     private suspend fun getCartItem(productId: String): CartItem? {
         val cartItems = getAllCartItems()
@@ -48,7 +50,8 @@ class CartRepositoryImpl(
         return cartItems.firstOrNull { it.product.id == productId }
     }
 
-    override suspend fun getCartItemQuantity(cartItemId: String): Int? = getCartItem(cartItemId)?.quantity
+    override suspend fun getCartItemQuantity(cartItemId: String): Int? =
+        getCartItem(cartItemId)?.quantity
 
     override suspend fun setCartItem(
         productId: String,
@@ -110,3 +113,8 @@ class CartRepositoryImpl(
             imageUrl = imageUrl,
         )
 }
+
+data class CartResponseResult(
+    val cartItems: List<CartItem>,
+    val isLastPage: Boolean,
+)

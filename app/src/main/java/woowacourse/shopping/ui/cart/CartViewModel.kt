@@ -30,17 +30,20 @@ class CartViewModel(
     }
 
     private suspend fun getCartItemsByPage() {
-            val cartItems = cartRepository.getCartItemsByPage(page = uiState.value.page, size = PAGE_SIZE)
+        val cartResult =
+            cartRepository.getCartItemsByPage(page = uiState.value.page, size = PAGE_SIZE)
 
-            _uiState.update {
-                it.copy(
-                    items =
-                        cartItems
-                            .map { cartItem ->
-                                cartItem.toUiModel()
-                            }.toImmutableList(),
-                )
-            }
+        _uiState.update {
+            it.copy(
+                items =
+                    cartResult.cartItems
+                        .map { cartItem ->
+                            cartItem.toUiModel()
+                        }.toImmutableList(),
+                isCanMoveNext = !cartResult.isLastPage,
+                totalCartSize = cartRepository.getTotalCartItemQuantity(),
+            )
+        }
     }
 
     fun nextPage() {

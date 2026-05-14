@@ -6,7 +6,7 @@ interface CartRepository {
     suspend fun getCartItemsByPage(
         page: Int,
         size: Int,
-    ): List<CartItem>
+    ): CartResponseResult
 
     suspend fun setCartItem(
         productId: String,
