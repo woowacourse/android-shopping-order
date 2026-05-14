@@ -14,8 +14,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -35,8 +33,6 @@ import woowacourse.shopping.ui.viewmodel.ShoppingCartRecommendViewModel.Shopping
 
 @OptIn(ExperimentalMaterial3Api::class)
 class ShoppingCartActivity : ComponentActivity() {
-
-
     private val app: ShoppingApplication by lazy { application as ShoppingApplication }
 
     private val screenViewModelFactory: ScreenViewModelFactory by lazy {
@@ -47,20 +43,7 @@ class ShoppingCartActivity : ComponentActivity() {
     }
 
     private val shoppingCartItemViewModel: ShoppingCartItemViewModel by viewModels { screenViewModelFactory }
-    private val shoppingCartRecommendViewModel: ShoppingCartRecommendViewModel by viewModels {
-        object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                if (modelClass.isAssignableFrom(ShoppingCartRecommendViewModel::class.java)) {
-                    return ShoppingCartRecommendViewModel(
-                        shoppingItemRepository = app.appContainer.shoppingItemRepository,
-                        visitStore = app.appContainer.visitStore,
-                    ) as T
-                }
-                throw IllegalArgumentException("지원하지 않는 ViewModel: ${modelClass.name}")
-            }
-        }
-    }
+    private val shoppingCartRecommendViewModel: ShoppingCartRecommendViewModel by viewModels { screenViewModelFactory }
     private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { apiViewModelFactory }
 
     companion object {
@@ -71,15 +54,12 @@ class ShoppingCartActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         observeApiViewModel()
         observeScreenEvents()
         shoppingCartViewModel.requestCartItems()
-
 
         setContent {
             val shoppingCartItems by shoppingCartViewModel.shoppingCartItems.collectAsStateWithLifecycle()
@@ -124,7 +104,6 @@ class ShoppingCartActivity : ComponentActivity() {
                     canMoveToNextPage = if (hasApiError) false else screenState.value.canMoveToNextPage,
                 )
 
-
             AndroidShoppingTheme {
                 BackHandler(enabled = recommendUiState.currentStep == ShoppingCartStep.RECOMMENT) {
                     shoppingCartRecommendViewModel.moveToCart()
@@ -163,9 +142,13 @@ class ShoppingCartActivity : ComponentActivity() {
                             shoppingCartItems = shoppingCartItems,
                             selectedProductIds = selectedProductIds,
                             shoppingCartSelectItemCount = selectedItemCount,
-                            onOrderButtonClick = { selectedProductIds ->
-                                if (selectedProductIds.isEmpty()) return@OrderButton
-                                if (recommendUiState.recommendedShoppingItems.isEmpty()) return@OrderButton
+                            onOrderButtonClick = { selectedIds ->
+                                if (
+                                    selectedIds.isEmpty() ||
+                                    recommendUiState.recommendedShoppingItems.isEmpty()
+                                ) {
+                                    return@OrderButton
+                                }
                                 shoppingCartRecommendViewModel.moveToRecommend()
                             },
                             checked = shoppingCartItems.isNotEmpty() && selectedItemCount == shoppingCartItems.size,
@@ -185,9 +168,7 @@ class ShoppingCartActivity : ComponentActivity() {
                         baseSelectedCartItemCount = selectedProductIds.size,
                         totalPrice = recommendUiState.selectedCartTotalPrice + recommendUiState.selectedRecommendTotalPrice,
                         onBackClick = shoppingCartItemViewModel::onBackClick,
-                        onOrderButtonClick = { selectedProductIds ->
-                            if (selectedProductIds.isEmpty()) return@ShoppingCartRecommendSection
-                        },
+                        onOrderButtonClick = {},
                         onAddToCartClick = { shoppingItem ->
                             shoppingCartViewModel.addOrIncreaseByProductId(
                                 productId = shoppingItem.getProductId(),

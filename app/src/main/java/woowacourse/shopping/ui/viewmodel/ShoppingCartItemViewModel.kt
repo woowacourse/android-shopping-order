@@ -56,26 +56,6 @@ class ShoppingCartItemViewModel(
         }
     }
 
-    fun increaseShoppingItemQuantity(shoppingCartItem: ShoppingCartItem) {
-        viewModelScope.launch {
-            shoppingItemRepository.plusQuantity(shoppingCartItem.product.id)
-        }
-    }
-
-    fun decreaseShoppingItemQuantity(shoppingCartItem: ShoppingCartItem) {
-        viewModelScope.launch {
-            val productId = shoppingCartItem.product.id
-            val currentQuantity = shoppingItemRepository.getQuantity(productId)
-            if (currentQuantity == 0) {
-                return@launch
-            }
-            shoppingItemRepository.minusQuantity(productId)
-            if (currentQuantity == 1) {
-                shoppingCartRepository.removeByProductId(productId)
-            }
-        }
-    }
-
     fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int = shoppingCartItem.getProductQuantityPrice()
 
     fun refresh() {
