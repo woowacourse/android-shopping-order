@@ -1,7 +1,5 @@
 package woowacourse.shopping.data
 
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -12,6 +10,7 @@ import org.junit.jupiter.api.Test
 import woowacourse.shopping.data.localdb.dao.RecentItemDao
 import woowacourse.shopping.data.localdb.entity.RecentItemEntity
 import woowacourse.shopping.data.repository.ProductRepository
+import woowacourse.shopping.data.repository.ProductResponseResult
 import woowacourse.shopping.data.repository.RecentItemRepository
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
@@ -21,13 +20,14 @@ class RecentItemRepositoryTest {
     private val product =
         Product(
             id = "1",
-            name = ProductName("상품"),
+            name = ProductName("product"),
             price = Money(2000),
             imageUrl = "image-url",
+            category = "book",
         )
 
     @Test
-    fun `최근 본 상품 저장 후 오래된 상품을 삭제한다`() =
+    fun `최근 본 상품을 저장하고 오래된 상품을 삭제한다`() =
         runTest {
             val dao = TestRecentItemDao()
             val repository = RecentItemRepository(dao, FakeProductRepository(listOf(product)))
@@ -40,7 +40,7 @@ class RecentItemRepositoryTest {
         }
 
     @Test
-    fun `최근 본 상품 목록을 도메인 상품으로 변환해 반환한다`() =
+    fun `최근 본 상품 엔티티 목록을 도메인 상품으로 변환한다`() =
         runTest {
             val dao = TestRecentItemDao()
             val repository = RecentItemRepository(dao, FakeProductRepository(listOf(product)))
@@ -69,7 +69,7 @@ class RecentItemRepositoryTest {
         }
 
     @Test
-    fun `최근 본 상품이 없으면 마지막으로 본 상품은 null이 반환된다`() =
+    fun `최근 본 상품이 없으면 마지막으로 본 상품은 널을 반환한다`() =
         runTest {
             val repository = RecentItemRepository(TestRecentItemDao(), FakeProductRepository(emptyList()))
 
@@ -84,6 +84,7 @@ class RecentItemRepositoryTest {
             name = ProductName("product$id"),
             price = Money(1000),
             imageUrl = "image$id",
+            category = "book",
         )
 
     private fun Product.toRecentItemEntity(timestamp: Long): RecentItemEntity =
@@ -127,10 +128,16 @@ class RecentItemRepositoryTest {
         private val products: List<Product>,
     ) : ProductRepository {
         override suspend fun getProducts(
-            offset: Int,
-            limit: Int,
-        ): ImmutableList<Product> = products.drop(offset).take(limit).toImmutableList()
+            category: String,
+            page: Int,
+            size: Int,
+        ): ProductResponseResult {
+            val fromIndex = page * size
+            val pageProducts = products.drop(fromIndex).take(size)
+            return ProductResponseResult(pageProducts, isLastPage = fromIndex + pageProducts.size >= products.size)
+        }
 
-        override suspend fun getProductById(id: String): Product = products.firstOrNull { it.id == id } ?: throw IllegalArgumentException()
+        override suspend fun getProductById(id: String): Product =
+            products.firstOrNull { it.id == id } ?: throw IllegalArgumentException("Product not found")
     }
 }

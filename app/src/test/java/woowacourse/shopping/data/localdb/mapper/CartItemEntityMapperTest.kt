@@ -11,7 +11,7 @@ import woowacourse.shopping.model.ProductName
 
 class CartItemEntityMapperTest {
     @Test
-    fun `장바구니 Entity를 도메인 장바구니 상품으로 변환한다`() {
+    fun `장바구니 엔티티를 도메인 장바구니 상품으로 변환한다`() {
         val entity =
             CartItemEntity(
                 id = "1",
@@ -24,6 +24,7 @@ class CartItemEntityMapperTest {
                 name = ProductName("상품"),
                 price = Money(2000),
                 imageUrl = "1",
+                category = "book",
             )
 
         val cartItem = entity.toDomain(product)
@@ -33,7 +34,7 @@ class CartItemEntityMapperTest {
     }
 
     @Test
-    fun `장바구니 내 상품과 Product 간 id가 불일치할 시 예외가 발생한다`() {
+    fun `장바구니 내 상품과 상품 간 식별자가 불일치할 시 예외가 발생한다`() {
         val entity =
             CartItemEntity(
                 id = "1",
@@ -46,6 +47,7 @@ class CartItemEntityMapperTest {
                 name = ProductName("상품"),
                 price = Money(2000),
                 imageUrl = "2",
+                category = "book",
             )
 
         assertThatThrownBy { entity.toDomain(product) }
@@ -54,7 +56,7 @@ class CartItemEntityMapperTest {
     }
 
     @Test
-    fun `도메인 장바구니 상품을 장바구니 Entity로 변환한다`() {
+    fun `도메인 장바구니 상품을 장바구니 엔티티로 변환한다`() {
         val cartItem =
             CartItem(
                 product =
@@ -63,6 +65,7 @@ class CartItemEntityMapperTest {
                         name = ProductName("상품"),
                         price = Money(2000),
                         imageUrl = "1",
+                        category = "book",
                     ),
                 quantity = 3,
             )

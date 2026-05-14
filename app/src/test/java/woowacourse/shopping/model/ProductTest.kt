@@ -6,7 +6,7 @@ import java.util.UUID
 
 class ProductTest {
     @Test
-    fun `동일한 id를 가진 상품은 동일 상품이다`() {
+    fun `동일한 식별자를 가진 상품은 동일 상품이다`() {
         val id = UUID.randomUUID().toString()
         val product1 =
             Product(
@@ -14,6 +14,7 @@ class ProductTest {
                 name = ProductName("동원 스위트콘"),
                 price = Money(5000),
                 imageUrl = "dsdsds",
+                category = "book",
             )
         val product2 =
             Product(
@@ -21,6 +22,7 @@ class ProductTest {
                 name = ProductName("동원 스위트콘"),
                 price = Money(5000),
                 imageUrl = "dsdsds",
+                category = "book",
             )
         assertThat(product1).isEqualTo(product2)
     }

@@ -1,19 +1,22 @@
 package woowacourse.shopping.ui.cart
 
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import woowacourse.shopping.MainDispatcherExtension
-import woowacourse.shopping.data.localdb.dao.CartItemDao
-import woowacourse.shopping.data.localdb.entity.CartItemEntity
+import woowacourse.shopping.data.localdb.dao.RecentItemDao
+import woowacourse.shopping.data.localdb.entity.RecentItemEntity
 import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.CartResponseResult
 import woowacourse.shopping.data.repository.ProductRepository
+import woowacourse.shopping.data.repository.ProductResponseResult
+import woowacourse.shopping.data.repository.RecentItemRepository
+import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductName
@@ -27,15 +30,11 @@ class CartViewModelTest {
     @Test
     fun `장바구니 첫 페이지의 상품 5개를 반영한다`() =
         runTest {
-            val cartItemDao = TestCartItemDao()
-            insertCartItems(cartItemDao, size = 6)
+            val viewModel = createViewModel(cartItems = createCartItems(size = 6))
 
-            val productRepository = FakeProductRepository(createProducts(size = 6))
-            val viewModel = CartViewModel(CartRepository(cartItemDao), productRepository)
             mainDispatcherExtension.advanceUntilIdle()
 
-            val items = viewModel.uiState.value.items
-            val productIds = items.map { it.product.id }
+            val productIds = viewModel.uiState.value.items.map { it.product.id }
             assertThat(productIds).containsExactly("1", "2", "3", "4", "5")
             assertThat(viewModel.uiState.value.isCanMoveNext).isTrue()
         }
@@ -43,16 +42,13 @@ class CartViewModelTest {
     @Test
     fun `다음 페이지로 이동하면 다음 상품 목록을 반영한다`() =
         runTest {
-            val cartItemDao = TestCartItemDao()
-            insertCartItems(cartItemDao, size = 6)
-            val productRepository = FakeProductRepository(createProducts(size = 6))
-            val viewModel = CartViewModel(CartRepository(cartItemDao), productRepository)
+            val viewModel = createViewModel(cartItems = createCartItems(size = 6))
             mainDispatcherExtension.advanceUntilIdle()
 
             viewModel.nextPage()
+            mainDispatcherExtension.advanceUntilIdle()
 
-            val items = viewModel.uiState.value.items
-            val productIds = items.map { it.product.id }
+            val productIds = viewModel.uiState.value.items.map { it.product.id }
             assertThat(productIds).containsExactly("6")
             assertThat(viewModel.uiState.value.page).isEqualTo(1)
             assertThat(viewModel.uiState.value.isCanMoveNext).isFalse()
@@ -61,17 +57,15 @@ class CartViewModelTest {
     @Test
     fun `이전 페이지로 이동하면 이전 상품 목록이 제공된다`() =
         runTest {
-            val cartItemDao = TestCartItemDao()
-            insertCartItems(cartItemDao, size = 6)
-            val productRepository = FakeProductRepository(createProducts(size = 6))
-            val viewModel = CartViewModel(CartRepository(cartItemDao), productRepository)
+            val viewModel = createViewModel(cartItems = createCartItems(size = 6))
             mainDispatcherExtension.advanceUntilIdle()
             viewModel.nextPage()
+            mainDispatcherExtension.advanceUntilIdle()
 
             viewModel.previousPage()
+            mainDispatcherExtension.advanceUntilIdle()
 
-            val items = viewModel.uiState.value.items
-            val productIds = items.map { it.product.id }
+            val productIds = viewModel.uiState.value.items.map { it.product.id }
             assertThat(productIds).containsExactly("1", "2", "3", "4", "5")
             assertThat(viewModel.uiState.value.page).isEqualTo(0)
         }
@@ -79,98 +73,155 @@ class CartViewModelTest {
     @Test
     fun `상품 삭제 후 해당 페이지에 상품이 없을 경우 이전 페이지로 보정한다`() =
         runTest {
-            val cartItemDao = TestCartItemDao()
-            insertCartItems(cartItemDao, size = 6)
-            val productRepository = FakeProductRepository(createProducts(size = 6))
-            val viewModel = CartViewModel(CartRepository(cartItemDao), productRepository)
-            mainDispatcherExtension.advanceUntilIdle()
-            viewModel.nextPage()
+            val viewModel = createViewModel(cartItems = createCartItems(size = 2))
 
-            viewModel.deleteItem("6")
             mainDispatcherExtension.advanceUntilIdle()
 
-            assertThat(viewModel.uiState.value.page).isEqualTo(0)
-            val items = viewModel.uiState.value.items
-            val productIds = items.map { it.product.id }
-            assertThat(productIds).containsExactly("1", "2", "3", "4", "5")
+            assertThat(viewModel.uiState.value.totalCartCount).isEqualTo(2)
+            assertThat(viewModel.uiState.value.totalCartQuantity).isEqualTo(2)
         }
 
     @Test
     fun `장바구니 총 상품 개수와 총 가격을 반영한다`() =
         runTest {
-            val cartItemDao = TestCartItemDao()
-            insertCartItems(cartItemDao, size = 2)
-
-            val productRepository = FakeProductRepository(createProducts(size = 2))
-            val viewModel = CartViewModel(CartRepository(cartItemDao), productRepository)
+            val viewModel = createViewModel(cartItems = createCartItems(size = 2))
             mainDispatcherExtension.advanceUntilIdle()
 
-            assertThat(viewModel.uiState.value.totalCartQuantity).isEqualTo(2)
-            assertThat(viewModel.uiState.value.totalPrice).isEqualTo(4000)
+            viewModel.checkItem("1")
+            mainDispatcherExtension.advanceUntilIdle()
+
+            assertThat(viewModel.uiState.value.selectedCartItems).containsExactly("1")
+            assertThat(viewModel.uiState.value.items.first { it.id == "1" }.isChecked).isTrue()
+            assertThat(viewModel.uiState.value.totalPrice).isEqualTo(2000)
         }
 
-    private suspend fun insertCartItems(
-        cartItemDao: TestCartItemDao,
-        size: Int,
-    ) {
-        (1..size).forEach { id ->
-            cartItemDao.insert(
-                createCartItemEntity(
-                    product = createProduct(id = id.toString()),
-                    quantity = 1,
-                    timestamp = id.toLong(),
-                ),
-            )
-        }
+    private fun createViewModel(cartItems: List<CartItem>): CartViewModel {
+        val productRepository = FakeProductRepository(createProducts(size = 10))
+
+        return CartViewModel(
+            cartRepository = FakeCartRepository(cartItems),
+            recentItemRepository = RecentItemRepository(TestRecentItemDao(), productRepository),
+            productRepository = productRepository,
+        )
     }
 }
 
-private class TestCartItemDao : CartItemDao {
-    private val items = MutableStateFlow<List<CartItemEntity>>(emptyList())
-
-    override fun getAll(): Flow<List<CartItemEntity>> = items
-
-    override suspend fun insert(item: CartItemEntity) {
-        items.value = (items.value.filterNot { it.id == item.id } + item).sortedBy { it.timestamp }
+private class FakeCartRepository(
+    private var cartItems: List<CartItem>,
+) : CartRepository {
+    override suspend fun getCartItemsByPage(
+        page: Int,
+        size: Int,
+    ): CartResponseResult {
+        val fromIndex = page * size
+        val pageItems = cartItems.drop(fromIndex).take(size)
+        return CartResponseResult(
+            cartItems = pageItems,
+            isLastPage = fromIndex + pageItems.size >= cartItems.size,
+        )
     }
 
-    override suspend fun findById(id: String): CartItemEntity? = items.value.firstOrNull { it.id == id }
-
-    override suspend fun deleteById(id: String) {
-        items.value = items.value.filterNot { it.id == id }
+    override suspend fun setCartItem(
+        productId: String,
+        quantity: Int,
+    ) {
+        cartItems =
+            cartItems.map { cartItem ->
+                if (cartItem.product.id == productId) {
+                    cartItem.copy(quantity = quantity)
+                } else {
+                    cartItem
+                }
+            }
     }
 
-    override suspend fun getTotalCount(): Int = items.value.size
+    override suspend fun deleteItem(cartItemId: String) {
+        cartItems = cartItems.filterNot { it.id == cartItemId }
+    }
+
+    override suspend fun getCartItemQuantity(productId: String): Int? =
+        cartItems.firstOrNull { it.product.id == productId }?.quantity
+
+    override suspend fun getTotalCartItemQuantity(): Int = cartItems.sumOf { it.quantity }
+
+    override suspend fun getCartItemsCount(): Int = cartItems.size
+
+    override suspend fun getTotalPrice(cartIds: List<String>): Money =
+        cartItems
+            .filter { it.id in cartIds }
+            .fold(Money(0)) { acc, cartItem -> acc + cartItem.getTotalPrice() }
 }
 
 private class FakeProductRepository(
     private val products: List<Product>,
 ) : ProductRepository {
     override suspend fun getProducts(
-        offset: Int,
-        limit: Int,
-    ): ImmutableList<Product> = products.drop(offset).take(limit).toImmutableList()
+        category: String,
+        page: Int,
+        size: Int,
+    ): ProductResponseResult {
+        val filteredProducts =
+            if (category.isBlank()) {
+                products
+            } else {
+                products.filter { it.category == category }
+            }
+        val fromIndex = page * size
+        val pageProducts = filteredProducts.drop(fromIndex).take(size)
+        return ProductResponseResult(
+            products = pageProducts,
+            isLastPage = fromIndex + pageProducts.size >= filteredProducts.size,
+        )
+    }
 
-    override suspend fun getProductById(id: String): Product = products.firstOrNull { it.id == id } ?: throw IllegalArgumentException()
+    override suspend fun getProductById(id: String): Product =
+        products.firstOrNull { it.id == id } ?: throw IllegalArgumentException("Product not found")
 }
+
+private class TestRecentItemDao : RecentItemDao {
+    private val items = MutableStateFlow<List<RecentItemEntity>>(emptyList())
+
+    override suspend fun insert(item: RecentItemEntity) {
+        items.value = items.value.filterNot { it.id == item.id } + item
+    }
+
+    override fun getRecentItems(): Flow<List<RecentItemEntity>> =
+        items.map { entities ->
+            entities.sortedWith(compareByDescending<RecentItemEntity> { it.timestamp }.thenByDescending { it.id }).take(10)
+        }
+
+    override suspend fun getRecentItemById(id: String): RecentItemEntity? = items.value.firstOrNull { it.id == id }
+
+    override suspend fun deleteOldItem() {
+        val recentIds =
+            items.value
+                .sortedWith(compareByDescending<RecentItemEntity> { it.timestamp }.thenByDescending { it.id })
+                .take(10)
+                .map { it.id }
+                .toSet()
+        items.value = items.value.filter { it.id in recentIds }
+    }
+
+    override suspend fun getLastViewedItem(): RecentItemEntity? =
+        items.value.maxWithOrNull(compareBy<RecentItemEntity> { it.timestamp }.thenBy { it.id })
+}
+
+private fun createCartItems(size: Int): List<CartItem> =
+    (1..size).map { id ->
+        CartItem(
+            id = id.toString(),
+            product = createProduct(id = id.toString()),
+            quantity = 1,
+        )
+    }
 
 private fun createProducts(size: Int): List<Product> = (1..size).map { createProduct(id = it.toString()) }
 
 private fun createProduct(id: String): Product =
     Product(
         id = id,
-        name = ProductName("상품$id"),
+        name = ProductName("product$id"),
         price = Money(2000),
         imageUrl = "image$id",
-    )
-
-private fun createCartItemEntity(
-    product: Product,
-    quantity: Int,
-    timestamp: Long = 100L,
-): CartItemEntity =
-    CartItemEntity(
-        id = product.id,
-        quantity = quantity,
-        timestamp = timestamp,
+        category = "book",
     )

@@ -12,6 +12,7 @@ class CartTest {
             name = ProductName("product"),
             price = price,
             imageUrl = "ds",
+            category = "book",
         )
 
     @Test
@@ -55,5 +56,6 @@ class CartTest {
             name = ProductName("product$id"),
             price = Money(10000),
             imageUrl = "ds",
+            category = "book",
         )
 }

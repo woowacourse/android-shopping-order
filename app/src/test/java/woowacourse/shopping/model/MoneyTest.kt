@@ -21,7 +21,7 @@ class MoneyTest {
     }
 
     @Test
-    fun `Money에 정수를 곱하면 곱셈값을 금액으로 가진 Money를 반환한다`() {
+    fun `금액에 정수를 곱하면 곱셈값을 금액으로 가진 값을 반환한다`() {
         assertThat(
             Money(amount = 1000) * 3,
         ).isEqualTo(Money(amount = 3000))

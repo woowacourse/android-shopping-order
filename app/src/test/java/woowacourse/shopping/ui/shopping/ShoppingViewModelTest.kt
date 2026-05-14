@@ -1,7 +1,5 @@
 package woowacourse.shopping.ui.shopping
 
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,14 +9,15 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import woowacourse.shopping.MainDispatcherExtension
-import woowacourse.shopping.data.localdb.dao.CartItemDao
 import woowacourse.shopping.data.localdb.dao.RecentItemDao
-import woowacourse.shopping.data.localdb.entity.CartItemEntity
 import woowacourse.shopping.data.localdb.entity.RecentItemEntity
 import woowacourse.shopping.data.remote.NetworkObserver
 import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.CartResponseResult
 import woowacourse.shopping.data.repository.ProductRepository
+import woowacourse.shopping.data.repository.ProductResponseResult
 import woowacourse.shopping.data.repository.RecentItemRepository
+import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductName
@@ -30,7 +29,7 @@ class ShoppingViewModelTest {
     val mainDispatcherExtension = MainDispatcherExtension()
 
     @Test
-    fun `네트워크가 없을 시 상품 목록을 로드하지 않는다`() =
+    fun `초기 장바구니 관찰 시 네트워크가 없어도 상품을 불러온다`() =
         runTest {
             val productRepository = FakeProductRepository(products = createProducts(size = 20))
             val viewModel =
@@ -41,12 +40,12 @@ class ShoppingViewModelTest {
 
             mainDispatcherExtension.advanceUntilIdle()
 
-            assertThat(viewModel.uiState.value.products).isEmpty()
-            assertThat(productRepository.getProductsCallCount).isEqualTo(0)
+            assertThat(viewModel.uiState.value.products).hasSize(20)
+            assertThat(productRepository.getProductsCallCount).isEqualTo(1)
         }
 
     @Test
-    fun `네트워크가 연결되면 상품 목록을 자동으로 로드한다`() =
+    fun `네트워크가 연결되면 상품 목록을 불러온다`() =
         runTest {
             val viewModel =
                 createViewModel(
@@ -60,7 +59,7 @@ class ShoppingViewModelTest {
         }
 
     @Test
-    fun `상품 목록 추가 로드 시 기존 목록에 합산한다`() =
+    fun `상품 목록 추가 로드 시 기존 목록에 합산하고 마지막 페이지 상태를 갱신한다`() =
         runTest {
             val viewModel =
                 createViewModel(
@@ -76,35 +75,16 @@ class ShoppingViewModelTest {
             assertThat(viewModel.uiState.value.canLoadMore).isFalse()
         }
 
-    @Test
-    fun `장바구니가 변경되면 장바구니 수량 상태를 갱신한다`() =
-        runTest {
-            val cartItemDao = TestCartItemDao()
-            val viewModel =
-                createViewModel(
-                    cartItemDao = cartItemDao,
-                    networkObserver = FakeNetworkObserver(isAvailable = false),
-                )
-            mainDispatcherExtension.advanceUntilIdle()
-
-            cartItemDao.insert(createCartItemEntity(product = createProduct(id = "1"), quantity = 3))
-            mainDispatcherExtension.advanceUntilIdle()
-
-            assertThat(viewModel.uiState.value.cartSize).isEqualTo(3)
-            assertThat(viewModel.uiState.value.cartQuantities["1"]).isEqualTo(3)
-        }
-
     private fun createViewModel(
-        productRepository: ProductRepository =
-            FakeProductRepository(products = createProducts(size = 20)),
-        cartItemDao: TestCartItemDao = TestCartItemDao(),
-        recentItemDao: TestRecentItemDao = TestRecentItemDao(),
+        productRepository: ProductRepository = FakeProductRepository(products = createProducts(size = 20)),
+        cartRepository: CartRepository = FakeCartRepository(),
+        recentItemRepository: RecentItemRepository = RecentItemRepository(TestRecentItemDao(), productRepository),
         networkObserver: NetworkObserver = FakeNetworkObserver(isAvailable = true),
     ): ShoppingViewModel =
         ShoppingViewModel(
             productRepository = productRepository,
-            cartRepository = CartRepository(cartItemDao),
-            recentItemRepository = RecentItemRepository(recentItemDao, productRepository),
+            cartRepository = cartRepository,
+            recentItemRepository = recentItemRepository,
             networkObserver = networkObserver,
         )
 }
@@ -124,33 +104,43 @@ private class FakeProductRepository(
         private set
 
     override suspend fun getProducts(
-        offset: Int,
-        limit: Int,
-    ): ImmutableList<Product> {
+        category: String,
+        page: Int,
+        size: Int,
+    ): ProductResponseResult {
         getProductsCallCount++
-        return products.drop(offset).take(limit).toImmutableList()
+        val fromIndex = page * size
+        val pageProducts = products.drop(fromIndex).take(size)
+        return ProductResponseResult(
+            products = pageProducts,
+            isLastPage = fromIndex + pageProducts.size >= products.size,
+        )
     }
 
     override suspend fun getProductById(id: String): Product =
-        products.firstOrNull { it.id == id } ?: throw IllegalArgumentException("상품 없음")
+        products.firstOrNull { it.id == id } ?: throw IllegalArgumentException("Product not found")
 }
 
-private class TestCartItemDao : CartItemDao {
-    private val items = MutableStateFlow<List<CartItemEntity>>(emptyList())
+private class FakeCartRepository : CartRepository {
+    override suspend fun getCartItemsByPage(
+        page: Int,
+        size: Int,
+    ): CartResponseResult = CartResponseResult(emptyList(), isLastPage = true)
 
-    override fun getAll(): Flow<List<CartItemEntity>> = items
+    override suspend fun setCartItem(
+        productId: String,
+        quantity: Int,
+    ) = Unit
 
-    override suspend fun insert(item: CartItemEntity) {
-        items.value = items.value.filterNot { it.id == item.id } + item
-    }
+    override suspend fun deleteItem(cartItemId: String) = Unit
 
-    override suspend fun findById(id: String): CartItemEntity? = items.value.firstOrNull { it.id == id }
+    override suspend fun getCartItemQuantity(productId: String): Int? = null
 
-    override suspend fun deleteById(id: String) {
-        items.value = items.value.filterNot { it.id == id }
-    }
+    override suspend fun getTotalCartItemQuantity(): Int = 0
 
-    override suspend fun getTotalCount(): Int = items.value.size
+    override suspend fun getCartItemsCount(): Int = 0
+
+    override suspend fun getTotalPrice(cartIds: List<String>): Money = Money(0)
 }
 
 private class TestRecentItemDao : RecentItemDao {
@@ -189,26 +179,8 @@ private fun createProducts(size: Int): List<Product> =
 private fun createProduct(id: String): Product =
     Product(
         id = id,
-        name = ProductName("상품$id"),
+        name = ProductName("product$id"),
         price = Money(2000),
         imageUrl = "image$id",
-    )
-
-private fun createCartItemEntity(
-    product: Product,
-    quantity: Int,
-): CartItemEntity =
-    CartItemEntity(
-        id = product.id,
-        quantity = quantity,
-        timestamp = 100L,
-    )
-
-private fun createRecentItemEntity(
-    product: Product,
-    timestamp: Long,
-): RecentItemEntity =
-    RecentItemEntity(
-        id = product.id,
-        timestamp = timestamp,
+        category = "book",
     )
