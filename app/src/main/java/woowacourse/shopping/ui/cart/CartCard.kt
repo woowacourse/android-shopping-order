@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -26,9 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -68,16 +65,20 @@ fun CartCard(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(
-                    onClick = onCheckedChange
+                    onClick = onCheckedChange,
                 ) {
                     Icon(
-                        imageVector = if (isChecked) Icons.Default.CheckBox
-                        else Icons.Default.CheckBoxOutlineBlank,
+                        imageVector =
+                            if (isChecked) {
+                                Icons.Default.CheckBox
+                            } else {
+                                Icons.Default.CheckBoxOutlineBlank
+                            },
                         contentDescription = "상품 선택 버튼",
-                        tint = if (isChecked) Green40 else Color.Unspecified
+                        tint = if (isChecked) Green40 else Color.Unspecified,
                     )
                 }
                 Text(

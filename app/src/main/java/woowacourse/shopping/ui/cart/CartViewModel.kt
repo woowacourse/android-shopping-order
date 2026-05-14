@@ -51,7 +51,7 @@ class CartViewModel(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    page = uiState.value.page + 1
+                    page = uiState.value.page + 1,
                 )
             }
             getCartItemsByPage()
@@ -62,7 +62,7 @@ class CartViewModel(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    page = uiState.value.page - 1
+                    page = uiState.value.page - 1,
                 )
             }
             getCartItemsByPage()
@@ -98,21 +98,17 @@ class CartViewModel(
 
         _uiState.update {
             it.copy(
-                selectedCartItems = selectedItems
+                selectedCartItems = selectedItems,
             )
         }
     }
 
-    fun isSelected(cartItemId: String): Boolean {
-        return _uiState.value.selectedCartItems.contains(cartItemId)
-    }
+    fun isSelected(cartItemId: String): Boolean = _uiState.value.selectedCartItems.contains(cartItemId)
 
     companion object {
         private const val PAGE_SIZE = 5
 
-        fun provideFactory(
-            cartRepository: CartRepository,
-        ): ViewModelProvider.Factory =
+        fun provideFactory(cartRepository: CartRepository): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
                     CartViewModel(
@@ -122,7 +118,6 @@ class CartViewModel(
             }
     }
 }
-
 
 private data class CartPage(
     val items: List<CartItem>,

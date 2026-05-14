@@ -54,7 +54,10 @@ class ShoppingViewModel(
         }
     }
 
-    fun loadProducts(page: Int = 0, size: Int = offset) {
+    fun loadProducts(
+        page: Int = 0,
+        size: Int = offset,
+    ) {
         viewModelScope.launch {
             _uiState.update { it.copy(cartErrorMessage = null) }
             runCatching {
@@ -74,7 +77,7 @@ class ShoppingViewModel(
                                 }.toImmutableList(),
                         cartSize = cartItemQuantity,
                         cartErrorMessage = null,
-                        canLoadMore = !apiResult.isLastPage
+                        canLoadMore = !apiResult.isLastPage,
                     )
                 }
             }.onFailure { throwable ->
@@ -121,14 +124,13 @@ class ShoppingViewModel(
         if (!_uiState.value.isNetworkAvailable || !_uiState.value.canLoadMore || _uiState.value.isLoading) return
 
         viewModelScope.launch {
-
             try {
                 val apiResult = productRepository.getProducts(page = (offset / pageSize), size = pageSize)
-                val loadProducts = apiResult.products.map {
-                    val quantity = cartRepository.getCartItemQuantity(it.id)
-                    it.toUiModel(quantity = quantity)
-                }
-
+                val loadProducts =
+                    apiResult.products.map {
+                        val quantity = cartRepository.getCartItemQuantity(it.id)
+                        it.toUiModel(quantity = quantity)
+                    }
 
                 offset += loadProducts.size
 
@@ -142,7 +144,6 @@ class ShoppingViewModel(
             } finally {
                 loadProducts()
             }
-
         }
     }
 

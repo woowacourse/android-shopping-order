@@ -14,13 +14,13 @@ class ProductRepositoryImpl(
         page: Int,
         size: Int,
     ): ProductResponseResult {
-
-        val apiResult = api
-            .getProducts(
-                category = "도서",
-                page = page,
-                size = size,
-            )
+        val apiResult =
+            api
+                .getProducts(
+                    category = "도서",
+                    page = page,
+                    size = size,
+                )
 
         val products = apiResult.content.map { it.toDomain() }
         val lastPage = apiResult.last
@@ -46,7 +46,6 @@ class ProductRepositoryImpl(
             imageUrl = imageUrl,
         )
 }
-
 
 data class ProductResponseResult(
     val products: List<Product>,

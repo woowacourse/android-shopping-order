@@ -72,21 +72,21 @@ class AppContainer(
         OkHttpClient
             .Builder()
             .addInterceptor { chain ->
-                val credential = runBlocking {
-                    val username = userDataStore.username.first()
-                    val password = userDataStore.password.first()
+                val credential =
+                    runBlocking {
+                        val username = userDataStore.username.first()
+                        val password = userDataStore.password.first()
 
-                    Credentials.basic(username, password)
-                }
+                        Credentials.basic(username, password)
+                    }
                 val request =
                     chain
                         .request()
                         .newBuilder()
                         .header(
                             "Authorization",
-                            credential
-                        )
-                        .build()
+                            credential,
+                        ).build()
 
                 chain.proceed(request)
             }.addInterceptor(loggingInterceptor)

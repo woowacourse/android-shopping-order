@@ -32,11 +32,12 @@ class CartRepositoryImpl(
         page: Int,
         size: Int,
     ): CartResponseResult {
-        val apiResult = api
-            .getCartItems(
-                page = page,
-                size = size,
-            )
+        val apiResult =
+            api
+                .getCartItems(
+                    page = page,
+                    size = size,
+                )
 
         val cartItems = apiResult.content.map { it.toDomain() }
         val lastPage = apiResult.last
@@ -50,8 +51,7 @@ class CartRepositoryImpl(
         return cartItems.firstOrNull { it.product.id == productId }
     }
 
-    override suspend fun getCartItemQuantity(cartItemId: String): Int? =
-        getCartItem(cartItemId)?.quantity
+    override suspend fun getCartItemQuantity(cartItemId: String): Int? = getCartItem(cartItemId)?.quantity
 
     override suspend fun setCartItem(
         productId: String,

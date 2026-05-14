@@ -1,7 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.model.CartItem
-
 interface CartRepository {
     suspend fun getCartItemsByPage(
         page: Int,
