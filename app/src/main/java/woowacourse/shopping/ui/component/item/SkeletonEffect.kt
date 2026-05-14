@@ -14,33 +14,35 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
-
 fun Modifier.skeleton(isLoading: Boolean = true): Modifier {
-    if(!isLoading) return this
+    if (!isLoading) return this
     return composed {
         val transition = rememberInfiniteTransition(label = "skeleton")
         val translateAnimation by transition.animateFloat(
             initialValue = 0f,
             targetValue = 1000f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(1200, easing = LinearEasing),
-                repeatMode = RepeatMode.Restart
-            ),
+            animationSpec =
+                infiniteRepeatable(
+                    animation = tween(1200, easing = LinearEasing),
+                    repeatMode = RepeatMode.Restart,
+                ),
             label = "skeletonEffect",
         )
 
         drawWithContent {
-            val shimmerColors = listOf(
-                Color.LightGray.copy(alpha = 0.9f),
-                Color.LightGray.copy(alpha = 0.5f),
-                Color.LightGray.copy(alpha = 0.9f),
-            )
+            val shimmerColors =
+                listOf(
+                    Color.LightGray.copy(alpha = 0.9f),
+                    Color.LightGray.copy(alpha = 0.5f),
+                    Color.LightGray.copy(alpha = 0.9f),
+                )
             drawRect(
-                brush = Brush.linearGradient(
-                    colors = shimmerColors,
-                    start = Offset.Zero,
-                    end = Offset(translateAnimation, translateAnimation),
-                ),
+                brush =
+                    Brush.linearGradient(
+                        colors = shimmerColors,
+                        start = Offset.Zero,
+                        end = Offset(translateAnimation, translateAnimation),
+                    ),
             )
         }
     }

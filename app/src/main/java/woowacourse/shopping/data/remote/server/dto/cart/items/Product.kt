@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.remote.server.dto.cart.items
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import woowacourse.shopping.domain.Product
@@ -16,12 +15,14 @@ data class ProductResponse(
     @SerialName("name")
     val name: String,
     @SerialName("price")
-    val price: Int
+    val price: Int,
 )
-fun ProductResponse.toDomain() = Product(
-    category = category,
-    id = id,
-    imageUri = imageUrl.ifBlank { "https://via.placeholder.com/300" },
-    name = name,
-    price = price
-)
+
+fun ProductResponse.toDomain() =
+    Product(
+        category = category,
+        id = id,
+        imageUri = imageUrl.ifBlank { "https://via.placeholder.com/300" },
+        name = name,
+        price = price,
+    )

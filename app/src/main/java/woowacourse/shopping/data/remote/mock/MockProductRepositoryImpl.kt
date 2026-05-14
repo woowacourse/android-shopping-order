@@ -51,7 +51,7 @@ class MockProductRepositoryImpl(
     override suspend fun getCategoryProducts(
         page: Int,
         pageSize: Int,
-        category: String
+        category: String,
     ): List<Product> {
         val offset = page * pageSize
         val url = "${baseUrl}products?offset=$offset&limit=$pageSize"

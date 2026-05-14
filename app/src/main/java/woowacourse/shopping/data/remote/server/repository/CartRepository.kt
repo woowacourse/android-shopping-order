@@ -8,11 +8,17 @@ interface CartRepository {
 
     suspend fun deleteCartItem(purchaseProductId: Long)
 
-    suspend fun updateCount(cartItemId: Long, newQuantity: Int)
+    suspend fun updateCount(
+        cartItemId: Long,
+        newQuantity: Int,
+    )
 
     suspend fun getProductCount(): Int
 
-    suspend fun getPagedCart(page: Int, size: Int): PurchaseProducts
+    suspend fun getPagedCart(
+        page: Int,
+        size: Int,
+    ): PurchaseProducts
 
     suspend fun getCartItemCount(): Int
 }

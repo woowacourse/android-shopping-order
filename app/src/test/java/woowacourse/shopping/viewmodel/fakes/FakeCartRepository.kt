@@ -13,7 +13,6 @@ class FakeCartRepository : CartRepository {
             val existing = _db[existingIndex]
             _db[existingIndex] = existing.copy(count = existing.count + purchaseProduct.count)
         } else {
-
             _db.add(purchaseProduct)
         }
     }
@@ -22,7 +21,10 @@ class FakeCartRepository : CartRepository {
         _db.removeIf { it.id == purchaseProductId }
     }
 
-    override suspend fun updateCount(cartItemId: Long, newQuantity: Int) {
+    override suspend fun updateCount(
+        cartItemId: Long,
+        newQuantity: Int,
+    ) {
         val index = _db.indexOfFirst { it.id == cartItemId }
         if (index != -1) {
             if (newQuantity <= 0) {
@@ -33,18 +35,17 @@ class FakeCartRepository : CartRepository {
         }
     }
 
-    override suspend fun getProductCount(): Int {
-        return _db.sumOf { it.count }
-    }
+    override suspend fun getProductCount(): Int = _db.sumOf { it.count }
 
-    override suspend fun getPagedCart(page: Int, size: Int): PurchaseProducts {
+    override suspend fun getPagedCart(
+        page: Int,
+        size: Int,
+    ): PurchaseProducts {
         val start = page * size
         if (start >= _db.size) return PurchaseProducts(emptyList())
         val end = minOf(start + size, _db.size)
         return PurchaseProducts(_db.subList(start, end))
     }
 
-    override suspend fun getCartItemCount(): Int {
-        return _db.size
-    }
+    override suspend fun getCartItemCount(): Int = _db.size
 }

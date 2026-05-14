@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.data.remote.server.repository.CartRepository
 import woowacourse.shopping.data.remote.server.repository.ProductRepository
-import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.PurchaseProduct
 import woowacourse.shopping.domain.PurchaseProducts
@@ -29,26 +28,28 @@ class ProductDetailViewModel(
     private val _count = MutableStateFlow(1)
     val countState = _count.asStateFlow()
 
-    val selectedProduct: StateFlow<Product?> = flow {
-        emit(productRepository.getProduct(selectedProductId))
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = null
-    )
+    val selectedProduct: StateFlow<Product?> =
+        flow {
+            emit(productRepository.getProduct(selectedProductId))
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null,
+        )
 
     private val _cart = MutableStateFlow(PurchaseProducts())
     val cart = _cart.asStateFlow()
 
-    val lastViewedProduct: StateFlow<Product?> = flow {
-        lastViewedProductId?.let {
-            emit(productRepository.getProduct(lastViewedProductId))
-        }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = null
-    )
+    val lastViewedProduct: StateFlow<Product?> =
+        flow {
+            lastViewedProductId?.let {
+                emit(productRepository.getProduct(lastViewedProductId))
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null,
+        )
 
     init {
         viewModelScope.launch {
@@ -71,7 +72,7 @@ class ProductDetailViewModel(
     fun addPurchaseProduct(purchaseProduct: PurchaseProduct) {
         viewModelScope.launch {
             val existCartItem = cart.value.findById(purchaseProduct.productId())
-            if(existCartItem != null) {
+            if (existCartItem != null) {
                 val newTotalCount = existCartItem.count + purchaseProduct.count
                 cartRepository.updateCount(existCartItem.id, newTotalCount)
             } else {
@@ -102,7 +103,7 @@ class ProductDetailViewModelFactory(
                 recentlyViewedProductRepository,
                 productRepository,
                 selectedProductId,
-                lastViewedProductId
+                lastViewedProductId,
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

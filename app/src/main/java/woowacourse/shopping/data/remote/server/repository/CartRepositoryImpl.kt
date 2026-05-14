@@ -7,47 +7,52 @@ import woowacourse.shopping.data.remote.server.service.CartService
 import woowacourse.shopping.domain.PurchaseProduct
 import woowacourse.shopping.domain.PurchaseProducts
 
-class CartRepositoryImpl(private val cartService: CartService) : CartRepository {
-
+class CartRepositoryImpl(
+    private val cartService: CartService,
+) : CartRepository {
     override suspend fun insert(purchaseProduct: PurchaseProduct) {
         cartService.postCartItems(
             PostCartRequest(
                 productId = purchaseProduct.id,
-                quantity = purchaseProduct.count
-            )
+                quantity = purchaseProduct.count,
+            ),
         )
     }
 
-    override suspend fun updateCount(cartItemId: Long, newQuantity: Int) {
+    override suspend fun updateCount(
+        cartItemId: Long,
+        newQuantity: Int,
+    ) {
         cartService.patchQuantity(
             cartItemId = cartItemId,
-            request = PatchQuantityRequest(newQuantity)
+            request = PatchQuantityRequest(newQuantity),
         )
     }
 
     override suspend fun deleteCartItem(purchaseProductId: Long) {
         cartService.deleteProduct(
-            productId = purchaseProductId
+            productId = purchaseProductId,
         )
     }
 
     override suspend fun getProductCount(): Int {
         try {
-            return  cartService.requestQuantity().quantity
-        } catch (e: Exception){
+            return cartService.requestQuantity().quantity
+        } catch (e: Exception) {
             throw e
         }
     }
 
     override suspend fun getPagedCart(
         page: Int,
-        size: Int
+        size: Int,
     ): PurchaseProducts {
         try {
             val response = cartService.requestCartItems(page, size)
-            val cartItems = response.content.map { content->
-                content.toDomain()
-            }
+            val cartItems =
+                response.content.map { content ->
+                    content.toDomain()
+                }
             android.util.Log.d("content", response.content.toString())
             return PurchaseProducts(cartItems)
         } catch (e: Exception) {
@@ -55,7 +60,5 @@ class CartRepositoryImpl(private val cartService: CartService) : CartRepository 
         }
     }
 
-    override suspend fun getCartItemCount(): Int {
-        return cartService.requestCartItems(0, 1).totalElements.toInt()
-    }
+    override suspend fun getCartItemCount(): Int = cartService.requestCartItems(0, 1).totalElements.toInt()
 }

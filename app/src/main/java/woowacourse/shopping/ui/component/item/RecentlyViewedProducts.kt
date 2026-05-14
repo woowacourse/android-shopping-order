@@ -39,7 +39,7 @@ fun RecentlyViewedProducts(
         LazyRow {
             itemsIndexed(
                 items = products.products,
-                key = { index, product -> "${product.id}_i$index}" }
+                key = { index, product -> "${product.id}_i$index}" },
             ) { index, item ->
                 RecentlyViewedProductItem(
                     product = item,
@@ -70,43 +70,50 @@ private fun RecentlyViewedProductsPreview() {
                         price = 100000,
                         category = "",
                         id = 1L,
-                    ),Product(
+                    ),
+                    Product(
                         imageUri = "hello",
                         name = "너무너무너무긴아이템이름",
                         price = 100000,
                         category = "",
                         id = 1L,
-                    ),Product(
+                    ),
+                    Product(
                         imageUri = "hello",
                         name = "너무너무너무긴아이템이름",
                         price = 100000,
                         category = "",
                         id = 1L,
-                    ),Product(
+                    ),
+                    Product(
                         imageUri = "hello",
                         name = "너무너무너무긴아이템이름",
                         price = 100000,
                         category = "",
                         id = 1L,
-                    ),Product(
+                    ),
+                    Product(
                         imageUri = "hello",
                         name = "너무너무너무긴아이템이름",
                         price = 100000,
                         category = "",
                         id = 1L,
-                    ),Product(
+                    ),
+                    Product(
                         imageUri = "hello",
                         name = "너무너무너무긴아이템이름",
                         price = 100000,
                         category = "",
                         id = 1L,
-                    ),Product(
+                    ),
+                    Product(
                         imageUri = "hello",
                         name = "너무너무너무긴아이템이름",
                         price = 100000,
                         category = "",
                         id = 1L,
-                    ),Product(
+                    ),
+                    Product(
                         imageUri = "hello",
                         name = "너무너무너무긴아이템이름",
                         price = 100000,

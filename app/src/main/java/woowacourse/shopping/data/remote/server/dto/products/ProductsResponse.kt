@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.remote.server.dto.products
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -27,5 +26,5 @@ data class ProductsResponse(
     @SerialName("totalElements")
     val totalElements: Long,
     @SerialName("totalPages")
-    val totalPages: Int
+    val totalPages: Int,
 )

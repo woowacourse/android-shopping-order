@@ -18,10 +18,11 @@ object ProductWebServer {
     val baseUrl: String get() = server?.url("/").toString()
 
     fun start() {
-        if(!isRun){
-            server = MockWebServer().apply {
-                dispatcher = ProductWebServerDispatcher()
-            }
+        if (!isRun) {
+            server =
+                MockWebServer().apply {
+                    dispatcher = ProductWebServerDispatcher()
+                }
             serverScope.launch {
                 server?.start()
                 _isReady.value = true
@@ -31,7 +32,7 @@ object ProductWebServer {
     }
 
     fun stop() {
-        if(isRun) {
+        if (isRun) {
             server?.close()
             isRun = false
             serverScope.cancel()

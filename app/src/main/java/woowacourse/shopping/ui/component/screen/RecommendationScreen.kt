@@ -61,41 +61,40 @@ fun CartRecommendationScreen(
                     onDelete = onDelete,
                     onItemClick = onItemClick,
                     isContainedInCart = isContainedInCart,
-                    itemCount = itemCount
+                    itemCount = itemCount,
                 )
             },
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
         CartBottomBar(
             totalPrice = totalPrice,
             totalCount = totalCount,
-            onOrderClick = onOrderClick
+            onOrderClick = onOrderClick,
         )
     }
 }
 
 @Composable
-private fun RecommendationHeader(
-    onBackClick: () -> Unit,
-) {
+private fun RecommendationHeader(onBackClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         Icon(
             painter = painterResource(R.drawable.ic_arrow_left),
             contentDescription = "뒤로가기",
             tint = Color.White,
-            modifier = Modifier
-                .size(24.dp)
-                .clickable { onBackClick() }
+            modifier =
+                Modifier
+                    .size(24.dp)
+                    .clickable { onBackClick() },
         )
         Spacer(Modifier.padding(horizontal = 8.dp))
         Text(
             text = "Cart",
             color = Color.White,
             fontSize = 20.sp,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
         )
     }
 }
@@ -112,23 +111,24 @@ private fun RecommendationBody(
     itemCount: (Long) -> Int,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.Center
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.Center,
     ) {
         Spacer(Modifier.height(48.dp))
         Text(
             text = "이런 상품은 어떠세요?",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = Color.Black,
         )
         Text(
             text = "* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.",
             fontSize = 12.sp,
             color = Color.Gray,
-            modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
+            modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
         )
 
         LazyRow(
@@ -144,7 +144,7 @@ private fun RecommendationBody(
                     onAdd = { onAdd(product.id, 1) },
                     onMinus = { onMinus(product.id, -1) },
                     onDelete = { onDelete(product.id) },
-                    onClick = { onItemClick(product) }
+                    onClick = { onItemClick(product) },
                 )
             }
         }
@@ -154,29 +154,32 @@ private fun RecommendationBody(
 @Preview(showBackground = true)
 @Composable
 internal fun CartRecommendationScreenPreview() {
-    val mockProducts = Products(listOf(
-        Product(
-            category = "default",
-            id = 1,
-            imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
-            name = "PET보틀-정사각형(400ml)",
-            price = 10000
-        ),
-        Product(
-            category = "default",
-            id = 2,
-            imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
-            name ="PET보틀-정사각형(400ml)",
-            price = 10000
-        ),
-        Product(
-            category = "default",
-            id = 3,
-            imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
-            name ="PET보틀-정사각형(400ml)",
-            price = 10000
+    val mockProducts =
+        Products(
+            listOf(
+                Product(
+                    category = "default",
+                    id = 1,
+                    imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
+                    name = "PET보틀-정사각형(400ml)",
+                    price = 10000,
+                ),
+                Product(
+                    category = "default",
+                    id = 2,
+                    imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
+                    name = "PET보틀-정사각형(400ml)",
+                    price = 10000,
+                ),
+                Product(
+                    category = "default",
+                    id = 3,
+                    imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
+                    name = "PET보틀-정사각형(400ml)",
+                    price = 10000,
+                ),
+            ),
         )
-    ))
 
     CartRecommendationScreen(
         recommendedProducts = mockProducts,
@@ -184,11 +187,11 @@ internal fun CartRecommendationScreenPreview() {
         totalCount = 3,
         onBackClick = {},
         onOrderClick = {},
-        onAddInCart = {  },
+        onAddInCart = { },
         onAdd = { id, amount -> },
         onMinus = { id, amount -> },
-        onDelete = {  },
-        onItemClick = {  },
+        onDelete = { },
+        onItemClick = { },
         isContainedInCart = { false },
         itemCount = { 0 },
     )

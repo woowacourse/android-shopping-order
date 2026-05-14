@@ -8,11 +8,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.ui.component.screen.CatalogScreen
@@ -29,7 +26,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            viewModel = viewModel<ShoppingViewModel>(
+            viewModel =
+                viewModel<ShoppingViewModel>(
                     factory =
                         ShoppingViewModelFactory(
                             (application as ShoppingApplication).cartRepository,
@@ -94,7 +92,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        if(::viewModel.isInitialized) {
+        if (::viewModel.isInitialized) {
             viewModel.fetchCart()
         }
     }

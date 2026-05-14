@@ -18,8 +18,6 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,7 +67,7 @@ fun CartItem(
                     checked = isChecked,
                     onCheckedChange = {
                         onCheckedChanged(product.id)
-                    }
+                    },
                 )
                 ProductName(product.name())
                 CloseBtn(
@@ -159,21 +157,23 @@ private fun ProductPrice(
 @Composable
 private fun CartItemPreview() {
     CartItem(
-        product = PurchaseProduct(
-            id = 1L,
-            product = Product(
-                category = "asjdhas",
+        product =
+            PurchaseProduct(
                 id = 1L,
-                imageUri = "adasda",
-                name = "asdasd",
-                price = 10
+                product =
+                    Product(
+                        category = "asjdhas",
+                        id = 1L,
+                        imageUri = "adasda",
+                        name = "asdasd",
+                        price = 10,
+                    ),
+                count = 5,
             ),
-            count = 5
-        ),
         onAdd = { id, count -> },
         onMinus = { id, count -> },
         onDelete = { },
-        onCheckedChanged = {  },
-        isChecked = true
+        onCheckedChanged = { },
+        isChecked = true,
     )
 }

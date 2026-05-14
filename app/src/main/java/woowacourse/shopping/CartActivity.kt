@@ -26,7 +26,7 @@ class CartActivity : ComponentActivity() {
                 viewModel<CartViewModel>(
                     factory =
                         CartViewModelFactory(
-                            (application as ShoppingApplication).cartRepository
+                            (application as ShoppingApplication).cartRepository,
                         ),
                 )
 

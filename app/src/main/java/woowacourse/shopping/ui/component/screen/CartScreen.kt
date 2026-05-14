@@ -78,7 +78,7 @@ fun CartScreen(
                     onNext = onNext,
                     isLoading = isLoading,
                     isChecked = isChecked,
-                    onCheckedChanged = onCheckedChanged
+                    onCheckedChanged = onCheckedChanged,
                 )
             },
             modifier = Modifier.weight(1f),
@@ -88,7 +88,7 @@ fun CartScreen(
             totalCount = totalCount,
             onOrderClick = onOrderClick,
             showSelectAll = true,
-            onSelectAllClick = onSelectAllClick
+            onSelectAllClick = onSelectAllClick,
         )
     }
 }
@@ -139,8 +139,7 @@ private fun CartBody(
     onCheckedChanged: (Long) -> Unit,
     isChecked: (Long) -> Boolean,
     modifier: Modifier = Modifier,
-
-    ) {
+) {
     Column(
         modifier =
             modifier
@@ -214,8 +213,7 @@ fun PagingBtn(
                     .clickable(
                         onClick = onPrevious,
                         enabled = previousEnable,
-                    )
-                    .wrapContentSize(Alignment.Center),
+                    ).wrapContentSize(Alignment.Center),
         )
         Text(
             text = (currentPage + 1).toString(),
@@ -241,8 +239,7 @@ fun PagingBtn(
                     .clickable(
                         onClick = onNext,
                         enabled = nextEnable,
-                    )
-                    .background(color = btnAvailable(nextEnable))
+                    ).background(color = btnAvailable(nextEnable))
                     .wrapContentHeight(Alignment.CenterVertically),
         )
     }
@@ -267,46 +264,50 @@ private fun CartScreenPreview() {
             PurchaseProducts(
                 listOf(
                     PurchaseProduct(
-                        product = Product(
-                            imageUri = "uri",
-                            name = "무엘사",
-                            price = 10000000,
-                            category = "asd",
-                            id = 1L,
-                        ),
+                        product =
+                            Product(
+                                imageUri = "uri",
+                                name = "무엘사",
+                                price = 10000000,
+                                category = "asd",
+                                id = 1L,
+                            ),
                         id = 1L,
                         count = 1,
                     ),
                     PurchaseProduct(
-                        product = Product(
-                            imageUri = "uri",
-                            name = "무엘사",
-                            price = 10000000,
-                            category = "asd",
-                            id = 1L,
-                        ),
+                        product =
+                            Product(
+                                imageUri = "uri",
+                                name = "무엘사",
+                                price = 10000000,
+                                category = "asd",
+                                id = 1L,
+                            ),
                         id = 1L,
                         count = 1,
                     ),
                     PurchaseProduct(
-                        product = Product(
-                            imageUri = "uri",
-                            name = "무엘사",
-                            price = 10000000,
-                            category = "asd",
-                            id = 1L,
-                        ),
+                        product =
+                            Product(
+                                imageUri = "uri",
+                                name = "무엘사",
+                                price = 10000000,
+                                category = "asd",
+                                id = 1L,
+                            ),
                         id = 1L,
                         count = 1,
                     ),
                     PurchaseProduct(
-                        product = Product(
-                            imageUri = "uri",
-                            name = "무엘사",
-                            price = 10000000,
-                            category = "ads",
-                            id = 1L,
-                        ),
+                        product =
+                            Product(
+                                imageUri = "uri",
+                                name = "무엘사",
+                                price = 10000000,
+                                category = "ads",
+                                id = 1L,
+                            ),
                         id = 1L,
                         count = 1,
                     ),
@@ -318,7 +319,7 @@ private fun CartScreenPreview() {
         totalPrice = 10000,
         totalCount = 10000,
         isChecked = { true },
-        onSelectAllClick = {  },
-        onOrderClick = {}
+        onSelectAllClick = { },
+        onOrderClick = {},
     )
 }

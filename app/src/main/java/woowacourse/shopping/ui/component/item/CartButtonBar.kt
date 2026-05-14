@@ -17,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -48,11 +47,12 @@ fun CartBottomBar(
     ) {
         if (showSelectAll) {
             Column(
-                modifier = Modifier
-                    .width(60.dp)
-                    .fillMaxHeight(),
+                modifier =
+                    Modifier
+                        .width(60.dp)
+                        .fillMaxHeight(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
             ) {
                 Checkbox(
                     checked = checked,
@@ -60,66 +60,68 @@ fun CartBottomBar(
                         checked = !checked
                         onSelectAllClick()
                     },
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
                 Text(
                     text = "전체",
                     color = Color.White,
-                    fontSize = 12.sp
+                    fontSize = 12.sp,
                 )
             }
         }
 
         Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            contentAlignment = Alignment.CenterEnd
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+            contentAlignment = Alignment.CenterEnd,
         ) {
             Text(
                 text = totalPrice.toPriceString(),
                 color = Color.White,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(end = 16.dp)
+                modifier = Modifier.padding(end = 16.dp),
             )
         }
 
         Box(
-            modifier = Modifier
-                .width(136.dp)
-                .fillMaxHeight()
-                .background(Color(0xFF04C09E))
-                .clickable { onOrderClick() },
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .width(136.dp)
+                    .fillMaxHeight()
+                    .background(Color(0xFF04C09E))
+                    .clickable { onOrderClick() },
+            contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = "주문하기($totalCount)",
                 color = Color.White,
                 fontSize = 18.sp,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
             )
         }
     }
 }
 
-@Preview (showBackground = true)
+@Preview(showBackground = true)
 @Composable
 internal fun CartBottomBarSelectAllPreview() {
     CartBottomBar(
         totalPrice = 184200,
         totalCount = 2,
         onOrderClick = {},
-        showSelectAll = true
+        showSelectAll = true,
     )
 }
 
-@Preview (showBackground = true)
+@Preview(showBackground = true)
 @Composable
 internal fun CartBottomBarRecommendationPreview() {
     CartBottomBar(
         totalPrice = 204200,
         totalCount = 4,
-        onOrderClick = {}
+        onOrderClick = {},
     )
 }

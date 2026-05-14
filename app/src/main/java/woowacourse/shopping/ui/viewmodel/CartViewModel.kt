@@ -36,15 +36,16 @@ class CartViewModel(
     private val _checkedItemIds = MutableStateFlow<List<Long>>(emptyList())
     val checkedItemIds = _checkedItemIds.asStateFlow()
 
-    val totalPrice: StateFlow<Int> = combine(_allCartItems, checkedItemIds) {allCart, checkedIds ->
-        allCart.purchaseProducts
-            .filter { it.id in checkedIds }
-            .sumOf { it.totalPrice() }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = 0
-    )
+    val totalPrice: StateFlow<Int> =
+        combine(_allCartItems, checkedItemIds) { allCart, checkedIds ->
+            allCart.purchaseProducts
+                .filter { it.id in checkedIds }
+                .sumOf { it.totalPrice() }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = 0,
+        )
 
     init {
         viewModelScope.launch {
@@ -148,7 +149,7 @@ class CartViewModel(
                 newTotalCount
             }
 
-            if(currentPage.value > 0 && currentPage.value * PAGE_SIZE >= newTotalCount){
+            if (currentPage.value > 0 && currentPage.value * PAGE_SIZE >= newTotalCount) {
                 _currentPage.update { it - 1 }
             }
 
@@ -191,7 +192,7 @@ class CartViewModel(
 }
 
 class CartViewModelFactory(
-    private val cartRepository: CartRepository
+    private val cartRepository: CartRepository,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CartViewModel::class.java)) {

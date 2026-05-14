@@ -50,11 +50,15 @@ fun ShoppingItem(
         Box {
             ProductImage(product.imageUri, Modifier.size(154.dp))
             CirclePlusBtn(
-                onClick = { onAddInCart(PurchaseProduct(
-                    product = product,
-                    id = product.id,
-                    count = 1
-                )) },
+                onClick = {
+                    onAddInCart(
+                        PurchaseProduct(
+                            product = product,
+                            id = product.id,
+                            count = 1,
+                        ),
+                    )
+                },
                 modifier =
                     Modifier
                         .padding(end = 15.dp)

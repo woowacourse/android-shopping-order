@@ -32,7 +32,6 @@ val MIGRATION_5_6 =
     version = 6,
 )
 abstract class DataBase : RoomDatabase() {
-
     abstract fun recentlyViewedProductDao(): RecentlyViewedProductDao
 
     companion object {

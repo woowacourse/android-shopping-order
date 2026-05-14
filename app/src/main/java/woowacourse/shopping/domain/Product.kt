@@ -2,7 +2,6 @@ package woowacourse.shopping.domain
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import java.util.UUID
 
 @Parcelize
 data class Product(

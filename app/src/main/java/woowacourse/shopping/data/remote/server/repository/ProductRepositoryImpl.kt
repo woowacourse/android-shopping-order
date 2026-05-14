@@ -1,21 +1,22 @@
 package woowacourse.shopping.data.remote.server.repository
 
-import woowacourse.shopping.data.remote.server.service.ProductService
 import woowacourse.shopping.data.remote.server.dto.product.toDomain
 import woowacourse.shopping.data.remote.server.dto.products.toDomain
+import woowacourse.shopping.data.remote.server.service.ProductService
 import woowacourse.shopping.domain.Product
 
 class ProductRepositoryImpl(
-    private val productService: ProductService
-): ProductRepository {
+    private val productService: ProductService,
+) : ProductRepository {
     override suspend fun getProducts(
         page: Int,
-        pageSize: Int
+        pageSize: Int,
     ): List<Product> {
-        val response = productService.requestProducts(
-            page = page,
-            size = pageSize
-        )
+        val response =
+            productService.requestProducts(
+                page = page,
+                size = pageSize,
+            )
         return response.content.map { it.toDomain() }
     }
 
@@ -31,7 +32,7 @@ class ProductRepositoryImpl(
     override suspend fun getCategoryProducts(
         page: Int,
         pageSize: Int,
-        category: String
+        category: String,
     ): List<Product> {
         val response = productService.requestCategoryProducts(category = category)
         return response.content.map { it.toDomain() }

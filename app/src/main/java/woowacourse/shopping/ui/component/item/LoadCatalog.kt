@@ -14,14 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-
 @Composable
 fun LoadCatalog(modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(bottom = 12.dp),
-        verticalArrangement = Arrangement.SpaceBetween
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(bottom = 12.dp),
+        verticalArrangement = Arrangement.SpaceBetween,
     ) {
         LoadItemRow()
         LoadItemRow()
@@ -30,9 +30,7 @@ fun LoadCatalog(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun LoadItem(
-    modifier: Modifier = Modifier
-) {
+fun LoadItem(modifier: Modifier = Modifier) {
     Column(
         modifier =
             modifier
@@ -41,24 +39,27 @@ fun LoadItem(
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp)
-                .skeleton()
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(150.dp)
+                    .skeleton(),
         )
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(14.dp)
-                .padding(end = 12.dp)
-                .skeleton()
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(14.dp)
+                    .padding(end = 12.dp)
+                    .skeleton(),
         )
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(14.dp)
-                .padding(end = 36.dp)
-                .skeleton()
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(14.dp)
+                    .padding(end = 36.dp)
+                    .skeleton(),
         )
     }
 }
@@ -66,10 +67,11 @@ fun LoadItem(
 @Composable
 fun LoadItemRow(modifier: Modifier = Modifier) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 10.dp, end = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(start = 10.dp, end = 10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         LoadItem()
         LoadItem()

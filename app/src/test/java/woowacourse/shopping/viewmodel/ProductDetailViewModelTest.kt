@@ -27,13 +27,14 @@ class ProductDetailViewModelTest {
     private lateinit var fakeCartRepository: FakeCartRepository
     private lateinit var fakeRecentlyViewedProductRepository: FakeRecentlyViewedProductRepository
     private val testProductId = 1L
-    private val testProduct = Product(
-        id = testProductId,
-        imageUri = "테스트",
-        name = "테스트",
-        price = 1000,
-        category = "asd"
-    )
+    private val testProduct =
+        Product(
+            id = testProductId,
+            imageUri = "테스트",
+            name = "테스트",
+            price = 1000,
+            category = "asd",
+        )
 
     @BeforeEach
     fun setUp() {
@@ -43,53 +44,57 @@ class ProductDetailViewModelTest {
 
         fakeProductRepository.setProducts(listOf(testProduct))
 
-        viewModel = ProductDetailViewModel(
-            cartRepository = fakeCartRepository,
-            recentlyViewedProductRepository = fakeRecentlyViewedProductRepository,
-            productRepository = fakeProductRepository,
-            selectedProductId = testProductId,
-            lastViewedProductId = null
-        )
+        viewModel =
+            ProductDetailViewModel(
+                cartRepository = fakeCartRepository,
+                recentlyViewedProductRepository = fakeRecentlyViewedProductRepository,
+                productRepository = fakeProductRepository,
+                selectedProductId = testProductId,
+                lastViewedProductId = null,
+            )
     }
 
-
     @Test
-    fun `선택된 상품 ID로 서버에서 상품을 조회할 수 있다`() = runTest {
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            viewModel.selectedProduct.collect {  }
+    fun `선택된 상품 ID로 서버에서 상품을 조회할 수 있다`() =
+        runTest {
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                viewModel.selectedProduct.collect { }
+            }
+
+            val product = viewModel.selectedProduct.value
+
+            assertNotNull(product)
+            assertEquals(testProductId, product?.id)
+            assertEquals(testProduct, product)
         }
 
-        val product = viewModel.selectedProduct.value
+    @Test
+    fun `장바구니에 담을 상품의 수량을 조절할 수 있다`() =
+        runTest {
+            assertEquals(1, viewModel.countState.value)
 
-        assertNotNull(product)
-        assertEquals(testProductId, product?.id)
-        assertEquals(testProduct, product)
-    }
+            viewModel.addCount()
+            assertEquals(2, viewModel.countState.value)
+
+            viewModel.minusCount()
+            assertEquals(1, viewModel.countState.value)
+        }
 
     @Test
-    fun `장바구니에 담을 상품의 수량을 조절할 수 있다`() = runTest {
-        assertEquals(1, viewModel.countState.value)
+    fun `수량은 1에서 더이상 감소하지 않는다`() =
+        runTest {
+            assertEquals(1, viewModel.countState.value)
+            viewModel.minusCount()
 
-        viewModel.addCount()
-        assertEquals(2, viewModel.countState.value)
-
-        viewModel.minusCount()
-        assertEquals(1, viewModel.countState.value)
-    }
+            assertEquals(1, viewModel.countState.value)
+        }
 
     @Test
-    fun `수량은 1에서 더이상 감소하지 않는다`() = runTest {
-        assertEquals(1, viewModel.countState.value)
-        viewModel.minusCount()
+    fun `마지막으로 본 상품을 조회하면 viewHistory가 업데이트 된다`() =
+        runTest {
+            viewModel.updateHistory(testProduct)
 
-        assertEquals(1, viewModel.countState.value)
-    }
-
-    @Test
-    fun `마지막으로 본 상품을 조회하면 viewHistory가 업데이트 된다`() = runTest {
-        viewModel.updateHistory(testProduct)
-
-        val history = fakeRecentlyViewedProductRepository.getLatestItem()
-        assertEquals(testProductId, history.first())
-    }
+            val history = fakeRecentlyViewedProductRepository.getLatestItem()
+            assertEquals(testProductId, history.first())
+        }
 }

@@ -3,7 +3,6 @@ package woowacourse.shopping.data.local.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import woowacourse.shopping.domain.Product
 
 @Entity(tableName = "recently_viewed_products")
 data class RecentlyViewedProductEntity(

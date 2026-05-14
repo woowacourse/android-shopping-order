@@ -32,7 +32,7 @@ class ShoppingViewModel(
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue = emptyList()
+                initialValue = emptyList(),
             )
 
     private val _products = MutableStateFlow<Products>(Products())
@@ -40,7 +40,6 @@ class ShoppingViewModel(
 
     private val _cart = MutableStateFlow(PurchaseProducts())
     val cart = _cart.asStateFlow()
-
 
     val recentlyViewedProducts: StateFlow<Products> =
         combine(recentlyViewedEntities, products) { entities, allProducts ->
@@ -52,19 +51,20 @@ class ShoppingViewModel(
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = Products()
+            initialValue = Products(),
         )
 
-    val lastViewProductId: StateFlow<Long?> = recentlyViewedProductRepository.getLatestItem()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null
-        )
+    val lastViewProductId: StateFlow<Long?> =
+        recentlyViewedProductRepository
+            .getLatestItem()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = null,
+            )
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-
 
     private val _currentIndex = MutableStateFlow(0)
     val currentIndex: StateFlow<Int> = _currentIndex.asStateFlow()
@@ -96,15 +96,15 @@ class ShoppingViewModel(
         }
     }
 
-
     fun addToCart(purchaseProduct: PurchaseProduct) {
         viewModelScope.launch {
-            val existingItem = cart.value.purchaseProducts.find {
-                it.product.id == purchaseProduct.product.id
-            }
+            val existingItem =
+                cart.value.purchaseProducts.find {
+                    it.product.id == purchaseProduct.product.id
+                }
             if (existingItem != null) {
                 cartRepository.updateCount(existingItem.id, existingItem.count + 1)
-            }else {
+            } else {
                 cartRepository.insert(purchaseProduct)
             }
             fetchCart()
@@ -119,7 +119,7 @@ class ShoppingViewModel(
             val target = cart.value.findById(id)
             if (target != null) {
                 val nextCount = target.count + updateAmount
-                if(nextCount >= 1) {
+                if (nextCount >= 1) {
                     cartRepository.updateCount(target.id, nextCount)
                     fetchCart()
                 }
@@ -130,7 +130,7 @@ class ShoppingViewModel(
     fun removeWithID(id: Long) {
         viewModelScope.launch {
             val target = cart.value.findById(id)
-            if(target != null){
+            if (target != null) {
                 cartRepository.deleteCartItem(target.id)
                 fetchCart()
             }
@@ -142,7 +142,6 @@ class ShoppingViewModel(
             recentlyViewedProductRepository.updateList(product)
         }
     }
-
 
     fun loadMore() {
         _currentIndex.value++
@@ -157,7 +156,7 @@ class ShoppingViewModel(
 class ShoppingViewModelFactory(
     private val cartRepository: CartRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ShoppingViewModel::class.java)) {

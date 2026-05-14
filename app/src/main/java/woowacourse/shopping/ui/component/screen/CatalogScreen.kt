@@ -10,11 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.visible
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -173,7 +171,7 @@ private fun CatalogBody(
                     onAddInCart = { onAddInCart(it) },
                 )
             }
-            if(isLoading){
+            if (isLoading) {
                 item(
                     span = { GridItemSpan(maxLineSpan) },
                 ) {
@@ -229,49 +227,57 @@ private fun CatalogScreenPreview() {
                     price = 100000,
                     category = "",
                     id = 1L,
-                ),Product(
+                ),
+                Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
                     category = "",
                     id = 1L,
-                ),Product(
+                ),
+                Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
                     category = "",
                     id = 1L,
-                ),Product(
+                ),
+                Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
                     category = "",
                     id = 1L,
-                ),Product(
+                ),
+                Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
                     category = "",
                     id = 1L,
-                ),Product(
+                ),
+                Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
                     category = "",
                     id = 1L,
-                ),Product(
+                ),
+                Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
                     category = "",
                     id = 1L,
-                ),Product(
+                ),
+                Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
                     category = "",
                     id = 1L,
-                ),Product(
+                ),
+                Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
@@ -311,49 +317,57 @@ private fun CatalogScreenPreview2() {
                     price = 100000,
                     category = "",
                     id = 1L,
-                ),Product(
+                ),
+                Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
                     category = "",
                     id = 1L,
-                ),Product(
+                ),
+                Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
                     category = "",
                     id = 1L,
-                ),Product(
+                ),
+                Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
                     category = "",
                     id = 1L,
-                ),Product(
+                ),
+                Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
                     category = "",
                     id = 1L,
-                ),Product(
+                ),
+                Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
                     category = "",
                     id = 1L,
-                ),Product(
+                ),
+                Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
                     category = "",
                     id = 1L,
-                ),Product(
+                ),
+                Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
                     category = "",
                     id = 1L,
-                ),Product(
+                ),
+                Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,

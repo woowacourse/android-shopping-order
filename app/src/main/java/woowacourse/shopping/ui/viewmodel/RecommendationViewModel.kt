@@ -24,37 +24,45 @@ class RecommendationViewModel(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
-): ViewModel() {
+) : ViewModel() {
+    val lastViewProductId: StateFlow<Long?> =
+        recentlyViewedProductRepository
+            .getLatestItem()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = null,
+            )
 
-    val lastViewProductId: StateFlow<Long?> = recentlyViewedProductRepository.getLatestItem()
-        .stateIn(
+    val lastViewedProduct: StateFlow<Product?> =
+        flow {
+            emit(productRepository.getProduct(lastViewProductId.value ?: 0))
+        }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null
+            initialValue = null,
         )
 
-    val lastViewedProduct: StateFlow<Product?> = flow {
-        emit(productRepository.getProduct(lastViewProductId.value ?: 0))
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = null
-    )
-
     private val _recommendedProducts = MutableStateFlow(Products(emptyList()))
-    val recommendedProducts =_recommendedProducts.asStateFlow()
+    val recommendedProducts = _recommendedProducts.asStateFlow()
 
     private val _allCartItems = MutableStateFlow<PurchaseProducts>(PurchaseProducts())
     val allCartItems = _allCartItems.asStateFlow()
 
     init {
         viewModelScope.launch {
-            val latestViewedProductId = recentlyViewedProductRepository.getLatestItem().first()
-            if (latestViewedProductId != null) {
-                val product = productRepository.getProduct(latestViewedProductId)
-                _recommendedProducts.update {
-                    Products(productRepository.getCategoryProducts(category = product.category))
+            try {
+                val latestViewedProductId = recentlyViewedProductRepository.getLatestItem().first()
+                if (latestViewedProductId != null) {
+                    val product = productRepository.getProduct(latestViewedProductId)
+                    _recommendedProducts.update {
+                        Products(productRepository.getCategoryProducts(category = product.category))
+                    }
                 }
+            } catch (e: Exception) {
+                // Handle or log the error here.
+                // Currently just failing silently, which keeps the list empty.
+                _recommendedProducts.update { Products(emptyList()) }
             }
         }
 
@@ -71,12 +79,13 @@ class RecommendationViewModel(
 
     fun addToCart(purchaseProduct: PurchaseProduct) {
         viewModelScope.launch {
-            val existingItem = allCartItems.value.purchaseProducts.find {
-                it.product.id == purchaseProduct.product.id
-            }
+            val existingItem =
+                allCartItems.value.purchaseProducts.find {
+                    it.product.id == purchaseProduct.product.id
+                }
             if (existingItem != null) {
                 cartRepository.updateCount(existingItem.id, existingItem.count + 1)
-            }else {
+            } else {
                 cartRepository.insert(purchaseProduct)
             }
             fetchCart()
@@ -91,7 +100,7 @@ class RecommendationViewModel(
             val target = allCartItems.value.findById(id)
             if (target != null) {
                 val nextCount = target.count + updateAmount
-                if(nextCount >= 1) {
+                if (nextCount >= 1) {
                     cartRepository.updateCount(target.id, nextCount)
                     fetchCart()
                 }
@@ -102,7 +111,7 @@ class RecommendationViewModel(
     fun removeWithID(id: Long) {
         viewModelScope.launch {
             val target = allCartItems.value.findById(id)
-            if(target != null){
+            if (target != null) {
                 cartRepository.deleteCartItem(target.id)
                 fetchCart()
             }
@@ -127,7 +136,7 @@ class RecommendationViewModelFactory(
             return RecommendationViewModel(
                 cartRepository,
                 productRepository,
-                recentlyViewedProductRepository
+                recentlyViewedProductRepository,
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

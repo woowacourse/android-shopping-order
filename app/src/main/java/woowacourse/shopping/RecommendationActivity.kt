@@ -12,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import woowacourse.shopping.domain.Products
 import woowacourse.shopping.ui.component.screen.CartRecommendationScreen
 import woowacourse.shopping.ui.viewmodel.CartViewModel
 import woowacourse.shopping.ui.viewmodel.CartViewModelFactory
@@ -28,7 +27,7 @@ class RecommendationActivity : ComponentActivity() {
                 viewModel<CartViewModel>(
                     factory =
                         CartViewModelFactory(
-                            (application as ShoppingApplication).cartRepository
+                            (application as ShoppingApplication).cartRepository,
                         ),
                 )
 
@@ -38,8 +37,8 @@ class RecommendationActivity : ComponentActivity() {
                         RecommendationViewModelFactory(
                             cartRepository = (application as ShoppingApplication).cartRepository,
                             productRepository = (application as ShoppingApplication).productRepository,
-                            recentlyViewedProductRepository = (application as ShoppingApplication).recentlyViewedProductRepository
-                        )
+                            recentlyViewedProductRepository = (application as ShoppingApplication).recentlyViewedProductRepository,
+                        ),
                 )
 
             val totalPrice by cartViewModel.totalPrice.collectAsStateWithLifecycle()
@@ -47,7 +46,6 @@ class RecommendationActivity : ComponentActivity() {
             val cartState by recommendationViewModel.allCartItems.collectAsStateWithLifecycle()
             val lastViewedProduct by recommendationViewModel.lastViewedProduct.collectAsStateWithLifecycle()
             val recommendedProducts by recommendationViewModel.recommendedProducts.collectAsStateWithLifecycle()
-
 
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                 CartRecommendationScreen(
@@ -71,7 +69,7 @@ class RecommendationActivity : ComponentActivity() {
                     },
                     isContainedInCart = { id -> cartState.isContain(id) },
                     itemCount = { id -> cartState.totalCountOfSpecificPurchaseProduct(id) },
-                    modifier = Modifier.padding(innerPadding)
+                    modifier = Modifier.padding(innerPadding),
                 )
             }
         }
