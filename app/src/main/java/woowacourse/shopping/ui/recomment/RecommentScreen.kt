@@ -1,4 +1,6 @@
-package woowacourse.shopping.ui
+@file:Suppress("FunctionName")
+
+package woowacourse.shopping.ui.recomment
 
 import android.icu.text.DecimalFormat
 import androidx.compose.foundation.background
@@ -32,6 +34,7 @@ import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductTitle
 import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.ui.component.ProductItem
+import woowacourse.shopping.ui.screen.ShoppingCartTopBar
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 @Composable
@@ -60,9 +63,10 @@ fun RecommentScreen(
         modifier = modifier.fillMaxSize(),
     ) { innerPadding ->
         Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier =
+                modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -91,9 +95,10 @@ fun RecommentScreen(
                 )
             } else {
                 LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     items(
@@ -131,28 +136,32 @@ fun OrderButton(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(88.dp)
-            .background(MaterialTheme.colorScheme.surfaceContainer),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(88.dp)
+                .background(MaterialTheme.colorScheme.surfaceContainer),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = DecimalFormat(stringResource(R.string.price_format_pattern)).format(
-                totalPrice
-            ),
-            modifier = Modifier
-                .weight(2f)
-                .padding(end = 16.dp),
+            text =
+                DecimalFormat(stringResource(R.string.price_format_pattern)).format(
+                    totalPrice,
+                ),
+            modifier =
+                Modifier
+                    .weight(2f)
+                    .padding(end = 16.dp),
             textAlign = TextAlign.End,
             color = MaterialTheme.colorScheme.onSurface,
         )
 
         Button(
             onClick = { onOrderButtonClick(selectedShoppingCartItemIds) },
-            modifier = Modifier
-                .weight(1.5f)
-                .fillMaxHeight(),
+            modifier =
+                Modifier
+                    .weight(1.5f)
+                    .fillMaxHeight(),
             shape = RectangleShape,
             enabled = orderItemCount > 0,
         ) {
@@ -166,18 +175,19 @@ fun OrderButton(
 private fun RecommentScreenPreview() {
     AndroidShoppingTheme {
         RecommentScreen(
-            recommentProducts = listOf(
-                ShoppingItem(
-                    product =
-                        Product(
-                            id = 1L,
-                            title = ProductTitle("샘플 상품"),
-                            price = Price(12000),
-                            imageUrl = "https://example.com/image.jpg",
-                        ),
-                    quantity = 1,
+            recommentProducts =
+                listOf(
+                    ShoppingItem(
+                        product =
+                            Product(
+                                id = 1L,
+                                title = ProductTitle("샘플 상품"),
+                                price = Price(12000),
+                                imageUrl = "https://example.com/image.jpg",
+                            ),
+                        quantity = 1,
+                    ),
                 ),
-            ),
             baseSelectedCartItemCount = 1,
             totalPrice = 12000,
             onOrderButtonClick = {},

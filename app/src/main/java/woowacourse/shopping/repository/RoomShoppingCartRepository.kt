@@ -11,7 +11,8 @@ class RoomShoppingCartRepository(
     private val shoppingCartDao: ShoppingCartDao,
 ) : ShoppingCartRepository {
     override fun observeShoppingItems(): Flow<List<ShoppingCartItem>> =
-        shoppingCartDao.observeShoppingCartItemRows()
+        shoppingCartDao
+            .observeShoppingCartItemRows()
             .map { shoppingCartItemRows -> shoppingCartItemRows.map { shoppingCartItemRow -> shoppingCartItemRow.toDomain() } }
 
     override suspend fun addIfAbsent(productId: Long) {

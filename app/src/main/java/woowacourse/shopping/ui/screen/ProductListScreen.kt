@@ -1,8 +1,7 @@
 @file:Suppress("FunctionName")
 
-package woowacourse.shopping.ui
+package woowacourse.shopping.ui.screen
 
-import android.icu.text.DecimalFormat
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,8 +48,7 @@ import woowacourse.shopping.model.ProductTitle
 import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.ui.component.ProductItem
 import woowacourse.shopping.ui.component.ProductListSkeletonItem
-import woowacourse.shopping.ui.component.ProductQuantityBox
-import woowacourse.shopping.ui.component.ShoppingCardAddBox
+import woowacourse.shopping.ui.state.ProductListState
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 @Composable
@@ -252,7 +250,6 @@ private fun RecentViewedItem(
         )
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

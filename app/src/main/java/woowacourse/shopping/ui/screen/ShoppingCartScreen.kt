@@ -1,6 +1,6 @@
 @file:Suppress("FunctionName")
 
-package woowacourse.shopping.ui
+package woowacourse.shopping.ui.screen
 
 import android.icu.text.DecimalFormat
 import androidx.compose.foundation.Image
@@ -50,6 +50,7 @@ import woowacourse.shopping.model.ShoppingCartItem
 import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.ui.component.CartSkeletonItem
 import woowacourse.shopping.ui.component.ProductQuantityBox
+import woowacourse.shopping.ui.state.ShoppingCartState
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 @Composable
@@ -135,13 +136,11 @@ private fun ShoppingCartItems(
                 .fillMaxWidth()
                 .clip(
                     RoundedCornerShape(4.dp),
-                )
-                .border(
+                ).border(
                     color = MaterialTheme.colorScheme.outline,
                     width = 1.dp,
                     shape = RoundedCornerShape(4.dp),
-                )
-                .padding(12.dp),
+                ).padding(12.dp),
     ) {
         val product = shoppingCartItem.product
         Row(
@@ -215,7 +214,6 @@ private fun ShoppingCartItems(
     }
 }
 
-
 @Composable
 fun OrderButton(
     shoppingCartItems: List<ShoppingCartItem>,
@@ -229,10 +227,11 @@ fun OrderButton(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(88.dp)
-            .background(MaterialTheme.colorScheme.surfaceContainer),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(88.dp)
+                .background(MaterialTheme.colorScheme.surfaceContainer),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (orderComplete) {
@@ -257,25 +256,28 @@ fun OrderButton(
             }
         }
         Text(
-            text = DecimalFormat(
-                stringResource(R.string.price_format_pattern)
-            ).format(totalPrice),
-            modifier = Modifier
-                .weight(2f)
-                .padding(end = 16.dp),
+            text =
+                DecimalFormat(
+                    stringResource(R.string.price_format_pattern),
+                ).format(totalPrice),
+            modifier =
+                Modifier
+                    .weight(2f)
+                    .padding(end = 16.dp),
             textAlign = TextAlign.End,
             color = MaterialTheme.colorScheme.onSurface,
         )
 
         Button(
             onClick = { onOrderButtonClick(selectedProductIds.toList()) },
-            modifier = Modifier
-                .weight(1.5f)
-                .fillMaxHeight(),
+            modifier =
+                Modifier
+                    .weight(1.5f)
+                    .fillMaxHeight(),
             shape = RectangleShape,
             enabled = shoppingCartSelectItemCount > 0,
         ) {
-            Text(text = "주문하기(${shoppingCartSelectItemCount})")
+            Text(text = "주문하기($shoppingCartSelectItemCount)")
         }
     }
 }

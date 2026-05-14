@@ -1,6 +1,6 @@
 @file:Suppress("FunctionName")
 
-package woowacourse.shopping.ui
+package woowacourse.shopping.ui.screen
 
 import android.icu.text.DecimalFormat
 import androidx.compose.foundation.Image

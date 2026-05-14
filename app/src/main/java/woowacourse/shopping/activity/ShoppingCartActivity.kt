@@ -21,10 +21,11 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.backend.retrofit.viewmodel.ApiViewModelFactory
 import woowacourse.shopping.backend.retrofit.viewmodel.ShoppingCartViewModel
-import woowacourse.shopping.ui.OrderButton
-import woowacourse.shopping.ui.ShoppingCartScreen
-import woowacourse.shopping.ui.ShoppingCartState
 import woowacourse.shopping.ui.component.PageNavigation
+import woowacourse.shopping.ui.recomment.ShoppingCartRecommendSection
+import woowacourse.shopping.ui.screen.OrderButton
+import woowacourse.shopping.ui.screen.ShoppingCartScreen
+import woowacourse.shopping.ui.state.ShoppingCartState
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 import woowacourse.shopping.ui.viewmodel.ScreenViewModelFactory
 import woowacourse.shopping.ui.viewmodel.ShoppingCartItemViewModel

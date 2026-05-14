@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.launch
 import woowacourse.shopping.backend.retrofit.awaitBody
 import woowacourse.shopping.backend.retrofit.awaitCompletion
@@ -28,7 +27,6 @@ class ShoppingCartViewModel(
 
     private val _selectedProductIds = MutableStateFlow<Set<Long>>(emptySet())
     val selectedProductIds: StateFlow<Set<Long>> = _selectedProductIds.asStateFlow()
-
 
     fun requestCartItems() {
         _isLoading.value = true
@@ -136,20 +134,19 @@ class ShoppingCartViewModel(
         decreaseByProductId(productId = shoppingCartItem.product.id)
     }
 
-    fun getTotalPrice(shoppingCartItems: List<ShoppingCartItem>): Int =
-        shoppingCartItems.sumOf { it.getProductQuantityPrice() }
-
+    fun getTotalPrice(shoppingCartItems: List<ShoppingCartItem>): Int = shoppingCartItems.sumOf { it.getProductQuantityPrice() }
 
     private suspend fun loadCartItems(): List<ShoppingCartItem> {
-        val ShoppingCartItems = shoppingCartRetrofitRepository
-            .requestCartItems(
-                page = DEFAULT_PAGE,
-                size = DEFAULT_SIZE,
-                sort = null,
-            ).awaitBody(errorPrefix = "장바구니 조회 실패")
-            .toDomainShoppingCartItems()
-        syncShoppingCartItems(ShoppingCartItems)
-        return ShoppingCartItems
+        val shoppingCartItems =
+            shoppingCartRetrofitRepository
+                .requestCartItems(
+                    page = DEFAULT_PAGE,
+                    size = DEFAULT_SIZE,
+                    sort = null,
+                ).awaitBody(errorPrefix = "장바구니 조회 실패")
+                .toDomainShoppingCartItems()
+        syncShoppingCartItems(shoppingCartItems)
+        return shoppingCartItems
     }
 
     private fun findByProductId(
