@@ -48,7 +48,7 @@ suspend fun <T> Call<T>.awaitBody(errorPrefix: String = "요청 실패"): T =
         )
     }
 
-suspend fun Call<Void>.awaitSuccess(errorPrefix: String = "요청 실패") {
+suspend fun Call<Void>.awaitCompletion(errorPrefix: String = "요청 실패") {
     suspendCancellableCoroutine<Unit> { continuation ->
         continuation.invokeOnCancellation { cancel() }
 
@@ -69,6 +69,7 @@ suspend fun Call<Void>.awaitSuccess(errorPrefix: String = "요청 실패") {
                         continuation.resumeWithException(exception)
                         return
                     }
+
                     continuation.resume(Unit)
                 }
 
