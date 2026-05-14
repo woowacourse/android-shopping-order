@@ -25,7 +25,10 @@ import woowacourse.shopping.ui.component.MoreButton
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 class ProductListActivity : ComponentActivity() {
-    private val backendViewModelFactory: BackendViewModelFactory by lazy { BackendViewModelFactory() }
+    private val backendViewModelFactory: BackendViewModelFactory by lazy {
+        val app = application as ShoppingApplication
+        BackendViewModelFactory(app.retrofitService)
+    }
     private val productViewModel: ProductViewModel by viewModels { backendViewModelFactory }
     private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { backendViewModelFactory }
 
@@ -36,6 +39,7 @@ class ProductListActivity : ComponentActivity() {
         productViewModel.requestProduct(size = MAX_PRODUCT_SIZE)
         shoppingCartViewModel.requestCartItems()
         setContent {
+            val state by productViewModel.state.collectAsStateWithLifecycle()
             val products by productViewModel.products.collectAsStateWithLifecycle()
             val shoppingCartItems by shoppingCartViewModel.shoppingCartItems.collectAsStateWithLifecycle()
             val recentVisitedProductIds by appContainer.visitStore.recentVisitedProductIds.collectAsStateWithLifecycle()
@@ -65,6 +69,7 @@ class ProductListActivity : ComponentActivity() {
                     recentViewedShoppingItems = recentViewedShoppingItems,
                     shoppingCartTotalCount = shoppingCartViewModel.getTotalCount(),
                     isNetworkConnected = isNetworkConnected,
+                    state = state,
                     onAddToCartClick = { shoppingItem ->
                         shoppingCartViewModel.addOrIncreaseByProductId(
                             productId = shoppingItem.getProductId(),
@@ -97,6 +102,7 @@ class ProductListActivity : ComponentActivity() {
                     onNavigateToCartClick = {
                         ShoppingCartActivity.start(this@ProductListActivity)
                     },
+
                     bottomContent =
                         if (canLoadNextPage) {
                             {
