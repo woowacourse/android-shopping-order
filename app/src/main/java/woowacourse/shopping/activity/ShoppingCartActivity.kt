@@ -6,12 +6,16 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -26,6 +30,8 @@ import woowacourse.shopping.ui.component.PageNavigation
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 import woowacourse.shopping.ui.viewmodel.ScreenViewModelFactory
 import woowacourse.shopping.ui.viewmodel.ShoppingCartItemViewModel
+import woowacourse.shopping.ui.viewmodel.ShoppingCartRecommendViewModel
+import woowacourse.shopping.ui.viewmodel.ShoppingCartRecommendViewModel.ShoppingCartStep
 
 @OptIn(ExperimentalMaterial3Api::class)
 class ShoppingCartActivity : ComponentActivity() {
@@ -41,6 +47,20 @@ class ShoppingCartActivity : ComponentActivity() {
     }
 
     private val shoppingCartItemViewModel: ShoppingCartItemViewModel by viewModels { screenViewModelFactory }
+    private val shoppingCartRecommendViewModel: ShoppingCartRecommendViewModel by viewModels {
+        object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                if (modelClass.isAssignableFrom(ShoppingCartRecommendViewModel::class.java)) {
+                    return ShoppingCartRecommendViewModel(
+                        shoppingItemRepository = app.appContainer.shoppingItemRepository,
+                        visitStore = app.appContainer.visitStore,
+                    ) as T
+                }
+                throw IllegalArgumentException("지원하지 않는 ViewModel: ${modelClass.name}")
+            }
+        }
+    }
     private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { apiViewModelFactory }
 
     companion object {
@@ -65,6 +85,7 @@ class ShoppingCartActivity : ComponentActivity() {
             val shoppingCartItems by shoppingCartViewModel.shoppingCartItems.collectAsStateWithLifecycle()
             val selectedProductIds by shoppingCartViewModel.selectedProductIds.collectAsStateWithLifecycle()
             val selectedItemCount = selectedProductIds.size
+            val recommendUiState by shoppingCartRecommendViewModel.uiState.collectAsStateWithLifecycle()
 
             val screenState =
                 shoppingCartItemViewModel.shoppingCartItems.collectAsStateWithLifecycle()
@@ -83,6 +104,12 @@ class ShoppingCartActivity : ComponentActivity() {
                 } else {
                     screenState.value.pagedItems
                 }
+            LaunchedEffect(shoppingCartItems, selectedProductIds) {
+                shoppingCartRecommendViewModel.updateCartSnapshot(
+                    shoppingCartItems = shoppingCartItems,
+                    selectedCartProductIds = selectedProductIds,
+                )
+            }
             val state =
                 ShoppingCartState(
                     items = visibleItems,
@@ -99,49 +126,83 @@ class ShoppingCartActivity : ComponentActivity() {
 
 
             AndroidShoppingTheme {
-                ShoppingCartScreen(
-                    shoppingCartItems = visiblePagedItems,
-                    getQuantityPrice = shoppingCartItemViewModel::getQuantityPrice,
-                    state = state,
-                    onBackClick = shoppingCartItemViewModel::onBackClick,
-                    onRemoveShoppingItemClick = { shoppingCartItem ->
-                        shoppingCartItemViewModel.removeShoppingItem(shoppingCartItem)
-                        shoppingCartViewModel.removeShoppingItem(shoppingCartItem)
-                    },
-                    onToggleShoppingItemSelectionClick = { productId, isSelected ->
-                        shoppingCartViewModel.setShoppingCartProductSelection(
-                            productId = productId,
-                            isSelected = isSelected,
-                        )
-                    },
-                    onIncreaseShoppingItemQuantityClick = { shoppingCartItem ->
-                        shoppingCartViewModel.increaseShoppingItemQuantity(shoppingCartItem)
-                    },
-                    onDecreaseShoppingItemQuantityClick = { shoppingCartItem ->
-                        shoppingCartViewModel.decreaseShoppingItemQuantity(shoppingCartItem)
-                    },
-                ) {
-                    PageNavigation(
-                        currentPage = screenState.value.currentPage,
-                        canMoveToPreviousPage = if (hasApiError) false else screenState.value.canMoveToPreviousPage,
-                        canMoveToNextPage = if (hasApiError) false else screenState.value.canMoveToNextPage,
-                        onBeforePageClick = shoppingCartItemViewModel::moveToPreviousPage,
-                        onNextPageClick = shoppingCartItemViewModel::moveToNextPage,
-                    )
-                    OrderButton(
-                        shoppingCartItems = shoppingCartItems,
-                        selectedProductIds = selectedProductIds,
-                        shoppingCartSelectItemCount = selectedItemCount,
-                        onOrderButtonClick = { selectedProductIds ->
-                            if (selectedProductIds.isEmpty()) return@OrderButton
+                BackHandler(enabled = recommendUiState.currentStep == ShoppingCartStep.RECOMMENT) {
+                    shoppingCartRecommendViewModel.moveToCart()
+                }
+                if (recommendUiState.currentStep == ShoppingCartStep.CART) {
+                    ShoppingCartScreen(
+                        shoppingCartItems = visiblePagedItems,
+                        getQuantityPrice = shoppingCartItemViewModel::getQuantityPrice,
+                        state = state,
+                        onBackClick = shoppingCartItemViewModel::onBackClick,
+                        onRemoveShoppingItemClick = { shoppingCartItem ->
+                            shoppingCartItemViewModel.removeShoppingItem(shoppingCartItem)
+                            shoppingCartViewModel.removeShoppingItem(shoppingCartItem)
                         },
-                        checked = shoppingCartItems.isNotEmpty() && selectedItemCount == shoppingCartItems.size,
-                        orderComplete = shoppingCartItems.isNotEmpty(),
-                        totalPrice = shoppingCartViewModel.getTotalPrice(shoppingCartItems),
-                        onToggleShoppingItemSelectionClick = { productIds, isSelected ->
-                            shoppingCartViewModel.setShoppingCartProductsSelection(
-                                productIds = productIds,
+                        onToggleShoppingItemSelectionClick = { productId, isSelected ->
+                            shoppingCartViewModel.setShoppingCartProductSelection(
+                                productId = productId,
                                 isSelected = isSelected,
+                            )
+                        },
+                        onIncreaseShoppingItemQuantityClick = { shoppingCartItem ->
+                            shoppingCartViewModel.increaseShoppingItemQuantity(shoppingCartItem)
+                        },
+                        onDecreaseShoppingItemQuantityClick = { shoppingCartItem ->
+                            shoppingCartViewModel.decreaseShoppingItemQuantity(shoppingCartItem)
+                        },
+                    ) {
+                        PageNavigation(
+                            currentPage = screenState.value.currentPage,
+                            canMoveToPreviousPage = if (hasApiError) false else screenState.value.canMoveToPreviousPage,
+                            canMoveToNextPage = if (hasApiError) false else screenState.value.canMoveToNextPage,
+                            onBeforePageClick = shoppingCartItemViewModel::moveToPreviousPage,
+                            onNextPageClick = shoppingCartItemViewModel::moveToNextPage,
+                        )
+                        OrderButton(
+                            shoppingCartItems = shoppingCartItems,
+                            selectedProductIds = selectedProductIds,
+                            shoppingCartSelectItemCount = selectedItemCount,
+                            onOrderButtonClick = { selectedProductIds ->
+                                if (selectedProductIds.isEmpty()) return@OrderButton
+                                if (recommendUiState.recommendedShoppingItems.isEmpty()) return@OrderButton
+                                shoppingCartRecommendViewModel.moveToRecommend()
+                            },
+                            checked = shoppingCartItems.isNotEmpty() && selectedItemCount == shoppingCartItems.size,
+                            orderComplete = shoppingCartItems.isNotEmpty(),
+                            totalPrice = shoppingCartViewModel.getTotalPrice(shoppingCartItems),
+                            onToggleShoppingItemSelectionClick = { productIds, isSelected ->
+                                shoppingCartViewModel.setShoppingCartProductsSelection(
+                                    productIds = productIds,
+                                    isSelected = isSelected,
+                                )
+                            },
+                        )
+                    }
+                } else {
+                    ShoppingCartRecommendSection(
+                        recommendedShoppingItems = recommendUiState.recommendedShoppingItems,
+                        baseSelectedCartItemCount = selectedProductIds.size,
+                        totalPrice = recommendUiState.selectedCartTotalPrice + recommendUiState.selectedRecommendTotalPrice,
+                        onBackClick = shoppingCartItemViewModel::onBackClick,
+                        onOrderButtonClick = { selectedProductIds ->
+                            if (selectedProductIds.isEmpty()) return@ShoppingCartRecommendSection
+                        },
+                        onAddToCartClick = { shoppingItem ->
+                            shoppingCartViewModel.addOrIncreaseByProductId(
+                                productId = shoppingItem.getProductId(),
+                                amount = 1,
+                            )
+                        },
+                        onQuantityPlusClick = { shoppingItem ->
+                            shoppingCartViewModel.addOrIncreaseByProductId(
+                                productId = shoppingItem.getProductId(),
+                                amount = 1,
+                            )
+                        },
+                        onQuantityMinusClick = { shoppingItem ->
+                            shoppingCartViewModel.decreaseByProductId(
+                                productId = shoppingItem.getProductId(),
                             )
                         },
                     )

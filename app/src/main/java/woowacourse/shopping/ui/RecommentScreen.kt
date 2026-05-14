@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,6 +39,7 @@ fun RecommentScreen(
     recommentProducts: List<ShoppingItem>,
     baseSelectedCartItemCount: Int,
     totalPrice: Int,
+    onBackClick: () -> Unit,
     onOrderButtonClick: (List<Long>) -> Unit,
     onAddToCartClick: (ShoppingItem) -> Unit,
     onQuantityPlusClick: (ShoppingItem) -> Unit,
@@ -49,64 +51,74 @@ fun RecommentScreen(
             .filter { shoppingItem -> shoppingItem.getQuantity() > 0 }
             .map { shoppingItem -> shoppingItem.getProductId() }
     val orderItemCount = baseSelectedCartItemCount + selectedIdsInCurrentList.size
-
-    Column(
+    Scaffold(
+        topBar = {
+            ShoppingCartTopBar(
+                onBackClick = onBackClick,
+            )
+        },
         modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+    ) { innerPadding ->
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(
-                text = "이런 상품은 어떠세요?",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
-            )
-            Text(
-                text = "* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onBackground,
-            )
-        }
-
-        if (recommentProducts.isEmpty()) {
-            Text(
-                text = "추천 상품이 없습니다.",
-                modifier = Modifier.padding(horizontal = 16.dp),
-                color = MaterialTheme.colorScheme.onBackground,
-            )
-        } else {
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            Column(
+                modifier = Modifier.padding(16.dp),
             ) {
-                items(
-                    items = recommentProducts,
-                    key = { recommentProduct -> recommentProduct.getProductId() },
-                ) { shoppingItem ->
+                Text(
+                    text = "이런 상품은 어떠세요?",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+                Text(
+                    text = "* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+            }
 
-                    ProductItem(
-                        product = shoppingItem.getProduct(),
-                        quantity = shoppingItem.getQuantity(),
-                        onAddToCartClick = { onAddToCartClick(shoppingItem) },
-                        onQuantityPlusClick = { onQuantityPlusClick(shoppingItem) },
-                        onQuantityMinusClick = { onQuantityMinusClick(shoppingItem) },
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                    )
+            if (recommentProducts.isEmpty()) {
+                Text(
+                    text = "추천 상품이 없습니다.",
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+            } else {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    items(
+                        items = recommentProducts,
+                        key = { recommentProduct -> recommentProduct.getProductId() },
+                    ) { shoppingItem ->
+
+                        ProductItem(
+                            product = shoppingItem.getProduct(),
+                            quantity = shoppingItem.getQuantity(),
+                            onAddToCartClick = { onAddToCartClick(shoppingItem) },
+                            onQuantityPlusClick = { onQuantityPlusClick(shoppingItem) },
+                            onQuantityMinusClick = { onQuantityMinusClick(shoppingItem) },
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                        )
+                    }
                 }
             }
+            OrderButton(
+                onOrderButtonClick = onOrderButtonClick,
+                selectedShoppingCartItemIds = selectedIdsInCurrentList,
+                orderItemCount = orderItemCount,
+                totalPrice = totalPrice,
+            )
         }
-        OrderButton(
-            onOrderButtonClick = onOrderButtonClick,
-            selectedShoppingCartItemIds = selectedIdsInCurrentList,
-            orderItemCount = orderItemCount,
-            totalPrice = totalPrice,
-        )
     }
 }
 
@@ -172,6 +184,7 @@ private fun RecommentScreenPreview() {
             onAddToCartClick = {},
             onQuantityPlusClick = {},
             onQuantityMinusClick = {},
+            onBackClick = {},
         )
     }
 }
