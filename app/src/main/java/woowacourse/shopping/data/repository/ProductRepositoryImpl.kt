@@ -1,9 +1,6 @@
 package woowacourse.shopping.data.repository
 
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import woowacourse.shopping.data.remote.api.ProductApi
-import woowacourse.shopping.data.remote.dto.request.Pageable
 import woowacourse.shopping.data.remote.dto.response.product.ProductResponse
 import woowacourse.shopping.data.remote.dto.response.products.ProductDto
 import woowacourse.shopping.model.Money
@@ -28,7 +25,7 @@ class ProductRepositoryImpl(
         val products = apiResult.content.map { it.toDomain() }
         val lastPage = apiResult.last
 
-        return ProductResponseResult(products.toImmutableList(), lastPage)
+        return ProductResponseResult(products, lastPage)
     }
 
     override suspend fun getProductById(id: String): Product = api.getProductById(id.toLong()).toDomain()
@@ -52,6 +49,6 @@ class ProductRepositoryImpl(
 
 
 data class ProductResponseResult(
-    val products: ImmutableList<Product>,
+    val products: List<Product>,
     val isLastPage: Boolean,
 )
