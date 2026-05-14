@@ -48,7 +48,6 @@ class CartRepositoryImpl(private val cartService: CartService) : CartRepository 
             val cartItems = response.content.map { content->
                 content.toDomain()
             }
-            android.util.Log.d("content", response.content.toString())
             return PurchaseProducts(cartItems)
         } catch (e: Exception) {
             throw e

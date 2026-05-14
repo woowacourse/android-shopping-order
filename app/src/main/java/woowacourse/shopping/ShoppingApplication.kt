@@ -11,7 +11,6 @@ import woowacourse.shopping.data.remote.server.repository.CartRepositoryImpl
 import woowacourse.shopping.data.remote.server.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.remote.server.service.CartService
 import woowacourse.shopping.data.remote.server.service.ProductService
-import kotlin.jvm.java
 
 class ShoppingApplication : Application() {
     val database by lazy { DataBase.getDatabase(this) }
@@ -38,7 +37,6 @@ class ShoppingApplication : Application() {
         retrofitClient.create(CartService::class.java)
     }
 
-//    val client by lazy { OkHttpClient() }
     val productRepository by lazy {
     ProductRepositoryImpl(productService)
     }
@@ -47,8 +45,4 @@ class ShoppingApplication : Application() {
         CartRepositoryImpl(cartService)
     }
 
-    override fun onCreate() {
-        super.onCreate()
-//        ProductWebServer.start()
-    }
 }

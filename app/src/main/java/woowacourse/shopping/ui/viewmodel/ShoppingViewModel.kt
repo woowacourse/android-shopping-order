@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -81,7 +80,6 @@ class ShoppingViewModel(
                 val response = productRepository.getProducts(page, PAGE_SIZE)
                 _products.update { it + Products(response) }
             } catch (e: Exception) {
-                Log.e("Web Server Error", "${e.message}")
             } finally {
                 _isLoading.value = false
             }
