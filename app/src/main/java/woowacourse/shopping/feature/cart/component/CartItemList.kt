@@ -16,6 +16,8 @@ import woowacourse.shopping.feature.common.state.ProductUiModel
 fun CartItemList(
     isLoading: Boolean,
     cartContents: List<ProductUiModel>,
+    checkMap: Map<String, Boolean>,
+    onChecked: (String) -> Unit,
     onDelete: (String) -> Unit,
     onIncrease: (String) -> Unit,
     onDecrease: (String) -> Unit,
@@ -37,12 +39,10 @@ fun CartItemList(
                     name = "qweasdzxc",
                     price = 1000,
                     quantity = 3,
-                    onDelete = {
-                    },
-                    onIncrease = {
-                    },
-                    onDecrease = {
-                    },
+                    onDelete = {},
+                    onIncrease = {},
+                    onDecrease = {},
+                    onChecked = {},
                 )
             }
         } else {
@@ -65,6 +65,11 @@ fun CartItemList(
                     onDecrease = {
                         onDecrease(it.id)
                     },
+                    onChecked = {
+                        onChecked(it.id)
+                    },
+                    isChecked = checkMap[it.id]
+                        ?: false,
                 )
             }
         }
@@ -95,5 +100,7 @@ private fun CartItemListPreview() {
         onIncrease = {},
         onDecrease = {},
         isLoading = false,
+        checkMap = emptyMap(),
+        onChecked = { _ -> },
     )
 }

@@ -1,8 +1,10 @@
 package woowacourse.shopping.feature.cart.component
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,8 +22,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import woowacourse.shopping.constants.MockData
 import woowacourse.shopping.feature.cart.CartEvent
+import woowacourse.shopping.feature.cart.CartUiState
 import woowacourse.shopping.feature.cart.CartViewModel
+import woowacourse.shopping.feature.common.state.ProductUiModel
 
 @Composable
 fun CartScreen(
@@ -45,13 +50,50 @@ fun CartScreen(
             }
         }
     }
+    CartScreenContent(
+        uiState = uiState,
+        onCloseClick = onCloseClick,
+        onDelete = viewModel::deleteCartItem,
+        onIncrease = viewModel::increase,
+        onDecrease = viewModel::decrease,
+        onPrev = viewModel::moveToPreviousPage,
+        onNext = viewModel::moveToNextPage,
+        canPrev = !viewModel.isStartPage(),
+        canNext = !viewModel.isEndPage(),
+        onChecked = viewModel::cartItemCheck,
+        modifier = modifier,
+    )
+}
 
+@Composable
+fun CartScreenContent(
+    uiState: CartUiState,
+    onChecked: (String) -> Unit,
+    onCloseClick: () -> Unit,
+    onDelete: (String) -> Unit,
+    onIncrease: (String) -> Unit,
+    onDecrease: (String) -> Unit,
+    onPrev: () -> Unit,
+    onNext: () -> Unit,
+    canPrev: Boolean,
+    canNext: Boolean,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         containerColor = Color.White,
         modifier = modifier
             .fillMaxSize(),
         topBar = {
             CartAppBar(onCloseClick = onCloseClick)
+        },
+        bottomBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(78.dp)
+                    .background(Color(0xff555555)),
+            ) {
+            }
         },
     ) { innerPadding ->
         Box {
@@ -62,20 +104,22 @@ fun CartScreen(
                     .padding(innerPadding),
             ) {
                 CartItemList(
+                    checkMap = uiState.checkMap,
                     isLoading = uiState.isLoading,
-                    uiState.paginatedCartContents,
+                    cartContents = uiState.paginatedCartContents,
                     modifier = Modifier.weight(1f),
-                    onDelete = viewModel::deleteCartItem,
-                    onIncrease = { viewModel.increase(it) },
-                    onDecrease = { viewModel.decrease(it) },
+                    onDelete = onDelete,
+                    onIncrease = onIncrease,
+                    onDecrease = onDecrease,
+                    onChecked = onChecked,
                 )
                 Spacer(modifier = Modifier.height(40.dp))
                 PageNavigator(
                     page = uiState.page,
-                    onLeftClick = viewModel::moveToPreviousPage,
-                    onRightClick = viewModel::moveToNextPage,
-                    canMoveToPreviousPage = !viewModel.isStartPage(),
-                    canMoveToNextPage = !viewModel.isEndPage(),
+                    onLeftClick = onPrev,
+                    onRightClick = onNext,
+                    canMoveToPreviousPage = canPrev,
+                    canMoveToNextPage = canNext,
                 )
                 Spacer(modifier = Modifier.height(40.dp))
             }
@@ -85,9 +129,28 @@ fun CartScreen(
 
 @Preview
 @Composable
-private fun CartScreenPreview() {
-    CartScreen(
+private fun CartScreenContentPreview() {
+    CartScreenContent(
+        uiState = CartUiState(
+            isLoading = false,
+            paginatedCartContents = MockData.MOCK_PRODUCTS.take(2).map {
+                ProductUiModel(
+                    name = it.name,
+                    price = it.priceAmount(),
+                    imageUrl = it.imageUrl,
+                    id = it.id,
+                    quantity = 1,
+                )
+            },
+        ),
+        onDelete = {},
+        onIncrease = {},
+        onDecrease = {},
+        onPrev = {},
+        onNext = {},
+        canPrev = true,
+        canNext = true,
         onCloseClick = {},
-        activityFinish = {},
+        onChecked = { _ -> },
     )
 }

@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -37,9 +39,11 @@ fun CartItem(
     name: String,
     price: Int,
     quantity: Int,
+    onChecked: () -> Unit,
     onDelete: () -> Unit,
     onIncrease: () -> Unit,
     onDecrease: () -> Unit,
+    isChecked: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
 
@@ -65,13 +69,24 @@ fun CartItem(
             modifier = Modifier
                 .fillMaxWidth(),
         ) {
-            Text(
-                text = name,
-                fontWeight = FontWeight.W700,
-                fontSize = 18.sp,
-                color = if (isLoading) Color.Transparent else Color.Unspecified,
-                modifier = Modifier.background(if (isLoading) Color.LightGray else Color.Unspecified),
-            )
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (isLoading.not())
+                    Checkbox(
+                        checked = isChecked,
+                        onCheckedChange = { onChecked() },
+                        colors = CheckboxDefaults.colors().copy(
+                            checkedBoxColor = Color(0xFF04C09E),
+                        ),
+                    )
+                Text(
+                    text = name,
+                    fontWeight = FontWeight.W700,
+                    fontSize = 18.sp,
+                    color = if (isLoading) Color.Transparent else Color.Unspecified,
+                    modifier = Modifier.background(if (isLoading) Color.LightGray else Color.Unspecified),
+                )
+            }
             if (isLoading.not())
                 IconButton(
                     onClick = onDelete,
@@ -127,6 +142,23 @@ fun CartItem(
 @Composable
 private fun CartItemPreview() {
     CartItem(
+        isLoading = false,
+        imageUrl = "",
+        name = "프리뷰",
+        price = 1000,
+        onDelete = {},
+        onIncrease = {},
+        onDecrease = {},
+        quantity = 33,
+        isChecked = true,
+        onChecked = { },
+    )
+}
+
+@Preview
+@Composable
+private fun CartItemLoadingPreview() {
+    CartItem(
         isLoading = true,
         imageUrl = "",
         name = "프리뷰",
@@ -135,5 +167,7 @@ private fun CartItemPreview() {
         onIncrease = {},
         onDecrease = {},
         quantity = 33,
+        isChecked = false,
+        onChecked = { },
     )
 }

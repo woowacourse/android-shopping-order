@@ -54,8 +54,8 @@ fun ProductListScreen(
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                // vm.cartRefresh()
-                // vm.loadRecentProducts()
+                vm.cartRefresh()
+                vm.loadRecentProducts()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)

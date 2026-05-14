@@ -30,6 +30,7 @@ data class CartUiState(
     val isLoading: Boolean = true,
     val page: Int = 1,
     val paginatedCartContents: List<ProductUiModel> = emptyList(),
+    val checkMap: Map<String, Boolean> = emptyMap(),
 )
 
 class CartViewModel(
@@ -51,7 +52,8 @@ class CartViewModel(
             val cartContents = pagination(
                 page = 1,
             )
-            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents) }
+            val checkMap: Map<String, Boolean> = cartContents.map { it.id }.associateWith { false }
+            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents, checkMap = checkMap) }
         }
     }
 
@@ -80,7 +82,8 @@ class CartViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val cartContents = pagination(page)
-            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents) }
+            val checkMap: Map<String, Boolean> = cartContents.map { it.id }.associateWith { false }
+            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents, checkMap = checkMap) }
         }
     }
 
@@ -94,7 +97,8 @@ class CartViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val cartContents = pagination(page)
-            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents) }
+            val checkMap: Map<String, Boolean> = cartContents.map { it.id }.associateWith { false }
+            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents, checkMap = checkMap) }
         }
     }
 
@@ -117,7 +121,8 @@ class CartViewModel(
             cartRepository.increase(product)
             cart = getCart()
             val cartContents = pagination(uiState.value.page)
-            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents) }
+            val checkMap: Map<String, Boolean> = cartContents.map { it.id }.associateWith { false }
+            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents, checkMap = checkMap) }
         }
     }
 
@@ -130,7 +135,8 @@ class CartViewModel(
             cartRepository.decrease(productId)
             cart = getCart()
             val cartContents = pagination(uiState.value.page)
-            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents) }
+            val checkMap: Map<String, Boolean> = cartContents.map { it.id }.associateWith { false }
+            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents, checkMap = checkMap) }
         }
     }
 
@@ -152,7 +158,8 @@ class CartViewModel(
             _uiState.update { it.copy(isLoading = true) }
             cartRepository.remove(id)
             val cartContents = pagination(uiState.value.page)
-            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents) }
+            val checkMap: Map<String, Boolean> = cartContents.map { it.id }.associateWith { false }
+            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents, checkMap = checkMap) }
         }
     }
 
@@ -165,6 +172,13 @@ class CartViewModel(
             id = product.id,
             quantity = cartContent.quantity,
         )
+    }
+
+    fun cartItemCheck(productId: String) {
+        val checkMap = _uiState.value.checkMap.toMutableMap()
+        checkMap[productId] = checkMap[productId]?.not()
+            ?: false
+        _uiState.update { it.copy(checkMap = checkMap.toMap()) }
     }
 
     companion object {
