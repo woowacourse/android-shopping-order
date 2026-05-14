@@ -23,6 +23,17 @@ class FakeProductRepository(
         return Products(products.toList().subList(safeFrom, safeTo))
     }
 
+    override suspend fun getProductsByCategory(
+        category: String,
+        limit: Int,
+    ): Products =
+        Products(
+            products
+                .toList()
+                .filter { it.category == category }
+                .take(limit.coerceAtLeast(0)),
+        )
+
     override suspend fun hasNext(current: Int): Boolean = current < products.toList().lastIndex
 
     override suspend fun findAllByIds(ids: Set<Long>): Map<Long, Product> =

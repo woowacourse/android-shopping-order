@@ -11,6 +11,11 @@ interface ProductRepository {
         limit: Int,
     ): Products
 
+    suspend fun getProductsByCategory(
+        category: String,
+        limit: Int,
+    ): Products
+
     suspend fun hasNext(current: Int): Boolean
 
     suspend fun findAllByIds(ids: Set<Long>): Map<Long, Product>

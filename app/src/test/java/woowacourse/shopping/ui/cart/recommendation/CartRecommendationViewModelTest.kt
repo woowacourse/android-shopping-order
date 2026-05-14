@@ -17,15 +17,17 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.model.CartItem
+import woowacourse.shopping.model.Money
+import woowacourse.shopping.model.Product
 import woowacourse.shopping.network.NetworkMonitor
-import woowacourse.shopping.ui.cart.SelectedCartOrder
-import woowacourse.shopping.ui.cart.SelectedCartOrderItem
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.FakeProductRepository
 import woowacourse.shopping.repository.FakeRecentProductRepository
 import woowacourse.shopping.repository.ProductRepositoryFixture
 import woowacourse.shopping.repository.cart.CartPageItem
 import woowacourse.shopping.repository.cart.CartPageResult
+import woowacourse.shopping.ui.cart.SelectedCartOrder
+import woowacourse.shopping.ui.cart.SelectedCartOrderItem
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CartRecommendationViewModelTest {
@@ -74,17 +76,7 @@ class CartRecommendationViewModelTest {
     fun `추천 상품을 추가하고 바로 주문하면 추가한 상품까지 주문에 포함되고 장바구니에서 제거된다`() =
         runTest(dispatcher.scheduler) {
             viewModel.startOrder(
-                SelectedCartOrder(
-                    items =
-                        listOf(
-                            SelectedCartOrderItem(
-                                cartItemId = 101L,
-                                productId = orderedProduct.id,
-                                price = orderedProduct.price.value,
-                                quantity = 1,
-                            ),
-                        ),
-                ),
+                selectedCartOrderOf(orderedProduct),
             )
             advanceUntilIdle()
 
@@ -113,6 +105,127 @@ class CartRecommendationViewModelTest {
             assertTrue(cartRepository.getCartItemsByProductIds(setOf(orderedProduct.id, recommendedProduct.id)).isEmpty())
             assertEquals(1, viewModel.uiState.value.orderCompletedCount)
         }
+
+    @Test
+    fun `가장 최근에 본 상품의 카테고리 상품만 추천한다`() =
+        runTest(dispatcher.scheduler) {
+            val dessertProducts =
+                listOf(
+                    product(id = 1L, category = "dessert"),
+                    product(id = 2L, category = "dessert"),
+                )
+            val fruitProduct = product(id = 3L, category = "fruit")
+
+            cartRepository = RecordingCartRepository()
+            cartRepository.setQuantity(fruitProduct.id, 1)
+            recentProductRepository =
+                FakeRecentProductRepository().apply {
+                    recordView(1L)
+                }
+            viewModel =
+                CartRecommendationViewModel(
+                    productRepository = FakeProductRepository(dessertProducts + fruitProduct),
+                    cartRepository = cartRepository,
+                    recentProductRepository = recentProductRepository,
+                    networkMonitor = FakeNetworkMonitor(),
+                )
+
+            viewModel.startOrder(selectedCartOrderOf(fruitProduct))
+            advanceUntilIdle()
+
+            assertEquals(
+                listOf(1L, 2L),
+                viewModel.uiState.value.recommendedProducts.map { it.product.id },
+            )
+            assertEquals(
+                setOf("dessert"),
+                viewModel.uiState.value.recommendedProducts.map { it.product.category }.toSet(),
+            )
+        }
+
+    @Test
+    fun `장바구니에 이미 담긴 상품을 제외하고 최대 10개까지만 추천한다`() =
+        runTest(dispatcher.scheduler) {
+            val dessertProducts = (1L..12L).map { id -> product(id = id, category = "dessert") }
+            val selectedOrderProduct = product(id = 100L, category = "fruit")
+
+            cartRepository = RecordingCartRepository()
+            cartRepository.setQuantity(selectedOrderProduct.id, 1)
+            cartRepository.setQuantity(1L, 1)
+            cartRepository.setQuantity(2L, 1)
+            recentProductRepository =
+                FakeRecentProductRepository().apply {
+                    recordView(1L)
+                }
+            viewModel =
+                CartRecommendationViewModel(
+                    productRepository = FakeProductRepository(dessertProducts + selectedOrderProduct),
+                    cartRepository = cartRepository,
+                    recentProductRepository = recentProductRepository,
+                    networkMonitor = FakeNetworkMonitor(),
+                )
+
+            viewModel.startOrder(selectedCartOrderOf(selectedOrderProduct))
+            advanceUntilIdle()
+
+            assertEquals(
+                (3L..12L).toList(),
+                viewModel.uiState.value.recommendedProducts.map { it.product.id },
+            )
+            assertEquals(10, viewModel.uiState.value.recommendedProducts.size)
+        }
+
+    @Test
+    fun `추천 가능한 상품이 없으면 빈 목록을 노출한다`() =
+        runTest(dispatcher.scheduler) {
+            val dessertProduct = product(id = 1L, category = "dessert")
+            val selectedOrderProduct = product(id = 2L, category = "fruit")
+
+            cartRepository = RecordingCartRepository()
+            cartRepository.setQuantity(selectedOrderProduct.id, 1)
+            cartRepository.setQuantity(dessertProduct.id, 1)
+            recentProductRepository =
+                FakeRecentProductRepository().apply {
+                    recordView(dessertProduct.id)
+                }
+            viewModel =
+                CartRecommendationViewModel(
+                    productRepository = FakeProductRepository(listOf(dessertProduct, selectedOrderProduct)),
+                    cartRepository = cartRepository,
+                    recentProductRepository = recentProductRepository,
+                    networkMonitor = FakeNetworkMonitor(),
+                )
+
+            viewModel.startOrder(selectedCartOrderOf(selectedOrderProduct))
+            advanceUntilIdle()
+
+            assertTrue(viewModel.uiState.value.recommendedProducts.isEmpty())
+        }
+
+    private fun selectedCartOrderOf(product: Product): SelectedCartOrder =
+        SelectedCartOrder(
+            items =
+                listOf(
+                    SelectedCartOrderItem(
+                        cartItemId = 101L,
+                        productId = product.id,
+                        price = product.price.value,
+                        quantity = 1,
+                    ),
+                ),
+        )
+
+    private fun product(
+        id: Long,
+        category: String,
+    ): Product =
+        Product(
+            id = id,
+            name = "상품$id",
+            price = Money((10_000 + id).toInt()),
+            imageUrl = "https://example.com/product-$id.png",
+            category = category,
+        )
 
     private class FakeNetworkMonitor : NetworkMonitor {
         override val isNetworkConnected = MutableStateFlow(true)

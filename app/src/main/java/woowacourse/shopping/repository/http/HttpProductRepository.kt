@@ -75,6 +75,42 @@ class HttpProductRepository(
             Products(cachedProducts.subList(safeFrom, safeTo))
         }
 
+    override suspend fun getProductsByCategory(
+        category: String,
+        limit: Int,
+    ): Products =
+        withContext(Dispatchers.IO) {
+            val safeLimit = limit.coerceAtLeast(0)
+            if (category.isBlank() || safeLimit == 0) return@withContext Products(emptyList())
+
+            val responseBody =
+                executeRequest(
+                    errorMessage = "카테고리 상품 목록 API 호출에 실패했습니다.",
+                    request = {
+                        productApiService.getProducts(
+                            page = 0,
+                            size = safeLimit,
+                            category = category,
+                        )
+                    },
+                )
+
+            val fetchedProducts =
+                runCatching {
+                    responseBody
+                        .content
+                        .orEmpty()
+                        .map { it.toDomain() }
+                }.getOrElse { throwable ->
+                    throw ProductParsingException("카테고리 상품 목록 응답을 파싱할 수 없습니다.", throwable)
+                }
+
+            cachedProducts = (cachedProducts + fetchedProducts).distinctBy { it.id }
+            totalCount = maxOf(totalCount, cachedProducts.size.toLong())
+
+            Products(fetchedProducts.take(safeLimit))
+        }
+
     override suspend fun hasNext(current: Int): Boolean =
         withContext(Dispatchers.IO) {
             if (current < 0) return@withContext false

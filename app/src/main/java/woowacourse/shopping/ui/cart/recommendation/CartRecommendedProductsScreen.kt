@@ -74,7 +74,7 @@ fun CartRecommendedProductsScreen(
                 )
                 Spacer(modifier = Modifier.size(4.dp))
                 Text(
-                    text = "* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.",
+                    text = "* 가장 최근에 본 상품의 카테고리에서 추천 상품을 보여드려요.",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.W400,
                     color = Gray4,

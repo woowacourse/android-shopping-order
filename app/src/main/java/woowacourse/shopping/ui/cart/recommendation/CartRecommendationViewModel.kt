@@ -20,8 +20,6 @@ import woowacourse.shopping.ui.shopping.ShoppingProductUiState
 import woowacourse.shopping.ui.shopping.ShoppingProductUiStateMapper
 
 private const val RECOMMENDED_PRODUCTS_LIMIT = 10
-private const val RECOMMENDED_PRODUCTS_FALLBACK_LIMIT = 20
-
 class CartRecommendationViewModel(
     private val productRepository: ProductRepository = ShoppingRepositoryProvider.productRepository,
     private val cartRepository: CartRepository = ShoppingRepositoryProvider.cartRepository,
@@ -35,6 +33,7 @@ class CartRecommendationViewModel(
     private val orderedProductIds = linkedSetOf<Long>()
     private var excludedProductIds: Set<Long> = emptySet()
     private var baseOrderItemDataByProductId: Map<Long, OrderItemData> = emptyMap()
+    private val recommendedOrderItemDataByProductId = linkedMapOf<Long, OrderItemData>()
     private var isSessionStarted = false
 
     init {
@@ -49,6 +48,7 @@ class CartRecommendationViewModel(
             selectedCartOrder.items.associate { item ->
                 item.productId to OrderItemData(price = item.price, quantity = item.quantity)
             }
+        recommendedOrderItemDataByProductId.clear()
         isSessionStarted = true
 
         _uiState.update { currentState ->
@@ -73,7 +73,7 @@ class CartRecommendationViewModel(
 
         viewModelScope.launch {
             runCatching {
-                val recommendedProducts = getRecommendedProducts(excludedProductIds)
+                val recommendedProducts = getRecommendedProducts()
                 _uiState.update { currentState ->
                     currentState.copy(
                         recommendedProducts = recommendedProducts,
@@ -122,6 +122,7 @@ class CartRecommendationViewModel(
                 cartRepository.createOrder(cartItemIds)
             }.onSuccess {
                 orderedProductIds.clear()
+                recommendedOrderItemDataByProductId.clear()
                 _uiState.update { currentState ->
                     currentState.copy(
                         pendingOrder = PendingOrderUiState(),
@@ -155,7 +156,7 @@ class CartRecommendationViewModel(
             }
 
             runCatching {
-                getRecommendedProducts(excludedProductIds)
+                getRecommendedProducts()
             }.onSuccess { recommendedProducts ->
                 _uiState.update { currentState ->
                     currentState.copy(
@@ -174,33 +175,29 @@ class CartRecommendationViewModel(
         }
     }
 
-    private suspend fun getRecommendedProducts(excludedProductIds: Set<Long>): List<ShoppingProductUiState> {
-        val recentProductIds =
+    private suspend fun getRecommendedProducts(): List<ShoppingProductUiState> {
+        val latestViewedProductId =
             recentProductRepository
-                .getRecentProducts(RECOMMENDED_PRODUCTS_LIMIT * 2)
-                .map { it.productId }
-                .distinct()
-                .filterNot { it in excludedProductIds }
-                .take(RECOMMENDED_PRODUCTS_LIMIT)
+                .getRecentProducts(limit = 1)
+                .firstOrNull()
+                ?.productId ?: return emptyList()
 
-        val recentProducts =
-            if (recentProductIds.isEmpty()) {
-                emptyList()
-            } else {
-                val productsById = productRepository.findAllByIds(recentProductIds.toSet())
-                recentProductIds.mapNotNull(productsById::get)
-            }
+        val latestViewedProduct =
+            productRepository
+                .findAllByIds(setOf(latestViewedProductId))[latestViewedProductId]
+                ?: return emptyList()
+        if (latestViewedProduct.category.isBlank()) return emptyList()
 
+        val cartProductIds = resolveCartProductIds()
+        val fetchLimit = RECOMMENDED_PRODUCTS_LIMIT + cartProductIds.size
         val recommendedProducts =
-            if (recentProducts.isNotEmpty()) {
-                recentProducts
-            } else {
-                productRepository
-                    .getProducts(fromIndex = 0, limit = RECOMMENDED_PRODUCTS_FALLBACK_LIMIT)
-                    .toList()
-                    .filterNot { it.id in excludedProductIds }
-                    .take(RECOMMENDED_PRODUCTS_LIMIT)
-            }
+            productRepository
+                .getProductsByCategory(
+                    category = latestViewedProduct.category,
+                    limit = fetchLimit,
+                ).toList()
+                .filterNot { it.id in cartProductIds }
+                .take(RECOMMENDED_PRODUCTS_LIMIT)
 
         val quantityByProductId =
             cartRepository
@@ -224,6 +221,13 @@ class CartRecommendationViewModel(
         val targetQuantity = (currentQuantity + delta).coerceAtLeast(0)
         if (targetQuantity == currentQuantity) return
 
+        val productPrice =
+            _uiState.value.recommendedProducts
+                .firstOrNull { it.product.id == productId }
+                ?.product
+                ?.price
+                ?.value ?: return
+
         if (!updateRecommendedProductQuantity(productId, targetQuantity)) return
 
         recommendedSyncJobs.remove(productId)?.cancel()
@@ -233,8 +237,14 @@ class CartRecommendationViewModel(
                     cartRepository.setQuantity(productId, targetQuantity)
                     if (targetQuantity > 0) {
                         orderedProductIds += productId
+                        recommendedOrderItemDataByProductId[productId] =
+                            OrderItemData(
+                                price = productPrice,
+                                quantity = targetQuantity,
+                            )
                     } else {
                         orderedProductIds -= productId
+                        recommendedOrderItemDataByProductId.remove(productId)
                     }
                     reloadRecommendedProducts()
                     refreshPendingOrder()
@@ -275,7 +285,7 @@ class CartRecommendationViewModel(
     }
 
     private suspend fun reloadRecommendedProducts() {
-        val recommendedProducts = getRecommendedProducts(excludedProductIds)
+        val recommendedProducts = getRecommendedProducts()
         _uiState.update { currentState ->
             currentState.copy(
                 recommendedProducts = recommendedProducts,
@@ -325,6 +335,7 @@ class CartRecommendationViewModel(
     private fun buildOrderItemDataByProductId(): Map<Long, OrderItemData> {
         val itemDataByProductId = linkedMapOf<Long, OrderItemData>()
         itemDataByProductId.putAll(baseOrderItemDataByProductId)
+        itemDataByProductId.putAll(recommendedOrderItemDataByProductId)
 
         _uiState.value.recommendedProducts.forEach { product ->
             itemDataByProductId[product.product.id] =
@@ -337,20 +348,26 @@ class CartRecommendationViewModel(
         return itemDataByProductId
     }
 
+    private suspend fun resolveCartProductIds(): Set<Long> =
+        resolveCartPageItems(productIds = null)
+            .map { it.productId }
+            .toSet()
+
     private suspend fun awaitRecommendedSyncs() {
         recommendedSyncJobs.values.toList().joinAll()
     }
 
-    private suspend fun resolveCartPageItems(productIds: Set<Long>): List<CartPageItem> {
-        if (productIds.isEmpty()) return emptyList()
-
+    private suspend fun resolveCartPageItems(productIds: Set<Long>?): List<CartPageItem> {
+        if (productIds?.isEmpty() == true) return emptyList()
         val totalCount = cartRepository.count()
         if (totalCount == 0) return emptyList()
 
         return cartRepository
             .getCartPage(page = 0, size = totalCount)
             .items
-            .filter { it.productId in productIds }
+            .filter { cartItem ->
+                productIds == null || cartItem.productId in productIds
+            }
     }
 
     private fun observeNetworkState() {

@@ -96,6 +96,26 @@ class HttpProductRepositoryTest {
         }
 
     @Test
+    fun `카테고리 상품 목록 API 성공 응답을 도메인 객체로 변환한다`() =
+        runBlocking {
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setHeader("Content-Type", "application/json")
+                    .setBody(createProductsJson(listOf(3L, 6L), last = true)),
+            )
+
+            val actual = repository.getProductsByCategory(category = "food", limit = 2).toList()
+            val request = mockWebServer.takeRequest()
+
+            assertTrue(request.requestUrl?.encodedPath == "/products")
+            assertEquals("0", request.requestUrl?.queryParameter("page"))
+            assertEquals("2", request.requestUrl?.queryParameter("size"))
+            assertEquals("food", request.requestUrl?.queryParameter("category"))
+            assertEquals(listOf(3L, 6L), actual.map { it.id })
+        }
+
+    @Test
     fun `상품 목록 API가 서버 오류를 반환하면 예외를 던진다`() {
         mockWebServer.enqueue(
             MockResponse()

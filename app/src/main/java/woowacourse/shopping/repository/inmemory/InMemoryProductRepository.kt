@@ -14,6 +14,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "다람",
             price = Money(10_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "dessert",
         )
     val BBOYAMI =
         Product(
@@ -21,6 +22,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "뽀야미",
             price = Money(11_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "dessert",
         )
     val BANILLA =
         Product(
@@ -28,6 +30,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "바닐라",
             price = Money(12_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "dessert",
         )
     val APPLE =
         Product(
@@ -35,6 +38,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "애플",
             price = Money(13_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "fruit",
         )
     val SYANTI =
         Product(
@@ -42,6 +46,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "샤니",
             price = Money(14_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "snack",
         )
     val GLLUMIN =
         Product(
@@ -49,6 +54,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "글루민",
             price = Money(15_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "snack",
         )
     val DARAM2 =
         Product(
@@ -56,6 +62,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "다람2",
             price = Money(10_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "dessert",
         )
     val BBOYAMI2 =
         Product(
@@ -63,6 +70,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "뽀야미2",
             price = Money(11_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "dessert",
         )
     val BANILLA2 =
         Product(
@@ -70,6 +78,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "바닐라2",
             price = Money(12_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "dessert",
         )
     val APPLE2 =
         Product(
@@ -77,6 +86,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "애플2",
             price = Money(13_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "fruit",
         )
     val SYANTI2 =
         Product(
@@ -84,6 +94,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "샤니2",
             price = Money(14_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "snack",
         )
     val GLLUMIN2 =
         Product(
@@ -91,6 +102,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "글루민2",
             price = Money(15_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "snack",
         )
     val DARAM3 =
         Product(
@@ -98,6 +110,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "다람3",
             price = Money(10_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "dessert",
         )
     val BBOYAMI3 =
         Product(
@@ -105,6 +118,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "뽀야미3",
             price = Money(11_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "dessert",
         )
     val BANILLA3 =
         Product(
@@ -112,6 +126,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "바닐라3",
             price = Money(12_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "dessert",
         )
     val APPLE3 =
         Product(
@@ -119,6 +134,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "애플3",
             price = Money(13_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "fruit",
         )
     val SYANTI3 =
         Product(
@@ -126,6 +142,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "샤니3",
             price = Money(14_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "snack",
         )
     val GLLUMIN3 =
         Product(
@@ -133,6 +150,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "글루민3",
             price = Money(15_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "snack",
         )
     val DARAM4 =
         Product(
@@ -140,6 +158,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "다람4",
             price = Money(10_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "dessert",
         )
     val BBOYAMI4 =
         Product(
@@ -147,6 +166,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "뽀야미4",
             price = Money(11_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "dessert",
         )
     val BANILLA4 =
         Product(
@@ -154,6 +174,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "바닐라4",
             price = Money(12_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "dessert",
         )
     val APPLE4 =
         Product(
@@ -161,6 +182,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "애플4",
             price = Money(13_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "fruit",
         )
     val SYANTI4 =
         Product(
@@ -168,6 +190,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "샤니4",
             price = Money(14_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "snack",
         )
     val GLLUMIN4 =
         Product(
@@ -175,6 +198,7 @@ object InMemoryProductRepository : ProductRepository {
             name = "글루민4",
             price = Money(15_000),
             imageUrl = PRODUCT_IMAGE_URL,
+            category = "snack",
         )
     val products =
         Products(
@@ -220,6 +244,17 @@ object InMemoryProductRepository : ProductRepository {
 
         return Products(products.toList().subList(safeFrom, safeTo))
     }
+
+    override suspend fun getProductsByCategory(
+        category: String,
+        limit: Int,
+    ): Products =
+        Products(
+            products
+                .toList()
+                .filter { it.category == category }
+                .take(limit.coerceAtLeast(0)),
+        )
 
     override suspend fun hasNext(current: Int) = current < products.toList().lastIndex
 

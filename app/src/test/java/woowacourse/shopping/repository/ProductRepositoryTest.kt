@@ -54,4 +54,13 @@ class ProductRepositoryTest {
 
             assertEquals(0, actual)
         }
+
+    @Test
+    fun `카테고리로 상품을 조회하면 해당 카테고리 상품만 반환한다`() =
+        runBlocking {
+            val actual = repo.getProductsByCategory(category = "dessert", limit = 10).toList()
+
+            assertEquals(8, actual.size)
+            assertEquals(setOf("dessert"), actual.map { it.category }.toSet())
+        }
 }

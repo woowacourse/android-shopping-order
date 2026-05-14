@@ -12,6 +12,7 @@ interface ProductApiService {
     suspend fun getProducts(
         @Query("page") page: Int,
         @Query("size") size: Int,
+        @Query("category") category: String? = null,
     ): Response<ProductPageResponseDto>
 
     @GET("products/{id}")
