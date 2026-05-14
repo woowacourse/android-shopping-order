@@ -11,16 +11,24 @@ class ProductRepositoryImpl(
     private val api: ProductApi,
 ) : ProductRepository {
     override suspend fun getProducts(
+        category: String,
         page: Int,
         size: Int,
     ): ProductResponseResult {
         val apiResult =
-            api
-                .getProducts(
-                    category = "도서",
+            if (category.isEmpty()) {
+                api
+                    .getProducts(
+                        page = page,
+                        size = size,
+                    )
+            } else {
+                api.getProductsByCategory(
+                    category = category,
                     page = page,
                     size = size,
                 )
+            }
 
         val products = apiResult.content.map { it.toDomain() }
         val lastPage = apiResult.last

@@ -4,6 +4,7 @@ import woowacourse.shopping.model.Product
 
 interface ProductRepository {
     suspend fun getProducts(
+        category: String = "",
         page: Int,
         size: Int,
     ): ProductResponseResult

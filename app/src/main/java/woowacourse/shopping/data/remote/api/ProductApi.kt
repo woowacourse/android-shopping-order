@@ -9,6 +9,13 @@ import woowacourse.shopping.data.remote.dto.response.products.ProductsResponse
 interface ProductApi {
     @GET("/products")
     suspend fun getProducts(
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("sort") sort: List<String> = emptyList(),
+    ): ProductsResponse
+
+    @GET("/products")
+    suspend fun getProductsByCategory(
         @Query("category") category: String,
         @Query("page") page: Int,
         @Query("size") size: Int,
