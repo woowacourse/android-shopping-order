@@ -47,4 +47,22 @@ class MockProductRepositoryImpl(
                 webResponse.toObject()
             }
         }
+
+    override suspend fun getCategoryProducts(
+        page: Int,
+        pageSize: Int,
+        category: String
+    ): List<Product> {
+        val offset = page * pageSize
+        val url = "${baseUrl}products?offset=$offset&limit=$pageSize"
+
+        val request = Request.Builder().url(url).build()
+        return client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) throw okio.IOException("Unexpected code $response")
+
+            val responseBody = response.body.string() ?: ""
+            val webResponse = json.decodeFromString<List<WebServerResponse>>(responseBody)
+            webResponse.map { it.toObject() }.filter { it.category == category }
+        }
+    }
 }
