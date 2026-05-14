@@ -6,6 +6,7 @@ import woowacourse.shopping.data.repository.DefaultCartRepository
 import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.data.repository.DefaultRecentProductRepository
 import woowacourse.shopping.data.source.local.ShoppingDatabase
+import woowacourse.shopping.data.source.local.auth.AuthDataSource
 import woowacourse.shopping.data.source.local.auth.DefaultAuthDataSource
 import woowacourse.shopping.data.source.remote.CartRemoteDataSource
 import woowacourse.shopping.domain.repository.CartRepository
@@ -13,14 +14,21 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
 object RepositoryProvider {
+    private lateinit var appContext: Context
     private lateinit var database: ShoppingDatabase
 
-    val productRepository: ProductRepository = DefaultProductRepository()
-    val cartRepository: CartRepository by lazy {
-        DefaultCartRepository(
-            remoteDataSource = CartRemoteDataSource(authDataSource = DefaultAuthDataSource),
-        )
+    fun init(context: Context) {
+        appContext = context.applicationContext
+        database =
+            Room
+                .databaseBuilder(
+                    context.applicationContext,
+                    ShoppingDatabase::class.java,
+                    "cart-db",
+                ).build()
     }
+
+    val productRepository: ProductRepository = DefaultProductRepository()
 
     val recentProductRepository: RecentProductRepository by lazy {
         DefaultRecentProductRepository(
@@ -29,13 +37,13 @@ object RepositoryProvider {
         )
     }
 
-    fun init(context: Context) {
-        database =
-            Room
-                .databaseBuilder(
-                    context.applicationContext,
-                    ShoppingDatabase::class.java,
-                    "cart-db",
-                ).build()
+    val authDataSource: AuthDataSource by lazy {
+        DefaultAuthDataSource(appContext)
+    }
+
+    val cartRepository: CartRepository by lazy {
+        DefaultCartRepository(
+            remoteDataSource = CartRemoteDataSource(authDataSource = authDataSource),
+        )
     }
 }

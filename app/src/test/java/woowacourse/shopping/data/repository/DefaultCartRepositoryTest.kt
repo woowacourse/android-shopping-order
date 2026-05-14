@@ -39,7 +39,16 @@ class DefaultCartRepositoryTest {
                         baseUrl = server.url("/").toString(),
                         authDataSource =
                             object : AuthDataSource {
-                                override val getAuthToken: String = FakeCartDispatcher.authToken
+                                override suspend fun getToken(): String {
+                                    return FakeCartDispatcher.authToken
+                                }
+
+                                override suspend fun saveToken(
+                                    id: String,
+                                    password: String
+                                ) {
+                                    throw UnsupportedOperationException()
+                                }
                             },
                     ),
             )

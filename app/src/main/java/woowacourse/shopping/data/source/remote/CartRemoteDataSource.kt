@@ -37,7 +37,7 @@ class CartRemoteDataSource(
             try {
                 val response =
                     cartService.requestItems(
-                        basicToken = "Basic ${authDataSource.getAuthToken}",
+                        basicToken = "Basic ${authDataSource.getToken()}",
                         page = offset,
                         size = limit,
                     )
@@ -56,7 +56,7 @@ class CartRemoteDataSource(
         withContext(Dispatchers.IO) {
             try {
                 cartService.requestAddItem(
-                    basicToken = "Basic ${authDataSource.getAuthToken}",
+                    basicToken = "Basic ${authDataSource.getToken()}",
                     addItemRequestBody = AddItemRequestBody(id, quantity),
                 )
             } catch (err: HttpException) {
@@ -79,7 +79,7 @@ class CartRemoteDataSource(
         withContext(Dispatchers.IO) {
             try {
                 cartService.requestDeleteItem(
-                    basicToken = "Basic ${authDataSource.getAuthToken}",
+                    basicToken = "Basic ${authDataSource.getToken()}",
                     id = id,
                 )
             } catch (err: HttpException) {
@@ -105,7 +105,7 @@ class CartRemoteDataSource(
         withContext(Dispatchers.IO) {
             try {
                 cartService.requestChangeQuantity(
-                    basicToken = "Basic ${authDataSource.getAuthToken}",
+                    basicToken = "Basic ${authDataSource.getToken()}",
                     id = id,
                     quantity = QuantityRequestBody(quantity),
                 )
