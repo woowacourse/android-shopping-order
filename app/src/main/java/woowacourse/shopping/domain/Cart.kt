@@ -10,19 +10,19 @@ class Cart(
     fun add(purchaseProduct: PurchaseProduct) = Cart(purchaseProducts.add(purchaseProduct))
 
     fun updateCountWithId(
-        id: String,
+        id: Long,
         updateAmount: Int,
     ) = Cart(purchaseProducts.updateCountWithUuid(id, updateAmount))
 
-    fun removeWithId(id: String) = Cart(purchaseProducts.removeProduct(id))
+    fun removeWithId(id: Long) = Cart(purchaseProducts.removeProduct(id))
 
-    fun totalPriceOfSpecificPurchaseProduct(id: String) = purchaseProducts.totalPriceOfSpecificPurchaseProduct(id)
+    fun totalPriceOfSpecificPurchaseProduct(id: Long) = purchaseProducts.totalPriceOfSpecificPurchaseProduct(id)
 
     fun totalCountOfPurchaseProducts() = purchaseProducts.totalCount()
 
-    fun totalCountOfSpecificPurchaseProduct(id: String) = purchaseProducts.totalCountOfSpecificPurchaseProduct(id)
+    fun totalCountOfSpecificPurchaseProduct(id: Long) = purchaseProducts.totalCountOfSpecificPurchaseProduct(id)
 
-    fun isContain(id: String) = purchaseProducts.isContain(id)
+    fun isContain(id: Long) = purchaseProducts.isContain(id)
 
-    fun findById(id: String) = purchaseProducts.findById(id)
+    fun findById(id: Long) = purchaseProducts.findById(id)
 }

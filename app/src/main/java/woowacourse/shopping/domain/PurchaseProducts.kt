@@ -8,39 +8,41 @@ class PurchaseProducts(
     val purchaseProducts: List<PurchaseProduct> = emptyList(),
 ) : Parcelable {
     fun add(purchaseProduct: PurchaseProduct) =
-        if (findById(purchaseProduct.id()) == null) {
+        if (findById(purchaseProduct.productId()) == null) {
             PurchaseProducts(purchaseProducts + purchaseProduct)
         } else {
-            updateCountWithUuid(purchaseProduct.id(), purchaseProduct.count)
+            updateCountWithUuid(purchaseProduct.productId(), purchaseProduct.count)
         }
 
     fun updateCountWithUuid(
-        id: String,
+        id: Long,
         updateAmount: Int,
     ) = PurchaseProducts(
         purchaseProducts.map {
-            if (it.isSameID(id)) it.updateCount(updateAmount) else it
+            if (it.isSameProductID(id)) it.updateCount(updateAmount) else it
         },
     )
 
-    fun removeProduct(id: String): PurchaseProducts {
+    fun removeProduct(id: Long): PurchaseProducts {
         val targetPurchaseProduct = findById(id) ?: return this
         return PurchaseProducts(purchaseProducts - targetPurchaseProduct)
     }
 
-    fun totalPriceOfSpecificPurchaseProduct(id: String): Int {
+    fun totalPriceOfSpecificPurchaseProduct(id: Long): Int {
         val targetProduct = findById(id) ?: return 0
         return targetProduct.totalPrice()
     }
 
-    fun totalCountOfSpecificPurchaseProduct(id: String): Int {
+    fun totalCountOfSpecificPurchaseProduct(id: Long): Int {
         val targetProduct = findById(id) ?: return 0
         return targetProduct.count
     }
 
     fun totalCount() = purchaseProducts.sumOf { it.count }
 
-    fun isContain(id: String): Boolean = purchaseProducts.any { it.id() == id }
+    fun isContain(id: Long): Boolean = purchaseProducts.any { it.productId() == id }
 
-    fun findById(id: String) = purchaseProducts.find { it.isSameID(id) }
+    fun findPurchaseProductById(id: Long): PurchaseProduct? = purchaseProducts.find { it.id == id }
+
+    fun findById(id: Long) = purchaseProducts.find { it.isSameProductID(id) }
 }

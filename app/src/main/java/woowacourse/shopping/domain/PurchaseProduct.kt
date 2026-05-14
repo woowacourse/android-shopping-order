@@ -5,6 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class PurchaseProduct(
+    val id: Long,
     val product: Product,
     val count: Int = 1,
 ) : Parcelable {
@@ -23,9 +24,9 @@ data class PurchaseProduct(
 
     fun imageUri() = product.imageUri
 
-    fun id() = product.id
+    fun productId() = product.id
 
     fun totalPrice() = product.price * count
 
-    fun isSameID(id: String) = id == product.id
+    fun isSameProductID(id: Long) = id == product.id
 }

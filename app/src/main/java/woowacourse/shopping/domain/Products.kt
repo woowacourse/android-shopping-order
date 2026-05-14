@@ -14,7 +14,7 @@ class Products(
 
     fun add(product: Product) = Products(products + product)
 
-    fun remove(id: String): Products {
+    fun remove(id: Long): Products {
         val product = findWithId(id) ?: return this
         return Products(products - product)
     }
@@ -33,5 +33,5 @@ class Products(
 
     operator fun plus(products: Products) = Products(this.products + products.products)
 
-    fun findWithId(id: String) = products.find { it.id == id }
+    fun findWithId(id: Long) = products.find { it.id == id }
 }
