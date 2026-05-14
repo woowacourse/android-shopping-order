@@ -14,12 +14,12 @@ import woowacourse.shopping.data.model.Cart
 import woowacourse.shopping.data.model.CartItem
 import woowacourse.shopping.data.model.Money
 import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.data.model.Products
 import woowacourse.shopping.ui.cart.component.CartBody
 import woowacourse.shopping.ui.cart.component.CartBottomBar
 import woowacourse.shopping.ui.cart.component.CartHeader
 import woowacourse.shopping.ui.cart.component.CartRecommendationBody
 import woowacourse.shopping.ui.cart.component.CartScreenSkeleton
+import woowacourse.shopping.ui.common.model.ProductUiModel
 
 @Composable
 fun CartScreen(
@@ -59,13 +59,13 @@ fun CartScreen(
 
         false ->
             RecommendScreen(
-                recommendedProducts = Products(uiState.recommendItems),
+                recommendedProducts = uiState.recommendItems,
                 count = uiState.totalSelectedCount,
                 price = uiState.totalPrice,
                 modifier = modifier,
                 onBackClick = { viewModel.changeScreen() },
-                onIncreaseClick = {  },
-                onDecreaseClick = { },
+                onIncreaseClick = { viewModel.increaseInRecommendScreen(it) },
+                onDecreaseClick = { viewModel.decreaseInRecommendScreen(it) },
                 onOrderClick = {
                     viewModel.order(uiState.selectedItemIds.toList())
                     onOrderClick()
@@ -134,7 +134,7 @@ fun CartScreen(
 
 @Composable
 private fun RecommendScreen(
-    recommendedProducts: Products,
+    recommendedProducts: List<ProductUiModel>,
     count: Int,
     price: Long,
     modifier: Modifier = Modifier,
@@ -232,15 +232,16 @@ private fun CartScreenPreview2() {
 @Preview(showBackground = true)
 @Composable
 private fun RecommendScreenPreview() {
-    val products = Products(
+    val products =
         listOf(
-            Product(name = "1번", price = Money(1000), imageUrl = ""),
-            Product(name = "2번", price = Money(1000), imageUrl = ""),
-            Product(name = "3번", price = Money(1000), imageUrl = ""),
-            Product(name = "4번", price = Money(1000), imageUrl = ""),
-            Product(name = "5번", price = Money(1000), imageUrl = ""),
+            ProductUiModel(Product(name = "1번", price = Money(1000), imageUrl = "")),
+            ProductUiModel(Product(name = "2번", price = Money(1000), imageUrl = "")),
+            ProductUiModel(Product(name = "3번", price = Money(1000), imageUrl = "")),
+            ProductUiModel(Product(name = "4번", price = Money(1000), imageUrl = "")),
+            ProductUiModel(Product(name = "5번", price = Money(1000), imageUrl = "")),
+            ProductUiModel(Product(name = "6번", price = Money(1000), imageUrl = "")),
         )
-    )
+
 
     RecommendScreen(
         recommendedProducts = products,

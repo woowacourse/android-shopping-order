@@ -12,6 +12,7 @@ import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.recommender.ProductRecommender
+import woowacourse.shopping.ui.common.model.ProductUiModel
 import woowacourse.shopping.ui.common.paging.Pager
 
 class CartViewModel(
@@ -26,42 +27,50 @@ class CartViewModel(
     val pager = Pager(pageSize)
 
     init {
-        loadData()
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            try {
+                refreshData()
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
     }
 
     fun increase(product: Product) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
             try {
                 cartRepo.increase(product)
                 loadData()
             } finally {
-                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
 
     fun decrease(product: Product) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
             try {
                 cartRepo.decrease(product)
                 loadData()
             } finally {
-                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
 
     fun delete(product: Product) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
             try {
+                val cartItem =
+                    cartRepo.getAllCartItems().items.find { it.product.id == product.id }
+                        ?: throw IllegalArgumentException("추가하려는 상품 아이디(${product.id})로 장바구니 아이디를 조회할 수 없습니다. ")
+                val cartId = cartItem.id
+                    ?: throw IllegalArgumentException("카트 아이템 아이디가 생성되지 않았습니다.")
+
+                _uiState.update { it.copy(selectedItemIds = it.selectedItemIds - cartId) }
                 cartRepo.delete(product)
+
                 loadData()
-            } finally {
-                _uiState.update { it.copy(isLoading = false) }
-            }
+            } finally {}
         }
     }
 
@@ -95,7 +104,6 @@ class CartViewModel(
 
     fun toggleAllItemsSelection(isSelected: Boolean) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
             try {
                 val cartItems = cartRepo.getAllCartItems()
                 val allIds = cartItems.items.map {
@@ -103,7 +111,7 @@ class CartViewModel(
                         ?: throw IllegalArgumentException("아이템에 id(${it.id})가 없습니다.")
                 }.toSet()
 
-                if (isSelected) _uiState.update {
+                if (isSelected && cartItems.items.isNotEmpty()) _uiState.update {
                     it.copy(
                         selectedItemIds = allIds,
                         isAllSelected = true
@@ -115,11 +123,10 @@ class CartViewModel(
                         isAllSelected = false
                     )
                 }
+                refreshData()
             } finally {
-                _uiState.update { it.copy(isLoading = false) }
             }
         }
-        loadData()
     }
 
     fun changeScreen() {
@@ -142,6 +149,64 @@ class CartViewModel(
         }
     }
 
+    fun increaseInRecommendScreen(product: Product) {
+        viewModelScope.launch {
+            try {
+                cartRepo.increase(product)
+                val cartId =
+                    cartRepo.getAllCartItems().items.find { it.product.id == product.id }?.id
+                        ?: throw IllegalArgumentException("추가하려는 상품 아이디(${product.id})로 장바구니 아이디를 조회할 수 없습니다. ")
+
+                _uiState.update { state ->
+                    val uiModel = state.recommendItems.map { uiModel ->
+                        if (uiModel.product.id == product.id) {
+                            uiModel.copy(cartQuantity = uiModel.cartQuantity + 1)
+                        } else {
+                            uiModel
+                        }
+                    }
+
+                    state.copy(
+                        recommendItems = uiModel,
+                        selectedItemIds = state.selectedItemIds + cartId
+                    )
+                }
+                refreshData()
+            } finally {
+            }
+        }
+    }
+
+    fun decreaseInRecommendScreen(product: Product) {
+        viewModelScope.launch {
+            try {
+                val cartItem =
+                    cartRepo.getAllCartItems().items.find { it.product.id == product.id }
+                        ?: throw IllegalArgumentException("추가하려는 상품 아이디(${product.id})로 장바구니 아이디를 조회할 수 없습니다. ")
+                val cartId = cartItem.id
+                    ?: throw IllegalArgumentException("카트 아이템 아이디가 생성되지 않았습니다.")
+
+                if (cartItem.quantity > 1) cartRepo.decrease(product) else cartRepo.delete(product)
+
+                _uiState.update { state ->
+                    val uiModel = state.recommendItems.map { uiModel ->
+                        if (uiModel.product.id == product.id) {
+                            uiModel.copy(cartQuantity = maxOf(0, uiModel.cartQuantity - 1))
+                        } else {
+                            uiModel
+                        }
+                    }
+                    state.copy(
+                        recommendItems = uiModel,
+                        selectedItemIds = if (cartItem.quantity == 1) state.selectedItemIds - cartId else state.selectedItemIds
+                    )
+                }
+                refreshData()
+            } finally {
+            }
+        }
+    }
+
     private fun getRecommendProducts() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
@@ -151,7 +216,10 @@ class CartViewModel(
                     allProductItems = productRepo.getProducts(0, 50),
                     allCartItem = cartRepo.getAllCartItems().items
                 )
-                _uiState.update { it.copy(recommendItems = products) }
+                val uiModel = products.map {
+                    ProductUiModel(product = it)
+                }
+                _uiState.update { it.copy(recommendItems = uiModel) }
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
@@ -160,11 +228,9 @@ class CartViewModel(
 
     private fun loadData() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
             try {
                 refreshData()
             } finally {
-                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -191,7 +257,7 @@ class CartViewModel(
             )
         }
 
-        if (_uiState.value.selectedItemIds.size == _uiState.value.totalCartItemCount) {
+        if (_uiState.value.selectedItemIds.isNotEmpty() && _uiState.value.selectedItemIds.size == _uiState.value.totalCartItemCount) {
             _uiState.update { it.copy(isAllSelected = true) }
         }
     }

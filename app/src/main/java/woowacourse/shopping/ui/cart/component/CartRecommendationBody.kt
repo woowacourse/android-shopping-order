@@ -18,14 +18,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.data.model.Money
 import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.data.model.Products
-import woowacourse.shopping.ui.common.theme.Gray5
 import woowacourse.shopping.ui.common.model.ProductUiModel
+import woowacourse.shopping.ui.common.theme.Gray5
 import woowacourse.shopping.ui.shopping.component.ProductUnit
 
 @Composable
 fun CartRecommendationBody(
-    productItems: Products,
+    productItems: List<ProductUiModel>,
     modifier: Modifier = Modifier,
     onIncreaseClick: (Product) -> Unit,
     onDecreaseClick: (Product) -> Unit
@@ -70,7 +69,7 @@ private fun Title(modifier: Modifier = Modifier) {
 
 @Composable
 private fun ItemRow(
-    products: Products,
+    products: List<ProductUiModel>,
     modifier: Modifier = Modifier,
     onIncreaseClick: (Product) -> Unit,
     onDecreaseClick: (Product) -> Unit
@@ -79,11 +78,9 @@ private fun ItemRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(items = products.toList(), key = { it.id }) { product ->
+        items(items = products.toList(), key = { it.product.id }) { uiModel ->
             ProductUnit(
-                model = ProductUiModel(
-                    product = product
-                ),
+                model = uiModel,
                 modifier = Modifier,
                 onClick = {},
                 onIncreaseClick = onIncreaseClick,
@@ -97,20 +94,23 @@ private fun ItemRow(
 @Composable
 fun CartRecommendationBodyPreview() {
     CartRecommendationBody(
-        productItems = Products(
-            products = listOf(
-                Product(
-                    name = "딸기라떼",
-                    price = Money(4500),
-                    imageUrl = "",
+        productItems =
+            listOf(
+                ProductUiModel(
+                    Product(
+                        name = "딸기라떼",
+                        price = Money(4500),
+                        imageUrl = "",
+                    )
                 ),
-                Product(
-                    name = "고구마라떼",
-                    price = Money(5500),
-                    imageUrl = "",
+                ProductUiModel(
+                    Product(
+                        name = "고구마라떼",
+                        price = Money(5500),
+                        imageUrl = "",
+                    )
                 )
-            )
-        ),
+            ),
         modifier = Modifier,
         onIncreaseClick = {},
         onDecreaseClick = {}
