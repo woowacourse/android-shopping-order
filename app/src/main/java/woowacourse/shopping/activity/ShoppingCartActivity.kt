@@ -18,7 +18,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.backend.retrofit.viewmodel.ApiViewModelFactory
+import woowacourse.shopping.backend.retrofit.viewmodel.OrderViewModel
 import woowacourse.shopping.backend.retrofit.viewmodel.ShoppingCartViewModel
+import woowacourse.shopping.mapper.toOrderInfo
 import woowacourse.shopping.ui.ShoppingCartScreen
 import woowacourse.shopping.ui.ShoppingCartState
 import woowacourse.shopping.ui.component.PageNavigation
@@ -41,6 +43,7 @@ class ShoppingCartActivity : ComponentActivity() {
 
     private val shoppingCartItemViewModel: ShoppingCartItemViewModel by viewModels { screenViewModelFactory }
     private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { apiViewModelFactory }
+    private val orderViewModel: OrderViewModel by viewModels { apiViewModelFactory }
 
     companion object {
         fun start(context: Context) {
@@ -61,9 +64,7 @@ class ShoppingCartActivity : ComponentActivity() {
 
 
         setContent {
-            val shoppingCartItems by shoppingCartViewModel.shoppingCartItems.collectAsStateWithLifecycle()
-            val selectedCartItemIds by shoppingCartViewModel.selectedCartItemIds.collectAsStateWithLifecycle()
-            val selectedItemCount = selectedCartItemIds.size
+            val selectedProductIds by shoppingCartViewModel.selectedProductIds.collectAsStateWithLifecycle()
 
             val screenState =
                 shoppingCartItemViewModel.shoppingCartItems.collectAsStateWithLifecycle()
@@ -82,15 +83,18 @@ class ShoppingCartActivity : ComponentActivity() {
                 } else {
                     screenState.value.pagedItems
                 }
+            val visibleProductIds = visibleItems.map { shoppingCartItem -> shoppingCartItem.product.id }.toSet()
+            val selectedVisibleProductIds = selectedProductIds.intersect(visibleProductIds)
+            val selectedItemCount = selectedVisibleProductIds.size
             val state =
                 ShoppingCartState(
                     items = visibleItems,
-                    selectedCartItemIds = selectedCartItemIds,
+                    selectedProductIds = selectedVisibleProductIds,
                     isLoading = isLoading.value,
                     errorMessage = errorMessage.value,
                     currentPage = screenState.value.currentPage,
-                    selectedItemCount = shoppingCartItems.size,
-                    canOrder = selectedItemCount > 0 && !isLoading.value,
+                    selectedItemCount = selectedItemCount,
+                    canOrder = selectedItemCount > 0 && !isLoading.value && !hasApiError,
                     canMoveToPreviousPage =
                         if (hasApiError) false else screenState.value.canMoveToPreviousPage,
                     canMoveToNextPage = if (hasApiError) false else screenState.value.canMoveToNextPage,
@@ -104,13 +108,32 @@ class ShoppingCartActivity : ComponentActivity() {
                     state = state,
                     onBackClick = shoppingCartItemViewModel::onBackClick,
                     onRemoveShoppingItemClick = { shoppingCartItem ->
+                        shoppingCartViewModel.removeShoppingCartItemSelection(shoppingCartItem)
+                        shoppingCartItemViewModel.removeShoppingItem(shoppingCartItem)
                         shoppingCartViewModel.removeShoppingItem(shoppingCartItem)
                     },
+                    onToggleShoppingItemSelectionClick = { shoppingCartItem ->
+                        shoppingCartViewModel.toggleShoppingCartItemSelection(shoppingCartItem)
+                    },
                     onIncreaseShoppingItemQuantityClick = { shoppingCartItem ->
+                        shoppingCartItemViewModel.increaseShoppingItemQuantity(shoppingCartItem)
                         shoppingCartViewModel.increaseShoppingItemQuantity(shoppingCartItem)
                     },
                     onDecreaseShoppingItemQuantityClick = { shoppingCartItem ->
+                        if (shoppingCartItem.getQuantity() == 1) {
+                            shoppingCartViewModel.removeShoppingCartItemSelection(shoppingCartItem)
+                        }
+                        shoppingCartItemViewModel.decreaseShoppingItemQuantity(shoppingCartItem)
                         shoppingCartViewModel.decreaseShoppingItemQuantity(shoppingCartItem)
+                    },
+                    onOrderClick = {
+                        orderViewModel.order(
+                            orderInfo = shoppingCartViewModel.getSelectedShoppingCartItems().toOrderInfo(),
+                            onSuccess = {
+                                shoppingCartViewModel.clearSelection()
+                                shoppingCartViewModel.requestCartItems()
+                            },
+                        )
                     },
                 ) {
                     PageNavigation(

@@ -14,6 +14,7 @@
     <string name="previous_page_description">이전 페이지</string>
     <string name="next_page_description">다음 페이지</string>
     <string name="more_button_text">더보기</string>
+    <string name="order_button_text">선택한 상품 %1$d개 주문하기</string>
     <string name="price_format_pattern">#,###원</string>
     <string name="recent_viewed_section_title">최근 본 상품</string>
     <string name="last_viewed_product_title">마지막으로 본 상품</string>

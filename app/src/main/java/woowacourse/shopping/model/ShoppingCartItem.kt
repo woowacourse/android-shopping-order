@@ -15,8 +15,23 @@ class ShoppingCartItem(
 
     override fun equals(other: Any?): Boolean {
         if (other !is ShoppingCartItem) return false
-        return id == other.id
+        return id == other.id &&
+            product.id == other.product.id &&
+            product.getTitle() == other.product.getTitle() &&
+            product.getPrice() == other.product.getPrice() &&
+            product.imageUrl == other.product.imageUrl &&
+            product.category == other.product.category &&
+            getQuantity() == other.getQuantity()
     }
 
-    override fun hashCode(): Int = id.hashCode()
+    override fun hashCode(): Int =
+        listOf(
+            id,
+            product.id,
+            product.getTitle(),
+            product.getPrice(),
+            product.imageUrl,
+            product.category,
+            getQuantity(),
+        ).hashCode()
 }

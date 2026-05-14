@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -99,15 +101,32 @@ fun ShoppingCartScreen(
                     shoppingCartItems.forEach { shoppingCartItem ->
                         ShoppingCartItems(
                             shoppingCartItem = shoppingCartItem,
-                            selected = shoppingCartItem.getId() in state.selectedCartItemIds,
+                            selected = shoppingCartItem.product.id in state.selectedProductIds,
                             quantityPrice = getQuantityPrice(shoppingCartItem),
                             onRemoveShoppingItemClick = onRemoveShoppingItemClick,
+                            onToggleShoppingItemSelectionClick = onToggleShoppingItemSelectionClick,
                             onIncreaseShoppingItemQuantityClick = onIncreaseShoppingItemQuantityClick,
                             onDecreaseShoppingItemQuantityClick = onDecreaseShoppingItemQuantityClick,
                         )
                     }
                 }
                 bottomContent()
+                Button(
+                    onClick = onOrderClick,
+                    enabled = state.canOrder,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                ) {
+                    Text(
+                        text =
+                            stringResource(
+                                R.string.order_button_text,
+                                state.selectedItemCount,
+                            ),
+                    )
+                }
             }
         }
     }
@@ -116,9 +135,10 @@ fun ShoppingCartScreen(
 @Composable
 private fun ShoppingCartItems(
     shoppingCartItem: ShoppingCartItem,
-    selected : Boolean,
+    selected: Boolean,
     quantityPrice: Int,
     onRemoveShoppingItemClick: (ShoppingCartItem) -> Unit,
+    onToggleShoppingItemSelectionClick: (ShoppingCartItem) -> Unit,
     onIncreaseShoppingItemQuantityClick: (ShoppingCartItem) -> Unit,
     onDecreaseShoppingItemQuantityClick: (ShoppingCartItem) -> Unit,
     modifier: Modifier = Modifier,
@@ -131,9 +151,16 @@ private fun ShoppingCartItems(
                     RoundedCornerShape(4.dp),
                 )
                 .border(
-                    color = MaterialTheme.colorScheme.outline,
+                    color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                     width = 1.dp,
                     shape = RoundedCornerShape(4.dp),
+                )
+                .background(
+                    if (selected) {
+                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
+                    } else {
+                        MaterialTheme.colorScheme.surface
+                    },
                 )
                 .padding(12.dp),
     ) {
@@ -158,6 +185,10 @@ private fun ShoppingCartItems(
                         .clickable { onRemoveShoppingItemClick(shoppingCartItem) },
             )
         }
+        Checkbox(
+            checked = selected,
+            onCheckedChange = { onToggleShoppingItemSelectionClick(shoppingCartItem) },
+        )
         Row(
             modifier =
                 Modifier
@@ -303,8 +334,10 @@ private fun ShoppingCartScreenPreview() {
             getQuantityPrice = { shoppingCartItem -> shoppingCartItem.getProductQuantityPrice() },
             onBackClick = {},
             onRemoveShoppingItemClick = {},
+            onToggleShoppingItemSelectionClick = {},
             onIncreaseShoppingItemQuantityClick = {},
             onDecreaseShoppingItemQuantityClick = {},
+            onOrderClick = {},
         )
     }
 }
@@ -322,8 +355,10 @@ private fun ShoppingCartItemsPreview() {
                         4,
                     ),
             ),
+        selected = false,
         quantityPrice = 399_200,
         onRemoveShoppingItemClick = {},
+        onToggleShoppingItemSelectionClick = {},
         onIncreaseShoppingItemQuantityClick = {},
         onDecreaseShoppingItemQuantityClick = {},
     )

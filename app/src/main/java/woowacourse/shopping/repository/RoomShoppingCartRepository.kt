@@ -1,5 +1,7 @@
 package woowacourse.shopping.repository
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import woowacourse.shopping.model.ShoppingCartItem
 import woowacourse.shopping.storage.room.shoppingcart.ShoppingCartDao
 import woowacourse.shopping.storage.room.shoppingcart.ShoppingCartEntity
@@ -8,6 +10,10 @@ import woowacourse.shopping.storage.room.shoppingcart.toDomain
 class RoomShoppingCartRepository(
     private val shoppingCartDao: ShoppingCartDao,
 ) : ShoppingCartRepository {
+    override fun observeShoppingItems(): Flow<List<ShoppingCartItem>> =
+        shoppingCartDao.observeShoppingCartItemRows()
+            .map { shoppingCartItemRows -> shoppingCartItemRows.map { shoppingCartItemRow -> shoppingCartItemRow.toDomain() } }
+
     override suspend fun addIfAbsent(productId: Long) {
         shoppingCartDao.insert(
             ShoppingCartEntity(
