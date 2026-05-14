@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,7 +43,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import woowacourse.shopping.R
-import woowacourse.shopping.constant.Format.formatPrice
 import woowacourse.shopping.constant.ShoppingColor.APP_BAR_COLOR
 import woowacourse.shopping.domain.product.Product
 import androidx.compose.foundation.lazy.grid.items as lazyGridItems
@@ -98,7 +96,12 @@ fun ProductListScreenContent(
 
         when (uiState) {
             is ProductListUiState.Loading -> {
-                LoadingContent(modifier = Modifier.fillMaxSize())
+                LoadingContent(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(20.dp),
+                )
             }
 
             is ProductListUiState.Success -> {
@@ -272,16 +275,6 @@ private fun CartBadgeIcon(
 }
 
 @Composable
-private fun LoadingContent(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center,
-    ) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
 private fun ErrorContent(
     message: String,
     modifier: Modifier = Modifier,
@@ -397,70 +390,6 @@ private fun ProductCardGrid(
 }
 
 @Composable
-private fun ProductCard(
-    productName: String,
-    price: Int,
-    imageUrl: String,
-    quantity: Int,
-    onClick: () -> Unit,
-    onAddClick: () -> Unit,
-    onIncrease: () -> Unit,
-    onDecrease: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(modifier = modifier.clickable { onClick() }) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = "상품 이미지",
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(154.dp),
-                contentScale = ContentScale.Crop,
-            )
-            ProductCardQuantityControl(
-                quantity = quantity,
-                onAddClick = onAddClick,
-                onIncrease = onIncrease,
-                onDecrease = onDecrease,
-                modifier =
-                    Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(8.dp),
-            )
-        }
-        ProductInfoColumn(
-            modifier = Modifier.padding(start = 6.dp, end = 9.dp, top = 8.dp, bottom = 12.dp),
-            productName = productName,
-            price = price,
-        )
-    }
-}
-
-@Composable
-private fun ProductInfoColumn(
-    productName: String,
-    price: Int,
-    modifier: Modifier = Modifier,
-) {
-    Column(modifier = modifier) {
-        Text(
-            productName,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-        Text(
-            formatPrice(price),
-            fontSize = 16.sp,
-            color = Color.Gray,
-        )
-    }
-}
-
-@Composable
 private fun MoreButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
@@ -473,121 +402,21 @@ private fun MoreButton(
     }
 }
 
-@Composable
-private fun ProductCardQuantityControl(
-    quantity: Int,
-    onAddClick: () -> Unit,
-    onIncrease: () -> Unit,
-    onDecrease: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    if (quantity == 0) {
-        AddCircleButton(onClick = onAddClick, modifier = modifier)
-    } else {
-        InlineStepper(
-            quantity = quantity,
-            onIncrease = onIncrease,
-            onDecrease = onDecrease,
-            modifier = modifier,
-        )
-    }
-}
-
-@Composable
-private fun AddCircleButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier =
-            modifier
-                .size(32.dp)
-                .clip(CircleShape)
-                .background(Color(0xFFB0B0B0))
-                .clickable { onClick() },
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = "+",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-        )
-    }
-}
-
-@Composable
-private fun InlineStepper(
-    quantity: Int,
-    onIncrease: () -> Unit,
-    onDecrease: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier =
-            modifier
-                .height(32.dp)
-                .clip(RoundedCornerShape(6.dp))
-                .background(Color.White),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        StepperSign(symbol = "-", onClick = onDecrease)
-        Box(
-            modifier =
-                Modifier
-                    .width(28.dp)
-                    .height(32.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "$quantity",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.Black,
-            )
-        }
-        StepperSign(symbol = "+", onClick = onIncrease)
-    }
-}
-
-@Composable
-private fun StepperSign(
-    symbol: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier =
-            modifier
-                .size(width = 28.dp, height = 32.dp)
-                .clickable { onClick() }
-                .padding(horizontal = 6.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = symbol,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-        )
-    }
-}
-
 @SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 fun ProductListScreenPreview() {
     ProductListScreenContent(
         modifier = Modifier.fillMaxSize(),
-        uiState =
-            ProductListUiState.Success(
-                products = emptyList(),
-                recentProducts = emptyList(),
-                quantitiesByProductId = emptyMap(),
-                canLoadMore = true,
-                isLoadingMore = false,
-                totalCartCount = 0,
-            ),
+        uiState = ProductListUiState.Loading,
+//            ProductListUiState.Success(
+//                products = emptyList(),
+//                recentProducts = emptyList(),
+//                quantitiesByProductId = emptyMap(),
+//                canLoadMore = true,
+//                isLoadingMore = false,
+//                totalCartCount = 0,
+//            ),
         cartCount = 0,
         onAddClick = {},
         onIncrease = {},
