@@ -108,6 +108,12 @@ class CartViewModel(
 
             val result = cartRepository.getAllCartItems()
             _cartItems.update { result }
+            val cartItem =
+                _cartItems.value?.values?.find { it.product.id == product.id } ?: return@launch
+
+            _selectedItems.update {
+                it + cartItem.id
+            }
         }
     }
 
@@ -118,7 +124,6 @@ class CartViewModel(
 
             cartRepository.increase(target.id, target.quantity.value + 1)
             val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
-
             _cartItems.update { result }
         }
     }
@@ -191,7 +196,9 @@ class CartViewModel(
         if (_flow.value == CartFlow.CART) {
             _flow.value = CartFlow.RECOMMEND
         } else {
-// TODO: 주문
+            viewModelScope.launch {
+                cartRepository.order(_selectedItems.value.toList())
+            }
         }
     }
 
