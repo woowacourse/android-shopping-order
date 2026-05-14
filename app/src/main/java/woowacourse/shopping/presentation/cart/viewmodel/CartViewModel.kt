@@ -32,6 +32,8 @@ class CartViewModel(
     private val _uiEvents = Channel<CartEvent>(Channel.BUFFERED)
     val uiEvents: Flow<CartEvent> = _uiEvents.receiveAsFlow()
 
+    fun getPaymentItemIds(): List<Long> = paymentItems.getProductIds()
+
     fun refreshCart() {
         viewModelScope.launch {
             loadCartItems()

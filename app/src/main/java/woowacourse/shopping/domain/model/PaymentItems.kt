@@ -6,6 +6,8 @@ data class PaymentItems(
     val totalPrice: Long get() = paymentItems.sumOf { it.product.price.amount * it.quantity }
     val totalQuantity: Int get() = paymentItems.sumOf { it.quantity }
 
+    fun getProductIds(): List<Long> = paymentItems.map { it.product.id }
+
     fun isContain(productId: Long): Boolean = paymentItems.any { it.product.id == productId }
 
     fun add(item: CartItem): PaymentItems = copy(paymentItems = paymentItems + item)

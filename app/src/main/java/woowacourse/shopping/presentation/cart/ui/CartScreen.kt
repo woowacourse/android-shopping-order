@@ -1,6 +1,8 @@
 package woowacourse.shopping.presentation.cart.ui
 
+import android.R.attr.onClick
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -26,6 +29,7 @@ import kotlinx.collections.immutable.toImmutableList
 import woowacourse.shopping.R
 import woowacourse.shopping.presentation.cart.model.CartUiState
 import woowacourse.shopping.presentation.cart.ui.components.CartBottomBar
+import woowacourse.shopping.presentation.cart.ui.components.CartCheckBox
 import woowacourse.shopping.presentation.cart.ui.components.CartContent
 import woowacourse.shopping.presentation.cart.ui.components.CartPageSection
 import woowacourse.shopping.presentation.common.components.ShoppingAppBar
@@ -84,9 +88,25 @@ fun CartScreen(
                 CartBottomBar(
                     purchaseItemCount = uiState.totalQuantity,
                     totalPrice = formattedPrice(uiState.totalPrice),
-                    isSelectAll = isSelectedAll,
                     onOrderClick = { onOrderClick() },
-                    onClickCheckBox = { onSelectAll() },
+                    allCheckBox = {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.padding(vertical = 8.dp),
+                        ) {
+                            CartCheckBox(
+                                isSelected = isSelectedAll,
+                                onClick = onSelectAll,
+                                modifier = Modifier.padding(0.dp),
+                            )
+                            Text(
+                                text = stringResource(R.string.total),
+                                color = Color.White,
+                                fontSize = 12.sp,
+                            )
+                        }
+                    },
                 )
             }
         },

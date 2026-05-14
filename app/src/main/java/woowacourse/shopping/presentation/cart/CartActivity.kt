@@ -16,6 +16,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.presentation.cart.ui.CartScreen
 import woowacourse.shopping.presentation.cart.viewmodel.CartEvent
 import woowacourse.shopping.presentation.cart.viewmodel.CartViewModel
+import woowacourse.shopping.presentation.recommend.RecommendActivity
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 
 class CartActivity : ComponentActivity() {
@@ -56,7 +57,14 @@ class CartActivity : ComponentActivity() {
                     onIncrease = { viewModel.increase(it) },
                     onDecrease = { viewModel.decrease(it) },
                     onSelected = { viewModel.selectItem(it) },
-                    onOrderClick = {},
+                    onOrderClick = {
+                        startActivity(
+                            RecommendActivity.newIntent(
+                                context,
+                                viewModel.getPaymentItemIds(),
+                            ),
+                        )
+                    },
                     onSelectAll = { viewModel.toggleSelectAll() },
                 )
             }

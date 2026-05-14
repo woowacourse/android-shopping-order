@@ -34,6 +34,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".presentation.recommend.RecommendActivity"
+            android:exported="false"
+            android:label="RecommendActivity"
+            android:theme="@style/Theme.Shopping" />
     </application>
 
 </manifest>

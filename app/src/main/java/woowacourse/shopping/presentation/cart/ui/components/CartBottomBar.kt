@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -30,9 +29,8 @@ import woowacourse.shopping.ui.theme.Green40
 fun CartBottomBar(
     purchaseItemCount: Int,
     totalPrice: String,
-    isSelectAll: Boolean,
     onOrderClick: () -> Unit,
-    onClickCheckBox: () -> Unit,
+    allCheckBox: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -52,22 +50,7 @@ fun CartBottomBar(
                     .background(Gray50)
                     .padding(horizontal = 12.dp),
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(vertical = 8.dp),
-            ) {
-                CartCheckBox(
-                    isSelected = isSelectAll,
-                    onClick = onClickCheckBox,
-                    modifier = Modifier.padding(0.dp),
-                )
-                Text(
-                    text = stringResource(R.string.total),
-                    color = Color.White,
-                    fontSize = 12.sp,
-                )
-            }
+            allCheckBox()
             Text(
                 text = totalPrice,
                 color = Color.White,
@@ -101,9 +84,14 @@ private fun CartBottomBarPreview() {
         CartBottomBar(
             purchaseItemCount = 2,
             totalPrice = "184,200원",
-            isSelectAll = true,
-            onClickCheckBox = {},
             onOrderClick = {},
+            allCheckBox = {
+                CartCheckBox(
+                    isSelected = true,
+                    onClick = {},
+                    modifier = Modifier.padding(0.dp),
+                )
+            },
         )
     }
 }
