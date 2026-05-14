@@ -64,12 +64,16 @@ fun CartScreen(
         uiState = uiState,
         onClickClose = { onClickClose() },
         onClickRemoveItem = viewModel::removeCartItem,
+        onClickAdd = viewModel::addCartItem,
         onClickIncrease = viewModel::increase,
         onClickDecrease = viewModel::decrease,
+        onClickIncreaseRecommendProduct = viewModel::increaseRecommendProduct,
+        onClickDecreaseRecommendProduct = viewModel::decreaseRecommendProduct,
         onClickGoToPreviousPage = viewModel::goToPreviousPage,
         onClickGoToNextPage = viewModel::goToNextPage,
         onClickToggleSelection = viewModel::toggleSelection,
         onClickAllSelect = viewModel::toggleAllSelection,
+        onClickOrder = viewModel::onClickOrder,
     )
 }
 
@@ -79,12 +83,16 @@ private fun CartScreenContent(
     modifier: Modifier = Modifier,
     onClickClose: () -> Unit,
     onClickRemoveItem: (Int) -> Unit,
+    onClickAdd: (Product) -> Unit,
     onClickIncrease: (Int) -> Unit,
     onClickDecrease: (Int) -> Unit,
+    onClickIncreaseRecommendProduct: (Int) -> Unit,
+    onClickDecreaseRecommendProduct: (Int) -> Unit,
     onClickGoToPreviousPage: () -> Unit,
     onClickGoToNextPage: () -> Unit,
     onClickToggleSelection: (Int) -> Unit,
     onClickAllSelect: () -> Unit,
+    onClickOrder: () -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -114,34 +122,50 @@ private fun CartScreenContent(
             }
 
             is CartUiState.Success -> {
-                CartItemList(
-                    cartItems = uiState.cartItems,
-                    modifier = Modifier.weight(1f),
-                    onRemoveClick = { cartId -> onClickRemoveItem(cartId) },
-                    onIncrease = { cartId -> onClickIncrease(cartId) },
-                    onDecrease = { cartId -> onClickDecrease(cartId) },
-                    onCheckedChange = { cartId -> onClickToggleSelection(cartId) },
-                )
+                when (uiState.currentFlow) {
+                    CartFlow.CART -> {
+                        CartItemList(
+                            cartItems = uiState.cartItems,
+                            modifier = Modifier.weight(1f),
+                            onRemoveClick = { cartId -> onClickRemoveItem(cartId) },
+                            onIncrease = { cartId -> onClickIncrease(cartId) },
+                            onDecrease = { cartId -> onClickDecrease(cartId) },
+                            onCheckedChange = { cartId -> onClickToggleSelection(cartId) },
+                        )
 
-                if (uiState.showPageNavigator) {
-                    PageNavigator(
-                        currentPage = uiState.currentPage,
-                        hasPrevious = uiState.hasPrevious,
-                        hasNext = uiState.hasNext,
-                        onPreviousClick = { onClickGoToPreviousPage() },
-                        onNextClick = { onClickGoToNextPage() },
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp),
-                    )
+                        if (uiState.showPageNavigator) {
+                            PageNavigator(
+                                currentPage = uiState.currentPage,
+                                hasPrevious = uiState.hasPrevious,
+                                hasNext = uiState.hasNext,
+                                onPreviousClick = { onClickGoToPreviousPage() },
+                                onNextClick = { onClickGoToNextPage() },
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 16.dp),
+                            )
+                        }
+                    }
+
+                    CartFlow.RECOMMEND -> {
+                        RecommendScreenContent(
+                            products = uiState.recommendProducts,
+                            quantitiesByProductId = uiState.quantitiesByProductId,
+                            onAddClick = { onClickAdd(it) },
+                            onIncrease = { onClickIncreaseRecommendProduct(it) },
+                            onDecrease = { onClickDecreaseRecommendProduct(it) },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
                 }
+
                 CartScreenBottomBar(
                     totalMoney = uiState.totalPrice,
                     totalCount = uiState.totalCount,
                     isAllSelected = uiState.isAllSelected,
                     onClickSelectAll = { onClickAllSelect() },
-                    onClickOrder = { /* TODO */ },
+                    onClickOrder = { onClickOrder() },
                 )
             }
 
@@ -458,5 +482,9 @@ private fun CartScreenPreview() {
         onClickGoToNextPage = {},
         onClickToggleSelection = {},
         onClickAllSelect = {},
+        onClickAdd = {},
+        onClickOrder = {},
+        onClickIncreaseRecommendProduct = {},
+        onClickDecreaseRecommendProduct = {},
     )
 }

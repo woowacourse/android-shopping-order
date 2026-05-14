@@ -19,7 +19,12 @@ class CartActivity : ComponentActivity() {
         setContent {
             val viewModel: CartViewModel =
                 viewModel(
-                    factory = CartViewModel.factory(appContainer.cartRepository),
+                    factory =
+                        CartViewModel.factory(
+                            appContainer.cartRepository,
+                            appContainer.recentProductRepository,
+                            appContainer.productRepository,
+                        ),
                 )
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
