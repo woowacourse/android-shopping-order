@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain
 
 class Cart(
-    private val cartContents: List<CartContent>,
+    val cartContents: List<CartContent>,
 ) {
     fun plusCartContent(newCartContent: CartContent): Cart {
         val duplicateCartItem = cartContents.firstOrNull { cartContent ->
@@ -38,6 +38,7 @@ class Cart(
             },
         )
     }
+
     fun quantityOf(productId: String): Int {
         val cartItem = cartContents.firstOrNull { cartContent ->
             cartContent.hasProductId(productId)

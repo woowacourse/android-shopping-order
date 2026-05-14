@@ -10,12 +10,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import woowacourse.shopping.feature.common.state.CartItemUiModel
 import woowacourse.shopping.feature.common.state.ProductUiModel
 
 @Composable
 fun CartItemList(
     isLoading: Boolean,
-    cartContents: List<ProductUiModel>,
+    cartContents: List<CartItemUiModel>,
     checkMap: Map<String, Boolean>,
     onChecked: (String) -> Unit,
     onDelete: (String) -> Unit,
@@ -47,28 +48,28 @@ fun CartItemList(
             }
         } else {
             items(
-                key = { it.id },
+                key = { it.contentId },
                 items = cartContents,
             ) {
                 CartItem(
                     isLoading = isLoading,
-                    imageUrl = it.imageUrl,
-                    name = it.name,
-                    price = it.price,
-                    quantity = it.quantity,
+                    imageUrl = it.productUiModel.imageUrl,
+                    name = it.productUiModel.name,
+                    price = it.productUiModel.price,
+                    quantity = it.productUiModel.quantity,
                     onDelete = {
-                        onDelete(it.id)
+                        onDelete(it.productUiModel.id)
                     },
                     onIncrease = {
-                        onIncrease(it.id)
+                        onIncrease(it.contentId)
                     },
                     onDecrease = {
-                        onDecrease(it.id)
+                        onDecrease(it.contentId)
                     },
                     onChecked = {
-                        onChecked(it.id)
+                        onChecked(it.contentId)
                     },
-                    isChecked = checkMap[it.id]
+                    isChecked = checkMap[it.contentId]
                         ?: false,
                 )
             }
@@ -81,19 +82,25 @@ fun CartItemList(
 private fun CartItemListPreview() {
     CartItemList(
         cartContents = listOf(
-            ProductUiModel(
-                id = "1",
-                name = "더미 상품 1",
-                price = 10000,
-                imageUrl = "",
-                quantity = 1,
+            CartItemUiModel(
+                "",
+                ProductUiModel(
+                    id = "1",
+                    name = "더미 상품 1",
+                    price = 10000,
+                    imageUrl = "",
+                    quantity = 1,
+                ),
             ),
-            ProductUiModel(
-                id = "2",
-                name = "더미 상품 2",
-                price = 20000,
-                imageUrl = "",
-                quantity = 3,
+            CartItemUiModel(
+                "",
+                ProductUiModel(
+                    id = "2",
+                    name = "더미 상품 2",
+                    price = 20000,
+                    imageUrl = "",
+                    quantity = 3,
+                ),
             ),
         ),
         onDelete = {},

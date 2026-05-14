@@ -33,9 +33,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.constants.MockData
+import woowacourse.shopping.feature.cart.CartContentId
 import woowacourse.shopping.feature.cart.CartEvent
 import woowacourse.shopping.feature.cart.CartUiState
 import woowacourse.shopping.feature.cart.CartViewModel
+import woowacourse.shopping.feature.common.state.CartItemUiModel
 import woowacourse.shopping.feature.common.state.ProductUiModel
 import woowacourse.shopping.feature.format.DecimalPriceFormatter
 
@@ -43,6 +45,7 @@ import woowacourse.shopping.feature.format.DecimalPriceFormatter
 fun CartScreen(
     onCloseClick: () -> Unit,
     activityFinish: () -> Unit,
+    onToRecommendIntent: (List<CartContentId>) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CartViewModel = viewModel(factory = CartViewModel.Factory),
 ) {
@@ -192,12 +195,15 @@ private fun CartScreenContentPreview() {
         uiState = CartUiState(
             isLoading = false,
             paginatedCartContents = MockData.MOCK_PRODUCTS.take(2).map {
-                ProductUiModel(
-                    name = it.name,
-                    price = it.priceAmount(),
-                    imageUrl = it.imageUrl,
-                    id = it.id,
-                    quantity = 1,
+                CartItemUiModel(
+                    contentId = "1",
+                    ProductUiModel(
+                        name = it.name,
+                        price = it.priceAmount(),
+                        imageUrl = it.imageUrl,
+                        id = it.id,
+                        quantity = 1,
+                    ),
                 )
             },
         ),
