@@ -8,6 +8,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.data.remote.api.CartApi
+import woowacourse.shopping.data.remote.api.OrderApi
 import woowacourse.shopping.data.remote.api.ProductApi
 import java.util.concurrent.TimeUnit
 import kotlin.getValue
@@ -57,5 +58,9 @@ object RetrofitProvider {
 
     val cartApi: CartApi by lazy {
         retrofit.create(CartApi::class.java)
+    }
+
+    val orderApi: OrderApi by lazy {
+        retrofit.create(OrderApi::class.java)
     }
 }

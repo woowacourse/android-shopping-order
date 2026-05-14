@@ -32,6 +32,7 @@ class AppContainer(
     private val cartDataSource: CartRemoteDataSource =
         CartRemoteDataSourceImpl(
             RetrofitProvider.cartApi,
+            RetrofitProvider.orderApi,
         )
     private val productRemoteDataSource: ProductRemoteDataSource =
         ProductRemoteDataSourceImpl(
