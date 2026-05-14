@@ -43,7 +43,8 @@ class CartViewModel(
                             cartItem.toUiModel(isSelected(cartItem.id))
                         }.toImmutableList(),
                 isCanMoveNext = !cartResult.isLastPage,
-                totalCartSize = cartRepository.getTotalCartItemQuantity(),
+                totalCartCount = cartRepository.getCartItemsCount(),
+                totalCartQuantity = cartRepository.getTotalCartItemQuantity(),
                 totalPrice = totalPrice.amount,
             )
         }

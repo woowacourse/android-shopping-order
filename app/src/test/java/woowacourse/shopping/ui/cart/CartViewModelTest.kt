@@ -105,7 +105,7 @@ class CartViewModelTest {
             val viewModel = CartViewModel(CartRepository(cartItemDao), productRepository)
             mainDispatcherExtension.advanceUntilIdle()
 
-            assertThat(viewModel.uiState.value.totalCartSize).isEqualTo(2)
+            assertThat(viewModel.uiState.value.totalCartQuantity).isEqualTo(2)
             assertThat(viewModel.uiState.value.totalPrice).isEqualTo(4000)
         }
 

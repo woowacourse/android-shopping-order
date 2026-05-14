@@ -76,7 +76,7 @@ fun CartScreen(
         modifier = modifier.systemBarsPadding(),
     ) { innerPadding ->
         CartContent(
-            totalCartSize = uiState.items.size,
+            totalCartSize = uiState.totalCartCount,
             page = uiState.page,
             onNextPage = onNextPage,
             onPreviousPage = onPreviousPage,

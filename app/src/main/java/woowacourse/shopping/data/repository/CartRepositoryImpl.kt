@@ -86,6 +86,8 @@ class CartRepositoryImpl(
 
     override suspend fun getTotalCartItemQuantity(): Int = api.getCartItemsQuantity().quantity
 
+    override suspend fun getCartItemsCount(): Int = getAllCartItems().size
+
     private suspend fun addCartItem(
         productId: String,
         quantity: Int,

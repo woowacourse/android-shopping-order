@@ -19,5 +19,7 @@ interface CartRepository {
 
     suspend fun getTotalCartItemQuantity(): Int
 
+    suspend fun getCartItemsCount(): Int
+
     suspend fun getTotalPrice(cartIds: List<String>): Money
 }
