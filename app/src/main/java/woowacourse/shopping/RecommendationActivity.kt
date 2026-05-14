@@ -1,5 +1,6 @@
 package woowacourse.shopping
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import woowacourse.shopping.domain.Products
 import woowacourse.shopping.ui.component.screen.CartRecommendationScreen
 import woowacourse.shopping.ui.viewmodel.CartViewModel
 import woowacourse.shopping.ui.viewmodel.CartViewModelFactory
@@ -53,12 +53,17 @@ class RecommendationActivity : ComponentActivity() {
                     totalPrice = totalPrice,
                     totalCount = totalCount,
                     onBackClick = { finish() },
-                    onOrderClick = { /* 주문 로직 추가 */ },
+                    onOrderClick = { finish() },
                     onAddInCart = { recommendationViewModel.addToCart(it) },
-                    onAdd = { id, amount -> cartViewModel.updateCountWithID(id, amount) },
-                    onMinus = { id, amount -> cartViewModel.updateCountWithID(id, amount) },
-                    onDelete = { id -> cartViewModel.removeWithID(id) },
-                    onItemClick = { id -> /* 상세화면 이동 로직 */ },
+                    onAdd = { id, amount -> recommendationViewModel.updateCountWithID(id, amount) },
+                    onMinus = { id, amount -> recommendationViewModel.updateCountWithID(id, amount) },
+                    onDelete = { id -> recommendationViewModel.removeWithID(id) },
+                    onItemClick = { id ->
+                        val intent = Intent(this, ProductDetailActivity::class.java).apply {
+                            putExtra(IntentKeys.SELECTED_PRODUCT_ID_KEY, id)
+                        }
+                        startActivity(intent)
+                    },
                     isContainedInCart = { id -> cartState.isContain(id) },
                     itemCount = { id -> cartState.totalCountOfSpecificPurchaseProduct(id) },
                     modifier = Modifier.padding(innerPadding)
