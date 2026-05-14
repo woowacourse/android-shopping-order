@@ -34,6 +34,7 @@ fun RecommendScreen(
         factory = RecommendViewModel.Factory,
     ),
     onCloseClick: () -> Unit,
+    contentIds: List<String>,
     modifier: Modifier = Modifier,
 ) {
     LaunchedEffect(Unit) {
@@ -76,7 +77,11 @@ fun RecommendScreen(
                         .padding(horizontal = 20.dp),
                 ) {
                     Text(
-                        DecimalPriceFormatter().format(10000),
+                        DecimalPriceFormatter().format(
+                            viewModel.getTotalPrice(
+                                contentIds = contentIds,
+                            ),
+                        ),
                         fontWeight = FontWeight.W700,
                         fontSize = 18.sp,
                         color = Color.White,
@@ -91,7 +96,11 @@ fun RecommendScreen(
                         .background(Color(0xff04C09E)),
                 ) {
                     Text(
-                        "주문하기(0)",
+                        "주문하기(${
+                            viewModel.getTotalCount(
+                                contentIds = contentIds,
+                            )
+                        })",
                         fontWeight = FontWeight.W700,
                         fontSize = 18.sp,
                         color = Color.White,
@@ -107,5 +116,6 @@ fun RecommendScreen(
 private fun RecommendScreenPreview() {
     RecommendScreen(
         onCloseClick = {},
+        contentIds = emptyList(),
     )
 }

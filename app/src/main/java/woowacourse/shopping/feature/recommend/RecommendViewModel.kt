@@ -129,6 +129,23 @@ class RecommendViewModel(
         )
     }
 
+    fun getTotalPrice(contentIds: List<String>): Int {
+
+        val checkedCartItems = serverCart.cartContents.filter { contentIds.contains(it.id) }
+
+        val checkPrice = checkedCartItems.sumOf { it.product.priceAmount() * it.quantity }
+
+        val memoryPrice = memoryCart.cartContents.sumOf { it.product.priceAmount() * it.quantity }
+
+        return checkPrice + memoryPrice
+    }
+
+    fun getTotalCount(contentIds: List<String>): Int {
+        val memoryTotalCount = memoryCart.cartContents.size
+
+        return contentIds.size + memoryTotalCount
+    }
+
     companion object {
         val Factory = viewModelFactory {
             initializer {
