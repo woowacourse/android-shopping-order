@@ -29,6 +29,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,6 +52,11 @@ import woowacourse.shopping.constant.Format.formatPrice
 import woowacourse.shopping.constant.ShoppingColor.APP_BAR_COLOR
 import woowacourse.shopping.constant.ShoppingColor.CART_PAGE_BUTTON_ACTIVE_COLOR
 import woowacourse.shopping.constant.ShoppingColor.CART_PAGE_BUTTON_INACTIVE_COLOR
+import woowacourse.shopping.domain.product.Category
+import woowacourse.shopping.domain.product.ImageUrl
+import woowacourse.shopping.domain.product.Price
+import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.domain.product.ProductName
 
 @Composable
 fun CartScreen(
@@ -69,6 +75,8 @@ fun CartScreen(
         onClickDecrease = viewModel::decrease,
         onClickGoToPreviousPage = viewModel::goToPreviousPage,
         onClickGoToNextPage = viewModel::goToNextPage,
+        onClickToggleSelection = viewModel::toggleSelection,
+        onClickAllSelect = viewModel::toggleAllSelection,
     )
 }
 
@@ -82,6 +90,8 @@ private fun CartScreenContent(
     onClickDecrease: (Int) -> Unit,
     onClickGoToPreviousPage: () -> Unit,
     onClickGoToNextPage: () -> Unit,
+    onClickToggleSelection: (Int) -> Unit,
+    onClickAllSelect: () -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -117,6 +127,7 @@ private fun CartScreenContent(
                     onRemoveClick = { cartId -> onClickRemoveItem(cartId) },
                     onIncrease = { cartId -> onClickIncrease(cartId) },
                     onDecrease = { cartId -> onClickDecrease(cartId) },
+                    onCheckedChange = { cartId -> onClickToggleSelection(cartId) },
                 )
 
                 if (uiState.showPageNavigator) {
@@ -132,6 +143,13 @@ private fun CartScreenContent(
                                 .padding(top = 16.dp),
                     )
                 }
+                CartScreenBottomBar(
+                    totalMoney = uiState.totalPrice,
+                    totalCount = uiState.totalCount,
+                    isAllSelected = uiState.isAllSelected,
+                    onClickSelectAll = { onClickAllSelect() },
+                    onClickOrder = { /* TODO */ },
+                )
             }
 
             is CartUiState.Error -> {
@@ -181,6 +199,7 @@ private fun CartItemList(
     onRemoveClick: (Int) -> Unit,
     onIncrease: (Int) -> Unit,
     onDecrease: (Int) -> Unit,
+    onCheckedChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -206,6 +225,9 @@ private fun CartItemList(
                 },
                 onDecrease = {
                     onDecrease(cartItem.id)
+                },
+                onCheckedChange = {
+                    onCheckedChange(cartItem.id)
                 },
             )
         }
@@ -256,6 +278,7 @@ private fun CartItemCard(
     onRemoveClick: () -> Unit,
     onIncrease: () -> Unit,
     onDecrease: () -> Unit,
+    onCheckedChange: (Int) -> Unit = {},
 ) {
     Card(
         modifier = modifier,
@@ -269,8 +292,14 @@ private fun CartItemCard(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
+                Checkbox(
+                    checked = cartItem.isSelected,
+                    onCheckedChange = {
+                        onCheckedChange(cartItem.id)
+                    },
+                )
                 Text(
                     text = cartItem.product.name.value,
                     modifier = Modifier.weight(1f),
@@ -278,6 +307,7 @@ private fun CartItemCard(
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF4A4A4A),
                 )
+
                 IconButton(
                     onClick = onRemoveClick,
                     modifier = Modifier.size(28.dp),
@@ -441,19 +471,36 @@ private fun CartScreenPreview() {
     CartScreenContent(
         modifier = Modifier.fillMaxSize(),
         uiState =
-            CartUiState.Loading,
-//            CartUiState.Success(
-//                cartItems = emptyList(),
-//                currentPage = 0,
-//                totalPages = 0,
-//                hasPrevious = false,
-//                hasNext = false,
-//            ),
+            CartUiState.Success(
+                cartItems =
+                    listOf(
+                        CartItemUiModel(
+                            id = 1,
+                            product =
+                                Product(
+                                    id = 1,
+                                    imageUrl = ImageUrl("https://example.com/image.png"),
+                                    name = ProductName("PET보틀-정사각형"),
+                                    price = Price(10_000),
+                                    Category("도서"),
+                                ),
+                            quantity = 2,
+                            totalPrice = 20_000,
+                            isSelected = false,
+                        ),
+                    ),
+                currentPage = 0,
+                totalPages = 0,
+                hasPrevious = false,
+                hasNext = false,
+            ),
         onClickClose = {},
         onClickRemoveItem = {},
         onClickIncrease = {},
         onClickDecrease = {},
         onClickGoToPreviousPage = {},
         onClickGoToNextPage = {},
+        onClickToggleSelection = {},
+        onClickAllSelect = {},
     )
 }
