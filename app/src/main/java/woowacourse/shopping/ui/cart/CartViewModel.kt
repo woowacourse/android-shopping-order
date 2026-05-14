@@ -13,16 +13,23 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.cart.CartItems
+import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.util.toUiModel
 
 class CartViewModel(
     private val cartRepository: CartRepository,
+    private val recentProductRepository: RecentProductRepository,
+    private val productRepository: ProductRepository,
 ) : ViewModel() {
     private val _cartItems = MutableStateFlow<CartItems?>(null)
     private val _selectedItems = MutableStateFlow<Set<Int>>(emptySet())
     private val _isAllSelected = MutableStateFlow(false)
+    private val _recommendProducts = MutableStateFlow<List<Product>>(emptyList())
 
+    private val _flow = MutableStateFlow(CartFlow.CART)
     private var currentPage = 0
 
     val uiState: StateFlow<CartUiState> =
@@ -30,7 +37,9 @@ class CartViewModel(
             _cartItems,
             _selectedItems,
             _isAllSelected,
-        ) { cartItems, selectedItems, isAllSelected ->
+            _recommendProducts,
+            _flow,
+        ) { cartItems, selectedItems, isAllSelected, recommendProducts, flow ->
             cartItems ?: return@combine CartUiState.Loading
             CartUiState.Success(
                 cartItems = cartItems.values.toUiModel(selectedItems, isAllSelected),
@@ -42,6 +51,9 @@ class CartViewModel(
                 hasNext = !cartItems.isLast,
                 totalCount = cartItems.calculateQuantity(selectedItems, isAllSelected),
                 totalPrice = cartItems.calculatePrice(selectedItems, isAllSelected),
+                recommendProducts = recommendProducts,
+                currentFlow = flow,
+                quantitiesByProductId = cartItems.values.associate { it.product.id to it.quantity.value },
             )
         }.stateIn(
             scope = viewModelScope,
@@ -51,6 +63,7 @@ class CartViewModel(
 
     init {
         loadPage(0)
+        loadRecommendProduct()
     }
 
     private fun loadPage(page: Int) {
@@ -62,12 +75,67 @@ class CartViewModel(
         }
     }
 
+    private fun loadRecommendProduct() {
+        viewModelScope.launch {
+            val recommended = recentProductRepository.getMostRecentProduct() ?: return@launch
+            val productList = productRepository.getProducts(0, Int.MAX_VALUE)
+            val categoryProducts = productList.getCategoryProducts(recommended.category.value)
+
+            val result =
+                categoryProducts -
+                    (
+                        _cartItems.value?.values?.map { it.product }
+                            ?: emptyList()
+                    ).toSet()
+            _recommendProducts.update { result }
+        }
+    }
+
     fun removeCartItem(cartId: Int) {
         viewModelScope.launch {
             _cartItems.update { null }
             _selectedItems.update { it - cartId }
             cartRepository.remove(cartId)
             val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
+            _cartItems.update { result }
+        }
+    }
+
+    fun addCartItem(product: Product) {
+        viewModelScope.launch {
+            _cartItems.update { null }
+            cartRepository.addProduct(product)
+
+            val result = cartRepository.getAllCartItems()
+            _cartItems.update { result }
+        }
+    }
+
+    fun increaseRecommendProduct(productId: Int) {
+        viewModelScope.launch {
+            val target =
+                _cartItems.value?.values?.find { it.product.id == productId } ?: return@launch
+
+            cartRepository.increase(target.id, target.quantity.value + 1)
+            val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
+
+            _cartItems.update { result }
+        }
+    }
+
+    fun decreaseRecommendProduct(productId: Int) {
+        viewModelScope.launch {
+            val target =
+                _cartItems.value?.values?.find { it.product.id == productId } ?: return@launch
+
+            if (target.quantity.value == 1) {
+                cartRepository.remove(target.id)
+                _selectedItems.update { it - target.id }
+            } else {
+                cartRepository.decrease(target.id, target.quantity.value - 1)
+            }
+            val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
+
             _cartItems.update { result }
         }
     }
@@ -119,13 +187,25 @@ class CartViewModel(
         loadPage(currentPage - 1)
     }
 
+    fun onClickOrder() {
+        if (_flow.value == CartFlow.CART) {
+            _flow.value = CartFlow.RECOMMEND
+        } else {
+// TODO: 주문
+        }
+    }
+
     companion object {
         private const val PAGE_SIZE = 5
 
-        fun factory(cartRepository: CartRepository): ViewModelProvider.Factory =
+        fun factory(
+            cartRepository: CartRepository,
+            recentProductRepository: RecentProductRepository,
+            productRepository: ProductRepository,
+        ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
-                    CartViewModel(cartRepository)
+                    CartViewModel(cartRepository, recentProductRepository, productRepository)
                 }
             }
     }
