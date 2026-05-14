@@ -12,9 +12,21 @@ class CartItems(
     val totalPrice: Int
         get() = values.sumOf { it.totalPrice }
 
-    fun calculatePrice(targetIds: Set<Int>): Int = values.filter { targetIds.contains(it.id) }.sumOf { it.totalPrice }
+    fun calculatePrice(
+        targetIds: Set<Int>,
+        isAll: Boolean,
+    ): Int {
+        if (isAll) return totalPrice
+        return values.filter { targetIds.contains(it.id) }.sumOf { it.totalPrice }
+    }
 
-    fun calculateQuantity(targetIds: Set<Int>): Int = values.filter { targetIds.contains(it.id) }.sumOf { it.quantity.value }
+    fun calculateQuantity(
+        targetIds: Set<Int>,
+        isAll: Boolean,
+    ): Int {
+        if (isAll) return totalQuantity
+        return values.filter { targetIds.contains(it.id) }.sumOf { it.quantity.value }
+    }
 
     fun increase(productId: Int): CartItems {
         val target = findByProductId(productId) ?: return this

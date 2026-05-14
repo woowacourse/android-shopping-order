@@ -40,8 +40,8 @@ class CartViewModel(
                 totalPages = cartItems.totalPages,
                 hasPrevious = !cartItems.isFirst,
                 hasNext = !cartItems.isLast,
-                totalCount = cartItems.calculateQuantity(selectedItems),
-                totalPrice = cartItems.calculatePrice(selectedItems),
+                totalCount = cartItems.calculateQuantity(selectedItems, isAllSelected),
+                totalPrice = cartItems.calculatePrice(selectedItems, isAllSelected),
             )
         }.stateIn(
             scope = viewModelScope,
