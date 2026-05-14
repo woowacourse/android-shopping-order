@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import woowacourse.shopping.R
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.repository.inmemory.InMemoryProductRepository
+import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.ShoppingTypography
 
 @Composable
@@ -63,7 +63,7 @@ fun RecentlyViewedItem(
 @Composable
 fun RecentlyViewedItemPreview() {
     RecentlyViewedItem(
-        product = InMemoryProductRepository.APPLE,
+        product = MockProducts.APPLE,
         onClick = {},
     )
 }

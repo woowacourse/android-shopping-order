@@ -4,8 +4,8 @@ import woowacourse.shopping.local.cart.CartItemDao
 import woowacourse.shopping.local.cart.CartItemEntity
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.repository.CartRepository
-import woowacourse.shopping.repository.cart.CartPageItem
-import woowacourse.shopping.repository.cart.CartPageResult
+import woowacourse.shopping.repository.query.CartPageItem
+import woowacourse.shopping.repository.query.CartPageResult
 
 class RoomCartRepository(
     private val cartItemDao: CartItemDao,

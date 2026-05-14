@@ -10,8 +10,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.repository.CartRepository
-import woowacourse.shopping.repository.cart.CartPageItem
-import woowacourse.shopping.repository.cart.CartPageResult
+import woowacourse.shopping.repository.query.CartPageItem
+import woowacourse.shopping.repository.query.CartPageResult
 import woowacourse.shopping.repository.http.api.CartApiService
 import woowacourse.shopping.repository.http.dto.CartItemQuantityUpdateRequestDto
 import woowacourse.shopping.repository.http.dto.CartItemRequestDto

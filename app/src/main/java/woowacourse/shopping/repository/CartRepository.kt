@@ -1,7 +1,7 @@
 package woowacourse.shopping.repository
 
 import woowacourse.shopping.model.CartItem
-import woowacourse.shopping.repository.cart.CartPageResult
+import woowacourse.shopping.repository.query.CartPageResult
 
 interface CartRepository {
     suspend fun createOrder(cartItemIds: List<Long>)

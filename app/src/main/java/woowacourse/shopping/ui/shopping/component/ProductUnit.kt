@@ -24,7 +24,7 @@ import coil3.compose.AsyncImage
 import woowacourse.shopping.R
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.repository.inmemory.InMemoryProductRepository
+import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.ShoppingTypography
 import woowacourse.shopping.ui.common.component.cartcontrol.AddToCartButton
 import woowacourse.shopping.ui.common.component.cartcontrol.QuantityStepper
@@ -102,7 +102,7 @@ fun ProductUnit(
 @Preview(showBackground = true, name = "장바구니 담기 버튼")
 private fun ProductUnitAddToCartPreview() {
     ProductUnit(
-        product = ShoppingProductUiState(product = InMemoryProductRepository.APPLE, quantity = 0),
+        product = ShoppingProductUiState(product = MockProducts.APPLE, quantity = 0),
         onClick = {},
         onAddToCart = {},
         onIncreaseQuantity = {},
@@ -114,7 +114,7 @@ private fun ProductUnitAddToCartPreview() {
 @Preview(showBackground = true, name = "수량 스테퍼")
 private fun ProductUnitQuantityPreview() {
     ProductUnit(
-        product = ShoppingProductUiState(product = InMemoryProductRepository.APPLE, quantity = 2),
+        product = ShoppingProductUiState(product = MockProducts.APPLE, quantity = 2),
         onClick = {},
         onAddToCart = {},
         onIncreaseQuantity = {},

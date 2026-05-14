@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import woowacourse.shopping.R
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.repository.inmemory.InMemoryProductRepository
+import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.ShoppingTypography
 import woowacourse.shopping.ui.common.component.cartcontrol.QuantityStepper
 
@@ -109,7 +109,7 @@ private fun ProductLabel(
 @Preview(showBackground = true, name = "상품 유닛")
 private fun ProductUnitPreview() {
     ProductDetailBody(
-        product = InMemoryProductRepository.APPLE,
+        product = MockProducts.APPLE,
         quantity = 0,
         onIncreaseQuantity = {},
         onDecreaseQuantity = {},
@@ -120,7 +120,7 @@ private fun ProductUnitPreview() {
 @Preview(showBackground = true, name = "상품 이름만")
 private fun ProductLabelPreview() {
     ProductLabel(
-        product = InMemoryProductRepository.APPLE,
+        product = MockProducts.APPLE,
         quantity = 2,
         onIncreaseQuantity = {},
         onDecreaseQuantity = {},

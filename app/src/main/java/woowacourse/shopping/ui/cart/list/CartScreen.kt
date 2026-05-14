@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import woowacourse.shopping.repository.inmemory.InMemoryProductRepository
+import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.cart.component.CartBottomBar
 import woowacourse.shopping.ui.cart.component.CartHeader
 import woowacourse.shopping.ui.cart.component.CartItemBody
@@ -113,19 +113,19 @@ private fun CartScreenPreview() {
     val items =
         listOf(
             CartItemUiModel(
-                cartItemId = InMemoryProductRepository.APPLE.id,
-                productId = InMemoryProductRepository.APPLE.id,
-                name = InMemoryProductRepository.APPLE.name,
-                imageUrl = InMemoryProductRepository.APPLE.imageUrl,
-                price = InMemoryProductRepository.APPLE.price.value,
+                cartItemId = MockProducts.APPLE.id,
+                productId = MockProducts.APPLE.id,
+                name = MockProducts.APPLE.name,
+                imageUrl = MockProducts.APPLE.imageUrl,
+                price = MockProducts.APPLE.price.value,
                 quantity = 2,
             ),
             CartItemUiModel(
-                cartItemId = InMemoryProductRepository.BBOYAMI.id,
-                productId = InMemoryProductRepository.BBOYAMI.id,
-                name = InMemoryProductRepository.BBOYAMI.name,
-                imageUrl = InMemoryProductRepository.BBOYAMI.imageUrl,
-                price = InMemoryProductRepository.BBOYAMI.price.value,
+                cartItemId = MockProducts.BBOYAMI.id,
+                productId = MockProducts.BBOYAMI.id,
+                name = MockProducts.BBOYAMI.name,
+                imageUrl = MockProducts.BBOYAMI.imageUrl,
+                price = MockProducts.BBOYAMI.price.value,
                 quantity = 1,
             ),
         )

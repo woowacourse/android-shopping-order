@@ -14,7 +14,7 @@ import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
-import woowacourse.shopping.repository.cart.CartPageItem
+import woowacourse.shopping.repository.query.CartPageItem
 import woowacourse.shopping.ui.cart.SelectedCartOrder
 import woowacourse.shopping.ui.shopping.ShoppingProductUiState
 import woowacourse.shopping.ui.shopping.ShoppingProductUiStateMapper

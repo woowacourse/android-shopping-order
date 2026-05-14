@@ -2,7 +2,7 @@ package woowacourse.shopping.ui.cart.list
 
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.repository.cart.CartPageItem
+import woowacourse.shopping.repository.query.CartPageItem
 
 object CartItemUiModelMapper {
     fun toUiModels(

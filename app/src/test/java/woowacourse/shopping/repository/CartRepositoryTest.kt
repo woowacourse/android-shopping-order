@@ -59,7 +59,7 @@ class CartRepositoryTest {
 
             val actual = repo.getCartPage(page = repo.count() + 1, size = 20)
 
-            assertEquals(emptyList<woowacourse.shopping.repository.cart.CartPageItem>(), actual.items)
+            assertEquals(emptyList<woowacourse.shopping.repository.query.CartPageItem>(), actual.items)
         }
 
     @Test

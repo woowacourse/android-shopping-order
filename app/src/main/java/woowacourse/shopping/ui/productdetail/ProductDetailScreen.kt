@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.repository.inmemory.InMemoryProductRepository
+import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
 import woowacourse.shopping.ui.common.component.recentlyviewed.LastViewedProductCard
 import woowacourse.shopping.ui.productdetail.component.CartAddButton
@@ -66,10 +66,10 @@ fun ProductDetailScreen(
 @Composable
 @Preview(showBackground = true, name = "장바구니 담기")
 private fun ProductDetailScreenAddToCartPreview() {
-    val product = InMemoryProductRepository.APPLE
+    val product = MockProducts.APPLE
     ProductDetailScreen(
         product = product,
-        lastViewedProduct = InMemoryProductRepository.BBOYAMI,
+        lastViewedProduct = MockProducts.BBOYAMI,
         quantity = 0,
         isAdding = false,
         isNetworkConnected = true,
@@ -84,10 +84,10 @@ private fun ProductDetailScreenAddToCartPreview() {
 @Composable
 @Preview(showBackground = true, name = "수량 스테퍼")
 private fun ProductDetailScreenQuantityPreview() {
-    val product = InMemoryProductRepository.APPLE
+    val product = MockProducts.APPLE
     ProductDetailScreen(
         product = product,
-        lastViewedProduct = InMemoryProductRepository.BBOYAMI,
+        lastViewedProduct = MockProducts.BBOYAMI,
         quantity = 2,
         isAdding = false,
         isNetworkConnected = true,

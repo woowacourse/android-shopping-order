@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import woowacourse.shopping.R
-import woowacourse.shopping.repository.inmemory.InMemoryProductRepository
+import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.ShoppingTypography
 import woowacourse.shopping.ui.cart.list.CartItemUiModel
 import woowacourse.shopping.ui.common.component.cartcontrol.QuantityStepper
@@ -170,11 +170,11 @@ private fun CartItemUnitPreview() {
     CartItemUnit(
         item =
             CartItemUiModel(
-                cartItemId = InMemoryProductRepository.APPLE.id,
-                productId = InMemoryProductRepository.APPLE.id,
-                name = InMemoryProductRepository.APPLE.name,
-                imageUrl = InMemoryProductRepository.APPLE.imageUrl,
-                price = InMemoryProductRepository.APPLE.price.value,
+                cartItemId = MockProducts.APPLE.id,
+                productId = MockProducts.APPLE.id,
+                name = MockProducts.APPLE.name,
+                imageUrl = MockProducts.APPLE.imageUrl,
+                price = MockProducts.APPLE.price.value,
                 quantity = 2,
             ),
         onCheckedChange = {},
@@ -190,11 +190,11 @@ private fun NameAndCloseIconPreview() {
     NameAndCloseIcon(
         item =
             CartItemUiModel(
-                cartItemId = InMemoryProductRepository.APPLE.id,
-                productId = InMemoryProductRepository.APPLE.id,
-                name = InMemoryProductRepository.APPLE.name,
-                imageUrl = InMemoryProductRepository.APPLE.imageUrl,
-                price = InMemoryProductRepository.APPLE.price.value,
+                cartItemId = MockProducts.APPLE.id,
+                productId = MockProducts.APPLE.id,
+                name = MockProducts.APPLE.name,
+                imageUrl = MockProducts.APPLE.imageUrl,
+                price = MockProducts.APPLE.price.value,
                 quantity = 2,
             ),
         onCheckedChange = {},
@@ -208,11 +208,11 @@ private fun ImageAndPricePreview() {
     ImageAndPrice(
         item =
             CartItemUiModel(
-                cartItemId = InMemoryProductRepository.APPLE.id,
-                productId = InMemoryProductRepository.APPLE.id,
-                name = InMemoryProductRepository.APPLE.name,
-                imageUrl = InMemoryProductRepository.APPLE.imageUrl,
-                price = InMemoryProductRepository.APPLE.price.value,
+                cartItemId = MockProducts.APPLE.id,
+                productId = MockProducts.APPLE.id,
+                name = MockProducts.APPLE.name,
+                imageUrl = MockProducts.APPLE.imageUrl,
+                price = MockProducts.APPLE.price.value,
                 quantity = 2,
             ),
         onIncreaseQuantity = {},

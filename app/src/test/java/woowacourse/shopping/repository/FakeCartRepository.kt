@@ -22,7 +22,7 @@ class FakeCartRepository : CartRepository {
     override suspend fun getCartPage(
         page: Int,
         size: Int,
-    ): woowacourse.shopping.repository.cart.CartPageResult {
+    ): woowacourse.shopping.repository.query.CartPageResult {
         val safePage = page.coerceAtLeast(0)
         val safeSize = size.coerceAtLeast(0)
         val totalElements = cart.items.size
@@ -31,7 +31,7 @@ class FakeCartRepository : CartRepository {
         val safeTo = minOf(safeFrom + safeSize, totalElements)
         val items =
             cart.items.subList(safeFrom, safeTo).map {
-                woowacourse.shopping.repository.cart.CartPageItem(
+                woowacourse.shopping.repository.query.CartPageItem(
                     cartItemId = it.productId,
                     productId = it.productId,
                     quantity = it.quantity,
@@ -44,7 +44,7 @@ class FakeCartRepository : CartRepository {
                 (totalElements - 1) / safeSize + 1
             }
 
-        return woowacourse.shopping.repository.cart.CartPageResult(
+        return woowacourse.shopping.repository.query.CartPageResult(
             items = items,
             totalElements = totalElements,
             totalPages = totalPages,

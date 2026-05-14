@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import woowacourse.shopping.R
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.repository.inmemory.InMemoryProductRepository
+import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.ShoppingTypography
 
 @Composable
@@ -62,7 +62,7 @@ fun RecentlyViewedProducts(
 @Composable
 fun RecentlyViewedSectionPreview() {
     RecentlyViewedSection(
-        products = InMemoryProductRepository.products.take(4),
+        products = MockProducts.products.take(4),
         onProductClick = {},
     )
 }

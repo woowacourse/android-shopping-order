@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.repository.inmemory.InMemoryProductRepository
+import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
 import woowacourse.shopping.ui.shopping.component.ShoppingBody
 import woowacourse.shopping.ui.shopping.component.ShoppingHeader
@@ -63,7 +63,7 @@ private fun ShoppingScreenPreview() {
         productListState =
             ProductListUiState.Content(
                 products =
-                    InMemoryProductRepository.products.toList().take(6).mapIndexed { index, product ->
+                    MockProducts.products.take(6).mapIndexed { index, product ->
                         ShoppingProductUiState(
                             product = product,
                             quantity = if (index < 2) 0 else 1,
@@ -71,7 +71,7 @@ private fun ShoppingScreenPreview() {
                     },
                 hasNext = true,
             ),
-        recentProducts = InMemoryProductRepository.products.take(4),
+        recentProducts = MockProducts.products.take(4),
         cartQuantity = 4,
         isNetworkConnected = true,
         onCartClick = {},

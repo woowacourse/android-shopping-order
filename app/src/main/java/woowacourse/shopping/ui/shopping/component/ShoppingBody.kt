@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.repository.inmemory.InMemoryProductRepository
+import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.common.component.recentlyviewed.RecentlyViewedSection
 import woowacourse.shopping.ui.shopping.ProductListUiState
 import woowacourse.shopping.ui.shopping.ShoppingProductUiState
@@ -162,7 +162,7 @@ private fun ShoppingBodyPreview() {
         productListState =
             ProductListUiState.Content(
                 products =
-                    InMemoryProductRepository.products.toList().take(4).mapIndexed { index, product ->
+                    MockProducts.products.take(4).mapIndexed { index, product ->
                         ShoppingProductUiState(
                             product = product,
                             quantity = if (index % 2 == 0) 0 else 2,
@@ -170,7 +170,7 @@ private fun ShoppingBodyPreview() {
                     },
                 hasNext = true,
             ),
-        recentProducts = InMemoryProductRepository.products.take(4),
+        recentProducts = MockProducts.products.take(4),
         onProductClick = {},
         onMoreClick = {},
         onAddToCart = {},
@@ -198,7 +198,7 @@ private fun ShoppingBodyLoadingPreview() {
 private fun ShoppingBodyLoadingWithRecentProductsPreview() {
     ShoppingBody(
         productListState = ProductListUiState.Loading,
-        recentProducts = InMemoryProductRepository.products.take(4),
+        recentProducts = MockProducts.products.take(4),
         onProductClick = {},
         onMoreClick = {},
         onAddToCart = {},
