@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -144,6 +145,38 @@ class CartRecommendationViewModelTest {
         }
 
     @Test
+    fun `해당 카테고리 상품이 10개 미만이면 가능한 개수만 추천한다`() =
+        runTest(dispatcher.scheduler) {
+            val dessertProducts =
+                listOf(
+                    product(id = 1L, category = "dessert"),
+                    product(id = 2L, category = "dessert"),
+                    product(id = 3L, category = "dessert"),
+                )
+            val selectedOrderProduct = product(id = 100L, category = "fruit")
+
+            cartRepository = RecordingCartRepository()
+            cartRepository.setQuantity(selectedOrderProduct.id, 1)
+            recentProductRepository =
+                FakeRecentProductRepository().apply {
+                    recordView(1L)
+                }
+            viewModel =
+                CartRecommendationViewModel(
+                    productRepository = FakeProductRepository(dessertProducts + selectedOrderProduct),
+                    cartRepository = cartRepository,
+                    recentProductRepository = recentProductRepository,
+                    networkMonitor = FakeNetworkMonitor(),
+                )
+
+            viewModel.startOrder(selectedCartOrderOf(selectedOrderProduct))
+            advanceUntilIdle()
+
+            assertEquals(3, viewModel.uiState.value.recommendedProducts.size)
+            assertEquals(listOf(1L, 2L, 3L), viewModel.uiState.value.recommendedProducts.map { it.product.id })
+        }
+
+    @Test
     fun `장바구니에 이미 담긴 상품을 제외하고 최대 10개까지만 추천한다`() =
         runTest(dispatcher.scheduler) {
             val dessertProducts = (1L..12L).map { id -> product(id = id, category = "dessert") }
@@ -200,6 +233,38 @@ class CartRecommendationViewModelTest {
             advanceUntilIdle()
 
             assertTrue(viewModel.uiState.value.recommendedProducts.isEmpty())
+        }
+
+    @Test
+    fun `추천 상품을 장바구니에 추가할 수 있다`() =
+        runTest(dispatcher.scheduler) {
+            viewModel.startOrder(selectedCartOrderOf(orderedProduct))
+            advanceUntilIdle()
+
+            viewModel.addRecommendedProduct(recommendedProduct.id)
+            advanceUntilIdle()
+
+            assertEquals(
+                listOf(CartItem(productId = recommendedProduct.id, quantity = 1)),
+                cartRepository.getCartItemsByProductIds(setOf(recommendedProduct.id)),
+            )
+        }
+
+    @Test
+    fun `추천 상품 추가 후 장바구니 상태가 갱신된다`() =
+        runTest(dispatcher.scheduler) {
+            viewModel.startOrder(selectedCartOrderOf(orderedProduct))
+            advanceUntilIdle()
+
+            viewModel.addRecommendedProduct(recommendedProduct.id)
+            advanceUntilIdle()
+
+            assertEquals(2, viewModel.uiState.value.pendingOrder.selectedCount)
+            assertEquals(
+                setOf(101L, 102L),
+                viewModel.uiState.value.pendingOrder.cartItemIds.toSet(),
+            )
+            assertFalse(viewModel.uiState.value.recommendedProducts.any { it.product.id == recommendedProduct.id })
         }
 
     private fun selectedCartOrderOf(product: Product): SelectedCartOrder =
