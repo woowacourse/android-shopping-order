@@ -29,7 +29,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -100,7 +99,12 @@ private fun CartScreenContent(
 
         when (uiState) {
             is CartUiState.Loading -> {
-                LoadingContent(modifier = Modifier.weight(1f))
+                LoadingContent(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(20.dp),
+                )
             }
 
             is CartUiState.Empty -> {
@@ -138,16 +142,6 @@ private fun CartScreenContent(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun LoadingContent(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        CircularProgressIndicator()
     }
 }
 
@@ -448,13 +442,14 @@ private fun CartScreenPreview() {
     CartScreenContent(
         modifier = Modifier.fillMaxSize(),
         uiState =
-            CartUiState.Success(
-                cartItems = emptyList(),
-                currentPage = 0,
-                totalPages = 0,
-                hasPrevious = false,
-                hasNext = false,
-            ),
+            CartUiState.Loading,
+//            CartUiState.Success(
+//                cartItems = emptyList(),
+//                currentPage = 0,
+//                totalPages = 0,
+//                hasPrevious = false,
+//                hasNext = false,
+//            ),
         onClickClose = {},
         onClickRemoveItem = {},
         onClickIncrease = {},
