@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -33,8 +33,18 @@ class RecommendationViewModel(
             initialValue = null
         )
 
-    val lastViewedProduct: StateFlow<Product?> = flow {
-        emit(productRepository.getProduct(lastViewProductId.value ?: 0))
+    val lastViewedProduct: StateFlow<Product?> = lastViewProductId.flatMapLatest { id ->
+        flow {
+            if (id != null && id != 0L) {
+                try {
+                    emit(productRepository.getProduct(id))
+                } catch (e: Exception) {
+                    emit(null)
+                }
+            } else {
+                emit(null)
+            }
+        }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -42,18 +52,25 @@ class RecommendationViewModel(
     )
 
     private val _recommendedProducts = MutableStateFlow(Products(emptyList()))
-    val recommendedProducts =_recommendedProducts.asStateFlow()
+    val recommendedProducts = _recommendedProducts.asStateFlow()
 
     private val _allCartItems = MutableStateFlow<PurchaseProducts>(PurchaseProducts())
     val allCartItems = _allCartItems.asStateFlow()
 
     init {
         viewModelScope.launch {
-            val latestViewedProductId = recentlyViewedProductRepository.getLatestItem()
-            val product = productRepository.getProduct(lastViewProductId.first() ?: 0L)
-
-            _recommendedProducts.update {
-                Products(productRepository.getCategoryProducts(category = product.category))
+            lastViewProductId.collect { id ->
+                try {
+                    val products = if (id != null && id != 0L) {
+                        val product = productRepository.getProduct(id)
+                        productRepository.getCategoryProducts(category = product.category)
+                    } else {
+                        productRepository.getProducts(0, 10)
+                    }
+                    _recommendedProducts.update { Products(products) }
+                } catch (e: Exception) {
+                    _recommendedProducts.update { Products(emptyList()) }
+                }
             }
         }
 
