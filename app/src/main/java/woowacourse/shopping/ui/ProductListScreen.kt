@@ -47,6 +47,7 @@ import woowacourse.shopping.model.Price
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductTitle
 import woowacourse.shopping.model.ShoppingItem
+import woowacourse.shopping.ui.component.ProductItem
 import woowacourse.shopping.ui.component.ProductListSkeletonItem
 import woowacourse.shopping.ui.component.ProductQuantityBox
 import woowacourse.shopping.ui.component.ShoppingCardAddBox
@@ -252,99 +253,6 @@ private fun RecentViewedItem(
     }
 }
 
-@Composable
-private fun ProductItem(
-    product: Product,
-    quantity: Int,
-    onAddToCartClick: () -> Unit,
-    onQuantityPlusClick: () -> Unit,
-    onQuantityMinusClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.BottomEnd,
-        ) {
-            AsyncImage(
-                model = product.imageUrl,
-                contentDescription =
-                    stringResource(
-                        R.string.product_image_content_description,
-                        product.getTitle(),
-                    ),
-                contentScale = ContentScale.Crop,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(154.dp)
-                        .background(MaterialTheme.colorScheme.surfaceContainer),
-            )
-            AddQuantityButton(
-                quantity = quantity,
-                onAddToCartClick = onAddToCartClick,
-                onQuantityPlusClick = onQuantityPlusClick,
-                onQuantityMinusClick = onQuantityMinusClick,
-                modifier = Modifier.padding(8.dp),
-            )
-        }
-        Text(
-            text = product.getTitle(),
-            style = MaterialTheme.typography.titleLarge,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier =
-                Modifier.padding(
-                    horizontal = 7.5.dp,
-                ),
-        )
-        Text(
-            text = DecimalFormat(stringResource(R.string.price_format_pattern)).format(product.getPrice()),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier =
-                Modifier.padding(
-                    horizontal = 7.5.dp,
-                ),
-        )
-    }
-}
-
-@Composable
-private fun AddQuantityButton(
-    quantity: Int,
-    onAddToCartClick: () -> Unit,
-    onQuantityPlusClick: () -> Unit,
-    onQuantityMinusClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    if (quantity == 0) {
-        Box(
-            modifier = modifier.fillMaxWidth(),
-            contentAlignment = Alignment.BottomEnd,
-        ) {
-            ShoppingCardAddBox(
-                onShoppingCartAddClick = onAddToCartClick,
-                modifier = Modifier.size(36.dp),
-            )
-        }
-    } else {
-        Box(
-            modifier = modifier.fillMaxWidth(),
-            contentAlignment = Alignment.BottomCenter,
-        ) {
-            ProductQuantityBox(
-                onQuantityPlusClick = onQuantityPlusClick,
-                onQuantityMinusClick = onQuantityMinusClick,
-                quantity = quantity,
-                modifier = Modifier,
-            )
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
