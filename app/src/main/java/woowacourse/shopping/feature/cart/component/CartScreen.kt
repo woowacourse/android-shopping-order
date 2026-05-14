@@ -2,15 +2,23 @@ package woowacourse.shopping.feature.cart.component
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,8 +26,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.constants.MockData
@@ -27,6 +37,7 @@ import woowacourse.shopping.feature.cart.CartEvent
 import woowacourse.shopping.feature.cart.CartUiState
 import woowacourse.shopping.feature.cart.CartViewModel
 import woowacourse.shopping.feature.common.state.ProductUiModel
+import woowacourse.shopping.feature.format.DecimalPriceFormatter
 
 @Composable
 fun CartScreen(
@@ -61,6 +72,7 @@ fun CartScreen(
         canPrev = !viewModel.isStartPage(),
         canNext = !viewModel.isEndPage(),
         onChecked = viewModel::cartItemCheck,
+        onTotalCheck = viewModel::totalCheck,
         modifier = modifier,
     )
 }
@@ -69,6 +81,7 @@ fun CartScreen(
 fun CartScreenContent(
     uiState: CartUiState,
     onChecked: (String) -> Unit,
+    onTotalCheck: () -> Unit,
     onCloseClick: () -> Unit,
     onDelete: (String) -> Unit,
     onIncrease: (String) -> Unit,
@@ -88,11 +101,58 @@ fun CartScreenContent(
         },
         bottomBar = {
             Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(78.dp)
                     .background(Color(0xff555555)),
             ) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 20.dp),
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Checkbox(
+                            checked = uiState.checkMap.all { it.value },
+                            onCheckedChange = {
+                                onTotalCheck()
+                            },
+                            colors = CheckboxDefaults.colors().copy(
+                                checkedBoxColor = Color(0xFF04C09E),
+                            ),
+                            modifier = Modifier.size(24.dp),
+                        )
+                        Text("전체", color = Color.White, fontSize = 12.sp)
+                    }
+                    Text(
+                        DecimalPriceFormatter().format(uiState.totalPrice),
+                        fontWeight = FontWeight.W700,
+                        fontSize = 18.sp,
+                        color = Color.White,
+                    )
+                }
+                TextButton(
+                    onClick = {
+                    },
+                    modifier = Modifier
+                        .width(122.dp)
+                        .fillMaxHeight()
+                        .background(Color(0xff04C09E)),
+                ) {
+                    Text(
+                        "주문하기(0)",
+                        fontWeight = FontWeight.W700,
+                        fontSize = 18.sp,
+                        color = Color.White,
+                    )
+                }
             }
         },
     ) { innerPadding ->
@@ -152,5 +212,6 @@ private fun CartScreenContentPreview() {
         canNext = true,
         onCloseClick = {},
         onChecked = { _ -> },
+        onTotalCheck = {},
     )
 }

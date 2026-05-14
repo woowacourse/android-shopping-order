@@ -31,6 +31,7 @@ data class CartUiState(
     val page: Int = 1,
     val paginatedCartContents: List<ProductUiModel> = emptyList(),
     val checkMap: Map<String, Boolean> = emptyMap(),
+    val totalPrice: Int = 0,
 )
 
 class CartViewModel(
@@ -178,7 +179,18 @@ class CartViewModel(
         val checkMap = _uiState.value.checkMap.toMutableMap()
         checkMap[productId] = checkMap[productId]?.not()
             ?: false
-        _uiState.update { it.copy(checkMap = checkMap.toMap()) }
+        val productUiModels = _uiState.value.paginatedCartContents
+        val totalPrice = productUiModels.filter { checkMap[it.id] == true }.sumOf { it.price * it.quantity }
+        _uiState.update { it.copy(checkMap = checkMap.toMap(), totalPrice = totalPrice) }
+    }
+
+    fun totalCheck() {
+        val productUiModels = _uiState.value.paginatedCartContents
+        val totalPrice = productUiModels.sumOf { it.price * it.quantity }
+
+        val newCheckMap = productUiModels.map { it.id }.associateWith { true }
+
+        _uiState.update { it.copy(checkMap = newCheckMap.toMap(), totalPrice = totalPrice) }
     }
 
     companion object {
