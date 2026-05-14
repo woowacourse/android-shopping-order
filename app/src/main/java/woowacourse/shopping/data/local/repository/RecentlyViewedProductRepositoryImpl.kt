@@ -14,5 +14,5 @@ class RecentlyViewedProductRepositoryImpl(
         recentlyViewedProductDao.enqueueAndLimit10(RecentlyViewedProductEntity(product.id))
     }
 
-    override fun getLatestItem(): Flow<String?> = recentlyViewedProductDao.getLatestItemId()
+    override fun getLatestItem(): Flow<Long?> = recentlyViewedProductDao.getLatestItemId()
 }

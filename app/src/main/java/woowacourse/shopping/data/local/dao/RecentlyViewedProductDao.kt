@@ -29,5 +29,5 @@ interface RecentlyViewedProductDao {
     fun getAll(): Flow<List<RecentlyViewedProductEntity>?>
 
     @Query("SELECT id FROM recently_viewed_products ORDER BY time_stamp DESC LIMIT 1")
-    fun getLatestItemId(): Flow<String?>
+    fun getLatestItemId(): Flow<Long?>
 }

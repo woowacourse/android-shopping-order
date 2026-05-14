@@ -9,5 +9,5 @@ interface RecentlyViewedProductRepository {
 
     suspend fun updateList(product: Product)
 
-    fun getLatestItem(): Flow<String?>
+    fun getLatestItem(): Flow<Long?>
 }

@@ -16,9 +16,9 @@ interface PurchaseProductsDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertIgnore(entity: PurchaseProductEntity): Long
 
-    @Query("UPDATE purchase_products SET count = count + :delta WHERE id = :id")
+    @Query("UPDATE purchase_products SET count = count + :delta WHERE id = :productId")
     suspend fun updateCount(
-        id: String,
+        productId: Long,
         delta: Int,
     )
 
@@ -29,7 +29,7 @@ interface PurchaseProductsDao {
     }
 
     @Query("DELETE FROM purchase_products WHERE id = :id")
-    suspend fun deleteWithId(id: String)
+    suspend fun deleteWithId(id: Long)
 
     @Query("SELECT COUNT(*) FROM purchase_products")
     fun getProductCount(): Flow<Int>
