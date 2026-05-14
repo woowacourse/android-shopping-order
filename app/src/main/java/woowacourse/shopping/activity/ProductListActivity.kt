@@ -7,8 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -24,17 +23,15 @@ import woowacourse.shopping.ui.viewmodel.ProductListViewModel
 import woowacourse.shopping.ui.viewmodel.ScreenViewModelFactory
 
 class ProductListActivity : ComponentActivity() {
-    private val appContainer by lazy { (application as ShoppingApplication).appContainer }
+    private val app: ShoppingApplication by lazy { application as ShoppingApplication }
 
     private val screenViewModelFactory: ScreenViewModelFactory by lazy {
-        ScreenViewModelFactory(
-            shoppingCartRepository = appContainer.shoppingCartRepository,
-            shoppingItemRepository = appContainer.shoppingItemRepository,
-            visitStore = appContainer.visitStore,
-            networkStatusMonitor = appContainer.networkStatusMonitor,
-        )
+        ScreenViewModelFactory(appContainer = app.appContainer)
     }
-    private val apiViewModelFactory: ApiViewModelFactory by lazy { ApiViewModelFactory() }
+    private val apiViewModelFactory: ApiViewModelFactory by lazy {
+        ApiViewModelFactory(app.retrofitService)
+    }
+
     private val productListViewModel: ProductListViewModel by viewModels { screenViewModelFactory }
     private val productViewModel: ProductViewModel by viewModels { apiViewModelFactory }
     private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { apiViewModelFactory }
@@ -42,48 +39,55 @@ class ProductListActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        observeApiViewModels()
-        requestApiData()
-        setContent {
-            val uiState by productListViewModel.uiState.collectAsStateWithLifecycle()
-            LaunchedEffect(Unit) {
-                productListViewModel.event.collect { event ->
-                    when (event) {
-                        is ProductListViewModel.ProductListEvent.NavigateToDetailProduct ->
-                            DetailProductActivity.start(
-                                context = this@ProductListActivity,
-                                productId = event.productId,
-                                showLastViewed = event.showLastViewed,
-                            )
 
-                        ProductListViewModel.ProductListEvent.NavigateToShoppingCart ->
-                            ShoppingCartActivity.start(this@ProductListActivity)
-                    }
+        observeApiViewModels()
+        observeScreenEvents()
+        requestProductsAndCart()
+
+        setContent {
+            val uiState = productListViewModel.uiState.collectAsStateWithLifecycle()
+            val state = productViewModel.state.collectAsStateWithLifecycle()
+            val hasApiError = state.value.errorMessage != null
+            val visibleShoppingItems =
+                if (hasApiError) {
+                    emptyList()
+                } else {
+                    uiState.value.shoppingItems
                 }
-            }
+            val visibleRecentViewedItems =
+                if (hasApiError) {
+                    emptyList()
+                } else {
+                    uiState.value.recentViewedShoppingItems
+                }
+
             AndroidShoppingTheme {
                 ProductListScreen(
-                    shoppingItems = uiState.shoppingItems,
-                    recentViewedShoppingItems = uiState.recentViewedShoppingItems,
-                    shoppingCartTotalCount = uiState.shoppingCartTotalCount,
-                    isNetworkConnected = uiState.isNetworkConnected,
+                    shoppingItems = visibleShoppingItems,
+                    recentViewedShoppingItems = visibleRecentViewedItems,
+                    shoppingCartTotalCount = if (hasApiError) 0 else uiState.value.shoppingCartTotalCount,
+                    isNetworkConnected = uiState.value.isNetworkConnected,
+                    state = state.value,
                     onAddToCartClick = { shoppingItem ->
-                        productListViewModel.addProductToCart(shoppingItem)
-                        shoppingCartViewModel.addOrIncreaseByProductId(shoppingItem.getProductId())
+                        shoppingCartViewModel.addOrIncreaseByProductId(
+                            productId = shoppingItem.getProductId(),
+                            amount = 1,
+                        )
                     },
                     onQuantityPlusClick = { shoppingItem ->
-                        productListViewModel.increaseProductQuantity(shoppingItem)
-                        shoppingCartViewModel.addOrIncreaseByProductId(shoppingItem.getProductId())
+                        shoppingCartViewModel.addOrIncreaseByProductId(
+                            productId = shoppingItem.getProductId(),
+                            amount = 1,
+                        )
                     },
                     onQuantityMinusClick = { shoppingItem ->
-                        productListViewModel.decreaseProductQuantity(shoppingItem)
                         shoppingCartViewModel.decreaseByProductId(shoppingItem.getProductId())
                     },
                     onProductClick = productListViewModel::onProductClick,
                     onRecentViewedProductClick = productListViewModel::onRecentViewedProductClick,
                     onNavigateToCartClick = productListViewModel::onNavigateToCartClick,
                     bottomContent =
-                        if (uiState.canLoadNextPage) {
+                        if (uiState.value.canLoadNextPage) {
                             {
                                 MoreButton(
                                     onClick = productListViewModel::loadNextPage,
@@ -99,34 +103,47 @@ class ProductListActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        requestApiData()
+        requestProductsAndCart()
     }
 
-    private fun requestApiData() {
-        val recommendedCategory = appContainer.recommendationStore.recommendedCategory.value
-        productViewModel.requestProduct(
-            page = INITIAL_PAGE,
-            size = PRODUCT_PAGE_SIZE,
-            sort = PRODUCT_SORT,
-            category = recommendedCategory,
-        )
+    private fun requestProductsAndCart() {
+        productViewModel.requestProduct(size = MAX_PRODUCT_SIZE)
         shoppingCartViewModel.requestCartItems()
     }
 
     private fun observeApiViewModels() {
         lifecycleScope.launch {
-            repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     productViewModel.products.collect { products ->
-                        appContainer.remoteShoppingStateSyncer.syncProducts(products)
+                        app.appContainer.remoteShoppingStateSyncer.syncProducts(products)
                     }
                 }
                 launch {
                     shoppingCartViewModel.shoppingCartItems.collect { shoppingCartItems ->
-                        if (!shoppingCartViewModel.hasLoadedCartItems.value) {
-                            return@collect
+                        app.appContainer.remoteShoppingStateSyncer.syncCartItems(shoppingCartItems)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun observeScreenEvents() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                productListViewModel.event.collect { event ->
+                    when (event) {
+                        is ProductListViewModel.ProductListEvent.NavigateToDetailProduct -> {
+                            DetailProductActivity.start(
+                                context = this@ProductListActivity,
+                                productId = event.productId,
+                                showLastViewed = event.showLastViewed,
+                            )
                         }
-                        appContainer.remoteShoppingStateSyncer.syncCartItems(shoppingCartItems)
+
+                        ProductListViewModel.ProductListEvent.NavigateToShoppingCart -> {
+                            ShoppingCartActivity.start(this@ProductListActivity)
+                        }
                     }
                 }
             }
@@ -134,8 +151,6 @@ class ProductListActivity : ComponentActivity() {
     }
 
     private companion object {
-        private const val INITIAL_PAGE = 0
-        private const val PRODUCT_PAGE_SIZE = 100
-        private val PRODUCT_SORT = listOf("id,asc")
+        private const val MAX_PRODUCT_SIZE = 100
     }
 }

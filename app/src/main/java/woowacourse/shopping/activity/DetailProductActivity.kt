@@ -27,17 +27,18 @@ import woowacourse.shopping.ui.viewmodel.DetailProductViewModel
 import woowacourse.shopping.ui.viewmodel.ScreenViewModelFactory
 
 class DetailProductActivity : ComponentActivity() {
-    private val appContainer by lazy { (application as ShoppingApplication).appContainer }
+    private val app: ShoppingApplication by lazy { application as ShoppingApplication }
 
     private val screenViewModelFactory: ScreenViewModelFactory by lazy {
         ScreenViewModelFactory(
-            shoppingCartRepository = appContainer.shoppingCartRepository,
-            shoppingItemRepository = appContainer.shoppingItemRepository,
-            visitStore = appContainer.visitStore,
-            networkStatusMonitor = appContainer.networkStatusMonitor,
+            appContainer = app.appContainer,
         )
     }
-    private val apiViewModelFactory: ApiViewModelFactory by lazy { ApiViewModelFactory() }
+    private val apiViewModelFactory: ApiViewModelFactory by lazy {
+        ApiViewModelFactory(
+            app.retrofitService,
+        )
+    }
     private val detailProductViewModel: DetailProductViewModel by viewModels { screenViewModelFactory }
     private val productViewModel: ProductViewModel by viewModels { apiViewModelFactory }
     private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { apiViewModelFactory }
@@ -122,7 +123,7 @@ class DetailProductActivity : ComponentActivity() {
                             return@collect
                         }
                         val detailProduct = productDetails[productId] ?: return@collect
-                        appContainer.remoteShoppingStateSyncer.syncProduct(detailProduct)
+                        app.appContainer.remoteShoppingStateSyncer.syncProduct(detailProduct)
                     }
                 }
             }

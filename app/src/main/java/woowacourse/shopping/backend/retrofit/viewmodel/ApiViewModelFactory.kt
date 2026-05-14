@@ -7,13 +7,15 @@ import woowacourse.shopping.backend.retrofit.repository.OrderRetrofitRepository
 import woowacourse.shopping.backend.retrofit.repository.ProductRetrofitRepository
 import woowacourse.shopping.backend.retrofit.repository.ShoppingCartRetrofitRepository
 
-class ApiViewModelFactory : ViewModelProvider.Factory {
+class ApiViewModelFactory(
+    retrofitService: RetrofitService,
+) : ViewModelProvider.Factory {
     private val productRetrofitRepository: ProductRetrofitRepository =
-        ProductRetrofitRepository(RetrofitService.productApiService)
+        ProductRetrofitRepository(retrofitService.productApiService)
     private val shoppingCartRetrofitRepository: ShoppingCartRetrofitRepository =
-        ShoppingCartRetrofitRepository(RetrofitService.shoppingCartApiService)
+        ShoppingCartRetrofitRepository(retrofitService.shoppingCartApiService)
     private val orderRetrofitRepository: OrderRetrofitRepository =
-        OrderRetrofitRepository(RetrofitService.orderApiService)
+        OrderRetrofitRepository(retrofitService.orderApiService)
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
