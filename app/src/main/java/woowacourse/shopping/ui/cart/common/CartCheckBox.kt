@@ -21,7 +21,7 @@ fun CartCheckbox(
         onCheckedChange = onCheckedChange,
         colors =
             CheckboxDefaults.colors(
-                uncheckedColor = ShoppingColors.Gray4,
+                uncheckedColor = ShoppingColors.Gray2,
                 checkedColor = ShoppingColors.BrandGreen,
             ),
     )

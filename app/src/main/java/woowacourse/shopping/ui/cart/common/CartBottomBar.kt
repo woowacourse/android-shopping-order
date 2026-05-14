@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -87,7 +88,6 @@ private fun CartSummarySection(
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (showSelectAll) {
@@ -107,6 +107,9 @@ private fun CartSummarySection(
                 )
             }
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+
         Text(
             text = totalPrice,
             fontSize = 18.sp,
@@ -153,6 +156,17 @@ fun CartBottomBarPreview2() {
     CartBottomBar(
         totalPrice = "0원",
         selectedCount = 0,
+        onOrderClick = {},
+    )
+}
+
+@Preview
+@Composable
+fun CartBottomBarPreview3() {
+    CartBottomBar(
+        totalPrice = "184,200원",
+        showSelectAll = false,
+        selectedCount = 2,
         onOrderClick = {},
     )
 }
