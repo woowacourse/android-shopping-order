@@ -1,13 +1,10 @@
 package woowacourse.shopping
 
 import android.app.Application
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import woowacourse.shopping.data.local.UserAuthDataStore
 import woowacourse.shopping.data.local.database.DataBase
-import woowacourse.shopping.data.local.repository.PurchaseProductsRepositoryImpl
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepositoryImpl
 import woowacourse.shopping.data.remote.server.RetrofitProvider
 import woowacourse.shopping.data.remote.server.repository.CartRepositoryImpl
@@ -18,10 +15,6 @@ import kotlin.jvm.java
 
 class ShoppingApplication : Application() {
     val database by lazy { DataBase.getDatabase(this) }
-
-    val purchaseProductsRepository by lazy {
-        PurchaseProductsRepositoryImpl(database.purchaseProductsDao())
-    }
 
     val recentlyViewedProductRepository by lazy {
         RecentlyViewedProductRepositoryImpl(database.recentlyViewedProductDao())

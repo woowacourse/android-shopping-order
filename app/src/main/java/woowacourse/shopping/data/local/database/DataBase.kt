@@ -6,24 +6,14 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import woowacourse.shopping.data.local.dao.PurchaseProductsDao
 import woowacourse.shopping.data.local.dao.RecentlyViewedProductDao
-import woowacourse.shopping.data.local.entity.PurchaseProductEntity
 import woowacourse.shopping.data.local.entity.RecentlyViewedProductEntity
 
-val MIGRATION_4_5 =
-    object : Migration(4, 5) {
+val MIGRATION_5_6 =
+    object : Migration(5, 6) {
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execSQL("DROP TABLE `purchase_products`")
-            db.execSQL(
-                """
-                CREATE TABLE IF NOT EXISTS `purchase_products` (
-                    `productId` TEXT NOT NULL,
-                    `count` INTEGER NOT NULL,
-                    PRIMARY KEY(`productId`)
-                )
-                """.trimIndent()
-            )
+
             db.execSQL("DROP TABLE `recently_viewed_products`")
             db.execSQL(
                 """                
@@ -38,11 +28,10 @@ val MIGRATION_4_5 =
     }
 
 @Database(
-    entities = [PurchaseProductEntity::class, RecentlyViewedProductEntity::class],
+    entities = [RecentlyViewedProductEntity::class],
     version = 5,
 )
 abstract class DataBase : RoomDatabase() {
-    abstract fun purchaseProductsDao(): PurchaseProductsDao
 
     abstract fun recentlyViewedProductDao(): RecentlyViewedProductDao
 
@@ -57,7 +46,7 @@ abstract class DataBase : RoomDatabase() {
                         context = context,
                         klass = DataBase::class.java,
                         name = "shopping_database",
-                    ).addMigrations(MIGRATION_4_5)
+                    ).addMigrations(MIGRATION_5_6)
                     .build()
                     .also { instance = it }
             }
