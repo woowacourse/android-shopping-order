@@ -10,4 +10,5 @@ fun ProductResponse.toDomain(): Product =
         name = ProductName(name),
         price = Money(price.toLong()),
         imageUrl = imageUrl,
+        category = category,
     )

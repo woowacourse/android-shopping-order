@@ -10,6 +10,7 @@ class ProductTest {
             name = ProductName("동원 스위트콘"),
             price = Money(5000),
             imageUrl = "dsdsds",
+            category = "",
         )
 
     @Test
@@ -21,6 +22,7 @@ class ProductTest {
                 name = ProductName("동원 스위트콘"),
                 price = Money(5000),
                 imageUrl = "url0",
+                category = "",
             )
         val product2 =
             Product(
@@ -28,6 +30,7 @@ class ProductTest {
                 name = ProductName("동원 스위트콘"),
                 price = Money(5000),
                 imageUrl = "url1",
+                category = "",
             )
         assertThat(product1.equals(product2)).isTrue
     }
@@ -42,6 +45,7 @@ class ProductTest {
                 name = ProductName("동원 스위트콘"),
                 price = Money(5000),
                 imageUrl = "dsdsds",
+                category = "",
             )
         val product2 =
             Product(
@@ -49,6 +53,7 @@ class ProductTest {
                 name = ProductName("동원 스위트콘"),
                 price = Money(5000),
                 imageUrl = "dsdsds",
+                category = "",
             )
         assertThat(product1.equals(product2)).isFalse
     }

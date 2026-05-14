@@ -10,6 +10,7 @@ class CartTest {
             name = ProductName("상품1"),
             price = Money(5000),
             imageUrl = "",
+            category = "",
         )
 
     private val product2 =
@@ -18,6 +19,7 @@ class CartTest {
             name = ProductName("상품2"),
             price = Money(1000),
             imageUrl = "",
+            category = "",
         )
 
     @Test

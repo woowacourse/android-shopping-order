@@ -10,7 +10,10 @@ data class PaymentItems(
 
     fun isContain(productId: Long): Boolean = paymentItems.any { it.product.id == productId }
 
-    fun add(item: CartItem): PaymentItems = copy(paymentItems = paymentItems + item)
+    fun add(item: CartItem): PaymentItems {
+        val filtered = paymentItems.filterNot { it.product.id == item.product.id }
+        return copy(paymentItems = (filtered + item).toSet())
+    }
 
     fun remove(productId: Long): PaymentItems = copy(paymentItems = paymentItems.filterNot { it.product.id == productId }.toSet())
 }

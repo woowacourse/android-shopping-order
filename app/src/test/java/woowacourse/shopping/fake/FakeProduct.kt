@@ -10,4 +10,5 @@ fun fakeProduct(id: Long): Product =
         name = ProductName(id.toString()),
         price = Money(1250L),
         imageUrl = "",
+        category = "",
     )

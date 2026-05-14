@@ -82,6 +82,8 @@ fun RecommendScreen(
             RecommendSection(
                 modifier = Modifier.padding(innerPadding),
                 items = uiState.recommendProducts.toImmutableList(),
+                onIncrease = onIncrease,
+                onDecrease = onDecrease,
             )
         }
     }

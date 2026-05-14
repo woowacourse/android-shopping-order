@@ -1,8 +1,11 @@
 package woowacourse.shopping.presentation.recommend.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
@@ -25,6 +28,8 @@ import woowacourse.shopping.ui.theme.Gray50
 
 @Composable
 fun RecommendSection(
+    onIncrease: (Long) -> Unit,
+    onDecrease: (Long) -> Unit,
     items: ImmutableList<ShoppingItemUiModel>,
     modifier: Modifier = Modifier,
 ) {
@@ -47,7 +52,10 @@ fun RecommendSection(
             color = Gray50,
         )
         Spacer(modifier = Modifier.height(30.dp))
-        LazyRow {
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
+        ) {
             items(
                 items = items,
                 key = { it.product.id },
@@ -56,8 +64,11 @@ fun RecommendSection(
                     product = item.product,
                     quantity = item.quantity,
                     onClick = {},
-                    onIncrease = {},
-                    onDecrease = {},
+                    onIncrease = { onIncrease(item.product.id) },
+                    onDecrease = { onDecrease(item.product.id) },
+                    modifier =
+                        Modifier
+                            .width(154.dp),
                 )
             }
         }
@@ -69,6 +80,8 @@ fun RecommendSection(
 private fun RecommendSectionPreview() {
     AndroidshoppingTheme {
         RecommendSection(
+            onIncrease = {},
+            onDecrease = {},
             items = emptyList<ShoppingItemUiModel>().toImmutableList(),
         )
     }

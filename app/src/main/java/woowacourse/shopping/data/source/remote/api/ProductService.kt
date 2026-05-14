@@ -11,6 +11,7 @@ interface ProductService {
     @GET("/products")
     suspend fun requestProducts(
         @Header("accept") accept: String = "*/*",
+        @Query("category") category: String? = null,
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 1,
     ): ProductsResponse

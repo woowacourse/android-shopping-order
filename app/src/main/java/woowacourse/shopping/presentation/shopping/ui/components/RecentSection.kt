@@ -107,6 +107,7 @@ private fun RecentSectionPreview() {
             name = ProductName("아메리카노"),
             price = Money(6000),
             imageUrl = "",
+            category = "커피",
         ).toUiModel()
     AndroidshoppingTheme {
         RecentSection(

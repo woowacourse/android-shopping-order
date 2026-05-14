@@ -32,4 +32,5 @@ fun ProductContent.toDomain(): Product =
                 this.price.toLong(),
             ),
         imageUrl = this.imageUrl,
+        category = this.category,
     )

@@ -3,7 +3,6 @@ package woowacourse.shopping.presentation.recommend
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -21,7 +20,6 @@ class RecommendActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val productIds = this.intent.getLongArrayExtra(INTENT_PRODUCT_IDS) ?: longArrayOf()
-        Log.d("Log", "RecommendActivity onCreate: ${productIds.size}")
         enableEdgeToEdge()
 
         setContent {
@@ -29,6 +27,7 @@ class RecommendActivity : ComponentActivity() {
 
             LaunchedEffect(Unit) {
                 viewModel.loadPaymentId(productIds)
+                viewModel.loadRecommendProducts()
             }
 
             AndroidshoppingTheme {
@@ -36,8 +35,8 @@ class RecommendActivity : ComponentActivity() {
                     uiState = uiState,
                     onBack = this::finish,
                     onOrderClick = {},
-                    onIncrease = {},
-                    onDecrease = {},
+                    onIncrease = viewModel::increase,
+                    onDecrease = viewModel::decrease,
                 )
             }
         }

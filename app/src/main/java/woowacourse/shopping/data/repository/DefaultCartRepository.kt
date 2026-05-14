@@ -32,6 +32,7 @@ class DefaultCartRepository(
                                 it.product.price.toLong(),
                             ),
                         imageUrl = it.product.imageUrl,
+                        category = it.product.category,
                     ),
                     it.quantity,
                 )

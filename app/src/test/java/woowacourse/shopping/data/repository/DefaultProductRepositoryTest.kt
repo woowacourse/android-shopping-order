@@ -25,6 +25,7 @@ class DefaultProductRepositoryTest {
             name = ProductName(name = "상품"),
             price = Money(amount = 5000),
             imageUrl = "",
+            category = "",
         )
 
     @BeforeEach

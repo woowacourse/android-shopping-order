@@ -5,6 +5,7 @@ class Product(
     val name: ProductName,
     val price: Money,
     val imageUrl: String,
+    val category: String,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
