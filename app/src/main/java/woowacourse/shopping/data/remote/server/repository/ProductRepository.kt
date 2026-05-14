@@ -9,4 +9,10 @@ interface ProductRepository {
     ): List<Product>
 
     suspend fun getProduct(id: Long): Product
+
+    suspend fun getCategoryProducts(
+        page: Int = 1,
+        pageSize: Int = 10,
+        category: String,
+    ): List<Product>
 }

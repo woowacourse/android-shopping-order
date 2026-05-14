@@ -17,4 +17,11 @@ interface ProductService {
     suspend fun requestProduct(
         @Path("id") id: Long
     ) : ProductResponse
+
+    @GET("/products/")
+    suspend fun requestCategoryProducts(
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 10,
+        @Query("category") category: String,
+    ): ProductsResponse
 }

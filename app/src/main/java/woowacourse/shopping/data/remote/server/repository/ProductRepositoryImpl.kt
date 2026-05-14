@@ -27,4 +27,13 @@ class ProductRepositoryImpl(
             throw e
         }
     }
+
+    override suspend fun getCategoryProducts(
+        page: Int,
+        pageSize: Int,
+        category: String
+    ): List<Product> {
+        val response = productService.requestCategoryProducts(category = category)
+        return response.content.map { it.toDomain() }
+    }
 }
