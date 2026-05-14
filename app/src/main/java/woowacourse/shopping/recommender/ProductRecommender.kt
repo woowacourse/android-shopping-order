@@ -28,7 +28,7 @@ object ProductRecommender {
     private fun filterByCategory(
         lastViewedItem: Product,
         allProductItems: List<Product>
-    ) = allProductItems.filter { it.category == lastViewedItem.category } - lastViewedItem
+    ) = allProductItems.filter { it.category == lastViewedItem.category }
 
     private fun getFilteredProducts(
         products: List<Product>,
