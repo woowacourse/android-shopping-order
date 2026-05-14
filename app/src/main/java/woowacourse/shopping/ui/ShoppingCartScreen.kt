@@ -103,7 +103,7 @@ fun ShoppingCartScreen(
                     shoppingCartItems.forEach { shoppingCartItem ->
                         ShoppingCartItems(
                             shoppingCartItem = shoppingCartItem,
-                            selected = shoppingCartItem.getId() in state.selectedProductIds,
+                            selected = shoppingCartItem.product.id in state.selectedProductIds,
                             quantityPrice = getQuantityPrice(shoppingCartItem),
                             onRemoveShoppingItemClick = onRemoveShoppingItemClick,
                             onToggleShoppingItemSelectionClick = onToggleShoppingItemSelectionClick,
@@ -156,7 +156,7 @@ private fun ShoppingCartItems(
                 ShoppingCartCheckBox(
                     checked = selected,
                     onCheckedChange = { isChecked ->
-                        onToggleShoppingItemSelectionClick(shoppingCartItem.getId(), isChecked)
+                        onToggleShoppingItemSelectionClick(shoppingCartItem.product.id, isChecked)
                     },
                 )
                 Text(
@@ -219,7 +219,7 @@ private fun ShoppingCartItems(
 @Composable
 fun OrderButton(
     shoppingCartItems: List<ShoppingCartItem>,
-    selectedShoppingCartItemIds: Set<Long>,
+    selectedProductIds: Set<Long>,
     shoppingCartSelectItemCount: Int,
     onToggleShoppingItemSelectionClick: (List<Long>, Boolean) -> Unit,
     onOrderButtonClick: (List<Long>) -> Unit,
@@ -235,7 +235,7 @@ fun OrderButton(
             .background(MaterialTheme.colorScheme.surfaceContainer),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if( orderComplete ){
+        if (orderComplete) {
             Column(
                 modifier = modifier,
                 verticalArrangement = Arrangement.Center,
@@ -245,7 +245,7 @@ fun OrderButton(
                     checked = checked,
                     onCheckedChange = { isChecked ->
                         onToggleShoppingItemSelectionClick(
-                            shoppingCartItems.map { shoppingCartItem -> shoppingCartItem.getId() },
+                            shoppingCartItems.map { shoppingCartItem -> shoppingCartItem.product.id },
                             isChecked,
                         )
                     },
@@ -268,7 +268,7 @@ fun OrderButton(
         )
 
         Button(
-            onClick = { onOrderButtonClick(selectedShoppingCartItemIds.toList()) },
+            onClick = { onOrderButtonClick(selectedProductIds.toList()) },
             modifier = Modifier
                 .weight(1.5f)
                 .fillMaxHeight(),
@@ -299,7 +299,7 @@ private fun ShoppingCartOrderButtonPreview() {
     AndroidShoppingTheme {
         OrderButton(
             shoppingCartItems = emptyList(),
-            selectedShoppingCartItemIds = emptySet(),
+            selectedProductIds = emptySet(),
             shoppingCartSelectItemCount = 3,
             totalPrice = 3400000,
             checked = true,
