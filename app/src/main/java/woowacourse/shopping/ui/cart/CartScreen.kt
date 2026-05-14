@@ -2,23 +2,20 @@ package woowacourse.shopping.ui.cart
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -39,7 +36,6 @@ fun CartScreen(
     onNextPage: () -> Unit,
     onPreviousPage: () -> Unit,
     onQuantityChange: (String, Int) -> Unit,
-    isSelected: (String) -> Boolean,
     onCheckedChange: (String) -> Unit,
     isAllSelectClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -49,7 +45,7 @@ fun CartScreen(
             ShoppingAppBar(
                 contents = {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "뒤로 가기",
                         tint = Color.White,
                         modifier =
@@ -69,32 +65,22 @@ fun CartScreen(
             )
         },
         bottomBar = {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                if (uiState.totalCartSize > 5) {
-                    CartPageSection(
-                        page = uiState.page + 1,
-                        onNext = { onNextPage() },
-                        onPrevious = { onPreviousPage() },
-                        isCanMoveNext = uiState.isCanMoveNext,
-                        modifier = Modifier.navigationBarsPadding(),
-                    )
-                }
-
-                CartBottomBar(
-                    isAllChecked = uiState.isAllChecked,
-                    totalPrice = uiState.totalPrice,
-                    totalCount = uiState.selectedCartItemCount,
-                    onAllCheckedChange = isAllSelectClick,
-                    onOrderClick = { },
-                )
-            }
+            CartBottomBar(
+                isAllChecked = uiState.isAllChecked,
+                totalPrice = uiState.totalPrice,
+                totalCount = uiState.selectedCartItemCount,
+                onAllCheckedChange = isAllSelectClick,
+                onOrderClick = { },
+            )
         },
-        modifier = modifier.statusBarsPadding(),
+        modifier = modifier.systemBarsPadding(),
     ) { innerPadding ->
         CartContent(
+            totalCartSize = uiState.items.size,
+            page = uiState.page,
+            onNextPage = onNextPage,
+            onPreviousPage = onPreviousPage,
+            isCanMoveNext = uiState.isCanMoveNext,
             onQuantityChange = onQuantityChange,
             onDeleteItem = {
                 onDeleteItem(it)
@@ -102,7 +88,6 @@ fun CartScreen(
             cartItems = uiState.items,
             isLoading = uiState.isLoading,
             errorMessage = uiState.errorMessage,
-            isChecked = isSelected,
             onCheckedChange = onCheckedChange,
             modifier =
                 Modifier
@@ -114,12 +99,16 @@ fun CartScreen(
 
 @Composable
 private fun CartContent(
+    totalCartSize: Int,
+    page: Int,
+    onNextPage: () -> Unit,
+    onPreviousPage: () -> Unit,
+    isCanMoveNext: Boolean,
     onQuantityChange: (String, Int) -> Unit,
     onDeleteItem: (String) -> Unit,
     cartItems: ImmutableList<CartItemUiModel>,
     isLoading: Boolean,
     errorMessage: String?,
-    isChecked: (String) -> Boolean,
     onCheckedChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -160,8 +149,18 @@ private fun CartContent(
                     onDeleteItem = {
                         onDeleteItem(item.id)
                     },
-                    isChecked = isChecked(item.id),
+                    isChecked = item.isChecked,
                     onCheckedChange = { onCheckedChange(item.id) },
+                )
+            }
+        }
+        if (totalCartSize > 5) {
+            item {
+                CartPageSection(
+                    page = page + 1,
+                    onNext = { onNextPage() },
+                    onPrevious = { onPreviousPage() },
+                    isCanMoveNext = isCanMoveNext,
                 )
             }
         }
@@ -178,7 +177,6 @@ private fun CartScreenPreview() {
         onNextPage = {},
         onPreviousPage = {},
         onQuantityChange = { _, _ -> },
-        isSelected = { true },
         onCheckedChange = { },
         isAllSelectClick = { },
     )
@@ -188,6 +186,11 @@ private fun CartScreenPreview() {
 @Composable
 private fun CartContentPreview() {
     CartContent(
+        totalCartSize = 10,
+        page = 0,
+        onNextPage = {},
+        onPreviousPage = {},
+        isCanMoveNext = true,
         onDeleteItem = {},
         onQuantityChange = { _, _ -> },
         cartItems =
@@ -203,6 +206,7 @@ private fun CartContentPreview() {
                     quantity = 1,
                     totalPrice = 1000,
                     id = "",
+                    isChecked = true,
                 ),
                 CartItemUiModel(
                     product =
@@ -215,11 +219,11 @@ private fun CartContentPreview() {
                     quantity = 1,
                     totalPrice = 1000,
                     id = "",
+                    isChecked = true,
                 ),
             ).toImmutableList(),
         isLoading = true,
         errorMessage = null,
-        isChecked = { true },
         onCheckedChange = { },
     )
 }

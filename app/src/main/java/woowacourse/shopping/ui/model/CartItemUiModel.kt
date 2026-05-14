@@ -5,4 +5,5 @@ data class CartItemUiModel(
     val product: ProductUiModel,
     val quantity: Int,
     val totalPrice: Long,
+    val isChecked: Boolean = false,
 )

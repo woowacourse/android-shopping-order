@@ -40,7 +40,7 @@ class CartViewModel(
                 items =
                     cartResult.cartItems
                         .map { cartItem ->
-                            cartItem.toUiModel()
+                            cartItem.toUiModel(isSelected(cartItem.id))
                         }.toImmutableList(),
                 isCanMoveNext = !cartResult.isLastPage,
                 totalCartSize = cartRepository.getTotalCartItemQuantity(),
@@ -101,8 +101,6 @@ class CartViewModel(
         _uiState.update {
             it.copy(
                 selectedCartItems = selectedItems,
-                isAllChecked = selectedItems.size == it.items.size,
-                selectedCartItemCount = selectedItems.size,
             )
         }
 
@@ -111,7 +109,7 @@ class CartViewModel(
         }
     }
 
-    fun isSelected(cartItemId: String): Boolean = _uiState.value.selectedCartItems.contains(cartItemId)
+    private fun isSelected(cartItemId: String): Boolean = _uiState.value.selectedCartItems.contains(cartItemId)
 
     fun isAllSelectClick() {
         val selectedItems =
