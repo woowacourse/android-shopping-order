@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -27,6 +28,8 @@ import woowacourse.shopping.ui.viewmodel.ShoppingCartItemViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 class ShoppingCartActivity : ComponentActivity() {
+
+
     private val app: ShoppingApplication by lazy { application as ShoppingApplication }
 
     private val screenViewModelFactory: ScreenViewModelFactory by lazy {
@@ -47,6 +50,8 @@ class ShoppingCartActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
@@ -54,8 +59,14 @@ class ShoppingCartActivity : ComponentActivity() {
         observeScreenEvents()
         shoppingCartViewModel.requestCartItems()
 
+
         setContent {
-            val screenState = shoppingCartItemViewModel.shoppingCartItems.collectAsStateWithLifecycle()
+            val shoppingCartItems by shoppingCartViewModel.shoppingCartItems.collectAsStateWithLifecycle()
+            val selectedCartItemIds by shoppingCartViewModel.selectedCartItemIds.collectAsStateWithLifecycle()
+            val selectedItemCount = selectedCartItemIds.size
+
+            val screenState =
+                shoppingCartItemViewModel.shoppingCartItems.collectAsStateWithLifecycle()
             val isLoading = shoppingCartViewModel.isLoading.collectAsStateWithLifecycle()
             val errorMessage = shoppingCartViewModel.errorMessage.collectAsStateWithLifecycle()
             val hasApiError = errorMessage.value != null
@@ -74,12 +85,17 @@ class ShoppingCartActivity : ComponentActivity() {
             val state =
                 ShoppingCartState(
                     items = visibleItems,
+                    selectedCartItemIds = selectedCartItemIds,
                     isLoading = isLoading.value,
                     errorMessage = errorMessage.value,
                     currentPage = screenState.value.currentPage,
-                    canMoveToPreviousPage = if (hasApiError) false else screenState.value.canMoveToPreviousPage,
+                    selectedItemCount = shoppingCartItems.size,
+                    canOrder = selectedItemCount > 0 && !isLoading.value,
+                    canMoveToPreviousPage =
+                        if (hasApiError) false else screenState.value.canMoveToPreviousPage,
                     canMoveToNextPage = if (hasApiError) false else screenState.value.canMoveToNextPage,
                 )
+
 
             AndroidShoppingTheme {
                 ShoppingCartScreen(

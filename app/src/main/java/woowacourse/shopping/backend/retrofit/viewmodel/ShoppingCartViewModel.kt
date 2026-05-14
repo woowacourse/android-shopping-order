@@ -24,6 +24,10 @@ class ShoppingCartViewModel(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
+    private val _selectedCartItemIds = MutableStateFlow<Set<Long>>(emptySet())
+    val selectedCartItemIds: StateFlow<Set<Long>> = _selectedCartItemIds.asStateFlow()
+
+
     fun requestCartItems() {
         _isLoading.value = true
         _errorMessage.value = null
@@ -33,6 +37,7 @@ class ShoppingCartViewModel(
             }.onSuccess { loadedItems ->
                 _shoppingCartItems.value = loadedItems
                 _isLoading.value = false
+                syncShoppingCartItems(loadedItems)
             }.onFailure { throwable ->
                 _isLoading.value = false
                 _errorMessage.value = throwable.message
@@ -67,6 +72,7 @@ class ShoppingCartViewModel(
             }.onSuccess { latestItems ->
                 _shoppingCartItems.value = latestItems
                 onSuccess?.invoke()
+                syncShoppingCartItems(latestItems)
             }
         }
     }
@@ -75,7 +81,8 @@ class ShoppingCartViewModel(
         viewModelScope.launch {
             runCatching {
                 val currentItems = loadCartItems()
-                val targetItem = findByProductId(currentItems, productId) ?: return@runCatching currentItems
+                val targetItem =
+                    findByProductId(currentItems, productId) ?: return@runCatching currentItems
                 val updatedQuantity = targetItem.getQuantity() - 1
                 if (updatedQuantity <= 0) {
                     shoppingCartRetrofitRepository
@@ -92,6 +99,7 @@ class ShoppingCartViewModel(
                 loadCartItems()
             }.onSuccess { latestItems ->
                 _shoppingCartItems.value = latestItems
+                syncShoppingCartItems(latestItems)
             }
         }
     }
@@ -106,6 +114,7 @@ class ShoppingCartViewModel(
                 loadCartItems()
             }.onSuccess { latestItems ->
                 _shoppingCartItems.value = latestItems
+                syncShoppingCartItems(latestItems)
             }
         }
     }
@@ -119,18 +128,23 @@ class ShoppingCartViewModel(
         decreaseByProductId(productId = shoppingCartItem.product.id)
     }
 
-    fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int = shoppingCartItem.getProductQuantityPrice()
+    fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int =
+        shoppingCartItem.getProductQuantityPrice()
 
-    fun getTotalCount(): Int = _shoppingCartItems.value.sumOf { shoppingCartItem -> shoppingCartItem.getQuantity() }
+    fun getTotalCount(): Int =
+        _shoppingCartItems.value.sumOf { shoppingCartItem -> shoppingCartItem.getQuantity() }
 
-    private suspend fun loadCartItems(): List<ShoppingCartItem> =
-        shoppingCartRetrofitRepository
+    private suspend fun loadCartItems(): List<ShoppingCartItem> {
+        val ShoppingCartItems = shoppingCartRetrofitRepository
             .requestCartItems(
                 page = DEFAULT_PAGE,
                 size = DEFAULT_SIZE,
                 sort = null,
             ).awaitBody(errorPrefix = "장바구니 조회 실패")
             .toDomainShoppingCartItems()
+        syncShoppingCartItems(ShoppingCartItems)
+        return ShoppingCartItems
+    }
 
     private fun findByProductId(
         shoppingCartItems: List<ShoppingCartItem>,
@@ -140,6 +154,30 @@ class ShoppingCartViewModel(
             shoppingCartItem.product.id == productId
         }
 
+    fun toggleShoppingCartItemSelection(shoppingCartItem: ShoppingCartItem) {
+        val id = shoppingCartItem.getId()
+        _selectedCartItemIds.value =
+            _selectedCartItemIds.value.toMutableSet().apply {
+                if (!add(id)) remove(id)
+            }
+    }
+
+    fun clearSelection() {
+        _selectedCartItemIds.value = emptySet()
+    }
+
+    private fun syncShoppingCartItems(shoppingCartItems: List<ShoppingCartItem>) {
+        _shoppingCartItems.value = shoppingCartItems
+        val validIds = shoppingCartItems.map { it.getId() }.toSet()
+        _selectedCartItemIds.value = _selectedCartItemIds.value.intersect(validIds)
+    }
+
+    fun getSelectedShoppingCartItems(): List<ShoppingCartItem> {
+        val selectedIds = _selectedCartItemIds.value
+        return _shoppingCartItems.value.filter { shoppingCartItem ->
+            shoppingCartItem.getId() in selectedIds
+        }
+    }
     private companion object {
         private const val DEFAULT_PAGE = 0
         private const val DEFAULT_SIZE = 100
