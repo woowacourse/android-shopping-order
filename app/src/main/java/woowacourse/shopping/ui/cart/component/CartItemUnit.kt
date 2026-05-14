@@ -33,7 +33,7 @@ import coil3.compose.AsyncImage
 import woowacourse.shopping.R
 import woowacourse.shopping.repository.inmemory.InMemoryProductRepository
 import woowacourse.shopping.ui.ShoppingTypography
-import woowacourse.shopping.ui.cart.CartItemUiModel
+import woowacourse.shopping.ui.cart.list.CartItemUiModel
 import woowacourse.shopping.ui.common.component.cartcontrol.QuantityStepper
 import woowacourse.shopping.ui.theme.ShoppingColors
 

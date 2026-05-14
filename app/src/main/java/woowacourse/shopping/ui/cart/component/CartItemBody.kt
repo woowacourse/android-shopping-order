@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import woowacourse.shopping.repository.inmemory.InMemoryProductRepository
-import woowacourse.shopping.ui.cart.CartItemUiModel
+import woowacourse.shopping.ui.cart.list.CartItemUiModel
 
 @Composable
 fun CartItemBody(

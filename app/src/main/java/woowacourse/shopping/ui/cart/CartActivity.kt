@@ -19,11 +19,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import woowacourse.shopping.ui.cart.list.CartScreen
+import woowacourse.shopping.ui.cart.list.CartViewModel
+import woowacourse.shopping.ui.cart.recommendation.CartRecommendationViewModel
+import woowacourse.shopping.ui.cart.recommendation.CartRecommendedProductsScreen
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.theme.ShoppingTheme
 
 class CartActivity : ComponentActivity() {
-    private val viewModel: CartViewModel by viewModels()
+    private val cartViewModel: CartViewModel by viewModels()
+    private val recommendationViewModel: CartRecommendationViewModel by viewModels()
 
     companion object {
         fun startActivity(context: Context) {
@@ -33,7 +38,8 @@ class CartActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.reloadVisibleState()
+        cartViewModel.reloadVisibleState()
+        recommendationViewModel.reloadVisibleState()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,20 +47,21 @@ class CartActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val cartUiState by cartViewModel.uiState.collectAsStateWithLifecycle()
+            val recommendationUiState by recommendationViewModel.uiState.collectAsStateWithLifecycle()
             var isShowingRecommendedProducts by rememberSaveable { mutableStateOf(false) }
 
-            LaunchedEffect(uiState.orderCompletedCount) {
-                if (uiState.orderCompletedCount > 0) {
+            LaunchedEffect(recommendationUiState.orderCompletedCount) {
+                if (recommendationUiState.orderCompletedCount > 0) {
                     Toast.makeText(this@CartActivity, "주문이 완료되었습니다.", Toast.LENGTH_SHORT).show()
                     finish()
                 }
             }
 
-            LaunchedEffect(uiState.orderErrorMessage) {
-                val message = uiState.orderErrorMessage ?: return@LaunchedEffect
+            LaunchedEffect(recommendationUiState.orderErrorMessage) {
+                val message = recommendationUiState.orderErrorMessage ?: return@LaunchedEffect
                 Toast.makeText(this@CartActivity, message, Toast.LENGTH_SHORT).show()
-                viewModel.clearOrderError()
+                recommendationViewModel.clearOrderError()
             }
 
             BackHandler(enabled = isShowingRecommendedProducts) {
@@ -65,38 +72,40 @@ class CartActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     if (isShowingRecommendedProducts) {
                         CartRecommendedProductsScreen(
-                            recommendedProducts = uiState.recommendedProducts,
-                            totalPrice = formatPrice(uiState.pendingOrder.totalPrice),
-                            selectedCount = uiState.pendingOrder.selectedCount,
-                            isLoading = uiState.isRecommendedProductsLoading,
-                            isNetworkConnected = uiState.isNetworkConnected,
+                            recommendedProducts = recommendationUiState.recommendedProducts,
+                            totalPrice = formatPrice(recommendationUiState.pendingOrder.totalPrice),
+                            selectedCount = recommendationUiState.pendingOrder.selectedCount,
+                            isLoading = recommendationUiState.isRecommendedProductsLoading,
+                            isNetworkConnected = recommendationUiState.isNetworkConnected,
                             modifier = Modifier.padding(innerPadding),
                             onProductClick = { product ->
                                 ProductDetailActivity.startActivity(this, product.id)
                             },
-                            onAddToCart = viewModel::increaseQuantity,
-                            onIncreaseQuantity = viewModel::increaseQuantity,
-                            onDecreaseQuantity = viewModel::decreaseQuantity,
-                            onOrderClick = viewModel::placeOrder,
+                            onAddToCart = recommendationViewModel::addRecommendedProduct,
+                            onIncreaseQuantity = recommendationViewModel::increaseRecommendedProductQuantity,
+                            onDecreaseQuantity = recommendationViewModel::decreaseRecommendedProductQuantity,
+                            onOrderClick = recommendationViewModel::placeOrder,
                             onBackClick = { isShowingRecommendedProducts = false },
                         )
                     } else {
                         CartScreen(
-                            cartListState = uiState.cartListState,
-                            isNetworkConnected = uiState.isNetworkConnected,
+                            cartListState = cartUiState.cartListState,
+                            isNetworkConnected = cartUiState.isNetworkConnected,
                             modifier = Modifier.padding(innerPadding),
                             onBackClick = ::finish,
                             onOrderClick = {
-                                if (viewModel.prepareOrder()) {
+                                val selectedCartOrder = cartViewModel.createSelectedCartOrder()
+                                if (selectedCartOrder != null) {
+                                    recommendationViewModel.startOrder(selectedCartOrder)
                                     isShowingRecommendedProducts = true
                                 }
                             },
-                            onItemCheckedChange = viewModel::toggleItemSelection,
-                            onDeleteClick = viewModel::delete,
-                            onIncreaseQuantity = viewModel::increaseQuantity,
-                            onDecreaseQuantity = viewModel::decreaseQuantity,
-                            onPreviousClick = viewModel::loadPreviousPage,
-                            onNextClick = viewModel::loadNextPage,
+                            onItemCheckedChange = cartViewModel::toggleItemSelection,
+                            onDeleteClick = cartViewModel::delete,
+                            onIncreaseQuantity = cartViewModel::increaseQuantity,
+                            onDecreaseQuantity = cartViewModel::decreaseQuantity,
+                            onPreviousClick = cartViewModel::loadPreviousPage,
+                            onNextClick = cartViewModel::loadNextPage,
                         )
                     }
                 }

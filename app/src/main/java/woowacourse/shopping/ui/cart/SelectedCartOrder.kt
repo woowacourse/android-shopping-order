@@ -1,11 +1,12 @@
 package woowacourse.shopping.ui.cart
 
-data class CartItemUiModel(
+data class SelectedCartOrder(
+    val items: List<SelectedCartOrderItem>,
+)
+
+data class SelectedCartOrderItem(
     val cartItemId: Long,
     val productId: Long,
-    val name: String,
-    val imageUrl: String,
     val price: Int,
     val quantity: Int,
-    val isSelected: Boolean = true,
 )
