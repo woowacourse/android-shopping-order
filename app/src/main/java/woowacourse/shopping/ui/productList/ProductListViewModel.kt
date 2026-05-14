@@ -35,6 +35,10 @@ class ProductListViewModel(
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ProductListUiState.Loading)
 
     init {
+        init()
+    }
+
+    fun init() {
         observeRecentProducts()
         loadNextPage()
     }
