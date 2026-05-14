@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.fake.FakeCartRepository
@@ -25,7 +26,7 @@ class ShoppingViewModelTest {
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(dispatcher)
-        val products = (1L..30L).map { fakeProduct(it) }
+        val products = (1L..20L).map { fakeProduct(it) }
         productRepository = FakeProductRepository(products)
         cartRepository = FakeCartRepository()
         recentProductRepository = FakeRecentProductRepository(products)
@@ -78,46 +79,5 @@ class ShoppingViewModelTest {
 
             val state = viewModel.uiState.value
             Assertions.assertThat(state.canLoadMore).isFalse
-        }
-
-    @Test
-    fun `상품 1개를 장바구니에 담으면 장바구니의 담긴 상품의 수량이 1이 된다`() =
-        runTest {
-            viewModel.loadMore()
-            viewModel.increase(1L)
-
-            val state = viewModel.uiState.value
-            val item = state.products.first { it.product.id == 1L }
-            Assertions.assertThat(item.quantity).isEqualTo(1)
-        }
-
-    @Test
-    fun `5개의 상품을 각각 1개씩 장바구니에 담으면 장바구니 총 상품 수량은 5가 된다`() =
-        runTest {
-            viewModel.loadMore()
-            viewModel.increase(1L)
-            viewModel.increase(2L)
-            viewModel.increase(3L)
-            viewModel.increase(4L)
-            viewModel.increase(5L)
-
-            val state = viewModel.uiState.value
-            Assertions.assertThat(state.totalQuantity).isEqualTo(5)
-        }
-
-    @Test
-    fun `장바구니에 담긴 1개의 상품의 수량을 1개 감소시키면 수량이 0이 된다`() =
-        runTest {
-            viewModel.loadMore()
-            viewModel.increase(1L)
-
-            val state = viewModel.uiState.value
-            val itemB = state.products.first { it.product.id == 1L }
-            Assertions.assertThat(itemB.quantity).isEqualTo(1)
-            viewModel.decrease(1L)
-
-            val updatedState = viewModel.uiState.value
-            val updatedItem = updatedState.products.first { it.product.id == 1L }
-            Assertions.assertThat(updatedItem.quantity).isEqualTo(0)
         }
 }

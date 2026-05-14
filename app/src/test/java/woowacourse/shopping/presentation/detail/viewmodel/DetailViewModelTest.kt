@@ -28,8 +28,9 @@ class DetailViewModelTest {
     fun setUp() {
         Dispatchers.setMain(dispatcher)
         val products = (1L..5L).map { fakeProduct(it) }
+        val productMap = products.associateBy { it.id }
         productRepository = FakeProductRepository(products)
-        cartRepository = FakeCartRepository()
+        cartRepository = FakeCartRepository(productMap)
         recentProductRepository = FakeRecentProductRepository(products)
         viewModel =
             DetailViewModel(
@@ -107,7 +108,7 @@ class DetailViewModelTest {
     @Test
     fun `addToCart는 cartRepository에 상품을 추가한다`() =
         runTest {
-            viewModel.addToCart(id = 1L)
+            viewModel.addToCart(id = 1L, quantity = 3)
 
             val cartItem = cartRepository.getCart().items.find { it.product.id == 1L }
             assertThat(cartItem!!.quantity).isEqualTo(3)
