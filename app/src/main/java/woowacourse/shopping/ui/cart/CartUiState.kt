@@ -12,6 +12,9 @@ sealed interface CartUiState {
         val hasPrevious: Boolean,
         val hasNext: Boolean,
         val selectedItems: Set<Int> = emptySet(),
+        val isAllSelected: Boolean = false,
+        val totalPrice: Int = 0,
+        val totalCount: Int = 0,
     ) : CartUiState {
         val showPageNavigator: Boolean
             get() = totalPages > 1
