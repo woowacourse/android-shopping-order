@@ -6,8 +6,8 @@ import woowacourse.shopping.data.repository.DefaultCartRepository
 import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.data.repository.DefaultRecentProductRepository
 import woowacourse.shopping.data.source.local.ShoppingDatabase
+import woowacourse.shopping.data.source.local.auth.DefaultAuthDataSource
 import woowacourse.shopping.data.source.remote.CartRemoteDataSource
-import woowacourse.shopping.domain.repository.AuthRepository
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
@@ -18,7 +18,7 @@ object RepositoryProvider {
     val productRepository: ProductRepository = DefaultProductRepository()
     val cartRepository: CartRepository by lazy {
         DefaultCartRepository(
-            remoteDataSource = CartRemoteDataSource(),
+            remoteDataSource = CartRemoteDataSource(authDataSource = DefaultAuthDataSource),
         )
     }
 
@@ -28,8 +28,6 @@ object RepositoryProvider {
             productRepository = productRepository,
         )
     }
-
-    val authRepository: AuthRepository = AuthRepository()
 
     fun init(context: Context) {
         database =

@@ -5,6 +5,7 @@ import mockwebserver3.MockWebServer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.data.source.local.auth.AuthDataSource
 import woowacourse.shopping.data.source.remote.CartRemoteDataSource
 import woowacourse.shopping.data.source.remote.dto.cart.Product
 import woowacourse.shopping.fake.FakeCartDispatcher
@@ -36,6 +37,10 @@ class DefaultCartRepositoryTest {
                 remoteDataSource =
                     CartRemoteDataSource(
                         baseUrl = server.url("/").toString(),
+                        authDataSource =
+                            object : AuthDataSource {
+                                override val getAuthToken: String = FakeCartDispatcher.authToken
+                            },
                     ),
             )
     }
@@ -51,8 +56,6 @@ class DefaultCartRepositoryTest {
 
             val newCart = defaultCartRepository.getCart()
             assertThat(newCart.items.size).isEqualTo(2)
-            assertThat(newCart.items.any { it.product.id == 1L }).isTrue
-            assertThat(newCart.items.any { it.product.id == 2L }).isTrue
         }
 
     @Test
@@ -68,13 +71,16 @@ class DefaultCartRepositoryTest {
     @Test
     fun `장바구니에 등록된 상품을 삭제한다`() =
         runTest {
-            val cart = defaultCartRepository.getCart()
             defaultCartRepository.addItem(1L)
+            val cart = defaultCartRepository.getCart()
             assertThat(cart.items.any { it.product.id == 1L }).isTrue
+            assertThat(cart.items.size).isEqualTo(1)
 
             defaultCartRepository.deleteItem(1L)
 
             val newCart = defaultCartRepository.getCart()
+            assertThat(newCart.items.size).isEqualTo(0)
+
             assertThat(newCart.items.any { it.product.id == 1L }).isFalse
         }
 

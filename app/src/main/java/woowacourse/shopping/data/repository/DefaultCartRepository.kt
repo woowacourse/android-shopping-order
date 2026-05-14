@@ -13,7 +13,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 class DefaultCartRepository(
     private val remoteDataSource: CartRemoteDataSource,
 ) : CartRepository {
-    private suspend fun getCartContents(): List<CartContent> = remoteDataSource.getCartItems(0, 20)
+    private suspend fun getCartContents(): List<CartContent> = remoteDataSource.getCartItems(0, 10000)
 
     override suspend fun getCart(): Cart {
         val cartContents = getCartContents()

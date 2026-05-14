@@ -9,17 +9,15 @@ import okio.IOException
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import woowacourse.shopping.data.source.local.auth.AuthDataSource
 import woowacourse.shopping.data.source.remote.api.AddItemRequestBody
 import woowacourse.shopping.data.source.remote.api.CartService
 import woowacourse.shopping.data.source.remote.api.QuantityRequestBody
 import woowacourse.shopping.data.source.remote.dto.cart.CartContent
-import woowacourse.shopping.di.RepositoryProvider
-import woowacourse.shopping.di.RepositoryProvider.authRepository
-import woowacourse.shopping.domain.repository.AuthRepository
 import kotlin.jvm.java
 
 class CartRemoteDataSource(
-    private val authRepository: AuthRepository = RepositoryProvider.authRepository,
+    private val authDataSource: AuthDataSource,
     private val baseUrl: String = "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com",
     private val json: Json = Json { ignoreUnknownKeys = true },
 ) {
@@ -39,7 +37,7 @@ class CartRemoteDataSource(
             try {
                 val response =
                     cartService.requestItems(
-                        basicToken = "Basic ${authRepository.getAuthToken}",
+                        basicToken = "Basic ${authDataSource.getAuthToken}",
                         page = offset,
                         size = limit,
                     )
@@ -58,7 +56,7 @@ class CartRemoteDataSource(
         withContext(Dispatchers.IO) {
             try {
                 cartService.requestAddItem(
-                    basicToken = "Basic ${authRepository.getAuthToken}",
+                    basicToken = "Basic ${authDataSource.getAuthToken}",
                     addItemRequestBody = AddItemRequestBody(id, quantity),
                 )
             } catch (err: HttpException) {
@@ -81,7 +79,7 @@ class CartRemoteDataSource(
         withContext(Dispatchers.IO) {
             try {
                 cartService.requestDeleteItem(
-                    basicToken = "Basic ${authRepository.getAuthToken}",
+                    basicToken = "Basic ${authDataSource.getAuthToken}",
                     id = id,
                 )
             } catch (err: HttpException) {
@@ -107,7 +105,7 @@ class CartRemoteDataSource(
         withContext(Dispatchers.IO) {
             try {
                 cartService.requestChangeQuantity(
-                    basicToken = "Basic ${authRepository.getAuthToken}",
+                    basicToken = "Basic ${authDataSource.getAuthToken}",
                     id = id,
                     quantity = QuantityRequestBody(quantity),
                 )
