@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.launch
 import woowacourse.shopping.backend.retrofit.awaitBody
 import woowacourse.shopping.backend.retrofit.awaitCompletion
@@ -135,11 +136,9 @@ class ShoppingCartViewModel(
         decreaseByProductId(productId = shoppingCartItem.product.id)
     }
 
-    fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int =
-        shoppingCartItem.getProductQuantityPrice()
+    fun getTotalPrice(shoppingCartItems: List<ShoppingCartItem>): Int =
+        shoppingCartItems.sumOf { it.getProductQuantityPrice() }
 
-    fun getTotalCount(): Int =
-        _shoppingCartItems.value.sumOf { shoppingCartItem -> shoppingCartItem.getQuantity() }
 
     private suspend fun loadCartItems(): List<ShoppingCartItem> {
         val ShoppingCartItems = shoppingCartRetrofitRepository
@@ -160,14 +159,6 @@ class ShoppingCartViewModel(
         shoppingCartItems.firstOrNull { shoppingCartItem ->
             shoppingCartItem.product.id == productId
         }
-
-    fun toggleShoppingCartItemSelection(shoppingCartItem: ShoppingCartItem) {
-        val id = shoppingCartItem.getId()
-        _selectedCartItemIds.value =
-            _selectedCartItemIds.value.toMutableSet().apply {
-                if (!add(id)) remove(id)
-            }
-    }
 
     fun setShoppingCartItemSelection(
         shoppingCartItemId: Long,
@@ -200,21 +191,10 @@ class ShoppingCartViewModel(
         _selectedCartItemIds.value = _selectedCartItemIds.value - targetIds
     }
 
-    fun clearSelection() {
-        _selectedCartItemIds.value = emptySet()
-    }
-
     private fun syncShoppingCartItems(shoppingCartItems: List<ShoppingCartItem>) {
         _shoppingCartItems.value = shoppingCartItems
         val validIds = shoppingCartItems.map { it.getId() }.toSet()
         _selectedCartItemIds.value = _selectedCartItemIds.value.intersect(validIds)
-    }
-
-    fun getSelectedShoppingCartItems(): List<ShoppingCartItem> {
-        val selectedIds = _selectedCartItemIds.value
-        return _shoppingCartItems.value.filter { shoppingCartItem ->
-            shoppingCartItem.getId() in selectedIds
-        }
     }
 
     private companion object {

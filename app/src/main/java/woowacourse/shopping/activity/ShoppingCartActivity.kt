@@ -137,7 +137,7 @@ class ShoppingCartActivity : ComponentActivity() {
                         },
                         checked = shoppingCartItems.isNotEmpty() && selectedItemCount == shoppingCartItems.size,
                         orderComplete = shoppingCartItems.isNotEmpty(),
-                        totalPrice = shoppingCartViewModel.getTotalCount(),
+                        totalPrice = shoppingCartViewModel.getTotalPrice(shoppingCartItems),
                         onToggleShoppingItemSelectionClick = { shoppingCartItemIds, isSelected ->
                             shoppingCartViewModel.setShoppingCartItemsSelection(
                                 shoppingCartItemIds = shoppingCartItemIds,
