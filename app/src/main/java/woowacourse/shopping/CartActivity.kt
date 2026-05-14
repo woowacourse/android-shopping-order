@@ -35,6 +35,9 @@ class CartActivity : ComponentActivity() {
             val nextEnable by viewModel.nextEnable.collectAsStateWithLifecycle()
             val prevEnable by viewModel.prevEnable.collectAsStateWithLifecycle()
             val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+            val checkedItemIds by viewModel.checkedItemIds.collectAsStateWithLifecycle()
+            val totalPrice by viewModel.totalPrice.collectAsStateWithLifecycle()
+            val totalCount by viewModel.cartItemCount.collectAsStateWithLifecycle()
 
             Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
                 CartScreen(
@@ -62,6 +65,11 @@ class CartActivity : ComponentActivity() {
                     nextEnable = nextEnable,
                     isPageable = isPageable,
                     isLoading = isLoading,
+                    onCheckedChanged = { viewModel.onItemChecked(it) },
+                    totalPrice = totalPrice,
+                    totalCount = totalCount,
+                    isChecked = { id -> checkedItemIds.contains(id) },
+                    onSelectAllClick = { viewModel.onSelectAllClick() },
                     modifier =
                         Modifier
                             .fillMaxSize()

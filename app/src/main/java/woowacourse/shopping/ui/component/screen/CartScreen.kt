@@ -35,6 +35,7 @@ import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.PurchaseProduct
 import woowacourse.shopping.domain.PurchaseProducts
 import woowacourse.shopping.ui.component.frame.CommonFrame
+import woowacourse.shopping.ui.component.item.CartBottomBar
 import woowacourse.shopping.ui.component.item.CartItem
 import woowacourse.shopping.ui.component.item.LoadCartItem
 
@@ -52,27 +53,43 @@ fun CartScreen(
     previousEnable: Boolean,
     nextEnable: Boolean,
     isLoading: Boolean,
+    onCheckedChanged: (Long) -> Unit,
+    totalPrice: Int,
+    totalCount: Int,
+    isChecked: (Long) -> Boolean,
+    onSelectAllClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CommonFrame(
-        headerContent = { CartHeader(onClose) },
-        bodyContent = {
-            CartBody(
-                cart = cart,
-                onAdd = onAdd,
-                onMinus = onMinus,
-                onDelete = onDelete,
-                currentPage = currentPage,
-                onPrevious = onPrevious,
-                isPageable = isPageable,
-                previousEnable = previousEnable,
-                nextEnable = nextEnable,
-                onNext = onNext,
-                isLoading = isLoading
-            )
-        },
-        modifier = modifier,
-    )
+    Column(modifier = modifier.fillMaxSize()) {
+        CommonFrame(
+            headerContent = { CartHeader(onClose) },
+            bodyContent = {
+                CartBody(
+                    cart = cart,
+                    onAdd = onAdd,
+                    onMinus = onMinus,
+                    onDelete = onDelete,
+                    currentPage = currentPage,
+                    onPrevious = onPrevious,
+                    isPageable = isPageable,
+                    previousEnable = previousEnable,
+                    nextEnable = nextEnable,
+                    onNext = onNext,
+                    isLoading = isLoading,
+                    isChecked = isChecked,
+                    onCheckedChanged = onCheckedChanged
+                )
+            },
+            modifier = Modifier.weight(1f),
+        )
+        CartBottomBar(
+            totalPrice = totalPrice,
+            totalCount = totalCount,
+            onOrderClick = { /* Logic not connected */ },
+            showSelectAll = true,
+            onSelectAllClick = onSelectAllClick
+        )
+    }
 }
 
 @Composable
@@ -112,14 +129,17 @@ private fun CartBody(
     onAdd: (Long, Int) -> Unit,
     onMinus: (Long, Int) -> Unit,
     onDelete: (Long) -> Unit,
-    onPrevious: () -> Unit = {},
-    onNext: () -> Unit = {},
     isPageable: Boolean,
     previousEnable: Boolean,
     nextEnable: Boolean,
     isLoading: Boolean,
+    onPrevious: () -> Unit = {},
+    onNext: () -> Unit = {},
+    onCheckedChanged: (Long) -> Unit,
+    isChecked: (Long) -> Boolean,
     modifier: Modifier = Modifier,
-) {
+
+    ) {
     Column(
         modifier =
             modifier
@@ -141,6 +161,8 @@ private fun CartBody(
                     onAdd = onAdd,
                     onMinus = onMinus,
                     onDelete = onDelete,
+                    onCheckedChanged = onCheckedChanged,
+                    isChecked = isChecked(it.id),
                     modifier = Modifier.padding(top = 24.dp),
                 )
             }
@@ -248,7 +270,7 @@ private fun CartScreenPreview() {
                             imageUri = "uri",
                             name = "무엘사",
                             price = 10000000,
-                            category = "",
+                            category = "asd",
                             id = 1L,
                         ),
                         id = 1L,
@@ -259,27 +281,29 @@ private fun CartScreenPreview() {
                             imageUri = "uri",
                             name = "무엘사",
                             price = 10000000,
-                            category = "",
+                            category = "asd",
                             id = 1L,
                         ),
                         id = 1L,
                         count = 1,
-                    ),PurchaseProduct(
+                    ),
+                    PurchaseProduct(
                         product = Product(
                             imageUri = "uri",
                             name = "무엘사",
                             price = 10000000,
-                            category = "",
+                            category = "asd",
                             id = 1L,
                         ),
                         id = 1L,
                         count = 1,
-                    ),PurchaseProduct(
+                    ),
+                    PurchaseProduct(
                         product = Product(
                             imageUri = "uri",
                             name = "무엘사",
                             price = 10000000,
-                            category = "",
+                            category = "ads",
                             id = 1L,
                         ),
                         id = 1L,
@@ -288,6 +312,11 @@ private fun CartScreenPreview() {
                 ),
             ),
         isPageable = true,
-        isLoading = true
+        isLoading = true,
+        onCheckedChanged = {},
+        totalPrice = 10000,
+        totalCount = 10000,
+        isChecked = { true },
+        onSelectAllClick = {  },
     )
 }

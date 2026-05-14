@@ -31,10 +31,28 @@ class CartViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
+    private val _allCartItems = MutableStateFlow<PurchaseProducts>(PurchaseProducts())
+    val allCartItems = _allCartItems.asStateFlow()
+    private val _checkedItemIds = MutableStateFlow<List<Long>>(emptyList())
+    val checkedItemIds = _checkedItemIds.asStateFlow()
+
+    val totalPrice: StateFlow<Int> = combine(_allCartItems, checkedItemIds) {allCart, checkedIds ->
+        allCart.purchaseProducts
+            .filter { it.id in checkedIds }
+            .sumOf { it.totalPrice() }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = 0
+    )
 
     init {
         viewModelScope.launch {
             _isLoading.update { true }
+
+            _allCartItems.update {
+                cartRepository.getPagedCart(0, 10000000)
+            }
             _pagedCart.update {
                 cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
             }
@@ -107,6 +125,7 @@ class CartViewModel(
                 val nextCount = target.count + updateAmount
                 if (nextCount >= 1) {
                     cartRepository.updateCount(id, nextCount)
+                    _allCartItems.update { cartRepository.getPagedCart(0, 1000000) }
                     _pagedCart.update {
                         cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
                     }
@@ -138,6 +157,31 @@ class CartViewModel(
             }
 
             _isLoading.update { false }
+        }
+    }
+
+    fun onItemChecked(id: Long) {
+        viewModelScope.launch {
+            _checkedItemIds.update {
+                if (it.contains(id)) {
+                    it - id
+                } else {
+                    it + id
+                }
+            }
+        }
+    }
+
+    fun onSelectAllClick() {
+        viewModelScope.launch {
+            _checkedItemIds.update { list ->
+                val allIds = _allCartItems.value.purchaseProducts.map { it.id }
+                if (list.containsAll(allIds)) {
+                    emptyList()
+                } else {
+                    allIds
+                }
+            }
         }
     }
 

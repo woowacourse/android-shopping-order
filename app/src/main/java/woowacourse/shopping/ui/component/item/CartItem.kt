@@ -17,6 +17,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +40,8 @@ fun CartItem(
     onAdd: (Long, Int) -> Unit,
     onMinus: (Long, Int) -> Unit,
     onDelete: (Long) -> Unit,
+    onCheckedChanged: (Long) -> Unit,
+    isChecked: Boolean,
     modifier: Modifier = Modifier,
 ) {
     OutlinedCard(
@@ -60,8 +66,10 @@ fun CartItem(
             ) {
                 Checkbox(
                     modifier = Modifier.size(24.dp),
-                    checked = true,
-                    onCheckedChange = {}
+                    checked = isChecked,
+                    onCheckedChange = {
+                        onCheckedChanged(product.id)
+                    }
                 )
                 ProductName(product.name())
                 CloseBtn(
@@ -154,16 +162,18 @@ private fun CartItemPreview() {
         product = PurchaseProduct(
             id = 1L,
             product = Product(
-                category = "",
+                category = "asjdhas",
                 id = 1L,
-                imageUri = "",
-                name = "",
+                imageUri = "adasda",
+                name = "asdasd",
                 price = 10
             ),
             count = 5
         ),
-        onAdd = { id, count->  },
+        onAdd = { id, count -> },
         onMinus = { id, count -> },
-        onDelete = {  },
+        onDelete = { },
+        onCheckedChanged = {  },
+        isChecked = true
     )
 }
