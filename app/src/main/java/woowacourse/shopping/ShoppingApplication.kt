@@ -1,12 +1,20 @@
 package woowacourse.shopping
 
 import android.app.Application
-import okhttp3.OkHttpClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import woowacourse.shopping.data.local.UserAuthDataStore
 import woowacourse.shopping.data.local.database.DataBase
 import woowacourse.shopping.data.local.repository.PurchaseProductsRepositoryImpl
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepositoryImpl
-import woowacourse.shopping.data.remote.mock.ProductWebServer
-import woowacourse.shopping.data.remote.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.remote.server.RetrofitProvider
+import woowacourse.shopping.data.remote.server.repository.CartRepositoryImpl
+import woowacourse.shopping.data.remote.server.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.remote.server.service.CartService
+import woowacourse.shopping.data.remote.server.service.ProductService
+import kotlin.jvm.java
 
 class ShoppingApplication : Application() {
     val database by lazy { DataBase.getDatabase(this) }
@@ -19,13 +27,35 @@ class ShoppingApplication : Application() {
         RecentlyViewedProductRepositoryImpl(database.recentlyViewedProductDao())
     }
 
-    val client by lazy { OkHttpClient() }
+    val userAuthDataStore by lazy { UserAuthDataStore(this) }
+
+    private val retrofitClient by lazy {
+        RetrofitProvider(
+            authHeaderProvider = {
+                runBlocking { userAuthDataStore.encodedUserAuthInfo.first() }
+            }
+        )
+    }
+
+    val productService: ProductService by lazy {
+        retrofitClient.create(ProductService::class.java)
+    }
+
+    val cartService: CartService by lazy {
+        retrofitClient.create(CartService::class.java)
+    }
+
+//    val client by lazy { OkHttpClient() }
     val productRepository by lazy {
-        ProductRepositoryImpl(client, ProductWebServer.baseUrl)
+    ProductRepositoryImpl(productService)
+    }
+
+    val cartRepository by lazy {
+        CartRepositoryImpl(cartService)
     }
 
     override fun onCreate() {
         super.onCreate()
-        ProductWebServer.start()
+//        ProductWebServer.start()
     }
 }

@@ -193,16 +193,20 @@ private fun ProductDetailScreenPreview1() {
     ProductDetailScreen(
         product =
             Product(
-                imageUri = "emptyUri",
-                name = "우유",
-                price = 100,
+                imageUri = "hello",
+                name = "너무너무너무긴아이템이름",
+                price = 100000,
+                category = "a",
+                id = 1L,
             ),
         count = 0,
         lastViewedProduct =
             Product(
-                imageUri = "emptyUri",
-                name = "우유",
-                price = 100,
+                imageUri = "hello",
+                name = "너무너무너무긴아이템이름",
+                price = 100000,
+                category = "a",
+                id = 1L,
             ),
         onLastViewedClick = {},
         onAddRequest = {},
@@ -217,9 +221,11 @@ private fun ProductDetailScreenPreview1() {
 private fun ProductDetailScreenPreview2() {
     val product =
         Product(
-            imageUri = "emptyUri",
-            name = "우유",
-            price = 100,
+            imageUri = "hello",
+            name = "너무너무너무긴아이템이름",
+            price = 100000,
+            category = "a",
+            id = 1L,
         )
 
     ProductDetailScreen(

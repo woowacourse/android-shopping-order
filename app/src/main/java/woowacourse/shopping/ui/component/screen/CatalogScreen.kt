@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.visible
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -31,6 +32,7 @@ import woowacourse.shopping.domain.Products
 import woowacourse.shopping.domain.PurchaseProduct
 import woowacourse.shopping.ui.component.frame.CommonFrame
 import woowacourse.shopping.ui.component.item.CartCountLabel
+import woowacourse.shopping.ui.component.item.LoadCatalog
 import woowacourse.shopping.ui.component.item.RecentlyViewedProducts
 import woowacourse.shopping.ui.component.item.ShoppingItem
 
@@ -39,17 +41,17 @@ fun CatalogScreen(
     catalog: Products,
     recentlyViewedProducts: Products,
     onRecentlyViewedClick: (Product) -> Unit,
-    totalCount: () -> Int,
-    specificProductCount: (String) -> Int,
+    totalCount: Int,
+    specificProductCount: (Long) -> Int,
     onItemClick: (Product) -> Unit,
     onCartClick: () -> Unit,
     onLoadClick: () -> Unit,
-    onAdd: (String, Int) -> Unit,
-    onMinus: (String, Int) -> Unit,
-    onDelete: (String) -> Unit,
+    onAdd: (Long, Int) -> Unit,
+    onMinus: (Long, Int) -> Unit,
+    onDelete: (Long) -> Unit,
     onAddInCart: (PurchaseProduct) -> Unit,
     isLoading: Boolean,
-    isContainedInCart: (String) -> Boolean,
+    isContainedInCart: (Long) -> Boolean,
     modifier: Modifier = Modifier,
 ) {
     CommonFrame(
@@ -82,7 +84,7 @@ fun CatalogScreen(
 
 @Composable
 private fun CatalogHeader(
-    totalCount: () -> Int,
+    totalCount: Int,
     onCartClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -109,7 +111,7 @@ private fun CatalogHeader(
                         .size(24.dp)
                         .clickable(onClick = onCartClick),
             )
-            CartCountLabel(totalCount())
+            CartCountLabel(totalCount)
         }
     }
 }
@@ -119,15 +121,15 @@ private fun CatalogBody(
     catalog: Products,
     recentlyViewedProducts: Products,
     onRecentlyViewedClick: (Product) -> Unit,
-    specificProductCount: (String) -> Int,
+    specificProductCount: (Long) -> Int,
     onItemClick: (Product) -> Unit,
     onAddInCart: (PurchaseProduct) -> Unit,
-    onAdd: (String, Int) -> Unit,
-    onMinus: (String, Int) -> Unit,
-    onDelete: (String) -> Unit,
+    onAdd: (Long, Int) -> Unit,
+    onMinus: (Long, Int) -> Unit,
+    onDelete: (Long) -> Unit,
     onLoadClick: () -> Unit,
     isLoading: Boolean,
-    isContainedInCart: (String) -> Boolean,
+    isContainedInCart: (Long) -> Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column {
@@ -171,12 +173,17 @@ private fun CatalogBody(
                     onAddInCart = { onAddInCart(it) },
                 )
             }
-
+            if(isLoading){
+                item(
+                    span = { GridItemSpan(maxLineSpan) },
+                ) {
+                    LoadCatalog()
+                }
+            }
             item(
                 span = { GridItemSpan(maxLineSpan) },
             ) {
                 LoadBtn(
-                    isLoading = isLoading,
                     onLoad = onLoadClick,
                 )
             }
@@ -186,37 +193,21 @@ private fun CatalogBody(
 
 @Composable
 private fun LoadBtn(
-    isLoading: Boolean,
     onLoad: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (isLoading) {
-        Row(
-            modifier =
-                Modifier
-                    .padding(25.dp)
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .background(color = Color.LightGray),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            CircularProgressIndicator()
-        }
-    } else {
-        Icon(
-            painter = painterResource(R.drawable.ic_add),
-            contentDescription = "더보기 버튼",
-            tint = Color.White,
-            modifier =
-                modifier
-                    .padding(25.dp)
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .background(color = Color.LightGray)
-                    .clickable(onClick = onLoad),
-        )
-    }
+    Icon(
+        painter = painterResource(R.drawable.ic_add),
+        contentDescription = "더보기 버튼",
+        tint = Color.White,
+        modifier =
+            modifier
+                .padding(25.dp)
+                .fillMaxWidth()
+                .height(50.dp)
+                .background(color = Color.LightGray)
+                .clickable(onClick = onLoad),
+    )
 }
 
 @Preview(showBackground = true)
@@ -229,61 +220,63 @@ private fun CatalogScreenPreview() {
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                ),
-                Product(
-                    imageUri = "디디",
-                    name = "당근주스",
-                    price = 1000,
-                ),
-                Product(
-                    imageUri = "hello",
-                    name = "우유",
-                    price = 100,
-                ),
-                Product(
-                    imageUri = "hello",
-                    name = "투핸더",
-                    price = 100000000,
+                    category = "",
+                    id = 1L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                ),
-                Product(
-                    imageUri = "디디",
-                    name = "당근주스",
-                    price = 1000,
-                ),
-                Product(
-                    imageUri = "hello",
-                    name = "우유",
-                    price = 100,
-                ),
-                Product(
-                    imageUri = "hello",
-                    name = "투핸더",
-                    price = 100000000,
-                ),
-                Product(
+                    category = "",
+                    id = 1L,
+                ),Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                ),
-                Product(
-                    imageUri = "디디",
-                    name = "당근주스",
-                    price = 1000,
-                ),
-                Product(
+                    category = "",
+                    id = 1L,
+                ),Product(
                     imageUri = "hello",
-                    name = "우유",
-                    price = 100,
-                ),
-                Product(
+                    name = "너무너무너무긴아이템이름",
+                    price = 100000,
+                    category = "",
+                    id = 1L,
+                ),Product(
                     imageUri = "hello",
-                    name = "투핸더",
-                    price = 100000000,
+                    name = "너무너무너무긴아이템이름",
+                    price = 100000,
+                    category = "",
+                    id = 1L,
+                ),Product(
+                    imageUri = "hello",
+                    name = "너무너무너무긴아이템이름",
+                    price = 100000,
+                    category = "",
+                    id = 1L,
+                ),Product(
+                    imageUri = "hello",
+                    name = "너무너무너무긴아이템이름",
+                    price = 100000,
+                    category = "",
+                    id = 1L,
+                ),Product(
+                    imageUri = "hello",
+                    name = "너무너무너무긴아이템이름",
+                    price = 100000,
+                    category = "",
+                    id = 1L,
+                ),Product(
+                    imageUri = "hello",
+                    name = "너무너무너무긴아이템이름",
+                    price = 100000,
+                    category = "",
+                    id = 1L,
+                ),Product(
+                    imageUri = "hello",
+                    name = "너무너무너무긴아이템이름",
+                    price = 100000,
+                    category = "",
+                    id = 1L,
                 ),
             ),
         )
@@ -292,7 +285,7 @@ private fun CatalogScreenPreview() {
         catalog,
         catalog,
         onRecentlyViewedClick = {},
-        totalCount = { 10 },
+        totalCount = 10,
         specificProductCount = { it -> 0 },
         onItemClick = { },
         onCartClick = { },
@@ -316,61 +309,56 @@ private fun CatalogScreenPreview2() {
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                ),
-                Product(
-                    imageUri = "디디",
-                    name = "당근주스",
-                    price = 1000,
-                ),
-                Product(
-                    imageUri = "hello",
-                    name = "우유",
-                    price = 100,
-                ),
-                Product(
-                    imageUri = "hello",
-                    name = "투핸더",
-                    price = 100000000,
-                ),
-                Product(
+                    category = "",
+                    id = 1L,
+                ),Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                ),
-                Product(
-                    imageUri = "디디",
-                    name = "당근주스",
-                    price = 1000,
-                ),
-                Product(
-                    imageUri = "hello",
-                    name = "우유",
-                    price = 100,
-                ),
-                Product(
-                    imageUri = "hello",
-                    name = "투핸더",
-                    price = 100000000,
-                ),
-                Product(
+                    category = "",
+                    id = 1L,
+                ),Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                ),
-                Product(
-                    imageUri = "디디",
-                    name = "당근주스",
-                    price = 1000,
-                ),
-                Product(
+                    category = "",
+                    id = 1L,
+                ),Product(
                     imageUri = "hello",
-                    name = "우유",
-                    price = 100,
-                ),
-                Product(
+                    name = "너무너무너무긴아이템이름",
+                    price = 100000,
+                    category = "",
+                    id = 1L,
+                ),Product(
                     imageUri = "hello",
-                    name = "투핸더",
-                    price = 100000000,
+                    name = "너무너무너무긴아이템이름",
+                    price = 100000,
+                    category = "",
+                    id = 1L,
+                ),Product(
+                    imageUri = "hello",
+                    name = "너무너무너무긴아이템이름",
+                    price = 100000,
+                    category = "",
+                    id = 1L,
+                ),Product(
+                    imageUri = "hello",
+                    name = "너무너무너무긴아이템이름",
+                    price = 100000,
+                    category = "",
+                    id = 1L,
+                ),Product(
+                    imageUri = "hello",
+                    name = "너무너무너무긴아이템이름",
+                    price = 100000,
+                    category = "",
+                    id = 1L,
+                ),Product(
+                    imageUri = "hello",
+                    name = "너무너무너무긴아이템이름",
+                    price = 100000,
+                    category = "",
+                    id = 1L,
                 ),
             ),
         )
@@ -379,7 +367,7 @@ private fun CatalogScreenPreview2() {
         catalog,
         Products(),
         onRecentlyViewedClick = {},
-        totalCount = { 10 },
+        totalCount = 10,
         specificProductCount = { it -> 0 },
         onItemClick = { },
         onCartClick = { },

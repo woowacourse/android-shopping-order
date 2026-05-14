@@ -25,8 +25,7 @@ class CartActivity : ComponentActivity() {
                 viewModel<CartViewModel>(
                     factory =
                         CartViewModelFactory(
-                            (application as ShoppingApplication).purchaseProductsRepository,
-                            (application as ShoppingApplication).productRepository
+                            (application as ShoppingApplication).cartRepository
                         ),
                 )
 
@@ -35,10 +34,11 @@ class CartActivity : ComponentActivity() {
             val isPageable by viewModel.isPageable.collectAsStateWithLifecycle()
             val nextEnable by viewModel.nextEnable.collectAsStateWithLifecycle()
             val prevEnable by viewModel.prevEnable.collectAsStateWithLifecycle()
+            val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
             Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
                 CartScreen(
-                    cart = pagedCart.purchaseProducts,
+                    cart = pagedCart,
                     onClose = {
                         finish()
                     },
@@ -61,6 +61,7 @@ class CartActivity : ComponentActivity() {
                     previousEnable = prevEnable,
                     nextEnable = nextEnable,
                     isPageable = isPageable,
+                    isLoading = isLoading,
                     modifier =
                         Modifier
                             .fillMaxSize()

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -32,9 +33,9 @@ import woowacourse.shopping.domain.PurchaseProduct
 @Composable
 fun CartItem(
     product: PurchaseProduct,
-    onAdd: (String, Int) -> Unit,
-    onMinus: (String, Int) -> Unit,
-    onDelete: (String) -> Unit,
+    onAdd: (Long, Int) -> Unit,
+    onMinus: (Long, Int) -> Unit,
+    onDelete: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     OutlinedCard(
@@ -57,6 +58,11 @@ fun CartItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                Checkbox(
+                    modifier = Modifier.size(24.dp),
+                    checked = true,
+                    onCheckedChange = {}
+                )
                 ProductName(product.name())
                 CloseBtn(
                     product = product,
@@ -80,9 +86,9 @@ fun CartItem(
                 ) {
                     QuantitySelector(
                         count = product.count,
-                        onAdd = { onAdd(product.id(), 1) },
-                        onMinus = { onMinus(product.id(), -1) },
-                        onDelete = { onDelete(product.id()) },
+                        onAdd = { onAdd(product.id, 1) },
+                        onMinus = { onMinus(product.id, -1) },
+                        onDelete = { onDelete(product.id) },
                         modifier = Modifier.align(Alignment.CenterEnd),
                     )
                     ProductPrice(
@@ -113,7 +119,7 @@ private fun ProductName(
 @Composable
 private fun CloseBtn(
     product: PurchaseProduct,
-    onClick: (String) -> Unit,
+    onClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Icon(
@@ -123,7 +129,7 @@ private fun CloseBtn(
             modifier
                 .size(16.dp)
                 .clickable(
-                    onClick = { onClick(product.id()) },
+                    onClick = { onClick(product.id) },
                 ),
     )
 }
@@ -145,15 +151,19 @@ private fun ProductPrice(
 @Composable
 private fun CartItemPreview() {
     CartItem(
-        PurchaseProduct(
-            Product(
-                imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
-                name = "진짜진짜정말정말매우매우긴상품명입니다",
-                price = 30000,
+        product = PurchaseProduct(
+            id = 1L,
+            product = Product(
+                category = "",
+                id = 1L,
+                imageUri = "",
+                name = "",
+                price = 10
             ),
+            count = 5
         ),
-        onAdd = { id, type -> },
-        onMinus = { id, type -> },
-        onDelete = { },
+        onAdd = { id, count->  },
+        onMinus = { id, count -> },
+        onDelete = {  },
     )
 }

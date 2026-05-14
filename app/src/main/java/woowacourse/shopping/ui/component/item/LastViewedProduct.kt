@@ -68,6 +68,8 @@ private fun LastViewedProductPreview() {
             imageUri = "테스트",
             name = "테스트",
             price = 1000,
+            category = "",
+            id = 1L,
         ),
         onClick = { },
     )

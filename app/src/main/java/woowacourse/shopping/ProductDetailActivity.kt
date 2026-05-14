@@ -11,7 +11,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.PurchaseProduct
 import woowacourse.shopping.ui.component.screen.ProductDetailScreen
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
@@ -23,13 +22,17 @@ class ProductDetailActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val selectedProductId =
-            intent.getStringExtra(IntentKeys.SELECTED_PRODUCT_ID_KEY) ?: run {
+            intent.getLongExtra(IntentKeys.SELECTED_PRODUCT_ID_KEY, -1L).takeIf { it != -1L } ?: run {
                 finish()
                 return
             }
 
         val lastViewedProductId =
-            intent.getStringExtra(IntentKeys.LATEST_VIEWED_PRODUCT_ID_KEY)
+            if (intent.hasExtra(IntentKeys.LATEST_VIEWED_PRODUCT_ID_KEY)) {
+                intent.getLongExtra(IntentKeys.LATEST_VIEWED_PRODUCT_ID_KEY, -1L).takeIf { it != -1L }
+            } else {
+                null
+            }
 
         enableEdgeToEdge()
         setContent {
@@ -37,7 +40,7 @@ class ProductDetailActivity : ComponentActivity() {
                 viewModel<ProductDetailViewModel>(
                     factory =
                         ProductDetailViewModelFactory(
-                            purchaseProductsRepository = (application as ShoppingApplication).purchaseProductsRepository,
+                            cartRepository = (application as ShoppingApplication).cartRepository,
                             recentlyViewedProductRepository = (application as ShoppingApplication).recentlyViewedProductRepository,
                             productRepository = (application as ShoppingApplication).productRepository,
                             selectedProductId = selectedProductId,
@@ -67,7 +70,7 @@ class ProductDetailActivity : ComponentActivity() {
                             onAdd = { viewModel.addCount() },
                             onMinus = { viewModel.minusCount() },
                             onAddRequest = {
-                                viewModel.addPurchaseProduct(PurchaseProduct(it, count.value))
+                                viewModel.addPurchaseProduct(PurchaseProduct(it.id, it, count.value))
                                 finish()
                             },
                             onClose = { finish() },

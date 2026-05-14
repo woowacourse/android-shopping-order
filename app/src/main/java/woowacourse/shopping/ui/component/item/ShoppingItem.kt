@@ -50,7 +50,11 @@ fun ShoppingItem(
         Box {
             ProductImage(product.imageUri, Modifier.size(154.dp))
             CirclePlusBtn(
-                onClick = { onAddInCart(PurchaseProduct(product = product)) },
+                onClick = { onAddInCart(PurchaseProduct(
+                    product = product,
+                    id = product.id,
+                    count = 1
+                )) },
                 modifier =
                     Modifier
                         .padding(end = 15.dp)
@@ -117,6 +121,8 @@ private fun ShoppingItemPreview1() {
             imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
             name = "매우매우긴상품명입니다",
             price = 1000000000,
+            category = "",
+            id = 1,
         ),
         onClick = {},
         onAdd = {},
@@ -136,6 +142,8 @@ private fun ShoppingItemPreview2() {
             imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
             name = "매우매우긴상품명입니다",
             price = 1000000000,
+            category = "",
+            id = 1,
         ),
         onClick = {},
         onAdd = {},

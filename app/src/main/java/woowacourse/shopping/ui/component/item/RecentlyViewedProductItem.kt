@@ -58,10 +58,11 @@ fun RecentlyViewedProductItem(
 private fun RecentlyViewedProductItemPreview() {
     RecentlyViewedProductItem(
         Product(
-            id = "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+            id = 1L,
             imageUri = "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcREOx9x8uZchUa41cKYxYrqv5uj-bD4zupCW4G3ADchbwNbXaxRIZtdeG9clkH0F06NCsQnTQ690KD0G4PygBj6ZPVbvCS7KUEmMwETqd9c7xuGRnAFucVgDQhFmfK2FJ3XWHAcKw&usqp=CAc",
             name = "너무너무너무너무너무너무너무너무 긴 이름",
             price = 1000,
+            category = "",
         ),
         onClick = {},
     )

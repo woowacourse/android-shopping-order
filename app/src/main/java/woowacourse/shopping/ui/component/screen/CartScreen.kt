@@ -36,6 +36,7 @@ import woowacourse.shopping.domain.PurchaseProduct
 import woowacourse.shopping.domain.PurchaseProducts
 import woowacourse.shopping.ui.component.frame.CommonFrame
 import woowacourse.shopping.ui.component.item.CartItem
+import woowacourse.shopping.ui.component.item.LoadCartItem
 
 @Composable
 fun CartScreen(
@@ -44,12 +45,13 @@ fun CartScreen(
     onPrevious: () -> Unit,
     onNext: () -> Unit,
     onClose: () -> Unit,
-    onAdd: (String, Int) -> Unit,
-    onMinus: (String, Int) -> Unit,
-    onDelete: (String) -> Unit,
+    onAdd: (Long, Int) -> Unit,
+    onMinus: (Long, Int) -> Unit,
+    onDelete: (Long) -> Unit,
     isPageable: Boolean,
     previousEnable: Boolean,
     nextEnable: Boolean,
+    isLoading: Boolean,
     modifier: Modifier = Modifier,
 ) {
     CommonFrame(
@@ -66,6 +68,7 @@ fun CartScreen(
                 previousEnable = previousEnable,
                 nextEnable = nextEnable,
                 onNext = onNext,
+                isLoading = isLoading
             )
         },
         modifier = modifier,
@@ -106,14 +109,15 @@ private fun CartHeader(
 private fun CartBody(
     cart: PurchaseProducts,
     currentPage: Int,
-    onAdd: (String, Int) -> Unit,
-    onMinus: (String, Int) -> Unit,
-    onDelete: (String) -> Unit,
+    onAdd: (Long, Int) -> Unit,
+    onMinus: (Long, Int) -> Unit,
+    onDelete: (Long) -> Unit,
     onPrevious: () -> Unit = {},
     onNext: () -> Unit = {},
     isPageable: Boolean,
     previousEnable: Boolean,
     nextEnable: Boolean,
+    isLoading: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -125,15 +129,21 @@ private fun CartBody(
                 ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        val products = cart.purchaseProducts
-        products.forEach {
-            CartItem(
-                product = it,
-                onAdd = onAdd,
-                onMinus = onMinus,
-                onDelete = onDelete,
-                modifier = Modifier.padding(top = 24.dp),
-            )
+        if (isLoading) {
+            (1..5).forEach { _ ->
+                LoadCartItem()
+            }
+        } else {
+            val products = cart.purchaseProducts
+            products.forEach {
+                CartItem(
+                    product = it,
+                    onAdd = onAdd,
+                    onMinus = onMinus,
+                    onDelete = onDelete,
+                    modifier = Modifier.padding(top = 24.dp),
+                )
+            }
         }
         if (isPageable) {
             PagingBtn(
@@ -181,7 +191,8 @@ fun PagingBtn(
                     .clickable(
                         onClick = onPrevious,
                         enabled = previousEnable,
-                    ).wrapContentSize(Alignment.Center),
+                    )
+                    .wrapContentSize(Alignment.Center),
         )
         Text(
             text = (currentPage + 1).toString(),
@@ -207,7 +218,8 @@ fun PagingBtn(
                     .clickable(
                         onClick = onNext,
                         enabled = nextEnable,
-                    ).background(color = btnAvailable(nextEnable))
+                    )
+                    .background(color = btnAvailable(nextEnable))
                     .wrapContentHeight(Alignment.CenterVertically),
         )
     }
@@ -232,56 +244,50 @@ private fun CartScreenPreview() {
             PurchaseProducts(
                 listOf(
                     PurchaseProduct(
-                        Product(
+                        product = Product(
                             imageUri = "uri",
                             name = "무엘사",
                             price = 10000000,
+                            category = "",
+                            id = 1L,
                         ),
+                        id = 1L,
+                        count = 1,
                     ),
                     PurchaseProduct(
-                        Product(
+                        product = Product(
                             imageUri = "uri",
                             name = "무엘사",
                             price = 10000000,
+                            category = "",
+                            id = 1L,
                         ),
-                    ),
-                    PurchaseProduct(
-                        Product(
+                        id = 1L,
+                        count = 1,
+                    ),PurchaseProduct(
+                        product = Product(
                             imageUri = "uri",
                             name = "무엘사",
                             price = 10000000,
+                            category = "",
+                            id = 1L,
                         ),
-                    ),
-                    PurchaseProduct(
-                        Product(
+                        id = 1L,
+                        count = 1,
+                    ),PurchaseProduct(
+                        product = Product(
                             imageUri = "uri",
                             name = "무엘사",
                             price = 10000000,
+                            category = "",
+                            id = 1L,
                         ),
-                    ),
-                    PurchaseProduct(
-                        Product(
-                            imageUri = "uri",
-                            name = "무엘사",
-                            price = 10000000,
-                        ),
-                    ),
-                    PurchaseProduct(
-                        Product(
-                            imageUri = "uri",
-                            name = "무엘사",
-                            price = 10000000,
-                        ),
-                    ),
-                    PurchaseProduct(
-                        Product(
-                            imageUri = "uri",
-                            name = "무엘사",
-                            price = 10000000,
-                        ),
+                        id = 1L,
+                        count = 1,
                     ),
                 ),
             ),
         isPageable = true,
+        isLoading = true
     )
 }
