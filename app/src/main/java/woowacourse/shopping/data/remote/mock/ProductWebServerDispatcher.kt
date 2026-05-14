@@ -38,7 +38,7 @@ class ProductWebServerDispatcher : Dispatcher() {
                 val id = path.removePrefix("/products/")
                 val product =
                     mockProducts.firstOrNull {
-                        it.jsonObject["id"]?.jsonPrimitive?.content == id
+                        it.jsonObject["productId"]?.jsonPrimitive?.content == id
                     }
 
                 if (product != null) {
