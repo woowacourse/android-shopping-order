@@ -12,8 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.model.Cart
-import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.ui.model.mapper.toUiModel
 
 class CartViewModel(
@@ -34,6 +32,9 @@ class CartViewModel(
         val cartResult =
             cartRepository.getCartItemsByPage(page = uiState.value.page, size = PAGE_SIZE)
 
+        val totalPrice =
+            cartRepository.getTotalPrice(uiState.value.selectedCartItems)
+
         _uiState.update {
             it.copy(
                 items =
@@ -43,6 +44,7 @@ class CartViewModel(
                         }.toImmutableList(),
                 isCanMoveNext = !cartResult.isLastPage,
                 totalCartSize = cartRepository.getTotalCartItemQuantity(),
+                totalPrice = totalPrice.amount,
             )
         }
     }
@@ -103,6 +105,10 @@ class CartViewModel(
                 selectedCartItemCount = selectedItems.size,
             )
         }
+
+        viewModelScope.launch {
+            getCartItemsByPage()
+        }
     }
 
     fun isSelected(cartItemId: String): Boolean = _uiState.value.selectedCartItems.contains(cartItemId)
@@ -122,6 +128,10 @@ class CartViewModel(
                 selectedCartItemCount = selectedItems.size,
             )
         }
+
+        viewModelScope.launch {
+            getCartItemsByPage()
+        }
     }
 
     companion object {
@@ -137,9 +147,3 @@ class CartViewModel(
             }
     }
 }
-
-private data class CartPage(
-    val items: List<CartItem>,
-    val page: Int,
-    val isCanMoveNext: Boolean,
-)

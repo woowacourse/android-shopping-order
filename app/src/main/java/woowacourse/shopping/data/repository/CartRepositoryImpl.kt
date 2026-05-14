@@ -14,6 +14,16 @@ import woowacourse.shopping.model.ProductName
 class CartRepositoryImpl(
     private val api: CartApi,
 ) : CartRepository {
+    override suspend fun getTotalPrice(cartIds: List<String>): Money {
+        val cartItems = getAllCartItems()
+
+        return cartItems
+            .filter { cartIds.contains(it.id) }
+            .fold(Money(0)) { acc, cartItem ->
+                acc + cartItem.product.price * cartItem.quantity
+            }
+    }
+
     private suspend fun getAllCartItems(): List<CartItem> {
         val cartItems = mutableListOf<CartItem>()
 

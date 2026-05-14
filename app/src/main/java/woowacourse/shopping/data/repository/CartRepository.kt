@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.repository
 
+import woowacourse.shopping.model.Money
+
 interface CartRepository {
     suspend fun getCartItemsByPage(
         page: Int,
@@ -16,4 +18,6 @@ interface CartRepository {
     suspend fun getCartItemQuantity(cartItemId: String): Int?
 
     suspend fun getTotalCartItemQuantity(): Int
+
+    suspend fun getTotalPrice(cartIds: List<String>): Money
 }
