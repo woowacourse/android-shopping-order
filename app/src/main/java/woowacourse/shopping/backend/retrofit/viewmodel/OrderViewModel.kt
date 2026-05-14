@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import woowacourse.shopping.backend.retrofit.awaitCompletion
 import woowacourse.shopping.backend.retrofit.awaitSuccess
 import woowacourse.shopping.backend.retrofit.dto.OrderInfo
 import woowacourse.shopping.backend.retrofit.repository.OrderRetrofitRepository
@@ -22,7 +23,7 @@ class OrderViewModel(
                 orderRetrofitRepository
                     .order(
                         order = orderInfo,
-                    ).awaitSuccess(errorPrefix = "주문 실패")
+                    ).awaitCompletion(errorPrefix = "주문 실패")
             }.onSuccess {
                 _event.tryEmit(OrderEvent.Success)
             }.onFailure { throwable ->

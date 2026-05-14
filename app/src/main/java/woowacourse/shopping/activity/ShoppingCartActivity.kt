@@ -15,44 +15,30 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.backend.retrofit.viewmodel.ApiViewModelFactory
-import woowacourse.shopping.backend.retrofit.viewmodel.OrderViewModel
+import woowacourse.shopping.backend.retrofit.viewmodel.BackendViewModelFactory
 import woowacourse.shopping.backend.retrofit.viewmodel.ShoppingCartViewModel
-import woowacourse.shopping.mapper.toOrderInfo
-import woowacourse.shopping.model.ShoppingCartItem
 import woowacourse.shopping.ui.ShoppingCartScreen
-import woowacourse.shopping.ui.component.OrderButton
 import woowacourse.shopping.ui.component.PageNavigation
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
-import woowacourse.shopping.ui.viewmodel.ScreenViewModelFactory
-import woowacourse.shopping.ui.viewmodel.ShoppingCartItemViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 class ShoppingCartActivity : ComponentActivity() {
-    private val appContainer by lazy { (application as ShoppingApplication).appContainer }
-
-    private val screenViewModelFactory: ScreenViewModelFactory by lazy {
-        ScreenViewModelFactory(
-            shoppingCartRepository = appContainer.shoppingCartRepository,
-            shoppingItemRepository = appContainer.shoppingItemRepository,
-            visitStore = appContainer.visitStore,
-            networkStatusMonitor = appContainer.networkStatusMonitor,
-        )
+    private val backendViewModelFactory: BackendViewModelFactory by lazy {
+        val app = application as ShoppingApplication
+        BackendViewModelFactory(app.retrofitService)
     }
-    private val apiViewModelFactory: ApiViewModelFactory by lazy { ApiViewModelFactory() }
-    private val shoppingCartItemViewModel: ShoppingCartItemViewModel by viewModels { screenViewModelFactory }
-    private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { apiViewModelFactory }
-    private val orderViewModel: OrderViewModel by viewModels { apiViewModelFactory }
+    private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { backendViewModelFactory }
 
     companion object {
-        private const val UNKNOWN_CATEGORY = "UNKNOWN"
+        private const val INITIAL_PAGE = 0
+        private const val PAGE_ITEM_SIZE = 5
 
         fun start(context: Context) {
             val intent = Intent(context, ShoppingCartActivity::class.java)
@@ -63,43 +49,42 @@ class ShoppingCartActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        observeApiViewModel()
-        requestCartItemsFromApi()
-        shoppingCartItemViewModel.refresh()
+        shoppingCartViewModel.requestCartItems()
         setContent {
-            val shoppingCartItemsState by shoppingCartItemViewModel.shoppingCartItems.collectAsStateWithLifecycle()
-            LaunchedEffect(Unit) {
-                launch {
-                    shoppingCartItemViewModel.event.collect { event ->
-                        when (event) {
-                            ShoppingCartItemViewModel.ShoppingCartEvent.NavigateBack -> finish()
-                        }
+            val shoppingCartItems by shoppingCartViewModel.shoppingCartItems.collectAsStateWithLifecycle()
+            val isLoading by shoppingCartViewModel.isLoading.collectAsStateWithLifecycle()
+            val errorMessage by shoppingCartViewModel.errorMessage.collectAsStateWithLifecycle()
+            var currentPage by rememberSaveable { mutableIntStateOf(INITIAL_PAGE) }
+            val pageStartIndex = currentPage * PAGE_ITEM_SIZE
+            val pagedItems = shoppingCartItems.drop(pageStartIndex).take(PAGE_ITEM_SIZE)
+            val canMoveToPreviousPage = currentPage > INITIAL_PAGE
+            val canMoveToNextPage = (currentPage + 1) * PAGE_ITEM_SIZE < shoppingCartItems.size
+            val state =
+                ShoppingCartState(
+                    items = shoppingCartItems,
+                    isLoading = isLoading,
+                    errorMessage = errorMessage,
+                    currentPage = currentPage,
+                    canMoveToPreviousPage = canMoveToPreviousPage,
+                    canMoveToNextPage = canMoveToNextPage,
+                )
+            LaunchedEffect(shoppingCartItems.size, currentPage) {
+                val lastPage =
+                    if (shoppingCartItems.isEmpty()) {
+                        INITIAL_PAGE
+                    } else {
+                        (shoppingCartItems.size - 1) / PAGE_ITEM_SIZE
                     }
-                }
-                launch {
-                    orderViewModel.event.collect { event ->
-                        when (event) {
-                            is OrderViewModel.OrderEvent.Success -> {
-                                appContainer.recommendationStore.updateRecommendedCategory(
-                                    resolveRecommendedCategory(
-                                        shoppingCartViewModel.shoppingCartItems.value,
-                                    ),
-                                )
-                                finish()
-                            }
-
-                            is OrderViewModel.OrderEvent.Failure -> {
-                                // no-op
-                            }
-                        }
-                    }
+                if (currentPage > lastPage) {
+                    currentPage = lastPage
                 }
             }
+
             AndroidShoppingTheme {
                 ShoppingCartScreen(
-                    shoppingCartItems = shoppingCartItemsState.pagedItems,
-                    getQuantityPrice = shoppingCartItemViewModel::getQuantityPrice,
-                    onBackClick = shoppingCartItemViewModel::onBackClick,
+                    shoppingCartItems = pagedItems,
+                    getQuantityPrice = shoppingCartViewModel::getQuantityPrice,
+                    onBackClick = this::finish,
                     onRemoveShoppingItemClick = { shoppingCartItem ->
                         shoppingCartViewModel.removeShoppingItem(shoppingCartItem)
                     },
@@ -117,11 +102,20 @@ class ShoppingCartActivity : ComponentActivity() {
                                 .padding(bottom = 8.dp),
                     ) {
                         PageNavigation(
-                            currentPage = shoppingCartItemsState.currentPage,
-                            canMoveToPreviousPage = shoppingCartItemsState.canMoveToPreviousPage,
-                            canMoveToNextPage = shoppingCartItemsState.canMoveToNextPage,
-                            onBeforePageClick = shoppingCartItemViewModel::moveToPreviousPage,
-                            onNextPageClick = shoppingCartItemViewModel::moveToNextPage,
+
+                            currentPage = currentPage,
+                            canMoveToPreviousPage = canMoveToPreviousPage,
+                            canMoveToNextPage = canMoveToNextPage,
+                            onBeforePageClick = {
+                                if (currentPage > INITIAL_PAGE) {
+                                    currentPage -= 1
+                                }
+                            },
+                            onNextPageClick = {
+                                if ((currentPage + 1) * PAGE_ITEM_SIZE < shoppingCartItems.size) {
+                                    currentPage += 1
+                                }
+                            },
                         )
                         OrderButton(
                             onOrderButtonClick = ::requestOrder,
@@ -135,45 +129,6 @@ class ShoppingCartActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        requestCartItemsFromApi()
-        shoppingCartItemViewModel.refresh()
-    }
-
-    private fun requestCartItemsFromApi() {
         shoppingCartViewModel.requestCartItems()
     }
-
-    private fun observeApiViewModel() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
-                launch {
-                    shoppingCartViewModel.shoppingCartItems.collect { shoppingCartItems ->
-                        if (!shoppingCartViewModel.hasLoadedCartItems.value) {
-                            return@collect
-                        }
-                        appContainer.remoteShoppingStateSyncer.syncCartItems(shoppingCartItems)
-                        shoppingCartItemViewModel.refresh()
-                    }
-                }
-            }
-        }
-    }
-
-    private fun requestOrder() {
-        val shoppingCartItems = shoppingCartViewModel.shoppingCartItems.value
-        if (shoppingCartItems.isEmpty()) {
-            return
-        }
-        orderViewModel.order(shoppingCartItems.toOrderInfo())
-    }
-
-    private fun resolveRecommendedCategory(shoppingCartItems: List<ShoppingCartItem>): String? =
-        shoppingCartItems
-            .map { shoppingCartItem -> shoppingCartItem.product.category }
-            .filter { category -> category.isNotBlank() && category != UNKNOWN_CATEGORY }
-            .groupingBy { category -> category }
-            .eachCount()
-            .maxByOrNull { (_, count) -> count }
-            ?.key
-
 }
