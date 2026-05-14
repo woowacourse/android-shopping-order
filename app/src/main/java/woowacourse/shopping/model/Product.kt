@@ -15,5 +15,5 @@ class Product(
 
     fun getName(): String = name.name
 
-    fun getPrice(): Int = price.amount
+    fun getPrice(): Long = price.amount
 }

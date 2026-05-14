@@ -33,7 +33,7 @@ import woowacourse.shopping.ui.util.formattedPrice
 fun ProductCard(
     imageUrl: String,
     productName: String,
-    price: Int,
+    price: Long,
     quantity: Int,
     onClick: () -> Unit,
     onQuantityChange: (Int) -> Unit,

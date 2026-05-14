@@ -10,7 +10,7 @@ data class CartUiState(
     val isCanMoveNext: Boolean = false,
     val isLoading: Boolean = true,
     val totalCartSize: Int = 0,
-    val totalPrice: Int = 0,
+    val totalPrice: Long = 0,
     val errorMessage: String? = null,
     val isAllChecked: Boolean = false,
     val selectedCartItemCount: Int = 0,

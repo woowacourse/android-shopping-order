@@ -4,5 +4,5 @@ data class CartItemUiModel(
     val id: String,
     val product: ProductUiModel,
     val quantity: Int,
-    val totalPrice: Int,
+    val totalPrice: Long,
 )

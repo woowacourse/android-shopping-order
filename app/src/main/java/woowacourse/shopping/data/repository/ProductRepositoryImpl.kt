@@ -34,7 +34,7 @@ class ProductRepositoryImpl(
         Product(
             id = id.toString(),
             name = ProductName(name),
-            price = Money(price),
+            price = Money(price.toLong()),
             imageUrl = imageUrl,
         )
 
@@ -42,7 +42,7 @@ class ProductRepositoryImpl(
         Product(
             id = id.toString(),
             name = ProductName(name),
-            price = Money(price),
+            price = Money(price.toLong()),
             imageUrl = imageUrl,
         )
 }

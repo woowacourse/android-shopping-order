@@ -40,7 +40,7 @@ fun CartCard(
     onCheckedChange: () -> Unit,
     productName: String,
     imageUrl: String,
-    price: Int,
+    price: Long,
     quantity: Int,
     isChecked: Boolean,
     modifier: Modifier = Modifier,

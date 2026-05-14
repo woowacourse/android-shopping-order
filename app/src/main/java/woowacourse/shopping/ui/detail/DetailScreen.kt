@@ -116,7 +116,7 @@ private fun DetailContent(
     imageUrl: String,
     productName: String,
     quantity: Int,
-    totalPrice: Int,
+    totalPrice: Long,
     onQuantityChange: (Int) -> Unit,
     recentItem: @Composable () -> Unit,
     modifier: Modifier = Modifier,

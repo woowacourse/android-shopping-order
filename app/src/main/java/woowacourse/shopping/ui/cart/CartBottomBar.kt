@@ -27,7 +27,7 @@ import woowacourse.shopping.ui.util.formattedPrice
 @Composable
 fun CartBottomBar(
     isAllChecked: Boolean,
-    totalPrice: Int,
+    totalPrice: Long,
     totalCount: Int,
     onAllCheckedChange: () -> Unit,
     onOrderClick: () -> Unit,
