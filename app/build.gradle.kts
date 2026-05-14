@@ -1,5 +1,5 @@
-import java.util.Properties
 import org.gradle.api.GradleException
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -26,8 +26,7 @@ fun requireLocalProperty(key: String): String =
         throw GradleException("local.properties에 `$key`를 설정해야 합니다.")
     }
 
-fun String.asBuildConfigString(): String =
-    "\"" + replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+fun String.asBuildConfigString(): String = "\"" + replace("\\", "\\\\").replace("\"", "\\\"") + "\""
 
 android {
     namespace = "woowacourse.shopping"

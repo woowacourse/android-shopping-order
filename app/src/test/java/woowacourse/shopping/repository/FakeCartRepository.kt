@@ -52,8 +52,7 @@ class FakeCartRepository : CartRepository {
         )
     }
 
-    override suspend fun getCartItemsByProductIds(productIds: Set<Long>): List<CartItem> =
-        cart.items.filter { it.productId in productIds }
+    override suspend fun getCartItemsByProductIds(productIds: Set<Long>): List<CartItem> = cart.items.filter { it.productId in productIds }
 
     override suspend fun count(): Int = cart.count()
 }

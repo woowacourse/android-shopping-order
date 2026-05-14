@@ -11,7 +11,10 @@ interface CartRepository {
         quantity: Int,
     )
 
-    suspend fun getCartPage(page: Int, size: Int): CartPageResult
+    suspend fun getCartPage(
+        page: Int,
+        size: Int,
+    ): CartPageResult
 
     suspend fun getCartItemsByProductIds(productIds: Set<Long>): List<CartItem>
 

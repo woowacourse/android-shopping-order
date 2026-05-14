@@ -27,7 +27,8 @@ class BasicAuthInterceptorTest {
     fun `Authorization 헤더가 없으면 Basic Authentication 헤더를 추가한다`() {
         mockWebServer.enqueue(MockResponse().setResponseCode(200))
         val client =
-            OkHttpClient.Builder()
+            OkHttpClient
+                .Builder()
                 .addInterceptor(
                     BasicAuthInterceptor {
                         BasicAuthHeaderFactory.create(
@@ -49,7 +50,8 @@ class BasicAuthInterceptorTest {
     fun `이미 Authorization 헤더가 있으면 기존 값을 유지한다`() {
         mockWebServer.enqueue(MockResponse().setResponseCode(200))
         val client =
-            OkHttpClient.Builder()
+            OkHttpClient
+                .Builder()
                 .addInterceptor(
                     BasicAuthInterceptor {
                         BasicAuthHeaderFactory.create(
@@ -63,7 +65,8 @@ class BasicAuthInterceptorTest {
 
         client
             .newCall(
-                Request.Builder()
+                Request
+                    .Builder()
                     .url(mockWebServer.url("/products"))
                     .header("Authorization", "Bearer existing-token")
                     .build(),

@@ -17,13 +17,13 @@ object ShoppingRepositoryProvider {
         "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/"
 
     private val httpClient: OkHttpClient by lazy {
-        OkHttpClient.Builder()
+        OkHttpClient
+            .Builder()
             .addInterceptor(
                 BasicAuthInterceptor {
                     BasicAuthHeaderFactory.create(AppAuthConfig.credentials)
                 },
-            )
-            .build()
+            ).build()
     }
 
     lateinit var productRepository: ProductRepository

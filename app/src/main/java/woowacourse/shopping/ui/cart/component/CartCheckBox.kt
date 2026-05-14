@@ -20,10 +20,11 @@ fun CartCheckbox(
         modifier = modifier.size(18.dp),
         checked = checked,
         onCheckedChange = onCheckedChange,
-        colors = CheckboxDefaults.colors(
-            uncheckedColor = Color.White,
-            checkedColor = ShoppingColors.BrandGreen,
-        ),
+        colors =
+            CheckboxDefaults.colors(
+                uncheckedColor = Color.White,
+                checkedColor = ShoppingColors.BrandGreen,
+            ),
     )
 }
 

@@ -32,7 +32,7 @@ fun RecentlyViewedSection(
         Spacer(modifier = Modifier.size(12.dp))
         RecentlyViewedProducts(
             products = products,
-            onProductClick = onProductClick
+            onProductClick = onProductClick,
         )
     }
 }
@@ -41,7 +41,7 @@ fun RecentlyViewedSection(
 fun RecentlyViewedProducts(
     products: List<Product>,
     modifier: Modifier = Modifier,
-    onProductClick: (Product) -> Unit
+    onProductClick: (Product) -> Unit,
 ) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -56,7 +56,6 @@ fun RecentlyViewedProducts(
             )
         }
     }
-
 }
 
 @Preview

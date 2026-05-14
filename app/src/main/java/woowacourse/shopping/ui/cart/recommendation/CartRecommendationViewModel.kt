@@ -20,6 +20,7 @@ import woowacourse.shopping.ui.shopping.ShoppingProductUiState
 import woowacourse.shopping.ui.shopping.ShoppingProductUiStateMapper
 
 private const val RECOMMENDED_PRODUCTS_LIMIT = 10
+
 class CartRecommendationViewModel(
     private val productRepository: ProductRepository = ShoppingRepositoryProvider.productRepository,
     private val cartRepository: CartRepository = ShoppingRepositoryProvider.cartRepository,
@@ -105,7 +106,12 @@ class CartRecommendationViewModel(
     }
 
     fun placeOrder() {
-        if (_uiState.value.pendingOrder.cartItemIds.isEmpty() || _uiState.value.isOrdering) return
+        if (_uiState.value.pendingOrder.cartItemIds
+                .isEmpty() ||
+            _uiState.value.isOrdering
+        ) {
+            return
+        }
 
         viewModelScope.launch {
             _uiState.update { currentState ->

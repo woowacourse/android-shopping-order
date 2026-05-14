@@ -52,7 +52,10 @@ class HttpCartRepository(
         }
     }
 
-    override suspend fun getCartPage(page: Int, size: Int): CartPageResult {
+    override suspend fun getCartPage(
+        page: Int,
+        size: Int,
+    ): CartPageResult {
         val body =
             execute("장바구니 조회 API 호출에 실패했습니다.") {
                 cartApiService.getCartItems(page = page, size = size)

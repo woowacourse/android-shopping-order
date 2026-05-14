@@ -34,37 +34,45 @@ fun CartBottomBar(
     onAllSelectedChanged: (Boolean) -> Unit = {},
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(78.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(78.dp),
     ) {
         CartSummarySection(
             showSelectAll = showSelectAll,
             isAllSelected = isAllSelected,
             onAllSelectedChanged = onAllSelectedChanged,
             totalPrice = totalPrice,
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(122.dp)
-                .weight(1f)
-                .background(Gray4)
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxHeight()
+                    .width(122.dp)
+                    .weight(1f)
+                    .background(Gray4)
+                    .padding(horizontal = 16.dp),
         )
 
         CartOrderSection(
             text =
-                if (selectedCount > 0) "주문하기(${selectedCount})"
-                else "주문하기",
+                if (selectedCount > 0) {
+                    "주문하기($selectedCount)"
+                } else {
+                    "주문하기"
+                },
             enabled = selectedCount > 0,
             onOrderClick = onOrderClick,
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(122.dp)
-                .background(
-                    if (selectedCount > 0) BrandGreen
-                    else ShoppingColors.Gray2,
-                )
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxHeight()
+                    .width(122.dp)
+                    .background(
+                        if (selectedCount > 0) {
+                            BrandGreen
+                        } else {
+                            ShoppingColors.Gray2
+                        },
+                    ).padding(horizontal = 16.dp),
         )
     }
 }

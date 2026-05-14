@@ -88,7 +88,8 @@ class CartRecommendationViewModelTest {
 
             assertEquals(
                 setOf(101L, 102L),
-                viewModel.uiState.value.pendingOrder.cartItemIds.toSet(),
+                viewModel.uiState.value.pendingOrder.cartItemIds
+                    .toSet(),
             )
             assertEquals(2, viewModel.uiState.value.pendingOrder.selectedCount)
             assertEquals(
@@ -136,11 +137,14 @@ class CartRecommendationViewModelTest {
 
             assertEquals(
                 listOf(1L, 2L),
-                viewModel.uiState.value.recommendedProducts.map { it.product.id },
+                viewModel.uiState.value.recommendedProducts
+                    .map { it.product.id },
             )
             assertEquals(
                 setOf("dessert"),
-                viewModel.uiState.value.recommendedProducts.map { it.product.category }.toSet(),
+                viewModel.uiState.value.recommendedProducts
+                    .map { it.product.category }
+                    .toSet(),
             )
         }
 
@@ -173,7 +177,11 @@ class CartRecommendationViewModelTest {
             advanceUntilIdle()
 
             assertEquals(3, viewModel.uiState.value.recommendedProducts.size)
-            assertEquals(listOf(1L, 2L, 3L), viewModel.uiState.value.recommendedProducts.map { it.product.id })
+            assertEquals(
+                listOf(1L, 2L, 3L),
+                viewModel.uiState.value.recommendedProducts
+                    .map { it.product.id },
+            )
         }
 
     @Test
@@ -203,7 +211,8 @@ class CartRecommendationViewModelTest {
 
             assertEquals(
                 (3L..12L).toList(),
-                viewModel.uiState.value.recommendedProducts.map { it.product.id },
+                viewModel.uiState.value.recommendedProducts
+                    .map { it.product.id },
             )
             assertEquals(10, viewModel.uiState.value.recommendedProducts.size)
         }
@@ -232,7 +241,10 @@ class CartRecommendationViewModelTest {
             viewModel.startOrder(selectedCartOrderOf(selectedOrderProduct))
             advanceUntilIdle()
 
-            assertTrue(viewModel.uiState.value.recommendedProducts.isEmpty())
+            assertTrue(
+                viewModel.uiState.value.recommendedProducts
+                    .isEmpty(),
+            )
         }
 
     @Test
@@ -262,9 +274,13 @@ class CartRecommendationViewModelTest {
             assertEquals(2, viewModel.uiState.value.pendingOrder.selectedCount)
             assertEquals(
                 setOf(101L, 102L),
-                viewModel.uiState.value.pendingOrder.cartItemIds.toSet(),
+                viewModel.uiState.value.pendingOrder.cartItemIds
+                    .toSet(),
             )
-            assertFalse(viewModel.uiState.value.recommendedProducts.any { it.product.id == recommendedProduct.id })
+            assertFalse(
+                viewModel.uiState.value.recommendedProducts
+                    .any { it.product.id == recommendedProduct.id },
+            )
         }
 
     private fun selectedCartOrderOf(product: Product): SelectedCartOrder =
@@ -328,7 +344,10 @@ class CartRecommendationViewModelTest {
                 )
         }
 
-        override suspend fun getCartPage(page: Int, size: Int): CartPageResult {
+        override suspend fun getCartPage(
+            page: Int,
+            size: Int,
+        ): CartPageResult {
             val safePage = page.coerceAtLeast(0)
             val safeSize = size.coerceAtLeast(0)
             val items = cartItems.values.toList()

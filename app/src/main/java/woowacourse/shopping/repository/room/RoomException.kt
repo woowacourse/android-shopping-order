@@ -12,4 +12,4 @@ sealed class CartRoomException(
 
 class CartItemNotFoundException(
     productId: Long,
-) : CartRoomException("해당 상품은 장바구니에 존재하지 않습니다. productId=${productId}")
+) : CartRoomException("해당 상품은 장바구니에 존재하지 않습니다. productId=$productId")

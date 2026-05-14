@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import woowacourse.shopping.ui.theme.ShoppingTheme
+
 class ProductDetailActivity : ComponentActivity() {
     private val viewModel: ProductDetailViewModel by viewModels()
 

@@ -3,7 +3,6 @@ package woowacourse.shopping.network.auth
 import okhttp3.Interceptor
 import okhttp3.Response
 
-
 class BasicAuthInterceptor(
     private val headerProvider: () -> String?,
 ) : Interceptor {
@@ -16,7 +15,8 @@ class BasicAuthInterceptor(
         }
 
         val authenticatedRequest =
-            originalRequest.newBuilder()
+            originalRequest
+                .newBuilder()
                 .header("Authorization", header)
                 .build()
 

@@ -347,7 +347,7 @@ class HttpProductRepositoryTest {
                   "totalElements": $totalElements,
                   "last": $last
                 }
-            """.trimIndent()
+                """.trimIndent()
         }
     }
 }

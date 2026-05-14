@@ -98,16 +98,18 @@ private fun NameAndCloseIcon(
             overflow = TextOverflow.Ellipsis,
         )
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = stringResource(R.string.content_description_close),
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .clickable(onClick = onClick),
+                modifier =
+                    Modifier
+                        .align(Alignment.CenterEnd)
+                        .clickable(onClick = onClick),
                 tint = ShoppingColors.Gray2,
             )
         }

@@ -43,7 +43,10 @@ class RoomCartRepository(
         cartItemDao.upsert(existingItem.copy(quantity = quantity))
     }
 
-    override suspend fun getCartPage(page: Int, size: Int): CartPageResult {
+    override suspend fun getCartPage(
+        page: Int,
+        size: Int,
+    ): CartPageResult {
         val safePage = page.coerceAtLeast(0)
         val safeSize = size.coerceAtLeast(0)
         val totalElements = cartItemDao.count()
