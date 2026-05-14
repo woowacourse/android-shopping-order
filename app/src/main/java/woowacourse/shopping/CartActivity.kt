@@ -17,12 +17,14 @@ import woowacourse.shopping.ui.viewmodel.CartViewModel
 import woowacourse.shopping.ui.viewmodel.CartViewModelFactory
 
 class CartActivity : ComponentActivity() {
+    private lateinit var viewModel: CartViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         setContent {
-            val viewModel: CartViewModel =
+            viewModel =
                 viewModel<CartViewModel>(
                     factory =
                         CartViewModelFactory(
@@ -81,6 +83,13 @@ class CartActivity : ComponentActivity() {
                             .padding(paddingValues),
                 )
             }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (::viewModel.isInitialized) {
+            viewModel.fetchCart()
         }
     }
 }

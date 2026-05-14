@@ -46,7 +46,7 @@ class CartViewModel(
         initialValue = 0
     )
 
-    init {
+    fun fetchCart() {
         viewModelScope.launch {
             _isLoading.update { true }
 
@@ -61,6 +61,10 @@ class CartViewModel(
             }
             _isLoading.update { false }
         }
+    }
+
+    init {
+        fetchCart()
     }
 
     fun next() {
