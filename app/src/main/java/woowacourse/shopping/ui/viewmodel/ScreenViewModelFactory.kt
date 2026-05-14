@@ -31,6 +31,12 @@ class ScreenViewModelFactory(
                     shoppingItemRepository = appContainer.shoppingItemRepository,
                 ) as T
 
+            modelClass.isAssignableFrom(ShoppingCartRecommendViewModel::class.java) ->
+                ShoppingCartRecommendViewModel(
+                    shoppingItemRepository = appContainer.shoppingItemRepository,
+                    visitStore = appContainer.visitStore,
+                ) as T
+
             else -> throw IllegalArgumentException("지원하지 않는 화면 ViewModel: ${modelClass.name}")
         }
 }

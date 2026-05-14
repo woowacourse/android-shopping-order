@@ -33,7 +33,10 @@ class ShoppingCartRecommendViewModel(
         shoppingCartItems: List<ShoppingCartItem>,
         selectedCartProductIds: Set<Long>,
     ) {
-        if (this.shoppingCartItems == shoppingCartItems && this.selectedCartProductIds == selectedCartProductIds) {
+        if (
+            this.shoppingCartItems == shoppingCartItems &&
+            this.selectedCartProductIds == selectedCartProductIds
+        ) {
             return
         }
         this.shoppingCartItems = shoppingCartItems
@@ -42,7 +45,10 @@ class ShoppingCartRecommendViewModel(
     }
 
     fun moveToRecommend() {
-        recommendBaseCartProductIds = shoppingCartItems.map { shoppingCartItem -> shoppingCartItem.product.id }.toSet()
+        recommendBaseCartProductIds =
+            shoppingCartItems
+                .map { shoppingCartItem -> shoppingCartItem.product.id }
+                .toSet()
         publishUiState(currentStep = ShoppingCartStep.RECOMMENT)
     }
 
@@ -77,11 +83,15 @@ class ShoppingCartRecommendViewModel(
             recentViewedProductIds.firstNotNullOfOrNull { productId ->
                 shoppingItemByProductId[productId]?.getProduct()?.category
             }
+        val cartProductIds =
+            shoppingCartItems
+                .map { shoppingCartItem -> shoppingCartItem.product.id }
+                .toSet()
         val excludedProductIdsForRecommend =
             if (currentStep == ShoppingCartStep.RECOMMENT) {
                 recommendBaseCartProductIds
             } else {
-                shoppingCartItems.map { shoppingCartItem -> shoppingCartItem.product.id }.toSet()
+                cartProductIds
             }
         val recommendedShoppingItems =
             if (mostRecentViewedCategory == null) {
