@@ -11,11 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import woowacourse.shopping.di.AppContainer
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.common.theme.ShoppingTheme
 
 class CartActivity : ComponentActivity() {
-    val cartRepo = AppContainer.cartRepository
+    private val container by lazy {
+        (application as ShoppingApplication).appContainer
+    }
     val pageSize = 5
 
     @Suppress("UNCHECKED_CAST")
@@ -31,7 +33,8 @@ class CartActivity : ComponentActivity() {
                                 object : ViewModelProvider.Factory {
                                     override fun <T : ViewModel> create(modelClass: Class<T>): T =
                                         CartViewModel(
-                                            cartRepo = cartRepo,
+                                            cartRepo = container.cartRepository,
+                                            orderRepo = container.orderRepository,
                                             pageSize = pageSize,
                                         ) as T
                                 },

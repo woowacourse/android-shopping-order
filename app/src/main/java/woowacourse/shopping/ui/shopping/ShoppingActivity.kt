@@ -12,16 +12,16 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import woowacourse.shopping.di.AppContainer
-import woowacourse.shopping._archive.network.NetworkMonitor
+import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.data.remote.NetworkMonitor
 import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.common.theme.ShoppingTheme
 
 class ShoppingActivity : ComponentActivity() {
-    val productRepo = AppContainer.productRepository
-    val cartRepo = AppContainer.cartRepository
-    val recentProductRepo = AppContainer.recentProductRepository
+    private val container by lazy {
+        (application as ShoppingApplication).appContainer
+    }
     val loadSize = 20
 
     @Suppress("UNCHECKED_CAST")
@@ -38,9 +38,9 @@ class ShoppingActivity : ComponentActivity() {
                                     override fun <T : ViewModel> create(modelClass: Class<T>): T =
                                         ShoppingViewModel(
                                             networkMonitor = NetworkMonitor(applicationContext),
-                                            productRepo = productRepo,
-                                            cartRepo = cartRepo,
-                                            recentProductRepo = recentProductRepo,
+                                            productRepo = container.productRepository,
+                                            cartRepo = container.cartRepository,
+                                            recentProductRepo = container.recentProductRepository,
                                             loadSize = loadSize,
                                         ) as T
                                 },

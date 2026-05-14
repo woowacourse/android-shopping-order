@@ -5,6 +5,7 @@ package woowacourse.shopping.repository.inmemory
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.data.repository.inmemory.InMemoryProductRepository
 
 class InMemoryProductResponseRepositoryTest {
     @Test

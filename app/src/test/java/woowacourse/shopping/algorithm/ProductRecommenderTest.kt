@@ -2,11 +2,11 @@ package woowacourse.shopping.algorithm
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.model.CartItem
-import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.data.model.CartItem
+import woowacourse.shopping.data.model.Money
+import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.recommender.ProductRecommender
 
 class ProductRecommenderTest {
 

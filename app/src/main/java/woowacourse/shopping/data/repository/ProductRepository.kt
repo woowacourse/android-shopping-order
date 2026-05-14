@@ -1,0 +1,16 @@
+package woowacourse.shopping.data.repository
+
+import woowacourse.shopping.data.model.Product
+
+interface ProductRepository {
+    suspend fun getSize(): Int
+
+    suspend fun getProducts(
+        fromIndex: Int,
+        count: Int,
+    ): List<Product>
+
+    suspend fun hasNext(currentIndex: Int): Boolean
+
+    suspend fun findProduct(id: Long): Product?
+}

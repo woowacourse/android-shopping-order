@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.cart
 
-import woowacourse.shopping.model.CartItem
+import woowacourse.shopping.data.model.CartItem
 
 data class CartUiState(
     val isLoading: Boolean = false,

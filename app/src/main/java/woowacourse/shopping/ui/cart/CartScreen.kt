@@ -11,10 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import woowacourse.shopping.model.Cart
-import woowacourse.shopping.model.CartItem
-import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.data.model.Cart
+import woowacourse.shopping.data.model.CartItem
+import woowacourse.shopping.data.model.Money
+import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.data.model.Products
 import woowacourse.shopping.ui.cart.component.CartBody
 import woowacourse.shopping.ui.cart.component.CartBottomBar
 import woowacourse.shopping.ui.cart.component.CartHeader

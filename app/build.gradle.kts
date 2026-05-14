@@ -17,10 +17,13 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField(
+            "String",
+            "BASE_URL",
+            "\"http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/\""
+        )
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -41,6 +44,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     testOptions {
         unitTests.all {
@@ -75,8 +79,6 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.okhttp)
-    testImplementation(libs.okhttp3.mockwebserver)
-    implementation(libs.okhttp3.mockwebserver)
     implementation(libs.retrofit)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit2.kotlinx.serialization.converter)

@@ -28,9 +28,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import woowacourse.shopping.model.CartItem
-import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.data.model.CartItem
+import woowacourse.shopping.data.model.Money
+import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.ui.common.component.QuantityControlButton
 import woowacourse.shopping.ui.common.component.ShoppingImage
 import woowacourse.shopping.ui.common.theme.Gray5
