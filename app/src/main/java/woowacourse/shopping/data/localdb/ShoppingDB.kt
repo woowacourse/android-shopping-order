@@ -15,8 +15,6 @@ import kotlin.jvm.java
     version = 1,
 )
 abstract class ShoppingDB : RoomDatabase() {
-    abstract fun cartItemDao(): CartItemDao
-
     abstract fun recentItemDao(): RecentItemDao
 
     companion object {
