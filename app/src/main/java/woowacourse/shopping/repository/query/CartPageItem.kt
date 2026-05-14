@@ -1,4 +1,4 @@
-package woowacourse.shopping.repository.cart
+package woowacourse.shopping.repository.query
 
 data class CartPageItem(
     val cartItemId: Long,
