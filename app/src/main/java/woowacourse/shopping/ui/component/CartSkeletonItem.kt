@@ -16,34 +16,35 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun CartSkeletonItem() {
     Column(
-        modifier = Modifier
-            .background(Color.LightGray)
-            .fillMaxWidth()
-            .height(152.dp)
-            .padding(vertical = 18.dp, horizontal = 14.dp),
-        verticalArrangement = Arrangement.spacedBy(17.dp)
+        modifier =
+            Modifier
+                .background(Color.LightGray)
+                .fillMaxWidth()
+                .height(152.dp)
+                .padding(vertical = 18.dp, horizontal = 14.dp),
+        verticalArrangement = Arrangement.spacedBy(17.dp),
     ) {
         Box(
-            modifier = Modifier
-                .padding(end = 90.dp)
-                .fillMaxWidth()
-                .height(23.dp)
-                .background(Color.Gray)
+            modifier =
+                Modifier
+                    .padding(end = 90.dp)
+                    .fillMaxWidth()
+                    .height(23.dp)
+                    .background(Color.Gray),
         )
         Box(
-            modifier = Modifier
-                .padding(end = 175.dp)
-                .fillMaxWidth()
-                .height(72.dp)
-                .background(Color.Gray)
+            modifier =
+                Modifier
+                    .padding(end = 175.dp)
+                    .fillMaxWidth()
+                    .height(72.dp)
+                    .background(Color.Gray),
         )
     }
 }
-
 
 @Preview
 @Composable
 private fun CartSkeletonItemPreview() {
     CartSkeletonItem()
 }
-

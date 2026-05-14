@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import woowacourse.shopping.backend.retrofit.awaitCompletion
-import woowacourse.shopping.backend.retrofit.awaitSuccess
 import woowacourse.shopping.backend.retrofit.dto.OrderInfo
 import woowacourse.shopping.backend.retrofit.repository.OrderRetrofitRepository
 

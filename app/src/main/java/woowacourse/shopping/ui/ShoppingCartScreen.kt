@@ -125,13 +125,11 @@ private fun ShoppingCartItems(
                 .fillMaxWidth()
                 .clip(
                     RoundedCornerShape(4.dp),
-                )
-                .border(
+                ).border(
                     color = MaterialTheme.colorScheme.outline,
                     width = 1.dp,
                     shape = RoundedCornerShape(4.dp),
-                )
-                .padding(12.dp),
+                ).padding(12.dp),
     ) {
         val product = shoppingCartItem.product
         Row(
@@ -233,59 +231,69 @@ private fun ShoppingCartScreenPreview() {
                 listOf(
                     ShoppingCartItem(
                         id = 1,
-                        shoppingItem = ShoppingItem(
-                            Product(
-                                1,
-                                ProductTitle("동원 스위트콘"),
-                                Price(99_800),
-                                ""
-                            ), 4
-                        ),
+                        shoppingItem =
+                            ShoppingItem(
+                                Product(
+                                    1,
+                                    ProductTitle("동원 스위트콘"),
+                                    Price(99_800),
+                                    "",
+                                ),
+                                4,
+                            ),
                     ),
                     ShoppingCartItem(
                         id = 2,
-                        shoppingItem = ShoppingItem(
-                            Product(
-                                1,
-                                ProductTitle("동원 스위트콘"),
-                                Price(99_800),
-                                ""
-                            ), 4
-                        ),
+                        shoppingItem =
+                            ShoppingItem(
+                                Product(
+                                    1,
+                                    ProductTitle("동원 스위트콘"),
+                                    Price(99_800),
+                                    "",
+                                ),
+                                4,
+                            ),
                     ),
                     ShoppingCartItem(
                         id = 3,
-                        shoppingItem = ShoppingItem(
-                            Product(
-                                1,
-                                ProductTitle("동원 스위트콘"),
-                                Price(99_800),
-                                ""
-                            ), 4
-                        ),
+                        shoppingItem =
+                            ShoppingItem(
+                                Product(
+                                    1,
+                                    ProductTitle("동원 스위트콘"),
+                                    Price(99_800),
+                                    "",
+                                ),
+                                4,
+                            ),
                     ),
                 ),
-            state = ShoppingCartState(
-                items = listOf(
-                    ShoppingCartItem(
-                        id = 1L,
-                        shoppingItem = ShoppingItem(
-                            product = Product(
+            state =
+                ShoppingCartState(
+                    items =
+                        listOf(
+                            ShoppingCartItem(
                                 id = 1L,
-                                title = ProductTitle("샘플 상품"),
-                                price = Price(12000),
-                                imageUrl = "https://example.com/image.jpg",
+                                shoppingItem =
+                                    ShoppingItem(
+                                        product =
+                                            Product(
+                                                id = 1L,
+                                                title = ProductTitle("샘플 상품"),
+                                                price = Price(12000),
+                                                imageUrl = "https://example.com/image.jpg",
+                                            ),
+                                        quantity = 1,
+                                    ),
                             ),
-                            quantity = 1,
                         ),
-                    )
+                    isLoading = true,
+                    errorMessage = null,
+                    currentPage = 0,
+                    canMoveToPreviousPage = false,
+                    canMoveToNextPage = false,
                 ),
-                isLoading = true,
-                errorMessage = null,
-                currentPage = 0,
-                canMoveToPreviousPage = false,
-                canMoveToNextPage = false,
-            ),
             getQuantityPrice = { shoppingCartItem -> shoppingCartItem.getProductQuantityPrice() },
             onBackClick = {},
             onRemoveShoppingItemClick = {},
@@ -302,10 +310,11 @@ private fun ShoppingCartItemsPreview() {
         shoppingCartItem =
             ShoppingCartItem(
                 id = 1,
-                shoppingItem = ShoppingItem(
-                    Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""),
-                    4
-                ),
+                shoppingItem =
+                    ShoppingItem(
+                        Product(1, ProductTitle("동원 스위트콘"), Price(99_800), ""),
+                        4,
+                    ),
             ),
         quantityPrice = 399_200,
         onRemoveShoppingItemClick = {},

@@ -13,7 +13,8 @@ class RetrofitService(
     authHeaderProvider: AuthHeaderProvider,
 ) {
     private val client =
-        OkHttpClient.Builder()
+        OkHttpClient
+            .Builder()
             .addInterceptor(AuthInterceptor(authHeaderProvider))
             .build()
 

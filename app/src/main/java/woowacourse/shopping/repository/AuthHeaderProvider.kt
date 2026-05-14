@@ -6,7 +6,7 @@ import woowacourse.shopping.storage.datastore.AuthDataStore
 
 // 저장된 username/password 읽어와서 Basic base64(username:password)로 변환
 class AuthHeaderProvider(
-    private val authDataStore: AuthDataStore
+    private val authDataStore: AuthDataStore,
 ) {
     suspend fun getAuthorizationHeader(): String? {
         val username = authDataStore.username.first()

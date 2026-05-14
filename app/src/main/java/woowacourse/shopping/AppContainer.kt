@@ -9,9 +9,7 @@ import woowacourse.shopping.repository.RoomShoppingCartRepository
 import woowacourse.shopping.repository.RoomShoppingItemRepository
 import woowacourse.shopping.repository.ShoppingCartRepository
 import woowacourse.shopping.repository.ShoppingItemRepository
-import woowacourse.shopping.storage.datastore.DataStoreRecommendationStore
 import woowacourse.shopping.storage.datastore.DataStoreVisitStore
-import woowacourse.shopping.storage.datastore.RecommendationStore
 import woowacourse.shopping.storage.datastore.VisitStore
 import woowacourse.shopping.storage.room.shoppingItem.ShoppingItemDao
 import woowacourse.shopping.storage.room.shoppingcart.ShoppingCartDao
@@ -35,12 +33,6 @@ class AppContainer(
 
     val visitStore: VisitStore =
         DataStoreVisitStore(
-            context = context,
-            scope = applicationScope,
-        )
-
-    val recommendationStore: RecommendationStore =
-        DataStoreRecommendationStore(
             context = context,
             scope = applicationScope,
         )

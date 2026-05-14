@@ -35,10 +35,11 @@ class ProductViewModel(
         sort: List<String>? = DEFAULT_SORT,
         category: String? = null,
     ) {
-        _state.value = _state.value.copy(
-            isLoading = true,
-            errorMessage = null,
-        )
+        _state.value =
+            _state.value.copy(
+                isLoading = true,
+                errorMessage = null,
+            )
 
         viewModelScope.launch {
             runCatching {
@@ -50,23 +51,25 @@ class ProductViewModel(
                         category = category,
                     ).awaitBody(errorPrefix = "상품 조회 실패")
             }.onSuccess { response ->
-                //delay(1500)      // 스켈레톤 ui 확인을 위한 딜레이
+//                 delay(1500)      // 스켈레톤 ui 확인을 위한 딜레이
                 val loadedProducts = response.toDomainProducts()
                 _products.value = loadedProducts
 
-                _state.value = _state.value.copy(
-                    isLoading = false,
-                    products = loadedProducts.map { it.toShoppingItem() },
-                    errorMessage = null,
-                )
+                _state.value =
+                    _state.value.copy(
+                        isLoading = false,
+                        products = loadedProducts.map { it.toShoppingItem() },
+                        errorMessage = null,
+                    )
                 _productDetails.update { cachedProducts ->
                     cachedProducts + loadedProducts.associateBy { product -> product.id }
                 }
             }.onFailure {
-                _state.value = _state.value.copy(
-                    isLoading = false,
-                    errorMessage = "상품 목록을 불러오지 못했습니다."
-                )
+                _state.value =
+                    _state.value.copy(
+                        isLoading = false,
+                        errorMessage = "상품 목록을 불러오지 못했습니다.",
+                    )
             }
         }
     }

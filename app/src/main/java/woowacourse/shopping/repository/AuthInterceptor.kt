@@ -5,7 +5,7 @@ import okhttp3.Interceptor
 import okhttp3.Response
 
 class AuthInterceptor(
-    private val authHeaderProvider: AuthHeaderProvider
+    private val authHeaderProvider: AuthHeaderProvider,
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         // id/password 가져오기
@@ -15,11 +15,12 @@ class AuthInterceptor(
             }
 
         val newRequest =
-            chain.request()
+            chain
+                .request()
                 .newBuilder()
-                .apply{
-                    if(authorizationHeader != null){
-                        addHeader("Authorization",authorizationHeader)
+                .apply {
+                    if (authorizationHeader != null) {
+                        addHeader("Authorization", authorizationHeader)
                     }
                 }.build()
         return chain.proceed(newRequest)

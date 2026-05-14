@@ -2,16 +2,13 @@ package woowacourse.shopping.backend.retrofit.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import okhttp3.internal.platform.PlatformRegistry.applicationContext
 import woowacourse.shopping.backend.retrofit.RetrofitService
 import woowacourse.shopping.backend.retrofit.repository.OrderRetrofitRepository
 import woowacourse.shopping.backend.retrofit.repository.ProductRetrofitRepository
 import woowacourse.shopping.backend.retrofit.repository.ShoppingCartRetrofitRepository
-import woowacourse.shopping.repository.AuthHeaderProvider
-import woowacourse.shopping.storage.datastore.AuthDataStore
 
-class BackendViewModelFactory(
-    retrofitService: RetrofitService
+class ApiViewModelFactory(
+    retrofitService: RetrofitService,
 ) : ViewModelProvider.Factory {
     private val productRetrofitRepository: ProductRetrofitRepository =
         ProductRetrofitRepository(retrofitService.productApiService)

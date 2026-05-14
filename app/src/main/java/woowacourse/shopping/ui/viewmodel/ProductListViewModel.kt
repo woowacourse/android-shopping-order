@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.viewmodel
 
-import android.app.Service
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -10,8 +9,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import woowacourse.shopping.backend.retrofit.RetrofitService
-import woowacourse.shopping.backend.retrofit.api.ProductRetrofitInterface
 import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.network.NetworkStatusMonitor
 import woowacourse.shopping.repository.ShoppingCartRepository
@@ -24,7 +21,6 @@ class ProductListViewModel(
     private val shoppingItemRepository: ShoppingItemRepository,
     private val visitStore: VisitStore,
     private val networkStatusMonitor: NetworkStatusMonitor,
-    private val apiService: ProductRetrofitInterface
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductListUiState())
     val uiState: StateFlow<ProductListUiState> = _uiState.asStateFlow()

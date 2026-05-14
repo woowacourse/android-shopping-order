@@ -14,24 +14,28 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ProductListSkeletonItem() {
     Column(
-        modifier = Modifier
-            .size(154.dp, 206.dp),
-        verticalArrangement = Arrangement.spacedBy(9.27.dp)
+        modifier =
+            Modifier
+                .size(154.dp, 206.dp),
+        verticalArrangement = Arrangement.spacedBy(9.27.dp),
     ) {
         Box(
-            modifier = Modifier
-                .size(154.dp, 159.dp)
-                .background(Color.LightGray)
+            modifier =
+                Modifier
+                    .size(154.dp, 159.dp)
+                    .background(Color.LightGray),
         )
         Box(
-            modifier = Modifier
-                .size(140.dp, 14.dp)
-                .background(Color.LightGray)
+            modifier =
+                Modifier
+                    .size(140.dp, 14.dp)
+                    .background(Color.LightGray),
         )
         Box(
-            modifier = Modifier
-                .size(118.dp, 14.dp)
-                .background(Color.LightGray)
+            modifier =
+                Modifier
+                    .size(118.dp, 14.dp)
+                    .background(Color.LightGray),
         )
     }
 }

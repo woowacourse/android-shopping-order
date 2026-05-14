@@ -9,37 +9,37 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.backend.retrofit.viewmodel.BackendViewModelFactory
+import woowacourse.shopping.backend.retrofit.viewmodel.ApiViewModelFactory
 import woowacourse.shopping.backend.retrofit.viewmodel.ShoppingCartViewModel
 import woowacourse.shopping.ui.ShoppingCartScreen
+import woowacourse.shopping.ui.ShoppingCartState
 import woowacourse.shopping.ui.component.PageNavigation
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
+import woowacourse.shopping.ui.viewmodel.ScreenViewModelFactory
+import woowacourse.shopping.ui.viewmodel.ShoppingCartItemViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 class ShoppingCartActivity : ComponentActivity() {
-    private val backendViewModelFactory: BackendViewModelFactory by lazy {
-        val app = application as ShoppingApplication
-        BackendViewModelFactory(app.retrofitService)
+    private val app: ShoppingApplication by lazy { application as ShoppingApplication }
+
+    private val screenViewModelFactory: ScreenViewModelFactory by lazy {
+        ScreenViewModelFactory(appContainer = app.appContainer)
     }
-    private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { backendViewModelFactory }
+    private val apiViewModelFactory: ApiViewModelFactory by lazy {
+        ApiViewModelFactory(app.retrofitService)
+    }
+
+    private val shoppingCartItemViewModel: ShoppingCartItemViewModel by viewModels { screenViewModelFactory }
+    private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { apiViewModelFactory }
 
     companion object {
-        private const val INITIAL_PAGE = 0
-        private const val PAGE_ITEM_SIZE = 5
-
         fun start(context: Context) {
             val intent = Intent(context, ShoppingCartActivity::class.java)
             context.startActivity(intent)
@@ -49,42 +49,44 @@ class ShoppingCartActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        observeApiViewModel()
+        observeScreenEvents()
         shoppingCartViewModel.requestCartItems()
+
         setContent {
-            val shoppingCartItems by shoppingCartViewModel.shoppingCartItems.collectAsStateWithLifecycle()
-            val isLoading by shoppingCartViewModel.isLoading.collectAsStateWithLifecycle()
-            val errorMessage by shoppingCartViewModel.errorMessage.collectAsStateWithLifecycle()
-            var currentPage by rememberSaveable { mutableIntStateOf(INITIAL_PAGE) }
-            val pageStartIndex = currentPage * PAGE_ITEM_SIZE
-            val pagedItems = shoppingCartItems.drop(pageStartIndex).take(PAGE_ITEM_SIZE)
-            val canMoveToPreviousPage = currentPage > INITIAL_PAGE
-            val canMoveToNextPage = (currentPage + 1) * PAGE_ITEM_SIZE < shoppingCartItems.size
+            val screenState = shoppingCartItemViewModel.shoppingCartItems.collectAsStateWithLifecycle()
+            val isLoading = shoppingCartViewModel.isLoading.collectAsStateWithLifecycle()
+            val errorMessage = shoppingCartViewModel.errorMessage.collectAsStateWithLifecycle()
+            val hasApiError = errorMessage.value != null
+            val visibleItems =
+                if (hasApiError) {
+                    emptyList()
+                } else {
+                    screenState.value.items
+                }
+            val visiblePagedItems =
+                if (hasApiError) {
+                    emptyList()
+                } else {
+                    screenState.value.pagedItems
+                }
             val state =
                 ShoppingCartState(
-                    items = shoppingCartItems,
-                    isLoading = isLoading,
-                    errorMessage = errorMessage,
-                    currentPage = currentPage,
-                    canMoveToPreviousPage = canMoveToPreviousPage,
-                    canMoveToNextPage = canMoveToNextPage,
+                    items = visibleItems,
+                    isLoading = isLoading.value,
+                    errorMessage = errorMessage.value,
+                    currentPage = screenState.value.currentPage,
+                    canMoveToPreviousPage = if (hasApiError) false else screenState.value.canMoveToPreviousPage,
+                    canMoveToNextPage = if (hasApiError) false else screenState.value.canMoveToNextPage,
                 )
-            LaunchedEffect(shoppingCartItems.size, currentPage) {
-                val lastPage =
-                    if (shoppingCartItems.isEmpty()) {
-                        INITIAL_PAGE
-                    } else {
-                        (shoppingCartItems.size - 1) / PAGE_ITEM_SIZE
-                    }
-                if (currentPage > lastPage) {
-                    currentPage = lastPage
-                }
-            }
 
             AndroidShoppingTheme {
                 ShoppingCartScreen(
-                    shoppingCartItems = pagedItems,
-                    getQuantityPrice = shoppingCartViewModel::getQuantityPrice,
-                    onBackClick = this::finish,
+                    shoppingCartItems = visiblePagedItems,
+                    getQuantityPrice = shoppingCartItemViewModel::getQuantityPrice,
+                    state = state,
+                    onBackClick = shoppingCartItemViewModel::onBackClick,
                     onRemoveShoppingItemClick = { shoppingCartItem ->
                         shoppingCartViewModel.removeShoppingItem(shoppingCartItem)
                     },
@@ -95,33 +97,13 @@ class ShoppingCartActivity : ComponentActivity() {
                         shoppingCartViewModel.decreaseShoppingItemQuantity(shoppingCartItem)
                     },
                 ) {
-                    Column(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 8.dp),
-                    ) {
-                        PageNavigation(
-
-                            currentPage = currentPage,
-                            canMoveToPreviousPage = canMoveToPreviousPage,
-                            canMoveToNextPage = canMoveToNextPage,
-                            onBeforePageClick = {
-                                if (currentPage > INITIAL_PAGE) {
-                                    currentPage -= 1
-                                }
-                            },
-                            onNextPageClick = {
-                                if ((currentPage + 1) * PAGE_ITEM_SIZE < shoppingCartItems.size) {
-                                    currentPage += 1
-                                }
-                            },
-                        )
-                        OrderButton(
-                            onOrderButtonClick = ::requestOrder,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
+                    PageNavigation(
+                        currentPage = screenState.value.currentPage,
+                        canMoveToPreviousPage = if (hasApiError) false else screenState.value.canMoveToPreviousPage,
+                        canMoveToNextPage = if (hasApiError) false else screenState.value.canMoveToNextPage,
+                        onBeforePageClick = shoppingCartItemViewModel::moveToPreviousPage,
+                        onNextPageClick = shoppingCartItemViewModel::moveToNextPage,
+                    )
                 }
             }
         }
@@ -130,5 +112,28 @@ class ShoppingCartActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         shoppingCartViewModel.requestCartItems()
+    }
+
+    private fun observeApiViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                shoppingCartViewModel.shoppingCartItems.collect { shoppingCartItems ->
+                    app.appContainer.remoteShoppingStateSyncer.syncCartItems(shoppingCartItems)
+                    shoppingCartItemViewModel.refresh()
+                }
+            }
+        }
+    }
+
+    private fun observeScreenEvents() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                shoppingCartItemViewModel.event.collect { event ->
+                    when (event) {
+                        ShoppingCartItemViewModel.ShoppingCartEvent.NavigateBack -> finish()
+                    }
+                }
+            }
+        }
     }
 }

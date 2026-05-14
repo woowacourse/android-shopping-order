@@ -79,21 +79,23 @@ fun ProductListScreen(
     ) { innerPadding ->
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(
-                start = 0.dp,
-                top = innerPadding.calculateTopPadding() + 12.dp,
-                end = 0.dp,
-                bottom = innerPadding.calculateBottomPadding(),
-            ),
+            contentPadding =
+                PaddingValues(
+                    start = 0.dp,
+                    top = innerPadding.calculateTopPadding() + 12.dp,
+                    end = 0.dp,
+                    bottom = innerPadding.calculateBottomPadding(),
+                ),
             horizontalArrangement = Arrangement.Center,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             if (state.isLoading) {
                 items(6) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(),
                         contentAlignment = Alignment.Center,
                     ) {
                         ProductListSkeletonItem()
@@ -219,8 +221,7 @@ private fun RecentViewedItem(
                 .background(
                     color = MaterialTheme.colorScheme.background,
                     shape = RoundedCornerShape(8.dp),
-                )
-                .clickable { onRecentViewedProductClick(product.id) }
+                ).clickable { onRecentViewedProductClick(product.id) }
                 .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
@@ -449,21 +450,24 @@ private fun ProductListScreenPreview() {
             recentViewedShoppingItems = emptyList(),
             shoppingCartTotalCount = 99,
             isNetworkConnected = true,
-            state = ProductListState(
-                isLoading = false,
-                products = listOf(
-                    ShoppingItem(
-                        product = Product(
-                            id = 1L,
-                            title = ProductTitle("샘플 상품"),
-                            price = Price(12000),
-                            imageUrl = "https://example.com/image.jpg",
+            state =
+                ProductListState(
+                    isLoading = false,
+                    products =
+                        listOf(
+                            ShoppingItem(
+                                product =
+                                    Product(
+                                        id = 1L,
+                                        title = ProductTitle("샘플 상품"),
+                                        price = Price(12000),
+                                        imageUrl = "https://example.com/image.jpg",
+                                    ),
+                                quantity = 1,
+                            ),
                         ),
-                        quantity = 1,
-                    ),
+                    errorMessage = null,
                 ),
-                errorMessage = null,
-            ),
             onAddToCartClick = {},
             onQuantityPlusClick = {},
             onQuantityMinusClick = {},
