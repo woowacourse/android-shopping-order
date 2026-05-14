@@ -43,4 +43,8 @@ class CartRepositoryImpl(
     override suspend fun remove(cartId: Int) {
         cartRemoteDataSource.deleteCartItem(cartId)
     }
+
+    override suspend fun order(cartItemIds: List<Int>) {
+        cartRemoteDataSource.order(cartItemIds)
+    }
 }

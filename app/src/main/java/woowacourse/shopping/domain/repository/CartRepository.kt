@@ -30,4 +30,6 @@ interface CartRepository {
     )
 
     suspend fun remove(cartId: Int)
+
+    suspend fun order(cartItemIds: List<Int>)
 }
