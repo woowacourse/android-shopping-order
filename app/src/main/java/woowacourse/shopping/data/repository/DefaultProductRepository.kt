@@ -8,7 +8,7 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import kotlin.collections.map
 
-class RemoteProductRepository(
+class DefaultProductRepository(
     private val remoteDataSource: ProductRemoteDataSource = ProductRemoteDataSource(),
 ) : ProductRepository {
     override suspend fun getProducts(

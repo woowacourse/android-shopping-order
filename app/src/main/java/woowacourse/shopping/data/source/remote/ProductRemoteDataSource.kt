@@ -30,7 +30,7 @@ class ProductRemoteDataSource(
         withContext(Dispatchers.IO) {
             val response =
                 productService.requestProducts(
-                    page = offset / limit,
+                    page = offset,
                     size = limit,
                 )
             response.content

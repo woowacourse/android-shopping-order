@@ -1,6 +1,5 @@
 package woowacourse.shopping.fake
 
-import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
@@ -20,19 +19,11 @@ class FakeCartRepository(
         return Cart(cartItems)
     }
 
-    override suspend fun getTotalCartSize(): Int = items.values.sum()
-
     override suspend fun addItem(
         id: Long,
         quantity: Int,
-    ): AddItemResult {
-        val before = items[id]
-        items[id] = (before ?: 0) + quantity
-        return if (before == null) {
-            AddItemResult.NewAdded(getCart())
-        } else {
-            AddItemResult.Incremented(getCart())
-        }
+    ) {
+        items[id] = (items[id] ?: 0) + quantity
     }
 
     override suspend fun deleteItem(productId: Long): RemoveItemResult =
@@ -42,13 +33,15 @@ class FakeCartRepository(
             RemoveItemResult.NotFoundItem
         }
 
-    override suspend fun decrease(id: Long): RemoveItemResult {
-        val current = items[id] ?: return RemoveItemResult.NotFoundItem
-        if (current == 1) items.remove(id) else items[id] = current - 1
-        return RemoveItemResult.Success(getCart())
+    override suspend fun changeCartItem(
+        productId: Long,
+        amount: Int,
+    ): Cart {
+        if (amount <= 0) {
+            items.remove(productId)
+        } else {
+            items[productId] = amount
+        }
+        return getCart()
     }
-
-    override suspend fun getAllQuantities(): Map<Long, Int> = items.toMap()
-
-    override suspend fun getQuantity(productId: Long): Int = items[productId] ?: 1
 }

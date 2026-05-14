@@ -72,7 +72,8 @@ class CartViewModelTest {
 
             viewModel.decrease(1L)
 
-            assertThat(cartRepository.getQuantity(1L)).isEqualTo(2)
+            val item = cartRepository.getCart().items.find { it.product.id == 1L }
+            assertThat(item!!.quantity).isEqualTo(2)
         }
 
     @Test

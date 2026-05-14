@@ -109,6 +109,7 @@ class DetailViewModelTest {
         runTest {
             viewModel.addToCart(id = 1L)
 
-            assertThat(cartRepository.getQuantity(1L)).isEqualTo(3)
+            val cartItem = cartRepository.getCart().items.find { it.product.id == 1L }
+            assertThat(cartItem!!.quantity).isEqualTo(3)
         }
 }

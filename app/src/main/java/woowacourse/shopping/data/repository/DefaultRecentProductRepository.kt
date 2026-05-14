@@ -8,7 +8,7 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
-class LocalRecentProductRepository(
+class DefaultRecentProductRepository(
     private val recentProductDao: RecentProductDao,
     private val productRepository: ProductRepository,
     private val maxKeep: Int = 10,
