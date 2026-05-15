@@ -23,7 +23,6 @@ import woowacourse.shopping.data.local.RecentProductDatabase
 import woowacourse.shopping.data.network.cart.CartService
 import woowacourse.shopping.data.network.order.OrderService
 import woowacourse.shopping.data.network.product.ProductService
-import woowacourse.shopping.data.network.startMockWebServer
 import woowacourse.shopping.data.repository.auth.AuthRepository
 import woowacourse.shopping.data.repository.auth.AuthRepositoryImpl
 import woowacourse.shopping.data.repository.cart.CartRepository
@@ -50,13 +49,7 @@ class ShoppingApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        Thread {
-            startMockWebServer()
-            initDependencies()
-        }.apply {
-            start()
-            join()
-        }
+        initDependencies()
     }
 
     private fun initDependencies() {
@@ -102,10 +95,9 @@ class ShoppingApplication : Application() {
         ).build()
 
         val product: ProductRepository = ProductRepositoryImpl(
-            dataSource = ProductRemoteDataSource(
-                productDataSource = ProductRemoteDataSource(
-                    productService = retrofitService,
-                ),
+            dataSource =
+            ProductRemoteDataSource(
+                productService = retrofitService,
             ),
         )
 
