@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import woowacourse.shopping.R
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.domain.model.Product
 import java.text.DecimalFormat
 
 @Composable
