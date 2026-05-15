@@ -7,13 +7,13 @@ import woowacourse.shopping.data.remote.server.dto.product.ProductResponse
 import woowacourse.shopping.data.remote.server.dto.products.ProductsResponse
 
 interface ProductService {
-    @GET("/products")
+    @GET("products")
     suspend fun requestProducts(
         @Query("page") page: Int,
         @Query("size") size: Int,
     ): ProductsResponse
 
-    @GET("/products/{id}")
+    @GET("products/{id}")
     suspend fun requestProduct(
         @Path("id") id: Long,
     ): ProductResponse
