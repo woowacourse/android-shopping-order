@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.network.cart.dto
+package woowacourse.shopping.data.network.product.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -6,11 +6,11 @@ import woowacourse.shopping.domain.Money
 import woowacourse.shopping.domain.Product
 
 @Serializable
-data class ProductDto(
+data class ProductItemDto(
     @SerialName("category")
     val category: String,
     @SerialName("id")
-    val id: Int,
+    val id: Long,
     @SerialName("imageUrl")
     val imageUrl: String,
     @SerialName("name")
@@ -24,7 +24,7 @@ data class ProductDto(
             price = Money(this.price),
             imageUrl = this.imageUrl,
             id = this.id.toString(),
-            category = category,
+            category = this.category,
         )
     }
 }

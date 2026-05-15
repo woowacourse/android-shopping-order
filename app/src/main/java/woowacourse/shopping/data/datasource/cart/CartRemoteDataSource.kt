@@ -3,8 +3,8 @@ package woowacourse.shopping.data.datasource.cart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.network.cart.CartService
-import woowacourse.shopping.data.network.cart.dto.CartItemInsertDto
-import woowacourse.shopping.data.network.cart.dto.Quantity
+import woowacourse.shopping.data.network.cart.dto.CartItemAddRequest
+import woowacourse.shopping.data.network.cart.dto.QuantityDto
 import woowacourse.shopping.domain.CartContent
 
 class CartRemoteDataSource(
@@ -41,7 +41,7 @@ class CartRemoteDataSource(
     override suspend fun insert(item: CartContent) = withContext(Dispatchers.IO) {
         val response = cartService
             .insertCartItem(
-                cartItemInsertDto = CartItemInsertDto(
+                request = CartItemAddRequest(
                     productId = item.product.id.toLong(),
                     quantity = item.quantity,
                 ),
@@ -55,7 +55,7 @@ class CartRemoteDataSource(
         val response = cartService
             .updateCartItemQuantity(
                 id = item.id,
-                quantity = Quantity(item.quantity),
+                quantity = QuantityDto(item.quantity),
             )
             .execute()
 

@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ProductResponse(
     @SerialName("content")
-    val content: List<Content>,
+    val content: List<ProductItemDto>,
 )
