@@ -36,7 +36,7 @@ class ConnectivityManagerNetworkMonitor(
                 network: Network,
                 networkCapabilities: NetworkCapabilities,
             ) {
-                _isNetworkConnected.value = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                _isNetworkConnected.value = currentConnectionState()
             }
         }
 
