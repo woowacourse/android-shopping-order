@@ -71,7 +71,6 @@ class DetailProductActivity : ComponentActivity() {
                         shoppingItem = shoppingItem,
                         lastViewedShoppingItem = uiState.lastViewedShoppingItem,
                         onAddToCartClick = {
-                            detailProductViewModel.addSelectedProductToCart()
                             shoppingCartViewModel.addOrIncreaseByProductId(
                                 productId = shoppingItem.getProductId(),
                                 amount = uiState.selectedQuantity,

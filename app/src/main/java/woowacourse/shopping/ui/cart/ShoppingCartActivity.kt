@@ -111,7 +111,6 @@ class ShoppingCartActivity : ComponentActivity() {
                         state = state,
                         onBackClick = shoppingCartItemViewModel::onBackClick,
                         onRemoveShoppingItemClick = { shoppingCartItem ->
-                            shoppingCartItemViewModel.removeShoppingItem(shoppingCartItem)
                             shoppingCartViewModel.removeShoppingItem(shoppingCartItem)
                         },
                         onToggleShoppingItemSelectionClick = { productId, isSelected ->

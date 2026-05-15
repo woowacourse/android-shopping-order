@@ -68,21 +68,18 @@ class ProductListActivity : ComponentActivity() {
                     isNetworkConnected = uiState.value.isNetworkConnected,
                     state = state.value,
                     onAddToCartClick = { shoppingItem ->
-                        productListViewModel.addProductToCart(shoppingItem)
                         shoppingCartViewModel.addOrIncreaseByProductId(
                             productId = shoppingItem.getProductId(),
                             amount = 1,
                         )
                     },
                     onQuantityPlusClick = { shoppingItem ->
-                        productListViewModel.increaseProductQuantity(shoppingItem)
                         shoppingCartViewModel.addOrIncreaseByProductId(
                             productId = shoppingItem.getProductId(),
                             amount = 1,
                         )
                     },
                     onQuantityMinusClick = { shoppingItem ->
-                        productListViewModel.decreaseProductQuantity(shoppingItem)
                         shoppingCartViewModel.decreaseByProductId(shoppingItem.getProductId())
                     },
                     onProductClick = productListViewModel::onProductClick,
@@ -156,6 +153,6 @@ class ProductListActivity : ComponentActivity() {
     }
 
     private companion object {
-        private const val MAX_PRODUCT_SIZE = 100
+        private const val MAX_PRODUCT_SIZE = 20
     }
 }

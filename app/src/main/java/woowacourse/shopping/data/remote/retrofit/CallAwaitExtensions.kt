@@ -18,13 +18,7 @@ suspend fun <T> Call<T>.awaitBody(errorPrefix: String = "요청 실패"): T =
                     response: Response<T>,
                 ) {
                     if (!response.isSuccessful) {
-                        val exception =
-                            when (val code = response.code()) {
-                                400 -> BadRequestException("$errorPrefix: 잘못된 요청입니다. (400)")
-                                404 -> NotFoundException("$errorPrefix: 요청한 리소스를 찾을 수 없습니다. (404)")
-                                in 500..599 -> ServerException("$errorPrefix: 서버 오류가 발생했습니다. ($code)")
-                                else -> UnknownHttpException("$errorPrefix: HTTP $code")
-                            }
+                        val exception = response.toHttpException(errorPrefix)
                         continuation.resumeWithException(exception)
                         return
                     }
@@ -59,13 +53,7 @@ suspend fun Call<Void>.awaitCompletion(errorPrefix: String = "요청 실패") {
                     response: Response<Void>,
                 ) {
                     if (!response.isSuccessful) {
-                        val exception =
-                            when (val code = response.code()) {
-                                400 -> BadRequestException("$errorPrefix: 잘못된 요청입니다. (400)")
-                                404 -> NotFoundException("$errorPrefix: 요청한 리소스를 찾을 수 없습니다. (404)")
-                                in 500..599 -> ServerException("$errorPrefix: 서버 오류가 발생했습니다. ($code)")
-                                else -> UnknownHttpException("$errorPrefix: HTTP $code")
-                            }
+                        val exception = response.toHttpException(errorPrefix)
                         continuation.resumeWithException(exception)
                         return
                     }
@@ -84,3 +72,31 @@ suspend fun Call<Void>.awaitCompletion(errorPrefix: String = "요청 실패") {
         )
     }
 }
+
+private fun Response<*>.toHttpException(errorPrefix: String): ApiCallException {
+    val code = code()
+    val detail = buildHttpErrorDetail()
+    return when (code) {
+        400 -> BadRequestException("$errorPrefix: 잘못된 요청입니다. (400)$detail")
+        404 -> NotFoundException("$errorPrefix: 요청한 리소스를 찾을 수 없습니다. (404)$detail")
+        in 500..599 -> ServerException("$errorPrefix: 서버 오류가 발생했습니다. ($code)$detail")
+        else -> UnknownHttpException("$errorPrefix: HTTP $code$detail")
+    }
+}
+
+private fun Response<*>.buildHttpErrorDetail(): String {
+    val requestUrl = runCatching { raw().request.url.toString() }.getOrNull().orEmpty()
+    val errorBody =
+        runCatching { errorBody()?.string()?.trim().orEmpty() }
+            .getOrDefault("")
+            .take(MAX_ERROR_BODY_LENGTH)
+
+    if (requestUrl.isBlank() && errorBody.isBlank()) return ""
+
+    val details = mutableListOf<String>()
+    if (requestUrl.isNotBlank()) details += "url=$requestUrl"
+    if (errorBody.isNotBlank()) details += "errorBody=$errorBody"
+    return " [${details.joinToString(", ")}]"
+}
+
+private const val MAX_ERROR_BODY_LENGTH = 400

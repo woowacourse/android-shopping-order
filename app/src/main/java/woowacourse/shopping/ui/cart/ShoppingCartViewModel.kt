@@ -51,6 +51,7 @@ class ShoppingCartViewModel(
         onSuccess: (() -> Unit)? = null,
     ) {
         if (amount <= 0) return
+        _errorMessage.value = null
         viewModelScope.launch {
             runCatching {
                 val currentItems = loadCartItems()
@@ -73,11 +74,14 @@ class ShoppingCartViewModel(
                 _shoppingCartItems.value = latestItems
                 onSuccess?.invoke()
                 syncShoppingCartItems(latestItems)
+            }.onFailure { throwable ->
+                _errorMessage.value = throwable.message
             }
         }
     }
 
     fun decreaseByProductId(productId: Long) {
+        _errorMessage.value = null
         viewModelScope.launch {
             runCatching {
                 val currentItems = loadCartItems()
@@ -100,11 +104,14 @@ class ShoppingCartViewModel(
             }.onSuccess { latestItems ->
                 _shoppingCartItems.value = latestItems
                 syncShoppingCartItems(latestItems)
+            }.onFailure { throwable ->
+                _errorMessage.value = throwable.message
             }
         }
     }
 
     fun removeShoppingItem(shoppingCartItem: ShoppingCartItem) {
+        _errorMessage.value = null
         viewModelScope.launch {
             runCatching {
                 val currentItems = loadCartItems()
@@ -121,6 +128,8 @@ class ShoppingCartViewModel(
             }.onSuccess { latestItems ->
                 _shoppingCartItems.value = latestItems
                 syncShoppingCartItems(latestItems)
+            }.onFailure { throwable ->
+                _errorMessage.value = throwable.message
             }
         }
     }
@@ -196,7 +205,7 @@ class ShoppingCartViewModel(
 
     private companion object {
         private const val DEFAULT_PAGE = 0
-        private const val DEFAULT_SIZE = 100
+        private const val DEFAULT_SIZE = 20
         private const val DEFAULT_QUANTITY = 1
     }
 }

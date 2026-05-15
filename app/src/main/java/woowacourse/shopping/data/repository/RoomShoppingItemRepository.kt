@@ -87,10 +87,7 @@ class RoomShoppingItemRepository(
         val currentQuantity =
             shoppingItemDao.getQuantityOrNull(productId)
                 ?: throw IllegalArgumentException("해당 상품을 찾을 수 없습니다.")
-        val updatedQuantity = currentQuantity + delta
-        if (updatedQuantity < 0) {
-            throw IllegalArgumentException("상품의 수량은 0보다 작을 수 없습니다.")
-        }
+        val updatedQuantity = (currentQuantity + delta).coerceAtLeast(0)
         shoppingItemDao.updateQuantity(productId, updatedQuantity)
     }
 }
