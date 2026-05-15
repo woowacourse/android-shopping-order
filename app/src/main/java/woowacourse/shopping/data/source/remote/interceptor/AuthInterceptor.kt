@@ -15,6 +15,7 @@ class AuthInterceptor(
                 .request()
                 .newBuilder()
                 .addHeader("Authorization", "Basic $token")
+                .addHeader("Accept", "application/json")
                 .build()
         return chain.proceed(newRequest)
     }
