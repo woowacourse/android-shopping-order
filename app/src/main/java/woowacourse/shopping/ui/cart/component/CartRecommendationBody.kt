@@ -27,14 +27,14 @@ fun CartRecommendationBody(
     productItems: List<ProductUiModel>,
     modifier: Modifier = Modifier,
     onIncreaseClick: (Product) -> Unit,
-    onDecreaseClick: (Product) -> Unit
+    onDecreaseClick: (Product) -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Title(
-            modifier = Modifier.padding(start = 16.dp)
+            modifier = Modifier.padding(start = 16.dp),
         )
         Spacer(Modifier.height(29.dp))
 
@@ -43,7 +43,7 @@ fun CartRecommendationBody(
                 products = productItems,
                 modifier = Modifier.padding(start = 12.dp),
                 onIncreaseClick = onIncreaseClick,
-                onDecreaseClick = onDecreaseClick
+                onDecreaseClick = onDecreaseClick,
             )
         } else {
             Text(
@@ -57,19 +57,19 @@ fun CartRecommendationBody(
 private fun Title(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
             text = "이런 상품은 어떠세요?",
             fontSize = 24.sp,
             fontWeight = FontWeight.W700,
-            color = Color(0xFF333333)
+            color = Color(0xFF333333),
         )
         Text(
             text = "* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.",
             fontSize = 12.sp,
             fontWeight = FontWeight.W400,
-            color = Gray5
+            color = Gray5,
         )
     }
 }
@@ -79,11 +79,11 @@ private fun ItemRow(
     products: List<ProductUiModel>,
     modifier: Modifier = Modifier,
     onIncreaseClick: (Product) -> Unit,
-    onDecreaseClick: (Product) -> Unit
+    onDecreaseClick: (Product) -> Unit,
 ) {
     LazyRow(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(items = products.toList(), key = { it.product.id }) { uiModel ->
             ProductUnit(
@@ -91,7 +91,7 @@ private fun ItemRow(
                 modifier = Modifier,
                 onClick = {},
                 onIncreaseClick = onIncreaseClick,
-                onDecreaseClick = onDecreaseClick
+                onDecreaseClick = onDecreaseClick,
             )
         }
     }
@@ -108,19 +108,19 @@ fun CartRecommendationBodyPreview() {
                         name = "딸기라떼",
                         price = Money(4500),
                         imageUrl = "",
-                    )
+                    ),
                 ),
                 ProductUiModel(
                     Product(
                         name = "고구마라떼",
                         price = Money(5500),
                         imageUrl = "",
-                    )
-                )
+                    ),
+                ),
             ),
         modifier = Modifier,
         onIncreaseClick = {},
-        onDecreaseClick = {}
+        onDecreaseClick = {},
     )
 }
 

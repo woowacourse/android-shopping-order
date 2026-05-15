@@ -14,17 +14,18 @@ import woowacourse.shopping.ui.common.theme.PrimaryColor
 fun CartCheckbox(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Checkbox(
         checked = checked,
         onCheckedChange = onCheckedChange,
         modifier = modifier.size(24.dp),
-        colors = CheckboxDefaults.colors(
-            checkedColor = PrimaryColor,
-            uncheckedColor = Color.Gray,
-            checkmarkColor = Color.White,
-        )
+        colors =
+            CheckboxDefaults.colors(
+                checkedColor = PrimaryColor,
+                uncheckedColor = Color.Gray,
+                checkmarkColor = Color.White,
+            ),
     )
 }
 
@@ -33,7 +34,7 @@ fun CartCheckbox(
 private fun CartCheckboxPreview1() {
     CartCheckbox(
         checked = true,
-        onCheckedChange = {}
+        onCheckedChange = {},
     )
 }
 
@@ -42,6 +43,6 @@ private fun CartCheckboxPreview1() {
 private fun CartCheckboxPreview2() {
     CartCheckbox(
         checked = false,
-        onCheckedChange = {}
+        onCheckedChange = {},
     )
 }

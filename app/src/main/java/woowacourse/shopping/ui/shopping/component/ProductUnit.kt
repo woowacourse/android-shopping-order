@@ -38,10 +38,11 @@ fun ProductUnit(
     val price = product.price.value
     val formatted = String.format("%,d", price)
     Column(
-        modifier = modifier
-            .width(154.dp)
-            .height(206.dp)
-            .clickable(onClick = onClick)
+        modifier =
+            modifier
+                .width(154.dp)
+                .height(206.dp)
+                .clickable(onClick = onClick),
     ) {
         Box {
             ShoppingImage(

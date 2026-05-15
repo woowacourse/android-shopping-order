@@ -58,7 +58,7 @@ fun CartItemUnit(
             cartItem = cartItem,
             onClick = onDeleteClick,
             onCheckedChange = onCheckedChange,
-            isChecked = isChecked
+            isChecked = isChecked,
         )
 
         Spacer(Modifier.size(20.dp))
@@ -97,7 +97,7 @@ private fun CartItemHeader(
             fontWeight = FontWeight.W700,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
         Icon(
             imageVector = Icons.Default.Close,
@@ -161,11 +161,12 @@ private fun CartItemBody(
 private fun CartItemUnitPreview() {
     val cartItem =
         CartItem(
-            product = Product(
-                name = "스피또",
-                price = Money(1000),
-                imageUrl = "",
-            ),
+            product =
+                Product(
+                    name = "스피또",
+                    price = Money(1000),
+                    imageUrl = "",
+                ),
             quantity = 2,
         )
     CartItemUnit(
@@ -174,7 +175,7 @@ private fun CartItemUnitPreview() {
         onAddClick = {},
         onRemoveClick = {},
         onCheckedChange = {},
-        isChecked = true
+        isChecked = true,
     )
 }
 
@@ -183,18 +184,19 @@ private fun CartItemUnitPreview() {
 private fun CartItemHeaderPreview() {
     val cartItem =
         CartItem(
-            product = Product(
-                name = "스피또",
-                price = Money(1000),
-                imageUrl = "",
-            ),
+            product =
+                Product(
+                    name = "스피또",
+                    price = Money(1000),
+                    imageUrl = "",
+                ),
             quantity = 2,
         )
     CartItemHeader(
         cartItem = cartItem,
         onClick = {},
         onCheckedChange = {},
-        isChecked = false
+        isChecked = false,
     )
 }
 
@@ -203,11 +205,12 @@ private fun CartItemHeaderPreview() {
 private fun CartItemBodyPreview() {
     val cartItem =
         CartItem(
-            product = Product(
-                name = "스피또",
-                price = Money(1000),
-                imageUrl = "",
-            ),
+            product =
+                Product(
+                    name = "스피또",
+                    price = Money(1000),
+                    imageUrl = "",
+                ),
             quantity = 2,
         )
     CartItemBody(

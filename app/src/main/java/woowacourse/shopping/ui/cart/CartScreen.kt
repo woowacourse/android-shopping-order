@@ -26,7 +26,7 @@ fun CartScreen(
     viewModel: CartViewModel,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
-    onOrderClick: () -> Unit
+    onOrderClick: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -46,7 +46,8 @@ fun CartScreen(
                 onRemoveClick = { viewModel.decrease(it.product) },
                 onCheckedChange = { id, isSelected ->
                     viewModel.toggleItemSelection(
-                        id.id ?: throw IllegalArgumentException(), isSelected
+                        id.id ?: throw IllegalArgumentException(),
+                        isSelected,
                     )
                 },
                 selectedItemCount = uiState.totalSelectedCount,
@@ -58,6 +59,7 @@ fun CartScreen(
                     viewModel.changeScreen()
                 },
             )
+
         false ->
             RecommendScreen(
                 recommendedProducts = uiState.recommendItems,
@@ -96,7 +98,7 @@ fun CartScreen(
     onRemoveClick: (CartItem) -> Unit,
     onCheckedChange: (CartItem, Boolean) -> Unit,
     onAllCheckboxChanged: (Boolean) -> Unit,
-    onOrderClick: () -> Unit
+    onOrderClick: () -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -128,7 +130,7 @@ fun CartScreen(
             price = totalPrice,
             onCheckedChanged = onAllCheckboxChanged,
             modifier = Modifier.fillMaxWidth(),
-            onOrderClick = onOrderClick
+            onOrderClick = onOrderClick,
         )
     }
 }
@@ -142,28 +144,28 @@ private fun RecommendScreen(
     onBackClick: () -> Unit,
     onIncreaseClick: (Product) -> Unit,
     onDecreaseClick: (Product) -> Unit,
-    onOrderClick: () -> Unit
+    onOrderClick: () -> Unit,
 ) {
     Column(
-        modifier = modifier
+        modifier = modifier,
     ) {
         CartHeader(
             modifier = Modifier,
-            onBackClick = onBackClick
+            onBackClick = onBackClick,
         )
 
         CartRecommendationBody(
             productItems = recommendedProducts,
             modifier = Modifier.weight(1f),
             onIncreaseClick = onIncreaseClick,
-            onDecreaseClick = onDecreaseClick
+            onDecreaseClick = onDecreaseClick,
         )
 
         CartBottomBar(
             count = count,
             price = price,
             modifier = Modifier.fillMaxWidth(),
-            onOrderClick = onOrderClick
+            onOrderClick = onOrderClick,
         )
     }
 }
@@ -199,7 +201,7 @@ private fun CartScreenPreview1() {
         onRemoveClick = {},
         onCheckedChange = { _, _ -> },
         onAllCheckboxChanged = {},
-        onOrderClick = {}
+        onOrderClick = {},
     )
 }
 
@@ -226,7 +228,7 @@ private fun CartScreenPreview2() {
         onRemoveClick = {},
         onCheckedChange = { _, _ -> },
         onAllCheckboxChanged = {},
-        onOrderClick = {}
+        onOrderClick = {},
     )
 }
 
@@ -243,7 +245,6 @@ private fun RecommendScreenPreview() {
             ProductUiModel(Product(name = "6번", price = Money(1000), imageUrl = "")),
         )
 
-
     RecommendScreen(
         recommendedProducts = products,
         count = 4,
@@ -252,6 +253,6 @@ private fun RecommendScreenPreview() {
         onBackClick = {},
         onIncreaseClick = {},
         onDecreaseClick = {},
-        onOrderClick = {}
+        onOrderClick = {},
     )
 }

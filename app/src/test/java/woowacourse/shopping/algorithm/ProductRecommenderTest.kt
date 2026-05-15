@@ -9,16 +9,19 @@ import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.recommender.ProductRecommender
 
 class ProductRecommenderTest {
-
     private val electronics = "electronics"
     private val food = "food"
 
-    private fun createProduct(id: Long, name: String, category: String) = Product(
+    private fun createProduct(
+        id: Long,
+        name: String,
+        category: String,
+    ) = Product(
         id = id,
         name = name,
         price = Money(1000),
         imageUrl = "url",
-        category = category
+        category = category,
     )
 
     @Test
@@ -27,7 +30,7 @@ class ProductRecommenderTest {
         val lastViewed = createProduct(1, "TV", electronics)
         val p2 = createProduct(2, "Radio", electronics)
         val p3 = createProduct(3, "Apple", food)
-        
+
         val allProducts = listOf(lastViewed, p2, p3)
         val cartItems = emptyList<CartItem>()
 

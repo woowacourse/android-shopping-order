@@ -32,7 +32,8 @@ fun LastViewedProductBanner(
                     width = 1.dp,
                     color = Color.Gray,
                     shape = RoundedCornerShape(4.dp),
-                ).clickable(onClick = onClick)
+                )
+                .clickable(onClick = onClick)
                 .padding(horizontal = 18.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.SpaceBetween,
     ) {

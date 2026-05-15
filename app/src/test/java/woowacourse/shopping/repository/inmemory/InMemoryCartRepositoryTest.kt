@@ -6,9 +6,9 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import woowacourse.shopping.data.repository.inmemory.InMemoryCartRepository
 import woowacourse.shopping.data.model.Money
 import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.data.repository.inmemory.InMemoryCartRepository
 
 class InMemoryCartRepositoryTest {
     val product1 =

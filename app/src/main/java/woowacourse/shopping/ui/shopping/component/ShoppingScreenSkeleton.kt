@@ -23,30 +23,29 @@ fun ShoppingScreenSkeleton(modifier: Modifier = Modifier) {
         ShoppingHeader(
             cartCount = 0,
             modifier = Modifier,
-            onCartClick = {}
+            onCartClick = {},
         )
 
         ProductGroup(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 20.dp)
-                .shimmer()
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(top = 20.dp)
+                    .shimmer(),
         )
     }
 }
 
 @Composable
-private fun ProductGroup(
-    modifier: Modifier = Modifier
-) {
+private fun ProductGroup(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         repeat(4) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 ProductItem()
                 ProductItem()
@@ -56,30 +55,31 @@ private fun ProductGroup(
 }
 
 @Composable
-private fun ProductItem(
-    modifier: Modifier = Modifier,
-) {
+private fun ProductItem(modifier: Modifier = Modifier) {
     val backColor = Color(0xFFE2E2E2)
 
     Column(
         modifier = modifier.size(width = 154.dp, height = 206.dp),
     ) {
         Box(
-            modifier = Modifier
-                .size(width = 154.dp, height = 158.62.dp)
-                .background(backColor)
+            modifier =
+                Modifier
+                    .size(width = 154.dp, height = 158.62.dp)
+                    .background(backColor),
         )
         Spacer(Modifier.size(9.27.dp))
         Box(
-            modifier = Modifier
-                .size(width = 140.dp, height = 14.42.dp)
-                .background(backColor)
+            modifier =
+                Modifier
+                    .size(width = 140.dp, height = 14.42.dp)
+                    .background(backColor),
         )
         Spacer(Modifier.size(9.27.dp))
         Box(
-            modifier = Modifier
-                .size(width = 118.dp, height = 14.42.dp)
-                .background(backColor)
+            modifier =
+                Modifier
+                    .size(width = 118.dp, height = 14.42.dp)
+                    .background(backColor),
         )
     }
 }

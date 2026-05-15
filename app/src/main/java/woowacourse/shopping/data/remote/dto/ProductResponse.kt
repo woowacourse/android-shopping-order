@@ -10,15 +10,14 @@ data class ProductResponse(
     val name: String,
     val price: Long,
     val imageUrl: String,
-    val category: String
+    val category: String,
 )
 
-fun ProductResponse.toDomain(): Product {
-    return Product(
+fun ProductResponse.toDomain(): Product =
+    Product(
         id = id,
         name = name,
         price = Money(price),
         imageUrl = imageUrl,
         category = category,
     )
-}

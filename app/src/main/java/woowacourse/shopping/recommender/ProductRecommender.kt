@@ -18,7 +18,7 @@ object ProductRecommender {
         if (filteredItems.isEmpty()) {
             return getFilteredProducts(allProductItems, allCartItem)
         }
-        val filteredByCategory =  getFilteredProducts(filteredItems, allCartItem)
+        val filteredByCategory = getFilteredProducts(filteredItems, allCartItem)
         if (filteredByCategory.isEmpty()) {
             return getFilteredProducts(allProductItems, allCartItem)
         }
@@ -27,7 +27,7 @@ object ProductRecommender {
 
     private fun filterByCategory(
         lastViewedItem: Product,
-        allProductItems: List<Product>
+        allProductItems: List<Product>,
     ) = allProductItems.filter { it.category == lastViewedItem.category }
 
     private fun getFilteredProducts(

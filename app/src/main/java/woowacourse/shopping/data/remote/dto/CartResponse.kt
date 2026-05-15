@@ -19,14 +19,13 @@ data class CartResponse(
     val empty: Boolean,
 )
 
-fun CartResponse.toDomain(): Cart {
-    return Cart(
+fun CartResponse.toDomain(): Cart =
+    Cart(
         content.map {
             CartItem(
                 id = it.id,
                 product = it.product.toDomain(),
                 quantity = it.quantity,
             )
-        }
+        },
     )
-}

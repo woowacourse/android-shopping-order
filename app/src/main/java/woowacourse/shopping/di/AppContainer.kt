@@ -14,14 +14,17 @@ import woowacourse.shopping.data.repository.network.RetrofitOrderRepository
 import woowacourse.shopping.data.repository.network.RetrofitProductRepository
 import woowacourse.shopping.data.repository.room.RoomRecentProductRepository
 
-class AppContainer(context: Context) {
-    private val database: Database = Room
-        .databaseBuilder(
-            context.applicationContext,
-            Database::class.java,
-            "shopping-db",
-        ).fallbackToDestructiveMigration(false)
-        .build()
+class AppContainer(
+    context: Context,
+) {
+    private val database: Database =
+        Room
+            .databaseBuilder(
+                context.applicationContext,
+                Database::class.java,
+                "shopping-db",
+            ).fallbackToDestructiveMigration(false)
+            .build()
     private val networkClient = RetrofitClient
     private val encoder = BasicAuthEncoder
 
@@ -30,7 +33,7 @@ class AppContainer(context: Context) {
     val cartRepository: CartRepository =
         RetrofitCartRepository(
             encoder = encoder,
-            service = networkClient.cartService
+            service = networkClient.cartService,
         )
     val recentProductRepository: RecentProductRepository by lazy {
         RoomRecentProductRepository(
@@ -41,6 +44,6 @@ class AppContainer(context: Context) {
     val orderRepository: OrderRepository =
         RetrofitOrderRepository(
             encoder = encoder,
-            service = networkClient.orderService
+            service = networkClient.orderService,
         )
 }

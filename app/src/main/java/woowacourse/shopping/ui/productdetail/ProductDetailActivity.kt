@@ -17,6 +17,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.common.theme.ShoppingTheme
+
 class ProductDetailActivity : ComponentActivity() {
     private val container by lazy {
         (application as ShoppingApplication).appContainer
@@ -62,7 +63,8 @@ class ProductDetailActivity : ComponentActivity() {
                         },
                         onAddToCartClick = ::finish,
                         onLastViewedProductClick = {
-                            val intent = newIntent(context = this, productId = it.id, isFromBanner = true)
+                            val intent =
+                                newIntent(context = this, productId = it.id, isFromBanner = true)
                             startActivity(intent)
                             finish()
                         },

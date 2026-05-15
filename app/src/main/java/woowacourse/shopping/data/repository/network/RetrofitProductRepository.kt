@@ -8,15 +8,13 @@ import woowacourse.shopping.data.remote.service.ProductService
 import woowacourse.shopping.data.repository.ProductRepository
 
 class RetrofitProductRepository(
-    private val service: ProductService
+    private val service: ProductService,
 ) : ProductRepository {
-    override suspend fun getSize(): Int {
-        return fetchProducts().size
-    }
+    override suspend fun getSize(): Int = fetchProducts().size
 
     override suspend fun getProducts(
         fromIndex: Int,
-        count: Int
+        count: Int,
     ): List<Product> {
         val allProducts = fetchProducts()
         val safeFromIndex = fromIndex.coerceIn(0, allProducts.size)
@@ -46,7 +44,7 @@ class RetrofitProductRepository(
                 name = it.name,
                 price = Money(it.price),
                 imageUrl = it.imageUrl,
-                category = it.category
+                category = it.category,
             )
         }
     }

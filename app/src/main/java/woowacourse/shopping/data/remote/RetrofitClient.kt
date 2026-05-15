@@ -13,23 +13,23 @@ import kotlin.reflect.KClass
 
 object RetrofitClient {
     private const val BASE_URL = BuildConfig.BASE_URL
-    private val json = Json {
-        ignoreUnknownKeys = true
-        coerceInputValues = true
-    }
+    private val json =
+        Json {
+            ignoreUnknownKeys = true
+            coerceInputValues = true
+        }
     private val httpClient = OkHttpClient.Builder().build()
     val productService = buildToService(ProductService::class)
     val cartService = buildToService(CartService::class)
     val orderService = buildToService(OrderService::class)
 
-    private fun <T : Any> buildToService(clazz: KClass<T>): T {
-        return Retrofit.Builder()
+    private fun <T : Any> buildToService(clazz: KClass<T>): T =
+        Retrofit
+            .Builder()
             .baseUrl(BASE_URL)
             .client(httpClient)
             .addConverterFactory(
-                json.asConverterFactory("application/json".toMediaType())
-            )
-            .build()
+                json.asConverterFactory("application/json".toMediaType()),
+            ).build()
             .create(clazz.java)
-    }
 }
