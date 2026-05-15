@@ -9,6 +9,8 @@ import woowacourse.shopping.data.source.local.ShoppingDatabase
 import woowacourse.shopping.data.source.local.auth.AuthDataSource
 import woowacourse.shopping.data.source.local.auth.DefaultAuthDataSource
 import woowacourse.shopping.data.source.remote.CartRemoteDataSource
+import woowacourse.shopping.data.source.remote.ProductRemoteDataSource
+import woowacourse.shopping.data.source.remote.RetrofitClient
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
@@ -28,7 +30,19 @@ object RepositoryProvider {
                 ).build()
     }
 
-    val productRepository: ProductRepository = DefaultProductRepository()
+    val authDataSource: AuthDataSource by lazy {
+        DefaultAuthDataSource(appContext)
+    }
+
+    private val retrofitClient: RetrofitClient by lazy {
+        RetrofitClient(authDataSource = authDataSource)
+    }
+
+    val productRepository: ProductRepository by lazy {
+        DefaultProductRepository(
+            remoteDataSource = ProductRemoteDataSource(retrofitClient.retrofit),
+        )
+    }
 
     val recentProductRepository: RecentProductRepository by lazy {
         DefaultRecentProductRepository(
@@ -37,13 +51,9 @@ object RepositoryProvider {
         )
     }
 
-    val authDataSource: AuthDataSource by lazy {
-        DefaultAuthDataSource(appContext)
-    }
-
     val cartRepository: CartRepository by lazy {
         DefaultCartRepository(
-            remoteDataSource = CartRemoteDataSource(authDataSource = authDataSource),
+            remoteDataSource = CartRemoteDataSource(retrofitClient.retrofit),
         )
     }
 }
