@@ -23,8 +23,8 @@ class RecentlyViewedProductDaoTest {
         runBlocking {
             // given
             createDb()
-            val entity1 = RecentlyViewedProductEntity(id = "1", timeStamp = 1L)
-            val entity2 = RecentlyViewedProductEntity(id = "2", timeStamp = 2L)
+            val entity1 = RecentlyViewedProductEntity(id = 1L, timeStamp = 1L)
+            val entity2 = RecentlyViewedProductEntity(id = 2L, timeStamp = 2L)
 
             // when
             dao.insert(entity1)
@@ -33,8 +33,8 @@ class RecentlyViewedProductDaoTest {
             // then
             val history = dao.getAll().first()
             assertEquals(2, history?.size)
-            assertEquals("2", history?.get(0)?.id)
-            assertEquals("1", history?.get(1)?.id)
+            assertEquals(2L, history?.get(0)?.id)
+            assertEquals(1L, history?.get(1)?.id)
             closeDb()
         }
 
@@ -46,7 +46,7 @@ class RecentlyViewedProductDaoTest {
             for (i in 0..15) {
                 dao.enqueueAndLimit10(
                     RecentlyViewedProductEntity(
-                        id = "$i",
+                        id = i.toLong(),
                         timeStamp = i.toLong(),
                     ),
                 )
