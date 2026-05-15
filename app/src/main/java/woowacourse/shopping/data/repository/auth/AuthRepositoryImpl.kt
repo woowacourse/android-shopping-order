@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.repository.auth
 
-import woowacourse.shopping.data.source.auth.AuthDataSource
+import woowacourse.shopping.data.datasource.auth.AuthDataSource
 
 class AuthRepositoryImpl(
     val dataSource: AuthDataSource,

@@ -12,7 +12,7 @@ import woowacourse.shopping.data.network.cart.dto.CartItemDto
 import woowacourse.shopping.data.network.cart.dto.CartItemInsertDto
 import woowacourse.shopping.data.network.cart.dto.Quantity
 
-interface RetrofitCartService {
+interface CartService {
     @GET("/cart-items")
     fun requestCartItems(
         @Query("page")

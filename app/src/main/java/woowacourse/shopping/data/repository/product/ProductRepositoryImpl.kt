@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.repository.product
 
-import woowacourse.shopping.data.source.product.ProductDataSource
+import woowacourse.shopping.data.datasource.product.ProductDataSource
 import woowacourse.shopping.domain.Product
 
 class ProductRepositoryImpl(
@@ -11,7 +11,7 @@ class ProductRepositoryImpl(
         pageSize: Int,
         sort: List<String>,
         category: String?,
-    ): List<Product> = dataSource.loadProducts(startIndex, pageSize, sort, category)
+    ): List<Product> = dataSource.findAllProduct(startIndex, pageSize, sort, category)
 
-    override suspend fun getProduct(id: String): Product = dataSource.getProduct(id)
+    override suspend fun getProduct(id: String): Product = dataSource.findById(id)
 }

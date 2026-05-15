@@ -1,19 +1,20 @@
-package woowacourse.shopping.data.network.product
+package woowacourse.shopping.data.datasource.product
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import woowacourse.shopping.data.network.product.ProductService
 import woowacourse.shopping.domain.Product
 
-class ProductRetrofitDaoImpl(
-    val retrofitProductService: RetrofitProductService,
-) : ProductDao {
+class ProductRemoteDataSource(
+    val productService: ProductService,
+) : ProductDataSource {
     override suspend fun findAllProduct(
         startIndex: Int,
         pageSize: Int,
         sort: List<String>,
         category: String?,
     ): List<Product> = withContext(Dispatchers.IO) {
-        val response = retrofitProductService
+        val response = productService
             .requestProducts(page = startIndex, size = pageSize, category = category)
             .execute()
 
@@ -24,7 +25,7 @@ class ProductRetrofitDaoImpl(
     }
 
     override suspend fun findById(id: String): Product = withContext(Dispatchers.IO) {
-        val response = retrofitProductService
+        val response = productService
             .getProductDetail(id = id)
             .execute()
 

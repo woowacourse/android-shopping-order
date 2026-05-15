@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.source.auth
+package woowacourse.shopping.data.datasource.auth
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-class AuthDataSourceImpl(
+class AuthRemoteDataSource(
     private val dataStore: DataStore<Preferences>,
 ) : AuthDataSource {
     override suspend fun load(): String {

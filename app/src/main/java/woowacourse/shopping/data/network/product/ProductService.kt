@@ -11,7 +11,7 @@ import retrofit2.http.Query
 import woowacourse.shopping.data.network.cart.dto.ProductDto
 import woowacourse.shopping.data.network.product.dto.ProductResponse
 
-interface RetrofitProductService {
+interface ProductService {
     @GET("/products")
     fun requestProducts(
         @Header("accept")

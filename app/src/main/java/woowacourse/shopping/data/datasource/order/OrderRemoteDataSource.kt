@@ -1,10 +1,10 @@
-package woowacourse.shopping.data.source.order
+package woowacourse.shopping.data.datasource.order
 
 import woowacourse.shopping.data.network.order.OrderService
 
-class OrderDaoImpl(
+class OrderRemoteDataSource(
     private val orderService: OrderService,
-) : OrderDao {
+) : OrderDataSource {
     override suspend fun orders(cartItemIds: List<String>) {
         orderService.orders(
             cartItemIds = cartItemIds,

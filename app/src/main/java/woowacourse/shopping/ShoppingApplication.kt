@@ -15,12 +15,14 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import woowacourse.shopping.data.datasource.auth.AuthRemoteDataSource
+import woowacourse.shopping.data.datasource.cart.CartRemoteDataSource
+import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
+import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
 import woowacourse.shopping.data.local.RecentProductDatabase
-import woowacourse.shopping.data.network.cart.CartRetrofitDaoImpl
-import woowacourse.shopping.data.network.cart.RetrofitCartService
+import woowacourse.shopping.data.network.cart.CartService
 import woowacourse.shopping.data.network.order.OrderService
-import woowacourse.shopping.data.network.product.ProductRetrofitDaoImpl
-import woowacourse.shopping.data.network.product.RetrofitProductService
+import woowacourse.shopping.data.network.product.ProductService
 import woowacourse.shopping.data.network.startMockWebServer
 import woowacourse.shopping.data.repository.auth.AuthRepository
 import woowacourse.shopping.data.repository.auth.AuthRepositoryImpl
@@ -32,9 +34,6 @@ import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
-import woowacourse.shopping.data.source.auth.AuthDataSourceImpl
-import woowacourse.shopping.data.source.order.OrderDaoImpl
-import woowacourse.shopping.data.source.product.ProductDataSourceImpl
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -62,7 +61,7 @@ class ShoppingApplication : Application() {
 
     private fun initDependencies() {
         val auth: AuthRepository = AuthRepositoryImpl(
-            dataSource = AuthDataSourceImpl(
+            dataSource = AuthRemoteDataSource(
                 dataStore = applicationContext.dataStore,
             ),
         )
@@ -94,7 +93,7 @@ class ShoppingApplication : Application() {
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .client(client)
             .build()
-            .create(RetrofitProductService::class.java)
+            .create(ProductService::class.java)
 
         val recentProductDatabase = Room.databaseBuilder(
             applicationContext,
@@ -103,23 +102,23 @@ class ShoppingApplication : Application() {
         ).build()
 
         val product: ProductRepository = ProductRepositoryImpl(
-            dataSource = ProductDataSourceImpl(
-                productDao = ProductRetrofitDaoImpl(
-                    retrofitProductService = retrofitService,
+            dataSource = ProductRemoteDataSource(
+                productDataSource = ProductRemoteDataSource(
+                    productService = retrofitService,
                 ),
             ),
         )
 
-        val retrofitCartService = Retrofit.Builder()
+        val cartService = Retrofit.Builder()
             .baseUrl("http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/")
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .client(client)
             .build()
-            .create(RetrofitCartService::class.java)
+            .create(CartService::class.java)
 
         val cart: CartRepository = CartRepositoryImpl(
-            cartServerDao = CartRetrofitDaoImpl(
-                retrofitCartService = retrofitCartService,
+            cartDataSource = CartRemoteDataSource(
+                cartService = cartService,
             ),
             productRepository = product,
         )
@@ -134,7 +133,7 @@ class ShoppingApplication : Application() {
             .create(OrderService::class.java)
 
         val order: OrderRepository = OrderRepositoryImpl(
-            orderDao = OrderDaoImpl(
+            orderDataSource = OrderRemoteDataSource(
                 orderService = orderService,
             ),
         )

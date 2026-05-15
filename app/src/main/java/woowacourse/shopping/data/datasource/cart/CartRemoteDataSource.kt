@@ -1,20 +1,21 @@
-package woowacourse.shopping.data.network.cart
+package woowacourse.shopping.data.datasource.cart
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import woowacourse.shopping.data.network.cart.CartService
 import woowacourse.shopping.data.network.cart.dto.CartItemInsertDto
 import woowacourse.shopping.data.network.cart.dto.Quantity
 import woowacourse.shopping.domain.CartContent
 
-class CartRetrofitDaoImpl(
-    val retrofitCartService: RetrofitCartService,
-) : CartServerDao {
+class CartRemoteDataSource(
+    val cartService: CartService,
+) : CartDataSource {
     override suspend fun pagination(
         startIndex: Int,
         pageSize: Int,
         sort: List<String>,
     ): List<CartContent> = withContext(Dispatchers.IO) {
-        val response = retrofitCartService
+        val response = cartService
             .requestCartItems(page = startIndex, size = pageSize)
             .execute()
 
@@ -26,7 +27,7 @@ class CartRetrofitDaoImpl(
     }
 
     override suspend fun getTotalQuantity(): Int? = withContext(Dispatchers.IO) {
-        val response = retrofitCartService
+        val response = cartService
             .getCartItemTotalCount()
             .execute()
 
@@ -38,7 +39,7 @@ class CartRetrofitDaoImpl(
     }
 
     override suspend fun insert(item: CartContent) = withContext(Dispatchers.IO) {
-        val response = retrofitCartService
+        val response = cartService
             .insertCartItem(
                 cartItemInsertDto = CartItemInsertDto(
                     productId = item.product.id.toLong(),
@@ -51,7 +52,7 @@ class CartRetrofitDaoImpl(
     }
 
     override suspend fun update(item: CartContent) = withContext(Dispatchers.IO) {
-        val response = retrofitCartService
+        val response = cartService
             .updateCartItemQuantity(
                 id = item.id,
                 quantity = Quantity(item.quantity),
@@ -62,7 +63,7 @@ class CartRetrofitDaoImpl(
     }
 
     override suspend fun deleteById(id: String) = withContext(Dispatchers.IO) {
-        val response = retrofitCartService
+        val response = cartService
             .deleteCartItem(id = id)
             .execute()
 
