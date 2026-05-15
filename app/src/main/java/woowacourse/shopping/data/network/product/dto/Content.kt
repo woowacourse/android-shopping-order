@@ -24,6 +24,7 @@ data class Content(
             price = Money(this.price),
             imageUrl = this.imageUrl,
             id = this.id.toString(),
+            category = this.category,
         )
     }
 }
