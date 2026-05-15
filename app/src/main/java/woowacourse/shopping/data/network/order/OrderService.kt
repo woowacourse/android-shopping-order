@@ -1,17 +1,13 @@
 package woowacourse.shopping.data.network.order
 
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
-import woowacourse.shopping.data.network.product.dto.ProductResponse
+import retrofit2.http.POST
 
 interface OrderService {
-    @GET("/orders")
-    fun orders(
-        @Header("accept")
-        accept: String = "*/*",
+    @POST("/orders")
+    suspend fun orders(
         @Body
         cartItemIds: List<String>,
-    ): Call<ProductResponse>
+    ): Response<Unit>
 }

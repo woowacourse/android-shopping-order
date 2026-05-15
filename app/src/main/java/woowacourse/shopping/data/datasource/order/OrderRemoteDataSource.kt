@@ -6,8 +6,8 @@ class OrderRemoteDataSource(
     private val orderService: OrderService,
 ) : OrderDataSource {
     override suspend fun orders(cartItemIds: List<String>) {
-        orderService.orders(
-            cartItemIds = cartItemIds,
-        )
+        val response = orderService.orders(cartItemIds = cartItemIds)
+
+        check(response.isSuccessful) { "order 요청 실패: ${response.code()}" }
     }
 }
