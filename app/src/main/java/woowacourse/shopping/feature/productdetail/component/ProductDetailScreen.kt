@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.productdetail
+package woowacourse.shopping.feature.productdetail.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,10 +35,10 @@ import woowacourse.shopping.R
 import woowacourse.shopping.feature.common.ProductQuantitySelector
 import woowacourse.shopping.feature.common.state.ProductUiModel
 import woowacourse.shopping.feature.format.DecimalPriceFormatter
-import woowacourse.shopping.feature.productdetail.viewmodel.ProductDetailLoadingState
-import woowacourse.shopping.feature.productdetail.viewmodel.ProductDetailViewModel
-import woowacourse.shopping.feature.productlist.LoadingIndicator
-import woowacourse.shopping.feature.productlist.PreviewableAsyncImage
+import woowacourse.shopping.feature.productdetail.ProductDetailLoadingState
+import woowacourse.shopping.feature.productdetail.ProductDetailViewModel
+import woowacourse.shopping.feature.productlist.component.LoadingIndicator
+import woowacourse.shopping.feature.productlist.component.PreviewableAsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,7 +48,7 @@ fun ProductDetailScreen(
     onClickRecentButton: (String) -> Unit,
     modifier: Modifier = Modifier,
     recentProductId: String? = null,
-    viewModel: ProductDetailViewModel = viewModel(factory = ProductDetailViewModel.Factory),
+    viewModel: ProductDetailViewModel = viewModel(factory = ProductDetailViewModel.Companion.Factory),
 ) {
     LaunchedEffect(Unit) {
         viewModel.initialLoading(

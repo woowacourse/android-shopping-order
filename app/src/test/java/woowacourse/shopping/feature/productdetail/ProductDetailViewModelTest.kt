@@ -7,8 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.feature.MainDispatcherExtension
 import woowacourse.shopping.feature.fake.FakeCartRepository
 import woowacourse.shopping.feature.fake.FakeProductRepository
-import woowacourse.shopping.feature.productdetail.viewmodel.ProductDetailLoadingState
-import woowacourse.shopping.feature.productdetail.viewmodel.ProductDetailViewModel
 import woowacourse.shopping.fixture.TestProductFixture
 
 @ExtendWith(MainDispatcherExtension::class)

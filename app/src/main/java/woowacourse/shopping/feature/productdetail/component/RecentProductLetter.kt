@@ -1,6 +1,5 @@
-package woowacourse.shopping.feature.productdetail
+package woowacourse.shopping.feature.productdetail.component
 
-import android.R.attr.name
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.R
 import woowacourse.shopping.feature.common.state.ProductUiModel
-import woowacourse.shopping.feature.productdetail.viewmodel.ProductDetailLoadingState
+import woowacourse.shopping.feature.productdetail.ProductDetailLoadingState
 
 @Composable
 fun RecentProductLetter(

@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.productlist.ui.theme
+package woowacourse.shopping.theme
 
 import androidx.compose.ui.graphics.Color
 

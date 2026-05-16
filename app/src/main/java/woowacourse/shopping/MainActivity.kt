@@ -7,8 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import woowacourse.shopping.feature.cart.CartActivity
 import woowacourse.shopping.feature.productdetail.ProductDetailActivity
-import woowacourse.shopping.feature.productlist.ProductListScreen
-import woowacourse.shopping.feature.productlist.ui.theme.AndroidshoppingTheme
+import woowacourse.shopping.feature.productlist.component.ProductListScreen
+import woowacourse.shopping.theme.AndroidshoppingTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

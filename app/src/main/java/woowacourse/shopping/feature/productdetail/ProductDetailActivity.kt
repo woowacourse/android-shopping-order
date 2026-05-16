@@ -7,7 +7,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import kotlin.jvm.java
-import woowacourse.shopping.feature.productlist.ui.theme.AndroidshoppingTheme
+import woowacourse.shopping.feature.productdetail.component.ProductDetailErrorScreen
+import woowacourse.shopping.feature.productdetail.component.ProductDetailScreen
+import woowacourse.shopping.theme.AndroidshoppingTheme
 
 class ProductDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

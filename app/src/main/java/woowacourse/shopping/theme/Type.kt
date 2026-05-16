@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.productlist.ui.theme
+package woowacourse.shopping.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

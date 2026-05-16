@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.productlist
+package woowacourse.shopping.feature.productlist.component
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -24,8 +24,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import woowacourse.shopping.feature.productlist.viewmodel.ProductListEvent
-import woowacourse.shopping.feature.productlist.viewmodel.ProductListViewModel
+import woowacourse.shopping.feature.productlist.ProductListEvent
+import woowacourse.shopping.feature.productlist.ProductListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
