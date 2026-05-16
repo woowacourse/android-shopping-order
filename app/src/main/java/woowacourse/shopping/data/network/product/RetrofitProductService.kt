@@ -8,7 +8,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.data.network.cart.dto.ProductDto
+import woowacourse.shopping.data.network.product.dto.ProductDto
 import woowacourse.shopping.data.network.product.dto.ProductResponse
 
 interface RetrofitProductService {

@@ -61,3 +61,4 @@
 
 - [x] Retrofit이 지원하는 suspend로 변경함
 - [x] 도메인과 DTO의 contextId, productId를 String에서 Long타입으로 변경함
+- [x] ProductDto의 임포트를 변경함
