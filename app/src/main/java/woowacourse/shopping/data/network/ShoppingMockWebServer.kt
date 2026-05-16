@@ -76,7 +76,7 @@ private fun fetchProducts(
     pageSize: Int,
 ): List<Product> {
     val size = MockData.MOCK_PRODUCTS.size
-    if (startIndex !in 0..size || pageSize <= 0) return emptyList()
+    if (startIndex !in 0 until size || pageSize <= 0) return emptyList()
 
     val toOffset = minOf(startIndex + pageSize, size)
     return MockData.MOCK_PRODUCTS.subList(startIndex, toOffset)
