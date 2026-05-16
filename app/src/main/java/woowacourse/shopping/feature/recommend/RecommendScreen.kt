@@ -34,7 +34,7 @@ fun RecommendScreen(
         factory = RecommendViewModel.Factory,
     ),
     onCloseClick: () -> Unit,
-    contentIds: List<String>,
+    contentIds: List<Long>,
     modifier: Modifier = Modifier,
 ) {
     LaunchedEffect(Unit) {

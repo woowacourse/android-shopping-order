@@ -10,5 +10,5 @@ interface ProductRepository {
         category: String?,
     ): List<Product>
 
-    suspend fun getProduct(id: String): Product
+    suspend fun getProduct(id: Long): Product
 }

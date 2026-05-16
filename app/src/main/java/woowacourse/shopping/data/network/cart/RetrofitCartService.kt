@@ -30,13 +30,13 @@ interface RetrofitCartService {
     @DELETE("/cart-items/{id}")
     suspend fun deleteCartItem(
         @Path("id")
-        id: String,
+        id: Long,
     ): Response<Unit>
 
     @PATCH("/cart-items/{id}")
     suspend fun updateCartItemQuantity(
         @Path("id")
-        id: String,
+        id: Long,
         @Body
         quantity: Quantity,
     ): Response<Unit>

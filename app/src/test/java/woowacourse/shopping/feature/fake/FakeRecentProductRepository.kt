@@ -3,15 +3,15 @@ package woowacourse.shopping.feature.fake
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
 
 class FakeRecentProductRepository(
-    initial: List<String> = emptyList(),
+    initial: List<Long> = emptyList(),
 ) : RecentProductRepository {
 
-    private val recents: ArrayDeque<String> = ArrayDeque(initial)
-    val insertedIds: MutableList<String> = mutableListOf()
+    private val recents: ArrayDeque<Long> = ArrayDeque(initial)
+    val insertedIds: MutableList<Long> = mutableListOf()
 
-    override suspend fun loadProducts(): List<String> = recents.toList()
+    override suspend fun loadProducts(): List<Long> = recents.toList()
 
-    override suspend fun insert(id: String) {
+    override suspend fun insert(id: Long) {
         insertedIds.add(id)
         recents.remove(id)
         recents.addFirst(id)

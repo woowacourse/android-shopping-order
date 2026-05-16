@@ -30,8 +30,8 @@ fun ProductList(
     products: List<ProductUiModel>,
     onProductClick: (ProductUiModel) -> Unit,
     onLoading: () -> Unit,
-    onIncrease: (String) -> Unit,
-    onDecrease: (String) -> Unit,
+    onIncrease: (Long) -> Unit,
+    onDecrease: (Long) -> Unit,
     modifier: Modifier = Modifier,
     isEnd: Boolean,
 ) {

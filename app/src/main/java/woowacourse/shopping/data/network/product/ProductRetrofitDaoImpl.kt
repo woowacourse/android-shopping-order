@@ -20,7 +20,7 @@ class ProductRetrofitDaoImpl(
         return body.content.map { it.toDomain() }
     }
 
-    override suspend fun findById(id: String): Product {
+    override suspend fun findById(id: Long): Product {
         val response = retrofitProductService
             .getProductDetail(id = id)
 

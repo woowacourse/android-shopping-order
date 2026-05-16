@@ -19,12 +19,12 @@ interface CartRepository {
         quantity: Int = 1,
     )
 
-    suspend fun decrease(productId: String)
+    suspend fun decrease(productId: Long)
 
-    suspend fun remove(productId: String)
+    suspend fun remove(productId: Long)
 
     suspend fun setProductQuantity(
-        productId: String,
+        productId: Long,
         quantity: Int,
     )
 }

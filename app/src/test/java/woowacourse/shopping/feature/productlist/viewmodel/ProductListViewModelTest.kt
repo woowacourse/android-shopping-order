@@ -18,7 +18,7 @@ import woowacourse.shopping.feature.fake.FakeRecentProductRepository
 class ProductListViewModelTest {
 
     private val sampleProducts: List<Product> = (1..5).map {
-        Product(id = it.toString(), name = "상품$it", price = Money(it * 1_000), imageUrl = "")
+        Product(id = it.toLong(), name = "상품$it", price = Money(it * 1_000), imageUrl = "")
     }
 
     @Test
@@ -35,14 +35,14 @@ class ProductListViewModelTest {
     @Test
     fun `최근 본 상품이 state recentProducts 에 노출된다`() = runTest {
         val viewModel = newViewModel(
-            recentProductRepository = FakeRecentProductRepository(listOf("3", "1")),
+            recentProductRepository = FakeRecentProductRepository(listOf(3, 1)),
         )
 
         viewModel.initialLoading()
 
         val state = viewModel.uiState.value
-        assertEquals(listOf("3", "1"), state.recentProducts.map { it.id })
-        assertEquals("3", state.mostRecentProductId)
+        assertEquals(listOf(3L, 1L), state.recentProducts.map { it.id })
+        assertEquals(3L, state.mostRecentProductId)
     }
 
     @Test
@@ -50,9 +50,9 @@ class ProductListViewModelTest {
         val viewModel = newViewModel()
         viewModel.initialLoading()
 
-        viewModel.increase("2")
+        viewModel.increase(2)
 
-        val target = viewModel.uiState.value.productUiModels.first { it.id == "2" }
+        val target = viewModel.uiState.value.productUiModels.first { it.id == 2.toLong() }
         assertEquals(1, target.quantity)
         assertEquals(1, viewModel.uiState.value.cartTotalQuantity)
     }
@@ -62,10 +62,10 @@ class ProductListViewModelTest {
         val viewModel = newViewModel()
         viewModel.initialLoading()
 
-        viewModel.increase("1")
-        viewModel.increase("1")
+        viewModel.increase(1)
+        viewModel.increase(1)
 
-        val target = viewModel.uiState.value.productUiModels.first { it.id == "1" }
+        val target = viewModel.uiState.value.productUiModels.first { it.id == 1.toLong() }
         assertEquals(2, target.quantity)
     }
 
@@ -76,9 +76,9 @@ class ProductListViewModelTest {
         )
         viewModel.initialLoading()
 
-        viewModel.decrease("1")
+        viewModel.decrease(1)
 
-        val target = viewModel.uiState.value.productUiModels.first { it.id == "1" }
+        val target = viewModel.uiState.value.productUiModels.first { it.id == 1.toLong() }
         assertEquals(0, target.quantity)
         assertEquals(0, viewModel.uiState.value.cartTotalQuantity)
     }
@@ -90,9 +90,9 @@ class ProductListViewModelTest {
         )
         viewModel.initialLoading()
 
-        viewModel.decrease("1")
+        viewModel.decrease(1)
 
-        val target = viewModel.uiState.value.productUiModels.first { it.id == "1" }
+        val target = viewModel.uiState.value.productUiModels.first { it.id == 1.toLong() }
         assertEquals(2, target.quantity)
     }
 
@@ -105,7 +105,7 @@ class ProductListViewModelTest {
         cartRepository.increase(sampleProducts[2])
         viewModel.cartRefresh()
 
-        val target = viewModel.uiState.value.productUiModels.first { it.id == "3" }
+        val target = viewModel.uiState.value.productUiModels.first { it.id == 3.toLong() }
         assertEquals(1, target.quantity)
     }
 
@@ -115,9 +115,9 @@ class ProductListViewModelTest {
         val viewModel = newViewModel(recentProductRepository = recentRepository)
         viewModel.initialLoading()
 
-        viewModel.insertRecentProduct("2")
+        viewModel.insertRecentProduct(2L)
 
-        assertEquals(listOf("2"), recentRepository.insertedIds)
+        assertEquals(listOf(2L), recentRepository.insertedIds)
     }
 
     private fun newViewModel(

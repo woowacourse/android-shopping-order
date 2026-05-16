@@ -39,7 +39,7 @@ class Cart(
         )
     }
 
-    fun quantityOf(productId: String): Int {
+    fun quantityOf(productId: Long): Int {
         val cartItem = cartContents.firstOrNull { cartContent ->
             cartContent.hasProductId(productId)
         }

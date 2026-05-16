@@ -28,7 +28,7 @@ class FakeCartRepository(
         }
     }
 
-    override suspend fun decrease(productId: String) {
+    override suspend fun decrease(productId: Long) {
         val index = indexOf(productId)
         if (index == -1) return
         val existing = contents[index]
@@ -49,13 +49,13 @@ class FakeCartRepository(
         return contents.subList(startIndex, end).toList()
     }
 
-    override suspend fun remove(productId: String) {
+    override suspend fun remove(productId: Long) {
         val index = indexOf(productId)
         if (index != -1) contents.removeAt(index)
     }
 
     override suspend fun setProductQuantity(
-        productId: String,
+        productId: Long,
         quantity: Int,
     ) {
         if (quantity < 1) return
@@ -65,5 +65,5 @@ class FakeCartRepository(
         contents[index] = CartContent(existing.product, quantity)
     }
 
-    private fun indexOf(productId: String): Int = contents.indexOfFirst { it.hasProductId(productId) }
+    private fun indexOf(productId: Long): Int = contents.indexOfFirst { it.hasProductId(productId) }
 }

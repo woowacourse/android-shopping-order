@@ -15,5 +15,5 @@ interface CartServerDao {
 
     suspend fun update(item: CartContent)
 
-    suspend fun deleteById(id: String)
+    suspend fun deleteById(id: Long)
 }

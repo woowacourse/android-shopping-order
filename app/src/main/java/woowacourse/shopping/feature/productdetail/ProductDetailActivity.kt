@@ -14,8 +14,8 @@ class ProductDetailActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val id = intent.getStringExtra(PRODUCT_ID)
-        val recentProductId = intent.getStringExtra(RECENT_PRODUCT_ID)
+        val id = intent.getLongExtra(PRODUCT_ID, 0)
+        val recentProductId = intent.getLongExtra(RECENT_PRODUCT_ID, 0)
 
         setContent {
             AndroidshoppingTheme {
@@ -43,8 +43,8 @@ class ProductDetailActivity : ComponentActivity() {
 
         fun newIntent(
             context: Context,
-            id: String,
-            recentProductId: String? = null,
+            id: Long,
+            recentProductId: Long? = null,
         ): Intent = Intent(context, ProductDetailActivity::class.java)
             .putExtra(PRODUCT_ID, id)
             .putExtra(RECENT_PRODUCT_ID, recentProductId)

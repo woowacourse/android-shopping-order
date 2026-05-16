@@ -35,7 +35,7 @@ class CartRepositoryImpl(
         }
     }
 
-    override suspend fun decrease(productId: String) {
+    override suspend fun decrease(productId: Long) {
         val existing = loadAll().firstOrNull { it.hasProductId(productId) }
             ?: return
         if (existing.quantity <= 1) {
@@ -47,14 +47,14 @@ class CartRepositoryImpl(
         }
     }
 
-    override suspend fun remove(productId: String) {
+    override suspend fun remove(productId: Long) {
         val existing = loadAll().firstOrNull { it.hasProductId(productId) }
             ?: return
         cartServerDao.deleteById(existing.id)
     }
 
     override suspend fun setProductQuantity(
-        productId: String,
+        productId: Long,
         quantity: Int,
     ) {
         if (quantity < 1) return

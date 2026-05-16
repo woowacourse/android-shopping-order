@@ -17,7 +17,7 @@ import woowacourse.shopping.feature.fake.FakeCartRepository
 class CartViewModelTest {
 
     private val sampleProducts: List<Product> = (1..3).map {
-        Product(id = it.toString(), name = "상품$it", price = Money(it * 1_000), imageUrl = "")
+        Product(id = it.toLong(), name = "상품$it", price = Money(it * 1_000), imageUrl = "")
     }
 
     @Test
@@ -32,41 +32,40 @@ class CartViewModelTest {
         viewModel.initialLoading()
 
         val items = viewModel.uiState.value.paginatedCartContents
-        assertEquals(listOf("1", "2"), items.map { it.id })
-        assertEquals(listOf(1, 2), items.map { it.quantity })
+        assertEquals(listOf(1, 2), items.map { it.productUiModel.quantity })
     }
 
     @Test
     fun `이미 존재하는 상품을 증가시키면 수량이 누적된다`() = runTest {
-        val viewModel = newViewModel(initial = listOf(CartContent(sampleProducts[0], 1)))
+        val viewModel = newViewModel(initial = listOf(CartContent(sampleProducts[0], 1, 24L)))
         viewModel.initialLoading()
 
-        viewModel.increase("1")
+        viewModel.increase(24L)
 
-        val target = viewModel.uiState.value.paginatedCartContents.first { it.id == "1" }
-        assertEquals(2, target.quantity)
+        val target = viewModel.uiState.value.paginatedCartContents.first { it.productUiModel.id == 1L }
+        assertEquals(2, target.productUiModel.quantity)
     }
 
     @Test
     fun `보유 수량과 같은 수량을 감소시키면 해당 상품이 제거된다`() = runTest {
-        val viewModel = newViewModel(initial = listOf(CartContent(sampleProducts[0], 1)))
+        val viewModel = newViewModel(initial = listOf(CartContent(sampleProducts[0], 1, 22L)))
         viewModel.initialLoading()
 
-        viewModel.decrease("1")
+        viewModel.decrease(22L)
 
         val items = viewModel.uiState.value.paginatedCartContents
-        assertTrue(items.none { it.id == "1" })
+        assertTrue(items.none { it.contentId == 22L })
     }
 
     @Test
     fun `보유 수량보다 적게 감소시키면 수량이 줄어든다`() = runTest {
-        val viewModel = newViewModel(initial = listOf(CartContent(sampleProducts[0], 3)))
+        val viewModel = newViewModel(initial = listOf(CartContent(sampleProducts[0], 3, 14L)))
         viewModel.initialLoading()
 
-        viewModel.decrease("1")
+        viewModel.decrease(14L)
 
-        val target = viewModel.uiState.value.paginatedCartContents.first { it.id == "1" }
-        assertEquals(2, target.quantity)
+        val target = viewModel.uiState.value.paginatedCartContents.first { it.productUiModel.id == 1L }
+        assertEquals(2, target.productUiModel.quantity)
     }
 
     @Test
@@ -74,7 +73,7 @@ class CartViewModelTest {
         val viewModel = newViewModel(initial = listOf(CartContent(sampleProducts[0], 1)))
         viewModel.initialLoading()
 
-        viewModel.deleteCartItem("1")
+        viewModel.deleteCartItem(1)
 
         assertTrue(viewModel.uiState.value.paginatedCartContents.isEmpty())
         assertTrue(viewModel.isEndPage())
@@ -90,7 +89,7 @@ class CartViewModelTest {
         viewModel.initialLoading()
 
         val items = viewModel.uiState.value.paginatedCartContents
-        assertEquals(setOf("1", "2"), items.map { it.id }.toSet())
+        assertEquals(setOf(1L, 2L), items.map { it.productUiModel.id }.toSet())
     }
 
     private fun newViewModel(initial: List<CartContent>): CartViewModel = CartViewModel(

@@ -5,5 +5,5 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class CartContentId(
-    val id: String,
+    val id: Long,
 ) : Parcelable

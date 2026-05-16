@@ -20,7 +20,7 @@ class ProductDataSourceImpl(
         )
     }
 
-    override suspend fun getProduct(id: String): Product {
+    override suspend fun getProduct(id: Long): Product {
         return productDao.findById(id = id)
     }
 }

@@ -32,7 +32,7 @@ sealed interface ProductListEvent {
 data class ProductListUiState(
     val productUiModels: List<ProductUiModel> = emptyList(),
     val recentProducts: List<ProductUiModel> = emptyList(),
-    val mostRecentProductId: String? = null,
+    val mostRecentProductId: Long? = null,
     val isLoading: Boolean = true,
     val isEnd: Boolean = false,
     val cartTotalQuantity: Int = 0,
@@ -68,7 +68,7 @@ class ProductListViewModel(
         }
     }
 
-    fun increase(productId: String) = guardFatal {
+    fun increase(productId: Long) = guardFatal {
         val product = products.firstOrNull { it.id == productId }
             ?: throw ProductNotFoundException(productId)
 
@@ -80,7 +80,7 @@ class ProductListViewModel(
         }
     }
 
-    fun decrease(productId: String) = guardFatal {
+    fun decrease(productId: Long) = guardFatal {
         products.firstOrNull { it.id == productId }
             ?: throw ProductNotFoundException(productId)
 
@@ -105,7 +105,7 @@ class ProductListViewModel(
         }
     }
 
-    fun insertRecentProduct(productId: String) {
+    fun insertRecentProduct(productId: Long) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             recentProductRepository.insert(productId)

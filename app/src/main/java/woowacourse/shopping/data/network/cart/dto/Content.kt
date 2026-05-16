@@ -9,7 +9,7 @@ import woowacourse.shopping.domain.Product
 @Serializable
 data class Content(
     @SerialName("id")
-    val id: Int,
+    val id: Long,
     @SerialName("product")
     val product: ProductDto,
     @SerialName("quantity")
@@ -21,10 +21,10 @@ data class Content(
                 name = product.name,
                 price = Money(product.price),
                 imageUrl = product.imageUrl,
-                id = product.id.toString(),
+                id = product.id,
             ),
             quantity = this.quantity,
-            id = this.id.toString(),
+            id = this.id,
         )
     }
 }

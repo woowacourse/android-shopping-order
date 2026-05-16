@@ -92,12 +92,12 @@ fun CartScreen(
 fun CartScreenContent(
     uiState: CartUiState,
     onToRecommendIntent: () -> Unit,
-    onChecked: (String) -> Unit,
+    onChecked: (Long) -> Unit,
     onTotalCheck: () -> Unit,
     onCloseClick: () -> Unit,
-    onDelete: (String) -> Unit,
-    onIncrease: (String) -> Unit,
-    onDecrease: (String) -> Unit,
+    onDelete: (Long) -> Unit,
+    onIncrease: (Long) -> Unit,
+    onDecrease: (Long) -> Unit,
     onPrev: () -> Unit,
     onNext: () -> Unit,
     canPrev: Boolean,
@@ -206,7 +206,7 @@ private fun CartScreenContentPreview() {
             isLoading = false,
             paginatedCartContents = MockData.MOCK_PRODUCTS.take(2).map {
                 CartItemUiModel(
-                    contentId = "1",
+                    contentId = 1,
                     ProductUiModel(
                         name = it.name,
                         price = it.priceAmount(),

@@ -17,36 +17,36 @@ import woowacourse.shopping.feature.fake.FakeProductRepository
 class ProductDetailViewModelTest {
 
     private val sampleProducts: List<Product> = (1..3).map {
-        Product(id = it.toString(), name = "상품$it", price = Money(it * 1_000), imageUrl = "")
+        Product(id = it.toLong(), name = "상품$it", price = Money(it * 1_000), imageUrl = "")
     }
 
     @Test
     fun `초기 진입 시 상품 상세를 불러와 state productState 에 Success 로 노출한다`() = runTest {
         val viewModel = newViewModel()
 
-        viewModel.initialLoading(productId = "2")
+        viewModel.initialLoading(productId = 2L)
 
         val state = viewModel.uiState.value.productState
         assertTrue(state is ProductDetailLoadingState.Success)
-        assertEquals("2", (state as ProductDetailLoadingState.Success).product.id)
+        assertEquals(2L, (state as ProductDetailLoadingState.Success).product.id)
     }
 
     @Test
     fun `recentProductId 가 현재 상품과 다르면 state recentProductState 에 노출된다`() = runTest {
         val viewModel = newViewModel()
 
-        viewModel.initialLoading(productId = "2", recentProductId = "1")
+        viewModel.initialLoading(productId = 2L, recentProductId = 1L)
 
         val recentState = viewModel.uiState.value.recentProductState
         assertTrue(recentState is ProductDetailLoadingState.Success)
-        assertEquals("1", (recentState as ProductDetailLoadingState.Success).product.id)
+        assertEquals(1L, (recentState as ProductDetailLoadingState.Success).product.id)
     }
 
     @Test
     fun `recentProductId 가 현재 상품과 같으면 recentProductState 는 노출되지 않는다`() = runTest {
         val viewModel = newViewModel()
 
-        viewModel.initialLoading(productId = "2", recentProductId = "2")
+        viewModel.initialLoading(productId = 2, recentProductId = 2)
 
         val recentState = viewModel.uiState.value.recentProductState
         assertEquals(ProductDetailLoadingState.None, recentState)
@@ -55,7 +55,7 @@ class ProductDetailViewModelTest {
     @Test
     fun `increase 이벤트의 결과가 state quantity 에 반영된다`() = runTest {
         val viewModel = newViewModel()
-        viewModel.initialLoading(productId = "1")
+        viewModel.initialLoading(productId = 1)
 
         viewModel.increase()
         viewModel.increase()
@@ -66,7 +66,7 @@ class ProductDetailViewModelTest {
     @Test
     fun `decrease 이벤트의 결과가 state quantity 에 반영된다`() = runTest {
         val viewModel = newViewModel()
-        viewModel.initialLoading(productId = "1")
+        viewModel.initialLoading(productId = 1)
 
         viewModel.decrease()
 
@@ -78,14 +78,14 @@ class ProductDetailViewModelTest {
         val cartRepository = FakeCartRepository()
         cartRepository.increase(sampleProducts[0])
         val viewModel = newViewModel(cartRepository = cartRepository)
-        viewModel.initialLoading(productId = "1")
+        viewModel.initialLoading(productId = 1)
         viewModel.increase()
         viewModel.increase()
 
         viewModel.addToCart()
 
         val cart = cartRepository.loadCart()
-        assertEquals(4, cart.quantityOf("1"))
+        assertEquals(4, cart.quantityOf(1))
     }
 
     private fun newViewModel(

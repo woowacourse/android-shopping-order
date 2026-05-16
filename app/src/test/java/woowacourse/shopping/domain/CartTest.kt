@@ -17,7 +17,7 @@ class CartTest {
     fun `quantityOf 는 존재하지 않는 상품이면 0을 반환한다`() {
         val cart = Cart(listOf(CartContent(normalProduct("임시"), 1)))
 
-        assertEquals(0, cart.quantityOf("없는상품"))
+        assertEquals(0, cart.quantityOf(123123))
     }
 
     @Test

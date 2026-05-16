@@ -11,13 +11,14 @@ class FakeProductRepository(
         startIndex: Int,
         pageSize: Int,
         sort: List<String>,
+        category: String?,
     ): List<Product> {
         if (startIndex >= products.size) return emptyList()
         val end = minOf(startIndex + pageSize, products.size)
         return products.subList(startIndex, end).toList()
     }
 
-    override suspend fun getProduct(id: String): Product {
+    override suspend fun getProduct(id: Long): Product {
         return products.firstOrNull { it.id == id }
             ?: throw NoSuchElementException("상품을 찾을 수 없습니다: $id")
     }

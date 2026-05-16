@@ -9,7 +9,7 @@ import androidx.room.Query
 interface RecentProductDao {
 
     @Query("SELECT productId FROM recent_products ORDER BY viewedAt DESC LIMIT :limit")
-    suspend fun findAll(limit: Int): List<String>
+    suspend fun findAll(limit: Int): List<Long>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: RecentProductEntity)

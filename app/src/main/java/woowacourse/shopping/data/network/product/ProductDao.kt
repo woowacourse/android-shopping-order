@@ -11,5 +11,5 @@ interface ProductDao {
         category: String?,
     ): List<Product>
 
-    suspend fun findById(id: String): Product
+    suspend fun findById(id: Long): Product
 }

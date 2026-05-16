@@ -6,7 +6,7 @@ import woowacourse.shopping.domain.Product
 
 @Serializable
 class ProductDto(
-    val id: Int,
+    val id: Long,
     val name: String,
     val price: Int,
     val imageUrl: String,
@@ -16,7 +16,7 @@ class ProductDto(
             name = this.name,
             price = Money(this.price),
             imageUrl = this.imageUrl,
-            id = this.id.toString(),
+            id = this.id,
         )
     }
 }

@@ -18,8 +18,8 @@ import woowacourse.shopping.feature.productlist.ProductItem
 fun RecommendList(
     isLoading: Boolean,
     products: List<ProductUiModel>,
-    onIncrease: (String) -> Unit,
-    onDecrease: (String) -> Unit,
+    onIncrease: (Long) -> Unit,
+    onDecrease: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyRow(

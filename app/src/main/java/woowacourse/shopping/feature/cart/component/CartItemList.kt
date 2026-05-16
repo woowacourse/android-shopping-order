@@ -17,11 +17,11 @@ import woowacourse.shopping.feature.common.state.ProductUiModel
 fun CartItemList(
     isLoading: Boolean,
     cartContents: List<CartItemUiModel>,
-    checkMap: Map<String, Boolean>,
-    onChecked: (String) -> Unit,
-    onDelete: (String) -> Unit,
-    onIncrease: (String) -> Unit,
-    onDecrease: (String) -> Unit,
+    checkMap: Map<Long, Boolean>,
+    onChecked: (Long) -> Unit,
+    onDelete: (Long) -> Unit,
+    onIncrease: (Long) -> Unit,
+    onDecrease: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -83,9 +83,9 @@ private fun CartItemListPreview() {
     CartItemList(
         cartContents = listOf(
             CartItemUiModel(
-                "",
+                0,
                 ProductUiModel(
-                    id = "1",
+                    id = 1,
                     name = "더미 상품 1",
                     price = 10000,
                     imageUrl = "",
@@ -93,9 +93,9 @@ private fun CartItemListPreview() {
                 ),
             ),
             CartItemUiModel(
-                "",
+                1,
                 ProductUiModel(
-                    id = "2",
+                    id = 2,
                     name = "더미 상품 2",
                     price = 20000,
                     imageUrl = "",

@@ -39,7 +39,6 @@ class RecommendViewModel(
     private var products: List<Product> = emptyList()
     private var serverCart: Cart = Cart(emptyList())
     private var memoryCart: Cart = Cart(emptyList())
-    private var initialTotalPrice = 0
 
     fun initialLoading() {
         viewModelScope.launch {
@@ -73,7 +72,7 @@ class RecommendViewModel(
         }
     }
 
-    fun increase(productId: String) {
+    fun increase(productId: Long) {
         val product = products.firstOrNull { it.id == productId }
             ?: throw ProductNotFoundException(productId)
 
@@ -93,7 +92,7 @@ class RecommendViewModel(
         priceAlter()
     }
 
-    fun decrease(productId: String) {
+    fun decrease(productId: Long) {
         val product = products.firstOrNull { it.id == productId }
             ?: throw ProductNotFoundException(productId)
 
@@ -133,7 +132,7 @@ class RecommendViewModel(
         )
     }
 
-    fun getTotalPrice(contentIds: List<String>): Int {
+    fun getTotalPrice(contentIds: List<Long>): Int {
 
         val checkedCartItems = serverCart.cartContents.filter { contentIds.contains(it.id) }
 
@@ -144,13 +143,13 @@ class RecommendViewModel(
         return checkPrice + memoryPrice
     }
 
-    fun getTotalCount(contentIds: List<String>): Int {
+    fun getTotalCount(contentIds: List<Long>): Int {
         val memoryTotalCount = memoryCart.cartContents.size
 
         return contentIds.size + memoryTotalCount
     }
 
-    fun order(cartContentIds: List<String>) {
+    fun order(cartContentIds: List<Long>) {
         viewModelScope.launch {
             val products = memoryCart.cartContents.map { it.product }
             memoryCart.cartContents.forEach {

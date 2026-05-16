@@ -12,6 +12,6 @@ interface OrderService {
         @Header("accept")
         accept: String = "*/*",
         @Body
-        cartItemIds: List<String>,
+        cartItemIds: List<Long>,
     ): Call<ProductResponse>
 }

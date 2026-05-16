@@ -25,7 +25,7 @@ fun startMockWebServer(): MockWebServer {
                         ?: 20
                     val products = fetchProducts(startIndex, pageSize).map {
                         ProductDto(
-                            id = it.id.toInt(),
+                            id = it.id,
                             name = it.name,
                             price = it.priceAmount(),
                             imageUrl = it.imageUrl,
@@ -38,7 +38,7 @@ fun startMockWebServer(): MockWebServer {
                 }
 
                 "/product" -> {
-                    val id = url.queryParameter("id").toString()
+                    val id = url.queryParameter("id")?.toLong()
 
                     val product = MockData.MOCK_PRODUCTS.firstOrNull {
                         it.id == id
@@ -51,7 +51,7 @@ fun startMockWebServer(): MockWebServer {
                         .setBody(
                             Json.encodeToString(
                                 ProductDto(
-                                    id = product.id.toInt(),
+                                    id = product.id,
                                     name = product.name,
                                     price = product.priceAmount(),
                                     imageUrl = product.imageUrl,

@@ -23,7 +23,7 @@ data class Content(
             name = this.name,
             price = Money(this.price),
             imageUrl = this.imageUrl,
-            id = this.id.toString(),
+            id = this.id,
         )
     }
 }

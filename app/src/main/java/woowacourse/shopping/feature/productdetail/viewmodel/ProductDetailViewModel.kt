@@ -42,8 +42,8 @@ class ProductDetailViewModel(
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
 
     fun initialLoading(
-        productId: String,
-        recentProductId: String? = null,
+        productId: Long,
+        recentProductId: Long? = null,
     ) {
         viewModelScope.launch {
             _uiState.update { it.copy(productState = ProductDetailLoadingState.Loading) }
@@ -66,7 +66,7 @@ class ProductDetailViewModel(
         }
     }
 
-    suspend fun getProduct(productId: String): ProductDetailLoadingState = runCatching { productRepository.getProduct(productId) }
+    suspend fun getProduct(productId: Long): ProductDetailLoadingState = runCatching { productRepository.getProduct(productId) }
         .fold(
             onSuccess = { ProductDetailLoadingState.Success(toProductUiModel(it)) },
             onFailure = {

@@ -43,11 +43,11 @@ import woowacourse.shopping.feature.productlist.PreviewableAsyncImage
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetailScreen(
-    id: String,
+    id: Long,
     activityFinish: () -> Unit,
-    onClickRecentButton: (String) -> Unit,
+    onClickRecentButton: (Long) -> Unit,
     modifier: Modifier = Modifier,
-    recentProductId: String? = null,
+    recentProductId: Long? = null,
     viewModel: ProductDetailViewModel = viewModel(factory = ProductDetailViewModel.Factory),
 ) {
     LaunchedEffect(Unit) {
@@ -95,7 +95,7 @@ fun ProductDetailContent(
     increase: () -> Unit,
     decrease: () -> Unit,
     onAddCartButton: () -> Unit,
-    onClickRecentButton: (String) -> Unit,
+    onClickRecentButton: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -232,7 +232,7 @@ private fun ProductScreenPreview() {
             name = "asd",
             price = 2000,
             imageUrl = "",
-            id = "1",
+            id = 1,
             quantity = 5,
         ),
         quantity = 5,

@@ -10,7 +10,7 @@ data class ProductDto(
     @SerialName("category")
     val category: String,
     @SerialName("id")
-    val id: Int,
+    val id: Long,
     @SerialName("imageUrl")
     val imageUrl: String,
     @SerialName("name")
@@ -23,7 +23,7 @@ data class ProductDto(
             name = this.name,
             price = Money(this.price),
             imageUrl = this.imageUrl,
-            id = this.id.toString(),
+            id = this.id,
             category = category,
         )
     }

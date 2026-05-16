@@ -5,7 +5,7 @@ import woowacourse.shopping.data.source.order.OrderDao
 class OrderRepositoryImpl(
     private val orderDao: OrderDao,
 ) : OrderRepository {
-    override suspend fun orders(cartItemIds: List<String>) {
+    override suspend fun orders(cartItemIds: List<Long>) {
         orderDao.orders(cartItemIds)
     }
 }

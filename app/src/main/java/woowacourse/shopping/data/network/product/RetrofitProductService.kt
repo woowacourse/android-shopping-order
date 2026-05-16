@@ -37,7 +37,7 @@ interface RetrofitProductService {
         @Header("accept")
         accept: String = "*/*",
         @Path("id")
-        id: String = "",
+        id: Long = 0,
     ): Response<ProductDto>
 
     @DELETE("/products/{id}")
@@ -45,6 +45,6 @@ interface RetrofitProductService {
         @Header("accept")
         accept: String = "*/*",
         @Path("id")
-        id: String = "",
+        id: Long = 0,
     ): Response<Unit>
 }

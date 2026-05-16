@@ -34,7 +34,7 @@ import woowacourse.shopping.feature.productdetail.viewmodel.ProductDetailLoading
 @Composable
 fun RecentProductLetter(
     loadingState: ProductDetailLoadingState,
-    onClickRecentProduct: (String) -> Unit,
+    onClickRecentProduct: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (loadingState) {
@@ -104,7 +104,7 @@ fun RecentProductLetterPreview(modifier: Modifier = Modifier) {
                 name = "asdqwe",
                 price = 1000,
                 imageUrl = "",
-                id = "",
+                id = 0,
                 quantity = 0,
             ),
         ),

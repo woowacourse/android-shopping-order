@@ -31,7 +31,7 @@ import woowacourse.shopping.feature.productlist.viewmodel.ProductListViewModel
 @Composable
 fun ProductListScreen(
     vm: ProductListViewModel = viewModel(factory = ProductListViewModel.Factory),
-    onProductClick: (String, String?) -> Unit,
+    onProductClick: (Long, Long?) -> Unit,
     onCartIconClick: () -> Unit,
     activityFinish: () -> Unit,
     modifier: Modifier = Modifier,
