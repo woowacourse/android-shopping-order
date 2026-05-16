@@ -13,31 +13,29 @@ class CartRetrofitDaoImpl(
         startIndex: Int,
         pageSize: Int,
         sort: List<String>,
-    ): List<CartContent> = withContext(Dispatchers.IO) {
+    ): List<CartContent> {
         val response = retrofitCartService
             .requestCartItems(page = startIndex, size = pageSize)
-            .execute()
 
         check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
 
         val body = response.body()
             ?: error("empty body")
-        body.content.map { it.toDomain() }
+        return body.content.map { it.toDomain() }
     }
 
-    override suspend fun getTotalQuantity(): Int? = withContext(Dispatchers.IO) {
+    override suspend fun getTotalQuantity(): Int {
         val response = retrofitCartService
             .getCartItemTotalCount()
-            .execute()
 
         check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
 
         val body = response.body()
             ?: error("empty body")
-        body.quantity
+        return body.quantity
     }
 
-    override suspend fun insert(item: CartContent) = withContext(Dispatchers.IO) {
+    override suspend fun insert(item: CartContent) {
         val response = retrofitCartService
             .insertCartItem(
                 cartItemInsertDto = CartItemInsertDto(
@@ -45,26 +43,23 @@ class CartRetrofitDaoImpl(
                     quantity = item.quantity,
                 ),
             )
-            .execute()
 
         check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
     }
 
-    override suspend fun update(item: CartContent) = withContext(Dispatchers.IO) {
+    override suspend fun update(item: CartContent) {
         val response = retrofitCartService
             .updateCartItemQuantity(
                 id = item.id,
                 quantity = Quantity(item.quantity),
             )
-            .execute()
 
         check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
     }
 
-    override suspend fun deleteById(id: String) = withContext(Dispatchers.IO) {
+    override suspend fun deleteById(id: String) {
         val response = retrofitCartService
             .deleteCartItem(id = id)
-            .execute()
 
         check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
     }
