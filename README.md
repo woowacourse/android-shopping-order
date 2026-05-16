@@ -75,10 +75,11 @@
 - [x] 최근 본 상품이 노출된다
 
 ### ProductDetailViewModelTest
-- [ ] 초기 진입 시 상품 상세를 불러온다
-- [ ] recentProductId가 null이 아니고 productId와 다르면 최근 본 상품 목록을 불러온다
-- [ ] recentProductId가 null이거나 productId와 같다면 최근 본 상품 목록을 불러오지 않는다
-- [ ] addToCart를 히면 Cart에 새로운 항목으로 Insert 된다
+- [x] 초기 진입 시 상품 상세를 불러온다
+- [x] recentProductId가 null이 아니고 productId와 다르면 최근 본 상품 목록을 불러온다
+- [x] recentProductId가 null이면 최근 본 상품 목록을 불러오지 않는다
+- [x] recentProductId가 productId와 같다면 최근 본 상품 목록을 불러오지 않는다
+- [x] addToCart를 히면 Cart에 새로운 항목으로 Insert 된다
 
 ### CartViewModelTest
 - [ ] 초기 진입 시 장바구니 항목을 paginate하여 노출한다
