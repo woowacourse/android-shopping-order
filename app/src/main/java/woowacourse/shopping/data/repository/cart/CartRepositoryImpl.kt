@@ -4,7 +4,6 @@ import woowacourse.shopping.data.datasource.cart.CartDataSource
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartContent
-import woowacourse.shopping.domain.Product
 
 class CartRepositoryImpl(
     private val cartDataSource: CartDataSource,
@@ -21,50 +20,37 @@ class CartRepositoryImpl(
         pageSize: Int,
     ): List<CartContent> = cartDataSource.pagination(page, pageSize, emptyList())
 
-    override suspend fun increase(
-        product: Product,
+    override suspend fun insert(
+        productId: String,
         quantity: Int,
     ) {
-        val existing = loadAll().firstOrNull { it.hasProductId(product.id) }
-        if (existing == null) {
-            cartDataSource.insert(CartContent(product, quantity))
-        } else {
-            cartDataSource.update(
-                CartContent(existing.product, existing.quantity + 1, existing.id),
-            )
-        }
+        cartDataSource.insert(productId, quantity)
     }
 
-    override suspend fun decrease(productId: String) {
-        val existing = loadAll().firstOrNull { it.hasProductId(productId) }
+    override suspend fun updateQuantity(
+        contentId: String,
+        quantity: Int,
+    ) {
+        cartDataSource.update(
+            contentId, quantity,
+        )
+    }
+
+    override suspend fun decrease(contentId: String) {
+        val existing = loadAll().firstOrNull { it.id == contentId }
             ?: return
         if (existing.quantity <= 1) {
             cartDataSource.deleteById(existing.id)
         } else {
             cartDataSource.update(
-                CartContent(existing.product, existing.quantity - 1, existing.id),
+                contentId = contentId,
+                quantity = existing.quantity - 1,
             )
         }
     }
 
-    override suspend fun remove(productId: String) {
-        val existing = loadAll().firstOrNull { it.hasProductId(productId) }
-            ?: return
-        cartDataSource.deleteById(existing.id)
-    }
-
-    override suspend fun setProductQuantity(
-        productId: String,
-        quantity: Int,
-    ) {
-        if (quantity < 1) return
-        val existing = loadAll().firstOrNull { it.hasProductId(productId) }
-        if (existing != null) {
-            cartDataSource.update(CartContent(existing.product, quantity, existing.id))
-            return
-        }
-        val product = productRepository.getProduct(productId)
-        cartDataSource.insert(CartContent(product, quantity))
+    override suspend fun remove(contentId: String) {
+        cartDataSource.deleteById(contentId)
     }
 
     private suspend fun loadAll(): List<CartContent> = cartDataSource.pagination(0, ALL_PAGE_SIZE, emptyList())

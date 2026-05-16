@@ -1,7 +1,5 @@
 package woowacourse.shopping.data.datasource.cart
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.network.cart.CartService
 import woowacourse.shopping.data.network.cart.dto.CartItemAddRequest
 import woowacourse.shopping.data.network.cart.dto.QuantityDto
@@ -14,58 +12,59 @@ class CartRemoteDataSource(
         startIndex: Int,
         pageSize: Int,
         sort: List<String>,
-    ): List<CartContent> = withContext(Dispatchers.IO) {
+    ): List<CartContent> {
         val response = cartService
             .requestCartItems(page = startIndex, size = pageSize)
-            .execute()
 
         check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
 
         val body = response.body()
             ?: error("empty body")
-        body.content.map { it.toDomain() }
+        return body.content.map { it.toDomain() }
     }
 
-    override suspend fun getTotalQuantity(): Int? = withContext(Dispatchers.IO) {
+    override suspend fun getTotalQuantity(): Int {
         val response = cartService
             .getCartItemTotalCount()
-            .execute()
 
         check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
 
         val body = response.body()
             ?: error("empty body")
-        body.quantity
+        return body.quantity
     }
 
-    override suspend fun insert(item: CartContent) = withContext(Dispatchers.IO) {
+    override suspend fun insert(
+        productId: String,
+        quantity: Int,
+    ) {
         val response = cartService
             .insertCartItem(
                 request = CartItemAddRequest(
-                    productId = item.product.id.toLong(),
-                    quantity = item.quantity,
+                    productId = productId.toLong(),
+                    quantity = quantity,
                 ),
             )
-            .execute()
 
         check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
     }
 
-    override suspend fun update(item: CartContent) = withContext(Dispatchers.IO) {
+    override suspend fun update(
+        contentId: String,
+        quantity: Int,
+    ) {
         val response = cartService
             .updateCartItemQuantity(
-                id = item.id,
-                quantity = QuantityDto(item.quantity),
+                id = contentId,
+                quantity = QuantityDto(quantity),
             )
-            .execute()
 
         check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
     }
 
-    override suspend fun deleteById(id: String) = withContext(Dispatchers.IO) {
+    override suspend fun deleteById(contentId: String) {
         val response = cartService
-            .deleteCartItem(id = id)
-            .execute()
+            .deleteCartItem(id = contentId)
 
         check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
     }

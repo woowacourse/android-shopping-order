@@ -107,7 +107,7 @@ class ProductDetailViewModel(
             val previousQuantity = cart.quantityOf(
                 productId = loadingState.product.id,
             )
-            cartRepository.setProductQuantity(loadingState.product.id, previousQuantity + uiState.value.quantity)
+            cartRepository.insert(loadingState.product.id, previousQuantity + uiState.value.quantity)
         }
     }
 

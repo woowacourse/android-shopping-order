@@ -102,7 +102,7 @@ class ProductListViewModelTest {
         val viewModel = newViewModel(cartRepository = cartRepository)
         viewModel.initialLoading()
 
-        cartRepository.increase(sampleProducts[2])
+        cartRepository.updateQuantity(sampleProducts[2])
         viewModel.cartRefresh()
 
         val target = viewModel.uiState.value.productUiModels.first { it.id == "3" }

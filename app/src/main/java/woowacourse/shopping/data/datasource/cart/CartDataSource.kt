@@ -11,9 +11,15 @@ interface CartDataSource {
 
     suspend fun getTotalQuantity(): Int?
 
-    suspend fun insert(item: CartContent)
+    suspend fun insert(
+        productId: String,
+        quantity: Int,
+    )
 
-    suspend fun update(item: CartContent)
+    suspend fun update(
+        contentId: String,
+        quantity: Int,
+    )
 
-    suspend fun deleteById(id: String)
+    suspend fun deleteById(contentId: String)
 }

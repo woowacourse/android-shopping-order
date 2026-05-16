@@ -76,7 +76,7 @@ class ProductDetailViewModelTest {
     @Test
     fun `addToCart 는 기존 수량과 현재 quantity 의 합을 CartRepository 에 반영한다`() = runTest {
         val cartRepository = FakeCartRepository()
-        cartRepository.increase(sampleProducts[0])
+        cartRepository.updateQuantity(sampleProducts[0])
         val viewModel = newViewModel(cartRepository = cartRepository)
         viewModel.initialLoading(productId = "1")
         viewModel.increase()

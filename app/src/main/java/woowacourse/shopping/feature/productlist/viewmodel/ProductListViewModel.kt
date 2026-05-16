@@ -69,12 +69,15 @@ class ProductListViewModel(
     }
 
     fun increase(productId: String) = guardFatal {
-        val product = products.firstOrNull { it.id == productId }
-            ?: throw ProductNotFoundException(productId)
-
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            cartRepository.increase(product)
+            val contentId = cart.cartContents.firstOrNull { it.hasProductId(productId) }?.id
+            if (contentId == null) {
+                cartRepository.insert(productId)
+            } else {
+                val nextQuantity = cart.quantityOf(productId) + 1
+                cartRepository.updateQuantity(contentId, nextQuantity)
+            }
             refreshCart()
             _uiState.update { it.copy(isLoading = false) }
         }
@@ -86,7 +89,10 @@ class ProductListViewModel(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            cartRepository.decrease(productId)
+            val contentId = cart.cartContents.firstOrNull { it.hasProductId(productId) }?.id
+            if (contentId != null) {
+                cartRepository.decrease(contentId)
+            }
             refreshCart()
             _uiState.update { it.copy(isLoading = false) }
         }

@@ -154,7 +154,7 @@ class RecommendViewModel(
         viewModelScope.launch {
             val products = memoryCart.cartContents.map { it.product }
             memoryCart.cartContents.forEach {
-                cartRepository.increase(it.product, quantity = it.quantity)
+                cartRepository.insert(it.product.id, quantity = it.quantity)
             }
 
             refreshCart()

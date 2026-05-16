@@ -86,7 +86,7 @@ class CartViewModelTest {
         val viewModel = CartViewModel(initialPageSize = 5, cartRepository = cartRepository)
         viewModel.initialLoading()
 
-        cartRepository.increase(sampleProducts[1])
+        cartRepository.updateQuantity(sampleProducts[1])
         viewModel.initialLoading()
 
         val items = viewModel.uiState.value.paginatedCartContents

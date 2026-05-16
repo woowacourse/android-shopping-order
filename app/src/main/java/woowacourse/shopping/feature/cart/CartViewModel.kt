@@ -17,7 +17,6 @@ import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartContent
-import woowacourse.shopping.domain.ProductNotFoundException
 import woowacourse.shopping.feature.common.state.CartItemUiModel
 import woowacourse.shopping.feature.common.state.ProductUiModel
 
@@ -114,44 +113,31 @@ class CartViewModel(
         return cartContents
     }
 
-    fun increase(contentId: String) = guardFatal {
-        val product = cart.cartContents.firstOrNull { it.id == contentId }?.product
-            ?: throw ProductNotFoundException(contentId)
+    fun increase(contentId: String) {
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            cartRepository.increase(product)
+
+            val quantity = cart.cartContents.firstOrNull { it.id == contentId }?.quantity
+                ?: return@launch
+            cartRepository.updateQuantity(contentId, quantity)
             cart = getCart()
             val cartContents = pagination(uiState.value.page)
             val checkMap: Map<String, Boolean> = cartContents.map { it.contentId }.associateWith { false }
+
             _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents, checkMap = checkMap) }
         }
     }
 
-    fun decrease(contentId: String) = guardFatal {
-        val product = cart.cartContents.firstOrNull { it.id == contentId }?.product
-            ?: throw ProductNotFoundException(contentId)
+    fun decrease(contentId: String) {
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            cartRepository.decrease(product.id)
+            cartRepository.decrease(contentId)
             cart = getCart()
             val cartContents = pagination(uiState.value.page)
             val checkMap: Map<String, Boolean> = cartContents.map { it.contentId }.associateWith { false }
             _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents, checkMap = checkMap) }
-        }
-    }
-
-    private inline fun guardFatal(block: () -> Unit) {
-        try {
-            block()
-        } catch (e: ProductNotFoundException) {
-            _event.trySend(
-                CartEvent.FatalError(
-                    e.message
-                        ?: "알 수 없는 오류가 발생했습니다.",
-                ),
-            )
         }
     }
 
