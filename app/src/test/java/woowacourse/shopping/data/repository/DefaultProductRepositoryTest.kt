@@ -10,11 +10,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import woowacourse.shopping.data.source.remote.ProductRemoteDataSource
-import woowacourse.shopping.data.source.remote.RetrofitServices
+import woowacourse.shopping.data.source.remote.api.RetrofitServices
 import woowacourse.shopping.domain.model.Money
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductName
-import woowacourse.shopping.fake.FakeCartDispatcher
 import woowacourse.shopping.fake.FakeProductDispatcher
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -50,7 +49,11 @@ class DefaultProductRepositoryTest {
         val defaultProductRepository =
             DefaultProductRepository(
                 ProductRemoteDataSource(
-                    productService = RetrofitServices(server.url("/").toString(), FakeCartDispatcher.authToken).productService,
+                    productService =
+                        RetrofitServices(
+                            server.url("/").toString(),
+                            FakeAuthInterceptor(""),
+                        ).productService,
                 ),
             )
 
@@ -65,7 +68,10 @@ class DefaultProductRepositoryTest {
             val defaultProductRepository =
                 DefaultProductRepository(
                     ProductRemoteDataSource(
-                        RetrofitServices(server.url("/").toString(), FakeCartDispatcher.authToken).productService,
+                        RetrofitServices(
+                            server.url("/").toString(),
+                            FakeAuthInterceptor(""),
+                        ).productService,
                     ),
                 )
 

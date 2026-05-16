@@ -2,13 +2,29 @@ package woowacourse.shopping.data.repository
 
 import kotlinx.coroutines.test.runTest
 import mockwebserver3.MockWebServer
+import okhttp3.Interceptor
+import okhttp3.Response
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.data.source.remote.CartRemoteDataSource
-import woowacourse.shopping.data.source.remote.RetrofitServices
+import woowacourse.shopping.data.source.remote.api.RetrofitServices
 import woowacourse.shopping.data.source.remote.dto.cart.Product
 import woowacourse.shopping.fake.FakeCartDispatcher
+
+class FakeAuthInterceptor(
+    private val token: String,
+) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request =
+            chain
+                .request()
+                .newBuilder()
+                .addHeader("Authorization", "Basic $token")
+                .build()
+        return chain.proceed(request)
+    }
+}
 
 class DefaultCartRepositoryTest {
     private lateinit var server: MockWebServer
@@ -39,7 +55,7 @@ class DefaultCartRepositoryTest {
                         cartService =
                             RetrofitServices(
                                 baseUrl = server.url("/").toString(),
-                                authToken = FakeCartDispatcher.authToken,
+                                interceptor = FakeAuthInterceptor(FakeCartDispatcher.authToken),
                             ).cartService,
                     ),
             )
