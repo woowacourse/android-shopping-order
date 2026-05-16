@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.recommend
 
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -114,5 +115,37 @@ class RecommendViewModelTest {
         // then:  추천 목록에 카트에 담긴 상품은 포함되지 않는다
         val expected = viewModel.uiState.value.recommendList
         assertThat(expected).hasSize(3)
+    }
+
+    @Test
+    fun `선택 아이템과 추가된 아이템의 합산 금액이 노출된다`() = runTest {
+        // given: 이전 화면에서 선택한 상품들이 입력된다
+        val cartRepo = FakeCartRepository(
+            initial = TestCartContentFixture.cartContentsOf(beverageProducts.take(2)),
+            productCatalog = beverageProducts,
+        )
+        val cart = cartRepo.loadCart()
+        val contentIds = cart.cartContents.map { it.id }
+
+        viewModel = RecommendViewModel(
+            productRepository = FakeProductRepository(
+                initial = beverageProducts,
+            ),
+            cartRepository = cartRepo,
+            orderRepository = FakeOrderRepository(),
+            recentProductRepository = FakeRecentProductRepository(initial = listOf(beverageProducts.first().id)),
+        )
+        viewModel.initialLoading()
+
+        // when:  상품을 추가하고
+        viewModel.increase(beverageProducts[3].id)
+        viewModel.increase(beverageProducts[3].id)
+
+        viewModel.increase(beverageProducts[4].id)
+        // when:  금액 계산을 수행할 때
+        val expected = viewModel.getTotalPrice(contentIds)
+
+        // then:  이전 화면에서 선택한 상품들과 추천 화면에서 선택한 상품들의 합산 금액이 반환된다
+        assertThat(expected).isEqualTo(16000)
     }
 }
