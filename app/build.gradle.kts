@@ -76,4 +76,5 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.retrofit)
     implementation(libs.converter.kotlinx.serialization)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
