@@ -39,7 +39,6 @@ class RecommendViewModel(
     private var products: List<Product> = emptyList()
     private var serverCart: Cart = Cart(emptyList())
     private var memoryCart: Cart = Cart(emptyList())
-    private var initialTotalPrice = 0
 
     fun initialLoading() {
         viewModelScope.launch {
@@ -130,6 +129,7 @@ class RecommendViewModel(
             imageUrl = product.imageUrl,
             id = product.id,
             quantity = memoryCart.quantityOf(product.id),
+            category = product.category,
         )
     }
 
@@ -169,8 +169,11 @@ class RecommendViewModel(
         }
     }
 
-    private suspend fun refreshRecentProducts(): String {
+    private suspend fun refreshRecentProducts(): String? {
         val recentProductIds = recentProductRepository.loadProducts()
+        if (recentProductIds.isEmpty()) {
+            return null
+        }
         val mostRecentProductId = recentProductIds.first()
 
         return productRepository.getProduct(mostRecentProductId).category

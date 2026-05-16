@@ -11,6 +11,7 @@ data class ProductUiModel(
     val imageUrl: String,
     val id: String,
     val quantity: Int,
+    val category: String = "",
 ) : Parcelable {
     fun formattedPrice(quantity: Int = 1): String = DecimalPriceFormatter().format(price * quantity)
 }
