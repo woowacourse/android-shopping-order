@@ -50,13 +50,35 @@ class CartViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             cart = getCart()
-            val cartContents = pagination(
-                page = 1,
-            )
-            val checkMap: Map<String, Boolean> = cartContents.map { it.contentId }.associateWith { false }
-            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents, checkMap = checkMap) }
+            val cartContents = pagination(page = 1)
+            applyContents(cartContents)
         }
     }
+
+    private fun applyContents(cartContents: List<CartItemUiModel>) {
+        val checkMap = mergeCheckMap(cartContents, _uiState.value.checkMap)
+        val totalPrice = calculateTotalPrice(cartContents, checkMap)
+        _uiState.update {
+            it.copy(
+                isLoading = false,
+                paginatedCartContents = cartContents,
+                checkMap = checkMap,
+                totalPrice = totalPrice,
+            )
+        }
+    }
+
+    private fun mergeCheckMap(
+        cartContents: List<CartItemUiModel>,
+        previous: Map<String, Boolean>,
+    ): Map<String, Boolean> = cartContents.associate { it.contentId to (previous[it.contentId] ?: false) }
+
+    private fun calculateTotalPrice(
+        cartContents: List<CartItemUiModel>,
+        checkMap: Map<String, Boolean>,
+    ): Int = cartContents
+        .filter { checkMap[it.contentId] == true }
+        .sumOf { it.productUiModel.price * it.productUiModel.quantity }
 
     private suspend fun getCart(): Cart {
         val cart = cartRepository.loadCart()
@@ -75,31 +97,19 @@ class CartViewModel(
 
     fun moveToPreviousPage() {
         val page = uiState.value.page - 1
-        _uiState.update {
-            it.copy(
-                page = page,
-            )
-        }
+        _uiState.update { it.copy(page = page) }
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            val cartContents = pagination(page)
-            val checkMap: Map<String, Boolean> = cartContents.map { it.contentId }.associateWith { false }
-            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents, checkMap = checkMap) }
+            applyContents(pagination(page))
         }
     }
 
     fun moveToNextPage() {
         val page = uiState.value.page + 1
-        _uiState.update {
-            it.copy(
-                page = page,
-            )
-        }
+        _uiState.update { it.copy(page = page) }
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            val cartContents = pagination(page)
-            val checkMap: Map<String, Boolean> = cartContents.map { it.contentId }.associateWith { false }
-            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents, checkMap = checkMap) }
+            applyContents(pagination(page))
         }
     }
 
@@ -114,30 +124,22 @@ class CartViewModel(
     }
 
     fun increase(contentId: String) {
-
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-
             val quantity = cart.cartContents.firstOrNull { it.id == contentId }?.quantity
                 ?: return@launch
             cartRepository.updateQuantity(contentId, quantity + 1)
             cart = getCart()
-            val cartContents = pagination(uiState.value.page)
-            val checkMap: Map<String, Boolean> = cartContents.map { it.contentId }.associateWith { false }
-
-            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents, checkMap = checkMap) }
+            applyContents(pagination(uiState.value.page))
         }
     }
 
     fun decrease(contentId: String) {
-
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             cartRepository.decrease(contentId)
             cart = getCart()
-            val cartContents = pagination(uiState.value.page)
-            val checkMap: Map<String, Boolean> = cartContents.map { it.contentId }.associateWith { false }
-            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents, checkMap = checkMap) }
+            applyContents(pagination(uiState.value.page))
         }
     }
 
@@ -145,9 +147,8 @@ class CartViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             cartRepository.remove(id)
-            val cartContents = pagination(uiState.value.page)
-            val checkMap: Map<String, Boolean> = cartContents.map { it.contentId }.associateWith { false }
-            _uiState.update { it.copy(isLoading = false, paginatedCartContents = cartContents, checkMap = checkMap) }
+            cart = getCart()
+            applyContents(pagination(uiState.value.page))
         }
     }
 
@@ -167,22 +168,18 @@ class CartViewModel(
 
     fun cartItemCheck(productId: String) {
         val checkMap = _uiState.value.checkMap.toMutableMap()
-        checkMap[productId] = checkMap[productId]?.not()
-            ?: false
+        checkMap[productId] = checkMap[productId]?.not() ?: false
         val cartItemUiModels = _uiState.value.paginatedCartContents
-        val totalPrice =
-            cartItemUiModels.filter { checkMap[it.contentId] == true }.sumOf { it.productUiModel.price * it.productUiModel.quantity }
+        val totalPrice = calculateTotalPrice(cartItemUiModels, checkMap)
         _uiState.update { it.copy(checkMap = checkMap.toMap(), totalPrice = totalPrice) }
     }
 
     fun totalCheck() {
         val productUiModels = _uiState.value.paginatedCartContents
-        val totalPrice = productUiModels.sumOf { it.productUiModel.price * it.productUiModel.quantity }
-
         val check = _uiState.value.checkMap.all { it.value }.not()
-        val newCheckMap = productUiModels.map { it.contentId }.associateWith { check }
-
-        _uiState.update { it.copy(checkMap = newCheckMap.toMap(), totalPrice = totalPrice) }
+        val newCheckMap = productUiModels.associate { it.contentId to check }
+        val totalPrice = calculateTotalPrice(productUiModels, newCheckMap)
+        _uiState.update { it.copy(checkMap = newCheckMap, totalPrice = totalPrice) }
     }
 
     companion object {
