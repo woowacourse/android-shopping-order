@@ -16,9 +16,6 @@ class RecommendViewModelTest {
 
     private lateinit var viewModel: RecommendViewModel
 
-    private val comnProducts = TestProductFixture.products(35)
-    private val comnCartContents = TestCartContentFixture.cartContentsOf(comnProducts)
-
     private val beverageProducts = TestProductFixture.products(15, category = "음료")
     private val clothesProducts = TestProductFixture.products(15, category = "의류", startIndex = 16)
 
@@ -27,7 +24,7 @@ class RecommendViewModelTest {
         // given: RecentProductRepository가 비어 있는 뷰모델이 주어진다
         viewModel = RecommendViewModel(
             productRepository = FakeProductRepository(initial = TestProductFixture.products(5)),
-            cartRepository = FakeCartRepository(productCatalog = comnProducts),
+            cartRepository = FakeCartRepository(productCatalog = beverageProducts + clothesProducts),
             orderRepository = FakeOrderRepository(),
             recentProductRepository = FakeRecentProductRepository(),
         )
@@ -95,5 +92,27 @@ class RecommendViewModelTest {
         // then:  추천 목록의 사이즈가 5개이다
         val expected = viewModel.uiState.value.recommendList
         assertThat(expected).hasSize(5)
+    }
+
+    @Test
+    fun `이미 장바구니에 담긴 상품은 추천 목록에서 제외된다`() {
+        // given: 카테고리 상품 중 일부가 이미 카트에 담겨 있다
+        viewModel = RecommendViewModel(
+            productRepository = FakeProductRepository(
+                initial = beverageProducts.take(5),
+            ),
+            cartRepository = FakeCartRepository(
+                initial = TestCartContentFixture.cartContentsOf(beverageProducts.take(2)),
+                productCatalog = beverageProducts,
+            ),
+            orderRepository = FakeOrderRepository(),
+            recentProductRepository = FakeRecentProductRepository(initial = listOf(beverageProducts.first().id)),
+        )
+        // when:  초기 로딩을 호출할 때
+        viewModel.initialLoading()
+
+        // then:  추천 목록에 카트에 담긴 상품은 포함되지 않는다
+        val expected = viewModel.uiState.value.recommendList
+        assertThat(expected).hasSize(3)
     }
 }
