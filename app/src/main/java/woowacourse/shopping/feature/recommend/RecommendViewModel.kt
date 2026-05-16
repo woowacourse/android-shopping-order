@@ -24,7 +24,6 @@ import woowacourse.shopping.feature.common.state.ProductUiModel
 data class RecommendUiState(
     val recommendList: List<ProductUiModel> = emptyList(),
     val isLoading: Boolean = true,
-    val totalPrice: Int = 0,
 )
 
 class RecommendViewModel(
@@ -91,8 +90,6 @@ class RecommendViewModel(
                 recommendList = products.map(::toProductUiModel),
             )
         }
-
-        priceAlter()
     }
 
     fun decrease(productId: String) {
@@ -109,18 +106,6 @@ class RecommendViewModel(
         _uiState.update {
             it.copy(
                 recommendList = products.map(::toProductUiModel),
-            )
-        }
-
-        priceAlter()
-    }
-
-    fun priceAlter() {
-        val totalPrice = products.sumOf { it.priceAmount() * memoryCart.quantityOf(it.id) }
-
-        _uiState.update {
-            it.copy(
-                totalPrice = it.totalPrice + totalPrice,
             )
         }
     }
