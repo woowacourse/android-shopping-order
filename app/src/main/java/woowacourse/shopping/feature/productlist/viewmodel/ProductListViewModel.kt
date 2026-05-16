@@ -52,6 +52,7 @@ class ProductListViewModel(
 
     private var products: List<Product> = emptyList()
     private var cart: Cart = Cart(emptyList())
+
     fun initialLoading() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
@@ -68,7 +69,7 @@ class ProductListViewModel(
         }
     }
 
-    fun increase(productId: String) = guardFatal {
+    fun increase(productId: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val contentId = cart.cartContents.firstOrNull { it.hasProductId(productId) }?.id
@@ -83,7 +84,7 @@ class ProductListViewModel(
         }
     }
 
-    fun decrease(productId: String) = guardFatal {
+    fun decrease(productId: String) {
         products.firstOrNull { it.id == productId }
             ?: throw ProductNotFoundException(productId)
 
@@ -95,19 +96,6 @@ class ProductListViewModel(
             }
             refreshCart()
             _uiState.update { it.copy(isLoading = false) }
-        }
-    }
-
-    private inline fun guardFatal(block: () -> Unit) {
-        try {
-            block()
-        } catch (e: ProductNotFoundException) {
-            _event.trySend(
-                ProductListEvent.FatalError(
-                    e.message
-                        ?: "알 수 없는 오류가 발생했습니다.",
-                ),
-            )
         }
     }
 

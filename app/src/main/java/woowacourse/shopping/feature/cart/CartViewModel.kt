@@ -120,7 +120,7 @@ class CartViewModel(
 
             val quantity = cart.cartContents.firstOrNull { it.id == contentId }?.quantity
                 ?: return@launch
-            cartRepository.updateQuantity(contentId, quantity)
+            cartRepository.updateQuantity(contentId, quantity + 1)
             cart = getCart()
             val cartContents = pagination(uiState.value.page)
             val checkMap: Map<String, Boolean> = cartContents.map { it.contentId }.associateWith { false }
