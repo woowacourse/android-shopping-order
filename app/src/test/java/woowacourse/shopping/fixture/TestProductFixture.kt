@@ -1,19 +1,18 @@
 package woowacourse.shopping.fixture
 
+import android.R.attr.category
+import android.util.Log.i
 import woowacourse.shopping.domain.Money
 import woowacourse.shopping.domain.Product
 
 object TestProductFixture {
-
-    const val DEFAULT_CATEGORY = "fashion"
-    const val ANOTHER_CATEGORY = "food"
 
     fun product(
         id: String = "1",
         name: String = "품목 $id",
         price: Int = 1_000,
         imageUrl: String = "https://image/$id.png",
-        category: String = DEFAULT_CATEGORY,
+        category: String = "음료",
     ): Product = Product(
         name = name,
         price = Money(price),
@@ -24,8 +23,9 @@ object TestProductFixture {
 
     fun products(
         count: Int,
-        category: String = DEFAULT_CATEGORY,
-    ): List<Product> = (1..count).map { i ->
+        category: String = "음료",
+        startIndex: Int = 1,
+    ): List<Product> = (startIndex..(startIndex - 1) + count).map { i ->
         product(
             id = i.toString(),
             name = "품목$i",
