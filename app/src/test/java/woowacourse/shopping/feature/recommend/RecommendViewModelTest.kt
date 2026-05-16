@@ -77,4 +77,23 @@ class RecommendViewModelTest {
         val expected = viewModel.uiState.value.recommendList
         assertThat(expected).hasSize(10)
     }
+
+    @Test
+    fun `카테고리 상품이 10개 미만이면 존재하는 개수만큼만 노출된다`() {
+        // given: 해당 카테고리에 5개의 상품이 존재한다
+        viewModel = RecommendViewModel(
+            productRepository = FakeProductRepository(
+                initial = beverageProducts.take(5),
+            ),
+            cartRepository = FakeCartRepository(productCatalog = beverageProducts.take(5)),
+            orderRepository = FakeOrderRepository(),
+            recentProductRepository = FakeRecentProductRepository(initial = listOf(beverageProducts.first().id)),
+        )
+        // when: 초기 로딩을 호출할 때
+        viewModel.initialLoading()
+
+        // then:  추천 목록의 사이즈가 5개이다
+        val expected = viewModel.uiState.value.recommendList
+        assertThat(expected).hasSize(5)
+    }
 }
