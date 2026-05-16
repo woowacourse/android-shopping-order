@@ -9,7 +9,7 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import kotlin.collections.map
 
 class DefaultProductRepository(
-    private val remoteDataSource: ProductRemoteDataSource = ProductRemoteDataSource(),
+    private val remoteDataSource: ProductRemoteDataSource,
 ) : ProductRepository {
     override suspend fun getProducts(
         offset: Int,
