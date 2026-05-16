@@ -64,7 +64,7 @@ class ShoppingViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
-                cartRepo.increase(product)
+                cartRepo.add(product)
 
                 _uiState.update { state ->
                     val updatedProducts =
@@ -143,8 +143,7 @@ class ShoppingViewModel(
 
     fun syncCartState() {
         viewModelScope.launch {
-            val cartItems = cartRepo.getAllCartItems()
-            val totalCartCount = cartItems.items.sumOf { it.quantity }
+            val totalCartCount = cartRepo.getCartCount()
             val recentProducts = recentProductRepo.getRecentProducts()
 
             _uiState.update { state ->

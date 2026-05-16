@@ -50,30 +50,6 @@ class RetrofitCartRepository(
         }
     }
 
-    override suspend fun increase(item: Product) {
-        val cartItems = getAllCartItems()
-        val foundedItem = cartItems.items.find { it.product.id == item.id }
-
-        if (foundedItem == null) {
-            service.addCartItem(
-                auth = encoder.getHeader(),
-                request =
-                    CartItemRequest(
-                        productId = item.id,
-                        quantity = 1,
-                    ),
-            )
-        } else {
-            service.updateCartItemQuantity(
-                auth = encoder.getHeader(),
-                cartItemId =
-                    foundedItem.id
-                        ?: throw IllegalArgumentException("찾은 카트 상품에 id가 없습니다."),
-                quantity = Quantity(foundedItem.quantity + 1),
-            )
-        }
-    }
-
     override suspend fun decrease(item: Product) {
         val cartItems = getAllCartItems()
         val foundedItem = cartItems.items.find { it.product.id == item.id }
@@ -130,7 +106,8 @@ class RetrofitCartRepository(
         }
     }
 
-    override suspend fun getSize(): Int = getAllCartItems().items.size
+    override suspend fun getSize(): Int =
+        service.getCartItems(auth = encoder.getHeader(), size = 1).totalElements.toInt()
 
     override suspend fun getCartCount(): Int =
         service.getTotalCount(auth = encoder.getHeader()).quantity

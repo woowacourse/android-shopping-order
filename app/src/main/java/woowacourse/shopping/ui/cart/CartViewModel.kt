@@ -40,7 +40,7 @@ class CartViewModel(
     fun increase(product: Product) {
         viewModelScope.launch {
             try {
-                cartRepo.increase(product)
+                cartRepo.add(product)
                 loadData()
             } finally {
             }
@@ -162,7 +162,7 @@ class CartViewModel(
     fun increaseInRecommendScreen(product: Product) {
         viewModelScope.launch {
             try {
-                cartRepo.increase(product)
+                cartRepo.add(product)
                 val cartId =
                     cartRepo
                         .getAllCartItems()

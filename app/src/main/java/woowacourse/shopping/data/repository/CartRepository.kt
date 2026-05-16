@@ -9,10 +9,10 @@ interface CartRepository {
 
     suspend fun add(
         item: Product,
-        quantity: Int,
+        quantity: Int = 1,
     )
 
-    suspend fun increase(item: Product)
+//    suspend fun add(item: Product)
 
     suspend fun decrease(item: Product)
 

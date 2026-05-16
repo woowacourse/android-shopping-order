@@ -39,7 +39,7 @@ class ProductDetailViewModel(
         }
     }
 
-    fun addToCart() {
+    fun addToCart(onSuccess: () -> Unit) {
         val currentState = _uiState.value
         val productToSave = currentState.product ?: return
 
@@ -47,6 +47,7 @@ class ProductDetailViewModel(
             _uiState.update { it.copy(isLoading = true) }
             try {
                 cartRepo.add(productToSave, quantity = currentState.selectedQuantity)
+                onSuccess()
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }

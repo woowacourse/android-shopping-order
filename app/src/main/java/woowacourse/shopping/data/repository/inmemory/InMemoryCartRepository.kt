@@ -27,16 +27,16 @@ class InMemoryCartRepository(
         }
     }
 
-    override suspend fun increase(item: Product) {
-        val existingIndex = value.indexOfFirst { it.product.id == item.id }
-
-        if (existingIndex != -1) {
-            val existingItem = value[existingIndex]
-            value[existingIndex] = existingItem.copy(quantity = existingItem.quantity + 1)
-        } else {
-            value.add(CartItem(product = item, quantity = 1))
-        }
-    }
+//    override suspend fun add(item: Product) {
+//        val existingIndex = value.indexOfFirst { it.product.id == item.id }
+//
+//        if (existingIndex != -1) {
+//            val existingItem = value[existingIndex]
+//            value[existingIndex] = existingItem.copy(quantity = existingItem.quantity + 1)
+//        } else {
+//            value.add(CartItem(product = item, quantity = 1))
+//        }
+//    }
 
     override suspend fun decrease(item: Product) {
         val existingIndex = value.indexOfFirst { it.product.id == item.id }

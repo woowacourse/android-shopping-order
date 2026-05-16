@@ -34,8 +34,7 @@ fun ProductDetailScreen(
                 count = uiState.selectedQuantity,
                 onCloseClick = onCloseClick,
                 onAddToCartClick = {
-                    viewModel.addToCart()
-                    onAddToCartClick()
+                    viewModel.addToCart(onSuccess = onAddToCartClick)
                 },
                 onIncreaseClick = { viewModel.increase() },
                 onDecreaseClick = { viewModel.decrease() },
