@@ -14,7 +14,7 @@ object TestCartContentFixture {
     ): CartContent = CartContent(
         product = product,
         quantity = quantity,
-        id = id + 1000,
+        id = id,
     )
 
     fun cartContentsOf(
@@ -24,7 +24,7 @@ object TestCartContentFixture {
         cartContent(
             product = p,
             quantity = quantity,
-            id = (index + 1000).toString(),
+            id = index.toString(),
         )
     }
 }
