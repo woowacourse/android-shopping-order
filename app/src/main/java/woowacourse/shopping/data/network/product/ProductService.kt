@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.network.product
 
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -13,7 +13,7 @@ import woowacourse.shopping.data.network.product.dto.ProductResponse
 
 interface ProductService {
     @GET("/products")
-    fun requestProducts(
+    suspend fun requestProducts(
         @Header("accept")
         accept: String = "*/*",
         @Query("category")
@@ -22,29 +22,29 @@ interface ProductService {
         page: Int = 0,
         @Query("size")
         size: Int = 1,
-    ): Call<ProductResponse>
+    ): Response<ProductResponse>
 
     @POST("/products")
-    fun insertProducts(
+    suspend fun insertProducts(
         @Header("accept")
         accept: String = "*/*",
         @Body
         product: ProductDto,
-    ): Call<Unit>
+    ): Response<Unit>
 
     @GET("/products/{id}")
-    fun getProductDetail(
+    suspend fun getProductDetail(
         @Header("accept")
         accept: String = "*/*",
         @Path("id")
         id: String = "",
-    ): Call<ProductDto>
+    ): Response<ProductDto>
 
     @DELETE("/products/{id}")
-    fun deleteProductDetail(
+    suspend fun deleteProductDetail(
         @Header("accept")
         accept: String = "*/*",
         @Path("id")
         id: String = "",
-    ): Call<Unit>
+    ): Response<Unit>
 }
