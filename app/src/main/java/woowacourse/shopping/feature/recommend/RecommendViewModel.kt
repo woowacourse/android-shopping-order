@@ -43,8 +43,8 @@ class RecommendViewModel(
     fun initialLoading() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            loadRecommendList(10)
             refreshCart()
+            loadRecommendList(10)
             _uiState.update { it.copy(isLoading = false) }
         }
     }
@@ -63,6 +63,9 @@ class RecommendViewModel(
                 sort = emptyList(),
                 category = category,
             )
+
+            val alreadyInProduct = serverCart.cartContents.map { it.product }
+            products = products.filter { alreadyInProduct.map { product -> product.id }.contains(it.id).not() }
 
             _uiState.update {
                 it.copy(
