@@ -63,14 +63,18 @@ class ShoppingApplication : Application() {
         runBlocking {
             token = auth.load()
             if (token.isBlank()) {
-                token = Credentials.basic("CommitTheKermit", "password")
-                auth.save(token)
+                val user = BuildConfig.SHOPPING_USERNAME
+                val pw = BuildConfig.SHOPPING_PASSWORD
+                if (user.isNotBlank() && pw.isNotBlank()) {
+                    token = Credentials.basic(user, pw)
+                    auth.save(token)
+                }
             }
         }
 
         val json = Json { ignoreUnknownKeys = true }
         val baseUrl =
-            "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/".toHttpUrl()
+            BuildConfig.SHOPPING_BASE_URL.toHttpUrl()
 
         val client = OkHttpClient.Builder()
             .addInterceptor { chain ->

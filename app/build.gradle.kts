@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,9 +9,17 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+
 android {
     namespace = "woowacourse.shopping"
     compileSdk = 36
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "woowacourse.shopping"
@@ -19,6 +29,22 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "SHOPPING_USERNAME",
+            "\"${localProps.getProperty("SHOPPING_USERNAME", "")}\"",
+        )
+        buildConfigField(
+            "String",
+            "SHOPPING_PASSWORD",
+            "\"${localProps.getProperty("SHOPPING_PASSWORD", "")}\"",
+        )
+        buildConfigField(
+            "String",
+            "SHOPPING_BASE_URL",
+            "\"${localProps.getProperty("SHOPPING_BASE_URL", "")}\"",
+        )
     }
 
     buildTypes {
