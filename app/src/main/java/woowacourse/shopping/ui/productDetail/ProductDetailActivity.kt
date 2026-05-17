@@ -45,8 +45,7 @@ class ProductDetailActivity : ComponentActivity() {
                     viewModel = viewModel,
                     onAddToCartClick = {
                         viewModel.addToCart()
-                        val cartIntent = Intent(this, CartActivity::class.java)
-                        startActivity(cartIntent)
+                        startActivity(CartActivity.newIntent(this))
                     },
                     onLastViewedProductClick = { product ->
                         startActivity(

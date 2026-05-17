@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.productList
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -37,8 +36,7 @@ class ProductListActivity : ComponentActivity() {
                     modifier = Modifier.padding(innerPadding),
                     viewModel = viewModel,
                     onCartClick = {
-                        val cartIntent = Intent(this, CartActivity::class.java)
-                        startActivity(cartIntent)
+                        startActivity(CartActivity.newIntent(this))
                     },
                     onProductClick = { product ->
                         startActivity(ProductDetailActivity.newIntent(this, product.id))
