@@ -2,9 +2,9 @@ package woowacourse.shopping.data.mapper
 
 import woowacourse.shopping.data.remote.dto.CartItemDto
 import woowacourse.shopping.data.remote.dto.CartResponseDto
-import woowacourse.shopping.domain.cart.CartItem
-import woowacourse.shopping.domain.cart.CartItems
-import woowacourse.shopping.domain.cart.Quantity
+import woowacourse.shopping.domain.model.cart.CartItem
+import woowacourse.shopping.domain.model.cart.CartItems
+import woowacourse.shopping.domain.model.cart.Quantity
 
 fun CartResponseDto.toDomain(): CartItems =
     CartItems(

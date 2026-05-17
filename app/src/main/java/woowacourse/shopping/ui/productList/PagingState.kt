@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.productList
 
-import woowacourse.shopping.domain.cart.Cart
-import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.domain.model.cart.Cart
+import woowacourse.shopping.domain.model.product.Product
 import kotlin.collections.associate
 
 data class PagingState(

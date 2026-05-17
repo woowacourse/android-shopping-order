@@ -44,7 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import woowacourse.shopping.R
 import woowacourse.shopping.constant.ShoppingColor.APP_BAR_COLOR
-import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.domain.model.product.Product
 import androidx.compose.foundation.lazy.grid.items as lazyGridItems
 import androidx.compose.foundation.lazy.items as lazyRowItems
 

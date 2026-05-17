@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.map
 import woowacourse.shopping.data.datasource.recent.RecentProductDataSource
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.mapper.toRecentProductEntity
-import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
 class LocalRecentProductRepository(

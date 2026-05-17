@@ -1,9 +1,8 @@
 package woowacourse.shopping.data.mock
 
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import woowacourse.shopping.data.remote.dto.ProductResponseDto
-import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.domain.model.product.Product
 
 object MockProductResponseFactory {
     private val json = Json { prettyPrint = true }

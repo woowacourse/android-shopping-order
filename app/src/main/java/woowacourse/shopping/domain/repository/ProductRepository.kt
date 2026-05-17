@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.product.Product
-import woowacourse.shopping.domain.product.Products
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.product.Products
 
 interface ProductRepository {
     suspend fun getProducts(

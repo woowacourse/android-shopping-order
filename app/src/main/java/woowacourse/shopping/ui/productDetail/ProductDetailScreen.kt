@@ -44,11 +44,11 @@ import woowacourse.shopping.constant.Format.formatPrice
 import woowacourse.shopping.constant.ShoppingColor.APP_BAR_COLOR
 import woowacourse.shopping.constant.ShoppingColor.CART_ADD_BUTTON_COLOR
 import woowacourse.shopping.constant.ShoppingColor.PRODUCT_DETAIL_BACKGROUND_COLOR
-import woowacourse.shopping.domain.product.Category
-import woowacourse.shopping.domain.product.ImageUrl
-import woowacourse.shopping.domain.product.Price
-import woowacourse.shopping.domain.product.Product
-import woowacourse.shopping.domain.product.ProductName
+import woowacourse.shopping.domain.model.product.Category
+import woowacourse.shopping.domain.model.product.ImageUrl
+import woowacourse.shopping.domain.model.product.Price
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.product.ProductName
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

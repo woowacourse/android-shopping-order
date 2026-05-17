@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.cart
+package woowacourse.shopping.domain.model.cart
 
 class CartItems(
     val values: List<CartItem> = emptyList(),

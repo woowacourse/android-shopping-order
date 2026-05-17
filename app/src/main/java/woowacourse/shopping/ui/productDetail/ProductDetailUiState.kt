@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.productDetail
 
-import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.domain.model.product.Product
 
 sealed interface ProductDetailUiState {
     data object Loading : ProductDetailUiState

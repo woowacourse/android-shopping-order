@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.util
 
-import woowacourse.shopping.domain.cart.CartItem
+import woowacourse.shopping.domain.model.cart.CartItem
 import woowacourse.shopping.ui.cart.CartItemUiModel
 
 fun List<CartItem>.toUiModel(

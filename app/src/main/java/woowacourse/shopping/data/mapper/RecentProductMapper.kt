@@ -1,11 +1,11 @@
 package woowacourse.shopping.data.mapper
 
 import woowacourse.shopping.data.local.recent.RecentProductEntity
-import woowacourse.shopping.domain.product.Category
-import woowacourse.shopping.domain.product.ImageUrl
-import woowacourse.shopping.domain.product.Price
-import woowacourse.shopping.domain.product.Product
-import woowacourse.shopping.domain.product.ProductName
+import woowacourse.shopping.domain.model.product.Category
+import woowacourse.shopping.domain.model.product.ImageUrl
+import woowacourse.shopping.domain.model.product.Price
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.product.ProductName
 
 fun RecentProductEntity.toDomain(): Product =
     Product(

@@ -45,11 +45,11 @@ import coil3.compose.AsyncImage
 import woowacourse.shopping.constant.Format.formatPrice
 import woowacourse.shopping.constant.ShoppingColor.CART_PAGE_BUTTON_ACTIVE_COLOR
 import woowacourse.shopping.constant.ShoppingColor.CART_PAGE_BUTTON_INACTIVE_COLOR
-import woowacourse.shopping.domain.product.Category
-import woowacourse.shopping.domain.product.ImageUrl
-import woowacourse.shopping.domain.product.Price
-import woowacourse.shopping.domain.product.Product
-import woowacourse.shopping.domain.product.ProductName
+import woowacourse.shopping.domain.model.product.Category
+import woowacourse.shopping.domain.model.product.ImageUrl
+import woowacourse.shopping.domain.model.product.Price
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.product.ProductName
 
 @Composable
 fun CartScreen(

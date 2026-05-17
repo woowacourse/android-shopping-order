@@ -2,9 +2,9 @@ package woowacourse.shopping.data.repository.cart
 
 import woowacourse.shopping.data.datasource.cart.CartRemoteDataSource
 import woowacourse.shopping.data.mapper.toDomain
-import woowacourse.shopping.domain.cart.CartItems
-import woowacourse.shopping.domain.cart.Quantity
-import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.domain.model.cart.CartItems
+import woowacourse.shopping.domain.model.cart.Quantity
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 
 class CartRepositoryImpl(

@@ -1,6 +1,6 @@
-package woowacourse.shopping.domain.cart
+package woowacourse.shopping.domain.model.cart
 
-import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.domain.model.product.Product
 
 data class CartItem(
     val id: Int,

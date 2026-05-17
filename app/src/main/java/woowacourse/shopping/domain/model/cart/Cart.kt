@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.cart
+package woowacourse.shopping.domain.model.cart
 
 data class Cart(
     val cartItems: CartItems = CartItems(),

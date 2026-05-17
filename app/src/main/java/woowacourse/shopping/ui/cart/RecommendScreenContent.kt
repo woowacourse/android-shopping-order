@@ -16,11 +16,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import woowacourse.shopping.domain.product.Category
-import woowacourse.shopping.domain.product.ImageUrl
-import woowacourse.shopping.domain.product.Price
-import woowacourse.shopping.domain.product.Product
-import woowacourse.shopping.domain.product.ProductName
+import woowacourse.shopping.domain.model.product.Category
+import woowacourse.shopping.domain.model.product.ImageUrl
+import woowacourse.shopping.domain.model.product.Price
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.product.ProductName
 import woowacourse.shopping.ui.productList.ProductCard
 
 @Composable

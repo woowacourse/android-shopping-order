@@ -1,8 +1,8 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.cart.CartItems
-import woowacourse.shopping.domain.cart.Quantity
-import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.domain.model.cart.CartItems
+import woowacourse.shopping.domain.model.cart.Quantity
+import woowacourse.shopping.domain.model.product.Product
 
 interface CartRepository {
     suspend fun getCartItems(

@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.domain.model.product.Product
 
 interface RecentProductRepository {
     fun getRecentProducts(limit: Int = DEFAULT_LIMIT): Flow<List<Product>>

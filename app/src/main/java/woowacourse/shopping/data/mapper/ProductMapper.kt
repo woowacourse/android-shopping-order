@@ -2,12 +2,12 @@ package woowacourse.shopping.data.mapper
 
 import woowacourse.shopping.data.remote.dto.ProductResponseDto
 import woowacourse.shopping.data.remote.dto.ProductsResponseDto
-import woowacourse.shopping.domain.product.Category
-import woowacourse.shopping.domain.product.ImageUrl
-import woowacourse.shopping.domain.product.Price
-import woowacourse.shopping.domain.product.Product
-import woowacourse.shopping.domain.product.ProductName
-import woowacourse.shopping.domain.product.Products
+import woowacourse.shopping.domain.model.product.Category
+import woowacourse.shopping.domain.model.product.ImageUrl
+import woowacourse.shopping.domain.model.product.Price
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.product.ProductName
+import woowacourse.shopping.domain.model.product.Products
 
 fun ProductsResponseDto.toDomain(): Products =
     Products(
