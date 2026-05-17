@@ -36,3 +36,30 @@
 - **단위 테스트 작성**
     - [ ] 선택 주문 로직 테스트 작성
     - [ ] 추천 알고리즘 단위 테스트 작성
+
+### 🧹 1차 피드백 반영 내용
+
+- **프로젝트 빌드 실패**
+  - [x] `CLEARTEXT` 허용 문구 추가
+
+- **RecentlyViewedProductRepositoryImpl**
+  - [ ] getAll() 함수의 반환타입을 List<Long> 타입으로 변경해 viewModel과 data 계층의 의존성 제거
+
+- **UserAuthDataStore**
+  - [ ] StateFlow를 사용하도록 변경
+  - [ ] applicationContext 제한 추가
+
+- **WebServerResponse**
+  - [ ] MockProductResponse로 네이밍 변경
+
+- **data/mock**
+  - [ ] 테스트 디렉터리로 이동
+
+- **MockProductRepositoryImpl**
+  - [ ] getCategoryProduct에 Dispatcher.IO 명시
+
+- **domain**
+  - [ ] @Percelizable 어노테이션 제거 및 상속관계 제거
+
+- **RecommendationViewModel**
+  - [ ] id를 넘겨받아 Product 자체를 다시 조회하는 대신 카테고리 문자열만 넘겨받아 API를 호출하도록 수정
