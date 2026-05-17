@@ -103,9 +103,9 @@ private fun LoadingCard(modifier: Modifier = Modifier) {
 private fun LoadingContentPreview() {
     LoadingContent(modifier = Modifier.fillMaxSize())
 }
-//
-// @Composable
-// @Preview
-// private fun LoadingCardPreview() {
-//    LoadingCard()
-// }
+
+@Composable
+@Preview
+private fun LoadingCardPreview() {
+    LoadingCard()
+}
