@@ -20,7 +20,7 @@ val MIGRATION_5_6 =
                 CREATE TABLE IF NOT EXISTS `recently_viewed_products` (
                     `product_id` INTEGER NOT NULL,
                     `time_stamp` INTEGER NOT NULL,
-                    PRIMARY KEY(`productId`)
+                    PRIMARY KEY(`product_id`)
                 )
                 """.trimIndent(),
             )
