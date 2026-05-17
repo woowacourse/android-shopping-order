@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.model
 
 data class User(
     val email: String,

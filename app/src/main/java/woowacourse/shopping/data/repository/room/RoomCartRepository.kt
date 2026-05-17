@@ -2,9 +2,9 @@ package woowacourse.shopping.data.repository.room
 
 import woowacourse.shopping.data.local.dao.CartDao
 import woowacourse.shopping.data.local.entity.CartEntity
-import woowacourse.shopping.data.model.Cart
-import woowacourse.shopping.data.model.CartItem
-import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.model.Cart
+import woowacourse.shopping.model.CartItem
+import woowacourse.shopping.model.Product
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 

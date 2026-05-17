@@ -4,9 +4,6 @@ package woowacourse.shopping.model
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.data.model.Money
-import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.data.model.Products
 
 class ProductsTest {
     val product1 =

@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.model
 
 @JvmInline
 value class Money(

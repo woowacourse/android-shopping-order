@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.model.Product
 
 interface ProductRepository {
     suspend fun getSize(): Int

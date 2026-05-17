@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.repository.inmemory
 
-import woowacourse.shopping.data.model.Money
-import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.data.model.Products
+import woowacourse.shopping.model.Money
+import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.Products
 import woowacourse.shopping.data.repository.ProductRepository
 
 class InMemoryProductRepository(

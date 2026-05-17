@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository.inmemory
 
-import woowacourse.shopping.data.model.Cart
-import woowacourse.shopping.data.model.User
+import woowacourse.shopping.model.Cart
+import woowacourse.shopping.model.User
 
 object InMemoryUserRepository {
     val STARTER =

@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.data.model.Products
+import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.Products
 
 interface RecentProductRepository {
     suspend fun getRecentProducts(): Products

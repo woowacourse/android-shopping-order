@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.productdetail
 
-import woowacourse.shopping.data.model.Money
-import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.model.Money
+import woowacourse.shopping.model.Product
 
 data class ProductDetailUiState(
     val isLoading: Boolean = false,

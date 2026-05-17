@@ -1,12 +1,11 @@
-package woowacourse.shopping.algorithm
+package woowacourse.shopping.recommender
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.data.model.CartItem
-import woowacourse.shopping.data.model.Money
-import woowacourse.shopping.data.model.Product
-import woowacourse.shopping.recommender.ProductRecommender
+import woowacourse.shopping.model.CartItem
+import woowacourse.shopping.model.Money
+import woowacourse.shopping.model.Product
 
 class ProductRecommenderTest {
     private val electronics = "electronics"

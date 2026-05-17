@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository.network
 
-import woowacourse.shopping.data.model.Money
-import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.model.Money
+import woowacourse.shopping.model.Product
 import woowacourse.shopping.data.remote.dto.ProductResponse
 import woowacourse.shopping.data.remote.dto.toDomain
 import woowacourse.shopping.data.remote.service.ProductService

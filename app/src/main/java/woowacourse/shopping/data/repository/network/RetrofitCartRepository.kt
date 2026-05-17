@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.repository.network
 
-import woowacourse.shopping.data.model.Cart
-import woowacourse.shopping.data.model.CartItem
-import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.model.Cart
+import woowacourse.shopping.model.CartItem
+import woowacourse.shopping.model.Product
 import woowacourse.shopping.data.remote.auth.BasicAuthEncoder
 import woowacourse.shopping.data.remote.dto.CartItemRequest
 import woowacourse.shopping.data.remote.dto.Quantity

@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.cart
 
-import woowacourse.shopping.data.model.CartItem
+import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.ui.common.model.ProductUiModel
 
 data class CartUiState(

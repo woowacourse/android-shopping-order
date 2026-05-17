@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.model
+package woowacourse.shopping.model
 
 import java.util.concurrent.atomic.AtomicLong
 
