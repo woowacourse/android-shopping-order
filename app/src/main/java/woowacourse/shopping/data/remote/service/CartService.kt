@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.remote.service
 
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -24,7 +25,7 @@ interface CartService {
     suspend fun addCartItem(
         @Header("Authorization") auth: String,
         @Body request: CartItemRequest,
-    )
+    ): Response<Unit>
 
     @DELETE("cart-items/{id}")
     suspend fun deleteCartItem(

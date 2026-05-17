@@ -39,14 +39,14 @@ fun CartScreen(
                 showPagination = uiState.showPagination,
                 selectedItemIds = uiState.selectedItemIds,
                 onBackClick = onBackClick,
-                onDeleteClick = { viewModel.delete(it.product) },
+                onDeleteClick = { viewModel.delete(it) },
                 onPreviousClick = { viewModel.previousPage() },
                 onNextClick = { viewModel.nextPage() },
-                onAddClick = { viewModel.increase(it.product) },
-                onRemoveClick = { viewModel.decrease(it.product) },
-                onCheckedChange = { id, isSelected ->
+                onAddClick = { viewModel.increase(it) },
+                onRemoveClick = { viewModel.decrease(it) },
+                onCheckedChange = { item, isSelected ->
                     viewModel.toggleItemSelection(
-                        id.id ?: throw IllegalArgumentException(),
+                        item.id ?: throw IllegalArgumentException(),
                         isSelected,
                     )
                 },
@@ -59,6 +59,7 @@ fun CartScreen(
                     viewModel.changeScreen()
                 },
             )
+
         false ->
             RecommendScreen(
                 recommendedProducts = uiState.recommendItems,
@@ -107,12 +108,11 @@ fun CartScreen(
         CartBody(
             cart = cart,
             showPagination = showPagination,
-            currentPage = currentPage,
+            currentPage = currentPage + 1,
             totalPages = totalPages,
-            modifier =
-                Modifier
-                    .padding(top = 8.dp, start = 18.dp, end = 18.dp)
-                    .weight(1f),
+            modifier = Modifier
+                .padding(top = 8.dp, start = 18.dp, end = 18.dp)
+                .weight(1f),
             onDeleteClick = onDeleteClick,
             onPreviousClick = onPreviousClick,
             onNextClick = onNextClick,
@@ -141,8 +141,8 @@ private fun RecommendScreen(
     price: Long,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
-    onIncreaseClick: (Product) -> Unit,
-    onDecreaseClick: (Product) -> Unit,
+    onIncreaseClick: (ProductUiModel) -> Unit,
+    onDecreaseClick: (ProductUiModel) -> Unit,
     onOrderClick: () -> Unit,
 ) {
     Column(

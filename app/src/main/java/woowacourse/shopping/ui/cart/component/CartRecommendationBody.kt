@@ -26,8 +26,8 @@ import woowacourse.shopping.ui.shopping.component.ProductUnit
 fun CartRecommendationBody(
     productItems: List<ProductUiModel>,
     modifier: Modifier = Modifier,
-    onIncreaseClick: (Product) -> Unit,
-    onDecreaseClick: (Product) -> Unit,
+    onIncreaseClick: (ProductUiModel) -> Unit,
+    onDecreaseClick: (ProductUiModel) -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -78,8 +78,8 @@ private fun Title(modifier: Modifier = Modifier) {
 private fun ItemRow(
     products: List<ProductUiModel>,
     modifier: Modifier = Modifier,
-    onIncreaseClick: (Product) -> Unit,
-    onDecreaseClick: (Product) -> Unit,
+    onIncreaseClick: (ProductUiModel) -> Unit,
+    onDecreaseClick: (ProductUiModel) -> Unit,
 ) {
     LazyRow(
         modifier = modifier,
@@ -90,8 +90,8 @@ private fun ItemRow(
                 model = uiModel,
                 modifier = Modifier,
                 onClick = {},
-                onIncreaseClick = onIncreaseClick,
-                onDecreaseClick = onDecreaseClick,
+                onIncreaseClick = { onIncreaseClick(uiModel) },
+                onDecreaseClick = { onDecreaseClick(uiModel) },
             )
         }
     }

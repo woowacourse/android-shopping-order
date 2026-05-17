@@ -17,7 +17,6 @@ import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.ui.common.model.ProductUiModel
-import woowacourse.shopping.ui.common.paging.Pager
 
 class ShoppingViewModel(
     networkMonitor: NetworkMonitor,
@@ -27,7 +26,6 @@ class ShoppingViewModel(
     private val loadSize: Int,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ShoppingUiState())
-    private val pager = Pager(loadSize)
     val uiState = _uiState.asStateFlow()
     val isNetworkConnected: StateFlow<Boolean> =
         networkMonitor.isConnected
@@ -58,50 +56,62 @@ class ShoppingViewModel(
         }
     }
 
-    fun increase(product: Product) {
+    fun increase(uiModel: ProductUiModel) {
+        var cartItemId: Long
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
             try {
-                cartRepo.increase(product)
-
+                if (uiModel.cartItemId == null) {
+                    cartItemId = cartRepo.add(productId = uiModel.product.id, quantity = 1)
+                } else {
+                    cartItemId = uiModel.cartItemId
+                    cartRepo.updateQuantity(
+                        cartItemId = uiModel.cartItemId,
+                        quantity = uiModel.quantity + 1
+                    )
+                }
                 _uiState.update { state ->
-                    val updatedProducts =
-                        state.visibleProducts.map { uiModel ->
-                            if (uiModel.product.id == product.id) {
-                                uiModel.copy(cartQuantity = uiModel.cartQuantity + 1)
-                            } else {
-                                uiModel
-                            }
+                    val updatedProducts = state.visibleProducts.map {
+                        if (uiModel.product.id == it.product.id) {
+                            it.copy(cartItemId = cartItemId, quantity = uiModel.quantity + 1)
+                        } else {
+                            it
                         }
+                    }
                     val cartCount = state.cartCount + 1
                     state.copy(visibleProducts = updatedProducts, cartCount = cartCount)
                 }
             } finally {
-                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
 
-    fun decrease(product: Product) {
+    fun decrease(uiModel: ProductUiModel) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
             try {
-                cartRepo.decrease(product)
+                val cartItemId = uiModel.cartItemId
+                    ?: throw IllegalArgumentException("상품(${uiModel.product.name})의 카트 아이템 아이디가 null 입니다.")
+                if (uiModel.quantity > 1) {
+                    cartRepo.updateQuantity(
+                        cartItemId = cartItemId,
+                        quantity = uiModel.quantity - 1
+                    )
+                } else {
+                    cartRepo.delete(cartItemId)
+                }
 
                 _uiState.update { state ->
-                    val updatedProducts =
-                        state.visibleProducts.map { uiModel ->
-                            if (uiModel.product.id == product.id) {
-                                uiModel.copy(cartQuantity = maxOf(0, uiModel.cartQuantity - 1))
-                            } else {
-                                uiModel
-                            }
+                    val updatedProducts = state.visibleProducts.map {
+                        if (uiModel.product.id == it.product.id) {
+                            if (uiModel.quantity > 1) it.copy(quantity = uiModel.quantity - 1)
+                            else it.copy(cartItemId = null, quantity = 0)
+                        } else {
+                            it
                         }
+                    }
                     val cartCount = maxOf(0, state.cartCount - 1)
                     state.copy(visibleProducts = updatedProducts, cartCount = cartCount)
                 }
             } finally {
-                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -109,7 +119,7 @@ class ShoppingViewModel(
     fun loadMore() {
         val currentSize = _uiState.value.visibleProducts.size
         val currentProducts = _uiState.value.visibleProducts
-        if (!pager.canLoadMore(currentSize, _uiState.value.sizeInRepo)) return
+        if (currentSize >= _uiState.value.sizeInRepo) return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
@@ -156,15 +166,14 @@ class ShoppingViewModel(
     }
 
     private suspend fun mapToProductUiModels(products: List<Product>): List<ProductUiModel> {
-        val cartItems = cartRepo.getAllCartItems()
-        val cartQuantityMap: Map<Long, Int> =
-            cartItems.items.associate {
-                it.product.id to it.quantity
-            }
+        val cart = cartRepo.getAllCartItems()
+
         return products.map { product ->
+            val cartItem = cart.items.find { it.product.id == product.id }
             ProductUiModel(
                 product = product,
-                cartQuantity = cartQuantityMap[product.id] ?: 0,
+                cartItemId = cartItem?.id,
+                quantity = cartItem?.quantity ?: 0,
             )
         }
     }

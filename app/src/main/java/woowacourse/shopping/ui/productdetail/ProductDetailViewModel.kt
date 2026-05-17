@@ -43,13 +43,21 @@ class ProductDetailViewModel(
     }
 
     fun addToCart() {
-        val currentState = _uiState.value
-        val productToSave = currentState.product ?: return
+        val state = _uiState.value
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
-                cartRepo.add(productToSave, quantity = currentState.selectedQuantity)
+                if (state.existingCartItemId == null) {
+                    val newId = cartRepo.add(productId, state.selectedQuantity)
+                    _uiState.update {
+                        it.copy(existingCartItemId = newId, existingQuantity = state.selectedQuantity)
+                    }
+                } else {
+                    val newQuantity = state.existingQuantity + state.selectedQuantity
+                    cartRepo.updateQuantity(state.existingCartItemId, newQuantity)
+                    _uiState.update { it.copy(existingQuantity = newQuantity) }
+                }
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
@@ -61,15 +69,17 @@ class ProductDetailViewModel(
             _uiState.update { it.copy(isLoading = true) }
             try {
                 val product = productRepo.findProduct(productId)
-                val bannerProduct =
-                    recentProductRepo
-                        .getLastViewedProduct()
-                        ?.takeIf { !isFromBanner && it.id != productId }
+                val existing = cartRepo.getAllCartItems()
+                    .items.find { it.product.id == productId }
+                val bannerProduct = recentProductRepo.getLastViewedProduct()
+                    ?.takeIf { !isFromBanner && it.id != productId }
 
                 _uiState.update {
                     it.copy(
                         product = product,
                         selectedQuantity = 1,
+                        existingCartItemId = existing?.id,
+                        existingQuantity = existing?.quantity ?: 0,
                         lastViewedProduct = bannerProduct,
                     )
                 }

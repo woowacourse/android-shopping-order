@@ -31,8 +31,8 @@ fun ProductUnit(
     model: ProductUiModel,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    onIncreaseClick: (Product) -> Unit,
-    onDecreaseClick: (Product) -> Unit,
+    onIncreaseClick: () -> Unit,
+    onDecreaseClick: () -> Unit,
 ) {
     val product = model.product
     val price = product.price.value
@@ -53,9 +53,9 @@ fun ProductUnit(
 
             if (model.isAddedToCart) {
                 QuantityControlButton(
-                    count = model.cartQuantity,
-                    onIncreaseClick = { onIncreaseClick(product) },
-                    onDecreaseClick = { onDecreaseClick(product) },
+                    count = model.quantity,
+                    onIncreaseClick = onIncreaseClick,
+                    onDecreaseClick = onDecreaseClick,
                     modifier =
                         Modifier
                             .align(Alignment.BottomCenter)
@@ -67,7 +67,7 @@ fun ProductUnit(
                         Modifier
                             .align(Alignment.BottomEnd)
                             .padding(8.dp),
-                    onClick = { onIncreaseClick(product) },
+                    onClick = onIncreaseClick,
                 )
             }
         }
@@ -103,7 +103,7 @@ private fun ProductUnitPreview() {
                     price = Money(1000),
                     imageUrl = "",
                 ),
-            cartQuantity = 2,
+            quantity = 2,
         )
     ProductUnit(
         model = product,

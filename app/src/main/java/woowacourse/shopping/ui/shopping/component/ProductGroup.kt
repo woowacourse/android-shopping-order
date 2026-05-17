@@ -26,8 +26,8 @@ fun ProductGroup(
     lazyGridState: LazyGridState,
     modifier: Modifier = Modifier,
     onProductClick: (Product) -> Unit,
-    onIncreaseClick: (Product) -> Unit,
-    onDecreaseClick: (Product) -> Unit,
+    onIncreaseClick: (ProductUiModel) -> Unit,
+    onDecreaseClick: (ProductUiModel) -> Unit,
     onMoreClick: () -> Unit,
 ) {
     LazyVerticalGrid(
@@ -37,16 +37,16 @@ fun ProductGroup(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        items(items = products, key = { it.product.id }) { productModel ->
+        items(items = products, key = { it.product.id }) { uiModel ->
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 ProductUnit(
-                    model = productModel,
-                    onClick = { onProductClick(productModel.product) },
-                    onIncreaseClick = onIncreaseClick,
-                    onDecreaseClick = onDecreaseClick,
+                    model = uiModel,
+                    onClick = { onProductClick(uiModel.product) },
+                    onIncreaseClick = { onIncreaseClick(uiModel) },
+                    onDecreaseClick = { onDecreaseClick(uiModel) },
                 )
             }
         }

@@ -11,7 +11,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,12 +44,11 @@ fun ShoppingScreen(
     val isConnected by viewModel.isNetworkConnected.collectAsStateWithLifecycle()
 
     DisposableEffect(lifecycleOwner) {
-        val observer =
-            LifecycleEventObserver { _, event ->
-                if (event == Lifecycle.Event.ON_RESUME) {
-                    viewModel.syncCartState()
-                }
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.syncCartState()
             }
+        }
 
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
@@ -94,8 +92,8 @@ fun ShoppingScreen(
     onCartClick: () -> Unit,
     onProductClick: (Product) -> Unit,
     onMoreClick: () -> Unit,
-    onIncreaseClick: (Product) -> Unit,
-    onDecreaseClick: (Product) -> Unit,
+    onIncreaseClick: (ProductUiModel) -> Unit,
+    onDecreaseClick: (ProductUiModel) -> Unit,
     onRecentProductClick: (Product) -> Unit,
 ) {
     Column(
@@ -121,10 +119,9 @@ fun ShoppingScreen(
             products = products,
             showMoreButton = hasNext,
             lazyGridState = lazyGridState,
-            modifier =
-                Modifier
-                    .padding(20.dp)
-                    .weight(1f),
+            modifier = Modifier
+                .padding(20.dp)
+                .weight(1f),
             onProductClick = onProductClick,
             onMoreClick = onMoreClick,
             onIncreaseClick = onIncreaseClick,
@@ -136,24 +133,21 @@ fun ShoppingScreen(
 @Preview(showBackground = true, name = "상품 여러개")
 @Composable
 private fun ShoppingScreenPreview1() {
-    val product1 =
-        Product(
-            name = "스피또",
-            price = Money(1000),
-            imageUrl = "",
-        )
-    val product2 =
-        Product(
-            name = "연금복권",
-            price = Money(1000),
-            imageUrl = "",
-        )
-    val product3 =
-        Product(
-            name = "로또",
-            price = Money(1000),
-            imageUrl = "",
-        )
+    val product1 = Product(
+        name = "스피또",
+        price = Money(1000),
+        imageUrl = "",
+    )
+    val product2 = Product(
+        name = "연금복권",
+        price = Money(1000),
+        imageUrl = "",
+    )
+    val product3 = Product(
+        name = "로또",
+        price = Money(1000),
+        imageUrl = "",
+    )
     val productUiModels = listOf(product1, product2, product3).map { ProductUiModel(it) }
 
     ShoppingScreen(

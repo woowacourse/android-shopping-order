@@ -9,105 +9,46 @@ import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.model.Cart
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Page
-import woowacourse.shopping.model.Product
 
 class RetrofitCartRepository(
     private val encoder: BasicAuthEncoder,
     private val service: CartService,
 ) : CartRepository {
     override suspend fun getAllCartItems(): Cart {
-        val response =
-            service.getCartItems(
-                auth = encoder.getHeader(),
-            )
-
+        val response = service.getCartItems(
+            auth = encoder.getHeader(),
+        )
         return response.toDomain()
     }
 
-    override suspend fun add(
-        item: Product,
-        quantity: Int,
-    ) {
-        val cartItems = getAllCartItems()
-        val foundedItem = cartItems.items.find { it.product.id == item.id }
-
-        if (foundedItem == null) {
-            service.addCartItem(
-                auth = encoder.getHeader(),
-                request =
-                    CartItemRequest(
-                        productId = item.id,
-                        quantity = quantity,
-                    ),
-            )
-        } else {
-            service.updateCartItemQuantity(
-                auth = encoder.getHeader(),
-                cartItemId =
-                    foundedItem.id
-                        ?: throw IllegalArgumentException("찾은 카트 상품에 id가 없습니다."),
-                quantity = Quantity(foundedItem.quantity + quantity),
+    override suspend fun add(productId: Long, quantity: Int): Long {
+        val response = service.addCartItem(
+            auth = encoder.getHeader(),
+            request = CartItemRequest(productId, quantity)
+        )
+        if (!response.isSuccessful) {
+            throw IllegalStateException(
+                "addCartItem 실패: ${response.code()} ${response.errorBody()?.string()}"
             )
         }
+
+        val location = response.headers()["Location"]
+            ?: error("Location 헤더가 없습니다 (status=${response.code()})")
+        return location.substringAfterLast("/").toLong()
     }
 
-    override suspend fun increase(item: Product) {
-        val cartItems = getAllCartItems()
-        val foundedItem = cartItems.items.find { it.product.id == item.id }
-
-        if (foundedItem == null) {
-            service.addCartItem(
-                auth = encoder.getHeader(),
-                request =
-                    CartItemRequest(
-                        productId = item.id,
-                        quantity = 1,
-                    ),
-            )
-        } else {
-            service.updateCartItemQuantity(
-                auth = encoder.getHeader(),
-                cartItemId =
-                    foundedItem.id
-                        ?: throw IllegalArgumentException("찾은 카트 상품에 id가 없습니다."),
-                quantity = Quantity(foundedItem.quantity + 1),
-            )
-        }
+    override suspend fun updateQuantity(cartItemId: Long, quantity: Int) {
+        service.updateCartItemQuantity(
+            auth = encoder.getHeader(),
+            cartItemId = cartItemId,
+            quantity = Quantity(quantity)
+        )
     }
 
-    override suspend fun decrease(item: Product) {
-        val cartItems = getAllCartItems()
-        val foundedItem = cartItems.items.find { it.product.id == item.id }
-
-        if (foundedItem == null) return
-        if (foundedItem.quantity == 1) {
-            service.deleteCartItem(
-                auth = encoder.getHeader(),
-                cartItemId =
-                    foundedItem.id
-                        ?: throw IllegalArgumentException("찾은 카트 상품에 id가 없습니다."),
-            )
-        } else {
-            service.updateCartItemQuantity(
-                auth = encoder.getHeader(),
-                cartItemId =
-                    foundedItem.id
-                        ?: throw IllegalArgumentException("찾은 카트 상품에 id가 없습니다."),
-                quantity = Quantity(foundedItem.quantity - 1),
-            )
-        }
-    }
-
-    override suspend fun delete(item: Product) {
-        val cartItems = getAllCartItems()
-        val foundedItem = cartItems.items.find { it.product.id == item.id }
-
-        if (foundedItem == null) return
+    override suspend fun delete(cartItemId: Long) {
         service.deleteCartItem(
             auth = encoder.getHeader(),
-            cartItemId =
-                foundedItem.id
-                    ?: throw IllegalArgumentException("찾은 카트 상품에 id가 없습니다."),
+            cartItemId = cartItemId
         )
     }
 
@@ -116,10 +57,10 @@ class RetrofitCartRepository(
         size: Int,
     ): Page<CartItem> {
         val response = service.getCartItems(
-                encoder.getHeader(),
-                pageIndex = page,
-                size = size,
-            )
+            encoder.getHeader(),
+            pageIndex = page,
+            size = size,
+        )
 
         return Page(
             items = response.content.map {
@@ -136,8 +77,6 @@ class RetrofitCartRepository(
         )
     }
 
-    override suspend fun getCartEntitySize(): Int = getAllCartItems().items.size
-
-    override suspend fun getCartCount(): Int =
+    override suspend fun getTotalProductCount(): Int =
         service.getTotalCount(auth = encoder.getHeader()).quantity
 }

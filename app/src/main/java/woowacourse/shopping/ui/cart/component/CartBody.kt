@@ -14,6 +14,7 @@ import woowacourse.shopping.model.Cart
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
+import kotlin.random.Random
 
 @Composable
 fun CartBody(
@@ -37,7 +38,7 @@ fun CartBody(
         verticalArrangement = Arrangement.spacedBy(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        items(items = cartItems, key = { it.product.id }) { cartItem ->
+        items(items = cartItems, key = { it.id ?: Random(Long.MAX_VALUE) }) { cartItem ->
             CartItemUnit(
                 cartItem = cartItem,
                 isChecked = selectedItemIds.contains(cartItem.id),

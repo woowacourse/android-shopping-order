@@ -6,7 +6,8 @@ import woowacourse.shopping.ui.common.model.ProductUiModel
 data class CartUiState(
     val isLoading: Boolean = false,
     val pagedItems: List<CartItem> = emptyList(),
-    val currentPage: Int = 1,
+    val currentPage: Int = 0,
+    val totalPages: Int = 0,
     val totalCartItemCount: Int = 0,
     val pageSize: Int = 5,
     val selectedItemIds: Set<Long> = emptySet(),
@@ -16,6 +17,5 @@ data class CartUiState(
     val isCartScreen: Boolean = true,
     val recommendItems: List<ProductUiModel> = emptyList(),
 ) {
-    val totalPages: Int get() = (totalCartItemCount - 1) / pageSize + 1
     val showPagination: Boolean get() = totalCartItemCount > pageSize
 }

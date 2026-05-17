@@ -13,7 +13,7 @@
 ## ViewModel 구조
 - [x] ViewModelProvider.Factory를 각 ViewModel의 companion object로 이동
 - [x] CartViewModel 멤버 가시성 점검
-- [ ] loadData() 제거 - refreshData()를 불필요하게 한 번 더 감싸기만 함
+- [x] loadData() 제거 - refreshData()를 불필요하게 한 번 더 감싸기만 함
 - [ ] 모든 상호작용마다 전체 새로고침 호출하는 패턴 점검 - 로컬 상태 업데이트로 충분한 케이스 분리
 
 ## 페이지네이션
