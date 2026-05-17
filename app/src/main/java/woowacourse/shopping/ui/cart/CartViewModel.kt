@@ -62,33 +62,35 @@ class CartViewModel(
         )
 
     init {
-        loadPage(0)
-        loadRecommendProduct()
+        init()
     }
 
-    private fun loadPage(page: Int) {
+    private fun init() {
         viewModelScope.launch {
-            _cartItems.update { null }
-            val result = cartRepository.getCartItems(page, PAGE_SIZE)
-            currentPage = page
-            _cartItems.update { result }
+            loadPage(currentPage)
+            loadRecommendProduct()
         }
     }
 
-    private fun loadRecommendProduct() {
-        viewModelScope.launch {
-            val recommended = recentProductRepository.getMostRecentProduct() ?: return@launch
-            val productList = productRepository.getProducts(0, Int.MAX_VALUE)
-            val categoryProducts = productList.getCategoryProducts(recommended.category.value)
+    private suspend fun loadPage(page: Int) {
+        _cartItems.update { null }
+        val result = cartRepository.getCartItems(page, PAGE_SIZE)
+        currentPage = page
+        _cartItems.update { result }
+    }
 
-            val result =
-                categoryProducts -
-                    (
-                        _cartItems.value?.values?.map { it.product }
-                            ?: emptyList()
-                    ).toSet()
-            _recommendProducts.update { result }
-        }
+    private suspend fun loadRecommendProduct() {
+        val recommended = recentProductRepository.getMostRecentProduct() ?: return
+        val productList = productRepository.getProducts(0, Int.MAX_VALUE)
+        val categoryProducts = productList.getCategoryProducts(recommended.category.value)
+
+        val result =
+            categoryProducts -
+                (
+                    _cartItems.value?.values?.map { it.product }
+                        ?: emptyList()
+                ).toSet()
+        _recommendProducts.update { result }
     }
 
     fun removeCartItem(cartId: Int) {
@@ -184,12 +186,12 @@ class CartViewModel(
 
     fun goToNextPage() {
         if (_cartItems.value?.isLast != false) return
-        loadPage(currentPage + 1)
+        viewModelScope.launch { loadPage(currentPage + 1) }
     }
 
     fun goToPreviousPage() {
         if (_cartItems.value?.isFirst != false) return
-        loadPage(currentPage - 1)
+        viewModelScope.launch { loadPage(currentPage - 1) }
     }
 
     fun onClickOrder() {
