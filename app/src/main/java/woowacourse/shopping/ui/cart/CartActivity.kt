@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.common.theme.ShoppingTheme
@@ -18,9 +16,8 @@ class CartActivity : ComponentActivity() {
     private val container by lazy {
         (application as ShoppingApplication).appContainer
     }
-    val pageSize = 5
+    private val pageSize = 5
 
-    @Suppress("UNCHECKED_CAST")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -29,17 +26,13 @@ class CartActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val viewModel: CartViewModel =
                         viewModel(
-                            factory =
-                                object : ViewModelProvider.Factory {
-                                    override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                                        CartViewModel(
-                                            cartRepo = container.cartRepository,
-                                            orderRepo = container.orderRepository,
-                                            pageSize = pageSize,
-                                            recentProductRepo = container.recentProductRepository,
-                                            productRepo = container.productRepository,
-                                        ) as T
-                                },
+                            factory = CartViewModel.provideFactory(
+                                cartRepo = container.cartRepository,
+                                productRepo = container.productRepository,
+                                orderRepo = container.orderRepository,
+                                recentProductRepo = container.recentProductRepository,
+                                pageSize = pageSize
+                            )
                         )
 
                     CartScreen(

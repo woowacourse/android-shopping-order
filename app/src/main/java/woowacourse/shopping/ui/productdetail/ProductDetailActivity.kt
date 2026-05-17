@@ -10,10 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.createSavedStateHandle
-import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.common.theme.ShoppingTheme
@@ -23,7 +19,6 @@ class ProductDetailActivity : ComponentActivity() {
         (application as ShoppingApplication).appContainer
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -36,23 +31,12 @@ class ProductDetailActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val viewModel: ProductDetailViewModel =
                         viewModel(
-                            factory =
-                                object : ViewModelProvider.Factory {
-                                    override fun <T : ViewModel> create(
-                                        modelClass: Class<T>,
-                                        extras: CreationExtras,
-                                    ): T {
-                                        val savedStateHandle = extras.createSavedStateHandle()
-
-                                        return ProductDetailViewModel(
-                                            savedStateHandle = savedStateHandle,
-                                            productRepo = container.productRepository,
-                                            cartRepo = container.cartRepository,
-                                            recentProductRepo = container.recentProductRepository,
-                                            productId = receivedProductId,
-                                        ) as T
-                                    }
-                                },
+                            factory = ProductDetailViewModel.provideFactory(
+                                productRepo = container.productRepository,
+                                cartRepo = container.cartRepository,
+                                recentProductRepo = container.recentProductRepository,
+                                receivedProductId = receivedProductId,
+                            ),
                         )
 
                     ProductDetailScreen(
@@ -63,7 +47,8 @@ class ProductDetailActivity : ComponentActivity() {
                         },
                         onAddToCartClick = ::finish,
                         onLastViewedProductClick = {
-                            val intent = newIntent(context = this, productId = it.id, isFromBanner = true)
+                            val intent =
+                                newIntent(context = this, productId = it.id, isFromBanner = true)
                             startActivity(intent)
                             finish()
                         },

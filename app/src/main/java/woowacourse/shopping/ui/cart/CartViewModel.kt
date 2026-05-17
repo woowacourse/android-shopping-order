@@ -1,16 +1,17 @@
 package woowacourse.shopping.ui.cart
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.model.Product
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
+import woowacourse.shopping.model.Product
 import woowacourse.shopping.recommender.ProductRecommender
 import woowacourse.shopping.ui.common.model.ProductUiModel
 import woowacourse.shopping.ui.common.paging.Pager
@@ -23,8 +24,8 @@ class CartViewModel(
     private val pageSize: Int,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
+    private val pager = Pager(pageSize)
     val uiState = _uiState.asStateFlow()
-    val pager = Pager(pageSize)
 
     init {
         viewModelScope.launch {
@@ -302,5 +303,26 @@ class CartViewModel(
                     ?: throw IllegalArgumentException("선택한 상품 아이디($itemId)로 장바구니에서 아이템을 조회할 수 없습니다.")
             }
         return selectedItems.sumOf { it.quantity }
+    }
+
+    companion object {
+        fun provideFactory(
+            cartRepo: CartRepository,
+            productRepo: ProductRepository,
+            orderRepo: OrderRepository,
+            recentProductRepo: RecentProductRepository,
+            pageSize: Int,
+        ): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                    CartViewModel(
+                        cartRepo = cartRepo,
+                        pageSize = pageSize,
+                        recentProductRepo = recentProductRepo,
+                        productRepo = productRepo,
+                        orderRepo = orderRepo,
+                    ) as T
+            }
     }
 }
