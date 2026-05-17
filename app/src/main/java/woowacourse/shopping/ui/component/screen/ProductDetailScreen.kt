@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -155,6 +156,8 @@ private fun ProductDetailInfo(
             text = product.name,
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 2,
             modifier = Modifier.padding(18.dp),
         )
         HorizontalDivider()
