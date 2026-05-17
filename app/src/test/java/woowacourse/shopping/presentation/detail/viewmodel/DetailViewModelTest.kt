@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.fake.FakeCartRepository
 import woowacourse.shopping.fake.FakeProductRepository
-import woowacourse.shopping.fake.FakeRecentProductRepository
 import woowacourse.shopping.fake.fakeProduct
 import woowacourse.shopping.presentation.detail.model.DetailUiState
 
@@ -22,7 +21,6 @@ class DetailViewModelTest {
     private lateinit var viewModel: DetailViewModel
     private lateinit var productRepository: FakeProductRepository
     private lateinit var cartRepository: FakeCartRepository
-    private lateinit var recentProductRepository: FakeRecentProductRepository
 
     @BeforeEach
     fun setUp() {
@@ -31,12 +29,10 @@ class DetailViewModelTest {
         val productMap = products.associateBy { it.id }
         productRepository = FakeProductRepository(products)
         cartRepository = FakeCartRepository(productMap)
-        recentProductRepository = FakeRecentProductRepository(products)
         viewModel =
             DetailViewModel(
                 productRepository = productRepository,
                 cartRepository = cartRepository,
-                recentProductRepository = recentProductRepository,
             )
     }
 
@@ -48,7 +44,7 @@ class DetailViewModelTest {
     @Test
     fun `loadProduct는 상품 정보를 uiState에 업데이트한다`() =
         runTest {
-            viewModel.loadProduct(id = 1L, isFromLastSeen = false)
+            viewModel.loadProduct(id = 1L)
 
             val state = viewModel.uiState.value
 
@@ -61,7 +57,7 @@ class DetailViewModelTest {
         runTest {
             cartRepository.addItem(1L, 3)
 
-            viewModel.loadProduct(id = 1L, isFromLastSeen = false)
+            viewModel.loadProduct(id = 1L)
             val state = viewModel.uiState.value
 
             assertThat(state).isInstanceOf(DetailUiState.Success::class.java)
@@ -70,12 +66,12 @@ class DetailViewModelTest {
 
     @Test
     fun `increase는 quantity를 1 증가시킨다`() {
-        viewModel.loadProduct(1L, false)
+        viewModel.loadProduct(1L)
         val state = viewModel.uiState.value
         assertThat(state).isInstanceOf(DetailUiState.Success::class.java)
         if (state is DetailUiState.Success) {
             val initial = state.quantity
-            viewModel.increase()
+            viewModel.increaseQuantity()
 
             val updatedState = viewModel.uiState.value as DetailUiState.Success
             assertThat(updatedState.quantity).isEqualTo(initial + 1)
@@ -84,11 +80,11 @@ class DetailViewModelTest {
 
     @Test
     fun `decrease는 quantity가 1보다 크면 1 감소시킨다`() {
-        viewModel.loadProduct(1L, false)
-        viewModel.increase()
-        viewModel.increase()
+        viewModel.loadProduct(1L)
+        viewModel.increaseQuantity()
+        viewModel.increaseQuantity()
 
-        viewModel.decrease()
+        viewModel.decreaseQuantity()
 
         val state = viewModel.uiState.value
         assertThat(state).isInstanceOf(DetailUiState.Success::class.java)
@@ -97,8 +93,8 @@ class DetailViewModelTest {
 
     @Test
     fun `decrease는 quantity가 1이면 감소시키지 않는다`() {
-        viewModel.loadProduct(1L, false)
-        viewModel.decrease()
+        viewModel.loadProduct(1L)
+        viewModel.decreaseQuantity()
 
         val state = viewModel.uiState.value
         assertThat(state).isInstanceOf(DetailUiState.Success::class.java)
@@ -108,9 +104,11 @@ class DetailViewModelTest {
     @Test
     fun `addToCart는 cartRepository에 상품을 추가한다`() =
         runTest {
-            viewModel.addToCart(id = 1L, quantity = 3)
+            viewModel.addItemToCart(id = 1L, quantity = 3)
 
-            val cartItem = cartRepository.getCart().items.find { it.product.id == 1L }
+            val cartItem =
+                cartRepository.cart.value.items
+                    .find { it.product.id == 1L }
             assertThat(cartItem!!.quantity).isEqualTo(3)
         }
 }

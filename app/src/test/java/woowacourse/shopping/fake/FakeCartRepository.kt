@@ -1,5 +1,7 @@
 package woowacourse.shopping.fake
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
@@ -10,8 +12,13 @@ class FakeCartRepository(
     private val products: Map<Long, Product> = emptyMap(),
 ) : CartRepository {
     private val items = mutableMapOf<Long, Int>()
+    private val _cart = MutableStateFlow(Cart())
 
-    override suspend fun getCart(): Cart {
+    override val cart = _cart.asStateFlow()
+
+    override suspend fun loadCart() = Unit
+
+    private fun currentCart(): Cart {
         val cartItems =
             items.mapNotNull { (id, quantity) ->
                 products[id]?.let { CartItem(it, quantity) }
@@ -24,11 +31,13 @@ class FakeCartRepository(
         quantity: Int,
     ) {
         items[id] = (items[id] ?: 0) + quantity
+        _cart.value = currentCart()
     }
 
     override suspend fun deleteItem(productId: Long): RemoveItemResult =
         if (items.remove(productId) != null) {
-            RemoveItemResult.Success(getCart())
+            _cart.value = currentCart()
+            RemoveItemResult.Success
         } else {
             RemoveItemResult.NotFoundItem
         }
@@ -36,12 +45,12 @@ class FakeCartRepository(
     override suspend fun changeCartItem(
         productId: Long,
         amount: Int,
-    ): Cart {
+    ) {
         if (amount <= 0) {
             items.remove(productId)
         } else {
             items[productId] = amount
         }
-        return getCart()
+        _cart.value = currentCart()
     }
 }

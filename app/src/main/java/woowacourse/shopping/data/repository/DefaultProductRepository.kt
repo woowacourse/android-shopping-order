@@ -1,24 +1,51 @@
 package woowacourse.shopping.data.repository
 
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
+import woowacourse.shopping.data.source.local.recent.RecentProductDao
+import woowacourse.shopping.data.source.local.recent.RecentProductEntity
 import woowacourse.shopping.data.source.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.source.remote.dto.product.toDomain
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
-import kotlin.collections.map
 
 class DefaultProductRepository(
-    private val remoteDataSource: ProductRemoteDataSource,
+    private val remoteProductDataSource: ProductRemoteDataSource,
+    private val recentProductDao: RecentProductDao,
 ) : ProductRepository {
-    override suspend fun getProducts(
+    private val _products = MutableStateFlow<List<Product>>(emptyList())
+
+    override val products = _products.asStateFlow()
+
+    override suspend fun loadProducts(
         offset: Int,
         limit: Int,
-    ): ImmutableList<Product> =
-        remoteDataSource
-            .fetchProducts(offset, limit)
-            .map { it.toDomain() }
-            .toImmutableList()
+    ): Int {
+        val newProducts = remoteProductDataSource.fetchProducts(offset, limit).map { it.toDomain() }
+        _products.update { products ->
+            (products + newProducts).distinctBy { it.id }
+        }
+        return newProducts.size
+    }
 
-    override suspend fun getProductById(id: Long): Product = remoteDataSource.fetchProductById(id).toDomain()
+    override fun getRecentProductsStream(limit: Int): Flow<List<Product>> =
+        recentProductDao
+            .getRecentStream(limit)
+            .map { entities ->
+                entities.mapNotNull { getProductById(it.productId) }
+            }
+
+    override suspend fun upsertRecentProduct(id: Long) {
+        recentProductDao.upsertRecentProduct(
+            RecentProductEntity(
+                productId = id,
+                lastViewedAt = System.currentTimeMillis(),
+            ),
+        )
+    }
+
+    override suspend fun getProductById(id: Long): Product? = _products.value.find { it.id == id }
 }

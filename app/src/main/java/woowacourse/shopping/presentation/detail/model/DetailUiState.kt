@@ -8,10 +8,10 @@ sealed interface DetailUiState {
     data class Success(
         val product: ProductUiModel,
         val quantity: Int,
-        val lastSeenProduct: ProductUiModel? = null,
+        val recentProduct: ProductUiModel? = null,
     ) : DetailUiState {
         val price: Long get() = product.price * quantity
-        val showLastSeenProductCard: Boolean get() = lastSeenProduct?.let { it.id != product.id } ?: false
+        val showLastSeenProductCard: Boolean get() = recentProduct?.let { it.id != product.id } ?: false
     }
 
     data class Error(

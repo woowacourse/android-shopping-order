@@ -103,7 +103,7 @@ fun DetailScreen(
                 onDecrease = { onDecrease() },
             )
             if (uiState.showLastSeenProductCard) {
-                uiState.lastSeenProduct?.let { lastProduct ->
+                uiState.recentProduct?.let { lastProduct ->
                     LastSeenProductCard(
                         name = lastProduct.name,
                         onClick = { onClickLastProductCard(lastProduct.id) },

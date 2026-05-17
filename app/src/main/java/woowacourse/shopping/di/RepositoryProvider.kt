@@ -5,7 +5,6 @@ import androidx.room.Room
 import kotlinx.coroutines.runBlocking
 import woowacourse.shopping.data.repository.DefaultCartRepository
 import woowacourse.shopping.data.repository.DefaultProductRepository
-import woowacourse.shopping.data.repository.DefaultRecentProductRepository
 import woowacourse.shopping.data.source.local.ShoppingDatabase
 import woowacourse.shopping.data.source.local.auth.AuthDataSource
 import woowacourse.shopping.data.source.local.auth.CryptoManager
@@ -16,7 +15,6 @@ import woowacourse.shopping.data.source.remote.api.AuthInterceptor
 import woowacourse.shopping.data.source.remote.api.RetrofitServices
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
 
 object RepositoryProvider {
     private lateinit var appContext: Context
@@ -42,7 +40,7 @@ object RepositoryProvider {
             authDataSource.saveToken(id, password)
             retrofitServices =
                 RetrofitServices(
-                    baseUrl = "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com",
+                    baseUrl = "http://192.168.2.152:3000",
                     interceptor = AuthInterceptor(authDataSource.getToken()),
                 )
         }
@@ -51,13 +49,7 @@ object RepositoryProvider {
     val productRepository: ProductRepository by lazy {
         DefaultProductRepository(
             ProductRemoteDataSource(retrofitServices.productService),
-        )
-    }
-
-    val recentProductRepository: RecentProductRepository by lazy {
-        DefaultRecentProductRepository(
-            recentProductDao = database.recentProductDao(),
-            productRepository = productRepository,
+            database.recentProductDao(),
         )
     }
 

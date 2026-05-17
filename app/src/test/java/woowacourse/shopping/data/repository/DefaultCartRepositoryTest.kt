@@ -64,13 +64,13 @@ class DefaultCartRepositoryTest {
     @Test
     fun `장바구니에 등록된 상품을 조회한다`() =
         runTest {
-            val cart = defaultCartRepository.getCart()
+            val cart = defaultCartRepository.cart.value
             assertThat(cart.items.isEmpty()).isTrue
 
             defaultCartRepository.addItem(1L)
             defaultCartRepository.addItem(2L)
 
-            val newCart = defaultCartRepository.getCart()
+            val newCart = defaultCartRepository.cart.value
             assertThat(newCart.items.size).isEqualTo(2)
         }
 
@@ -79,7 +79,7 @@ class DefaultCartRepositoryTest {
         runTest {
             defaultCartRepository.addItem(1L)
 
-            val cart = defaultCartRepository.getCart()
+            val cart = defaultCartRepository.cart.value
 
             assertThat(cart.items.any { it.product.id == 1L }).isTrue
         }
@@ -88,13 +88,13 @@ class DefaultCartRepositoryTest {
     fun `장바구니에 등록된 상품을 삭제한다`() =
         runTest {
             defaultCartRepository.addItem(1L)
-            val cart = defaultCartRepository.getCart()
+            val cart = defaultCartRepository.cart.value
             assertThat(cart.items.any { it.product.id == 1L }).isTrue
             assertThat(cart.items.size).isEqualTo(1)
 
             defaultCartRepository.deleteItem(1L)
 
-            val newCart = defaultCartRepository.getCart()
+            val newCart = defaultCartRepository.cart.value
             assertThat(newCart.items.size).isEqualTo(0)
 
             assertThat(newCart.items.any { it.product.id == 1L }).isFalse
@@ -107,7 +107,7 @@ class DefaultCartRepositoryTest {
 
             defaultCartRepository.changeCartItem(1L, 10)
 
-            val newCart = defaultCartRepository.getCart()
+            val newCart = defaultCartRepository.cart.value
             val item = newCart.items.find { it.product.id == 1L }
             assertThat(item!!.quantity).isEqualTo(10)
         }

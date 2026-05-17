@@ -26,7 +26,7 @@ class RecommendActivity : ComponentActivity() {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             LaunchedEffect(Unit) {
-                viewModel.loadPaymentId(productIds)
+                viewModel.initializePaymentItems(productIds)
                 viewModel.loadRecommendProducts()
             }
 
@@ -35,8 +35,8 @@ class RecommendActivity : ComponentActivity() {
                     uiState = uiState,
                     onBack = this::finish,
                     onOrderClick = {},
-                    onIncrease = viewModel::increase,
-                    onDecrease = viewModel::decrease,
+                    onIncrease = viewModel::addItemToCart,
+                    onDecrease = viewModel::removeItemFromCart,
                 )
             }
         }

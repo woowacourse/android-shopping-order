@@ -3,16 +3,17 @@ package woowacourse.shopping.presentation.recommend.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.domain.addToCartUseCase
 import woowacourse.shopping.domain.model.PaymentItems
+import woowacourse.shopping.domain.recommendProductUseCase
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.presentation.common.addToCartUseCase
 import woowacourse.shopping.presentation.common.model.toUiModel
 import woowacourse.shopping.presentation.recommend.model.RecommendUiState
 import woowacourse.shopping.presentation.shopping.model.ShoppingItemUiModel
@@ -20,32 +21,47 @@ import woowacourse.shopping.presentation.shopping.model.ShoppingItemUiModel
 class RecommendViewModel(
     private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
     private val productRepository: ProductRepository = RepositoryProvider.productRepository,
-    private val recentProductRepository: RecentProductRepository = RepositoryProvider.recentProductRepository,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(RecommendUiState())
-    val uiState: StateFlow<RecommendUiState> = _uiState.asStateFlow()
+    init {
+        viewModelScope.launch {
+            cartRepository.loadCart()
+            productRepository.loadProducts(0, 20)
+        }
+    }
 
-    private lateinit var paymentItems: PaymentItems
+    private val _uiState = MutableStateFlow(RecommendUiState())
+    private val products = productRepository.products
+    private val cart = cartRepository.cart
+    private val paymentItemIds = MutableStateFlow(emptySet<Long>())
+
+    val uiState =
+        combine(cart, paymentItemIds, _uiState) { cart, paymentIds, state ->
+            val payment = PaymentItems(cart.items.filter { it.product.id in paymentIds }.toSet())
+            state.copy(
+                totalQuantity = payment.totalQuantity,
+                totalPrice = payment.totalPrice,
+                recommendProducts =
+                    state.recommendProducts.map { item ->
+                        item.copy(
+                            quantity = cart.items.find { it.product.id == item.product.id }?.quantity ?: 0,
+                        )
+                    },
+            )
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = RecommendUiState(),
+        )
 
     fun loadRecommendProducts() {
         viewModelScope.launch {
-            val recentProducts = recentProductRepository.getRecentProducts(1)
-            if (recentProducts.isEmpty()) return@launch
-            val inCartProductIds = cartRepository.getCart().items.map { it.product.id }
-            val products = productRepository.getProducts(0, 100000)
-            val sameCategoryProducts = products.filter { it.category == recentProducts[0].category }
-            val recommendProducts =
-                sameCategoryProducts
-                    .filter { product ->
-                        product.id !in inCartProductIds
-                    }.take(10)
-
+            val recommendProducts = recommendProductUseCase(productRepository, cartRepository)
             _uiState.update {
                 it.copy(
                     recommendProducts =
-                        recommendProducts.map {
+                        recommendProducts.map { product ->
                             ShoppingItemUiModel(
-                                product = it.toUiModel(),
+                                product = product.toUiModel(),
                                 quantity = 0,
                             )
                         },
@@ -54,89 +70,26 @@ class RecommendViewModel(
         }
     }
 
-    fun loadPaymentId(productIds: LongArray) {
-        viewModelScope.launch {
-            val cart = cartRepository.getCart()
-            paymentItems =
-                PaymentItems(
-                    cart.items
-                        .filter { cartItem ->
-                            productIds.contains(cartItem.product.id)
-                        }.toSet(),
-                )
-
-            _uiState.update {
-                it.copy(
-                    totalQuantity = paymentItems.totalQuantity,
-                    totalPrice = paymentItems.totalPrice,
-                )
-            }
-        }
+    fun initializePaymentItems(productIds: LongArray) {
+        paymentItemIds.value = productIds.toSet()
     }
 
-    fun increase(productId: Long) {
+    fun addItemToCart(productId: Long) {
         viewModelScope.launch {
             addToCartUseCase(cartRepository, productId)
-
-            val cartItem =
-                cartRepository
-                    .getCart()
-                    .items
-                    .find { it.product.id == productId } ?: return@launch
-
-            paymentItems = paymentItems.add(cartItem)
-            updateRecommendQuantity(productId, cartItem.quantity)
-            updateDerived()
+            paymentItemIds.update { it + productId }
         }
     }
 
-    fun decrease(productId: Long) {
+    fun removeItemFromCart(productId: Long) {
         viewModelScope.launch {
-            val cartItem =
-                cartRepository
-                    .getCart()
-                    .items
-                    .find { it.product.id == productId } ?: return@launch
-
-            cartRepository.changeCartItem(productId, cartItem.decrease().quantity)
-
-            val updated = cartRepository.getCart().items.find { it.product.id == productId }
-            paymentItems =
-                if (updated == null) {
-                    paymentItems.remove(productId)
-                } else {
-                    paymentItems.add(updated)
-                }
-
-            updateRecommendQuantity(productId, updated?.quantity ?: 0)
-            updateDerived()
-        }
-    }
-
-    private fun updateDerived() {
-        _uiState.update {
-            it.copy(
-                totalQuantity = paymentItems.totalQuantity,
-                totalPrice = paymentItems.totalPrice,
-            )
-        }
-    }
-
-    private fun updateRecommendQuantity(
-        productId: Long,
-        quantity: Int,
-    ) {
-        _uiState.update { state ->
-            state.copy(
-                recommendProducts =
-                    state.recommendProducts.map { item ->
-                        if (item.product.id == productId) {
-                            item.copy(quantity = quantity)
-                        } else {
-                            item
-                        }
-                    },
-            )
+            val cartItem = cart.value.items.find { it.product.id == productId } ?: return@launch
+            if (cartItem.quantity == 1) {
+                cartRepository.deleteItem(productId)
+                paymentItemIds.update { it - productId }
+            } else {
+                cartRepository.changeCartItem(productId, cartItem.decrease().quantity)
+            }
         }
     }
 }

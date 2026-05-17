@@ -7,22 +7,20 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.RepositoryProvider
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.addToCartUseCase
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.presentation.common.addToCartUseCase
 import woowacourse.shopping.presentation.common.model.toUiModel
 import woowacourse.shopping.presentation.detail.model.DetailUiState
 
 class DetailViewModel(
     private val productRepository: ProductRepository = RepositoryProvider.productRepository,
     private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
-    private val recentProductRepository: RecentProductRepository = RepositoryProvider.recentProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
@@ -30,50 +28,7 @@ class DetailViewModel(
     private val _uiEvents = Channel<DetailEvent>(Channel.BUFFERED)
     val uiEvents: Flow<DetailEvent> = _uiEvents.receiveAsFlow()
 
-    private var loadedProduct: Product? = null
-
-    fun loadProduct(
-        id: Long,
-        isFromLastSeen: Boolean,
-    ) {
-        if (_uiState.value !is DetailUiState.Loading) return
-
-        viewModelScope.launch {
-            try {
-                val loaded = productRepository.getProductById(id)
-                loadedProduct = loaded
-
-                val lastSeen =
-                    runCatching {
-                        if (!isFromLastSeen) {
-                            recentProductRepository
-                                .getRecentProducts(limit = 1)
-                                .firstOrNull()
-                                ?.toUiModel()
-                        } else {
-                            null
-                        }
-                    }.getOrNull()
-
-                _uiState.value =
-                    DetailUiState.Success(
-                        product = loaded.toUiModel(),
-                        quantity = 1,
-                        lastSeenProduct = lastSeen,
-                    )
-                if (!isFromLastSeen) {
-                    runCatching {
-                        recentProductRepository.upsertRecentProduct(id)
-                    }
-                }
-            } catch (e: Exception) {
-                _uiState.value = DetailUiState.Error("상품 로딩에 실패했습니다.")
-                _uiEvents.send(DetailEvent.ShowErrorToast("상품 로딩에 실패했습니다."))
-            }
-        }
-    }
-
-    fun increase() {
+    fun increaseQuantity() {
         _uiState.update { state ->
             if (state is DetailUiState.Success) {
                 state.copy(quantity = state.quantity + 1)
@@ -83,7 +38,7 @@ class DetailViewModel(
         }
     }
 
-    fun decrease() {
+    fun decreaseQuantity() {
         _uiState.update { state ->
             if (state is DetailUiState.Success && state.quantity > 1) {
                 state.copy(quantity = state.quantity - 1)
@@ -93,13 +48,44 @@ class DetailViewModel(
         }
     }
 
-    fun addToCart(
+    fun addItemToCart(
         id: Long,
         quantity: Int = 1,
     ) {
         viewModelScope.launch {
             addToCartUseCase(cartRepository, id, quantity)
             _uiEvents.send(DetailEvent.NavigateToCart)
+        }
+    }
+
+    fun loadProduct(id: Long) {
+        if (_uiState.value !is DetailUiState.Loading) return
+
+        viewModelScope.launch {
+            try {
+                val loadedProduct =
+                    productRepository.getProductById(id)
+                        ?: throw NoSuchElementException()
+
+                val recentProduct =
+                    productRepository
+                        .getRecentProductsStream(limit = 1)
+                        .firstOrNull()
+                        ?.firstOrNull()
+                        ?.toUiModel()
+
+                _uiState.value =
+                    DetailUiState.Success(
+                        product = loadedProduct.toUiModel(),
+                        quantity = 1,
+                        recentProduct = recentProduct,
+                    )
+
+                productRepository.upsertRecentProduct(id)
+            } catch (_: Exception) {
+                _uiState.value = DetailUiState.Error("상품 로딩에 실패했습니다.")
+                _uiEvents.send(DetailEvent.ShowErrorToast("상품 로딩에 실패했습니다."))
+            }
         }
     }
 }

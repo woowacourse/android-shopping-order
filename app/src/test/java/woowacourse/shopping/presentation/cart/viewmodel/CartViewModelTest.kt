@@ -2,7 +2,6 @@ package woowacourse.shopping.presentation.cart.viewmodel
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -37,8 +36,6 @@ class CartViewModelTest {
     @Test
     fun `장바구니가 비어있다면 currentCartItems는 비어있고, totalCartSize는 0이다`() =
         runTest {
-            viewModel.refreshCart()
-
             val state = viewModel.uiState.value
             assertThat(state.currentCartItems).isEmpty()
             assertThat(state.totalCartSize).isEqualTo(0)
@@ -51,7 +48,6 @@ class CartViewModelTest {
             cartRepository.addItem(2L, 10)
             cartRepository.addItem(3L, 5)
 
-            viewModel.refreshCart()
             val state = viewModel.uiState.value
 
             assertThat(state.isCanMoveNext).isFalse
@@ -60,7 +56,7 @@ class CartViewModelTest {
     @Test
     fun `increase는 카트에 상품을 추가하고 totalCartSize를 갱신한다`() =
         runTest {
-            viewModel.increase(1L)
+            viewModel.addItemToCart(1L)
 
             assertThat(viewModel.uiState.value.totalCartSize).isEqualTo(1)
         }
@@ -70,27 +66,32 @@ class CartViewModelTest {
         runTest {
             cartRepository.addItem(1L, 3)
 
-            viewModel.decrease(1L)
+            viewModel.removeItemFromCart(1L)
 
-            val item = cartRepository.getCart().items.find { it.product.id == 1L }
+            val item =
+                cartRepository.cart.value.items
+                    .find { it.product.id == 1L }
             assertThat(item!!.quantity).isEqualTo(2)
         }
 
     @Test
-    fun `deleteItem은 성공 시 DeleteSuccess 이벤트를 발생시킨다`() =
+    fun `deleteItem은 성공 시 상품을 장바구니에서 삭제한다`() =
         runTest {
             cartRepository.addItem(1L, 1)
 
             viewModel.deleteItem(1L)
 
-            assertThat(viewModel.uiEvents.first()).isEqualTo(CartEvent.DeleteSuccess)
+            assertThat(
+                cartRepository.cart.value.items
+                    .any { it.product.id == 1L },
+            ).isFalse
         }
 
     @Test
-    fun `deleteItem은 없는 상품이면 DeleteNotFound 이벤트를 발생시킨다`() =
+    fun `deleteItem은 없는 상품이면 장바구니를 변경하지 않는다`() =
         runTest {
             viewModel.deleteItem(999L)
 
-            assertThat(viewModel.uiEvents.first()).isEqualTo(CartEvent.DeleteNotFound)
+            assertThat(cartRepository.cart.value.items).isEmpty()
         }
 }

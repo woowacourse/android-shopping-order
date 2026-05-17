@@ -1,6 +1,8 @@
 package woowacourse.shopping.data.repository
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mockwebserver3.MockWebServer
@@ -9,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import woowacourse.shopping.data.source.local.recent.RecentProductDao
+import woowacourse.shopping.data.source.local.recent.RecentProductEntity
 import woowacourse.shopping.data.source.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.source.remote.api.RetrofitServices
 import woowacourse.shopping.domain.model.Money
@@ -19,6 +23,7 @@ import woowacourse.shopping.fake.FakeProductDispatcher
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultProductRepositoryTest {
     private lateinit var server: MockWebServer
+    private lateinit var recentProductDao: FakeRecentProductDao
 
     private val product =
         Product(
@@ -32,6 +37,7 @@ class DefaultProductRepositoryTest {
     @BeforeEach
     fun setUp() {
         server = MockWebServer()
+        recentProductDao = FakeRecentProductDao()
         server.dispatcher =
             FakeProductDispatcher(
                 size = 100,
@@ -55,11 +61,12 @@ class DefaultProductRepositoryTest {
                             FakeAuthInterceptor(""),
                         ).productService,
                 ),
+                recentProductDao,
             )
 
-        val products = defaultProductRepository.getProducts(offset, limit)
+        defaultProductRepository.loadProducts(offset, limit)
         advanceUntilIdle()
-        assertThat(products.size).isEqualTo(limit)
+        assertThat(defaultProductRepository.products.value.size).isEqualTo(limit)
     }
 
     @Test
@@ -73,10 +80,23 @@ class DefaultProductRepositoryTest {
                             FakeAuthInterceptor(""),
                         ).productService,
                     ),
+                    recentProductDao,
                 )
 
+            defaultProductRepository.loadProducts(0, 10)
             val product = defaultProductRepository.getProductById(1L)
             advanceUntilIdle()
-            assertThat(product.id).isEqualTo(1L)
+            assertThat(product?.id).isEqualTo(1L)
         }
+
+    private class FakeRecentProductDao : RecentProductDao {
+        private val recentProducts = MutableStateFlow<List<RecentProductEntity>>(emptyList())
+
+        override fun getRecentStream(limit: Int): Flow<List<RecentProductEntity>> = recentProducts
+
+        override suspend fun upsertRecentProduct(entity: RecentProductEntity) {
+            recentProducts.value =
+                listOf(entity) + recentProducts.value.filterNot { it.productId == entity.productId }
+        }
+    }
 }

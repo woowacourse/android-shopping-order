@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import woowacourse.shopping.presentation.cart.CartActivity
@@ -25,10 +24,6 @@ class ShoppingActivity : ComponentActivity() {
             AndroidshoppingTheme {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-                LaunchedEffect(Unit) {
-                    viewModel.initialize()
-                }
-
                 ShoppingScreen(
                     uiState = uiState,
                     onNavigateToCart = {
@@ -36,18 +31,12 @@ class ShoppingActivity : ComponentActivity() {
                         startActivity(intent)
                     },
                     onProductCardClick = { startActivity(DetailActivity.newIntent(this, it)) },
-                    onIncrease = { viewModel.increase(it) },
-                    onDecrease = { viewModel.decrease(it) },
+                    onIncrease = { viewModel.addItemToCart(it) },
+                    onDecrease = { viewModel.removeItemFromCart(it) },
                     onUpsertRecentProduct = { viewModel.upsertRecentProduct(it) },
-                    onLoadMore = { viewModel.loadMore() },
+                    onLoadMore = { viewModel.loadMoreProducts() },
                 )
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.loadCartItemQuantities()
-        viewModel.loadRecentProducts(10)
     }
 }

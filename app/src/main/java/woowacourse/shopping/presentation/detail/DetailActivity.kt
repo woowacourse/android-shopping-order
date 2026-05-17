@@ -31,7 +31,6 @@ class DetailActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val id = this.intent.getLongExtra(INTENT_PRODUCT_ID, -1L)
-        val isFromLastSeen = this.intent.getBooleanExtra(IS_FROM_LAST_SEEN, false)
         if (id == -1L) {
             Toast.makeText(this, R.string.invalid_product, Toast.LENGTH_SHORT).show()
             this.finish()
@@ -61,7 +60,7 @@ class DetailActivity : ComponentActivity() {
                 }
 
                 LaunchedEffect(Unit) {
-                    viewModel.loadProduct(id, isFromLastSeen)
+                    viewModel.loadProduct(id)
                 }
 
                 when (val state = uiState) {
@@ -81,13 +80,13 @@ class DetailActivity : ComponentActivity() {
                             },
                             onBack = { finish() },
                             onAddToCart = {
-                                viewModel.addToCart(
+                                viewModel.addItemToCart(
                                     id = id,
                                     quantity = state.quantity,
                                 )
                             },
-                            onIncrease = { viewModel.increase() },
-                            onDecrease = { viewModel.decrease() },
+                            onIncrease = { viewModel.increaseQuantity() },
+                            onDecrease = { viewModel.decreaseQuantity() },
                         )
                     }
                 }

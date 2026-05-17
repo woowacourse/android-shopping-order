@@ -3,6 +3,7 @@ package woowacourse.shopping.domain.model
 data class CartItem(
     val product: Product,
     val quantity: Int,
+    val id: Long = 0L,
 ) {
     init {
         require(quantity > 0) { "수량은 1개 이상이어야 합니다." }
