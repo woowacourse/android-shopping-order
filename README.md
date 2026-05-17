@@ -17,9 +17,9 @@
 - [ ] 모든 상호작용마다 전체 새로고침 호출하는 패턴 점검 - 로컬 상태 업데이트로 충분한 케이스 분리
 
 ## 페이지네이션
-- [ ] ProductRepository를 fromIndex/count -> page/size 기반 인터페이스로 변경
-- [ ] getProducts 내부 drop().take() 제거하고 서버 페이지네이션 그대로 활용
-- [ ] hasNext 책임을 ViewModel로 이동 - 서버 응답 메타데이터(last, totalPages)로 판단
+- [x] ProductRepository를 fromIndex/count -> page/size 기반 인터페이스로 변경
+- [x] getProducts 내부 drop().take() 제거하고 서버 페이지네이션 그대로 활용
+- [x] hasNext 책임을 ViewModel로 이동 - 서버 응답 메타데이터(last, totalPages)로 판단
 
 ## 에러/예외 처리
 - [ ] 요청 실패 시 피드백 추가 (ex. 토스트)

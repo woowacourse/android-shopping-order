@@ -4,7 +4,7 @@ import woowacourse.shopping.data.repository.inmemory.InMemoryUserRepository
 import kotlin.io.encoding.Base64
 
 object BasicAuthEncoder {
-    private val user = InMemoryUserRepository.SAM
+    private val user = InMemoryUserRepository.STARTER
 
     fun getHeader() = encodeToBase64()
 

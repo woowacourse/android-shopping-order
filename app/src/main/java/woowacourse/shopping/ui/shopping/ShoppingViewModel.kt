@@ -41,18 +41,14 @@ class ShoppingViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
-                val initialProducts = productRepo.getProducts(0, loadSize)
-                val uiModels = mapToProductUiModels(initialProducts)
-
-                val hasNextPage = productRepo.hasNext(initialProducts.lastIndex)
-                val totalSize = productRepo.getSize()
+                val page = productRepo.getProducts(0, loadSize)
                 val recentProducts = recentProductRepo.getRecentProducts()
 
                 _uiState.update {
                     it.copy(
-                        visibleProducts = uiModels,
-                        hasNext = hasNextPage,
-                        sizeInRepo = totalSize,
+                        visibleProducts = mapToProductUiModels(page.items),
+                        hasNext = !page.isLast,
+                        sizeInRepo = page.totalElements,
                         recentProducts = recentProducts,
                     )
                 }
@@ -111,30 +107,27 @@ class ShoppingViewModel(
     }
 
     fun loadMore() {
-        val currentState = _uiState.value
-        if (!pager.canLoadMore(currentState.visibleProducts.size, currentState.sizeInRepo)) return
+        val currentSize = _uiState.value.visibleProducts.size
+        val currentProducts = _uiState.value.visibleProducts
+        if (!pager.canLoadMore(currentSize, _uiState.value.sizeInRepo)) return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
-                val currentSize = _uiState.value.visibleProducts.size
-                val currentProducts = _uiState.value.visibleProducts
-                val newProducts =
-                    productRepo.getProducts(
-                        fromIndex = currentSize,
-                        count = loadSize,
-                    )
-                val newUiModels = mapToProductUiModels(newProducts)
+                val page = productRepo.getProducts(
+                    // 마지막 페이지가 부분(예: 25개 중 5개)일 때도 다음 페이지 정확히 계산
+                    page = (currentSize - 1) / loadSize + 1,
+                    size = loadSize,
+                )
+                val newUiModels = mapToProductUiModels(page.items)
                 val combineProducts = currentProducts + newUiModels
-                val totalSize = productRepo.getSize()
-                val hasNext = pager.canLoadMore(combineProducts.size, totalSize)
 
                 _uiState.update {
                     it.copy(
-                        visibleCount = minOf(it.visibleCount + loadSize, totalSize),
+                        visibleCount = minOf(it.visibleCount + loadSize, page.totalElements),
                         visibleProducts = combineProducts,
-                        hasNext = hasNext,
-                        sizeInRepo = totalSize,
+                        hasNext = !page.isLast,
+                        sizeInRepo = page.totalElements,
                     )
                 }
             } finally {

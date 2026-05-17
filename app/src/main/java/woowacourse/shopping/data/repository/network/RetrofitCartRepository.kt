@@ -1,14 +1,15 @@
 package woowacourse.shopping.data.repository.network
 
-import woowacourse.shopping.model.Cart
-import woowacourse.shopping.model.CartItem
-import woowacourse.shopping.model.Product
 import woowacourse.shopping.data.remote.auth.BasicAuthEncoder
 import woowacourse.shopping.data.remote.dto.CartItemRequest
 import woowacourse.shopping.data.remote.dto.Quantity
 import woowacourse.shopping.data.remote.dto.toDomain
 import woowacourse.shopping.data.remote.service.CartService
 import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.model.Cart
+import woowacourse.shopping.model.CartItem
+import woowacourse.shopping.model.Page
+import woowacourse.shopping.model.Product
 
 class RetrofitCartRepository(
     private val encoder: BasicAuthEncoder,
@@ -112,25 +113,31 @@ class RetrofitCartRepository(
 
     override suspend fun getPagedItems(
         page: Int,
-        count: Int,
-    ): List<CartItem> {
-        val response =
-            service.getCartItems(
+        size: Int,
+    ): Page<CartItem> {
+        val response = service.getCartItems(
                 encoder.getHeader(),
-                pageIndex = page - 1,
-                size = count,
+                pageIndex = page,
+                size = size,
             )
 
-        return response.content.map {
-            CartItem(
-                id = it.id,
-                product = it.product.toDomain(),
-                quantity = it.quantity,
-            )
-        }
+        return Page(
+            items = response.content.map {
+                CartItem(
+                    id = it.id,
+                    product = it.product.toDomain(),
+                    quantity = it.quantity,
+                )
+            },
+            isLast = response.last,
+            totalPages = response.totalPages,
+            currentPage = response.number,
+            totalElements = response.totalElements.toInt()
+        )
     }
 
-    override suspend fun getSize(): Int = getAllCartItems().items.size
+    override suspend fun getCartEntitySize(): Int = getAllCartItems().items.size
 
-    override suspend fun getCartCount(): Int = service.getTotalCount(auth = encoder.getHeader()).quantity
+    override suspend fun getCartCount(): Int =
+        service.getTotalCount(auth = encoder.getHeader()).quantity
 }
