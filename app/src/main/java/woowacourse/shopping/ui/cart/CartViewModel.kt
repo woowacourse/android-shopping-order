@@ -33,10 +33,11 @@ class CartViewModel(
 
     private val _allCartItems = MutableStateFlow<PurchaseProducts>(PurchaseProducts())
     val allCartItems = _allCartItems.asStateFlow()
+
     private val _checkedItemIds = MutableStateFlow<List<Long>>(emptyList())
     val checkedItemIds = _checkedItemIds.asStateFlow()
 
-    val totalPrice: StateFlow<Int> = combine(_allCartItems, checkedItemIds) {allCart, checkedIds ->
+    val totalPrice: StateFlow<Int> = combine(_allCartItems, checkedItemIds) { allCart, checkedIds ->
         allCart.purchaseProducts
             .filter { it.id in checkedIds }
             .sumOf { it.totalPrice }
@@ -129,7 +130,7 @@ class CartViewModel(
                 val nextCount = target.count + updateAmount
                 if (nextCount >= 1) {
                     cartRepository.updateCount(id, nextCount)
-                    _allCartItems.update { cartRepository.getPagedCart(0, 1000000) }
+                    updateAllCartItemCount(id, nextCount)
                     _pagedCart.update {
                         cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
                     }
@@ -189,8 +190,21 @@ class CartViewModel(
         }
     }
 
+    private fun updateAllCartItemCount(
+        id: Long,
+        newCount: Int,
+    ) {
+        _allCartItems.update { allCart ->
+            PurchaseProducts(
+                allCart.purchaseProducts.map {
+                    if (it.id == id) it.copy(count = newCount) else it
+                },
+            )
+        }
+    }
+
     companion object {
-        private val PAGE_SIZE = 5
+        private const val PAGE_SIZE = 5
     }
 }
 
