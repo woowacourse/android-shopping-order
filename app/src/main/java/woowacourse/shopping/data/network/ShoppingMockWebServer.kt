@@ -29,6 +29,7 @@ fun startMockWebServer(): MockWebServer {
                             name = it.name,
                             price = it.priceAmount(),
                             imageUrl = it.imageUrl,
+                            category = it.category
                         )
                     }
                     MockResponse()
@@ -55,6 +56,7 @@ fun startMockWebServer(): MockWebServer {
                                     name = product.name,
                                     price = product.priceAmount(),
                                     imageUrl = product.imageUrl,
+                                    category = product.category
                                 ),
                             ),
                         )

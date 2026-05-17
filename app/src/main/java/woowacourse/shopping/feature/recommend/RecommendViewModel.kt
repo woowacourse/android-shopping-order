@@ -170,7 +170,7 @@ class RecommendViewModel(
 
     private suspend fun refreshRecentProducts(): String {
         val recentProductIds = recentProductRepository.loadProducts()
-        val mostRecentProductId = recentProductIds.first()
+        val mostRecentProductId = recentProductIds.firstOrNull() ?: return ""
 
         return productRepository.getProduct(mostRecentProductId).category
     }
