@@ -18,22 +18,22 @@
         android:theme="@style/Theme.Shopping"
         tools:targetApi="31" >
         <activity
-            android:name=".RecommendationActivity"
+            android:name=".ui.recommendation.RecommendationActivity"
             android:exported="false"
             android:label="@string/title_activity_recommendation_acttivity"
             android:theme="@style/Theme.Shopping" />
         <activity
-            android:name=".CartActivity"
+            android:name=".ui.cart.CartActivity"
             android:exported="false"
             android:label="@string/title_activity_cart"
             android:theme="@style/Theme.Shopping" />
         <activity
-            android:name=".ProductDetailActivity"
+            android:name=".ui.productdetail.ProductDetailActivity"
             android:exported="false"
             android:label="@string/title_activity_product_detail"
             android:theme="@style/Theme.Shopping" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.catalog.MainActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

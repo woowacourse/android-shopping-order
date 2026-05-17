@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import android.util.Base64
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 
 private val Context.dataStore by preferencesDataStore(name = "auth_prefs")
 
@@ -20,7 +19,7 @@ class UserAuthDataStore(private val context: Context) {
 
     val userName: Flow<String?> = context.dataStore.data
         .map { preferences ->
-            preferences[USER_NAME] ?: "First_woosun"
+            preferences[USER_NAME] ?: "cbnuLeehyunwoo"
         }
 
     val userPassword: Flow<String?> = context.dataStore.data
