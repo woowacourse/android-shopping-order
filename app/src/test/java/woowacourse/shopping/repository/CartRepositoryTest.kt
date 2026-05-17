@@ -53,6 +53,20 @@ class CartRepositoryTest {
         }
 
     @Test
+    fun `여러 상품을 한 번에 주문하면 대상 상품이 모두 장바구니에서 제거된다`() =
+        runBlocking {
+            val product2 = CartRepositoryFixture.sourCandy
+            repo.setQuantity(product1.id, 1)
+            repo.setQuantity(product2.id, 2)
+
+            repo.createOrder(listOf(product1.id, product2.id))
+
+            val actual = repo.getCartItemsByProductIds(setOf(product1.id, product2.id))
+
+            assertEquals(emptyList<woowacourse.shopping.model.CartItem>(), actual)
+        }
+
+    @Test
     fun `전체 데이터 개수보다 큰 페이지를 요청했을 때 빈 결과를 반환한다`() =
         runBlocking {
             repo.setQuantity(product1.id, 1)

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 
 @Dao
 interface CartItemDao {
@@ -36,6 +37,15 @@ interface CartItemDao {
 
     @Query("DELETE FROM cart_items WHERE productId = :productId")
     suspend fun deleteBy(productId: Long)
+
+    @Transaction
+    suspend fun deleteByProductIds(productIds: List<Long>) {
+        if (productIds.isEmpty()) return
+        deleteByProductIdsInternal(productIds)
+    }
+
+    @Query("DELETE FROM cart_items WHERE productId IN (:productIds)")
+    suspend fun deleteByProductIdsInternal(productIds: List<Long>)
 
     @Query("SELECT COUNT(*) FROM cart_items")
     suspend fun count(): Int

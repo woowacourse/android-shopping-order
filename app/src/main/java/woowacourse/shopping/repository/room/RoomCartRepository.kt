@@ -11,9 +11,7 @@ class RoomCartRepository(
     private val cartItemDao: CartItemDao,
 ) : CartRepository {
     override suspend fun createOrder(cartItemIds: List<Long>) {
-        cartItemIds.forEach { cartItemId ->
-            cartItemDao.deleteBy(cartItemId)
-        }
+        cartItemDao.deleteByProductIds(cartItemIds)
     }
 
     override suspend fun setQuantity(
