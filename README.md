@@ -63,3 +63,5 @@
 - [x] 도메인과 DTO의 contextId, productId를 String에서 Long타입으로 변경함
 - [x] ProductDto의 임포트를 변경함
 - [x] 조건식의 범위를 수정함
+- [x] 더보기 버튼 안됨
+- [] 추천 상품 목록이 뜨지 않음
