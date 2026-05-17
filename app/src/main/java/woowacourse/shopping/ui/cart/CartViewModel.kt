@@ -39,7 +39,7 @@ class CartViewModel(
     val totalPrice: StateFlow<Int> = combine(_allCartItems, checkedItemIds) {allCart, checkedIds ->
         allCart.purchaseProducts
             .filter { it.id in checkedIds }
-            .sumOf { it.totalPrice() }
+            .sumOf { it.totalPrice }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),

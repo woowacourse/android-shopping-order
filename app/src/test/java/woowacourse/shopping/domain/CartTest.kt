@@ -28,7 +28,7 @@ class CartTest {
                 product = Product(category = "category", id = 1L, imageUri = "image", name = "TwoHander", price = 10000),
             )
 
-        val targetId = newPurchaseProduct.productId()
+        val targetId = newPurchaseProduct.productId
 
         val cart =
             Cart(
@@ -51,7 +51,7 @@ class CartTest {
                 product = Product(category = "category", id = 1L, imageUri = "image", name = "TwoHander", price = 10000),
             )
 
-        val targetId = newPurchaseProduct.productId()
+        val targetId = newPurchaseProduct.productId
 
         val cart =
             Cart(
@@ -79,7 +79,7 @@ class CartTest {
                 count = 10,
             )
 
-        val targetId = newPurchaseProduct.productId()
+        val targetId = newPurchaseProduct.productId
 
         val cart =
             Cart(
@@ -127,7 +127,7 @@ class CartTest {
                     ),
             )
 
-        val targetId = purchaseProduct.productId()
+        val targetId = purchaseProduct.productId
 
         val cart =
             Cart(
@@ -157,7 +157,7 @@ class CartTest {
                     ),
             )
 
-        val targetId = purchaseProduct.productId()
+        val targetId = purchaseProduct.productId
 
         val cart =
             Cart(
@@ -185,7 +185,7 @@ class CartTest {
                     ),
             )
 
-        val targetId = purchaseProduct.productId()
+        val targetId = purchaseProduct.productId
 
         val cart =
             Cart(

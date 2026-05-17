@@ -58,7 +58,7 @@ class PurchaseProductTest {
                 count = 2,
             )
 
-        val totalPrice = purchaseProduct.totalPrice()
+        val totalPrice = purchaseProduct.totalPrice
 
         assert(totalPrice == 2)
     }

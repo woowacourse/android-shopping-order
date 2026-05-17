@@ -27,15 +27,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.R
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.PurchaseProduct
+import woowacourse.shopping.ui.cart.uimodel.CartInfo
 import woowacourse.shopping.ui.common.ProductImage
 import woowacourse.shopping.ui.common.QuantitySelector
-import woowacourse.shopping.ui.common.toPriceString
 
 @Composable
 fun CartItem(
-    product: PurchaseProduct,
+    product: CartInfo,
     onAdd: (Long, Int) -> Unit,
     onMinus: (Long, Int) -> Unit,
     onDelete: (Long) -> Unit,
@@ -70,9 +68,9 @@ fun CartItem(
                         onCheckedChanged(product.id)
                     }
                 )
-                ProductName(product.name())
+                ProductName(product.productName)
                 CloseBtn(
-                    product = product,
+                    id = product.id,
                     onClick = onDelete,
                 )
             }
@@ -85,21 +83,21 @@ fun CartItem(
                 verticalAlignment = Alignment.Bottom,
             ) {
                 ProductImage(
-                    product.imageUri(),
+                    product.productImageUrl,
                     modifier = Modifier.size(width = 136.dp, height = 72.dp),
                 )
                 Box(
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     QuantitySelector(
-                        count = product.count,
+                        count = product.quantity,
                         onAdd = { onAdd(product.id, 1) },
                         onMinus = { onMinus(product.id, -1) },
                         onDelete = { onDelete(product.id) },
                         modifier = Modifier.align(Alignment.CenterEnd),
                     )
                     ProductPrice(
-                        product.price(),
+                        product.formattedPrice,
                         modifier = Modifier.align(Alignment.BottomEnd),
                     )
                 }
@@ -125,7 +123,7 @@ private fun ProductName(
 
 @Composable
 private fun CloseBtn(
-    product: PurchaseProduct,
+    id: Long,
     onClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -136,18 +134,18 @@ private fun CloseBtn(
             modifier
                 .size(16.dp)
                 .clickable(
-                    onClick = { onClick(product.id) },
+                    onClick = { onClick(id) },
                 ),
     )
 }
 
 @Composable
 private fun ProductPrice(
-    price: Int,
+    formattedPrice: String,
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = price.toPriceString(),
+        text = formattedPrice,
         fontSize = 16.sp,
         color = Color(0xFF555555),
         modifier = modifier,
@@ -158,17 +156,7 @@ private fun ProductPrice(
 @Composable
 private fun CartItemPreview() {
     CartItem(
-        product = PurchaseProduct(
-            id = 1L,
-            product = Product(
-                category = "asjdhas",
-                id = 1L,
-                imageUri = "adasda",
-                name = "asdasd",
-                price = 10
-            ),
-            count = 5
-        ),
+        product = CartInfo.PREVIEW,
         onAdd = { id, count -> },
         onMinus = { id, count -> },
         onDelete = { },

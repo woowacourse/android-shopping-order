@@ -69,7 +69,7 @@ class ProductDetailViewModel(
 
     fun addPurchaseProduct(purchaseProduct: PurchaseProduct) {
         viewModelScope.launch {
-            val existCartItem = cart.value.findById(purchaseProduct.productId())
+            val existCartItem = cart.value.findById(purchaseProduct.productId)
             if(existCartItem != null) {
                 val newTotalCount = existCartItem.count + purchaseProduct.count
                 cartRepository.updateCount(existCartItem.id, newTotalCount)

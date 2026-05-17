@@ -9,6 +9,22 @@ data class PurchaseProduct(
     val product: Product,
     val count: Int = 1,
 ) : Parcelable {
+
+    val name: String
+        get() = product.name
+
+    val price: Int
+        get() = product.price
+
+    val imageUri: String
+        get() = product.imageUri
+
+    val productId: Long
+        get() = product.id
+
+    val totalPrice: Int
+        get() = product.price * count
+
     init {
         require(count > 0) { "구매할 상품의 개수는 1개 이상이어야 합니다." }
     }
@@ -17,16 +33,6 @@ data class PurchaseProduct(
         val newCount = count + updateAmount
         return copy(count = newCount)
     }
-
-    fun name() = product.name
-
-    fun price() = product.price
-
-    fun imageUri() = product.imageUri
-
-    fun productId() = product.id
-
-    fun totalPrice() = product.price * count
 
     fun isSameProductID(id: Long) = id == product.id
 }

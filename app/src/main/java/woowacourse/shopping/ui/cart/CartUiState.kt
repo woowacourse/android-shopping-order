@@ -1,4 +1,6 @@
-package woowacourse.shopping.ui.cart.uimodel
+package woowacourse.shopping.ui.cart
+
+import woowacourse.shopping.ui.cart.uimodel.CartInfo
 
 data class CartUiState(
     val cartItems: List<CartInfo> = emptyList(),

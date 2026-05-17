@@ -40,7 +40,7 @@ class PurchaseProductsTest {
                     ),
             )
 
-        val productsId = newPurchaseProduct.productId()
+        val productsId = newPurchaseProduct.productId
 
         val purchaseProducts =
             PurchaseProducts(
@@ -84,7 +84,7 @@ class PurchaseProductsTest {
                     ),
             )
 
-        val product1Id = purchaseProduct1.productId()
+        val product1Id = purchaseProduct1.productId
 
         val purchaseProducts =
             PurchaseProducts(
@@ -115,7 +115,7 @@ class PurchaseProductsTest {
                 count = 3,
             )
 
-        val productsId = newPurchaseProduct.productId()
+        val productsId = newPurchaseProduct.productId
 
         val purchaseProducts =
             PurchaseProducts(
@@ -194,7 +194,7 @@ class PurchaseProductsTest {
                     ),
             )
 
-        val productId = newPurchaseProduct.productId()
+        val productId = newPurchaseProduct.productId
 
         val purchaseProducts =
             PurchaseProducts(
@@ -221,7 +221,7 @@ class PurchaseProductsTest {
                     ),
             )
 
-        val productId = newPurchaseProduct.productId()
+        val productId = newPurchaseProduct.productId
 
         val purchaseProducts =
             PurchaseProducts(
@@ -246,7 +246,7 @@ class PurchaseProductsTest {
                     ),
             )
 
-        val productId = newPurchaseProduct.productId()
+        val productId = newPurchaseProduct.productId
 
         val purchaseProducts =
             PurchaseProducts(

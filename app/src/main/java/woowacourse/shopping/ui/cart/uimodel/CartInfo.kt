@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.cart.uimodel
 
-import androidx.compose.runtime.Stable
 import woowacourse.shopping.domain.PurchaseProduct
 import woowacourse.shopping.domain.PurchaseProducts
 import woowacourse.shopping.ui.common.toPriceString

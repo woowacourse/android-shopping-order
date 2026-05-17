@@ -14,6 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.ui.recommendation.RecommendationActivity
 import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.ui.cart.uimodel.toUiModel
 
 class CartActivity : ComponentActivity() {
     private lateinit var viewModel: CartViewModel
@@ -40,10 +41,22 @@ class CartActivity : ComponentActivity() {
             val checkedItemIds by viewModel.checkedItemIds.collectAsStateWithLifecycle()
             val totalPrice by viewModel.totalPrice.collectAsStateWithLifecycle()
             val totalCount by viewModel.cartItemCount.collectAsStateWithLifecycle()
+            val uiState =
+                CartUiState(
+                    cartItems = pagedCart.toUiModel(),
+                    currentPage = currentPage,
+                    isPageable = isPageable,
+                    previousEnable = prevEnable,
+                    nextEnable = nextEnable,
+                    isLoading = isLoading,
+                    totalPrice = totalPrice,
+                    totalCount = totalCount,
+                    checkedItemIds = checkedItemIds,
+                )
 
             Scaffold(modifier = Modifier.Companion.fillMaxSize()) { paddingValues ->
                 CartScreen(
-                    cart = pagedCart,
+                    uiState = uiState,
                     onClose = {
                         finish()
                     },
@@ -56,21 +69,13 @@ class CartActivity : ComponentActivity() {
                     onDelete = { id ->
                         viewModel.removeWithID(id)
                     },
-                    currentPage = currentPage,
                     onPrevious = {
                         viewModel.prev()
                     },
                     onNext = {
                         viewModel.next()
                     },
-                    previousEnable = prevEnable,
-                    nextEnable = nextEnable,
-                    isPageable = isPageable,
-                    isLoading = isLoading,
                     onCheckedChanged = { viewModel.onItemChecked(it) },
-                    totalPrice = totalPrice,
-                    totalCount = totalCount,
-                    isChecked = { id -> checkedItemIds.contains(id) },
                     onSelectAllClick = { viewModel.onSelectAllClick() },
                     onOrderClick = {
                         val intent = Intent(this, RecommendationActivity::class.java)
