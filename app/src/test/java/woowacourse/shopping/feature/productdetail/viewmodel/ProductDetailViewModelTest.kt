@@ -11,6 +11,7 @@ import woowacourse.shopping.domain.Product
 import woowacourse.shopping.feature.MainDispatcherExtension
 import woowacourse.shopping.feature.fake.FakeCartRepository
 import woowacourse.shopping.feature.fake.FakeProductRepository
+import woowacourse.shopping.feature.fake.FakeShoppingApplication
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(MainDispatcherExtension::class)
@@ -91,8 +92,15 @@ class ProductDetailViewModelTest {
     private fun newViewModel(
         productRepository: FakeProductRepository = FakeProductRepository(sampleProducts),
         cartRepository: FakeCartRepository = FakeCartRepository(),
-    ): ProductDetailViewModel = ProductDetailViewModel(
-        productRepository = productRepository,
-        cartRepository = cartRepository,
-    )
+    ): ProductDetailViewModel {
+        val app = FakeShoppingApplication().apply {
+            setupFakeDependencies(
+                productRepository = productRepository,
+                cartRepository = cartRepository
+            )
+        }
+        return ProductDetailViewModel(
+            application = app,
+        )
+    }
 }

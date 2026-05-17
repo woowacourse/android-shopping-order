@@ -37,13 +37,22 @@ data class CartUiState(
 
 class CartViewModel(
     private val initialPageSize: Int = 5,
-    private val cartRepository: CartRepository,
+    private val application: ShoppingApplication,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
 
     private val _event = Channel<CartEvent>(Channel.BUFFERED)
     val event: Flow<CartEvent> = _event.receiveAsFlow()
+
+    lateinit var cartRepository: CartRepository
+
+    init {
+        viewModelScope.launch {
+            val appDependencies = application.appDependenciesDeferred.await()
+            cartRepository = appDependencies.cartRepository
+        }
+    }
 
     private var cart: Cart = Cart(emptyList())
 
@@ -203,7 +212,7 @@ class CartViewModel(
         val Factory = viewModelFactory {
             initializer {
                 val app = this[APPLICATION_KEY] as ShoppingApplication
-                CartViewModel(5, app.cartRepository)
+                CartViewModel(5, app)
             }
         }
     }

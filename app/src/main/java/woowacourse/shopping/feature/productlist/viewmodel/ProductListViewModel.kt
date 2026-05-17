@@ -39,9 +39,7 @@ data class ProductListUiState(
 )
 
 class ProductListViewModel(
-    private val cartRepository: CartRepository,
-    private val productRepository: ProductRepository,
-    private val recentProductRepository: RecentProductRepository,
+    private val application: ShoppingApplication
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProductListUiState())
@@ -49,6 +47,19 @@ class ProductListViewModel(
 
     private val _event = Channel<ProductListEvent>(Channel.BUFFERED)
     val event: Flow<ProductListEvent> = _event.receiveAsFlow()
+
+    lateinit var productRepository: ProductRepository
+    lateinit var cartRepository: CartRepository
+    lateinit var recentProductRepository: RecentProductRepository
+
+    init {
+        viewModelScope.launch {
+            val appDependencies = application.appDependenciesDeferred.await()
+            productRepository = appDependencies.productRepository
+            cartRepository = appDependencies.cartRepository
+            recentProductRepository = appDependencies.recentProductRepository
+        }
+    }
 
     private var products: List<Product> = emptyList()
     private var cart: Cart = Cart(emptyList())
@@ -185,9 +196,7 @@ class ProductListViewModel(
             initializer {
                 val app = this[APPLICATION_KEY] as ShoppingApplication
                 ProductListViewModel(
-                    app.cartRepository,
-                    app.productRepository,
-                    app.recentProductRepository,
+                    app
                 )
             }
         }

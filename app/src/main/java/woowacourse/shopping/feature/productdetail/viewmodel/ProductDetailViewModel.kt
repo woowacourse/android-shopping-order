@@ -35,11 +35,22 @@ sealed interface ProductDetailLoadingState {
 }
 
 class ProductDetailViewModel(
-    private val productRepository: ProductRepository,
-    private val cartRepository: CartRepository,
+    private val application: ShoppingApplication
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductDetailUiState())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
+
+    lateinit var productRepository: ProductRepository
+    lateinit var cartRepository: CartRepository
+
+    init {
+        viewModelScope.launch {
+            val appDependencies = application.appDependenciesDeferred.await()
+            productRepository = appDependencies.productRepository
+            cartRepository = appDependencies.cartRepository
+        }
+    }
+
 
     fun initialLoading(
         productId: Long,
@@ -115,7 +126,7 @@ class ProductDetailViewModel(
         val Factory = viewModelFactory {
             initializer {
                 val app = this[APPLICATION_KEY] as ShoppingApplication
-                ProductDetailViewModel(app.productRepository, app.cartRepository)
+                ProductDetailViewModel(app)
             }
         }
     }

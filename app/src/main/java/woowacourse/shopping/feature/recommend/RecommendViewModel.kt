@@ -28,10 +28,7 @@ data class RecommendUiState(
 )
 
 class RecommendViewModel(
-    private val productRepository: ProductRepository,
-    private val cartRepository: CartRepository,
-    private val orderRepository: OrderRepository,
-    private val recentProductRepository: RecentProductRepository,
+    private val application: ShoppingApplication
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RecommendUiState())
     val uiState: StateFlow<RecommendUiState> = _uiState.asStateFlow()
@@ -39,6 +36,21 @@ class RecommendViewModel(
     private var products: List<Product> = emptyList()
     private var serverCart: Cart = Cart(emptyList())
     private var memoryCart: Cart = Cart(emptyList())
+
+    lateinit var productRepository: ProductRepository
+    lateinit var cartRepository: CartRepository
+    lateinit var recentProductRepository: RecentProductRepository
+    lateinit var orderRepository: OrderRepository
+
+    init {
+        viewModelScope.launch {
+            val appDependencies = application.appDependenciesDeferred.await()
+            productRepository = appDependencies.productRepository
+            cartRepository = appDependencies.cartRepository
+            recentProductRepository = appDependencies.recentProductRepository
+            orderRepository = appDependencies.orderRepository
+        }
+    }
 
     fun initialLoading() {
         viewModelScope.launch {
@@ -180,10 +192,7 @@ class RecommendViewModel(
             initializer {
                 val app = this[APPLICATION_KEY] as ShoppingApplication
                 RecommendViewModel(
-                    app.productRepository,
-                    app.cartRepository,
-                    app.orderRepository,
-                    app.recentProductRepository,
+                    app
                 )
             }
         }

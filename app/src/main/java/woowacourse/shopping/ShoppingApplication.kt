@@ -6,6 +6,12 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import okhttp3.Credentials
@@ -37,42 +43,40 @@ import woowacourse.shopping.data.source.product.ProductDataSourceImpl
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-class ShoppingApplication : Application() {
-    lateinit var productRepository: ProductRepository
-        private set
-    lateinit var cartRepository: CartRepository
-        private set
-    lateinit var recentProductRepository: RecentProductRepository
-        private set
+data class AppDependencies(
+    val productRepository: ProductRepository,
+    val cartRepository: CartRepository,
+    val recentProductRepository: RecentProductRepository,
+    val orderRepository: OrderRepository,
+)
 
-    lateinit var orderRepository: OrderRepository
-        private set
+open class ShoppingApplication : Application() {
+    private val applicationScope = CoroutineScope(context = SupervisorJob() + Dispatchers.IO)
+
+    lateinit var appDependenciesDeferred: Deferred<AppDependencies>
 
     override fun onCreate() {
         super.onCreate()
-        Thread {
-            startMockWebServer()
-            initDependencies()
-        }.apply {
-            start()
-            join()
+        applicationScope.launch {
+            appDependenciesDeferred = async {
+                startMockWebServer()
+                initDependencies()
+            }
         }
     }
 
-    private fun initDependencies() {
+    private suspend fun initDependencies(): AppDependencies {
+
         val auth: AuthRepository = AuthRepositoryImpl(
             dataSource = AuthDataSourceImpl(
                 dataStore = applicationContext.dataStore,
             ),
         )
 
-        lateinit var token: String
-        runBlocking {
-            token = auth.load()
-            if (token.isBlank()) {
-                token = Credentials.basic("CommitTheKermit", "password")
-                auth.save(token)
-            }
+        var token = auth.load()
+        if (token.isBlank()) {
+            token = Credentials.basic("CommitTheKermit", "password")
+            auth.save(token)
         }
 
         val json = Json { ignoreUnknownKeys = true }
@@ -89,7 +93,7 @@ class ShoppingApplication : Application() {
             .build()
 
         val retrofitService = Retrofit.Builder()
-            .baseUrl("http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/")
+            .baseUrl(baseUrl)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .client(client)
             .build()
@@ -110,7 +114,7 @@ class ShoppingApplication : Application() {
         )
 
         val retrofitCartService = Retrofit.Builder()
-            .baseUrl("http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/")
+            .baseUrl(baseUrl)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .client(client)
             .build()
@@ -126,7 +130,7 @@ class ShoppingApplication : Application() {
             RecentProductRepositoryImpl(recentProductDatabase.recentProductDao())
 
         val orderService = Retrofit.Builder()
-            .baseUrl("http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/")
+            .baseUrl(baseUrl)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .client(client)
             .build()
@@ -138,9 +142,11 @@ class ShoppingApplication : Application() {
             ),
         )
 
-        productRepository = product
-        cartRepository = cart
-        recentProductRepository = recent
-        orderRepository = order
+        return AppDependencies(
+            productRepository = product,
+            cartRepository = cart,
+            recentProductRepository = recent,
+            orderRepository = order,
+        )
     }
 }

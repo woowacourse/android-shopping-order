@@ -11,6 +11,7 @@ import woowacourse.shopping.domain.Money
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.feature.MainDispatcherExtension
 import woowacourse.shopping.feature.fake.FakeCartRepository
+import woowacourse.shopping.feature.fake.FakeShoppingApplication
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(MainDispatcherExtension::class)
@@ -82,7 +83,10 @@ class CartViewModelTest {
     @Test
     fun `외부에서 장바구니에 변경이 생기면 cart 재조회로 state 에 반영된다`() = runTest {
         val cartRepository = FakeCartRepository(listOf(CartContent(sampleProducts[0], 1)))
-        val viewModel = CartViewModel(initialPageSize = 5, cartRepository = cartRepository)
+        val app = FakeShoppingApplication().apply {
+            setupFakeDependencies(cartRepository = cartRepository)
+        }
+        val viewModel = CartViewModel(initialPageSize = 5, application = app)
         viewModel.initialLoading()
 
         cartRepository.increase(sampleProducts[1])
@@ -92,8 +96,13 @@ class CartViewModelTest {
         assertEquals(setOf(1L, 2L), items.map { it.productUiModel.id }.toSet())
     }
 
-    private fun newViewModel(initial: List<CartContent>): CartViewModel = CartViewModel(
-        initialPageSize = 5,
-        cartRepository = FakeCartRepository(initial),
-    )
+    private fun newViewModel(initial: List<CartContent>): CartViewModel {
+        val app = FakeShoppingApplication().apply {
+            setupFakeDependencies(cartRepository = FakeCartRepository(initial))
+        }
+        return CartViewModel(
+            initialPageSize = 5,
+            application = app,
+        )
+    }
 }
