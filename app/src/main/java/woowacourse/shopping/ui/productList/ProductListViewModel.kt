@@ -59,7 +59,7 @@ class ProductListViewModel(
             val target =
                 cartFlow.value.cartItems.values
                     .find { it.product.id == productId } ?: return@launch
-            cartRepository.increase(target.id, target.quantity.value + 1)
+            cartRepository.updateQuantity(target.id, target.quantity.value + 1)
             refreshCart()
         }
     }
@@ -69,7 +69,7 @@ class ProductListViewModel(
             val target =
                 cartFlow.value.cartItems.values
                     .find { it.product.id == productId } ?: return@launch
-            cartRepository.decrease(target.id, target.quantity.value - 1)
+            cartRepository.updateQuantity(target.id, target.quantity.value - 1)
             refreshCart()
         }
     }

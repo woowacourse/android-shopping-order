@@ -122,7 +122,7 @@ class CartViewModel(
             val target =
                 _cartItems.value?.values?.find { it.product.id == productId } ?: return@launch
 
-            cartRepository.increase(target.id, target.quantity.value + 1)
+            cartRepository.updateQuantity(target.id, target.quantity.value + 1)
             val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
             _cartItems.update { result }
         }
@@ -137,7 +137,7 @@ class CartViewModel(
                 cartRepository.remove(target.id)
                 _selectedItems.update { it - target.id }
             } else {
-                cartRepository.decrease(target.id, target.quantity.value - 1)
+                cartRepository.updateQuantity(target.id, target.quantity.value - 1)
             }
             val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
 
@@ -149,7 +149,7 @@ class CartViewModel(
         viewModelScope.launch {
             val target = _cartItems.value?.values?.find { it.id == cartId } ?: return@launch
 
-            cartRepository.increase(cartId, target.quantity.value + 1)
+            cartRepository.updateQuantity(cartId, target.quantity.value + 1)
             val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
 
             _cartItems.update { result }
@@ -164,7 +164,7 @@ class CartViewModel(
                 cartRepository.remove(cartId)
                 _selectedItems.update { it - cartId }
             } else {
-                cartRepository.decrease(cartId, target.quantity.value - 1)
+                cartRepository.updateQuantity(cartId, target.quantity.value - 1)
             }
             val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
 

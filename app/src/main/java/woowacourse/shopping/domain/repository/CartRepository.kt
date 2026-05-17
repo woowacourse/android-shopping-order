@@ -19,12 +19,7 @@ interface CartRepository {
         quantity: Quantity = Quantity.ONE,
     )
 
-    suspend fun increase(
-        cartId: Int,
-        quantity: Int,
-    )
-
-    suspend fun decrease(
+    suspend fun updateQuantity(
         cartId: Int,
         quantity: Int,
     )
@@ -32,4 +27,10 @@ interface CartRepository {
     suspend fun remove(cartId: Int)
 
     suspend fun order(cartItemIds: List<Int>)
+}
+
+sealed interface CartDecreaseResult {
+    object Deleted : CartDecreaseResult
+
+    object Decreased : CartDecreaseResult
 }
