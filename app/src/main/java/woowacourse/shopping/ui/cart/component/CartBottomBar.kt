@@ -14,12 +14,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import woowacourse.shopping.R
 import woowacourse.shopping.ui.common.theme.PrimaryColor
-import java.text.NumberFormat
 
 @Composable
 fun CartBottomBar(
@@ -31,7 +32,7 @@ fun CartBottomBar(
     onOrderClick: () -> Unit,
     onCheckedChanged: (Boolean) -> Unit = {},
 ) {
-    val formatted = NumberFormat.getInstance().format(price)
+    val formatted = stringResource(id = R.string.price_format, price)
 
     Row(
         modifier = modifier.size(width = 360.dp, height = 78.dp),
@@ -79,7 +80,7 @@ private fun CheckboxAndPrice(
             onCheckedChanged = onCheckedChanged,
         )
         Text(
-            text = "${price}원",
+            text = "$price",
             color = Color.White,
             fontSize = 18.sp,
             fontWeight = FontWeight.W700,
@@ -101,7 +102,7 @@ private fun Price(
         contentAlignment = Alignment.CenterEnd,
     ) {
         Text(
-            text = "${price}원",
+            text = "$price",
             color = Color.White,
             fontSize = 18.sp,
             fontWeight = FontWeight.W700,
