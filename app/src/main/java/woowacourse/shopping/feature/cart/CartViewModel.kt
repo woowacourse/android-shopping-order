@@ -154,7 +154,7 @@ class CartViewModel(
     private inline fun guardFatal(block: () -> Unit) {
         try {
             block()
-        } catch (e: ProductNotFoundException) {
+        } catch (e: Exception) {
             _event.trySend(
                 CartEvent.FatalError(
                     e.message

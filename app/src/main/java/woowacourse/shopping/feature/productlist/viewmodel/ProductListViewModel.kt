@@ -106,7 +106,7 @@ class ProductListViewModel(
     private inline fun guardFatal(block: () -> Unit) {
         try {
             block()
-        } catch (e: ProductNotFoundException) {
+        } catch (e: Exception) {
             _event.trySend(
                 ProductListEvent.FatalError(
                     e.message
