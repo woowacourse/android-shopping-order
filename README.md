@@ -4,7 +4,7 @@
 - From Rabbit
   - [x] plus 연산에서의 조용한 overflow 차단
 - From 코니
-  - [ ] Compose App의 접근성 관련, 기존 Box Clickable을 Button으로 수정
+  - [x] Compose App의 접근성 관련, 기존 Box Clickable을 Button으로 수정
   - [ ] SupervisorJob + Dispatcher.IO의 사용이유 및 관련 코드 리팩토링
   - [ ] viewModelScope.launch {...}의 올바른 사용
   - [ ] 일관성과 테스트 용이성을 위한 RecentItemRepository의 interface화
