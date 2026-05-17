@@ -2,7 +2,7 @@
 
 ## 1차 리팩토링
 - From Rabbit
-  - [ ] plus 연산에서의 조용한 overflow 차단
+  - [x] plus 연산에서의 조용한 overflow 차단
 - From 코니
   - [ ] Compose App의 접근성 관련, 기존 Box Clickable을 Button으로 수정
   - [ ] SupervisorJob + Dispatcher.IO의 사용이유 및 관련 코드 리팩토링
