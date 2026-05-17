@@ -5,7 +5,7 @@ import woowacourse.shopping.data.local.entity.RecentlyViewedProductEntity
 import woowacourse.shopping.domain.Product
 
 interface RecentlyViewedProductRepository {
-    fun getAll(): Flow<List<RecentlyViewedProductEntity>?>
+    fun getAll(): Flow<List<Long>?>
 
     suspend fun updateList(product: Product)
 

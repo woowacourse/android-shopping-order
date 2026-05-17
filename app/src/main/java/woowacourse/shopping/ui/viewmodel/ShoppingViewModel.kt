@@ -26,7 +26,7 @@ class ShoppingViewModel(
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
     private val productRepository: ProductRepository,
 ) : ViewModel() {
-    val recentlyViewedEntities: StateFlow<List<RecentlyViewedProductEntity>?> =
+    val recentlyViewedEntities: StateFlow<List<Long>?> =
         recentlyViewedProductRepository
             .getAll()
             .stateIn(
@@ -44,8 +44,8 @@ class ShoppingViewModel(
     val recentlyViewedProducts: StateFlow<Products> =
         combine(recentlyViewedEntities, products) { entities, allProducts ->
             val productList =
-                entities?.mapNotNull { entity ->
-                    allProducts.findWithId(entity.id)
+                entities?.mapNotNull { id ->
+                    allProducts.findWithId(id)
                 } ?: emptyList()
             Products(productList)
         }.stateIn(
