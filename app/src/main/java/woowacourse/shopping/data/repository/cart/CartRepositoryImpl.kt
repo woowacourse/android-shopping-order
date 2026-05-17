@@ -30,7 +30,7 @@ class CartRepositoryImpl(
             cartServerDao.insert(CartContent(product, quantity))
         } else {
             cartServerDao.update(
-                CartContent(existing.product, existing.quantity + 1, existing.id),
+                CartContent(existing.product, existing.quantity + quantity, existing.id),
             )
         }
     }
