@@ -229,7 +229,7 @@ class CartViewModel(
             _uiState.update { it.copy(isLoading = true) }
             try {
                 val products =
-                    ProductRecommender.recommendProduct(
+                    ProductRecommender.getRecommendProducts(
                         lastViewedItem = recentProductRepo.getLastViewedProduct(),
                         allProductItems = productRepo.getProducts(0, 50),
                         allCartItem = cartRepo.getAllCartItems().items,

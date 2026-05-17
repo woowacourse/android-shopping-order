@@ -6,7 +6,7 @@ import woowacourse.shopping.model.Product
 object ProductRecommender {
     const val MAX_PRODUCT_SIZE = 10
 
-    fun recommendProduct(
+    fun getRecommendProducts(
         lastViewedItem: Product?,
         allProductItems: List<Product>,
         allCartItem: List<CartItem>,
