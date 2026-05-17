@@ -124,7 +124,6 @@ open class ShoppingApplication : Application() {
             cartServerDao = CartRetrofitDaoImpl(
                 retrofitCartService = retrofitCartService,
             ),
-            productRepository = product,
         )
         val recent: RecentProductRepository =
             RecentProductRepositoryImpl(recentProductDatabase.recentProductDao())

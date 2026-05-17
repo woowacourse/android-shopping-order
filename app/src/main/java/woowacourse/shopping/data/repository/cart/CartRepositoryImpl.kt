@@ -8,7 +8,6 @@ import woowacourse.shopping.domain.Product
 
 class CartRepositoryImpl(
     private val cartServerDao: CartServerDao,
-    private val productRepository: ProductRepository,
 ) : CartRepository {
 
     override suspend fun loadCart(): Cart = Cart(loadAll())
@@ -54,16 +53,15 @@ class CartRepositoryImpl(
     }
 
     override suspend fun setProductQuantity(
-        productId: Long,
+        product: Product,
         quantity: Int,
     ) {
         if (quantity < 1) return
-        val existing = loadAll().firstOrNull { it.hasProductId(productId) }
+        val existing = loadAll().firstOrNull { it.hasProductId(product.id) }
         if (existing != null) {
             cartServerDao.update(CartContent(existing.product, quantity, existing.id))
             return
         }
-        val product = productRepository.getProduct(productId)
         cartServerDao.insert(CartContent(product, quantity))
     }
 
