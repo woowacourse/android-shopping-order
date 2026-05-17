@@ -1,7 +1,6 @@
 package woowacourse.shopping.data.repository.cart
 
 import woowacourse.shopping.data.network.cart.CartServerDao
-import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartContent
 import woowacourse.shopping.domain.Product
@@ -26,9 +25,9 @@ class CartRepositoryImpl(
     ) {
         val existing = loadAll().firstOrNull { it.hasProductId(product.id) }
         if (existing == null) {
-            cartServerDao.insert(CartContent(product, quantity))
+            cartServerDao.insertCartItem(CartContent(product, quantity))
         } else {
-            cartServerDao.update(
+            cartServerDao.updateCartItem(
                 CartContent(existing.product, existing.quantity + quantity, existing.id),
             )
         }
@@ -40,7 +39,7 @@ class CartRepositoryImpl(
         if (existing.quantity <= 1) {
             cartServerDao.deleteById(existing.id)
         } else {
-            cartServerDao.update(
+            cartServerDao.updateCartItem(
                 CartContent(existing.product, existing.quantity - 1, existing.id),
             )
         }
@@ -59,10 +58,10 @@ class CartRepositoryImpl(
         if (quantity < 1) return
         val existing = loadAll().firstOrNull { it.hasProductId(product.id) }
         if (existing != null) {
-            cartServerDao.update(CartContent(existing.product, quantity, existing.id))
+            cartServerDao.updateCartItem(CartContent(existing.product, quantity, existing.id))
             return
         }
-        cartServerDao.insert(CartContent(product, quantity))
+        cartServerDao.insertCartItem(CartContent(product, quantity))
     }
 
     private suspend fun loadAll(): List<CartContent> = cartServerDao.pagination(0, ALL_PAGE_SIZE, emptyList())

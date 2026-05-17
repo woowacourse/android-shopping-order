@@ -11,9 +11,9 @@ interface CartServerDao {
 
     suspend fun getTotalQuantity(): Int?
 
-    suspend fun insert(item: CartContent)
+    suspend fun insertCartItem(item: CartContent)
 
-    suspend fun update(item: CartContent)
+    suspend fun updateCartItem(item: CartContent)
 
     suspend fun deleteById(id: Long)
 }

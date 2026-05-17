@@ -1,8 +1,5 @@
 package woowacourse.shopping.data.network.cart
 
-import android.util.Log
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.network.cart.dto.CartItemInsertDto
 import woowacourse.shopping.data.network.cart.dto.Quantity
 import woowacourse.shopping.domain.CartContent
@@ -42,7 +39,7 @@ class CartRetrofitDaoImpl(
         return body.quantity
     }
 
-    override suspend fun insert(item: CartContent) {
+    override suspend fun insertCartItem(item: CartContent): Unit {
         val response = retrofitCartService
             .insertCartItem(
                 cartItemInsertDto = CartItemInsertDto(
@@ -57,7 +54,7 @@ class CartRetrofitDaoImpl(
         }
     }
 
-    override suspend fun update(item: CartContent) {
+    override suspend fun updateCartItem(item: CartContent): Unit {
         val response = retrofitCartService
             .updateCartItemQuantity(
                 id = item.id,
