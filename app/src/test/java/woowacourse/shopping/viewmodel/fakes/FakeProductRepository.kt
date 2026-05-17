@@ -17,4 +17,10 @@ class FakeProductRepository : ProductRepository {
     ): List<Product> = products
 
     override suspend fun getProduct(id: Long): Product = products.first { it.id == id }
+
+    override suspend fun getCategoryProducts(
+        page: Int,
+        pageSize: Int,
+        category: String
+    ): List<Product> = products.filter { it.category == category }
 }
