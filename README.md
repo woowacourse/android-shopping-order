@@ -1,3 +1,31 @@
+# 1 & 2단계 리팩토링 목록
+
+## 정리
+- [ ] 미션에서 사용하지 않는 파일 제거
+
+## Network 레이어
+- [ ] RetrofitClient 단일화 - Retrofit 인스턴스 하나만 만들고 .create()로 여러 서비스 생성으로 변경
+- [ ] CartService의 @Header 파라미터 제거 후 Interceptor로 자동 주입하도록 변경
+
+## UiState 설계
+- [ ] CartUiState 상태 표현 개선 - Sealed class(Loading / Success / Empty / Error) 또는 명시적 error 필드 추가
+
+## ViewModel 구조
+- [ ] ViewModelProvider.Factory를 각 ViewModel의 companion object로 이동
+- [ ] CartViewModel 멤버 가시성 점검
+- [ ] loadData() 제거 - refreshData()를 불필요하게 한 번 더 감싸기만 함
+- [ ] 모든 상호작용마다 전체 새로고침 호출하는 패턴 점검 - 로컬 상태 업데이트로 충분한 케이스 분리
+
+## 페이지네이션
+- [ ] ProductRepository를 fromIndex/count -> page/size 기반 인터페이스로 변경
+- [ ] getProducts 내부 drop().take() 제거하고 서버 페이지네이션 그대로 활용
+- [ ] hasNext 책임을 ViewModel로 이동 - 서버 응답 메타데이터(last, totalPages)로 판단
+
+## 에러/예외 처리
+- [ ] 요청 실패 시 피드백 추가 (ex. 토스트)
+- [ ] changeScreen()에서 getRecommendProducts() 실패 대비 - 실패 시 isCartScreen 롤백 + 에러 노출
+- [ ] 추천 화면 재진입 시 stale한 recommendItems 초기화
+
 # 🚀 2단계 - 상품 추천
 
 ## 🎯 기능 목록
