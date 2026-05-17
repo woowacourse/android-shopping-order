@@ -47,7 +47,7 @@
 
 - **UserAuthDataStore**
   - [ ] StateFlow를 사용하도록 변경
-  - [ ] applicationContext 제한 추가
+  - [x] applicationContext 제한 추가
 
 - **WebServerResponse**
   - [ ] MockProductResponse로 네이밍 변경

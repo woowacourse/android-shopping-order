@@ -8,25 +8,28 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import woowacourse.shopping.ShoppingApplication
 
 private val Context.dataStore by preferencesDataStore(name = "auth_prefs")
 
 class UserAuthDataStore(
-    private val context: Context,
+    context: ShoppingApplication,
 ) {
+    private val dataStoreContext = context.applicationContext
+
     companion object {
         private val USER_NAME = stringPreferencesKey("userName")
         private val USER_PASSWORD = stringPreferencesKey("userPassword")
     }
 
-    val userName: Flow<String?> =
-        context.dataStore.data
+    val userName: Flow<String> =
+        dataStoreContext.dataStore.data
             .map { preferences ->
                 preferences[USER_NAME] ?: "First_woosun"
             }
 
-    val userPassword: Flow<String?> =
-        context.dataStore.data
+    val userPassword: Flow<String> =
+        dataStoreContext.dataStore.data
             .map { preferences ->
                 preferences[USER_PASSWORD] ?: "password"
             }
@@ -35,14 +38,14 @@ class UserAuthDataStore(
         userName: String,
         userPassword: String,
     ) {
-        context.dataStore.edit { preferences ->
+        dataStoreContext.dataStore.edit { preferences ->
             preferences[USER_NAME] = userName
             preferences[USER_PASSWORD] = userPassword
         }
     }
 
     suspend fun clearUserAuth() {
-        context.dataStore.edit { preferences ->
+        dataStoreContext.dataStore.edit { preferences ->
             preferences.remove(USER_NAME)
             preferences.remove(USER_PASSWORD)
         }
