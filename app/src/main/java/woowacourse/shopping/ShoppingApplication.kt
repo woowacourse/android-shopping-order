@@ -12,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import okhttp3.Credentials
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -92,12 +91,15 @@ open class ShoppingApplication : Application() {
             }
             .build()
 
-        val retrofitService = Retrofit.Builder()
+        val retrofit = Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .client(client)
             .build()
-            .create(RetrofitProductService::class.java)
+
+        val retrofitProductService = retrofit.create(RetrofitProductService::class.java)
+        val retrofitCartService = retrofit.create(RetrofitCartService::class.java)
+        val orderService = retrofit.create(OrderService::class.java)
 
         val recentProductDatabase = Room.databaseBuilder(
             applicationContext,
@@ -108,17 +110,11 @@ open class ShoppingApplication : Application() {
         val product: ProductRepository = ProductRepositoryImpl(
             dataSource = ProductDataSourceImpl(
                 productDao = ProductRetrofitDaoImpl(
-                    retrofitProductService = retrofitService,
+                    retrofitProductService = retrofitProductService,
                 ),
             ),
         )
 
-        val retrofitCartService = Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-            .client(client)
-            .build()
-            .create(RetrofitCartService::class.java)
 
         val cart: CartRepository = CartRepositoryImpl(
             cartServerDao = CartRetrofitDaoImpl(
@@ -126,14 +122,10 @@ open class ShoppingApplication : Application() {
             ),
         )
         val recent: RecentProductRepository =
-            RecentProductRepositoryImpl(recentProductDatabase.recentProductDao())
+            RecentProductRepositoryImpl(
+                recentProductDao = recentProductDatabase.recentProductDao()
+            )
 
-        val orderService = Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-            .client(client)
-            .build()
-            .create(OrderService::class.java)
 
         val order: OrderRepository = OrderRepositoryImpl(
             orderDao = OrderDaoImpl(

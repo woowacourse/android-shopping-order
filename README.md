@@ -73,3 +73,4 @@
 - [x] Repository 의존성 분리
 - [x] http 디버깅 로직 수정하기
 - [x] 클래스의 시그니처 변경
+- [x] 중복되는 Retrofit 객체 생성
