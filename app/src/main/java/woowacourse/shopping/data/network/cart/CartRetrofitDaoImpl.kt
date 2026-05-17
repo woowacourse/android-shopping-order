@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.network.cart
 
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.network.cart.dto.CartItemInsertDto
@@ -17,7 +18,10 @@ class CartRetrofitDaoImpl(
         val response = retrofitCartService
             .requestCartItems(page = startIndex, size = pageSize)
 
-        check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
+        check(response.isSuccessful) {
+            val errorBody = response.errorBody()?.string()
+            "products 요청 실패: ${response.code()},  Message: $errorBody"
+        }
 
         val body = response.body()
             ?: error("empty body")
@@ -28,7 +32,10 @@ class CartRetrofitDaoImpl(
         val response = retrofitCartService
             .getCartItemTotalCount()
 
-        check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
+        check(response.isSuccessful) {
+            val errorBody = response.errorBody()?.string()
+            "products 요청 실패: ${response.code()},  Message: $errorBody"
+        }
 
         val body = response.body()
             ?: error("empty body")
@@ -44,7 +51,10 @@ class CartRetrofitDaoImpl(
                 ),
             )
 
-        check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
+        check(response.isSuccessful) {
+            val errorBody = response.errorBody()?.string()
+            "products 요청 실패: ${response.code()},  Message: $errorBody"
+        }
     }
 
     override suspend fun update(item: CartContent) {
@@ -54,13 +64,19 @@ class CartRetrofitDaoImpl(
                 quantity = Quantity(item.quantity),
             )
 
-        check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
+        check(response.isSuccessful) {
+            val errorBody = response.errorBody()?.string()
+            "products 요청 실패: ${response.code()},  Message: $errorBody"
+        }
     }
 
     override suspend fun deleteById(id: Long) {
         val response = retrofitCartService
             .deleteCartItem(id = id)
 
-        check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
+        check(response.isSuccessful) {
+            val errorBody = response.errorBody()?.string()
+            "products 요청 실패: ${response.code()},  Message: $errorBody"
+        }
     }
 }

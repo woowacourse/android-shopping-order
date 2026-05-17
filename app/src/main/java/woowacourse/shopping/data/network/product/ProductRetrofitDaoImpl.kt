@@ -14,7 +14,10 @@ class ProductRetrofitDaoImpl(
         val response = retrofitProductService
             .requestProducts(page = startIndex, size = pageSize, category = category)
 
-        check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
+        check(response.isSuccessful) {
+            val errorBody = response.errorBody()?.string()
+            "products 요청 실패: ${response.code()},  Message: $errorBody"
+        }
         val body = response.body()
             ?: error("empty body")
         return body.content.map { it.toDomain() }
@@ -24,7 +27,10 @@ class ProductRetrofitDaoImpl(
         val response = retrofitProductService
             .getProductDetail(id = id)
 
-        check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
+        check(response.isSuccessful) {
+            val errorBody = response.errorBody()?.string()
+            "products 요청 실패: ${response.code()},  Message: $errorBody"
+        }
         val body = response.body()
             ?: error("empty body")
         return body.toDomain()
