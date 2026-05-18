@@ -15,20 +15,22 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.ui.component.screen.CartScreen
 import woowacourse.shopping.ui.viewmodel.CartViewModel
 import woowacourse.shopping.ui.viewmodel.CartViewModelFactory
+import woowacourse.shopping.ui.viewmodel.ShoppingViewModel
 
 class CartActivity : ComponentActivity() {
+    private lateinit var viewModel: CartViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         setContent {
-            val viewModel: CartViewModel =
-                viewModel<CartViewModel>(
-                    factory =
-                        CartViewModelFactory(
-                            (application as ShoppingApplication).cartRepository,
-                        ),
-                )
+            viewModel = viewModel<CartViewModel>(
+                factory =
+                    CartViewModelFactory(
+                        (application as ShoppingApplication).cartRepository,
+                    ),
+            )
 
             val pagedCart by viewModel.pagedCart.collectAsStateWithLifecycle()
             val currentPage by viewModel.currentPage.collectAsStateWithLifecycle()
@@ -72,10 +74,13 @@ class CartActivity : ComponentActivity() {
                     isChecked = { id -> checkedItemIds.contains(id) },
                     onSelectAllClick = { viewModel.onSelectAllClick() },
                     onOrderClick = {
-                        if(checkedItemIds.isNotEmpty()) {
+                        if (checkedItemIds.isNotEmpty()) {
                             val intent = Intent(this, RecommendationActivity::class.java)
                             intent.putExtra(IntentKeys.SELECTED_TOTAL_PRICE, totalPrice)
-                            intent.putExtra(IntentKeys.SELECTED_CART_ITEM_IDS, checkedItemIds.toLongArray())
+                            intent.putExtra(
+                                IntentKeys.SELECTED_CART_ITEM_IDS,
+                                checkedItemIds.toLongArray()
+                            )
                             startActivity(intent)
                         }
                     },
@@ -87,5 +92,10 @@ class CartActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (::viewModel.isInitialized) viewModel.fetchCart()
     }
 }

@@ -57,6 +57,10 @@ class CartViewModel(
         )
 
     init {
+        fetchCart()
+    }
+
+    fun fetchCart() {
         viewModelScope.launch {
             _isLoading.update { true }
 
