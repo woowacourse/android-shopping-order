@@ -8,8 +8,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class UserDataStore(
-    private val context: Context,
+    context: Context,
 ) {
+    private val context = context.applicationContext
     private val Context.userDataStore by preferencesDataStore(name = "user")
 
     suspend fun saveUser(

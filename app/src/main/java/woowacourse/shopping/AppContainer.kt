@@ -27,13 +27,14 @@ import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentItemRepository
 
 class AppContainer(
-    private val context: Context,
+    context: Context,
 ) {
-    private val database = ShoppingDB.getInstance(context)
+    private val applicationContext = context.applicationContext
+    private val database = ShoppingDB.getInstance(applicationContext)
 
     val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    val userDataStore = UserDataStore(context)
+    val userDataStore = UserDataStore(applicationContext)
 
     init {
         applicationScope.launch {
@@ -59,7 +60,7 @@ class AppContainer(
     }
 
     val networkObserver: NetworkObserver by lazy {
-        NetworkManager(context)
+        NetworkManager(applicationContext)
     }
 
     private val loggingInterceptor =
