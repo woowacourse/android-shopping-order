@@ -1,12 +1,12 @@
 package woowacourse.shopping.backend.retrofit.repository
 
 import retrofit2.Call
-import woowacourse.shopping.backend.retrofit.api.ProductRetrofitInterface
+import woowacourse.shopping.backend.retrofit.api.ProductRetrofit
 import woowacourse.shopping.backend.retrofit.dto.Product
 import woowacourse.shopping.backend.retrofit.dto.ProductResponse
 
 class ProductRetrofitRepository(
-    private val apiService: ProductRetrofitInterface,
+    private val apiService: ProductRetrofit,
 ) {
     fun requestProduct(
         page: Int = DEFAULT_PAGE,

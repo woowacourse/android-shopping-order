@@ -1,13 +1,13 @@
 package woowacourse.shopping.backend.retrofit.repository
 
 import retrofit2.Call
-import woowacourse.shopping.backend.retrofit.api.ShoppingCartRetrofitInterface
+import woowacourse.shopping.backend.retrofit.api.ShoppingCartRetrofit
 import woowacourse.shopping.backend.retrofit.dto.CartQuantity
 import woowacourse.shopping.backend.retrofit.dto.CartRequest
 import woowacourse.shopping.backend.retrofit.dto.ShoppingCartResponse
 
 class ShoppingCartRetrofitRepository(
-    private val apiService: ShoppingCartRetrofitInterface,
+    private val apiService: ShoppingCartRetrofit,
 ) {
     fun requestCartItems(
         page: Int = DEFAULT_PAGE,

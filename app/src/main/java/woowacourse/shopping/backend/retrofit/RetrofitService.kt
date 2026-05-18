@@ -3,9 +3,9 @@ package woowacourse.shopping.backend.retrofit
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import woowacourse.shopping.backend.retrofit.api.OrderRetrofitInterface
-import woowacourse.shopping.backend.retrofit.api.ProductRetrofitInterface
-import woowacourse.shopping.backend.retrofit.api.ShoppingCartRetrofitInterface
+import woowacourse.shopping.backend.retrofit.api.OrderRetrofit
+import woowacourse.shopping.backend.retrofit.api.ProductRetrofit
+import woowacourse.shopping.backend.retrofit.api.ShoppingCartRetrofit
 import woowacourse.shopping.repository.AuthHeaderProvider
 import woowacourse.shopping.repository.AuthInterceptor
 
@@ -26,12 +26,12 @@ class RetrofitService(
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-    val orderApiService: OrderRetrofitInterface =
-        retrofit.create(OrderRetrofitInterface::class.java)
-    val productApiService: ProductRetrofitInterface =
-        retrofit.create(ProductRetrofitInterface::class.java)
-    val shoppingCartApiService: ShoppingCartRetrofitInterface =
-        retrofit.create(ShoppingCartRetrofitInterface::class.java)
+    val orderApiService: OrderRetrofit =
+        retrofit.create(OrderRetrofit::class.java)
+    val productApiService: ProductRetrofit =
+        retrofit.create(ProductRetrofit::class.java)
+    val shoppingCartApiService: ShoppingCartRetrofit =
+        retrofit.create(ShoppingCartRetrofit::class.java)
 
     companion object {
         private const val BASE_URL =
