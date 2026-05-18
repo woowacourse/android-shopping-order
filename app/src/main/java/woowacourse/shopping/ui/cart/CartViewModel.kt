@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.cart
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -51,16 +52,20 @@ class CartViewModel(
         viewModelScope.launch {
             _isLoading.update { true }
 
-            _allCartItems.update {
-                cartRepository.getPagedCart(0, 10000000)
-            }
-            _pagedCart.update {
-                cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
-            }
-            _cartItemCount.update {
-                cartRepository.getCartItemCount()
-            }
+            val firstPage = cartRepository.getPagedCart(0, PAGE_SIZE)
+            _pagedCart.update { firstPage }
+            
+            val totalCount = cartRepository.getCartItemCount()
+            _cartItemCount.update { totalCount }
+            
             _isLoading.update { false }
+
+            if (totalCount > 0) {
+                launch(Dispatchers.IO) {
+                    val allData = cartRepository.getPagedCart(0, totalCount)
+                    _allCartItems.update { allData }
+                }
+            }
         }
     }
 
