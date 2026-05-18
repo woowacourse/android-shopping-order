@@ -79,10 +79,12 @@ class ShoppingCartRecommendViewModel(
     private fun createUiState(currentStep: ShoppingCartStep): ShoppingCartRecommendUiState {
         val shoppingItemByProductId =
             allShoppingItems.associateBy { shoppingItem -> shoppingItem.getProductId() }
+        val mostRecentViewedProductId = recentViewedProductIds.firstOrNull()
         val mostRecentViewedCategory =
-            recentViewedProductIds.firstNotNullOfOrNull { productId ->
-                shoppingItemByProductId[productId]?.getProduct()?.category
-            }
+            mostRecentViewedProductId
+                ?.let { productId -> shoppingItemByProductId[productId] }
+                ?.getProduct()
+                ?.category
         val cartProductIds =
             shoppingCartItems
                 .map { shoppingCartItem -> shoppingCartItem.product.id }
@@ -94,7 +96,7 @@ class ShoppingCartRecommendViewModel(
                 cartProductIds
             }
         val recommendedShoppingItems =
-            if (mostRecentViewedCategory == null) {
+            if (mostRecentViewedCategory == null || mostRecentViewedCategory == UNKNOWN_CATEGORY) {
                 emptyList()
             } else {
                 allShoppingItems
@@ -134,5 +136,6 @@ class ShoppingCartRecommendViewModel(
 
     private companion object {
         private const val MAX_RECOMMEND_PRODUCTS = 10
+        private const val UNKNOWN_CATEGORY = "UNKNOWN"
     }
 }

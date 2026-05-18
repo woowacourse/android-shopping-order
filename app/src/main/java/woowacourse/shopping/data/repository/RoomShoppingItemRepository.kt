@@ -31,6 +31,7 @@ class RoomShoppingItemRepository(
                     title = product.getTitle(),
                     price = product.getPrice(),
                     imageUrl = product.imageUrl,
+                    category = product.category,
                     quantity = preservedQuantity,
                 ),
             ),
@@ -53,6 +54,7 @@ class RoomShoppingItemRepository(
                     title = product.getTitle(),
                     price = product.getPrice(),
                     imageUrl = product.imageUrl,
+                    category = product.category,
                     quantity = quantityByProductId[product.id] ?: 0,
                 )
             }

@@ -14,7 +14,7 @@ import woowacourse.shopping.data.local.room.shoppingcart.ShoppingCartEntity
 
 @Database(
     entities = [ShoppingItemEntity::class, ShoppingCartEntity::class],
-    version = 3,
+    version = 4,
     exportSchema = false,
 )
 abstract class ShoppingDatabase : RoomDatabase() {
@@ -36,11 +36,17 @@ abstract class ShoppingDatabase : RoomDatabase() {
                     rebuildRoomTables(db)
                 }
             }
+        private val migration3To4 =
+            object : Migration(3, 4) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    rebuildShoppingItemsTable(db)
+                }
+            }
 
         fun create(context: Context): ShoppingDatabase =
             Room
                 .databaseBuilder(context, ShoppingDatabase::class.java, DATABASE_NAME)
-                .addMigrations(migration1To3, migration2To3)
+                .addMigrations(migration1To3, migration2To3, migration3To4)
                 .build()
 
         private fun rebuildRoomTables(db: SupportSQLiteDatabase) {
@@ -60,6 +66,7 @@ abstract class ShoppingDatabase : RoomDatabase() {
                     `title` TEXT NOT NULL,
                     `price` INTEGER NOT NULL,
                     `image_url` TEXT NOT NULL,
+                    `category` TEXT NOT NULL,
                     `quantity` INTEGER NOT NULL,
                     PRIMARY KEY(`product_id`)
                 )
@@ -70,12 +77,13 @@ abstract class ShoppingDatabase : RoomDatabase() {
                 val titleExpression = oldColumns.stringExpression(columnName = "title", defaultValue = "''")
                 val priceExpression = oldColumns.stringExpression(columnName = "price", defaultValue = "0")
                 val imageUrlExpression = oldColumns.stringExpression(columnName = "image_url", defaultValue = "''")
+                val categoryExpression = oldColumns.stringExpression(columnName = "category", defaultValue = "'UNKNOWN'")
                 val quantityExpression = oldColumns.stringExpression(columnName = "quantity", defaultValue = "0")
 
                 db.execSQL(
                     """
-                    INSERT OR REPLACE INTO `shopping_items` (`product_id`, `title`, `price`, `image_url`, `quantity`)
-                    SELECT `product_id`, $titleExpression, $priceExpression, $imageUrlExpression, $quantityExpression
+                    INSERT OR REPLACE INTO `shopping_items` (`product_id`, `title`, `price`, `image_url`, `category`, `quantity`)
+                    SELECT `product_id`, $titleExpression, $priceExpression, $imageUrlExpression, $categoryExpression, $quantityExpression
                     FROM `$backupTableName`
                     """.trimIndent(),
                 )

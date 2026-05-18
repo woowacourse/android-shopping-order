@@ -18,6 +18,8 @@ data class ShoppingCartItemRow(
     val price: Int,
     @ColumnInfo(name = "image_url")
     val imageUrl: String,
+    @ColumnInfo(name = "category")
+    val category: String,
     @ColumnInfo(name = "quantity")
     val quantity: Int,
 )
@@ -33,6 +35,7 @@ fun ShoppingCartItemRow.toDomain(): ShoppingCartItem =
                         title = ProductTitle(title),
                         price = Price(price),
                         imageUrl = imageUrl,
+                        category = category,
                     ),
                 quantity = quantity,
             ),

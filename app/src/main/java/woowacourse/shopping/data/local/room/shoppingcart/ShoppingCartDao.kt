@@ -33,6 +33,7 @@ interface ShoppingCartDao {
                s.title AS title,
                s.price AS price,
                s.image_url AS image_url,
+               s.category AS category,
                s.quantity AS quantity
         FROM shopping_cart_items c
         INNER JOIN shopping_items s ON s.product_id = c.product_id
@@ -49,6 +50,7 @@ interface ShoppingCartDao {
                s.title AS title,
                s.price AS price,
                s.image_url AS image_url,
+               s.category AS category,
                s.quantity AS quantity
         FROM shopping_cart_items c
         INNER JOIN shopping_items s ON s.product_id = c.product_id
