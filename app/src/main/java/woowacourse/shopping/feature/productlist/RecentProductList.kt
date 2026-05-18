@@ -32,7 +32,9 @@ fun RecentProductList(
             items(
                 items = recentProducts,
             ) {
-                Column {
+                Column (
+                    modifier = Modifier.size(width = 98.dp, height = 130.dp)
+                ) {
                     PreviewableAsyncImage(
                         imageUrl = it.imageUrl,
                         description = it.name,
@@ -48,6 +50,7 @@ fun RecentProductList(
                         it.name,
                         fontWeight = FontWeight.W700,
                         fontSize = 12.sp,
+                        maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
