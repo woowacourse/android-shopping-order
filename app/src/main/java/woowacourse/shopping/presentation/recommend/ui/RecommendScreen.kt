@@ -96,8 +96,6 @@ private fun RecommendScreenPreview() {
         RecommendScreen(
             uiState =
                 RecommendUiState(
-                    totalPrice = 5000,
-                    totalQuantity = 5,
                     recommendProducts = emptyList(),
                 ),
             onBack = {},

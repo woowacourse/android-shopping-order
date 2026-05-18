@@ -25,8 +25,6 @@ class RecommendViewModel(
     private val _uiState = MutableStateFlow(RecommendUiState())
     val uiState: StateFlow<RecommendUiState> = _uiState.asStateFlow()
 
-    private lateinit var paymentItems: PaymentItems
-
     fun loadRecommendProducts() {
         viewModelScope.launch {
             val recentProducts = recentProductRepository.getRecentProducts(1)
@@ -57,7 +55,7 @@ class RecommendViewModel(
     fun loadPaymentId(productIds: LongArray) {
         viewModelScope.launch {
             val cart = cartRepository.getCart()
-            paymentItems =
+            val newPaymentItems =
                 PaymentItems(
                     cart.items
                         .filter { cartItem ->
@@ -66,10 +64,7 @@ class RecommendViewModel(
                 )
 
             _uiState.update {
-                it.copy(
-                    totalQuantity = paymentItems.totalQuantity,
-                    totalPrice = paymentItems.totalPrice,
-                )
+                it.copy(paymentItems = newPaymentItems)
             }
         }
     }
@@ -84,9 +79,12 @@ class RecommendViewModel(
                     .items
                     .find { it.product.id == productId } ?: return@launch
 
-            paymentItems = paymentItems.add(cartItem)
+            _uiState.update {
+                it.copy(
+                    paymentItems = it.paymentItems.add(cartItem),
+                )
+            }
             updateRecommendQuantity(productId, cartItem.quantity)
-            updateDerived()
         }
     }
 
@@ -101,24 +99,18 @@ class RecommendViewModel(
             cartRepository.changeCartItem(productId, cartItem.decrease().quantity)
 
             val updated = cartRepository.getCart().items.find { it.product.id == productId }
-            paymentItems =
+            val newPaymentItems =
                 if (updated == null) {
-                    paymentItems.remove(productId)
+                    uiState.value.paymentItems.remove(productId)
                 } else {
-                    paymentItems.add(updated)
+                    uiState.value.paymentItems.add(updated)
                 }
 
-            updateRecommendQuantity(productId, updated?.quantity ?: 0)
-            updateDerived()
-        }
-    }
+            _uiState.update {
+                it.copy(paymentItems = newPaymentItems)
+            }
 
-    private fun updateDerived() {
-        _uiState.update {
-            it.copy(
-                totalQuantity = paymentItems.totalQuantity,
-                totalPrice = paymentItems.totalPrice,
-            )
+            updateRecommendQuantity(productId, updated?.quantity ?: 0)
         }
     }
 
