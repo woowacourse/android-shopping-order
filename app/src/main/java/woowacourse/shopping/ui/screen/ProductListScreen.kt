@@ -48,7 +48,7 @@ import woowacourse.shopping.model.ProductTitle
 import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.ui.component.ProductItem
 import woowacourse.shopping.ui.component.ProductListSkeletonItem
-import woowacourse.shopping.ui.state.ProductListState
+import woowacourse.shopping.ui.state.ProductListUiState
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 @Composable
@@ -57,7 +57,7 @@ fun ProductListScreen(
     recentViewedShoppingItems: List<ShoppingItem>,
     shoppingCartTotalCount: Int,
     isNetworkConnected: Boolean,
-    state: ProductListState,
+    state: ProductListUiState,
     onAddToCartClick: (ShoppingItem) -> Unit,
     onQuantityPlusClick: (ShoppingItem) -> Unit,
     onQuantityMinusClick: (ShoppingItem) -> Unit,
@@ -220,7 +220,8 @@ private fun RecentViewedItem(
                 .background(
                     color = MaterialTheme.colorScheme.background,
                     shape = RoundedCornerShape(8.dp),
-                ).clickable { onRecentViewedProductClick(product.id) }
+                )
+                .clickable { onRecentViewedProductClick(product.id) }
                 .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
@@ -350,27 +351,33 @@ private fun ProductItemPreview() {
 @Preview(showBackground = true)
 private fun ProductListScreenPreview() {
     AndroidShoppingTheme {
+        val previewItems =
+            listOf(
+                ShoppingItem(
+                    product =
+                        Product(
+                            id = 1L,
+                            title = ProductTitle("샘플 상품"),
+                            price = Price(12000),
+                            imageUrl = "https://example.com/image.jpg",
+                        ),
+                    quantity = 1,
+                ),
+            )
+
         ProductListScreen(
-            shoppingItems = emptyList(),
+            shoppingItems = previewItems,
             recentViewedShoppingItems = emptyList(),
             shoppingCartTotalCount = 99,
             isNetworkConnected = true,
             state =
-                ProductListState(
+                ProductListUiState(
+                    shoppingItems = previewItems,
+                    recentViewedShoppingItems = emptyList(),
+                    shoppingCartTotalCount = 99,
+                    isNetworkConnected = true,
+                    canLoadNextPage = false,
                     isLoading = false,
-                    products =
-                        listOf(
-                            ShoppingItem(
-                                product =
-                                    Product(
-                                        id = 1L,
-                                        title = ProductTitle("샘플 상품"),
-                                        price = Price(12000),
-                                        imageUrl = "https://example.com/image.jpg",
-                                    ),
-                                quantity = 1,
-                            ),
-                        ),
                     errorMessage = null,
                 ),
             onAddToCartClick = {},

@@ -9,14 +9,19 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import woowacourse.shopping.backend.retrofit.awaitBody
+import woowacourse.shopping.backend.retrofit.repository.ProductRetrofitRepository
+import woowacourse.shopping.mapper.toDomainProducts
 import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.network.NetworkStatusMonitor
 import woowacourse.shopping.repository.ShoppingCartRepository
 import woowacourse.shopping.repository.ShoppingItemRepository
 import woowacourse.shopping.storage.datastore.VisitStore
 import woowacourse.shopping.ui.pagination.ProductPageStateHolder
+import woowacourse.shopping.ui.state.ProductListUiState
 
 class ProductListViewModel(
+    private val productRetrofitRepository: ProductRetrofitRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
     private val shoppingItemRepository: ShoppingItemRepository,
     private val visitStore: VisitStore,
@@ -24,6 +29,7 @@ class ProductListViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductListUiState())
     val uiState: StateFlow<ProductListUiState> = _uiState.asStateFlow()
+
     private val _event = MutableSharedFlow<ProductListEvent>(extraBufferCapacity = 1)
     val event: SharedFlow<ProductListEvent> = _event.asSharedFlow()
 
@@ -31,11 +37,37 @@ class ProductListViewModel(
     private var allShoppingItems: List<ShoppingItem> = shoppingItemRepository.shoppingItems.value
     private var recentViewedProductIds: List<Long> = visitStore.recentVisitedProductIds.value
     private var networkConnected: Boolean = networkStatusMonitor.isConnected.value
+    private var isLoading: Boolean = false
+    private var errorMessage: String? = null
 
     init {
         productPageStateHolder.updateItems(allShoppingItems)
         publishUiState()
         observeSources()
+    }
+
+    fun requestProducts(size: Int) {
+        isLoading = true
+        errorMessage = null
+        publishUiState()
+
+        viewModelScope.launch {
+            runCatching {
+                productRetrofitRepository
+                    .requestProduct(size = size)
+                    .awaitBody(errorPrefix = "상품 조회 실패")
+                    .toDomainProducts()
+            }.onSuccess { products ->
+                shoppingItemRepository.replaceProducts(products)
+                isLoading = false
+                errorMessage = null
+                publishUiState()
+            }.onFailure {
+                isLoading = false
+                errorMessage = "상품 목록을 불러오지 못했습니다."
+                publishUiState()
+            }
+        }
     }
 
     fun loadNextPage() {
@@ -118,23 +150,30 @@ class ProductListViewModel(
     }
 
     private fun createUiState(): ProductListUiState {
-        val shoppingItemByProductId = allShoppingItems.associateBy { shoppingItem -> shoppingItem.getProductId() }
+        val shoppingItemByProductId =
+            allShoppingItems.associateBy { shoppingItem -> shoppingItem.getProductId() }
+        val hasError = errorMessage != null
+
         return ProductListUiState(
-            shoppingItems = productPageStateHolder.getItems(),
-            recentViewedShoppingItems = recentViewedProductIds.mapNotNull { productId -> shoppingItemByProductId[productId] },
-            shoppingCartTotalCount = allShoppingItems.sumOf { shoppingItem -> shoppingItem.getQuantity() },
+            shoppingItems = if (hasError) emptyList() else productPageStateHolder.getItems(),
+            recentViewedShoppingItems =
+                if (hasError) {
+                    emptyList()
+                } else {
+                    recentViewedProductIds.mapNotNull { productId -> shoppingItemByProductId[productId] }
+                },
+            shoppingCartTotalCount =
+                if (hasError) {
+                    0
+                } else {
+                    allShoppingItems.sumOf { shoppingItem -> shoppingItem.getQuantity() }
+                },
             isNetworkConnected = networkConnected,
-            canLoadNextPage = productPageStateHolder.canMoveToNextPage(),
+            canLoadNextPage = !hasError && productPageStateHolder.canMoveToNextPage(),
+            isLoading = isLoading,
+            errorMessage = errorMessage,
         )
     }
-
-    data class ProductListUiState(
-        val shoppingItems: List<ShoppingItem> = emptyList(),
-        val recentViewedShoppingItems: List<ShoppingItem> = emptyList(),
-        val shoppingCartTotalCount: Int = 0,
-        val isNetworkConnected: Boolean = true,
-        val canLoadNextPage: Boolean = false,
-    )
 
     sealed interface ProductListEvent {
         data class NavigateToDetailProduct(

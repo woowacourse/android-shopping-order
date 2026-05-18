@@ -14,7 +14,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.backend.retrofit.viewmodel.ProductViewModel
 import woowacourse.shopping.ui.component.MoreButton
 import woowacourse.shopping.ui.screen.ProductListScreen
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
@@ -33,42 +32,24 @@ class ProductListActivity : ComponentActivity() {
 
     private val productListViewModel: ProductListViewModel by viewModels { screenViewModelFactory }
 
-    private val productViewModel: ProductViewModel by viewModels { screenViewModelFactory }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        observeApiViewModels()
         observeScreenEvents()
-        requestProductsAndCart()
+        requestProducts()
 
         setContent {
             val uiState by productListViewModel.uiState.collectAsStateWithLifecycle()
-            val apiState by productViewModel.state.collectAsStateWithLifecycle()
 
-            val errorMessage = apiState.errorMessage
-            val hasApiError = errorMessage != null
-            val visibleShoppingItems =
-                if (hasApiError) {
-                    emptyList()
-                } else {
-                    uiState.shoppingItems
-                }
-            val visibleRecentViewedItems =
-                if (hasApiError) {
-                    emptyList()
-                } else {
-                    uiState.recentViewedShoppingItems
-                }
 
             AndroidShoppingTheme {
                 ProductListScreen(
-                    shoppingItems = visibleShoppingItems,
-                    recentViewedShoppingItems = visibleRecentViewedItems,
-                    shoppingCartTotalCount = if (hasApiError) 0 else uiState.shoppingCartTotalCount,
+                    shoppingItems = uiState.shoppingItems,
+                    recentViewedShoppingItems = uiState.recentViewedShoppingItems,
+                    shoppingCartTotalCount = uiState.shoppingCartTotalCount,
                     isNetworkConnected = uiState.isNetworkConnected,
-                    state = apiState,
+                    state = uiState,
                     onAddToCartClick = { shoppingItem ->
                         productListViewModel.addProductToCart(shoppingItem)
                     },
@@ -98,23 +79,11 @@ class ProductListActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        requestProductsAndCart()
+        requestProducts()
     }
 
-    private fun requestProductsAndCart() {
-        productViewModel.requestProduct(size = MAX_PRODUCT_SIZE)
-    }
-
-    private fun observeApiViewModels() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    productViewModel.products.collect { products ->
-                        app.appContainer.remoteShoppingStateSyncer.syncProducts(products)
-                    }
-                }
-            }
-        }
+    private fun requestProducts() {
+        productListViewModel.requestProducts(size = MAX_PRODUCT_SIZE)
     }
 
     private fun observeScreenEvents() {

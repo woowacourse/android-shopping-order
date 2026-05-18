@@ -28,6 +28,7 @@ class ScreenViewModelFactory(
         when {
             modelClass.isAssignableFrom(ProductListViewModel::class.java) ->
                 ProductListViewModel(
+                    productRetrofitRepository = productRetrofitRepository,
                     shoppingCartRepository = appContainer.shoppingCartRepository,
                     shoppingItemRepository = appContainer.shoppingItemRepository,
                     visitStore = appContainer.visitStore,
