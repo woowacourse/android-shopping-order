@@ -52,17 +52,18 @@ class MockProductRepositoryImpl(
         page: Int,
         pageSize: Int,
         category: String,
-    ): List<Product> {
-        val offset = page * pageSize
-        val url = "${baseUrl}products?offset=$offset&limit=$pageSize"
+    ): List<Product> =
+        withContext(Dispatchers.IO) {
+            val offset = page * pageSize
+            val url = "${baseUrl}products?offset=$offset&limit=$pageSize"
 
-        val request = Request.Builder().url(url).build()
-        return client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw okio.IOException("Unexpected code $response")
+            val request = Request.Builder().url(url).build()
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) throw okio.IOException("Unexpected code $response")
 
-            val responseBody = response.body.string() ?: ""
-            val webResponse = json.decodeFromString<List<MockProductResponse>>(responseBody)
-            webResponse.map { it.toObject() }.filter { it.category == category }
+                val responseBody = response.body.string() ?: ""
+                val webResponse = json.decodeFromString<List<MockProductResponse>>(responseBody)
+                webResponse.map { it.toObject() }.filter { it.category == category }
+            }
         }
-    }
 }

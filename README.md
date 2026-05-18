@@ -56,7 +56,7 @@
   - [x] 테스트 디렉터리로 이동
 
 - **MockProductRepositoryImpl**
-  - [ ] getCategoryProduct에 Dispatcher.IO 명시
+  - [x] getCategoryProduct에 Dispatcher.IO 명시
 
 - **domain**
   - [ ] @Percelizable 어노테이션 제거 및 상속관계 제거
