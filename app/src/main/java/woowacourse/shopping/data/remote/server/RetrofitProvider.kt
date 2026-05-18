@@ -6,10 +6,9 @@ import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.Retrofit.*
 
 class RetrofitProvider(
-    private val authHeaderProvider: () -> String?,
+    private val authHeaderProvider: () -> String,
 ) {
     private val BASE_URL = "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/"
 
@@ -18,12 +17,8 @@ class RetrofitProvider(
             val originalRequest = chain.request()
             val authHeader = authHeaderProvider()
 
-            android.util.Log.d("AUTH_CHECK", "$authHeader")
-
             val requestBuilder = originalRequest.newBuilder()
-            if (authHeader != null) {
-                requestBuilder.header("Authorization", authHeader)
-            }
+            requestBuilder.header("Authorization", authHeader)
             chain.proceed(requestBuilder.build())
         }
 
@@ -33,7 +28,7 @@ class RetrofitProvider(
             .addInterceptor(authInterceptor)
             .build()
 
-    private val retrofit: Retrofit =
+    private val retrofit =
         Retrofit
             .Builder()
             .baseUrl(BASE_URL)

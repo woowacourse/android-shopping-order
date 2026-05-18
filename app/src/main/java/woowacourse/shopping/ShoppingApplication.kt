@@ -25,7 +25,7 @@ class ShoppingApplication : Application() {
     private val retrofitClient by lazy {
         RetrofitProvider(
             authHeaderProvider = {
-                runBlocking { userAuthDataStore.encodedUserAuthInfo.first() }
+                userAuthDataStore.encodedUserAuthInfo.value
             },
         )
     }
@@ -38,17 +38,11 @@ class ShoppingApplication : Application() {
         retrofitClient.create(CartService::class.java)
     }
 
-//    val client by lazy { OkHttpClient() }
     val productRepository by lazy {
         ProductRepositoryImpl(productService)
     }
 
     val cartRepository by lazy {
         CartRepositoryImpl(cartService)
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-//        ProductWebServer.start()
     }
 }

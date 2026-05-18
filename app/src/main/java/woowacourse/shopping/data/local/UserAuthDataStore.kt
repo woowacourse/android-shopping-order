@@ -5,9 +5,13 @@ import android.util.Base64
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import woowacourse.shopping.ShoppingApplication
 
 private val Context.dataStore by preferencesDataStore(name = "auth_prefs")
@@ -22,17 +26,25 @@ class UserAuthDataStore(
         private val USER_PASSWORD = stringPreferencesKey("userPassword")
     }
 
-    val userName: Flow<String> =
+    val userName: StateFlow<String> =
         dataStoreContext.dataStore.data
             .map { preferences ->
                 preferences[USER_NAME] ?: "First_woosun"
-            }
+            }.stateIn(
+                scope = CoroutineScope(Dispatchers.IO),
+                started = SharingStarted.Eagerly,
+                initialValue = "First_woosun"
+            )
 
-    val userPassword: Flow<String> =
+    val userPassword: StateFlow<String> =
         dataStoreContext.dataStore.data
             .map { preferences ->
                 preferences[USER_PASSWORD] ?: "password"
-            }
+            }.stateIn(
+                scope = CoroutineScope(Dispatchers.IO),
+                started = SharingStarted.Eagerly,
+                initialValue = "password"
+            )
 
     suspend fun saveUserAuth(
         userName: String,
@@ -51,9 +63,13 @@ class UserAuthDataStore(
         }
     }
 
-    val encodedUserAuthInfo: Flow<String> =
+    val encodedUserAuthInfo: StateFlow<String> =
         combine(userName, userPassword) { name, password ->
             val credentials = "$name:$password"
             "Basic " + Base64.encodeToString(credentials.toByteArray(), Base64.NO_WRAP)
-        }
+        }.stateIn(
+            scope = CoroutineScope(Dispatchers.IO),
+            started = SharingStarted.Eagerly,
+            initialValue = "Basic " + Base64.encodeToString("${userName.value}:${userPassword.value}".toByteArray(), Base64.NO_WRAP)
+        )
 }
