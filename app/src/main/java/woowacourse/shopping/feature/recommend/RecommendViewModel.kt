@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.recommend
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
@@ -15,8 +16,7 @@ import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.order.OrderRepository
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
-import woowacourse.shopping.domain.Cart
-import woowacourse.shopping.domain.CartContent
+import woowacourse.shopping.domain.Money
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.ProductNotFoundException
 import woowacourse.shopping.feature.common.state.ProductUiModel
@@ -25,17 +25,17 @@ data class RecommendUiState(
     val recommendList: List<ProductUiModel> = emptyList(),
     val isLoading: Boolean = true,
     val totalPrice: Int = 0,
+    val totalCount: Int = 0,
 )
 
 class RecommendViewModel(
-    private val application: ShoppingApplication
+    private val application: ShoppingApplication,
+    private val contentIds: List<Long>
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RecommendUiState())
     val uiState: StateFlow<RecommendUiState> = _uiState.asStateFlow()
 
     private var products: List<Product> = emptyList()
-    private var serverCart: Cart = Cart(emptyList())
-    private var memoryCart: Cart = Cart(emptyList())
 
     lateinit var productRepository: ProductRepository
     lateinit var cartRepository: CartRepository
@@ -56,18 +56,14 @@ class RecommendViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             loadRecommendList(10)
-            refreshCart()
             _uiState.update { it.copy(isLoading = false) }
         }
-    }
-
-    private suspend fun refreshCart() {
-        serverCart = cartRepository.loadCart()
     }
 
     fun loadRecommendList(pageSize: Int) {
         viewModelScope.launch {
             val category = refreshRecentProducts()
+            val serverCart = cartRepository.loadCart()
 
             products = productRepository.loadProducts(
                 startIndex = products.size,
@@ -76,9 +72,16 @@ class RecommendViewModel(
                 category = category,
             )
 
+            val duplicationProducts = products.filter { !serverCart.getProductList().map{ it.id }.contains(it.id) }
+            val checkCart = serverCart.cartContents.filter{ it.id in contentIds }
+
             _uiState.update {
                 it.copy(
-                    recommendList = products.map(::toProductUiModel),
+                    recommendList = duplicationProducts.map { product ->
+                        product.toProductUiModel()
+                    },
+                    totalPrice = checkCart.sumOf{ it.quantity * it.product.priceAmount() },
+                    totalCount = checkCart.size,
                 )
             }
         }
@@ -88,94 +91,71 @@ class RecommendViewModel(
         val product = products.firstOrNull { it.id == productId }
             ?: throw ProductNotFoundException(productId)
 
-        memoryCart = memoryCart.plusCartContent(
-            CartContent(
-                product = product,
-                quantity = 1,
-                id = productId,
-            ),
-        )
         _uiState.update {
             it.copy(
-                recommendList = products.map(::toProductUiModel),
+                recommendList = it.recommendList.map { product ->
+                    if (product.id == productId) {
+                        product.copy(quantity = product.quantity + 1)
+                    } else {
+                        product.copy(quantity = product.quantity)
+                    }
+                },
+                totalPrice = it.totalPrice + product.priceAmount(),
+                totalCount = it.totalCount + if (it.recommendList.firstOrNull { it.id == productId }?.quantity == 0) 1 else 0
             )
         }
-
-        priceAlter()
     }
 
     fun decrease(productId: Long) {
         val product = products.firstOrNull { it.id == productId }
             ?: throw ProductNotFoundException(productId)
 
-        memoryCart = memoryCart.minusCartContent(
-            CartContent(
-                product = product,
-                quantity = 1,
-                id = productId,
-            ),
-        )
         _uiState.update {
             it.copy(
-                recommendList = products.map(::toProductUiModel),
-            )
-        }
-
-        priceAlter()
-    }
-
-    fun priceAlter() {
-        val totalPrice = products.sumOf { it.priceAmount() * memoryCart.quantityOf(it.id) }
-
-        _uiState.update {
-            it.copy(
-                totalPrice = it.totalPrice + totalPrice,
+                recommendList = it.recommendList.map { product ->
+                    if (product.id == productId) {
+                        product.copy(quantity = product.quantity - 1)
+                    } else {
+                        product.copy(quantity = product.quantity)
+                    }
+                },
+                totalPrice = it.totalPrice - product.priceAmount(),
+                totalCount = it.totalCount - if (it.recommendList.firstOrNull { it.id == productId }?.quantity == 1) 1 else 0
             )
         }
     }
 
-    fun toProductUiModel(product: Product): ProductUiModel {
+    fun Product.toProductUiModel(quantity: Int = 0): ProductUiModel {
         return ProductUiModel(
-            name = product.name,
-            price = product.priceAmount(),
-            imageUrl = product.imageUrl,
-            id = product.id,
-            quantity = memoryCart.quantityOf(product.id),
+            name = this.name,
+            price = this.priceAmount(),
+            imageUrl = this.imageUrl,
+            id = this.id,
+            quantity = quantity,
         )
     }
 
-    fun getTotalPrice(contentIds: List<Long>): Int {
-
-        val checkedCartItems = serverCart.cartContents.filter { contentIds.contains(it.id) }
-
-        val checkPrice = checkedCartItems.sumOf { it.product.priceAmount() * it.quantity }
-
-        val memoryPrice = memoryCart.cartContents.sumOf { it.product.priceAmount() * it.quantity }
-
-        return checkPrice + memoryPrice
-    }
-
-    fun getTotalCount(contentIds: List<Long>): Int {
-        val memoryTotalCount = memoryCart.cartContents.size
-
-        return contentIds.size + memoryTotalCount
-    }
-
-    fun order(cartContentIds: List<Long>) {
+    fun order() {
         viewModelScope.launch {
-            val products = memoryCart.cartContents.map { it.product }
-            memoryCart.cartContents.forEach {
-                cartRepository.increase(it.product, quantity = it.quantity)
+            _uiState.value.recommendList.filter{ it.quantity > 0 }.forEach {
+                cartRepository.increase(
+                    product = Product(
+                        id = it.id,
+                        name = it.name,
+                        price = Money(it.price),
+                        imageUrl = it.imageUrl,
+                    ),
+                    quantity = it.quantity
+                )
             }
-
-            refreshCart()
+            val serverCart = cartRepository.loadCart()
 
             val latestContents = serverCart.cartContents.filter { cartContent ->
                 products.map { it.id }.contains(cartContent.product.id)
             }
-
+            Log.d("order", latestContents.toString())
             orderRepository.orders(
-                cartItemIds = cartContentIds + latestContents.map { it.id },
+                cartItemIds = contentIds + latestContents.map { it.id },
             )
         }
     }
@@ -188,12 +168,10 @@ class RecommendViewModel(
     }
 
     companion object {
-        val Factory = viewModelFactory {
+        fun recommendFactory(contentIds: List<Long>) = viewModelFactory {
             initializer {
                 val app = this[APPLICATION_KEY] as ShoppingApplication
-                RecommendViewModel(
-                    app
-                )
+                RecommendViewModel(app, contentIds)
             }
         }
     }

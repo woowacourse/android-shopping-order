@@ -75,3 +75,4 @@
 - [x] 클래스의 시그니처 변경
 - [x] 중복되는 Retrofit 객체 생성
 - [x] guardFatal이 다른 예외도 받도록 수정
+- [x] RecommendViewModel 정합성 문제 수정

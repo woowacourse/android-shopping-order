@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.recommend
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,18 +32,16 @@ import woowacourse.shopping.feature.format.DecimalPriceFormatter
 
 @Composable
 fun RecommendScreen(
-    viewModel: RecommendViewModel = viewModel(
-        factory = RecommendViewModel.Factory,
-    ),
     onCloseClick: () -> Unit,
-    contentIds: List<Long>,
     modifier: Modifier = Modifier,
+    viewModel: RecommendViewModel = viewModel(),
 ) {
     LaunchedEffect(Unit) {
         viewModel.initialLoading()
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentContext = LocalContext.current
 
     Scaffold(
         containerColor = Color.White,
@@ -78,9 +78,7 @@ fun RecommendScreen(
                 ) {
                     Text(
                         DecimalPriceFormatter().format(
-                            viewModel.getTotalPrice(
-                                contentIds = contentIds,
-                            ),
+                            uiState.totalPrice,
                         ),
                         fontWeight = FontWeight.W700,
                         fontSize = 18.sp,
@@ -89,7 +87,8 @@ fun RecommendScreen(
                 }
                 TextButton(
                     onClick = {
-                        viewModel.order(contentIds)
+                        viewModel.order()
+                        Toast.makeText(currentContext, "주문이 완료되었습니다.", Toast.LENGTH_SHORT).show()
                     },
                     modifier = Modifier
                         .width(122.dp)
@@ -97,11 +96,7 @@ fun RecommendScreen(
                         .background(Color(0xff04C09E)),
                 ) {
                     Text(
-                        "주문하기(${
-                            viewModel.getTotalCount(
-                                contentIds = contentIds,
-                            )
-                        })",
+                        "주문하기(${uiState.totalCount})",
                         fontWeight = FontWeight.W700,
                         fontSize = 18.sp,
                         color = Color.White,
@@ -117,6 +112,5 @@ fun RecommendScreen(
 private fun RecommendScreenPreview() {
     RecommendScreen(
         onCloseClick = {},
-        contentIds = emptyList(),
     )
 }
