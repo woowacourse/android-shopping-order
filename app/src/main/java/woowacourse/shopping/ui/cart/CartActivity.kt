@@ -28,13 +28,14 @@ class CartActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val viewModel: CartViewModel =
                         viewModel(
-                            factory = CartViewModel.provideFactory(
-                                cartRepo = container.cartRepository,
-                                productRepo = container.productRepository,
-                                orderRepo = container.orderRepository,
-                                recentProductRepo = container.recentProductRepository,
-                                pageSize = pageSize
-                            )
+                            factory =
+                                CartViewModel.provideFactory(
+                                    cartRepo = container.cartRepository,
+                                    productRepo = container.productRepository,
+                                    orderRepo = container.orderRepository,
+                                    recentProductRepo = container.recentProductRepository,
+                                    pageSize = pageSize,
+                                ),
                         )
 
                     CartScreen(
@@ -49,7 +50,6 @@ class CartActivity : ComponentActivity() {
     }
 
     companion object {
-        fun newIntent(context: Context): Intent =
-            Intent(context, CartActivity::class.java)
+        fun newIntent(context: Context): Intent = Intent(context, CartActivity::class.java)
     }
 }

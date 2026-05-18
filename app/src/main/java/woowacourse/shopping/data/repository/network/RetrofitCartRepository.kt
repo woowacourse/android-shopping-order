@@ -12,34 +12,41 @@ import woowacourse.shopping.model.Page
 class RetrofitCartRepository(
     private val service: CartService,
 ) : CartRepository {
-    override suspend fun getAllCartItems(): Cart =
-        service.getCartItems().toDomain()
+    override suspend fun getAllCartItems(): Cart = service.getCartItems().toDomain()
 
-    override suspend fun add(productId: Long, quantity: Int): Long {
-        val response = service.addCartItem(
-            request = CartItemRequest(productId, quantity)
-        )
+    override suspend fun add(
+        productId: Long,
+        quantity: Int,
+    ): Long {
+        val response =
+            service.addCartItem(
+                request = CartItemRequest(productId, quantity),
+            )
         if (!response.isSuccessful) {
             throw IllegalStateException(
-                "addCartItem 실패: ${response.code()} ${response.errorBody()?.string()}"
+                "addCartItem 실패: ${response.code()} ${response.errorBody()?.string()}",
             )
         }
 
-        val location = response.headers()["Location"]
-            ?: error("Location 헤더가 없습니다 (status=${response.code()})")
+        val location =
+            response.headers()["Location"]
+                ?: error("Location 헤더가 없습니다 (status=${response.code()})")
         return location.substringAfterLast("/").toLong()
     }
 
-    override suspend fun updateQuantity(cartItemId: Long, quantity: Int) {
+    override suspend fun updateQuantity(
+        cartItemId: Long,
+        quantity: Int,
+    ) {
         service.updateCartItemQuantity(
             cartItemId = cartItemId,
-            quantity = Quantity(quantity)
+            quantity = Quantity(quantity),
         )
     }
 
     override suspend fun delete(cartItemId: Long) {
         service.deleteCartItem(
-            cartItemId = cartItemId
+            cartItemId = cartItemId,
         )
     }
 
@@ -47,26 +54,27 @@ class RetrofitCartRepository(
         page: Int,
         size: Int,
     ): Page<CartItem> {
-        val response = service.getCartItems(
-            pageIndex = page,
-            size = size,
-        )
+        val response =
+            service.getCartItems(
+                pageIndex = page,
+                size = size,
+            )
 
         return Page(
-            items = response.content.map {
-                CartItem(
-                    id = it.id,
-                    product = it.product.toDomain(),
-                    quantity = it.quantity,
-                )
-            },
+            items =
+                response.content.map {
+                    CartItem(
+                        id = it.id,
+                        product = it.product.toDomain(),
+                        quantity = it.quantity,
+                    )
+                },
             isLast = response.last,
             totalPages = response.totalPages,
             currentPage = response.number,
-            totalElements = response.totalElements.toInt()
+            totalElements = response.totalElements.toInt(),
         )
     }
 
-    override suspend fun getTotalProductCount(): Int =
-        service.getTotalCount().quantity
+    override suspend fun getTotalProductCount(): Int = service.getTotalCount().quantity
 }

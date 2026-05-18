@@ -21,16 +21,19 @@ object RetrofitClient {
             coerceInputValues = true
         }
     private val encoder = BasicAuthEncoder
-    private val httpClient = OkHttpClient.Builder()
-        .addInterceptor(AuthInterceptor { encoder.getHeader() })
-        .build()
-    private val retrofit = Retrofit
-        .Builder()
-        .baseUrl(BASE_URL)
-        .client(httpClient)
-        .addConverterFactory(
-            json.asConverterFactory("application/json".toMediaType()),
-        ).build()
+    private val httpClient =
+        OkHttpClient
+            .Builder()
+            .addInterceptor(AuthInterceptor { encoder.getHeader() })
+            .build()
+    private val retrofit =
+        Retrofit
+            .Builder()
+            .baseUrl(BASE_URL)
+            .client(httpClient)
+            .addConverterFactory(
+                json.asConverterFactory("application/json".toMediaType()),
+            ).build()
     val productService: ProductService by lazy { retrofit.create() }
     val cartService: CartService by lazy { retrofit.create() }
     val orderService: OrderService by lazy { retrofit.create() }

@@ -81,10 +81,15 @@ class ProductDetailViewModel(
             _uiState.update { it.copy(isLoading = true) }
             try {
                 val product = productRepo.findProduct(productId)
-                val existing = cartRepo.getAllCartItems()
-                    .items.find { it.product.id == productId }
-                val bannerProduct = recentProductRepo.getLastViewedProduct()
-                    ?.takeIf { !isFromBanner && it.id != productId }
+                val existing =
+                    cartRepo
+                        .getAllCartItems()
+                        .items
+                        .find { it.product.id == productId }
+                val bannerProduct =
+                    recentProductRepo
+                        .getLastViewedProduct()
+                        ?.takeIf { !isFromBanner && it.id != productId }
 
                 _uiState.update {
                     it.copy(
@@ -104,18 +109,24 @@ class ProductDetailViewModel(
         }
     }
 
-    private suspend fun handleError(tag: String, e: Exception, defaultMessage: String) {
+    private suspend fun handleError(
+        tag: String,
+        e: Exception,
+        defaultMessage: String,
+    ) {
         if (e is CancellationException) throw e
         Log.e(TAG, "$tag 에러", e)
-        val msg = when (e) {
-            is IOException -> "네트워크 연결을 확인해주세요."
-            is HttpException -> when (e.code()) {
-                401, 403 -> "다시 로그인이 필요해요."
-                in 500..599 -> "서버에 일시적 문제가 있어요."
+        val msg =
+            when (e) {
+                is IOException -> "네트워크 연결을 확인해주세요."
+                is HttpException ->
+                    when (e.code()) {
+                        401, 403 -> "다시 로그인이 필요해요."
+                        in 500..599 -> "서버에 일시적 문제가 있어요."
+                        else -> defaultMessage
+                    }
                 else -> defaultMessage
             }
-            else -> defaultMessage
-        }
         _events.send(msg)
     }
 

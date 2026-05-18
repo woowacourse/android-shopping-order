@@ -57,21 +57,25 @@ class ShoppingViewModel(
     fun increase(uiModel: ProductUiModel) {
         viewModelScope.launch {
             try {
-                val cartItemId = if (uiModel.cartItemId == null) {
-                    cartRepo.add(productId = uiModel.product.id, quantity = 1)
-                } else {
-                    cartRepo.updateQuantity(
-                        cartItemId = uiModel.cartItemId,
-                        quantity = uiModel.quantity + 1,
-                    )
-                    uiModel.cartItemId
-                }
-                _uiState.update { state ->
-                    val updatedProducts = state.visibleProducts.map {
-                        if (uiModel.product.id == it.product.id) {
-                            it.copy(cartItemId = cartItemId, quantity = uiModel.quantity + 1)
-                        } else it
+                val cartItemId =
+                    if (uiModel.cartItemId == null) {
+                        cartRepo.add(productId = uiModel.product.id, quantity = 1)
+                    } else {
+                        cartRepo.updateQuantity(
+                            cartItemId = uiModel.cartItemId,
+                            quantity = uiModel.quantity + 1,
+                        )
+                        uiModel.cartItemId
                     }
+                _uiState.update { state ->
+                    val updatedProducts =
+                        state.visibleProducts.map {
+                            if (uiModel.product.id == it.product.id) {
+                                it.copy(cartItemId = cartItemId, quantity = uiModel.quantity + 1)
+                            } else {
+                                it
+                            }
+                        }
                     state.copy(
                         visibleProducts = updatedProducts,
                         cartCount = state.cartCount + 1,
@@ -86,24 +90,31 @@ class ShoppingViewModel(
     fun decrease(uiModel: ProductUiModel) {
         viewModelScope.launch {
             try {
-                val cartItemId = uiModel.cartItemId
-                    ?: throw IllegalArgumentException("상품(${uiModel.product.name})의 카트 아이템 아이디가 null 입니다.")
+                val cartItemId =
+                    uiModel.cartItemId
+                        ?: throw IllegalArgumentException("상품(${uiModel.product.name})의 카트 아이템 아이디가 null 입니다.")
                 if (uiModel.quantity > 1) {
                     cartRepo.updateQuantity(
                         cartItemId = cartItemId,
-                        quantity = uiModel.quantity - 1
+                        quantity = uiModel.quantity - 1,
                     )
                 } else {
                     cartRepo.delete(cartItemId)
                 }
 
                 _uiState.update { state ->
-                    val updatedProducts = state.visibleProducts.map {
-                        if (uiModel.product.id == it.product.id) {
-                            if (uiModel.quantity > 1) it.copy(quantity = uiModel.quantity - 1)
-                            else it.copy(cartItemId = null, quantity = 0)
-                        } else it
-                    }
+                    val updatedProducts =
+                        state.visibleProducts.map {
+                            if (uiModel.product.id == it.product.id) {
+                                if (uiModel.quantity > 1) {
+                                    it.copy(quantity = uiModel.quantity - 1)
+                                } else {
+                                    it.copy(cartItemId = null, quantity = 0)
+                                }
+                            } else {
+                                it
+                            }
+                        }
                     state.copy(
                         visibleProducts = updatedProducts,
                         cartCount = maxOf(0, state.cartCount - 1),
@@ -123,10 +134,11 @@ class ShoppingViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
-                val page = productRepo.getProducts(
-                    page = (currentSize - 1) / loadSize + 1,
-                    size = loadSize,
-                )
+                val page =
+                    productRepo.getProducts(
+                        page = (currentSize - 1) / loadSize + 1,
+                        size = loadSize,
+                    )
                 val newUiModels = mapToProductUiModels(page.items)
                 val combineProducts = currentProducts + newUiModels
 
@@ -153,13 +165,14 @@ class ShoppingViewModel(
                 val totalCartCount = cartItems.items.sumOf { it.quantity }
 
                 _uiState.update { state ->
-                    val updatedUiModels = state.visibleProducts.map { ui ->
-                        val cartItem = cartItems.items.find { it.product.id == ui.product.id }
-                        ui.copy(
-                            cartItemId = cartItem?.id,
-                            quantity = cartItem?.quantity ?: 0
-                        )
-                    }
+                    val updatedUiModels =
+                        state.visibleProducts.map { ui ->
+                            val cartItem = cartItems.items.find { it.product.id == ui.product.id }
+                            ui.copy(
+                                cartItemId = cartItem?.id,
+                                quantity = cartItem?.quantity ?: 0,
+                            )
+                        }
                     state.copy(
                         visibleProducts = updatedUiModels,
                         cartCount = totalCartCount,
@@ -196,11 +209,9 @@ class ShoppingViewModel(
             .observeRecent()
             .onEach { products ->
                 _uiState.update { it.copy(recentProducts = Products(products)) }
-            }
-            .catch { e ->
+            }.catch { e ->
                 Log.e(TAG, "observeRecentProducts: 에러", e)
-            }
-            .launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
     private suspend fun mapToProductUiModels(products: List<Product>): List<ProductUiModel> {
@@ -216,18 +227,24 @@ class ShoppingViewModel(
         }
     }
 
-    private suspend fun handleError(tag: String, e: Exception, defaultMessage: String) {
+    private suspend fun handleError(
+        tag: String,
+        e: Exception,
+        defaultMessage: String,
+    ) {
         if (e is CancellationException) throw e
         Log.e(TAG, "$tag 에러", e)
-        val msg = when (e) {
-            is IOException -> "네트워크 연결을 확인해주세요."
-            is HttpException -> when (e.code()) {
-                401, 403 -> "다시 로그인이 필요해요."
-                in 500..599 -> "서버에 일시적 문제가 있어요."
+        val msg =
+            when (e) {
+                is IOException -> "네트워크 연결을 확인해주세요."
+                is HttpException ->
+                    when (e.code()) {
+                        401, 403 -> "다시 로그인이 필요해요."
+                        in 500..599 -> "서버에 일시적 문제가 있어요."
+                        else -> defaultMessage
+                    }
                 else -> defaultMessage
             }
-            else -> defaultMessage
-        }
         _events.send(msg)
     }
 

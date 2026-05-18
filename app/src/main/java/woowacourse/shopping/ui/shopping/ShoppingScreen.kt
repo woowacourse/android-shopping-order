@@ -54,11 +54,12 @@ fun ShoppingScreen(
     }
 
     DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                viewModel.refresh()
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    viewModel.refresh()
+                }
             }
-        }
 
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
@@ -129,9 +130,10 @@ fun ShoppingScreen(
             products = products,
             showMoreButton = hasNext,
             lazyGridState = lazyGridState,
-            modifier = Modifier
-                .padding(20.dp)
-                .weight(1f),
+            modifier =
+                Modifier
+                    .padding(20.dp)
+                    .weight(1f),
             onProductClick = onProductClick,
             onMoreClick = onMoreClick,
             onIncreaseClick = onIncreaseClick,
@@ -143,21 +145,24 @@ fun ShoppingScreen(
 @Preview(showBackground = true, name = "상품 여러개")
 @Composable
 private fun ShoppingScreenPreview1() {
-    val product1 = Product(
-        name = "스피또",
-        price = Money(1000),
-        imageUrl = "",
-    )
-    val product2 = Product(
-        name = "연금복권",
-        price = Money(1000),
-        imageUrl = "",
-    )
-    val product3 = Product(
-        name = "로또",
-        price = Money(1000),
-        imageUrl = "",
-    )
+    val product1 =
+        Product(
+            name = "스피또",
+            price = Money(1000),
+            imageUrl = "",
+        )
+    val product2 =
+        Product(
+            name = "연금복권",
+            price = Money(1000),
+            imageUrl = "",
+        )
+    val product3 =
+        Product(
+            name = "로또",
+            price = Money(1000),
+            imageUrl = "",
+        )
     val productUiModels = listOf(product1, product2, product3).map { ProductUiModel(it) }
 
     ShoppingScreen(

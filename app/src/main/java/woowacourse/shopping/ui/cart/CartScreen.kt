@@ -45,55 +45,56 @@ fun CartScreen(
     when (uiState.loadState) {
         LoadState.Loading -> CartScreenSkeleton()
         LoadState.Error -> Text(text = "에러 발생")
-        else -> when (uiState.isCartScreen) {
-            true ->
-                CartScreen(
-                    cart = Cart(uiState.pagedItems),
-                    currentPage = uiState.currentPage,
-                    totalPages = uiState.totalPages,
-                    showPagination = uiState.showPagination,
-                    selectedItemIds = uiState.selectedItemIds,
-                    onBackClick = onBackClick,
-                    onDeleteClick = { viewModel.delete(it) },
-                    onPreviousClick = { viewModel.previousPage() },
-                    onNextClick = { viewModel.nextPage() },
-                    onAddClick = { viewModel.increase(it) },
-                    onRemoveClick = { viewModel.decrease(it) },
-                    onCheckedChange = { item, isSelected ->
-                        viewModel.toggleItemSelection(
-                            item.id ?: throw IllegalArgumentException(),
-                            isSelected,
-                        )
-                    },
-                    selectedItemCount = uiState.totalSelectedCount,
-                    totalPrice = uiState.totalSelectedPrice,
-                    onAllCheckboxChanged = { isSelected ->
-                        viewModel.toggleAllItemsSelection(
-                            isSelected
-                        )
-                    },
-                    checked = uiState.isAllSelected,
-                    modifier = modifier,
-                    onOrderClick = {
-                        viewModel.changeScreen()
-                    },
-                )
+        else ->
+            when (uiState.isCartScreen) {
+                true ->
+                    CartScreen(
+                        cart = Cart(uiState.pagedItems),
+                        currentPage = uiState.currentPage,
+                        totalPages = uiState.totalPages,
+                        showPagination = uiState.showPagination,
+                        selectedItemIds = uiState.selectedItemIds,
+                        onBackClick = onBackClick,
+                        onDeleteClick = { viewModel.delete(it) },
+                        onPreviousClick = { viewModel.previousPage() },
+                        onNextClick = { viewModel.nextPage() },
+                        onAddClick = { viewModel.increase(it) },
+                        onRemoveClick = { viewModel.decrease(it) },
+                        onCheckedChange = { item, isSelected ->
+                            viewModel.toggleItemSelection(
+                                item.id ?: throw IllegalArgumentException(),
+                                isSelected,
+                            )
+                        },
+                        selectedItemCount = uiState.totalSelectedCount,
+                        totalPrice = uiState.totalSelectedPrice,
+                        onAllCheckboxChanged = { isSelected ->
+                            viewModel.toggleAllItemsSelection(
+                                isSelected,
+                            )
+                        },
+                        checked = uiState.isAllSelected,
+                        modifier = modifier,
+                        onOrderClick = {
+                            viewModel.changeScreen()
+                        },
+                    )
 
-            false ->
-                RecommendScreen(
-                    recommendedProducts = uiState.recommendItems,
-                    count = uiState.totalSelectedCount,
-                    price = uiState.totalSelectedPrice,
-                    modifier = modifier,
-                    onBackClick = { viewModel.changeScreen() },
-                    onIncreaseClick = { viewModel.increaseInRecommendScreen(it) },
-                    onDecreaseClick = { viewModel.decreaseInRecommendScreen(it) },
-                    onOrderClick = {
-                        viewModel.order(uiState.selectedItemIds.toList())
-                        onOrderClick()
-                    },
-                )
-        }
+                false ->
+                    RecommendScreen(
+                        recommendedProducts = uiState.recommendItems,
+                        count = uiState.totalSelectedCount,
+                        price = uiState.totalSelectedPrice,
+                        modifier = modifier,
+                        onBackClick = { viewModel.changeScreen() },
+                        onIncreaseClick = { viewModel.increaseInRecommendScreen(it) },
+                        onDecreaseClick = { viewModel.decreaseInRecommendScreen(it) },
+                        onOrderClick = {
+                            viewModel.order(uiState.selectedItemIds.toList())
+                            onOrderClick()
+                        },
+                    )
+            }
     }
 }
 
@@ -128,9 +129,10 @@ fun CartScreen(
             showPagination = showPagination,
             currentPage = currentPage + 1,
             totalPages = totalPages,
-            modifier = Modifier
-                .padding(top = 8.dp, start = 18.dp, end = 18.dp)
-                .weight(1f),
+            modifier =
+                Modifier
+                    .padding(top = 8.dp, start = 18.dp, end = 18.dp)
+                    .weight(1f),
             onDeleteClick = onDeleteClick,
             onPreviousClick = onPreviousClick,
             onNextClick = onNextClick,

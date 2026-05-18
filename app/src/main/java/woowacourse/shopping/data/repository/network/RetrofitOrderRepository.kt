@@ -7,6 +7,5 @@ import woowacourse.shopping.data.repository.OrderRepository
 class RetrofitOrderRepository(
     private val service: OrderService,
 ) : OrderRepository {
-    override suspend fun requestOrder(ids: List<Long>) =
-        service.requestOrder(OrderRequest(ids))
+    override suspend fun requestOrder(ids: List<Long>) = service.requestOrder(OrderRequest(ids))
 }

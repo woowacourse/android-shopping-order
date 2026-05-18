@@ -7,9 +7,15 @@ import woowacourse.shopping.model.Page
 interface CartRepository {
     suspend fun getAllCartItems(): Cart
 
-    suspend fun add(productId: Long, quantity: Int): Long
+    suspend fun add(
+        productId: Long,
+        quantity: Int,
+    ): Long
 
-    suspend fun updateQuantity(cartItemId: Long, quantity: Int)
+    suspend fun updateQuantity(
+        cartItemId: Long,
+        quantity: Int,
+    )
 
     suspend fun delete(cartItemId: Long)
 

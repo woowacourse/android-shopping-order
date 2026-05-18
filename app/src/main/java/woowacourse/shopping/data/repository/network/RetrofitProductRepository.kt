@@ -16,22 +16,22 @@ class RetrofitProductRepository(
     ): Page<Product> {
         val response = service.getProducts(page = page, size = size)
         return Page(
-            items = response.content.map {
-                Product(
-                    id = it.id,
-                    name = it.name,
-                    price = Money(it.price),
-                    imageUrl = it.imageUrl,
-                    category = it.category
-                )
-            },
+            items =
+                response.content.map {
+                    Product(
+                        id = it.id,
+                        name = it.name,
+                        price = Money(it.price),
+                        imageUrl = it.imageUrl,
+                        category = it.category,
+                    )
+                },
             isLast = response.last,
             totalPages = response.totalPages,
             currentPage = response.number,
-            totalElements = response.totalElements
+            totalElements = response.totalElements,
         )
     }
 
-    override suspend fun findProduct(id: Long): Product =
-        service.getProduct(id = id).toDomain()
+    override suspend fun findProduct(id: Long): Product = service.getProduct(id = id).toDomain()
 }
