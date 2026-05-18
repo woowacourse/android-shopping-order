@@ -2,7 +2,7 @@ package woowacourse.shopping.data.remote.mock.dto
 
 import woowacourse.shopping.domain.Product
 
-fun WebServerResponse.toObject() =
+fun MockProductResponse.toObject() =
     Product(
         id = id,
         imageUri = imageUri,

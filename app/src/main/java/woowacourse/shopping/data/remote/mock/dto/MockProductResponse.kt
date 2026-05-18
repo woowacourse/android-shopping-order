@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class WebServerResponse(
+class MockProductResponse(
     @SerialName("productId")
     val id: Long,
     val name: String,

@@ -50,7 +50,7 @@
   - [x] applicationContext 제한 추가
 
 - **WebServerResponse**
-  - [ ] MockProductResponse로 네이밍 변경
+  - [x] MockProductResponse로 네이밍 변경
 
 - **data/mock**
   - [ ] 테스트 디렉터리로 이동
