@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.domain.cart.Quantity
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -124,25 +124,24 @@ class ProductDetailViewModel(
     fun addToCart() {
         viewModelScope.launch {
             val target = _uiState.value.product ?: return@launch
-            cartRepository.addProduct(target, Quantity(uiState.value.currentQuantity))
+            cartRepository.addProduct(target.id, uiState.value.currentQuantity)
         }
     }
 
     companion object {
-
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val savedStateHandle = createSavedStateHandle()
-                val application =
-                    (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ShoppingApplication)
-                ProductDetailViewModel(
-                    savedStateHandle = savedStateHandle,
-                    productRepository = application.appContainer.productRepository,
-                    cartRepository = application.appContainer.cartRepository,
-                    recentProductRepository = application.appContainer.recentProductRepository,
-                )
-
+        val Factory: ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer {
+                    val savedStateHandle = createSavedStateHandle()
+                    val application =
+                        (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ShoppingApplication)
+                    ProductDetailViewModel(
+                        savedStateHandle = savedStateHandle,
+                        productRepository = application.appContainer.productRepository,
+                        cartRepository = application.appContainer.cartRepository,
+                        recentProductRepository = application.appContainer.recentProductRepository,
+                    )
+                }
             }
-        }
     }
 }
