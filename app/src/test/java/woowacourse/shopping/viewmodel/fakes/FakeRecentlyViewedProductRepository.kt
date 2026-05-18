@@ -2,6 +2,7 @@ package woowacourse.shopping.viewmodel.fakes
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import woowacourse.shopping.data.local.entity.RecentlyViewedProductEntity
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.domain.Product
@@ -23,5 +24,5 @@ class FakeRecentlyViewedProductRepository : RecentlyViewedProductRepository {
     }
 
     override fun getLatestItem(): Flow<Long?> =
-        MutableStateFlow(_history.value.firstOrNull()?.id)
+        _history.map { it.firstOrNull()?.id }
 }
