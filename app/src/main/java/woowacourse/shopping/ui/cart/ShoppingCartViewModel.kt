@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import woowacourse.shopping.data.remote.retrofit.awaitBody
 import woowacourse.shopping.data.remote.retrofit.awaitCompletion
 import woowacourse.shopping.data.remote.retrofit.dto.CartRequest
@@ -17,6 +19,8 @@ import woowacourse.shopping.domain.model.ShoppingCartItem
 class ShoppingCartViewModel(
     private val shoppingCartRetrofitRepository: ShoppingCartRetrofitRepository,
 ) : ViewModel() {
+    private val cartRequestMutex = Mutex()
+
     private val _shoppingCartItems = MutableStateFlow<List<ShoppingCartItem>>(emptyList())
     val shoppingCartItems: StateFlow<List<ShoppingCartItem>> = _shoppingCartItems.asStateFlow()
     private val _isLoading = MutableStateFlow(false)
@@ -29,18 +33,18 @@ class ShoppingCartViewModel(
     val selectedProductIds: StateFlow<Set<Long>> = _selectedProductIds.asStateFlow()
 
     fun requestCartItems() {
-        _isLoading.value = true
         _errorMessage.value = null
         viewModelScope.launch {
-            runCatching {
-                loadCartItems()
-            }.onSuccess { loadedItems ->
-                _shoppingCartItems.value = loadedItems
-                _isLoading.value = false
-                syncShoppingCartItems(loadedItems)
-            }.onFailure { throwable ->
-                _isLoading.value = false
-                _errorMessage.value = throwable.message
+            cartRequestMutex.withLock {
+                _isLoading.value = true
+                try {
+                    val loadedItems = loadCartItems()
+                    syncShoppingCartItems(loadedItems)
+                } catch (throwable: Throwable) {
+                    _errorMessage.value = throwable.message
+                } finally {
+                    _isLoading.value = false
+                }
             }
         }
     }
@@ -53,29 +57,30 @@ class ShoppingCartViewModel(
         if (amount <= 0) return
         _errorMessage.value = null
         viewModelScope.launch {
-            runCatching {
-                val currentItems = loadCartItems()
-                val targetItem = findByProductId(currentItems, productId)
-                if (targetItem == null) {
-                    shoppingCartRetrofitRepository
-                        .addCartItem(
-                            product = CartRequest(productId = productId, quantity = amount),
-                        ).awaitCompletion(errorPrefix = "장바구니 추가 실패")
-                } else {
-                    val updatedQuantity = targetItem.getQuantity() + amount
-                    shoppingCartRetrofitRepository
-                        .updateQuantityCartItem(
-                            id = targetItem.getId().toInt(),
-                            product = updatedQuantity.toCartQuantity(),
-                        ).awaitCompletion("장바구니 수량 수정 실패")
+            cartRequestMutex.withLock {
+                runCatching {
+                    val currentItems = loadCartItems()
+                    val targetItem = findByProductId(currentItems, productId)
+                    if (targetItem == null) {
+                        shoppingCartRetrofitRepository
+                            .addCartItem(
+                                product = CartRequest(productId = productId, quantity = amount),
+                            ).awaitCompletion(errorPrefix = "장바구니 추가 실패")
+                    } else {
+                        val updatedQuantity = targetItem.getQuantity() + amount
+                        shoppingCartRetrofitRepository
+                            .updateQuantityCartItem(
+                                id = targetItem.getId().toInt(),
+                                product = updatedQuantity.toCartQuantity(),
+                            ).awaitCompletion("장바구니 수량 수정 실패")
+                    }
+                    loadCartItems()
+                }.onSuccess { latestItems ->
+                    syncShoppingCartItems(latestItems)
+                    onSuccess?.invoke()
+                }.onFailure { throwable ->
+                    _errorMessage.value = throwable.message
                 }
-                loadCartItems()
-            }.onSuccess { latestItems ->
-                _shoppingCartItems.value = latestItems
-                onSuccess?.invoke()
-                syncShoppingCartItems(latestItems)
-            }.onFailure { throwable ->
-                _errorMessage.value = throwable.message
             }
         }
     }
@@ -83,29 +88,30 @@ class ShoppingCartViewModel(
     fun decreaseByProductId(productId: Long) {
         _errorMessage.value = null
         viewModelScope.launch {
-            runCatching {
-                val currentItems = loadCartItems()
-                val targetItem =
-                    findByProductId(currentItems, productId) ?: return@runCatching currentItems
-                val updatedQuantity = targetItem.getQuantity() - 1
-                if (updatedQuantity <= 0) {
-                    shoppingCartRetrofitRepository
-                        .deleteCartItem(
-                            id = targetItem.getId().toInt(),
-                        ).awaitCompletion(errorPrefix = "장바구니 삭제 실패")
-                } else {
-                    shoppingCartRetrofitRepository
-                        .updateQuantityCartItem(
-                            id = targetItem.getId().toInt(),
-                            product = updatedQuantity.toCartQuantity(),
-                        ).awaitCompletion(errorPrefix = "장바구니 수량 수정 실패")
+            cartRequestMutex.withLock {
+                runCatching {
+                    val currentItems = loadCartItems()
+                    val targetItem =
+                        findByProductId(currentItems, productId) ?: return@runCatching currentItems
+                    val updatedQuantity = targetItem.getQuantity() - 1
+                    if (updatedQuantity <= 0) {
+                        shoppingCartRetrofitRepository
+                            .deleteCartItem(
+                                id = targetItem.getId().toInt(),
+                            ).awaitCompletion(errorPrefix = "장바구니 삭제 실패")
+                    } else {
+                        shoppingCartRetrofitRepository
+                            .updateQuantityCartItem(
+                                id = targetItem.getId().toInt(),
+                                product = updatedQuantity.toCartQuantity(),
+                            ).awaitCompletion(errorPrefix = "장바구니 수량 수정 실패")
+                    }
+                    loadCartItems()
+                }.onSuccess { latestItems ->
+                    syncShoppingCartItems(latestItems)
+                }.onFailure { throwable ->
+                    _errorMessage.value = throwable.message
                 }
-                loadCartItems()
-            }.onSuccess { latestItems ->
-                _shoppingCartItems.value = latestItems
-                syncShoppingCartItems(latestItems)
-            }.onFailure { throwable ->
-                _errorMessage.value = throwable.message
             }
         }
     }
@@ -113,23 +119,24 @@ class ShoppingCartViewModel(
     fun removeShoppingItem(shoppingCartItem: ShoppingCartItem) {
         _errorMessage.value = null
         viewModelScope.launch {
-            runCatching {
-                val currentItems = loadCartItems()
-                val targetItem =
-                    findByProductId(
-                        shoppingCartItems = currentItems,
-                        productId = shoppingCartItem.product.id,
-                    ) ?: return@runCatching currentItems
-                shoppingCartRetrofitRepository
-                    .deleteCartItem(
-                        id = targetItem.getId().toInt(),
-                    ).awaitCompletion(errorPrefix = "장바구니 삭제 실패")
-                loadCartItems()
-            }.onSuccess { latestItems ->
-                _shoppingCartItems.value = latestItems
-                syncShoppingCartItems(latestItems)
-            }.onFailure { throwable ->
-                _errorMessage.value = throwable.message
+            cartRequestMutex.withLock {
+                runCatching {
+                    val currentItems = loadCartItems()
+                    val targetItem =
+                        findByProductId(
+                            shoppingCartItems = currentItems,
+                            productId = shoppingCartItem.product.id,
+                        ) ?: return@runCatching currentItems
+                    shoppingCartRetrofitRepository
+                        .deleteCartItem(
+                            id = targetItem.getId().toInt(),
+                        ).awaitCompletion(errorPrefix = "장바구니 삭제 실패")
+                    loadCartItems()
+                }.onSuccess { latestItems ->
+                    syncShoppingCartItems(latestItems)
+                }.onFailure { throwable ->
+                    _errorMessage.value = throwable.message
+                }
             }
         }
     }
@@ -146,16 +153,13 @@ class ShoppingCartViewModel(
     fun getTotalPrice(shoppingCartItems: List<ShoppingCartItem>): Int = shoppingCartItems.sumOf { it.getProductQuantityPrice() }
 
     private suspend fun loadCartItems(): List<ShoppingCartItem> {
-        val shoppingCartItems =
-            shoppingCartRetrofitRepository
-                .requestCartItems(
-                    page = DEFAULT_PAGE,
-                    size = DEFAULT_SIZE,
-                    sort = null,
-                ).awaitBody(errorPrefix = "장바구니 조회 실패")
-                .toDomainShoppingCartItems()
-        syncShoppingCartItems(shoppingCartItems)
-        return shoppingCartItems
+        return shoppingCartRetrofitRepository
+            .requestCartItems(
+                page = DEFAULT_PAGE,
+                size = DEFAULT_SIZE,
+                sort = null,
+            ).awaitBody(errorPrefix = "장바구니 조회 실패")
+            .toDomainShoppingCartItems()
     }
 
     private fun findByProductId(

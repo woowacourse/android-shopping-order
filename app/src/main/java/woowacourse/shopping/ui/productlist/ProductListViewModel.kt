@@ -55,7 +55,6 @@ class ProductListViewModel(
         _event.tryEmit(
             ProductListEvent.NavigateToDetailProduct(
                 productId = productId,
-                showLastViewed = false,
             ),
         )
     }

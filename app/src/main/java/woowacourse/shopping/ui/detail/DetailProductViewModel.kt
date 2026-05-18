@@ -29,6 +29,7 @@ class DetailProductViewModel(
     private var selectedProductId: Long? = null
     private var selectedQuantity: Int = DEFAULT_QUANTITY
     private var showLastViewedSection: Boolean = true
+    private var lastViewedProductIdForCurrentDetail: Long? = null
 
     init {
         publishUiState()
@@ -68,10 +69,16 @@ class DetailProductViewModel(
         showLastViewed: Boolean = true,
     ) {
         showLastViewedSection = showLastViewed
+        val recentProductIdsBeforeVisit = visitStore.recentVisitedProductIds.value
         if (selectedProductId != productId) {
             selectedProductId = productId
             selectedQuantity = DEFAULT_QUANTITY
         }
+        lastViewedProductIdForCurrentDetail =
+            resolveLastViewedProductId(
+                productId = productId,
+                recentProductIds = recentProductIdsBeforeVisit,
+            )
         viewModelScope.launch {
             visitStore.visit(productId)
         }
@@ -124,15 +131,8 @@ class DetailProductViewModel(
         val shoppingItemByProductId = cachedShoppingItems.associateBy { shoppingItem -> shoppingItem.getProductId() }
         val currentShoppingItem = selectedProductId?.let { productId -> shoppingItemByProductId[productId] }
         val safeQuantity = selectedQuantity.coerceAtLeast(DEFAULT_QUANTITY)
-        val lastViewedProductId =
-            selectedProductId?.let { productId ->
-                resolveLastViewedProductId(
-                    productId = productId,
-                    recentProductIds = recentViewedProductIds,
-                )
-            }
         val resolvedLastViewedShoppingItem =
-            lastViewedProductId
+            lastViewedProductIdForCurrentDetail
                 ?.takeIf { showLastViewedSection && it != selectedProductId }
                 ?.let { productId -> shoppingItemByProductId[productId] }
         return DetailProductUiState(
@@ -146,17 +146,7 @@ class DetailProductViewModel(
     private fun resolveLastViewedProductId(
         productId: Long,
         recentProductIds: List<Long>,
-    ): Long? {
-        if (recentProductIds.isEmpty()) {
-            return null
-        }
-        val currentProductIndex = recentProductIds.indexOf(productId)
-        return when {
-            currentProductIndex == 0 -> null
-            currentProductIndex > 0 -> recentProductIds[currentProductIndex - 1]
-            else -> recentProductIds.firstOrNull()
-        }
-    }
+    ): Long? = recentProductIds.firstOrNull()
 
     data class DetailProductUiState(
         val shoppingItem: ShoppingItem? = null,

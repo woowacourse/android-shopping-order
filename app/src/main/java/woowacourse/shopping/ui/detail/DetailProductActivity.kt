@@ -81,7 +81,6 @@ class DetailProductActivity : ComponentActivity() {
                             start(
                                 context = this,
                                 productId = selectedProductId,
-                                showLastViewed = false,
                             )
                             finish()
                         },
