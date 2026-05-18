@@ -60,7 +60,11 @@ object ShoppingRepositoryProvider {
                 baseUrl = PRODUCT_API_BASE_URL,
             )
 
-        recentProductRepository = RoomRecentProductRepository(database.recentProductDao())
+        recentProductRepository =
+            RoomRecentProductRepository(
+                database = database,
+                recentProductDao = database.recentProductDao(),
+            )
         networkMonitor = ConnectivityManagerNetworkMonitor(context)
     }
 }
