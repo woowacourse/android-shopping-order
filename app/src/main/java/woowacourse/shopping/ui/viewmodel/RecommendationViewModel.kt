@@ -24,6 +24,7 @@ class RecommendationViewModel(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
+    initPrice: Int,
 ) : ViewModel() {
     val lastViewProductId: StateFlow<Long?> =
         recentlyViewedProductRepository
@@ -45,6 +46,9 @@ class RecommendationViewModel(
 
     private val _recommendedProducts = MutableStateFlow(Products(emptyList()))
     val recommendedProducts = _recommendedProducts.asStateFlow()
+
+    private val _totalPrice = MutableStateFlow(initPrice)
+    val totalPrice = _totalPrice.asStateFlow()
 
     private val _allCartItems = MutableStateFlow<PurchaseProducts>(PurchaseProducts())
     val allCartItems = _allCartItems.asStateFlow()

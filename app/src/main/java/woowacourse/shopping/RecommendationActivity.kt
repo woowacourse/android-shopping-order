@@ -30,6 +30,7 @@ class RecommendationActivity : ComponentActivity() {
                             (application as ShoppingApplication).cartRepository,
                         ),
                 )
+            val initTotalPrice = intent.getIntExtra(IntentKeys.SELECTED_TOTAL_PRICE, 0)
 
             val recommendationViewModel: RecommendationViewModel =
                 viewModel<RecommendationViewModel>(
@@ -38,6 +39,7 @@ class RecommendationActivity : ComponentActivity() {
                             cartRepository = (application as ShoppingApplication).cartRepository,
                             productRepository = (application as ShoppingApplication).productRepository,
                             recentlyViewedProductRepository = (application as ShoppingApplication).recentlyViewedProductRepository,
+                            initPrice = initTotalPrice,
                         ),
                 )
 
