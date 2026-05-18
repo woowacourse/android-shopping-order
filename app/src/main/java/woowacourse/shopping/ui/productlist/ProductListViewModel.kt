@@ -10,14 +10,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.datastore.VisitStore
-import woowacourse.shopping.data.network.NetworkStatusMonitor
 import woowacourse.shopping.domain.model.ShoppingItem
 import woowacourse.shopping.domain.repository.ShoppingItemRepository
 
 class ProductListViewModel(
     private val shoppingItemRepository: ShoppingItemRepository,
     private val visitStore: VisitStore,
-    private val networkStatusMonitor: NetworkStatusMonitor,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductListUiState())
     val uiState: StateFlow<ProductListUiState> = _uiState.asStateFlow()
@@ -27,7 +25,6 @@ class ProductListViewModel(
     private val productPageStateHolder = ProductPageStateHolder(shoppingItems = emptyList())
     private var allShoppingItems: List<ShoppingItem> = shoppingItemRepository.shoppingItems.value
     private var recentViewedProductIds: List<Long> = visitStore.recentVisitedProductIds.value
-    private var networkConnected: Boolean = networkStatusMonitor.isConnected.value
 
     init {
         productPageStateHolder.updateItems(allShoppingItems)
@@ -70,12 +67,6 @@ class ProductListViewModel(
                 publishUiState()
             }
         }
-        viewModelScope.launch {
-            networkStatusMonitor.isConnected.collect { isConnected ->
-                networkConnected = isConnected
-                publishUiState()
-            }
-        }
     }
 
     private fun publishUiState() {
@@ -88,7 +79,6 @@ class ProductListViewModel(
             shoppingItems = productPageStateHolder.getItems(),
             recentViewedShoppingItems = recentViewedProductIds.mapNotNull { productId -> shoppingItemByProductId[productId] },
             shoppingCartTotalCount = allShoppingItems.sumOf { shoppingItem -> shoppingItem.getQuantity() },
-            isNetworkConnected = networkConnected,
             canLoadNextPage = productPageStateHolder.canMoveToNextPage(),
         )
     }
@@ -97,7 +87,6 @@ class ProductListViewModel(
         val shoppingItems: List<ShoppingItem> = emptyList(),
         val recentViewedShoppingItems: List<ShoppingItem> = emptyList(),
         val shoppingCartTotalCount: Int = 0,
-        val isNetworkConnected: Boolean = true,
         val canLoadNextPage: Boolean = false,
     )
 

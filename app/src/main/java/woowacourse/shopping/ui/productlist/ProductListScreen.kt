@@ -56,7 +56,6 @@ fun ProductListScreen(
     shoppingItems: List<ShoppingItem>,
     recentViewedShoppingItems: List<ShoppingItem>,
     shoppingCartTotalCount: Int,
-    isNetworkConnected: Boolean,
     state: ProductListState,
     onAddToCartClick: (ShoppingItem) -> Unit,
     onQuantityPlusClick: (ShoppingItem) -> Unit,
@@ -101,12 +100,6 @@ fun ProductListScreen(
                     }
                 }
             } else {
-                if (!isNetworkConnected) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        OfflineBanner()
-                    }
-                }
-
                 if (recentViewedShoppingItems.isNotEmpty()) {
                     item(span = { GridItemSpan(maxLineSpan) }) {
                         RecentViewedSection(
@@ -143,24 +136,6 @@ fun ProductListScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun OfflineBanner(modifier: Modifier = Modifier) {
-    Box(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.errorContainer)
-                .padding(horizontal = 16.dp, vertical = 10.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = stringResource(R.string.network_disconnected_message),
-            color = MaterialTheme.colorScheme.onErrorContainer,
-            style = MaterialTheme.typography.bodyMedium,
-        )
     }
 }
 
@@ -354,7 +329,6 @@ private fun ProductListScreenPreview() {
             shoppingItems = emptyList(),
             recentViewedShoppingItems = emptyList(),
             shoppingCartTotalCount = 99,
-            isNetworkConnected = true,
             state =
                 ProductListState(
                     isLoading = false,

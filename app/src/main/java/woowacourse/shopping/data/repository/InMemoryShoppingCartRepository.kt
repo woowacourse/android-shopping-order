@@ -28,11 +28,10 @@ class InMemoryShoppingCartRepository(
     override suspend fun addIfAbsent(productId: Long) {
         mutex.withLock {
             if (cartEntries.value.any { entry -> entry.productId == productId }) return
-            cartEntries.value =
-                cartEntries.value + CartEntry(
-                    id = nextCartItemId++,
-                    productId = productId,
-                )
+            cartEntries.value += CartEntry(
+                                id = nextCartItemId++,
+                                productId = productId,
+                            )
         }
     }
 

@@ -17,7 +17,6 @@ class ScreenViewModelFactory(
                 ProductListViewModel(
                     shoppingItemRepository = appContainer.shoppingItemRepository,
                     visitStore = appContainer.visitStore,
-                    networkStatusMonitor = appContainer.networkStatusMonitor,
                 ) as T
 
             modelClass.isAssignableFrom(DetailProductViewModel::class.java) ->

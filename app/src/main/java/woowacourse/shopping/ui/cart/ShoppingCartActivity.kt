@@ -30,7 +30,6 @@ import woowacourse.shopping.ui.recommend.ShoppingCartRecommendViewModel.Shopping
 @OptIn(ExperimentalMaterial3Api::class)
 class ShoppingCartActivity : ComponentActivity() {
     private val app: ShoppingApplication by lazy { application as ShoppingApplication }
-    private var hasResumedOnce: Boolean = false
 
     private val screenViewModelFactory: ScreenViewModelFactory by lazy {
         ScreenViewModelFactory(appContainer = app.appContainer)
@@ -56,7 +55,6 @@ class ShoppingCartActivity : ComponentActivity() {
 
         observeApiViewModel()
         observeScreenEvents()
-        shoppingCartViewModel.requestCartItems(force = true)
 
         setContent {
             val shoppingCartItems by shoppingCartViewModel.shoppingCartItems.collectAsStateWithLifecycle()
@@ -201,10 +199,6 @@ class ShoppingCartActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (!hasResumedOnce) {
-            hasResumedOnce = true
-            return
-        }
         shoppingCartViewModel.requestCartItems(force = true)
     }
 

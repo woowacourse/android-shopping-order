@@ -18,7 +18,6 @@
 - 장바구니 담기/삭제
 - 상품 목록, 상세, 장바구니 간 수량 동기화(SSOT)
 - 최근 본 상품(최신순, 최대 10개) 관리
-- 네트워크 상태 변경 감지 및 UI 배너 표시
 - 앱 재시작 이후 장바구니/최근 방문 데이터 유지
 
 ## 미션 요구사항 반영
@@ -26,7 +25,6 @@
 - 로컬 상태 관리를 위해 InMemory Repository 사용
 - HTTP Client(OkHttp) 구현
 - MockWebServer 기반 테스트 서버 구성
-- 네트워크 상태 변경 시스템 이벤트 감지 후 UI 반영
 
 ## 패키지 구조
 
@@ -58,9 +56,6 @@ app/src/main/java/woowacourse/shopping
 │  ├─ ProductBackendDataSource.kt
 │  ├─ OkHttpProductBackendDataSource.kt
 │  └─ ShoppingItemsRemoteSyncer.kt
-├─ network
-│  ├─ NetworkStatusMonitor.kt
-│  └─ AndroidNetworkStatusMonitor.kt
 ├─ storage
 │  └─ datastore
 │     ├─ VisitStore.kt

@@ -23,7 +23,6 @@ import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 class ProductListActivity : ComponentActivity() {
     private val app: ShoppingApplication by lazy { application as ShoppingApplication }
-    private var hasResumedOnce: Boolean = false
 
     private val screenViewModelFactory: ScreenViewModelFactory by lazy {
         ScreenViewModelFactory(appContainer = app.appContainer)
@@ -42,7 +41,6 @@ class ProductListActivity : ComponentActivity() {
 
         observeApiViewModels()
         observeScreenEvents()
-        requestProductsAndCart()
 
         setContent {
             val uiState = productListViewModel.uiState.collectAsStateWithLifecycle()
@@ -66,7 +64,6 @@ class ProductListActivity : ComponentActivity() {
                     shoppingItems = visibleShoppingItems,
                     recentViewedShoppingItems = visibleRecentViewedItems,
                     shoppingCartTotalCount = if (hasApiError) 0 else uiState.value.shoppingCartTotalCount,
-                    isNetworkConnected = uiState.value.isNetworkConnected,
                     state = state.value,
                     onAddToCartClick = { shoppingItem ->
                         shoppingCartViewModel.addOrIncreaseByProductId(
@@ -103,11 +100,14 @@ class ProductListActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (!hasResumedOnce) {
-            hasResumedOnce = true
-            return
+        val shouldLoadInitialProducts =
+            productViewModel.state.value.products.isEmpty() &&
+                !productViewModel.state.value.isLoading
+        if (shouldLoadInitialProducts) {
+            requestProductsAndCart()
+        } else {
+            shoppingCartViewModel.requestCartItems(force = true)
         }
-        shoppingCartViewModel.requestCartItems(force = true)
     }
 
     private fun requestProductsAndCart() {

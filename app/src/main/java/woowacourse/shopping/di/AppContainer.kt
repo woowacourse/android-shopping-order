@@ -4,8 +4,6 @@ import android.content.Context
 import kotlinx.coroutines.CoroutineScope
 import woowacourse.shopping.data.local.datastore.DataStoreVisitStore
 import woowacourse.shopping.data.local.datastore.VisitStore
-import woowacourse.shopping.data.network.AndroidNetworkStatusMonitor
-import woowacourse.shopping.data.network.NetworkStatusMonitor
 import woowacourse.shopping.data.remote.retrofit.sync.RemoteShoppingStateSyncer
 import woowacourse.shopping.data.repository.InMemoryShoppingCartRepository
 import woowacourse.shopping.data.repository.InMemoryShoppingItemRepository
@@ -24,12 +22,6 @@ class AppContainer(
 
     val visitStore: VisitStore =
         DataStoreVisitStore(
-            context = context,
-            scope = applicationScope,
-        )
-
-    val networkStatusMonitor: NetworkStatusMonitor =
-        AndroidNetworkStatusMonitor(
             context = context,
             scope = applicationScope,
         )
