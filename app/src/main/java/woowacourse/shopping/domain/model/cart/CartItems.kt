@@ -49,6 +49,8 @@ class CartItems(
 
     fun contains(cartId: Int): Boolean = findById(cartId) != null
 
+    fun isExistProduct(productId: Int): Boolean = values.any { it.product.id == productId }
+
     fun subList(
         fromIndex: Int,
         toIndex: Int,

@@ -1,14 +1,19 @@
 package woowacourse.shopping.ui.productDetail
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import woowacourse.shopping.domain.model.cart.Cart
 import woowacourse.shopping.domain.model.cart.Quantity
 import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
@@ -23,10 +28,18 @@ class ProductDetailViewModel(
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<ProductDetailUiState>(ProductDetailUiState.Loading)
+    private val cartFlow = MutableStateFlow(Cart())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
 
     init {
         loadProduct()
+        loadCart()
+    }
+
+    private fun loadCart(){
+        viewModelScope.launch{
+            cartFlow.value = Cart(cartRepository.getAllCartItems())
+        }
     }
 
     private fun loadProduct() {
@@ -73,7 +86,13 @@ class ProductDetailViewModel(
     fun addToCart() {
         val current = _uiState.value as? ProductDetailUiState.Success ?: return
         viewModelScope.launch {
-            cartRepository.addProduct(current.product, Quantity(current.selectedQuantity))
+            val cart = cartFlow.value
+            val existing = cart.cartItems.values.find { it.product.id == current.product.id }
+            if (existing != null){
+                cartRepository.increase(existing.id, Quantity(existing.quantity.value + current.selectedQuantity))
+            }else{
+                cartRepository.addProduct(current.product, Quantity(current.selectedQuantity))
+            }
         }
     }
 
