@@ -204,12 +204,22 @@ class CartViewModel(
                 1,
                 if (cartContents.isEmpty()) uiState.value.page - 1 else uiState.value.page
             )
-            if (cartContents.isEmpty() && page != uiState.value.page) {
-                cartContents = pagination(page)
+
+            val finalCartContents = if (cartContents.isEmpty() && page != uiState.value.page) {
+                pagination(page)
+            } else {
+                cartContents
             }
+
             cart = getCart()
             val newCheckMap = _uiState.value.checkMap.toMutableMap()
             newCheckMap.remove(contentId)
+
+            finalCartContents.forEach { item ->
+                if (!newCheckMap.containsKey(item.contentId)) {
+                    newCheckMap[item.contentId] = false
+                }
+            }
 
             val newTotalPrice = cart.cartContents
                 .filter{ newCheckMap[it.id] == true }
@@ -219,7 +229,7 @@ class CartViewModel(
 
             _uiState.update {
                 it.copy(
-                    paginatedCartContents = cartContents.ifEmpty { pagination(page - 1) },
+                    paginatedCartContents = finalCartContents,
                     page = page,
                     isFirstPage = page == 1,
                     isLastPage = page >= lastPage(initialPageSize),
