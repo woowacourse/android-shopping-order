@@ -41,7 +41,7 @@ class CartActivity : ComponentActivity() {
             val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
             val checkedItemIds by viewModel.checkedItemIds.collectAsStateWithLifecycle()
             val totalPrice by viewModel.totalPrice.collectAsStateWithLifecycle()
-            val totalCount by viewModel.cartItemCount.collectAsStateWithLifecycle()
+            val totalCount by viewModel.selectedItemCount.collectAsStateWithLifecycle()
             val uiState =
                 CartUiState(
                     cartItems = pagedCart.toUiModel(),

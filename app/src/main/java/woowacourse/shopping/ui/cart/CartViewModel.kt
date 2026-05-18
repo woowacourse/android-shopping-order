@@ -3,7 +3,6 @@ package woowacourse.shopping.ui.cart
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -53,6 +52,12 @@ class CartViewModel(
         initialValue = 0
     )
 
+    val selectedItemCount: StateFlow<Int> = checkedItemIds.map { it.size }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = 0
+    )
+
     fun fetchCart() {
         viewModelScope.launch {
             _isLoading.update { true }
@@ -63,14 +68,12 @@ class CartViewModel(
             val totalCount = cartRepository.getCartItemCount()
             _cartItemCount.update { totalCount }
             
-            _isLoading.update { false }
-
             if (totalCount > 0) {
-                launch(Dispatchers.IO) {
-                    val allData = cartRepository.getPagedCart(0, totalCount)
-                    _allCartItems.update { allData }
-                }
+                val allData = cartRepository.getPagedCart(0, totalCount)
+                _allCartItems.update { allData }
             }
+
+            _isLoading.update { false }
         }
     }
 
@@ -141,7 +144,15 @@ class CartViewModel(
             _isLoading.update { true }
             try {
                 cartRepository.updateCount(id, nextCount)
-                updateAllCartItemCount(id, nextCount)
+                
+                _allCartItems.update { allCart ->
+                    PurchaseProducts(
+                        allCart.purchaseProducts.map {
+                            if (it.id == id) it.copy(count = nextCount) else it
+                        }
+                    )
+                }
+
                 _pagedCart.update {
                     cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
                 }
@@ -212,19 +223,6 @@ class CartViewModel(
                     allIds
                 }
             }
-        }
-    }
-
-    private fun updateAllCartItemCount(
-        id: Long,
-        newCount: Int,
-    ) {
-        _allCartItems.update { allCart ->
-            PurchaseProducts(
-                allCart.purchaseProducts.map {
-                    if (it.id == id) it.copy(count = newCount) else it
-                },
-            )
         }
     }
 
