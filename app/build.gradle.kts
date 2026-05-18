@@ -84,4 +84,8 @@ dependencies {
 
     implementation(libs.logging.interceptor.v4120)
     implementation(libs.androidx.datastore.preferences)
+
+    // ViewModel
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 }
