@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.cart.viewmodel
 
-import android.nfc.tech.MifareUltralight.PAGE_SIZE
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -13,7 +12,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.RepositoryProvider
-import woowacourse.shopping.di.RepositoryProvider.cartRepository
 import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.PaymentItems
