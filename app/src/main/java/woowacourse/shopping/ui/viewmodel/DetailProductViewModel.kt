@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.viewmodel
 
-import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,19 +43,7 @@ class DetailProductViewModel(
         }
     }
 
-    fun initializeFromIntentExtras(extras: Bundle?) {
-        val productId = extras?.getLong(EXTRA_PRODUCT_ID, INVALID_PRODUCT_ID) ?: INVALID_PRODUCT_ID
-        if (productId == INVALID_PRODUCT_ID) {
-            return
-        }
-        val showLastViewed = extras?.getBoolean(EXTRA_SHOW_LAST_VIEWED, true) ?: true
-        initialize(
-            productId = productId,
-            showLastViewed = showLastViewed,
-        )
-    }
-
-    private fun initialize(
+    fun initialize(
         productId: Long,
         showLastViewed: Boolean = true,
     ) {

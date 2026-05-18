@@ -21,6 +21,8 @@ import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.screen.DetailProductScreen
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 import woowacourse.shopping.ui.viewmodel.DetailProductViewModel
+import woowacourse.shopping.ui.viewmodel.DetailProductViewModel.Companion.EXTRA_PRODUCT_ID
+import woowacourse.shopping.ui.viewmodel.DetailProductViewModel.Companion.EXTRA_SHOW_LAST_VIEWED
 import woowacourse.shopping.ui.viewmodel.ScreenViewModelFactory
 
 class DetailProductActivity : ComponentActivity() {
@@ -37,7 +39,16 @@ class DetailProductActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        detailProductViewModel.initializeFromIntentExtras(intent.extras)
+
+        val productId = intent.getLongExtra(EXTRA_PRODUCT_ID, INVALID_PRODUCT_ID)
+        val showLastViewed = intent.getBooleanExtra(EXTRA_SHOW_LAST_VIEWED, true)
+
+        if(productId != INVALID_PRODUCT_ID){
+            detailProductViewModel.initialize(
+                productId = productId,
+                showLastViewed = showLastViewed,
+            )
+        }
         observeApiViewModel()
         requestProductDetailFromApi()
         setContent {
