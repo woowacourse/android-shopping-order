@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.cart
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,6 +12,7 @@ import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
+import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.recommender.ProductRecommender
 import woowacourse.shopping.ui.common.model.ProductUiModel
 import woowacourse.shopping.ui.common.paging.Pager
@@ -113,10 +115,7 @@ class CartViewModel(
                 val cartItems = cartRepo.getAllCartItems()
                 val allIds =
                     cartItems.items
-                        .map {
-                            it.id
-                                ?: throw IllegalArgumentException("아이템에 id(${it.id})가 없습니다.")
-                        }.toSet()
+                        .mapNotNull { it.id }.toSet()
 
                 if (isSelected && cartItems.items.isNotEmpty()) {
                     _uiState.update {
@@ -286,9 +285,8 @@ class CartViewModel(
         val cart = cartRepo.getAllCartItems()
         if (cart.items.isEmpty()) return 0
         val selectedItems =
-            _uiState.value.selectedItemIds.map { itemId ->
+            _uiState.value.selectedItemIds.mapNotNull { itemId ->
                 cart.items.find { it.id == itemId }
-                    ?: throw IllegalArgumentException("선택한 상품 아이디($itemId)로 장바구니에서 아이템을 조회할 수 없습니다.")
             }
         return selectedItems.sumOf { it.totalPrice.value }
     }
@@ -297,9 +295,8 @@ class CartViewModel(
         val cart = cartRepo.getAllCartItems()
         if (cart.items.isEmpty()) return 0
         val selectedItems =
-            _uiState.value.selectedItemIds.map { itemId ->
+            _uiState.value.selectedItemIds.mapNotNull { itemId ->
                 cart.items.find { it.id == itemId }
-                    ?: throw IllegalArgumentException("선택한 상품 아이디($itemId)로 장바구니에서 아이템을 조회할 수 없습니다.")
             }
         return selectedItems.sumOf { it.quantity }
     }
