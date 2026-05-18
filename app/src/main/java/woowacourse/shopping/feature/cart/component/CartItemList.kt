@@ -58,7 +58,7 @@ fun CartItemList(
                     price = it.productUiModel.price,
                     quantity = it.productUiModel.quantity,
                     onDelete = {
-                        onDelete(it.productUiModel.id)
+                        onDelete(it.contentId)
                     },
                     onIncrease = {
                         onIncrease(it.contentId)
