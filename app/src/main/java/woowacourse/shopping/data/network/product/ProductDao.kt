@@ -9,7 +9,7 @@ interface ProductDao {
         pageSize: Int,
         sort: List<String>,
         category: String?,
-    ): List<Product>
+    ): Pair<List<Product>, Boolean>
 
     suspend fun findById(id: Long): Product
 }

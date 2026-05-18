@@ -11,7 +11,7 @@ class ProductDataSourceImpl(
         pageSize: Int,
         sort: List<String>,
         category: String?,
-    ): List<Product> {
+    ): Pair<List<Product>, Boolean> {
         return productDao.findAllProduct(
             startIndex = startIndex,
             pageSize = pageSize,

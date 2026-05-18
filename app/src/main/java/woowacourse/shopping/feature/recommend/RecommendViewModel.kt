@@ -70,7 +70,7 @@ class RecommendViewModel(
                 pageSize = pageSize,
                 sort = emptyList(),
                 category = category,
-            )
+            ).first
 
             val duplicationProducts = products.filter { !serverCart.getProductList().map{ it.id }.contains(it.id) }
             val checkCart = serverCart.cartContents.filter{ it.id in contentIds }

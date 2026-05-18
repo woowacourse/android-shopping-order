@@ -59,6 +59,7 @@ class ProductListViewModel(
             cartRepository = appDependencies.cartRepository
             recentProductRepository = appDependencies.recentProductRepository
         }
+        initialLoading()
     }
 
     private var products: List<Product> = emptyList()
@@ -152,7 +153,7 @@ class ProductListViewModel(
     }
 
     private suspend fun fetchAndAppendProducts(pageSize: Int) {
-        val result = productRepository.loadProducts(
+        val (result, isEnd) = productRepository.loadProducts(
             startIndex = products.size / pageSize,
             pageSize = pageSize,
             sort = emptyList(),
@@ -162,7 +163,7 @@ class ProductListViewModel(
         _uiState.update {
             it.copy(
                 productUiModels = products.map(::toProductUiModel),
-                isEnd = result.size >= MockData.MOCK_PRODUCTS.size,
+                isEnd = isEnd,
             )
         }
     }

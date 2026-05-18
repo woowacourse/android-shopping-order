@@ -11,7 +11,7 @@ class ProductRepositoryImpl(
         pageSize: Int,
         sort: List<String>,
         category: String?,
-    ): List<Product> = dataSource.loadProducts(startIndex, pageSize, sort, category)
+    ): Pair<List<Product>, Boolean> = dataSource.loadProducts(startIndex, pageSize, sort, category)
 
     override suspend fun getProduct(id: Long): Product = dataSource.getProduct(id)
 }

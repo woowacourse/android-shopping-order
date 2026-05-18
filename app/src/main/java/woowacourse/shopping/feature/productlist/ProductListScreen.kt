@@ -36,9 +36,6 @@ fun ProductListScreen(
     activityFinish: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LaunchedEffect(Unit) {
-        vm.initialLoading()
-    }
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         vm.event.collect { event ->

@@ -10,7 +10,7 @@ class ProductRetrofitDaoImpl(
         pageSize: Int,
         sort: List<String>,
         category: String?,
-    ): List<Product> {
+    ): Pair<List<Product>, Boolean> {
         val response = retrofitProductService
             .requestProducts(page = startIndex, size = pageSize, category = category)
 
@@ -20,7 +20,7 @@ class ProductRetrofitDaoImpl(
         }
         val body = response.body()
             ?: error("empty body")
-        return body.content.map { it.toDomain() }
+        return Pair(body.content.map { it.toDomain() }, body.last)
     }
 
     override suspend fun findById(id: Long): Product {
