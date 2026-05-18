@@ -7,13 +7,13 @@ data class Cart(
     val totalPrice: Int = cartItems.totalPrice
     val isEmpty: Boolean = cartItems.size() == 0
 
-    fun increase(productId: Int): Cart = copy(cartItems = cartItems.increase(productId))
+    fun increase(cartId: Int): Cart = copy(cartItems = cartItems.increase(cartId))
 
-    fun decrease(productId: Int): Cart = copy(cartItems = cartItems.decrease(productId))
+    fun decrease(cartId: Int): Cart = copy(cartItems = cartItems.decrease(cartId))
 
-    fun remove(productId: Int): Cart = copy(cartItems = cartItems.remove(productId))
+    fun remove(cartId: Int): Cart = copy(cartItems = cartItems.remove(cartId))
 
-    fun findQuantity(productId: Int): Quantity = cartItems.findQuantity(productId)
+    fun findQuantity(cartId: Int): Quantity = cartItems.findQuantity(cartId)
 
     fun getPage(
         page: Int,

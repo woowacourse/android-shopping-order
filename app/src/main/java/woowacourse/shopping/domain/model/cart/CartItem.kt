@@ -10,7 +10,7 @@ data class CartItem(
     val totalPrice: Int
         get() = product.price.value * quantity.value
 
-    fun isSameCartItem(targetCartItem: CartItem): Boolean = product.id == targetCartItem.product.id
+    fun isSameCartItem(targetCartItem: CartItem): Boolean = id == targetCartItem.id
 
     fun isSameProduct(productId: Int): Boolean = product.id == productId
 

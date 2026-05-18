@@ -18,7 +18,8 @@ data class PagingState(
         loadError?.let { return ProductListUiState.Error.from(it) }
         if (products.isEmpty() && isLoading) return ProductListUiState.Loading
 
-        val quantities = products.associate { it.id to cart.findQuantity(it.id).value }
+        val quantities =
+            cart.cartItems.values.associate { it.product.id to it.quantity.value }
         return ProductListUiState.Success(
             products = products,
             recentProducts = recents,

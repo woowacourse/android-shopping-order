@@ -28,26 +28,26 @@ class CartItems(
         return values.filter { targetIds.contains(it.id) }.sumOf { it.quantity.value }
     }
 
-    fun increase(productId: Int): CartItems {
-        val target = findByProductId(productId) ?: return this
+    fun increase(cartId: Int): CartItems {
+        val target = findById(cartId) ?: return this
         return replace(target, target.increaseQuantity())
     }
 
-    fun decrease(productId: Int): CartItems {
-        val target = findByProductId(productId) ?: return this
+    fun decrease(cartId: Int): CartItems {
+        val target = findById(cartId) ?: return this
         val decreased = target.decreaseQuantity()
         return if (decreased.quantity.isZero) {
-            remove(productId)
+            remove(cartId)
         } else {
             replace(target, decreased)
         }
     }
 
-    fun remove(productId: Int): CartItems = CartItems(values.filter { !it.isSameProduct(productId) })
+    fun remove(cartId: Int): CartItems = CartItems(values.filter { it.id != cartId })
 
-    fun findQuantity(productId: Int): Quantity = findByProductId(productId)?.quantity ?: Quantity.ZERO
+    fun findQuantity(cartId: Int): Quantity = findById(cartId)?.quantity ?: Quantity.ZERO
 
-    fun contains(productId: Int): Boolean = findByProductId(productId) != null
+    fun contains(cartId: Int): Boolean = findById(cartId) != null
 
     fun subList(
         fromIndex: Int,
@@ -60,7 +60,7 @@ class CartItems(
 
     fun size(): Int = values.size
 
-    private fun findByProductId(productId: Int): CartItem? = values.firstOrNull { it.isSameProduct(productId) }
+    private fun findById(cartId: Int): CartItem? = values.firstOrNull { it.id == cartId }
 
     private fun replace(
         target: CartItem,
