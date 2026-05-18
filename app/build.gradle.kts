@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -17,6 +19,15 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        val testUsername = properties.getProperty("TEST_USERNAME") ?: ""
+        val testPassword = properties.getProperty("TEST_PASSWORD") ?: ""
+        val baseUrl = properties.getProperty("BASE_URL") ?: ""
+
+        buildConfigField("String", "TEST_USERNAME", "\"$testUsername\"")
+        buildConfigField("String", "TEST_PASSWORD", "\"$testPassword\"")
+        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -38,6 +49,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     testOptions {
         unitTests.all {

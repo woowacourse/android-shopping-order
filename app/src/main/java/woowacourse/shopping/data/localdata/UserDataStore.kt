@@ -7,11 +7,11 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+private val Context.userDataStore by preferencesDataStore(name = "user")
+
 class UserDataStore(
     private val context: Context,
 ) {
-    val Context.userDataStore by preferencesDataStore(name = "user")
-
     suspend fun saveUser(
         username: String,
         password: String,

@@ -1,12 +1,6 @@
 package woowacourse.shopping
 
 import android.content.Context
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import okhttp3.Credentials
 import okhttp3.MediaType.Companion.toMediaType
@@ -20,6 +14,7 @@ import woowacourse.shopping.data.remote.NetworkManager
 import woowacourse.shopping.data.remote.NetworkObserver
 import woowacourse.shopping.data.remote.api.CartApi
 import woowacourse.shopping.data.remote.api.ProductApi
+import woowacourse.shopping.data.repository.AuthRepository
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepository
@@ -31,18 +26,9 @@ class AppContainer(
 ) {
     private val database = ShoppingDB.getInstance(context)
 
-    val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
     val userDataStore = UserDataStore(context)
 
-    init {
-        applicationScope.launch {
-            userDataStore.saveUser(
-                username = "byunghyunkim0",
-                password = "password",
-            )
-        }
-    }
+    val authRepository = AuthRepository(userDataStore)
 
     val productRepository: ProductRepository by lazy {
         ProductRepositoryImpl(
@@ -72,30 +58,22 @@ class AppContainer(
         OkHttpClient
             .Builder()
             .addInterceptor { chain ->
-                val credential =
-                    runBlocking {
-                        val username = userDataStore.username.first()
-                        val password = userDataStore.password.first()
+                val requestBuilder = chain.request().newBuilder()
 
-                        Credentials.basic(username, password)
-                    }
-                val request =
-                    chain
-                        .request()
-                        .newBuilder()
-                        .header(
-                            "Authorization",
-                            credential,
-                        ).build()
-
-                chain.proceed(request)
+                val userName = authRepository.userName.value
+                val password = authRepository.password.value
+                if (!userName.isNullOrBlank() && !password.isNullOrBlank()) {
+                    val credential = Credentials.basic(userName, password)
+                    requestBuilder.header("Authorization", credential)
+                }
+                chain.proceed(requestBuilder.build())
             }.addInterceptor(loggingInterceptor)
             .build()
 
-    val retrofitService =
+    val retrofitService: Retrofit =
         Retrofit
             .Builder()
-            .baseUrl("http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/")
+            .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(
                 Json.asConverterFactory(
                     "application/json".toMediaType(),
