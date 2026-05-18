@@ -4,8 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
@@ -32,47 +36,45 @@ class RecommendationViewModel(
     private val _checkedItemsIds = MutableStateFlow(initCheckedItemIds)
     val checkedItemIds = _checkedItemsIds.asStateFlow()
 
-    private val _totalPrice = MutableStateFlow(initPrice)
-    val totalPrice = _totalPrice.asStateFlow()
-
     private val _allCartItems = MutableStateFlow<PurchaseProducts>(PurchaseProducts())
     val allCartItems = _allCartItems.asStateFlow()
 
+    private val _totalPrice = MutableStateFlow(initPrice)
+    val totalPrice = _totalPrice.asStateFlow()
+
     init {
-        fetchCart()
-        fetchRecommendations()
-    }
-
-    private fun fetchRecommendations() {
         viewModelScope.launch {
-            try {
-                val latestId = recentlyViewedProductRepository.getLatestItem().first()
-
-                if (latestId != null) {
-                    val product = productRepository.getProduct(latestId)
-                    _lastViewedProductCategory.value = product.category
-
-                    val categoryProducts = productRepository.getCategoryProducts(
-                        category = lastViewedProductCategory.value
-                    )
-
-                    val cartProductIds = allCartItems.value.purchaseProducts.map { it.product.id }
-
-                    val recommendations = categoryProducts.filter { it.id !in cartProductIds }
-
-                    _recommendedProducts.value = Products(recommendations)
-                }
-            } catch (_: Exception) {
-                _recommendedProducts.value = Products()
-            }
+            fetchCart()
+            fetchRecommendations()
         }
     }
 
-    private fun fetchCart() {
-        viewModelScope.launch {
-            _allCartItems.update {
-                cartRepository.getPagedCart(0, 1000000)
+    private suspend fun fetchRecommendations() {
+        try {
+            val latestId = recentlyViewedProductRepository.getLatestItem().first()
+
+            if (latestId != null) {
+                val product = productRepository.getProduct(latestId)
+                _lastViewedProductCategory.value = product.category
+
+                val categoryProducts = productRepository.getCategoryProducts(
+                    category = lastViewedProductCategory.value
+                )
+
+                val cartProductIds = allCartItems.value.purchaseProducts.map { it.product.id }
+
+                val recommendations = categoryProducts.filter { it.id !in cartProductIds }
+
+                _recommendedProducts.value = Products(recommendations)
             }
+        } catch (_: Exception) {
+            _recommendedProducts.value = Products()
+        }
+    }
+
+    private suspend fun fetchCart() {
+        _allCartItems.update {
+            cartRepository.getPagedCart(0, 1000000)
         }
     }
 
@@ -86,6 +88,8 @@ class RecommendationViewModel(
                 cartRepository.updateCount(existingItem.id, existingItem.count + 1)
             } else {
                 cartRepository.insert(purchaseProduct)
+                _checkedItemsIds.update { it + purchaseProduct.id }
+                _totalPrice.update { it + purchaseProduct.totalPrice() }
             }
             fetchCart()
         }
@@ -103,6 +107,12 @@ class RecommendationViewModel(
                     cartRepository.updateCount(target.id, nextCount)
                     fetchCart()
                 }
+                if(updateAmount > 0) {
+                    _totalPrice.update { it + target.price() }
+                } else {
+                    _totalPrice.update { it - target.price() }
+                }
+
             }
         }
     }
@@ -112,6 +122,7 @@ class RecommendationViewModel(
             val target = allCartItems.value.findById(id)
             if (target != null) {
                 cartRepository.deleteCartItem(target.id)
+                _totalPrice.update { it - target.price() }
                 fetchCart()
             }
         }
