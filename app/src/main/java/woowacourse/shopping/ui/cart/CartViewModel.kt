@@ -303,4 +303,20 @@ class CartViewModel(
             }
         return selectedItems.sumOf { it.quantity }
     }
+
+    companion object {
+        fun provideFactory(container: AppContainer, pageSize: Int): ViewModelProvider.Factory {
+            return object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return CartViewModel(
+                        recentProductRepo = container.recentProductRepository,
+                        productRepo = container.productRepository,
+                        cartRepo = container.cartRepository,
+                        orderRepo = container.orderRepository,
+                        pageSize = pageSize,
+                    ) as T
+                }
+            }
+        }
+    }
 }

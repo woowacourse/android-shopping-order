@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.common.theme.ShoppingTheme
@@ -29,17 +27,7 @@ class CartActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val viewModel: CartViewModel =
                         viewModel(
-                            factory =
-                                object : ViewModelProvider.Factory {
-                                    override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                                        CartViewModel(
-                                            cartRepo = container.cartRepository,
-                                            orderRepo = container.orderRepository,
-                                            pageSize = pageSize,
-                                            recentProductRepo = container.recentProductRepository,
-                                            productRepo = container.productRepository,
-                                        ) as T
-                                },
+                            factory = CartViewModel.provideFactory(container, pageSize)
                         )
 
                     CartScreen(
