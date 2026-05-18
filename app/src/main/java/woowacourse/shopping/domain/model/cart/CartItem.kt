@@ -12,8 +12,6 @@ data class CartItem(
 
     fun isSameCartItem(targetCartItem: CartItem): Boolean = id == targetCartItem.id
 
-    fun isSameProduct(productId: Int): Boolean = product.id == productId
-
     fun increaseQuantity(): CartItem = copy(quantity = quantity.increase())
 
     fun decreaseQuantity(): CartItem = copy(quantity = quantity.decrease())
