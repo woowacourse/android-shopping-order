@@ -60,7 +60,6 @@ class ShoppingCartActivity : ComponentActivity() {
         setContent {
             val shoppingCartItems by shoppingCartViewModel.shoppingCartItems.collectAsStateWithLifecycle()
             val selectedProductIds by shoppingCartViewModel.selectedProductIds.collectAsStateWithLifecycle()
-            val selectedItemCount = selectedProductIds.size
             val recommendUiState by shoppingCartRecommendViewModel.uiState.collectAsStateWithLifecycle()
 
             val screenState =
@@ -80,16 +79,26 @@ class ShoppingCartActivity : ComponentActivity() {
                 } else {
                     screenState.value.pagedItems
                 }
+            val selectableCartProductIds =
+                visibleItems
+                    .map { shoppingCartItem -> shoppingCartItem.product.id }
+                    .toSet()
+            val selectedVisibleProductIds = selectedProductIds.intersect(selectableCartProductIds)
+            val selectedItemCount = selectedVisibleProductIds.size
+            val selectedCartTotalPrice =
+                shoppingCartItems
+                    .filter { shoppingCartItem -> shoppingCartItem.product.id in selectedVisibleProductIds }
+                    .sumOf { shoppingCartItem -> shoppingCartItem.getProductQuantityPrice() }
             LaunchedEffect(shoppingCartItems, selectedProductIds) {
                 shoppingCartRecommendViewModel.updateCartSnapshot(
                     shoppingCartItems = shoppingCartItems,
-                    selectedCartProductIds = selectedProductIds,
+                    selectedCartProductIds = selectedVisibleProductIds,
                 )
             }
             val state =
                 ShoppingCartState(
                     items = visibleItems,
-                    selectedProductIds = selectedProductIds,
+                    selectedProductIds = selectedVisibleProductIds,
                     isLoading = isLoading.value,
                     errorMessage = errorMessage.value,
                     currentPage = screenState.value.currentPage,
@@ -134,8 +143,8 @@ class ShoppingCartActivity : ComponentActivity() {
                             onNextPageClick = shoppingCartItemViewModel::moveToNextPage,
                         )
                         OrderButton(
-                            shoppingCartItems = shoppingCartItems,
-                            selectedProductIds = selectedProductIds,
+                            shoppingCartItems = visibleItems,
+                            selectedProductIds = selectedVisibleProductIds,
                             shoppingCartSelectItemCount = selectedItemCount,
                             onOrderButtonClick = { selectedIds ->
                                 if (
@@ -146,9 +155,11 @@ class ShoppingCartActivity : ComponentActivity() {
                                 }
                                 shoppingCartRecommendViewModel.moveToRecommend()
                             },
-                            checked = shoppingCartItems.isNotEmpty() && selectedItemCount == shoppingCartItems.size,
-                            orderComplete = shoppingCartItems.isNotEmpty(),
-                            totalPrice = shoppingCartViewModel.getTotalPrice(shoppingCartItems),
+                            checked =
+                                selectableCartProductIds.isNotEmpty() &&
+                                    selectedVisibleProductIds.size == selectableCartProductIds.size,
+                            orderComplete = visibleItems.isNotEmpty(),
+                            totalPrice = selectedCartTotalPrice,
                             onToggleShoppingItemSelectionClick = { productIds, isSelected ->
                                 shoppingCartViewModel.setShoppingCartProductsSelection(
                                     productIds = productIds,
@@ -160,7 +171,7 @@ class ShoppingCartActivity : ComponentActivity() {
                 } else {
                     ShoppingCartRecommendSection(
                         recommendedShoppingItems = recommendUiState.recommendedShoppingItems,
-                        baseSelectedCartItemCount = selectedProductIds.size,
+                        baseSelectedCartItemCount = selectedVisibleProductIds.size,
                         totalPrice = recommendUiState.selectedCartTotalPrice + recommendUiState.selectedRecommendTotalPrice,
                         onBackClick = shoppingCartItemViewModel::onBackClick,
                         onOrderButtonClick = {},
