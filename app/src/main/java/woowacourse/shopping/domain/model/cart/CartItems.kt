@@ -12,7 +12,7 @@ class CartItems(
     val totalPrice: Int
         get() = values.sumOf { it.totalPrice }
 
-    fun calculatePrice(
+    fun selectedCartItemsPrice(
         targetIds: Set<Int>,
         isAll: Boolean,
     ): Int {

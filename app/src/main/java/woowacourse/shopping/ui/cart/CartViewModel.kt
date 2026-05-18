@@ -52,7 +52,7 @@ class CartViewModel(
                 hasPrevious = !cartItems.isFirst,
                 hasNext = !cartItems.isLast,
                 totalCount = cartItems.calculateQuantity(selectedItems, isAllSelected),
-                totalPrice = cartItems.calculatePrice(selectedItems, isAllSelected),
+                totalPrice = cartItems.selectedCartItemsPrice(selectedItems, isAllSelected),
                 recommendProducts = recommendProducts,
                 currentFlow = flow,
                 quantitiesByProductId = cartItems.values.associate { it.product.id to it.quantity.value },
