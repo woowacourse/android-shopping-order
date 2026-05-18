@@ -49,9 +49,6 @@ fun CartScreen(
     modifier: Modifier = Modifier,
     viewModel: CartViewModel = viewModel(factory = CartViewModel.Factory),
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.initialLoading()
-    }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     LaunchedEffect(Unit) {
@@ -79,8 +76,8 @@ fun CartScreen(
         onDecrease = viewModel::decrease,
         onPrev = viewModel::moveToPreviousPage,
         onNext = viewModel::moveToNextPage,
-        canPrev = !viewModel.isStartPage(),
-        canNext = !viewModel.isEndPage(),
+        canPrev = !uiState.isFirstPage,
+        canNext = !uiState.isLastPage,
         onChecked = viewModel::cartItemCheck,
         onTotalCheck = viewModel::totalCheck,
         modifier = modifier,
@@ -186,7 +183,7 @@ fun CartScreenContent(
                             .background(Color(0xff04C09E)),
                     ) {
                         Text(
-                            "주문하기(${uiState.checkMap.count { it.value }})",
+                            "주문하기(${uiState.totalCount})",
                             fontWeight = FontWeight.W700,
                             fontSize = 18.sp,
                             color = Color.White,

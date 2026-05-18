@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -49,7 +50,6 @@ fun ProductListScreen(
         }
     }
 
-
     val state by vm.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -63,6 +63,10 @@ fun ProductListScreen(
             )
         },
     ) { innerPadding ->
+        LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+            vm.cartRefresh()
+            vm.loadRecentProducts()
+        }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
