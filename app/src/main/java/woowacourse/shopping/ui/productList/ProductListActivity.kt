@@ -14,12 +14,13 @@ import woowacourse.shopping.ui.cart.CartActivity
 import woowacourse.shopping.ui.productDetail.ProductDetailActivity
 
 class ProductListActivity : ComponentActivity() {
-    private lateinit var viewModel: ProductListViewModel
-
+    private val viewModel: ProductListViewModel by viewModels {
+        ProductListViewModel.Factory
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val appContainer = (application as ShoppingApplication).appContainer
+
         setContent {
             viewModel =
                 viewModel(

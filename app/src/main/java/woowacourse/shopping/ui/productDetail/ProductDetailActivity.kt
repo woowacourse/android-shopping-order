@@ -11,25 +11,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.cart.CartActivity
+import woowacourse.shopping.ui.productList.ProductListViewModel
 
 class ProductDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val appContainer = (application as ShoppingApplication).appContainer
-
         setContent {
             val viewModel: ProductDetailViewModel =
                 viewModel(
                     factory =
-                        ProductDetailViewModel.factory(
-                            productRepository = appContainer.productRepository,
-                            cartRepository = appContainer.cartRepository,
-                            recentProductRepository = appContainer.recentProductRepository,
-                        ),
+                        ProductListViewModel.Factory
                 )
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                 ProductDetailScreen(

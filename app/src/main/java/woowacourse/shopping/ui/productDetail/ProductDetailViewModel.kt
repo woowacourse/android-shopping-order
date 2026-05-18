@@ -129,22 +129,20 @@ class ProductDetailViewModel(
     }
 
     companion object {
-        fun factory(
-            productRepository: ProductRepository,
-            cartRepository: CartRepository,
-            recentProductRepository: RecentProductRepository,
-        ): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    val savedStateHandle = createSavedStateHandle()
 
-                    ProductDetailViewModel(
-                        savedStateHandle = savedStateHandle,
-                        productRepository = productRepository,
-                        cartRepository = cartRepository,
-                        recentProductRepository = recentProductRepository,
-                    )
-                }
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val savedStateHandle = createSavedStateHandle()
+                val application =
+                    (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ShoppingApplication)
+                ProductDetailViewModel(
+                    savedStateHandle = savedStateHandle,
+                    productRepository = application.appContainer.productRepository,
+                    cartRepository = application.appContainer.cartRepository,
+                    recentProductRepository = application.appContainer.recentProductRepository,
+                )
+
             }
+        }
     }
 }

@@ -207,15 +207,15 @@ class CartViewModel(
     companion object {
         private const val PAGE_SIZE = 5
 
-        fun factory(
-            cartRepository: CartRepository,
-            recentProductRepository: RecentProductRepository,
-            productRepository: ProductRepository,
-        ): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    CartViewModel(cartRepository, recentProductRepository, productRepository)
-                }
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ShoppingApplication)
+                CartViewModel(
+                    application.appContainer.cartRepository,
+                    application.appContainer.recentProductRepository,
+                    application.appContainer.productRepository,
+                )
             }
+        }
     }
 }

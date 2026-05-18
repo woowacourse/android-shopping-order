@@ -17,16 +17,10 @@ class CartActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val appContainer = (application as ShoppingApplication).appContainer
         setContent {
             val viewModel: CartViewModel =
                 viewModel(
-                    factory =
-                        CartViewModel.factory(
-                            appContainer.cartRepository,
-                            appContainer.recentProductRepository,
-                            appContainer.productRepository,
-                        ),
+                    factory = CartViewModel.Factory
                 )
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
