@@ -53,7 +53,7 @@
   - [x] MockProductResponse로 네이밍 변경
 
 - **data/mock**
-  - [ ] 테스트 디렉터리로 이동
+  - [x] 테스트 디렉터리로 이동
 
 - **MockProductRepositoryImpl**
   - [ ] getCategoryProduct에 Dispatcher.IO 명시

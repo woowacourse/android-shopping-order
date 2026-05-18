@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.remote.mock
+package woowacourse.shopping.viewmodel.fakes.server
 
 object MockProducts {
     val products: String =

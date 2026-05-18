@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.remote.mock
+package woowacourse.shopping.viewmodel.fakes.server
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

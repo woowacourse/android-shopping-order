@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.remote.mock.dto
+package woowacourse.shopping.viewmodel.fakes.server.dto
 
 import woowacourse.shopping.domain.Product
 

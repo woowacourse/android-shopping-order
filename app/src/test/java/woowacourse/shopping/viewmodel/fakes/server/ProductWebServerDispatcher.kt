@@ -1,6 +1,5 @@
-package woowacourse.shopping.data.remote.mock
+package woowacourse.shopping.viewmodel.fakes.server
 
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.jsonArray
@@ -10,7 +9,7 @@ import mockwebserver3.Dispatcher
 import mockwebserver3.MockResponse
 import mockwebserver3.RecordedRequest
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import woowacourse.shopping.data.remote.mock.MockProducts.products
+import woowacourse.shopping.viewmodel.fakes.server.MockProducts.products
 
 class ProductWebServerDispatcher : Dispatcher() {
     private val mockProducts = Json.parseToJsonElement(products).jsonArray

@@ -1,14 +1,14 @@
-package woowacourse.shopping.data.remote.mock
+package woowacourse.shopping.viewmodel.fakes.server
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import woowacourse.shopping.data.remote.mock.dto.MockProductResponse
-import woowacourse.shopping.data.remote.mock.dto.toObject
 import woowacourse.shopping.data.remote.server.repository.ProductRepository
 import woowacourse.shopping.domain.Product
+import woowacourse.shopping.viewmodel.fakes.server.dto.MockProductResponse
+import woowacourse.shopping.viewmodel.fakes.server.dto.toObject
 
 class MockProductRepositoryImpl(
     private val client: OkHttpClient,
