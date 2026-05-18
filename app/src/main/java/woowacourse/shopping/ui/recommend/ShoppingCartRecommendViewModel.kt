@@ -49,7 +49,7 @@ class ShoppingCartRecommendViewModel(
             shoppingCartItems
                 .map { shoppingCartItem -> shoppingCartItem.product.id }
                 .toSet()
-        publishUiState(currentStep = ShoppingCartStep.RECOMMENT)
+        publishUiState(currentStep = ShoppingCartStep.RECOMMEND)
     }
 
     fun moveToCart() {
@@ -90,7 +90,7 @@ class ShoppingCartRecommendViewModel(
                 .map { shoppingCartItem -> shoppingCartItem.product.id }
                 .toSet()
         val excludedProductIdsForRecommend =
-            if (currentStep == ShoppingCartStep.RECOMMENT) {
+            if (currentStep == ShoppingCartStep.RECOMMEND) {
                 recommendBaseCartProductIds
             } else {
                 cartProductIds
@@ -131,7 +131,7 @@ class ShoppingCartRecommendViewModel(
 
     enum class ShoppingCartStep {
         CART,
-        RECOMMENT,
+        RECOMMEND,
     }
 
     private companion object {

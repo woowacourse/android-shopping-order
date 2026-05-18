@@ -10,24 +10,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.remote.retrofit.RetrofitService
-import woowacourse.shopping.data.remote.AuthHeaderProvider
 import woowacourse.shopping.data.local.datastore.AuthDataStore
-import woowacourse.shopping.data.local.room.ShoppingDatabase
+import woowacourse.shopping.data.remote.AuthHeaderProvider
+import woowacourse.shopping.data.remote.retrofit.RetrofitService
 import woowacourse.shopping.di.AppContainer
 
 class ShoppingApplication : Application() {
-    /**
-     * 이러한 값들을 Object로 만들어 저장해도 현재 단계에서는 무리가 없다고 생각이 드는데요.
-     * 또한, Application의 생명주기는 어떻게 될까요?
-     */
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    /**
-     * 위와 같은 스코프는 신경을 써야 하는 부분이 많은데요.
-     * SupervisorJob이 있을 때와 없을 때는 어떤 차이가 있나요?
-     * Dispatchers.IO를 기본 값으로 만들어준 이유는 무엇인가요?
-     */
     private val Context.authDataStore: DataStore<Preferences> by preferencesDataStore(
         name = "auth_datastore",
     )
@@ -51,17 +41,14 @@ class ShoppingApplication : Application() {
 
         applicationScope.launch {
             authDataStore.saveAuthInfo(
-                username = "chohs4164",
+                username = "parkhyomi",
                 password = "password",
             )
         }
 
-        val shoppingDatabase = ShoppingDatabase.create(this)
         appContainer =
             AppContainer(
                 context = this,
-                shoppingItemDao = shoppingDatabase.shoppingItemDao(),
-                shoppingCartDao = shoppingDatabase.shoppingCartDao(),
                 applicationScope = applicationScope,
             )
     }

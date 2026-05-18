@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.cart
 
+import android.os.SystemClock
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +21,8 @@ class ShoppingCartViewModel(
     private val shoppingCartRetrofitRepository: ShoppingCartRetrofitRepository,
 ) : ViewModel() {
     private val cartRequestMutex = Mutex()
+    private var hasLoadedCartOnce: Boolean = false
+    private var lastCartLoadedElapsedMs: Long = 0L
 
     private val _shoppingCartItems = MutableStateFlow<List<ShoppingCartItem>>(emptyList())
     val shoppingCartItems: StateFlow<List<ShoppingCartItem>> = _shoppingCartItems.asStateFlow()
@@ -32,14 +35,17 @@ class ShoppingCartViewModel(
     private val _selectedProductIds = MutableStateFlow<Set<Long>>(emptySet())
     val selectedProductIds: StateFlow<Set<Long>> = _selectedProductIds.asStateFlow()
 
-    fun requestCartItems() {
+    fun requestCartItems(force: Boolean = false) {
+        if (shouldSkipCartRequest(force = force)) return
         _errorMessage.value = null
         viewModelScope.launch {
             cartRequestMutex.withLock {
+                if (shouldSkipCartRequest(force = force)) return@withLock
                 _isLoading.value = true
                 try {
                     val loadedItems = loadCartItems()
                     syncShoppingCartItems(loadedItems)
+                    markCartLoaded()
                 } catch (throwable: Throwable) {
                     _errorMessage.value = throwable.message
                 } finally {
@@ -59,7 +65,7 @@ class ShoppingCartViewModel(
         viewModelScope.launch {
             cartRequestMutex.withLock {
                 runCatching {
-                    val currentItems = loadCartItems()
+                    val currentItems = ensureCartSnapshotLoaded()
                     val targetItem = findByProductId(currentItems, productId)
                     if (targetItem == null) {
                         shoppingCartRetrofitRepository
@@ -77,6 +83,7 @@ class ShoppingCartViewModel(
                     loadCartItems()
                 }.onSuccess { latestItems ->
                     syncShoppingCartItems(latestItems)
+                    markCartLoaded()
                     onSuccess?.invoke()
                 }.onFailure { throwable ->
                     _errorMessage.value = throwable.message
@@ -90,7 +97,7 @@ class ShoppingCartViewModel(
         viewModelScope.launch {
             cartRequestMutex.withLock {
                 runCatching {
-                    val currentItems = loadCartItems()
+                    val currentItems = ensureCartSnapshotLoaded()
                     val targetItem =
                         findByProductId(currentItems, productId) ?: return@runCatching currentItems
                     val updatedQuantity = targetItem.getQuantity() - 1
@@ -109,6 +116,7 @@ class ShoppingCartViewModel(
                     loadCartItems()
                 }.onSuccess { latestItems ->
                     syncShoppingCartItems(latestItems)
+                    markCartLoaded()
                 }.onFailure { throwable ->
                     _errorMessage.value = throwable.message
                 }
@@ -121,7 +129,7 @@ class ShoppingCartViewModel(
         viewModelScope.launch {
             cartRequestMutex.withLock {
                 runCatching {
-                    val currentItems = loadCartItems()
+                    val currentItems = ensureCartSnapshotLoaded()
                     val targetItem =
                         findByProductId(
                             shoppingCartItems = currentItems,
@@ -134,6 +142,7 @@ class ShoppingCartViewModel(
                     loadCartItems()
                 }.onSuccess { latestItems ->
                     syncShoppingCartItems(latestItems)
+                    markCartLoaded()
                 }.onFailure { throwable ->
                     _errorMessage.value = throwable.message
                 }
@@ -150,8 +159,6 @@ class ShoppingCartViewModel(
         decreaseByProductId(productId = shoppingCartItem.product.id)
     }
 
-    fun getTotalPrice(shoppingCartItems: List<ShoppingCartItem>): Int = shoppingCartItems.sumOf { it.getProductQuantityPrice() }
-
     private suspend fun loadCartItems(): List<ShoppingCartItem> {
         return shoppingCartRetrofitRepository
             .requestCartItems(
@@ -160,6 +167,28 @@ class ShoppingCartViewModel(
                 sort = null,
             ).awaitBody(errorPrefix = "장바구니 조회 실패")
             .toDomainShoppingCartItems()
+    }
+
+    private suspend fun ensureCartSnapshotLoaded(): List<ShoppingCartItem> {
+        if (hasLoadedCartOnce) return _shoppingCartItems.value
+        val loadedItems = loadCartItems()
+        syncShoppingCartItems(loadedItems)
+        markCartLoaded()
+        return loadedItems
+    }
+
+    private fun shouldSkipCartRequest(force: Boolean): Boolean {
+        if (force) return false
+        if (!hasLoadedCartOnce) return false
+        return isCartCacheFresh()
+    }
+
+    private fun isCartCacheFresh(): Boolean =
+        SystemClock.elapsedRealtime() - lastCartLoadedElapsedMs < CART_CACHE_DURATION_MS
+
+    private fun markCartLoaded() {
+        hasLoadedCartOnce = true
+        lastCartLoadedElapsedMs = SystemClock.elapsedRealtime()
     }
 
     private fun findByProductId(
@@ -211,5 +240,6 @@ class ShoppingCartViewModel(
         private const val DEFAULT_PAGE = 0
         private const val DEFAULT_SIZE = 20
         private const val DEFAULT_QUANTITY = 1
+        private const val CART_CACHE_DURATION_MS = 30_000L
     }
 }

@@ -74,8 +74,8 @@ class DetailProductActivity : ComponentActivity() {
                             shoppingCartViewModel.addOrIncreaseByProductId(
                                 productId = shoppingItem.getProductId(),
                                 amount = uiState.selectedQuantity,
+                                onSuccess = this::finish,
                             )
-                            finish()
                         },
                         onLastViewedProductClick = { selectedProductId ->
                             start(

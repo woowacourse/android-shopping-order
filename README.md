@@ -1,6 +1,6 @@
 # Android Shopping Cart
 
-현재 HTTP 400 에러를 반환 및 Room 문제로 빌드가 제대로 되지 않고 있습니다.
+현재 HTTP 400 에러를 반환 및 빌드가 제대로 되지 않고 있습니다.
 
 다음 제출부터는 이러한 부분도 잘 확인해주세요.
 
@@ -23,7 +23,7 @@
 
 ## 미션 요구사항 반영
 
-- 로컬 데이터 유지를 위해 Room 사용
+- 로컬 상태 관리를 위해 InMemory Repository 사용
 - HTTP Client(OkHttp) 구현
 - MockWebServer 기반 테스트 서버 구성
 - 네트워크 상태 변경 시스템 이벤트 감지 후 UI 반영
@@ -50,8 +50,8 @@ app/src/main/java/woowacourse/shopping
 ├─ repository
 │  ├─ ShoppingItemRepository.kt
 │  ├─ ShoppingCartRepository.kt
-│  ├─ RoomShoppingItemRepository.kt
-│  └─ RoomShoppingCartRepository.kt
+│  ├─ InMemoryShoppingItemRepository.kt
+│  └─ InMemoryShoppingCartRepository.kt
 ├─ backend
 │  ├─ MockProductSeedData.kt
 │  ├─ MockShoppingBackendServer.kt
@@ -62,15 +62,6 @@ app/src/main/java/woowacourse/shopping
 │  ├─ NetworkStatusMonitor.kt
 │  └─ AndroidNetworkStatusMonitor.kt
 ├─ storage
-│  ├─ room
-│  │  ├─ ShoppingDatabase.kt
-│  │  ├─ shoppingItem
-│  │  │  ├─ ShoppingItemEntity.kt
-│  │  │  └─ ShoppingItemDao.kt
-│  │  └─ shoppingcart
-│  │     ├─ ShoppingCartEntity.kt
-│  │     ├─ ShoppingCartItemRow.kt
-│  │     └─ ShoppingCartDao.kt
 │  └─ datastore
 │     ├─ VisitStore.kt
 │     └─ DataStoreVisitStore.kt
@@ -203,4 +194,3 @@ app/src/main/java/woowacourse/shopping
 
 - [X] 추천 상품 화면에서 상품을 바로 장바구니에 추가할 수 있다.
 - [x] 추천 상품을 추가하면 함께 주문할 수 있다.
-

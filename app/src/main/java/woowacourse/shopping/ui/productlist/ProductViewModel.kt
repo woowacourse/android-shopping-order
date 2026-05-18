@@ -1,31 +1,30 @@
 package woowacourse.shopping.ui.productlist
 
+import android.os.SystemClock
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import woowacourse.shopping.data.remote.retrofit.awaitBody
 import woowacourse.shopping.data.remote.retrofit.awaitCompletion
-import woowacourse.shopping.data.remote.retrofit.repository.ProductRetrofitRepository
 import woowacourse.shopping.data.mapper.toApiProduct
 import woowacourse.shopping.data.mapper.toDomainProduct
 import woowacourse.shopping.data.mapper.toDomainProducts
 import woowacourse.shopping.data.mapper.toShoppingItem
+import woowacourse.shopping.data.remote.retrofit.repository.ProductRetrofitRepository
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.ui.productlist.ProductListState
 
-/**
- * 로미가 작성한 패키지의 구조는 어떤 생각을 기반으로 작성이 된 것인지 공유해주실 수 있을까요?
- * 로미가 생각하기에 Repository와 ViewModel은 어떤 역할을 하는 친구들인가요?
- * 또한, 현재 패키지에 있는 ViewModel들과 ui 패키지 아래있는 ViewModel들은 어떤 차이가 있는 것일까요?
- */
 class ProductViewModel(
     private val productRetrofitRepository: ProductRetrofitRepository,
 ) : ViewModel() {
+    private val productRequestMutex = Mutex()
+
     private val _products = MutableStateFlow<List<Product>>(emptyList())
     val products: StateFlow<List<Product>> = _products.asStateFlow()
     private val _productDetails = MutableStateFlow<Map<Long, Product>>(emptyMap())
@@ -33,56 +32,63 @@ class ProductViewModel(
 
     private val _state = MutableStateFlow(ProductListState())
     val state: StateFlow<ProductListState> = _state.asStateFlow()
+    private var hasLoadedProductsOnce: Boolean = false
+    private var lastProductsLoadedElapsedMs: Long = 0L
 
     fun requestProduct(
         page: Int = DEFAULT_PAGE,
         size: Int = DEFAULT_SIZE,
         sort: List<String>? = DEFAULT_SORT,
         category: String? = null,
+        force: Boolean = false,
     ) {
-        _state.value =
-            _state.value.copy(
-                isLoading = true,
-                errorMessage = null,
-            )
+        if (shouldSkipProductRequest(force = force)) return
 
         viewModelScope.launch {
-            runCatching {
-                productRetrofitRepository
-                    .requestProduct(
-                        page = page,
-                        size = size,
-                        sort = sort,
-                        category = category,
-                    ).awaitBody(errorPrefix = "상품 조회 실패")
-            }.onSuccess { response ->
-                /**
-                 * 이러한 코드는 프로덕션에 추가되어도 괜찮을까요?
-                 */
-                delay(3000) // 스켈레톤 ui 확인을 위한 딜레이
-                val loadedProducts = response.toDomainProducts()
-                _products.value = loadedProducts
+            productRequestMutex.withLock {
+                if (shouldSkipProductRequest(force = force)) return@withLock
 
                 _state.value =
                     _state.value.copy(
-                        isLoading = false,
-                        products = loadedProducts.map { it.toShoppingItem() },
+                        isLoading = true,
                         errorMessage = null,
                     )
-                _productDetails.update { cachedProducts ->
-                    cachedProducts + loadedProducts.associateBy { product -> product.id }
+
+                runCatching {
+                    productRetrofitRepository
+                        .requestProduct(
+                            page = page,
+                            size = size,
+                            sort = sort,
+                            category = category,
+                        ).awaitBody(errorPrefix = "상품 조회 실패")
+                }.onSuccess { response ->
+                    val loadedProducts = response.toDomainProducts()
+                    _products.value = loadedProducts
+
+                    _state.value =
+                        _state.value.copy(
+                            isLoading = false,
+                            products = loadedProducts.map { it.toShoppingItem() },
+                            errorMessage = null,
+                        )
+                    _productDetails.update { cachedProducts ->
+                        cachedProducts + loadedProducts.associateBy { product -> product.id }
+                    }
+                    markProductsLoaded()
+                }.onFailure {
+                    _state.value =
+                        _state.value.copy(
+                            isLoading = false,
+                            errorMessage = "상품 목록을 불러오지 못했습니다.",
+                        )
                 }
-            }.onFailure {
-                _state.value =
-                    _state.value.copy(
-                        isLoading = false,
-                        errorMessage = "상품 목록을 불러오지 못했습니다.",
-                    )
             }
         }
     }
 
     fun requestProductDetail(id: Long) {
+        if (_productDetails.value.containsKey(id)) return
         viewModelScope.launch {
             runCatching {
                 productRetrofitRepository
@@ -96,6 +102,20 @@ class ProductViewModel(
                 }
             }
         }
+    }
+
+    private fun shouldSkipProductRequest(force: Boolean): Boolean {
+        if (force) return false
+        if (!hasLoadedProductsOnce) return false
+        return isProductsCacheFresh()
+    }
+
+    private fun isProductsCacheFresh(): Boolean =
+        SystemClock.elapsedRealtime() - lastProductsLoadedElapsedMs < PRODUCTS_CACHE_DURATION_MS
+
+    private fun markProductsLoaded() {
+        hasLoadedProductsOnce = true
+        lastProductsLoadedElapsedMs = SystemClock.elapsedRealtime()
     }
 
     fun addProduct(product: Product) {
@@ -124,5 +144,6 @@ class ProductViewModel(
         private const val DEFAULT_PAGE = 0
         private const val DEFAULT_SIZE = 20
         private val DEFAULT_SORT = listOf("id,asc")
+        private const val PRODUCTS_CACHE_DURATION_MS = 30_000L
     }
 }

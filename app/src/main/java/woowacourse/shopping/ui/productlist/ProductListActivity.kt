@@ -23,6 +23,7 @@ import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 class ProductListActivity : ComponentActivity() {
     private val app: ShoppingApplication by lazy { application as ShoppingApplication }
+    private var hasResumedOnce: Boolean = false
 
     private val screenViewModelFactory: ScreenViewModelFactory by lazy {
         ScreenViewModelFactory(appContainer = app.appContainer)
@@ -102,19 +103,20 @@ class ProductListActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        requestProductsAndCart()
+        if (!hasResumedOnce) {
+            hasResumedOnce = true
+            return
+        }
+        shoppingCartViewModel.requestCartItems(force = true)
     }
 
     private fun requestProductsAndCart() {
         productViewModel.requestProduct(size = MAX_PRODUCT_SIZE)
-        shoppingCartViewModel.requestCartItems()
+        shoppingCartViewModel.requestCartItems(force = true)
     }
 
     private fun observeApiViewModels() {
         lifecycleScope.launch {
-            /**
-             * repeatOnLifecycle은 어떻게 동작을 하나요? 🤔
-             */
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     productViewModel.products.collect { products ->
