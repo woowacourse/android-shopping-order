@@ -119,7 +119,8 @@ class ShoppingViewModel(
             .toImmutableList()
 
     private suspend fun loadNext() {
-        if (uiState.value.isLoading || !uiState.value.canLoadMore) return
+        if (uiState.value.isLoading) return
+        if (uiState.value.offset > 0 && !uiState.value.canLoadMore) return
         _uiState.update {
             it.copy(isLoading = true)
         }

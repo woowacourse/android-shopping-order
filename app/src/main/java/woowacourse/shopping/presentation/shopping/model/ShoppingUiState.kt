@@ -4,7 +4,7 @@ import woowacourse.shopping.presentation.common.model.ProductUiModel
 
 data class ShoppingUiState(
     val products: List<ShoppingItemUiModel> = emptyList(),
-    val canLoadMore: Boolean = true,
+    val canLoadMore: Boolean = false,
     val isLoading: Boolean = false,
     val offset: Int = 0,
     val totalQuantity: Int = 0,

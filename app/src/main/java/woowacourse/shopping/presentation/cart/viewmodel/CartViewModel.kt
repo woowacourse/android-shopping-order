@@ -177,19 +177,24 @@ class CartViewModel(
 
     private suspend fun loadCartItems(providedCart: Cart? = null) {
         if (uiState.value.isLoading) return
+        val isFirstLoad = uiState.value.totalCartSize == 0
         _uiState.update { it.copy(isLoading = true) }
         try {
             val cart = providedCart ?: cartRepository.getCart()
 
-            val selectedIds =
-                cart.items
-                    .map { it.product.id }
-                    .filter { paymentItems.isContain(it) }
-                    .toSet()
             paymentItems =
-                PaymentItems(
-                    cart.items.filter { it.product.id in selectedIds }.toSet(),
-                )
+                if (isFirstLoad) {
+                    PaymentItems(cart.items.toSet())
+                } else {
+                    val selectedIds =
+                        cart.items
+                            .map { it.product.id }
+                            .filter { paymentItems.isContain(it) }
+                            .toSet()
+                    PaymentItems(
+                        cart.items.filter { it.product.id in selectedIds }.toSet(),
+                    )
+                }
 
             val items =
                 cart.items.map {
