@@ -12,7 +12,7 @@ class RecentItemRepository(
     private val productRepository: ProductRepository,
 ) {
     suspend fun addRecentItem(product: Product) {
-        recentItemDao.insert(product.toEntity(System.currentTimeMillis()))
+        recentItemDao.upsert(product.toEntity(System.currentTimeMillis()))
         recentItemDao.deleteOldItem()
     }
 

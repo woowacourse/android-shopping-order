@@ -44,7 +44,7 @@ class RecentItemRepositoryTest {
         runTest {
             val dao = TestRecentItemDao()
             val repository = RecentItemRepository(dao, FakeProductRepository(listOf(product)))
-            dao.insert(product.toRecentItemEntity(timestamp = 100L))
+            dao.upsert(product.toRecentItemEntity(timestamp = 100L))
 
             val recentItems = repository.getRecentItems().first()
 
@@ -60,8 +60,8 @@ class RecentItemRepositoryTest {
         runTest {
             val dao = TestRecentItemDao()
             val repository = RecentItemRepository(dao, FakeProductRepository(listOf(createProduct(id = "1"), createProduct(id = "2"))))
-            dao.insert(createProduct(id = "1").toRecentItemEntity(timestamp = 100L))
-            dao.insert(createProduct(id = "2").toRecentItemEntity(timestamp = 200L))
+            dao.upsert(createProduct(id = "1").toRecentItemEntity(timestamp = 100L))
+            dao.upsert(createProduct(id = "2").toRecentItemEntity(timestamp = 200L))
 
             val lastViewedItem = repository.getLastViewedItem()
 
@@ -98,7 +98,7 @@ class RecentItemRepositoryTest {
         var deleteOldItemCount = 0
             private set
 
-        override suspend fun insert(item: RecentItemEntity) {
+        override suspend fun upsert(item: RecentItemEntity) {
             items.value = items.value.filterNot { it.id == item.id } + item
         }
 

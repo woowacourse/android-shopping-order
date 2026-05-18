@@ -1,16 +1,15 @@
 package woowacourse.shopping.data.localdb.dao
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import woowacourse.shopping.data.localdb.entity.RecentItemEntity
 
 @Dao
 interface RecentItemDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(item: RecentItemEntity)
+    @Upsert
+    suspend fun upsert(item: RecentItemEntity)
 
     @Query("SELECT * FROM recent_items ORDER BY timestamp DESC, id DESC LIMIT 10")
     fun getRecentItems(): Flow<List<RecentItemEntity>>

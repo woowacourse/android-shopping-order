@@ -190,7 +190,7 @@ private class FakeProductRepository(
 private class TestRecentItemDao : RecentItemDao {
     private val items = MutableStateFlow<List<RecentItemEntity>>(emptyList())
 
-    override suspend fun insert(item: RecentItemEntity) {
+    override suspend fun upsert(item: RecentItemEntity) {
         items.value = items.value.filterNot { it.id == item.id } + item
     }
 

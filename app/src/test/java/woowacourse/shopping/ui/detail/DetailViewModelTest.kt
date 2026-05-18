@@ -57,7 +57,7 @@ class DetailViewModelTest {
     fun `마지막으로 본 상품을 최근 본 상품으로 제공한다`() =
         runTest {
             val recentItemDao = TestRecentItemDao()
-            recentItemDao.insert(RecentItemEntity(id = "2", timestamp = 100L))
+            recentItemDao.upsert(RecentItemEntity(id = "2", timestamp = 100L))
 
             val viewModel = createViewModel(id = "1", recentItemDao = recentItemDao)
             mainDispatcherExtension.advanceUntilIdle()
@@ -72,7 +72,7 @@ class DetailViewModelTest {
     fun `최근 본 상품 숨김 옵션이 참이면 최근 본 상품을 제공하지 않는다`() =
         runTest {
             val recentItemDao = TestRecentItemDao()
-            recentItemDao.insert(RecentItemEntity(id = "2", timestamp = 100L))
+            recentItemDao.upsert(RecentItemEntity(id = "2", timestamp = 100L))
 
             val viewModel =
                 createViewModel(
@@ -164,7 +164,7 @@ private class FakeCartRepository(
 private class TestRecentItemDao : RecentItemDao {
     private val items = MutableStateFlow<List<RecentItemEntity>>(emptyList())
 
-    override suspend fun insert(item: RecentItemEntity) {
+    override suspend fun upsert(item: RecentItemEntity) {
         items.value = items.value.filterNot { it.id == item.id } + item
     }
 
