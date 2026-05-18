@@ -37,6 +37,7 @@ fun ProductListScreen(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+
     LaunchedEffect(Unit) {
         vm.event.collect { event ->
             when (event) {
@@ -47,19 +48,10 @@ fun ProductListScreen(
             }
         }
     }
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                vm.cartRefresh()
-                vm.loadRecentProducts()
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-    }
+
 
     val state by vm.uiState.collectAsStateWithLifecycle()
+
     Scaffold(
         containerColor = Color.White,
         modifier = modifier

@@ -85,10 +85,8 @@ class ProductListViewModel(
             ?: throw ProductNotFoundException(productId)
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
             cartRepository.increase(product)
             refreshCart()
-            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
@@ -97,10 +95,8 @@ class ProductListViewModel(
             ?: throw ProductNotFoundException(productId)
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
             cartRepository.decrease(productId)
             refreshCart()
-            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
