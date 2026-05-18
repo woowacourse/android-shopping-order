@@ -10,6 +10,7 @@ import woowacourse.shopping.data.source.remote.interceptor.AuthInterceptor
 
 class RetrofitClient(
     authDataSource: AuthDataSource,
+    baseUrl: String = RemoteConfig.BASE_URL,
 ) {
     private val okHttpClient =
         OkHttpClient
@@ -22,7 +23,7 @@ class RetrofitClient(
     val retrofit: Retrofit =
         Retrofit
             .Builder()
-            .baseUrl(RemoteConfig.BASE_URL)
+            .baseUrl(baseUrl)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()

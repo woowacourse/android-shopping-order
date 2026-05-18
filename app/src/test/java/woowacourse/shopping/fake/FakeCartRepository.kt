@@ -1,9 +1,11 @@
 package woowacourse.shopping.fake
 
+import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RemoveItemResult
+import woowacourse.shopping.domain.model.UpdateItemResult
 import woowacourse.shopping.domain.repository.CartRepository
 
 class FakeCartRepository(
@@ -22,8 +24,15 @@ class FakeCartRepository(
     override suspend fun addItem(
         id: Long,
         quantity: Int,
-    ) {
+    ): AddItemResult {
+        val wasInCart = items.containsKey(id)
         items[id] = (items[id] ?: 0) + quantity
+        val updatedCart = getCart()
+        return if (wasInCart) {
+            AddItemResult.Incremented(updatedCart)
+        } else {
+            AddItemResult.NewAdded(updatedCart)
+        }
     }
 
     override suspend fun deleteItem(productId: Long): RemoveItemResult =
@@ -36,12 +45,12 @@ class FakeCartRepository(
     override suspend fun changeCartItem(
         productId: Long,
         amount: Int,
-    ): Cart {
+    ): UpdateItemResult {
         if (amount <= 0) {
             items.remove(productId)
         } else {
             items[productId] = amount
         }
-        return getCart()
+        return UpdateItemResult.Success(getCart())
     }
 }

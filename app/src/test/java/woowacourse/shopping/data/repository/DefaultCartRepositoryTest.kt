@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.data.source.local.auth.AuthDataSource
 import woowacourse.shopping.data.source.remote.CartRemoteDataSource
+import woowacourse.shopping.data.source.remote.RetrofitClient
 import woowacourse.shopping.data.source.remote.dto.cart.Product
 import woowacourse.shopping.fake.FakeCartDispatcher
 
@@ -32,21 +33,25 @@ class DefaultCartRepositoryTest {
             )
         server.start()
 
+        val authDataSource =
+            object : AuthDataSource {
+                override suspend fun getToken(): String = FakeCartDispatcher.authToken
+
+                override suspend fun saveToken(
+                    id: String,
+                    password: String,
+                ): Unit = throw UnsupportedOperationException()
+            }
+
+        val retrofitClient =
+            RetrofitClient(
+                authDataSource = authDataSource,
+                baseUrl = server.url("/").toString(),
+            )
+
         defaultCartRepository =
             DefaultCartRepository(
-                remoteDataSource =
-                    CartRemoteDataSource(
-                        baseUrl = server.url("/").toString(),
-                        authDataSource =
-                            object : AuthDataSource {
-                                override suspend fun getToken(): String = FakeCartDispatcher.authToken
-
-                                override suspend fun saveToken(
-                                    id: String,
-                                    password: String,
-                                ): Unit = throw UnsupportedOperationException()
-                            },
-                    ),
+                remoteDataSource = CartRemoteDataSource(retrofitClient.retrofit),
             )
     }
 

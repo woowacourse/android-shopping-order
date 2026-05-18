@@ -9,7 +9,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import woowacourse.shopping.data.source.local.auth.AuthDataSource
 import woowacourse.shopping.data.source.remote.ProductRemoteDataSource
+import woowacourse.shopping.data.source.remote.RetrofitClient
+import woowacourse.shopping.di.RepositoryProvider.authDataSource
 import woowacourse.shopping.domain.model.Money
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductName
@@ -18,6 +21,7 @@ import woowacourse.shopping.fake.FakeProductDispatcher
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultProductRepositoryTest {
     private lateinit var server: MockWebServer
+    private lateinit var defaultProductRepository: DefaultProductRepository
 
     private val product =
         Product(
@@ -28,6 +32,16 @@ class DefaultProductRepositoryTest {
             category = "",
         )
 
+    private fun fakeAuthDataSource() =
+        object : AuthDataSource {
+            override suspend fun getToken(): String = ""
+
+            override suspend fun saveToken(
+                id: String,
+                password: String,
+            ): Unit = throw UnsupportedOperationException()
+        }
+
     @BeforeEach
     fun setUp() {
         server = MockWebServer()
@@ -37,6 +51,17 @@ class DefaultProductRepositoryTest {
                 product = product,
             )
         server.start()
+
+        val retrofitClient =
+            RetrofitClient(
+                authDataSource = fakeAuthDataSource(),
+                baseUrl = server.url("/").toString(),
+            )
+
+        defaultProductRepository =
+            DefaultProductRepository(
+                ProductRemoteDataSource(retrofitClient.retrofit),
+            )
     }
 
     @ParameterizedTest
@@ -45,13 +70,6 @@ class DefaultProductRepositoryTest {
         offset: Int,
         limit: Int,
     ) = runTest {
-        val defaultProductRepository =
-            DefaultProductRepository(
-                ProductRemoteDataSource(
-                    baseUrl = server.url("/").toString(),
-                ),
-            )
-
         val products = defaultProductRepository.getProducts(offset, limit)
         advanceUntilIdle()
         assertThat(products.size).isEqualTo(limit)
@@ -60,13 +78,6 @@ class DefaultProductRepositoryTest {
     @Test
     fun `상품의 ID로 단일 상품을 조회한다`() =
         runTest {
-            val defaultProductRepository =
-                DefaultProductRepository(
-                    ProductRemoteDataSource(
-                        baseUrl = server.url("/").toString(),
-                    ),
-                )
-
             val product = defaultProductRepository.getProductById(1L)
             advanceUntilIdle()
             assertThat(product.id).isEqualTo(1L)

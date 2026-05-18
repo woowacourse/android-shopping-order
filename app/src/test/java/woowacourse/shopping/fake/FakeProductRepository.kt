@@ -13,6 +13,7 @@ class FakeProductRepository(
     override suspend fun getProducts(
         offset: Int,
         limit: Int,
+        category: String?,
     ): ImmutableList<Product> {
         if (shouldFail) throw IOException()
         if (offset >= products.size) return emptyList<Product>().toImmutableList()
