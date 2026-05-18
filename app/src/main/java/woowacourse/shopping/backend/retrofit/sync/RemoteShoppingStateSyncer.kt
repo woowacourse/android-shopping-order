@@ -20,32 +20,4 @@ class RemoteShoppingStateSyncer(
     suspend fun syncProduct(product: ShoppingItem) {
         shoppingItemRepository.upsertProduct(product)
     }
-
-    suspend fun syncCartItems(shoppingCartItems: List<ShoppingCartItem>) {
-        val quantityByProductId =
-            shoppingCartItems.associate { shoppingCartItem ->
-                shoppingCartItem.product.id to shoppingCartItem.getQuantity()
-            }
-        val localShoppingItems = shoppingItemRepository.shoppingItems.value
-        localShoppingItems.forEach { shoppingItem ->
-            val productId = shoppingItem.getProductId()
-            val currentQuantity = shoppingItem.getQuantity()
-            val targetQuantity = quantityByProductId[productId] ?: 0
-            when {
-                targetQuantity > currentQuantity ->
-                    shoppingItemRepository.plusQuantity(productId, targetQuantity - currentQuantity)
-
-                targetQuantity < currentQuantity ->
-                    shoppingItemRepository.minusQuantity(
-                        productId,
-                        currentQuantity - targetQuantity
-                    )
-            }
-            if (targetQuantity > 0) {
-                shoppingCartRepository.addIfAbsent(productId)
-            } else {
-                shoppingCartRepository.removeByProductId(productId)
-            }
-        }
-    }
 }
