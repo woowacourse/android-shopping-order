@@ -12,9 +12,12 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.RepositoryProvider.cartRepository
+import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.PaymentItems
 import woowacourse.shopping.domain.model.RemoveItemResult
+import woowacourse.shopping.domain.model.UpdateItemResult
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.cart.model.CartUiState
 import woowacourse.shopping.presentation.cart.model.toUiModel
@@ -47,9 +50,11 @@ class CartViewModel(
                     loadCartItems(result.cart)
                     _uiEvents.send(CartEvent.DeleteSuccess)
                 }
-
                 is RemoveItemResult.NotFoundItem -> {
                     _uiEvents.send(CartEvent.DeleteNotFound)
+                }
+                is RemoveItemResult.Error -> {
+                    _uiEvents.send(CartEvent.ShowError(result.message))
                 }
             }
         }
@@ -57,7 +62,17 @@ class CartViewModel(
 
     fun increase(productId: Long) {
         viewModelScope.launch {
-            loadCartItems(addToCartUseCase(cartRepository, productId))
+            when (val result = addToCartUseCase(cartRepository, productId)) {
+                is AddItemResult.NewAdded -> {
+                    loadCartItems(result.cart)
+                }
+                is AddItemResult.Incremented -> {
+                    loadCartItems(result.cart)
+                }
+                is AddItemResult.Error -> {
+                    _uiEvents.send(CartEvent.ShowError(result.message))
+                }
+            }
         }
     }
 
@@ -66,8 +81,13 @@ class CartViewModel(
             val cartItem = cartRepository.getCart().items.find { it.product.id == productId }
             if (cartItem == null) return@launch
 
-            val updatedCart = cartRepository.changeCartItem(productId, cartItem.decrease().quantity)
-            loadCartItems(updatedCart)
+            when (val result = cartRepository.changeCartItem(productId, cartItem.decrease().quantity)) {
+                is UpdateItemResult.Success -> loadCartItems(result.cart)
+                is UpdateItemResult.Error -> {
+                    _uiEvents.send(CartEvent.ShowError(result.message))
+                    loadCartItems()
+                }
+            }
         }
     }
 
@@ -201,4 +221,8 @@ sealed interface CartEvent {
     data object DeleteSuccess : CartEvent
 
     data object DeleteNotFound : CartEvent
+
+    data class ShowError(
+        val message: String,
+    ) : CartEvent
 }

@@ -1,8 +1,5 @@
 package woowacourse.shopping.data.source.remote
 
-import android.util.Log
-import okio.IOException
-import retrofit2.HttpException
 import retrofit2.Retrofit
 import woowacourse.shopping.data.source.remote.api.AddItemRequestBody
 import woowacourse.shopping.data.source.remote.api.CartService
@@ -30,60 +27,16 @@ class CartRemoteDataSource(
     suspend fun addItem(
         id: Long,
         quantity: Int,
-    ) {
-        try {
-            cartService.requestAddItem(addItemRequestBody = AddItemRequestBody(id, quantity))
-        } catch (err: HttpException) {
-            when (err.code()) {
-                400 -> Log.e("cartItem", "Bad Request")
-                401 -> Log.e("cartItem", "Unauthorized")
-                403 -> Log.e("cartItem", "Forbidden")
-                404 -> Log.e("cartItem", "Not Found")
-                500 -> Log.e("cartItem", "Internal Server Error")
-            }
-        } catch (err: IOException) {
-            Log.e("cartItem", "Network Error : $err")
-        } catch (err: Exception) {
-            Log.e("cartItem", "Unknown Error : $err")
-        }
-    }
+    ) = cartService.requestAddItem(addItemRequestBody = AddItemRequestBody(id, quantity))
 
     suspend fun deleteItem(id: Long) {
-        try {
-            cartService.requestDeleteItem(id = id)
-        } catch (err: HttpException) {
-            when (err.code()) {
-                400 -> Log.e("cartItem", "Bad Request: $err")
-                401 -> Log.e("cartItem", "Unauthorized")
-                403 -> Log.e("cartItem", "Forbidden")
-                404 -> Log.e("cartItem", "Not Found")
-                500 -> Log.e("cartItem", "Internal Server Error")
-            }
-        } catch (err: IOException) {
-            Log.e("cartItem", "Network Error : $err")
-        } catch (err: Exception) {
-            Log.e("cartItem", "Unknown Error : $err")
-        }
+        cartService.requestDeleteItem(id = id)
     }
 
     suspend fun changeQuantity(
         id: Long,
         quantity: Int,
     ) {
-        try {
-            cartService.requestChangeQuantity(id = id, quantity = QuantityRequestBody(quantity))
-        } catch (err: HttpException) {
-            when (err.code()) {
-                400 -> Log.e("cartItem", "Bad Request: $err")
-                401 -> Log.e("cartItem", "Unauthorized")
-                403 -> Log.e("cartItem", "Forbidden")
-                404 -> Log.e("cartItem", "Not Found")
-                500 -> Log.e("cartItem", "Internal Server Error")
-            }
-        } catch (err: IOException) {
-            Log.e("cartItem", "Network Error : $err")
-        } catch (err: Exception) {
-            Log.e("cartItem", "Unknown Error : $err")
-        }
+        cartService.requestChangeQuantity(id = id, quantity = QuantityRequestBody(quantity))
     }
 }

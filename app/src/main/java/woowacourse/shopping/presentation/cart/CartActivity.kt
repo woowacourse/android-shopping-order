@@ -39,8 +39,9 @@ class CartActivity : ComponentActivity() {
                         viewModel.uiEvents.collect { event ->
                             val toastMessage =
                                 when (event) {
-                                    is CartEvent.DeleteSuccess -> R.string.delete_item_success
-                                    is CartEvent.DeleteNotFound -> R.string.not_found_item
+                                    is CartEvent.DeleteSuccess -> context.getString(R.string.delete_item_success)
+                                    is CartEvent.DeleteNotFound -> context.getString(R.string.not_found_item)
+                                    is CartEvent.ShowError -> event.message
                                 }
                             Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
                         }

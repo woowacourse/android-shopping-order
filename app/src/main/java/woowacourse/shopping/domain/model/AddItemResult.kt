@@ -8,4 +8,8 @@ sealed class AddItemResult {
     data class Incremented(
         val cart: Cart,
     ) : AddItemResult()
+
+    data class Error(
+        val message: String,
+    ) : AddItemResult()
 }

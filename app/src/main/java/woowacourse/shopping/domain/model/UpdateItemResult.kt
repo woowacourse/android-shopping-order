@@ -1,13 +1,11 @@
 package woowacourse.shopping.domain.model
 
-sealed class RemoveItemResult {
+sealed class UpdateItemResult {
     data class Success(
         val cart: Cart,
-    ) : RemoveItemResult()
-
-    data object NotFoundItem : RemoveItemResult()
+    ) : UpdateItemResult()
 
     data class Error(
         val message: String,
-    ) : RemoveItemResult()
+    ) : UpdateItemResult()
 }
