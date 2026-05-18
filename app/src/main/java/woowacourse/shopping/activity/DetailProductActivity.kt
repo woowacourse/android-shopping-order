@@ -43,21 +43,6 @@ class DetailProductActivity : ComponentActivity() {
     private val productViewModel: ProductViewModel by viewModels { apiViewModelFactory }
     private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { apiViewModelFactory }
 
-    companion object {
-        private const val INVALID_PRODUCT_ID = -1L
-
-        fun start(
-            context: Context,
-            productId: Long,
-            showLastViewed: Boolean = true,
-        ) {
-            val intent = Intent(context, DetailProductActivity::class.java)
-            intent.putExtra(DetailProductViewModel.EXTRA_PRODUCT_ID, productId)
-            intent.putExtra(DetailProductViewModel.EXTRA_SHOW_LAST_VIEWED, showLastViewed)
-            context.startActivity(intent)
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -127,6 +112,21 @@ class DetailProductActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+
+    companion object {
+        private const val INVALID_PRODUCT_ID = -1L
+
+        fun start(
+            context: Context,
+            productId: Long,
+            showLastViewed: Boolean = true,
+        ) {
+            val intent = Intent(context, DetailProductActivity::class.java)
+            intent.putExtra(DetailProductViewModel.EXTRA_PRODUCT_ID, productId)
+            intent.putExtra(DetailProductViewModel.EXTRA_SHOW_LAST_VIEWED, showLastViewed)
+            context.startActivity(intent)
         }
     }
 }

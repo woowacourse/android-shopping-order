@@ -47,13 +47,6 @@ class ShoppingCartActivity : ComponentActivity() {
     private val shoppingCartRecommendViewModel: ShoppingCartRecommendViewModel by viewModels { screenViewModelFactory }
     private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { apiViewModelFactory }
 
-    companion object {
-        fun start(context: Context) {
-            val intent = Intent(context, ShoppingCartActivity::class.java)
-            context.startActivity(intent)
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -218,6 +211,13 @@ class ShoppingCartActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+
+    companion object {
+        fun start(context: Context) {
+            val intent = Intent(context, ShoppingCartActivity::class.java)
+            context.startActivity(intent)
         }
     }
 }
