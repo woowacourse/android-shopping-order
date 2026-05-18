@@ -15,7 +15,17 @@ import woowacourse.shopping.domain.repository.CartRepository
 class DefaultCartRepository(
     private val remoteDataSource: CartRemoteDataSource,
 ) : CartRepository {
-    private suspend fun getCartContents(): List<CartContent> = remoteDataSource.getCartItems(0, 10000)
+    private suspend fun getCartContents(): List<CartContent> {
+        val all = mutableListOf<CartContent>()
+        var page = 0
+        while (true) {
+            val response = remoteDataSource.getCartItems(page, PAGE_SIZE)
+            all += response.cartContent
+            if (response.last) break
+            page++
+        }
+        return all
+    }
 
     override suspend fun getCart(): Cart {
         val cartContents = getCartContents()
@@ -67,8 +77,8 @@ class DefaultCartRepository(
     }
 
     override suspend fun deleteItem(productId: Long): RemoveItemResult {
-        val cartContent = getCartContents().find { it.product.id == productId } ?: return RemoveItemResult.NotFoundItem
         return try {
+            val cartContent = getCartContents().find { it.product.id == productId } ?: return RemoveItemResult.NotFoundItem
             remoteDataSource.deleteItem(cartContent.id)
             RemoveItemResult.Success(getCart())
         } catch (err: Exception) {
@@ -80,15 +90,18 @@ class DefaultCartRepository(
         productId: Long,
         amount: Int,
     ): UpdateItemResult {
-        val cartContent =
-            getCartContents().find { it.product.id == productId }
-                ?: return UpdateItemResult.Error("상품을 찾을 수 없습니다.")
-
         return try {
+            val cartContent =
+                getCartContents().find { it.product.id == productId }
+                    ?: return UpdateItemResult.Error("상품을 찾을 수 없습니다.")
             remoteDataSource.changeQuantity(cartContent.id, amount)
             UpdateItemResult.Success(getCart())
         } catch (err: Exception) {
             UpdateItemResult.Error("수량 변경에 실패했습니다.")
         }
+    }
+
+    companion object {
+        private const val PAGE_SIZE = 50
     }
 }

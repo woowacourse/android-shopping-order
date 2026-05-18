@@ -52,16 +52,12 @@ class ShoppingViewModel(
 
     fun loadCartItemQuantities() {
         viewModelScope.launch(exceptionHandler) {
-            val products = productRepository.getProducts(0, 100000)
             val cart = cartRepository.getCart()
             _uiState.update {
                 it.copy(
                     products =
-                        products.map { product ->
-                            ShoppingItemUiModel(
-                                product.toUiModel(),
-                                cart[product.id]?.quantity ?: 0,
-                            )
+                        it.products.map { item ->
+                            item.copy(quantity = cart[item.product.id]?.quantity ?: 0)
                         },
                     totalQuantity = cart.totalQuantity,
                 )

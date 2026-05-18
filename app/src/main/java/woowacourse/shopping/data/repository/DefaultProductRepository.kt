@@ -14,9 +14,11 @@ class DefaultProductRepository(
     override suspend fun getProducts(
         offset: Int,
         limit: Int,
+        category: String?,
     ): ImmutableList<Product> =
         remoteDataSource
-            .fetchProducts(offset, limit)
+            .fetchProducts(page = offset, size = limit, category = category)
+            .content
             .map { it.toDomain() }
             .toImmutableList()
 

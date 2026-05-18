@@ -7,6 +7,7 @@ interface ProductRepository {
     suspend fun getProducts(
         offset: Int,
         limit: Int,
+        category: String? = null,
     ): ImmutableList<Product>
 
     suspend fun getProductById(id: Long): Product

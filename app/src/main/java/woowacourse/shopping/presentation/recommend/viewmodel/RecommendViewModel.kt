@@ -43,8 +43,12 @@ class RecommendViewModel(
             val recentProducts = recentProductRepository.getRecentProducts(1)
             if (recentProducts.isEmpty()) return@launch
             val inCartProductIds = cartRepository.getCart().items.map { it.product.id }
-            val products = productRepository.getProducts(0, 100000)
-            val sameCategoryProducts = products.filter { it.category == recentProducts[0].category }
+            val sameCategoryProducts =
+                productRepository.getProducts(
+                    offset = 0,
+                    limit = RECOMMEND_PRODUCT_SIZE,
+                    category = recentProducts[0].category,
+                )
             val recommendProducts =
                 sameCategoryProducts
                     .filter { product ->
@@ -143,6 +147,10 @@ class RecommendViewModel(
                     },
             )
         }
+    }
+
+    companion object {
+        private const val RECOMMEND_PRODUCT_SIZE = 20
     }
 }
 

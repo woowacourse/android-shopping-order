@@ -4,7 +4,7 @@ import retrofit2.Retrofit
 import woowacourse.shopping.data.source.remote.api.AddItemRequestBody
 import woowacourse.shopping.data.source.remote.api.CartService
 import woowacourse.shopping.data.source.remote.api.QuantityRequestBody
-import woowacourse.shopping.data.source.remote.dto.cart.CartContent
+import woowacourse.shopping.data.source.remote.dto.cart.CartResponse
 import kotlin.jvm.java
 
 class CartRemoteDataSource(
@@ -13,16 +13,9 @@ class CartRemoteDataSource(
     private val cartService = retrofit.create(CartService::class.java)
 
     suspend fun getCartItems(
-        offset: Int,
-        limit: Int,
-    ): List<CartContent> =
-        try {
-            val response =
-                cartService.requestItems(page = offset, size = limit)
-            response.cartContent
-        } catch (err: Exception) {
-            emptyList()
-        }
+        page: Int,
+        size: Int,
+    ): CartResponse = cartService.requestItems(page = page, size = size)
 
     suspend fun addItem(
         id: Long,
