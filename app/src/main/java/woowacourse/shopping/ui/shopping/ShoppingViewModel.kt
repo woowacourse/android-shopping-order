@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.model.Product
 import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
 import woowacourse.shopping.ui.common.recentlyviewed.RecentViewedProductsMapper
-import woowacourse.shopping.model.Product
 
 private const val PAGE_SIZE = 20
 private const val RECENT_PRODUCT_LIMIT = 10

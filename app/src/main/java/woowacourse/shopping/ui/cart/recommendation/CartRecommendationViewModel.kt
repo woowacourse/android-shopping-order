@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.model.ProductRecommendationPolicy
+import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
