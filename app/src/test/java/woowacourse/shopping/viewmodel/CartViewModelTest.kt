@@ -1,6 +1,7 @@
 package woowacourse.shopping.viewmodel
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -140,5 +141,49 @@ class CartViewModelTest {
 
         viewModel.updateCountWithID(1L, -2)
         assertEquals(4, viewModel.pagedCart.value.purchaseProducts[0].count)
+    }
+
+    @Test
+    fun `수량 변경 실패 시 에러 이벤트가 발생하고 로딩이 종료된다`() = runTest {
+        val product = Product(id = 1L, name = "상품1", price = 1000, imageUri = "uri", category = "카테고리")
+        fakeCartRepository.insert(PurchaseProduct(1L, product, 5))
+
+        viewModel = CartViewModel(fakeCartRepository)
+        testScheduler.advanceUntilIdle()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.isLoading.collect { }
+        }
+
+        fakeCartRepository.shouldFail = true
+
+        viewModel.updateCountWithID(1L, 1)
+
+        val errorMsg = viewModel.errorEvent.first()
+        assertEquals("수량 변경에 실패했습니다. 다시 시도해주세요.", errorMsg)
+
+        assertFalse(viewModel.isLoading.value)
+    }
+
+    @Test
+    fun `아이템 삭제 실패 시 에러 이벤트가 발생하고 로딩이 종료된다`() = runTest {
+        val product = Product(id = 1L, name = "상품1", price = 1000, imageUri = "uri", category = "카테고리")
+        fakeCartRepository.insert(PurchaseProduct(1L, product, 5))
+
+        viewModel = CartViewModel(fakeCartRepository)
+        testScheduler.advanceUntilIdle()
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.isLoading.collect { }
+        }
+
+        fakeCartRepository.shouldFail = true
+
+        viewModel.removeWithID(1L)
+
+        val errorMsg = viewModel.errorEvent.first()
+        assertEquals("아이템 삭제에 실패했습니다.", errorMsg)
+
+        assertFalse(viewModel.isLoading.value)
     }
 }

@@ -6,8 +6,10 @@ import woowacourse.shopping.domain.PurchaseProducts
 
 class FakeCartRepository : CartRepository {
     private val _db = mutableListOf<PurchaseProduct>()
+    var shouldFail: Boolean = false
 
     override suspend fun insert(purchaseProduct: PurchaseProduct) {
+        if (shouldFail) throw Exception("Network Error")
         val existingIndex = _db.indexOfFirst { it.product.id == purchaseProduct.product.id }
         if (existingIndex != -1) {
             val existing = _db[existingIndex]
@@ -19,10 +21,12 @@ class FakeCartRepository : CartRepository {
     }
 
     override suspend fun deleteCartItem(purchaseProductId: Long) {
+        if (shouldFail) throw Exception("Network Error")
         _db.removeIf { it.id == purchaseProductId }
     }
 
     override suspend fun updateCount(cartItemId: Long, newQuantity: Int) {
+        if (shouldFail) throw Exception("Network Error")
         val index = _db.indexOfFirst { it.id == cartItemId }
         if (index != -1) {
             if (newQuantity <= 0) {
@@ -34,10 +38,12 @@ class FakeCartRepository : CartRepository {
     }
 
     override suspend fun getProductCount(): Int {
+        if (shouldFail) throw Exception("Network Error")
         return _db.sumOf { it.count }
     }
 
     override suspend fun getPagedCart(page: Int, size: Int): PurchaseProducts {
+        if (shouldFail) throw Exception("Network Error")
         val start = page * size
         if (start >= _db.size) return PurchaseProducts(emptyList())
         val end = minOf(start + size, _db.size)
@@ -45,6 +51,7 @@ class FakeCartRepository : CartRepository {
     }
 
     override suspend fun getCartItemCount(): Int {
+        if (shouldFail) throw Exception("Network Error")
         return _db.size
     }
 }
