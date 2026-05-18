@@ -12,9 +12,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 
-/**
- * 현재 단계에서 NetworkStatusMonitor가 필요한 이유는 무엇인가요?
- */
 class AndroidNetworkStatusMonitor(
     context: Context,
     scope: CoroutineScope,

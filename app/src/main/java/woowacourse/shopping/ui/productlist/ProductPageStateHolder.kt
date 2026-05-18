@@ -7,9 +7,6 @@ class ProductPageStateHolder(
     shoppingItems: List<ShoppingItem>,
     initialPage: Int = 0,
 ) : PageStateHolder<ShoppingItem>(shoppingItems) {
-    /**
-     * 로미는 StateHolder와 ViewModel의 공통점과 차이점은 무엇이라고 생각하시나요?
-     */
     init {
         restoreCurrentPage(initialPage)
     }

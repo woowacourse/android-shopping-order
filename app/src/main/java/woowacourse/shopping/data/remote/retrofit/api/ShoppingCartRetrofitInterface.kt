@@ -40,10 +40,4 @@ interface ShoppingCartRetrofitInterface {
         @Path("id") id: Int,
         @Body product: CartQuantity,
     ): Call<Void>
-
-    // 장바구니 총 수량
-    @GET("/cart-items/counts")
-    fun requestQuantityCartItem(
-        @Header("Accept") accept: String = "*/*",
-    ): Call<CartQuantity>
 }

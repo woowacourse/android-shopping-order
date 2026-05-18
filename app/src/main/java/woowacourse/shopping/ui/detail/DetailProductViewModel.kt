@@ -17,10 +17,6 @@ class DetailProductViewModel(
     private val shoppingItemRepository: ShoppingItemRepository,
     private val visitStore: VisitStore,
 ) : ViewModel() {
-    /**
-     * DetailProductUiState는 무엇이라고 생각하시나요?
-     * cachedShoppingItems는 UiState에서 저장하고 있는 값인데, 다른 변수에 따로 저장하는 이유는 무엇일까요?
-     */
     private val _uiState = MutableStateFlow(DetailProductUiState())
     val uiState: StateFlow<DetailProductUiState> = _uiState.asStateFlow()
 
@@ -47,11 +43,6 @@ class DetailProductViewModel(
         }
     }
 
-    /**
-     * Bundle 자체를 ViewModel로 넘기게 된 이유는 무엇이었을까요?
-     * 상품의 id를 넘겨받아 작업하는 것과는 어떻게 다른가요?
-     * 그리고 요청을 하기 위해 상품의 id를 꺼내는 작업은 Activity에서 하고 있기도 하네요.
-     */
     fun initializeFromIntentExtras(extras: Bundle?) {
         val productId = extras?.getLong(EXTRA_PRODUCT_ID, INVALID_PRODUCT_ID) ?: INVALID_PRODUCT_ID
         if (productId == INVALID_PRODUCT_ID) {
@@ -76,7 +67,6 @@ class DetailProductViewModel(
         }
         lastViewedProductIdForCurrentDetail =
             resolveLastViewedProductId(
-                productId = productId,
                 recentProductIds = recentProductIdsBeforeVisit,
             )
         viewModelScope.launch {
@@ -90,10 +80,6 @@ class DetailProductViewModel(
         publishUiState()
     }
 
-    /**
-     * 함수명에 관한 이야기인데요.
-     * increaseQuantity와 같이 사용한다면 더 간단하게 같은 의미를 전달해줄 수 있지 않을까요?
-     */
     fun decreaseSelectedQuantity() {
         if (selectedQuantity <= DEFAULT_QUANTITY) {
             return
@@ -144,7 +130,6 @@ class DetailProductViewModel(
     }
 
     private fun resolveLastViewedProductId(
-        productId: Long,
         recentProductIds: List<Long>,
     ): Long? = recentProductIds.firstOrNull()
 

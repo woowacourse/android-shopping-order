@@ -39,8 +39,6 @@ class ShoppingCartRetrofitRepository(
             product = product,
         )
 
-    fun requestQuantityCartItem(): Call<CartQuantity> = apiService.requestQuantityCartItem()
-
     companion object {
         private const val DEFAULT_PAGE = 0
         private const val DEFAULT_SIZE = 5

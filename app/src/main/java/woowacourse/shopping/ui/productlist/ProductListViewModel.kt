@@ -9,15 +9,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import woowacourse.shopping.domain.model.ShoppingItem
-import woowacourse.shopping.data.network.NetworkStatusMonitor
-import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import woowacourse.shopping.domain.repository.ShoppingItemRepository
 import woowacourse.shopping.data.local.datastore.VisitStore
-import woowacourse.shopping.ui.productlist.ProductPageStateHolder
+import woowacourse.shopping.data.network.NetworkStatusMonitor
+import woowacourse.shopping.domain.model.ShoppingItem
+import woowacourse.shopping.domain.repository.ShoppingItemRepository
 
 class ProductListViewModel(
-    private val shoppingCartRepository: ShoppingCartRepository,
     private val shoppingItemRepository: ShoppingItemRepository,
     private val visitStore: VisitStore,
     private val networkStatusMonitor: NetworkStatusMonitor,
@@ -27,10 +24,6 @@ class ProductListViewModel(
     private val _event = MutableSharedFlow<ProductListEvent>(extraBufferCapacity = 1)
     val event: SharedFlow<ProductListEvent> = _event.asSharedFlow()
 
-    /**
-     * 사용해보셨으니 남겨봅니다.
-     * Flow, StateFlow, SharedFlow는 각각 어떻게 다른 것일까요?
-     */
     private val productPageStateHolder = ProductPageStateHolder(shoppingItems = emptyList())
     private var allShoppingItems: List<ShoppingItem> = shoppingItemRepository.shoppingItems.value
     private var recentViewedProductIds: List<Long> = visitStore.recentVisitedProductIds.value
@@ -61,37 +54,6 @@ class ProductListViewModel(
 
     fun onNavigateToCartClick() {
         _event.tryEmit(ProductListEvent.NavigateToShoppingCart)
-    }
-
-    fun addProductToCart(shoppingItem: ShoppingItem) {
-        viewModelScope.launch {
-            increaseQuantity(shoppingItem.getProductId())
-        }
-    }
-
-    fun increaseProductQuantity(shoppingItem: ShoppingItem) {
-        viewModelScope.launch {
-            increaseQuantity(shoppingItem.getProductId())
-        }
-    }
-
-    fun decreaseProductQuantity(shoppingItem: ShoppingItem) {
-        viewModelScope.launch {
-            val productId = shoppingItem.getProductId()
-            val currentQuantity = shoppingItemRepository.getQuantity(productId)
-            if (currentQuantity == 0) {
-                return@launch
-            }
-            shoppingItemRepository.minusQuantity(productId)
-            if (currentQuantity == 1) {
-                shoppingCartRepository.removeByProductId(productId)
-            }
-        }
-    }
-
-    private suspend fun increaseQuantity(productId: Long) {
-        shoppingCartRepository.addIfAbsent(productId)
-        shoppingItemRepository.plusQuantity(productId)
     }
 
     private fun observeSources() {
