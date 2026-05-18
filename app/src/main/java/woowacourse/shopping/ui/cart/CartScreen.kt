@@ -51,7 +51,7 @@ fun CartScreen(
                     )
                 },
                 selectedItemCount = uiState.totalSelectedCount,
-                totalPrice = uiState.totalPrice,
+                totalPrice = uiState.totalSelectedPrice,
                 onAllCheckboxChanged = { isSelected -> viewModel.toggleAllItemsSelection(isSelected) },
                 checked = uiState.isAllSelected,
                 modifier = modifier,
@@ -64,7 +64,7 @@ fun CartScreen(
             RecommendScreen(
                 recommendedProducts = uiState.recommendItems,
                 count = uiState.totalSelectedCount,
-                price = uiState.totalPrice,
+                price = uiState.totalSelectedPrice,
                 modifier = modifier,
                 onBackClick = { viewModel.changeScreen() },
                 onIncreaseClick = { viewModel.increaseInRecommendScreen(it) },

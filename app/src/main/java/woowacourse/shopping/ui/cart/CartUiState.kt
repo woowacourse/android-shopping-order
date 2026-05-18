@@ -11,7 +11,7 @@ data class CartUiState(
     val totalCartItemCount: Int = 0,
     val pageSize: Int = 5,
     val selectedItemIds: Set<Long> = emptySet(),
-    val totalPrice: Long = 0,
+    val totalSelectedPrice: Long = 0,
     val isAllSelected: Boolean = false,
     val totalSelectedCount: Int = 0,
     val isCartScreen: Boolean = true,
