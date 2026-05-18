@@ -16,7 +16,7 @@ import woowacourse.shopping.mapper.toDomainProduct
 import woowacourse.shopping.mapper.toDomainProducts
 import woowacourse.shopping.mapper.toShoppingItem
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.ui.state.ProductListState
+import woowacourse.shopping.ui.state.ProductListUiState
 
 class ProductViewModel(
     private val productRetrofitRepository: ProductRetrofitRepository,
@@ -26,8 +26,8 @@ class ProductViewModel(
     private val _productDetails = MutableStateFlow<Map<Long, Product>>(emptyMap())
     val productDetails: StateFlow<Map<Long, Product>> = _productDetails.asStateFlow()
 
-    private val _state = MutableStateFlow(ProductListState())
-    val state: StateFlow<ProductListState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(ProductListUiState())
+    val state: StateFlow<ProductListUiState> = _state.asStateFlow()
 
     fun requestProduct(
         page: Int = DEFAULT_PAGE,
@@ -58,7 +58,7 @@ class ProductViewModel(
                 _state.value =
                     _state.value.copy(
                         isLoading = false,
-                        products = loadedProducts.map { it.toShoppingItem() },
+                        shoppingItems = loadedProducts.map { it.toShoppingItem() },
                         errorMessage = null,
                     )
                 _productDetails.update { cachedProducts ->

@@ -12,4 +12,7 @@ data class ShoppingCartState(
     val canOrder: Boolean = false,
     val canMoveToPreviousPage: Boolean = false,
     val canMoveToNextPage: Boolean = false,
-)
+) {
+    val hasApiError: Boolean
+        get() = errorMessage != null
+}
