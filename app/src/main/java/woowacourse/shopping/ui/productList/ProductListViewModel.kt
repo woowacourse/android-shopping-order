@@ -9,8 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -42,6 +40,10 @@ class ProductListViewModel(
     fun init() {
         observeRecentProducts()
         loadNextPage()
+        viewModelScope.launch {
+            refreshCart()
+        }
+
     }
 
     fun moreProducts() {
@@ -76,10 +78,11 @@ class ProductListViewModel(
     }
 
     private fun observeRecentProducts() {
-        recentProductRepository
-            .getRecentProducts()
-            .onEach { recentProductsFlow.value = it }
-            .launchIn(viewModelScope)
+        viewModelScope.launch{
+            recentProductRepository.getRecentProducts().collect{
+                recentProductsFlow.value = it
+            }
+        }
     }
 
     private suspend fun refreshCart() {
