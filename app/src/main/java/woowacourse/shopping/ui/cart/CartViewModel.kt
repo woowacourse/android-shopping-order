@@ -151,7 +151,7 @@ class CartViewModel(
         viewModelScope.launch {
             val target = _cartItems.value?.values?.find { it.id == cartId } ?: return@launch
 
-            cartRepository.increase(cartId, Quantity(target.quantity.value + 10))
+            cartRepository.increase(cartId, Quantity(target.quantity.value + 1))
             val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
 
             _cartItems.update { result }
