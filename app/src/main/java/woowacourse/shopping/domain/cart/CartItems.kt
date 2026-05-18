@@ -60,7 +60,7 @@ class CartItems(
 
     fun size(): Int = values.size
 
-    private fun findByProductId(productId: Int): CartItem? = values.firstOrNull { it.isSameProduct(productId) }
+    fun findByProductId(productId: Int): CartItem? = values.firstOrNull { it.isSameProduct(productId) }
 
     private fun replace(
         target: CartItem,

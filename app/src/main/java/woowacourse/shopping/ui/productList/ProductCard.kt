@@ -25,14 +25,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import woowacourse.shopping.constant.Format.formatPrice
 
 @Composable
 fun ProductCard(
     productName: String,
-    price: Int,
+    price: String,
     imageUrl: String,
-    quantity: Int,
+    quantity: String,
+    showAmountController: Boolean,
     onClick: () -> Unit,
     onAddClick: () -> Unit,
     onIncreaseClick: () -> Unit,
@@ -52,6 +52,7 @@ fun ProductCard(
             )
             ProductCardQuantityControl(
                 quantity = quantity,
+                showAmountController = showAmountController,
                 onAddClick = onAddClick,
                 onIncreaseClick = onIncreaseClick,
                 onDecreaseClick = onDecreaseClick,
@@ -72,7 +73,7 @@ fun ProductCard(
 @Composable
 private fun ProductInfoColumn(
     productName: String,
-    price: Int,
+    price: String,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -84,7 +85,7 @@ private fun ProductInfoColumn(
             overflow = TextOverflow.Ellipsis,
         )
         Text(
-            formatPrice(price),
+            text = price,
             fontSize = 16.sp,
             color = Color.Gray,
         )
@@ -93,21 +94,22 @@ private fun ProductInfoColumn(
 
 @Composable
 private fun ProductCardQuantityControl(
-    quantity: Int,
+    quantity: String,
+    showAmountController: Boolean,
     onAddClick: () -> Unit,
     onIncreaseClick: () -> Unit,
     onDecreaseClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (quantity == 0) {
-        AddCircleButton(onClick = onAddClick, modifier = modifier)
-    } else {
+    if (showAmountController) {
         InlineStepper(
             quantity = quantity,
             onIncreaseClick = onIncreaseClick,
             onDecreaseClick = onDecreaseClick,
             modifier = modifier,
         )
+    } else {
+        AddCircleButton(onClick = onAddClick, modifier = modifier)
     }
 }
 
@@ -136,7 +138,7 @@ private fun AddCircleButton(
 
 @Composable
 private fun InlineStepper(
-    quantity: Int,
+    quantity: String,
     onIncreaseClick: () -> Unit,
     onDecreaseClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -158,7 +160,7 @@ private fun InlineStepper(
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = "$quantity",
+                text = quantity,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color.Black,
@@ -195,13 +197,14 @@ private fun StepperSign(
 @Composable
 private fun ProductCardPreview() {
     ProductCard(
-        productName = "상품명",
-        price = 10000,
+        productName = "asdf",
+        price = "1,000원",
         imageUrl = "",
-        quantity = 0,
-        onClick = {},
-        onAddClick = {},
-        onIncreaseClick = {},
-        onDecreaseClick = {},
+        quantity = "1",
+        showAmountController = true,
+        onClick = { },
+        onAddClick = { },
+        onIncreaseClick = { },
+        onDecreaseClick = { },
     )
 }

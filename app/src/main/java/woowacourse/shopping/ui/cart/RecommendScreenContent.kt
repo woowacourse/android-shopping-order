@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import woowacourse.shopping.constant.Format.formatPrice
 import woowacourse.shopping.domain.product.Category
 import woowacourse.shopping.domain.product.ImageUrl
 import woowacourse.shopping.domain.product.Price
@@ -48,9 +49,10 @@ fun RecommendScreenContent(
                         Modifier
                             .width(154.dp),
                     productName = product.name.value,
-                    price = product.price.value,
+                    price = formatPrice(product.price.value),
                     imageUrl = product.imageUrl.value,
-                    quantity = quantitiesByProductId[product.id] ?: 0,
+                    quantity = "${quantitiesByProductId[product.id] ?: 0}",
+                    showAmountController = (quantitiesByProductId[product.id] ?: 0) > 0,
                     onClick = {},
                     onAddClick = { onAddClick(product) },
                     onIncreaseClick = { onIncrease(product.id) },

@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,24 +44,22 @@ import coil3.compose.AsyncImage
 import woowacourse.shopping.R
 import woowacourse.shopping.constant.ShoppingColor.APP_BAR_COLOR
 import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.ui.util.LoadState
 import androidx.compose.foundation.lazy.grid.items as lazyGridItems
 import androidx.compose.foundation.lazy.items as lazyRowItems
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductListScreen(
     modifier: Modifier = Modifier,
     viewModel: ProductListViewModel,
     onCartClick: () -> Unit = {},
-    onProductClick: (Product) -> Unit = {},
+    onProductClick: (Int) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val cartCount = (uiState as? ProductListUiState.Success)?.totalCartCount ?: 0
 
     ProductListScreenContent(
         modifier = modifier,
         uiState = uiState,
-        cartCount = cartCount,
         onAddClick = viewModel::addProduct,
         onIncrease = viewModel::increaseQuantity,
         onDecrease = viewModel::decreaseQuantity,
@@ -76,13 +73,12 @@ fun ProductListScreen(
 fun ProductListScreenContent(
     modifier: Modifier = Modifier,
     uiState: ProductListUiState,
-    cartCount: Int,
-    onAddClick: (Product) -> Unit,
+    onAddClick: (Int) -> Unit,
     onIncrease: (Int) -> Unit,
     onDecrease: (Int) -> Unit,
     onMoreClick: () -> Unit,
     onCartClick: () -> Unit = {},
-    onProductClick: (Product) -> Unit = {},
+    onProductClick: (Int) -> Unit = {},
 ) {
     Column(modifier = modifier) {
         ProductListTopAppBar(
@@ -90,12 +86,12 @@ fun ProductListScreenContent(
                 Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-            cartCount = cartCount,
+            cartCount = uiState.totalCartAmount,
+            showCartAmountBadge = uiState.showCartAmountBadge,
             onClick = onCartClick,
         )
-
-        when (uiState) {
-            is ProductListUiState.Loading -> {
+        when (uiState.loadState) {
+            is LoadState.Loading if uiState.products.isEmpty() -> {
                 LoadingContent(
                     modifier =
                         Modifier
@@ -104,7 +100,16 @@ fun ProductListScreenContent(
                 )
             }
 
-            is ProductListUiState.Success -> {
+            is LoadState.Error -> {
+                ErrorContent(
+                    modifier = Modifier.fillMaxSize(),
+                    message = uiState.loadState.message ?: "알수 없는 에러입니다.",
+                )
+            }
+
+            is LoadState.Initial -> {}
+
+            else -> {
                 ProductListContent(
                     modifier =
                         Modifier
@@ -112,9 +117,35 @@ fun ProductListScreenContent(
                             .padding(20.dp),
                     visibleProducts = uiState.products,
                     recentProducts = uiState.recentProducts,
-                    quantitiesByProductId = uiState.quantitiesByProductId,
-                    canLoadMore = uiState.canLoadMore,
-                    isLoadingMore = uiState.isLoadingMore,
+                    hasNextPage = uiState.hasNextPage,
+                    onProductClick = onProductClick,
+                    onAddClick = { product -> onAddClick(product) },
+                    onIncrease = { productId -> onIncrease(productId) },
+                    onDecrease = { productId -> onDecrease(productId) },
+                    onMoreClick = { onMoreClick() },
+                )
+            }
+        }
+        when (uiState.loadState) {
+            is LoadState.Initial -> {}
+            is LoadState.Loading -> {
+                LoadingContent(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(20.dp),
+                )
+            }
+
+            is LoadState.Success -> {
+                ProductListContent(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(20.dp),
+                    visibleProducts = uiState.products,
+                    recentProducts = uiState.recentProducts,
+                    hasNextPage = uiState.hasNextPage,
                     onProductClick = onProductClick,
                     onAddClick = { product -> onAddClick(product) },
                     onIncrease = { productId -> onIncrease(productId) },
@@ -123,10 +154,10 @@ fun ProductListScreenContent(
                 )
             }
 
-            is ProductListUiState.Error -> {
+            is LoadState.Error -> {
                 ErrorContent(
                     modifier = Modifier.fillMaxSize(),
-                    message = uiState.message,
+                    message = uiState.loadState.message ?: "알수 없는 에러입니다.",
                 )
             }
         }
@@ -135,14 +166,12 @@ fun ProductListScreenContent(
 
 @Composable
 private fun ProductListContent(
-    visibleProducts: List<Product>,
+    visibleProducts: List<ProductUiModel>,
     recentProducts: List<Product>,
-    quantitiesByProductId: Map<Int, Int>,
-    canLoadMore: Boolean,
-    isLoadingMore: Boolean,
+    hasNextPage: Boolean,
     modifier: Modifier = Modifier,
-    onProductClick: (Product) -> Unit = {},
-    onAddClick: (Product) -> Unit = {},
+    onProductClick: (Int) -> Unit = {},
+    onAddClick: (Int) -> Unit = {},
     onIncrease: (Int) -> Unit = {},
     onDecrease: (Int) -> Unit = {},
     onMoreClick: () -> Unit = {},
@@ -155,10 +184,8 @@ private fun ProductListContent(
             )
         }
         ProductCardGrid(
-            visibleProducts = visibleProducts,
-            quantitiesByProductId = quantitiesByProductId,
-            canLoadMore = canLoadMore,
-            isLoadingMore = isLoadingMore,
+            products = visibleProducts,
+            hasNextPage = hasNextPage,
             modifier = Modifier.weight(1f),
             onProductClick = onProductClick,
             onAddClick = onAddClick,
@@ -172,7 +199,7 @@ private fun ProductListContent(
 @Composable
 private fun RecentProductsSection(
     recentProducts: List<Product>,
-    onProductClick: (Product) -> Unit,
+    onProductClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.padding(bottom = 20.dp)) {
@@ -195,7 +222,7 @@ private fun RecentProductsSection(
             ) { product ->
                 RecentProductCard(
                     product = product,
-                    onClick = { onProductClick(product) },
+                    onClick = { onProductClick(product.id) },
                 )
             }
         }
@@ -238,7 +265,8 @@ private fun RecentProductCard(
 
 @Composable
 private fun CartBadgeIcon(
-    cartCount: Int,
+    cartCount: String,
+    showCartAmountBadge: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -252,7 +280,7 @@ private fun CartBadgeIcon(
                 contentDescription = "장바구니 아이콘",
             )
         }
-        if (cartCount > 0) {
+        if (showCartAmountBadge) {
             Box(
                 modifier =
                     Modifier
@@ -264,7 +292,7 @@ private fun CartBadgeIcon(
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = "$cartCount",
+                    text = cartCount,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -294,7 +322,8 @@ private fun ErrorContent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProductListTopAppBar(
-    cartCount: Int,
+    cartCount: String,
+    showCartAmountBadge: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
@@ -309,6 +338,7 @@ private fun ProductListTopAppBar(
         actions = {
             CartBadgeIcon(
                 cartCount = cartCount,
+                showCartAmountBadge = showCartAmountBadge,
                 onClick = onClick,
             )
         },
@@ -326,13 +356,11 @@ private fun ProductListTopAppBar(
 
 @Composable
 private fun ProductCardGrid(
-    visibleProducts: List<Product>,
-    quantitiesByProductId: Map<Int, Int>,
-    canLoadMore: Boolean,
-    isLoadingMore: Boolean,
+    products: List<ProductUiModel>,
+    hasNextPage: Boolean,
     modifier: Modifier = Modifier,
-    onProductClick: (Product) -> Unit = {},
-    onAddClick: (Product) -> Unit = {},
+    onProductClick: (Int) -> Unit = {},
+    onAddClick: (Int) -> Unit = {},
     onIncreaseClick: (Int) -> Unit = {},
     onDecreaseClick: (Int) -> Unit = {},
     onMoreClick: () -> Unit = {},
@@ -343,34 +371,23 @@ private fun ProductCardGrid(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         lazyGridItems(
-            items = visibleProducts,
+            items = products,
             key = { item -> item.id },
         ) { item ->
             ProductCard(
                 modifier = Modifier.fillMaxWidth(),
-                imageUrl = item.imageUrl.value,
-                productName = item.name.value,
-                price = item.price.value,
-                quantity = quantitiesByProductId[item.id] ?: 0,
-                onClick = { onProductClick(item) },
-                onAddClick = { onAddClick(item) },
+                productName = item.name,
+                price = item.price,
+                imageUrl = item.imageUrl,
+                quantity = item.cartAmount,
+                showAmountController = item.showAmountController,
+                onClick = { onProductClick(item.id) },
+                onAddClick = { onAddClick(item.id) },
                 onIncreaseClick = { onIncreaseClick(item.id) },
                 onDecreaseClick = { onDecreaseClick(item.id) },
             )
         }
-        if (isLoadingMore) {
-            item(span = { GridItemSpan(2) }) {
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-        } else if (canLoadMore) {
+        if (hasNextPage) {
             item(span = { GridItemSpan(2) }) {
                 MoreButton(
                     modifier =
@@ -407,20 +424,10 @@ private fun MoreButton(
 @Composable
 fun ProductListScreenPreview() {
     ProductListScreenContent(
-        modifier = Modifier.fillMaxSize(),
-        uiState = ProductListUiState.Loading,
-//            ProductListUiState.Success(
-//                products = emptyList(),
-//                recentProducts = emptyList(),
-//                quantitiesByProductId = emptyMap(),
-//                canLoadMore = true,
-//                isLoadingMore = false,
-//                totalCartCount = 0,
-//            ),
-        cartCount = 0,
-        onAddClick = {},
-        onIncrease = {},
-        onDecrease = {},
-        onMoreClick = {},
+        uiState = ProductListUiState(),
+        onAddClick = { },
+        onIncrease = { },
+        onDecrease = { },
+        onMoreClick = { },
     )
 }
