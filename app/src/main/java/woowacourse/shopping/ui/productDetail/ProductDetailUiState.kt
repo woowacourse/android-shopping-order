@@ -1,17 +1,11 @@
 package woowacourse.shopping.ui.productDetail
 
 import woowacourse.shopping.domain.product.Product
+import woowacourse.shopping.ui.util.LoadState
 
-sealed interface ProductDetailUiState {
-    data object Loading : ProductDetailUiState
-
-    data class Success(
-        val product: Product,
-        val currentQuantity: Int = 1,
-        val lastViewedProduct: Product? = null,
-    ) : ProductDetailUiState
-
-    data class Error(
-        val throwable: Throwable,
-    ) : ProductDetailUiState
-}
+data class ProductDetailUiState(
+    val product: Product? = null,
+    val currentQuantity: Int = 1,
+    val lastViewedProduct: Product? = null,
+    val loadState: LoadState = LoadState.Initial,
+)
