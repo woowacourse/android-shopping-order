@@ -115,7 +115,8 @@ class CartViewModel(
                 val cartItems = cartRepo.getAllCartItems()
                 val allIds =
                     cartItems.items
-                        .mapNotNull { it.id }.toSet()
+                        .mapNotNull { it.id }
+                        .toSet()
 
                 if (isSelected && cartItems.items.isNotEmpty()) {
                     _uiState.update {
@@ -302,18 +303,19 @@ class CartViewModel(
     }
 
     companion object {
-        fun provideFactory(container: AppContainer, pageSize: Int): ViewModelProvider.Factory {
-            return object : ViewModelProvider.Factory {
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return CartViewModel(
+        fun provideFactory(
+            container: AppContainer,
+            pageSize: Int,
+        ): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                    CartViewModel(
                         recentProductRepo = container.recentProductRepository,
                         productRepo = container.productRepository,
                         cartRepo = container.cartRepository,
                         orderRepo = container.orderRepository,
                         pageSize = pageSize,
                     ) as T
-                }
             }
-        }
     }
 }
