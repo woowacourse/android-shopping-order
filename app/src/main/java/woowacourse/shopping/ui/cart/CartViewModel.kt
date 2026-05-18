@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.domain.cart.CartItems
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
@@ -106,7 +107,7 @@ class CartViewModel(
     fun addCartItem(product: Product) {
         viewModelScope.launch {
             cartItems.update { null }
-            cartRepository.addProduct(product)
+            cartRepository.addProduct(product.id, 1)
 
             val result = cartRepository.getAllCartItems()
             cartItems.update { result }
@@ -207,15 +208,16 @@ class CartViewModel(
     companion object {
         private const val PAGE_SIZE = 5
 
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ShoppingApplication)
-                CartViewModel(
-                    application.appContainer.cartRepository,
-                    application.appContainer.recentProductRepository,
-                    application.appContainer.productRepository,
-                )
+        val Factory: ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer {
+                    val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ShoppingApplication)
+                    CartViewModel(
+                        application.appContainer.cartRepository,
+                        application.appContainer.recentProductRepository,
+                        application.appContainer.productRepository,
+                    )
+                }
             }
-        }
     }
 }

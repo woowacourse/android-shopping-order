@@ -3,8 +3,6 @@ package woowacourse.shopping.data.repository.cart
 import woowacourse.shopping.data.datasource.cart.CartRemoteDataSource
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.cart.CartItems
-import woowacourse.shopping.domain.cart.Quantity
-import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 
 class CartRepositoryImpl(
@@ -20,10 +18,10 @@ class CartRepositoryImpl(
     override suspend fun getAllCartItems(): CartItems = cartRemoteDataSource.getCartItems(0, Int.MAX_VALUE).toDomain()
 
     override suspend fun addProduct(
-        product: Product,
-        quantity: Quantity,
+        productId: Int,
+        quantity: Int,
     ) {
-        cartRemoteDataSource.addCartItem(product.id, quantity.value)
+        cartRemoteDataSource.addCartItem(productId, quantity)
     }
 
     override suspend fun updateQuantity(

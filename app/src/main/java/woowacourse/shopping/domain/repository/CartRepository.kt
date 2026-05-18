@@ -1,8 +1,6 @@
 package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.cart.CartItems
-import woowacourse.shopping.domain.cart.Quantity
-import woowacourse.shopping.domain.product.Product
 
 interface CartRepository {
     suspend fun getCartItems(
@@ -15,8 +13,8 @@ interface CartRepository {
     suspend fun getAllCartItems(): CartItems
 
     suspend fun addProduct(
-        product: Product,
-        quantity: Quantity = Quantity.ONE,
+        productId: Int,
+        quantity: Int,
     )
 
     suspend fun updateQuantity(
