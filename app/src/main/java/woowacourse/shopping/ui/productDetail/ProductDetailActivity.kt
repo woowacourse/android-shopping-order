@@ -23,7 +23,7 @@ class ProductDetailActivity : ComponentActivity() {
             val viewModel: ProductDetailViewModel =
                 viewModel(
                     factory =
-                        ProductListViewModel.Factory,
+                        ProductDetailViewModel.Factory,
                 )
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                 ProductDetailScreen(
