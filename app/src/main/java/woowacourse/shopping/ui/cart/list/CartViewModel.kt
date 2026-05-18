@@ -81,6 +81,7 @@ class CartViewModel(
         if (!updateLocalQuantity(productId, targetQuantity = 0)) return
 
         clearDeselection(productId)
+        moveToPreviousPageImmediatelyIfLastPageBecameEmpty()
         scheduleCartSync(productId)
     }
 
@@ -114,6 +115,7 @@ class CartViewModel(
         if (!updateLocalQuantity(productId, targetQuantity = targetQuantity)) return
         if (targetQuantity == 0) {
             clearDeselection(productId)
+            moveToPreviousPageImmediatelyIfLastPageBecameEmpty()
         }
         scheduleCartSync(productId)
     }
@@ -136,7 +138,13 @@ class CartViewModel(
 
     private suspend fun updatePage(page: Int) {
         val requestedPage = page.coerceAtLeast(1)
-        val cartPageResult = cartRepository.getCartPage(page = requestedPage - 1, size = PAGE_SIZE)
+        val initialPageResult = cartRepository.getCartPage(page = requestedPage - 1, size = PAGE_SIZE)
+        val cartPageResult =
+            if (shouldMoveToPreviousPage(requestedPage, initialPageResult)) {
+                cartRepository.getCartPage(page = initialPageResult.totalPages - 1, size = PAGE_SIZE)
+            } else {
+                initialPageResult
+            }
         val currentPage = if (cartPageResult.totalPages == 0) 1 else cartPageResult.page + 1
         val productMap = productRepository.findAllByIds(cartPageResult.items.map { it.productId }.toSet())
 
@@ -160,6 +168,11 @@ class CartViewModel(
             )
         }
     }
+
+    private fun shouldMoveToPreviousPage(
+        requestedPage: Int,
+        cartPageResult: woowacourse.shopping.repository.query.CartPageResult,
+    ): Boolean = requestedPage > 1 && cartPageResult.totalPages > 0 && cartPageResult.items.isEmpty() && requestedPage > cartPageResult.totalPages
 
     private suspend fun reloadPage(page: Int) {
         runCatching {
@@ -241,6 +254,17 @@ class CartViewModel(
             currentState.copy(
                 deselectedProductIds = currentState.deselectedProductIds - productId,
             )
+        }
+    }
+
+    private fun moveToPreviousPageImmediatelyIfLastPageBecameEmpty() {
+        val contentState = _uiState.value.cartListState as? CartListUiState.Content ?: return
+        val isEmptyLastPage = contentState.items.isEmpty() && contentState.currentPage == contentState.totalPages
+
+        if (!isEmptyLastPage || !contentState.hasPrevious) return
+
+        viewModelScope.launch {
+            reloadPage(contentState.currentPage - 1)
         }
     }
 

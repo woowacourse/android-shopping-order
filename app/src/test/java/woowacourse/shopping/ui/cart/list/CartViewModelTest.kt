@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -18,6 +19,8 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.model.Money
+import woowacourse.shopping.model.Product
 import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepositoryFixture
 import woowacourse.shopping.repository.FakeCartRepository
@@ -95,6 +98,55 @@ class CartViewModelTest {
         assertNull(viewModel.createSelectedCartOrder())
         assertFalse(contentState.items.any { it.isSelected })
     }
+
+    @Test
+    fun `마지막 페이지의 마지막 상품을 삭제하면 이전 페이지로 이동한다`() =
+        runTest {
+            val products = (1L..6L).map(::createProduct)
+            val cartRepository =
+                FakeCartRepository().apply {
+                    products.forEach { product ->
+                        setQuantity(product.id, 1)
+                    }
+                }
+            val viewModel =
+                CartViewModel(
+                    productRepository = FakeProductRepository(products),
+                    cartRepository = cartRepository,
+                    networkMonitor = FakeNetworkMonitor(),
+                )
+
+            advanceUntilIdle()
+
+            viewModel.loadNextPage()
+            advanceUntilIdle()
+
+            val lastProductId = products.last().id
+
+            viewModel.delete(lastProductId)
+            advanceUntilIdle()
+
+            val movedState = viewModel.uiState.value.cartListState as CartListUiState.Content
+
+            assertEquals(1, movedState.currentPage)
+
+            advanceTimeBy(400L)
+            advanceUntilIdle()
+
+            val contentState = viewModel.uiState.value.cartListState as CartListUiState.Content
+
+            assertEquals(1, contentState.currentPage)
+            assertEquals(1, contentState.totalPages)
+            assertEquals(products.dropLast(1).map(Product::id), contentState.items.map { it.productId })
+        }
+
+    private fun createProduct(id: Long): Product =
+        Product(
+            id = id,
+            name = "상품$id",
+            price = Money((id * 1_000).toInt()),
+            imageUrl = "",
+        )
 
     private class FakeNetworkMonitor : NetworkMonitor {
         override val isNetworkConnected = MutableStateFlow(true)
