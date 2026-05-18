@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import woowacourse.shopping.network.NetworkMonitor
+import woowacourse.shopping.model.ProductRecommendationPolicy
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
@@ -19,13 +20,12 @@ import woowacourse.shopping.ui.cart.SelectedCartOrder
 import woowacourse.shopping.ui.shopping.ShoppingProductUiState
 import woowacourse.shopping.ui.shopping.ShoppingProductUiStateMapper
 
-private const val RECOMMENDED_PRODUCTS_LIMIT = 10
-
 class CartRecommendationViewModel(
     private val productRepository: ProductRepository = ShoppingRepositoryProvider.productRepository,
     private val cartRepository: CartRepository = ShoppingRepositoryProvider.cartRepository,
     private val recentProductRepository: RecentProductRepository = ShoppingRepositoryProvider.recentProductRepository,
     private val networkMonitor: NetworkMonitor = ShoppingRepositoryProvider.networkMonitor,
+    private val productRecommendationPolicy: ProductRecommendationPolicy = ProductRecommendationPolicy(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartRecommendationUiState())
     val uiState: StateFlow<CartRecommendationUiState> = _uiState.asStateFlow()
@@ -197,16 +197,20 @@ class CartRecommendationViewModel(
         if (latestViewedProduct.category.isBlank()) return emptyList()
 
         val cartProductIds = initialCartProductIds ?: resolveCartProductIds().also { initialCartProductIds = it }
-        val fetchLimit = RECOMMENDED_PRODUCTS_LIMIT + cartProductIds.size
+        val fetchSize = productRecommendationPolicy.calculateFetchSize(cartProductIds)
         val recommendedProducts =
             productRepository
                 .getProductsByCategory(
                     category = latestViewedProduct.category,
                     page = 0,
-                    size = fetchLimit,
+                    size = fetchSize,
                 ).items
-                .filterNot { it.id in cartProductIds }
-                .take(RECOMMENDED_PRODUCTS_LIMIT)
+                .let { products ->
+                    productRecommendationPolicy.recommend(
+                        products = products,
+                        excludedProductIds = cartProductIds,
+                    )
+                }
 
         val quantityByProductId =
             cartRepository
