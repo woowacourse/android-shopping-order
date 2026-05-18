@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.recommend
+package woowacourse.shopping.feature.recommend.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth

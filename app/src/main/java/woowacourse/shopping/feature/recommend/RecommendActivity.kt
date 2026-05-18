@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.content.IntentCompat
 import kotlin.jvm.java
 import woowacourse.shopping.feature.cart.CartContentId
+import woowacourse.shopping.feature.recommend.component.RecommendScreen
 import woowacourse.shopping.theme.AndroidshoppingTheme
 
 class RecommendActivity : ComponentActivity() {

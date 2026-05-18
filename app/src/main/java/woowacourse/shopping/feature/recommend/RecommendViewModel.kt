@@ -17,6 +17,7 @@ import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartContent
+import woowacourse.shopping.domain.OrderResult
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.ProductNotFoundException
 import woowacourse.shopping.feature.common.state.ProductUiModel
@@ -24,6 +25,7 @@ import woowacourse.shopping.feature.common.state.ProductUiModel
 data class RecommendUiState(
     val recommendList: List<ProductUiModel> = emptyList(),
     val isLoading: Boolean = true,
+    val dialog: OrderDialogUiState = OrderDialogUiState.None,
 )
 
 class RecommendViewModel(
@@ -151,10 +153,22 @@ class RecommendViewModel(
                 products.map { it.id }.contains(cartContent.product.id)
             }
 
-            orderRepository.orders(
+            val result = orderRepository.orders(
                 cartItemIds = cartContentIds + latestContents.map { it.id },
             )
+            _uiState.update { it.copy(dialog = result.toDialogState()) }
         }
+    }
+
+    fun dismissDialog() {
+        _uiState.update { it.copy(dialog = OrderDialogUiState.None) }
+    }
+
+    private fun OrderResult.toDialogState(): OrderDialogUiState = when (this) {
+        OrderResult.Success -> OrderDialogUiState.Success
+        OrderResult.AuthExpired -> OrderDialogUiState.AuthExpired
+        OrderResult.ServerError -> OrderDialogUiState.ServerError
+        OrderResult.NetworkError -> OrderDialogUiState.NetworkError
     }
 
     private suspend fun refreshRecentProducts(): String? {

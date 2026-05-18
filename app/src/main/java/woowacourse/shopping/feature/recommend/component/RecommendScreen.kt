@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.recommend
+package woowacourse.shopping.feature.recommend.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,11 +27,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.feature.cart.component.CartAppBar
 import woowacourse.shopping.feature.format.DecimalPriceFormatter
+import woowacourse.shopping.feature.recommend.RecommendViewModel
 
 @Composable
 fun RecommendScreen(
     viewModel: RecommendViewModel = viewModel(
-        factory = RecommendViewModel.Factory,
+        factory = RecommendViewModel.Companion.Factory,
     ),
     onCloseClick: () -> Unit,
     contentIds: List<String>,
@@ -110,6 +111,19 @@ fun RecommendScreen(
             }
         }
     }
+
+    OrderResultDialog(
+        state = uiState.dialog,
+        onDismiss = viewModel::dismissDialog,
+        onCompleted = {
+            viewModel.dismissDialog()
+            onCloseClick()
+        },
+        onRetry = {
+            viewModel.dismissDialog()
+            viewModel.order(contentIds)
+        },
+    )
 }
 
 @Preview
