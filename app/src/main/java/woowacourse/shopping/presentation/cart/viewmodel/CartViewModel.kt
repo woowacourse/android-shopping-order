@@ -1,7 +1,9 @@
 package woowacourse.shopping.presentation.cart.viewmodel
 
+import android.nfc.tech.MifareUltralight.PAGE_SIZE
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +13,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.RepositoryProvider.cartRepository
 import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.PaymentItems
@@ -33,24 +36,33 @@ class CartViewModel(
     private val _uiEvents = Channel<CartEvent>(Channel.BUFFERED)
     val uiEvents: Flow<CartEvent> = _uiEvents.receiveAsFlow()
 
+    private val exceptionHandler =
+        CoroutineExceptionHandler { _, _ ->
+            viewModelScope.launch {
+                _uiEvents.send(CartEvent.ShowError("알 수 없는 오류가 발생했습니다."))
+            }
+        }
+
     fun getPaymentItemIds(): List<Long> = paymentItems.getProductIds()
 
     fun refreshCart() {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             loadCartItems()
         }
     }
 
     fun deleteItem(productId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             when (val result = cartRepository.deleteItem(productId)) {
                 is RemoveItemResult.Success -> {
                     loadCartItems(result.cart)
                     _uiEvents.send(CartEvent.DeleteSuccess)
                 }
+
                 is RemoveItemResult.NotFoundItem -> {
                     _uiEvents.send(CartEvent.DeleteNotFound)
                 }
+
                 is RemoveItemResult.Error -> {
                     _uiEvents.send(CartEvent.ShowError(result.message))
                 }
@@ -59,14 +71,16 @@ class CartViewModel(
     }
 
     fun increase(productId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             when (val result = addToCartUseCase(cartRepository, productId)) {
                 is AddItemResult.NewAdded -> {
                     loadCartItems(result.cart)
                 }
+
                 is AddItemResult.Incremented -> {
                     loadCartItems(result.cart)
                 }
+
                 is AddItemResult.Error -> {
                     _uiEvents.send(CartEvent.ShowError(result.message))
                 }
@@ -75,11 +89,14 @@ class CartViewModel(
     }
 
     fun decrease(productId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             val cartItem = cartRepository.getCart().items.find { it.product.id == productId }
             if (cartItem == null) return@launch
 
-            when (val result = cartRepository.changeCartItem(productId, cartItem.decrease().quantity)) {
+            when (
+                val result =
+                    cartRepository.changeCartItem(productId, cartItem.decrease().quantity)
+            ) {
                 is UpdateItemResult.Success -> loadCartItems(result.cart)
                 is UpdateItemResult.Error -> {
                     _uiEvents.send(CartEvent.ShowError(result.message))
@@ -92,7 +109,9 @@ class CartViewModel(
     fun nextPage() {
         if (!uiState.value.isCanMoveNext) return
         _uiState.update { it.copy(page = it.page + 1) }
-        viewModelScope.launch { refreshCart() }
+        viewModelScope.launch(exceptionHandler) {
+            refreshCart()
+        }
     }
 
     fun previousPage() {
@@ -100,11 +119,13 @@ class CartViewModel(
         _uiState.update {
             it.copy(page = it.page - 1)
         }
-        viewModelScope.launch { refreshCart() }
+        viewModelScope.launch(exceptionHandler) {
+            refreshCart()
+        }
     }
 
     fun selectItem(productId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             val cart = cartRepository.getCart()
             val cartItem =
                 cart.items
@@ -134,7 +155,7 @@ class CartViewModel(
     }
 
     fun toggleSelectAll() {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             val cart = cartRepository.getCart()
             paymentItems =
                 if (uiState.value.isSelectAll) {

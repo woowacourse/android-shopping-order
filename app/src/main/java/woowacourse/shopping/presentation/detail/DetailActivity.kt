@@ -48,7 +48,7 @@ class DetailActivity : ComponentActivity() {
                     lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                         viewModel.uiEvents.collect { event ->
                             when (event) {
-                                is DetailEvent.ShowErrorToast -> {
+                                is DetailEvent.ShowError -> {
                                     Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                                 }
                                 is DetailEvent.NavigateToCart -> {

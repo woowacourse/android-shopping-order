@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.detail.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,6 +32,13 @@ class DetailViewModel(
     val uiEvents: Flow<DetailEvent> = _uiEvents.receiveAsFlow()
 
     private var loadedProduct: Product? = null
+
+    private val exceptionHandler =
+        CoroutineExceptionHandler { _, _ ->
+            viewModelScope.launch {
+                _uiEvents.send(DetailEvent.ShowError("알 수 없는 오류가 발생했습니다."))
+            }
+        }
 
     fun loadProduct(
         id: Long,
@@ -68,7 +76,7 @@ class DetailViewModel(
                 }
             } catch (e: Exception) {
                 _uiState.value = DetailUiState.Error("상품 로딩에 실패했습니다.")
-                _uiEvents.send(DetailEvent.ShowErrorToast("상품 로딩에 실패했습니다."))
+                _uiEvents.send(DetailEvent.ShowError("상품 로딩에 실패했습니다."))
             }
         }
     }
@@ -97,7 +105,7 @@ class DetailViewModel(
         id: Long,
         quantity: Int = 1,
     ) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             addToCartUseCase(cartRepository, id, quantity)
             _uiEvents.send(DetailEvent.NavigateToCart)
         }
@@ -105,7 +113,7 @@ class DetailViewModel(
 }
 
 sealed interface DetailEvent {
-    data class ShowErrorToast(
+    data class ShowError(
         val message: String,
     ) : DetailEvent
 

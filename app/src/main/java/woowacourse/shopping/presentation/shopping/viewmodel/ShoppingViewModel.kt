@@ -4,9 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okio.IOException
@@ -28,17 +31,27 @@ class ShoppingViewModel(
     private val _uiState = MutableStateFlow(ShoppingUiState())
     val uiState: StateFlow<ShoppingUiState> = _uiState.asStateFlow()
 
+    private val _uiEvents = Channel<ShoppingEvent>(Channel.BUFFERED)
+    val uiEvents = _uiEvents.receiveAsFlow()
+
+    private val exceptionHandler =
+        CoroutineExceptionHandler { _, _ ->
+            viewModelScope.launch {
+                _uiEvents.send(ShoppingEvent.ShowError("알 수 없는 오류가 발생했습니다."))
+            }
+        }
+
     private val pageSize = 20
 
     fun initialize() {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             if (uiState.value.offset == 0) loadMore()
             loadRecentProducts(10)
         }
     }
 
     fun loadCartItemQuantities() {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             val products = productRepository.getProducts(0, 100000)
             val cart = cartRepository.getCart()
             _uiState.update {
@@ -57,18 +70,18 @@ class ShoppingViewModel(
     }
 
     fun loadMore() {
-        viewModelScope.launch { loadNext() }
+        viewModelScope.launch(exceptionHandler) { loadNext() }
     }
 
     fun increase(id: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             addToCartUseCase(cartRepository, id)
             loadCartItemQuantities()
         }
     }
 
     fun decrease(id: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             val cartItem =
                 cartRepository.getCart().items.find { it.product.id == id } ?: return@launch
             cartRepository.changeCartItem(id, cartItem.decrease().quantity)
@@ -78,13 +91,13 @@ class ShoppingViewModel(
     }
 
     fun upsertRecentProduct(id: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             recentProductRepository.upsertRecentProduct(id)
         }
     }
 
     fun loadRecentProducts(limit: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             refreshRecentProducts(limit)
         }
     }
@@ -136,4 +149,10 @@ class ShoppingViewModel(
             _uiState.update { it.copy(isLoading = false) }
         }
     }
+}
+
+sealed interface ShoppingEvent {
+    data class ShowError(
+        val message: String,
+    ) : ShoppingEvent
 }
