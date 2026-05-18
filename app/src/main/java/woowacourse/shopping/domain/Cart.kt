@@ -3,10 +3,10 @@ package woowacourse.shopping.domain
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
-@Parcelize
+
 class Cart(
     val purchaseProducts: PurchaseProducts = PurchaseProducts(),
-) : Parcelable {
+) {
     fun add(purchaseProduct: PurchaseProduct) = Cart(purchaseProducts.add(purchaseProduct))
 
     fun updateCountWithId(

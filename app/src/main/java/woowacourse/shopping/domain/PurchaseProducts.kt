@@ -3,10 +3,10 @@ package woowacourse.shopping.domain
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
-@Parcelize
+
 class PurchaseProducts(
     val purchaseProducts: List<PurchaseProduct> = emptyList(),
-) : Parcelable {
+) {
     fun add(purchaseProduct: PurchaseProduct) =
         if (findById(purchaseProduct.productId()) == null) {
             PurchaseProducts(purchaseProducts + purchaseProduct)

@@ -4,10 +4,10 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import kotlin.math.min
 
-@Parcelize
+
 class Products(
     val products: List<Product> = emptyList(),
-) : Parcelable {
+) {
     fun isEmpty() = products.isEmpty()
 
     fun size() = products.size

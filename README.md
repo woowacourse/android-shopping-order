@@ -59,7 +59,7 @@
   - [x] getCategoryProduct에 Dispatcher.IO 명시
 
 - **domain**
-  - [ ] @Percelizable 어노테이션 제거 및 상속관계 제거
+  - [x] @Percelizable 어노테이션 제거 및 상속관계 제거
 
 - **RecommendationViewModel**
   - [ ] id를 넘겨받아 Product 자체를 다시 조회하는 대신 카테고리 문자열만 넘겨받아 API를 호출하도록 수정
