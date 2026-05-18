@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import woowacourse.shopping.R
 import woowacourse.shopping.presentation.common.components.QuantityCounter
+import woowacourse.shopping.presentation.common.model.MockModels
 import woowacourse.shopping.presentation.common.model.ProductUiModel
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 import woowacourse.shopping.ui.theme.Gray50
@@ -112,13 +113,7 @@ fun ProductCard(
 @Composable
 private fun InCartProductCardPreview() {
     ProductCard(
-        product =
-            ProductUiModel(
-                id = 1L,
-                name = "아메리카노",
-                price = 6000,
-                imageUrl = "",
-            ),
+        product = MockModels.product,
         quantity = 1,
         onClick = {},
         onIncrease = {},
@@ -131,13 +126,7 @@ private fun InCartProductCardPreview() {
 private fun NoCartProductCardPreview() {
     AndroidshoppingTheme {
         ProductCard(
-            product =
-                ProductUiModel(
-                    id = 1L,
-                    name = "아메리카노",
-                    price = 6000,
-                    imageUrl = "",
-                ),
+            product = MockModels.product,
             quantity = 0,
             onClick = {},
             onIncrease = {},

@@ -10,7 +10,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import woowacourse.shopping.presentation.cart.model.CartItemUiModel
-import woowacourse.shopping.presentation.common.model.ProductUiModel
+import woowacourse.shopping.presentation.common.model.MockModels
+import woowacourse.shopping.presentation.common.model.MockModels.product
 
 @Composable
 fun CartContent(
@@ -67,27 +68,9 @@ private fun CartContentPreview() {
         onDecrease = {},
         cartItems =
             listOf(
-                CartItemUiModel(
-                    product =
-                        ProductUiModel(
-                            id = 1L,
-                            name = "커피",
-                            imageUrl = "",
-                            price = 1000,
-                        ),
-                    quantity = 1,
-                    isSelected = true,
-                ),
-                CartItemUiModel(
-                    product =
-                        ProductUiModel(
-                            id = 2L,
-                            name = "커피",
-                            imageUrl = "",
-                            price = 1000,
-                        ),
-                    quantity = 1,
-                    isSelected = true,
+                MockModels.cartItem,
+                MockModels.cartItem.copy(
+                    product = product.copy(id = 2L, name = "아메리카노"),
                 ),
             ).toImmutableList(),
     )

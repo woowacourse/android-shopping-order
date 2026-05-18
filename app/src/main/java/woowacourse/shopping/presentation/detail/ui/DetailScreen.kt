@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.R
 import woowacourse.shopping.presentation.common.components.ShoppingAppBar
-import woowacourse.shopping.presentation.common.model.ProductUiModel
+import woowacourse.shopping.presentation.common.model.MockModels
 import woowacourse.shopping.presentation.detail.model.DetailUiState
 import woowacourse.shopping.presentation.detail.ui.components.DetailContent
 import woowacourse.shopping.presentation.detail.ui.components.LastSeenProductCard
@@ -124,13 +124,7 @@ private fun DetailScreenPreview() {
     DetailScreen(
         uiState =
             DetailUiState.Success(
-                product =
-                    ProductUiModel(
-                        id = 1L,
-                        name = "제품",
-                        price = 134L,
-                        imageUrl = "",
-                    ),
+                product = MockModels.product,
                 quantity = 1,
             ),
         onClickLastProductCard = {},
