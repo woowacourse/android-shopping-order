@@ -36,7 +36,7 @@ class ConnectivityManagerNetworkMonitor(
                 network: Network,
                 networkCapabilities: NetworkCapabilities,
             ) {
-                _isNetworkConnected.value = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                _isNetworkConnected.value = networkCapabilities.isInternetAvailable()
             }
         }
 
@@ -51,7 +51,10 @@ class ConnectivityManagerNetworkMonitor(
         val currentNetwork = connectivityManager.activeNetwork ?: return false
         val capabilities = connectivityManager.getNetworkCapabilities(currentNetwork) ?: return false
 
-        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
-            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+        return capabilities.isInternetAvailable()
     }
+
+    private fun NetworkCapabilities.isInternetAvailable(): Boolean =
+        hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+            hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
 }
