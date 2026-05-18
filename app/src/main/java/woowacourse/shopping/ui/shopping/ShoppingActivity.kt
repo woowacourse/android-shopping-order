@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.shopping
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -42,7 +41,8 @@ class ShoppingActivity : ComponentActivity() {
                         viewModel = viewModel,
                         modifier = Modifier.padding(innerPadding),
                         onCartClick = {
-                            startActivity(Intent(this, CartActivity::class.java))
+                            val intent = CartActivity.newIntent(this)
+                            startActivity(intent)
                         },
                         onProductClick = {
                             val intent =
