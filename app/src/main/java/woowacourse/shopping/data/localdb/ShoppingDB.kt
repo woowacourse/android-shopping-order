@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import woowacourse.shopping.data.localdb.dao.CartItemDao
 import woowacourse.shopping.data.localdb.dao.RecentItemDao
 import woowacourse.shopping.data.localdb.entity.CartItemEntity
 import woowacourse.shopping.data.localdb.entity.RecentItemEntity

@@ -34,7 +34,9 @@ class CartViewModelTest {
 
             mainDispatcherExtension.advanceUntilIdle()
 
-            val productIds = viewModel.uiState.value.items.map { it.product.id }
+            val productIds =
+                viewModel.uiState.value.items
+                    .map { it.product.id }
             assertThat(productIds).containsExactly("1", "2", "3", "4", "5")
             assertThat(viewModel.uiState.value.isCanMoveNext).isTrue()
         }
@@ -48,7 +50,9 @@ class CartViewModelTest {
             viewModel.nextPage()
             mainDispatcherExtension.advanceUntilIdle()
 
-            val productIds = viewModel.uiState.value.items.map { it.product.id }
+            val productIds =
+                viewModel.uiState.value.items
+                    .map { it.product.id }
             assertThat(productIds).containsExactly("6")
             assertThat(viewModel.uiState.value.page).isEqualTo(1)
             assertThat(viewModel.uiState.value.isCanMoveNext).isFalse()
@@ -65,7 +69,9 @@ class CartViewModelTest {
             viewModel.previousPage()
             mainDispatcherExtension.advanceUntilIdle()
 
-            val productIds = viewModel.uiState.value.items.map { it.product.id }
+            val productIds =
+                viewModel.uiState.value.items
+                    .map { it.product.id }
             assertThat(productIds).containsExactly("1", "2", "3", "4", "5")
             assertThat(viewModel.uiState.value.page).isEqualTo(0)
         }
@@ -91,7 +97,11 @@ class CartViewModelTest {
             mainDispatcherExtension.advanceUntilIdle()
 
             assertThat(viewModel.uiState.value.selectedCartItems).containsExactly("1")
-            assertThat(viewModel.uiState.value.items.first { it.id == "1" }.isChecked).isTrue()
+            assertThat(
+                viewModel.uiState.value.items
+                    .first { it.id == "1" }
+                    .isChecked,
+            ).isTrue()
             assertThat(viewModel.uiState.value.totalPrice).isEqualTo(2000)
         }
 
@@ -139,8 +149,7 @@ private class FakeCartRepository(
         cartItems = cartItems.filterNot { it.id == cartItemId }
     }
 
-    override suspend fun getCartItemQuantity(productId: String): Int? =
-        cartItems.firstOrNull { it.product.id == productId }?.quantity
+    override suspend fun getCartItemQuantity(productId: String): Int? = cartItems.firstOrNull { it.product.id == productId }?.quantity
 
     override suspend fun getTotalCartItemQuantity(): Int = cartItems.sumOf { it.quantity }
 
