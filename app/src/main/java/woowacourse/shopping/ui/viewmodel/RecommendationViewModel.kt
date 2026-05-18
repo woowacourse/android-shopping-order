@@ -4,12 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
@@ -27,24 +23,9 @@ class RecommendationViewModel(
     initPrice: Int,
     initCheckedItemIds: List<Long>
 ) : ViewModel() {
-    val lastViewProductId: StateFlow<Long?> =
-        recentlyViewedProductRepository
-            .getLatestItem()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = null,
-            )
 
-    val lastViewedProduct: StateFlow<Product?> =
-        flow {
-            emit(productRepository.getProduct(lastViewProductId.value ?: 0))
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null,
-        )
-
+    private val _lastViewedProductCategory = MutableStateFlow<String>("")
+    val lastViewedProductCategory = _lastViewedProductCategory.asStateFlow()
     private val _recommendedProducts = MutableStateFlow(Products(emptyList()))
     val recommendedProducts = _recommendedProducts.asStateFlow()
 
@@ -58,26 +39,36 @@ class RecommendationViewModel(
     val allCartItems = _allCartItems.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            try {
-                val latestViewedProductId = recentlyViewedProductRepository.getLatestItem().first()
-                if (latestViewedProductId != null) {
-                    val product = productRepository.getProduct(latestViewedProductId)
-                    _recommendedProducts.update {
-                        Products(productRepository.getCategoryProducts(category = product.category))
-                    }
-                }
-            } catch (e: Exception) {
-                // Handle or log the error here.
-                // Currently just failing silently, which keeps the list empty.
-                _recommendedProducts.update { Products(emptyList()) }
-            }
-        }
-
         fetchCart()
+        fetchRecommendations()
     }
 
-    fun fetchCart() {
+    private fun fetchRecommendations() {
+        viewModelScope.launch {
+            try {
+                val latestId = recentlyViewedProductRepository.getLatestItem().first()
+
+                if (latestId != null) {
+                    val product = productRepository.getProduct(latestId)
+                    _lastViewedProductCategory.value = product.category
+
+                    val categoryProducts = productRepository.getCategoryProducts(
+                        category = lastViewedProductCategory.value
+                    )
+
+                    val cartProductIds = allCartItems.value.purchaseProducts.map { it.product.id }
+
+                    val recommendations = categoryProducts.filter { it.id !in cartProductIds }
+
+                    _recommendedProducts.value = Products(recommendations)
+                }
+            } catch (_: Exception) {
+                _recommendedProducts.value = Products()
+            }
+        }
+    }
+
+    private fun fetchCart() {
         viewModelScope.launch {
             _allCartItems.update {
                 cartRepository.getPagedCart(0, 1000000)
@@ -137,6 +128,8 @@ class RecommendationViewModelFactory(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
+    private val initPrice: Int,
+    private val initCheckItemIds: List<Long>,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(RecommendationViewModel::class.java)) {
@@ -145,6 +138,8 @@ class RecommendationViewModelFactory(
                 cartRepository,
                 productRepository,
                 recentlyViewedProductRepository,
+                initPrice,
+                initCheckItemIds
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
