@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import woowacourse.shopping.ShoppingApplication
 
 class CartActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,7 +19,7 @@ class CartActivity : ComponentActivity() {
         setContent {
             val viewModel: CartViewModel =
                 viewModel(
-                    factory = CartViewModel.Factory
+                    factory = CartViewModel.Factory,
                 )
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
