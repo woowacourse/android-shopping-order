@@ -32,11 +32,11 @@ fun CartBottomBar(
     totalPrice: Int,
     totalCount: Int,
     onOrderClick: () -> Unit,
-    modifier: Modifier = Modifier,
     showSelectAll: Boolean = false,
+    isChecked: Boolean,
     onSelectAllClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
 ) {
-    var checked by rememberSaveable { mutableStateOf(false) }
     Row(
         modifier =
             modifier
@@ -55,9 +55,8 @@ fun CartBottomBar(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Checkbox(
-                    checked = checked,
+                    checked = isChecked,
                     onCheckedChange = {
-                        checked = !checked
                         onSelectAllClick()
                     },
                     modifier = Modifier.size(24.dp),
@@ -113,6 +112,7 @@ internal fun CartBottomBarSelectAllPreview() {
         totalCount = 2,
         onOrderClick = {},
         showSelectAll = true,
+        isChecked = true,
     )
 }
 
@@ -123,5 +123,6 @@ internal fun CartBottomBarRecommendationPreview() {
         totalPrice = 204200,
         totalCount = 4,
         onOrderClick = {},
+        isChecked = false,
     )
 }

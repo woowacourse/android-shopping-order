@@ -62,7 +62,7 @@
   - [x] @Percelizable 어노테이션 제거 및 상속관계 제거
 
 - **CartViewModel**
-  - [ ] `전체 체크` 체크박스와 개별 체크박스 상태 동기화
+  - [x] `전체 체크` 체크박스와 개별 체크박스 상태 동기화
 
 - **RecommendationViewModel**
   - [ ] 체크한 주문의 id를 주입받는다

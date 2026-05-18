@@ -38,7 +38,7 @@ class CartActivity : ComponentActivity() {
             val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
             val checkedItemIds by viewModel.checkedItemIds.collectAsStateWithLifecycle()
             val totalPrice by viewModel.totalPrice.collectAsStateWithLifecycle()
-            val totalCount by viewModel.cartItemCount.collectAsStateWithLifecycle()
+            val isAllChecked by viewModel.isAllChecked.collectAsStateWithLifecycle()
 
             Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
                 CartScreen(
@@ -68,13 +68,18 @@ class CartActivity : ComponentActivity() {
                     isLoading = isLoading,
                     onCheckedChanged = { viewModel.onItemChecked(it) },
                     totalPrice = totalPrice,
-                    totalCount = totalCount,
+                    totalCount = checkedItemIds.size,
                     isChecked = { id -> checkedItemIds.contains(id) },
                     onSelectAllClick = { viewModel.onSelectAllClick() },
                     onOrderClick = {
-                        val intent = Intent(this, RecommendationActivity::class.java)
-                        startActivity(intent)
+                        if(checkedItemIds.isNotEmpty()) {
+                            val intent = Intent(this, RecommendationActivity::class.java)
+                            intent.putExtra(IntentKeys.SELECTED_TOTAL_PRICE, totalPrice)
+                            intent.putExtra(IntentKeys.SELECTED_CART_ITEM_IDS, checkedItemIds.toLongArray())
+                            startActivity(intent)
+                        }
                     },
+                    isAllChecked = isAllChecked,
                     modifier =
                         Modifier
                             .fillMaxSize()

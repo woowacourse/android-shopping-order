@@ -57,6 +57,7 @@ fun CartScreen(
     totalPrice: Int,
     totalCount: Int,
     isChecked: (Long) -> Boolean,
+    isAllChecked: Boolean,
     onSelectAllClick: () -> Unit,
     onOrderClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -89,6 +90,7 @@ fun CartScreen(
             onOrderClick = onOrderClick,
             showSelectAll = true,
             onSelectAllClick = onSelectAllClick,
+            isChecked = isAllChecked
         )
     }
 }
@@ -321,5 +323,6 @@ private fun CartScreenPreview() {
         isChecked = { true },
         onSelectAllClick = { },
         onOrderClick = {},
+        isAllChecked = false
     )
 }

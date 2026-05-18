@@ -32,9 +32,18 @@ class CartViewModel(
     val isLoading = _isLoading.asStateFlow()
 
     private val _allCartItems = MutableStateFlow<PurchaseProducts>(PurchaseProducts())
-    val allCartItems = _allCartItems.asStateFlow()
     private val _checkedItemIds = MutableStateFlow<List<Long>>(emptyList())
     val checkedItemIds = _checkedItemIds.asStateFlow()
+
+    val isAllChecked: StateFlow<Boolean> =
+        combine(_allCartItems, _checkedItemIds) { allCart, checkIds ->
+            val allIds = allCart.purchaseProducts.map { it.id }
+            allIds.isNotEmpty() && checkIds.containsAll(allIds)
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue =  false
+        )
 
     val totalPrice: StateFlow<Int> =
         combine(_allCartItems, checkedItemIds) { allCart, checkedIds ->
@@ -144,6 +153,11 @@ class CartViewModel(
             _isLoading.update { true }
             cartRepository.deleteCartItem(id)
 
+            _allCartItems.update {
+                cartRepository.getPagedCart(0, 100000)
+            }
+            _checkedItemIds.update { it - id }
+
             val newTotalCount = cartRepository.getCartItemCount()
             _cartItemCount.update {
                 newTotalCount
@@ -174,15 +188,11 @@ class CartViewModel(
     }
 
     fun onSelectAllClick() {
-        viewModelScope.launch {
-            _checkedItemIds.update { list ->
-                val allIds = _allCartItems.value.purchaseProducts.map { it.id }
-                if (list.containsAll(allIds)) {
-                    emptyList()
-                } else {
-                    allIds
-                }
-            }
+        val allIds = _allCartItems.value.purchaseProducts.map { it.id }
+        if(isAllChecked.value) {
+            _checkedItemIds.update { emptyList() }
+        } else {
+            _checkedItemIds.update { allIds }
         }
     }
 
