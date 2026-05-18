@@ -13,6 +13,7 @@ import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.query.CartPageItem
 import woowacourse.shopping.repository.query.CartPageResult
 
+private const val NETWORK_PAGE_SIZE = 100
 private val NETWORK_JSON =
     Json {
         ignoreUnknownKeys = true
@@ -114,10 +115,9 @@ class HttpCartRepository(
     override suspend fun getCartItemsByProductIds(productIds: Set<Long>): List<CartItem> {
         if (productIds.isEmpty()) return emptyList()
 
-        val firstPage = fetchCartItemPage(size = 100)
-
-        return firstPage.content
-            .filter { (it.product.id) in productIds }
+        val allItems = fetchAllCartItems()
+        return allItems
+            .filter { it.product.id in productIds }
             .map {
                 CartItem(
                     productId = (it.product.id),
@@ -132,7 +132,7 @@ class HttpCartRepository(
         var page = 0
 
         while (true) {
-            val response = fetchCartItemPage(page = page, size = 100)
+            val response = fetchCartItemPage(page = page, size = NETWORK_PAGE_SIZE)
 
             response.content.firstOrNull { it.product.id == productId }?.let { return it }
 
@@ -148,6 +148,28 @@ class HttpCartRepository(
         size: Int,
     ) = execute("장바구니 조회 API 호출에 실패했습니다.") {
         cartApiService.getCartItems(page = page, size = size)
+    }
+
+    private suspend fun fetchAllCartItems(): List<CartItemResponseDto> {
+        val allCartItems = mutableListOf<CartItemResponseDto>()
+
+        var currentPage = 0
+
+        while (true) {
+            val response = execute("장바구니 조회 API 호출에 실패했습니다.") {
+                cartApiService.getCartItems(page = currentPage, size = NETWORK_PAGE_SIZE)
+            }
+
+            allCartItems.addAll(response.content)
+
+            if (currentPage + 1 >= response.totalPages) {
+                break
+            }
+
+            currentPage += 1
+        }
+
+        return allCartItems
     }
 
     private suspend fun <T> execute(

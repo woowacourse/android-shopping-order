@@ -84,7 +84,7 @@ class ProductDetailViewModel(
 
                 runCatching {
                     cartRepository.setQuantity(productId, targetQuantity)
-                    refreshProductDetail(productId)
+                    //refreshProductDetail(productId)
                 }.onFailure { throwable ->
                     refreshProductDetail(productId)
                     _uiState.update { current ->

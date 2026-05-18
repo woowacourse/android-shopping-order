@@ -216,7 +216,7 @@ class ShoppingViewModel(
 
                 runCatching {
                     cartRepository.setQuantity(productId, targetQuantity)
-                    refreshCartState()
+                    //refreshCartState()
                 }.onFailure { throwable ->
                     refreshCartState()
                     _uiState.update { current ->
