@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.repository.cart
 
-import woowacourse.shopping.data.datasource.cart.CartRemoteDataSource
+import woowacourse.shopping.data.datasource.cart.CartDataSource
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.model.cart.CartItems
 import woowacourse.shopping.domain.model.cart.Quantity
@@ -8,7 +8,7 @@ import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 
 class CartRepositoryImpl(
-    private val cartRemoteDataSource: CartRemoteDataSource,
+    private val cartRemoteDataSource: CartDataSource,
 ) : CartRepository {
     override suspend fun getCartItems(
         page: Int,
@@ -23,19 +23,19 @@ class CartRepositoryImpl(
         product: Product,
         quantity: Quantity,
     ) {
-        cartRemoteDataSource.addCartItem(product.id, quantity.value)
+        cartRemoteDataSource.addCartItem(product.id, quantity)
     }
 
     override suspend fun increase(
         cartId: Int,
-        quantity: Int,
+        quantity: Quantity,
     ) {
         cartRemoteDataSource.updateCartItem(cartId, quantity)
     }
 
     override suspend fun decrease(
         cartId: Int,
-        quantity: Int,
+        quantity: Quantity,
     ) {
         cartRemoteDataSource.updateCartItem(cartId, quantity)
     }

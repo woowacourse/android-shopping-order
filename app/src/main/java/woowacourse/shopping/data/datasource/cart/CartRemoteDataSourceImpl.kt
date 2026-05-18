@@ -7,11 +7,12 @@ import woowacourse.shopping.data.remote.api.OrderApi
 import woowacourse.shopping.data.remote.api.OrderRequest
 import woowacourse.shopping.data.remote.api.UpdateCartItemRequest
 import woowacourse.shopping.data.remote.dto.CartResponseDto
+import woowacourse.shopping.domain.model.cart.Quantity
 
 class CartRemoteDataSourceImpl(
     private val cartApi: CartApi,
     private val orderApi: OrderApi,
-) : CartRemoteDataSource {
+) : CartDataSource {
     override suspend fun getCartItems(
         page: Int,
         size: Int,
@@ -21,17 +22,16 @@ class CartRemoteDataSourceImpl(
 
     override suspend fun addCartItem(
         productId: Int,
-        quantity: Int,
-    ) = cartApi.addCartItem(AddCartItemRequest(productId, quantity))
+        quantity: Quantity,
+    ) = cartApi.addCartItem(AddCartItemRequest(productId, quantity.value))
 
     override suspend fun deleteCartItem(id: Int) = cartApi.deleteCartItem(id)
 
     override suspend fun updateCartItem(
         id: Int,
-        quantity: Int,
+        quantity: Quantity,
     ) {
-        Log.d("CartRemoteDataSourceImpl", "updateCartItem: $id")
-        cartApi.updateCartItem(id, UpdateCartItemRequest(quantity))
+        cartApi.updateCartItem(id, UpdateCartItemRequest(quantity.value))
     }
 
     override suspend fun order(cartItemIds: List<Int>) = orderApi.order(OrderRequest(cartItemIds))

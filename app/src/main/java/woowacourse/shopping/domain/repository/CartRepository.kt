@@ -21,12 +21,12 @@ interface CartRepository {
 
     suspend fun increase(
         cartId: Int,
-        quantity: Int,
+        quantity: Quantity,
     )
 
     suspend fun decrease(
         cartId: Int,
-        quantity: Int,
+        quantity: Quantity,
     )
 
     suspend fun remove(cartId: Int)

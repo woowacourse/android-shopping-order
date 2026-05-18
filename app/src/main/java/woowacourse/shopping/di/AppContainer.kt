@@ -2,7 +2,7 @@ package woowacourse.shopping.di
 
 import android.content.Context
 import androidx.room.Room
-import woowacourse.shopping.data.datasource.cart.CartRemoteDataSource
+import woowacourse.shopping.data.datasource.cart.CartDataSource
 import woowacourse.shopping.data.datasource.cart.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
 import woowacourse.shopping.data.datasource.product.ProductRemoteDataSourceImpl
@@ -29,7 +29,7 @@ class AppContainer(
             ).fallbackToDestructiveMigration(dropAllTables = true)
             .build()
 
-    private val cartDataSource: CartRemoteDataSource =
+    private val cartDataSource: CartDataSource =
         CartRemoteDataSourceImpl(
             RetrofitProvider.cartApi,
             RetrofitProvider.orderApi,

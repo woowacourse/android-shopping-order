@@ -9,6 +9,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import woowacourse.shopping.data.remote.dto.CartResponseDto
+import woowacourse.shopping.domain.model.cart.Quantity
 
 interface CartApi {
     @GET("cart-items")

@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.cart.Cart
+import woowacourse.shopping.domain.model.cart.Quantity
 import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -59,7 +60,7 @@ class ProductListViewModel(
             val target =
                 cartFlow.value.cartItems.values
                     .find { it.product.id == productId } ?: return@launch
-            cartRepository.increase(target.id, target.quantity.value + 1)
+            cartRepository.increase(target.id, Quantity(target.quantity.value + 1))
             refreshCart()
         }
     }
@@ -69,7 +70,7 @@ class ProductListViewModel(
             val target =
                 cartFlow.value.cartItems.values
                     .find { it.product.id == productId } ?: return@launch
-            cartRepository.decrease(target.id, target.quantity.value - 1)
+            cartRepository.decrease(target.id, Quantity(target.quantity.value - 1))
             refreshCart()
         }
     }

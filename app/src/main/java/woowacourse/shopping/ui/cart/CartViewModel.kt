@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import coil3.util.CoilUtils.result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.cart.CartItems
+import woowacourse.shopping.domain.model.cart.Quantity
 import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -122,7 +124,7 @@ class CartViewModel(
             val target =
                 _cartItems.value?.values?.find { it.product.id == productId } ?: return@launch
 
-            cartRepository.increase(target.id, target.quantity.value + 1)
+            cartRepository.increase(target.id, Quantity(target.quantity.value + 1))
             val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
             _cartItems.update { result }
         }
@@ -137,7 +139,7 @@ class CartViewModel(
                 cartRepository.remove(target.id)
                 _selectedItems.update { it - target.id }
             } else {
-                cartRepository.decrease(target.id, target.quantity.value - 1)
+                cartRepository.decrease(target.id, Quantity(target.quantity.value - 1))
             }
             val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
 
@@ -149,7 +151,7 @@ class CartViewModel(
         viewModelScope.launch {
             val target = _cartItems.value?.values?.find { it.id == cartId } ?: return@launch
 
-            cartRepository.increase(cartId, target.quantity.value + 1)
+            cartRepository.increase(cartId, Quantity(target.quantity.value + 10))
             val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
 
             _cartItems.update { result }
@@ -164,7 +166,7 @@ class CartViewModel(
                 cartRepository.remove(cartId)
                 _selectedItems.update { it - cartId }
             } else {
-                cartRepository.decrease(cartId, target.quantity.value - 1)
+                cartRepository.decrease(cartId, Quantity(target.quantity.value - 1))
             }
             val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
 
