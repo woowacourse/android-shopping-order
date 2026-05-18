@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class ConnectivityManagerNetworkMonitor(
     context: Context,
-) : NetworkMonitor {
+) : NetworkMonitor,
+    AutoCloseable {
     private val connectivityManager =
         context.applicationContext.getSystemService(ConnectivityManager::class.java)
 
@@ -57,4 +58,8 @@ class ConnectivityManagerNetworkMonitor(
     private fun NetworkCapabilities.isInternetAvailable(): Boolean =
         hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
             hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+
+    override fun close() {
+        connectivityManager.unregisterNetworkCallback(networkCallback)
+    }
 }
