@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository.network
 
+import retrofit2.HttpException
 import woowacourse.shopping.data.model.Money
 import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.data.remote.dto.ProductResponse
@@ -31,7 +32,7 @@ class RetrofitProductRepository(
         try {
             response = service.getProduct(id = id)
             return response.toDomain()
-        } catch (_: Exception) {
+        } catch (_: HttpException) {
             return null
         }
     }
