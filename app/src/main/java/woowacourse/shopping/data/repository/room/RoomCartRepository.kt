@@ -25,19 +25,9 @@ class RoomCartRepository(
         if (currentEntity != null) {
             cartDao.updateQuantity(item.id, currentEntity.quantity + quantity)
         } else {
-            cartDao.insert(CartEntity(item.id, quantity))
+            cartDao.insert(CartEntity(item.id, item.id, quantity))
         }
     }
-
-//    override suspend fun add(item: Product) {
-//        val currentEntity = cartDao.getCartItemById(item.id)
-//
-//        if (currentEntity != null) {
-//            cartDao.updateQuantity(productId = item.id, currentEntity.quantity + 1)
-//        } else {
-//            cartDao.insert(CartEntity(item.id, 1))
-//        }
-//    }
 
     override suspend fun decrease(item: Product) {
         val currentEntity = cartDao.getCartItemById(item.id)

@@ -11,8 +11,11 @@ interface CartDao {
     @Query("SELECT * FROM cart_items")
     suspend fun getAll(): List<CartEntity>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(cartEntity: CartEntity)
+
+    @Query("DELETE FROM cart_items")
+    suspend fun deleteAll()
 
     @Query("UPDATE cart_items SET quantity = :quantity WHERE productId = :productId")
     suspend fun updateQuantity(
