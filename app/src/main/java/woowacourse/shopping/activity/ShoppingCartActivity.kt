@@ -19,8 +19,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.backend.retrofit.viewmodel.ApiViewModelFactory
-import woowacourse.shopping.backend.retrofit.viewmodel.ShoppingCartViewModel
 import woowacourse.shopping.ui.component.PageNavigation
 import woowacourse.shopping.ui.recomment.ShoppingCartRecommendSection
 import woowacourse.shopping.ui.screen.OrderButton
@@ -37,35 +35,34 @@ class ShoppingCartActivity : ComponentActivity() {
     private val app: ShoppingApplication by lazy { application as ShoppingApplication }
 
     private val screenViewModelFactory: ScreenViewModelFactory by lazy {
-        ScreenViewModelFactory(appContainer = app.appContainer)
-    }
-    private val apiViewModelFactory: ApiViewModelFactory by lazy {
-        ApiViewModelFactory(app.retrofitService)
+        ScreenViewModelFactory(
+            appContainer = app.appContainer,
+            retrofitService = app.retrofitService
+        )
     }
 
     private val shoppingCartItemViewModel: ShoppingCartItemViewModel by viewModels { screenViewModelFactory }
     private val shoppingCartRecommendViewModel: ShoppingCartRecommendViewModel by viewModels { screenViewModelFactory }
-    private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { apiViewModelFactory }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        observeApiViewModel()
         observeScreenEvents()
-        shoppingCartViewModel.requestCartItems()
 
         setContent {
-            val shoppingCartItems by shoppingCartViewModel.shoppingCartItems.collectAsStateWithLifecycle()
-            val selectedProductIds by shoppingCartViewModel.selectedProductIds.collectAsStateWithLifecycle()
+            val shoppingCartItems by shoppingCartItemViewModel.shoppingCartItems.collectAsStateWithLifecycle()
+            val selectedProductIds by shoppingCartItemViewModel.selectedProductIds.collectAsStateWithLifecycle()
             val selectedItemCount = selectedProductIds.size
             val recommendUiState by shoppingCartRecommendViewModel.uiState.collectAsStateWithLifecycle()
 
             val screenState =
                 shoppingCartItemViewModel.shoppingCartItems.collectAsStateWithLifecycle()
-            val isLoading = shoppingCartViewModel.isLoading.collectAsStateWithLifecycle()
-            val errorMessage = shoppingCartViewModel.errorMessage.collectAsStateWithLifecycle()
-            val hasApiError = errorMessage.value != null
+            val uiState by shoppingCartItemViewModel.uiState.collectAsStateWithLifecycle()
+            val isLoading = uiState.isLoading
+            val errorMessage = uiState.errorMessage
+            val hasApiError = errorMessage != null
             val visibleItems =
                 if (hasApiError) {
                     emptyList()
@@ -80,7 +77,7 @@ class ShoppingCartActivity : ComponentActivity() {
                 }
             LaunchedEffect(shoppingCartItems, selectedProductIds) {
                 shoppingCartRecommendViewModel.updateCartSnapshot(
-                    shoppingCartItems = shoppingCartItems,
+                    shoppingCartItems = shoppingCartItems.items,
                     selectedCartProductIds = selectedProductIds,
                 )
             }
@@ -88,11 +85,11 @@ class ShoppingCartActivity : ComponentActivity() {
                 ShoppingCartState(
                     items = visibleItems,
                     selectedProductIds = selectedProductIds,
-                    isLoading = isLoading.value,
-                    errorMessage = errorMessage.value,
+                    isLoading = isLoading,
+                    errorMessage = errorMessage,
                     currentPage = screenState.value.currentPage,
                     selectedItemCount = selectedItemCount,
-                    canOrder = selectedItemCount > 0 && !isLoading.value,
+                    canOrder = selectedItemCount > 0 && !isLoading,
                     canMoveToPreviousPage =
                         if (hasApiError) false else screenState.value.canMoveToPreviousPage,
                     canMoveToNextPage = if (hasApiError) false else screenState.value.canMoveToNextPage,
@@ -110,19 +107,18 @@ class ShoppingCartActivity : ComponentActivity() {
                         onBackClick = shoppingCartItemViewModel::onBackClick,
                         onRemoveShoppingItemClick = { shoppingCartItem ->
                             shoppingCartItemViewModel.removeShoppingItem(shoppingCartItem)
-                            shoppingCartViewModel.removeShoppingItem(shoppingCartItem)
                         },
                         onToggleShoppingItemSelectionClick = { productId, isSelected ->
-                            shoppingCartViewModel.setShoppingCartProductSelection(
+                            shoppingCartItemViewModel.setShoppingCartProductSelection(
                                 productId = productId,
                                 isSelected = isSelected,
                             )
                         },
                         onIncreaseShoppingItemQuantityClick = { shoppingCartItem ->
-                            shoppingCartViewModel.increaseShoppingItemQuantity(shoppingCartItem)
+                            shoppingCartItemViewModel.increaseShoppingItemQuantity(shoppingCartItem)
                         },
                         onDecreaseShoppingItemQuantityClick = { shoppingCartItem ->
-                            shoppingCartViewModel.decreaseShoppingItemQuantity(shoppingCartItem)
+                            shoppingCartItemViewModel.decreaseShoppingItemQuantity(shoppingCartItem)
                         },
                     ) {
                         PageNavigation(
@@ -133,7 +129,7 @@ class ShoppingCartActivity : ComponentActivity() {
                             onNextPageClick = shoppingCartItemViewModel::moveToNextPage,
                         )
                         OrderButton(
-                            shoppingCartItems = shoppingCartItems,
+                            shoppingCartItems = shoppingCartItems.items,
                             selectedProductIds = selectedProductIds,
                             shoppingCartSelectItemCount = selectedItemCount,
                             onOrderButtonClick = { selectedIds ->
@@ -145,11 +141,14 @@ class ShoppingCartActivity : ComponentActivity() {
                                 }
                                 shoppingCartRecommendViewModel.moveToRecommend()
                             },
-                            checked = shoppingCartItems.isNotEmpty() && selectedItemCount == shoppingCartItems.size,
-                            orderComplete = shoppingCartItems.isNotEmpty(),
-                            totalPrice = shoppingCartViewModel.getTotalPrice(shoppingCartItems),
+                            checked = shoppingCartItems.items.isNotEmpty() && selectedItemCount == shoppingCartItems.items.size,
+                            orderComplete = shoppingCartItems.items.isNotEmpty(),
+                            totalPrice = shoppingCartItemViewModel.getTotalPrice(
+                                shoppingCartItems = screenState.value.items,
+                                selectedProductIds = selectedProductIds,
+                            ),
                             onToggleShoppingItemSelectionClick = { productIds, isSelected ->
-                                shoppingCartViewModel.setShoppingCartProductsSelection(
+                                shoppingCartItemViewModel.setShoppingCartProductsSelection(
                                     productIds = productIds,
                                     isSelected = isSelected,
                                 )
@@ -164,19 +163,17 @@ class ShoppingCartActivity : ComponentActivity() {
                         onBackClick = shoppingCartItemViewModel::onBackClick,
                         onOrderButtonClick = {},
                         onAddToCartClick = { shoppingItem ->
-                            shoppingCartViewModel.addOrIncreaseByProductId(
+                            shoppingCartItemViewModel.addOrIncreaseByProductId(
                                 productId = shoppingItem.getProductId(),
-                                amount = 1,
                             )
                         },
                         onQuantityPlusClick = { shoppingItem ->
-                            shoppingCartViewModel.addOrIncreaseByProductId(
+                            shoppingCartItemViewModel.addOrIncreaseByProductId(
                                 productId = shoppingItem.getProductId(),
-                                amount = 1,
                             )
                         },
                         onQuantityMinusClick = { shoppingItem ->
-                            shoppingCartViewModel.decreaseByProductId(
+                            shoppingCartItemViewModel.decreaseByProductId(
                                 productId = shoppingItem.getProductId(),
                             )
                         },
@@ -188,18 +185,7 @@ class ShoppingCartActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        shoppingCartViewModel.requestCartItems()
-    }
-
-    private fun observeApiViewModel() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                shoppingCartViewModel.shoppingCartItems.collect { shoppingCartItems ->
-                    app.appContainer.remoteShoppingStateSyncer.syncCartItems(shoppingCartItems)
-                    shoppingCartItemViewModel.refresh()
-                }
-            }
-        }
+        shoppingCartItemViewModel.requestCartItems()
     }
 
     private fun observeScreenEvents() {

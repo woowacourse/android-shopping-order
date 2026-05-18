@@ -11,7 +11,9 @@ import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.repository.ShoppingCartRepository
 import woowacourse.shopping.repository.ShoppingItemRepository
 import woowacourse.shopping.storage.datastore.VisitStore
+import kotlin.uuid.ExperimentalUuidApi
 
+@OptIn(ExperimentalUuidApi::class)
 class DetailProductViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
     private val shoppingItemRepository: ShoppingItemRepository,
@@ -69,6 +71,14 @@ class DetailProductViewModel(
         publishUiState()
     }
 
+
+    fun loadProductDetail(productId: Long) {
+        viewModelScope.launch {
+            shoppingItemRepository.fetchProductById(productId)
+            publishUiState()
+        }
+    }
+
     fun increaseSelectedQuantity() {
         selectedQuantity += 1
         publishUiState()
@@ -83,24 +93,14 @@ class DetailProductViewModel(
     }
 
     fun addSelectedProductToCart() {
-        val shoppingItem = uiState.value.shoppingItem ?: return
-        viewModelScope.launch {
-            addSelectedProductQuantityToCart(
-                productId = shoppingItem.getProductId(),
-                quantity = selectedQuantity,
-            )
-        }
-    }
+        val productId = selectedProductId ?: return
+        val quantity = selectedQuantity
+        if (quantity < 1) return
 
-    private suspend fun addSelectedProductQuantityToCart(
-        productId: Long,
-        quantity: Int,
-    ) {
-        if (quantity < 1) {
-            return
+        viewModelScope.launch {
+            shoppingCartRepository.addIfAbsent(productId)
+            shoppingItemRepository.plusQuantity(productId, quantity)
         }
-        shoppingCartRepository.addIfAbsent(productId)
-        shoppingItemRepository.plusQuantity(productId, quantity)
     }
 
     private fun publishUiState() {
@@ -108,8 +108,10 @@ class DetailProductViewModel(
     }
 
     private fun createUiState(): DetailProductUiState {
-        val shoppingItemByProductId = cachedShoppingItems.associateBy { shoppingItem -> shoppingItem.getProductId() }
-        val currentShoppingItem = selectedProductId?.let { productId -> shoppingItemByProductId[productId] }
+        val shoppingItemByProductId =
+            cachedShoppingItems.associateBy { shoppingItem -> shoppingItem.getProductId() }
+        val currentShoppingItem =
+            selectedProductId?.let { productId -> shoppingItemByProductId[productId] }
         val safeQuantity = selectedQuantity.coerceAtLeast(DEFAULT_QUANTITY)
         val lastViewedProductId =
             selectedProductId?.let { productId ->
@@ -144,6 +146,7 @@ class DetailProductViewModel(
             else -> recentProductIds.firstOrNull()
         }
     }
+
 
     data class DetailProductUiState(
         val shoppingItem: ShoppingItem? = null,

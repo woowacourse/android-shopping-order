@@ -14,5 +14,6 @@ class ShoppingItem(
 
     fun getQuantity(): Int = quantity
 
+
     fun getProductQuantityPrice(quantity: Int = this.quantity): Int = product.getPrice() * quantity
 }

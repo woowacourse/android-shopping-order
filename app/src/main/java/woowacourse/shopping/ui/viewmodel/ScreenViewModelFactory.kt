@@ -3,11 +3,26 @@ package woowacourse.shopping.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.AppContainer
-import woowacourse.shopping.ui.viewmodel.ShoppingCartRecommendViewModel
+import woowacourse.shopping.backend.retrofit.RetrofitService
+import woowacourse.shopping.backend.retrofit.repository.OrderRetrofitRepository
+import woowacourse.shopping.backend.retrofit.repository.ProductRetrofitRepository
+import woowacourse.shopping.backend.retrofit.repository.ShoppingCartRetrofitRepository
+import woowacourse.shopping.backend.retrofit.viewmodel.OrderViewModel
+import woowacourse.shopping.backend.retrofit.viewmodel.ProductViewModel
+import woowacourse.shopping.backend.retrofit.viewmodel.ShoppingCartViewModel
 
 class ScreenViewModelFactory(
     private val appContainer: AppContainer,
+    val retrofitService: RetrofitService,
 ) : ViewModelProvider.Factory {
+
+    private val productRetrofitRepository: ProductRetrofitRepository =
+        ProductRetrofitRepository(retrofitService.productApiService)
+    private val shoppingCartRetrofitRepository: ShoppingCartRetrofitRepository =
+        ShoppingCartRetrofitRepository(retrofitService.shoppingCartApiService)
+    private val orderRetrofitRepository: OrderRetrofitRepository =
+        OrderRetrofitRepository(retrofitService.orderApiService)
+
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
         when {
@@ -38,6 +53,17 @@ class ScreenViewModelFactory(
                     visitStore = appContainer.visitStore,
                 ) as T
 
-            else -> throw IllegalArgumentException("지원하지 않는 화면 ViewModel: ${modelClass.name}")
+            modelClass.isAssignableFrom(ProductViewModel::class.java) ->
+                ProductViewModel(productRetrofitRepository = productRetrofitRepository) as T
+
+            modelClass.isAssignableFrom(ShoppingCartViewModel::class.java) ->
+                ShoppingCartViewModel(
+                    shoppingCartRetrofitRepository = shoppingCartRetrofitRepository,
+                ) as T
+
+            modelClass.isAssignableFrom(OrderViewModel::class.java) ->
+                OrderViewModel(orderRetrofitRepository = orderRetrofitRepository) as T
+
+            else -> throw IllegalArgumentException("지원하지 않는 API ViewModel: ${modelClass.name}")
         }
 }

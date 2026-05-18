@@ -7,15 +7,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.backend.retrofit.viewmodel.ApiViewModelFactory
 import woowacourse.shopping.backend.retrofit.viewmodel.ProductViewModel
-import woowacourse.shopping.backend.retrofit.viewmodel.ShoppingCartViewModel
 import woowacourse.shopping.ui.component.MoreButton
 import woowacourse.shopping.ui.screen.ProductListScreen
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
@@ -26,15 +25,15 @@ class ProductListActivity : ComponentActivity() {
     private val app: ShoppingApplication by lazy { application as ShoppingApplication }
 
     private val screenViewModelFactory: ScreenViewModelFactory by lazy {
-        ScreenViewModelFactory(appContainer = app.appContainer)
-    }
-    private val apiViewModelFactory: ApiViewModelFactory by lazy {
-        ApiViewModelFactory(app.retrofitService)
+        ScreenViewModelFactory(
+            appContainer = app.appContainer,
+            retrofitService = app.retrofitService
+        )
     }
 
     private val productListViewModel: ProductListViewModel by viewModels { screenViewModelFactory }
-    private val productViewModel: ProductViewModel by viewModels { apiViewModelFactory }
-    private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { apiViewModelFactory }
+
+    private val productViewModel: ProductViewModel by viewModels { screenViewModelFactory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,52 +44,45 @@ class ProductListActivity : ComponentActivity() {
         requestProductsAndCart()
 
         setContent {
-            val uiState = productListViewModel.uiState.collectAsStateWithLifecycle()
-            val state = productViewModel.state.collectAsStateWithLifecycle()
-            val hasApiError = state.value.errorMessage != null
+            val uiState by productListViewModel.uiState.collectAsStateWithLifecycle()
+            val apiState by productViewModel.state.collectAsStateWithLifecycle()
+
+            val errorMessage = apiState.errorMessage
+            val hasApiError = errorMessage != null
             val visibleShoppingItems =
                 if (hasApiError) {
                     emptyList()
                 } else {
-                    uiState.value.shoppingItems
+                    uiState.shoppingItems
                 }
             val visibleRecentViewedItems =
                 if (hasApiError) {
                     emptyList()
                 } else {
-                    uiState.value.recentViewedShoppingItems
+                    uiState.recentViewedShoppingItems
                 }
 
             AndroidShoppingTheme {
                 ProductListScreen(
                     shoppingItems = visibleShoppingItems,
                     recentViewedShoppingItems = visibleRecentViewedItems,
-                    shoppingCartTotalCount = if (hasApiError) 0 else uiState.value.shoppingCartTotalCount,
-                    isNetworkConnected = uiState.value.isNetworkConnected,
-                    state = state.value,
+                    shoppingCartTotalCount = if (hasApiError) 0 else uiState.shoppingCartTotalCount,
+                    isNetworkConnected = uiState.isNetworkConnected,
+                    state = apiState,
                     onAddToCartClick = { shoppingItem ->
                         productListViewModel.addProductToCart(shoppingItem)
-                        shoppingCartViewModel.addOrIncreaseByProductId(
-                            productId = shoppingItem.getProductId(),
-                            amount = 1,
-                        )
                     },
                     onQuantityPlusClick = { shoppingItem ->
                         productListViewModel.increaseProductQuantity(shoppingItem)
-                        shoppingCartViewModel.addOrIncreaseByProductId(
-                            productId = shoppingItem.getProductId(),
-                            amount = 1,
-                        )
                     },
                     onQuantityMinusClick = { shoppingItem ->
                         productListViewModel.decreaseProductQuantity(shoppingItem)
-                        shoppingCartViewModel.decreaseByProductId(shoppingItem.getProductId())
                     },
                     onProductClick = productListViewModel::onProductClick,
                     onRecentViewedProductClick = productListViewModel::onRecentViewedProductClick,
                     onNavigateToCartClick = productListViewModel::onNavigateToCartClick,
                     bottomContent =
-                        if (uiState.value.canLoadNextPage) {
+                        if (uiState.canLoadNextPage) {
                             {
                                 MoreButton(
                                     onClick = productListViewModel::loadNextPage,
@@ -111,7 +103,6 @@ class ProductListActivity : ComponentActivity() {
 
     private fun requestProductsAndCart() {
         productViewModel.requestProduct(size = MAX_PRODUCT_SIZE)
-        shoppingCartViewModel.requestCartItems()
     }
 
     private fun observeApiViewModels() {
@@ -120,11 +111,6 @@ class ProductListActivity : ComponentActivity() {
                 launch {
                     productViewModel.products.collect { products ->
                         app.appContainer.remoteShoppingStateSyncer.syncProducts(products)
-                    }
-                }
-                launch {
-                    shoppingCartViewModel.shoppingCartItems.collect { shoppingCartItems ->
-                        app.appContainer.remoteShoppingStateSyncer.syncCartItems(shoppingCartItems)
                     }
                 }
             }

@@ -18,9 +18,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.backend.retrofit.viewmodel.ApiViewModelFactory
-import woowacourse.shopping.backend.retrofit.viewmodel.ProductViewModel
-import woowacourse.shopping.backend.retrofit.viewmodel.ShoppingCartViewModel
 import woowacourse.shopping.ui.screen.DetailProductScreen
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 import woowacourse.shopping.ui.viewmodel.DetailProductViewModel
@@ -32,16 +29,10 @@ class DetailProductActivity : ComponentActivity() {
     private val screenViewModelFactory: ScreenViewModelFactory by lazy {
         ScreenViewModelFactory(
             appContainer = app.appContainer,
-        )
-    }
-    private val apiViewModelFactory: ApiViewModelFactory by lazy {
-        ApiViewModelFactory(
-            app.retrofitService,
+            retrofitService = app.retrofitService
         )
     }
     private val detailProductViewModel: DetailProductViewModel by viewModels { screenViewModelFactory }
-    private val productViewModel: ProductViewModel by viewModels { apiViewModelFactory }
-    private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { apiViewModelFactory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,10 +50,6 @@ class DetailProductActivity : ComponentActivity() {
                         lastViewedShoppingItem = uiState.lastViewedShoppingItem,
                         onAddToCartClick = {
                             detailProductViewModel.addSelectedProductToCart()
-                            shoppingCartViewModel.addOrIncreaseByProductId(
-                                productId = shoppingItem.getProductId(),
-                                amount = uiState.selectedQuantity,
-                            )
                             finish()
                         },
                         onLastViewedProductClick = { selectedProductId ->
@@ -93,22 +80,17 @@ class DetailProductActivity : ComponentActivity() {
         if (productId == INVALID_PRODUCT_ID) {
             return
         }
-        productViewModel.requestProductDetail(productId)
+        detailProductViewModel.loadProductDetail(productId)
     }
 
     private fun observeApiViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
                 launch {
-                    productViewModel.productDetails.collect { productDetails ->
-                        val productId =
-                            intent.extras?.getLong(DetailProductViewModel.EXTRA_PRODUCT_ID, INVALID_PRODUCT_ID)
-                                ?: INVALID_PRODUCT_ID
-                        if (productId == INVALID_PRODUCT_ID) {
-                            return@collect
+                    detailProductViewModel.uiState.collect { uiState ->
+                        uiState.shoppingItem?.let { shoppingItem ->
+                            app.appContainer.remoteShoppingStateSyncer.syncProduct(shoppingItem)
                         }
-                        val detailProduct = productDetails[productId] ?: return@collect
-                        app.appContainer.remoteShoppingStateSyncer.syncProduct(detailProduct)
                     }
                 }
             }

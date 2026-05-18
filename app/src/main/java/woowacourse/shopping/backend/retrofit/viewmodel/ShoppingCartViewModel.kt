@@ -125,16 +125,10 @@ class ShoppingCartViewModel(
         }
     }
 
-    fun increaseShoppingItemQuantity(shoppingCartItem: ShoppingCartItem) {
-        val productId = shoppingCartItem.product.id
-        addOrIncreaseByProductId(productId = productId, amount = 1)
-    }
 
-    fun decreaseShoppingItemQuantity(shoppingCartItem: ShoppingCartItem) {
-        decreaseByProductId(productId = shoppingCartItem.product.id)
-    }
 
-    fun getTotalPrice(shoppingCartItems: List<ShoppingCartItem>): Int = shoppingCartItems.sumOf { it.getProductQuantityPrice() }
+    fun getTotalPrice(shoppingCartItems: List<ShoppingCartItem>): Int =
+        shoppingCartItems.sumOf { it.getProductQuantityPrice() }
 
     private suspend fun loadCartItems(): List<ShoppingCartItem> {
         val shoppingCartItems =
@@ -157,36 +151,6 @@ class ShoppingCartViewModel(
             shoppingCartItem.product.id == productId
         }
 
-    fun setShoppingCartProductSelection(
-        productId: Long,
-        isSelected: Boolean,
-    ) {
-        val validProductIds =
-            _shoppingCartItems.value.map { shoppingCartItem -> shoppingCartItem.product.id }.toSet()
-        if (productId !in validProductIds) return
-        _selectedProductIds.value =
-            _selectedProductIds.value.toMutableSet().apply {
-                if (isSelected) {
-                    add(productId)
-                } else {
-                    remove(productId)
-                }
-            }
-    }
-
-    fun setShoppingCartProductsSelection(
-        productIds: List<Long>,
-        isSelected: Boolean,
-    ) {
-        val validProductIds =
-            _shoppingCartItems.value.map { shoppingCartItem -> shoppingCartItem.product.id }.toSet()
-        val targetProductIds = productIds.toSet().intersect(validProductIds)
-        if (isSelected) {
-            _selectedProductIds.value = targetProductIds
-            return
-        }
-        _selectedProductIds.value = _selectedProductIds.value - targetProductIds
-    }
 
     private fun syncShoppingCartItems(shoppingCartItems: List<ShoppingCartItem>) {
         _shoppingCartItems.value = shoppingCartItems

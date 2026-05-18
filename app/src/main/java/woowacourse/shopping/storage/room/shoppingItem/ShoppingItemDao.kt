@@ -1,9 +1,8 @@
 package woowacourse.shopping.storage.room.shoppingItem
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -26,7 +25,7 @@ interface ShoppingItemDao {
         quantity: Int,
     ): Int
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun insertAll(shoppingItems: List<ShoppingItemEntity>)
 
     @Query("DELETE FROM shopping_items")

@@ -21,15 +21,15 @@ class RoomShoppingItemRepository(
             .map { entities -> entities.map { entity -> entity.toDomain() } }
             .stateIn(scope, SharingStarted.Eagerly, emptyList())
 
-    override suspend fun upsertProduct(product: Product) {
-        val preservedQuantity = shoppingItemDao.getQuantityOrNull(product.id) ?: 0
+    override suspend fun upsertProduct(shoppingItem: ShoppingItem) {
+        val preservedQuantity = shoppingItemDao.getQuantityOrNull(shoppingItem.getProductId()) ?: 0
         shoppingItemDao.insertAll(
             listOf(
                 ShoppingItemEntity(
-                    productId = product.id,
-                    title = product.getTitle(),
-                    price = product.getPrice(),
-                    imageUrl = product.imageUrl,
+                    productId = shoppingItem.getProductId(),
+                    title = shoppingItem.getProduct().getTitle(),
+                    price = shoppingItem.getProduct().getPrice(),
+                    imageUrl = shoppingItem.getProduct().imageUrl,
                     quantity = preservedQuantity,
                 ),
             ),
