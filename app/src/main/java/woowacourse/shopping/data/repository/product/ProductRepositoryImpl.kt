@@ -8,11 +8,11 @@ class ProductRepositoryImpl(
     private val dataSource: ProductDataSource,
 ) : ProductRepository {
     override suspend fun loadProducts(
-        startIndex: Int,
+        page: Int,
         pageSize: Int,
         sort: List<String>,
         category: String?,
-    ): ProductPage = dataSource.findAllProduct(startIndex, pageSize, sort, category)
+    ): ProductPage = dataSource.findAllProduct(page, pageSize, sort, category)
 
     override suspend fun getProduct(id: String): Product = dataSource.findById(id)
 }

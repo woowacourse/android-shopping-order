@@ -6,7 +6,7 @@ import woowacourse.shopping.domain.ProductPage
 interface ProductDataSource {
 
     suspend fun findAllProduct(
-        startIndex: Int,
+        page: Int,
         pageSize: Int,
         sort: List<String>,
         category: String?,

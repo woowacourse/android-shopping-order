@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.constants.MockData
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
@@ -135,13 +134,18 @@ class ProductListViewModel(
     }
 
     private suspend fun fetchAndAppendProducts(pageSize: Int) {
-        val result = productRepository.loadProducts(products.size, pageSize, emptyList(), null)
-        products = products + result
+        val page = productRepository.loadProducts(
+            page = products.size / pageSize,
+            pageSize = pageSize,
+            sort = emptyList(),
+            category = null,
+        )
+        products = products + page.products
 
         _uiState.update {
             it.copy(
                 productUiModels = products.map(::toProductUiModel),
-                isEnd = result.size >= MockData.MOCK_PRODUCTS.size,
+                isEnd = page.isLast,
             )
         }
     }

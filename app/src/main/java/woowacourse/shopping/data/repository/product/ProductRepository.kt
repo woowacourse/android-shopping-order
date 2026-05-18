@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.ProductPage
 
 interface ProductRepository {
     suspend fun loadProducts(
-        startIndex: Int,
+        page: Int,
         pageSize: Int,
         sort: List<String>,
         category: String?,

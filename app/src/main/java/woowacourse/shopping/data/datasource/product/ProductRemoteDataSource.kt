@@ -8,13 +8,13 @@ class ProductRemoteDataSource(
     val productService: ProductService,
 ) : ProductDataSource {
     override suspend fun findAllProduct(
-        startIndex: Int,
+        page: Int,
         pageSize: Int,
         sort: List<String>,
         category: String?,
     ): ProductPage {
         val response = productService
-            .requestProducts(page = startIndex, size = pageSize, category = category)
+            .requestProducts(page = page, size = pageSize, category = category)
 
         check(response.isSuccessful) { "products 요청 실패: ${response.code()}" }
         val body = response.body()

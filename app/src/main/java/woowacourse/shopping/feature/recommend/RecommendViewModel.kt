@@ -57,11 +57,11 @@ class RecommendViewModel(
             val category = refreshRecentProducts()
 
             products = productRepository.loadProducts(
-                startIndex = products.size,
+                page = products.size / pageSize,
                 pageSize = pageSize,
                 sort = emptyList(),
                 category = category,
-            )
+            ).products
 
             val alreadyInProduct = serverCart.cartContents.map { it.product }
             products = products.filter { alreadyInProduct.map { product -> product.id }.contains(it.id).not() }
