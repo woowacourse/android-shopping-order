@@ -63,7 +63,7 @@ fun ProductListScreen(
         onAddClick = viewModel::addProduct,
         onIncrease = viewModel::increaseQuantity,
         onDecrease = viewModel::decreaseQuantity,
-        onMoreClick = viewModel::moreProducts,
+        onMoreClick = viewModel::getMoreProducts,
         onCartClick = onCartClick,
         onProductClick = onProductClick,
     )

@@ -72,7 +72,7 @@ class ProductListViewModel(
 
     init {
         observeRecentProducts()
-        loadProducts()
+        getMoreProducts()
     }
 
     fun refresh() {
@@ -81,8 +81,33 @@ class ProductListViewModel(
         }
     }
 
-    fun moreProducts() {
-        loadProducts()
+    fun getMoreProducts() {
+        val state = uiState.value
+        if (state.loadState == LoadState.Loading || !state.hasNextPage) return
+
+        viewModelScope.launch {
+            loadStateFlow.update { LoadState.Loading }
+            runCatching { productRepository.getProducts(currentPage, PAGE_SIZE) }
+                .onSuccess { newProducts ->
+                    productsFlow.update {
+                        Products(
+                            items = it.items + newProducts.items,
+                            isLast = newProducts.isLast,
+                        )
+                    }
+                    currentPage++
+
+                    refreshCart()
+                    loadStateFlow.update { LoadState.Success }
+                }.onFailure { throwable ->
+                    loadStateFlow.update {
+                        LoadState.Error(
+                            throwable,
+                            throwable.message ?: "다음 페이지를 불러올 수 없습니다.",
+                        )
+                    }
+                }
+        }
     }
 
     fun addProduct(productId: Int) {
@@ -119,35 +144,6 @@ class ProductListViewModel(
     private suspend fun refreshCart() {
         val cartItems = cartRepository.getAllCartItems()
         cartFlow.update { cartItems }
-    }
-
-    private fun loadProducts() {
-        val state = uiState.value
-        if (state.loadState == LoadState.Loading || !state.hasNextPage) return
-
-        viewModelScope.launch {
-            loadStateFlow.update { LoadState.Loading }
-            runCatching { productRepository.getProducts(currentPage, PAGE_SIZE) }
-                .onSuccess { newProducts ->
-                    productsFlow.update {
-                        Products(
-                            items = it.items + newProducts.items,
-                            isLast = newProducts.isLast,
-                        )
-                    }
-                    currentPage++
-
-                    refreshCart()
-                    loadStateFlow.update { LoadState.Success }
-                }.onFailure { throwable ->
-                    loadStateFlow.update {
-                        LoadState.Error(
-                            throwable,
-                            throwable.message ?: "다음 페이지를 불러올 수 없습니다.",
-                        )
-                    }
-                }
-        }
     }
 
     companion object {
