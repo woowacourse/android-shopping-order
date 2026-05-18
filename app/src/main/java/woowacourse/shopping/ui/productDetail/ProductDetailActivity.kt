@@ -20,19 +20,12 @@ class ProductDetailActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val appContainer = (application as ShoppingApplication).appContainer
-        val productId = intent.getIntExtra(EXTRA_PRODUCT_ID, -1)
-        val openedFromLastViewed = intent.getBooleanExtra(EXTRA_OPENED_FROM_LAST_VIEWED, false)
-        if (productId == -1) {
-            finish()
-            return
-        }
+
         setContent {
             val viewModel: ProductDetailViewModel =
                 viewModel(
                     factory =
                         ProductDetailViewModel.factory(
-                            productId = productId,
-                            openedFromLastViewed = openedFromLastViewed,
                             productRepository = appContainer.productRepository,
                             cartRepository = appContainer.cartRepository,
                             recentProductRepository = appContainer.recentProductRepository,
@@ -62,8 +55,8 @@ class ProductDetailActivity : ComponentActivity() {
     }
 
     companion object {
-        private const val EXTRA_PRODUCT_ID = "PRODUCT_ID"
-        private const val EXTRA_OPENED_FROM_LAST_VIEWED = "OPENED_FROM_LAST_VIEWED"
+        const val EXTRA_PRODUCT_ID = "PRODUCT_ID"
+        const val EXTRA_OPENED_FROM_LAST_VIEWED = "OPENED_FROM_LAST_VIEWED"
 
         fun newIntent(
             context: Context,

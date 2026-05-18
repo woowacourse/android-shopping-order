@@ -49,6 +49,7 @@ import woowacourse.shopping.domain.product.ImageUrl
 import woowacourse.shopping.domain.product.Price
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.ProductName
+import woowacourse.shopping.ui.util.LoadState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,42 +98,45 @@ private fun ProductDetailScreenContent(
             },
         )
 
-        when (uiState) {
-            is ProductDetailUiState.Loading -> {
+        when (uiState.loadState) {
+            is LoadState.Initial -> {}
+
+            is LoadState.Loading -> {
                 LoadingContent(modifier = Modifier.weight(1f))
             }
 
-            is ProductDetailUiState.Success -> {
-                ProductDetailContent(
-                    modifier =
-                        Modifier
-                            .background(Color.White)
-                            .weight(1f),
-                    imageUrl = uiState.product.imageUrl.value,
-                    productName = uiState.product.name.value,
-                    price = uiState.product.price.value,
-                    selectedQuantity = uiState.currentQuantity,
-                    lastViewedProduct = uiState.lastViewedProduct,
-                    onIncreaseClick = onIncreaseClick,
-                    onDecreaseClick = onDecreaseClick,
-                    onLastViewedProductClick = onLastViewedProductClick,
-                )
-
-                CardAddButton(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .height(52.dp),
-                    onAddToCartClick = {
-                        onAddToCartClick()
-                    },
-                )
+            is LoadState.Success -> {
+                uiState.product?.let {
+                    ProductDetailContent(
+                        modifier =
+                            Modifier
+                                .background(Color.White)
+                                .weight(1f),
+                        imageUrl = it.imageUrl.value,
+                        productName = it.name.value,
+                        price = it.price.value,
+                        selectedQuantity = uiState.currentQuantity,
+                        lastViewedProduct = uiState.lastViewedProduct,
+                        onIncreaseClick = onIncreaseClick,
+                        onDecreaseClick = onDecreaseClick,
+                        onLastViewedProductClick = onLastViewedProductClick,
+                    )
+                    CardAddButton(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(52.dp),
+                        onAddToCartClick = {
+                            onAddToCartClick()
+                        },
+                    )
+                }
             }
 
-            is ProductDetailUiState.Error -> {
+            is LoadState.Error -> {
                 ErrorContent(
                     modifier = Modifier.weight(1f),
-                    message = uiState.throwable.message ?: "상품 정보를 불러오지 못했어요.",
+                    message = uiState.loadState.message ?: "알 수 없는 에러가 발생하였습니다.",
                 )
             }
         }
@@ -461,7 +465,7 @@ private fun CardAddButton(
 fun ProductDetailScreenPreview() {
     ProductDetailScreenContent(
         uiState =
-            ProductDetailUiState.Success(
+            ProductDetailUiState(
                 product =
                     Product(
                         id = 1,
@@ -472,6 +476,7 @@ fun ProductDetailScreenPreview() {
                     ),
                 currentQuantity = 1,
                 lastViewedProduct = null,
+                loadState = LoadState.Success,
             ),
         onCloseClick = {},
         onIncreaseClick = {},
