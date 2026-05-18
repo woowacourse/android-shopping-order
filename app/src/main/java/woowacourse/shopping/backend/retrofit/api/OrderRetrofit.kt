@@ -6,7 +6,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import woowacourse.shopping.backend.retrofit.dto.OrderInfo
 
-interface OrderRetrofitInterface {
+interface OrderRetrofit {
     @POST("/orders")
     fun order(
         @Header("Accept") accept: String = "*/*",

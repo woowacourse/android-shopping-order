@@ -13,7 +13,7 @@ import woowacourse.shopping.backend.retrofit.dto.CartQuantity
 import woowacourse.shopping.backend.retrofit.dto.CartRequest
 import woowacourse.shopping.backend.retrofit.dto.ShoppingCartResponse
 
-interface ShoppingCartRetrofitInterface {
+interface ShoppingCartRetrofit {
     @GET("/cart-items")
     fun requestCartItems(
         @Header("Accept") accept: String = "*/*",

@@ -11,7 +11,7 @@ import retrofit2.http.Query
 import woowacourse.shopping.backend.retrofit.dto.Product
 import woowacourse.shopping.backend.retrofit.dto.ProductResponse
 
-interface ProductRetrofitInterface {
+interface ProductRetrofit {
     @GET("/products")
     fun requestProducts(
         @Header("Accept") accept: String = "*/*",
