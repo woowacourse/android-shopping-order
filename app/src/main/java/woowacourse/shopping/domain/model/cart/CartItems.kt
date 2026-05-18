@@ -2,9 +2,9 @@ package woowacourse.shopping.domain.model.cart
 
 class CartItems(
     val values: List<CartItem> = emptyList(),
-    val isLast: Boolean = false,
-    val isFirst: Boolean = true,
-    val totalPages: Int = 1,
+//    val isLast: Boolean = false,
+//    val isFirst: Boolean = true,
+//    val totalPages: Int = 1,
 ) {
     val totalQuantity: Int
         get() = values.sumOf { it.quantity.value }
@@ -48,8 +48,6 @@ class CartItems(
     fun findQuantity(cartId: Int): Quantity = findById(cartId)?.quantity ?: Quantity.ZERO
 
     fun contains(cartId: Int): Boolean = findById(cartId) != null
-
-    fun isExistProduct(productId: Int): Boolean = values.any { it.product.id == productId }
 
     fun subList(
         fromIndex: Int,

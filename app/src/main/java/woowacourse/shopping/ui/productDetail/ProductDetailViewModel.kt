@@ -38,7 +38,7 @@ class ProductDetailViewModel(
 
     private fun loadCart(){
         viewModelScope.launch{
-            cartFlow.value = Cart(cartRepository.getAllCartItems())
+            cartFlow.value = Cart(cartRepository.getAllCartItems().items)
         }
     }
 

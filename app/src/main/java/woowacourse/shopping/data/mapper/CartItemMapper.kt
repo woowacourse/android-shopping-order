@@ -5,10 +5,11 @@ import woowacourse.shopping.data.remote.dto.CartResponseDto
 import woowacourse.shopping.domain.model.cart.CartItem
 import woowacourse.shopping.domain.model.cart.CartItems
 import woowacourse.shopping.domain.model.cart.Quantity
+import woowacourse.shopping.ui.cart.PagedCartItems
 
-fun CartResponseDto.toDomain(): CartItems =
-    CartItems(
-        values = content.toDomain(),
+fun CartResponseDto.toDomain(): PagedCartItems =
+    PagedCartItems(
+        items = CartItems(content.toDomain()),
         isLast = last,
         isFirst = first,
         totalPages = totalPages,
