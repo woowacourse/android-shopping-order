@@ -25,9 +25,10 @@ fun CartItemList(
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 18.dp, vertical = 24.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 18.dp, vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         if (isLoading) {
@@ -69,8 +70,9 @@ fun CartItemList(
                     onChecked = {
                         onChecked(it.contentId)
                     },
-                    isChecked = checkMap[it.contentId]
-                        ?: false,
+                    isChecked =
+                        checkMap[it.contentId]
+                            ?: false,
                 )
             }
         }
@@ -81,28 +83,29 @@ fun CartItemList(
 @Composable
 private fun CartItemListPreview() {
     CartItemList(
-        cartContents = listOf(
-            CartItemUiModel(
-                0,
-                ProductUiModel(
-                    id = 1,
-                    name = "더미 상품 1",
-                    price = 10000,
-                    imageUrl = "",
-                    quantity = 1,
+        cartContents =
+            listOf(
+                CartItemUiModel(
+                    0,
+                    ProductUiModel(
+                        id = 1,
+                        name = "더미 상품 1",
+                        price = 10000,
+                        imageUrl = "",
+                        quantity = 1,
+                    ),
+                ),
+                CartItemUiModel(
+                    1,
+                    ProductUiModel(
+                        id = 2,
+                        name = "더미 상품 2",
+                        price = 20000,
+                        imageUrl = "",
+                        quantity = 3,
+                    ),
                 ),
             ),
-            CartItemUiModel(
-                1,
-                ProductUiModel(
-                    id = 2,
-                    name = "더미 상품 2",
-                    price = 20000,
-                    imageUrl = "",
-                    quantity = 3,
-                ),
-            ),
-        ),
         onDelete = {},
         onIncrease = {},
         onDecrease = {},

@@ -34,11 +34,12 @@ fun ProductAppBar(
                 )
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color(0xFF555555),
-            titleContentColor = Color.White,
-            actionIconContentColor = Color.White,
-        ),
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = Color(0xFF555555),
+                titleContentColor = Color.White,
+                actionIconContentColor = Color.White,
+            ),
         modifier = modifier,
     )
 }

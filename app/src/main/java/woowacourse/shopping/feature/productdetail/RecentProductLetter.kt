@@ -40,58 +40,62 @@ fun RecentProductLetter(
     when (loadingState) {
         ProductDetailLoadingState.None -> Box {}
         ProductDetailLoadingState.Loading,
-        -> Box(contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
-        }
+        ->
+            Box(contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
 
         is ProductDetailLoadingState.Error,
-        -> Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(vertical = 5.dp),
-        ) {
-            Icon(
-                imageVector = Icons.Default.Warning,
-                contentDescription = stringResource(R.string.product_detail_error_description),
-                tint = Color(0xFFFF9800),
-                modifier = Modifier.size(32.dp),
-            )
-            Text(
-                text = stringResource(R.string.product_detail_entry_error),
-                fontWeight = FontWeight.W500,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(top = 4.dp),
-            )
-        }
-
-        is ProductDetailLoadingState.Success -> Box(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(18.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .border(1.dp, Color(0xffaaaaaa), shape = RoundedCornerShape(8.dp))
-                .clickable(onClick = { onClickRecentProduct(loadingState.product.id) }),
-        ) {
+        ->
             Column(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 18.dp, vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(vertical = 5.dp),
             ) {
-                Text(
-                    "마지막으로 본 상품",
-                    fontWeight = FontWeight.W700,
-                    fontSize = 12.sp,
-                    color = Color(0xff04c09e),
+                Icon(
+                    imageVector = Icons.Default.Warning,
+                    contentDescription = stringResource(R.string.product_detail_error_description),
+                    tint = Color(0xFFFF9800),
+                    modifier = Modifier.size(32.dp),
                 )
-                Spacer(Modifier.height(8.dp))
                 Text(
-                    loadingState.product.name,
-                    fontWeight = FontWeight.W400,
-                    fontSize = 18.sp,
-                    color = Color(0xff555555),
+                    text = stringResource(R.string.product_detail_entry_error),
+                    fontWeight = FontWeight.W500,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(top = 4.dp),
                 )
             }
-        }
+
+        is ProductDetailLoadingState.Success ->
+            Box(
+                modifier =
+                    modifier
+                        .fillMaxWidth()
+                        .padding(18.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .border(1.dp, Color(0xffaaaaaa), shape = RoundedCornerShape(8.dp))
+                        .clickable(onClick = { onClickRecentProduct(loadingState.product.id) }),
+            ) {
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 18.dp, vertical = 16.dp),
+                ) {
+                    Text(
+                        "마지막으로 본 상품",
+                        fontWeight = FontWeight.W700,
+                        fontSize = 12.sp,
+                        color = Color(0xff04c09e),
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        loadingState.product.name,
+                        fontWeight = FontWeight.W400,
+                        fontSize = 18.sp,
+                        color = Color(0xff555555),
+                    )
+                }
+            }
     }
 }
 
@@ -99,15 +103,16 @@ fun RecentProductLetter(
 @Composable
 fun RecentProductLetterPreview(modifier: Modifier = Modifier) {
     RecentProductLetter(
-        loadingState = ProductDetailLoadingState.Success(
-            ProductUiModel(
-                name = "asdqwe",
-                price = 1000,
-                imageUrl = "",
-                id = 0,
-                quantity = 0,
+        loadingState =
+            ProductDetailLoadingState.Success(
+                ProductUiModel(
+                    name = "asdqwe",
+                    price = 1000,
+                    imageUrl = "",
+                    id = 0,
+                    quantity = 0,
+                ),
             ),
-        ),
         onClickRecentProduct = {},
     )
 }
@@ -116,9 +121,10 @@ fun RecentProductLetterPreview(modifier: Modifier = Modifier) {
 @Composable
 fun RecentProductErrorLetterPreview(modifier: Modifier = Modifier) {
     RecentProductLetter(
-        loadingState = ProductDetailLoadingState.Error(
-            "asd",
-        ),
+        loadingState =
+            ProductDetailLoadingState.Error(
+                "asd",
+            ),
         onClickRecentProduct = {},
     )
 }

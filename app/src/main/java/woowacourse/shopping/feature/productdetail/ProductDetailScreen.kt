@@ -73,20 +73,21 @@ fun ProductDetailScreen(
         productState is ProductDetailLoadingState.Error ||
             productState is ProductDetailLoadingState.None -> ProductDetailErrorScreen(activityFinish)
 
-        productState is ProductDetailLoadingState.Success -> ProductDetailContent(
-            ProductUiModel = productState.product,
-            recentProductLoadingState = recentState,
-            quantity = uiState.quantity,
-            activityFinish = activityFinish,
-            increase = viewModel::increase,
-            decrease = viewModel::decrease,
-            onAddCartButton = {
-                viewModel.addToCart()
-                Toast.makeText(currentContext, "장바구니에 담겼습니다.", Toast.LENGTH_SHORT).show()
-            },
-            onClickRecentButton = onClickRecentButton,
-            modifier = modifier,
-        )
+        productState is ProductDetailLoadingState.Success ->
+            ProductDetailContent(
+                ProductUiModel = productState.product,
+                recentProductLoadingState = recentState,
+                quantity = uiState.quantity,
+                activityFinish = activityFinish,
+                increase = viewModel::increase,
+                decrease = viewModel::decrease,
+                onAddCartButton = {
+                    viewModel.addToCart()
+                    Toast.makeText(currentContext, "장바구니에 담겼습니다.", Toast.LENGTH_SHORT).show()
+                },
+                onClickRecentButton = onClickRecentButton,
+                modifier = modifier,
+            )
     }
 }
 
@@ -112,17 +113,19 @@ fun ProductDetailContent(
         },
     ) { innerPadding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
         ) {
             Column {
                 PreviewableAsyncImage(
                     imageUrl = ProductUiModel.imageUrl,
                     description = ProductUiModel.name,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f),
                 )
                 Text(
                     text = ProductUiModel.name,
@@ -133,9 +136,10 @@ fun ProductDetailContent(
                 HorizontalDivider()
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp, horizontal = 18.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp, horizontal = 18.dp),
                 ) {
                     Text(
                         text = DecimalPriceFormatter().format(ProductUiModel.price * quantity),
@@ -147,10 +151,11 @@ fun ProductDetailContent(
                         quantity = quantity,
                         onIncrease = increase,
                         onDecrease = decrease,
-                        modifier = Modifier.size(
-                            width = 126.dp,
-                            height = 42.dp,
-                        ),
+                        modifier =
+                            Modifier.size(
+                                width = 126.dp,
+                                height = 42.dp,
+                            ),
                     )
                 }
                 RecentProductLetter(
@@ -174,11 +179,12 @@ private fun CartPutButton(
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier
-            .fillMaxWidth()
-            .background(color = Color(0xff04c09e))
-            .clickable(onClick = onClick)
-            .padding(vertical = 12.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(color = Color(0xff04c09e))
+                .clickable(onClick = onClick)
+                .padding(vertical = 12.dp),
     ) {
         Text(
             stringResource(R.string.product_detail_select),
@@ -207,9 +213,10 @@ fun ProductDetailErrorScreen(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
         ) {
             Icon(
                 imageVector = Icons.Default.Warning,
@@ -232,13 +239,14 @@ fun ProductDetailErrorScreen(
 private fun ProductScreenPreview() {
     ProductDetailContent(
         activityFinish = {},
-        ProductUiModel = ProductUiModel(
-            name = "asd",
-            price = 2000,
-            imageUrl = "",
-            id = 1,
-            quantity = 5,
-        ),
+        ProductUiModel =
+            ProductUiModel(
+                name = "asd",
+                price = 2000,
+                imageUrl = "",
+                id = 1,
+                quantity = 5,
+            ),
         quantity = 5,
         increase = { },
         decrease = { },

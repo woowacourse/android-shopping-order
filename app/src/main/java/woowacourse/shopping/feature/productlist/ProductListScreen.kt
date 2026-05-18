@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -20,9 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LifecycleEventEffect
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.feature.productlist.viewmodel.ProductListEvent
@@ -54,8 +51,9 @@ fun ProductListScreen(
 
     Scaffold(
         containerColor = Color.White,
-        modifier = modifier
-            .fillMaxSize(),
+        modifier =
+            modifier
+                .fillMaxSize(),
         topBar = {
             ProductListAppBar(
                 onCartIconClick = onCartIconClick,
@@ -68,14 +66,16 @@ fun ProductListScreen(
             vm.loadRecentProducts()
         }
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPadding),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(innerPadding),
         ) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .weight(1f),
             ) {
                 Column {
                     if (state.recentProducts.isNotEmpty()) {
@@ -91,10 +91,11 @@ fun ProductListScreen(
                             modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 10.dp),
                         )
                         Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(5.dp)
-                                .background(Color(0xff555555)),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(5.dp)
+                                    .background(Color(0xff555555)),
                         )
                     }
 
@@ -107,7 +108,9 @@ fun ProductListScreen(
                                 it.id,
                                 if (state.recentProducts.isNotEmpty()) {
                                     state.recentProducts.first().id
-                                } else null,
+                                } else {
+                                    null
+                                },
                             )
                         },
                         onLoading = vm::loadingFetch,

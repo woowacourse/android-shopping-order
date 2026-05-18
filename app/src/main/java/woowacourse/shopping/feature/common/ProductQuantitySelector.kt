@@ -33,9 +33,10 @@ fun ProductQuantitySelector(
     Row(
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .clip(RoundedCornerShape(4.dp))
-            .background(Color.White),
+        modifier =
+            modifier
+                .clip(RoundedCornerShape(4.dp))
+                .background(Color.White),
     ) {
         IconButton(
             onClick = onDecrease,
@@ -44,12 +45,14 @@ fun ProductQuantitySelector(
             Icon(
                 imageVector = Icons.Default.Remove,
                 contentDescription = stringResource(R.string.decrease_product_description),
-                modifier = Modifier
-                    .size(20.dp),
-                tint = when (quantity > 0) {
-                    true -> Color(0xff555555)
-                    false -> Color(0xff999999)
-                },
+                modifier =
+                    Modifier
+                        .size(20.dp),
+                tint =
+                    when (quantity > 0) {
+                        true -> Color(0xff555555)
+                        false -> Color(0xff999999)
+                    },
             )
         }
 
@@ -58,8 +61,9 @@ fun ProductQuantitySelector(
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = stringResource(R.string.add_product_description),
-                modifier = Modifier
-                    .size(20.dp),
+                modifier =
+                    Modifier
+                        .size(20.dp),
                 tint = Color(0xff555555),
             )
         }

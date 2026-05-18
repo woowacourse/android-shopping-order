@@ -10,18 +10,15 @@ class CartContent(
     }
 
     val productId: Long get() = product.id
+
     fun hasProductId(id: Long): Boolean = productId == id
 
-    fun addQuantity(increment: Int): CartContent {
-        return CartContent(product, quantity + increment)
-    }
+    fun addQuantity(increment: Int): CartContent = CartContent(product, quantity + increment)
 
     fun decreaseQuantity(decrement: Int): CartContent {
         require(decrement <= quantity) { "존재하는 수량보다 많이 뺄 수 없습니다." }
         return CartContent(product, quantity - decrement)
     }
 
-    fun changeQuantity(newQuantity: Int): CartContent {
-        return CartContent(product, newQuantity)
-    }
+    fun changeQuantity(newQuantity: Int): CartContent = CartContent(product, newQuantity)
 }

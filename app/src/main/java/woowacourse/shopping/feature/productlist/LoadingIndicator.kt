@@ -15,10 +15,11 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun LoadingIndicator(modifier: Modifier = Modifier) {
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.3f))
-            .pointerInput(Unit) { awaitEachGesture { awaitPointerEvent() } },
+        modifier =
+            modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f))
+                .pointerInput(Unit) { awaitEachGesture { awaitPointerEvent() } },
         contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator()

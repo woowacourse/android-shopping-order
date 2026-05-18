@@ -8,11 +8,11 @@ import woowacourse.shopping.domain.Product
 class CartRepositoryImpl(
     private val cartServerDao: CartServerDao,
 ) : CartRepository {
-
     override suspend fun loadCart(): Cart = Cart(loadAll())
 
-    override suspend fun loadTotalQuantity(): Int = cartServerDao.getTotalQuantity()
-        ?: 0
+    override suspend fun loadTotalQuantity(): Int =
+        cartServerDao.getTotalQuantity()
+            ?: 0
 
     override suspend fun pagination(
         page: Int,
@@ -34,8 +34,9 @@ class CartRepositoryImpl(
     }
 
     override suspend fun decrease(productId: Long) {
-        val existing = loadAll().firstOrNull { it.hasProductId(productId) }
-            ?: return
+        val existing =
+            loadAll().firstOrNull { it.hasProductId(productId) }
+                ?: return
         if (existing.quantity <= 1) {
             cartServerDao.deleteById(existing.id)
         } else {
@@ -46,8 +47,9 @@ class CartRepositoryImpl(
     }
 
     override suspend fun remove(productId: Long) {
-        val existing = loadAll().firstOrNull { it.hasProductId(productId) }
-            ?: return
+        val existing =
+            loadAll().firstOrNull { it.hasProductId(productId) }
+                ?: return
         cartServerDao.deleteById(existing.id)
     }
 

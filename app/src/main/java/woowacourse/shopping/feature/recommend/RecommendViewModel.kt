@@ -30,7 +30,7 @@ data class RecommendUiState(
 
 class RecommendViewModel(
     private val application: ShoppingApplication,
-    private val contentIds: List<Long>
+    private val contentIds: List<Long>,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RecommendUiState())
     val uiState: StateFlow<RecommendUiState> = _uiState.asStateFlow()
@@ -65,22 +65,25 @@ class RecommendViewModel(
             val category = refreshRecentProducts()
             val serverCart = cartRepository.loadCart()
 
-            products = productRepository.loadProducts(
-                startIndex = products.size,
-                pageSize = pageSize,
-                sort = emptyList(),
-                category = category,
-            ).first
+            products =
+                productRepository
+                    .loadProducts(
+                        startIndex = products.size,
+                        pageSize = pageSize,
+                        sort = emptyList(),
+                        category = category,
+                    ).first
 
-            val duplicationProducts = products.filter { !serverCart.getProductList().map{ it.id }.contains(it.id) }
-            val checkCart = serverCart.cartContents.filter{ it.id in contentIds }
+            val duplicationProducts = products.filter { !serverCart.getProductList().map { it.id }.contains(it.id) }
+            val checkCart = serverCart.cartContents.filter { it.id in contentIds }
 
             _uiState.update {
                 it.copy(
-                    recommendList = duplicationProducts.map { product ->
-                        product.toProductUiModel()
-                    },
-                    totalPrice = checkCart.sumOf{ it.quantity * it.product.priceAmount() },
+                    recommendList =
+                        duplicationProducts.map { product ->
+                            product.toProductUiModel()
+                        },
+                    totalPrice = checkCart.sumOf { it.quantity * it.product.priceAmount() },
                     totalCount = checkCart.size,
                 )
             }
@@ -88,71 +91,76 @@ class RecommendViewModel(
     }
 
     fun increase(productId: Long) {
-        val product = products.firstOrNull { it.id == productId }
-            ?: throw ProductNotFoundException(productId)
+        val product =
+            products.firstOrNull { it.id == productId }
+                ?: throw ProductNotFoundException(productId)
 
         _uiState.update {
             it.copy(
-                recommendList = it.recommendList.map { product ->
-                    if (product.id == productId) {
-                        product.copy(quantity = product.quantity + 1)
-                    } else {
-                        product.copy(quantity = product.quantity)
-                    }
-                },
+                recommendList =
+                    it.recommendList.map { product ->
+                        if (product.id == productId) {
+                            product.copy(quantity = product.quantity + 1)
+                        } else {
+                            product.copy(quantity = product.quantity)
+                        }
+                    },
                 totalPrice = it.totalPrice + product.priceAmount(),
-                totalCount = it.totalCount + if (it.recommendList.firstOrNull { it.id == productId }?.quantity == 0) 1 else 0
+                totalCount = it.totalCount + if (it.recommendList.firstOrNull { it.id == productId }?.quantity == 0) 1 else 0,
             )
         }
     }
 
     fun decrease(productId: Long) {
-        val product = products.firstOrNull { it.id == productId }
-            ?: throw ProductNotFoundException(productId)
+        val product =
+            products.firstOrNull { it.id == productId }
+                ?: throw ProductNotFoundException(productId)
 
         _uiState.update {
             it.copy(
-                recommendList = it.recommendList.map { product ->
-                    if (product.id == productId) {
-                        product.copy(quantity = product.quantity - 1)
-                    } else {
-                        product.copy(quantity = product.quantity)
-                    }
-                },
+                recommendList =
+                    it.recommendList.map { product ->
+                        if (product.id == productId) {
+                            product.copy(quantity = product.quantity - 1)
+                        } else {
+                            product.copy(quantity = product.quantity)
+                        }
+                    },
                 totalPrice = it.totalPrice - product.priceAmount(),
-                totalCount = it.totalCount - if (it.recommendList.firstOrNull { it.id == productId }?.quantity == 1) 1 else 0
+                totalCount = it.totalCount - if (it.recommendList.firstOrNull { it.id == productId }?.quantity == 1) 1 else 0,
             )
         }
     }
 
-    fun Product.toProductUiModel(quantity: Int = 0): ProductUiModel {
-        return ProductUiModel(
+    fun Product.toProductUiModel(quantity: Int = 0): ProductUiModel =
+        ProductUiModel(
             name = this.name,
             price = this.priceAmount(),
             imageUrl = this.imageUrl,
             id = this.id,
             quantity = quantity,
         )
-    }
 
     fun order() {
         viewModelScope.launch {
-            _uiState.value.recommendList.filter{ it.quantity > 0 }.forEach {
+            _uiState.value.recommendList.filter { it.quantity > 0 }.forEach {
                 cartRepository.increase(
-                    product = Product(
-                        id = it.id,
-                        name = it.name,
-                        price = Money(it.price),
-                        imageUrl = it.imageUrl,
-                    ),
-                    quantity = it.quantity
+                    product =
+                        Product(
+                            id = it.id,
+                            name = it.name,
+                            price = Money(it.price),
+                            imageUrl = it.imageUrl,
+                        ),
+                    quantity = it.quantity,
                 )
             }
             val serverCart = cartRepository.loadCart()
 
-            val latestContents = serverCart.cartContents.filter { cartContent ->
-                products.map { it.id }.contains(cartContent.product.id)
-            }
+            val latestContents =
+                serverCart.cartContents.filter { cartContent ->
+                    products.map { it.id }.contains(cartContent.product.id)
+                }
             Log.d("order", latestContents.toString())
             orderRepository.orders(
                 cartItemIds = contentIds + latestContents.map { it.id },
@@ -168,11 +176,12 @@ class RecommendViewModel(
     }
 
     companion object {
-        fun recommendFactory(contentIds: List<Long>) = viewModelFactory {
-            initializer {
-                val app = this[APPLICATION_KEY] as ShoppingApplication
-                RecommendViewModel(app, contentIds)
+        fun recommendFactory(contentIds: List<Long>) =
+            viewModelFactory {
+                initializer {
+                    val app = this[APPLICATION_KEY] as ShoppingApplication
+                    RecommendViewModel(app, contentIds)
+                }
             }
-        }
     }
 }

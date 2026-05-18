@@ -57,20 +57,22 @@ open class ShoppingApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         applicationScope.launch {
-            appDependenciesDeferred = async {
-                startMockWebServer()
-                initDependencies()
-            }
+            appDependenciesDeferred =
+                async {
+                    startMockWebServer()
+                    initDependencies()
+                }
         }
     }
 
     private suspend fun initDependencies(): AppDependencies {
-
-        val auth: AuthRepository = AuthRepositoryImpl(
-            dataSource = AuthDataSourceImpl(
-                dataStore = applicationContext.dataStore,
-            ),
-        )
+        val auth: AuthRepository =
+            AuthRepositoryImpl(
+                dataSource =
+                    AuthDataSourceImpl(
+                        dataStore = applicationContext.dataStore,
+                    ),
+            )
 
         var token = auth.load()
         if (token.isBlank()) {
@@ -82,56 +84,69 @@ open class ShoppingApplication : Application() {
         val baseUrl =
             "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/".toHttpUrl()
 
-        val client = OkHttpClient.Builder()
-            .addInterceptor { chain ->
-                val authorized = chain.request().newBuilder()
-                    .header("Authorization", token)
-                    .build()
-                chain.proceed(authorized)
-            }
-            .build()
+        val client =
+            OkHttpClient
+                .Builder()
+                .addInterceptor { chain ->
+                    val authorized =
+                        chain
+                            .request()
+                            .newBuilder()
+                            .header("Authorization", token)
+                            .build()
+                    chain.proceed(authorized)
+                }.build()
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-            .client(client)
-            .build()
+        val retrofit =
+            Retrofit
+                .Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+                .client(client)
+                .build()
 
         val retrofitProductService = retrofit.create(RetrofitProductService::class.java)
         val retrofitCartService = retrofit.create(RetrofitCartService::class.java)
         val orderService = retrofit.create(OrderService::class.java)
 
-        val recentProductDatabase = Room.databaseBuilder(
-            applicationContext,
-            RecentProductDatabase::class.java,
-            "recent_product.db",
-        ).build()
+        val recentProductDatabase =
+            Room
+                .databaseBuilder(
+                    applicationContext,
+                    RecentProductDatabase::class.java,
+                    "recent_product.db",
+                ).build()
 
-        val product: ProductRepository = ProductRepositoryImpl(
-            dataSource = ProductDataSourceImpl(
-                productDao = ProductRetrofitDaoImpl(
-                    retrofitProductService = retrofitProductService,
-                ),
-            ),
-        )
-
-
-        val cart: CartRepository = CartRepositoryImpl(
-            cartServerDao = CartRetrofitDaoImpl(
-                retrofitCartService = retrofitCartService,
-            ),
-        )
-        val recent: RecentProductRepository =
-            RecentProductRepositoryImpl(
-                recentProductDao = recentProductDatabase.recentProductDao()
+        val product: ProductRepository =
+            ProductRepositoryImpl(
+                dataSource =
+                    ProductDataSourceImpl(
+                        productDao =
+                            ProductRetrofitDaoImpl(
+                                retrofitProductService = retrofitProductService,
+                            ),
+                    ),
             )
 
+        val cart: CartRepository =
+            CartRepositoryImpl(
+                cartServerDao =
+                    CartRetrofitDaoImpl(
+                        retrofitCartService = retrofitCartService,
+                    ),
+            )
+        val recent: RecentProductRepository =
+            RecentProductRepositoryImpl(
+                recentProductDao = recentProductDatabase.recentProductDao(),
+            )
 
-        val order: OrderRepository = OrderRepositoryImpl(
-            orderDao = OrderDaoImpl(
-                orderService = orderService,
-            ),
-        )
+        val order: OrderRepository =
+            OrderRepositoryImpl(
+                orderDao =
+                    OrderDaoImpl(
+                        orderService = orderService,
+                    ),
+            )
 
         return AppDependencies(
             productRepository = product,

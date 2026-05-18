@@ -1,12 +1,10 @@
 package woowacourse.shopping.domain
 
-import java.util.UUID
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class CartContentTest {
-
     @Test
     fun `입력받은 상품의 id가 CartItem 의 상품 id 와 같으면 true를 반환한다`() {
         val product = normalProduct("임시", id = 1)
@@ -38,10 +36,11 @@ class CartContentTest {
     private fun normalProduct(
         name: String = "상품",
         id: Long = 1,
-    ): Product = Product(
-        id = id,
-        name = name,
-        price = Money(1000),
-        imageUrl = "",
-    )
+    ): Product =
+        Product(
+            id = id,
+            name = name,
+            price = Money(1000),
+            imageUrl = "",
+        )
 }

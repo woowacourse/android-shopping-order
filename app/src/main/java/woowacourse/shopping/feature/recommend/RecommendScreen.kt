@@ -45,8 +45,9 @@ fun RecommendScreen(
 
     Scaffold(
         containerColor = Color.White,
-        modifier = modifier
-            .fillMaxSize(),
+        modifier =
+            modifier
+                .fillMaxSize(),
         topBar = {
             CartAppBar(onCloseClick = onCloseClick)
         },
@@ -64,17 +65,19 @@ fun RecommendScreen(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(78.dp)
-                    .background(Color(0xff555555)),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(78.dp)
+                        .background(Color(0xff555555)),
             ) {
                 Row(
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 20.dp),
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .padding(horizontal = 20.dp),
                 ) {
                     Text(
                         DecimalPriceFormatter().format(
@@ -90,10 +93,11 @@ fun RecommendScreen(
                         viewModel.order()
                         Toast.makeText(currentContext, "주문이 완료되었습니다.", Toast.LENGTH_SHORT).show()
                     },
-                    modifier = Modifier
-                        .width(122.dp)
-                        .fillMaxHeight()
-                        .background(Color(0xff04C09E)),
+                    modifier =
+                        Modifier
+                            .width(122.dp)
+                            .fillMaxHeight()
+                            .background(Color(0xff04C09E)),
                 ) {
                     Text(
                         "주문하기(${uiState.totalCount})",

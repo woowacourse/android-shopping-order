@@ -18,13 +18,12 @@ data class ProductDto(
     @SerialName("price")
     val price: Int,
 ) {
-    fun toDomain(): Product {
-        return Product(
+    fun toDomain(): Product =
+        Product(
             name = this.name,
             price = Money(this.price),
             imageUrl = this.imageUrl,
             id = this.id,
             category = category,
         )
-    }
 }

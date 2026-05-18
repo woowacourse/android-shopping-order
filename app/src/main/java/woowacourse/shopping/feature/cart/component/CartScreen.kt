@@ -81,7 +81,6 @@ fun CartScreen(
         onChecked = viewModel::cartItemCheck,
         onTotalCheck = viewModel::totalCheck,
         modifier = modifier,
-
     )
 }
 
@@ -103,8 +102,9 @@ fun CartScreenContent(
 ) {
     Scaffold(
         containerColor = Color.White,
-        modifier = modifier
-            .fillMaxSize(),
+        modifier =
+            modifier
+                .fillMaxSize(),
         topBar = {
             CartAppBar(onCloseClick = onCloseClick)
         },
@@ -112,9 +112,10 @@ fun CartScreenContent(
         Box {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(innerPadding),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(innerPadding),
             ) {
                 CartItemList(
                     checkMap = uiState.checkMap,
@@ -138,17 +139,19 @@ fun CartScreenContent(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(78.dp)
-                        .background(Color(0xff555555)),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(78.dp)
+                            .background(Color(0xff555555)),
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 20.dp),
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .padding(horizontal = 20.dp),
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -159,9 +162,10 @@ fun CartScreenContent(
                                 onCheckedChange = {
                                     onTotalCheck()
                                 },
-                                colors = CheckboxDefaults.colors().copy(
-                                    checkedBoxColor = Color(0xFF04C09E),
-                                ),
+                                colors =
+                                    CheckboxDefaults.colors().copy(
+                                        checkedBoxColor = Color(0xFF04C09E),
+                                    ),
                                 modifier = Modifier.size(24.dp),
                             )
                             Text("전체", color = Color.White, fontSize = 12.sp)
@@ -177,10 +181,11 @@ fun CartScreenContent(
                         onClick = {
                             onToRecommendIntent()
                         },
-                        modifier = Modifier
-                            .width(122.dp)
-                            .fillMaxHeight()
-                            .background(Color(0xff04C09E)),
+                        modifier =
+                            Modifier
+                                .width(122.dp)
+                                .fillMaxHeight()
+                                .background(Color(0xff04C09E)),
                     ) {
                         Text(
                             "주문하기(${uiState.totalCount})",
@@ -199,21 +204,23 @@ fun CartScreenContent(
 @Composable
 private fun CartScreenContentPreview() {
     CartScreenContent(
-        uiState = CartUiState(
-            isLoading = false,
-            paginatedCartContents = MockData.MOCK_PRODUCTS.take(2).map {
-                CartItemUiModel(
-                    contentId = 1,
-                    ProductUiModel(
-                        name = it.name,
-                        price = it.priceAmount(),
-                        imageUrl = it.imageUrl,
-                        id = it.id,
-                        quantity = 1,
-                    ),
-                )
-            },
-        ),
+        uiState =
+            CartUiState(
+                isLoading = false,
+                paginatedCartContents =
+                    MockData.MOCK_PRODUCTS.take(2).map {
+                        CartItemUiModel(
+                            contentId = 1,
+                            ProductUiModel(
+                                name = it.name,
+                                price = it.priceAmount(),
+                                imageUrl = it.imageUrl,
+                                id = it.id,
+                                quantity = 1,
+                            ),
+                        )
+                    },
+            ),
         onDelete = {},
         onIncrease = {},
         onDecrease = {},

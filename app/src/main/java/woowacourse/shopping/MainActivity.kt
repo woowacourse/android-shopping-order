@@ -21,11 +21,12 @@ class MainActivity : ComponentActivity() {
             AndroidshoppingTheme {
                 ProductListScreen(
                     onProductClick = { id, recentProductId ->
-                        val toProductDetailIntent = ProductDetailActivity.newIntent(
-                            context = this,
-                            id = id,
-                            recentProductId = recentProductId,
-                        )
+                        val toProductDetailIntent =
+                            ProductDetailActivity.newIntent(
+                                context = this,
+                                id = id,
+                                recentProductId = recentProductId,
+                            )
                         startActivity(toProductDetailIntent)
                     },
                     onCartIconClick = {

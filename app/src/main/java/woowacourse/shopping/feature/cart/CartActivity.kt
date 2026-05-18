@@ -22,7 +22,8 @@ class CartActivity : ComponentActivity() {
                     onToRecommendIntent = { cartContentIds ->
                         val toRecommendIntent = Intent(this, RecommendActivity::class.java)
                         toRecommendIntent.putParcelableArrayListExtra(
-                            "cartContentIds", ArrayList(cartContentIds),
+                            "cartContentIds",
+                            ArrayList(cartContentIds),
                         )
                         startActivity(toRecommendIntent)
                     },

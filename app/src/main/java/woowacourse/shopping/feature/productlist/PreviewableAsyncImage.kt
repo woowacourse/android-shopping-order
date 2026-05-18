@@ -20,16 +20,23 @@ fun PreviewableAsyncImage(
     modifier: Modifier = Modifier,
 ) {
     AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(imageUrl)
-            .crossfade(true)
-            .build(),
+        model =
+            ImageRequest
+                .Builder(LocalContext.current)
+                .data(imageUrl)
+                .crossfade(true)
+                .build(),
         contentDescription = description,
         contentScale = ContentScale.Crop,
-        modifier = modifier
-            .fillMaxWidth(),
-        error = if (isLoading) null
-        else painterResource(R.drawable.ic_launcher_background),
+        modifier =
+            modifier
+                .fillMaxWidth(),
+        error =
+            if (isLoading) {
+                null
+            } else {
+                painterResource(R.drawable.ic_launcher_background)
+            },
     )
 }
 

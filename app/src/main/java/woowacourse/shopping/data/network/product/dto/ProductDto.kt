@@ -12,13 +12,12 @@ class ProductDto(
     val imageUrl: String,
     val category: String,
 ) {
-    fun toDomain(): Product {
-        return Product(
+    fun toDomain(): Product =
+        Product(
             name = this.name,
             price = Money(this.price),
             imageUrl = this.imageUrl,
             id = this.id,
             category = this.category,
         )
-    }
 }

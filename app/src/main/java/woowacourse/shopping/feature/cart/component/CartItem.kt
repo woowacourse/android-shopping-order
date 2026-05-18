@@ -47,41 +47,44 @@ fun CartItem(
     isChecked: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
-
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
-        modifier = modifier
-            .then(
-                if (isLoading) {
-                    Modifier.background(Color(0xfff3f3f3))
-                } else Modifier,
-            )
-            .clip(RoundedCornerShape(4.dp))
-            .border(
-                shape = RoundedCornerShape(4.dp),
-                color = Color(0xffaaaaaa),
-                width = 1.dp,
-            )
-            .padding(horizontal = 12.dp, vertical = 18.dp),
+        modifier =
+            modifier
+                .then(
+                    if (isLoading) {
+                        Modifier.background(Color(0xfff3f3f3))
+                    } else {
+                        Modifier
+                    },
+                ).clip(RoundedCornerShape(4.dp))
+                .border(
+                    shape = RoundedCornerShape(4.dp),
+                    color = Color(0xffaaaaaa),
+                    width = 1.dp,
+                ).padding(horizontal = 12.dp, vertical = 18.dp),
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .fillMaxWidth(),
         ) {
             Row(
                 modifier = Modifier.weight(1f),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                if (isLoading.not())
+                if (isLoading.not()) {
                     Checkbox(
                         checked = isChecked,
                         onCheckedChange = { onChecked() },
-                        colors = CheckboxDefaults.colors().copy(
-                            checkedBoxColor = Color(0xFF04C09E),
-                        ),
+                        colors =
+                            CheckboxDefaults.colors().copy(
+                                checkedBoxColor = Color(0xFF04C09E),
+                            ),
                     )
+                }
                 Text(
                     text = name,
                     fontWeight = FontWeight.W700,
@@ -92,7 +95,7 @@ fun CartItem(
                     modifier = Modifier.background(if (isLoading) Color.LightGray else Color.Unspecified),
                 )
             }
-            if (isLoading.not())
+            if (isLoading.not()) {
                 IconButton(
                     onClick = onDelete,
                 ) {
@@ -103,6 +106,7 @@ fun CartItem(
                         modifier = Modifier.padding(end = 10.dp),
                     )
                 }
+            }
         }
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -113,23 +117,27 @@ fun CartItem(
                 isLoading = isLoading,
                 imageUrl = imageUrl,
                 description = name,
-                modifier = Modifier
-                    .size(width = 136.dp, height = 72.dp)
-                    .then(
-                        if (isLoading)
-                            Modifier.background(Color.LightGray)
-                        else Modifier,
-                    ),
+                modifier =
+                    Modifier
+                        .size(width = 136.dp, height = 72.dp)
+                        .then(
+                            if (isLoading) {
+                                Modifier.background(Color.LightGray)
+                            } else {
+                                Modifier
+                            },
+                        ),
             )
-            if (isLoading.not())
+            if (isLoading.not()) {
                 Column(horizontalAlignment = Alignment.End) {
                     ProductQuantitySelector(
                         quantity = quantity,
                         onIncrease = onIncrease,
                         onDecrease = onDecrease,
-                        modifier = Modifier
-                            .padding(end = 5.dp)
-                            .size(width = 126.dp, height = 42.dp),
+                        modifier =
+                            Modifier
+                                .padding(end = 5.dp)
+                                .size(width = 126.dp, height = 42.dp),
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(
@@ -139,6 +147,7 @@ fun CartItem(
                         color = Color(0xff555555),
                     )
                 }
+            }
         }
     }
 }

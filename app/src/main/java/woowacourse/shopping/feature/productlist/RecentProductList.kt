@@ -32,19 +32,20 @@ fun RecentProductList(
             items(
                 items = recentProducts,
             ) {
-                Column (
-                    modifier = Modifier.size(width = 98.dp, height = 130.dp)
+                Column(
+                    modifier = Modifier.size(width = 98.dp, height = 130.dp),
                 ) {
                     PreviewableAsyncImage(
                         imageUrl = it.imageUrl,
                         description = it.name,
-                        modifier = Modifier
-                            .size(98.dp)
-                            .clickable(
-                                onClick = {
-                                    onRecentProductClick(it)
-                                },
-                            ),
+                        modifier =
+                            Modifier
+                                .size(98.dp)
+                                .clickable(
+                                    onClick = {
+                                        onRecentProductClick(it)
+                                    },
+                                ),
                     )
                     Text(
                         it.name,
@@ -63,15 +64,16 @@ fun RecentProductList(
 @Composable
 private fun RecentProductListPreview() {
     RecentProductList(
-        recentProducts = MockData.MOCK_PRODUCTS.map {
-            ProductUiModel(
-                name = it.name,
-                price = 1000,
-                imageUrl = it.imageUrl,
-                id = it.id,
-                quantity = 0,
-            )
-        },
+        recentProducts =
+            MockData.MOCK_PRODUCTS.map {
+                ProductUiModel(
+                    name = it.name,
+                    price = 1000,
+                    imageUrl = it.imageUrl,
+                    id = it.id,
+                    quantity = 0,
+                )
+            },
         onRecentProductClick = {},
     )
 }

@@ -32,9 +32,10 @@ fun CartAppBar(
                     painter = painterResource(R.drawable.left_arrow),
                     contentDescription = stringResource(R.string.left_arrow_description),
                     tint = Color.White,
-                    modifier = Modifier
-                        .padding(start = 10.dp, end = 10.dp)
-                        .size(16.dp),
+                    modifier =
+                        Modifier
+                            .padding(start = 10.dp, end = 10.dp)
+                            .size(16.dp),
                 )
             }
         },
@@ -47,11 +48,12 @@ fun CartAppBar(
                 modifier = Modifier.padding(start = 10.dp),
             )
         },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color(0xFF555555),
-            titleContentColor = Color.White,
-            actionIconContentColor = Color.White,
-        ),
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = Color(0xFF555555),
+                titleContentColor = Color.White,
+                actionIconContentColor = Color.White,
+            ),
         modifier = modifier,
     )
 }

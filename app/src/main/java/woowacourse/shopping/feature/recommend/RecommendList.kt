@@ -24,8 +24,9 @@ fun RecommendList(
 ) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier =
+            modifier
+                .fillMaxWidth(),
     ) {
         items(
             key = { it.id },
@@ -51,15 +52,15 @@ private fun RecommendListPreview() {
     RecommendList(
         isLoading = false,
         products =
-        MockData.MOCK_PRODUCTS.map {
-            ProductUiModel(
-                name = it.name,
-                price = 1000,
-                imageUrl = it.imageUrl,
-                id = it.id,
-                quantity = 0,
-            )
-        },
+            MockData.MOCK_PRODUCTS.map {
+                ProductUiModel(
+                    name = it.name,
+                    price = 1000,
+                    imageUrl = it.imageUrl,
+                    id = it.id,
+                    quantity = 0,
+                )
+            },
         onIncrease = { },
         onDecrease = { },
     )

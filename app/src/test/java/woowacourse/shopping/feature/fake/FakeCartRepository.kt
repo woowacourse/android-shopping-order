@@ -8,7 +8,6 @@ import woowacourse.shopping.domain.Product
 class FakeCartRepository(
     initial: List<CartContent> = emptyList(),
 ) : CartRepository {
-
     private val contents: MutableList<CartContent> = initial.toMutableList()
 
     override suspend fun loadCart(): Cart = Cart(contents.toList())

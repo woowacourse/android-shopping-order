@@ -26,9 +26,10 @@ fun PageNavigator(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = modifier
-            .height(height = 42.dp)
-            .clip(RoundedCornerShape(4.dp)),
+        modifier =
+            modifier
+                .height(height = 42.dp)
+                .clip(RoundedCornerShape(4.dp)),
     ) {
         PageButton(
             text = "<",

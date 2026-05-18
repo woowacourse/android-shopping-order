@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class CartTest {
-
     @Test
     fun `quantityOf 는 해당 상품의 수량을 반환한다`() {
         val product = normalProduct("임시")
@@ -22,19 +21,21 @@ class CartTest {
 
     @Test
     fun `totalQuantityOf 는 모든 상품 수량의 합을 반환한다`() {
-        val cart = Cart(
-            listOf(
-                CartContent(normalProduct("A"), 2),
-                CartContent(normalProduct("B"), 3),
-            ),
-        )
+        val cart =
+            Cart(
+                listOf(
+                    CartContent(normalProduct("A"), 2),
+                    CartContent(normalProduct("B"), 3),
+                ),
+            )
 
         assertEquals(5, cart.totalQuantityOf())
     }
 
-    private fun normalProduct(name: String): Product = Product(
-        name = name,
-        price = Money(1000),
-        imageUrl = "",
-    )
+    private fun normalProduct(name: String): Product =
+        Product(
+            name = name,
+            price = Money(1000),
+            imageUrl = "",
+        )
 }

@@ -11,20 +11,22 @@ import woowacourse.shopping.data.repository.recentproduct.RecentProductRepositor
 
 class FakeShoppingApplication : ShoppingApplication() {
     fun setupFakeDependencies(
-        productRepository: ProductRepository = FakeProductRepository(
-            MockData.MOCK_PRODUCTS
-        ),
+        productRepository: ProductRepository =
+            FakeProductRepository(
+                MockData.MOCK_PRODUCTS,
+            ),
         cartRepository: CartRepository = FakeCartRepository(),
         recentProductRepository: RecentProductRepository = FakeRecentProductRepository(),
         orderRepository: OrderRepository = FakeOrderRepository(),
     ) {
-        appDependenciesDeferred = CompletableDeferred(
-            AppDependencies(
-                productRepository = productRepository,
-                cartRepository = cartRepository,
-                recentProductRepository = recentProductRepository,
-                orderRepository = orderRepository,
+        appDependenciesDeferred =
+            CompletableDeferred(
+                AppDependencies(
+                    productRepository = productRepository,
+                    cartRepository = cartRepository,
+                    recentProductRepository = recentProductRepository,
+                    orderRepository = orderRepository,
+                ),
             )
-        )
     }
 }

@@ -24,7 +24,9 @@ data class ProductDetailUiState(
 
 sealed interface ProductDetailLoadingState {
     data object None : ProductDetailLoadingState
+
     data object Loading : ProductDetailLoadingState
+
     data class Success(
         val product: ProductUiModel,
     ) : ProductDetailLoadingState
@@ -35,7 +37,7 @@ sealed interface ProductDetailLoadingState {
 }
 
 class ProductDetailViewModel(
-    private val application: ShoppingApplication
+    private val application: ShoppingApplication,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductDetailUiState())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
@@ -50,7 +52,6 @@ class ProductDetailViewModel(
             cartRepository = appDependencies.cartRepository
         }
     }
-
 
     fun initialLoading(
         productId: Long,
@@ -77,26 +78,26 @@ class ProductDetailViewModel(
         }
     }
 
-    suspend fun getProduct(productId: Long): ProductDetailLoadingState = runCatching { productRepository.getProduct(productId) }
-        .fold(
-            onSuccess = { ProductDetailLoadingState.Success(toProductUiModel(it)) },
-            onFailure = {
-                ProductDetailLoadingState.Error(
-                    it.message
-                        ?: "unknown error",
-                )
-            },
-        )
+    suspend fun getProduct(productId: Long): ProductDetailLoadingState =
+        runCatching { productRepository.getProduct(productId) }
+            .fold(
+                onSuccess = { ProductDetailLoadingState.Success(toProductUiModel(it)) },
+                onFailure = {
+                    ProductDetailLoadingState.Error(
+                        it.message
+                            ?: "unknown error",
+                    )
+                },
+            )
 
-    fun toProductUiModel(product: Product): ProductUiModel {
-        return ProductUiModel(
+    fun toProductUiModel(product: Product): ProductUiModel =
+        ProductUiModel(
             name = product.name,
             price = product.priceAmount(),
             imageUrl = product.imageUrl,
             id = product.id,
             quantity = 0,
         )
-    }
 
     fun increase() {
         _uiState.update {
@@ -111,24 +112,27 @@ class ProductDetailViewModel(
     }
 
     fun addToCart() {
-        val loadingState = uiState.value.productState as? ProductDetailLoadingState.Success
-            ?: return
+        val loadingState =
+            uiState.value.productState as? ProductDetailLoadingState.Success
+                ?: return
         viewModelScope.launch {
             val cart = cartRepository.loadCart()
-            val previousQuantity = cart.quantityOf(
-                productId = loadingState.product.id,
-            )
+            val previousQuantity =
+                cart.quantityOf(
+                    productId = loadingState.product.id,
+                )
             val product = productRepository.getProduct(loadingState.product.id)
             cartRepository.setProductQuantity(product, previousQuantity + uiState.value.quantity)
         }
     }
 
     companion object {
-        val Factory = viewModelFactory {
-            initializer {
-                val app = this[APPLICATION_KEY] as ShoppingApplication
-                ProductDetailViewModel(app)
+        val Factory =
+            viewModelFactory {
+                initializer {
+                    val app = this[APPLICATION_KEY] as ShoppingApplication
+                    ProductDetailViewModel(app)
+                }
             }
-        }
     }
 }

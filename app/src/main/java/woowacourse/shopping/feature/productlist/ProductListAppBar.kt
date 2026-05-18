@@ -59,32 +59,36 @@ fun ProductListAppBar(
                 }
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .background(Color(0xff04c09e))
-                        .size(20.dp),
+                    modifier =
+                        Modifier
+                            .clip(CircleShape)
+                            .background(Color(0xff04c09e))
+                            .size(20.dp),
                 ) {
                     Text(
                         cartQuantities.toString(),
                         color = Color.White,
                         fontSize = 14.sp,
                         lineHeight = 14.sp,
-                        style = LocalTextStyle.current.copy(
-                            platformStyle = PlatformTextStyle(includeFontPadding = false),
-                            lineHeightStyle = LineHeightStyle(
-                                alignment = LineHeightStyle.Alignment.Center,
-                                trim = LineHeightStyle.Trim.Both,
+                        style =
+                            LocalTextStyle.current.copy(
+                                platformStyle = PlatformTextStyle(includeFontPadding = false),
+                                lineHeightStyle =
+                                    LineHeightStyle(
+                                        alignment = LineHeightStyle.Alignment.Center,
+                                        trim = LineHeightStyle.Trim.Both,
+                                    ),
                             ),
-                        ),
                     )
                 }
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color(0xFF555555),
-            titleContentColor = Color.White,
-            actionIconContentColor = Color.White,
-        ),
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = Color(0xFF555555),
+                titleContentColor = Color.White,
+                actionIconContentColor = Color.White,
+            ),
         modifier = modifier,
     )
 }

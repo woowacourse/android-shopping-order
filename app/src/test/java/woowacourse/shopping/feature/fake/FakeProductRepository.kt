@@ -6,7 +6,6 @@ import woowacourse.shopping.domain.Product
 class FakeProductRepository(
     private val products: List<Product>,
 ) : ProductRepository {
-
     override suspend fun loadProducts(
         startIndex: Int,
         pageSize: Int,
@@ -18,8 +17,7 @@ class FakeProductRepository(
         return products.subList(startIndex, end).toList()
     }
 
-    override suspend fun getProduct(id: Long): Product {
-        return products.firstOrNull { it.id == id }
+    override suspend fun getProduct(id: Long): Product =
+        products.firstOrNull { it.id == id }
             ?: throw NoSuchElementException("상품을 찾을 수 없습니다: $id")
-    }
 }

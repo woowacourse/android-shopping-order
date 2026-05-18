@@ -24,12 +24,13 @@ fun PageButton(
         onClick = onClick,
         enabled = isEnable,
         shape = RoundedCornerShape(0.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xff04c09e),
-            contentColor = Color.White,
-            disabledContainerColor = Color(0xffaaaaaa),
-            disabledContentColor = Color.White,
-        ),
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = Color(0xff04c09e),
+                contentColor = Color.White,
+                disabledContainerColor = Color(0xffaaaaaa),
+                disabledContentColor = Color.White,
+            ),
         modifier = modifier.size(height = 42.dp, width = 42.dp),
         contentPadding = PaddingValues(10.dp),
     ) {

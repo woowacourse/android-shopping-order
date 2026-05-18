@@ -5,7 +5,6 @@ import woowacourse.shopping.data.repository.recentproduct.RecentProductRepositor
 class FakeRecentProductRepository(
     initial: List<Long> = emptyList(),
 ) : RecentProductRepository {
-
     private val recents: ArrayDeque<Long> = ArrayDeque(initial)
     val insertedIds: MutableList<Long> = mutableListOf()
 

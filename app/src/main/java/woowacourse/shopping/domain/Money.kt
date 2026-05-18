@@ -7,15 +7,9 @@ class Money(
         require(amount >= 0) { "가격은 0원 이상이어야 합니다." }
     }
 
-    operator fun plus(other: Money): Money {
-        return Money(amount + other.amount)
-    }
+    operator fun plus(other: Money): Money = Money(amount + other.amount)
 
-    operator fun minus(other: Money): Money {
-        return Money(amount - other.amount)
-    }
+    operator fun minus(other: Money): Money = Money(amount - other.amount)
 
-    operator fun times(other: Int): Money {
-        return Money(amount * other)
-    }
+    operator fun times(other: Int): Money = Money(amount * other)
 }

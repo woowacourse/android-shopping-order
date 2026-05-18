@@ -6,8 +6,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import kotlin.jvm.java
 import woowacourse.shopping.feature.productlist.ui.theme.AndroidshoppingTheme
+import kotlin.jvm.java
 
 class ProductDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,8 +45,9 @@ class ProductDetailActivity : ComponentActivity() {
             context: Context,
             id: Long,
             recentProductId: Long? = null,
-        ): Intent = Intent(context, ProductDetailActivity::class.java)
-            .putExtra(PRODUCT_ID, id)
-            .putExtra(RECENT_PRODUCT_ID, recentProductId)
+        ): Intent =
+            Intent(context, ProductDetailActivity::class.java)
+                .putExtra(PRODUCT_ID, id)
+                .putExtra(RECENT_PRODUCT_ID, recentProductId)
     }
 }

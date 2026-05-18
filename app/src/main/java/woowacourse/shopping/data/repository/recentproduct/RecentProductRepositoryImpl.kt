@@ -8,9 +8,7 @@ import woowacourse.shopping.data.repository.recentproduct.RecentProductRepositor
 class RecentProductRepositoryImpl(
     private val recentProductDao: RecentProductDao,
 ) : RecentProductRepository {
-    override suspend fun loadProducts(): List<Long> {
-        return recentProductDao.findAll(MAX_SIZE)
-    }
+    override suspend fun loadProducts(): List<Long> = recentProductDao.findAll(MAX_SIZE)
 
     @Transaction
     override suspend fun insert(id: Long) {

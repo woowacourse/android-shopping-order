@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.constants.MockData
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
@@ -39,9 +38,8 @@ data class ProductListUiState(
 )
 
 class ProductListViewModel(
-    private val application: ShoppingApplication
+    private val application: ShoppingApplication,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(ProductListUiState())
     val uiState: StateFlow<ProductListUiState> = _uiState.asStateFlow()
 
@@ -64,6 +62,7 @@ class ProductListViewModel(
 
     private var products: List<Product> = emptyList()
     private var cart: Cart = Cart(emptyList())
+
     fun initialLoading() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
@@ -80,25 +79,28 @@ class ProductListViewModel(
         }
     }
 
-    fun increase(productId: Long) = guardFatal {
-        val product = products.firstOrNull { it.id == productId }
-            ?: throw ProductNotFoundException(productId)
+    fun increase(productId: Long) =
+        guardFatal {
+            val product =
+                products.firstOrNull { it.id == productId }
+                    ?: throw ProductNotFoundException(productId)
 
-        viewModelScope.launch {
-            cartRepository.increase(product)
-            refreshCart()
+            viewModelScope.launch {
+                cartRepository.increase(product)
+                refreshCart()
+            }
         }
-    }
 
-    fun decrease(productId: Long) = guardFatal {
-        products.firstOrNull { it.id == productId }
-            ?: throw ProductNotFoundException(productId)
+    fun decrease(productId: Long) =
+        guardFatal {
+            products.firstOrNull { it.id == productId }
+                ?: throw ProductNotFoundException(productId)
 
-        viewModelScope.launch {
-            cartRepository.decrease(productId)
-            refreshCart()
+            viewModelScope.launch {
+                cartRepository.decrease(productId)
+                refreshCart()
+            }
         }
-    }
 
     private inline fun guardFatal(block: () -> Unit) {
         try {
@@ -149,12 +151,13 @@ class ProductListViewModel(
     }
 
     private suspend fun fetchAndAppendProducts(pageSize: Int) {
-        val (result, isEnd) = productRepository.loadProducts(
-            startIndex = products.size / pageSize,
-            pageSize = pageSize,
-            sort = emptyList(),
-            category = null
-        )
+        val (result, isEnd) =
+            productRepository.loadProducts(
+                startIndex = products.size / pageSize,
+                pageSize = pageSize,
+                sort = emptyList(),
+                category = null,
+            )
         products = products + result
         _uiState.update {
             it.copy(
@@ -178,24 +181,24 @@ class ProductListViewModel(
         }
     }
 
-    fun toProductUiModel(product: Product): ProductUiModel {
-        return ProductUiModel(
+    fun toProductUiModel(product: Product): ProductUiModel =
+        ProductUiModel(
             name = product.name,
             price = product.priceAmount(),
             imageUrl = product.imageUrl,
             id = product.id,
             quantity = cart.quantityOf(product.id),
         )
-    }
 
     companion object {
-        val Factory = viewModelFactory {
-            initializer {
-                val app = this[APPLICATION_KEY] as ShoppingApplication
-                ProductListViewModel(
-                    app
-                )
+        val Factory =
+            viewModelFactory {
+                initializer {
+                    val app = this[APPLICATION_KEY] as ShoppingApplication
+                    ProductListViewModel(
+                        app,
+                    )
+                }
             }
-        }
     }
 }

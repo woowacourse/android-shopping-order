@@ -7,7 +7,6 @@ import androidx.room.Query
 
 @Dao
 interface RecentProductDao {
-
     @Query("SELECT productId FROM recent_products ORDER BY viewedAt DESC LIMIT :limit")
     suspend fun findAll(limit: Int): List<Long>
 

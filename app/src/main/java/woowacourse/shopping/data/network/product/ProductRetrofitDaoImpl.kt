@@ -11,28 +11,32 @@ class ProductRetrofitDaoImpl(
         sort: List<String>,
         category: String?,
     ): Pair<List<Product>, Boolean> {
-        val response = retrofitProductService
-            .requestProducts(page = startIndex, size = pageSize, category = category)
+        val response =
+            retrofitProductService
+                .requestProducts(page = startIndex, size = pageSize, category = category)
 
         check(response.isSuccessful) {
             val errorBody = response.errorBody()?.string()
             "products 요청 실패: ${response.code()},  Message: $errorBody"
         }
-        val body = response.body()
-            ?: error("empty body")
+        val body =
+            response.body()
+                ?: error("empty body")
         return Pair(body.content.map { it.toDomain() }, body.last)
     }
 
     override suspend fun findById(id: Long): Product {
-        val response = retrofitProductService
-            .getProductDetail(id = id)
+        val response =
+            retrofitProductService
+                .getProductDetail(id = id)
 
         check(response.isSuccessful) {
             val errorBody = response.errorBody()?.string()
             "products 요청 실패: ${response.code()},  Message: $errorBody"
         }
-        val body = response.body()
-            ?: error("empty body")
+        val body =
+            response.body()
+                ?: error("empty body")
         return body.toDomain()
     }
 }

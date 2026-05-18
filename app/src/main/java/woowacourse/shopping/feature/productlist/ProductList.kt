@@ -38,8 +38,9 @@ fun ProductList(
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier =
+            modifier
+                .fillMaxWidth(),
     ) {
         if (isLoading) {
             items(20) {
@@ -51,10 +52,11 @@ fun ProductList(
                     quantity = 0,
                     onIncrease = { },
                     onDecrease = { },
-                    modifier = Modifier.clickable(
-                        onClick = {
-                        },
-                    ),
+                    modifier =
+                        Modifier.clickable(
+                            onClick = {
+                            },
+                        ),
                 )
             }
         } else {
@@ -70,33 +72,37 @@ fun ProductList(
                     quantity = it.quantity,
                     onIncrease = { onIncrease(it.id) },
                     onDecrease = { onDecrease(it.id) },
-                    modifier = Modifier.clickable(
-                        onClick = {
-                            onProductClick(it)
-                        },
-                    ),
+                    modifier =
+                        Modifier.clickable(
+                            onClick = {
+                                onProductClick(it)
+                            },
+                        ),
                 )
             }
-            if (isEnd.not())
+            if (isEnd.not()) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                onLoading()
-                            },
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onLoading()
+                                },
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowDownward,
                             contentDescription = stringResource(R.string.load_more_description),
-                            modifier = Modifier
-                                .padding(12.dp)
-                                .size(24.dp)
-                                .align(Alignment.Center),
+                            modifier =
+                                Modifier
+                                    .padding(12.dp)
+                                    .size(24.dp)
+                                    .align(Alignment.Center),
                             tint = Color(0xFF555555),
                         )
                     }
                 }
+            }
         }
     }
 }

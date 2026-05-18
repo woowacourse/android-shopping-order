@@ -11,16 +11,13 @@ class ProductDataSourceImpl(
         pageSize: Int,
         sort: List<String>,
         category: String?,
-    ): Pair<List<Product>, Boolean> {
-        return productDao.findAllProduct(
+    ): Pair<List<Product>, Boolean> =
+        productDao.findAllProduct(
             startIndex = startIndex,
             pageSize = pageSize,
             sort = sort,
             category = category,
         )
-    }
 
-    override suspend fun getProduct(id: Long): Product {
-        return productDao.findById(id = id)
-    }
+    override suspend fun getProduct(id: Long): Product = productDao.findById(id = id)
 }

@@ -15,16 +15,16 @@ data class Content(
     @SerialName("quantity")
     val quantity: Int,
 ) {
-    fun toDomain(): CartContent {
-        return CartContent(
-            product = Product(
-                name = product.name,
-                price = Money(product.price),
-                imageUrl = product.imageUrl,
-                id = product.id,
-            ),
+    fun toDomain(): CartContent =
+        CartContent(
+            product =
+                Product(
+                    name = product.name,
+                    price = Money(product.price),
+                    imageUrl = product.imageUrl,
+                    id = product.id,
+                ),
             quantity = this.quantity,
             id = this.id,
         )
-    }
 }

@@ -52,22 +52,24 @@ fun ProductItem(
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Box(
-            modifier = Modifier.then(
-                if (isLoading) {
-                    Modifier.background(color = Color.LightGray)
-                } else {
-                    Modifier
-                },
-            ),
+            modifier =
+                Modifier.then(
+                    if (isLoading) {
+                        Modifier.background(color = Color.LightGray)
+                    } else {
+                        Modifier
+                    },
+                ),
         ) {
             PreviewableAsyncImage(
                 imageUrl = imageUrl,
                 description = name,
                 isLoading = isLoading,
-                modifier = Modifier
-                    .aspectRatio(1f),
+                modifier =
+                    Modifier
+                        .aspectRatio(1f),
             )
-            if (isLoading.not())
+            if (isLoading.not()) {
                 AnimatedContent(
                     targetState = quantity == 0,
                     transitionSpec = {
@@ -79,23 +81,26 @@ fun ProductItem(
                 ) { isEmpty ->
                     if (isEmpty) {
                         ProductInitialAddButton(
-                            modifier = Modifier
-                                .size(45.dp)
-                                .padding(bottom = 4.dp, end = 4.dp)
-                                .clickable(onClick = onIncrease),
+                            modifier =
+                                Modifier
+                                    .size(45.dp)
+                                    .padding(bottom = 4.dp, end = 4.dp)
+                                    .clickable(onClick = onIncrease),
                         )
                     } else {
                         ProductQuantitySelector(
                             quantity = quantity,
                             onIncrease = onIncrease,
                             onDecrease = onDecrease,
-                            modifier = Modifier
-                                .height(42.dp)
-                                .fillMaxWidth()
-                                .padding(bottom = 6.dp, start = 4.dp, end = 4.dp),
+                            modifier =
+                                Modifier
+                                    .height(42.dp)
+                                    .fillMaxWidth()
+                                    .padding(bottom = 6.dp, start = 4.dp, end = 4.dp),
                         )
                     }
                 }
+            }
         }
         Spacer(modifier = Modifier.height(9.dp))
         Text(
@@ -106,9 +111,10 @@ fun ProductItem(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             color = if (isLoading) Color.Transparent else Color.Unspecified,
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(if (isLoading) Color.LightGray else Color.Transparent),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(if (isLoading) Color.LightGray else Color.Transparent),
         )
         Spacer(modifier = Modifier.height(9.dp))
         Text(
@@ -133,9 +139,10 @@ private fun PreviewProduct() {
         onIncrease = {},
         onDecrease = {},
         quantity = 3,
-        modifier = Modifier
-            .width(160.dp)
-            .padding(horizontal = 16.dp),
+        modifier =
+            Modifier
+                .width(160.dp)
+                .padding(horizontal = 16.dp),
     )
 }
 
@@ -144,9 +151,10 @@ private fun PreviewProduct() {
 fun ProductInitialAddButton(modifier: Modifier = Modifier) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier
-            .clip(CircleShape)
-            .background(Color.White),
+        modifier =
+            modifier
+                .clip(CircleShape)
+                .background(Color.White),
     ) {
         Icon(
             imageVector = Icons.Default.Add,
