@@ -3,7 +3,6 @@ package woowacourse.shopping.ui.cart.list.component
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -104,15 +104,18 @@ private fun NameAndCloseIcon(
                     .fillMaxWidth()
                     .weight(1f),
         ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = stringResource(R.string.content_description_close),
+            IconButton(
                 modifier =
                     Modifier
-                        .align(Alignment.CenterEnd)
-                        .clickable(onClick = onClick),
-                tint = ShoppingColors.Gray2,
-            )
+                        .align(Alignment.CenterEnd),
+                onClick = onClick,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(R.string.content_description_close),
+                    tint = ShoppingColors.Gray2,
+                )
+            }
         }
     }
 }

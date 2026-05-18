@@ -12,6 +12,7 @@ import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.query.CartPageItem
 import woowacourse.shopping.repository.query.CartPageResult
+import java.io.IOException
 
 private val NETWORK_JSON =
     Json {
@@ -153,14 +154,25 @@ class HttpCartRepository(
     private suspend fun <T> execute(
         errorMessage: String,
         request: suspend () -> Response<T>,
-    ): T {
-        val response = request()
-        if (!response.isSuccessful) {
-            error("$errorMessage code=${response.code()}")
+    ): T =
+        try {
+            val response = request()
+            if (!response.isSuccessful) {
+                throw CartResponseException(
+                    code = response.code(),
+                    message = "$errorMessage code=${response.code()} body=${response.errorSummary()}",
+                )
+            }
+
+            @Suppress("UNCHECKED_CAST")
+            response.body() ?: Unit as T
+        } catch (exception: CartRemoteException) {
+            throw exception
+        } catch (exception: IOException) {
+            throw CartNetworkException(errorMessage, exception)
         }
-        @Suppress("UNCHECKED_CAST")
-        return response.body() ?: Unit as T
-    }
+
+    private fun Response<*>.errorSummary(): String = errorBody()?.string().orEmpty().ifBlank { "<empty>" }
 
     companion object {
         private fun createCartApiService(

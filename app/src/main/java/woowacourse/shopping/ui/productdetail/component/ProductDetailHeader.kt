@@ -1,7 +1,6 @@
 package woowacourse.shopping.ui.productdetail.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,12 +33,13 @@ fun ProductDetailHeader(
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(
-            imageVector = Icons.Default.Close,
-            contentDescription = stringResource(R.string.content_description_close),
-            modifier = Modifier.clickable(onClick = onCloseClick),
-            tint = Color.White,
-        )
+        IconButton(onClick = onCloseClick) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(R.string.content_description_close),
+                tint = Color.White,
+            )
+        }
     }
 }
 
