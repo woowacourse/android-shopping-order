@@ -1,6 +1,6 @@
 package woowacourse.shopping.backend.retrofit.api
 
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -13,29 +13,29 @@ import woowacourse.shopping.backend.retrofit.dto.ProductResponse
 
 interface ProductRetrofit {
     @GET("/products")
-    fun requestProducts(
+    suspend fun requestProducts(
         @Header("Accept") accept: String = "*/*",
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("sort") sort: List<String>? = null,
         @Query("category") category: String? = null,
-    ): Call<ProductResponse>
+    ): Response<ProductResponse>
 
     @GET("/products/{id}")
-    fun requestProductDetail(
+    suspend fun requestProductDetail(
         @Header("Accept") accept: String = "*/*",
         @Path("id") id: Long,
-    ): Call<Product>
+    ): Response<Product>
 
     @POST("/products")
-    fun addProduct(
+    suspend fun addProduct(
         @Header("Accept") accept: String = "*/*",
         @Body product: Product,
-    ): Call<Void>
+    ): Response<Unit>
 
     @DELETE("/products/{id}")
-    fun deleteProduct(
+    suspend fun deleteProduct(
         @Header("Accept") accept: String = "*/*",
         @Path("id") id: Long,
-    ): Call<Void>
+    ): Response<Unit>
 }

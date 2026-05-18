@@ -1,6 +1,6 @@
 package woowacourse.shopping.backend.retrofit.api
 
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -15,35 +15,35 @@ import woowacourse.shopping.backend.retrofit.dto.ShoppingCartResponse
 
 interface ShoppingCartRetrofit {
     @GET("/cart-items")
-    fun requestCartItems(
+    suspend fun requestCartItems(
         @Header("Accept") accept: String = "*/*",
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("sort") sort: List<String>? = null,
-    ): Call<ShoppingCartResponse>
+    ): Response<ShoppingCartResponse>
 
     @POST("/cart-items")
-    fun addCartItem(
+    suspend fun addCartItem(
         @Header("Accept") accept: String = "*/*",
         @Body product: CartRequest,
-    ): Call<Void>
+    ): Response<Unit>
 
     @DELETE("/cart-items/{id}")
-    fun deleteCartItem(
+    suspend fun deleteCartItem(
         @Header("Accept") accept: String = "*/*",
         @Path("id") id: Int,
-    ): Call<Void>
+    ): Response<Unit>
 
     @PATCH("/cart-items/{id}")
-    fun updateQuantityCartItem(
+    suspend fun updateQuantityCartItem(
         @Header("Accept") accept: String = "*/*",
         @Path("id") id: Int,
         @Body product: CartQuantity,
-    ): Call<Void>
+    ): Response<Unit>
 
     // 장바구니 총 수량
     @GET("/cart-items/counts")
-    fun requestQuantityCartItem(
+    suspend fun requestQuantityCartItem(
         @Header("Accept") accept: String = "*/*",
-    ): Call<CartQuantity>
+    ): Response<CartQuantity>
 }

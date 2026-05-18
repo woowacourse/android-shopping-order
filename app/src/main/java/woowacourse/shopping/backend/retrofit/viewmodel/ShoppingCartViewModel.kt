@@ -6,8 +6,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import woowacourse.shopping.backend.retrofit.awaitBody
-import woowacourse.shopping.backend.retrofit.awaitCompletion
 import woowacourse.shopping.backend.retrofit.dto.CartRequest
 import woowacourse.shopping.backend.retrofit.repository.ShoppingCartRetrofitRepository
 import woowacourse.shopping.mapper.toCartQuantity
@@ -59,14 +57,14 @@ class ShoppingCartViewModel(
                     shoppingCartRetrofitRepository
                         .addCartItem(
                             product = CartRequest(productId = productId, quantity = amount),
-                        ).awaitCompletion(errorPrefix = "장바구니 추가 실패")
+                        )
                 } else {
                     val updatedQuantity = targetItem.getQuantity() + amount
                     shoppingCartRetrofitRepository
                         .updateQuantityCartItem(
                             id = targetItem.getId().toInt(),
                             product = updatedQuantity.toCartQuantity(),
-                        ).awaitCompletion("장바구니 수량 수정 실패")
+                        )
                 }
                 loadCartItems()
             }.onSuccess { latestItems ->
@@ -88,13 +86,13 @@ class ShoppingCartViewModel(
                     shoppingCartRetrofitRepository
                         .deleteCartItem(
                             id = targetItem.getId().toInt(),
-                        ).awaitCompletion(errorPrefix = "장바구니 삭제 실패")
+                        )
                 } else {
                     shoppingCartRetrofitRepository
                         .updateQuantityCartItem(
                             id = targetItem.getId().toInt(),
                             product = updatedQuantity.toCartQuantity(),
-                        ).awaitCompletion(errorPrefix = "장바구니 수량 수정 실패")
+                        )
                 }
                 loadCartItems()
             }.onSuccess { latestItems ->
@@ -116,7 +114,7 @@ class ShoppingCartViewModel(
                 shoppingCartRetrofitRepository
                     .deleteCartItem(
                         id = targetItem.getId().toInt(),
-                    ).awaitCompletion(errorPrefix = "장바구니 삭제 실패")
+                    )
                 loadCartItems()
             }.onSuccess { latestItems ->
                 _shoppingCartItems.value = latestItems
@@ -137,7 +135,7 @@ class ShoppingCartViewModel(
                     page = DEFAULT_PAGE,
                     size = DEFAULT_SIZE,
                     sort = null,
-                ).awaitBody(errorPrefix = "장바구니 조회 실패")
+                )
                 .toDomainShoppingCartItems()
         syncShoppingCartItems(shoppingCartItems)
         return shoppingCartItems

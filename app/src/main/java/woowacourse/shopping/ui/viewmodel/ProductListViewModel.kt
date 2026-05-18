@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import woowacourse.shopping.backend.retrofit.awaitBody
 import woowacourse.shopping.backend.retrofit.repository.ProductRetrofitRepository
 import woowacourse.shopping.mapper.toDomainProducts
 import woowacourse.shopping.model.ShoppingItem
@@ -55,7 +54,6 @@ class ProductListViewModel(
             runCatching {
                 productRetrofitRepository
                     .requestProduct(size = size)
-                    .awaitBody(errorPrefix = "상품 조회 실패")
                     .toDomainProducts()
             }.onSuccess { products ->
                 shoppingItemRepository.replaceProducts(products)

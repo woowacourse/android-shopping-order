@@ -8,8 +8,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.backend.retrofit.awaitBody
-import woowacourse.shopping.backend.retrofit.awaitCompletion
 import woowacourse.shopping.backend.retrofit.repository.ProductRetrofitRepository
 import woowacourse.shopping.mapper.toApiProduct
 import woowacourse.shopping.mapper.toDomainProduct
@@ -49,7 +47,7 @@ class ProductViewModel(
                         size = size,
                         sort = sort,
                         category = category,
-                    ).awaitBody(errorPrefix = "상품 조회 실패")
+                    )
             }.onSuccess { response ->
                 delay(3000) // 스켈레톤 ui 확인을 위한 딜레이
                 val loadedProducts = response.toDomainProducts()
@@ -80,7 +78,7 @@ class ProductViewModel(
                 productRetrofitRepository
                     .requestProductDetail(
                         id = id,
-                    ).awaitBody(errorPrefix = "상품 조회 실패")
+                    )
             }.onSuccess { response ->
                 val detailProduct = response.toDomainProduct()
                 _productDetails.update { cachedProducts ->
@@ -96,7 +94,7 @@ class ProductViewModel(
                 productRetrofitRepository
                     .addProduct(
                         product = product.toApiProduct(),
-                    ).awaitCompletion(errorPrefix = "상품 추가 실패")
+                    )
             }
         }
     }
@@ -107,7 +105,7 @@ class ProductViewModel(
                 productRetrofitRepository
                     .deleteProduct(
                         id = id,
-                    ).awaitCompletion(errorPrefix = "상품 삭제 실패")
+                    )
             }
         }
     }
