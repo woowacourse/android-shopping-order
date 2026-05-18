@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.repository.cart
+package woowacourse.shopping.data.repository.recentproduct
 
 import androidx.room.Transaction
 import woowacourse.shopping.data.local.recentproduct.RecentProductDao

@@ -76,3 +76,4 @@
 - [x] 중복되는 Retrofit 객체 생성
 - [x] guardFatal이 다른 예외도 받도록 수정
 - [x] RecommendViewModel 정합성 문제 수정
+- [x] RecentProductRepositoryImpl의 패키지 경로 변경
