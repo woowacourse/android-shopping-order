@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.repository.product
 
 import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.ProductPage
 
 interface ProductRepository {
     suspend fun loadProducts(
@@ -8,7 +9,7 @@ interface ProductRepository {
         pageSize: Int,
         sort: List<String>,
         category: String?,
-    ): List<Product>
+    ): ProductPage
 
     suspend fun getProduct(id: String): Product
 }

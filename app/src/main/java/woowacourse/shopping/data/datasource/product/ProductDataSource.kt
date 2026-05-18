@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.datasource.product
 
 import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.ProductPage
 
 interface ProductDataSource {
 
@@ -9,7 +10,7 @@ interface ProductDataSource {
         pageSize: Int,
         sort: List<String>,
         category: String?,
-    ): List<Product>
+    ): ProductPage
 
     suspend fun findById(id: String): Product
 }
