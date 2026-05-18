@@ -2,7 +2,6 @@ package woowacourse.shopping.viewmodel.fakes
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import woowacourse.shopping.data.local.entity.RecentlyViewedProductEntity
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.domain.Product
 

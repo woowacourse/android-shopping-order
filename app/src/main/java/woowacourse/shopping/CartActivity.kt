@@ -15,7 +15,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.ui.component.screen.CartScreen
 import woowacourse.shopping.ui.viewmodel.CartViewModel
 import woowacourse.shopping.ui.viewmodel.CartViewModelFactory
-import woowacourse.shopping.ui.viewmodel.ShoppingViewModel
 
 class CartActivity : ComponentActivity() {
     private lateinit var viewModel: CartViewModel
@@ -25,12 +24,13 @@ class CartActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            viewModel = viewModel<CartViewModel>(
-                factory =
-                    CartViewModelFactory(
-                        (application as ShoppingApplication).cartRepository,
-                    ),
-            )
+            viewModel =
+                viewModel<CartViewModel>(
+                    factory =
+                        CartViewModelFactory(
+                            (application as ShoppingApplication).cartRepository,
+                        ),
+                )
 
             val pagedCart by viewModel.pagedCart.collectAsStateWithLifecycle()
             val currentPage by viewModel.currentPage.collectAsStateWithLifecycle()
@@ -79,7 +79,7 @@ class CartActivity : ComponentActivity() {
                             intent.putExtra(IntentKeys.SELECTED_TOTAL_PRICE, totalPrice)
                             intent.putExtra(
                                 IntentKeys.SELECTED_CART_ITEM_IDS,
-                                checkedItemIds.toLongArray()
+                                checkedItemIds.toLongArray(),
                             )
                             startActivity(intent)
                         }

@@ -1,8 +1,6 @@
 package woowacourse.shopping
 
 import android.app.Application
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import woowacourse.shopping.data.local.UserAuthDataStore
 import woowacourse.shopping.data.local.database.DataBase
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepositoryImpl

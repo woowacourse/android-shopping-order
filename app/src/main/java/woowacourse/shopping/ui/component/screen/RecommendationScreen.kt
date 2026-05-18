@@ -70,7 +70,7 @@ fun CartRecommendationScreen(
             totalPrice = totalPrice,
             totalCount = totalCount,
             onOrderClick = onOrderClick,
-            isChecked = true
+            isChecked = true,
         )
     }
 }

@@ -1,9 +1,5 @@
 package woowacourse.shopping.domain
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-
-
 data class PurchaseProduct(
     val id: Long,
     val product: Product,

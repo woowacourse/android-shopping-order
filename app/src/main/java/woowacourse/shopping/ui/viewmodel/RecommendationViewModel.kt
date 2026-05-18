@@ -4,12 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
@@ -25,9 +21,8 @@ class RecommendationViewModel(
     private val productRepository: ProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
     initPrice: Int,
-    initCheckedItemIds: List<Long>
+    initCheckedItemIds: List<Long>,
 ) : ViewModel() {
-
     private val _lastViewedProductCategory = MutableStateFlow<String>("")
     val lastViewedProductCategory = _lastViewedProductCategory.asStateFlow()
     private val _recommendedProducts = MutableStateFlow(Products(emptyList()))
@@ -57,9 +52,10 @@ class RecommendationViewModel(
                 val product = productRepository.getProduct(latestId)
                 _lastViewedProductCategory.value = product.category
 
-                val categoryProducts = productRepository.getCategoryProducts(
-                    category = lastViewedProductCategory.value
-                )
+                val categoryProducts =
+                    productRepository.getCategoryProducts(
+                        category = lastViewedProductCategory.value,
+                    )
 
                 val cartProductIds = allCartItems.value.purchaseProducts.map { it.product.id }
 
@@ -107,12 +103,11 @@ class RecommendationViewModel(
                     cartRepository.updateCount(target.id, nextCount)
                     fetchCart()
                 }
-                if(updateAmount > 0) {
+                if (updateAmount > 0) {
                     _totalPrice.update { it + target.price() }
                 } else {
                     _totalPrice.update { it - target.price() }
                 }
-
             }
         }
     }
@@ -150,7 +145,7 @@ class RecommendationViewModelFactory(
                 productRepository,
                 recentlyViewedProductRepository,
                 initPrice,
-                initCheckItemIds
+                initCheckItemIds,
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

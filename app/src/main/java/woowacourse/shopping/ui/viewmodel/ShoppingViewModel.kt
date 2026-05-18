@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.local.entity.RecentlyViewedProductEntity
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.data.remote.server.repository.CartRepository
 import woowacourse.shopping.data.remote.server.repository.ProductRepository

@@ -42,7 +42,7 @@ class CartViewModel(
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue =  false
+            initialValue = false,
         )
 
     val totalPrice: StateFlow<Int> =
@@ -193,7 +193,7 @@ class CartViewModel(
 
     fun onSelectAllClick() {
         val allIds = _allCartItems.value.purchaseProducts.map { it.id }
-        if(isAllChecked.value) {
+        if (isAllChecked.value) {
             _checkedItemIds.update { emptyList() }
         } else {
             _checkedItemIds.update { allIds }

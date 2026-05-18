@@ -1,9 +1,6 @@
 package woowacourse.shopping.domain
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import kotlin.math.min
-
 
 class Products(
     val products: List<Product> = emptyList(),

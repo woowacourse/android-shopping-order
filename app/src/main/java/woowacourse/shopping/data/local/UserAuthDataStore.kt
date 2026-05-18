@@ -33,7 +33,7 @@ class UserAuthDataStore(
             }.stateIn(
                 scope = CoroutineScope(Dispatchers.IO),
                 started = SharingStarted.Eagerly,
-                initialValue = "First_woosun"
+                initialValue = "First_woosun",
             )
 
     val userPassword: StateFlow<String> =
@@ -43,7 +43,7 @@ class UserAuthDataStore(
             }.stateIn(
                 scope = CoroutineScope(Dispatchers.IO),
                 started = SharingStarted.Eagerly,
-                initialValue = "password"
+                initialValue = "password",
             )
 
     suspend fun saveUserAuth(
@@ -70,6 +70,6 @@ class UserAuthDataStore(
         }.stateIn(
             scope = CoroutineScope(Dispatchers.IO),
             started = SharingStarted.Eagerly,
-            initialValue = "Basic " + Base64.encodeToString("${userName.value}:${userPassword.value}".toByteArray(), Base64.NO_WRAP)
+            initialValue = "Basic " + Base64.encodeToString("${userName.value}:${userPassword.value}".toByteArray(), Base64.NO_WRAP),
         )
 }

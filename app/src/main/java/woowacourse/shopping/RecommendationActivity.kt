@@ -24,7 +24,6 @@ class RecommendationActivity : ComponentActivity() {
             val initTotalPrice = intent.getIntExtra(IntentKeys.SELECTED_TOTAL_PRICE, 0)
             val initCheckItemsIds = intent.getLongArrayExtra(IntentKeys.SELECTED_CART_ITEM_IDS)?.toList()
 
-
             val viewModel: RecommendationViewModel =
                 viewModel<RecommendationViewModel>(
                     factory =
@@ -33,7 +32,7 @@ class RecommendationActivity : ComponentActivity() {
                             productRepository = (application as ShoppingApplication).productRepository,
                             recentlyViewedProductRepository = (application as ShoppingApplication).recentlyViewedProductRepository,
                             initPrice = initTotalPrice,
-                            initCheckItemIds = initCheckItemsIds ?: emptyList()
+                            initCheckItemIds = initCheckItemsIds ?: emptyList(),
                         ),
                 )
 

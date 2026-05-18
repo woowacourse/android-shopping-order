@@ -90,7 +90,7 @@ fun CartScreen(
             onOrderClick = onOrderClick,
             showSelectAll = true,
             onSelectAllClick = onSelectAllClick,
-            isChecked = isAllChecked
+            isChecked = isAllChecked,
         )
     }
 }
@@ -323,6 +323,6 @@ private fun CartScreenPreview() {
         isChecked = { true },
         onSelectAllClick = { },
         onOrderClick = {},
-        isAllChecked = false
+        isAllChecked = false,
     )
 }
