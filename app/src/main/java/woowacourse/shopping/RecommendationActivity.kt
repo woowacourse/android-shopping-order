@@ -24,7 +24,8 @@ class RecommendationActivity : ComponentActivity() {
             val initTotalPrice = intent.getIntExtra(IntentKeys.SELECTED_TOTAL_PRICE, 0)
             val initCheckItemsIds = intent.getLongArrayExtra(IntentKeys.SELECTED_CART_ITEM_IDS)?.toList()
 
-            val recommendationViewModel: RecommendationViewModel =
+
+            val viewModel: RecommendationViewModel =
                 viewModel<RecommendationViewModel>(
                     factory =
                         RecommendationViewModelFactory(
@@ -36,29 +37,27 @@ class RecommendationActivity : ComponentActivity() {
                         ),
                 )
 
-            val totalPrice by cartViewModel.totalPrice.collectAsStateWithLifecycle()
-            val totalCount by cartViewModel.cartItemCount.collectAsStateWithLifecycle()
-            val cartState by recommendationViewModel.allCartItems.collectAsStateWithLifecycle()
-            val lastViewedProduct by recommendationViewModel.lastViewedProduct.collectAsStateWithLifecycle()
-            val recommendedProducts by recommendationViewModel.recommendedProducts.collectAsStateWithLifecycle()
+            val totalPrice by viewModel.totalPrice.collectAsStateWithLifecycle()
+            val checkedIds by viewModel.checkedItemIds.collectAsStateWithLifecycle()
+            val cartState by viewModel.allCartItems.collectAsStateWithLifecycle()
+            val recommendedProducts by viewModel.recommendedProducts.collectAsStateWithLifecycle()
 
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                 CartRecommendationScreen(
                     recommendedProducts = recommendedProducts,
                     totalPrice = totalPrice,
-                    totalCount = totalCount,
+                    totalCount = checkedIds.size,
                     onBackClick = { finish() },
                     onOrderClick = { finish() },
-                    onAddInCart = { recommendationViewModel.addToCart(it) },
-                    onAdd = { id, amount -> cartViewModel.updateCountWithID(id, amount) },
-                    onMinus = { id, amount -> cartViewModel.updateCountWithID(id, amount) },
-                    onDelete = { id -> cartViewModel.removeWithID(id) },
+                    onAddInCart = { viewModel.addToCart(it) },
+                    onAdd = { id, amount -> viewModel.updateCountWithID(id, amount) },
+                    onMinus = { id, amount -> viewModel.updateCountWithID(id, amount) },
+                    onDelete = { id -> viewModel.removeWithID(id) },
                     onItemClick = { product ->
-                        recommendationViewModel.updateHistory(product)
+                        viewModel.updateHistory(product)
                         val intent =
                             Intent(this, ProductDetailActivity::class.java).apply {
                                 putExtra(IntentKeys.SELECTED_PRODUCT_ID_KEY, product.id)
-                                putExtra(IntentKeys.LATEST_VIEWED_PRODUCT_ID_KEY, lastViewedProduct?.id)
                             }
                         startActivity(intent)
                     },
