@@ -12,10 +12,13 @@ import woowacourse.shopping.data.remote.api.OrderApi
 import woowacourse.shopping.data.remote.api.ProductApi
 import java.util.concurrent.TimeUnit
 import kotlin.getValue
+import woowacourse.shopping.BuildConfig
 
 object RetrofitProvider {
-    private const val BASE_URL =
-        "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/"
+    private const val BASE_URL = BuildConfig.BASE_URL
+    private const val USERNAME = BuildConfig.API_USERNAME
+    private const val PASSWORD = BuildConfig.API_PASSWORD
+
     private val json: Json =
         Json {
             ignoreUnknownKeys = true
@@ -36,7 +39,7 @@ object RetrofitProvider {
                     chain
                         .request()
                         .newBuilder()
-                        .header("Authorization", Credentials.basic("BaekCCI", "password"))
+                        .header("Authorization", Credentials.basic(USERNAME, PASSWORD))
                         .build()
                 chain.proceed(request)
             }.connectTimeout(30, TimeUnit.SECONDS)

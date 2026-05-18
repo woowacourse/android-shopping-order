@@ -1,3 +1,12 @@
+import java.util.Properties
+
+val envFile = rootProject.file(".env")
+val envProperties = Properties()
+
+if (envFile.exists()) {
+    envProperties.load(envFile.inputStream())
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -10,6 +19,11 @@ android {
     namespace = "woowacourse.shopping"
     compileSdk = 36
 
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "woowacourse.shopping"
         minSdk = 26
@@ -18,6 +32,24 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "BASE_URL",
+            "\"${envProperties.getProperty("BASE_URL")}\""
+        )
+
+        buildConfigField(
+            "String",
+            "API_USERNAME",
+            "\"${envProperties.getProperty("API_USERNAME") ?: ""}\"",
+        )
+
+        buildConfigField(
+            "String",
+            "API_PASSWORD",
+            "\"${envProperties.getProperty("API_PASSWORD") ?: ""}\"",
+        )
     }
 
     buildTypes {
@@ -34,9 +66,6 @@ android {
         compilerOptions {
             jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
         }
-    }
-    buildFeatures {
-        compose = true
     }
     testOptions {
         unitTests.all {
