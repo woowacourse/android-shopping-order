@@ -4,12 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -19,6 +21,9 @@ import woowacourse.shopping.domain.PurchaseProducts
 class CartViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel() {
+    private val _errorEvent = Channel<String>()
+    val errorEvent = _errorEvent.receiveAsFlow()
+
     private val _currentPage: MutableStateFlow<Int> = MutableStateFlow(0)
 
     val currentPage: StateFlow<Int> = _currentPage.asStateFlow()
@@ -129,44 +134,59 @@ class CartViewModel(
         updateAmount: Int,
     ) {
         viewModelScope.launch {
+            val target = pagedCart.value.findPurchaseProductById(id) ?: return@launch
+            val nextCount = target.count + updateAmount
+            if (nextCount < 1) return@launch
+
             _isLoading.update { true }
-            val target = pagedCart.value.findPurchaseProductById(id)
-            if (target != null) {
-                val nextCount = target.count + updateAmount
-                if (nextCount >= 1) {
-                    cartRepository.updateCount(id, nextCount)
-                    updateAllCartItemCount(id, nextCount)
-                    _pagedCart.update {
-                        cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
-                    }
-                    _cartItemCount.update {
-                        cartRepository.getCartItemCount()
-                    }
+            try {
+                cartRepository.updateCount(id, nextCount)
+                updateAllCartItemCount(id, nextCount)
+                _pagedCart.update {
+                    cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
                 }
+                _cartItemCount.update {
+                    cartRepository.getCartItemCount()
+                }
+            } catch (e: Exception) {
+                _errorEvent.send("수량 변경에 실패했습니다. 다시 시도해주세요.")
+            } finally {
+                _isLoading.update { false }
             }
-            _isLoading.update { false }
         }
     }
 
     fun removeWithID(id: Long) {
         viewModelScope.launch {
             _isLoading.update { true }
-            cartRepository.deleteCartItem(id)
+            try {
+                cartRepository.deleteCartItem(id)
 
-            val newTotalCount = cartRepository.getCartItemCount()
-            _cartItemCount.update {
-                newTotalCount
+                val newTotalCount = cartRepository.getCartItemCount()
+                _cartItemCount.update {
+                    newTotalCount
+                }
+
+                if (currentPage.value > 0 && currentPage.value * PAGE_SIZE >= newTotalCount) {
+                    _currentPage.update { it - 1 }
+                }
+
+                _pagedCart.update {
+                    cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
+                }
+
+                _allCartItems.update { allCart ->
+                    PurchaseProducts(
+                        allCart.purchaseProducts.filter { it.id != id }
+                    )
+                }
+
+                _checkedItemIds.update { it - id }
+            } catch (e: Exception) {
+                _errorEvent.send("아이템 삭제에 실패했습니다.")
+            } finally {
+                _isLoading.update { false }
             }
-
-            if(currentPage.value > 0 && currentPage.value * PAGE_SIZE >= newTotalCount){
-                _currentPage.update { it - 1 }
-            }
-
-            _pagedCart.update {
-                cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
-            }
-
-            _isLoading.update { false }
         }
     }
 
