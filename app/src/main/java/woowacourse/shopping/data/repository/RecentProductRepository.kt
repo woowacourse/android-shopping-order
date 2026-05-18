@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.coroutines.flow.Flow
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.Products
 
@@ -9,4 +10,6 @@ interface RecentProductRepository {
     suspend fun getLastViewedProduct(): Product?
 
     suspend fun add(productId: Long)
+
+    fun observeRecent(): Flow<List<Product>>
 }

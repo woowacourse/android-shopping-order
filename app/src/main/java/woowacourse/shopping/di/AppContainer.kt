@@ -33,7 +33,7 @@ class AppContainer(
     val recentProductRepository: RecentProductRepository by lazy {
         RoomRecentProductRepository(
             recentProductDao = database.recentProductDao(),
-            productRepository = productRepository,
+            productRepo = productRepository,
         )
     }
     val orderRepository: OrderRepository =

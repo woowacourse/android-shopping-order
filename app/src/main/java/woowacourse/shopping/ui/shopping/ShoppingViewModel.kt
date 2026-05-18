@@ -1,22 +1,30 @@
 package woowacourse.shopping.ui.shopping
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import woowacourse.shopping.data.remote.NetworkMonitor
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.Products
 import woowacourse.shopping.ui.common.model.ProductUiModel
+import java.io.IOException
 
 class ShoppingViewModel(
     networkMonitor: NetworkMonitor,
@@ -36,51 +44,41 @@ class ShoppingViewModel(
             )
 
     init {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            try {
-                val page = productRepo.getProducts(0, loadSize)
-                val recentProducts = recentProductRepo.getRecentProducts()
-
-                _uiState.update {
-                    it.copy(
-                        visibleProducts = mapToProductUiModels(page.items),
-                        hasNext = !page.isLast,
-                        sizeInRepo = page.totalElements,
-                        recentProducts = recentProducts,
-                    )
-                }
-            } finally {
-                _uiState.update { it.copy(isLoading = false) }
-            }
-        }
+        initialize()
+        observeRecentProducts()
     }
 
     fun increase(uiModel: ProductUiModel) {
-        var cartItemId: Long
         viewModelScope.launch {
             try {
-                if (uiModel.cartItemId == null) {
-                    cartItemId = cartRepo.add(productId = uiModel.product.id, quantity = 1)
+                val cartItemId = if (uiModel.cartItemId == null) {
+                    cartRepo.add(productId = uiModel.product.id, quantity = 1)
                 } else {
-                    cartItemId = uiModel.cartItemId
                     cartRepo.updateQuantity(
                         cartItemId = uiModel.cartItemId,
-                        quantity = uiModel.quantity + 1
+                        quantity = uiModel.quantity + 1,
                     )
+                    uiModel.cartItemId
                 }
                 _uiState.update { state ->
                     val updatedProducts = state.visibleProducts.map {
                         if (uiModel.product.id == it.product.id) {
                             it.copy(cartItemId = cartItemId, quantity = uiModel.quantity + 1)
-                        } else {
-                            it
-                        }
+                        } else it
                     }
-                    val cartCount = state.cartCount + 1
-                    state.copy(visibleProducts = updatedProducts, cartCount = cartCount)
+                    state.copy(
+                        visibleProducts = updatedProducts,
+                        cartCount = state.cartCount + 1,
+                    )
                 }
-            } finally {
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IOException) {
+                Log.e(TAG, "increase: 네트워크 에러", e)
+            } catch (e: HttpException) {
+                Log.e(TAG, "increase: HTTP ${e.code()} 에러", e)
+            } catch (e: Exception) {
+                Log.e(TAG, "increase: 기타 에러", e)
             }
         }
     }
@@ -104,14 +102,21 @@ class ShoppingViewModel(
                         if (uiModel.product.id == it.product.id) {
                             if (uiModel.quantity > 1) it.copy(quantity = uiModel.quantity - 1)
                             else it.copy(cartItemId = null, quantity = 0)
-                        } else {
-                            it
-                        }
+                        } else it
                     }
-                    val cartCount = maxOf(0, state.cartCount - 1)
-                    state.copy(visibleProducts = updatedProducts, cartCount = cartCount)
+                    state.copy(
+                        visibleProducts = updatedProducts,
+                        cartCount = maxOf(0, state.cartCount - 1),
+                    )
                 }
-            } finally {
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IOException) {
+                Log.e(TAG, "decrease: 네트워크 에러", e)
+            } catch (e: HttpException) {
+                Log.e(TAG, "decrease: HTTP ${e.code()} 에러", e)
+            } catch (e: Exception) {
+                Log.e(TAG, "decrease: 기타 에러", e)
             }
         }
     }
@@ -125,7 +130,6 @@ class ShoppingViewModel(
             _uiState.update { it.copy(isLoading = true) }
             try {
                 val page = productRepo.getProducts(
-                    // 마지막 페이지가 부분(예: 25개 중 5개)일 때도 다음 페이지 정확히 계산
                     page = (currentSize - 1) / loadSize + 1,
                     size = loadSize,
                 )
@@ -140,29 +144,87 @@ class ShoppingViewModel(
                         sizeInRepo = page.totalElements,
                     )
                 }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IOException) {
+                Log.e(TAG, "loadMore: 네트워크 에러", e)
+            } catch (e: HttpException) {
+                Log.e(TAG, "loadMore: HTTP ${e.code()} 에러", e)
+            } catch (e: Exception) {
+                Log.e(TAG, "loadMore: 기타 에러", e)
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
 
-    fun syncCartState() {
+    fun refresh() {
         viewModelScope.launch {
-            val cartItems = cartRepo.getAllCartItems()
-            val totalCartCount = cartItems.items.sumOf { it.quantity }
-            val recentProducts = recentProductRepo.getRecentProducts()
+            try {
+                val cartItems = cartRepo.getAllCartItems()
+                val totalCartCount = cartItems.items.sumOf { it.quantity }
 
-            _uiState.update { state ->
-                val currentProducts = state.visibleProducts.map { it.product }
-                val updatedUiModels = mapToProductUiModels(currentProducts)
-
-                state.copy(
-                    visibleProducts = updatedUiModels,
-                    cartCount = totalCartCount,
-                    recentProducts = recentProducts,
-                )
+                _uiState.update { state ->
+                    val updatedUiModels = state.visibleProducts.map { ui ->
+                        val cartItem = cartItems.items.find { it.product.id == ui.product.id }
+                        ui.copy(
+                            cartItemId = cartItem?.id,
+                            quantity = cartItem?.quantity ?: 0
+                        )
+                    }
+                    state.copy(
+                        visibleProducts = updatedUiModels,
+                        cartCount = totalCartCount,
+                    )
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IOException) {
+                Log.e(TAG, "syncCartState: 네트워크 에러", e)
+            } catch (e: HttpException) {
+                Log.e(TAG, "syncCartState: HTTP ${e.code()} 에러", e)
+            } catch (e: Exception) {
+                Log.e(TAG, "syncCartState: 기타 에러", e)
             }
         }
+    }
+
+    private fun initialize() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            try {
+                val page = productRepo.getProducts(0, loadSize)
+                _uiState.update {
+                    it.copy(
+                        visibleProducts = mapToProductUiModels(page.items),
+                        hasNext = !page.isLast,
+                        sizeInRepo = page.totalElements,
+                    )
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IOException) {
+                Log.e(TAG, "initialize: 네트워크 에러", e)
+            } catch (e: HttpException) {
+                Log.e(TAG, "initialize: HTTP ${e.code()} 에러", e)
+            } catch (e: Exception) {
+                Log.e(TAG, "initialize: 기타 에러", e)
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
+    private fun observeRecentProducts() {
+        recentProductRepo
+            .observeRecent()
+            .onEach { products ->
+                _uiState.update { it.copy(recentProducts = Products(products)) }
+            }
+            .catch { e ->
+                Log.e(TAG, "observeRecentProducts: 에러", e)
+            }
+            .launchIn(viewModelScope)
     }
 
     private suspend fun mapToProductUiModels(products: List<Product>): List<ProductUiModel> {
@@ -179,6 +241,8 @@ class ShoppingViewModel(
     }
 
     companion object {
+        private const val TAG = "ShoppingViewModel"
+
         fun provideFactory(
             applicationContext: Context,
             productRepo: ProductRepository,

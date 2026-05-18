@@ -23,7 +23,6 @@
 
 ## 에러/예외 처리
 - [ ] 요청 실패 시 피드백 추가 (ex. 토스트)
-- [ ] changeScreen()에서 getRecommendProducts() 실패 대비 - 실패 시 isCartScreen 롤백 + 에러 노출
 - [ ] 추천 화면 재진입 시 stale한 recommendItems 초기화
 
 # 🚀 2단계 - 상품 추천

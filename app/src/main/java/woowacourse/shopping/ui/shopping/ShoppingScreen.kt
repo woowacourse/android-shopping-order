@@ -46,7 +46,7 @@ fun ShoppingScreen(
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                viewModel.syncCartState()
+                viewModel.refresh()
             }
         }
 
