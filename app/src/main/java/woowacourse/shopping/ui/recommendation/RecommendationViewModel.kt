@@ -57,11 +57,26 @@ class RecommendationViewModel(
         initialValue = null
     )
 
-    private val _recommendedProducts = MutableStateFlow(Products(emptyList()))
-    val recommendedProducts = _recommendedProducts.asStateFlow()
+    private val _allRecommendedProducts = MutableStateFlow(Products(emptyList()))
 
     private val _allCartItems = MutableStateFlow<PurchaseProducts>(PurchaseProducts())
     val allCartItems = _allCartItems.asStateFlow()
+
+    private val cartProductIds: StateFlow<List<Long>> = allCartItems.map { allCart ->
+        allCart.purchaseProducts.map { it.product.id }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
+    val recommendedProducts: StateFlow<Products> = combine(_allRecommendedProducts, cartProductIds) { products, cartIds ->
+        Products(products.products.filter { it.id !in cartIds })
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = Products(emptyList())
+    )
 
     val totalPrice: StateFlow<Int> = combine(allCartItems, selectedItemIds) { allCart, selectedIds ->
         allCart.purchaseProducts
@@ -91,9 +106,9 @@ class RecommendationViewModel(
                     } else {
                         productRepository.getProducts(0, 10)
                     }
-                    _recommendedProducts.update { Products(products) }
+                    _allRecommendedProducts.update { Products(products) }
                 } catch (e: Exception) {
-                    _recommendedProducts.update { Products(emptyList()) }
+                    _allRecommendedProducts.update { Products(emptyList()) }
                 }
             }
         }
