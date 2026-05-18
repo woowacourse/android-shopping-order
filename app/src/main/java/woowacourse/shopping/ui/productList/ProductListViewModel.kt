@@ -54,7 +54,7 @@ class ProductListViewModel(
         }
     }
 
-    fun increase(productId: Int) {
+    fun increaseQuantity(productId: Int) {
         viewModelScope.launch {
             val target =
                 cartFlow.value.cartItems.values
@@ -64,7 +64,7 @@ class ProductListViewModel(
         }
     }
 
-    fun decrease(productId: Int) {
+    fun decreaseQuantity(productId: Int) {
         viewModelScope.launch {
             val target =
                 cartFlow.value.cartItems.values

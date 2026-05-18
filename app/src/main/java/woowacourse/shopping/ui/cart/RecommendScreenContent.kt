@@ -53,8 +53,8 @@ fun RecommendScreenContent(
                     quantity = quantitiesByProductId[product.id] ?: 0,
                     onClick = {},
                     onAddClick = { onAddClick(product) },
-                    onIncrease = { onIncrease(product.id) },
-                    onDecrease = { onDecrease(product.id) },
+                    onIncreaseClick = { onIncrease(product.id) },
+                    onDecreaseClick = { onDecrease(product.id) },
                 )
             }
         }

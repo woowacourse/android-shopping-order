@@ -35,8 +35,8 @@ fun ProductCard(
     quantity: Int,
     onClick: () -> Unit,
     onAddClick: () -> Unit,
-    onIncrease: () -> Unit,
-    onDecrease: () -> Unit,
+    onIncreaseClick: () -> Unit,
+    onDecreaseClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.clickable { onClick() }) {
@@ -53,8 +53,8 @@ fun ProductCard(
             ProductCardQuantityControl(
                 quantity = quantity,
                 onAddClick = onAddClick,
-                onIncrease = onIncrease,
-                onDecrease = onDecrease,
+                onIncreaseClick = onIncreaseClick,
+                onDecreaseClick = onDecreaseClick,
                 modifier =
                     Modifier
                         .align(Alignment.BottomEnd)
@@ -95,8 +95,8 @@ private fun ProductInfoColumn(
 private fun ProductCardQuantityControl(
     quantity: Int,
     onAddClick: () -> Unit,
-    onIncrease: () -> Unit,
-    onDecrease: () -> Unit,
+    onIncreaseClick: () -> Unit,
+    onDecreaseClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (quantity == 0) {
@@ -104,8 +104,8 @@ private fun ProductCardQuantityControl(
     } else {
         InlineStepper(
             quantity = quantity,
-            onIncrease = onIncrease,
-            onDecrease = onDecrease,
+            onIncreaseClick = onIncreaseClick,
+            onDecreaseClick = onDecreaseClick,
             modifier = modifier,
         )
     }
@@ -137,8 +137,8 @@ private fun AddCircleButton(
 @Composable
 private fun InlineStepper(
     quantity: Int,
-    onIncrease: () -> Unit,
-    onDecrease: () -> Unit,
+    onIncreaseClick: () -> Unit,
+    onDecreaseClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -149,7 +149,7 @@ private fun InlineStepper(
                 .background(Color.White),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        StepperSign(symbol = "-", onClick = onDecrease)
+        StepperSign(symbol = "-", onClick = onDecreaseClick)
         Box(
             modifier =
                 Modifier
@@ -164,7 +164,7 @@ private fun InlineStepper(
                 color = Color.Black,
             )
         }
-        StepperSign(symbol = "+", onClick = onIncrease)
+        StepperSign(symbol = "+", onClick = onIncreaseClick)
     }
 }
 
@@ -201,7 +201,7 @@ private fun ProductCardPreview() {
         quantity = 0,
         onClick = {},
         onAddClick = {},
-        onIncrease = {},
-        onDecrease = {},
+        onIncreaseClick = {},
+        onDecreaseClick = {},
     )
 }

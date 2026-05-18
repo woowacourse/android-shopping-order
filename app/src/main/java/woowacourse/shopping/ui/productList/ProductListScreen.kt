@@ -64,8 +64,8 @@ fun ProductListScreen(
         uiState = uiState,
         cartCount = cartCount,
         onAddClick = viewModel::addProduct,
-        onIncrease = viewModel::increase,
-        onDecrease = viewModel::decrease,
+        onIncrease = viewModel::increaseQuantity,
+        onDecrease = viewModel::decreaseQuantity,
         onMoreClick = viewModel::moreProducts,
         onCartClick = onCartClick,
         onProductClick = onProductClick,
@@ -162,8 +162,8 @@ private fun ProductListContent(
             modifier = Modifier.weight(1f),
             onProductClick = onProductClick,
             onAddClick = onAddClick,
-            onIncrease = onIncrease,
-            onDecrease = onDecrease,
+            onIncreaseClick = onIncrease,
+            onDecreaseClick = onDecrease,
             onMoreClick = onMoreClick,
         )
     }
@@ -333,8 +333,8 @@ private fun ProductCardGrid(
     modifier: Modifier = Modifier,
     onProductClick: (Product) -> Unit = {},
     onAddClick: (Product) -> Unit = {},
-    onIncrease: (Int) -> Unit = {},
-    onDecrease: (Int) -> Unit = {},
+    onIncreaseClick: (Int) -> Unit = {},
+    onDecreaseClick: (Int) -> Unit = {},
     onMoreClick: () -> Unit = {},
 ) {
     LazyVerticalGrid(
@@ -354,8 +354,8 @@ private fun ProductCardGrid(
                 quantity = quantitiesByProductId[item.id] ?: 0,
                 onClick = { onProductClick(item) },
                 onAddClick = { onAddClick(item) },
-                onIncrease = { onIncrease(item.id) },
-                onDecrease = { onDecrease(item.id) },
+                onIncreaseClick = { onIncreaseClick(item.id) },
+                onDecreaseClick = { onDecreaseClick(item.id) },
             )
         }
         if (isLoadingMore) {

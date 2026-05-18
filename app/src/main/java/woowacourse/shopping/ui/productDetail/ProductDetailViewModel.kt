@@ -59,21 +59,21 @@ class ProductDetailViewModel(
         }
     }
 
-    fun increaseSelected() {
+    fun increaseQuantity() {
         val current = _uiState.value as? ProductDetailUiState.Success ?: return
-        _uiState.value = current.copy(selectedQuantity = current.selectedQuantity + 1)
+        _uiState.value = current.copy(currentQuantity = current.currentQuantity + 1)
     }
 
-    fun decreaseSelected() {
+    fun decreaseQuantity() {
         val current = _uiState.value as? ProductDetailUiState.Success ?: return
-        if (current.selectedQuantity <= 1) return
-        _uiState.value = current.copy(selectedQuantity = current.selectedQuantity - 1)
+        if (current.currentQuantity <= 1) return
+        _uiState.value = current.copy(currentQuantity = current.currentQuantity - 1)
     }
 
     fun addToCart() {
         val current = _uiState.value as? ProductDetailUiState.Success ?: return
         viewModelScope.launch {
-            cartRepository.addProduct(current.product, Quantity(current.selectedQuantity))
+            cartRepository.addProduct(current.product, Quantity(current.currentQuantity))
         }
     }
 

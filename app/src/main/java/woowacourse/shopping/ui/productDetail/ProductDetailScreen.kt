@@ -65,8 +65,8 @@ fun ProductDetailScreen(
         modifier = modifier,
         uiState = uiState,
         onCloseClick = onCloseClick,
-        onClickIncrease = viewModel::increaseSelected,
-        onClickDecrease = viewModel::decreaseSelected,
+        onIncreaseClick = viewModel::increaseQuantity,
+        onDecreaseClick = viewModel::decreaseQuantity,
         onAddToCartClick = {
             onAddToCartClick()
         },
@@ -78,8 +78,8 @@ fun ProductDetailScreen(
 private fun ProductDetailScreenContent(
     uiState: ProductDetailUiState,
     onCloseClick: () -> Unit,
-    onClickIncrease: () -> Unit,
-    onClickDecrease: () -> Unit,
+    onIncreaseClick: () -> Unit,
+    onDecreaseClick: () -> Unit,
     modifier: Modifier = Modifier,
     onAddToCartClick: () -> Unit = {},
     onLastViewedProductClick: (Product) -> Unit = {},
@@ -111,10 +111,10 @@ private fun ProductDetailScreenContent(
                     imageUrl = uiState.product.imageUrl.value,
                     productName = uiState.product.name.value,
                     price = uiState.product.price.value,
-                    selectedQuantity = uiState.selectedQuantity,
+                    selectedQuantity = uiState.currentQuantity,
                     lastViewedProduct = uiState.lastViewedProduct,
-                    onIncrease = onClickIncrease,
-                    onDecrease = onClickDecrease,
+                    onIncreaseClick = onIncreaseClick,
+                    onDecreaseClick = onDecreaseClick,
                     onLastViewedProductClick = onLastViewedProductClick,
                 )
 
@@ -206,8 +206,8 @@ private fun ProductDetailContent(
     price: Int,
     selectedQuantity: Int,
     lastViewedProduct: Product?,
-    onIncrease: () -> Unit,
-    onDecrease: () -> Unit,
+    onIncreaseClick: () -> Unit,
+    onDecreaseClick: () -> Unit,
     onLastViewedProductClick: (Product) -> Unit,
 ) {
     Column(
@@ -234,8 +234,8 @@ private fun ProductDetailContent(
         ProductPriceSection(price = price)
         ProductQuantitySection(
             quantity = selectedQuantity,
-            onIncrease = onIncrease,
-            onDecrease = onDecrease,
+            onIncreaseClick = onIncreaseClick,
+            onDecreaseClick = onDecreaseClick,
         )
         if (lastViewedProduct != null) {
             LastViewedProductSection(
@@ -309,8 +309,8 @@ private fun ProductPriceSection(
 @Composable
 private fun ProductQuantitySection(
     quantity: Int,
-    onIncrease: () -> Unit,
-    onDecrease: () -> Unit,
+    onIncreaseClick: () -> Unit,
+    onDecreaseClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -328,8 +328,8 @@ private fun ProductQuantitySection(
         )
         QuantityStepper(
             quantity = quantity,
-            onIncrease = onIncrease,
-            onDecrease = onDecrease,
+            onIncreaseClick = onIncreaseClick,
+            onDecreaseClick = onDecreaseClick,
         )
     }
 }
@@ -376,15 +376,15 @@ private fun LastViewedProductSection(
 @Composable
 private fun QuantityStepper(
     quantity: Int,
-    onIncrease: () -> Unit,
-    onDecrease: () -> Unit,
+    onIncreaseClick: () -> Unit,
+    onDecreaseClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        StepperSign(symbol = "−", onClick = onDecrease)
+        StepperSign(symbol = "−", onClick = onDecreaseClick)
         Spacer(modifier = Modifier.width(16.dp))
         Text(
             text = quantity.toString(),
@@ -393,7 +393,7 @@ private fun QuantityStepper(
             color = Color.Black,
         )
         Spacer(modifier = Modifier.width(16.dp))
-        StepperSign(symbol = "+", onClick = onIncrease)
+        StepperSign(symbol = "+", onClick = onIncreaseClick)
     }
 }
 
@@ -470,12 +470,12 @@ fun ProductDetailScreenPreview() {
                         price = Price(10000),
                         category = Category("카테고리"),
                     ),
-                selectedQuantity = 1,
+                currentQuantity = 1,
                 lastViewedProduct = null,
             ),
         onCloseClick = {},
-        onClickIncrease = {},
-        onClickDecrease = {},
+        onIncreaseClick = {},
+        onDecreaseClick = {},
         onAddToCartClick = {},
         onLastViewedProductClick = { },
     )
