@@ -13,8 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.ui.component.screen.CartRecommendationScreen
-import woowacourse.shopping.ui.viewmodel.CartViewModel
-import woowacourse.shopping.ui.viewmodel.CartViewModelFactory
 import woowacourse.shopping.ui.viewmodel.RecommendationViewModel
 import woowacourse.shopping.ui.viewmodel.RecommendationViewModelFactory
 
@@ -23,14 +21,8 @@ class RecommendationActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val cartViewModel: CartViewModel =
-                viewModel<CartViewModel>(
-                    factory =
-                        CartViewModelFactory(
-                            (application as ShoppingApplication).cartRepository,
-                        ),
-                )
             val initTotalPrice = intent.getIntExtra(IntentKeys.SELECTED_TOTAL_PRICE, 0)
+            val initCheckItemsIds = intent.getLongArrayExtra(IntentKeys.SELECTED_CART_ITEM_IDS)?.toList()
 
             val recommendationViewModel: RecommendationViewModel =
                 viewModel<RecommendationViewModel>(
@@ -40,6 +32,7 @@ class RecommendationActivity : ComponentActivity() {
                             productRepository = (application as ShoppingApplication).productRepository,
                             recentlyViewedProductRepository = (application as ShoppingApplication).recentlyViewedProductRepository,
                             initPrice = initTotalPrice,
+                            initCheckItemIds = initCheckItemsIds ?: emptyList()
                         ),
                 )
 

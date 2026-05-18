@@ -25,6 +25,7 @@ class RecommendationViewModel(
     private val productRepository: ProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
     initPrice: Int,
+    initCheckedItemIds: List<Long>
 ) : ViewModel() {
     val lastViewProductId: StateFlow<Long?> =
         recentlyViewedProductRepository
@@ -46,6 +47,9 @@ class RecommendationViewModel(
 
     private val _recommendedProducts = MutableStateFlow(Products(emptyList()))
     val recommendedProducts = _recommendedProducts.asStateFlow()
+
+    private val _checkedItemsIds = MutableStateFlow(initCheckedItemIds)
+    val checkedItemIds = _checkedItemsIds.asStateFlow()
 
     private val _totalPrice = MutableStateFlow(initPrice)
     val totalPrice = _totalPrice.asStateFlow()
