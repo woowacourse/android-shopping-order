@@ -38,7 +38,7 @@ class HttpProductRepositoryTest {
     }
 
     @Test
-    fun `상품 목록 API 성공 응답을 도메인 객체로 변환한다`() =
+    fun `상품 목록 API 성공 응답을 페이지 결과로 변환한다`() =
         runBlocking {
             mockWebServer.enqueue(
                 MockResponse()
@@ -47,34 +47,45 @@ class HttpProductRepositoryTest {
                     .setBody(createProductsJson(listOf(1L, 2L), last = true)),
             )
 
-            val actual = repository.getProducts(fromIndex = 0, limit = 20).toList()
+            val actual = repository.getProducts(page = 0, size = 20)
             val request = mockWebServer.takeRequest()
 
             assertTrue(request.requestUrl?.encodedPath == "/products")
             assertEquals("0", request.requestUrl?.queryParameter("page"))
             assertEquals("20", request.requestUrl?.queryParameter("size"))
-            assertEquals(2, actual.size)
-            assertEquals((1L), actual.first().id)
-            assertEquals("상품1", actual.first().name)
+            assertEquals(2, actual.items.size)
+            assertEquals(1L, actual.items.first().id)
+            assertEquals("상품1", actual.items.first().name)
+            assertEquals(2, actual.totalElements)
+            assertEquals(false, actual.hasNext)
         }
 
     @Test
-    fun `상품 목록을 한 번 조회한 뒤에는 캐시된 목록으로 슬라이스를 반환한다`() =
+    fun `카테고리 조회 이후 일반 목록 조회를 호출해도 결과가 섞이지 않는다`() =
         runBlocking {
             mockWebServer.enqueue(
                 MockResponse()
                     .setResponseCode(200)
                     .setHeader("Content-Type", "application/json")
-                    .setBody(createProductsJson(listOf(1L, 2L), last = true)),
+                    .setBody(createProductsJson(listOf(101L, 102L), last = true)),
+            )
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setHeader("Content-Type", "application/json")
+                    .setBody(createProductsJson(listOf(1L, 2L, 3L), last = true)),
             )
 
-            repository.getProducts(fromIndex = 0, limit = 20)
-            val actual = repository.getProducts(fromIndex = 1, limit = 1).toList()
+            val categoryResult = repository.getProductsByCategory(category = "fashion", page = 0, size = 2)
+            val mainResult = repository.getProducts(page = 0, size = 3)
+            val firstRequest = mockWebServer.takeRequest()
+            val secondRequest = mockWebServer.takeRequest()
 
-            assertEquals(1, mockWebServer.requestCount)
-            assertEquals(1, actual.size)
-            assertEquals((2L), actual.first().id)
-            assertEquals("상품2", actual.first().name)
+            assertEquals(listOf(101L, 102L), categoryResult.items.map { it.id })
+            assertEquals("fashion", firstRequest.requestUrl?.queryParameter("category"))
+            assertEquals(listOf(1L, 2L, 3L), mainResult.items.map { it.id })
+            assertEquals(null, secondRequest.requestUrl?.queryParameter("category"))
+            assertEquals(2, mockWebServer.requestCount)
         }
 
     @Test
@@ -87,16 +98,16 @@ class HttpProductRepositoryTest {
                     .setBody(productJson),
             )
 
-            val actual = repository.findAllByIds(setOf((1L)))
+            val actual = repository.findAllByIds(setOf(1L))
             val request = mockWebServer.takeRequest()
 
             assertTrue(request.path?.endsWith("/products/1") == true)
-            assertEquals(setOf((1L)), actual.keys)
-            assertEquals("치킨", actual[(1L)]?.name)
+            assertEquals(setOf(1L), actual.keys)
+            assertEquals("치킨", actual[1L]?.name)
         }
 
     @Test
-    fun `카테고리 상품 목록 API 성공 응답을 도메인 객체로 변환한다`() =
+    fun `카테고리 상품 목록 API 성공 응답을 페이지 결과로 변환한다`() =
         runBlocking {
             mockWebServer.enqueue(
                 MockResponse()
@@ -105,14 +116,14 @@ class HttpProductRepositoryTest {
                     .setBody(createProductsJson(listOf(3L, 6L), last = true)),
             )
 
-            val actual = repository.getProductsByCategory(category = "food", limit = 2).toList()
+            val actual = repository.getProductsByCategory(category = "food", page = 0, size = 2)
             val request = mockWebServer.takeRequest()
 
             assertTrue(request.requestUrl?.encodedPath == "/products")
             assertEquals("0", request.requestUrl?.queryParameter("page"))
             assertEquals("2", request.requestUrl?.queryParameter("size"))
             assertEquals("food", request.requestUrl?.queryParameter("category"))
-            assertEquals(listOf(3L, 6L), actual.map { it.id })
+            assertEquals(listOf(3L, 6L), actual.items.map { it.id })
         }
 
     @Test
@@ -126,7 +137,7 @@ class HttpProductRepositoryTest {
 
         val actual =
             assertThrows<ProductResponseException> {
-                runBlocking { repository.getProducts(fromIndex = 0, limit = 20) }
+                runBlocking { repository.getProducts(page = 0, size = 20) }
             }
 
         assertEquals(500, actual.code)
@@ -146,7 +157,7 @@ class HttpProductRepositoryTest {
             )
 
         assertThrows<ProductNetworkException> {
-            runBlocking { disconnectedRepository.getProducts(fromIndex = 0, limit = 20) }
+            runBlocking { disconnectedRepository.getProducts(page = 0, size = 20) }
         }
     }
 
@@ -161,7 +172,7 @@ class HttpProductRepositoryTest {
 
         val actual =
             assertThrows<ProductResponseException> {
-                runBlocking { repository.findAllByIds(setOf((1L))) }
+                runBlocking { repository.findAllByIds(setOf(1L)) }
             }
 
         assertEquals(500, actual.code)
@@ -178,7 +189,7 @@ class HttpProductRepositoryTest {
 
         val actual =
             assertThrows<ProductParsingException> {
-                runBlocking { repository.getProducts(fromIndex = 0, limit = 20) }
+                runBlocking { repository.getProducts(page = 0, size = 20) }
             }
 
         assertTrue(actual.message?.contains("응답") == true)
@@ -195,21 +206,15 @@ class HttpProductRepositoryTest {
 
         val actual =
             assertThrows<ProductParsingException> {
-                runBlocking { repository.findAllByIds(setOf((1L))) }
+                runBlocking { repository.findAllByIds(setOf(1L)) }
             }
 
         assertTrue(actual.message?.contains("응답") == true)
     }
 
     @Test
-    fun `상품 목록이 페이지 크기를 넘기면 다음 페이지를 추가로 조회한다`() =
+    fun `다음 페이지를 직접 요청하면 해당 페이지 결과와 hasNext 상태를 반환한다`() =
         runBlocking {
-            mockWebServer.enqueue(
-                MockResponse()
-                    .setResponseCode(200)
-                    .setHeader("Content-Type", "application/json")
-                    .setBody(createProductsJson((1L..20L).toList(), last = false, totalElements = 21L)),
-            )
             mockWebServer.enqueue(
                 MockResponse()
                     .setResponseCode(200)
@@ -217,36 +222,13 @@ class HttpProductRepositoryTest {
                     .setBody(createProductsJson(listOf(21L), last = true, totalElements = 21L)),
             )
 
-            val actual = repository.getProducts(fromIndex = 0, limit = 21).toList()
-            val firstRequest = mockWebServer.takeRequest()
-            val secondRequest = mockWebServer.takeRequest()
+            val actual = repository.getProducts(page = 1, size = 20)
+            val request = mockWebServer.takeRequest()
 
-            assertEquals(21, actual.size)
-            assertEquals("0", firstRequest.requestUrl?.queryParameter("page"))
-            assertEquals("1", secondRequest.requestUrl?.queryParameter("page"))
-            assertEquals(2, mockWebServer.requestCount)
-        }
-
-    @Test
-    fun `현재 인덱스가 마지막 페이지 이전이면 다음 상품이 있음을 반환한다`() =
-        runBlocking {
-            mockWebServer.enqueue(
-                MockResponse()
-                    .setResponseCode(200)
-                    .setHeader("Content-Type", "application/json")
-                    .setBody(createProductsJson((1L..20L).toList(), last = false, totalElements = 21L)),
-            )
-            mockWebServer.enqueue(
-                MockResponse()
-                    .setResponseCode(200)
-                    .setHeader("Content-Type", "application/json")
-                    .setBody(createProductsJson(listOf(21L), last = true, totalElements = 21L)),
-            )
-
-            val actual = repository.hasNext(19)
-
-            assertTrue(actual)
-            assertEquals(2, mockWebServer.requestCount)
+            assertEquals(listOf(21L), actual.items.map { it.id })
+            assertEquals(21, actual.totalElements)
+            assertEquals(false, actual.hasNext)
+            assertEquals("1", request.requestUrl?.queryParameter("page"))
         }
 
     @Test
@@ -269,7 +251,7 @@ class HttpProductRepositoryTest {
                     ),
             )
 
-            val targetId = (9007199254740991L)
+            val targetId = 9007199254740991L
             val actual = repository.findAllByIds(setOf(targetId))
 
             assertEquals(setOf(targetId), actual.keys)
@@ -286,10 +268,11 @@ class HttpProductRepositoryTest {
                     .setBody(createProductsJson(listOf(9007199254740991L), last = true, totalElements = 9007199254740991L)),
             )
 
-            val actual = repository.getProducts(fromIndex = 0, limit = 1).toList()
+            val actual = repository.getProducts(page = 0, size = 1)
 
-            assertEquals(1, actual.size)
-            assertEquals((9007199254740991L), actual.first().id)
+            assertEquals(1, actual.items.size)
+            assertEquals(9007199254740991L, actual.items.first().id)
+            assertEquals(Int.MAX_VALUE, actual.totalElements)
         }
 
     @Test
@@ -303,7 +286,7 @@ class HttpProductRepositoryTest {
 
         val actual =
             assertThrows<ProductParsingException> {
-                runBlocking { repository.getProducts(fromIndex = 0, limit = 20) }
+                runBlocking { repository.getProducts(page = 0, size = 20) }
             }
 
         assertTrue(actual.message?.contains("파싱") == true || actual.message?.contains("올바르지") == true)

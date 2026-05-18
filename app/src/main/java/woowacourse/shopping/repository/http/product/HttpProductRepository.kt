@@ -12,11 +12,10 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.Products
 import woowacourse.shopping.repository.ProductRepository
+import woowacourse.shopping.repository.query.ProductPageResult
 import java.io.IOException
 
-private const val NETWORK_PAGE_SIZE = 20
 private val NETWORK_JSON =
     Json {
         ignoreUnknownKeys = true
@@ -42,128 +41,103 @@ class HttpProductRepository(
         },
     )
 
-    @Volatile
-    private var cachedProducts: List<Product> = emptyList()
-
-    @Volatile
-    private var totalCount: Long = 0L
-
-    @Volatile
-    private var nextPage: Int = 0
-
-    @Volatile
-    private var lastPageLoaded: Boolean = false
-
-    override val size: Int
-        get() = maxOf(totalCount.coerceAtMost(Int.MAX_VALUE.toLong()), cachedProducts.size.toLong()).toInt()
-
     override suspend fun getProducts(
-        fromIndex: Int,
-        limit: Int,
-    ): Products =
-        withContext(Dispatchers.IO) {
-            val safeFrom = fromIndex.coerceAtLeast(0)
-            val safeLimit = limit.coerceAtLeast(0)
-            val untilExclusive = safeFrom + safeLimit
-
-            ensureProductsLoaded(untilExclusive)
-
-            val safeTo = minOf(untilExclusive, cachedProducts.size)
-            if (safeFrom >= safeTo) return@withContext Products(emptyList())
-
-            Products(cachedProducts.subList(safeFrom, safeTo))
-        }
+        page: Int,
+        size: Int,
+    ): ProductPageResult = getProductPage(page = page, size = size)
 
     override suspend fun getProductsByCategory(
         category: String,
-        limit: Int,
-    ): Products =
+        page: Int,
+        size: Int,
+    ): ProductPageResult =
         withContext(Dispatchers.IO) {
-            val safeLimit = limit.coerceAtLeast(0)
-            if (category.isBlank() || safeLimit == 0) return@withContext Products(emptyList())
-
-            val responseBody =
-                executeRequest(
-                    errorMessage = "카테고리 상품 목록 API 호출에 실패했습니다.",
-                    request = {
-                        productApiService.getProducts(
-                            page = 0,
-                            size = safeLimit,
-                            category = category,
-                        )
-                    },
+            val safePage = page.coerceAtLeast(0)
+            val safeSize = size.coerceAtLeast(0)
+            if (category.isBlank() || safeSize == 0) {
+                return@withContext ProductPageResult(
+                    items = emptyList(),
+                    totalElements = 0,
+                    page = safePage,
+                    size = safeSize,
+                    hasNext = false,
                 )
+            }
 
-            val fetchedProducts =
-                runCatching {
-                    responseBody
-                        .content
-                        .orEmpty()
-                        .map { it.toDomain() }
-                }.getOrElse { throwable ->
-                    throw ProductParsingException("카테고리 상품 목록 응답을 파싱할 수 없습니다.", throwable)
-                }
-
-            cachedProducts = (cachedProducts + fetchedProducts).distinctBy { it.id }
-            totalCount = maxOf(totalCount, cachedProducts.size.toLong())
-
-            Products(fetchedProducts.take(safeLimit))
-        }
-
-    override suspend fun hasNext(current: Int): Boolean =
-        withContext(Dispatchers.IO) {
-            if (current < 0) return@withContext false
-
-            ensureProductsLoaded(current + 2)
-            current < size - 1
+            fetchProductPage(
+                page = safePage,
+                size = safeSize,
+                category = category,
+                errorMessage = "카테고리 상품 목록 API 호출에 실패했습니다.",
+                parsingErrorMessage = "카테고리 상품 목록 응답을 파싱할 수 없습니다.",
+            )
         }
 
     override suspend fun findAllByIds(ids: Set<Long>): Map<Long, Product> =
         withContext(Dispatchers.IO) {
             if (ids.isEmpty()) return@withContext emptyMap()
 
-            val cachedProductsById = cachedProducts.associateBy { it.id }.toMutableMap()
-            val missingIds = ids - cachedProductsById.keys
-
-            missingIds.forEach { productId ->
-                fetchProductById(productId)?.let { product ->
-                    cachedProductsById[product.id] = product
-                }
-            }
-
-            cachedProducts = cachedProductsById.values.toList()
-
             ids
                 .mapNotNull { productId ->
-                    cachedProductsById[productId]?.let { productId to it }
+                    fetchProductById(productId)?.let { productId to it }
                 }.toMap()
         }
 
-    private suspend fun ensureProductsLoaded(untilExclusive: Int) {
-        if (untilExclusive <= cachedProducts.size || lastPageLoaded) return
-
-        while (cachedProducts.size < untilExclusive && !lastPageLoaded) {
-            val responseBody =
-                executeRequest(
-                    errorMessage = "상품 목록 API 호출에 실패했습니다.",
-                    request = { productApiService.getProducts(page = nextPage, size = NETWORK_PAGE_SIZE) },
+    private suspend fun getProductPage(
+        page: Int,
+        size: Int,
+    ): ProductPageResult =
+        withContext(Dispatchers.IO) {
+            val safePage = page.coerceAtLeast(0)
+            val safeSize = size.coerceAtLeast(0)
+            if (safeSize == 0) {
+                return@withContext ProductPageResult(
+                    items = emptyList(),
+                    totalElements = 0,
+                    page = safePage,
+                    size = safeSize,
+                    hasNext = false,
                 )
+            }
 
-            val fetchedProducts =
-                runCatching {
-                    responseBody
-                        .content
-                        .orEmpty()
-                        .map { it.toDomain() }
-                }.getOrElse { throwable ->
-                    throw ProductParsingException("상품 목록 응답을 파싱할 수 없습니다.", throwable)
-                }
-
-            cachedProducts = cachedProducts + fetchedProducts
-            totalCount = responseBody.totalElements ?: cachedProducts.size.toLong()
-            lastPageLoaded = responseBody.last ?: fetchedProducts.isEmpty()
-            nextPage += 1
+            fetchProductPage(
+                page = safePage,
+                size = safeSize,
+                errorMessage = "상품 목록 API 호출에 실패했습니다.",
+                parsingErrorMessage = "상품 목록 응답을 파싱할 수 없습니다.",
+            )
         }
+
+    private suspend fun fetchProductPage(
+        page: Int,
+        size: Int,
+        category: String? = null,
+        errorMessage: String,
+        parsingErrorMessage: String,
+    ): ProductPageResult {
+        val responseBody =
+            executeRequest(
+                errorMessage = errorMessage,
+                request = { productApiService.getProducts(page = page, size = size, category = category) },
+            )
+
+        val fetchedProducts =
+            runCatching {
+                responseBody
+                    .content
+                    .orEmpty()
+                    .map { it.toDomain() }
+            }.getOrElse { throwable ->
+                throw ProductParsingException(parsingErrorMessage, throwable)
+            }
+
+        return ProductPageResult(
+            items = fetchedProducts,
+            totalElements = responseBody.totalElements?.coerceAtMost(Int.MAX_VALUE.toLong())?.toInt() ?: fetchedProducts.size,
+            page = page,
+            size = size,
+            hasNext = responseBody.last?.not() ?: (fetchedProducts.size >= size),
+        )
     }
 
     private suspend fun fetchProductById(productId: Long): Product? {
@@ -173,16 +147,11 @@ class HttpProductRepository(
                 request = { productApiService.getProduct(id = productId) },
             )
 
-        val product =
-            runCatching {
-                responseBody.toDomain()
-            }.getOrElse { throwable ->
-                throw ProductParsingException("상품 상세 응답을 파싱할 수 없습니다.", throwable)
-            }
-
-        cachedProducts = (cachedProducts + product).distinctBy { it.id }
-        totalCount = maxOf(totalCount, cachedProducts.size.toLong())
-        return product
+        return runCatching {
+            responseBody.toDomain()
+        }.getOrElse { throwable ->
+            throw ProductParsingException("상품 상세 응답을 파싱할 수 없습니다.", throwable)
+        }
     }
 
     private suspend fun <T> executeRequest(

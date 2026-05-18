@@ -202,8 +202,9 @@ class CartRecommendationViewModel(
             productRepository
                 .getProductsByCategory(
                     category = latestViewedProduct.category,
-                    limit = fetchLimit,
-                ).toList()
+                    page = 0,
+                    size = fetchLimit,
+                ).items
                 .filterNot { it.id in cartProductIds }
                 .take(RECOMMENDED_PRODUCTS_LIMIT)
 

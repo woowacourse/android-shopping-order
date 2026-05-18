@@ -1,40 +1,69 @@
 package woowacourse.shopping.repository
 
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.Products
+import woowacourse.shopping.repository.query.ProductPageResult
 
 class FakeProductRepository(
     products: List<Product>,
 ) : ProductRepository {
-    private val products = Products(products)
-    private val productMap: Map<Long, Product> = products.associateBy { it.id }
-
-    override val size: Int
-        get() = products.count()
+    private val products = products.toList()
+    private val productMap: Map<Long, Product> = this.products.associateBy { it.id }
 
     override suspend fun getProducts(
-        fromIndex: Int,
-        limit: Int,
-    ): Products {
-        val safeFrom = fromIndex.coerceIn(0, products.count())
-        val safeLimit = limit.coerceAtLeast(0)
-        val safeTo = minOf(safeFrom + safeLimit, products.count())
+        page: Int,
+        size: Int,
+    ): ProductPageResult {
+        val safePage = page.coerceAtLeast(0)
+        val safeSize = size.coerceAtLeast(0)
+        if (safeSize == 0) {
+            return ProductPageResult(
+                items = emptyList(),
+                totalElements = products.size,
+                page = safePage,
+                size = safeSize,
+                hasNext = false,
+            )
+        }
+        val fromIndex = (safePage * safeSize).coerceIn(0, products.size)
+        val toIndex = minOf(fromIndex + safeSize, products.size)
 
-        return Products(products.toList().subList(safeFrom, safeTo))
+        return ProductPageResult(
+            items = products.subList(fromIndex, toIndex),
+            totalElements = products.size,
+            page = safePage,
+            size = safeSize,
+            hasNext = toIndex < products.size,
+        )
     }
 
     override suspend fun getProductsByCategory(
         category: String,
-        limit: Int,
-    ): Products =
-        Products(
-            products
-                .toList()
-                .filter { it.category == category }
-                .take(limit.coerceAtLeast(0)),
-        )
+        page: Int,
+        size: Int,
+    ): ProductPageResult {
+        val filteredProducts = products.filter { it.category == category }
+        val safePage = page.coerceAtLeast(0)
+        val safeSize = size.coerceAtLeast(0)
+        if (safeSize == 0) {
+            return ProductPageResult(
+                items = emptyList(),
+                totalElements = filteredProducts.size,
+                page = safePage,
+                size = safeSize,
+                hasNext = false,
+            )
+        }
+        val fromIndex = (safePage * safeSize).coerceIn(0, filteredProducts.size)
+        val toIndex = minOf(fromIndex + safeSize, filteredProducts.size)
 
-    override suspend fun hasNext(current: Int): Boolean = current < products.toList().lastIndex
+        return ProductPageResult(
+            items = filteredProducts.subList(fromIndex, toIndex),
+            totalElements = filteredProducts.size,
+            page = safePage,
+            size = safeSize,
+            hasNext = toIndex < filteredProducts.size,
+        )
+    }
 
     override suspend fun findAllByIds(ids: Set<Long>): Map<Long, Product> =
         ids

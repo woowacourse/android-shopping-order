@@ -1,22 +1,19 @@
 package woowacourse.shopping.repository
 
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.Products
+import woowacourse.shopping.repository.query.ProductPageResult
 
 interface ProductRepository {
-    val size: Int
-
     suspend fun getProducts(
-        fromIndex: Int,
-        limit: Int,
-    ): Products
+        page: Int,
+        size: Int,
+    ): ProductPageResult
 
     suspend fun getProductsByCategory(
         category: String,
-        limit: Int,
-    ): Products
-
-    suspend fun hasNext(current: Int): Boolean
+        page: Int,
+        size: Int,
+    ): ProductPageResult
 
     suspend fun findAllByIds(ids: Set<Long>): Map<Long, Product>
 }

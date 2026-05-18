@@ -15,6 +15,7 @@ import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
 import woowacourse.shopping.ui.common.recentlyviewed.RecentViewedProductsMapper
+import woowacourse.shopping.model.Product
 
 private const val PAGE_SIZE = 20
 private const val RECENT_PRODUCT_LIMIT = 10
@@ -29,12 +30,15 @@ class ShoppingViewModel(
     private val _uiState = MutableStateFlow(ShoppingUiState(productListState = ProductListUiState.Loading))
     val uiState: StateFlow<ShoppingUiState> = _uiState.asStateFlow()
 
-    private var visibleCount = PAGE_SIZE
+    private var currentPage = 0
+    private var hasNextPage = false
+    private var isLoadingProducts = false
+    private var loadedProducts: List<Product> = emptyList()
     private val syncJobs = mutableMapOf<Long, Job>()
 
     init {
         observeNetworkState()
-        loadProducts()
+        loadInitialProducts()
     }
 
     fun reloadVisibleState() {
@@ -54,30 +58,42 @@ class ShoppingViewModel(
         }
     }
 
-    private fun loadProducts() {
+    private fun loadInitialProducts() {
         viewModelScope.launch {
-            refreshProducts()
+            refreshProducts(reset = true)
         }
     }
 
-    suspend fun refreshProducts() {
+    private suspend fun refreshProducts(reset: Boolean) {
+        if (isLoadingProducts) return
+        isLoadingProducts = true
         _uiState.update { currentState ->
             currentState.copy(
                 productListState = ProductListUiState.Loading,
             )
         }
         runCatching {
-            val visibleProducts = productRepository.getProducts(0, visibleCount).toList()
-            val hasNext = productRepository.hasNext(visibleProducts.count() - 1)
+            val targetPage = if (reset) 0 else currentPage + 1
+            val pageResult = productRepository.getProducts(page = targetPage, size = PAGE_SIZE)
+            val visibleProducts =
+                if (reset) {
+                    pageResult.items
+                } else {
+                    loadedProducts + pageResult.items
+                }
             val cartState = createCartState(visibleProducts)
             val restoredRecentProducts = getRecentProducts()
+
+            currentPage = pageResult.page
+            hasNextPage = pageResult.hasNext
+            loadedProducts = visibleProducts
 
             _uiState.update { currentState ->
                 currentState.copy(
                     productListState =
                         ProductListUiState.Content(
                             products = cartState.products,
-                            hasNext = hasNext,
+                            hasNext = hasNextPage,
                         ),
                     recentProducts = restoredRecentProducts,
                     cartQuantity = cartState.cartQuantity,
@@ -89,6 +105,8 @@ class ShoppingViewModel(
                     productListState = ProductListUiState.Error(throwable.message),
                 )
             }
+        }.also {
+            isLoadingProducts = false
         }
     }
 
@@ -160,10 +178,11 @@ class ShoppingViewModel(
 
     fun loadMore() {
         val contentState = _uiState.value.productListState as? ProductListUiState.Content ?: return
-        if (!contentState.hasNext) return
+        if (!contentState.hasNext || isLoadingProducts) return
 
-        visibleCount = minOf(visibleCount + PAGE_SIZE, productRepository.size)
-        loadProducts()
+        viewModelScope.launch {
+            refreshProducts(reset = false)
+        }
     }
 
     fun addToCart(productId: Long) = increaseQuantity(productId)

@@ -58,6 +58,23 @@ class ShoppingViewModelTest {
         assertEquals(ProductRepositoryFixture.products.take(20).map { it.id }, contentState.products.map { it.product.id })
     }
 
+    @Test
+    fun `더 보기 요청 시 ViewModel이 다음 페이지를 조회하고 기존 목록 뒤에 누적한다`() {
+        val viewModel = createViewModel()
+
+        dispatcher.scheduler.advanceUntilIdle()
+        viewModel.loadMore()
+        dispatcher.scheduler.advanceUntilIdle()
+
+        val contentState =
+            assertInstanceOf(
+                ProductListUiState.Content::class.java,
+                viewModel.uiState.value.productListState,
+            )
+        assertEquals(ProductRepositoryFixture.products.size, contentState.products.size)
+        assertEquals(ProductRepositoryFixture.products.map { it.id }, contentState.products.map { it.product.id })
+    }
+
     private fun createViewModel(): ShoppingViewModel =
         ShoppingViewModel(
             productRepository = FakeProductRepository(ProductRepositoryFixture.products),
