@@ -1,12 +1,16 @@
 package woowacourse.shopping.ui.cart
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -19,6 +23,7 @@ import woowacourse.shopping.ui.cart.component.CartBottomBar
 import woowacourse.shopping.ui.cart.component.CartHeader
 import woowacourse.shopping.ui.cart.component.CartRecommendationBody
 import woowacourse.shopping.ui.cart.component.CartScreenSkeleton
+import woowacourse.shopping.ui.common.model.LoadState
 import woowacourse.shopping.ui.common.model.ProductUiModel
 
 @Composable
@@ -29,54 +34,67 @@ fun CartScreen(
     onOrderClick: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
-    when (uiState.isCartScreen) {
-        true ->
-            CartScreen(
-                cart = Cart(uiState.pagedItems),
-                currentPage = uiState.currentPage,
-                totalPages = uiState.totalPages,
-                showPagination = uiState.showPagination,
-                selectedItemIds = uiState.selectedItemIds,
-                onBackClick = onBackClick,
-                onDeleteClick = { viewModel.delete(it) },
-                onPreviousClick = { viewModel.previousPage() },
-                onNextClick = { viewModel.nextPage() },
-                onAddClick = { viewModel.increase(it) },
-                onRemoveClick = { viewModel.decrease(it) },
-                onCheckedChange = { item, isSelected ->
-                    viewModel.toggleItemSelection(
-                        item.id ?: throw IllegalArgumentException(),
-                        isSelected,
-                    )
-                },
-                selectedItemCount = uiState.totalSelectedCount,
-                totalPrice = uiState.totalSelectedPrice,
-                onAllCheckboxChanged = { isSelected -> viewModel.toggleAllItemsSelection(isSelected) },
-                checked = uiState.isAllSelected,
-                modifier = modifier,
-                onOrderClick = {
-                    viewModel.changeScreen()
-                },
-            )
-
-        false ->
-            RecommendScreen(
-                recommendedProducts = uiState.recommendItems,
-                count = uiState.totalSelectedCount,
-                price = uiState.totalSelectedPrice,
-                modifier = modifier,
-                onBackClick = { viewModel.changeScreen() },
-                onIncreaseClick = { viewModel.increaseInRecommendScreen(it) },
-                onDecreaseClick = { viewModel.decreaseInRecommendScreen(it) },
-                onOrderClick = {
-                    viewModel.order(uiState.selectedItemIds.toList())
-                    onOrderClick()
-                },
-            )
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
     }
 
-    if (uiState.isLoading) CartScreenSkeleton()
+    when (uiState.loadState) {
+        LoadState.Loading -> CartScreenSkeleton()
+        LoadState.Error -> Text(text = "에러 발생")
+        else -> when (uiState.isCartScreen) {
+            true ->
+                CartScreen(
+                    cart = Cart(uiState.pagedItems),
+                    currentPage = uiState.currentPage,
+                    totalPages = uiState.totalPages,
+                    showPagination = uiState.showPagination,
+                    selectedItemIds = uiState.selectedItemIds,
+                    onBackClick = onBackClick,
+                    onDeleteClick = { viewModel.delete(it) },
+                    onPreviousClick = { viewModel.previousPage() },
+                    onNextClick = { viewModel.nextPage() },
+                    onAddClick = { viewModel.increase(it) },
+                    onRemoveClick = { viewModel.decrease(it) },
+                    onCheckedChange = { item, isSelected ->
+                        viewModel.toggleItemSelection(
+                            item.id ?: throw IllegalArgumentException(),
+                            isSelected,
+                        )
+                    },
+                    selectedItemCount = uiState.totalSelectedCount,
+                    totalPrice = uiState.totalSelectedPrice,
+                    onAllCheckboxChanged = { isSelected ->
+                        viewModel.toggleAllItemsSelection(
+                            isSelected
+                        )
+                    },
+                    checked = uiState.isAllSelected,
+                    modifier = modifier,
+                    onOrderClick = {
+                        viewModel.changeScreen()
+                    },
+                )
+
+            false ->
+                RecommendScreen(
+                    recommendedProducts = uiState.recommendItems,
+                    count = uiState.totalSelectedCount,
+                    price = uiState.totalSelectedPrice,
+                    modifier = modifier,
+                    onBackClick = { viewModel.changeScreen() },
+                    onIncreaseClick = { viewModel.increaseInRecommendScreen(it) },
+                    onDecreaseClick = { viewModel.decreaseInRecommendScreen(it) },
+                    onOrderClick = {
+                        viewModel.order(uiState.selectedItemIds.toList())
+                        onOrderClick()
+                    },
+                )
+        }
+    }
 }
 
 @Composable

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -35,6 +37,10 @@ class ShoppingViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ShoppingUiState())
     val uiState = _uiState.asStateFlow()
+
+    private val _events = Channel<String>(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
+
     val isNetworkConnected: StateFlow<Boolean> =
         networkMonitor.isConnected
             .stateIn(
@@ -71,14 +77,8 @@ class ShoppingViewModel(
                         cartCount = state.cartCount + 1,
                     )
                 }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: IOException) {
-                Log.e(TAG, "increase: 네트워크 에러", e)
-            } catch (e: HttpException) {
-                Log.e(TAG, "increase: HTTP ${e.code()} 에러", e)
             } catch (e: Exception) {
-                Log.e(TAG, "increase: 기타 에러", e)
+                handleError("increase", e, "장바구니 담기에 실패했어요.")
             }
         }
     }
@@ -109,14 +109,8 @@ class ShoppingViewModel(
                         cartCount = maxOf(0, state.cartCount - 1),
                     )
                 }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: IOException) {
-                Log.e(TAG, "decrease: 네트워크 에러", e)
-            } catch (e: HttpException) {
-                Log.e(TAG, "decrease: HTTP ${e.code()} 에러", e)
             } catch (e: Exception) {
-                Log.e(TAG, "decrease: 기타 에러", e)
+                handleError("decrease", e, "수량 변경에 실패했어요.")
             }
         }
     }
@@ -144,14 +138,8 @@ class ShoppingViewModel(
                         sizeInRepo = page.totalElements,
                     )
                 }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: IOException) {
-                Log.e(TAG, "loadMore: 네트워크 에러", e)
-            } catch (e: HttpException) {
-                Log.e(TAG, "loadMore: HTTP ${e.code()} 에러", e)
             } catch (e: Exception) {
-                Log.e(TAG, "loadMore: 기타 에러", e)
+                handleError("loadMore", e, "상품을 더 불러올 수 없어요.")
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
@@ -177,14 +165,8 @@ class ShoppingViewModel(
                         cartCount = totalCartCount,
                     )
                 }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: IOException) {
-                Log.e(TAG, "syncCartState: 네트워크 에러", e)
-            } catch (e: HttpException) {
-                Log.e(TAG, "syncCartState: HTTP ${e.code()} 에러", e)
             } catch (e: Exception) {
-                Log.e(TAG, "syncCartState: 기타 에러", e)
+                handleError("refresh", e, "장바구니 상태를 동기화할 수 없어요.")
             }
         }
     }
@@ -201,14 +183,8 @@ class ShoppingViewModel(
                         sizeInRepo = page.totalElements,
                     )
                 }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: IOException) {
-                Log.e(TAG, "initialize: 네트워크 에러", e)
-            } catch (e: HttpException) {
-                Log.e(TAG, "initialize: HTTP ${e.code()} 에러", e)
             } catch (e: Exception) {
-                Log.e(TAG, "initialize: 기타 에러", e)
+                handleError("initialize", e, "상품을 불러올 수 없어요.")
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
@@ -238,6 +214,21 @@ class ShoppingViewModel(
                 quantity = cartItem?.quantity ?: 0,
             )
         }
+    }
+
+    private suspend fun handleError(tag: String, e: Exception, defaultMessage: String) {
+        if (e is CancellationException) throw e
+        Log.e(TAG, "$tag 에러", e)
+        val msg = when (e) {
+            is IOException -> "네트워크 연결을 확인해주세요."
+            is HttpException -> when (e.code()) {
+                401, 403 -> "다시 로그인이 필요해요."
+                in 500..599 -> "서버에 일시적 문제가 있어요."
+                else -> defaultMessage
+            }
+            else -> defaultMessage
+        }
+        _events.send(msg)
     }
 
     companion object {

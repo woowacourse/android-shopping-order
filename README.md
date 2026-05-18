@@ -8,7 +8,7 @@
 - [x] CartService의 @Header 파라미터 제거 후 Interceptor로 자동 주입하도록 변경
 
 ## UiState 설계
-- [ ] CartUiState 상태 표현 개선 - Sealed class(Loading / Success / Empty / Error) 또는 명시적 error 필드 추가
+- [x] CartUiState 상태 표현 개선
 
 ## ViewModel 구조
 - [x] ViewModelProvider.Factory를 각 ViewModel의 companion object로 이동
@@ -22,8 +22,8 @@
 - [x] hasNext 책임을 ViewModel로 이동 - 서버 응답 메타데이터(last, totalPages)로 판단
 
 ## 에러/예외 처리
-- [ ] 요청 실패 시 피드백 추가 (ex. 토스트)
-- [ ] 추천 화면 재진입 시 stale한 recommendItems 초기화
+- [x] 요청 실패 시 피드백 추가 (ex. 토스트)
+- [x] 추천 화면 재진입 시 stale한 recommendItems 초기화
 
 # 🚀 2단계 - 상품 추천
 
@@ -94,6 +94,5 @@
     - [x] 상품 목록 화면 스켈레톤 레이아웃 작성
     - [x] 데이터 로딩 전까지 스켈레톤 노출, 완료 시 실제 UI로 교체
     - [x] Shimmer 효과 적용 여부 결정
-- [ ] 네트워크 에러 핸들링 UI
-    - [ ] 일반 에러 / 인증 실패 / 네트워크 단절 케이스 분기
-    - [ ] 재시도 버튼 제공
+- [x] 네트워크 에러 핸들링 UI
+    - [x] 일반 에러 / 인증 실패 / 네트워크 단절 케이스 분기
