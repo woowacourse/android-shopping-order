@@ -3,9 +3,9 @@ package woowacourse.shopping.repository
 import android.content.Context
 import okhttp3.OkHttpClient
 import woowacourse.shopping.local.ShoppingDatabase
+import woowacourse.shopping.local.config.AppConfig
 import woowacourse.shopping.network.ConnectivityManagerNetworkMonitor
 import woowacourse.shopping.network.NetworkMonitor
-import woowacourse.shopping.network.auth.AppAuthConfig
 import woowacourse.shopping.network.auth.BasicAuthHeaderFactory
 import woowacourse.shopping.network.auth.BasicAuthInterceptor
 import woowacourse.shopping.repository.http.cart.HttpCartRepository
@@ -13,15 +13,12 @@ import woowacourse.shopping.repository.http.product.HttpProductRepository
 import woowacourse.shopping.repository.room.RoomRecentProductRepository
 
 object ShoppingRepositoryProvider {
-    private const val PRODUCT_API_BASE_URL =
-        "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/"
-
     private val httpClient: OkHttpClient by lazy {
         OkHttpClient
             .Builder()
             .addInterceptor(
                 BasicAuthInterceptor {
-                    BasicAuthHeaderFactory.create(AppAuthConfig.credentials)
+                    BasicAuthHeaderFactory.create()
                 },
             ).build()
     }
@@ -52,12 +49,12 @@ object ShoppingRepositoryProvider {
         productRepository =
             HttpProductRepository(
                 client = httpClient,
-                baseUrl = PRODUCT_API_BASE_URL,
+                baseUrl = AppConfig.BASE_URL,
             )
         cartRepository =
             HttpCartRepository(
                 client = httpClient,
-                baseUrl = PRODUCT_API_BASE_URL,
+                baseUrl = AppConfig.BASE_URL,
             )
 
         recentProductRepository = RoomRecentProductRepository(database.recentProductDao())
