@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.map
 class UserDataStore(
     private val context: Context,
 ) {
-    val Context.userDataStore by preferencesDataStore(name = "user")
+    private val Context.userDataStore by preferencesDataStore(name = "user")
 
     suspend fun saveUser(
         username: String,
