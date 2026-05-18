@@ -15,7 +15,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -29,8 +28,11 @@ import woowacourse.shopping.ui.theme.ShoppingTheme
 class CartActivity : ComponentActivity() {
     private val cartViewModel: CartViewModel by viewModels()
     private val recommendationViewModel: CartRecommendationViewModel by viewModels()
+    private var isShowingRecommendedProducts by mutableStateOf(false)
 
     companion object {
+        private const val KEY_IS_SHOWING_RECOMMENDED_PRODUCTS = "key_is_showing_recommended_products"
+
         fun startActivity(context: Context) {
             context.startActivity(Intent(context, CartActivity::class.java))
         }
@@ -38,18 +40,27 @@ class CartActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        cartViewModel.reloadVisibleState()
-        recommendationViewModel.reloadVisibleState()
+        if (isShowingRecommendedProducts) {
+            recommendationViewModel.reloadVisibleState()
+        } else {
+            cartViewModel.reloadVisibleState()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(KEY_IS_SHOWING_RECOMMENDED_PRODUCTS, isShowingRecommendedProducts)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        isShowingRecommendedProducts =
+            savedInstanceState?.getBoolean(KEY_IS_SHOWING_RECOMMENDED_PRODUCTS) ?: false
 
         setContent {
             val cartUiState by cartViewModel.uiState.collectAsStateWithLifecycle()
             val recommendationUiState by recommendationViewModel.uiState.collectAsStateWithLifecycle()
-            var isShowingRecommendedProducts by rememberSaveable { mutableStateOf(false) }
 
             LaunchedEffect(recommendationUiState.orderCompletedCount) {
                 if (recommendationUiState.orderCompletedCount > 0) {
