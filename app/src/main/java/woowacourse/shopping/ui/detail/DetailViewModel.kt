@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentItemRepository
@@ -96,21 +98,19 @@ class DetailViewModel(
     }
 
     companion object {
-        fun provideFactory(
+        fun Factory(
             id: String,
             hideRecentItem: Boolean,
-            productRepository: ProductRepository,
-            cartRepository: CartRepository,
-            recentItemRepository: RecentItemRepository,
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
+                    val app = this[APPLICATION_KEY] as ShoppingApplication
                     DetailViewModel(
                         id = id,
                         hideRecentItem = hideRecentItem,
-                        productRepository = productRepository,
-                        cartRepository = cartRepository,
-                        recentItemRepository = recentItemRepository,
+                        cartRepository = app.appContainer.cartRepository,
+                        productRepository = app.appContainer.productRepository,
+                        recentItemRepository = app.appContainer.recentItemRepository,
                     )
                 }
             }

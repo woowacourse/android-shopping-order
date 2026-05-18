@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.cart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentItemRepository
@@ -122,7 +124,8 @@ class CartViewModel(
         }
     }
 
-    private fun isSelected(cartItemId: String): Boolean = _uiState.value.selectedCartItems.contains(cartItemId)
+    private fun isSelected(cartItemId: String): Boolean =
+        _uiState.value.selectedCartItems.contains(cartItemId)
 
     fun isAllSelectClick() {
         val selectedItems =
@@ -180,17 +183,14 @@ class CartViewModel(
     companion object {
         private const val PAGE_SIZE = 5
 
-        fun provideFactory(
-            cartRepository: CartRepository,
-            recentItemRepository: RecentItemRepository,
-            productRepository: ProductRepository,
-        ): ViewModelProvider.Factory =
+        val Factory: ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
+                    val app = this[APPLICATION_KEY] as ShoppingApplication
                     CartViewModel(
-                        cartRepository = cartRepository,
-                        recentItemRepository = recentItemRepository,
-                        productRepository = productRepository,
+                        cartRepository = app.appContainer.cartRepository,
+                        productRepository = app.appContainer.productRepository,
+                        recentItemRepository = app.appContainer.recentItemRepository,
                     )
                 }
             }

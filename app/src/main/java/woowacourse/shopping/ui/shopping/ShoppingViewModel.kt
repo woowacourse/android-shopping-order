@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.shopping
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.remote.NetworkObserver
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
@@ -168,19 +170,15 @@ class ShoppingViewModel(
     }
 
     companion object {
-        fun provideFactory(
-            productRepository: ProductRepository,
-            cartRepository: CartRepository,
-            recentItemRepository: RecentItemRepository,
-            networkObserver: NetworkObserver,
-        ): ViewModelProvider.Factory =
+        val Factory: ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
+                    val app = this[APPLICATION_KEY] as ShoppingApplication
                     ShoppingViewModel(
-                        productRepository = productRepository,
-                        cartRepository = cartRepository,
-                        recentItemRepository = recentItemRepository,
-                        networkObserver = networkObserver,
+                        productRepository = app.appContainer.productRepository,
+                        cartRepository = app.appContainer.cartRepository,
+                        recentItemRepository = app.appContainer.recentItemRepository,
+                        networkObserver = app.appContainer.networkObserver,
                     )
                 }
             }
