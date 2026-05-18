@@ -16,8 +16,14 @@ class ShoppingApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         RepositoryProvider.init(this)
-        CoroutineScope(Dispatchers.IO).launch {
-            RepositoryProvider.authDataSource.saveToken(id = "joon0447", password = "password")
+
+        if (BuildConfig.DEBUG) {
+            CoroutineScope(Dispatchers.IO).launch {
+                RepositoryProvider.authDataSource.saveToken(
+                    id = BuildConfig.ID,
+                    password = BuildConfig.PASSWORD,
+                )
+            }
         }
     }
 }

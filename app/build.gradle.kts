@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +8,11 @@ plugins {
     kotlin("plugin.serialization") version "2.1.0"
     id("kotlin-parcelize")
 }
+
+val properties =
+    Properties().apply {
+        load(project.rootProject.file("local.properties").inputStream())
+    }
 
 android {
     namespace = "woowacourse.shopping"
@@ -25,6 +32,10 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        debug {
+            buildConfigField("String", "ID", properties.getProperty("id"))
+            buildConfigField("String", "PASSWORD", properties.getProperty("password"))
         }
     }
     compileOptions {
