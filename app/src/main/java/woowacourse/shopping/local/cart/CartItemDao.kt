@@ -37,6 +37,9 @@ interface CartItemDao {
     @Query("DELETE FROM cart_items WHERE productId = :productId")
     suspend fun deleteBy(productId: Long)
 
+    @Query("DELETE FROM cart_items WHERE productId IN (:productIds)")
+    suspend fun deleteAllByProductIds(productIds: List<Long>)
+
     @Query("SELECT COUNT(*) FROM cart_items")
     suspend fun count(): Int
 }
