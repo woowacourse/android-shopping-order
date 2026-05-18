@@ -66,7 +66,7 @@ class ShoppingViewModelTest {
             advanceUntilIdle()
 
             val state = viewModel.uiState.value
-            Assertions.assertThat(state.canLoadMore).isTrue
+            Assertions.assertThat(state.canLoadMore).isTrue()
         }
 
     @Test
@@ -78,6 +78,6 @@ class ShoppingViewModelTest {
             advanceUntilIdle()
 
             val state = viewModel.uiState.value
-            Assertions.assertThat(state.canLoadMore).isFalse
+            Assertions.assertThat(state.canLoadMore).isFalse()
         }
 }
