@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository.network
 
-import woowacourse.shopping.data.remote.auth.BasicAuthEncoder
 import woowacourse.shopping.data.remote.dto.CartItemRequest
 import woowacourse.shopping.data.remote.dto.Quantity
 import woowacourse.shopping.data.remote.dto.toDomain
@@ -11,19 +10,13 @@ import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Page
 
 class RetrofitCartRepository(
-    private val encoder: BasicAuthEncoder,
     private val service: CartService,
 ) : CartRepository {
-    override suspend fun getAllCartItems(): Cart {
-        val response = service.getCartItems(
-            auth = encoder.getHeader(),
-        )
-        return response.toDomain()
-    }
+    override suspend fun getAllCartItems(): Cart =
+        service.getCartItems().toDomain()
 
     override suspend fun add(productId: Long, quantity: Int): Long {
         val response = service.addCartItem(
-            auth = encoder.getHeader(),
             request = CartItemRequest(productId, quantity)
         )
         if (!response.isSuccessful) {
@@ -39,7 +32,6 @@ class RetrofitCartRepository(
 
     override suspend fun updateQuantity(cartItemId: Long, quantity: Int) {
         service.updateCartItemQuantity(
-            auth = encoder.getHeader(),
             cartItemId = cartItemId,
             quantity = Quantity(quantity)
         )
@@ -47,7 +39,6 @@ class RetrofitCartRepository(
 
     override suspend fun delete(cartItemId: Long) {
         service.deleteCartItem(
-            auth = encoder.getHeader(),
             cartItemId = cartItemId
         )
     }
@@ -57,7 +48,6 @@ class RetrofitCartRepository(
         size: Int,
     ): Page<CartItem> {
         val response = service.getCartItems(
-            encoder.getHeader(),
             pageIndex = page,
             size = size,
         )
@@ -78,5 +68,5 @@ class RetrofitCartRepository(
     }
 
     override suspend fun getTotalProductCount(): Int =
-        service.getTotalCount(auth = encoder.getHeader()).quantity
+        service.getTotalCount().quantity
 }

@@ -7,6 +7,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.create
 import woowacourse.shopping.BuildConfig
+import woowacourse.shopping.data.remote.auth.AuthInterceptor
+import woowacourse.shopping.data.remote.auth.BasicAuthEncoder
 import woowacourse.shopping.data.remote.service.CartService
 import woowacourse.shopping.data.remote.service.OrderService
 import woowacourse.shopping.data.remote.service.ProductService
@@ -18,7 +20,10 @@ object RetrofitClient {
             ignoreUnknownKeys = true
             coerceInputValues = true
         }
-    private val httpClient = OkHttpClient.Builder().build()
+    private val encoder = BasicAuthEncoder
+    private val httpClient = OkHttpClient.Builder()
+        .addInterceptor(AuthInterceptor { encoder.getHeader() })
+        .build()
     private val retrofit = Retrofit
         .Builder()
         .baseUrl(BASE_URL)
