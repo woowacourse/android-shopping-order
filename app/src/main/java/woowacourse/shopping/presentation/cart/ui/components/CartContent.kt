@@ -13,6 +13,8 @@ import woowacourse.shopping.presentation.cart.model.CartItemUiModel
 import woowacourse.shopping.presentation.common.model.MockModels
 import woowacourse.shopping.presentation.common.model.MockModels.product
 
+private const val SKELETON_CARD_SIZE = 5
+
 @Composable
 fun CartContent(
     isLoading: Boolean,
@@ -27,32 +29,33 @@ fun CartContent(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier,
     ) {
+        if (isLoading && cartItems.isEmpty()) {
+            items(count = SKELETON_CARD_SIZE) {
+                SkeletonCartCard()
+            }
+        }
         items(
             items = cartItems,
             key = { it.product.id },
         ) { item ->
-            if (isLoading) {
-                SkeletonCartCard()
-            } else {
-                val product = item.product
-                CartCard(
-                    productName = product.name,
-                    price = item.totalPrice,
-                    imageUrl = product.imageUrl,
-                    quantity = item.quantity,
-                    onDeleteItem = {
-                        onDeleteItem(product.id)
-                    },
-                    onIncrease = {
-                        onIncrease(product.id)
-                    },
-                    onDecrease = {
-                        onDecrease(product.id)
-                    },
-                    isSelected = item.isSelected,
-                    onSelectProduct = { onSelected(item.product.id) },
-                )
-            }
+            val product = item.product
+            CartCard(
+                productName = product.name,
+                price = item.totalPrice,
+                imageUrl = product.imageUrl,
+                quantity = item.quantity,
+                onDeleteItem = {
+                    onDeleteItem(product.id)
+                },
+                onIncrease = {
+                    onIncrease(product.id)
+                },
+                onDecrease = {
+                    onDecrease(product.id)
+                },
+                isSelected = item.isSelected,
+                onSelectProduct = { onSelected(item.product.id) },
+            )
         }
     }
 }

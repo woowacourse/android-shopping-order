@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +34,8 @@ import woowacourse.shopping.presentation.shopping.ui.components.LoadButton
 import woowacourse.shopping.presentation.shopping.ui.components.ProductCard
 import woowacourse.shopping.presentation.shopping.ui.components.RecentSection
 import woowacourse.shopping.presentation.shopping.ui.components.SkeletonProductCard
+
+private const val SKELETON_CARD_SIZE = 8
 
 @Composable
 fun ShoppingScreen(
@@ -78,7 +79,6 @@ fun ShoppingScreen(
                     .padding(innerPadding),
             contentAlignment = Alignment.Center,
         ) {
-            if (uiState.isLoading) CircularProgressIndicator()
             uiState.errorMessage?.let { errorMessage ->
                 Text(
                     text = errorMessage,
@@ -127,24 +127,26 @@ private fun ShoppingContents(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.padding(top = 20.dp),
         ) {
-            item(
-                span = { GridItemSpan(2) },
-            ) {
-                RecentSection(
-                    recentProducts = recentProducts,
-                    onClick = {
-                        onProductCardClick(it)
-                        onUpsertRecentProduct(it)
-                    },
-                )
-            }
-            items(
-                items = items,
-                key = { it.product.id },
-            ) { item ->
-                if (isLoading) {
+            if (isLoading && items.isEmpty()) {
+                items(count = SKELETON_CARD_SIZE) {
                     SkeletonProductCard()
-                } else {
+                }
+            } else {
+                item(
+                    span = { GridItemSpan(2) },
+                ) {
+                    RecentSection(
+                        recentProducts = recentProducts,
+                        onClick = {
+                            onProductCardClick(it)
+                            onUpsertRecentProduct(it)
+                        },
+                    )
+                }
+                items(
+                    items = items,
+                    key = { it.product.id },
+                ) { item ->
                     ProductCard(
                         product = item.product,
                         quantity = item.quantity,
@@ -153,14 +155,14 @@ private fun ShoppingContents(
                         onDecrease = { onDecrease(item.product.id) },
                     )
                 }
-            }
-            if (isCanLoadMore) {
-                item(
-                    span = { GridItemSpan(2) },
-                ) {
-                    LoadButton(
-                        onClick = onLoad,
-                    )
+                if (isCanLoadMore) {
+                    item(
+                        span = { GridItemSpan(2) },
+                    ) {
+                        LoadButton(
+                            onClick = onLoad,
+                        )
+                    }
                 }
             }
         }
