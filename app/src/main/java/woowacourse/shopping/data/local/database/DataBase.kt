@@ -38,16 +38,18 @@ abstract class DataBase : RoomDatabase() {
         @Volatile
         private var instance: DataBase? = null
 
-        fun getDatabase(context: Context): DataBase =
-            instance ?: synchronized(this) {
+        fun getDatabase(context: Context): DataBase {
+            val dataBaseContext = context.applicationContext
+            return instance ?: synchronized(this) {
                 Room
                     .databaseBuilder(
-                        context = context,
+                        context = dataBaseContext,
                         klass = DataBase::class.java,
                         name = "shopping_database",
                     ).addMigrations(MIGRATION_5_6)
                     .build()
                     .also { instance = it }
             }
+        }
     }
 }
