@@ -20,3 +20,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "android-shopping-cart"
 include(":app")
+include(":benchmark")
