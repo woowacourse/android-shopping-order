@@ -4,7 +4,7 @@
 - [x] 미션에서 사용하지 않는 파일 제거
 
 ## Network 레이어
-- [ ] RetrofitClient 단일화 - Retrofit 인스턴스 하나만 만들고 .create()로 여러 서비스 생성으로 변경
+- [x] RetrofitClient 단일화 - Retrofit 인스턴스 하나만 만들고 .create()로 여러 서비스 생성으로 변경
 - [ ] CartService의 @Header 파라미터 제거 후 Interceptor로 자동 주입하도록 변경
 
 ## UiState 설계
