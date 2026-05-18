@@ -17,7 +17,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ui.cart.list.CartScreen
 import woowacourse.shopping.ui.cart.list.CartViewModel
 import woowacourse.shopping.ui.cart.recommendation.CartRecommendationViewModel
@@ -29,6 +32,7 @@ class CartActivity : ComponentActivity() {
     private val cartViewModel: CartViewModel by viewModels()
     private val recommendationViewModel: CartRecommendationViewModel by viewModels()
     private var isShowingRecommendedProducts by mutableStateOf(false)
+    private var returnToCartJob: Job? = null
 
     companion object {
         private const val KEY_IS_SHOWING_RECOMMENDED_PRODUCTS = "key_is_showing_recommended_products"
@@ -76,7 +80,7 @@ class CartActivity : ComponentActivity() {
             }
 
             BackHandler(enabled = isShowingRecommendedProducts) {
-                isShowingRecommendedProducts = false
+                returnToCart()
             }
 
             ShoppingTheme {
@@ -96,7 +100,7 @@ class CartActivity : ComponentActivity() {
                             onIncreaseQuantity = recommendationViewModel::increaseRecommendedProductQuantity,
                             onDecreaseQuantity = recommendationViewModel::decreaseRecommendedProductQuantity,
                             onOrderClick = recommendationViewModel::placeOrder,
-                            onBackClick = { isShowingRecommendedProducts = false },
+                            onBackClick = ::returnToCart,
                         )
                     } else {
                         CartScreen(
@@ -122,6 +126,21 @@ class CartActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun returnToCart() {
+        if (returnToCartJob?.isActive == true) return
+
+        returnToCartJob =
+            lifecycleScope.launch {
+                recommendationViewModel.awaitPendingChanges()
+                cartViewModel.reloadVisibleStateImmediately()
+                isShowingRecommendedProducts = false
+            }.also { job ->
+                job.invokeOnCompletion {
+                    returnToCartJob = null
+                }
+            }
     }
 }
 

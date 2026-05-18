@@ -41,15 +41,7 @@ class CartViewModel(
         val currentPage = (_uiState.value.cartListState as? CartListUiState.Content)?.currentPage ?: 1
 
         viewModelScope.launch {
-            runCatching {
-                updatePage(currentPage)
-            }.onFailure { throwable ->
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        cartListState = CartListUiState.Error(throwable.message),
-                    )
-                }
-            }
+            reloadPage(currentPage)
         }
     }
 
@@ -133,16 +125,13 @@ class CartViewModel(
                     cartListState = CartListUiState.Loading,
                 )
             }
-            runCatching {
-                updatePage(page)
-            }.onFailure { throwable ->
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        cartListState = CartListUiState.Error(throwable.message),
-                    )
-                }
-            }
+            reloadPage(page)
         }
+    }
+
+    suspend fun reloadVisibleStateImmediately() {
+        val currentPage = (_uiState.value.cartListState as? CartListUiState.Content)?.currentPage ?: 1
+        reloadPage(currentPage)
     }
 
     private suspend fun updatePage(page: Int) {
@@ -169,6 +158,18 @@ class CartViewModel(
                         hasNext = currentPage < cartPageResult.totalPages,
                     ),
             )
+        }
+    }
+
+    private suspend fun reloadPage(page: Int) {
+        runCatching {
+            updatePage(page)
+        }.onFailure { throwable ->
+            _uiState.update { currentState ->
+                currentState.copy(
+                    cartListState = CartListUiState.Error(throwable.message),
+                )
+            }
         }
     }
 

@@ -155,6 +155,10 @@ class CartRecommendationViewModel(
         }
     }
 
+    suspend fun awaitPendingChanges() {
+        awaitRecommendedSyncs()
+    }
+
     private fun loadRecommendedProducts() {
         viewModelScope.launch {
             _uiState.update { currentState ->
