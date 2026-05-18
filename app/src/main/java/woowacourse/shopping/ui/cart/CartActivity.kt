@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import woowacourse.shopping.IntentKeys
 import woowacourse.shopping.ui.recommendation.RecommendationActivity
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.cart.uimodel.toUiModel
@@ -78,7 +79,12 @@ class CartActivity : ComponentActivity() {
                     onCheckedChanged = { viewModel.onItemChecked(it) },
                     onSelectAllClick = { viewModel.onSelectAllClick() },
                     onOrderClick = {
-                        val intent = Intent(this, RecommendationActivity::class.java)
+                        val intent = Intent(this, RecommendationActivity::class.java).apply {
+                            putExtra(
+                                IntentKeys.SELECTED_CART_ID_KEY,
+                                checkedItemIds.toLongArray()
+                            )
+                        }
                         startActivity(intent)
                     },
                     modifier =

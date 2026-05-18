@@ -14,8 +14,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.IntentKeys
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.ui.cart.CartViewModel
-import woowacourse.shopping.ui.cart.CartViewModelFactory
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 
 class RecommendationActivity : ComponentActivity() {
@@ -23,13 +21,10 @@ class RecommendationActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val cartViewModel: CartViewModel =
-                viewModel<CartViewModel>(
-                    factory =
-                        CartViewModelFactory(
-                            (application as ShoppingApplication).cartRepository
-                        ),
-                )
+            val selectedCartItemIds =
+                intent.getLongArrayExtra(IntentKeys.SELECTED_CART_ID_KEY)
+                    ?.toList()
+                    ?: emptyList()
 
             val recommendationViewModel: RecommendationViewModel =
                 viewModel<RecommendationViewModel>(
@@ -37,12 +32,13 @@ class RecommendationActivity : ComponentActivity() {
                         RecommendationViewModelFactory(
                             cartRepository = (application as ShoppingApplication).cartRepository,
                             productRepository = (application as ShoppingApplication).productRepository,
-                            recentlyViewedProductRepository = (application as ShoppingApplication).recentlyViewedProductRepository
+                            recentlyViewedProductRepository = (application as ShoppingApplication).recentlyViewedProductRepository,
+                            initialSelectedIds = selectedCartItemIds
                         )
                 )
 
-            val totalPrice by cartViewModel.totalPrice.collectAsStateWithLifecycle()
-            val totalCount by cartViewModel.cartItemCount.collectAsStateWithLifecycle()
+            val totalPrice by recommendationViewModel.totalPrice.collectAsStateWithLifecycle()
+            val totalCount by recommendationViewModel.selectedCount.collectAsStateWithLifecycle()
             val cartState by recommendationViewModel.allCartItems.collectAsStateWithLifecycle()
             val recommendedProducts by recommendationViewModel.recommendedProducts.collectAsStateWithLifecycle()
 
