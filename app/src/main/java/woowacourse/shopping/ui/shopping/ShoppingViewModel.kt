@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.shopping
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,6 +15,7 @@ import woowacourse.shopping.data.remote.NetworkMonitor
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
+import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.ui.common.model.ProductUiModel
 import woowacourse.shopping.ui.common.paging.Pager
 
@@ -171,5 +173,23 @@ class ShoppingViewModel(
                 cartQuantity = cartQuantityMap[product.id] ?: 0,
             )
         }
+    }
+
+    companion object {
+        fun provideFactory(
+            container: AppContainer,
+            networkMonitor: NetworkMonitor,
+            loadSize: Int,
+        ): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                    ShoppingViewModel(
+                        networkMonitor = networkMonitor,
+                        productRepo = container.productRepository,
+                        cartRepo = container.cartRepository,
+                        recentProductRepo = container.recentProductRepository,
+                        loadSize = loadSize,
+                    ) as T
+            }
     }
 }

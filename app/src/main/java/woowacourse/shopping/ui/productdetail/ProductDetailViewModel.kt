@@ -2,7 +2,10 @@ package woowacourse.shopping.ui.productdetail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -10,6 +13,7 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
+import woowacourse.shopping.di.AppContainer
 
 class ProductDetailViewModel(
     savedStateHandle: SavedStateHandle,
@@ -76,5 +80,26 @@ class ProductDetailViewModel(
                 _uiState.update { it.copy(isLoading = false) }
             }
         }
+    }
+
+    companion object {
+        fun provideFactory(
+            receivedProductId: Long,
+            container: AppContainer,
+        ): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(
+                    modelClass: Class<T>,
+                    extras: CreationExtras,
+                ): T =
+                    ProductDetailViewModel(
+                        savedStateHandle = extras.createSavedStateHandle(),
+                        productRepo = container.productRepository,
+                        cartRepo = container.cartRepository,
+                        recentProductRepo = container.recentProductRepository,
+                        productId = receivedProductId,
+                    ) as T
+            }
+
     }
 }
