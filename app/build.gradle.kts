@@ -1,8 +1,34 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("org.jetbrains.kotlin.kapt")
+}
+
+val properties =
+    Properties().apply {
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use { load(it) }
+        }
+    }
+
+fun asBuildConfigString(rawValue: String): String {
+    if (rawValue.startsWith("\"") && rawValue.endsWith("\"")) return rawValue
+    val escaped = rawValue.replace("\\", "\\\\").replace("\"", "\\\"")
+    return "\"$escaped\""
+}
+
+fun readConfig(
+    localPropertiesKey: String,
+    envKey: String,
+    defaultValue: String = "",
+): String {
+    return properties.getProperty(localPropertiesKey)
+        ?: providers.environmentVariable(envKey).orNull
+        ?: defaultValue
 }
 
 android {
@@ -21,13 +47,39 @@ android {
         buildConfigField(
             "String",
             "BASE_URL",
-            "\"http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/\"",
+            asBuildConfigString(
+                readConfig(
+                    "BASE_URL",
+                    "",
+                ),
+            ),
         )
-        buildConfigField("String", "API_USERNAME", "\"parkhyomi\"")
-        buildConfigField("String", "API_PASSWORD", "\"password\"")
+
+        buildConfigField(
+            "String",
+            "API_USERNAME",
+            asBuildConfigString(readConfig("shoppingApiUsername", "")),
+        )
+        buildConfigField(
+            "String",
+            "API_PASSWORD",
+            asBuildConfigString(readConfig("shoppingApiPassword", "")),
+        )
     }
 
     buildTypes {
+        debug {
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                asBuildConfigString(
+                    readConfig(
+                        "DEBUG_BASE_URL",
+                        "",
+                    ),
+                ),
+            )
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
