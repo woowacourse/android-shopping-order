@@ -14,7 +14,6 @@ import woowacourse.shopping.presentation.common.model.ProductUiModel
 
 @Composable
 fun CartContent(
-    isLoading: Boolean,
     onSelected: (Long) -> Unit,
     onDeleteItem: (Long) -> Unit,
     onIncrease: (Long) -> Unit,
@@ -30,28 +29,24 @@ fun CartContent(
             items = cartItems,
             key = { it.product.id },
         ) { item ->
-            if (isLoading) {
-                SkeletonCartCard()
-            } else {
-                val product = item.product
-                CartCard(
-                    productName = product.name,
-                    price = item.totalPrice,
-                    imageUrl = product.imageUrl,
-                    quantity = item.quantity,
-                    onDeleteItem = {
-                        onDeleteItem(product.id)
-                    },
-                    onIncrease = {
-                        onIncrease(product.id)
-                    },
-                    onDecrease = {
-                        onDecrease(product.id)
-                    },
-                    isSelected = item.isSelected,
-                    onSelectProduct = { onSelected(item.product.id) },
-                )
-            }
+            val product = item.product
+            CartCard(
+                productName = product.name,
+                price = item.totalPrice,
+                imageUrl = product.imageUrl,
+                quantity = item.quantity,
+                onDeleteItem = {
+                    onDeleteItem(product.id)
+                },
+                onIncrease = {
+                    onIncrease(product.id)
+                },
+                onDecrease = {
+                    onDecrease(product.id)
+                },
+                isSelected = item.isSelected,
+                onSelectProduct = { onSelected(item.product.id) },
+            )
         }
     }
 }
@@ -60,7 +55,6 @@ fun CartContent(
 @Composable
 private fun CartContentPreview() {
     CartContent(
-        isLoading = false,
         onSelected = {},
         onDeleteItem = {},
         onIncrease = {},

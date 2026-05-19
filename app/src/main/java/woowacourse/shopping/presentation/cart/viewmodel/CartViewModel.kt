@@ -19,12 +19,6 @@ import kotlin.math.min
 class CartViewModel(
     private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
 ) : ViewModel() {
-    init {
-        viewModelScope.launch {
-            cartRepository.loadCart()
-        }
-    }
-
     private val cart = cartRepository.cart
     private val paymentItemIds = MutableStateFlow(emptySet<Long>())
     private val _uiState = MutableStateFlow(CartUiState())
@@ -44,12 +38,21 @@ class CartViewModel(
                 isSelectAll = items.isNotEmpty() && items.all { it.isSelected },
                 totalCartSize = items.size,
                 isShowPageSection = items.size > PAGE_SIZE,
+                isLoading = state.isLoading,
             )
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
             initialValue = _uiState.value,
         )
+
+    init {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            cartRepository.loadCart()
+            _uiState.update { it.copy(isLoading = false) }
+        }
+    }
 
     fun getPaymentItemIds(): List<Long> = paymentItemIds.value.toList()
 

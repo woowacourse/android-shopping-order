@@ -32,6 +32,7 @@ import woowacourse.shopping.presentation.cart.ui.components.CartBottomBar
 import woowacourse.shopping.presentation.cart.ui.components.CartCheckBox
 import woowacourse.shopping.presentation.cart.ui.components.CartContent
 import woowacourse.shopping.presentation.cart.ui.components.CartPageSection
+import woowacourse.shopping.presentation.cart.ui.components.SkeletonCartContent
 import woowacourse.shopping.presentation.common.components.ShoppingAppBar
 import woowacourse.shopping.util.formattedPrice
 
@@ -118,8 +119,11 @@ fun CartScreen(
                     .fillMaxSize()
                     .padding(innerPadding),
         ) {
+            if (uiState.isLoading) {
+                SkeletonCartContent(modifier = Modifier.fillMaxSize())
+                return@Box
+            }
             CartContent(
-                isLoading = uiState.isLoading,
                 onSelected = { onSelected(it) },
                 onDeleteItem = { onDeleteItem(it) },
                 cartItems = uiState.currentCartItems.toImmutableList(),

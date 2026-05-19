@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +33,7 @@ import woowacourse.shopping.presentation.shopping.ui.components.CartIcon
 import woowacourse.shopping.presentation.shopping.ui.components.LoadButton
 import woowacourse.shopping.presentation.shopping.ui.components.ProductCard
 import woowacourse.shopping.presentation.shopping.ui.components.RecentSection
-import woowacourse.shopping.presentation.shopping.ui.components.SkeletonProductCard
+import woowacourse.shopping.presentation.shopping.ui.components.SkeletonProductsContent
 
 @Composable
 fun ShoppingScreen(
@@ -78,7 +77,6 @@ fun ShoppingScreen(
                     .padding(innerPadding),
             contentAlignment = Alignment.Center,
         ) {
-            if (uiState.isLoading) CircularProgressIndicator()
             uiState.errorMessage?.let { errorMessage ->
                 Text(
                     text = errorMessage,
@@ -86,23 +84,32 @@ fun ShoppingScreen(
                     fontSize = 18.sp,
                 )
             }
-            ShoppingContents(
-                items = uiState.products.toImmutableList(),
-                onLoad = { onLoadMore() },
-                isCanLoadMore = uiState.canLoadMore,
-                onProductCardClick = { onProductCardClick(it) },
-                onIncrease = { onIncrease(it) },
-                onDecrease = { onDecrease(it) },
-                onUpsertRecentProduct = { onUpsertRecentProduct(it) },
-                recentProducts = uiState.recentProducts.toImmutableList(),
-                isLoading = uiState.isLoading,
-            )
+            if (uiState.isLoading && uiState.products.isEmpty()) {
+                SkeletonProductsContent(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 20.dp, vertical = 20.dp),
+                )
+                return@Box
+            } else {
+                ShoppingContent(
+                    items = uiState.products.toImmutableList(),
+                    onLoad = { onLoadMore() },
+                    isCanLoadMore = uiState.canLoadMore,
+                    onProductCardClick = { onProductCardClick(it) },
+                    onIncrease = { onIncrease(it) },
+                    onDecrease = { onDecrease(it) },
+                    onUpsertRecentProduct = { onUpsertRecentProduct(it) },
+                    recentProducts = uiState.recentProducts.toImmutableList(),
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun ShoppingContents(
+private fun ShoppingContent(
     items: ImmutableList<ShoppingItemUiModel>,
     onLoad: () -> Unit,
     onProductCardClick: (Long) -> Unit,
@@ -111,7 +118,6 @@ private fun ShoppingContents(
     onUpsertRecentProduct: (Long) -> Unit,
     recentProducts: ImmutableList<ProductUiModel>,
     isCanLoadMore: Boolean,
-    isLoading: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -142,17 +148,13 @@ private fun ShoppingContents(
                 items = items,
                 key = { it.product.id },
             ) { item ->
-                if (isLoading) {
-                    SkeletonProductCard()
-                } else {
-                    ProductCard(
-                        product = item.product,
-                        quantity = item.quantity,
-                        onClick = { onProductCardClick(item.product.id) },
-                        onIncrease = { onIncrease(item.product.id) },
-                        onDecrease = { onDecrease(item.product.id) },
-                    )
-                }
+                ProductCard(
+                    product = item.product,
+                    quantity = item.quantity,
+                    onClick = { onProductCardClick(item.product.id) },
+                    onIncrease = { onIncrease(item.product.id) },
+                    onDecrease = { onDecrease(item.product.id) },
+                )
             }
             if (isCanLoadMore) {
                 item(

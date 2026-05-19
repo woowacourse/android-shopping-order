@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.shopping.ui.components
+package woowacourse.shopping.presentation.cart.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,23 +13,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
+import woowacourse.shopping.ui.theme.Gray20
 import woowacourse.shopping.ui.theme.Gray30
 
 @Composable
-fun SkeletonProductCard(modifier: Modifier = Modifier) {
+fun SkeletonCartContent(modifier: Modifier = Modifier) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier,
+    ) {
+        repeat(3) {
+            SkeletonCartCard(modifier = Modifier.height(200.dp).padding(10.dp))
+        }
+    }
+}
+
+@Composable
+fun SkeletonCartCard(modifier: Modifier = Modifier) {
     Column(
         modifier =
             modifier
-                .fillMaxSize(),
+                .background(Gray20)
+                .fillMaxSize()
+                .padding(10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(154.dp)
-                    .background(Gray30),
-        )
         Box(
             modifier =
                 Modifier
@@ -43,7 +51,7 @@ fun SkeletonProductCard(modifier: Modifier = Modifier) {
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(28.dp)
+                    .height(154.dp)
                     .padding(end = 80.dp)
                     .background(Gray30),
         )
@@ -52,8 +60,8 @@ fun SkeletonProductCard(modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-private fun SkeletonProductCardPreview() {
+private fun SkeletonCartCardPreview() {
     AndroidshoppingTheme {
-        SkeletonProductCard()
+        SkeletonCartCard()
     }
 }
