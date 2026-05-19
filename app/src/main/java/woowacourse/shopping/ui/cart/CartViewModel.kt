@@ -124,8 +124,7 @@ class CartViewModel(
         }
     }
 
-    private fun isSelected(cartItemId: String): Boolean =
-        _uiState.value.selectedCartItems.contains(cartItemId)
+    private fun isSelected(cartItemId: String): Boolean = _uiState.value.selectedCartItems.contains(cartItemId)
 
     fun isAllSelectClick() {
         val selectedItems =
