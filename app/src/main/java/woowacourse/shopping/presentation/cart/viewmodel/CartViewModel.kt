@@ -174,7 +174,6 @@ class CartViewModel(
     }
 
     private suspend fun loadCartItems(providedCart: Cart? = null) {
-        if (uiState.value.isLoading) return
         val isFirstLoad = uiState.value.totalCartSize == 0
         _uiState.update { it.copy(isLoading = true) }
         try {
