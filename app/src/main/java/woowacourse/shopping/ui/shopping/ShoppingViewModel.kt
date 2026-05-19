@@ -23,10 +23,10 @@ private const val RECENT_PRODUCT_LIMIT = 10
 private const val CART_SYNC_DELAY_MILLIS = 400L
 
 class ShoppingViewModel(
-    private val productRepository: ProductRepository = ShoppingRepositoryProvider.productRepository,
-    private val cartRepository: CartRepository = ShoppingRepositoryProvider.cartRepository,
-    private val recentProductRepository: RecentProductRepository = ShoppingRepositoryProvider.recentProductRepository,
-    private val networkMonitor: NetworkMonitor = ShoppingRepositoryProvider.networkMonitor,
+    private val productRepository: ProductRepository,
+    private val cartRepository: CartRepository,
+    private val recentProductRepository: RecentProductRepository,
+    private val networkMonitor: NetworkMonitor,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ShoppingUiState(productListState = ProductListUiState.Loading))
     val uiState: StateFlow<ShoppingUiState> = _uiState.asStateFlow()
