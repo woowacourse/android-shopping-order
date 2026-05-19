@@ -1,5 +1,6 @@
 package woowacourse.shopping.repository.http.repository
 
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -15,8 +16,13 @@ import woowacourse.shopping.repository.http.dto.cart.CartItemQuantityUpdateReque
 import woowacourse.shopping.repository.http.dto.cart.CartItemRequestDto
 import woowacourse.shopping.repository.http.dto.cart.CartItemResponseDto
 import woowacourse.shopping.repository.http.dto.cart.OrderRequestDto
+import woowacourse.shopping.repository.http.exception.CartNetworkException
+import woowacourse.shopping.repository.http.exception.CartParsingException
+import woowacourse.shopping.repository.http.exception.CartRemoteException
+import woowacourse.shopping.repository.http.exception.CartResponseException
 import woowacourse.shopping.repository.query.CartPageItem
 import woowacourse.shopping.repository.query.CartPageResult
+import java.io.IOException
 
 private const val NETWORK_PAGE_SIZE = 100
 private val NETWORK_JSON =
@@ -181,14 +187,35 @@ class HttpCartRepository(
     private suspend fun <T> execute(
         errorMessage: String,
         request: suspend () -> Response<T>,
-    ): T {
-        val response = request()
-        if (!response.isSuccessful) {
-            error("$errorMessage code=${response.code()}")
+    ): T =
+        try {
+            val response = request()
+
+            if (!response.isSuccessful) {
+                throw CartResponseException(
+                    code = response.code(),
+                    message = "$errorMessage code=${response.code()}",
+                )
+            }
+
+            response.body()
+                ?: throw CartParsingException(
+                    message = "장바구니 API 응답 본문이 비어 있습니다.",
+                    cause = IllegalStateException("response body is null"),
+                )
+        } catch (exception: CartRemoteException) {
+            throw exception
+        } catch (exception: IOException) {
+            throw CartNetworkException(
+                message = errorMessage,
+                cause = exception,
+            )
+        } catch (exception: SerializationException) {
+            throw CartParsingException(
+                message = "장바구니 API 응답이 올바르지 않습니다.",
+                cause = exception,
+            )
         }
-        @Suppress("UNCHECKED_CAST")
-        return response.body() ?: Unit as T
-    }
 
     companion object {
         private fun createCartApiService(

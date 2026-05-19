@@ -15,6 +15,7 @@ import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
+import woowacourse.shopping.repository.http.common.RemoteException
 import woowacourse.shopping.ui.common.recentlyviewed.RecentViewedProductsMapper
 
 private const val PAGE_SIZE = 20
@@ -48,7 +49,7 @@ class ShoppingViewModel(
             }.onFailure { throwable ->
                 _uiState.update { currentState ->
                     currentState.copy(
-                        productListState = ProductListUiState.Error(throwable.message),
+                        productListState = ProductListUiState.Error(throwable.toUserMessage()),
                     )
                 }
             }
@@ -87,7 +88,7 @@ class ShoppingViewModel(
         }.onFailure { throwable ->
             _uiState.update { currentState ->
                 currentState.copy(
-                    productListState = ProductListUiState.Error(throwable.message),
+                    productListState = ProductListUiState.Error(throwable.toUserMessage()),
                 )
             }
         }
@@ -221,7 +222,7 @@ class ShoppingViewModel(
                     refreshCartState()
                     _uiState.update { current ->
                         current.copy(
-                            productListState = ProductListUiState.Error(throwable.message),
+                            productListState = ProductListUiState.Error(throwable.toUserMessage()),
                         )
                     }
                 }
@@ -251,3 +252,9 @@ class ShoppingViewModelFactory : ViewModelProvider.Factory {
             networkMonitor = ShoppingRepositoryProvider.networkMonitor,
         ) as T
 }
+
+private fun Throwable.toUserMessage(): String =
+    when (this) {
+        is RemoteException -> userMessage
+        else -> "알 수 없는 오류가 발생했습니다."
+    }

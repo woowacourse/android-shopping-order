@@ -14,6 +14,7 @@ import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
+import woowacourse.shopping.repository.http.common.RemoteException
 import woowacourse.shopping.ui.cart.SelectedCartOrder
 import woowacourse.shopping.ui.cart.SelectedCartOrderItem
 import woowacourse.shopping.ui.cart.list.uistate.CartItemUiModelMapper
@@ -50,7 +51,7 @@ class CartViewModel(
             }.onFailure { throwable ->
                 _uiState.update { currentState ->
                     currentState.copy(
-                        cartListState = CartListUiState.Error(throwable.message),
+                        cartListState = CartListUiState.Error(throwable.toUserMessage()),
                     )
                 }
             }
@@ -142,7 +143,7 @@ class CartViewModel(
             }.onFailure { throwable ->
                 _uiState.update { currentState ->
                     currentState.copy(
-                        cartListState = CartListUiState.Error(throwable.message),
+                        cartListState = CartListUiState.Error(throwable.toUserMessage()),
                     )
                 }
             }
@@ -233,7 +234,7 @@ class CartViewModel(
                     updatePage(currentPage)
                     _uiState.update { currentState ->
                         currentState.copy(
-                            cartListState = CartListUiState.Error(throwable.message),
+                            cartListState = CartListUiState.Error(throwable.toUserMessage()),
                         )
                     }
                 }
@@ -301,3 +302,9 @@ class CartViewModelFactory : ViewModelProvider.Factory {
             networkMonitor = ShoppingRepositoryProvider.networkMonitor,
         ) as T
 }
+
+private fun Throwable.toUserMessage(): String =
+    when (this) {
+        is RemoteException -> userMessage
+        else -> "알 수 없는 오류가 발생했습니다."
+    }

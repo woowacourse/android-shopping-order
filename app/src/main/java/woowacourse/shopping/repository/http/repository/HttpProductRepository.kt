@@ -15,10 +15,10 @@ import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.Products
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.http.api.ProductApiService
-import woowacourse.shopping.repository.http.exception.product.ProductNetworkException
-import woowacourse.shopping.repository.http.exception.product.ProductParsingException
-import woowacourse.shopping.repository.http.exception.product.ProductRemoteException
-import woowacourse.shopping.repository.http.exception.product.ProductResponseException
+import woowacourse.shopping.repository.http.exception.ProductNetworkException
+import woowacourse.shopping.repository.http.exception.ProductParsingException
+import woowacourse.shopping.repository.http.exception.ProductRemoteException
+import woowacourse.shopping.repository.http.exception.ProductResponseException
 import java.io.IOException
 
 private const val NETWORK_PAGE_SIZE = 20
@@ -106,7 +106,10 @@ class HttpProductRepository(
                         .orEmpty()
                         .map { it.toProduct() }
                 }.getOrElse { throwable ->
-                    throw ProductParsingException("카테고리 상품 목록 응답을 파싱할 수 없습니다.", throwable)
+                    throw ProductParsingException(
+                        message = "카테고리 상품 목록 응답을 파싱할 수 없습니다.",
+                        cause = throwable,
+                    )
                 }
 
             cachedProducts = (cachedProducts + fetchedProducts).distinctBy { it.id }
@@ -161,7 +164,10 @@ class HttpProductRepository(
                         .orEmpty()
                         .map { it.toProduct() }
                 }.getOrElse { throwable ->
-                    throw ProductParsingException("상품 목록 응답을 파싱할 수 없습니다.", throwable)
+                    throw ProductParsingException(
+                        message = "상품 목록 응답을 파싱할 수 없습니다.",
+                        cause = throwable,
+                    )
                 }
 
             cachedProducts = cachedProducts + fetchedProducts
@@ -182,7 +188,10 @@ class HttpProductRepository(
             runCatching {
                 responseBody.toProduct()
             }.getOrElse { throwable ->
-                throw ProductParsingException("상품 상세 응답을 파싱할 수 없습니다.", throwable)
+                throw ProductParsingException(
+                    message = "상품 상세 응답을 파싱할 수 없습니다.",
+                    cause = throwable,
+                )
             }
 
         cachedProducts = (cachedProducts + product).distinctBy { it.id }
@@ -206,15 +215,21 @@ class HttpProductRepository(
 
             response.body()
                 ?: throw ProductParsingException(
-                    "상품 API 응답 본문이 비어 있습니다.",
-                    IllegalStateException("response body is null"),
+                    message = "상품 API 응답 본문이 비어 있습니다.",
+                    cause = IllegalStateException("response body is null"),
                 )
         } catch (exception: ProductRemoteException) {
             throw exception
         } catch (exception: IOException) {
-            throw ProductNetworkException(errorMessage, exception)
+            throw ProductNetworkException(
+                message = errorMessage,
+                cause = exception,
+            )
         } catch (exception: SerializationException) {
-            throw ProductParsingException("상품 API 응답이 올바르지 않습니다.", exception)
+            throw ProductParsingException(
+                message = "상품 API 응답이 올바르지 않습니다.",
+                cause = exception,
+            )
         }
 
     companion object {

@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import woowacourse.shopping.repository.http.exception.product.ProductNetworkException
-import woowacourse.shopping.repository.http.exception.product.ProductParsingException
-import woowacourse.shopping.repository.http.exception.product.ProductResponseException
+import woowacourse.shopping.repository.http.exception.ProductNetworkException
+import woowacourse.shopping.repository.http.exception.ProductParsingException
+import woowacourse.shopping.repository.http.exception.ProductResponseException
 import woowacourse.shopping.repository.http.repository.HttpProductRepository
 
 class HttpProductRepositoryTest {
