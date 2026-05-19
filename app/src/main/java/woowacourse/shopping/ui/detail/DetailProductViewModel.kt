@@ -10,15 +10,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.ShoppingItem
-import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.repository.ShoppingItemRepository
 import woowacourse.shopping.data.local.datastore.VisitStore
 import woowacourse.shopping.data.mapper.toDomainProduct
-import woowacourse.shopping.data.remote.retrofit.awaitBody
 import woowacourse.shopping.data.remote.retrofit.repository.ProductRetrofitRepository
 
 class DetailProductViewModel(
-    private val shoppingCartRepository: ShoppingCartRepository,
     private val shoppingItemRepository: ShoppingItemRepository,
     private val visitStore: VisitStore,
     private val productRetrofitRepository: ProductRetrofitRepository,
@@ -97,27 +94,6 @@ class DetailProductViewModel(
         publishUiState()
     }
 
-    fun addSelectedProductToCart() {
-        val shoppingItem = uiState.value.shoppingItem ?: return
-        viewModelScope.launch {
-            addSelectedProductQuantityToCart(
-                productId = shoppingItem.getProductId(),
-                quantity = selectedQuantity,
-            )
-        }
-    }
-
-    private suspend fun addSelectedProductQuantityToCart(
-        productId: Long,
-        quantity: Int,
-    ) {
-        if (quantity < 1) {
-            return
-        }
-        shoppingCartRepository.addIfAbsent(productId)
-        shoppingItemRepository.plusQuantity(productId, quantity)
-    }
-
     private fun requestProductDetailIfNeeded(productId: Long) {
         viewModelScope.launch {
             detailRequestMutex.withLock {
@@ -128,7 +104,7 @@ class DetailProductViewModel(
                     productRetrofitRepository
                         .requestProductDetail(
                             id = productId,
-                        ).awaitBody(errorPrefix = "상품 조회 실패")
+                        )
                         .toDomainProduct()
                 }.onSuccess { detailProduct ->
                     shoppingItemRepository.upsertProduct(detailProduct)

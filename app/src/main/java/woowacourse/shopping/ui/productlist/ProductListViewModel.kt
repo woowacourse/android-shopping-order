@@ -14,8 +14,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import woowacourse.shopping.data.local.datastore.VisitStore
 import woowacourse.shopping.data.mapper.toDomainProducts
-import woowacourse.shopping.data.mapper.toShoppingItem
-import woowacourse.shopping.data.remote.retrofit.awaitBody
 import woowacourse.shopping.data.remote.retrofit.repository.ProductRetrofitRepository
 import woowacourse.shopping.domain.model.ShoppingItem
 import woowacourse.shopping.domain.repository.ShoppingItemRepository
@@ -25,6 +23,7 @@ class ProductListViewModel(
     private val visitStore: VisitStore,
     private val productRetrofitRepository: ProductRetrofitRepository,
 ) : ViewModel() {
+
     private val _uiState = MutableStateFlow(ProductListUiState())
     val uiState: StateFlow<ProductListUiState> = _uiState.asStateFlow()
     private val _event = MutableSharedFlow<ProductListEvent>(extraBufferCapacity = 1)
@@ -66,10 +65,8 @@ class ProductListViewModel(
                             page = page,
                             size = size,
                             category = category,
-                        ).awaitBody(errorPrefix = "상품 조회 실패")
-                        .toDomainProducts()
+                        ).toDomainProducts()
                 }.onSuccess { loadedProducts ->
-                    val loadedShoppingItems = loadedProducts.map { product -> product.toShoppingItem() }
                     if (loadedProducts.isNotEmpty()) {
                         shoppingItemRepository.replaceProducts(loadedProducts)
                     }
@@ -77,7 +74,7 @@ class ProductListViewModel(
                     publishUiState(
                         isLoading = false,
                         errorMessage = null,
-                        loadedProducts = loadedShoppingItems,
+                        hasLoadedProducts = true,
                     )
                 }.onFailure {
                     publishUiState(
@@ -96,14 +93,6 @@ class ProductListViewModel(
 
     fun onProductClick(productId: Long) {
         _event.tryEmit(ProductListEvent.NavigateToDetailProduct(productId))
-    }
-
-    fun onRecentViewedProductClick(productId: Long) {
-        _event.tryEmit(
-            ProductListEvent.NavigateToDetailProduct(
-                productId = productId,
-            ),
-        )
     }
 
     fun onNavigateToCartClick() {
@@ -129,26 +118,26 @@ class ProductListViewModel(
     private fun publishUiState(
         isLoading: Boolean = _uiState.value.isLoading,
         errorMessage: String? = _uiState.value.errorMessage,
-        loadedProducts: List<ShoppingItem> = _uiState.value.loadedProducts,
+        hasLoadedProducts: Boolean = _uiState.value.hasLoadedProducts,
     ) {
         _uiState.value =
             createUiState(
                 isLoading = isLoading,
                 errorMessage = errorMessage,
-                loadedProducts = loadedProducts,
+                hasLoadedProducts = hasLoadedProducts,
             )
     }
 
     private fun createUiState(
         isLoading: Boolean,
         errorMessage: String?,
-        loadedProducts: List<ShoppingItem>,
+        hasLoadedProducts: Boolean,
     ): ProductListUiState {
         val shoppingItemByProductId = allShoppingItems.associateBy { shoppingItem -> shoppingItem.getProductId() }
         return ProductListUiState(
             isLoading = isLoading,
             errorMessage = errorMessage,
-            loadedProducts = loadedProducts,
+            hasLoadedProducts = hasLoadedProducts,
             shoppingItems = productPageStateHolder.getItems(),
             recentViewedShoppingItems = recentViewedProductIds.mapNotNull { productId -> shoppingItemByProductId[productId] },
             shoppingCartTotalCount = allShoppingItems.sumOf { shoppingItem -> shoppingItem.getQuantity() },
@@ -173,7 +162,7 @@ class ProductListViewModel(
     data class ProductListUiState(
         val isLoading: Boolean = false,
         val errorMessage: String? = null,
-        val loadedProducts: List<ShoppingItem> = emptyList(),
+        val hasLoadedProducts: Boolean = false,
         val shoppingItems: List<ShoppingItem> = emptyList(),
         val recentViewedShoppingItems: List<ShoppingItem> = emptyList(),
         val shoppingCartTotalCount: Int = 0,
@@ -183,7 +172,6 @@ class ProductListViewModel(
     sealed interface ProductListEvent {
         data class NavigateToDetailProduct(
             val productId: Long,
-            val showLastViewed: Boolean = true,
         ) : ProductListEvent
 
         data object NavigateToShoppingCart : ProductListEvent

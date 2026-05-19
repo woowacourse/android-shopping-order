@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.cart
 import android.os.SystemClock
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -12,22 +13,28 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import woowacourse.shopping.data.remote.retrofit.awaitBody
-import woowacourse.shopping.data.remote.retrofit.awaitCompletion
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.remote.retrofit.dto.CartRequest
 import woowacourse.shopping.data.remote.retrofit.repository.ShoppingCartRetrofitRepository
 import woowacourse.shopping.data.mapper.toCartQuantity
 import woowacourse.shopping.data.mapper.toDomainShoppingCartItems
+import woowacourse.shopping.data.remote.retrofit.sync.RemoteShoppingStateSyncer
 import woowacourse.shopping.domain.model.ShoppingCartItem
+import woowacourse.shopping.domain.model.ShoppingItem
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
+import woowacourse.shopping.domain.repository.ShoppingItemRepository
 
 class ShoppingCartViewModel(
     private val shoppingCartRetrofitRepository: ShoppingCartRetrofitRepository,
     private val shoppingCartRepository: ShoppingCartRepository,
+    private val remoteShoppingStateSyncer: RemoteShoppingStateSyncer,
+    private val shoppingItemRepository: ShoppingItemRepository,
 ) : ViewModel() {
+
     private val cartRequestMutex = Mutex()
     private var hasLoadedCartOnce: Boolean = false
     private var lastCartLoadedElapsedMs: Long = 0L
+    private var remoteCartItemIdByProductId: Map<Long, Int> = emptyMap()
     private val shoppingCartPageStateHolder = ShoppingCartPageStateHolder(shoppingCartItems = emptyList())
     private val _event = MutableSharedFlow<ShoppingCartEvent>(extraBufferCapacity = 1)
     val event: SharedFlow<ShoppingCartEvent> = _event.asSharedFlow()
@@ -51,7 +58,7 @@ class ShoppingCartViewModel(
         viewModelScope.launch {
             shoppingCartRepository.observeShoppingItems().collect { latestShoppingCartItems ->
                 shoppingCartPageStateHolder.updateItems(latestShoppingCartItems)
-                _screenState.value = createShoppingCartItemsState(latestShoppingCartItems)
+                syncLocalShoppingCartItems(latestShoppingCartItems)
             }
         }
     }
@@ -72,10 +79,6 @@ class ShoppingCartViewModel(
 
     fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int = shoppingCartItem.getProductQuantityPrice()
 
-    fun refreshPagedItems() {
-        publishCurrentPageState()
-    }
-
     fun requestCartItems(force: Boolean = false) {
         if (shouldSkipCartRequest(force = force)) return
         _errorMessage.value = null
@@ -84,8 +87,7 @@ class ShoppingCartViewModel(
                 if (shouldSkipCartRequest(force = force)) return@withLock
                 _isLoading.value = true
                 try {
-                    val loadedItems = loadCartItems()
-                    syncShoppingCartItems(loadedItems)
+                    refreshCartItemsFromRemote()
                     markCartLoaded()
                 } catch (throwable: Throwable) {
                     _errorMessage.value = throwable.message
@@ -106,24 +108,46 @@ class ShoppingCartViewModel(
         viewModelScope.launch {
             cartRequestMutex.withLock {
                 runCatching {
-                    val currentItems = ensureCartSnapshotLoaded()
-                    val targetItem = findByProductId(currentItems, productId)
-                    if (targetItem == null) {
+                    ensureRemoteSnapshotLoaded()
+                    val currentItems = _shoppingCartItems.value
+                    val currentItem = findByProductId(currentItems, productId)
+                    if (currentItem == null) {
                         shoppingCartRetrofitRepository
                             .addCartItem(
                                 product = CartRequest(productId = productId, quantity = amount),
-                            ).awaitCompletion(errorPrefix = "장바구니 추가 실패")
+                            )
+                        remoteCartItemIdByProductId -= productId
+                        val newCartItem = createProjectedCartItem(productId = productId, quantity = amount)
+                        if (newCartItem == null) {
+                            refreshCartItemsFromRemote()
+                        } else {
+                            syncProjectedCartItems(currentItems + newCartItem)
+                        }
                     } else {
-                        val updatedQuantity = targetItem.getQuantity() + amount
-                        shoppingCartRetrofitRepository
-                            .updateQuantityCartItem(
-                                id = targetItem.getId().toInt(),
-                                product = updatedQuantity.toCartQuantity(),
-                            ).awaitCompletion("장바구니 수량 수정 실패")
+                        val updatedQuantity = currentItem.getQuantity() + amount
+                        val remoteCartItemId = resolveRemoteCartItemId(productId = productId)
+                        if (remoteCartItemId == null) {
+                            shoppingCartRetrofitRepository
+                                .addCartItem(
+                                    product = CartRequest(productId = productId, quantity = updatedQuantity),
+                                )
+                            remoteCartItemIdByProductId -= productId
+                        } else {
+                            shoppingCartRetrofitRepository
+                                .updateQuantityCartItem(
+                                    id = remoteCartItemId,
+                                    product = updatedQuantity.toCartQuantity(),
+                                )
+                        }
+                        val projectedCartItems =
+                            updateProjectedCartItemsQuantity(
+                                currentItems = currentItems,
+                                productId = productId,
+                                quantity = updatedQuantity,
+                            )
+                        syncProjectedCartItems(projectedCartItems)
                     }
-                    loadCartItems()
-                }.onSuccess { latestItems ->
-                    syncShoppingCartItems(latestItems)
+                }.onSuccess {
                     markCartLoaded()
                     onSuccess?.invoke()
                 }.onFailure { throwable ->
@@ -138,25 +162,35 @@ class ShoppingCartViewModel(
         viewModelScope.launch {
             cartRequestMutex.withLock {
                 runCatching {
-                    val currentItems = ensureCartSnapshotLoaded()
-                    val targetItem =
-                        findByProductId(currentItems, productId) ?: return@runCatching currentItems
+                    ensureRemoteSnapshotLoaded()
+                    val currentItems = _shoppingCartItems.value
+                    val targetItem = findByProductId(currentItems, productId) ?: return@runCatching
+                    val remoteCartItemId = resolveRemoteCartItemId(productId = productId) ?: return@runCatching
                     val updatedQuantity = targetItem.getQuantity() - 1
                     if (updatedQuantity <= 0) {
                         shoppingCartRetrofitRepository
                             .deleteCartItem(
-                                id = targetItem.getId().toInt(),
-                            ).awaitCompletion(errorPrefix = "장바구니 삭제 실패")
+                                id = remoteCartItemId,
+                            )
+                        remoteCartItemIdByProductId -= productId
+                        syncProjectedCartItems(
+                            currentItems = currentItems.filterNot { cartItem -> cartItem.product.id == productId },
+                        )
                     } else {
                         shoppingCartRetrofitRepository
                             .updateQuantityCartItem(
-                                id = targetItem.getId().toInt(),
+                                id = remoteCartItemId,
                                 product = updatedQuantity.toCartQuantity(),
-                            ).awaitCompletion(errorPrefix = "장바구니 수량 수정 실패")
+                            )
+                        val projectedCartItems =
+                            updateProjectedCartItemsQuantity(
+                                currentItems = currentItems,
+                                productId = productId,
+                                quantity = updatedQuantity,
+                            )
+                        syncProjectedCartItems(projectedCartItems)
                     }
-                    loadCartItems()
-                }.onSuccess { latestItems ->
-                    syncShoppingCartItems(latestItems)
+                }.onSuccess {
                     markCartLoaded()
                 }.onFailure { throwable ->
                     _errorMessage.value = throwable.message
@@ -170,19 +204,20 @@ class ShoppingCartViewModel(
         viewModelScope.launch {
             cartRequestMutex.withLock {
                 runCatching {
-                    val currentItems = ensureCartSnapshotLoaded()
-                    val targetItem =
-                        findByProductId(
-                            shoppingCartItems = currentItems,
-                            productId = shoppingCartItem.product.id,
-                        ) ?: return@runCatching currentItems
+                    ensureRemoteSnapshotLoaded()
+                    val currentItems = _shoppingCartItems.value
+                    val productId = shoppingCartItem.product.id
+                    val targetItem = findByProductId(currentItems, productId) ?: return@runCatching
+                    val remoteCartItemId = resolveRemoteCartItemId(productId = productId) ?: return@runCatching
                     shoppingCartRetrofitRepository
                         .deleteCartItem(
-                            id = targetItem.getId().toInt(),
-                        ).awaitCompletion(errorPrefix = "장바구니 삭제 실패")
-                    loadCartItems()
-                }.onSuccess { latestItems ->
-                    syncShoppingCartItems(latestItems)
+                            id = remoteCartItemId,
+                        )
+                    remoteCartItemIdByProductId -= targetItem.product.id
+                    syncProjectedCartItems(
+                        currentItems = currentItems.filterNot { cartItem -> cartItem.product.id == targetItem.product.id },
+                    )
+                }.onSuccess {
                     markCartLoaded()
                 }.onFailure { throwable ->
                     _errorMessage.value = throwable.message
@@ -200,22 +235,37 @@ class ShoppingCartViewModel(
         decreaseByProductId(productId = shoppingCartItem.product.id)
     }
 
-    private suspend fun loadCartItems(): List<ShoppingCartItem> {
-        return shoppingCartRetrofitRepository
+    private suspend fun loadRemoteCartItems(): List<ShoppingCartItem> =
+        shoppingCartRetrofitRepository
             .requestCartItems(
                 page = DEFAULT_PAGE,
                 size = DEFAULT_SIZE,
                 sort = null,
-            ).awaitBody(errorPrefix = "장바구니 조회 실패")
-            .toDomainShoppingCartItems()
+            ).toDomainShoppingCartItems()
+
+    private suspend fun refreshCartItemsFromRemote(): List<ShoppingCartItem> {
+        val remoteCartItems = loadRemoteCartItems()
+        remoteCartItemIdByProductId =
+            remoteCartItems.associate { remoteCartItem ->
+                remoteCartItem.product.id to remoteCartItem.getId().toInt()
+            }
+        withContext(Dispatchers.IO) {
+            remoteShoppingStateSyncer.syncCartItems(remoteCartItems)
+        }
+        return remoteCartItems
     }
 
-    private suspend fun ensureCartSnapshotLoaded(): List<ShoppingCartItem> {
-        if (hasLoadedCartOnce) return _shoppingCartItems.value
-        val loadedItems = loadCartItems()
-        syncShoppingCartItems(loadedItems)
+    private suspend fun ensureRemoteSnapshotLoaded() {
+        if (hasLoadedCartOnce) return
+        refreshCartItemsFromRemote()
         markCartLoaded()
-        return loadedItems
+    }
+
+    private suspend fun resolveRemoteCartItemId(productId: Long): Int? {
+        val existingRemoteCartItemId = remoteCartItemIdByProductId[productId]
+        if (existingRemoteCartItemId != null) return existingRemoteCartItemId
+        refreshCartItemsFromRemote()
+        return remoteCartItemIdByProductId[productId]
     }
 
     private fun shouldSkipCartRequest(force: Boolean): Boolean {
@@ -239,6 +289,53 @@ class ShoppingCartViewModel(
         shoppingCartItems.firstOrNull { shoppingCartItem ->
             shoppingCartItem.product.id == productId
         }
+
+    private fun createProjectedCartItem(
+        productId: Long,
+        quantity: Int,
+    ): ShoppingCartItem? {
+        val baseShoppingItem =
+            shoppingItemRepository
+                .shoppingItems
+                .value
+                .firstOrNull { shoppingItem -> shoppingItem.getProductId() == productId }
+                ?: return null
+
+        return ShoppingCartItem(
+            id = TEMP_CART_ITEM_ID_BASE - productId,
+            shoppingItem =
+                ShoppingItem(
+                    product = baseShoppingItem.getProduct(),
+                    quantity = quantity,
+                ),
+        )
+    }
+
+    private fun updateProjectedCartItemsQuantity(
+        currentItems: List<ShoppingCartItem>,
+        productId: Long,
+        quantity: Int,
+    ): List<ShoppingCartItem> =
+        currentItems.map { currentCartItem ->
+            if (currentCartItem.product.id != productId) {
+                currentCartItem
+            } else {
+                ShoppingCartItem(
+                    id = currentCartItem.getId(),
+                    shoppingItem =
+                        ShoppingItem(
+                            product = currentCartItem.product,
+                            quantity = quantity,
+                        ),
+                )
+            }
+        }
+
+    private suspend fun syncProjectedCartItems(currentItems: List<ShoppingCartItem>) {
+        withContext(Dispatchers.IO) {
+            remoteShoppingStateSyncer.syncCartItems(currentItems)
+        }
+    }
 
     fun setShoppingCartProductSelection(
         productId: Long,
@@ -271,8 +368,9 @@ class ShoppingCartViewModel(
         _selectedProductIds.value -= targetProductIds
     }
 
-    private fun syncShoppingCartItems(shoppingCartItems: List<ShoppingCartItem>) {
+    private fun syncLocalShoppingCartItems(shoppingCartItems: List<ShoppingCartItem>) {
         _shoppingCartItems.value = shoppingCartItems
+        _screenState.value = createShoppingCartItemsState(shoppingCartItems)
         val validProductIds = shoppingCartItems.map { it.product.id }.toSet()
         _selectedProductIds.value = _selectedProductIds.value.intersect(validProductIds)
     }
@@ -309,5 +407,6 @@ class ShoppingCartViewModel(
         private const val DEFAULT_SIZE = 20
         private const val DEFAULT_QUANTITY = 1
         private const val CART_CACHE_DURATION_MS = 30_000L
+        private const val TEMP_CART_ITEM_ID_BASE = -1_000_000L
     }
 }

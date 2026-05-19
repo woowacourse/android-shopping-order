@@ -1,14 +1,17 @@
 package woowacourse.shopping.data.remote.retrofit.repository
 
-import retrofit2.Call
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.remote.retrofit.api.OrderRetrofitInterface
 import woowacourse.shopping.data.remote.retrofit.dto.OrderInfo
 
 class OrderRetrofitRepository(
     private val apiService: OrderRetrofitInterface,
 ) {
-    fun order(order: OrderInfo): Call<Void> =
-        apiService.order(
-            order = order,
-        )
+    suspend fun order(order: OrderInfo): Unit =
+        withContext(Dispatchers.IO) {
+            apiService.order(
+                order = order,
+            )
+        }
 }

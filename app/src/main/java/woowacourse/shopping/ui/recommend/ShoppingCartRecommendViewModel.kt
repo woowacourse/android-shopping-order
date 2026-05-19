@@ -23,6 +23,8 @@ class ShoppingCartRecommendViewModel(
     private var shoppingCartItems: List<ShoppingCartItem> = emptyList()
     private var selectedCartProductIds: Set<Long> = emptySet()
     private var recommendBaseCartProductIds: Set<Long> = emptySet()
+    private var recommendBaseSelectedCartItemCount: Int = 0
+    private var recommendBaseSelectedCartTotalPrice: Int = 0
 
     init {
         observeSources()
@@ -44,16 +46,26 @@ class ShoppingCartRecommendViewModel(
         publishUiState()
     }
 
-    fun moveToRecommend() {
+    fun moveToRecommend(
+        baseCartItems: List<ShoppingCartItem> = shoppingCartItems,
+        baseSelectedCartProductIds: Set<Long> = selectedCartProductIds,
+    ) {
         recommendBaseCartProductIds =
-            shoppingCartItems
+            baseCartItems
                 .map { shoppingCartItem -> shoppingCartItem.product.id }
                 .toSet()
+        recommendBaseSelectedCartItemCount = baseSelectedCartProductIds.size
+        recommendBaseSelectedCartTotalPrice =
+            baseCartItems
+                .filter { shoppingCartItem -> shoppingCartItem.product.id in baseSelectedCartProductIds }
+                .sumOf { shoppingCartItem -> shoppingCartItem.getProductQuantityPrice() }
         publishUiState(currentStep = ShoppingCartStep.RECOMMEND)
     }
 
     fun moveToCart() {
         recommendBaseCartProductIds = emptySet()
+        recommendBaseSelectedCartItemCount = 0
+        recommendBaseSelectedCartTotalPrice = 0
         publishUiState(currentStep = ShoppingCartStep.CART)
     }
 
@@ -105,10 +117,22 @@ class ShoppingCartRecommendViewModel(
                             shoppingItem.getProductId() !in excludedProductIdsForRecommend
                     }.take(MAX_RECOMMEND_PRODUCTS)
             }
-        val selectedCartTotalPrice =
+        val dynamicSelectedCartTotalPrice =
             shoppingCartItems
                 .filter { shoppingCartItem -> shoppingCartItem.product.id in selectedCartProductIds }
                 .sumOf { shoppingCartItem -> shoppingCartItem.getProductQuantityPrice() }
+        val selectedCartTotalPrice =
+            if (currentStep == ShoppingCartStep.RECOMMEND) {
+                recommendBaseSelectedCartTotalPrice
+            } else {
+                dynamicSelectedCartTotalPrice
+            }
+        val baseSelectedCartItemCount =
+            if (currentStep == ShoppingCartStep.RECOMMEND) {
+                recommendBaseSelectedCartItemCount
+            } else {
+                selectedCartProductIds.size
+            }
         val selectedRecommendTotalPrice =
             recommendedShoppingItems
                 .filter { shoppingItem -> shoppingItem.getQuantity() > 0 }
@@ -117,6 +141,7 @@ class ShoppingCartRecommendViewModel(
         return ShoppingCartRecommendUiState(
             currentStep = currentStep,
             recommendedShoppingItems = recommendedShoppingItems,
+            baseSelectedCartItemCount = baseSelectedCartItemCount,
             selectedCartTotalPrice = selectedCartTotalPrice,
             selectedRecommendTotalPrice = selectedRecommendTotalPrice,
         )
@@ -125,6 +150,7 @@ class ShoppingCartRecommendViewModel(
     data class ShoppingCartRecommendUiState(
         val currentStep: ShoppingCartStep = ShoppingCartStep.CART,
         val recommendedShoppingItems: List<ShoppingItem> = emptyList(),
+        val baseSelectedCartItemCount: Int = 0,
         val selectedCartTotalPrice: Int = 0,
         val selectedRecommendTotalPrice: Int = 0,
     )

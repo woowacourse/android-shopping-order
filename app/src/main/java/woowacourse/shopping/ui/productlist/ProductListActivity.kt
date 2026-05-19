@@ -37,7 +37,6 @@ class ProductListActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        observeApiViewModels()
         observeScreenEvents()
 
         setContent {
@@ -78,7 +77,7 @@ class ProductListActivity : ComponentActivity() {
                         shoppingCartViewModel.decreaseByProductId(shoppingItem.getProductId())
                     },
                     onProductClick = productListViewModel::onProductClick,
-                    onRecentViewedProductClick = productListViewModel::onRecentViewedProductClick,
+                    onRecentViewedProductClick = productListViewModel::onProductClick,
                     onNavigateToCartClick = productListViewModel::onNavigateToCartClick,
                     bottomContent =
                         if (uiState.value.canLoadNextPage) {
@@ -98,30 +97,18 @@ class ProductListActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         val shouldLoadInitialProducts =
-            productListViewModel.uiState.value.loadedProducts.isEmpty() &&
+            !productListViewModel.uiState.value.hasLoadedProducts &&
                 !productListViewModel.uiState.value.isLoading
         if (shouldLoadInitialProducts) {
             requestProductsAndCart()
         } else {
-            shoppingCartViewModel.requestCartItems(force = true)
+            shoppingCartViewModel.requestCartItems()
         }
     }
 
     private fun requestProductsAndCart() {
         productListViewModel.requestProduct(size = MAX_PRODUCT_SIZE)
-        shoppingCartViewModel.requestCartItems(force = true)
-    }
-
-    private fun observeApiViewModels() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    shoppingCartViewModel.shoppingCartItems.collect { shoppingCartItems ->
-                        app.appContainer.remoteShoppingStateSyncer.syncCartItems(shoppingCartItems)
-                    }
-                }
-            }
-        }
+        shoppingCartViewModel.requestCartItems()
     }
 
     private fun observeScreenEvents() {
@@ -133,7 +120,6 @@ class ProductListActivity : ComponentActivity() {
                             DetailProductActivity.start(
                                 context = this@ProductListActivity,
                                 productId = event.productId,
-                                showLastViewed = event.showLastViewed,
                             )
                         }
 

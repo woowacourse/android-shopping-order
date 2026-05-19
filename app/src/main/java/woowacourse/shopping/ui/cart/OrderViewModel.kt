@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.remote.retrofit.awaitCompletion
 import woowacourse.shopping.data.remote.retrofit.dto.OrderInfo
 import woowacourse.shopping.data.remote.retrofit.repository.OrderRetrofitRepository
 
@@ -25,7 +24,7 @@ class OrderViewModel(
                 orderRetrofitRepository
                     .order(
                         order = orderInfo,
-                    ).awaitCompletion(errorPrefix = "주문 실패")
+                    )
             }.onSuccess {
                 _event.tryEmit(OrderEvent.Success)
                 onSuccess?.invoke()

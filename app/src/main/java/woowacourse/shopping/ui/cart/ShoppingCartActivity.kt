@@ -51,7 +51,6 @@ class ShoppingCartActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        observeApiViewModel()
         observeScreenEvents()
 
         setContent {
@@ -150,7 +149,10 @@ class ShoppingCartActivity : ComponentActivity() {
                                 ) {
                                     return@OrderButton
                                 }
-                                shoppingCartRecommendViewModel.moveToRecommend()
+                                shoppingCartRecommendViewModel.moveToRecommend(
+                                    baseCartItems = shoppingCartItems,
+                                    baseSelectedCartProductIds = selectedVisibleProductIds,
+                                )
                             },
                             checked =
                                 selectableCartProductIds.isNotEmpty() &&
@@ -168,7 +170,7 @@ class ShoppingCartActivity : ComponentActivity() {
                 } else {
                     ShoppingCartRecommendSection(
                         recommendedShoppingItems = recommendUiState.recommendedShoppingItems,
-                        baseSelectedCartItemCount = selectedVisibleProductIds.size,
+                        baseSelectedCartItemCount = recommendUiState.baseSelectedCartItemCount,
                         totalPrice = recommendUiState.selectedCartTotalPrice + recommendUiState.selectedRecommendTotalPrice,
                         onBackClick = shoppingCartViewModel::onBackClick,
                         onOrderButtonClick = {},
@@ -197,18 +199,7 @@ class ShoppingCartActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        shoppingCartViewModel.requestCartItems(force = true)
-    }
-
-    private fun observeApiViewModel() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                shoppingCartViewModel.shoppingCartItems.collect { shoppingCartItems ->
-                    app.appContainer.remoteShoppingStateSyncer.syncCartItems(shoppingCartItems)
-                    shoppingCartViewModel.refreshPagedItems()
-                }
-            }
-        }
+        shoppingCartViewModel.requestCartItems()
     }
 
     private fun observeScreenEvents() {

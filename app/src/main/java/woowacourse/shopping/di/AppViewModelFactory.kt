@@ -35,7 +35,6 @@ class AppViewModelFactory(
 
             modelClass.isAssignableFrom(DetailProductViewModel::class.java) ->
                 DetailProductViewModel(
-                    shoppingCartRepository = appContainer.shoppingCartRepository,
                     shoppingItemRepository = appContainer.shoppingItemRepository,
                     visitStore = appContainer.visitStore,
                     productRetrofitRepository = productRetrofitRepository,
@@ -51,6 +50,8 @@ class AppViewModelFactory(
                 ShoppingCartViewModel(
                     shoppingCartRetrofitRepository = shoppingCartRetrofitRepository,
                     shoppingCartRepository = appContainer.shoppingCartRepository,
+                    remoteShoppingStateSyncer = appContainer.remoteShoppingStateSyncer,
+                    shoppingItemRepository = appContainer.shoppingItemRepository,
                 ) as T
 
             modelClass.isAssignableFrom(OrderViewModel::class.java) ->

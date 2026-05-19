@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.remote.retrofit.repository
 
-import retrofit2.Call
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.remote.retrofit.api.ProductRetrofitInterface
 import woowacourse.shopping.data.remote.retrofit.dto.Product
 import woowacourse.shopping.data.remote.retrofit.dto.ProductResponse
@@ -8,33 +9,27 @@ import woowacourse.shopping.data.remote.retrofit.dto.ProductResponse
 class ProductRetrofitRepository(
     private val apiService: ProductRetrofitInterface,
 ) {
-    fun requestProduct(
+    suspend fun requestProduct(
         page: Int = DEFAULT_PAGE,
         size: Int = DEFAULT_SIZE,
         sort: List<String>? = DEFAULT_SORT,
         category: String? = null,
-    ): Call<ProductResponse> =
-        apiService.requestProducts(
-            page = page,
-            size = size,
-            sort = sort,
-            category = category,
-        )
+    ): ProductResponse =
+        withContext(Dispatchers.IO) {
+            apiService.requestProducts(
+                page = page,
+                size = size,
+                sort = sort,
+                category = category,
+            )
+        }
 
-    fun requestProductDetail(id: Long): Call<Product> =
-        apiService.requestProductDetail(
-            id = id,
-        )
-
-    fun addProduct(product: Product): Call<Void> =
-        apiService.addProduct(
-            product = product,
-        )
-
-    fun deleteProduct(id: Long): Call<Void> =
-        apiService.deleteProduct(
-            id = id,
-        )
+    suspend fun requestProductDetail(id: Long): Product =
+        withContext(Dispatchers.IO) {
+            apiService.requestProductDetail(
+                id = id,
+            )
+        }
 
     companion object {
         private const val DEFAULT_PAGE = 0

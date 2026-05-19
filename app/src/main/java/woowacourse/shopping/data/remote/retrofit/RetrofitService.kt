@@ -33,5 +33,4 @@ class RetrofitService(
         retrofit.create(ProductRetrofitInterface::class.java)
     val shoppingCartApiService: ShoppingCartRetrofitInterface =
         retrofit.create(ShoppingCartRetrofitInterface::class.java)
-
 }
