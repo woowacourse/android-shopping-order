@@ -33,11 +33,9 @@ class ShoppingViewModel(
     private val pageSize = 20
 
     init {
-        _uiState.update { it.copy(isLoading = true) }
         observeNetwork()
         observeCart()
         observeRecentItems()
-        _uiState.update { it.copy(isLoading = false) }
     }
 
     private fun observeNetwork() {
@@ -59,7 +57,7 @@ class ShoppingViewModel(
         size: Int = offset,
     ) {
         viewModelScope.launch {
-            _uiState.update { it.copy(cartErrorMessage = null) }
+            _uiState.update { it.copy(isLoading = _uiState.value.products.isEmpty(), cartErrorMessage = null) }
             runCatching {
                 val apiResult =
                     productRepository.getProducts(page = page, size = size)
@@ -89,6 +87,8 @@ class ShoppingViewModel(
                     throw throwable
                 }
             }
+
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
