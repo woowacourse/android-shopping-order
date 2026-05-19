@@ -11,18 +11,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
-import woowacourse.shopping.model.Cart
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.recommender.ProductRecommender
 import woowacourse.shopping.ui.common.error.ErrorMessageMapper
 import woowacourse.shopping.ui.common.model.LoadState
 import woowacourse.shopping.ui.common.model.ProductUiModel
-import java.io.IOException
 
 class CartViewModel(
     private val recentProductRepo: RecentProductRepository,
@@ -67,13 +64,9 @@ class CartViewModel(
                     val updatedItems = state.pagedItems.map {
                         if (it.id == cartItemId) it.copy(quantity = it.quantity + 1) else it
                     }
-                    val isSelected = cartItemId in state.selectedItemIds
-                    state.copy(
-                        pagedItems = updatedItems,
-                        totalSelectedCount = if (isSelected) state.totalSelectedCount + 1 else state.totalSelectedCount,
-                        totalSelectedPrice = if (isSelected) state.totalSelectedPrice + item.product.price.value else state.totalSelectedPrice,
-                    )
+                    state.copy(pagedItems = updatedItems)
                 }
+                recalculateTotals()
             } catch (e: Exception) {
                 handleError("increase", e, "수량을 변경할 수 없어요.")
             }
@@ -99,13 +92,9 @@ class CartViewModel(
                         val updatedItems = state.pagedItems.map {
                             if (it.id == cartItemId) it.copy(quantity = it.quantity - 1) else it
                         }
-                        val isSelected = cartItemId in state.selectedItemIds
-                        state.copy(
-                            pagedItems = updatedItems,
-                            totalSelectedCount = if (isSelected) state.totalSelectedCount - 1 else state.totalSelectedCount,
-                            totalSelectedPrice = if (isSelected) state.totalSelectedPrice - item.product.price.value else state.totalSelectedPrice,
-                        )
+                        state.copy(pagedItems = updatedItems)
                     }
+                    recalculateTotals()
                 }
             } catch (e: Exception) {
                 handleError("decrease", e, "수량을 변경할 수 없어요.")
@@ -142,19 +131,16 @@ class CartViewModel(
                     return@launch
                 }
 
-                _uiState.update { state ->
-                    val newCount = state.totalCartItemCount - 1
-                    val wasSelected = cartItemId in state.selectedItemIds
-
-                    state.copy(
-                        pagedItems = state.pagedItems.filterNot { it.id == cartItemId },
-                        selectedItemIds = state.selectedItemIds - cartItemId,
+                _uiState.update { current ->
+                    val newCount = current.totalCartItemCount - 1
+                    current.copy(
+                        pagedItems = current.pagedItems.filterNot { it.id == cartItemId },
+                        selectedItemIds = current.selectedItemIds - cartItemId,
                         totalCartItemCount = newCount,
-                        totalSelectedPrice = if (wasSelected) state.totalSelectedPrice - item.product.price.value else state.totalSelectedPrice,
-                        totalSelectedCount = if (wasSelected) state.totalSelectedCount - 1 else state.totalSelectedCount,
-                        loadState = if (newCount == 0) LoadState.Empty else state.loadState,
+                        loadState = if (newCount == 0) LoadState.Empty else current.loadState,
                     )
                 }
+                recalculateTotals()
             } catch (e: Exception) {
                 handleError("delete", e, "상품을 삭제할 수 없어요.")
             }
@@ -218,13 +204,13 @@ class CartViewModel(
     fun toggleAllItemsSelection(isSelected: Boolean) {
         viewModelScope.launch {
             try {
-                val cartItems = cartRepo.getAllCartItems()
-                val allIds = cartItems.items.map {
-                        it.id ?: throw IllegalArgumentException("아이템에 id가 없습니다.")
-                    }.toSet()
+                val cart = cartRepo.getAllCartItems()
+                val allIds = cart.items.map {
+                    it.id ?: throw IllegalArgumentException("아이템에 id가 없습니다.")
+                }.toSet()
 
                 _uiState.update {
-                    if (isSelected && cartItems.items.isNotEmpty()) {
+                    if (isSelected && cart.items.isNotEmpty()) {
                         it.copy(selectedItemIds = allIds, isAllSelected = true)
                     } else {
                         it.copy(selectedItemIds = emptySet(), isAllSelected = false)
@@ -279,10 +265,9 @@ class CartViewModel(
                     state.copy(
                         recommendItems = newUiModels,
                         selectedItemIds = state.selectedItemIds + cartItemId,
-                        totalSelectedCount = state.totalSelectedCount + 1,
-                        totalSelectedPrice = state.totalSelectedPrice + uiModel.product.price.value,
                     )
                 }
+                recalculateTotals()
             } catch (e: Exception) {
                 handleError("increaseInRecommendScreen", e, "장바구니에 담을 수 없어요.")
             }
@@ -319,10 +304,9 @@ class CartViewModel(
                         } else {
                             state.selectedItemIds
                         },
-                        totalSelectedPrice = state.totalSelectedPrice - uiModel.product.price.value,
-                        totalSelectedCount = state.totalSelectedCount - 1,
                     )
                 }
+                recalculateTotals()
             } catch (e: Exception) {
                 handleError("decreaseInRecommendScreen", e, "수량을 변경할 수 없어요.")
             }
@@ -380,26 +364,12 @@ class CartViewModel(
 
     private suspend fun recalculateTotals() {
         val cart = cartRepo.getAllCartItems()
-        val totalPrice = calculatePrice(cart)
-        val totalSelectedCount = calculateTotalSelectedCount(cart)
+        val selectedIds = _uiState.value.selectedItemIds
         _uiState.update {
-            it.copy(totalSelectedPrice = totalPrice, totalSelectedCount = totalSelectedCount)
-        }
-    }
-
-    private fun calculatePrice(cart: Cart): Long {
-        val selectedIds = _uiState.value.selectedItemIds
-        if (selectedIds.isEmpty()) return 0
-        return selectedIds.sumOf { itemId ->
-            cart.items.find { it.id == itemId }?.totalPrice?.value ?: 0
-        }
-    }
-
-    private fun calculateTotalSelectedCount(cart: Cart): Int {
-        val selectedIds = _uiState.value.selectedItemIds
-        if (selectedIds.isEmpty()) return 0
-        return selectedIds.sumOf { itemId ->
-            cart.items.find { it.id == itemId }?.quantity ?: 0
+            it.copy(
+                totalSelectedPrice = cart.priceOf(selectedIds),
+                totalSelectedCount = cart.totalQuantityOf(selectedIds),
+            )
         }
     }
 

@@ -86,11 +86,7 @@ class ProductDetailViewModel(
             _uiState.update { it.copy(isLoading = true) }
             try {
                 val product = productRepo.findProduct(productId)
-                val existing =
-                    cartRepo
-                        .getAllCartItems()
-                        .items
-                        .find { it.product.id == productId }
+                val existing = cartRepo.getAllCartItems().findByProductId(productId)
                 val bannerProduct =
                     recentProductRepo
                         .getLastViewedProduct()

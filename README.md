@@ -1,8 +1,8 @@
 # 1 & 2단계 리팩토링 목록 - 2번째
 
 ### 아키텍처 및 ViewModel 계층 개선
-- [ ] **도메인 로직 분리:** `CartViewModel`에서 수행 중인 총액 계산(`calculatePrice`) 등의 로직을 도메인 객체나 별도 UseCase로 위임하기.
-- [ ] **데이터 매핑 로직 위임:** `ShoppingViewModel`에서 `Product`와 `Cart`를 조합해 `ProductUiModel`로 변환하는 작업을 Mapper 클래스로 분리하여 단위 테스트 환경 구축하기.
+- [x] **도메인 로직 분리:** `CartViewModel`에서 수행 중인 총액 계산(`calculatePrice`) 등의 로직을 도메인 객체나 별도 UseCase로 위임하기.
+- [x] **데이터 매핑 로직 위임:** `ShoppingViewModel`에서 `Product`와 `Cart`를 조합해 `ProductUiModel`로 변환하는 작업을 Mapper 클래스로 분리하여 단위 테스트 환경 구축하기.
 - [x] **중복 함수 호출 제거:** `calculatePrice`와 `calculateTotalSelectedCount` 함수에서 각각 호출되는 `getAllCartItems()`를 한 번만 호출하여 재사용하도록 수정하기.
 - [x] **공통 로직 모듈화:** 모든 ViewModel에서 중복으로 사용되는 `handleError` 함수를 재사용 가능하도록 공통화하기.
 

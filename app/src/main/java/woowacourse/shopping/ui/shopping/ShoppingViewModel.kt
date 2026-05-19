@@ -22,10 +22,10 @@ import woowacourse.shopping.data.remote.NetworkMonitor
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
-import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.Products
 import woowacourse.shopping.ui.common.error.ErrorMessageMapper
 import woowacourse.shopping.ui.common.model.ProductUiModel
+import woowacourse.shopping.ui.common.model.ProductUiModelMapper
 
 class ShoppingViewModel(
     networkMonitor: NetworkMonitor,
@@ -138,7 +138,8 @@ class ShoppingViewModel(
                         page = (currentSize - 1) / loadSize + 1,
                         size = loadSize,
                     )
-                val newUiModels = mapToProductUiModels(page.items)
+                val cart = cartRepo.getAllCartItems()
+                val newUiModels = ProductUiModelMapper.fromProducts(page.items, cart)
                 val combineProducts = currentProducts + newUiModels
 
                 _uiState.update {
@@ -160,20 +161,12 @@ class ShoppingViewModel(
     fun refresh() {
         viewModelScope.launch {
             try {
-                val cartItems = cartRepo.getAllCartItems()
-                val totalCartCount = cartItems.items.sumOf { it.quantity }
+                val cart = cartRepo.getAllCartItems()
+                val totalCartCount = cart.items.sumOf { it.quantity }
 
                 _uiState.update { state ->
-                    val updatedUiModels =
-                        state.visibleProducts.map { ui ->
-                            val cartItem = cartItems.items.find { it.product.id == ui.product.id }
-                            ui.copy(
-                                cartItemId = cartItem?.id,
-                                quantity = cartItem?.quantity ?: 0,
-                            )
-                        }
                     state.copy(
-                        visibleProducts = updatedUiModels,
+                        visibleProducts = ProductUiModelMapper.syncWithCart(state.visibleProducts, cart),
                         cartCount = totalCartCount,
                     )
                 }
@@ -188,9 +181,10 @@ class ShoppingViewModel(
             _uiState.update { it.copy(isLoading = true) }
             try {
                 val page = productRepo.getProducts(0, loadSize)
+                val cart = cartRepo.getAllCartItems()
                 _uiState.update {
                     it.copy(
-                        visibleProducts = mapToProductUiModels(page.items),
+                        visibleProducts = ProductUiModelMapper.fromProducts(page.items, cart),
                         hasNext = !page.isLast,
                         sizeInRepo = page.totalElements,
                     )
@@ -211,19 +205,6 @@ class ShoppingViewModel(
             }.catch { e ->
                 Log.e(TAG, "observeRecentProducts: 에러", e)
             }.launchIn(viewModelScope)
-    }
-
-    private suspend fun mapToProductUiModels(products: List<Product>): List<ProductUiModel> {
-        val cart = cartRepo.getAllCartItems()
-
-        return products.map { product ->
-            val cartItem = cart.items.find { it.product.id == product.id }
-            ProductUiModel(
-                product = product,
-                cartItemId = cartItem?.id,
-                quantity = cartItem?.quantity ?: 0,
-            )
-        }
     }
 
     private suspend fun handleError(
