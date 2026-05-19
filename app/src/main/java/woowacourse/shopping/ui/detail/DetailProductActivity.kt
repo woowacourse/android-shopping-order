@@ -32,14 +32,18 @@ class DetailProductActivity : ComponentActivity() {
     private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { viewModelFactory }
 
     companion object {
+        private const val EXTRA_PRODUCT_ID = "productId"
+        private const val EXTRA_SHOW_LAST_VIEWED = "showLastViewed"
+        private const val INVALID_PRODUCT_ID = -1L
+
         fun start(
             context: Context,
             productId: Long,
             showLastViewed: Boolean = true,
         ) {
             val intent = Intent(context, DetailProductActivity::class.java)
-            intent.putExtra(DetailProductViewModel.EXTRA_PRODUCT_ID, productId)
-            intent.putExtra(DetailProductViewModel.EXTRA_SHOW_LAST_VIEWED, showLastViewed)
+            intent.putExtra(EXTRA_PRODUCT_ID, productId)
+            intent.putExtra(EXTRA_SHOW_LAST_VIEWED, showLastViewed)
             context.startActivity(intent)
         }
     }
@@ -47,7 +51,14 @@ class DetailProductActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        detailProductViewModel.initializeFromIntentExtras(intent.extras)
+        val productId = intent.getLongExtra(EXTRA_PRODUCT_ID, INVALID_PRODUCT_ID)
+        if (productId != INVALID_PRODUCT_ID) {
+            val showLastViewed = intent.getBooleanExtra(EXTRA_SHOW_LAST_VIEWED, true)
+            detailProductViewModel.initialize(
+                productId = productId,
+                showLastViewed = showLastViewed,
+            )
+        }
         setContent {
             val uiState by detailProductViewModel.uiState.collectAsStateWithLifecycle()
             AndroidShoppingTheme {

@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.detail
 
-import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.sync.Mutex
@@ -47,19 +46,7 @@ class DetailProductViewModel(
         }
     }
 
-    fun initializeFromIntentExtras(extras: Bundle?) {
-        val productId = extras?.getLong(EXTRA_PRODUCT_ID, INVALID_PRODUCT_ID) ?: INVALID_PRODUCT_ID
-        if (productId == INVALID_PRODUCT_ID) {
-            return
-        }
-        val showLastViewed = extras?.getBoolean(EXTRA_SHOW_LAST_VIEWED, true) ?: true
-        initialize(
-            productId = productId,
-            showLastViewed = showLastViewed,
-        )
-    }
-
-    private fun initialize(
+    fun initialize(
         productId: Long,
         showLastViewed: Boolean = true,
     ) {
@@ -145,9 +132,6 @@ class DetailProductViewModel(
     )
 
     companion object {
-        const val EXTRA_PRODUCT_ID = "productId"
-        const val EXTRA_SHOW_LAST_VIEWED = "showLastViewed"
         private const val DEFAULT_QUANTITY = 1
-        private const val INVALID_PRODUCT_ID = -1L
     }
 }

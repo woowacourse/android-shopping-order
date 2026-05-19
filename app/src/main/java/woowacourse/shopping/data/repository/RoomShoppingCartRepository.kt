@@ -84,8 +84,12 @@ class RoomShoppingCartRepository(
         val remoteCartItemId = remoteCartItemIdByProductId[productId]
         if (remoteCartItemId == null) {
             shoppingCartRetrofitRepository.addCartItem(
-                product = CartRequest(productId = productId, quantity = updatedQuantity),
+                product = CartRequest(productId = productId, quantity = amount),
             )
+            val resolvedRemoteCartItemId = resolveRemoteCartItemIdInternal(productId = productId)
+            if (resolvedRemoteCartItemId != null) {
+                remoteCartItemIdByProductId += productId to resolvedRemoteCartItemId
+            }
         } else {
             shoppingCartRetrofitRepository.updateQuantityCartItem(
                 id = remoteCartItemId,
