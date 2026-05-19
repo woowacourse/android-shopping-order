@@ -30,7 +30,7 @@ class CartRepositoryImpl(
         val response =
             api.getCartItems(
                 page = 0,
-                size = Int.MAX_VALUE,
+                size = MAX_CART_ITEM_LIMIT,
             )
 
         cartItems += response.content.map { it.toDomain() }
@@ -125,6 +125,10 @@ class CartRepositoryImpl(
             imageUrl = imageUrl,
             category = category,
         )
+
+    companion object {
+        private const val MAX_CART_ITEM_LIMIT = 100
+    }
 }
 
 data class CartResponseResult(
