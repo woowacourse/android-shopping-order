@@ -38,7 +38,10 @@ class CartViewModel(
     }
 
     fun reloadVisibleState() {
-        val currentPage = (_uiState.value.cartListState as? CartListUiState.Content)?.currentPage ?: 1
+        val currentPage =
+            withContentState(defaultValue = 1) { contentState ->
+                contentState.currentPage
+            }
 
         viewModelScope.launch {
             runCatching {
@@ -54,36 +57,36 @@ class CartViewModel(
     }
 
     fun loadPreviousPage() {
-        val contentState = _uiState.value.cartListState as? CartListUiState.Content ?: return
-        if (!contentState.hasPrevious) return
-
-        loadPage(contentState.currentPage - 1)
+        withContentState { contentState ->
+            if (!contentState.hasPrevious) return
+            loadPage(contentState.currentPage - 1)
+        }
     }
 
     fun loadNextPage() {
-        val contentState = _uiState.value.cartListState as? CartListUiState.Content ?: return
-        if (!contentState.hasNext) return
-
-        loadPage(contentState.currentPage + 1)
+        withContentState { contentState ->
+            if (!contentState.hasNext) return
+            loadPage(contentState.currentPage + 1)
+        }
     }
 
-    fun createSelectedCartOrder(): SelectedCartOrder? {
-        val contentState = _uiState.value.cartListState as? CartListUiState.Content ?: return null
-        val selectedItems = contentState.items.filter { it.isSelected }
-        if (selectedItems.isEmpty()) return null
+    fun createSelectedCartOrder(): SelectedCartOrder? =
+        withContentState(null) { contentState ->
+            val selectedItems = contentState.items.filter { it.isSelected }
+            if (selectedItems.isEmpty()) return null
 
-        return SelectedCartOrder(
-            items =
-                selectedItems.map { item ->
-                    SelectedCartOrderItem(
-                        cartItemId = item.cartItemId,
-                        productId = item.productId,
-                        price = item.price,
-                        quantity = item.quantity,
-                    )
-                },
-        )
-    }
+            return SelectedCartOrder(
+                items =
+                    selectedItems.map { item ->
+                        SelectedCartOrderItem(
+                            cartItemId = item.cartItemId,
+                            productId = item.productId,
+                            price = item.price,
+                            quantity = item.quantity,
+                        )
+                    },
+            )
+        }
 
     fun delete(productId: Long) {
         if (!updateLocalQuantity(productId, targetQuantity = 0)) return
@@ -175,33 +178,33 @@ class CartViewModel(
     private fun updateLocalQuantity(
         productId: Long,
         targetQuantity: Int,
-    ): Boolean {
-        val contentState = _uiState.value.cartListState as? CartListUiState.Content ?: return false
-        var changed = false
+    ): Boolean =
+        withContentState(false) { contentState ->
+            var changed = false
 
-        val updatedItems =
-            contentState.items.mapNotNull { item ->
-                if (item.productId != productId) return@mapNotNull item
-                if (item.quantity == targetQuantity) return@mapNotNull item
+            val updatedItems =
+                contentState.items.mapNotNull { item ->
+                    if (item.productId != productId) return@mapNotNull item
+                    if (item.quantity == targetQuantity) return@mapNotNull item
 
-                changed = true
-                if (targetQuantity == 0) {
-                    null
-                } else {
-                    item.copy(quantity = targetQuantity)
+                    changed = true
+                    if (targetQuantity == 0) {
+                        null
+                    } else {
+                        item.copy(quantity = targetQuantity)
+                    }
                 }
+
+            if (!changed) return false
+
+            _uiState.update { current ->
+                val latestContent = current.cartListState as? CartListUiState.Content ?: return@update current
+                current.copy(
+                    cartListState = latestContent.copy(items = updatedItems),
+                )
             }
-
-        if (!changed) return false
-
-        _uiState.update { current ->
-            val latestContent = current.cartListState as? CartListUiState.Content ?: return@update current
-            current.copy(
-                cartListState = latestContent.copy(items = updatedItems),
-            )
+            return true
         }
-        return true
-    }
 
     private fun findQuantity(productId: Long): Int? =
         (_uiState.value.cartListState as? CartListUiState.Content)
@@ -216,7 +219,11 @@ class CartViewModel(
             viewModelScope.launch {
                 delay(CART_SYNC_DELAY_MILLIS)
 
-                val currentPage = (_uiState.value.cartListState as? CartListUiState.Content)?.currentPage ?: 1
+                val currentPage =
+                    withContentState(defaultValue = 1) { contentState ->
+                        contentState.currentPage
+                    }
+
                 val targetQuantity = findQuantity(productId) ?: 0
 
                 runCatching {
@@ -243,19 +250,20 @@ class CartViewModel(
     }
 
     private fun refreshVisibleSelections() {
-        val contentState = _uiState.value.cartListState as? CartListUiState.Content ?: return
-        val deselectedProductIds = _uiState.value.deselectedProductIds
+        withContentState { contentState ->
+            val deselectedProductIds = _uiState.value.deselectedProductIds
 
-        _uiState.update { currentState ->
-            currentState.copy(
-                cartListState =
-                    contentState.copy(
-                        items =
-                            contentState.items.map { item ->
-                                item.copy(isSelected = item.productId !in deselectedProductIds)
-                            },
-                    ),
-            )
+            _uiState.update { currentState ->
+                currentState.copy(
+                    cartListState =
+                        contentState.copy(
+                            items =
+                                contentState.items.map { item ->
+                                    item.copy(isSelected = item.productId !in deselectedProductIds)
+                                },
+                        ),
+                )
+            }
         }
     }
 
@@ -267,5 +275,18 @@ class CartViewModel(
                 }
             }
         }
+    }
+
+    private inline fun withContentState(block: (CartListUiState.Content) -> Unit) {
+        val contentState = _uiState.value.cartListState as? CartListUiState.Content ?: return
+        block(contentState)
+    }
+
+    private inline fun <T> withContentState(
+        defaultValue: T,
+        block: (CartListUiState.Content) -> T,
+    ): T {
+        val contentState = _uiState.value.cartListState as? CartListUiState.Content ?: return defaultValue
+        return block(contentState)
     }
 }
