@@ -85,13 +85,11 @@ class CartViewModel(
             val recommended = recentProductRepository.getMostRecentProduct() ?: return@launch
             val recommendedCategory = recommended.category.value
             val productList = productRepository.getCategoryProducts(recommendedCategory,0, 100)
-
-            val cartProducts = _pagedCartItems.value
-                                    ?.items
-                                    ?.values
-                                    ?.map { it.product }
-                                    ?.toSet()
-                                    ?: emptySet()
+            val cartProducts = cartRepository.getCartItems(0,100)
+                .items
+                .values
+                .map { it.product }
+                .toSet()
             val result = productList.getCategoryProductsLimit(cartProducts,recommended)
             _recommendProducts.update { result }
         }
