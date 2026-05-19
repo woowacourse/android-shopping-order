@@ -62,7 +62,10 @@ class DetailViewModelTest {
             val viewModel = createViewModel(id = "1", recentItemDao = recentItemDao)
             mainDispatcherExtension.advanceUntilIdle()
 
-            assertThat(viewModel.uiState.value.recentItem?.id).isEqualTo("2")
+            assertThat(
+                viewModel.uiState.value.recentItem
+                    ?.id,
+            ).isEqualTo("2")
         }
 
     @Test

@@ -148,7 +148,7 @@ class ShoppingViewModel(
     }
 
     fun updateQuantity(
-        productId: String,
+        productId: Long,
         quantity: Int,
     ) {
         viewModelScope.launch {

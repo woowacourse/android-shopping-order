@@ -8,6 +8,7 @@ fun CartItemEntity.toDomain(product: Product): CartItem {
     require(id == product.id) { "id가 일치하지 않습니다." }
 
     return CartItem(
+        id = id,
         product = product,
         quantity = quantity,
     )

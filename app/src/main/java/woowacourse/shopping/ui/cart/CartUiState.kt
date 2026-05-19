@@ -16,7 +16,7 @@ data class CartUiState(
     val errorMessage: String? = null,
     val isAllChecked: Boolean = false,
     val selectedCartItemCount: Int = 0,
-    val selectedCartItems: ImmutableList<String> = persistentListOf(),
+    val selectedCartItems: ImmutableList<Long> = persistentListOf(),
     val isOrder: Boolean = false,
     val recommendProducts: ImmutableList<ProductUiModel> = persistentListOf(),
 )

@@ -9,5 +9,5 @@ interface ProductRepository {
         size: Int,
     ): ProductResponseResult
 
-    suspend fun getProductById(id: String): Product
+    suspend fun getProductById(id: Long): Product
 }

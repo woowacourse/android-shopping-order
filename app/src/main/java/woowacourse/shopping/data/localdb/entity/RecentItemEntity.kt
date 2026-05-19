@@ -5,6 +5,6 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "recent_items")
 data class RecentItemEntity(
-    @PrimaryKey val id: String,
+    @PrimaryKey val id: Long,
     val timestamp: Long,
 )

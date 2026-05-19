@@ -9,7 +9,7 @@ data class Cart(
         return copy(items = newItems)
     }
 
-    fun deleteItem(id: String): Cart {
+    fun deleteItem(id: Long): Cart {
         val newItems = items.filter { it.product.id != id }
         return copy(items = newItems)
     }

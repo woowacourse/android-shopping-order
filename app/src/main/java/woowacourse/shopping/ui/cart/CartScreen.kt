@@ -32,11 +32,11 @@ import woowacourse.shopping.ui.model.ProductUiModel
 fun CartScreen(
     uiState: CartUiState,
     onBackClick: () -> Unit,
-    onDeleteItem: (String) -> Unit,
+    onDeleteItem: (Long) -> Unit,
     onNextPage: () -> Unit,
     onPreviousPage: () -> Unit,
-    onQuantityChange: (String, Int) -> Unit,
-    onCheckedChange: (String) -> Unit,
+    onQuantityChange: (Long, Int) -> Unit,
+    onCheckedChange: (Long) -> Unit,
     isAllSelectClick: () -> Unit,
     onOrderClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -117,12 +117,12 @@ private fun CartContent(
     onNextPage: () -> Unit,
     onPreviousPage: () -> Unit,
     isCanMoveNext: Boolean,
-    onQuantityChange: (String, Int) -> Unit,
-    onDeleteItem: (String) -> Unit,
+    onQuantityChange: (Long, Int) -> Unit,
+    onDeleteItem: (Long) -> Unit,
     cartItems: ImmutableList<CartItemUiModel>,
     isLoading: Boolean,
     errorMessage: String?,
-    onCheckedChange: (String) -> Unit,
+    onCheckedChange: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -212,27 +212,27 @@ private fun CartContentPreview() {
                 CartItemUiModel(
                     product =
                         ProductUiModel(
-                            id = "1",
+                            id = 1,
                             name = "커피",
                             imageUrl = "",
                             price = 1000,
                         ),
                     quantity = 1,
                     totalPrice = 1000,
-                    id = "",
+                    id = 0,
                     isChecked = true,
                 ),
                 CartItemUiModel(
                     product =
                         ProductUiModel(
-                            id = "2",
+                            id = 2,
                             name = "커피",
                             imageUrl = "",
                             price = 1000,
                         ),
                     quantity = 1,
                     totalPrice = 1000,
-                    id = "",
+                    id = 1,
                     isChecked = true,
                 ),
             ).toImmutableList(),

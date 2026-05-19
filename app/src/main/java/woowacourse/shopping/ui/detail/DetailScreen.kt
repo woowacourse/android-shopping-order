@@ -44,7 +44,7 @@ fun DetailScreen(
     onCloseClick: () -> Unit,
     onQuantityChange: (Int) -> Unit,
     onAddToCart: () -> Unit,
-    onRecentItemClick: (String) -> Unit,
+    onRecentItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(

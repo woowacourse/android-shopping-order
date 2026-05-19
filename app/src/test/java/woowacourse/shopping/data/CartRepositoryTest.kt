@@ -49,14 +49,15 @@ class CartRepositoryTest {
     @Test
     fun `장바구니 총 상품 수량을 반환한다`() =
         runTest {
-            val repository = CartRepositoryImpl(
-                FakeCartApi(
-                    listOf(
-                        createCartDto(id = 1, productId = 1, quantity = 2),
-                        createCartDto(id = 2, productId = 2, quantity = 3),
+            val repository =
+                CartRepositoryImpl(
+                    FakeCartApi(
+                        listOf(
+                            createCartDto(id = 1, productId = 1, quantity = 2),
+                            createCartDto(id = 2, productId = 2, quantity = 3),
+                        ),
                     ),
-                ),
-            )
+                )
 
             val quantity = repository.getTotalCartItemQuantity()
 
@@ -66,14 +67,15 @@ class CartRepositoryTest {
     @Test
     fun `선택된 장바구니 식별자 목록의 총 가격을 계산한다`() =
         runTest {
-            val repository = CartRepositoryImpl(
-                FakeCartApi(
-                    listOf(
-                        createCartDto(id = 1, productId = 1, quantity = 2, price = 1000),
-                        createCartDto(id = 2, productId = 2, quantity = 3, price = 2000),
+            val repository =
+                CartRepositoryImpl(
+                    FakeCartApi(
+                        listOf(
+                            createCartDto(id = 1, productId = 1, quantity = 2, price = 1000),
+                            createCartDto(id = 2, productId = 2, quantity = 3, price = 2000),
+                        ),
                     ),
-                ),
-            )
+                )
 
             val totalPrice = repository.getTotalPrice(cartIds = listOf("1", "2"))
 
@@ -116,11 +118,11 @@ private class FakeCartApi(
         val nextId = ((items.maxOfOrNull { it.id } ?: 0L) + 1)
         items =
             items +
-                createCartDto(
-                    id = nextId,
-                    productId = addCartRequestBody.productId,
-                    quantity = addCartRequestBody.quantity,
-                )
+            createCartDto(
+                id = nextId,
+                productId = addCartRequestBody.productId,
+                quantity = addCartRequestBody.quantity,
+            )
     }
 
     override suspend fun deleteCartItem(id: Long) {
@@ -142,8 +144,7 @@ private class FakeCartApi(
             }
     }
 
-    override suspend fun getCartItemsQuantity(): CartQuantityResponse =
-        CartQuantityResponse(quantity = items.sumOf { it.quantity })
+    override suspend fun getCartItemsQuantity(): CartQuantityResponse = CartQuantityResponse(quantity = items.sumOf { it.quantity })
 }
 
 private fun createCartDtos(size: Int): List<CartDto> =

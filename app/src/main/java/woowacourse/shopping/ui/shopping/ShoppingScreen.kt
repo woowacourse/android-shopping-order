@@ -37,9 +37,9 @@ import woowacourse.shopping.ui.theme.Green40
 fun ShoppingScreen(
     uiState: ShoppingUiState,
     onLoad: () -> Unit,
-    onProductClick: (String) -> Unit,
+    onProductClick: (Long) -> Unit,
     onCartClick: () -> Unit,
-    onQuantityChange: (String, Int) -> Unit,
+    onQuantityChange: (Long, Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -116,8 +116,8 @@ private fun ShoppingContents(
     onLoad: () -> Unit,
     isLoading: Boolean,
     isCanLoadMore: Boolean,
-    onProductClick: (String) -> Unit,
-    onQuantityChange: (String, Int) -> Unit,
+    onProductClick: (Long) -> Unit,
+    onQuantityChange: (Long, Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(

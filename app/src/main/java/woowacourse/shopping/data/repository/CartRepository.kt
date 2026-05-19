@@ -9,17 +9,17 @@ interface CartRepository {
     ): CartResponseResult
 
     suspend fun setCartItem(
-        productId: String,
+        productId: Long,
         quantity: Int,
     )
 
-    suspend fun deleteItem(cartItemId: String)
+    suspend fun deleteItem(cartItemId: Long)
 
-    suspend fun getCartItemQuantity(productId: String): Int?
+    suspend fun getCartItemQuantity(productId: Long): Int?
 
     suspend fun getTotalCartItemQuantity(): Int
 
     suspend fun getCartItemsCount(): Int
 
-    suspend fun getTotalPrice(cartIds: List<String>): Money
+    suspend fun getTotalPrice(cartIds: List<Long>): Money
 }

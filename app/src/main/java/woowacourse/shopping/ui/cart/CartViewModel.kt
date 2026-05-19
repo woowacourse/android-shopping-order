@@ -84,7 +84,7 @@ class CartViewModel(
         }
     }
 
-    fun deleteItem(cartId: String) {
+    fun deleteItem(cartId: Long) {
         viewModelScope.launch {
             cartRepository.deleteItem(cartId)
 
@@ -93,7 +93,7 @@ class CartViewModel(
     }
 
     fun updateQuantity(
-        productId: String,
+        productId: Long,
         quantity: Int,
     ) {
         viewModelScope.launch {
@@ -103,7 +103,7 @@ class CartViewModel(
         }
     }
 
-    fun checkItem(cartItemId: String) {
+    fun checkItem(cartItemId: Long) {
         val selectedItems =
             if (_uiState.value.selectedCartItems.contains(cartItemId)) {
                 _uiState.value.selectedCartItems - cartItemId
@@ -122,7 +122,7 @@ class CartViewModel(
         }
     }
 
-    private fun isSelected(cartItemId: String): Boolean = _uiState.value.selectedCartItems.contains(cartItemId)
+    private fun isSelected(cartItemId: Long): Boolean = _uiState.value.selectedCartItems.contains(cartItemId)
 
     fun isAllSelectClick() {
         val selectedItems =

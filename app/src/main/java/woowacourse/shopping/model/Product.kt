@@ -1,7 +1,7 @@
 package woowacourse.shopping.model
 
 class Product(
-    val id: String,
+    val id: Long,
     val name: ProductName,
     val price: Money,
     val imageUrl: String,

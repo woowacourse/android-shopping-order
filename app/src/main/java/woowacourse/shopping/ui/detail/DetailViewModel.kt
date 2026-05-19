@@ -19,7 +19,7 @@ import woowacourse.shopping.ui.model.mapper.toUiModel
 import java.io.IOException
 
 class DetailViewModel(
-    private val id: String,
+    private val id: Long,
     private val hideRecentItem: Boolean,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
@@ -97,7 +97,7 @@ class DetailViewModel(
 
     companion object {
         fun provideFactory(
-            id: String,
+            id: Long,
             hideRecentItem: Boolean,
             productRepository: ProductRepository,
             cartRepository: CartRepository,

@@ -13,7 +13,7 @@ import woowacourse.shopping.model.ProductName
 class CartRepositoryImpl(
     private val api: CartApi,
 ) : CartRepository {
-    override suspend fun getTotalPrice(cartIds: List<String>): Money {
+    override suspend fun getTotalPrice(cartIds: List<Long>): Money {
         val cartItems = getAllCartItems()
 
         return cartItems
@@ -54,16 +54,16 @@ class CartRepositoryImpl(
         return CartResponseResult(cartItems, lastPage)
     }
 
-    private suspend fun getCartItem(productId: String): CartItem? {
+    private suspend fun getCartItem(productId: Long): CartItem? {
         val cartItems = getAllCartItems()
 
         return cartItems.firstOrNull { it.product.id == productId }
     }
 
-    override suspend fun getCartItemQuantity(productId: String): Int? = getCartItem(productId)?.quantity
+    override suspend fun getCartItemQuantity(productId: Long): Int? = getCartItem(productId)?.quantity
 
     override suspend fun setCartItem(
-        productId: String,
+        productId: Long,
         quantity: Int,
     ) {
         val cartItem = getCartItem(productId)
@@ -76,8 +76,8 @@ class CartRepositoryImpl(
         updateQuantity(cartItem.id, quantity)
     }
 
-    override suspend fun deleteItem(cartItemId: String) {
-        api.deleteCartItem(id = cartItemId.toLong())
+    override suspend fun deleteItem(cartItemId: Long) {
+        api.deleteCartItem(id = cartItemId)
     }
 
     override suspend fun getTotalCartItemQuantity(): Int = api.getCartItemsQuantity().quantity
@@ -85,37 +85,37 @@ class CartRepositoryImpl(
     override suspend fun getCartItemsCount(): Int = getAllCartItems().size
 
     private suspend fun addCartItem(
-        productId: String,
+        productId: Long,
         quantity: Int,
     ) {
         api.addCartItem(
             AddCartRequestBody(
-                productId = productId.toLong(),
+                productId = productId,
                 quantity = quantity,
             ),
         )
     }
 
     private suspend fun updateQuantity(
-        cartItemId: String,
+        cartItemId: Long,
         quantity: Int,
     ) {
         api.updateCartItem(
-            id = cartItemId.toLong(),
+            id = cartItemId,
             updateCartRequestBody = UpdateCartRequestBody(quantity = quantity),
         )
     }
 
     private fun CartDto.toDomain(): CartItem =
         CartItem(
-            id = id.toString(),
+            id = id,
             product = product.toDomain(),
             quantity = quantity,
         )
 
     private fun CartProductDto.toDomain(): Product =
         Product(
-            id = id.toString(),
+            id = id,
             name = ProductName(name),
             price = Money(price),
             imageUrl = imageUrl,

@@ -21,7 +21,7 @@ class DetailActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val id = intent.getStringExtra(PRODUCT_ID)
+        val id = intent.getStringExtra(PRODUCT_ID)?.toLongOrNull()
         val hideRecentItem = intent.getBooleanExtra(HIDE_RECENT_ITEM, false)
 
         if (id == null) {
@@ -107,7 +107,7 @@ class DetailActivity : ComponentActivity() {
 
         fun getIntent(
             context: Context,
-            id: String,
+            id: Long,
             hideRecentItem: Boolean = false,
         ): Intent =
             Intent(context, DetailActivity::class.java).apply {

@@ -36,11 +36,11 @@ class ProductRepositoryImpl(
         return ProductResponseResult(products, lastPage)
     }
 
-    override suspend fun getProductById(id: String): Product = api.getProductById(id.toLong()).toDomain()
+    override suspend fun getProductById(id: Long): Product = api.getProductById(id).toDomain()
 
     private fun ProductDto.toDomain(): Product =
         Product(
-            id = id.toString(),
+            id = id,
             name = ProductName(name),
             price = Money(price.toLong()),
             imageUrl = imageUrl,
@@ -49,7 +49,7 @@ class ProductRepositoryImpl(
 
     private fun ProductResponse.toDomain(): Product =
         Product(
-            id = id.toString(),
+            id = id,
             name = ProductName(name),
             price = Money(price.toLong()),
             imageUrl = imageUrl,

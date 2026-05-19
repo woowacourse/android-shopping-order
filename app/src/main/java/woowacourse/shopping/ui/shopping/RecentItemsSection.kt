@@ -29,7 +29,7 @@ import woowacourse.shopping.ui.model.ProductUiModel
 @Composable
 fun RecentItemsSection(
     recentItems: ImmutableList<ProductUiModel>,
-    onProductClick: (String) -> Unit,
+    onProductClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {

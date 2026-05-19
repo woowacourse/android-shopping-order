@@ -23,7 +23,7 @@ import woowacourse.shopping.ui.theme.Gray50
 @Composable
 fun RecommendProductContent(
     products: ImmutableList<ProductUiModel>,
-    onQuantityChange: (String, Int) -> Unit,
+    onQuantityChange: (Long, Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
