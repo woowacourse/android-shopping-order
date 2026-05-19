@@ -9,5 +9,11 @@ interface ProductRepository {
         pageSize: Int,
     ): Products
 
+    suspend fun getCategoryProducts(
+        category: String,
+        page: Int,
+        pageSize: Int,
+    ):Products
+
     suspend fun getProduct(id: Int): Product?
 }

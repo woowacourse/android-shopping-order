@@ -83,18 +83,16 @@ class CartViewModel(
     private fun loadRecommendProduct() {
         viewModelScope.launch {
             val recommended = recentProductRepository.getMostRecentProduct() ?: return@launch
-            val productList = productRepository.getProducts(0, Int.MAX_VALUE)
-            val categoryProducts = productList.getCategoryProducts(recommended.category.value)
+            val recommendedCategory = recommended.category.value
+            val productList = productRepository.getCategoryProducts(recommendedCategory,0, 100)
 
-            val result =
-                categoryProducts -
-                    (
-                            _pagedCartItems.value
-                                ?.items
-                                ?.values
-                                ?.map { it.product }
-                            ?: emptyList()
-                    ).toSet()
+            val cartProducts = _pagedCartItems.value
+                                    ?.items
+                                    ?.values
+                                    ?.map { it.product }
+                                    ?.toSet()
+                                    ?: emptySet()
+            val result = productList.getCategoryProductsLimit(cartProducts,recommended)
             _recommendProducts.update { result }
         }
     }

@@ -17,5 +17,14 @@ class RemoteProductRepository(
         return result.toDomain()
     }
 
+    override suspend fun getCategoryProducts(
+        category: String,
+        page: Int,
+        pageSize: Int,
+    ): Products {
+        val result = productRemoteDataSource.getProducts(page, pageSize)
+        return result.toDomain()
+    }
+
     override suspend fun getProduct(id: Int): Product? = productRemoteDataSource.getProduct(id)?.toDomain()
 }
