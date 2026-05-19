@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -73,6 +74,7 @@ fun CartScreen(
                 totalCount = uiState.selectedCartItemCount,
                 onAllCheckedChange = isAllSelectClick,
                 onOrderClick = onOrderClick,
+                modifier = Modifier.fillMaxWidth()
             )
         },
         modifier = modifier.systemBarsPadding(),
@@ -148,12 +150,12 @@ private fun CartContent(
         } else {
             items(
                 items = cartItems,
-                key = { it.product.id },
+                key = { it.id },
             ) { item ->
                 val product = item.product
                 CartCard(
                     productName = product.name,
-                    price = product.price,
+                    price = item.totalPrice,
                     imageUrl = product.imageUrl,
                     quantity = item.quantity,
                     onQuantityChange = { quantity ->
