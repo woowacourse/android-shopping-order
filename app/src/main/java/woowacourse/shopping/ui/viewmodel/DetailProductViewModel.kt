@@ -133,8 +133,6 @@ class DetailProductViewModel(
             else -> recentProductIds.firstOrNull()
         }
     }
-
-
     data class DetailProductUiState(
         val shoppingItem: ShoppingItem? = null,
         val lastViewedShoppingItem: ShoppingItem? = null,
@@ -143,9 +141,6 @@ class DetailProductViewModel(
     )
 
     companion object {
-        const val EXTRA_PRODUCT_ID = "productId"
-        const val EXTRA_SHOW_LAST_VIEWED = "showLastViewed"
         private const val DEFAULT_QUANTITY = 1
-        private const val INVALID_PRODUCT_ID = -1L
     }
 }

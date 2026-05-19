@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -21,8 +22,6 @@ import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.screen.DetailProductScreen
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 import woowacourse.shopping.ui.viewmodel.DetailProductViewModel
-import woowacourse.shopping.ui.viewmodel.DetailProductViewModel.Companion.EXTRA_PRODUCT_ID
-import woowacourse.shopping.ui.viewmodel.DetailProductViewModel.Companion.EXTRA_SHOW_LAST_VIEWED
 import woowacourse.shopping.ui.viewmodel.ScreenViewModelFactory
 
 class DetailProductActivity : ComponentActivity() {
@@ -31,7 +30,7 @@ class DetailProductActivity : ComponentActivity() {
     private val screenViewModelFactory: ScreenViewModelFactory by lazy {
         ScreenViewModelFactory(
             appContainer = app.appContainer,
-            retrofitService = app.retrofitService
+            retrofitService = app.retrofitService,
         )
     }
     private val detailProductViewModel: DetailProductViewModel by viewModels { screenViewModelFactory }
@@ -40,17 +39,17 @@ class DetailProductActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val productId = intent.getLongExtra(EXTRA_PRODUCT_ID, INVALID_PRODUCT_ID)
-        val showLastViewed = intent.getBooleanExtra(EXTRA_SHOW_LAST_VIEWED, true)
-
-        if(productId != INVALID_PRODUCT_ID){
-            detailProductViewModel.initialize(
-                productId = productId,
-                showLastViewed = showLastViewed,
-            )
+        val args = intent.toDetailProductArgs() ?: run {
+            finish()
+            return
         }
+
+        detailProductViewModel.initialize(
+            productId = args.productId,
+            showLastViewed = args.showLastViewed,
+        )
         observeApiViewModel()
-        requestProductDetailFromApi()
+        detailProductViewModel.loadProductDetail(args.productId)
         setContent {
             val uiState by detailProductViewModel.uiState.collectAsStateWithLifecycle()
             AndroidShoppingTheme {
@@ -84,19 +83,9 @@ class DetailProductActivity : ComponentActivity() {
         }
     }
 
-    private fun requestProductDetailFromApi() {
-        val productId =
-            intent.extras?.getLong(DetailProductViewModel.EXTRA_PRODUCT_ID, INVALID_PRODUCT_ID)
-                ?: INVALID_PRODUCT_ID
-        if (productId == INVALID_PRODUCT_ID) {
-            return
-        }
-        detailProductViewModel.loadProductDetail(productId)
-    }
-
     private fun observeApiViewModel() {
         lifecycleScope.launch {
-            repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     detailProductViewModel.uiState.collect { uiState ->
                         uiState.shoppingItem?.let { shoppingItem ->
@@ -108,7 +97,14 @@ class DetailProductActivity : ComponentActivity() {
         }
     }
 
+    data class DetailProductArgs(
+        val productId: Long,
+        val showLastViewed: Boolean,
+    )
+
     companion object {
+        private const val EXTRA_PRODUCT_ID = "productId"
+        private const val EXTRA_SHOW_LAST_VIEWED = "showLastViewed"
         private const val INVALID_PRODUCT_ID = -1L
 
         fun start(
@@ -116,10 +112,22 @@ class DetailProductActivity : ComponentActivity() {
             productId: Long,
             showLastViewed: Boolean = true,
         ) {
-            val intent = Intent(context, DetailProductActivity::class.java)
-            intent.putExtra(DetailProductViewModel.EXTRA_PRODUCT_ID, productId)
-            intent.putExtra(DetailProductViewModel.EXTRA_SHOW_LAST_VIEWED, showLastViewed)
+            val intent =
+                Intent(context, DetailProductActivity::class.java).apply {
+                    putExtra(EXTRA_PRODUCT_ID, productId)
+                    putExtra(EXTRA_SHOW_LAST_VIEWED, showLastViewed)
+                }
             context.startActivity(intent)
+        }
+
+        private fun Intent.toDetailProductArgs(): DetailProductArgs? {
+            val productId = getLongExtra(EXTRA_PRODUCT_ID, INVALID_PRODUCT_ID)
+            if (productId == INVALID_PRODUCT_ID) return null
+
+            return DetailProductArgs(
+                productId = productId,
+                showLastViewed = getBooleanExtra(EXTRA_SHOW_LAST_VIEWED, true),
+            )
         }
     }
 }

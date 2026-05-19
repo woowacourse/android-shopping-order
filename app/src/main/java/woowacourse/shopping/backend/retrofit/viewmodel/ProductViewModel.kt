@@ -49,7 +49,6 @@ class ProductViewModel(
                         category = category,
                     )
             }.onSuccess { response ->
-                delay(3000) // 스켈레톤 ui 확인을 위한 딜레이
                 val loadedProducts = response.toDomainProducts()
                 _products.value = loadedProducts
 
