@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -54,6 +56,7 @@ import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 fun ProductListScreen(
     shoppingItems: List<ShoppingItem>,
     recentViewedShoppingItems: List<ShoppingItem>,
+    recentViewedListState: LazyListState,
     shoppingCartTotalCount: Int,
     isLoading: Boolean,
     onAddToCartClick: (ShoppingItem) -> Unit,
@@ -103,6 +106,7 @@ fun ProductListScreen(
                     item(span = { GridItemSpan(maxLineSpan) }) {
                         RecentViewedSection(
                             recentViewedShoppingItems = recentViewedShoppingItems,
+                            recentViewedListState = recentViewedListState,
                             onRecentViewedProductClick = onRecentViewedProductClick,
                         )
                     }
@@ -141,6 +145,7 @@ fun ProductListScreen(
 @Composable
 private fun RecentViewedSection(
     recentViewedShoppingItems: List<ShoppingItem>,
+    recentViewedListState: LazyListState,
     onRecentViewedProductClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -160,6 +165,7 @@ private fun RecentViewedSection(
                 color = MaterialTheme.colorScheme.onBackground,
             )
             LazyRow(
+                state = recentViewedListState,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 items(
@@ -298,6 +304,7 @@ private fun RecentViewedSectionPreview() {
                     quantity = 4,
                 ),
             ),
+        recentViewedListState = rememberLazyListState(),
         onRecentViewedProductClick = {},
     )
 }
@@ -327,6 +334,7 @@ private fun ProductListScreenPreview() {
         ProductListScreen(
             shoppingItems = emptyList(),
             recentViewedShoppingItems = emptyList(),
+            recentViewedListState = rememberLazyListState(),
             shoppingCartTotalCount = 99,
             isLoading = false,
             onAddToCartClick = {},

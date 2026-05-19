@@ -7,6 +7,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -53,11 +55,20 @@ class ProductListActivity : ComponentActivity() {
                 } else {
                     uiState.value.recentViewedShoppingItems
                 }
+            val recentViewedListState = rememberLazyListState()
+            val latestRecentViewedProductId = visibleRecentViewedItems.firstOrNull()?.getProductId()
+
+            LaunchedEffect(latestRecentViewedProductId) {
+                if (latestRecentViewedProductId != null) {
+                    recentViewedListState.animateScrollToItem(index = 0)
+                }
+            }
 
             AndroidShoppingTheme {
                 ProductListScreen(
                     shoppingItems = visibleShoppingItems,
                     recentViewedShoppingItems = visibleRecentViewedItems,
+                    recentViewedListState = recentViewedListState,
                     shoppingCartTotalCount = if (hasApiError) 0 else uiState.value.shoppingCartTotalCount,
                     isLoading = uiState.value.isLoading,
                     onAddToCartClick = { shoppingItem ->
