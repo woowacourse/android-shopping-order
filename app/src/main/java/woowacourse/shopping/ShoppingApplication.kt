@@ -93,7 +93,7 @@ class ShoppingApplication : Application() {
             .build()
 
         val retrofitService = Retrofit.Builder()
-            .baseUrl("http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/")
+            .baseUrl(baseUrl)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .client(client)
             .build()
@@ -113,7 +113,7 @@ class ShoppingApplication : Application() {
         )
 
         val cartService = Retrofit.Builder()
-            .baseUrl("http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/")
+            .baseUrl(baseUrl)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .client(client)
             .build()
@@ -129,7 +129,7 @@ class ShoppingApplication : Application() {
             RecentProductRepositoryImpl(recentProductDatabase.recentProductDao())
 
         val orderService = Retrofit.Builder()
-            .baseUrl("http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/")
+            .baseUrl(baseUrl)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .client(client)
             .build()
