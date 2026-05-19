@@ -60,7 +60,7 @@ fun QuantityCounter(
         )
         Icon(
             imageVector = Icons.Default.Add,
-            contentDescription = stringResource(R.string.decrease_quantity),
+            contentDescription = stringResource(R.string.increase_quantity),
             tint = Gray50,
             modifier =
                 Modifier
