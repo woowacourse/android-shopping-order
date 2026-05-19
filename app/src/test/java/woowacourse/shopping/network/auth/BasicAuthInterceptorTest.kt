@@ -1,11 +1,11 @@
 package woowacourse.shopping.network.auth
 
+import junit.framework.TestCase.assertEquals
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -24,29 +24,6 @@ class BasicAuthInterceptorTest {
     }
 
     @Test
-    fun `Authorization 헤더가 없으면 Basic Authentication 헤더를 추가한다`() {
-        mockWebServer.enqueue(MockResponse().setResponseCode(200))
-        val client =
-            OkHttpClient
-                .Builder()
-                .addInterceptor(
-                    BasicAuthInterceptor {
-                        BasicAuthHeaderFactory.create(
-                            AuthCredentials(
-                                userId = "nadajinny",
-                                password = "password",
-                            ),
-                        )
-                    },
-                ).build()
-
-        client.newCall(Request.Builder().url(mockWebServer.url("/products")).build()).execute().close()
-
-        val request = mockWebServer.takeRequest()
-        assertEquals("Basic bmFkYWppbm55OnBhc3N3b3Jk", request.getHeader("Authorization"))
-    }
-
-    @Test
     fun `이미 Authorization 헤더가 있으면 기존 값을 유지한다`() {
         mockWebServer.enqueue(MockResponse().setResponseCode(200))
         val client =
@@ -54,12 +31,7 @@ class BasicAuthInterceptorTest {
                 .Builder()
                 .addInterceptor(
                     BasicAuthInterceptor {
-                        BasicAuthHeaderFactory.create(
-                            AuthCredentials(
-                                userId = "nadajinny",
-                                password = "password",
-                            ),
-                        )
+                        BasicAuthHeaderFactory.create()
                     },
                 ).build()
 

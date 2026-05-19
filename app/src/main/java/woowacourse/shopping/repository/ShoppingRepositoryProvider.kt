@@ -2,8 +2,8 @@ package woowacourse.shopping.repository
 
 import android.content.Context
 import okhttp3.OkHttpClient
+import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.local.ShoppingDatabase
-import woowacourse.shopping.local.config.AppConfig
 import woowacourse.shopping.network.ConnectivityManagerNetworkMonitor
 import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.network.auth.BasicAuthHeaderFactory
@@ -49,12 +49,12 @@ object ShoppingRepositoryProvider {
         productRepository =
             HttpProductRepository(
                 client = httpClient,
-                baseUrl = AppConfig.BASE_URL,
+                baseUrl = BuildConfig.BASE_URL,
             )
         cartRepository =
             HttpCartRepository(
                 client = httpClient,
-                baseUrl = AppConfig.BASE_URL,
+                baseUrl = BuildConfig.BASE_URL,
             )
 
         recentProductRepository = RoomRecentProductRepository(database.recentProductDao())
