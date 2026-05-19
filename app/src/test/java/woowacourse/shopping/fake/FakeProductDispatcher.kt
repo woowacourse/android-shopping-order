@@ -55,7 +55,7 @@ class FakeProductDispatcher(
         page: Int,
         size: Int,
     ): MockResponse {
-        val productContents = allProductContents.subList(page, page + size)
+        val productContents = allProductContents.drop(page).take(size)
         return MockResponse
             .Builder()
             .code(200)
