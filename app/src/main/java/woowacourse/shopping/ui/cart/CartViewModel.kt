@@ -16,6 +16,7 @@ import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
+import woowacourse.shopping.model.Cart
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.recommender.ProductRecommender
 import woowacourse.shopping.ui.common.model.LoadState
@@ -373,8 +374,7 @@ class CartViewModel(
             initialPage
         }
 
-        val totalPrice = calculatePrice()
-        val totalSelectedCount = calculateTotalSelectedCount()
+        recalculateTotals()
 
         _uiState.update {
             it.copy(
@@ -382,34 +382,31 @@ class CartViewModel(
                 pagedItems = finalPage.items,
                 totalCartItemCount = finalPage.totalElements,
                 totalPages = finalPage.totalPages,
-                totalSelectedPrice = totalPrice,
-                totalSelectedCount = totalSelectedCount,
                 isAllSelected = it.selectedItemIds.isNotEmpty() && it.selectedItemIds.size == finalPage.totalElements,
             )
         }
     }
 
     private suspend fun recalculateTotals() {
-        val totalPrice = calculatePrice()
-        val totalSelectedCount = calculateTotalSelectedCount()
+        val cart = cartRepo.getAllCartItems()
+        val totalPrice = calculatePrice(cart)
+        val totalSelectedCount = calculateTotalSelectedCount(cart)
         _uiState.update {
             it.copy(totalSelectedPrice = totalPrice, totalSelectedCount = totalSelectedCount)
         }
     }
 
-    private suspend fun calculatePrice(): Long {
+    private fun calculatePrice(cart: Cart): Long {
         val selectedIds = _uiState.value.selectedItemIds
         if (selectedIds.isEmpty()) return 0
-        val cart = cartRepo.getAllCartItems()
         return selectedIds.sumOf { itemId ->
             cart.items.find { it.id == itemId }?.totalPrice?.value ?: 0
         }
     }
 
-    private suspend fun calculateTotalSelectedCount(): Int {
+    private fun calculateTotalSelectedCount(cart: Cart): Int {
         val selectedIds = _uiState.value.selectedItemIds
         if (selectedIds.isEmpty()) return 0
-        val cart = cartRepo.getAllCartItems()
         return selectedIds.sumOf { itemId ->
             cart.items.find { it.id == itemId }?.quantity ?: 0
         }
