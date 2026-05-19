@@ -74,7 +74,7 @@ fun CartScreen(
                 totalCount = uiState.selectedCartItemCount,
                 onAllCheckedChange = isAllSelectClick,
                 onOrderClick = onOrderClick,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
         },
         modifier = modifier.systemBarsPadding(),

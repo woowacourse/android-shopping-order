@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import woowacourse.shopping.MainDispatcherExtension
 import woowacourse.shopping.data.repository.RecentItemRepositoryImpl
-import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.mockup.MockCartRepository
 import woowacourse.shopping.mockup.MockProductRepository
 import woowacourse.shopping.mockup.MockRecentItemDao
 import woowacourse.shopping.mockup.createCartItems
 import woowacourse.shopping.mockup.createProducts
+import woowacourse.shopping.model.CartItem
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CartViewModelTest {
@@ -27,7 +27,9 @@ class CartViewModelTest {
 
             mainDispatcherExtension.advanceUntilIdle()
 
-            val productIds = viewModel.uiState.value.items.map { it.product.id }
+            val productIds =
+                viewModel.uiState.value.items
+                    .map { it.product.id }
             assertThat(productIds).containsExactly("1", "2", "3", "4", "5")
             assertThat(viewModel.uiState.value.isCanMoveNext).isTrue()
         }
@@ -41,7 +43,9 @@ class CartViewModelTest {
             viewModel.nextPage()
             mainDispatcherExtension.advanceUntilIdle()
 
-            val productIds = viewModel.uiState.value.items.map { it.product.id }
+            val productIds =
+                viewModel.uiState.value.items
+                    .map { it.product.id }
             assertThat(productIds).containsExactly("6")
             assertThat(viewModel.uiState.value.page).isEqualTo(1)
             assertThat(viewModel.uiState.value.isCanMoveNext).isFalse()
@@ -58,7 +62,9 @@ class CartViewModelTest {
             viewModel.previousPage()
             mainDispatcherExtension.advanceUntilIdle()
 
-            val productIds = viewModel.uiState.value.items.map { it.product.id }
+            val productIds =
+                viewModel.uiState.value.items
+                    .map { it.product.id }
             assertThat(productIds).containsExactly("1", "2", "3", "4", "5")
             assertThat(viewModel.uiState.value.page).isEqualTo(0)
         }
@@ -84,7 +90,11 @@ class CartViewModelTest {
             mainDispatcherExtension.advanceUntilIdle()
 
             assertThat(viewModel.uiState.value.selectedCartItems).containsExactly("1")
-            assertThat(viewModel.uiState.value.items.first { it.id == "1" }.isChecked).isTrue()
+            assertThat(
+                viewModel.uiState.value.items
+                    .first { it.id == "1" }
+                    .isChecked,
+            ).isTrue()
             assertThat(viewModel.uiState.value.totalPrice).isEqualTo(2000)
         }
 

@@ -18,7 +18,7 @@ data class CartSelection(
 
     fun isAllSelected(cartItems: List<CartItem>): Boolean =
         cartItems.isNotEmpty() &&
-                cartItems.all { it.id in ids }
+            cartItems.all { it.id in ids }
 
     fun totalPrice(cartItems: List<CartItem>): Money =
         cartItems

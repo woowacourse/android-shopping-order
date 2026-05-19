@@ -55,10 +55,11 @@ class AppContainer(
         OkHttpClient
             .Builder()
             .addInterceptor { chain ->
-                val credential = Credentials.basic(
-                    username = "GiyunKim00",
-                    password = "password",
-                )
+                val credential =
+                    Credentials.basic(
+                        username = "GiyunKim00",
+                        password = "password",
+                    )
 
                 val request =
                     chain

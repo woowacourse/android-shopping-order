@@ -50,37 +50,47 @@ class CartRepositoryTest {
     @Test
     fun `장바구니 총 상품 수량을 반환한다`() =
         runTest {
-            val repository = CartRepositoryImpl(
-                FakeCartApi(
-                    listOf(
-                        createCartDto(id = 1, productId = 1, quantity = 2),
-                        createCartDto(id = 2, productId = 2, quantity = 3),
+            val repository =
+                CartRepositoryImpl(
+                    FakeCartApi(
+                        listOf(
+                            createCartDto(id = 1, productId = 1, quantity = 2),
+                            createCartDto(id = 2, productId = 2, quantity = 3),
+                        ),
                     ),
-                ),
-            )
+                )
 
             repository.refreshCartItems()
             repository.setCartItem(productId = "1", quantity = 5)
 
-            assertThat(repository.cartItems.value.first { it.product.id == "1" }.quantity).isEqualTo(5)
+            assertThat(
+                repository.cartItems.value
+                    .first { it.product.id == "1" }
+                    .quantity,
+            ).isEqualTo(5)
         }
 
     @Test
     fun `장바구니에 없는 상품이면 새로 추가한다`() =
         runTest {
-            val repository = CartRepositoryImpl(
-                FakeCartApi(
-                    listOf(
-                        createCartDto(id = 1, productId = 1, quantity = 2),
-                        createCartDto(id = 2, productId = 2, quantity = 3),
+            val repository =
+                CartRepositoryImpl(
+                    FakeCartApi(
+                        listOf(
+                            createCartDto(id = 1, productId = 1, quantity = 2),
+                            createCartDto(id = 2, productId = 2, quantity = 3),
+                        ),
                     ),
-                ),
-            )
+                )
 
             repository.refreshCartItems()
             repository.setCartItem(productId = "3", quantity = 4)
 
-            assertThat(repository.cartItems.value.first { it.product.id == "3" }.quantity).isEqualTo(4)
+            assertThat(
+                repository.cartItems.value
+                    .first { it.product.id == "3" }
+                    .quantity,
+            ).isEqualTo(4)
         }
 
     @Test
@@ -121,11 +131,11 @@ private class FakeCartApi(
         val nextId = ((items.maxOfOrNull { it.id } ?: 0L) + 1)
         items =
             items +
-                createCartDto(
-                    id = nextId,
-                    productId = addCartRequestBody.productId,
-                    quantity = addCartRequestBody.quantity,
-                )
+            createCartDto(
+                id = nextId,
+                productId = addCartRequestBody.productId,
+                quantity = addCartRequestBody.quantity,
+            )
     }
 
     override suspend fun deleteCartItem(id: Long) {
@@ -147,8 +157,7 @@ private class FakeCartApi(
             }
     }
 
-    override suspend fun getCartItemsQuantity(): CartQuantityResponse =
-        CartQuantityResponse(quantity = items.sumOf { it.quantity })
+    override suspend fun getCartItemsQuantity(): CartQuantityResponse = CartQuantityResponse(quantity = items.sumOf { it.quantity })
 }
 
 private fun createCartDtos(size: Int): List<CartDto> =

@@ -70,19 +70,21 @@ fun CartBottomBar(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                modifier = Modifier.padding(end = 12.dp)
+                modifier = Modifier.padding(end = 12.dp),
             )
         }
         Button(
             onClick = onOrderClick,
             enabled = totalCount > 0,
-            modifier = Modifier
-                .height(78.dp)
-                .weight(2f),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Green40,
-                contentColor = Color.White,
-            ),
+            modifier =
+                Modifier
+                    .height(78.dp)
+                    .weight(2f),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = Green40,
+                    contentColor = Color.White,
+                ),
             shape = RectangleShape,
         ) {
             Text(

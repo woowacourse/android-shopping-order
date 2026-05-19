@@ -5,13 +5,13 @@ import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.data.repository.RecentItemRepositoryImpl
-import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.ProductName
 import woowacourse.shopping.mockup.MockProductRepository
 import woowacourse.shopping.mockup.MockRecentItemDao
 import woowacourse.shopping.mockup.createProduct
 import woowacourse.shopping.mockup.toRecentItemEntity
+import woowacourse.shopping.model.Money
+import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.ProductName
 
 class RecentItemRepositoryTest {
     private val product =

@@ -45,8 +45,8 @@ class CartRepositoryImpl(
         api.deleteCartItem(id = cartItemId.toLong())
         refreshCartItems()
     }
-    private suspend fun getAllRemoteCartItems(): List<CartItem> {
 
+    private suspend fun getAllRemoteCartItems(): List<CartItem> {
         val response =
             api.getCartItems(
                 page = 0,
