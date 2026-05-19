@@ -11,6 +11,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.datastore.AuthDataStore
+import woowacourse.shopping.data.local.room.ShoppingDatabase
 import woowacourse.shopping.data.remote.AuthHeaderProvider
 import woowacourse.shopping.data.remote.retrofit.RetrofitService
 import woowacourse.shopping.di.AppContainer
@@ -46,9 +47,12 @@ class ShoppingApplication : Application() {
             )
         }
 
+        val shoppingDatabase = ShoppingDatabase.create(this)
         appContainer =
             AppContainer(
                 context = this,
+                shoppingItemDao = shoppingDatabase.shoppingItemDao(),
+                shoppingCartDao = shoppingDatabase.shoppingCartDao(),
                 applicationScope = applicationScope,
             )
     }
