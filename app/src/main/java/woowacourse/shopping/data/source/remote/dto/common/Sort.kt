@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.source.remote.dto
+package woowacourse.shopping.data.source.remote.dto.common
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -1,9 +1,9 @@
-package woowacourse.shopping.data.source.remote.dto.product
+package woowacourse.shopping.data.source.remote.dto.product.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import woowacourse.shopping.data.source.remote.dto.Pageable
-import woowacourse.shopping.data.source.remote.dto.Sort
+import woowacourse.shopping.data.source.remote.dto.common.Pageable
+import woowacourse.shopping.data.source.remote.dto.common.Sort
 
 @Serializable
 data class ProductsResponse(

@@ -4,11 +4,11 @@ import kotlinx.serialization.json.Json
 import mockwebserver3.Dispatcher
 import mockwebserver3.MockResponse
 import mockwebserver3.RecordedRequest
-import woowacourse.shopping.data.source.remote.dto.Pageable
-import woowacourse.shopping.data.source.remote.dto.Sort
-import woowacourse.shopping.data.source.remote.dto.product.ProductContent
-import woowacourse.shopping.data.source.remote.dto.product.ProductResponse
-import woowacourse.shopping.data.source.remote.dto.product.ProductsResponse
+import woowacourse.shopping.data.source.remote.dto.common.Pageable
+import woowacourse.shopping.data.source.remote.dto.common.Sort
+import woowacourse.shopping.data.source.remote.dto.product.response.ProductContent
+import woowacourse.shopping.data.source.remote.dto.product.response.ProductResponse
+import woowacourse.shopping.data.source.remote.dto.product.response.ProductsResponse
 import woowacourse.shopping.domain.model.Product
 
 class FakeProductDispatcher(

@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.source.remote
 
 import woowacourse.shopping.data.source.remote.api.ProductService
-import woowacourse.shopping.data.source.remote.dto.product.ProductContent
+import woowacourse.shopping.data.source.remote.dto.product.response.ProductContent
 
 class ProductRemoteDataSource(
     private val productService: ProductService,

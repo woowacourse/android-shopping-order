@@ -8,8 +8,9 @@ import kotlinx.coroutines.flow.update
 import woowacourse.shopping.data.source.local.recent.RecentProductDao
 import woowacourse.shopping.data.source.local.recent.RecentProductEntity
 import woowacourse.shopping.data.source.remote.ProductRemoteDataSource
-import woowacourse.shopping.data.source.remote.dto.product.toDomain
+import woowacourse.shopping.domain.model.Money
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductName
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class DefaultProductRepository(
@@ -24,7 +25,22 @@ class DefaultProductRepository(
         page: Int,
         size: Int,
     ): Int {
-        val newProducts = remoteProductDataSource.fetchProducts(page, size).map { it.toDomain() }
+        val newProducts =
+            remoteProductDataSource.fetchProducts(page, size).map {
+                Product(
+                    id = it.id,
+                    name =
+                        ProductName(
+                            it.name,
+                        ),
+                    price =
+                        Money(
+                            it.price.toLong(),
+                        ),
+                    imageUrl = it.imageUrl,
+                    category = it.category,
+                )
+            }
         _products.update { products ->
             (products + newProducts).distinctBy { it.id }
         }

@@ -3,10 +3,10 @@ package woowacourse.shopping.data.source.remote
 import android.util.Log
 import okio.IOException
 import retrofit2.HttpException
-import woowacourse.shopping.data.source.remote.api.AddItemRequestBody
 import woowacourse.shopping.data.source.remote.api.CartService
-import woowacourse.shopping.data.source.remote.api.QuantityRequestBody
-import woowacourse.shopping.data.source.remote.dto.cart.CartContent
+import woowacourse.shopping.data.source.remote.dto.cart.request.AddItemRequest
+import woowacourse.shopping.data.source.remote.dto.cart.request.QuantityRequest
+import woowacourse.shopping.data.source.remote.dto.cart.response.CartContent
 
 class CartRemoteDataSource(
     private val cartService: CartService,
@@ -34,7 +34,7 @@ class CartRemoteDataSource(
     ) {
         try {
             cartService.requestAddItem(
-                addItemRequestBody = AddItemRequestBody(id, quantity),
+                addItemRequest = AddItemRequest(id, quantity),
             )
         } catch (err: HttpException) {
             when (err.code()) {
@@ -78,7 +78,7 @@ class CartRemoteDataSource(
         try {
             cartService.requestChangeQuantity(
                 id = id,
-                quantity = QuantityRequestBody(quantity),
+                quantity = QuantityRequest(quantity),
             )
         } catch (err: HttpException) {
             when (err.code()) {

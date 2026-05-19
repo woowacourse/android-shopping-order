@@ -4,17 +4,17 @@ import kotlinx.serialization.json.Json
 import mockwebserver3.Dispatcher
 import mockwebserver3.MockResponse
 import mockwebserver3.RecordedRequest
-import woowacourse.shopping.data.source.remote.api.AddItemRequestBody
-import woowacourse.shopping.data.source.remote.api.QuantityRequestBody
-import woowacourse.shopping.data.source.remote.dto.Pageable
-import woowacourse.shopping.data.source.remote.dto.Sort
-import woowacourse.shopping.data.source.remote.dto.cart.CartContent
-import woowacourse.shopping.data.source.remote.dto.cart.CartResponse
-import woowacourse.shopping.data.source.remote.dto.cart.Product
+import woowacourse.shopping.data.source.remote.dto.cart.request.AddItemRequest
+import woowacourse.shopping.data.source.remote.dto.cart.request.QuantityRequest
+import woowacourse.shopping.data.source.remote.dto.cart.response.CartContent
+import woowacourse.shopping.data.source.remote.dto.cart.response.CartProductContent
+import woowacourse.shopping.data.source.remote.dto.cart.response.CartResponse
+import woowacourse.shopping.data.source.remote.dto.common.Pageable
+import woowacourse.shopping.data.source.remote.dto.common.Sort
 import kotlin.math.min
 
 class FakeCartDispatcher(
-    private val fixedProductContent: Product,
+    private val fixedCartProductContentContent: CartProductContent,
 ) : Dispatcher() {
     private val json =
         Json {
@@ -41,13 +41,13 @@ class FakeCartDispatcher(
 
                     if (method == "POST") {
                         val bodyContent = request.body?.utf8() ?: return clientErrorResponse
-                        val addItemRequestBody =
-                            json.decodeFromString<AddItemRequestBody>(bodyContent)
+                        val addItemRequest =
+                            json.decodeFromString<AddItemRequest>(bodyContent)
                         allCartItems.add(
                             CartContent(
                                 id = allCartItems.size.toLong(),
-                                product = fixedProductContent,
-                                quantity = addItemRequestBody.quantity,
+                                productContent = fixedCartProductContentContent,
+                                quantity = addItemRequest.quantity,
                             ),
                         )
                     }
@@ -57,9 +57,9 @@ class FakeCartDispatcher(
                 } else if (method == "PATCH") {
                     val id = pathSegments[1].toLongOrNull() ?: return clientErrorResponse
                     val bodyContent = request.body?.utf8() ?: return clientErrorResponse
-                    val changeQuantityRequestBody =
-                        json.decodeFromString<QuantityRequestBody>(bodyContent)
-                    changeQuantity(id.toInt(), changeQuantityRequestBody.quantity)
+                    val changeQuantityRequest =
+                        json.decodeFromString<QuantityRequest>(bodyContent)
+                    changeQuantity(id.toInt(), changeQuantityRequest.quantity)
                 }
                 clientErrorResponse
             } else {

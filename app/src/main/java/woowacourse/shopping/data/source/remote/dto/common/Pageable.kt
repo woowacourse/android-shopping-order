@@ -1,8 +1,8 @@
-package woowacourse.shopping.data.source.remote.dto
+package woowacourse.shopping.data.source.remote.dto.common
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import woowacourse.shopping.data.source.remote.dto.Sort
+import woowacourse.shopping.data.source.remote.dto.common.Sort
 
 @Serializable
 data class Pageable(

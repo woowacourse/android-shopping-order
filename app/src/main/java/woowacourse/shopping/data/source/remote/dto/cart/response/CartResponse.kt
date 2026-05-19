@@ -1,9 +1,9 @@
-package woowacourse.shopping.data.source.remote.dto.cart
+package woowacourse.shopping.data.source.remote.dto.cart.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import woowacourse.shopping.data.source.remote.dto.Pageable
-import woowacourse.shopping.data.source.remote.dto.Sort
+import woowacourse.shopping.data.source.remote.dto.common.Pageable
+import woowacourse.shopping.data.source.remote.dto.common.Sort
 
 @Serializable
 data class CartResponse(
@@ -29,4 +29,28 @@ data class CartResponse(
     val totalElements: Long,
     @SerialName("totalPages")
     val totalPages: Int,
+)
+
+@Serializable
+data class CartContent(
+    @SerialName("id")
+    val id: Long,
+    @SerialName("product")
+    val productContent: CartProductContent,
+    @SerialName("quantity")
+    val quantity: Int,
+)
+
+@Serializable
+data class CartProductContent(
+    @SerialName("category")
+    val category: String,
+    @SerialName("id")
+    val id: Long,
+    @SerialName("imageUrl")
+    val imageUrl: String,
+    @SerialName("name")
+    val name: String,
+    @SerialName("price")
+    val price: Int,
 )

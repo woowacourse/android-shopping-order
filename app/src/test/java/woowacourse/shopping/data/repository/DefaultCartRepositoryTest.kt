@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.data.source.remote.CartRemoteDataSource
 import woowacourse.shopping.data.source.remote.api.RetrofitServices
-import woowacourse.shopping.data.source.remote.dto.cart.Product
+import woowacourse.shopping.data.source.remote.dto.cart.response.CartProductContent
 import woowacourse.shopping.fake.FakeCartDispatcher
 
 class FakeAuthInterceptor(
@@ -30,8 +30,8 @@ class DefaultCartRepositoryTest {
     private lateinit var server: MockWebServer
     private lateinit var defaultCartRepository: DefaultCartRepository
 
-    private val product =
-        Product(
+    private val cartProductContent =
+        CartProductContent(
             id = 1L,
             category = "장난감",
             name = "상품",
@@ -44,7 +44,7 @@ class DefaultCartRepositoryTest {
         server = MockWebServer()
         server.dispatcher =
             FakeCartDispatcher(
-                fixedProductContent = product,
+                fixedCartProductContentContent = cartProductContent,
             )
         server.start()
 

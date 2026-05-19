@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import woowacourse.shopping.data.source.remote.CartRemoteDataSource
-import woowacourse.shopping.data.source.remote.dto.cart.CartContent
+import woowacourse.shopping.data.source.remote.dto.cart.response.CartContent
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Money
@@ -67,11 +67,11 @@ class DefaultCartRepository(
                         id = cartContent.id,
                         product =
                             Product(
-                                id = cartContent.product.id,
-                                name = ProductName(cartContent.product.name),
-                                price = Money(cartContent.product.price.toLong()),
-                                imageUrl = cartContent.product.imageUrl,
-                                category = cartContent.product.category,
+                                id = cartContent.productContent.id,
+                                name = ProductName(cartContent.productContent.name),
+                                price = Money(cartContent.productContent.price.toLong()),
+                                imageUrl = cartContent.productContent.imageUrl,
+                                category = cartContent.productContent.category,
                             ),
                         quantity = cartContent.quantity,
                     )
