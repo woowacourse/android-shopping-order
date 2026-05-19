@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.cart.recommendation
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,10 +23,10 @@ import woowacourse.shopping.ui.shopping.ShoppingProductUiStateMapper
 private const val RECOMMENDED_PRODUCTS_LIMIT = 10
 
 class CartRecommendationViewModel(
-    private val productRepository: ProductRepository = ShoppingRepositoryProvider.productRepository,
-    private val cartRepository: CartRepository = ShoppingRepositoryProvider.cartRepository,
-    private val recentProductRepository: RecentProductRepository = ShoppingRepositoryProvider.recentProductRepository,
-    private val networkMonitor: NetworkMonitor = ShoppingRepositoryProvider.networkMonitor,
+    private val productRepository: ProductRepository,
+    private val cartRepository: CartRepository,
+    private val recentProductRepository: RecentProductRepository,
+    private val networkMonitor: NetworkMonitor,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartRecommendationUiState())
     val uiState: StateFlow<CartRecommendationUiState> = _uiState.asStateFlow()
@@ -392,4 +393,14 @@ class CartRecommendationViewModel(
         val price: Int,
         val quantity: Int,
     )
+}
+
+class CartRecommendationViewModelFactory : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T =
+        CartRecommendationViewModel(
+            productRepository = ShoppingRepositoryProvider.productRepository,
+            cartRepository = ShoppingRepositoryProvider.cartRepository,
+            recentProductRepository = ShoppingRepositoryProvider.recentProductRepository,
+            networkMonitor = ShoppingRepositoryProvider.networkMonitor,
+        ) as T
 }

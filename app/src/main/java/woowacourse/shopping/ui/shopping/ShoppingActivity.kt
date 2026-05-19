@@ -17,7 +17,9 @@ import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.theme.ShoppingTheme
 
 class ShoppingActivity : ComponentActivity() {
-    private val viewModel: ShoppingViewModel by viewModels()
+    private val viewModel: ShoppingViewModel by viewModels {
+        ShoppingViewModelFactory()
+    }
 
     override fun onResume() {
         super.onResume()

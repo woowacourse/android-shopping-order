@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.cart.list
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -23,9 +24,9 @@ private const val PAGE_SIZE = 5
 private const val CART_SYNC_DELAY_MILLIS = 400L
 
 class CartViewModel(
-    private val productRepository: ProductRepository = ShoppingRepositoryProvider.productRepository,
-    private val cartRepository: CartRepository = ShoppingRepositoryProvider.cartRepository,
-    private val networkMonitor: NetworkMonitor = ShoppingRepositoryProvider.networkMonitor,
+    private val productRepository: ProductRepository,
+    private val cartRepository: CartRepository,
+    private val networkMonitor: NetworkMonitor,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState(cartListState = CartListUiState.Loading))
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
@@ -289,4 +290,14 @@ class CartViewModel(
         val contentState = _uiState.value.cartListState as? CartListUiState.Content ?: return defaultValue
         return block(contentState)
     }
+}
+
+class CartViewModelFactory : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T =
+        CartViewModel(
+            productRepository = ShoppingRepositoryProvider.productRepository,
+            cartRepository = ShoppingRepositoryProvider.cartRepository,
+            networkMonitor = ShoppingRepositoryProvider.networkMonitor,
+        ) as T
 }

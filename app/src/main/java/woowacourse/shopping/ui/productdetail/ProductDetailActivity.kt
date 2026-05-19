@@ -17,7 +17,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import woowacourse.shopping.ui.theme.ShoppingTheme
 
 class ProductDetailActivity : ComponentActivity() {
-    private val viewModel: ProductDetailViewModel by viewModels()
+    private val viewModel: ProductDetailViewModel by viewModels {
+        ProductDetailViewModelFactory()
+    }
 
     companion object {
         private const val PUT_EXTRA_KEY_PRODUCT_ID = "PRODUCT_ID"

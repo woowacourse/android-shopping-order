@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.shopping
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -238,4 +239,15 @@ class ShoppingViewModel(
             }
         }
     }
+}
+
+class ShoppingViewModelFactory : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T =
+        ShoppingViewModel(
+            productRepository = ShoppingRepositoryProvider.productRepository,
+            cartRepository = ShoppingRepositoryProvider.cartRepository,
+            recentProductRepository = ShoppingRepositoryProvider.recentProductRepository,
+            networkMonitor = ShoppingRepositoryProvider.networkMonitor,
+        ) as T
 }

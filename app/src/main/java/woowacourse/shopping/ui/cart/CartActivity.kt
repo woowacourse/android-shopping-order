@@ -21,14 +21,20 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import woowacourse.shopping.ui.cart.list.CartScreen
 import woowacourse.shopping.ui.cart.list.CartViewModel
+import woowacourse.shopping.ui.cart.list.CartViewModelFactory
 import woowacourse.shopping.ui.cart.recommendation.CartRecommendationViewModel
+import woowacourse.shopping.ui.cart.recommendation.CartRecommendationViewModelFactory
 import woowacourse.shopping.ui.cart.recommendation.CartRecommendedProductsScreen
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.theme.ShoppingTheme
 
 class CartActivity : ComponentActivity() {
-    private val cartViewModel: CartViewModel by viewModels()
-    private val recommendationViewModel: CartRecommendationViewModel by viewModels()
+    private val cartViewModel: CartViewModel by viewModels {
+        CartViewModelFactory()
+    }
+    private val recommendationViewModel: CartRecommendationViewModel by viewModels {
+        CartRecommendationViewModelFactory()
+    }
 
     companion object {
         fun startActivity(context: Context) {
