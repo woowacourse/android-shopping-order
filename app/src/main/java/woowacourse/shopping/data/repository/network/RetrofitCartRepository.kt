@@ -12,7 +12,11 @@ import woowacourse.shopping.model.Page
 class RetrofitCartRepository(
     private val service: CartService,
 ) : CartRepository {
-    override suspend fun getAllCartItems(): Cart = service.getCartItems().toDomain()
+    override suspend fun getAllCartItems(pageSize: Int): Cart {
+        val response = service.getCartItems()
+        val totalSize = response.totalPages * pageSize
+        return service.getCartItems(0, totalSize).toDomain()
+    }
 
     override suspend fun add(
         productId: Long,
