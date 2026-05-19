@@ -1,7 +1,7 @@
-package woowacourse.shopping.repository.http.cart
+package woowacourse.shopping.repository.http.dto.cart
 
 import kotlinx.serialization.Serializable
-import woowacourse.shopping.repository.http.product.ProductResponseDto
+import woowacourse.shopping.repository.http.dto.product.ProductResponseDto
 
 @Serializable
 data class CartItemResponseDto(

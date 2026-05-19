@@ -1,4 +1,4 @@
-package woowacourse.shopping.repository.http.cart
+package woowacourse.shopping.repository.http.api
 
 import retrofit2.Response
 import retrofit2.http.Body
@@ -8,6 +8,11 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import woowacourse.shopping.repository.http.dto.cart.CartItemCountResponseDto
+import woowacourse.shopping.repository.http.dto.cart.CartItemQuantityUpdateRequestDto
+import woowacourse.shopping.repository.http.dto.cart.CartItemRequestDto
+import woowacourse.shopping.repository.http.dto.cart.CartPageResponseDto
+import woowacourse.shopping.repository.http.dto.cart.OrderRequestDto
 
 interface CartApiService {
     @GET("cart-items")

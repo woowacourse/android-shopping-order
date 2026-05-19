@@ -1,4 +1,4 @@
-package woowacourse.shopping.repository.http.product
+package woowacourse.shopping.repository.http.repository
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,6 +14,11 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.Products
 import woowacourse.shopping.repository.ProductRepository
+import woowacourse.shopping.repository.http.api.ProductApiService
+import woowacourse.shopping.repository.http.exception.product.ProductNetworkException
+import woowacourse.shopping.repository.http.exception.product.ProductParsingException
+import woowacourse.shopping.repository.http.exception.product.ProductRemoteException
+import woowacourse.shopping.repository.http.exception.product.ProductResponseException
 import java.io.IOException
 
 private const val NETWORK_PAGE_SIZE = 20

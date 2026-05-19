@@ -1,4 +1,4 @@
-package woowacourse.shopping.repository.http.product
+package woowacourse.shopping.repository.http.exception.product
 
 import woowacourse.shopping.repository.http.common.RemoteException
 

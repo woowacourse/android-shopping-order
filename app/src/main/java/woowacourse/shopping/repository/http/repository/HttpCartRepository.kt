@@ -1,4 +1,4 @@
-package woowacourse.shopping.repository.http.cart
+package woowacourse.shopping.repository.http.repository
 
 import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
@@ -10,6 +10,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.repository.CartRepository
+import woowacourse.shopping.repository.http.api.CartApiService
+import woowacourse.shopping.repository.http.dto.cart.CartItemQuantityUpdateRequestDto
+import woowacourse.shopping.repository.http.dto.cart.CartItemRequestDto
+import woowacourse.shopping.repository.http.dto.cart.CartItemResponseDto
+import woowacourse.shopping.repository.http.dto.cart.OrderRequestDto
 import woowacourse.shopping.repository.query.CartPageItem
 import woowacourse.shopping.repository.query.CartPageResult
 

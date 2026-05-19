@@ -8,8 +8,8 @@ import woowacourse.shopping.network.ConnectivityManagerNetworkMonitor
 import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.network.auth.BasicAuthHeaderFactory
 import woowacourse.shopping.network.auth.BasicAuthInterceptor
-import woowacourse.shopping.repository.http.cart.HttpCartRepository
-import woowacourse.shopping.repository.http.product.HttpProductRepository
+import woowacourse.shopping.repository.http.repository.HttpCartRepository
+import woowacourse.shopping.repository.http.repository.HttpProductRepository
 import woowacourse.shopping.repository.room.RoomRecentProductRepository
 
 object ShoppingRepositoryProvider {
