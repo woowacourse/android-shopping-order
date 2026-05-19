@@ -25,7 +25,6 @@ class DetailProductActivity : ComponentActivity() {
     private val viewModelFactory: AppViewModelFactory by lazy {
         AppViewModelFactory(
             appContainer = app.appContainer,
-            retrofitService = app.retrofitService,
         )
     }
 

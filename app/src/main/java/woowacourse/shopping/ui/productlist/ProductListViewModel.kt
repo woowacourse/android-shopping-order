@@ -13,15 +13,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import woowacourse.shopping.data.local.datastore.VisitStore
-import woowacourse.shopping.data.mapper.toDomainProducts
 import woowacourse.shopping.data.remote.retrofit.repository.ProductRetrofitRepository
+import woowacourse.shopping.data.remote.retrofit.toApiFailure
+import woowacourse.shopping.data.remote.retrofit.toUserMessage
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ShoppingItem
 import woowacourse.shopping.domain.repository.ShoppingItemRepository
 
 class ProductListViewModel(
     private val shoppingItemRepository: ShoppingItemRepository,
     private val visitStore: VisitStore,
-    private val productRetrofitRepository: ProductRetrofitRepository,
+    private val productRepository: ProductRetrofitRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProductListUiState())
@@ -60,26 +62,27 @@ class ProductListViewModel(
                 )
 
                 runCatching {
-                    productRetrofitRepository
-                        .requestProduct(
-                            page = page,
-                            size = size,
-                            category = category,
-                        ).toDomainProducts()
+                    requestAllProducts(
+                        startPage = page,
+                        size = size,
+                        category = category,
+                    )
                 }.onSuccess { loadedProducts ->
-                    if (loadedProducts.isNotEmpty()) {
-                        shoppingItemRepository.replaceProducts(loadedProducts)
-                    }
+                    shoppingItemRepository.replaceProducts(loadedProducts)
+                    productPageStateHolder.restoreCurrentPage(DEFAULT_PAGE)
                     markProductsLoaded()
                     publishUiState(
                         isLoading = false,
                         errorMessage = null,
                         hasLoadedProducts = true,
                     )
-                }.onFailure {
+                }.onFailure { throwable ->
                     publishUiState(
                         isLoading = false,
-                        errorMessage = "상품 목록을 불러오지 못했습니다.",
+                        errorMessage =
+                            throwable
+                                .toApiFailure()
+                                .toUserMessage(defaultMessage = "상품 목록을 불러오지 못했습니다."),
                     )
                 }
             }
@@ -87,8 +90,31 @@ class ProductListViewModel(
     }
 
     fun loadNextPage() {
+        if (!productPageStateHolder.canMoveToNextPage()) return
         productPageStateHolder.nextPage()
         publishUiState()
+    }
+
+    private suspend fun requestAllProducts(
+        startPage: Int,
+        size: Int,
+        category: String?,
+    ): List<Product> {
+        val loadedProducts = mutableListOf<Product>()
+        var page = startPage
+        var hasNextPage: Boolean
+        do {
+            val pageResult =
+                productRepository.requestProductPage(
+                    page = page,
+                    size = size,
+                    category = category,
+                )
+            loadedProducts += pageResult.products
+            hasNextPage = pageResult.hasNextPage
+            page += 1
+        } while (hasNextPage)
+        return loadedProducts
     }
 
     fun onProductClick(productId: Long) {

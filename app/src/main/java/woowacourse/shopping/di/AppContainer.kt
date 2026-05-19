@@ -6,7 +6,10 @@ import woowacourse.shopping.data.local.datastore.DataStoreVisitStore
 import woowacourse.shopping.data.local.datastore.VisitStore
 import woowacourse.shopping.data.local.room.shoppingItem.ShoppingItemDao
 import woowacourse.shopping.data.local.room.shoppingcart.ShoppingCartDao
-import woowacourse.shopping.data.remote.retrofit.sync.RemoteShoppingStateSyncer
+import woowacourse.shopping.data.remote.retrofit.RetrofitService
+import woowacourse.shopping.data.remote.retrofit.repository.OrderRetrofitRepository
+import woowacourse.shopping.data.remote.retrofit.repository.ProductRetrofitRepository
+import woowacourse.shopping.data.remote.retrofit.repository.ShoppingCartRetrofitRepository
 import woowacourse.shopping.data.repository.RoomShoppingCartRepository
 import woowacourse.shopping.data.repository.RoomShoppingItemRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
@@ -17,6 +20,7 @@ class AppContainer(
     shoppingItemDao: ShoppingItemDao,
     shoppingCartDao: ShoppingCartDao,
     applicationScope: CoroutineScope,
+    retrofitService: RetrofitService,
 ) {
     val shoppingItemRepository: ShoppingItemRepository =
         RoomShoppingItemRepository(
@@ -27,17 +31,19 @@ class AppContainer(
     val shoppingCartRepository: ShoppingCartRepository =
         RoomShoppingCartRepository(
             shoppingCartDao = shoppingCartDao,
+            shoppingItemRepository = shoppingItemRepository,
+            shoppingCartRetrofitRepository = ShoppingCartRetrofitRepository(retrofitService.shoppingCartApiService),
         )
+
+    val productRepository =
+        ProductRetrofitRepository(retrofitService.productApiService)
+
+    val orderRepository =
+        OrderRetrofitRepository(retrofitService.orderApiService)
 
     val visitStore: VisitStore =
         DataStoreVisitStore(
             context = context,
             scope = applicationScope,
-        )
-
-    val remoteShoppingStateSyncer: RemoteShoppingStateSyncer =
-        RemoteShoppingStateSyncer(
-            shoppingCartRepository = shoppingCartRepository,
-            shoppingItemRepository = shoppingItemRepository,
         )
 }

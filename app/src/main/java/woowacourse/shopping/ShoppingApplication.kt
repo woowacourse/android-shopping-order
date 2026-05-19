@@ -54,6 +54,7 @@ class ShoppingApplication : Application() {
                 shoppingItemDao = shoppingDatabase.shoppingItemDao(),
                 shoppingCartDao = shoppingDatabase.shoppingCartDao(),
                 applicationScope = applicationScope,
+                retrofitService = retrofitService,
             )
     }
 

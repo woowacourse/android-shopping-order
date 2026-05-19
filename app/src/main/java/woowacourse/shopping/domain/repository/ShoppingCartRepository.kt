@@ -6,7 +6,18 @@ import woowacourse.shopping.domain.model.ShoppingCartItem
 interface ShoppingCartRepository {
     fun observeShoppingItems(): Flow<List<ShoppingCartItem>>
 
-    suspend fun addIfAbsent(productId: Long)
+    suspend fun requestCartItems(
+        page: Int = 0,
+        size: Int = 20,
+        sort: List<String>? = null,
+    )
 
-    suspend fun removeByProductId(productId: Long): Boolean
+    suspend fun addOrIncreaseByProductId(
+        productId: Long,
+        amount: Int = 1,
+    )
+
+    suspend fun decreaseByProductId(productId: Long)
+
+    suspend fun removeByProductId(productId: Long)
 }

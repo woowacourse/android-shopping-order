@@ -9,16 +9,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import woowacourse.shopping.data.remote.retrofit.repository.ProductRetrofitRepository
 import woowacourse.shopping.domain.model.ShoppingItem
 import woowacourse.shopping.domain.repository.ShoppingItemRepository
 import woowacourse.shopping.data.local.datastore.VisitStore
-import woowacourse.shopping.data.mapper.toDomainProduct
-import woowacourse.shopping.data.remote.retrofit.repository.ProductRetrofitRepository
 
 class DetailProductViewModel(
     private val shoppingItemRepository: ShoppingItemRepository,
     private val visitStore: VisitStore,
-    private val productRetrofitRepository: ProductRetrofitRepository,
+    private val productRepository: ProductRetrofitRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DetailProductUiState())
     val uiState: StateFlow<DetailProductUiState> = _uiState.asStateFlow()
@@ -101,11 +100,10 @@ class DetailProductViewModel(
                 requestedProductIds = requestedProductIds + productId
 
                 runCatching {
-                    productRetrofitRepository
+                    productRepository
                         .requestProductDetail(
                             id = productId,
                         )
-                        .toDomainProduct()
                 }.onSuccess { detailProduct ->
                     shoppingItemRepository.upsertProduct(detailProduct)
                 }.onFailure {

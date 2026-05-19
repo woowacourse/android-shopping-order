@@ -8,10 +8,13 @@ import woowacourse.shopping.data.remote.retrofit.dto.OrderInfo
 class OrderRetrofitRepository(
     private val apiService: OrderRetrofitInterface,
 ) {
-    suspend fun order(order: OrderInfo): Unit =
+    suspend fun order(orderInfo: OrderInfo) =
         withContext(Dispatchers.IO) {
             apiService.order(
-                order = order,
+                order =
+                    OrderInfo(
+                        cartItemIds = orderInfo.cartItemIds,
+                    ),
             )
         }
 }

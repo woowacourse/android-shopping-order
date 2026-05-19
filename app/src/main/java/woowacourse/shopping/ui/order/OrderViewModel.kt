@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart
+package woowacourse.shopping.ui.order
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,9 +8,11 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.retrofit.dto.OrderInfo
 import woowacourse.shopping.data.remote.retrofit.repository.OrderRetrofitRepository
+import woowacourse.shopping.data.remote.retrofit.toApiFailure
+import woowacourse.shopping.data.remote.retrofit.toUserMessage
 
 class OrderViewModel(
-    private val orderRetrofitRepository: OrderRetrofitRepository,
+    private val orderRepository: OrderRetrofitRepository,
 ) : ViewModel() {
     private val _event = MutableSharedFlow<OrderEvent>(extraBufferCapacity = 1)
     val event: SharedFlow<OrderEvent> = _event.asSharedFlow()
@@ -21,15 +23,21 @@ class OrderViewModel(
     ) {
         viewModelScope.launch {
             runCatching {
-                orderRetrofitRepository
+                orderRepository
                     .order(
-                        order = orderInfo,
+                        orderInfo = orderInfo,
                     )
             }.onSuccess {
                 _event.tryEmit(OrderEvent.Success)
                 onSuccess?.invoke()
             }.onFailure { throwable ->
-                _event.tryEmit(OrderEvent.Failure(throwable.message ?: "주문 실패"))
+                _event.tryEmit(
+                    OrderEvent.Failure(
+                        throwable
+                            .toApiFailure()
+                            .toUserMessage(defaultMessage = "주문 처리에 실패했습니다."),
+                    ),
+                )
             }
         }
     }
