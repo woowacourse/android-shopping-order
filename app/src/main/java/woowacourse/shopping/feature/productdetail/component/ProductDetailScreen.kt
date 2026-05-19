@@ -33,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.R
 import woowacourse.shopping.feature.common.ProductQuantitySelector
+import woowacourse.shopping.feature.common.state.AppError
 import woowacourse.shopping.feature.common.state.ProductUiModel
 import woowacourse.shopping.feature.format.DecimalPriceFormatter
 import woowacourse.shopping.feature.productdetail.ProductDetailLoadingState
@@ -240,7 +241,7 @@ private fun ProductScreenPreview() {
         decrease = { },
         onAddCartButton = { },
         onClickRecentButton = {},
-        recentProductLoadingState = ProductDetailLoadingState.Error("asd"),
+        recentProductLoadingState = ProductDetailLoadingState.Error(AppError.Unknown),
     )
 }
 

@@ -5,26 +5,19 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartContent
+import woowacourse.shopping.feature.common.state.AppError
 import woowacourse.shopping.feature.common.state.CartItemUiModel
 import woowacourse.shopping.feature.common.state.ProductUiModel
-
-sealed interface CartEvent {
-    data class FatalError(
-        val message: String,
-    ) : CartEvent
-}
+import woowacourse.shopping.feature.common.state.toAppError
 
 data class CartUiState(
     val isLoading: Boolean = true,
@@ -32,6 +25,7 @@ data class CartUiState(
     val paginatedCartContents: List<CartItemUiModel> = emptyList(),
     val checkMap: Map<String, Boolean> = emptyMap(),
     val totalPrice: Int = 0,
+    val error: AppError? = null,
 )
 
 class CartViewModel(
@@ -41,17 +35,28 @@ class CartViewModel(
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
 
-    private val _event = Channel<CartEvent>(Channel.BUFFERED)
-    val event: Flow<CartEvent> = _event.receiveAsFlow()
-
     private var cart: Cart = Cart(emptyList())
 
     fun initialLoading() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+        launchCatching {
+            _uiState.update { it.copy(isLoading = true, error = null) }
             cart = getCart()
             val cartContents = pagination(page = 1)
             applyContents(cartContents)
+        }
+    }
+
+    fun dismissError() {
+        _uiState.update { it.copy(error = null) }
+    }
+
+    private fun launchCatching(block: suspend () -> Unit) {
+        viewModelScope.launch {
+            try {
+                block()
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, error = e.toAppError()) }
+            }
         }
     }
 
@@ -98,7 +103,7 @@ class CartViewModel(
     fun moveToPreviousPage() {
         val page = uiState.value.page - 1
         _uiState.update { it.copy(page = page) }
-        viewModelScope.launch {
+        launchCatching {
             _uiState.update { it.copy(isLoading = true) }
             applyContents(pagination(page))
         }
@@ -107,7 +112,7 @@ class CartViewModel(
     fun moveToNextPage() {
         val page = uiState.value.page + 1
         _uiState.update { it.copy(page = page) }
-        viewModelScope.launch {
+        launchCatching {
             _uiState.update { it.copy(isLoading = true) }
             applyContents(pagination(page))
         }
@@ -124,10 +129,10 @@ class CartViewModel(
     }
 
     fun increase(contentId: String) {
-        viewModelScope.launch {
+        launchCatching {
             _uiState.update { it.copy(isLoading = true) }
             val quantity = cart.cartContents.firstOrNull { it.id == contentId }?.quantity
-                ?: return@launch
+                ?: return@launchCatching
             cartRepository.updateQuantity(contentId, quantity + 1)
             cart = getCart()
             applyContents(pagination(uiState.value.page))
@@ -135,7 +140,7 @@ class CartViewModel(
     }
 
     fun decrease(contentId: String) {
-        viewModelScope.launch {
+        launchCatching {
             _uiState.update { it.copy(isLoading = true) }
             cartRepository.decrease(contentId)
             cart = getCart()
@@ -144,7 +149,7 @@ class CartViewModel(
     }
 
     fun deleteCartItem(id: String) {
-        viewModelScope.launch {
+        launchCatching {
             _uiState.update { it.copy(isLoading = true) }
             cartRepository.remove(id)
             cart = getCart()

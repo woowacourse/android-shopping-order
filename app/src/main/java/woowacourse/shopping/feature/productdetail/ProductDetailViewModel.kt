@@ -14,7 +14,9 @@ import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.domain.Product
+import woowacourse.shopping.feature.common.state.AppError
 import woowacourse.shopping.feature.common.state.ProductUiModel
+import woowacourse.shopping.feature.common.state.toAppError
 
 data class ProductDetailUiState(
     val productState: ProductDetailLoadingState = ProductDetailLoadingState.Loading,
@@ -30,7 +32,7 @@ sealed interface ProductDetailLoadingState {
     ) : ProductDetailLoadingState
 
     data class Error(
-        val errorString: String,
+        val error: AppError,
     ) : ProductDetailLoadingState
 }
 
@@ -69,12 +71,7 @@ class ProductDetailViewModel(
     suspend fun getProduct(productId: String): ProductDetailLoadingState = runCatching { productRepository.getProduct(productId) }
         .fold(
             onSuccess = { ProductDetailLoadingState.Success(toProductUiModel(it)) },
-            onFailure = {
-                ProductDetailLoadingState.Error(
-                    it.message
-                        ?: "unknown error",
-                )
-            },
+            onFailure = { ProductDetailLoadingState.Error(it.toAppError()) },
         )
 
     fun toProductUiModel(product: Product): ProductUiModel {

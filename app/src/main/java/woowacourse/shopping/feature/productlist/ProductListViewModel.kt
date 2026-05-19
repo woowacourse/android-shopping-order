@@ -5,12 +5,9 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
@@ -20,13 +17,9 @@ import woowacourse.shopping.data.repository.recentproduct.RecentProductRepositor
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.ProductNotFoundException
+import woowacourse.shopping.feature.common.state.AppError
 import woowacourse.shopping.feature.common.state.ProductUiModel
-
-sealed interface ProductListEvent {
-    data class FatalError(
-        val message: String,
-    ) : ProductListEvent
-}
+import woowacourse.shopping.feature.common.state.toAppError
 
 data class ProductListUiState(
     val productUiModels: List<ProductUiModel> = emptyList(),
@@ -35,6 +28,7 @@ data class ProductListUiState(
     val isLoading: Boolean = true,
     val isEnd: Boolean = false,
     val cartTotalQuantity: Int = 0,
+    val error: AppError? = null,
 )
 
 class ProductListViewModel(
@@ -46,26 +40,36 @@ class ProductListViewModel(
     private val _uiState = MutableStateFlow(ProductListUiState())
     val uiState: StateFlow<ProductListUiState> = _uiState.asStateFlow()
 
-    private val _event = Channel<ProductListEvent>(Channel.BUFFERED)
-    val event: Flow<ProductListEvent> = _event.receiveAsFlow()
-
     private var products: List<Product> = emptyList()
     private var cart: Cart = Cart(emptyList())
 
     fun initialLoading() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            refreshCart()
-            fetchAndAppendProducts(20)
-            refreshRecentProducts()
-            _uiState.update { it.copy(isLoading = false) }
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            try {
+                refreshCart()
+                fetchAndAppendProducts(20)
+                refreshRecentProducts()
+            } catch (e: Exception) {
+                _uiState.update { it.copy(error = e.toAppError()) }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
     }
 
     fun loadingFetch() {
         viewModelScope.launch {
-            fetchAndAppendProducts(20)
+            try {
+                fetchAndAppendProducts(20)
+            } catch (e: Exception) {
+                _uiState.update { it.copy(error = e.toAppError()) }
+            }
         }
+    }
+
+    fun dismissError() {
+        _uiState.update { it.copy(error = null) }
     }
 
     fun increase(productId: String) {

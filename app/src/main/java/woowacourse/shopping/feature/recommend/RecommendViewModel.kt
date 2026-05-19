@@ -20,12 +20,15 @@ import woowacourse.shopping.domain.CartContent
 import woowacourse.shopping.domain.OrderResult
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.ProductNotFoundException
+import woowacourse.shopping.feature.common.state.AppError
 import woowacourse.shopping.feature.common.state.ProductUiModel
+import woowacourse.shopping.feature.common.state.toAppError
 
 data class RecommendUiState(
     val recommendList: List<ProductUiModel> = emptyList(),
     val isLoading: Boolean = true,
     val dialog: OrderDialogUiState = OrderDialogUiState.None,
+    val error: AppError? = null,
 )
 
 class RecommendViewModel(
@@ -43,36 +46,43 @@ class RecommendViewModel(
 
     fun initialLoading() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            refreshCart()
-            loadRecommendList(10)
-            _uiState.update { it.copy(isLoading = false) }
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            try {
+                refreshCart()
+                loadRecommendList(10)
+            } catch (e: Exception) {
+                _uiState.update { it.copy(error = e.toAppError()) }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
+    }
+
+    fun dismissError() {
+        _uiState.update { it.copy(error = null) }
     }
 
     private suspend fun refreshCart() {
         serverCart = cartRepository.loadCart()
     }
 
-    fun loadRecommendList(pageSize: Int) {
-        viewModelScope.launch {
-            val category = refreshRecentProducts()
+    private suspend fun loadRecommendList(pageSize: Int) {
+        val category = refreshRecentProducts()
 
-            products = productRepository.loadProducts(
-                page = products.size / pageSize,
-                pageSize = pageSize,
-                sort = emptyList(),
-                category = category,
-            ).products
+        products = productRepository.loadProducts(
+            page = products.size / pageSize,
+            pageSize = pageSize,
+            sort = emptyList(),
+            category = category,
+        ).products
 
-            val alreadyInProduct = serverCart.cartContents.map { it.product }
-            products = products.filter { alreadyInProduct.map { product -> product.id }.contains(it.id).not() }
+        val alreadyInProduct = serverCart.cartContents.map { it.product }
+        products = products.filter { alreadyInProduct.map { product -> product.id }.contains(it.id).not() }
 
-            _uiState.update {
-                it.copy(
-                    recommendList = products.map(::toProductUiModel),
-                )
-            }
+        _uiState.update {
+            it.copy(
+                recommendList = products.map(::toProductUiModel),
+            )
         }
     }
 

@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.feature.cart.component.CartAppBar
+import woowacourse.shopping.feature.common.state.ErrorDialog
 import woowacourse.shopping.feature.format.DecimalPriceFormatter
 import woowacourse.shopping.feature.recommend.RecommendViewModel
 
@@ -122,6 +123,18 @@ fun RecommendScreen(
         onRetry = {
             viewModel.dismissDialog()
             viewModel.order(contentIds)
+        },
+    )
+
+    ErrorDialog(
+        error = uiState.error,
+        onDismiss = {
+            viewModel.dismissError()
+            onCloseClick()
+        },
+        onRetry = {
+            viewModel.dismissError()
+            viewModel.initialLoading()
         },
     )
 }
