@@ -214,12 +214,17 @@ class CartViewModel(
     }
 
     fun onClickOrder() {
+        val selectedItems = _selectedItems.value
+
+        if (selectedItems.isEmpty()) return
+
         if (_isCartOrRecommend.value == CartFlow.CART) {
             _isCartOrRecommend.value = CartFlow.RECOMMEND
-        } else {
-            viewModelScope.launch {
-                cartRepository.order(_selectedItems.value.toList())
-            }
+            return
+        }
+
+        viewModelScope.launch {
+            cartRepository.order(selectedItems.toList())
         }
     }
 
