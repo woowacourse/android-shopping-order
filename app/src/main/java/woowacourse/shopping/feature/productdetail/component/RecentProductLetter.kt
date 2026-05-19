@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.R
+import woowacourse.shopping.feature.common.state.AppError
 import woowacourse.shopping.feature.common.state.ProductUiModel
 import woowacourse.shopping.feature.productdetail.ProductDetailLoadingState
 
@@ -116,7 +117,7 @@ fun RecentProductLetterPreview(modifier: Modifier = Modifier) {
 fun RecentProductErrorLetterPreview(modifier: Modifier = Modifier) {
     RecentProductLetter(
         loadingState = ProductDetailLoadingState.Error(
-            "asd",
+            AppError.Unknown,
         ),
         onClickRecentProduct = {},
     )
