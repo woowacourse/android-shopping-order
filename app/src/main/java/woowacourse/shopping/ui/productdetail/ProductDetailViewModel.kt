@@ -25,7 +25,6 @@ class ProductDetailViewModel(
     private val productRepo: ProductRepository,
     private val cartRepo: CartRepository,
     private val recentProductRepo: RecentProductRepository,
-    private val productId: Long,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductDetailUiState())
     val uiState = _uiState.asStateFlow()
@@ -35,6 +34,10 @@ class ProductDetailViewModel(
 
     private val isFromBanner: Boolean =
         savedStateHandle[ProductDetailActivity.EXTRA_IS_FROM_BANNER] ?: false
+    private val productId: Long =
+        requireNotNull(savedStateHandle[ProductDetailActivity.EXTRA_PRODUCT_ID]) {
+            "ProductDetail 화면을 띄우기 위해 상품 ID가 필요합니다."
+        }
 
     init {
         loadProduct()
@@ -61,7 +64,10 @@ class ProductDetailViewModel(
                 if (state.existingCartItemId == null) {
                     val newId = cartRepo.add(productId, state.selectedQuantity)
                     _uiState.update {
-                        it.copy(existingCartItemId = newId, existingQuantity = state.selectedQuantity)
+                        it.copy(
+                            existingCartItemId = newId,
+                            existingQuantity = state.selectedQuantity
+                        )
                     }
                 } else {
                     val newQuantity = state.existingQuantity + state.selectedQuantity
@@ -125,6 +131,7 @@ class ProductDetailViewModel(
                         in 500..599 -> "서버에 일시적 문제가 있어요."
                         else -> defaultMessage
                     }
+
                 else -> defaultMessage
             }
         _events.send(msg)
@@ -137,7 +144,6 @@ class ProductDetailViewModel(
             productRepo: ProductRepository,
             cartRepo: CartRepository,
             recentProductRepo: RecentProductRepository,
-            receivedProductId: Long,
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
@@ -152,7 +158,6 @@ class ProductDetailViewModel(
                         productRepo = productRepo,
                         cartRepo = cartRepo,
                         recentProductRepo = recentProductRepo,
-                        productId = receivedProductId,
                     ) as T
                 }
             }

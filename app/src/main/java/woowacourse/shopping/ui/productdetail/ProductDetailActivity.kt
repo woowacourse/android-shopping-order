@@ -22,9 +22,6 @@ class ProductDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val receivedProductId: Long =
-            intent.getLongExtra(EXTRA_PRODUCT_ID, -1L).takeIf { it != -1L }
-                ?: error("ProductDetailActivity를 실행하려면 반드시 Intent에 Product ID 데이터가 포함되어야 합니다.")
         enableEdgeToEdge()
         setContent {
             ShoppingTheme {
@@ -36,7 +33,6 @@ class ProductDetailActivity : ComponentActivity() {
                                     productRepo = container.productRepository,
                                     cartRepo = container.cartRepository,
                                     recentProductRepo = container.recentProductRepository,
-                                    receivedProductId = receivedProductId,
                                 ),
                         )
 
@@ -67,10 +63,9 @@ class ProductDetailActivity : ComponentActivity() {
             context: Context,
             productId: Long,
             isFromBanner: Boolean = false,
-        ): Intent =
-            Intent(context, ProductDetailActivity::class.java).apply {
-                putExtra(EXTRA_PRODUCT_ID, productId)
-                putExtra(EXTRA_IS_FROM_BANNER, isFromBanner)
-            }
+        ): Intent = Intent(context, ProductDetailActivity::class.java).apply {
+            putExtra(EXTRA_PRODUCT_ID, productId)
+            putExtra(EXTRA_IS_FROM_BANNER, isFromBanner)
+        }
     }
 }
