@@ -10,10 +10,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.di.AppContainer
+import java.io.IOException
 
 class ProductDetailViewModel(
     savedStateHandle: SavedStateHandle,
@@ -28,6 +30,10 @@ class ProductDetailViewModel(
         savedStateHandle[ProductDetailActivity.EXTRA_IS_FROM_BANNER] ?: false
 
     init {
+        loadProduct()
+    }
+
+    fun retry() {
         loadProduct()
     }
 
@@ -52,6 +58,14 @@ class ProductDetailViewModel(
             try {
                 cartRepo.add(productToSave, quantity = currentState.selectedQuantity)
                 onSuccess()
+            } catch (_: IOException) {
+                _uiState.update {
+                    it.copy(errorMessage = "장바구니에 상품을 담지 못했습니다.")
+                }
+            } catch (_: HttpException) {
+                _uiState.update {
+                    it.copy(errorMessage = "장바구니에 상품을 담지 못했습니다.")
+                }
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
@@ -60,9 +74,16 @@ class ProductDetailViewModel(
 
     private fun loadProduct() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 val product = productRepo.findProduct(productId)
+                if (product == null) {
+                    _uiState.update {
+                        it.copy(errorMessage = "상품 정보를 불러오지 못했습니다.")
+                    }
+                    return@launch
+                }
+
                 val bannerProduct =
                     recentProductRepo
                         .getLastViewedProduct()
@@ -73,9 +94,18 @@ class ProductDetailViewModel(
                         product = product,
                         selectedQuantity = 1,
                         lastViewedProduct = bannerProduct,
+                        errorMessage = null,
                     )
                 }
                 recentProductRepo.add(productId)
+            } catch (_: IOException) {
+                _uiState.update {
+                    it.copy(errorMessage = "상품 정보를 불러오지 못했습니다.")
+                }
+            } catch (_: HttpException) {
+                _uiState.update {
+                    it.copy(errorMessage = "상품 정보를 불러오지 못했습니다.")
+                }
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
@@ -88,6 +118,7 @@ class ProductDetailViewModel(
             container: AppContainer,
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(
                     modelClass: Class<T>,
                     extras: CreationExtras,

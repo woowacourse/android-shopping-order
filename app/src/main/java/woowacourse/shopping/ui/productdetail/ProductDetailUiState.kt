@@ -8,7 +8,11 @@ data class ProductDetailUiState(
     val product: Product? = null,
     val selectedQuantity: Int = 1,
     val lastViewedProduct: Product? = null,
+    val errorMessage: String? = null,
 ) {
+    val shouldShowError: Boolean
+        get() = errorMessage != null && product == null
+
     val totalPrice: Money
         get() = (product?.price ?: Money(0)) * selectedQuantity
 }

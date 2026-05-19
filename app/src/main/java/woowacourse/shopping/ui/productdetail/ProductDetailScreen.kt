@@ -11,6 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import woowacourse.shopping.data.model.Money
 import woowacourse.shopping.data.model.Product
+import woowacourse.shopping.ui.common.component.NetworkErrorMessage
 import woowacourse.shopping.ui.common.component.ShoppingLoading
 import woowacourse.shopping.ui.productdetail.component.CartAddButton
 import woowacourse.shopping.ui.productdetail.component.ProductDetailBody
@@ -25,6 +26,7 @@ fun ProductDetailScreen(
     onLastViewedProductClick: (Product) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val errorMessage = uiState.errorMessage
 
     Box(modifier = modifier) {
         uiState.product?.let { product ->
@@ -40,6 +42,13 @@ fun ProductDetailScreen(
                 onDecreaseClick = { viewModel.decrease() },
                 lastViewedProduct = uiState.lastViewedProduct,
                 onLastViewedProductClick = onLastViewedProductClick,
+            )
+        }
+
+        if (uiState.shouldShowError && errorMessage != null) {
+            NetworkErrorMessage(
+                message = errorMessage,
+                onRetryClick = { viewModel.retry() },
             )
         }
 

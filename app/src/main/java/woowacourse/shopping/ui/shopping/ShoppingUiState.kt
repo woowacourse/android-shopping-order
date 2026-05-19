@@ -11,4 +11,8 @@ data class ShoppingUiState(
     val hasNext: Boolean = false,
     val sizeInRepo: Int = 0,
     val cartCount: Int = 0,
-)
+    val errorMessage: String? = null,
+) {
+    val shouldShowError: Boolean
+        get() = errorMessage != null && visibleProducts.isEmpty()
+}

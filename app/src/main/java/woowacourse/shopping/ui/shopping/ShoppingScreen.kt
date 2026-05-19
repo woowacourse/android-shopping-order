@@ -25,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import woowacourse.shopping.data.model.Money
 import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.data.model.Products
+import woowacourse.shopping.ui.common.component.NetworkErrorMessage
 import woowacourse.shopping.ui.common.model.ProductUiModel
 import woowacourse.shopping.ui.shopping.component.ProductGroup
 import woowacourse.shopping.ui.shopping.component.RecentProductGroup
@@ -43,6 +44,7 @@ fun ShoppingScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
     val isConnected by viewModel.isNetworkConnected.collectAsState()
+    val errorMessage = state.errorMessage
 
     DisposableEffect(lifecycleOwner) {
         val observer =
@@ -62,6 +64,12 @@ fun ShoppingScreen(
         Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(text = "인터넷 연결이 끊겼습니다. 오프라인 모드입니다. 😥")
         }
+    } else if (state.shouldShowError && errorMessage != null) {
+        NetworkErrorMessage(
+            message = errorMessage,
+            modifier = modifier,
+            onRetryClick = { viewModel.retry() },
+        )
     } else {
         Box(modifier = modifier) {
             ShoppingScreen(

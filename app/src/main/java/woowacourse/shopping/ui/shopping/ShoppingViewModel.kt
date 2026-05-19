@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.data.remote.NetworkMonitor
 import woowacourse.shopping.data.repository.CartRepository
@@ -18,6 +19,7 @@ import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.ui.common.model.ProductUiModel
 import woowacourse.shopping.ui.common.paging.Pager
+import java.io.IOException
 
 class ShoppingViewModel(
     networkMonitor: NetworkMonitor,
@@ -38,8 +40,20 @@ class ShoppingViewModel(
             )
 
     init {
+        loadInitialProducts()
+    }
+
+    fun retry() {
+        if (_uiState.value.visibleProducts.isEmpty()) {
+            loadInitialProducts()
+        } else {
+            syncCartState()
+        }
+    }
+
+    private fun loadInitialProducts() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 val initialProducts = productRepo.getProducts(0, loadSize)
                 val uiModels = mapToProductUiModels(initialProducts)
@@ -54,7 +68,16 @@ class ShoppingViewModel(
                         hasNext = hasNextPage,
                         sizeInRepo = totalSize,
                         recentProducts = recentProducts,
+                        errorMessage = null,
                     )
+                }
+            } catch (_: IOException) {
+                _uiState.update {
+                    it.copy(errorMessage = "상품 목록을 불러오지 못했습니다.")
+                }
+            } catch (_: HttpException) {
+                _uiState.update {
+                    it.copy(errorMessage = "상품 목록을 불러오지 못했습니다.")
                 }
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
@@ -64,7 +87,7 @@ class ShoppingViewModel(
 
     fun increase(product: Product) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 cartRepo.add(product)
 
@@ -78,7 +101,19 @@ class ShoppingViewModel(
                             }
                         }
                     val cartCount = state.cartCount + 1
-                    state.copy(visibleProducts = updatedProducts, cartCount = cartCount)
+                    state.copy(
+                        visibleProducts = updatedProducts,
+                        cartCount = cartCount,
+                        errorMessage = null,
+                    )
+                }
+            } catch (_: IOException) {
+                _uiState.update {
+                    it.copy(errorMessage = "장바구니 수량을 변경하지 못했습니다.")
+                }
+            } catch (_: HttpException) {
+                _uiState.update {
+                    it.copy(errorMessage = "장바구니 수량을 변경하지 못했습니다.")
                 }
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
@@ -88,7 +123,7 @@ class ShoppingViewModel(
 
     fun decrease(product: Product) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 cartRepo.decrease(product)
 
@@ -102,7 +137,19 @@ class ShoppingViewModel(
                             }
                         }
                     val cartCount = maxOf(0, state.cartCount - 1)
-                    state.copy(visibleProducts = updatedProducts, cartCount = cartCount)
+                    state.copy(
+                        visibleProducts = updatedProducts,
+                        cartCount = cartCount,
+                        errorMessage = null,
+                    )
+                }
+            } catch (_: IOException) {
+                _uiState.update {
+                    it.copy(errorMessage = "장바구니 수량을 변경하지 못했습니다.")
+                }
+            } catch (_: HttpException) {
+                _uiState.update {
+                    it.copy(errorMessage = "장바구니 수량을 변경하지 못했습니다.")
                 }
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
@@ -115,7 +162,7 @@ class ShoppingViewModel(
         if (!pager.canLoadMore(currentState.visibleProducts.size, currentState.sizeInRepo)) return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 val currentSize = _uiState.value.visibleProducts.size
                 val currentProducts = _uiState.value.visibleProducts
@@ -135,7 +182,16 @@ class ShoppingViewModel(
                         visibleProducts = combineProducts,
                         hasNext = hasNext,
                         sizeInRepo = totalSize,
+                        errorMessage = null,
                     )
+                }
+            } catch (_: IOException) {
+                _uiState.update {
+                    it.copy(errorMessage = "상품을 더 불러오지 못했습니다.")
+                }
+            } catch (_: HttpException) {
+                _uiState.update {
+                    it.copy(errorMessage = "상품을 더 불러오지 못했습니다.")
                 }
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
@@ -145,18 +201,29 @@ class ShoppingViewModel(
 
     fun syncCartState() {
         viewModelScope.launch {
-            val totalCartCount = cartRepo.getCartCount()
-            val recentProducts = recentProductRepo.getRecentProducts()
+            try {
+                val totalCartCount = cartRepo.getCartCount()
+                val recentProducts = recentProductRepo.getRecentProducts()
 
-            _uiState.update { state ->
-                val currentProducts = state.visibleProducts.map { it.product }
-                val updatedUiModels = mapToProductUiModels(currentProducts)
+                _uiState.update { state ->
+                    val currentProducts = state.visibleProducts.map { it.product }
+                    val updatedUiModels = mapToProductUiModels(currentProducts)
 
-                state.copy(
-                    visibleProducts = updatedUiModels,
-                    cartCount = totalCartCount,
-                    recentProducts = recentProducts,
-                )
+                    state.copy(
+                        visibleProducts = updatedUiModels,
+                        cartCount = totalCartCount,
+                        recentProducts = recentProducts,
+                        errorMessage = null,
+                    )
+                }
+            } catch (_: IOException) {
+                _uiState.update {
+                    it.copy(errorMessage = "장바구니 정보를 동기화하지 못했습니다.")
+                }
+            } catch (_: HttpException) {
+                _uiState.update {
+                    it.copy(errorMessage = "장바구니 정보를 동기화하지 못했습니다.")
+                }
             }
         }
     }
@@ -182,6 +249,7 @@ class ShoppingViewModel(
             loadSize: Int,
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T =
                     ShoppingViewModel(
                         networkMonitor = networkMonitor,
