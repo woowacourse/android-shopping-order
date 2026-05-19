@@ -22,7 +22,7 @@
 
 ## 미션 요구사항 반영
 
-- 로컬 상태 관리를 위해 InMemory Repository 사용
+- 로컬 영속 저장소 관리를 위해 Room Repository 사용
 - HTTP Client(OkHttp) 구현
 - MockWebServer 기반 테스트 서버 구성
 
@@ -48,8 +48,8 @@ app/src/main/java/woowacourse/shopping
 ├─ repository
 │  ├─ ShoppingItemRepository.kt
 │  ├─ ShoppingCartRepository.kt
-│  ├─ InMemoryShoppingItemRepository.kt
-│  └─ InMemoryShoppingCartRepository.kt
+│  ├─ RoomShoppingItemRepository.kt
+│  └─ RoomShoppingCartRepository.kt
 ├─ backend
 │  ├─ MockProductSeedData.kt
 │  ├─ MockShoppingBackendServer.kt
@@ -132,12 +132,6 @@ app/src/main/java/woowacourse/shopping
 - 기존에 작성한 테스트가 깨지면 안 된다.
 - 사용자 인증 정보를 저장한다.
 - 서버 통신을 위한 JSON 직렬화 라이브러리를 선택하고, 선택 이유를 PR에 남긴다.
-
-### 서버 API 참고
-
-- API 문서: `http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/swagger-ui/index.html`
-- 관리자 페이지(상품 관리): `http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/admin`
-- 설정 페이지(계정 정보 확인): `http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/settings`
 
 ### 1단계 기능 목록
 
