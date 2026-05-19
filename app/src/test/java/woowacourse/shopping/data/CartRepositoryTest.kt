@@ -16,21 +16,21 @@ import woowacourse.shopping.data.repository.CartRepositoryImpl
 
 class CartRepositoryTest {
     @Test
-    fun `장바구니 항목 목록을 반환한다`() =
+    fun `장바구니 항목을 불러온다`() =
         runTest {
             val repository = CartRepositoryImpl(FakeCartApi(createCartDtos(size = 6)))
 
-            val result = repository.getCartItemsByPage(page = 0, size = 5)
+            repository.refreshCartItems()
 
-            assertThat(result.cartItems.map { it.id }).containsExactly("1", "2", "3", "4", "5")
-            assertThat(result.isLastPage).isFalse()
+            assertThat(repository.cartItems.value.map { it.id }).containsExactly("1", "2", "3", "4", "5", "6")
         }
 
     @Test
-    fun `장바구니에 담긴 상품 수량을 변경한다`() =
+    fun `장바구니에 담긴 상품 수량을 반환한다`() =
         runTest {
             val repository = CartRepositoryImpl(FakeCartApi(listOf(createCartDto(id = 1, productId = 10, quantity = 3))))
 
+            repository.refreshCartItems()
             val quantity = repository.getCartItemQuantity(productId = "10")
 
             assertThat(quantity).isEqualTo(3)
@@ -41,6 +41,7 @@ class CartRepositoryTest {
         runTest {
             val repository = CartRepositoryImpl(FakeCartApi(emptyList()))
 
+            repository.refreshCartItems()
             val quantity = repository.getCartItemQuantity(productId = "10")
 
             assertThat(quantity).isNull()
@@ -58,37 +59,41 @@ class CartRepositoryTest {
                 ),
             )
 
-            val quantity = repository.getTotalCartItemQuantity()
+            repository.refreshCartItems()
+            repository.setCartItem(productId = "1", quantity = 5)
 
-            assertThat(quantity).isEqualTo(5)
+            assertThat(repository.cartItems.value.first { it.product.id == "1" }.quantity).isEqualTo(5)
         }
 
     @Test
-    fun `선택된 장바구니 식별자 목록의 총 가격을 계산한다`() =
+    fun `장바구니에 없는 상품이면 새로 추가한다`() =
         runTest {
             val repository = CartRepositoryImpl(
                 FakeCartApi(
                     listOf(
-                        createCartDto(id = 1, productId = 1, quantity = 2, price = 1000),
-                        createCartDto(id = 2, productId = 2, quantity = 3, price = 2000),
+                        createCartDto(id = 1, productId = 1, quantity = 2),
+                        createCartDto(id = 2, productId = 2, quantity = 3),
                     ),
                 ),
             )
 
-            val totalPrice = repository.getTotalPrice(cartIds = listOf("1", "2"))
+            repository.refreshCartItems()
+            repository.setCartItem(productId = "3", quantity = 4)
 
-            assertThat(totalPrice.amount).isEqualTo(8000)
+            assertThat(repository.cartItems.value.first { it.product.id == "3" }.quantity).isEqualTo(4)
         }
 
     @Test
-    fun `상품 삭제를 원격 장바구니 서비스에 위임한다`() =
+    fun `상품 삭제 후 상태를 갱신한다`() =
         runTest {
             val api = FakeCartApi(createCartDtos(size = 2))
             val repository = CartRepositoryImpl(api)
 
+            repository.refreshCartItems()
             repository.deleteItem("1")
 
             assertThat(api.deletedIds).containsExactly(1L)
+            assertThat(repository.cartItems.value.map { it.id }).containsExactly("2")
         }
 }
 

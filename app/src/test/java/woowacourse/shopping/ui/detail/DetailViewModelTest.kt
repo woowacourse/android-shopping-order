@@ -1,24 +1,20 @@
 package woowacourse.shopping.ui.detail
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import woowacourse.shopping.MainDispatcherExtension
-import woowacourse.shopping.data.localdb.dao.RecentItemDao
 import woowacourse.shopping.data.localdb.entity.RecentItemEntity
 import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.CartResponseResult
 import woowacourse.shopping.data.repository.ProductRepository
-import woowacourse.shopping.data.repository.ProductResponseResult
-import woowacourse.shopping.data.repository.RecentItemRepository
-import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.ProductName
+import woowacourse.shopping.data.repository.RecentItemRepositoryImpl
+import woowacourse.shopping.mockup.MockCartRepository
+import woowacourse.shopping.mockup.MockProductRepository
+import woowacourse.shopping.mockup.MockRecentItemDao
+import woowacourse.shopping.mockup.createCartItem
+import woowacourse.shopping.mockup.createProduct
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DetailViewModelTest {
@@ -41,10 +37,11 @@ class DetailViewModelTest {
     @Test
     fun `장바구니에 담긴 수량을 상세 수량 초기값으로 사용한다`() =
         runTest {
+            val product = createProduct(id = "1")
             val viewModel =
                 createViewModel(
                     id = "1",
-                    cartRepository = FakeCartRepository(quantities = mapOf("1" to 3)),
+                    cartRepository = MockCartRepository(listOf(createCartItem(id = "1", product = product, quantity = 3))),
                 )
 
             mainDispatcherExtension.advanceUntilIdle()
@@ -56,7 +53,7 @@ class DetailViewModelTest {
     @Test
     fun `마지막으로 본 상품을 최근 본 상품으로 제공한다`() =
         runTest {
-            val recentItemDao = TestRecentItemDao()
+            val recentItemDao = MockRecentItemDao()
             recentItemDao.insert(RecentItemEntity(id = "2", timestamp = 100L))
 
             val viewModel = createViewModel(id = "1", recentItemDao = recentItemDao)
@@ -68,7 +65,7 @@ class DetailViewModelTest {
     @Test
     fun `최근 본 상품 숨김 옵션이 참이면 최근 본 상품을 제공하지 않는다`() =
         runTest {
-            val recentItemDao = TestRecentItemDao()
+            val recentItemDao = MockRecentItemDao()
             recentItemDao.insert(RecentItemEntity(id = "2", timestamp = 100L))
 
             val viewModel =
@@ -97,7 +94,7 @@ class DetailViewModelTest {
     @Test
     fun `상세 화면 진입 시 해당 상품을 최근 본 상품으로 저장한다`() =
         runTest {
-            val recentItemDao = TestRecentItemDao()
+            val recentItemDao = MockRecentItemDao()
 
             createViewModel(id = "1", recentItemDao = recentItemDao)
             mainDispatcherExtension.advanceUntilIdle()
@@ -108,89 +105,15 @@ class DetailViewModelTest {
     private fun createViewModel(
         id: String,
         hideRecentItem: Boolean = false,
-        productRepository: ProductRepository = FakeProductRepository(products = listOf(createProduct("1"), createProduct("2"))),
-        cartRepository: CartRepository = FakeCartRepository(),
-        recentItemDao: TestRecentItemDao = TestRecentItemDao(),
+        productRepository: ProductRepository = MockProductRepository(products = listOf(createProduct("1"), createProduct("2"))),
+        cartRepository: CartRepository = MockCartRepository(),
+        recentItemDao: MockRecentItemDao = MockRecentItemDao(),
     ): DetailViewModel =
         DetailViewModel(
             id = id,
             hideRecentItem = hideRecentItem,
             productRepository = productRepository,
             cartRepository = cartRepository,
-            recentItemRepository = RecentItemRepository(recentItemDao, productRepository),
+            recentItemRepository = RecentItemRepositoryImpl(recentItemDao, productRepository),
         )
 }
-
-private class FakeProductRepository(
-    private val products: List<Product>,
-) : ProductRepository {
-    override suspend fun getProducts(
-        category: String,
-        page: Int,
-        size: Int,
-    ): ProductResponseResult = ProductResponseResult(products, isLastPage = true)
-
-    override suspend fun getProductById(id: String): Product =
-        products.firstOrNull { it.id == id } ?: throw IllegalArgumentException("Product not found")
-}
-
-private class FakeCartRepository(
-    private val quantities: Map<String, Int> = emptyMap(),
-) : CartRepository {
-    override suspend fun getCartItemsByPage(
-        page: Int,
-        size: Int,
-    ): CartResponseResult = CartResponseResult(emptyList(), isLastPage = true)
-
-    override suspend fun setCartItem(
-        productId: String,
-        quantity: Int,
-    ) = Unit
-
-    override suspend fun deleteItem(cartItemId: String) = Unit
-
-    override suspend fun getCartItemQuantity(productId: String): Int? = quantities[productId]
-
-    override suspend fun getTotalCartItemQuantity(): Int = quantities.values.sum()
-
-    override suspend fun getCartItemsCount(): Int = quantities.size
-
-    override suspend fun getTotalPrice(cartIds: List<String>): Money = Money(0)
-}
-
-private class TestRecentItemDao : RecentItemDao {
-    private val items = MutableStateFlow<List<RecentItemEntity>>(emptyList())
-
-    override suspend fun insert(item: RecentItemEntity) {
-        items.value = items.value.filterNot { it.id == item.id } + item
-    }
-
-    override fun getRecentItems(): Flow<List<RecentItemEntity>> =
-        items.map { entities ->
-            entities.sortedWith(compareByDescending<RecentItemEntity> { it.timestamp }.thenByDescending { it.id }).take(10)
-        }
-
-    override suspend fun getRecentItemById(id: String): RecentItemEntity? = items.value.firstOrNull { it.id == id }
-
-    override suspend fun deleteOldItem() {
-        val recentIds =
-            items.value
-                .sortedWith(compareByDescending<RecentItemEntity> { it.timestamp }.thenByDescending { it.id })
-                .take(10)
-                .map { it.id }
-                .toSet()
-        items.value = items.value.filter { it.id in recentIds }
-    }
-
-    override suspend fun getLastViewedItem(): RecentItemEntity? =
-        items.value.maxWithOrNull(compareBy<RecentItemEntity> { it.timestamp }.thenBy { it.id })
-}
-
-private fun createProduct(id: String): Product =
-    Product(
-        id = id,
-        name = ProductName("product$id"),
-        price = Money(2000),
-        imageUrl = "image$id",
-        category = "book",
-    )
