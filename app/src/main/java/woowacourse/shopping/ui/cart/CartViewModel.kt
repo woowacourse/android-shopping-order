@@ -31,7 +31,7 @@ class CartViewModel(
     private val _isAllSelected = MutableStateFlow(false)
     private val _recommendProducts = MutableStateFlow<List<Product>>(emptyList())
 
-    private val _cartFlow = MutableStateFlow(CartFlow.CART)
+    private val _isCartOrRecommend = MutableStateFlow(CartFlow.CART)
     private var currentPage = 0
 
     val uiState: StateFlow<CartUiState> =
@@ -40,8 +40,8 @@ class CartViewModel(
             _selectedItems,
             _isAllSelected,
             _recommendProducts,
-            _cartFlow,
-        ) { pagedCartItems, selectedItems, isAllSelected, recommendProducts, cartFlow ->
+            _isCartOrRecommend,
+        ) { pagedCartItems, selectedItems, isAllSelected, recommendProducts, isCartOrRecommend ->
             pagedCartItems ?: return@combine CartUiState.Loading
 
             val cartItems = pagedCartItems.items
@@ -57,7 +57,7 @@ class CartViewModel(
                 totalCount = cartItems.calculateQuantity(selectedItems, isAllSelected),
                 totalPrice = cartItems.selectedCartItemsPrice(selectedItems, isAllSelected),
                 recommendProducts = recommendProducts,
-                currentFlow = cartFlow,
+                currentFlow = isCartOrRecommend,
                 quantitiesByProductId = cartItems.values.associate { it.product.id to it.quantity.value },
             )
         }.stateIn(
@@ -199,8 +199,8 @@ class CartViewModel(
     }
 
     fun onClickOrder() {
-        if (_cartFlow.value == CartFlow.CART) {
-            _cartFlow.value = CartFlow.RECOMMEND
+        if (_isCartOrRecommend.value == CartFlow.CART) {
+            _isCartOrRecommend.value = CartFlow.RECOMMEND
         } else {
             viewModelScope.launch {
                 cartRepository.order(_selectedItems.value.toList())
