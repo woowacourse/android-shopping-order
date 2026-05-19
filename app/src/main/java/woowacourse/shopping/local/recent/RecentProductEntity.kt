@@ -9,14 +9,14 @@ data class RecentProductEntity(
     @PrimaryKey val productId: Long,
     val viewedAtMillis: Long,
 ) {
-    fun toDomain(): RecentProduct =
+    fun toRecentProduct(): RecentProduct =
         RecentProduct(
             productId = (productId),
             viewedAtMillis = viewedAtMillis,
         )
 
     companion object {
-        fun fromDomain(recentProduct: RecentProduct): RecentProductEntity =
+        fun fromRecentProduct(recentProduct: RecentProduct): RecentProductEntity =
             RecentProductEntity(
                 productId = recentProduct.productId,
                 viewedAtMillis = recentProduct.viewedAtMillis,

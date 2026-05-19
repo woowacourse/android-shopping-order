@@ -99,7 +99,7 @@ class HttpProductRepository(
                     responseBody
                         .content
                         .orEmpty()
-                        .map { it.toDomain() }
+                        .map { it.toProduct() }
                 }.getOrElse { throwable ->
                     throw ProductParsingException("카테고리 상품 목록 응답을 파싱할 수 없습니다.", throwable)
                 }
@@ -154,7 +154,7 @@ class HttpProductRepository(
                     responseBody
                         .content
                         .orEmpty()
-                        .map { it.toDomain() }
+                        .map { it.toProduct() }
                 }.getOrElse { throwable ->
                     throw ProductParsingException("상품 목록 응답을 파싱할 수 없습니다.", throwable)
                 }
@@ -175,7 +175,7 @@ class HttpProductRepository(
 
         val product =
             runCatching {
-                responseBody.toDomain()
+                responseBody.toProduct()
             }.getOrElse { throwable ->
                 throw ProductParsingException("상품 상세 응답을 파싱할 수 없습니다.", throwable)
             }

@@ -14,7 +14,7 @@ class RoomRecentProductRepository(
 
     override suspend fun recordView(productId: Long) {
         recentProductDao.upsert(
-            RecentProductEntity.fromDomain(
+            RecentProductEntity.fromRecentProduct(
                 RecentProduct(
                     productId = productId,
                     viewedAtMillis = System.currentTimeMillis(),
@@ -27,10 +27,10 @@ class RoomRecentProductRepository(
     override suspend fun getRecentProducts(limit: Int): List<RecentProduct> =
         recentProductDao
             .getRecentProducts(limit.coerceAtLeast(0))
-            .map(RecentProductEntity::toDomain)
+            .map(RecentProductEntity::toRecentProduct)
 
     override suspend fun getLatestViewedProductExcluding(productId: Long): RecentProduct? =
         recentProductDao
             .getLatestViewedProductExcluding(productId)
-            ?.toDomain()
+            ?.toRecentProduct()
 }

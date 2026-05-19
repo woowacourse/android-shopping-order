@@ -81,7 +81,7 @@ class RoomCartRepository(
 
         return cartItemDao
             .getCartItemsByProductIds(productIds.toSet())
-            .map(CartItemEntity::toDomain)
+            .map(CartItemEntity::toCartItem)
     }
 
     override suspend fun count(): Int = cartItemDao.count()

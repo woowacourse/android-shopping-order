@@ -10,14 +10,14 @@ data class CartItemEntity(
     val quantity: Int,
     val createdAtMillis: Long,
 ) {
-    fun toDomain(): CartItem =
+    fun toCartItem(): CartItem =
         CartItem(
             productId = (productId),
             quantity = quantity,
         )
 
     companion object {
-        fun fromDomain(
+        fun fromCartItem(
             cartItem: CartItem,
             createdAtMillis: Long,
         ): CartItemEntity =

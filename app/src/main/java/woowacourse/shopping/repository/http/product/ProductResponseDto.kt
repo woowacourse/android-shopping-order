@@ -12,7 +12,7 @@ data class ProductResponseDto(
     val imageUrl: String,
     val category: String,
 ) {
-    fun toDomain(): Product =
+    fun toProduct(): Product =
         Product(
             id = (id),
             name = name,
