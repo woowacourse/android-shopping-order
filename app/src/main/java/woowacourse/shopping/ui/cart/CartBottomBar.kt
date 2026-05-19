@@ -1,14 +1,12 @@
 package woowacourse.shopping.ui.cart
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -42,42 +40,45 @@ fun CartBottomBar(
                 .padding(start = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(2.dp),
+        Row(
+            modifier = Modifier.weight(3f),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (!isOrder) {
-                CartCheckBox(
-                    onCheckedChange = {
-                        onAllCheckedChange()
-                    },
-                    isChecked = isAllChecked,
-                )
-                Text(
-                    text = "전체",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.White,
-                )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                if (!isOrder) {
+                    CartCheckBox(
+                        onCheckedChange = {
+                            onAllCheckedChange()
+                        },
+                        isChecked = isAllChecked,
+                    )
+                    Text(
+                        text = "전체",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.White,
+                    )
+                }
             }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Text(
+                text = formattedPrice(totalPrice),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                modifier = Modifier.padding(end = 12.dp)
+            )
         }
-
-        Spacer(modifier = Modifier.width(95.dp))
-
-        Text(
-            text = formattedPrice(totalPrice),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-        )
-
-        Spacer(modifier = Modifier.width(12.dp))
-
         Button(
             onClick = onOrderClick,
+            enabled = totalCount > 0,
             modifier = Modifier
                 .height(78.dp)
-                .weight(1f),
+                .weight(2f),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Green40,
                 contentColor = Color.White,
