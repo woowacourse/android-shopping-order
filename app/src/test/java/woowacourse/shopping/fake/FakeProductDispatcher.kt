@@ -70,7 +70,7 @@ class FakeProductDispatcher(
                         numberOfElements = productContents.size,
                         pageable =
                             Pageable(
-                                offset = page,
+                                offset = page * size,
                                 pageNumber = allProductContents.size / size,
                                 pageSize = size,
                                 paged = true,

@@ -41,7 +41,7 @@ class ShoppingViewModelTest {
 
             val state = viewModel.uiState.value
             Assertions.assertThat(state.products.size).isEqualTo(20)
-            Assertions.assertThat(state.offset).isEqualTo(20)
+            Assertions.assertThat(state.page).isEqualTo(20)
         }
 
     @Test
@@ -50,7 +50,7 @@ class ShoppingViewModelTest {
             advanceUntilIdle()
 
             val state = viewModel.uiState.value
-            Assertions.assertThat(state.offset).isEqualTo(20)
+            Assertions.assertThat(state.page).isEqualTo(20)
         }
 
     @Test

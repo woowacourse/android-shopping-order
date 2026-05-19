@@ -13,13 +13,13 @@ class CartRemoteDataSource(
 ) {
     suspend fun getCartItems(
         page: Int,
-        limit: Int,
+        size: Int,
     ): List<CartContent> =
         try {
             val response =
                 cartService.requestItems(
                     page = page,
-                    size = limit,
+                    size = size,
                 )
             Log.d("cartItem", "${response.cartContent}")
             response.cartContent

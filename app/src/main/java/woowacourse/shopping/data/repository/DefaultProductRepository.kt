@@ -21,19 +21,19 @@ class DefaultProductRepository(
     override val products = _products.asStateFlow()
 
     override suspend fun loadProducts(
-        offset: Int,
-        limit: Int,
+        page: Int,
+        size: Int,
     ): Int {
-        val newProducts = remoteProductDataSource.fetchProducts(offset, limit).map { it.toDomain() }
+        val newProducts = remoteProductDataSource.fetchProducts(page, size).map { it.toDomain() }
         _products.update { products ->
             (products + newProducts).distinctBy { it.id }
         }
         return newProducts.size
     }
 
-    override fun getRecentProductsStream(limit: Int): Flow<List<Product>> =
+    override fun getRecentProductsStream(size: Int): Flow<List<Product>> =
         recentProductDao
-            .getRecentStream(limit)
+            .getRecentStream(size)
             .map { entities ->
                 entities.mapNotNull { getProductById(it.productId) }
             }

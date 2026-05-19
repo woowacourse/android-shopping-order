@@ -18,23 +18,23 @@ class FakeProductRepository(
     override val products = _products.asStateFlow()
 
     override suspend fun loadProducts(
-        offset: Int,
-        limit: Int,
+        page: Int,
+        size: Int,
     ): Int {
         if (shouldFail) throw IOException()
-        if (offset >= sourceProducts.size) return 0
-        val toIndex = minOf(offset + limit, sourceProducts.size)
-        val newProducts = sourceProducts.subList(offset, toIndex)
+        if (page >= sourceProducts.size) return 0
+        val toIndex = minOf(page + size, sourceProducts.size)
+        val newProducts = sourceProducts.subList(page, toIndex)
         _products.update { products -> (products + newProducts).distinctBy { it.id } }
         return newProducts.size
     }
 
     override suspend fun getProductById(id: Long): Product? = sourceProducts.find { it.id == id }
 
-    override fun getRecentProductsStream(limit: Int) =
+    override fun getRecentProductsStream(size: Int) =
         recentProductIds.map { ids ->
             ids
-                .take(limit)
+                .take(size)
                 .mapNotNull { id -> sourceProducts.find { it.id == id } }
         }
 

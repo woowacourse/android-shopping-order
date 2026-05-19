@@ -49,8 +49,8 @@ class DefaultProductRepositoryTest {
     @ParameterizedTest
     @CsvSource("0, 10", "20,30")
     fun `레파지토리에서 상품 정보를 가져온다`(
-        offset: Int,
-        limit: Int,
+        page: Int,
+        size: Int,
     ) = runTest {
         val defaultProductRepository =
             DefaultProductRepository(
@@ -64,9 +64,9 @@ class DefaultProductRepositoryTest {
                 recentProductDao,
             )
 
-        defaultProductRepository.loadProducts(offset, limit)
+        defaultProductRepository.loadProducts(page, size)
         advanceUntilIdle()
-        assertThat(defaultProductRepository.products.value.size).isEqualTo(limit)
+        assertThat(defaultProductRepository.products.value.size).isEqualTo(size)
     }
 
     @Test
@@ -92,7 +92,7 @@ class DefaultProductRepositoryTest {
     private class FakeRecentProductDao : RecentProductDao {
         private val recentProducts = MutableStateFlow<List<RecentProductEntity>>(emptyList())
 
-        override fun getRecentStream(limit: Int): Flow<List<RecentProductEntity>> = recentProducts
+        override fun getRecentStream(size: Int): Flow<List<RecentProductEntity>> = recentProducts
 
         override suspend fun upsertRecentProduct(entity: RecentProductEntity) {
             recentProducts.value =

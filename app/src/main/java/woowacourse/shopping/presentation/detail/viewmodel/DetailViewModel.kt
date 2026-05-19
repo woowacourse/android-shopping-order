@@ -69,7 +69,7 @@ class DetailViewModel(
 
                 val recentProduct =
                     productRepository
-                        .getRecentProductsStream(limit = 1)
+                        .getRecentProductsStream(size = 1)
                         .firstOrNull()
                         ?.firstOrNull()
                         ?.toUiModel()

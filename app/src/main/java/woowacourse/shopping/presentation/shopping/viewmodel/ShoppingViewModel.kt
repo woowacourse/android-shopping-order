@@ -62,8 +62,8 @@ class ShoppingViewModel(
         viewModelScope.launch {
             cartRepository.loadCart()
             loadProducts(
-                offset = _uiState.value.offset,
-                limit = PRODUCT_PAGE_SIZE,
+                page = _uiState.value.page,
+                size = PRODUCT_PAGE_SIZE,
             )
         }
     }
@@ -90,13 +90,13 @@ class ShoppingViewModel(
 
     fun loadMoreProducts() {
         viewModelScope.launch {
-            loadProducts(_uiState.value.offset, PRODUCT_PAGE_SIZE)
+            loadProducts(_uiState.value.page, PRODUCT_PAGE_SIZE)
         }
     }
 
     private suspend fun loadProducts(
-        offset: Int,
-        limit: Int,
+        page: Int,
+        size: Int,
     ) {
         if (_uiState.value.isLoading || !_uiState.value.canLoadMore) return
         _uiState.update {
@@ -105,13 +105,13 @@ class ShoppingViewModel(
         try {
             val loadedSize =
                 productRepository.loadProducts(
-                    offset = offset,
-                    limit = limit,
+                    page = page,
+                    size = size,
                 )
             _uiState.update {
                 it.copy(
-                    offset = it.offset + loadedSize,
-                    canLoadMore = loadedSize == limit,
+                    page = it.page + loadedSize,
+                    canLoadMore = loadedSize == size,
                 )
             }
         } catch (_: IOException) {

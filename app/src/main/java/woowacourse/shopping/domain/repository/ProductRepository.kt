@@ -8,13 +8,13 @@ interface ProductRepository {
     suspend fun getProductById(id: Long): Product?
 
     suspend fun loadProducts(
-        offset: Int,
-        limit: Int,
+        page: Int,
+        size: Int,
     ): Int
 
     val products: StateFlow<List<Product>>
 
-    fun getRecentProductsStream(limit: Int): Flow<List<Product>>
+    fun getRecentProductsStream(size: Int): Flow<List<Product>>
 
     suspend fun upsertRecentProduct(id: Long)
 }
