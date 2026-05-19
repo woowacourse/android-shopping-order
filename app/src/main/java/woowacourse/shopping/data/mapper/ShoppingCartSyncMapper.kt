@@ -1,9 +1,7 @@
 package woowacourse.shopping.data.mapper
 
 import woowacourse.shopping.data.remote.retrofit.dto.CartQuantity
-import woowacourse.shopping.data.remote.retrofit.dto.CartRequest
 import woowacourse.shopping.data.remote.retrofit.dto.Content
-import woowacourse.shopping.data.remote.retrofit.dto.OrderInfo
 import woowacourse.shopping.data.remote.retrofit.dto.ShoppingCartResponse
 import woowacourse.shopping.domain.model.ShoppingCartItem
 import woowacourse.shopping.domain.model.ShoppingItem
