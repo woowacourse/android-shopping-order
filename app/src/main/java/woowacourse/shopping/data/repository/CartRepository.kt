@@ -1,12 +1,12 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.model.Money
+import kotlinx.coroutines.flow.StateFlow
+import woowacourse.shopping.model.CartItem
 
 interface CartRepository {
-    suspend fun getCartItemsByPage(
-        page: Int,
-        size: Int,
-    ): CartResponseResult
+    val cartItems: StateFlow<List<CartItem>>
+
+    suspend fun refreshCartItems()
 
     suspend fun setCartItem(
         productId: String,
@@ -16,10 +16,4 @@ interface CartRepository {
     suspend fun deleteItem(cartItemId: String)
 
     suspend fun getCartItemQuantity(productId: String): Int?
-
-    suspend fun getTotalCartItemQuantity(): Int
-
-    suspend fun getCartItemsCount(): Int
-
-    suspend fun getTotalPrice(cartIds: List<String>): Money
 }
