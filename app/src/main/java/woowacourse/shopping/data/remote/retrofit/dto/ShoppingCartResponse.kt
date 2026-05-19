@@ -10,7 +10,7 @@ data class ShoppingCartResponse(
     val last: Boolean,
     val number: Int,
     val numberOfElements: Int,
-    val pageable: ShoppingCartPageable,
+    val pageable: PageableDto,
     val size: Int,
     val sort: Sort,
     val totalElements: Long,

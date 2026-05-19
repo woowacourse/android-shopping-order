@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Content(
     val id: Long,
-    val product: Product,
+    val product: ProductDto,
     val quantity: Int,
 )

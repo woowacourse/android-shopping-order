@@ -3,7 +3,7 @@ package woowacourse.shopping.data.remote.retrofit.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Product(
+data class ProductDto(
     val category: String,
     val id: Long,
     val imageUrl: String,

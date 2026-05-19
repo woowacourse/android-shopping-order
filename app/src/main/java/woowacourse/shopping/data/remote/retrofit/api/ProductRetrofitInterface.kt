@@ -7,7 +7,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.data.remote.retrofit.dto.Product
+import woowacourse.shopping.data.remote.retrofit.dto.ProductDto
 import woowacourse.shopping.data.remote.retrofit.dto.ProductResponse
 
 interface ProductRetrofitInterface {
@@ -24,12 +24,12 @@ interface ProductRetrofitInterface {
     suspend fun requestProductDetail(
         @Header("Accept") accept: String = "*/*",
         @Path("id") id: Long,
-    ): Product
+    ): ProductDto
 
     @POST("/products")
     suspend fun addProduct(
         @Header("Accept") accept: String = "*/*",
-        @Body product: Product,
+        @Body product: ProductDto,
     ): Unit
 
     @DELETE("/products/{id}")
