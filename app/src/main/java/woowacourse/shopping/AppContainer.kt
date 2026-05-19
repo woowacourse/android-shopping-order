@@ -32,7 +32,9 @@ class AppContainer(
     }
 
     val cartRepository: CartRepository by lazy {
-        CartRepositoryImpl(api = retrofitService.create(CartApi::class.java))
+        CartRepositoryImpl(
+            api = retrofitService.create(CartApi::class.java),
+        )
     }
 
     val recentItemRepository: RecentItemRepository by lazy {
@@ -54,7 +56,7 @@ class AppContainer(
             .Builder()
             .addInterceptor { chain ->
                 val credential = Credentials.basic(
-                    username = "byunghyunkim0",
+                    username = "GiyunKim00",
                     password = "password",
                 )
 
