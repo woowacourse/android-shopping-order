@@ -37,7 +37,6 @@ class ShoppingCartActivity : ComponentActivity() {
         )
     }
 
-    private val shoppingCartItemViewModel: ShoppingCartItemViewModel by viewModels { viewModelFactory }
     private val shoppingCartRecommendViewModel: ShoppingCartRecommendViewModel by viewModels { viewModelFactory }
     private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { viewModelFactory }
 
@@ -61,7 +60,7 @@ class ShoppingCartActivity : ComponentActivity() {
             val recommendUiState by shoppingCartRecommendViewModel.uiState.collectAsStateWithLifecycle()
 
             val screenState =
-                shoppingCartItemViewModel.shoppingCartItems.collectAsStateWithLifecycle()
+                shoppingCartViewModel.screenState.collectAsStateWithLifecycle()
             val isLoading = shoppingCartViewModel.isLoading.collectAsStateWithLifecycle()
             val errorMessage = shoppingCartViewModel.errorMessage.collectAsStateWithLifecycle()
             val hasApiError = errorMessage.value != null
@@ -114,9 +113,9 @@ class ShoppingCartActivity : ComponentActivity() {
                 if (recommendUiState.currentStep == ShoppingCartStep.CART) {
                     ShoppingCartScreen(
                         shoppingCartItems = visiblePagedItems,
-                        getQuantityPrice = shoppingCartItemViewModel::getQuantityPrice,
+                        getQuantityPrice = shoppingCartViewModel::getQuantityPrice,
                         state = state,
-                        onBackClick = shoppingCartItemViewModel::onBackClick,
+                        onBackClick = shoppingCartViewModel::onBackClick,
                         onRemoveShoppingItemClick = { shoppingCartItem ->
                             shoppingCartViewModel.removeShoppingItem(shoppingCartItem)
                         },
@@ -137,8 +136,8 @@ class ShoppingCartActivity : ComponentActivity() {
                             currentPage = screenState.value.currentPage,
                             canMoveToPreviousPage = if (hasApiError) false else screenState.value.canMoveToPreviousPage,
                             canMoveToNextPage = if (hasApiError) false else screenState.value.canMoveToNextPage,
-                            onBeforePageClick = shoppingCartItemViewModel::moveToPreviousPage,
-                            onNextPageClick = shoppingCartItemViewModel::moveToNextPage,
+                            onBeforePageClick = shoppingCartViewModel::moveToPreviousPage,
+                            onNextPageClick = shoppingCartViewModel::moveToNextPage,
                         )
                         OrderButton(
                             shoppingCartItems = visibleItems,
@@ -171,7 +170,7 @@ class ShoppingCartActivity : ComponentActivity() {
                         recommendedShoppingItems = recommendUiState.recommendedShoppingItems,
                         baseSelectedCartItemCount = selectedVisibleProductIds.size,
                         totalPrice = recommendUiState.selectedCartTotalPrice + recommendUiState.selectedRecommendTotalPrice,
-                        onBackClick = shoppingCartItemViewModel::onBackClick,
+                        onBackClick = shoppingCartViewModel::onBackClick,
                         onOrderButtonClick = {},
                         onAddToCartClick = { shoppingItem ->
                             shoppingCartViewModel.addOrIncreaseByProductId(
@@ -206,7 +205,7 @@ class ShoppingCartActivity : ComponentActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 shoppingCartViewModel.shoppingCartItems.collect { shoppingCartItems ->
                     app.appContainer.remoteShoppingStateSyncer.syncCartItems(shoppingCartItems)
-                    shoppingCartItemViewModel.refresh()
+                    shoppingCartViewModel.refreshPagedItems()
                 }
             }
         }
@@ -215,9 +214,9 @@ class ShoppingCartActivity : ComponentActivity() {
     private fun observeScreenEvents() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                shoppingCartItemViewModel.event.collect { event ->
+                shoppingCartViewModel.event.collect { event ->
                     when (event) {
-                        ShoppingCartItemViewModel.ShoppingCartEvent.NavigateBack -> finish()
+                        ShoppingCartViewModel.ShoppingCartEvent.NavigateBack -> finish()
                     }
                 }
             }

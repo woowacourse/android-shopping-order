@@ -7,7 +7,6 @@ import woowacourse.shopping.data.remote.retrofit.repository.OrderRetrofitReposit
 import woowacourse.shopping.data.remote.retrofit.repository.ProductRetrofitRepository
 import woowacourse.shopping.data.remote.retrofit.repository.ShoppingCartRetrofitRepository
 import woowacourse.shopping.ui.cart.OrderViewModel
-import woowacourse.shopping.ui.cart.ShoppingCartItemViewModel
 import woowacourse.shopping.ui.cart.ShoppingCartViewModel
 import woowacourse.shopping.ui.detail.DetailProductViewModel
 import woowacourse.shopping.ui.productlist.ProductListViewModel
@@ -42,12 +41,6 @@ class AppViewModelFactory(
                     productRetrofitRepository = productRetrofitRepository,
                 ) as T
 
-            modelClass.isAssignableFrom(ShoppingCartItemViewModel::class.java) ->
-                ShoppingCartItemViewModel(
-                    shoppingCartRepository = appContainer.shoppingCartRepository,
-                    shoppingItemRepository = appContainer.shoppingItemRepository,
-                ) as T
-
             modelClass.isAssignableFrom(ShoppingCartRecommendViewModel::class.java) ->
                 ShoppingCartRecommendViewModel(
                     shoppingItemRepository = appContainer.shoppingItemRepository,
@@ -57,6 +50,7 @@ class AppViewModelFactory(
             modelClass.isAssignableFrom(ShoppingCartViewModel::class.java) ->
                 ShoppingCartViewModel(
                     shoppingCartRetrofitRepository = shoppingCartRetrofitRepository,
+                    shoppingCartRepository = appContainer.shoppingCartRepository,
                 ) as T
 
             modelClass.isAssignableFrom(OrderViewModel::class.java) ->

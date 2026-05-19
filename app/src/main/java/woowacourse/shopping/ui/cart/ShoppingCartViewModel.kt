@@ -3,8 +3,11 @@ package woowacourse.shopping.ui.cart
 import android.os.SystemClock
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -16,16 +19,24 @@ import woowacourse.shopping.data.remote.retrofit.repository.ShoppingCartRetrofit
 import woowacourse.shopping.data.mapper.toCartQuantity
 import woowacourse.shopping.data.mapper.toDomainShoppingCartItems
 import woowacourse.shopping.domain.model.ShoppingCartItem
+import woowacourse.shopping.domain.repository.ShoppingCartRepository
 
 class ShoppingCartViewModel(
     private val shoppingCartRetrofitRepository: ShoppingCartRetrofitRepository,
+    private val shoppingCartRepository: ShoppingCartRepository,
 ) : ViewModel() {
     private val cartRequestMutex = Mutex()
     private var hasLoadedCartOnce: Boolean = false
     private var lastCartLoadedElapsedMs: Long = 0L
+    private val shoppingCartPageStateHolder = ShoppingCartPageStateHolder(shoppingCartItems = emptyList())
+    private val _event = MutableSharedFlow<ShoppingCartEvent>(extraBufferCapacity = 1)
+    val event: SharedFlow<ShoppingCartEvent> = _event.asSharedFlow()
 
     private val _shoppingCartItems = MutableStateFlow<List<ShoppingCartItem>>(emptyList())
     val shoppingCartItems: StateFlow<List<ShoppingCartItem>> = _shoppingCartItems.asStateFlow()
+    private val _screenState: MutableStateFlow<ShoppingCartItemsState> =
+        MutableStateFlow(createShoppingCartItemsState(emptyList()))
+    val screenState: StateFlow<ShoppingCartItemsState> = _screenState.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -35,6 +46,35 @@ class ShoppingCartViewModel(
 
     private val _selectedProductIds = MutableStateFlow<Set<Long>>(emptySet())
     val selectedProductIds: StateFlow<Set<Long>> = _selectedProductIds.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            shoppingCartRepository.observeShoppingItems().collect { latestShoppingCartItems ->
+                shoppingCartPageStateHolder.updateItems(latestShoppingCartItems)
+                _screenState.value = createShoppingCartItemsState(latestShoppingCartItems)
+            }
+        }
+    }
+
+    fun moveToPreviousPage() {
+        shoppingCartPageStateHolder.beforePage()
+        publishCurrentPageState()
+    }
+
+    fun moveToNextPage() {
+        shoppingCartPageStateHolder.nextPage()
+        publishCurrentPageState()
+    }
+
+    fun onBackClick() {
+        _event.tryEmit(ShoppingCartEvent.NavigateBack)
+    }
+
+    fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int = shoppingCartItem.getProductQuantityPrice()
+
+    fun refreshPagedItems() {
+        publishCurrentPageState()
+    }
 
     fun requestCartItems(force: Boolean = false) {
         if (shouldSkipCartRequest(force = force)) return
@@ -237,7 +277,34 @@ class ShoppingCartViewModel(
         _selectedProductIds.value = _selectedProductIds.value.intersect(validProductIds)
     }
 
+    private fun publishCurrentPageState() {
+        val currentItems = _screenState.value.items
+        _screenState.value = createShoppingCartItemsState(currentItems)
+    }
+
+    private fun createShoppingCartItemsState(items: List<ShoppingCartItem>): ShoppingCartItemsState =
+        ShoppingCartItemsState(
+            items = items,
+            pagedItems = shoppingCartPageStateHolder.getItems(),
+            currentPage = shoppingCartPageStateHolder.currentPage,
+            canMoveToPreviousPage = shoppingCartPageStateHolder.canMoveToPreviousPage(),
+            canMoveToNextPage = shoppingCartPageStateHolder.canMoveToNextPage(),
+        )
+
+    data class ShoppingCartItemsState(
+        val items: List<ShoppingCartItem>,
+        val pagedItems: List<ShoppingCartItem> = emptyList(),
+        val currentPage: Int = INITIAL_PAGE,
+        val canMoveToPreviousPage: Boolean = false,
+        val canMoveToNextPage: Boolean = false,
+    )
+
+    sealed interface ShoppingCartEvent {
+        data object NavigateBack : ShoppingCartEvent
+    }
+
     private companion object {
+        private const val INITIAL_PAGE = 0
         private const val DEFAULT_PAGE = 0
         private const val DEFAULT_SIZE = 20
         private const val DEFAULT_QUANTITY = 1
