@@ -12,10 +12,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.RepositoryProvider
 import woowacourse.shopping.domain.model.PaymentItems
+import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.presentation.common.addToCartUseCase
 import woowacourse.shopping.presentation.common.model.toUiModel
 import woowacourse.shopping.presentation.recommend.model.RecommendUiState
 import woowacourse.shopping.presentation.shopping.model.ShoppingItemUiModel
@@ -38,6 +38,8 @@ class RecommendViewModel(
             }
         }
 
+    private var recommendProducts: List<Product> = emptyList()
+
     fun loadRecommendProducts() {
         viewModelScope.launch(exceptionHandler) {
             val recentProducts = recentProductRepository.getRecentProducts(1)
@@ -49,16 +51,18 @@ class RecommendViewModel(
                     limit = RECOMMEND_PRODUCT_SIZE,
                     category = recentProducts[0].category,
                 )
-            val recommendProducts =
+            val recommend =
                 sameCategoryProducts
                     .filter { product ->
                         product.id !in inCartProductIds
                     }.take(10)
 
+            recommendProducts = recommend
+
             _uiState.update {
                 it.copy(
                     recommendProducts =
-                        recommendProducts.map {
+                        recommend.map {
                             ShoppingItemUiModel(
                                 product = it.toUiModel(),
                                 quantity = 0,
@@ -87,48 +91,20 @@ class RecommendViewModel(
     }
 
     fun increase(productId: Long) {
-        viewModelScope.launch(exceptionHandler) {
-            addToCartUseCase(cartRepository, productId)
-
-            val cartItem =
-                cartRepository
-                    .getCart()
-                    .items
-                    .find { it.product.id == productId } ?: return@launch
-
-            _uiState.update {
-                it.copy(
-                    paymentItems = it.paymentItems.add(cartItem),
-                )
-            }
-            updateRecommendQuantity(productId, cartItem.quantity)
+        val product = recommendProducts.find { it.id == productId } ?: return
+        val newPaymentItems = uiState.value.paymentItems.increase(product)
+        _uiState.update {
+            it.copy(
+                paymentItems = newPaymentItems,
+            )
         }
+        updateRecommendQuantity(productId, newPaymentItems.quantityOf(productId))
     }
 
     fun decrease(productId: Long) {
-        viewModelScope.launch(exceptionHandler) {
-            val cartItem =
-                cartRepository
-                    .getCart()
-                    .items
-                    .find { it.product.id == productId } ?: return@launch
-
-            cartRepository.changeCartItem(productId, cartItem.decrease().quantity)
-
-            val updated = cartRepository.getCart().items.find { it.product.id == productId }
-            val newPaymentItems =
-                if (updated == null) {
-                    uiState.value.paymentItems.remove(productId)
-                } else {
-                    uiState.value.paymentItems.add(updated)
-                }
-
-            _uiState.update {
-                it.copy(paymentItems = newPaymentItems)
-            }
-
-            updateRecommendQuantity(productId, updated?.quantity ?: 0)
-        }
+        val newPaymentItems = uiState.value.paymentItems.decrease(productId)
+        _uiState.update { it.copy(paymentItems = newPaymentItems) }
+        updateRecommendQuantity(productId, newPaymentItems.quantityOf(productId))
     }
 
     private fun updateRecommendQuantity(
