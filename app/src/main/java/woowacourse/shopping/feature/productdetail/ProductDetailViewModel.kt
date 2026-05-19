@@ -68,13 +68,13 @@ class ProductDetailViewModel(
         }
     }
 
-    suspend fun getProduct(productId: String): ProductDetailLoadingState = runCatching { productRepository.getProduct(productId) }
+    private suspend fun getProduct(productId: String): ProductDetailLoadingState = runCatching { productRepository.getProduct(productId) }
         .fold(
             onSuccess = { ProductDetailLoadingState.Success(toProductUiModel(it)) },
             onFailure = { ProductDetailLoadingState.Error(it.toAppError()) },
         )
 
-    fun toProductUiModel(product: Product): ProductUiModel {
+    private fun toProductUiModel(product: Product): ProductUiModel {
         return ProductUiModel(
             name = product.name,
             price = product.priceAmount(),

@@ -4,10 +4,20 @@ import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import woowacourse.shopping.domain.Product
 import woowacourse.shopping.feature.MainDispatcherExtension
+import woowacourse.shopping.feature.common.state.ProductUiModel
 import woowacourse.shopping.feature.fake.FakeCartRepository
 import woowacourse.shopping.feature.fake.FakeProductRepository
 import woowacourse.shopping.fixture.TestProductFixture
+
+private fun Product.toUiModel(): ProductUiModel = ProductUiModel(
+    name = name,
+    price = priceAmount(),
+    imageUrl = imageUrl,
+    id = id,
+    quantity = 0,
+)
 
 @ExtendWith(MainDispatcherExtension::class)
 class ProductDetailViewModelTest {
@@ -31,7 +41,7 @@ class ProductDetailViewModelTest {
         )
         // then:  product state 에 해당 상품 상세가 노출된다
         val expected = ProductDetailLoadingState.Success(
-            product = viewModel.toProductUiModel(comnProducts.first()),
+            product = comnProducts.first().toUiModel(),
         )
         assertThat(viewModel.uiState.value.productState).isEqualTo(expected)
     }
@@ -53,7 +63,7 @@ class ProductDetailViewModelTest {
 
         // then:  recentProduct state 에 최근 본 상품이 노출된다
         val expected = ProductDetailLoadingState.Success(
-            product = viewModel.toProductUiModel(comnProducts.last()),
+            product = comnProducts.last().toUiModel(),
         )
         assertThat(viewModel.uiState.value.recentProductState).isEqualTo(expected)
     }

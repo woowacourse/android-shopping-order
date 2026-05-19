@@ -168,7 +168,7 @@ class ProductListViewModel(
         }
     }
 
-    fun toProductUiModel(product: Product): ProductUiModel {
+    private fun toProductUiModel(product: Product): ProductUiModel {
         return ProductUiModel(
             name = product.name,
             price = product.priceAmount(),

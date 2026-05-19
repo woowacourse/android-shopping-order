@@ -157,7 +157,7 @@ class CartViewModel(
         }
     }
 
-    fun toCartItemUiModel(cartContent: CartContent): CartItemUiModel {
+    private fun toCartItemUiModel(cartContent: CartContent): CartItemUiModel {
         val product = cartContent.product
         return CartItemUiModel(
             contentId = cartContent.id,
