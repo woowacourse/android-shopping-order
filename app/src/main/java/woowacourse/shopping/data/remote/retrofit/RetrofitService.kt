@@ -3,6 +3,7 @@ package woowacourse.shopping.data.remote.retrofit
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.remote.retrofit.api.OrderRetrofitInterface
 import woowacourse.shopping.data.remote.retrofit.api.ProductRetrofitInterface
 import woowacourse.shopping.data.remote.retrofit.api.ShoppingCartRetrofitInterface
@@ -21,7 +22,7 @@ class RetrofitService(
     private val retrofit =
         Retrofit
             .Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(BuildConfig.BASE_URL)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -33,8 +34,4 @@ class RetrofitService(
     val shoppingCartApiService: ShoppingCartRetrofitInterface =
         retrofit.create(ShoppingCartRetrofitInterface::class.java)
 
-    companion object {
-        private const val BASE_URL =
-            "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/"
-    }
 }

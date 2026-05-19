@@ -42,8 +42,8 @@ class ShoppingApplication : Application() {
 
         applicationScope.launch {
             authDataStore.saveAuthInfo(
-                username = "parkhyomi",
-                password = "password",
+                username = BuildConfig.API_USERNAME,
+                password = BuildConfig.API_PASSWORD,
             )
         }
 
