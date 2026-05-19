@@ -1,0 +1,15 @@
+package woowacourse.shopping.domain.model
+
+sealed class AddItemResult {
+    data class NewAdded(
+        val cart: Cart,
+    ) : AddItemResult()
+
+    data class Incremented(
+        val cart: Cart,
+    ) : AddItemResult()
+
+    data class Error(
+        val message: String,
+    ) : AddItemResult()
+}

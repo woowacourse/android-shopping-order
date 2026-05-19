@@ -1,0 +1,141 @@
+package woowacourse.shopping.presentation.cart.ui.components
+
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
+import woowacourse.shopping.presentation.common.components.QuantityCounter
+import woowacourse.shopping.ui.theme.AndroidshoppingTheme
+import woowacourse.shopping.ui.theme.Gray40
+import woowacourse.shopping.ui.theme.Gray50
+import woowacourse.shopping.util.formattedPrice
+
+@Composable
+fun CartCard(
+    onDeleteItem: () -> Unit,
+    productName: String,
+    imageUrl: String,
+    price: Long,
+    quantity: Int,
+    onIncrease: () -> Unit,
+    onDecrease: () -> Unit,
+    isSelected: Boolean,
+    onSelectProduct: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 18.dp)
+                .border(1.dp, Gray40, RoundedCornerShape(5.dp)),
+    ) {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 18.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                CartCheckBox(
+                    isSelected,
+                    onSelectProduct,
+                )
+                Text(
+                    text = productName,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 24.sp,
+                    color = Color.Black,
+                )
+            }
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "삭제",
+                modifier =
+                    Modifier
+                        .size(16.dp)
+                        .clickable {
+                            onDeleteItem()
+                        },
+                tint = Gray40,
+            )
+        }
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 18.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Bottom,
+        ) {
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = productName,
+                contentScale = ContentScale.Fit,
+                modifier =
+                    Modifier
+                        .width(136.dp),
+            )
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.End,
+            ) {
+                QuantityCounter(
+                    quantity = quantity,
+                    onIncrease = onIncrease,
+                    onDecrease = onDecrease,
+                )
+                Text(
+                    text = formattedPrice(price),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    lineHeight = 26.sp,
+                    color = Gray50,
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CheckCartCardPreview() {
+    AndroidshoppingTheme {
+        CartCard(
+            onSelectProduct = {},
+            isSelected = true,
+            onDeleteItem = {},
+            productName = "Test",
+            imageUrl = "",
+            price = 10000,
+            quantity = 3,
+            onIncrease = {},
+            onDecrease = {},
+        )
+    }
+}
