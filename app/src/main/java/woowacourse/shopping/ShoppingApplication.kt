@@ -7,6 +7,10 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import kotlin.jvm.java
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import okhttp3.Credentials
@@ -37,19 +41,22 @@ import woowacourse.shopping.data.repository.recentproduct.RecentProductRepositor
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 class ShoppingApplication : Application() {
+    val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
     lateinit var productRepository: ProductRepository
         private set
     lateinit var cartRepository: CartRepository
         private set
     lateinit var recentProductRepository: RecentProductRepository
         private set
-
     lateinit var orderRepository: OrderRepository
         private set
 
     override fun onCreate() {
         super.onCreate()
-        initDependencies()
+        applicationScope.launch(Dispatchers.IO) {
+            initDependencies()
+        }
     }
 
     private fun initDependencies() {
