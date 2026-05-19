@@ -53,11 +53,11 @@ class DefaultCartRepository(
 
     override suspend fun loadCart() {
         var page = 0
-        val allCartContents = mutableListOf<CartContent>()
+        val allCartContents = mutableSetOf<CartContent>()
         while (true) {
-            val pagedCartContents = remoteDataSource.getCartItems(page, 5)
+            val pagedCartContents = remoteDataSource.getCartItems(page, PAGE_SIZE)
             allCartContents.addAll(pagedCartContents)
-            if (pagedCartContents.size < 5) break
+            if (pagedCartContents.size < PAGE_SIZE) break
             page += 1
         }
         _cart.update {
@@ -78,5 +78,9 @@ class DefaultCartRepository(
                 },
             )
         }
+    }
+
+    companion object {
+        private const val PAGE_SIZE = 10
     }
 }
