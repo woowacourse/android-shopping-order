@@ -1,0 +1,20 @@
+package woowacourse.shopping.domain
+
+import kotlinx.coroutines.flow.firstOrNull
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+
+suspend fun recommendProductUseCase(
+    productRepository: ProductRepository,
+    cartRepository: CartRepository,
+): List<Product> {
+    val cart = cartRepository.cart
+    val recentProducts =
+        productRepository.getRecentProductsStream(1).firstOrNull() ?: return emptyList()
+    val sameCategoryProducts = productRepository.products.value.filter { it.category == recentProducts[0].category }
+    return sameCategoryProducts
+        .filter { product ->
+            product.id !in cart.value.items.map { it.product.id }
+        }.take(10)
+}

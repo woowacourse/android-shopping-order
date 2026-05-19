@@ -1,0 +1,114 @@
+package woowacourse.shopping.data.repository
+
+import kotlinx.coroutines.test.runTest
+import mockwebserver3.MockWebServer
+import okhttp3.Interceptor
+import okhttp3.Response
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import woowacourse.shopping.data.source.remote.CartRemoteDataSource
+import woowacourse.shopping.data.source.remote.api.RetrofitServices
+import woowacourse.shopping.data.source.remote.dto.cart.response.CartProductContent
+import woowacourse.shopping.fake.FakeCartDispatcher
+
+class FakeAuthInterceptor(
+    private val token: String,
+) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request =
+            chain
+                .request()
+                .newBuilder()
+                .addHeader("Authorization", "Basic $token")
+                .build()
+        return chain.proceed(request)
+    }
+}
+
+class DefaultCartRepositoryTest {
+    private lateinit var server: MockWebServer
+    private lateinit var defaultCartRepository: DefaultCartRepository
+
+    private val cartProductContent =
+        CartProductContent(
+            id = 1L,
+            category = "장난감",
+            name = "상품",
+            price = 5000,
+            imageUrl = "",
+        )
+
+    @BeforeEach
+    fun setUp() {
+        server = MockWebServer()
+        server.dispatcher =
+            FakeCartDispatcher(
+                fixedCartProductContentContent = cartProductContent,
+            )
+        server.start()
+
+        defaultCartRepository =
+            DefaultCartRepository(
+                remoteDataSource =
+                    CartRemoteDataSource(
+                        cartService =
+                            RetrofitServices(
+                                baseUrl = server.url("/").toString(),
+                                interceptor = FakeAuthInterceptor(FakeCartDispatcher.authToken),
+                            ).cartService,
+                    ),
+            )
+    }
+
+    @Test
+    fun `장바구니에 등록된 상품을 조회한다`() =
+        runTest {
+            val cart = defaultCartRepository.cart.value
+            assertThat(cart.items.isEmpty()).isTrue
+
+            defaultCartRepository.addItem(1L)
+            defaultCartRepository.addItem(2L)
+
+            val newCart = defaultCartRepository.cart.value
+            assertThat(newCart.items.size).isEqualTo(2)
+        }
+
+    @Test
+    fun `장바구니에 등록된 상품을 추가한다`() =
+        runTest {
+            defaultCartRepository.addItem(1L)
+
+            val cart = defaultCartRepository.cart.value
+
+            assertThat(cart.items.any { it.product.id == 1L }).isTrue
+        }
+
+    @Test
+    fun `장바구니에 등록된 상품을 삭제한다`() =
+        runTest {
+            defaultCartRepository.addItem(1L)
+            val cart = defaultCartRepository.cart.value
+            assertThat(cart.items.any { it.product.id == 1L }).isTrue
+            assertThat(cart.items.size).isEqualTo(1)
+
+            defaultCartRepository.deleteItem(1L)
+
+            val newCart = defaultCartRepository.cart.value
+            assertThat(newCart.items.size).isEqualTo(0)
+
+            assertThat(newCart.items.any { it.product.id == 1L }).isFalse
+        }
+
+    @Test
+    fun `장바구니에 등록된 상품의 수량을 변경한다`() =
+        runTest {
+            defaultCartRepository.addItem(1L, 5)
+
+            defaultCartRepository.changeCartItem(1L, 10)
+
+            val newCart = defaultCartRepository.cart.value
+            val item = newCart.items.find { it.product.id == 1L }
+            assertThat(item!!.quantity).isEqualTo(10)
+        }
+}
