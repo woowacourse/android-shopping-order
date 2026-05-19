@@ -11,7 +11,7 @@ import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductName
 
 class CartRepositoryImpl(
-    private val api: CartApi,
+    private val cartApi: CartApi,
 ) : CartRepository {
     override suspend fun getTotalPrice(cartIds: List<Long>): Money {
         val cartItems = getAllCartItems()
@@ -27,7 +27,7 @@ class CartRepositoryImpl(
         val cartItems = mutableListOf<CartItem>()
 
         val response =
-            api.getCartItems(
+            cartApi.getCartItems(
                 page = 0,
                 size = MAX_CART_ITEM_LIMIT,
             )
@@ -42,7 +42,7 @@ class CartRepositoryImpl(
         size: Int,
     ): CartResponseResult {
         val apiResult =
-            api
+            cartApi
                 .getCartItems(
                     page = page,
                     size = size,
@@ -77,10 +77,10 @@ class CartRepositoryImpl(
     }
 
     override suspend fun deleteItem(cartItemId: Long) {
-        api.deleteCartItem(id = cartItemId)
+        cartApi.deleteCartItem(id = cartItemId)
     }
 
-    override suspend fun getTotalCartItemQuantity(): Int = api.getCartItemsQuantity().quantity
+    override suspend fun getTotalCartItemQuantity(): Int = cartApi.getCartItemsQuantity().quantity
 
     override suspend fun getCartItemsCount(): Int = getAllCartItems().size
 
@@ -88,7 +88,7 @@ class CartRepositoryImpl(
         productId: Long,
         quantity: Int,
     ) {
-        api.addCartItem(
+        cartApi.addCartItem(
             AddCartRequestBody(
                 productId = productId,
                 quantity = quantity,
@@ -100,7 +100,7 @@ class CartRepositoryImpl(
         cartItemId: Long,
         quantity: Int,
     ) {
-        api.updateCartItem(
+        cartApi.updateCartItem(
             id = cartItemId,
             updateCartRequestBody = UpdateCartRequestBody(quantity = quantity),
         )

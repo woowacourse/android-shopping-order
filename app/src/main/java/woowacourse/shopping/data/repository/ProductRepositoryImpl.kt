@@ -7,7 +7,7 @@ import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductName
 
 class ProductRepositoryImpl(
-    private val api: ProductApi,
+    private val productApi: ProductApi,
 ) : ProductRepository {
     override suspend fun getProducts(
         category: String,
@@ -16,13 +16,13 @@ class ProductRepositoryImpl(
     ): ProductResponseResult {
         val apiResult =
             if (category.isEmpty()) {
-                api
+                productApi
                     .getProducts(
                         page = page,
                         size = size,
                     )
             } else {
-                api.getProductsByCategory(
+                productApi.getProductsByCategory(
                     category = category,
                     page = page,
                     size = size,
@@ -35,7 +35,7 @@ class ProductRepositoryImpl(
         return ProductResponseResult(products, lastPage)
     }
 
-    override suspend fun getProductById(id: Long): Product = api.getProductById(id).toDomain()
+    override suspend fun getProductById(id: Long): Product = productApi.getProductById(id).toDomain()
 
     private fun ProductResponse.toDomain(): Product =
         Product(

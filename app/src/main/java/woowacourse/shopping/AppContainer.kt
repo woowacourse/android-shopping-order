@@ -32,12 +32,12 @@ class AppContainer(
 
     val productRepository: ProductRepository by lazy {
         ProductRepositoryImpl(
-            api = retrofitService.create(ProductApi::class.java),
+            productApi = retrofitService.create(ProductApi::class.java),
         )
     }
 
     val cartRepository: CartRepository by lazy {
-        CartRepositoryImpl(api = retrofitService.create(CartApi::class.java))
+        CartRepositoryImpl(cartApi = retrofitService.create(CartApi::class.java))
     }
 
     val recentItemRepository: RecentItemRepository by lazy {
