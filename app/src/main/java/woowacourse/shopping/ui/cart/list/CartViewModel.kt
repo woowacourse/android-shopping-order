@@ -221,7 +221,6 @@ class CartViewModel(
 
                 runCatching {
                     cartRepository.setQuantity(productId, targetQuantity)
-                    //updatePage(currentPage)
                 }.onFailure { throwable ->
                     updatePage(currentPage)
                     _uiState.update { currentState ->
