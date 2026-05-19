@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import coil3.util.CoilUtils.result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -28,37 +27,43 @@ class CartViewModel(
 ) : ViewModel() {
     private val _pagedCartItems = MutableStateFlow<PagedCartItems?>(null)
     private val _selectedItems = MutableStateFlow<Set<Int>>(emptySet())
-    private val _isAllSelected = MutableStateFlow(false)
     private val _recommendProducts = MutableStateFlow<List<Product>>(emptyList())
-
     private val _isCartOrRecommend = MutableStateFlow(CartFlow.CART)
+    private val _allCartItems = MutableStateFlow<CartItems?>(null)
     private var currentPage = 0
 
     val uiState: StateFlow<CartUiState> =
         combine(
             _pagedCartItems,
             _selectedItems,
-            _isAllSelected,
             _recommendProducts,
             _isCartOrRecommend,
-        ) { pagedCartItems, selectedItems, isAllSelected, recommendProducts, isCartOrRecommend ->
-            pagedCartItems ?: return@combine CartUiState.Loading
+            _allCartItems,
+        ) { pagedCartItems, selectedItems, recommendProducts, isCartOrRecommend, allCartItems ->
 
-            val cartItems = pagedCartItems.items
+            pagedCartItems ?: return@combine CartUiState.Loading
+            allCartItems ?: return@combine CartUiState.Loading
+
+            val pagedItems = pagedCartItems.items
+            val allCartIds = allCartItems.values.map { it.id }.toSet()
+
+            val isAllSelected =
+                allCartIds.isNotEmpty() &&
+                        allCartIds.all { it in selectedItems }
 
             CartUiState.Success(
-                cartItems = cartItems.values.toUiModel(selectedItems, isAllSelected),
+                cartItems = pagedItems.values.toUiModel(selectedItems, isAllSelected),
                 selectedItems = selectedItems,
                 isAllSelected = isAllSelected,
                 currentPage = currentPage,
                 totalPages = pagedCartItems.totalPages,
                 hasPrevious = !pagedCartItems.isFirst,
                 hasNext = !pagedCartItems.isLast,
-                totalCount = cartItems.calculateQuantity(selectedItems, isAllSelected),
-                totalPrice = cartItems.selectedCartItemsPrice(selectedItems, isAllSelected),
+                totalCount = allCartItems.calculateQuantity(selectedItems, isAllSelected),
+                totalPrice = allCartItems.selectedCartItemsPrice(selectedItems, isAllSelected),
                 recommendProducts = recommendProducts,
                 currentFlow = isCartOrRecommend,
-                quantitiesByProductId = cartItems.values.associate { it.product.id to it.quantity.value },
+                quantitiesByProductId = pagedItems.values.associate { it.product.id to it.quantity.value },
             )
         }.stateIn(
             scope = viewModelScope,
@@ -74,9 +79,7 @@ class CartViewModel(
     private fun loadPage(page: Int) {
         viewModelScope.launch {
             _pagedCartItems.update { null }
-            val result = cartRepository.getCartItems(page, PAGE_SIZE)
-            currentPage = page
-            _pagedCartItems.update { result }
+            refreshCartItems(page)
         }
     }
 
@@ -84,13 +87,15 @@ class CartViewModel(
         viewModelScope.launch {
             val recommended = recentProductRepository.getMostRecentProduct() ?: return@launch
             val recommendedCategory = recommended.category.value
-            val productList = productRepository.getCategoryProducts(recommendedCategory,0, 100)
-            val cartProducts = cartRepository.getCartItems(0,100)
-                .items
-                .values
-                .map { it.product }
-                .toSet()
-            val result = productList.getCategoryProductsLimit(cartProducts,recommended)
+            val productList = productRepository.getCategoryProducts(recommendedCategory, 0, 100)
+            val cartProducts =
+                cartRepository.getAllCartItems()
+                    .items
+                    .values
+                    .map { it.product }
+                    .toSet()
+
+            val result = productList.getCategoryProductsLimit(cartProducts, recommended)
             _recommendProducts.update { result }
         }
     }
@@ -100,8 +105,7 @@ class CartViewModel(
             _pagedCartItems.update { null }
             _selectedItems.update { it - cartId }
             cartRepository.remove(cartId)
-            val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
-            _pagedCartItems.update { result }
+            refreshCartItems()
         }
     }
 
@@ -183,7 +187,20 @@ class CartViewModel(
     }
 
     fun toggleAllSelection() {
-        _isAllSelected.update { !it }
+        val allCartItems = _allCartItems.value ?: return
+        val allCartIds = allCartItems.values.map { it.id }.toSet()
+
+        _selectedItems.update { selectedItems ->
+            val isAllSelected =
+                allCartIds.isNotEmpty() &&
+                        allCartIds.all { it in selectedItems }
+
+            if (isAllSelected) {
+                selectedItems - allCartIds
+            } else {
+                selectedItems + allCartIds
+            }
+        }
     }
 
     fun goToNextPage() {
@@ -204,6 +221,15 @@ class CartViewModel(
                 cartRepository.order(_selectedItems.value.toList())
             }
         }
+    }
+
+    private suspend fun refreshCartItems(page: Int = currentPage) {
+        val pagedResult = cartRepository.getCartItems(page, PAGE_SIZE)
+        val allResult = cartRepository.getAllCartItems()
+
+        currentPage = page
+        _pagedCartItems.update { pagedResult }
+        _allCartItems.update { allResult.items }
     }
 
     companion object {
