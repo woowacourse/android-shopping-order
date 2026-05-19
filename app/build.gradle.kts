@@ -77,6 +77,7 @@ dependencies {
 
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.datastore.tink)
     ksp(libs.androidx.room.compiler)
 
     implementation(platform(libs.okhttp.bom))
@@ -87,6 +88,8 @@ dependencies {
 
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+
+    implementation(libs.tink.android)
 
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner.junit5)

@@ -15,7 +15,9 @@ class AuthRepository(
     val password = _password.asStateFlow()
 
     suspend fun loadCredentialsToMemory() {
-        _userName.value = userDataStore.username.first()
-        _password.value = userDataStore.password.first()
+        val credentials = userDataStore.userCredentialsFlow.first()
+
+        _userName.value = credentials.username
+        _password.value = credentials.password
     }
 }

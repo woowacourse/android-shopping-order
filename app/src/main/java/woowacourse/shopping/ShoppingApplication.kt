@@ -1,33 +1,26 @@
 package woowacourse.shopping
 
 import android.app.Application
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class ShoppingApplication : Application() {
     lateinit var appContainer: AppContainer
         private set
 
-    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
     override fun onCreate() {
         super.onCreate()
         appContainer = AppContainer(applicationContext)
 
-        applicationScope.launch {
-            val savedUsername = appContainer.userDataStore.username.first()
-            val savedPassword = appContainer.userDataStore.password.first()
+        runBlocking {
+            val savedUsername = appContainer.userDataStore.userCredentialsFlow.first()
 
-            if (savedUsername.isEmpty() || savedPassword.isEmpty()) {
+            if (savedUsername.username.isBlank()) {
                 appContainer.userDataStore.saveUser(
                     username = BuildConfig.TEST_USERNAME,
-                    password = BuildConfig.TEST_PASSWORD
+                    password = BuildConfig.TEST_PASSWORD,
                 )
             }
-
             appContainer.authRepository.loadCredentialsToMemory()
         }
     }

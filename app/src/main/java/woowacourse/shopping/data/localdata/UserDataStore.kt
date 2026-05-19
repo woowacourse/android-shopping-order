@@ -1,39 +1,59 @@
 package woowacourse.shopping.data.localdata
 
 import android.content.Context
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.tink.AeadSerializer
+import com.google.crypto.tink.Aead
+import com.google.crypto.tink.KeyTemplates
+import com.google.crypto.tink.RegistryConfiguration
+import com.google.crypto.tink.aead.AeadConfig
+import com.google.crypto.tink.integration.android.AndroidKeysetManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-
-private val Context.userDataStore by preferencesDataStore(name = "user")
+import java.io.File
 
 class UserDataStore(
     private val context: Context,
 ) {
+    val dataStore: DataStore<UserCredentials> = createEncryptedDataStore()
+
+    private fun createEncryptedDataStore(): DataStore<UserCredentials> {
+        AeadConfig.register()
+
+        val keysetHandle =
+            AndroidKeysetManager
+                .Builder()
+                .withSharedPref(context, "keyset", "keyset_prefs")
+                .withKeyTemplate(KeyTemplates.get("AES256_GCM"))
+                .withMasterKeyUri("android-keystore://master_key")
+                .build()
+                .keysetHandle
+
+        val aeadSerializer =
+            AeadSerializer(
+                aead = keysetHandle.getPrimitive(RegistryConfiguration.get(), Aead::class.java),
+                wrappedSerializer = UserCredentialsSerializer,
+                associatedData = "auth_prefs.json".encodeToByteArray(),
+            )
+
+        return DataStoreFactory.create(
+            serializer = aeadSerializer,
+            produceFile = { File(context.filesDir, "datastore/auth_prefs.json") },
+            scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+        )
+    }
+
     suspend fun saveUser(
         username: String,
         password: String,
     ) {
-        context.userDataStore.edit { prefs ->
-            prefs[USERNAME_KEY] = username
-            prefs[PASSWORD_KEY] = password
+        dataStore.updateData { currentData ->
+            currentData.copy(username = username, password = password)
         }
     }
 
-    val username: Flow<String> =
-        context.userDataStore.data.map { prefs ->
-            prefs[USERNAME_KEY] ?: ""
-        }
-
-    val password: Flow<String> =
-        context.userDataStore.data.map { prefs ->
-            prefs[PASSWORD_KEY] ?: ""
-        }
-
-    companion object {
-        private val USERNAME_KEY = stringPreferencesKey("username")
-        private val PASSWORD_KEY = stringPreferencesKey("password")
-    }
+    val userCredentialsFlow: Flow<UserCredentials> = dataStore.data
 }
