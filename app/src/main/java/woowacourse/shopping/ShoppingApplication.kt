@@ -6,11 +6,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
-import kotlin.jvm.java
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import okhttp3.Credentials
@@ -41,8 +36,6 @@ import woowacourse.shopping.data.repository.recentproduct.RecentProductRepositor
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 class ShoppingApplication : Application() {
-    val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
     lateinit var productRepository: ProductRepository
         private set
     lateinit var cartRepository: CartRepository
@@ -54,9 +47,7 @@ class ShoppingApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        applicationScope.launch(Dispatchers.IO) {
-            initDependencies()
-        }
+        initDependencies()
     }
 
     private fun initDependencies() {
@@ -64,40 +55,31 @@ class ShoppingApplication : Application() {
             dataSource = AuthRemoteDataSource(
                 dataStore = applicationContext.dataStore,
             ),
+            issueToken = ::issueBasicCredential,
         )
 
-        lateinit var token: String
-        runBlocking {
-            token = auth.load()
-            if (token.isBlank()) {
-                val user = BuildConfig.SHOPPING_USERNAME
-                val pw = BuildConfig.SHOPPING_PASSWORD
-                if (user.isNotBlank() && pw.isNotBlank()) {
-                    token = Credentials.basic(user, pw)
-                    auth.save(token)
-                }
-            }
-        }
-
         val json = Json { ignoreUnknownKeys = true }
-        val baseUrl =
-            BuildConfig.SHOPPING_BASE_URL.toHttpUrl()
+        val baseUrl = BuildConfig.SHOPPING_BASE_URL.toHttpUrl()
 
         val client = OkHttpClient.Builder()
             .addInterceptor { chain ->
-                val authorized = chain.request().newBuilder()
-                    .header("Authorization", token)
-                    .build()
-                chain.proceed(authorized)
+                val token = runBlocking { auth.token() }
+                val request = chain.request().newBuilder().apply {
+                    if (token.isNotBlank()) header("Authorization", token)
+                }.build()
+                chain.proceed(request)
             }
             .build()
 
-        val retrofitService = Retrofit.Builder()
+        val retrofit = Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .client(client)
             .build()
-            .create(ProductService::class.java)
+
+        val productService = retrofit.create(ProductService::class.java)
+        val cartService = retrofit.create(CartService::class.java)
+        val orderService = retrofit.create(OrderService::class.java)
 
         val recentProductDatabase = Room.databaseBuilder(
             applicationContext,
@@ -106,44 +88,28 @@ class ShoppingApplication : Application() {
         ).build()
 
         val product: ProductRepository = ProductRepositoryImpl(
-            dataSource =
-            ProductRemoteDataSource(
-                productService = retrofitService,
-            ),
+            dataSource = ProductRemoteDataSource(productService = productService),
         )
-
-        val cartService = Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-            .client(client)
-            .build()
-            .create(CartService::class.java)
-
         val cart: CartRepository = CartRepositoryImpl(
-            cartDataSource = CartRemoteDataSource(
-                cartService = cartService,
-            ),
+            cartDataSource = CartRemoteDataSource(cartService = cartService),
             productRepository = product,
         )
         val recent: RecentProductRepository =
             RecentProductRepositoryImpl(recentProductDatabase.recentProductDao())
-
-        val orderService = Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-            .client(client)
-            .build()
-            .create(OrderService::class.java)
-
         val order: OrderRepository = OrderRepositoryImpl(
-            orderDataSource = OrderRemoteDataSource(
-                orderService = orderService,
-            ),
+            orderDataSource = OrderRemoteDataSource(orderService = orderService),
         )
 
         productRepository = product
         cartRepository = cart
         recentProductRepository = recent
         orderRepository = order
+    }
+
+    private fun issueBasicCredential(): String? {
+        val user = BuildConfig.SHOPPING_USERNAME
+        val pw = BuildConfig.SHOPPING_PASSWORD
+        if (user.isBlank() || pw.isBlank()) return null
+        return Credentials.basic(user, pw)
     }
 }

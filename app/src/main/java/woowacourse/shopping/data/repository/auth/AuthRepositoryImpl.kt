@@ -3,13 +3,15 @@ package woowacourse.shopping.data.repository.auth
 import woowacourse.shopping.data.datasource.auth.AuthDataSource
 
 class AuthRepositoryImpl(
-    val dataSource: AuthDataSource,
+    private val dataSource: AuthDataSource,
+    private val issueToken: () -> String?,
 ) : AuthRepository {
-    override suspend fun load(): String {
-        return dataSource.load()
-    }
+    override suspend fun token(): String {
+        val stored = dataSource.load()
+        if (stored.isNotBlank()) return stored
 
-    override suspend fun save(token: String) {
-        dataSource.save(token)
+        val issued = issueToken().orEmpty()
+        if (issued.isNotBlank()) dataSource.save(issued)
+        return issued
     }
 }
