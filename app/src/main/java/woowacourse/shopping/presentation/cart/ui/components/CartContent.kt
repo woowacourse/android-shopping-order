@@ -33,29 +33,30 @@ fun CartContent(
             items(count = SKELETON_CARD_SIZE) {
                 SkeletonCartCard()
             }
-        }
-        items(
-            items = cartItems,
-            key = { it.product.id },
-        ) { item ->
-            val product = item.product
-            CartCard(
-                productName = product.name,
-                price = item.totalPrice,
-                imageUrl = product.imageUrl,
-                quantity = item.quantity,
-                onDeleteItem = {
-                    onDeleteItem(product.id)
-                },
-                onIncrease = {
-                    onIncrease(product.id)
-                },
-                onDecrease = {
-                    onDecrease(product.id)
-                },
-                isSelected = item.isSelected,
-                onSelectProduct = { onSelected(item.product.id) },
-            )
+        } else {
+            items(
+                items = cartItems,
+                key = { it.product.id },
+            ) { item ->
+                val product = item.product
+                CartCard(
+                    productName = product.name,
+                    price = item.totalPrice,
+                    imageUrl = product.imageUrl,
+                    quantity = item.quantity,
+                    onDeleteItem = {
+                        onDeleteItem(product.id)
+                    },
+                    onIncrease = {
+                        onIncrease(product.id)
+                    },
+                    onDecrease = {
+                        onDecrease(product.id)
+                    },
+                    isSelected = item.isSelected,
+                    onSelectProduct = { onSelected(item.product.id) },
+                )
+            }
         }
     }
 }
