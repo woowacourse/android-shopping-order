@@ -17,9 +17,3 @@ fun ProductDto.toDomainProduct(): Product =
     )
 
 fun ProductResponse.toDomainProducts(): List<Product> = content.map { product -> product.toDomainProduct() }
-
-fun Product.toShoppingItem(quantity: Int = 0): ShoppingItem =
-    ShoppingItem(
-        product = this,
-        quantity = quantity,
-    )

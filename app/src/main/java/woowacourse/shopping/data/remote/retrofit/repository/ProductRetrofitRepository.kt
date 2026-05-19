@@ -11,18 +11,6 @@ import woowacourse.shopping.domain.model.Product
 class ProductRetrofitRepository(
     private val apiService: ProductRetrofitInterface,
 ) {
-    suspend fun requestProducts(
-        page: Int,
-        size: Int,
-        sort: List<String>? = null,
-        category: String?,
-    ): List<Product> =
-        requestProductPage(
-            page = page,
-            size = size,
-            sort = sort,
-            category = category,
-        ).products
 
     suspend fun requestProductPage(
         page: Int,
