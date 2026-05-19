@@ -48,7 +48,6 @@ import woowacourse.shopping.domain.model.ProductTitle
 import woowacourse.shopping.domain.model.ShoppingItem
 import woowacourse.shopping.ui.component.ProductItem
 import woowacourse.shopping.ui.component.ProductListSkeletonItem
-import woowacourse.shopping.ui.productlist.ProductListState
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 @Composable
@@ -56,7 +55,7 @@ fun ProductListScreen(
     shoppingItems: List<ShoppingItem>,
     recentViewedShoppingItems: List<ShoppingItem>,
     shoppingCartTotalCount: Int,
-    state: ProductListState,
+    isLoading: Boolean,
     onAddToCartClick: (ShoppingItem) -> Unit,
     onQuantityPlusClick: (ShoppingItem) -> Unit,
     onQuantityMinusClick: (ShoppingItem) -> Unit,
@@ -87,7 +86,7 @@ fun ProductListScreen(
             horizontalArrangement = Arrangement.Center,
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            if (state.isLoading) {
+            if (isLoading) {
                 items(6) {
                     Box(
                         modifier =
@@ -329,24 +328,7 @@ private fun ProductListScreenPreview() {
             shoppingItems = emptyList(),
             recentViewedShoppingItems = emptyList(),
             shoppingCartTotalCount = 99,
-            state =
-                ProductListState(
-                    isLoading = false,
-                    products =
-                        listOf(
-                            ShoppingItem(
-                                product =
-                                    Product(
-                                        id = 1L,
-                                        title = ProductTitle("샘플 상품"),
-                                        price = Price(12000),
-                                        imageUrl = "https://example.com/image.jpg",
-                                    ),
-                                quantity = 1,
-                            ),
-                        ),
-                    errorMessage = null,
-                ),
+            isLoading = false,
             onAddToCartClick = {},
             onQuantityPlusClick = {},
             onQuantityMinusClick = {},

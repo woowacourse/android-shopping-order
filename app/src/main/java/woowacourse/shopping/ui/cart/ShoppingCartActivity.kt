@@ -19,8 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.di.ApiViewModelFactory
-import woowacourse.shopping.di.ScreenViewModelFactory
+import woowacourse.shopping.di.AppViewModelFactory
 import woowacourse.shopping.ui.component.PageNavigation
 import woowacourse.shopping.ui.recommend.ShoppingCartRecommendSection
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
@@ -31,16 +30,16 @@ import woowacourse.shopping.ui.recommend.ShoppingCartRecommendViewModel.Shopping
 class ShoppingCartActivity : ComponentActivity() {
     private val app: ShoppingApplication by lazy { application as ShoppingApplication }
 
-    private val screenViewModelFactory: ScreenViewModelFactory by lazy {
-        ScreenViewModelFactory(appContainer = app.appContainer)
-    }
-    private val apiViewModelFactory: ApiViewModelFactory by lazy {
-        ApiViewModelFactory(app.retrofitService)
+    private val viewModelFactory: AppViewModelFactory by lazy {
+        AppViewModelFactory(
+            appContainer = app.appContainer,
+            retrofitService = app.retrofitService,
+        )
     }
 
-    private val shoppingCartItemViewModel: ShoppingCartItemViewModel by viewModels { screenViewModelFactory }
-    private val shoppingCartRecommendViewModel: ShoppingCartRecommendViewModel by viewModels { screenViewModelFactory }
-    private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { apiViewModelFactory }
+    private val shoppingCartItemViewModel: ShoppingCartItemViewModel by viewModels { viewModelFactory }
+    private val shoppingCartRecommendViewModel: ShoppingCartRecommendViewModel by viewModels { viewModelFactory }
+    private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { viewModelFactory }
 
     companion object {
         fun start(context: Context) {

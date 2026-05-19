@@ -13,37 +13,26 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.di.ApiViewModelFactory
-import woowacourse.shopping.di.ScreenViewModelFactory
+import woowacourse.shopping.di.AppViewModelFactory
 import woowacourse.shopping.ui.cart.ShoppingCartViewModel
-import woowacourse.shopping.ui.productlist.ProductViewModel
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 class DetailProductActivity : ComponentActivity() {
     private val app: ShoppingApplication by lazy { application as ShoppingApplication }
 
-    private val screenViewModelFactory: ScreenViewModelFactory by lazy {
-        ScreenViewModelFactory(
+    private val viewModelFactory: AppViewModelFactory by lazy {
+        AppViewModelFactory(
             appContainer = app.appContainer,
+            retrofitService = app.retrofitService,
         )
     }
-    private val apiViewModelFactory: ApiViewModelFactory by lazy {
-        ApiViewModelFactory(
-            app.retrofitService,
-        )
-    }
-    private val detailProductViewModel: DetailProductViewModel by viewModels { screenViewModelFactory }
-    private val productViewModel: ProductViewModel by viewModels { apiViewModelFactory }
-    private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { apiViewModelFactory }
+
+    private val detailProductViewModel: DetailProductViewModel by viewModels { viewModelFactory }
+    private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { viewModelFactory }
 
     companion object {
-        private const val INVALID_PRODUCT_ID = -1L
-
         fun start(
             context: Context,
             productId: Long,
@@ -60,8 +49,6 @@ class DetailProductActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         detailProductViewModel.initializeFromIntentExtras(intent.extras)
-        observeApiViewModel()
-        requestProductDetailFromApi()
         setContent {
             val uiState by detailProductViewModel.uiState.collectAsStateWithLifecycle()
             AndroidShoppingTheme {
@@ -92,35 +79,6 @@ class DetailProductActivity : ComponentActivity() {
                     )
                 } else {
                     Text(stringResource(R.string.product_not_found_message))
-                }
-            }
-        }
-    }
-
-    private fun requestProductDetailFromApi() {
-        val productId =
-            intent.extras?.getLong(DetailProductViewModel.EXTRA_PRODUCT_ID, INVALID_PRODUCT_ID)
-                ?: INVALID_PRODUCT_ID
-        if (productId == INVALID_PRODUCT_ID) {
-            return
-        }
-        productViewModel.requestProductDetail(productId)
-    }
-
-    private fun observeApiViewModel() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
-                launch {
-                    productViewModel.productDetails.collect { productDetails ->
-                        val productId =
-                            intent.extras?.getLong(DetailProductViewModel.EXTRA_PRODUCT_ID, INVALID_PRODUCT_ID)
-                                ?: INVALID_PRODUCT_ID
-                        if (productId == INVALID_PRODUCT_ID) {
-                            return@collect
-                        }
-                        val detailProduct = productDetails[productId] ?: return@collect
-                        app.appContainer.remoteShoppingStateSyncer.syncProduct(detailProduct)
-                    }
                 }
             }
         }

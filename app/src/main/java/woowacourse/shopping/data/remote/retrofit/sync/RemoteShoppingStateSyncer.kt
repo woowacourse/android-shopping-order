@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.remote.retrofit.sync
 
-import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ShoppingCartItem
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.repository.ShoppingItemRepository
@@ -9,17 +8,6 @@ class RemoteShoppingStateSyncer(
     private val shoppingCartRepository: ShoppingCartRepository,
     private val shoppingItemRepository: ShoppingItemRepository,
 ) {
-    suspend fun syncProducts(products: List<Product>) {
-        if (products.isEmpty()) {
-            return
-        }
-        shoppingItemRepository.replaceProducts(products)
-    }
-
-    suspend fun syncProduct(product: Product) {
-        shoppingItemRepository.upsertProduct(product)
-    }
-
     suspend fun syncCartItems(shoppingCartItems: List<ShoppingCartItem>) {
         shoppingCartItems.forEach { shoppingCartItem ->
             shoppingItemRepository.upsertProduct(shoppingCartItem.product)

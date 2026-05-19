@@ -3,6 +3,8 @@ package woowacourse.shopping.ui.detail
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,15 +13,21 @@ import woowacourse.shopping.domain.model.ShoppingItem
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.repository.ShoppingItemRepository
 import woowacourse.shopping.data.local.datastore.VisitStore
+import woowacourse.shopping.data.mapper.toDomainProduct
+import woowacourse.shopping.data.remote.retrofit.awaitBody
+import woowacourse.shopping.data.remote.retrofit.repository.ProductRetrofitRepository
 
 class DetailProductViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
     private val shoppingItemRepository: ShoppingItemRepository,
     private val visitStore: VisitStore,
+    private val productRetrofitRepository: ProductRetrofitRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DetailProductUiState())
     val uiState: StateFlow<DetailProductUiState> = _uiState.asStateFlow()
 
+    private val detailRequestMutex = Mutex()
+    private var requestedProductIds: Set<Long> = emptySet()
     private var cachedShoppingItems: List<ShoppingItem> = shoppingItemRepository.shoppingItems.value
     private var recentViewedProductIds: List<Long> = visitStore.recentVisitedProductIds.value
     private var selectedProductId: Long? = null
@@ -72,6 +80,7 @@ class DetailProductViewModel(
         viewModelScope.launch {
             visitStore.visit(productId)
         }
+        requestProductDetailIfNeeded(productId)
         publishUiState()
     }
 
@@ -107,6 +116,27 @@ class DetailProductViewModel(
         }
         shoppingCartRepository.addIfAbsent(productId)
         shoppingItemRepository.plusQuantity(productId, quantity)
+    }
+
+    private fun requestProductDetailIfNeeded(productId: Long) {
+        viewModelScope.launch {
+            detailRequestMutex.withLock {
+                if (requestedProductIds.contains(productId)) return@withLock
+                requestedProductIds = requestedProductIds + productId
+
+                runCatching {
+                    productRetrofitRepository
+                        .requestProductDetail(
+                            id = productId,
+                        ).awaitBody(errorPrefix = "상품 조회 실패")
+                        .toDomainProduct()
+                }.onSuccess { detailProduct ->
+                    shoppingItemRepository.upsertProduct(detailProduct)
+                }.onFailure {
+                    requestedProductIds = requestedProductIds - productId
+                }
+            }
+        }
     }
 
     private fun publishUiState() {

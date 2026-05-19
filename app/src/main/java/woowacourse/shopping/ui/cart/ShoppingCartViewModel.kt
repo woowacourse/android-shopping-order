@@ -26,6 +26,7 @@ class ShoppingCartViewModel(
 
     private val _shoppingCartItems = MutableStateFlow<List<ShoppingCartItem>>(emptyList())
     val shoppingCartItems: StateFlow<List<ShoppingCartItem>> = _shoppingCartItems.asStateFlow()
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
@@ -227,7 +228,7 @@ class ShoppingCartViewModel(
             _selectedProductIds.value = targetProductIds
             return
         }
-        _selectedProductIds.value = _selectedProductIds.value - targetProductIds
+        _selectedProductIds.value -= targetProductIds
     }
 
     private fun syncShoppingCartItems(shoppingCartItems: List<ShoppingCartItem>) {

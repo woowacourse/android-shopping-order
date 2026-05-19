@@ -13,8 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.di.ApiViewModelFactory
-import woowacourse.shopping.di.ScreenViewModelFactory
+import woowacourse.shopping.di.AppViewModelFactory
 import woowacourse.shopping.ui.cart.ShoppingCartActivity
 import woowacourse.shopping.ui.cart.ShoppingCartViewModel
 import woowacourse.shopping.ui.component.MoreButton
@@ -24,16 +23,15 @@ import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 class ProductListActivity : ComponentActivity() {
     private val app: ShoppingApplication by lazy { application as ShoppingApplication }
 
-    private val screenViewModelFactory: ScreenViewModelFactory by lazy {
-        ScreenViewModelFactory(appContainer = app.appContainer)
-    }
-    private val apiViewModelFactory: ApiViewModelFactory by lazy {
-        ApiViewModelFactory(app.retrofitService)
+    private val viewModelFactory: AppViewModelFactory by lazy {
+        AppViewModelFactory(
+            appContainer = app.appContainer,
+            retrofitService = app.retrofitService,
+        )
     }
 
-    private val productListViewModel: ProductListViewModel by viewModels { screenViewModelFactory }
-    private val productViewModel: ProductViewModel by viewModels { apiViewModelFactory }
-    private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { apiViewModelFactory }
+    private val productListViewModel: ProductListViewModel by viewModels { viewModelFactory }
+    private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { viewModelFactory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,8 +42,7 @@ class ProductListActivity : ComponentActivity() {
 
         setContent {
             val uiState = productListViewModel.uiState.collectAsStateWithLifecycle()
-            val state = productViewModel.state.collectAsStateWithLifecycle()
-            val hasApiError = state.value.errorMessage != null
+            val hasApiError = uiState.value.errorMessage != null
             val visibleShoppingItems =
                 if (hasApiError) {
                     emptyList()
@@ -64,7 +61,7 @@ class ProductListActivity : ComponentActivity() {
                     shoppingItems = visibleShoppingItems,
                     recentViewedShoppingItems = visibleRecentViewedItems,
                     shoppingCartTotalCount = if (hasApiError) 0 else uiState.value.shoppingCartTotalCount,
-                    state = state.value,
+                    isLoading = uiState.value.isLoading,
                     onAddToCartClick = { shoppingItem ->
                         shoppingCartViewModel.addOrIncreaseByProductId(
                             productId = shoppingItem.getProductId(),
@@ -101,8 +98,8 @@ class ProductListActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         val shouldLoadInitialProducts =
-            productViewModel.state.value.products.isEmpty() &&
-                !productViewModel.state.value.isLoading
+            productListViewModel.uiState.value.loadedProducts.isEmpty() &&
+                !productListViewModel.uiState.value.isLoading
         if (shouldLoadInitialProducts) {
             requestProductsAndCart()
         } else {
@@ -111,18 +108,13 @@ class ProductListActivity : ComponentActivity() {
     }
 
     private fun requestProductsAndCart() {
-        productViewModel.requestProduct(size = MAX_PRODUCT_SIZE)
+        productListViewModel.requestProduct(size = MAX_PRODUCT_SIZE)
         shoppingCartViewModel.requestCartItems(force = true)
     }
 
     private fun observeApiViewModels() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    productViewModel.products.collect { products ->
-                        app.appContainer.remoteShoppingStateSyncer.syncProducts(products)
-                    }
-                }
                 launch {
                     shoppingCartViewModel.shoppingCartItems.collect { shoppingCartItems ->
                         app.appContainer.remoteShoppingStateSyncer.syncCartItems(shoppingCartItems)

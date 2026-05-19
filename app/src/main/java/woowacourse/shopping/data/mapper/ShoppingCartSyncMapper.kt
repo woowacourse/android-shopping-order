@@ -8,12 +8,6 @@ import woowacourse.shopping.data.remote.retrofit.dto.ShoppingCartResponse
 import woowacourse.shopping.domain.model.ShoppingCartItem
 import woowacourse.shopping.domain.model.ShoppingItem
 
-fun ShoppingItem.toCartRequest(quantity: Int = getQuantity()): CartRequest =
-    CartRequest(
-        productId = getProductId(),
-        quantity = quantity,
-    )
-
 fun Int.toCartQuantity(): CartQuantity = CartQuantity(quantity = this)
 
 fun Content.toDomainShoppingCartItem(): ShoppingCartItem =
@@ -27,8 +21,3 @@ fun Content.toDomainShoppingCartItem(): ShoppingCartItem =
     )
 
 fun ShoppingCartResponse.toDomainShoppingCartItems(): List<ShoppingCartItem> = content.map { item -> item.toDomainShoppingCartItem() }
-
-fun List<ShoppingCartItem>.toOrderInfo(): OrderInfo =
-    OrderInfo(
-        cartItemIds = map { shoppingCartItem -> shoppingCartItem.getId() },
-    )

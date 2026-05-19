@@ -11,7 +11,7 @@ class ProductRetrofitRepository(
     fun requestProduct(
         page: Int = DEFAULT_PAGE,
         size: Int = DEFAULT_SIZE,
-        sort: List<String>? = null,
+        sort: List<String>? = DEFAULT_SORT,
         category: String? = null,
     ): Call<ProductResponse> =
         apiService.requestProducts(
@@ -39,5 +39,6 @@ class ProductRetrofitRepository(
     companion object {
         private const val DEFAULT_PAGE = 0
         private const val DEFAULT_SIZE = 20
+        private val DEFAULT_SORT = listOf("id,asc")
     }
 }

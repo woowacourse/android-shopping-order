@@ -28,15 +28,6 @@ fun Pageable.toDomainProduct(): Product =
 
 fun ProductResponse.toDomainProducts(): List<Product> = content.map { product -> product.toDomainProduct() }
 
-fun Product.toApiProduct(category: String = this.category): ApiProduct =
-    ApiProduct(
-        category = category,
-        id = id,
-        imageUrl = imageUrl,
-        name = getTitle(),
-        price = getPrice(),
-    )
-
 fun Product.toShoppingItem(quantity: Int = 0): ShoppingItem =
     ShoppingItem(
         product = this,
