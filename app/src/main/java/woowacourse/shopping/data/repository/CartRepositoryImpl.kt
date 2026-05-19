@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.repository
 
-import android.util.Log
 import woowacourse.shopping.data.remote.api.CartApi
 import woowacourse.shopping.data.remote.dto.request.AddCartRequestBody
 import woowacourse.shopping.data.remote.dto.request.UpdateCartRequestBody
@@ -68,12 +67,9 @@ class CartRepositoryImpl(
         quantity: Int,
     ) {
         val cartItem = getCartItem(productId)
-        Log.d("okhttp1", "$cartItem")
 
         if (cartItem == null) {
             addCartItem(productId, quantity)
-
-            Log.d("okhttp1", "addCartItem")
             return
         }
 
