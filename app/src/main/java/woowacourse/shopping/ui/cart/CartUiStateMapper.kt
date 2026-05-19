@@ -29,7 +29,7 @@ fun CartUiState.toUiState(
         selectedCartItemCount = selection.selectedCount,
         recommendProducts =
             if (isOrder) {
-                recommendProducts.withCartQuantities(cartItems)
+                recommendProducts.mapper(cartItems)
             } else {
                 recommendProducts
             },

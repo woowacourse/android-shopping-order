@@ -39,6 +39,7 @@ class DetailViewModel(
         viewModelScope.launch {
             try {
                 val product = productRepository.getProductById(id)
+                cartRepository.refreshCartItems()
                 val lastViewedItem =
                     if (hideRecentItem) {
                         null
