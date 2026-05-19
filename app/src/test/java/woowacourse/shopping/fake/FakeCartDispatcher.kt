@@ -43,23 +43,17 @@ class FakeCartDispatcher(
                         val bodyContent = request.body?.utf8() ?: return clientErrorResponse
                         val addItemRequestBody =
                             json.decodeFromString<AddItemRequestBody>(bodyContent)
-                        allCartItems.add(
-                            CartContent(
-                                id = allCartItems.size.toLong(),
-                                product = fixedProductContent,
-                                quantity = addItemRequestBody.quantity,
-                            ),
-                        )
+                        return responseAddItem(addItemRequestBody.quantity)
                     }
                 } else if (method == "DELETE") {
                     val id = pathSegments[1].toLongOrNull() ?: return clientErrorResponse
-                    responseDeleteItem(id.toInt())
+                    return responseDeleteItem(id.toInt())
                 } else if (method == "PATCH") {
                     val id = pathSegments[1].toLongOrNull() ?: return clientErrorResponse
                     val bodyContent = request.body?.utf8() ?: return clientErrorResponse
                     val changeQuantityRequestBody =
                         json.decodeFromString<QuantityRequestBody>(bodyContent)
-                    changeQuantity(id.toInt(), changeQuantityRequestBody.quantity)
+                    return changeQuantity(id.toInt(), changeQuantityRequestBody.quantity)
                 }
                 clientErrorResponse
             } else {
@@ -111,6 +105,17 @@ class FakeCartDispatcher(
 
     private fun responseDeleteItem(index: Int): MockResponse {
         allCartItems.removeAt(index)
+        return MockResponse.Builder().code(200).build()
+    }
+
+    private fun responseAddItem(quantity: Int): MockResponse {
+        allCartItems.add(
+            CartContent(
+                id = allCartItems.size.toLong(),
+                product = fixedProductContent,
+                quantity = quantity,
+            )
+        )
         return MockResponse.Builder().code(200).build()
     }
 
