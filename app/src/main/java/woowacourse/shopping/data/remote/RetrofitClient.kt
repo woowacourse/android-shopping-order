@@ -13,6 +13,7 @@ import kotlin.reflect.KClass
 
 object RetrofitClient {
     private const val BASE_URL = BuildConfig.BASE_URL
+    private const val TEMP_URL = "http://192.168.2.152:3000"
     private val json =
         Json {
             ignoreUnknownKeys = true

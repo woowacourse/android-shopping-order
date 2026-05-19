@@ -6,5 +6,6 @@
         <domain includeSubdomains="true">
             techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com
         </domain>
+        <domain includeSubdomains="true">192.168.2.152</domain>
     </domain-config>
 </network-security-config>
