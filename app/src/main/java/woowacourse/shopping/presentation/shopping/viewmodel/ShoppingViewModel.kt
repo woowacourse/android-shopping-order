@@ -60,13 +60,11 @@ class ShoppingViewModel(
 
     init {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
             cartRepository.loadCart()
             loadProducts(
                 page = _uiState.value.page,
                 size = PRODUCT_PAGE_SIZE,
             )
-            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
