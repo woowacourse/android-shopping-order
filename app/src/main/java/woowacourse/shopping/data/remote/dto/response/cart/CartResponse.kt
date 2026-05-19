@@ -6,7 +6,7 @@ import woowacourse.shopping.data.remote.dto.response.Sort
 
 @Serializable
 data class CartResponse(
-    val content: List<CartDto>,
+    val content: List<CartItemResponse>,
     val empty: Boolean,
     val first: Boolean,
     val last: Boolean,

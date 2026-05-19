@@ -3,8 +3,8 @@ package woowacourse.shopping.data.repository
 import woowacourse.shopping.data.remote.api.CartApi
 import woowacourse.shopping.data.remote.dto.request.AddCartRequestBody
 import woowacourse.shopping.data.remote.dto.request.UpdateCartRequestBody
-import woowacourse.shopping.data.remote.dto.response.cart.CartDto
-import woowacourse.shopping.data.remote.dto.response.cart.CartProductDto
+import woowacourse.shopping.data.remote.dto.response.cart.CartItemResponse
+import woowacourse.shopping.data.remote.dto.response.cart.CartProductResponse
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
@@ -106,14 +106,14 @@ class CartRepositoryImpl(
         )
     }
 
-    private fun CartDto.toDomain(): CartItem =
+    private fun CartItemResponse.toDomain(): CartItem =
         CartItem(
             id = id,
             product = product.toDomain(),
             quantity = quantity,
         )
 
-    private fun CartProductDto.toDomain(): Product =
+    private fun CartProductResponse.toDomain(): Product =
         Product(
             id = id,
             name = ProductName(name),

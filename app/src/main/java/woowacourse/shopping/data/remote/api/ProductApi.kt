@@ -3,7 +3,7 @@ package woowacourse.shopping.data.remote.api
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.data.remote.dto.response.product.ProductResponse
+import woowacourse.shopping.data.remote.dto.response.products.ProductResponse
 import woowacourse.shopping.data.remote.dto.response.products.ProductsResponse
 
 interface ProductApi {

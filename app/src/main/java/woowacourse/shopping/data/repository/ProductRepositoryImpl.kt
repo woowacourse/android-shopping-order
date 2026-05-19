@@ -1,8 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.remote.api.ProductApi
-import woowacourse.shopping.data.remote.dto.response.product.ProductResponse
-import woowacourse.shopping.data.remote.dto.response.products.ProductDto
+import woowacourse.shopping.data.remote.dto.response.products.ProductResponse
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductName
@@ -37,15 +36,6 @@ class ProductRepositoryImpl(
     }
 
     override suspend fun getProductById(id: Long): Product = api.getProductById(id).toDomain()
-
-    private fun ProductDto.toDomain(): Product =
-        Product(
-            id = id,
-            name = ProductName(name),
-            price = Money(price.toLong()),
-            imageUrl = imageUrl,
-            category = category,
-        )
 
     private fun ProductResponse.toDomain(): Product =
         Product(

@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.remote.dto.response.product
+package woowacourse.shopping.data.remote.dto.response.products
 
 import kotlinx.serialization.Serializable
 

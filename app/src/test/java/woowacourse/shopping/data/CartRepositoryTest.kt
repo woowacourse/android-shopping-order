@@ -8,8 +8,8 @@ import woowacourse.shopping.data.remote.dto.request.AddCartRequestBody
 import woowacourse.shopping.data.remote.dto.request.UpdateCartRequestBody
 import woowacourse.shopping.data.remote.dto.response.Pageable
 import woowacourse.shopping.data.remote.dto.response.Sort
-import woowacourse.shopping.data.remote.dto.response.cart.CartDto
-import woowacourse.shopping.data.remote.dto.response.cart.CartProductDto
+import woowacourse.shopping.data.remote.dto.response.cart.CartItemResponse
+import woowacourse.shopping.data.remote.dto.response.cart.CartProductResponse
 import woowacourse.shopping.data.remote.dto.response.cart.CartQuantityResponse
 import woowacourse.shopping.data.remote.dto.response.cart.CartResponse
 import woowacourse.shopping.data.repository.CartRepositoryImpl
@@ -22,7 +22,7 @@ class CartRepositoryTest {
 
             val result = repository.getCartItemsByPage(page = 0, size = 5)
 
-            assertThat(result.cartItems.map { it.id }).containsExactly("1", "2", "3", "4", "5")
+            assertThat(result.cartItems.map { it.id }).containsExactly(1, 2, 3, 4, 5)
             assertThat(result.isLastPage).isFalse()
         }
 
@@ -31,7 +31,7 @@ class CartRepositoryTest {
         runTest {
             val repository = CartRepositoryImpl(FakeCartApi(listOf(createCartDto(id = 1, productId = 10, quantity = 3))))
 
-            val quantity = repository.getCartItemQuantity(productId = "10")
+            val quantity = repository.getCartItemQuantity(productId = 10)
 
             assertThat(quantity).isEqualTo(3)
         }
@@ -41,7 +41,7 @@ class CartRepositoryTest {
         runTest {
             val repository = CartRepositoryImpl(FakeCartApi(emptyList()))
 
-            val quantity = repository.getCartItemQuantity(productId = "10")
+            val quantity = repository.getCartItemQuantity(productId = 10)
 
             assertThat(quantity).isNull()
         }
@@ -77,7 +77,7 @@ class CartRepositoryTest {
                     ),
                 )
 
-            val totalPrice = repository.getTotalPrice(cartIds = listOf("1", "2"))
+            val totalPrice = repository.getTotalPrice(cartIds = listOf(1, 2))
 
             assertThat(totalPrice.amount).isEqualTo(8000)
         }
@@ -88,14 +88,14 @@ class CartRepositoryTest {
             val api = FakeCartApi(createCartDtos(size = 2))
             val repository = CartRepositoryImpl(api)
 
-            repository.deleteItem("1")
+            repository.deleteItem(1)
 
             assertThat(api.deletedIds).containsExactly(1L)
         }
 }
 
 private class FakeCartApi(
-    private var items: List<CartDto>,
+    private var items: List<CartItemResponse>,
 ) : CartApi {
     val deletedIds = mutableListOf<Long>()
 
@@ -147,7 +147,7 @@ private class FakeCartApi(
     override suspend fun getCartItemsQuantity(): CartQuantityResponse = CartQuantityResponse(quantity = items.sumOf { it.quantity })
 }
 
-private fun createCartDtos(size: Int): List<CartDto> =
+private fun createCartDtos(size: Int): List<CartItemResponse> =
     (1..size).map { id ->
         createCartDto(id = id.toLong(), productId = id.toLong(), quantity = 1)
     }
@@ -157,11 +157,11 @@ private fun createCartDto(
     productId: Long,
     quantity: Int,
     price: Long = 2000,
-): CartDto =
-    CartDto(
+): CartItemResponse =
+    CartItemResponse(
         id = id,
         product =
-            CartProductDto(
+            CartProductResponse(
                 id = productId,
                 name = "product$productId",
                 price = price,
@@ -172,7 +172,7 @@ private fun createCartDto(
     )
 
 private fun createCartResponse(
-    content: List<CartDto>,
+    content: List<CartItemResponse>,
     page: Int,
     size: Int,
     totalElements: Int,
