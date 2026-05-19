@@ -12,8 +12,8 @@ interface RecentItemDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: RecentItemEntity)
 
-    @Query("SELECT * FROM recent_items ORDER BY timestamp DESC, id DESC LIMIT 10")
-    fun getRecentItems(): Flow<List<RecentItemEntity>>
+    @Query("SELECT * FROM recent_items ORDER BY timestamp DESC, id DESC LIMIT :limit")
+    fun getRecentItems(limit: Int): Flow<List<RecentItemEntity>>
 
     @Query("SELECT * FROM recent_items WHERE id = :id")
     suspend fun getRecentItemById(id: String): RecentItemEntity?
@@ -21,10 +21,10 @@ interface RecentItemDao {
     @Query(
         """
         DELETE FROM recent_items
-        WHERE id NOT IN (SELECT id FROM recent_items ORDER BY timestamp DESC, id DESC LIMIT 10)
+        WHERE id NOT IN (SELECT id FROM recent_items ORDER BY timestamp DESC, id DESC LIMIT :limit)
     """,
     )
-    suspend fun deleteOldItem()
+    suspend fun deleteItemsExceedingLimit(limit: Int)
 
     @Query(
         """

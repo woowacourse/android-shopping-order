@@ -13,11 +13,11 @@ class RecentItemRepository(
 ) {
     suspend fun addRecentItem(product: Product) {
         recentItemDao.insert(product.toEntity(System.currentTimeMillis()))
-        recentItemDao.deleteOldItem()
+        recentItemDao.deleteItemsExceedingLimit(MAX_RECENT_ITEMS_LIMIT)
     }
 
     fun getRecentItems(): Flow<List<Product>> =
-        recentItemDao.getRecentItems().map { entities ->
+        recentItemDao.getRecentItems(MAX_RECENT_ITEMS_LIMIT).map { entities ->
             entities.mapNotNull { entity ->
                 val product =
                     runCatching {
@@ -36,5 +36,9 @@ class RecentItemRepository(
             }.getOrNull()
 
         return product?.let { entity.toDomain(it) }
+    }
+
+    companion object {
+        private const val MAX_RECENT_ITEMS_LIMIT = 10
     }
 }
