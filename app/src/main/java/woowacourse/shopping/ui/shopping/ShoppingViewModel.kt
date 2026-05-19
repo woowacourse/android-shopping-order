@@ -18,15 +18,14 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import woowacourse.shopping.data.remote.NetworkMonitor
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.Products
+import woowacourse.shopping.ui.common.error.ErrorMessageMapper
 import woowacourse.shopping.ui.common.model.ProductUiModel
-import java.io.IOException
 
 class ShoppingViewModel(
     networkMonitor: NetworkMonitor,
@@ -234,18 +233,7 @@ class ShoppingViewModel(
     ) {
         if (e is CancellationException) throw e
         Log.e(TAG, "$tag 에러", e)
-        val msg =
-            when (e) {
-                is IOException -> "네트워크 연결을 확인해주세요."
-                is HttpException ->
-                    when (e.code()) {
-                        401, 403 -> "다시 로그인이 필요해요."
-                        in 500..599 -> "서버에 일시적 문제가 있어요."
-                        else -> defaultMessage
-                    }
-                else -> defaultMessage
-            }
-        _events.send(msg)
+        _events.send(ErrorMessageMapper.toUserMessage(e, defaultMessage))
     }
 
     companion object {

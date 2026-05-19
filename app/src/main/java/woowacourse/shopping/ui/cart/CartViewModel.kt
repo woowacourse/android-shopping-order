@@ -19,6 +19,7 @@ import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.model.Cart
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.recommender.ProductRecommender
+import woowacourse.shopping.ui.common.error.ErrorMessageMapper
 import woowacourse.shopping.ui.common.model.LoadState
 import woowacourse.shopping.ui.common.model.ProductUiModel
 import java.io.IOException
@@ -351,17 +352,7 @@ class CartViewModel(
     ) {
         if (e is CancellationException) throw e
         Log.e(TAG, "$tag 에러", e)
-        val msg = when (e) {
-            is IOException -> "네트워크 연결을 확인해주세요."
-            is HttpException -> when (e.code()) {
-                401, 403 -> "다시 로그인이 필요해요."
-                in 500..599 -> "서버에 일시적 문제가 있어요."
-                else -> defaultMessage
-            }
-
-            else -> defaultMessage
-        }
-        _events.send(msg)
+        _events.send(ErrorMessageMapper.toUserMessage(e, defaultMessage))
     }
 
     private suspend fun refreshData() {
