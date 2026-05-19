@@ -23,10 +23,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import woowacourse.shopping.ui.component.ShoppingAppBar
 import woowacourse.shopping.ui.model.CartItemUiModel
-import woowacourse.shopping.ui.model.ProductUiModel
+import woowacourse.shopping.ui.preview.PreviewMockData
 
 @Composable
 fun CartScreen(
@@ -207,35 +206,7 @@ private fun CartContentPreview() {
         isCanMoveNext = true,
         onDeleteItem = {},
         onQuantityChange = { _, _ -> },
-        cartItems =
-            listOf(
-                CartItemUiModel(
-                    product =
-                        ProductUiModel(
-                            id = "1",
-                            name = "커피",
-                            imageUrl = "",
-                            price = 1000,
-                        ),
-                    quantity = 1,
-                    totalPrice = 1000,
-                    id = "",
-                    isChecked = true,
-                ),
-                CartItemUiModel(
-                    product =
-                        ProductUiModel(
-                            id = "2",
-                            name = "커피",
-                            imageUrl = "",
-                            price = 1000,
-                        ),
-                    quantity = 1,
-                    totalPrice = 1000,
-                    id = "",
-                    isChecked = true,
-                ),
-            ).toImmutableList(),
+        cartItems = PreviewMockData.cartItems,
         isLoading = true,
         errorMessage = null,
         onCheckedChange = { },
