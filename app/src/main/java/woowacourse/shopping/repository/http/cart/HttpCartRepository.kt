@@ -156,9 +156,10 @@ class HttpCartRepository(
         var currentPage = 0
 
         while (true) {
-            val response = execute("장바구니 조회 API 호출에 실패했습니다.") {
-                cartApiService.getCartItems(page = currentPage, size = NETWORK_PAGE_SIZE)
-            }
+            val response =
+                execute("장바구니 조회 API 호출에 실패했습니다.") {
+                    cartApiService.getCartItems(page = currentPage, size = NETWORK_PAGE_SIZE)
+                }
 
             allCartItems.addAll(response.content)
 
