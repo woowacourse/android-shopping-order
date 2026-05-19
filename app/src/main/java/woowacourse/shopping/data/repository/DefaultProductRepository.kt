@@ -29,14 +29,8 @@ class DefaultProductRepository(
             remoteProductDataSource.fetchProducts(page, size).map {
                 Product(
                     id = it.id,
-                    name =
-                        ProductName(
-                            it.name,
-                        ),
-                    price =
-                        Money(
-                            it.price.toLong(),
-                        ),
+                    name = ProductName(it.name),
+                    price = Money(it.price.toLong()),
                     imageUrl = it.imageUrl,
                     category = it.category,
                 )

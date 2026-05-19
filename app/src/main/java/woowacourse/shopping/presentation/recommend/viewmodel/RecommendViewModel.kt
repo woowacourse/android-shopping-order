@@ -30,7 +30,6 @@ class RecommendViewModel(
     }
 
     private val _uiState = MutableStateFlow(RecommendUiState())
-    private val products = productRepository.products
     private val cart = cartRepository.cart
     private val paymentItemIds = MutableStateFlow(emptySet<Long>())
 

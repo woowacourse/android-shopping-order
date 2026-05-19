@@ -110,7 +110,7 @@ class ShoppingViewModel(
                 )
             _uiState.update {
                 it.copy(
-                    page = it.page + loadedSize,
+                    page = it.page + 1,
                     canLoadMore = loadedSize == size,
                 )
             }
