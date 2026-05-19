@@ -13,5 +13,5 @@ value class Money(
         return Money(Math.multiplyExact(amount, time))
     }
 
-    operator fun plus(money: Money): Money = Money(amount + money.amount)
+    operator fun plus(money: Money): Money = Money(Math.addExact(amount, money.amount))
 }
