@@ -21,10 +21,10 @@ class DetailActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val id = intent.getStringExtra(PRODUCT_ID)?.toLongOrNull()
+        val id = intent.getLongExtra(PRODUCT_ID, 0)
         val hideRecentItem = intent.getBooleanExtra(HIDE_RECENT_ITEM, false)
 
-        if (id == null) {
+        if (id == 0L) {
             Toast.makeText(this, "유효하지 않은 상품입니다.", Toast.LENGTH_SHORT).show()
             finish()
             return
