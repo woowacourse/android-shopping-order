@@ -1,3 +1,53 @@
+# 🚀 3단계 - Navigation & Flow
+
+## 🎯 기능 목록
+
+### 환경 및 인프라 설정
+- [ ] Compose Navigation 의존성 추가 및 프로젝트 구성
+  - [ ] `androidx.navigation:navigation-compose` 의존성 추가
+- [ ] 기존 Activity/Intent 기반 화면 전환 코드 제거
+  - [ ] 각 화면별 Activity 클래스 및 `startActivity` 호출부 제거
+  - [ ] `AndroidManifest.xml`에서 불필요한 Activity 선언 정리
+  - [ ] 진입점을 단일 Activity + NavHost 구조로 전환
+
+### Navigation 구조 설계 (Route)
+- [ ] 화면별 Route를 `@Serializable` 타입으로 선언
+  - [ ] 상품 목록 Route (`Shopping`) 정의
+  - [ ] 상품 상세 Route (`ProductDetail`) 정의 — productId 파라미터 포함
+  - [ ] 장바구니 Route (`Cart`) 정의
+  - [ ] 상품 추천 Route (`Recommendation`) 정의
+- [ ] NavHost 및 NavController 구성
+  - [ ] 앱 루트에 단일 `NavHost` 배치 및 시작 목적지(상품 목록) 지정
+  - [ ] 각 Route에 대응하는 `composable<Route>` 블록 작성
+  - [ ] NavController는 화면 Composable에 직접 전달하지 않고 이동 콜백 람다로 분리
+
+### 화면 이동 및 Back Stack 제어
+- [ ] 화면 간 이동을 NavController 기반으로 처리
+  - [ ] 상품 목록 → 상품 상세 이동 시 productId 전달
+  - [ ] 상품 상세 → 장바구니 이동
+  - [ ] 장바구니 → 상품 추천 이동
+- [ ] 주문 완료 흐름의 Back Stack 정리
+  - [ ] 주문 완료 후 상품 목록으로 이동 시 `popUpTo`로 주문 관련 화면 제거
+  - [ ] `inclusive` 옵션을 적절히 설정하여 뒤로가기 시 주문 흐름이 남지 않도록 처리
+
+### 도메인 로직 / UI 상태 관리 (Flow)
+- [ ] ViewModel의 UI 상태를 `StateFlow`로 노출
+  - [ ] 내부 상태는 `MutableStateFlow`로 선언
+  - [ ] 외부 노출은 `asStateFlow()`를 통한 읽기 전용 `StateFlow`
+  - [ ] 기존 `remember` / `mutableStateOf` 기반 상태를 모두 교체
+- [ ] 일회성 이벤트를 `SharedFlow`로 처리
+  - [ ] 장바구니 담기 성공/실패 이벤트를 `MutableSharedFlow`로 발행
+  - [ ] 스낵바 표시, 화면 이동 트리거 등 단발성 이벤트 처리
+  - [ ] 이벤트 수신 후 재발행되지 않도록 replay/buffer 정책 검토
+- [ ] Composable에서 Lifecycle 인식 상태 구독
+  - [ ] `collectAsState()` 호출부를 `collectAsStateWithLifecycle()`로 교체
+  - [ ] 백그라운드 상태에서 불필요한 수집이 발생하지 않도록 보장
+
+### 테스트
+- [ ] 기존 테스트 호환성 유지
+
+---
+
 # 1 & 2단계 리팩토링 목록 - 2번째
 
 ### 아키텍처 및 ViewModel 계층 개선
@@ -82,7 +132,7 @@
 
 # 🚀 1단계 - 서버 연동
 
-## 🎯 기능 목록
+##  기능 목록
 
 ### 환경 및 인프라 설정
 - [x] 네트워크 통신 환경 구성
