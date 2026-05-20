@@ -27,7 +27,7 @@ object RetrofitClient {
     private fun <T : Any> buildToService(clazz: KClass<T>): T =
         Retrofit
             .Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(TEMP_URL)
             .client(httpClient)
             .addConverterFactory(
                 json.asConverterFactory("application/json".toMediaType()),
