@@ -273,12 +273,17 @@ class HttpCartRepository(
                 val body = response.body()
 
                 if (body == null) {
-                    Result.failure(
-                        CartParsingException(
-                            message = "장바구니 API 응답 본문이 비어 있습니다.",
-                            cause = IllegalStateException("response body is null"),
-                        ),
-                    )
+                    if (response.code() == 204) {
+                        @Suppress("UNCHECKED_CAST")
+                        Result.success(Unit as T)
+                    } else {
+                        Result.failure(
+                            CartParsingException(
+                                message = "장바구니 API 응답 본문이 비어 있습니다.",
+                                cause = IllegalStateException("response body is null"),
+                            ),
+                        )
+                    }
                 } else {
                     Result.success(body)
                 }
