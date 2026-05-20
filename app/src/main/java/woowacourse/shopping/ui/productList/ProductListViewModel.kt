@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.domain.cart.CartItems
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.Products
 import woowacourse.shopping.domain.repository.CartRepository
@@ -32,7 +31,7 @@ class ProductListViewModel(
 ) : ViewModel() {
     private val productsFlow = MutableStateFlow(Products(items = emptyList(), isLast = false))
     private val recentProductsFlow = MutableStateFlow<List<Product>>(emptyList())
-    private val cartFlow = MutableStateFlow(CartItems())
+    private val cartFlow = cartRepository.cartItems
 
     private val loadStateFlow = MutableStateFlow<LoadState>(LoadState.Initial)
 
@@ -46,7 +45,7 @@ class ProductListViewModel(
             loadStateFlow,
         ) { products, recents, cart, loadState ->
             ProductListUiState(
-                products = products.toUiModel(cartFlow.value),
+                products = products.toUiModel(cart),
                 recentProducts = recents,
                 hasNextPage = !products.isLast,
                 loadState = loadState,
@@ -63,7 +62,11 @@ class ProductListViewModel(
 
     fun initCartItem() {
         viewModelScope.launch {
-            cartRepository.refreshCartItems()
+            runCatching {
+                cartRepository.refreshCartItems()
+            }.onFailure { throwable ->
+                loadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+            }
         }
     }
 
@@ -97,22 +100,33 @@ class ProductListViewModel(
 
     fun addProduct(productId: Int) {
         viewModelScope.launch {
-            cartRepository.addProduct(productId, 1)
+            runCatching {
+                cartRepository.addProduct(productId, 1)
+            }.onFailure { throwable ->
+                loadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+            }
         }
     }
 
     fun increaseQuantity(productId: Int) {
         viewModelScope.launch {
             val target = cartFlow.value.findByProductId(productId) ?: return@launch
-            cartRepository.updateQuantity(target.id, target.quantity.value + 1)
+            runCatching {
+                cartRepository.updateQuantity(target.id, target.quantity.value + 1)
+            }.onFailure { throwable ->
+                loadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+            }
         }
     }
 
     fun decreaseQuantity(productId: Int) {
         viewModelScope.launch {
             val target = cartFlow.value.findByProductId(productId) ?: return@launch
-
-            cartRepository.updateQuantity(target.id, target.quantity.value - 1)
+            runCatching {
+                cartRepository.updateQuantity(target.id, target.quantity.value - 1)
+            }.onFailure { throwable ->
+                loadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+            }
         }
     }
 
