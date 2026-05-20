@@ -19,6 +19,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ui.cart.list.CartScreen
 import woowacourse.shopping.ui.cart.list.CartViewModel
 import woowacourse.shopping.ui.cart.list.CartViewModelFactory
@@ -99,10 +101,12 @@ class CartActivity : ComponentActivity() {
                             modifier = Modifier.padding(innerPadding),
                             onBackClick = ::finish,
                             onOrderClick = {
-                                val selectedCartOrder = cartViewModel.createSelectedCartOrder()
-                                if (selectedCartOrder != null) {
-                                    recommendationViewModel.startOrder(selectedCartOrder)
-                                    isShowingRecommendedProducts = true
+                                lifecycleScope.launch {
+                                    val selectedCartOrder = cartViewModel.createSelectedCartOrder()
+                                    if (selectedCartOrder != null) {
+                                        recommendationViewModel.startOrder(selectedCartOrder)
+                                        isShowingRecommendedProducts = true
+                                    }
                                 }
                             },
                             onItemCheckedChange = cartViewModel::toggleItemSelection,

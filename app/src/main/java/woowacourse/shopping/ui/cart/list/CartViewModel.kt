@@ -62,23 +62,38 @@ class CartViewModel(
         }
     }
 
-    fun createSelectedCartOrder(): SelectedCartOrder? =
-        withContentState(null) { contentState ->
-            val selectedItems = contentState.items.filter { it.isSelected }
-            if (selectedItems.isEmpty()) return null
+    suspend fun createSelectedCartOrder(): SelectedCartOrder? {
+        val totalCount = cartRepository.count().getOrDefault(0)
+        if (totalCount == 0) return null
 
-            return SelectedCartOrder(
-                items =
-                    selectedItems.map { item ->
-                        SelectedCartOrderItem(
-                            cartItemId = item.cartItemId,
-                            productId = item.productId,
-                            price = item.price,
-                            quantity = item.quantity,
-                        )
-                    },
-            )
+        val allCartItems = cartRepository.getCartPage(
+            page = 0,
+            size = totalCount,
+        ).getOrNull()?.items ?: return null
+
+        val productIds = allCartItems.map { it.productId }.toSet()
+        val productsById = productRepository.findAllByIds(productIds)
+            .getOrDefault(emptyMap())
+
+        val deselectedIds = _uiState.value.deselectedProductIds
+        val selectedItems = allCartItems.filter {
+            it.productId !in deselectedIds
         }
+
+        if (selectedItems.isEmpty()) return null
+
+        return SelectedCartOrder(
+            items =
+                selectedItems.map { item ->
+                    SelectedCartOrderItem(
+                        cartItemId = item.cartItemId,
+                        productId = item.productId,
+                        price = productsById[item.productId]?.price?.value ?: 0,
+                        quantity = item.quantity
+                    )
+                }
+        )
+    }
 
     fun delete(productId: Long) {
         updateQuantity(productId = productId, targetQuantity = 0)
