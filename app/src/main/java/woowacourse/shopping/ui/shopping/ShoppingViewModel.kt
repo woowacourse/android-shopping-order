@@ -45,7 +45,6 @@ class ShoppingViewModel(
                 _uiState.update { it.copy(uiInfo = it.uiInfo.copy(isLoading = false)) }
             }
         }
-
     }
 
     private suspend fun observeNetwork() {
