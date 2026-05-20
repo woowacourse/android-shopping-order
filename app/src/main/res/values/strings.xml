@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Shopping</string>
     <string name="price_format">%,d원</string>
+    <string name="thanks_for_add_all_product">모든 상품을 담아서 추천 상품이 없습니다. 고객님 감사합니다.</string>
 </resources>

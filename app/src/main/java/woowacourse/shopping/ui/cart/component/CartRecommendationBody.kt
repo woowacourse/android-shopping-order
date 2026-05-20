@@ -12,10 +12,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Money
 import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.ui.common.model.ProductUiModel
@@ -47,7 +49,7 @@ fun CartRecommendationBody(
             )
         } else {
             Text(
-                text = "모든 상품을 담아서 추천 상품이 없습니다. 고객님 감사합니다.",
+                text = stringResource(R.string.thanks_for_add_all_product),
             )
         }
     }
