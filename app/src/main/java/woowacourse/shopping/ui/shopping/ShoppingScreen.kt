@@ -16,12 +16,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import woowacourse.shopping.R
 import woowacourse.shopping.data.model.Money
 import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.data.model.Products
@@ -62,7 +64,7 @@ fun ShoppingScreen(
 
     if (!isConnected) {
         Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(text = "인터넷 연결이 끊겼습니다. 오프라인 모드입니다. 😥")
+            Text(text = stringResource(R.string.alert_message_for_offline_mode))
         }
     } else if (state.shouldShowError && errorMessage != null) {
         NetworkErrorMessage(
