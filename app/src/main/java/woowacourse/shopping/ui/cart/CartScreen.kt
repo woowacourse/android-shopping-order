@@ -66,17 +66,17 @@ fun CartScreen(
         },
         bottomBar = {
             CartBottomBar(
-                isOrder = uiState.isOrder,
-                isAllChecked = uiState.isAllChecked,
-                totalPrice = uiState.totalPrice,
-                totalCount = uiState.selectedCartItemCount,
+                isOrder = uiState.uiInfoState.isOrder,
+                isAllChecked = uiState.selectedCartState.isAllChecked,
+                totalPrice = uiState.cartSummary.totalPrice,
+                totalCount = uiState.selectedCartState.selectedCartItemCount,
                 onAllCheckedChange = isAllSelectClick,
                 onOrderClick = onOrderClick,
             )
         },
         modifier = modifier.systemBarsPadding(),
     ) { innerPadding ->
-        if (uiState.isOrder) {
+        if (uiState.uiInfoState.isOrder) {
             RecommendProductContent(
                 products = uiState.recommendProducts,
                 onQuantityChange = onQuantityChange,
@@ -87,18 +87,18 @@ fun CartScreen(
             )
         } else {
             CartContent(
-                totalCartSize = uiState.totalCartCount,
-                page = uiState.page,
+                totalCartSize = uiState.cartSummary.totalCartCount,
+                page = uiState.pageState.page,
                 onNextPage = onNextPage,
                 onPreviousPage = onPreviousPage,
-                isCanMoveNext = uiState.isCanMoveNext,
+                isCanMoveNext = uiState.pageState.isCanMoveNext,
                 onQuantityChange = onQuantityChange,
                 onDeleteItem = {
                     onDeleteItem(it)
                 },
                 cartItems = uiState.items,
-                isLoading = uiState.isLoading,
-                errorMessage = uiState.errorMessage,
+                isLoading = uiState.uiInfoState.isLoading,
+                errorMessage = uiState.uiInfoState.errorMessage,
                 onCheckedChange = onCheckedChange,
                 modifier =
                     Modifier

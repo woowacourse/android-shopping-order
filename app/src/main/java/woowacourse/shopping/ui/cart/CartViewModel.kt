@@ -28,19 +28,34 @@ class CartViewModel(
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
 
     init {
-        _uiState.update { it.copy(isLoading = true) }
+        _uiState.update {
+            it.copy(
+                uiInfoState =
+                    it.uiInfoState.copy(
+                        isLoading = true,
+                    ),
+            )
+        }
         viewModelScope.launch {
             getCartItemsByPage()
+
+            _uiState.update {
+                it.copy(
+                    uiInfoState =
+                        it.uiInfoState.copy(
+                            isLoading = false,
+                        ),
+                )
+            }
         }
-        _uiState.update { it.copy(isLoading = false) }
     }
 
     private suspend fun getCartItemsByPage() {
         val cartResult =
-            cartRepository.getCartItemsByPage(page = uiState.value.page, size = PAGE_SIZE)
+            cartRepository.getCartItemsByPage(page = uiState.value.pageState.page, size = PAGE_SIZE)
 
         val totalPrice =
-            cartRepository.getTotalPrice(uiState.value.selectedCartItems)
+            cartRepository.getTotalPrice(uiState.value.selectedCartState.selectedCartItems)
 
         _uiState.update {
             it.copy(
@@ -49,10 +64,16 @@ class CartViewModel(
                         .map { cartItem ->
                             cartItem.toUiModel(isSelected(cartItem.id))
                         }.toImmutableList(),
-                isCanMoveNext = !cartResult.isLastPage,
-                totalCartCount = cartRepository.getCartItemsCount(),
-                totalCartQuantity = cartRepository.getTotalCartItemQuantity(),
-                totalPrice = totalPrice.amount,
+                pageState =
+                    it.pageState.copy(
+                        isCanMoveNext = !cartResult.isLastPage,
+                    ),
+                cartSummary =
+                    it.cartSummary.copy(
+                        totalCartCount = cartRepository.getCartItemsCount(),
+                        totalCartQuantity = cartRepository.getTotalCartItemQuantity(),
+                        totalPrice = totalPrice.amount,
+                    ),
                 recommendProducts =
                     loadRecommendProducts()
                         .map { recentProduct ->
@@ -68,7 +89,10 @@ class CartViewModel(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    page = uiState.value.page + 1,
+                    pageState =
+                        it.pageState.copy(
+                            page = uiState.value.pageState.page + 1,
+                        ),
                 )
             }
             getCartItemsByPage()
@@ -79,7 +103,10 @@ class CartViewModel(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    page = uiState.value.page - 1,
+                    pageState =
+                        it.pageState.copy(
+                            page = uiState.value.pageState.page - 1,
+                        ),
                 )
             }
             getCartItemsByPage()
@@ -107,15 +134,20 @@ class CartViewModel(
 
     fun checkItem(cartItemId: String) {
         val selectedItems =
-            if (_uiState.value.selectedCartItems.contains(cartItemId)) {
-                _uiState.value.selectedCartItems - cartItemId
+            if (_uiState.value.selectedCartState.selectedCartItems
+                    .contains(cartItemId)
+            ) {
+                _uiState.value.selectedCartState.selectedCartItems - cartItemId
             } else {
-                _uiState.value.selectedCartItems + cartItemId
+                _uiState.value.selectedCartState.selectedCartItems + cartItemId
             }.toImmutableList()
 
         _uiState.update {
             it.copy(
-                selectedCartItems = selectedItems,
+                selectedCartState =
+                    it.selectedCartState.copy(
+                        selectedCartItems = selectedItems,
+                    ),
             )
         }
 
@@ -124,11 +156,13 @@ class CartViewModel(
         }
     }
 
-    private fun isSelected(cartItemId: String): Boolean = _uiState.value.selectedCartItems.contains(cartItemId)
+    private fun isSelected(cartItemId: String): Boolean =
+        _uiState.value.selectedCartState.selectedCartItems
+            .contains(cartItemId)
 
     fun isAllSelectClick() {
         val selectedItems =
-            if (_uiState.value.isAllChecked) {
+            if (_uiState.value.selectedCartState.isAllChecked) {
                 emptyList()
             } else {
                 _uiState.value.items.map { it.id }
@@ -136,9 +170,11 @@ class CartViewModel(
 
         _uiState.update {
             it.copy(
-                selectedCartItems = selectedItems,
-                isAllChecked = !it.isAllChecked,
-                selectedCartItemCount = selectedItems.size,
+                selectedCartState =
+                    it.selectedCartState.copy(
+                        selectedCartItems = selectedItems,
+                        isAllChecked = !it.selectedCartState.isAllChecked,
+                    ),
             )
         }
 
@@ -165,7 +201,10 @@ class CartViewModel(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    isOrder = true,
+                    uiInfoState =
+                        it.uiInfoState.copy(
+                            isOrder = true,
+                        ),
                     recommendProducts =
                         loadRecommendProducts()
                             .filter { product ->

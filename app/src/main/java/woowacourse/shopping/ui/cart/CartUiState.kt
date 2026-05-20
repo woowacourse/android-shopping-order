@@ -7,16 +7,34 @@ import woowacourse.shopping.ui.model.ProductUiModel
 
 data class CartUiState(
     val items: ImmutableList<CartItemUiModel> = persistentListOf(),
+    val recommendProducts: ImmutableList<ProductUiModel> = persistentListOf(),
+    val pageState: PageState = PageState(),
+    val cartSummary: CartSummaryState = CartSummaryState(),
+    val uiInfoState: UiInfoState = UiInfoState(),
+    val selectedCartState: SelectedCartState = SelectedCartState(),
+)
+
+data class PageState(
     val page: Int = 0,
     val isCanMoveNext: Boolean = false,
+)
+
+data class UiInfoState(
     val isLoading: Boolean = true,
+    val errorMessage: String? = null,
+    val isOrder: Boolean = false,
+)
+
+data class CartSummaryState(
     val totalCartQuantity: Int = 0,
     val totalCartCount: Int = 0,
     val totalPrice: Long = 0,
-    val errorMessage: String? = null,
-    val isAllChecked: Boolean = false,
-    val selectedCartItemCount: Int = 0,
-    val selectedCartItems: ImmutableList<String> = persistentListOf(),
-    val isOrder: Boolean = false,
-    val recommendProducts: ImmutableList<ProductUiModel> = persistentListOf(),
 )
+
+data class SelectedCartState(
+    val selectedCartItems: ImmutableList<String> = persistentListOf(),
+    val isAllChecked: Boolean = false,
+) {
+    val selectedCartItemCount: Int
+        get() = selectedCartItems.size
+}

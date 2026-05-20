@@ -38,7 +38,7 @@ class CartViewModelTest {
                 viewModel.uiState.value.items
                     .map { it.product.id }
             assertThat(productIds).containsExactly("1", "2", "3", "4", "5")
-            assertThat(viewModel.uiState.value.isCanMoveNext).isTrue()
+            assertThat(viewModel.uiState.value.pageState.isCanMoveNext).isTrue()
         }
 
     @Test
@@ -54,8 +54,8 @@ class CartViewModelTest {
                 viewModel.uiState.value.items
                     .map { it.product.id }
             assertThat(productIds).containsExactly("6")
-            assertThat(viewModel.uiState.value.page).isEqualTo(1)
-            assertThat(viewModel.uiState.value.isCanMoveNext).isFalse()
+            assertThat(viewModel.uiState.value.pageState.page).isEqualTo(1)
+            assertThat(viewModel.uiState.value.pageState.isCanMoveNext).isFalse()
         }
 
     @Test
@@ -73,7 +73,7 @@ class CartViewModelTest {
                 viewModel.uiState.value.items
                     .map { it.product.id }
             assertThat(productIds).containsExactly("1", "2", "3", "4", "5")
-            assertThat(viewModel.uiState.value.page).isEqualTo(0)
+            assertThat(viewModel.uiState.value.pageState.page).isEqualTo(0)
         }
 
     @Test
@@ -83,8 +83,8 @@ class CartViewModelTest {
 
             mainDispatcherExtension.advanceUntilIdle()
 
-            assertThat(viewModel.uiState.value.totalCartCount).isEqualTo(2)
-            assertThat(viewModel.uiState.value.totalCartQuantity).isEqualTo(2)
+            assertThat(viewModel.uiState.value.cartSummary.totalCartCount).isEqualTo(2)
+            assertThat(viewModel.uiState.value.cartSummary.totalCartQuantity).isEqualTo(2)
         }
 
     @Test
@@ -96,13 +96,13 @@ class CartViewModelTest {
             viewModel.checkItem("1")
             mainDispatcherExtension.advanceUntilIdle()
 
-            assertThat(viewModel.uiState.value.selectedCartItems).containsExactly("1")
+            assertThat(viewModel.uiState.value.selectedCartState.selectedCartItems).containsExactly("1")
             assertThat(
                 viewModel.uiState.value.items
                     .first { it.id == "1" }
                     .isChecked,
             ).isTrue()
-            assertThat(viewModel.uiState.value.totalPrice).isEqualTo(2000)
+            assertThat(viewModel.uiState.value.cartSummary.totalPrice).isEqualTo(2000)
         }
 
     private fun createViewModel(cartItems: List<CartItem>): CartViewModel {
