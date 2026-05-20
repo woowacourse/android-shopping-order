@@ -27,6 +27,7 @@ import woowacourse.shopping.constant.Format.formatPrice
 fun CartScreenBottomBar(
     totalMoney: Int,
     totalCount: Int,
+    selectAllButtonVisible: Boolean,
     isAllSelected: Boolean,
     onClickSelectAll: () -> Unit,
     onClickOrder: () -> Unit,
@@ -52,16 +53,18 @@ fun CartScreenBottomBar(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                Checkbox(
-                    checked = isAllSelected,
-                    onCheckedChange = { onClickSelectAll() },
-                    colors =
-                        CheckboxDefaults.colors(
-                            checkedColor = Color(0xff04C09E),
-                            uncheckedColor = Color.LightGray,
-                            checkmarkColor = Color.White,
-                        ),
-                )
+                if (selectAllButtonVisible) {
+                    Checkbox(
+                        checked = isAllSelected,
+                        onCheckedChange = { onClickSelectAll() },
+                        colors =
+                            CheckboxDefaults.colors(
+                                checkedColor = Color(0xff04C09E),
+                                uncheckedColor = Color.LightGray,
+                                checkmarkColor = Color.White,
+                            ),
+                    )
+                }
                 Text(text = "전체", color = Color.White, fontSize = 12.sp)
             }
 
@@ -97,6 +100,7 @@ fun CartScreenBottomBarPreview() {
     CartScreenBottomBar(
         totalMoney = 10000,
         totalCount = 3,
+        selectAllButtonVisible = true,
         isAllSelected = true,
         onClickSelectAll = {},
         onClickOrder = {},

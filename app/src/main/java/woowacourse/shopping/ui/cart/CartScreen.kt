@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.cart
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -50,6 +49,7 @@ import woowacourse.shopping.domain.product.ImageUrl
 import woowacourse.shopping.domain.product.Price
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.ProductName
+import woowacourse.shopping.ui.util.LoadState
 
 @Composable
 fun CartScreen(
@@ -57,43 +57,8 @@ fun CartScreen(
     onClickClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    CartScreenContent(
-        modifier = modifier,
-        uiState = uiState,
-        onClickClose = { onClickClose() },
-        onClickRemoveItem = viewModel::removeCartItem,
-        onClickAdd = viewModel::addCartItem,
-        onClickIncrease = viewModel::increase,
-        onClickDecrease = viewModel::decrease,
-        onClickIncreaseRecommendProduct = viewModel::increaseRecommendProduct,
-        onClickDecreaseRecommendProduct = viewModel::decreaseRecommendProduct,
-        onClickGoToPreviousPage = viewModel::goToPreviousPage,
-        onClickGoToNextPage = viewModel::goToNextPage,
-        onClickToggleSelection = viewModel::toggleSelection,
-        onClickAllSelect = viewModel::toggleAllSelection,
-        onClickOrder = viewModel::onClickOrder,
-    )
-}
-
-@Composable
-private fun CartScreenContent(
-    uiState: CartUiState,
-    modifier: Modifier = Modifier,
-    onClickClose: () -> Unit,
-    onClickRemoveItem: (Int) -> Unit,
-    onClickAdd: (Product) -> Unit,
-    onClickIncrease: (Int) -> Unit,
-    onClickDecrease: (Int) -> Unit,
-    onClickIncreaseRecommendProduct: (Int) -> Unit,
-    onClickDecreaseRecommendProduct: (Int) -> Unit,
-    onClickGoToPreviousPage: () -> Unit,
-    onClickGoToNextPage: () -> Unit,
-    onClickToggleSelection: (Int) -> Unit,
-    onClickAllSelect: () -> Unit,
-    onClickOrder: () -> Unit,
-) {
+    val uiState by viewModel.cartUiState.collectAsStateWithLifecycle()
+    val screen by viewModel.currentScreen.collectAsStateWithLifecycle()
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
@@ -106,90 +71,93 @@ private fun CartScreenContent(
                 onClickClose()
             },
         )
-
-        when (uiState) {
-            is CartUiState.Loading -> {
-                LoadingContent(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(20.dp),
+        when (screen) {
+            CartFlow.CART -> {
+                CartScreenContent(
+                    modifier = modifier,
+                    uiState = uiState,
+                    onClickRemoveItem = viewModel::removeCartItem,
+                    onClickIncrease = viewModel::increaseCartItemQuantity,
+                    onClickDecrease = viewModel::decreaseCartItemQuantity,
+                    onClickGoToPreviousPage = viewModel::goToPreviousPage,
+                    onClickGoToNextPage = viewModel::goToNextPage,
+                    onClickToggleSelection = viewModel::toggleSelection,
                 )
             }
 
-            is CartUiState.Empty -> {
-                EmptyContent(modifier = Modifier.weight(1f))
-            }
-
-            is CartUiState.Success -> {
-                when (uiState.currentFlow) {
-                    CartFlow.CART -> {
-                        CartItemList(
-                            cartItems = uiState.cartItems,
-                            modifier = Modifier.weight(1f),
-                            onRemoveClick = { cartId -> onClickRemoveItem(cartId) },
-                            onIncrease = { cartId -> onClickIncrease(cartId) },
-                            onDecrease = { cartId -> onClickDecrease(cartId) },
-                            onCheckedChange = { cartId -> onClickToggleSelection(cartId) },
-                        )
-
-                        if (uiState.showPageNavigator) {
-                            PageNavigator(
-                                currentPage = uiState.currentPage,
-                                hasPrevious = uiState.hasPrevious,
-                                hasNext = uiState.hasNext,
-                                onPreviousClick = { onClickGoToPreviousPage() },
-                                onNextClick = { onClickGoToNextPage() },
-                                modifier =
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 16.dp),
-                            )
-                        }
-                    }
-
-                    CartFlow.RECOMMEND -> {
-                        RecommendScreenContent(
-                            products = uiState.recommendProducts,
-                            quantitiesByProductId = uiState.quantitiesByProductId,
-                            onAddClick = { onClickAdd(it) },
-                            onIncrease = { onClickIncreaseRecommendProduct(it) },
-                            onDecrease = { onClickDecreaseRecommendProduct(it) },
-                            modifier = Modifier.weight(1f),
-                        )
-                    }
-                }
-
-                CartScreenBottomBar(
-                    totalMoney = uiState.totalPrice,
-                    totalCount = uiState.totalCount,
-                    isAllSelected = uiState.isAllSelected,
-                    onClickSelectAll = { onClickAllSelect() },
-                    onClickOrder = { onClickOrder() },
-                )
-            }
-
-            is CartUiState.Error -> {
-                ErrorContent(
+            CartFlow.RECOMMEND -> {
+                RecommendScreenContent(
+                    uiState = uiState,
+                    onAddClick = viewModel::addCartItem,
+                    onIncrease = viewModel::increaseRecommendProduct,
+                    onDecrease = viewModel::decreaseRecommendProduct,
                     modifier = Modifier.weight(1f),
-                    message = uiState.throwable.message ?: "장바구니를 불러오지 못했어요.",
                 )
             }
         }
+        CartScreenBottomBar(
+            totalMoney = uiState.totalPrice,
+            totalCount = uiState.totalCount,
+            selectAllButtonVisible = true,
+            isAllSelected = uiState.isAllSelected,
+            onClickSelectAll = viewModel::toggleAllSelection,
+            onClickOrder = viewModel::onClickOrder,
+        )
     }
 }
 
 @Composable
-private fun EmptyContent(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = "장바구니가 비어있어요.",
-            fontSize = 16.sp,
-            color = Color.Gray,
-        )
+private fun CartScreenContent(
+    uiState: CartUiState,
+    modifier: Modifier = Modifier,
+    onClickRemoveItem: (Int) -> Unit,
+    onClickIncrease: (Int) -> Unit,
+    onClickDecrease: (Int) -> Unit,
+    onClickGoToPreviousPage: () -> Unit,
+    onClickGoToNextPage: () -> Unit,
+    onClickToggleSelection: (Int) -> Unit,
+) {
+    when (uiState.loadState) {
+        is LoadState.Initial -> {}
+
+        is LoadState.Loading -> {
+            LoadingContent(
+                modifier =
+                modifier,
+            )
+        }
+
+        is LoadState.Success -> {
+            CartItemList(
+                cartItems = uiState.cartItems,
+                modifier = modifier,
+                onRemoveClick = { cartId -> onClickRemoveItem(cartId) },
+                onIncrease = { cartId -> onClickIncrease(cartId) },
+                onDecrease = { cartId -> onClickDecrease(cartId) },
+                onCheckedChange = { cartId -> onClickToggleSelection(cartId) },
+            )
+
+            if (uiState.showPageNavigator) {
+                PageNavigator(
+                    currentPage = uiState.currentPage,
+                    hasPrevious = uiState.hasPreviousPage,
+                    hasNext = uiState.hasNextPage,
+                    onPreviousClick = { onClickGoToPreviousPage() },
+                    onNextClick = { onClickGoToNextPage() },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                )
+            }
+        }
+
+        is LoadState.Error -> {
+            ErrorContent(
+                modifier = modifier,
+                message = uiState.loadState.throwable?.message ?: "장바구니를 불러오지 못했어요.",
+            )
+        }
     }
 }
 
@@ -444,14 +412,13 @@ private fun ProductImage(
     )
 }
 
-@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 private fun CartScreenPreview() {
     CartScreenContent(
         modifier = Modifier.fillMaxSize(),
         uiState =
-            CartUiState.Success(
+            CartUiState(
                 cartItems =
                     listOf(
                         CartItemUiModel(
@@ -469,22 +436,16 @@ private fun CartScreenPreview() {
                             isSelected = false,
                         ),
                     ),
-                currentPage = 0,
-                totalPages = 0,
-                hasPrevious = false,
-                hasNext = false,
+                currentPage = 1,
+                hasPreviousPage = false,
+                hasNextPage = false,
+                loadState = LoadState.Success,
             ),
-        onClickClose = {},
         onClickRemoveItem = {},
         onClickIncrease = {},
         onClickDecrease = {},
         onClickGoToPreviousPage = {},
         onClickGoToNextPage = {},
         onClickToggleSelection = {},
-        onClickAllSelect = {},
-        onClickAdd = {},
-        onClickOrder = {},
-        onClickIncreaseRecommendProduct = {},
-        onClickDecreaseRecommendProduct = {},
     )
 }
