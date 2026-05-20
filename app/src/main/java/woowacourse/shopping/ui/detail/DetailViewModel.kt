@@ -41,11 +41,12 @@ class DetailViewModel(
         viewModelScope.launch {
             try {
                 val product = productRepository.getProductById(id)
+                val lastViewId = recentItemRepository.getLastViewedItem()
                 val lastViewedItem =
-                    if (hideRecentItem) {
+                    if (hideRecentItem || lastViewId == null) {
                         null
                     } else {
-                        recentItemRepository.getLastViewedItem()
+                        productRepository.getProductById(lastViewId)
                     }
                 val quantity = cartRepository.getCartItemQuantity(id) ?: 1
 
@@ -55,7 +56,7 @@ class DetailViewModel(
                     _uiState.value.copy(
                         product = product.toUiModel(),
                         quantity = quantity,
-                        recentItem = lastViewedItem?.takeIf { it.id != id }?.toUiModel(),
+                        recentItem = lastViewedItem?.toUiModel(),
                         totalPrice = product.getPrice() * quantity,
                     )
             } catch (_: IllegalArgumentException) {

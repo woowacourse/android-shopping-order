@@ -107,7 +107,11 @@ class ShoppingViewModel(
             recentItemRepository.getRecentItems().collect { recentItems ->
                 _uiState.update {
                     it.copy(
-                        recentItems = recentItems.map { it.toUiModel() }.toImmutableList(),
+                        recentItems =
+                            recentItems
+                                .map { productId ->
+                                    productRepository.getProductById(productId).toUiModel()
+                                }.toImmutableList(),
                     )
                 }
             }
@@ -120,7 +124,7 @@ class ShoppingViewModel(
                 recentItemRepository
                     .getRecentItems()
                     .first()
-                    .map { it.toUiModel() }
+                    .map { productRepository.getProductById(it).toUiModel() }
                     .toImmutableList()
 
             _uiState.update { it.copy(recentItems = recentItems) }
