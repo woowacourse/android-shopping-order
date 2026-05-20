@@ -28,24 +28,27 @@ class CartViewModel(
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
 
     init {
-        _uiState.update {
-            it.copy(
-                uiInfoState =
-                    it.uiInfoState.copy(
-                        isLoading = true,
-                    ),
-            )
-        }
         viewModelScope.launch {
-            getCartItemsByPage()
+            try {
+                _uiState.update {
+                    it.copy(
+                        uiInfoState =
+                            it.uiInfoState.copy(
+                                isLoading = true,
+                            ),
+                    )
+                }
 
-            _uiState.update {
-                it.copy(
-                    uiInfoState =
-                        it.uiInfoState.copy(
-                            isLoading = false,
-                        ),
-                )
+                getCartItemsByPage()
+            } finally {
+                _uiState.update {
+                    it.copy(
+                        uiInfoState =
+                            it.uiInfoState.copy(
+                                isLoading = false,
+                            ),
+                    )
+                }
             }
         }
     }
