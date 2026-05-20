@@ -3,8 +3,6 @@ package woowacourse.shopping.ui.productdetail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,8 +16,6 @@ import woowacourse.shopping.repository.ShoppingRepositoryProvider
 import woowacourse.shopping.repository.http.common.RemoteException
 import woowacourse.shopping.ui.common.recentlyviewed.RecentViewedProductsMapper
 
-private const val CART_SYNC_DELAY_MILLIS = 400L
-
 class ProductDetailViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
@@ -28,8 +24,6 @@ class ProductDetailViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductDetailUiState())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
-
-    private var syncJob: Job? = null
 
     init {
         observeNetworkState()
@@ -73,25 +67,18 @@ class ProductDetailViewModel(
             )
         }
 
-        scheduleCartSync(product.id)
-    }
-
-    private fun scheduleCartSync(productId: Long) {
-        syncJob?.cancel()
-
-        syncJob =
-            viewModelScope.launch {
-                delay(CART_SYNC_DELAY_MILLIS)
-
-                val targetQuantity = _uiState.value.quantity
-
-                cartRepository
-                    .setQuantity(productId, targetQuantity)
-                    .onFailure { throwable ->
-                        refreshProductDetail(productId)
-                        updateErrorState(throwable)
+        viewModelScope.launch {
+            cartRepository
+                .setQuantity(product.id, nextQuantity)
+                .onSuccess {
+                    _uiState.update { current ->
+                        current.copy(isAdding = false)
                     }
-            }
+                }.onFailure { throwable ->
+                    refreshProductDetail(product.id)
+                    updateErrorState(throwable)
+                }
+        }
     }
 
     private suspend fun refreshProductDetail(productId: Long) {

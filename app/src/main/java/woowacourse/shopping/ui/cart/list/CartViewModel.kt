@@ -3,8 +3,6 @@ package woowacourse.shopping.ui.cart.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +20,6 @@ import woowacourse.shopping.ui.cart.list.uistate.CartListUiState
 import woowacourse.shopping.ui.cart.list.uistate.CartUiState
 
 private const val PAGE_SIZE = 5
-private const val CART_SYNC_DELAY_MILLIS = 400L
 
 class CartViewModel(
     private val productRepository: ProductRepository,
@@ -31,8 +28,6 @@ class CartViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState(cartListState = CartListUiState.Loading))
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
-
-    private val syncJobs = mutableMapOf<Long, Job>()
 
     init {
         observeNetworkState()
@@ -83,10 +78,7 @@ class CartViewModel(
         }
 
     fun delete(productId: Long) {
-        if (!updateLocalQuantity(productId, targetQuantity = 0)) return
-
-        clearDeselection(productId)
-        scheduleCartSync(productId)
+        updateQuantity(productId = productId, targetQuantity = 0)
     }
 
     fun toggleItemSelection(
@@ -109,18 +101,38 @@ class CartViewModel(
     fun increaseQuantity(productId: Long) {
         val quantity = findQuantity(productId) ?: return
         if (!updateLocalQuantity(productId, targetQuantity = quantity + 1)) return
-        scheduleCartSync(productId)
     }
 
     fun decreaseQuantity(productId: Long) {
         val quantity = findQuantity(productId) ?: return
         val targetQuantity = (quantity - 1).coerceAtLeast(0)
 
-        if (!updateLocalQuantity(productId, targetQuantity = targetQuantity)) return
+        updateQuantity(productId = productId, targetQuantity = targetQuantity)
+    }
+
+    private fun updateQuantity(
+        productId: Long,
+        targetQuantity: Int,
+    ) {
+        val currentPage =
+            withContentState(defaultValue = 1) { contentState ->
+                contentState.currentPage
+            }
+
+        if (!updateLocalQuantity(productId, targetQuantity)) return
+
         if (targetQuantity == 0) {
             clearDeselection(productId)
         }
-        scheduleCartSync(productId)
+
+        viewModelScope.launch {
+            cartRepository
+                .setQuantity(productId, targetQuantity)
+                .onFailure { throwable ->
+                    updatePage(currentPage)
+                    updateErrorState(throwable)
+                }
+        }
     }
 
     private fun loadPage(page: Int) {
@@ -212,31 +224,6 @@ class CartViewModel(
             ?.items
             ?.firstOrNull { it.productId == productId }
             ?.quantity
-
-    private fun scheduleCartSync(productId: Long) {
-        syncJobs.remove(productId)?.cancel()
-
-        syncJobs[productId] =
-            viewModelScope.launch {
-                delay(CART_SYNC_DELAY_MILLIS)
-
-                val currentPage =
-                    withContentState(defaultValue = 1) { contentState ->
-                        contentState.currentPage
-                    }
-
-                val targetQuantity = findQuantity(productId) ?: 0
-
-                cartRepository
-                    .setQuantity(productId, targetQuantity)
-                    .onFailure { throwable ->
-                        updatePage(currentPage)
-                        updateErrorState(throwable)
-                    }
-
-                syncJobs.remove(productId)
-            }
-    }
 
     private fun updateErrorState(throwable: Throwable) {
         _uiState.update { currentState ->
