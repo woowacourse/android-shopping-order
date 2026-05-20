@@ -32,6 +32,9 @@ class CartViewModel(
     init {
         observeNetworkState()
         loadPage(1)
+        viewModelScope.launch {
+            calculateTotals()
+        }
     }
 
     fun reloadVisibleState() {
@@ -79,6 +82,7 @@ class CartViewModel(
 
     fun delete(productId: Long) {
         updateQuantity(productId = productId, targetQuantity = 0)
+        clearDeselection(productId)
     }
 
     fun toggleItemSelection(
@@ -95,12 +99,16 @@ class CartViewModel(
 
             currentState.copy(deselectedProductIds = updatedDeselectedProductIds)
         }
+
+        viewModelScope.launch {
+            calculateTotals()
+        }
         refreshVisibleSelections()
     }
 
     fun increaseQuantity(productId: Long) {
         val quantity = findQuantity(productId) ?: return
-        if (!updateLocalQuantity(productId, targetQuantity = quantity + 1)) return
+        updateQuantity(productId, quantity + 1)
     }
 
     fun decreaseQuantity(productId: Long) {
@@ -108,6 +116,28 @@ class CartViewModel(
         val targetQuantity = (quantity - 1).coerceAtLeast(0)
 
         updateQuantity(productId = productId, targetQuantity = targetQuantity)
+    }
+
+    fun toggleAllSelection(isSelected: Boolean) {
+        viewModelScope.launch {
+            if (isSelected) {
+                _uiState.update { it.copy(deselectedProductIds = emptySet()) }
+            } else {
+                val totalCount = cartRepository.count().getOrDefault(0)
+                val allIds =
+                    cartRepository
+                        .getCartPage(0, totalCount)
+                        .getOrNull()
+                        ?.items
+                        ?.map {
+                            it.productId
+                        }?.toSet() ?: emptySet()
+
+                _uiState.update { it.copy(deselectedProductIds = allIds) }
+            }
+            calculateTotals()
+            refreshVisibleSelections()
+        }
     }
 
     private fun updateQuantity(
@@ -128,7 +158,9 @@ class CartViewModel(
         viewModelScope.launch {
             cartRepository
                 .setQuantity(productId, targetQuantity)
-                .onFailure { throwable ->
+                .onSuccess {
+                    calculateTotals()
+                }.onFailure { throwable ->
                     updatePage(currentPage)
                     updateErrorState(throwable)
                 }
@@ -266,6 +298,58 @@ class CartViewModel(
                     currentState.copy(isNetworkConnected = isConnected)
                 }
             }
+        }
+    }
+
+    private suspend fun calculateTotals() {
+        val totalCount = cartRepository.count().getOrDefault(0)
+        if (totalCount == 0) {
+            _uiState.update {
+                it.copy(
+                    totalPrice = 0,
+                    totalSelectedCount = 0,
+                    isAllSelected = false,
+                )
+            }
+            return
+        }
+
+        val allCartItems =
+            cartRepository
+                .getCartPage(
+                    page = 0,
+                    size = totalCount,
+                ).getOrNull()
+                ?.items ?: emptyList()
+
+        val productIds =
+            allCartItems
+                .map {
+                    it.productId
+                }.toSet()
+        val productsById =
+            productRepository
+                .findAllByIds(productIds)
+                .getOrDefault(emptyMap())
+
+        val deselectedIds = _uiState.value.deselectedProductIds
+        var totalPrice = 0
+        var selectedCount = 0
+
+        allCartItems.forEach { item ->
+            val product = productsById[item.productId]
+            if (item.productId !in deselectedIds) {
+                totalPrice += (product?.price?.value ?: 0) * item.quantity
+                selectedCount++
+            }
+        }
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                totalPrice = totalPrice,
+                totalSelectedCount = selectedCount,
+                isAllSelected = deselectedIds.isEmpty() && allCartItems.isNotEmpty(),
+            )
         }
     }
 

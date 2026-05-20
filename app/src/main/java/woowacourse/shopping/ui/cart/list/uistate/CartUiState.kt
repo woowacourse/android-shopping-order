@@ -4,6 +4,9 @@ data class CartUiState(
     val cartListState: CartListUiState = CartListUiState.Loading,
     val isNetworkConnected: Boolean = true,
     val deselectedProductIds: Set<Long> = emptySet(),
+    val totalPrice: Int = 0,
+    val totalSelectedCount: Int = 0,
+    val isAllSelected: Boolean = false,
 )
 
 sealed interface CartListUiState {

@@ -95,8 +95,7 @@ class CartActivity : ComponentActivity() {
                         )
                     } else {
                         CartScreen(
-                            cartListState = cartUiState.cartListState,
-                            isNetworkConnected = cartUiState.isNetworkConnected,
+                            cartUiState = cartUiState,
                             modifier = Modifier.padding(innerPadding),
                             onBackClick = ::finish,
                             onOrderClick = {
@@ -107,6 +106,7 @@ class CartActivity : ComponentActivity() {
                                 }
                             },
                             onItemCheckedChange = cartViewModel::toggleItemSelection,
+                            onAllCheckedChange = cartViewModel::toggleAllSelection,
                             onDeleteClick = cartViewModel::delete,
                             onIncreaseQuantity = cartViewModel::increaseQuantity,
                             onDecreaseQuantity = cartViewModel::decreaseQuantity,

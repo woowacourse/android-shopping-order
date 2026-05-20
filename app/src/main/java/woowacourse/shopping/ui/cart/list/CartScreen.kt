@@ -17,33 +17,33 @@ import woowacourse.shopping.ui.cart.list.component.CartItemBody
 import woowacourse.shopping.ui.cart.list.component.CartItemSkeletonBody
 import woowacourse.shopping.ui.cart.list.uistate.CartItemUiModel
 import woowacourse.shopping.ui.cart.list.uistate.CartListUiState
+import woowacourse.shopping.ui.cart.list.uistate.CartUiState
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
 import woowacourse.shopping.ui.fixture.MockProducts
 
 @Composable
 fun CartScreen(
-    cartListState: CartListUiState,
-    isNetworkConnected: Boolean,
+    cartUiState: CartUiState,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
     onOrderClick: () -> Unit,
     onItemCheckedChange: (Long, Boolean) -> Unit,
+    onAllCheckedChange: (Boolean) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onIncreaseQuantity: (Long) -> Unit,
     onDecreaseQuantity: (Long) -> Unit,
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
 ) {
+    val cartListState = cartUiState.cartListState
     val cartItems = (cartListState as? CartListUiState.Content)?.items.orEmpty()
     val selectedItems = cartItems.filter { it.isSelected }
-    val totalPrice = selectedItems.sumOf { it.price * it.quantity }
-    val isAllSelected = cartItems.isNotEmpty() && cartItems.all { it.isSelected }
 
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
         CartHeader(onBackClick = onBackClick)
-        if (!isNetworkConnected) {
+        if (!cartUiState.isNetworkConnected) {
             NetworkStatusBanner(modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp))
         }
 
@@ -92,17 +92,13 @@ fun CartScreen(
             }
         }
         CartBottomBar(
-            totalPrice = formatPrice(totalPrice),
-            selectedCount = selectedItems.size,
+            totalPrice = formatPrice(cartUiState.totalPrice),
+            selectedCount = cartUiState.totalSelectedCount,
             onOrderClick = onOrderClick,
             modifier = Modifier.fillMaxWidth(),
             showSelectAll = cartItems.isNotEmpty(),
-            isAllSelected = isAllSelected,
-            onAllSelectedChanged = { isSelected ->
-                cartItems.forEach { item ->
-                    onItemCheckedChange(item.productId, isSelected)
-                }
-            },
+            isAllSelected = cartUiState.isAllSelected,
+            onAllSelectedChanged = onAllCheckedChange,
         )
     }
 }
@@ -132,18 +128,16 @@ private fun CartScreenPreview() {
             ),
         )
     CartScreen(
-        cartListState =
-            CartListUiState.Content(
-                items = items,
-                currentPage = 1,
-                totalPages = 1,
-                hasPrevious = false,
-                hasNext = false,
+        cartUiState =
+            CartUiState(
+                totalPrice = 10000,
+                totalSelectedCount = 2,
+                isAllSelected = false,
             ),
-        isNetworkConnected = true,
         onBackClick = {},
         onOrderClick = {},
         onItemCheckedChange = { _, _ -> },
+        onAllCheckedChange = {},
         onDeleteClick = {},
         onIncreaseQuantity = {},
         onDecreaseQuantity = {},
@@ -156,11 +150,16 @@ private fun CartScreenPreview() {
 @Preview(showBackground = true, name = "장바구니 로딩")
 private fun CartScreenLoadingPreview() {
     CartScreen(
-        cartListState = CartListUiState.Loading,
-        isNetworkConnected = true,
+        cartUiState =
+            CartUiState(
+                totalPrice = 10000,
+                totalSelectedCount = 2,
+                isAllSelected = false,
+            ),
         onBackClick = {},
         onOrderClick = {},
         onItemCheckedChange = { _, _ -> },
+        onAllCheckedChange = {},
         onDeleteClick = {},
         onIncreaseQuantity = {},
         onDecreaseQuantity = {},
@@ -173,11 +172,16 @@ private fun CartScreenLoadingPreview() {
 @Preview(showBackground = true, name = "장바구니 에러")
 private fun CartScreenErrorPreview() {
     CartScreen(
-        cartListState = CartListUiState.Error("장바구니를 불러오지 못했습니다."),
-        isNetworkConnected = true,
+        cartUiState =
+            CartUiState(
+                totalPrice = 10000,
+                totalSelectedCount = 2,
+                isAllSelected = false,
+            ),
         onBackClick = {},
         onOrderClick = {},
         onItemCheckedChange = { _, _ -> },
+        onAllCheckedChange = {},
         onDeleteClick = {},
         onIncreaseQuantity = {},
         onDecreaseQuantity = {},
