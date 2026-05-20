@@ -1,12 +1,28 @@
+import java.util.Properties
+
+val envFile = rootProject.file(".env")
+val envProperties = Properties()
+
+if (envFile.exists()) {
+    envProperties.load(envFile.inputStream())
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
     namespace = "woowacourse.shopping"
     compileSdk = 36
+
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "woowacourse.shopping"
@@ -16,9 +32,34 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "BASE_URL",
+            "\"${envProperties.getProperty("BASE_URL")}\""
+        )
+
+        buildConfigField(
+            "String",
+            "API_USERNAME",
+            "\"${envProperties.getProperty("API_USERNAME") ?: ""}\"",
+        )
+
+        buildConfigField(
+            "String",
+            "API_PASSWORD",
+            "\"${envProperties.getProperty("API_PASSWORD") ?: ""}\"",
+        )
     }
 
     buildTypes {
+        debug {
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"http://127.0.0.1:8080/\"",
+            )
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -33,9 +74,6 @@ android {
             jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
         }
     }
-    buildFeatures {
-        compose = true
-    }
     testOptions {
         unitTests.all {
             it.useJUnitPlatform()
@@ -46,16 +84,40 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+    implementation(libs.compose.material.icons.extended)
+
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner.junit5)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    // okhttp
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+
+    // serialization
+    implementation(libs.kotlinx.serialization.json)
+
+    debugImplementation(libs.okhttp.mockwebserver)
+    testImplementation("org.assertj:assertj-core:3.27.3")
+
+    // retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.kotlinx.serialization)
 }

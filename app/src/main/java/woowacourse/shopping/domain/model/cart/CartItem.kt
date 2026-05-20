@@ -1,0 +1,18 @@
+package woowacourse.shopping.domain.model.cart
+
+import woowacourse.shopping.domain.model.product.Product
+
+data class CartItem(
+    val id: Int,
+    val product: Product,
+    val quantity: Quantity = Quantity.ONE,
+) {
+    val totalPrice: Int
+        get() = product.price.value * quantity.value
+
+    fun isSameCartItem(targetCartItem: CartItem): Boolean = id == targetCartItem.id
+
+    fun increaseQuantity(): CartItem = copy(quantity = quantity.increase())
+
+    fun decreaseQuantity(): CartItem = copy(quantity = quantity.decrease())
+}
