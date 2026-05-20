@@ -15,7 +15,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import woowacourse.shopping.presentation.recommend.ui.RecommendScreen
-import woowacourse.shopping.presentation.recommend.viewmodel.RecommendEvent
+import woowacourse.shopping.presentation.recommend.viewmodel.   RecommendEvent
 import woowacourse.shopping.presentation.recommend.viewmodel.RecommendViewModel
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 
@@ -36,7 +36,7 @@ class RecommendActivity : ComponentActivity() {
                 viewModel.loadRecommendProducts()
             }
 
-            LaunchedEffect(viewModel.uiState, lifecycleOwner) {
+            LaunchedEffect( lifecycleOwner) {
                 lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.uiEvents.collect { event ->
                         when (event) {

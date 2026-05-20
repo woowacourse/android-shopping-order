@@ -42,7 +42,7 @@ class DetailActivity : ComponentActivity() {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 val lifecycleOwner = LocalLifecycleOwner.current
 
-                LaunchedEffect(viewModel.uiState, lifecycleOwner) {
+                LaunchedEffect(lifecycleOwner) {
                     lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                         viewModel.uiEvents.collect { event ->
                             when (event) {
