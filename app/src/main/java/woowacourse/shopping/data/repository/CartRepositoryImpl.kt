@@ -1,63 +1,36 @@
 package woowacourse.shopping.data.repository
 
+import woowacourse.shopping.data.localdb.mapper.toDomain
 import woowacourse.shopping.data.remote.api.CartApi
 import woowacourse.shopping.data.remote.dto.request.AddCartRequestBody
 import woowacourse.shopping.data.remote.dto.request.UpdateCartRequestBody
-import woowacourse.shopping.data.remote.dto.response.cart.CartDto
-import woowacourse.shopping.data.remote.dto.response.cart.CartProductDto
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.ProductName
 
 class CartRepositoryImpl(
     private val api: CartApi,
 ) : CartRepository {
-    override suspend fun getTotalPrice(cartIds: List<String>): Money {
-        val cartItems = getAllCartItems()
-
-        return cartItems
+    override suspend fun getTotalPrice(cartIds: List<String>): Money =
+        getAllCartItems()
             .filter { cartIds.contains(it.id) }
             .fold(Money(0)) { acc, cartItem ->
                 acc + cartItem.product.price * cartItem.quantity
             }
-    }
-
-    private suspend fun getAllCartItems(): List<CartItem> {
-        val cartItems = mutableListOf<CartItem>()
-
-        val response =
-            api.getCartItems(
-                page = 0,
-                size = Int.MAX_VALUE,
-            )
-
-        cartItems += response.content.map { it.toDomain() }
-
-        return cartItems
-    }
 
     override suspend fun getCartItemsByPage(
         page: Int,
         size: Int,
     ): CartResponseResult {
         val apiResult =
-            api
-                .getCartItems(
-                    page = page,
-                    size = size,
-                )
+            api.getCartItems(
+                page = page,
+                size = size,
+            )
 
         val cartItems = apiResult.content.map { it.toDomain() }
         val lastPage = apiResult.last
 
         return CartResponseResult(cartItems, lastPage)
-    }
-
-    private suspend fun getCartItem(productId: String): CartItem? {
-        val cartItems = getAllCartItems()
-
-        return cartItems.firstOrNull { it.product.id == productId }
     }
 
     override suspend fun getCartItemQuantity(productId: String): Int? = getCartItem(productId)?.quantity
@@ -107,21 +80,25 @@ class CartRepositoryImpl(
         )
     }
 
-    private fun CartDto.toDomain(): CartItem =
-        CartItem(
-            id = id.toString(),
-            product = product.toDomain(),
-            quantity = quantity,
-        )
+    private suspend fun getAllCartItems(): List<CartItem> {
+        val cartItems = mutableListOf<CartItem>()
 
-    private fun CartProductDto.toDomain(): Product =
-        Product(
-            id = id.toString(),
-            name = ProductName(name),
-            price = Money(price),
-            imageUrl = imageUrl,
-            category = category,
-        )
+        val response =
+            api.getCartItems(
+                page = 0,
+                size = Int.MAX_VALUE,
+            )
+
+        cartItems += response.content.map { it.toDomain() }
+
+        return cartItems
+    }
+
+    private suspend fun getCartItem(productId: String): CartItem? {
+        val cartItems = getAllCartItems()
+
+        return cartItems.firstOrNull { it.product.id == productId }
+    }
 }
 
 data class CartResponseResult(
