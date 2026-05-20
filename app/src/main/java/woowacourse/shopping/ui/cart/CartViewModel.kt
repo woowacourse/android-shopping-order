@@ -159,7 +159,7 @@ class CartViewModel(
     }
 
     suspend fun loadRecommendProducts(): List<Product> {
-        val productId = recentItemRepository.getLastViewedItem()?.id
+        val productId = recentItemRepository.getLastViewedItemId()
 
         return productId?.let {
             val category = productRepository.getProductById(productId).category

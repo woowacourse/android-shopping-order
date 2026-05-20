@@ -38,15 +38,22 @@ class DetailViewModel(
         viewModelScope.launch {
             try {
                 val product = productRepository.getProductById(id)
+
+                val quantity = cartRepository.getCartItemQuantity(id) ?: 1
+
                 val lastViewedItem =
                     if (hideRecentItem) {
                         null
                     } else {
-                        recentItemRepository.getLastViewedItem()
+                        val lastViewedItemId = recentItemRepository.getLastViewedItemId()
+                        if (lastViewedItemId != null && lastViewedItemId != id) {
+                            runCatching { productRepository.getProductById(lastViewedItemId) }.getOrNull()
+                        } else {
+                            null
+                        }
                     }
-                val quantity = cartRepository.getCartItemQuantity(id) ?: 1
 
-                recentItemRepository.addRecentItem(product)
+                recentItemRepository.addRecentItemId(id)
 
                 _uiState.value =
                     _uiState.value.copy(

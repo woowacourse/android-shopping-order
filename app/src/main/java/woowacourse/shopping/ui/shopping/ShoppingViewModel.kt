@@ -19,6 +19,7 @@ import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentItemRepository
 import woowacourse.shopping.ui.model.mapper.toUiModel
 import java.io.IOException
+import kotlin.coroutines.cancellation.CancellationException
 
 class ShoppingViewModel(
     private val productRepository: ProductRepository,
@@ -98,25 +99,34 @@ class ShoppingViewModel(
 
     private fun observeRecentItems() {
         viewModelScope.launch {
-            recentItemRepository.getRecentItems().collect { recentItems ->
-                _uiState.value =
-                    _uiState.value.copy(
-                        recentItems = recentItems.map { it.toUiModel() }.toImmutableList(),
+            recentItemRepository.getRecentItemIds().collect { ids ->
+                if (ids.isEmpty()) return@collect
+
+                val products = productRepository.getProductsByIds(ids)
+                _uiState.update { state ->
+                    state.copy(
+                        recentItems = products.map { it.toUiModel() }.toImmutableList(),
                     )
+                }
             }
         }
     }
 
     fun loadRecentItems() {
         viewModelScope.launch {
-            val recentItems =
-                recentItemRepository
-                    .getRecentItems()
-                    .first()
-                    .map { it.toUiModel() }
-                    .toImmutableList()
+            try {
+                val ids = recentItemRepository.getRecentItemIds().first()
+                if (ids.isEmpty()) return@launch
 
-            _uiState.value = _uiState.value.copy(recentItems = recentItems)
+                val products = productRepository.getProductsByIds(ids)
+                _uiState.update { it.copy(recentItems = products.map { product -> product.toUiModel() }.toImmutableList()) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                _uiState.update { state ->
+                    state.copy(cartErrorMessage = "최근 상품 목록을 불러오지 못했습니다.")
+                }
+            }
         }
     }
 

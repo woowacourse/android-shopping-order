@@ -1,5 +1,8 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import woowacourse.shopping.data.remote.api.ProductApi
 import woowacourse.shopping.data.remote.dto.response.products.ProductResponse
 import woowacourse.shopping.model.Money
@@ -36,6 +39,17 @@ class ProductRepositoryImpl(
     }
 
     override suspend fun getProductById(id: Long): Product = productApi.getProductById(id).toDomain()
+
+    override suspend fun getProductsByIds(ids: List<Long>): List<Product> =
+        coroutineScope {
+            ids
+                .map { id ->
+                    async {
+                        runCatching { getProductById(id) }.getOrNull()
+                    }
+                }.awaitAll()
+                .filterNotNull()
+        }
 
     private fun ProductResponse.toDomain(): Product =
         Product(

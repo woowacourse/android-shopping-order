@@ -10,4 +10,6 @@ interface ProductRepository {
     ): ProductResponseResult
 
     suspend fun getProductById(id: Long): Product
+
+    suspend fun getProductsByIds(ids: List<Long>): List<Product>
 }
