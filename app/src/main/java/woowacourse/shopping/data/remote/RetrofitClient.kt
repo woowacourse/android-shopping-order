@@ -14,7 +14,9 @@ import woowacourse.shopping.data.remote.service.OrderService
 import woowacourse.shopping.data.remote.service.ProductService
 
 object RetrofitClient {
-    private const val BASE_URL = BuildConfig.BASE_URL
+    private val useMock = BuildConfig.IS_MOCK && android.os.Debug.isDebuggerConnected()
+    private val BASE_URL = if (useMock) "http://localhost:8080/" else BuildConfig.BASE_URL
+    
     private val json =
         Json {
             ignoreUnknownKeys = true
@@ -25,7 +27,11 @@ object RetrofitClient {
         OkHttpClient
             .Builder()
             .addInterceptor(AuthInterceptor { encoder.getHeader() })
-            .build()
+            .apply {
+                if (useMock) {
+                    addInterceptor(MockInterceptor())
+                }
+            }.build()
     private val retrofit =
         Retrofit
             .Builder()
