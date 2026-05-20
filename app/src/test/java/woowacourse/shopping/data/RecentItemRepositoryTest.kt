@@ -30,7 +30,7 @@ class RecentItemRepositoryTest {
     fun `최근 본 상품을 저장하고 오래된 상품을 삭제한다`() =
         runTest {
             val dao = TestRecentItemDao()
-            val repository = RecentItemRepository(dao, FakeProductRepository(listOf(product)))
+            val repository = RecentItemRepository(dao)
 
             repository.addRecentItem(product)
 
@@ -43,35 +43,32 @@ class RecentItemRepositoryTest {
     fun `최근 본 상품 엔티티 목록을 도메인 상품으로 변환한다`() =
         runTest {
             val dao = TestRecentItemDao()
-            val repository = RecentItemRepository(dao, FakeProductRepository(listOf(product)))
+            val repository = RecentItemRepository(dao)
             dao.upsert(product.toRecentItemEntity(timestamp = 100L))
 
             val recentItems = repository.getRecentItems().first()
 
             assertThat(recentItems).hasSize(1)
-            assertThat(recentItems[0].id).isEqualTo(product.id)
-            assertThat(recentItems[0].getName()).isEqualTo(product.getName())
-            assertThat(recentItems[0].getPrice()).isEqualTo(product.getPrice())
-            assertThat(recentItems[0].imageUrl).isEqualTo(product.imageUrl)
+            assertThat(recentItems[0]).isEqualTo(product.id)
         }
 
     @Test
     fun `마지막으로 본 상품을 반환한다`() =
         runTest {
             val dao = TestRecentItemDao()
-            val repository = RecentItemRepository(dao, FakeProductRepository(listOf(createProduct(id = "1"), createProduct(id = "2"))))
+            val repository = RecentItemRepository(dao)
             dao.upsert(createProduct(id = "1").toRecentItemEntity(timestamp = 100L))
             dao.upsert(createProduct(id = "2").toRecentItemEntity(timestamp = 200L))
 
             val lastViewedItem = repository.getLastViewedItem()
 
-            assertThat(lastViewedItem?.id).isEqualTo("2")
+            assertThat(lastViewedItem).isEqualTo("2")
         }
 
     @Test
     fun `최근 본 상품이 없으면 마지막으로 본 상품은 널을 반환한다`() =
         runTest {
-            val repository = RecentItemRepository(TestRecentItemDao(), FakeProductRepository(emptyList()))
+            val repository = RecentItemRepository(TestRecentItemDao())
 
             val lastViewedItem = repository.getLastViewedItem()
 

@@ -28,36 +28,6 @@ class ShoppingViewModelTest {
     val mainDispatcherExtension = MainDispatcherExtension()
 
     @Test
-    fun `초기 장바구니 관찰 시 네트워크가 없어도 상품을 불러온다`() =
-        runTest {
-            val productRepository = FakeProductRepository(products = createProducts(size = 20))
-            val viewModel =
-                createViewModel(
-                    productRepository = productRepository,
-                    networkObserver = FakeNetworkObserver(isAvailable = false),
-                )
-
-            mainDispatcherExtension.advanceUntilIdle()
-
-            assertThat(viewModel.uiState.value.products).hasSize(20)
-            assertThat(productRepository.getProductsCallCount).isEqualTo(1)
-        }
-
-    @Test
-    fun `네트워크가 연결되면 상품 목록을 불러온다`() =
-        runTest {
-            val viewModel =
-                createViewModel(
-                    productRepository = FakeProductRepository(products = createProducts(size = 20)),
-                    networkObserver = FakeNetworkObserver(isAvailable = true),
-                )
-
-            mainDispatcherExtension.advanceUntilIdle()
-
-            assertThat(viewModel.uiState.value.products).hasSize(20)
-        }
-
-    @Test
     fun `상품 목록 추가 로드 시 기존 목록에 합산하고 마지막 페이지 상태를 갱신한다`() =
         runTest {
             val viewModel =

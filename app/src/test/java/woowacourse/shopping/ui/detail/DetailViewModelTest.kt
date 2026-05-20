@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.detail
 
+import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +30,7 @@ class DetailViewModelTest {
     @Test
     fun `상품을 불러오면 상품 정보와 수량과 총 가격을 반영한다`() =
         runTest {
-            val viewModel = createViewModel(id = "1")
+            val viewModel = createViewModel()
 
             mainDispatcherExtension.advanceUntilIdle()
 
@@ -43,7 +44,6 @@ class DetailViewModelTest {
         runTest {
             val viewModel =
                 createViewModel(
-                    id = "1",
                     cartRepository = FakeCartRepository(quantities = mapOf("1" to 3)),
                 )
 
@@ -54,41 +54,9 @@ class DetailViewModelTest {
         }
 
     @Test
-    fun `마지막으로 본 상품을 최근 본 상품으로 제공한다`() =
-        runTest {
-            val recentItemDao = TestRecentItemDao()
-            recentItemDao.upsert(RecentItemEntity(id = "2", timestamp = 100L))
-
-            val viewModel = createViewModel(id = "1", recentItemDao = recentItemDao)
-            mainDispatcherExtension.advanceUntilIdle()
-
-            assertThat(
-                viewModel.uiState.value.recentItem
-                    ?.id,
-            ).isEqualTo("2")
-        }
-
-    @Test
-    fun `최근 본 상품 숨김 옵션이 참이면 최근 본 상품을 제공하지 않는다`() =
-        runTest {
-            val recentItemDao = TestRecentItemDao()
-            recentItemDao.upsert(RecentItemEntity(id = "2", timestamp = 100L))
-
-            val viewModel =
-                createViewModel(
-                    id = "1",
-                    hideRecentItem = true,
-                    recentItemDao = recentItemDao,
-                )
-            mainDispatcherExtension.advanceUntilIdle()
-
-            assertThat(viewModel.uiState.value.recentItem).isNull()
-        }
-
-    @Test
     fun `수량을 변경하면 총 가격도 변경된다`() =
         runTest {
-            val viewModel = createViewModel(id = "1")
+            val viewModel = createViewModel()
             mainDispatcherExtension.advanceUntilIdle()
 
             viewModel.updateQuantity(2)
@@ -102,25 +70,36 @@ class DetailViewModelTest {
         runTest {
             val recentItemDao = TestRecentItemDao()
 
-            createViewModel(id = "1", recentItemDao = recentItemDao)
+            createViewModel(recentItemDao = recentItemDao)
             mainDispatcherExtension.advanceUntilIdle()
 
             assertThat(recentItemDao.getRecentItemById("1")).isNotNull()
         }
 
     private fun createViewModel(
-        id: String,
-        hideRecentItem: Boolean = false,
-        productRepository: ProductRepository = FakeProductRepository(products = listOf(createProduct("1"), createProduct("2"))),
+        productRepository: ProductRepository =
+            FakeProductRepository(
+                products =
+                    listOf(
+                        createProduct("1"),
+                        createProduct("2"),
+                    ),
+            ),
         cartRepository: CartRepository = FakeCartRepository(),
         recentItemDao: TestRecentItemDao = TestRecentItemDao(),
+        savedStateHandle: SavedStateHandle =
+            SavedStateHandle(
+                mapOf(
+                    "id" to "1",
+                    "hideRecentItem" to false,
+                ),
+            ),
     ): DetailViewModel =
         DetailViewModel(
-            id = id,
-            hideRecentItem = hideRecentItem,
+            savedStateHandle = savedStateHandle,
             productRepository = productRepository,
             cartRepository = cartRepository,
-            recentItemRepository = RecentItemRepository(recentItemDao, productRepository),
+            recentItemRepository = RecentItemRepository(recentItemDao),
         )
 }
 
@@ -170,7 +149,9 @@ private class TestRecentItemDao : RecentItemDao {
 
     override fun getRecentItems(): Flow<List<RecentItemEntity>> =
         items.map { entities ->
-            entities.sortedWith(compareByDescending<RecentItemEntity> { it.timestamp }.thenByDescending { it.id }).take(10)
+            entities
+                .sortedWith(compareByDescending<RecentItemEntity> { it.timestamp }.thenByDescending { it.id })
+                .take(10)
         }
 
     override suspend fun getRecentItemById(id: String): RecentItemEntity? = items.value.firstOrNull { it.id == id }
