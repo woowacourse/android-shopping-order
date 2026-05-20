@@ -33,7 +33,7 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/\"",
+                "\"http://127.0.0.1:8080/\"",
             )
             buildConfigField("String", "USER_ID", "\"eungyeong12\"")
             buildConfigField("String", "PASSWORD", "\"password\"")
@@ -82,7 +82,7 @@ dependencies {
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.okhttp.mockwebserver)
+    implementation(libs.okhttp.mockwebserver)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
