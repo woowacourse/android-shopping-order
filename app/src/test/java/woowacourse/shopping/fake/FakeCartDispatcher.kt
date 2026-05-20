@@ -114,7 +114,7 @@ class FakeCartDispatcher(
                 id = allCartItems.size.toLong(),
                 product = fixedProductContent,
                 quantity = quantity,
-            )
+            ),
         )
         return MockResponse.Builder().code(200).build()
     }
