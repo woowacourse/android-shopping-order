@@ -88,7 +88,7 @@ class CartActivity : ComponentActivity() {
                                 ProductDetailActivity.startActivity(this, product.id)
                             },
                             onAddToCart = recommendationViewModel::addRecommendedProduct,
-                            onIncreaseQuantity = recommendationViewModel::increaseRecommendedProductQuantity,
+                            onIncreaseQuantity = recommendationViewModel::addRecommendedProduct,
                             onDecreaseQuantity = recommendationViewModel::decreaseRecommendedProductQuantity,
                             onOrderClick = recommendationViewModel::placeOrder,
                             onBackClick = { isShowingRecommendedProducts = false },

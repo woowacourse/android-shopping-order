@@ -94,10 +94,6 @@ class CartRecommendationViewModel(
         changeRecommendedProductQuantity(productId, delta = 1)
     }
 
-    fun increaseRecommendedProductQuantity(productId: Long) {
-        changeRecommendedProductQuantity(productId, delta = 1)
-    }
-
     fun decreaseRecommendedProductQuantity(productId: Long) {
         changeRecommendedProductQuantity(productId, delta = -1)
     }
