@@ -33,11 +33,13 @@ import woowacourse.shopping.feature.format.DecimalPriceFormatter
 @Composable
 fun RecommendScreen(
     onCloseClick: () -> Unit,
+    onBuyClick: () -> Unit,
+    contentIds: List<Long>,
     modifier: Modifier = Modifier,
-    viewModel: RecommendViewModel = viewModel(),
+    viewModel: RecommendViewModel = viewModel(factory = RecommendViewModel.recommendFactory()),
 ) {
     LaunchedEffect(Unit) {
-        viewModel.initialLoading()
+        viewModel.initialLoading(contentIds)
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -90,8 +92,9 @@ fun RecommendScreen(
                 }
                 TextButton(
                     onClick = {
-                        viewModel.order()
+                        viewModel.order(contentIds)
                         Toast.makeText(currentContext, "주문이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+                        onBuyClick()
                     },
                     modifier =
                         Modifier
@@ -116,5 +119,7 @@ fun RecommendScreen(
 private fun RecommendScreenPreview() {
     RecommendScreen(
         onCloseClick = {},
+        onBuyClick = {},
+        contentIds = emptyList(),
     )
 }

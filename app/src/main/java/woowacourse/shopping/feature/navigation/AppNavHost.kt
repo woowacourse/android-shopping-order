@@ -8,6 +8,7 @@ import androidx.navigation.toRoute
 import woowacourse.shopping.feature.cart.component.CartScreen
 import woowacourse.shopping.feature.productdetail.ProductDetailScreen
 import woowacourse.shopping.feature.productlist.ProductListScreen
+import woowacourse.shopping.feature.recommend.RecommendScreen
 
 @Composable
 fun AppNavHost() {
@@ -58,8 +59,21 @@ fun AppNavHost() {
                 onCloseClick = { navController.popBackStack() },
                 activityFinish = { navController.popBackStack() },
                 onToRecommendIntent = { cartContentIds ->
-
+                    navController.navigate(Recommend(cartContentIds.map {
+                        it.id
+                    }))
                 }
+            )
+        }
+
+        composable<Recommend> { backStackEntry ->
+            val route = backStackEntry.toRoute<Recommend>()
+            RecommendScreen(
+                onCloseClick = { navController.popBackStack() },
+                onBuyClick = {
+                    navController.navigate(ProductList)
+                },
+                contentIds = route.cartContentIds,
             )
         }
     }

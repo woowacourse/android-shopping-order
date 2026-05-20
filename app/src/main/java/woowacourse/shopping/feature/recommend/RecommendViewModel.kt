@@ -30,7 +30,6 @@ data class RecommendUiState(
 
 class RecommendViewModel(
     private val application: ShoppingApplication,
-    private val contentIds: List<Long>,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RecommendUiState())
     val uiState: StateFlow<RecommendUiState> = _uiState.asStateFlow()
@@ -52,15 +51,15 @@ class RecommendViewModel(
         }
     }
 
-    fun initialLoading() {
+    fun initialLoading(contentIds: List<Long>) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            loadRecommendList(10)
+            loadRecommendList(10, contentIds)
             _uiState.update { it.copy(isLoading = false) }
         }
     }
 
-    fun loadRecommendList(pageSize: Int) {
+    fun loadRecommendList(pageSize: Int, contentIds: List<Long>) {
         viewModelScope.launch {
             val category = refreshRecentProducts()
             val serverCart = cartRepository.loadCart()
@@ -141,7 +140,7 @@ class RecommendViewModel(
             quantity = quantity,
         )
 
-    fun order() {
+    fun order(contentIds: List<Long>) {
         viewModelScope.launch {
             _uiState.value.recommendList.filter { it.quantity > 0 }.forEach {
                 cartRepository.increase(
@@ -161,7 +160,6 @@ class RecommendViewModel(
                 serverCart.cartContents.filter { cartContent ->
                     products.map { it.id }.contains(cartContent.product.id)
                 }
-            Log.d("order", latestContents.toString())
             orderRepository.orders(
                 cartItemIds = contentIds + latestContents.map { it.id },
             )
@@ -176,11 +174,11 @@ class RecommendViewModel(
     }
 
     companion object {
-        fun recommendFactory(contentIds: List<Long>) =
+        fun recommendFactory() =
             viewModelFactory {
                 initializer {
                     val app = this[APPLICATION_KEY] as ShoppingApplication
-                    RecommendViewModel(app, contentIds)
+                    RecommendViewModel(app)
                 }
             }
     }
