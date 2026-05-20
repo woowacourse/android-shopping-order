@@ -25,8 +25,8 @@ class ProductDetailViewModel(
     private val _uiState = MutableStateFlow(ProductDetailUiState())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
 
-    private val _event = MutableSharedFlow<ProductDetailEvent>()
-    val event: SharedFlow<ProductDetailEvent> = _event.asSharedFlow()
+    private val _event = MutableSharedFlow<AddEvent>()
+    val event: SharedFlow<AddEvent> = _event.asSharedFlow()
 
     lateinit var productRepository: ProductRepository
     lateinit var cartRepository: CartRepository
@@ -109,7 +109,7 @@ class ProductDetailViewModel(
                 )
             val product = productRepository.getProduct(loadingState.product.id)
             cartRepository.setProductQuantity(product, previousQuantity + uiState.value.quantity)
-            _event.emit(ProductDetailEvent.Success("장바구니에 담기 성공했습니다."))
+            _event.emit(AddEvent("장바구니에 담기 성공했습니다."))
 
         }
     }
@@ -139,8 +139,4 @@ sealed interface ProductDetailLoadingState {
     ) : ProductDetailLoadingState
 }
 
-sealed interface ProductDetailEvent {
-    data class Failed(val message: String) : ProductDetailEvent
-
-    data class Success(val message: String) : ProductDetailEvent
-}
+data class AddEvent(val message: String)

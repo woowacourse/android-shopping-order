@@ -22,21 +22,6 @@ import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.ProductNotFoundException
 import woowacourse.shopping.feature.common.state.ProductUiModel
 
-sealed interface ProductListEvent {
-    data class FatalError(
-        val message: String,
-    ) : ProductListEvent
-}
-
-data class ProductListUiState(
-    val productUiModels: List<ProductUiModel> = emptyList(),
-    val recentProducts: List<ProductUiModel> = emptyList(),
-    val mostRecentProductId: Long? = null,
-    val isLoading: Boolean = true,
-    val isEnd: Boolean = false,
-    val cartTotalQuantity: Int = 0,
-)
-
 class ProductListViewModel(
     private val application: ShoppingApplication,
 ) : ViewModel() {
@@ -201,4 +186,10 @@ class ProductListViewModel(
                 }
             }
     }
+}
+
+sealed interface ProductListEvent {
+    data class FatalError(
+        val message: String,
+    ) : ProductListEvent
 }

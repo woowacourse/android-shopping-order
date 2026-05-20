@@ -67,18 +67,9 @@ fun ProductDetailScreen(
 
     val currentContext = LocalContext.current
 
-
     LaunchedEffect(Unit) {
         viewModel.event.collect { event ->
-            when (event) {
-                is ProductDetailEvent.Success -> {
-                    Toast.makeText(currentContext, event.message, Toast.LENGTH_SHORT).show()
-                }
-
-                is ProductDetailEvent.Failed -> {
-                    Toast.makeText(currentContext, event.message, Toast.LENGTH_SHORT).show()
-                }
-            }
+            Toast.makeText(currentContext, event.message, Toast.LENGTH_SHORT).show()
         }
     }
 
