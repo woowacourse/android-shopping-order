@@ -121,9 +121,16 @@ class ShoppingViewModel(
     }
 
     fun loadMore() {
-        if (!_uiState.value.isNetworkAvailable || !_uiState.value.canLoadMore || _uiState.value.isLoading) return
+        if (!_uiState.value.isNetworkAvailable ||
+            !_uiState.value.canLoadMore ||
+            _uiState.value.isLoading ||
+            _uiState.value.isPagingMore
+        ) {
+            return
+        }
 
         viewModelScope.launch {
+            _uiState.update { it.copy(isPagingMore = true) }
             try {
                 val apiResult = productRepository.getProducts(page = (offset / pageSize), size = pageSize)
                 val loadProducts =
@@ -140,9 +147,15 @@ class ShoppingViewModel(
                         canLoadMore = !apiResult.isLastPage,
                     )
             } catch (_: IOException) {
-                _uiState.value = _uiState.value
+                _uiState.update { state ->
+                    state.copy(cartErrorMessage = "상품을 추가로 불러오는 데 실패했습니다.")
+                }
+            } catch (_: HttpException) {
+                _uiState.update { state ->
+                    state.copy(cartErrorMessage = "서버 통신 오류가 발생했습니다.")
+                }
             } finally {
-                loadProducts()
+                _uiState.update { it.copy(isPagingMore = false) }
             }
         }
     }
