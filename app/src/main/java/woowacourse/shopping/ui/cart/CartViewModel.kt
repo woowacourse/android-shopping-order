@@ -70,9 +70,13 @@ class CartViewModel(
     private fun initCartItems() {
         viewModelScope.launch {
             cartLoadStateFlow.update { LoadState.Loading }
-            cartRepository.refreshCartItems()
-            loadRecommendProduct()
-            cartLoadStateFlow.update { LoadState.Success }
+            runCatching {
+                cartRepository.refreshCartItems()
+                loadRecommendProduct()
+                cartLoadStateFlow.update { LoadState.Success }
+            }.onFailure { throwable ->
+                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+            }
         }
     }
 
@@ -88,44 +92,58 @@ class CartViewModel(
 
     fun removeCartItem(cartId: Int) {
         viewModelScope.launch {
-            cartRepository.removeCartItem(cartId)
-
-            val totalPage = (cartItemsFlow.value.size() + PAGE_SIZE - 1) / PAGE_SIZE
-            if (currentPageIdxFlow.value >= totalPage) {
-                currentPageIdxFlow.update { maxOf(0, totalPage - 1) }
+            runCatching {
+                cartRepository.removeCartItem(cartId)
+                val totalPage = (cartItemsFlow.value.size() + PAGE_SIZE - 1) / PAGE_SIZE
+                if (currentPageIdxFlow.value >= totalPage) {
+                    currentPageIdxFlow.update { maxOf(0, totalPage - 1) }
+                }
+                selectedItemsFlow.update { it - cartId }
+            }.onFailure { throwable ->
+                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
             }
-            selectedItemsFlow.update { it - cartId }
         }
     }
 
     fun addCartItem(productId: Int) {
         viewModelScope.launch {
-            cartRepository.addProduct(productId, 1)
-            val cartItem = cartItemsFlow.value.findByProductId(productId) ?: return@launch
+            runCatching {
+                cartRepository.addProduct(productId, 1)
+                val cartItem = cartItemsFlow.value.findByProductId(productId) ?: return@launch
 
-            selectedItemsFlow.update {
-                it + cartItem.id
+                selectedItemsFlow.update {
+                    it + cartItem.id
+                }
+            }.onFailure { throwable ->
+                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
             }
         }
     }
 
     fun increaseCartItemQuantity(cartId: Int) {
         viewModelScope.launch {
-            val targetQuantity = cartItemsFlow.value.getQuantityByCartId(cartId)
-
-            cartRepository.updateQuantity(cartId, targetQuantity.value + 1)
+            runCatching {
+                val targetQuantity = cartItemsFlow.value.getQuantityByCartId(cartId)
+                cartRepository.updateQuantity(cartId, targetQuantity.value + 1)
+            }.onFailure { throwable ->
+                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+            }
         }
     }
 
     fun decreaseCartItemQuantity(cartId: Int) {
         viewModelScope.launch {
-            val targetQuantity = cartItemsFlow.value.getQuantityByCartId(cartId)
+            runCatching {
+                val targetQuantity = cartItemsFlow.value.getQuantityByCartId(cartId)
 
-            if (targetQuantity.value == 1) {
-                cartRepository.removeCartItem(cartId)
-                selectedItemsFlow.update { it - cartId }
-            } else {
-                cartRepository.updateQuantity(cartId, targetQuantity.value - 1)
+                if (targetQuantity.value == 1) {
+                    cartRepository.removeCartItem(cartId)
+                    selectedItemsFlow.update { it - cartId }
+                } else {
+                    cartRepository.updateQuantity(cartId, targetQuantity.value - 1)
+                }
+            }.onFailure { throwable ->
+                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
             }
         }
     }
@@ -161,23 +179,31 @@ class CartViewModel(
 
     fun increaseRecommendProduct(productId: Int) {
         viewModelScope.launch {
-            val target =
-                cartItemsFlow.value.findByProductId(productId) ?: return@launch
+            runCatching {
+                val target =
+                    cartItemsFlow.value.findByProductId(productId) ?: return@launch
 
-            cartRepository.updateQuantity(target.id, target.quantity.value + 1)
+                cartRepository.updateQuantity(target.id, target.quantity.value + 1)
+            }.onFailure { throwable ->
+                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+            }
         }
     }
 
     fun decreaseRecommendProduct(productId: Int) {
         viewModelScope.launch {
-            val target =
-                cartItemsFlow.value.findByProductId(productId) ?: return@launch
+            runCatching {
+                val target =
+                    cartItemsFlow.value.findByProductId(productId) ?: return@launch
 
-            if (target.quantity.value == 1) {
-                cartRepository.removeCartItem(target.id)
-                selectedItemsFlow.update { it - target.id }
-            } else {
-                cartRepository.updateQuantity(target.id, target.quantity.value - 1)
+                if (target.quantity.value == 1) {
+                    cartRepository.removeCartItem(target.id)
+                    selectedItemsFlow.update { it - target.id }
+                } else {
+                    cartRepository.updateQuantity(target.id, target.quantity.value - 1)
+                }
+            }.onFailure { throwable ->
+                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
             }
         }
     }
@@ -187,7 +213,11 @@ class CartViewModel(
             _currentScreen.value = CartFlow.RECOMMEND
         } else {
             viewModelScope.launch {
-                cartRepository.order(selectedItemsFlow.value.toList())
+                runCatching {
+                    cartRepository.order(selectedItemsFlow.value.toList())
+                }.onFailure { throwable ->
+                    cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+                }
             }
         }
     }
