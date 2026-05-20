@@ -16,6 +16,7 @@ import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentItemRepository
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.ui.model.mapper.toUiModel
+import kotlin.coroutines.cancellation.CancellationException
 
 class CartViewModel(
     private val cartRepository: CartRepository,
@@ -28,67 +29,74 @@ class CartViewModel(
     init {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            getCartItemsByPage()
-            _uiState.update { it.copy(isLoading = false) }
+            try {
+                getCartItemsByPage()
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
     }
 
-    private suspend fun getCartItemsByPage() {
-        val cartResult =
-            cartRepository.getCartItemsByPage(page = uiState.value.page, size = PAGE_SIZE)
+    private suspend fun getCartItemsByPage(targetPage: Int = uiState.value.page) {
+        try {
+            val cartResult =
+                cartRepository.getCartItemsByPage(page = targetPage, size = PAGE_SIZE)
 
-        val totalPrice =
-            cartRepository.getTotalPrice(uiState.value.selectedCartItems)
+            val totalPrice =
+                cartRepository.getTotalPrice(uiState.value.selectedCartItems)
 
-        _uiState.update {
-            it.copy(
-                items =
-                    cartResult.cartItems
-                        .map { cartItem ->
-                            cartItem.toUiModel(isSelected(cartItem.id))
-                        }.toImmutableList(),
-                isCanMoveNext = !cartResult.isLastPage,
-                totalCartCount = cartRepository.getCartItemsCount(),
-                totalCartQuantity = cartRepository.getTotalCartItemQuantity(),
-                totalPrice = totalPrice.amount,
-                recommendProducts =
-                    loadRecommendProducts()
-                        .map { recentProduct ->
-                            recentProduct.toUiModel(
-                                quantity = cartRepository.getCartItemQuantity(recentProduct.id),
-                            )
-                        }.toImmutableList(),
-            )
+            _uiState.update {
+                it.copy(
+                    page = targetPage,
+                    items =
+                        cartResult.cartItems
+                            .map { cartItem ->
+                                cartItem.toUiModel(isSelected(cartItem.id))
+                            }.toImmutableList(),
+                    isCanMoveNext = !cartResult.isLastPage,
+                    totalCartCount = cartRepository.getCartItemsCount(),
+                    totalCartQuantity = cartRepository.getTotalCartItemQuantity(),
+                    totalPrice = totalPrice.amount,
+                    recommendProducts =
+                        loadRecommendProducts()
+                            .map { recentProduct ->
+                                recentProduct.toUiModel(
+                                    quantity = cartRepository.getCartItemQuantity(recentProduct.id),
+                                )
+                            }.toImmutableList(),
+                )
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            _uiState.update {
+                it.copy(errorMessage = "카트 정보를 불러오는 데 실패했습니다.")
+            }
         }
     }
 
     fun nextPage() {
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    page = uiState.value.page + 1,
-                )
-            }
-            getCartItemsByPage()
+            getCartItemsByPage(targetPage = uiState.value.page + 1)
         }
     }
 
     fun previousPage() {
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    page = uiState.value.page - 1,
-                )
-            }
-            getCartItemsByPage()
+            getCartItemsByPage(targetPage = uiState.value.page - 1)
         }
     }
 
     fun deleteItem(cartId: Long) {
         viewModelScope.launch {
-            cartRepository.deleteItem(cartId)
-
-            getCartItemsByPage()
+            try {
+                cartRepository.deleteItem(cartId)
+                getCartItemsByPage()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                _uiState.update { it.copy(errorMessage = "상품 삭제에 실패했습니다.") }
+            }
         }
     }
 
@@ -97,9 +105,14 @@ class CartViewModel(
         quantity: Int,
     ) {
         viewModelScope.launch {
-            cartRepository.setCartItem(productId, quantity = quantity)
-
-            getCartItemsByPage()
+            try {
+                cartRepository.setCartItem(productId, quantity = quantity)
+                getCartItemsByPage()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                _uiState.update { it.copy(errorMessage = "수량 변경에 실패했습니다.") }
+            }
         }
     }
 
