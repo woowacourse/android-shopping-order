@@ -8,8 +8,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun DetailRoute(
-    id: String,
-    hideRecentItem: Boolean,
     onDismiss: () -> Unit,
     onRecentItemClick: (String) -> Unit,
     navigateToCart: () -> Unit,
@@ -17,10 +15,7 @@ fun DetailRoute(
     viewModel: DetailViewModel =
         viewModel(
             factory =
-                DetailViewModel.Factory(
-                    id = id,
-                    hideRecentItem = hideRecentItem,
-                ),
+                DetailViewModel.Factory,
         ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

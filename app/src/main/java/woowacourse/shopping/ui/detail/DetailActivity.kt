@@ -15,7 +15,6 @@ class DetailActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val id = intent.getStringExtra(PRODUCT_ID)
-        val hideRecentItem = intent.getBooleanExtra(HIDE_RECENT_ITEM, false)
 
         if (id == null) {
             Toast.makeText(this, "유효하지 않은 상품입니다.", Toast.LENGTH_SHORT).show()
@@ -25,8 +24,6 @@ class DetailActivity : ComponentActivity() {
 
         setContent {
             DetailRoute(
-                id = id,
-                hideRecentItem = hideRecentItem,
                 onDismiss = { finish() },
                 onRecentItemClick = { id ->
                     startActivity(getIntent(this, id, hideRecentItem = true))
