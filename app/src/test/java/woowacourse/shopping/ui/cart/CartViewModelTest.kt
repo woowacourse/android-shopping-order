@@ -110,7 +110,7 @@ class CartViewModelTest {
 
         return CartViewModel(
             cartRepository = FakeCartRepository(cartItems),
-            recentItemRepository = RecentItemRepository(TestRecentItemDao(), productRepository),
+            recentItemRepository = RecentItemRepository(TestRecentItemDao()),
             productRepository = productRepository,
         )
     }
