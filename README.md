@@ -3,8 +3,8 @@
 ## 🎯 기능 목록
 
 ### 환경 및 인프라 설정
-- [ ] Compose Navigation 의존성 추가 및 프로젝트 구성
-  - [ ] `androidx.navigation:navigation-compose` 의존성 추가
+- [x] Compose Navigation 의존성 추가 및 프로젝트 구성
+  - [x] `androidx.navigation:navigation-compose` 의존성 추가
 - [ ] 기존 Activity/Intent 기반 화면 전환 코드 제거
   - [ ] 각 화면별 Activity 클래스 및 `startActivity` 호출부 제거
   - [ ] `AndroidManifest.xml`에서 불필요한 Activity 선언 정리
