@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.constant.Format.formatPrice
 import woowacourse.shopping.domain.cart.CartItems
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.Products
@@ -24,6 +23,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.util.LoadState
+import woowacourse.shopping.ui.util.toUiModel
 
 class ProductListViewModel(
     private val productRepository: ProductRepository,
@@ -54,21 +54,6 @@ class ProductListViewModel(
                 showCartAmountBadge = cart.totalQuantity > 0,
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ProductListUiState())
-
-    fun Products.toUiModel(cartItems: CartItems): List<ProductUiModel> =
-        this.items.map { product ->
-            product.toUiModel(cartItems.findQuantity(product.id).value)
-        }
-
-    fun Product.toUiModel(cartAmount: Int): ProductUiModel =
-        ProductUiModel(
-            id = this.id,
-            name = this.name.value,
-            price = formatPrice(this.price.value),
-            imageUrl = this.imageUrl.value,
-            cartAmount = cartAmount.toString(),
-            showAmountController = cartAmount > 0,
-        )
 
     init {
         observeRecentProducts()
