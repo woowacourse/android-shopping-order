@@ -68,9 +68,7 @@ class RoomCartRepository(
 
     override suspend fun getSize(): Int = cartDao.getSize()
 
-    override suspend fun getCartCount(): Int {
-        TODO("Not yet implemented")
-    }
+    override suspend fun getCartCount(): Int = cartDao.getSize()
 
     private suspend fun toCartItems(): List<CartItem> {
         val cartEntities = cartDao.getAll()
