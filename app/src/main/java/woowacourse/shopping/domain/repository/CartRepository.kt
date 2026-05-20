@@ -1,16 +1,12 @@
 package woowacourse.shopping.domain.repository
 
+import kotlinx.coroutines.flow.StateFlow
 import woowacourse.shopping.domain.cart.CartItems
 
 interface CartRepository {
-    suspend fun getCartItems(
-        page: Int,
-        size: Int,
-    ): CartItems
+    val cartItems: StateFlow<CartItems>
 
-    suspend fun getCartItemsCount(): Int
-
-    suspend fun getAllCartItems(): CartItems
+    suspend fun refreshCartItems()
 
     suspend fun addProduct(
         productId: Int,
@@ -22,13 +18,7 @@ interface CartRepository {
         quantity: Int,
     )
 
-    suspend fun remove(cartId: Int)
+    suspend fun removeCartItem(cartId: Int)
 
     suspend fun order(cartItemIds: List<Int>)
-}
-
-sealed interface CartDecreaseResult {
-    object Deleted : CartDecreaseResult
-
-    object Decreased : CartDecreaseResult
 }
