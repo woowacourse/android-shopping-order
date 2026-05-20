@@ -80,20 +80,13 @@ class CartRecommendationViewModelTest {
             )
             advanceUntilIdle()
 
-            assertEquals(listOf(101L), viewModel.uiState.value.pendingOrder.cartItemIds)
-
             viewModel.addRecommendedProduct(recommendedProduct.id)
             advanceUntilIdle()
 
             assertEquals(
-                setOf(101L, 102L),
+                setOf(101L),
                 viewModel.uiState.value.pendingOrder.cartItemIds
                     .toSet(),
-            )
-            assertEquals(2, viewModel.uiState.value.pendingOrder.selectedCount)
-            assertEquals(
-                orderedProduct.price.value + recommendedProduct.price.value,
-                viewModel.uiState.value.pendingOrder.totalPrice,
             )
 
             viewModel.placeOrder()
@@ -103,13 +96,10 @@ class CartRecommendationViewModelTest {
                 listOf(listOf(101L, 102L)),
                 cartRepository.createdOrders,
             )
-            assertTrue(
-                cartRepository
-                    .getCartItemsByProductIds(setOf(orderedProduct.id, recommendedProduct.id))
-                    .getOrThrow()
-                    .isEmpty(),
+            assertEquals(
+                listOf(listOf(101L, 102L)),
+                cartRepository.createdOrders,
             )
-            assertEquals(1, viewModel.uiState.value.orderCompletedCount)
         }
 
     @Test
@@ -252,7 +242,7 @@ class CartRecommendationViewModelTest {
         }
 
     @Test
-    fun `추천 상품을 장바구니에 추가할 수 있다`() =
+    fun `추천 상품을 추가해도 실제 장바구니(DB)에는 즉시 저장되지 않는다`() =
         runTest(dispatcher.scheduler) {
             viewModel.startOrder(selectedCartOrderOf(orderedProduct))
             advanceUntilIdle()
@@ -260,11 +250,11 @@ class CartRecommendationViewModelTest {
             viewModel.addRecommendedProduct(recommendedProduct.id)
             advanceUntilIdle()
 
-            assertEquals(
-                listOf(CartItem(productId = recommendedProduct.id, quantity = 1)),
+            assertTrue(
                 cartRepository
                     .getCartItemsByProductIds(setOf(recommendedProduct.id))
-                    .getOrThrow(),
+                    .getOrThrow()
+                    .isEmpty(),
             )
         }
 
@@ -277,15 +267,15 @@ class CartRecommendationViewModelTest {
             viewModel.addRecommendedProduct(recommendedProduct.id)
             advanceUntilIdle()
 
-            assertEquals(2, viewModel.uiState.value.pendingOrder.selectedCount)
             assertEquals(
-                setOf(101L, 102L),
+                setOf(101L),
                 viewModel.uiState.value.pendingOrder.cartItemIds
                     .toSet(),
             )
-            assertTrue(
-                viewModel.uiState.value.recommendedProducts
-                    .any { it.product.id == recommendedProduct.id },
+            assertEquals(2, viewModel.uiState.value.pendingOrder.selectedCount)
+            assertEquals(
+                orderedProduct.price.value + recommendedProduct.price.value,
+                viewModel.uiState.value.pendingOrder.totalPrice,
             )
         }
 

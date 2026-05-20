@@ -66,19 +66,25 @@ class CartViewModel(
         val totalCount = cartRepository.count().getOrDefault(0)
         if (totalCount == 0) return null
 
-        val allCartItems = cartRepository.getCartPage(
-            page = 0,
-            size = totalCount,
-        ).getOrNull()?.items ?: return null
+        val allCartItems =
+            cartRepository
+                .getCartPage(
+                    page = 0,
+                    size = totalCount,
+                ).getOrNull()
+                ?.items ?: return null
 
         val productIds = allCartItems.map { it.productId }.toSet()
-        val productsById = productRepository.findAllByIds(productIds)
-            .getOrDefault(emptyMap())
+        val productsById =
+            productRepository
+                .findAllByIds(productIds)
+                .getOrDefault(emptyMap())
 
         val deselectedIds = _uiState.value.deselectedProductIds
-        val selectedItems = allCartItems.filter {
-            it.productId !in deselectedIds
-        }
+        val selectedItems =
+            allCartItems.filter {
+                it.productId !in deselectedIds
+            }
 
         if (selectedItems.isEmpty()) return null
 
@@ -89,9 +95,9 @@ class CartViewModel(
                         cartItemId = item.cartItemId,
                         productId = item.productId,
                         price = productsById[item.productId]?.price?.value ?: 0,
-                        quantity = item.quantity
+                        quantity = item.quantity,
                     )
-                }
+                },
         )
     }
 

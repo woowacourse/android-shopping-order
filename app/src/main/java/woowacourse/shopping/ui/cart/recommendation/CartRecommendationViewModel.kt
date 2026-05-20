@@ -100,49 +100,69 @@ class CartRecommendationViewModel(
 
     fun placeOrder() {
         viewModelScope.launch {
-            if (_uiState.value.pendingOrder.cartItemIds
-                    .isEmpty() ||
-                _uiState.value.isOrdering
-            ) {
-                return@launch
-            }
+            if (_uiState.value.isOrdering) return@launch
 
-            _uiState.update { currentState ->
-                currentState.copy(
+            _uiState.update {
+                it.copy(
                     isOrdering = true,
                     orderErrorMessage = null,
                 )
             }
 
-            awaitRecommendedSyncs()
+            val additionalCartItemIds = mutableListOf<Long>()
 
-            val cartItemIds = _uiState.value.pendingOrder.cartItemIds
-            if (cartItemIds.isEmpty()) {
-                updateOrderError("주문할 상품이 없습니다.")
-                return@launch
+            for ((productId, orderData) in recommendedOrderItemDataByProductId) {
+                val result = cartRepository.setQuantity(productId, orderData.quantity)
+                if (result.isFailure) {
+                    updateOrderError("추천 상품을 주문할 수 없습니다.")
+                    return@launch
+                }
             }
 
-            cartRepository
-                .createOrder(cartItemIds)
-                .onSuccess {
-                    orderedProductIds.clear()
-                    recommendedOrderItemDataByProductId.clear()
+            if (recommendedOrderItemDataByProductId.isNotEmpty()) {
+                val totalCount = cartRepository.count().getOrDefault(0)
+                val allCartItems =
+                    cartRepository
+                        .getCartPage(0, totalCount)
+                        .getOrNull()
+                        ?.items ?: emptyList()
 
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            pendingOrder = PendingOrderUiState(),
-                            isOrdering = false,
-                            orderCompletedCount = currentState.orderCompletedCount + 1,
-                        )
-                    }
-                }.onFailure { throwable ->
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            isOrdering = false,
-                            orderErrorMessage = throwable.toUserMessage("주문에 실패했습니다."),
-                        )
+                recommendedOrderItemDataByProductId.keys.forEach { addedProductId ->
+                    val newCartItemId =
+                        allCartItems
+                            .find {
+                                it.productId == addedProductId
+                            }?.cartItemId
+
+                    if (newCartItemId != null) {
+                        additionalCartItemIds.add(newCartItemId)
                     }
                 }
+
+                val baseCartItemIds = _uiState.value.pendingOrder.cartItemIds
+                val finalCartItemIdsToOrder = baseCartItemIds + additionalCartItemIds
+
+                if (finalCartItemIdsToOrder.isEmpty()) {
+                    updateOrderError("주문할 상품이 없습니다")
+                    return@launch
+                }
+
+                cartRepository
+                    .createOrder(finalCartItemIdsToOrder)
+                    .onSuccess {
+                        orderedProductIds.clear()
+                        recommendedOrderItemDataByProductId.clear()
+                        _uiState.update { currentState ->
+                            currentState.copy(
+                                pendingOrder = PendingOrderUiState(),
+                                isOrdering = false,
+                                orderCompletedCount = currentState.orderCompletedCount + 1,
+                            )
+                        }
+                    }.onFailure { throwable ->
+                        updateOrderError(throwable.toUserMessage("주문에 실패했습니다."))
+                    }
+            }
         }
     }
 
@@ -234,39 +254,21 @@ class CartRecommendationViewModel(
 
         if (!updateRecommendedProductQuantity(productId, targetQuantity)) return
 
-        recommendedSyncJobs.remove(productId)?.cancel()
-        recommendedSyncJobs[productId] =
-            viewModelScope.launch {
-                cartRepository
-                    .setQuantity(productId, targetQuantity)
-                    .onSuccess {
-                        if (targetQuantity > 0) {
-                            orderedProductIds += productId
-                            recommendedOrderItemDataByProductId[productId] =
-                                OrderItemData(
-                                    price = productPrice,
-                                    quantity = targetQuantity,
-                                )
-                        } else {
-                            orderedProductIds -= productId
-                            recommendedOrderItemDataByProductId.remove(productId)
-                        }
+        if (targetQuantity > 0) {
+            orderedProductIds += productId
+            recommendedOrderItemDataByProductId[productId] =
+                OrderItemData(
+                    price = productPrice,
+                    quantity = targetQuantity,
+                )
+        } else {
+            orderedProductIds -= productId
+            recommendedOrderItemDataByProductId.remove(productId)
+        }
 
-                        reloadRecommendedProducts()
-                        refreshPendingOrder()
-                    }.onFailure { throwable ->
-                        reloadRecommendedProducts()
-                        refreshPendingOrder()
-
-                        _uiState.update { currentState ->
-                            currentState.copy(
-                                orderErrorMessage = throwable.toUserMessage("장바구니를 갱신하지 못했습니다."),
-                            )
-                        }
-                    }
-            }
-
-        recommendedSyncJobs.remove(productId)
+        viewModelScope.launch {
+            refreshPendingOrder()
+        }
     }
 
     private fun updateRecommendedProductQuantity(
@@ -303,37 +305,24 @@ class CartRecommendationViewModel(
 
     private suspend fun refreshPendingOrder() {
         val pendingOrderExcludedProductIds = _uiState.value.pendingOrder.excludedProductIds
-        if (orderedProductIds.isEmpty()) {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    pendingOrder = PendingOrderUiState(excludedProductIds = pendingOrderExcludedProductIds),
-                )
-            }
-            return
-        }
 
-        val cartItems = resolveCartPageItems(orderedProductIds)
         val itemDataByProductId = buildOrderItemDataByProductId()
-        val activeCartItems =
-            cartItems.filter { cartItem ->
-                (itemDataByProductId[cartItem.productId]?.quantity ?: 0) > 0
+
+        val activeItems =
+            itemDataByProductId.filter {
+                it.value.quantity > 0
             }
 
-        orderedProductIds.clear()
-        orderedProductIds += activeCartItems.map { it.productId }
+        val cartItems = resolveCartPageItems(activeItems.keys)
 
         _uiState.update { currentState ->
             currentState.copy(
                 pendingOrder =
                     PendingOrderUiState(
-                        cartItemIds = activeCartItems.map { it.cartItemId },
+                        cartItemIds = cartItems.map { it.cartItemId },
                         excludedProductIds = pendingOrderExcludedProductIds,
-                        selectedCount = activeCartItems.size,
-                        totalPrice =
-                            activeCartItems.sumOf { cartItem ->
-                                val itemData = itemDataByProductId[cartItem.productId] ?: return@sumOf 0
-                                itemData.price * itemData.quantity
-                            },
+                        selectedCount = activeItems.size,
+                        totalPrice = activeItems.values.sumOf { it.price * it.quantity },
                     ),
             )
         }
