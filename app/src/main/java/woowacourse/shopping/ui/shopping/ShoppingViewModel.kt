@@ -214,8 +214,40 @@ class ShoppingViewModel(
         val contentState = _uiState.value.productListState as? ProductListUiState.Content ?: return
         if (!contentState.hasNext) return
 
-        visibleCount = minOf(visibleCount + PAGE_SIZE, productRepository.size)
-        loadProducts()
+        viewModelScope.launch {
+            productRepository
+                .getProducts(contentState.products.size, PAGE_SIZE)
+                .onSuccess { newProducts ->
+                    val hasNext =
+                        productRepository
+                            .hasNext(
+                                contentState.products.size + newProducts.count() - 1,
+                            ).getOrDefault(false)
+
+                    val newCartState =
+                        createCartState(newProducts.toList())
+                            .getOrElse {
+                                updateErrorState(it)
+                                return@onSuccess
+                            }
+
+                    _uiState.update { currentState ->
+                        val latestContent =
+                            currentState.productListState as? ProductListUiState.Content
+                                ?: return@update currentState
+                        currentState.copy(
+                            productListState =
+                                latestContent.copy(
+                                    products = currentState.productListState.products + newCartState.products,
+                                    hasNext = hasNext,
+                                ),
+                            cartQuantity = currentState.cartQuantity + newCartState.cartQuantity,
+                        )
+                    }
+                }.onFailure { throwable ->
+                    updateErrorState(throwable)
+                }
+        }
     }
 
     fun addToCart(productId: Long) = increaseQuantity(productId)
