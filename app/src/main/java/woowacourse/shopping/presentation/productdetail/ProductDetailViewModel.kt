@@ -1,14 +1,11 @@
-package woowacourse.shopping.presentation.detail.viewmodel
+package woowacourse.shopping.presentation.productdetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.RepositoryProvider
@@ -16,17 +13,14 @@ import woowacourse.shopping.domain.addToCartUseCase
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.common.model.toUiModel
-import woowacourse.shopping.presentation.detail.model.DetailUiState
+import woowacourse.shopping.presentation.productdetail.model.DetailUiState
 
-class DetailViewModel(
+class ProductDetailViewModel(
     private val productRepository: ProductRepository = RepositoryProvider.productRepository,
     private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
-
-    private val _uiEvents = Channel<DetailEvent>(Channel.BUFFERED)
-    val uiEvents: Flow<DetailEvent> = _uiEvents.receiveAsFlow()
 
     fun increaseQuantity() {
         _uiState.update { state ->
@@ -54,7 +48,6 @@ class DetailViewModel(
     ) {
         viewModelScope.launch {
             addToCartUseCase(cartRepository, id, quantity)
-            _uiEvents.send(DetailEvent.NavigateToCart)
         }
     }
 
@@ -84,16 +77,7 @@ class DetailViewModel(
                 productRepository.upsertRecentProduct(id)
             } catch (_: Exception) {
                 _uiState.value = DetailUiState.Error("상품 로딩에 실패했습니다.")
-                _uiEvents.send(DetailEvent.ShowErrorToast("상품 로딩에 실패했습니다."))
             }
         }
     }
-}
-
-sealed interface DetailEvent {
-    data class ShowErrorToast(
-        val message: String,
-    ) : DetailEvent
-
-    data object NavigateToCart : DetailEvent
 }

@@ -22,12 +22,12 @@
             android:label="@string/title_activity_cart"
             android:theme="@style/Theme.Shopping" />
         <activity
-            android:name=".presentation.detail.DetailActivity"
+            android:name=".presentation.productdetail.DetailActivity"
             android:exported="false"
             android:label="@string/title_activity_detail"
             android:theme="@style/Theme.Shopping" />
         <activity
-            android:name=".presentation.shopping.ShoppingActivity"
+            android:name=".NavActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

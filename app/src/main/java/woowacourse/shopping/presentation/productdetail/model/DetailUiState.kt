@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.detail.model
+package woowacourse.shopping.presentation.productdetail.model
 
 import woowacourse.shopping.presentation.common.model.ProductUiModel
 
@@ -11,7 +11,6 @@ sealed interface DetailUiState {
         val recentProduct: ProductUiModel? = null,
     ) : DetailUiState {
         val price: Long get() = product.price * quantity
-        val showLastSeenProductCard: Boolean get() = recentProduct?.let { it.id != product.id } ?: false
     }
 
     data class Error(

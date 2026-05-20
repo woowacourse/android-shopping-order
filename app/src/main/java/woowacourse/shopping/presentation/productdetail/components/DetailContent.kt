@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.detail.ui.components
+package woowacourse.shopping.presentation.productdetail.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

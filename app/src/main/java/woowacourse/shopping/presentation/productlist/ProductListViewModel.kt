@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.shopping.viewmodel
+package woowacourse.shopping.presentation.productlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,10 +16,10 @@ import woowacourse.shopping.domain.addToCartUseCase
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.common.model.toUiModel
-import woowacourse.shopping.presentation.shopping.model.ShoppingItemUiModel
-import woowacourse.shopping.presentation.shopping.model.ShoppingUiState
+import woowacourse.shopping.presentation.productlist.model.ShoppingItemUiModel
+import woowacourse.shopping.presentation.productlist.model.ShoppingUiState
 
-class ShoppingViewModel(
+class ProductListViewModel(
     private val productRepository: ProductRepository = RepositoryProvider.productRepository,
     private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
 ) : ViewModel() {
@@ -79,12 +79,6 @@ class ShoppingViewModel(
             val cartItem =
                 cart.value.items.find { it.product.id == id } ?: return@launch
             cartRepository.changeCartItem(id, cartItem.decrease().quantity)
-        }
-    }
-
-    fun upsertRecentProduct(id: Long) {
-        viewModelScope.launch {
-            productRepository.upsertRecentProduct(id)
         }
     }
 

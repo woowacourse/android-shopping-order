@@ -1,6 +1,6 @@
 package woowacourse.shopping.presentation.recommend.model
 
-import woowacourse.shopping.presentation.shopping.model.ShoppingItemUiModel
+import woowacourse.shopping.presentation.productlist.model.ShoppingItemUiModel
 
 data class RecommendUiState(
     val totalPrice: Long = 0L,

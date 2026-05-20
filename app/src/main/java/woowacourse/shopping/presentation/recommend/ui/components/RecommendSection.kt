@@ -21,8 +21,8 @@ import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import woowacourse.shopping.R
-import woowacourse.shopping.presentation.shopping.model.ShoppingItemUiModel
-import woowacourse.shopping.presentation.shopping.ui.components.ProductCard
+import woowacourse.shopping.presentation.productlist.components.ProductCard
+import woowacourse.shopping.presentation.productlist.model.ShoppingItemUiModel
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 import woowacourse.shopping.ui.theme.Gray50
 

@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.shopping.ui.components
+package woowacourse.shopping.presentation.productlist.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +21,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.Money
@@ -33,7 +32,7 @@ import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 
 @Composable
 fun RecentSection(
-    recentProducts: ImmutableList<ProductUiModel>,
+    recentProducts: List<ProductUiModel>,
     onClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {

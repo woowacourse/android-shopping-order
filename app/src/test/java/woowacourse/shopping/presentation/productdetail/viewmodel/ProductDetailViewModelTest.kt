@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.detail.viewmodel
+package woowacourse.shopping.presentation.productdetail.viewmodel
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,12 +13,13 @@ import org.junit.jupiter.api.Test
 import woowacourse.shopping.fake.FakeCartRepository
 import woowacourse.shopping.fake.FakeProductRepository
 import woowacourse.shopping.fake.fakeProduct
-import woowacourse.shopping.presentation.detail.model.DetailUiState
+import woowacourse.shopping.presentation.productdetail.ProductDetailViewModel
+import woowacourse.shopping.presentation.productdetail.model.DetailUiState
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DetailViewModelTest {
+class ProductDetailViewModelTest {
     private val dispatcher = UnconfinedTestDispatcher()
-    private lateinit var viewModel: DetailViewModel
+    private lateinit var viewModel: ProductDetailViewModel
     private lateinit var productRepository: FakeProductRepository
     private lateinit var cartRepository: FakeCartRepository
 
@@ -30,7 +31,7 @@ class DetailViewModelTest {
         productRepository = FakeProductRepository(products)
         cartRepository = FakeCartRepository(productMap)
         viewModel =
-            DetailViewModel(
+            ProductDetailViewModel(
                 productRepository = productRepository,
                 cartRepository = cartRepository,
             )

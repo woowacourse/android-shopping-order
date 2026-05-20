@@ -15,8 +15,8 @@ import woowacourse.shopping.domain.recommendProductUseCase
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.common.model.toUiModel
+import woowacourse.shopping.presentation.productlist.model.ShoppingItemUiModel
 import woowacourse.shopping.presentation.recommend.model.RecommendUiState
-import woowacourse.shopping.presentation.shopping.model.ShoppingItemUiModel
 
 class RecommendViewModel(
     private val cartRepository: CartRepository = RepositoryProvider.cartRepository,

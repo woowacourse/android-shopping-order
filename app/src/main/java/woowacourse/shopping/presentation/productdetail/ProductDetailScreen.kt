@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.detail.ui
+package woowacourse.shopping.presentation.productdetail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,19 +29,59 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.R
 import woowacourse.shopping.presentation.common.components.ShoppingAppBar
 import woowacourse.shopping.presentation.common.model.ProductUiModel
-import woowacourse.shopping.presentation.detail.model.DetailUiState
-import woowacourse.shopping.presentation.detail.ui.components.DetailContent
-import woowacourse.shopping.presentation.detail.ui.components.LastSeenProductCard
+import woowacourse.shopping.presentation.productdetail.components.DetailContent
+import woowacourse.shopping.presentation.productdetail.components.LastSeenProductCard
+import woowacourse.shopping.presentation.productdetail.model.DetailUiState
+import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 import woowacourse.shopping.ui.theme.Green40
 
 @Composable
-fun DetailScreen(
-    uiState: DetailUiState.Success,
-    onClickLastProductCard: (Long) -> Unit,
-    onBack: () -> Unit,
+fun ProductDetailScreen(
+    productId: Long,
+    onRecentProductClick: (Long) -> Unit,
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: ProductDetailViewModel = viewModel(),
+) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadProduct(productId)
+    }
+
+    when (val uiState = uiState.value) {
+        is DetailUiState.Loading -> {}
+
+        is DetailUiState.Error -> {}
+
+        is DetailUiState.Success -> {
+            ProductDetailContent(
+                product = uiState.product,
+                recentProduct = uiState.recentProduct,
+                productQuantity = uiState.quantity,
+                onRecentProductClick = onRecentProductClick,
+                onBackClick = onBackClick,
+                onAddToCart = { viewModel.addItemToCart(productId, uiState.quantity) },
+                onIncrease = viewModel::increaseQuantity,
+                onDecrease = viewModel::decreaseQuantity,
+                modifier = modifier,
+            )
+        }
+    }
+}
+
+@Composable
+fun ProductDetailContent(
+    product: ProductUiModel,
+    recentProduct: ProductUiModel?,
+    productQuantity: Int,
+    onRecentProductClick: (Long) -> Unit,
+    onBackClick: () -> Unit,
     onAddToCart: () -> Unit,
     onIncrease: () -> Unit,
     onDecrease: () -> Unit,
@@ -59,7 +100,7 @@ fun DetailScreen(
                         modifier =
                             Modifier
                                 .size(16.dp)
-                                .clickable { onBack() },
+                                .clickable { onBackClick() },
                     )
                 },
             )
@@ -95,24 +136,22 @@ fun DetailScreen(
             verticalArrangement = Arrangement.spacedBy(30.dp),
         ) {
             DetailContent(
-                imageUrl = uiState.product.imageUrl,
-                productName = uiState.product.name,
-                price = uiState.price,
-                quantity = uiState.quantity,
+                imageUrl = product.imageUrl,
+                productName = product.name,
+                price = product.price,
+                quantity = productQuantity,
                 onIncrease = { onIncrease() },
                 onDecrease = { onDecrease() },
             )
-            if (uiState.showLastSeenProductCard) {
-                uiState.recentProduct?.let { lastProduct ->
-                    LastSeenProductCard(
-                        name = lastProduct.name,
-                        onClick = { onClickLastProductCard(lastProduct.id) },
-                        modifier =
-                            Modifier
-                                .padding(horizontal = 18.dp),
-                    )
-                    Spacer(modifier = Modifier.height(18.dp))
-                }
+            recentProduct?.let { lastProduct ->
+                LastSeenProductCard(
+                    name = lastProduct.name,
+                    onClick = { onRecentProductClick(lastProduct.id) },
+                    modifier =
+                        Modifier
+                            .padding(horizontal = 18.dp),
+                )
+                Spacer(modifier = Modifier.height(18.dp))
             }
         }
     }
@@ -120,23 +159,29 @@ fun DetailScreen(
 
 @Preview
 @Composable
-private fun DetailScreenPreview() {
-    DetailScreen(
-        uiState =
-            DetailUiState.Success(
-                product =
-                    ProductUiModel(
-                        id = 1L,
-                        name = "제품",
-                        price = 134L,
-                        imageUrl = "",
-                    ),
-                quantity = 1,
-            ),
-        onClickLastProductCard = {},
-        onBack = {},
-        onAddToCart = {},
-        onIncrease = {},
-        onDecrease = {},
-    )
+private fun ProductDetailContentPreview() {
+    AndroidshoppingTheme {
+        ProductDetailContent(
+            product =
+                ProductUiModel(
+                    id = 1L,
+                    name = "맛있는 사과",
+                    price = 3000L,
+                    imageUrl = "",
+                ),
+            recentProduct =
+                ProductUiModel(
+                    id = 2L,
+                    name = "신선한 바나나",
+                    price = 1500L,
+                    imageUrl = "",
+                ),
+            productQuantity = 1,
+            onRecentProductClick = {},
+            onBackClick = {},
+            onAddToCart = {},
+            onIncrease = {},
+            onDecrease = {},
+        )
+    }
 }
