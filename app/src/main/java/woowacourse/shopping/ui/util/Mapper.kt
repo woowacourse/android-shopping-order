@@ -8,9 +8,7 @@ import woowacourse.shopping.domain.product.Products
 import woowacourse.shopping.ui.cart.CartItemUiModel
 import woowacourse.shopping.ui.productList.ProductUiModel
 
-fun List<CartItem>.toUiModel(
-    selectedItems: Set<Int>,
-): List<CartItemUiModel> =
+fun List<CartItem>.toUiModel(selectedItems: Set<Int>): List<CartItemUiModel> =
     this.map { cartItem ->
         val isSelected = selectedItems.contains(cartItem.id)
         cartItem.toUiModel(isSelected)
@@ -25,13 +23,11 @@ fun CartItem.toUiModel(isSelected: Boolean): CartItemUiModel =
         totalPrice = totalPrice,
     )
 
-
-fun Products.toUiModel(cartItems: CartItems): List<ProductUiModel> =
-    this.items.toUiModel(cartItems)
+fun Products.toUiModel(cartItems: CartItems): List<ProductUiModel> = this.items.toUiModel(cartItems)
 
 fun List<Product>.toUiModel(cartItems: CartItems): List<ProductUiModel> =
     this.map { product ->
-        product.toUiModel(cartItems.findQuantity(product.id).value)
+        product.toUiModel(cartItems.getQuantityByProductId(product.id).value)
     }
 
 fun Product.toUiModel(cartAmount: Int): ProductUiModel =

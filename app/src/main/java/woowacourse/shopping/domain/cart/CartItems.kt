@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain.cart
 
-class CartItems(
+data class CartItems(
     val values: List<CartItem> = emptyList(),
     val isLast: Boolean = false,
     val isFirst: Boolean = true,
@@ -12,55 +12,35 @@ class CartItems(
     val totalPrice: Int
         get() = values.sumOf { it.totalPrice }
 
-    fun calculatePrice(
-        targetIds: Set<Int>,
-        isAll: Boolean,
-    ): Int {
-        if (isAll) return totalPrice
-        return values.filter { targetIds.contains(it.id) }.sumOf { it.totalPrice }
-    }
+    fun calculatePrice(targetIds: Set<Int>): Int = values.filter { targetIds.contains(it.id) }.sumOf { it.totalPrice }
 
-    fun calculateQuantity(
-        targetIds: Set<Int>,
-        isAll: Boolean,
-    ): Int {
-        if (isAll) return totalQuantity
-        return values.filter { targetIds.contains(it.id) }.sumOf { it.quantity.value }
-    }
+    fun calculateQuantity(targetIds: Set<Int>): Int = values.filter { targetIds.contains(it.id) }.sumOf { it.quantity.value }
 
-    fun increase(productId: Int): CartItems {
-        val target = findByProductId(productId) ?: return this
-        return replace(target, target.increaseQuantity())
-    }
+    fun getQuantityByProductId(productId: Int): Quantity = findByProductId(productId)?.quantity ?: Quantity.ZERO
 
-    fun decrease(productId: Int): CartItems {
-        val target = findByProductId(productId) ?: return this
-        val decreased = target.decreaseQuantity()
-        return if (decreased.quantity.isZero) {
-            remove(productId)
-        } else {
-            replace(target, decreased)
-        }
-    }
-
-    fun remove(productId: Int): CartItems = CartItems(values.filter { !it.isSameProduct(productId) })
-
-    fun findQuantity(productId: Int): Quantity = findByProductId(productId)?.quantity ?: Quantity.ZERO
+    fun getQuantityByCartId(cartId: Int): Quantity = getCartItemByCartId(cartId)?.quantity ?: Quantity.ZERO
 
     fun contains(productId: Int): Boolean = findByProductId(productId) != null
 
     fun subList(
         fromIndex: Int,
         toIndex: Int,
-    ): List<CartItem> {
+    ): CartItems {
         val safeFrom = fromIndex.coerceIn(0, values.size)
         val safeTo = toIndex.coerceIn(safeFrom, values.size)
-        return values.subList(safeFrom, safeTo)
+        return CartItems(
+            values = values.subList(safeFrom, safeTo),
+            isLast = safeTo == values.size,
+            isFirst = safeFrom == 0,
+            totalPages = totalPages,
+        )
     }
 
     fun size(): Int = values.size
 
     fun findByProductId(productId: Int): CartItem? = values.firstOrNull { it.isSameProduct(productId) }
+
+    fun getCartItemByCartId(cartId: Int): CartItem? = values.firstOrNull { it.id == cartId }
 
     private fun replace(
         target: CartItem,
