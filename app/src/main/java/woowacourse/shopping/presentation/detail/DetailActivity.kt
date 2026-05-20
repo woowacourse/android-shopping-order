@@ -41,7 +41,6 @@ class DetailActivity : ComponentActivity() {
         setContent {
             AndroidshoppingTheme {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-                val context = LocalContext.current
                 val lifecycleOwner = LocalLifecycleOwner.current
 
                 LaunchedEffect(viewModel.uiState, lifecycleOwner) {
@@ -49,7 +48,7 @@ class DetailActivity : ComponentActivity() {
                         viewModel.uiEvents.collect { event ->
                             when (event) {
                                 is DetailEvent.ShowError -> {
-                                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this@DetailActivity, event.message, Toast.LENGTH_SHORT).show()
                                 }
                                 is DetailEvent.NavigateToCart -> {
                                     val intent = Intent(this@DetailActivity, CartActivity::class.java)

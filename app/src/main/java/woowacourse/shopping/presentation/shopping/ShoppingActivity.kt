@@ -30,7 +30,6 @@ class ShoppingActivity : ComponentActivity() {
         setContent {
             AndroidshoppingTheme {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-                val context = LocalContext.current
                 val lifecycleOwner = LocalLifecycleOwner.current
 
                 LaunchedEffect(Unit) {
@@ -42,7 +41,7 @@ class ShoppingActivity : ComponentActivity() {
                         viewModel.uiEvents.collect { event ->
                             when (event) {
                                 is ShoppingEvent.ShowError -> {
-                                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this@ShoppingActivity, event.message, Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }

@@ -28,7 +28,6 @@ class CartActivity : ComponentActivity() {
         setContent {
             AndroidshoppingTheme {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-                val context = LocalContext.current
 
                 LaunchedEffect(Unit) {
                     viewModel.refreshCart()
@@ -39,12 +38,12 @@ class CartActivity : ComponentActivity() {
                         viewModel.uiEvents.collect { event ->
                             val toastMessage =
                                 when (event) {
-                                    is CartEvent.DeleteSuccess -> context.getString(R.string.delete_item_success)
-                                    is CartEvent.DeleteNotFound -> context.getString(R.string.not_found_item)
+                                    is CartEvent.DeleteSuccess -> this@CartActivity.getString(R.string.delete_item_success)
+                                    is CartEvent.DeleteNotFound -> this@CartActivity.getString(R.string.not_found_item)
                                     is CartEvent.ShowError -> event.message
                                     is CartEvent.ShowCancelReason -> event.message
                                 }
-                            Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@CartActivity, toastMessage, Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -62,7 +61,7 @@ class CartActivity : ComponentActivity() {
                     onOrderClick = {
                         startActivity(
                             RecommendActivity.newIntent(
-                                context,
+                                this@CartActivity,
                                 viewModel.getPaymentItemIds(),
                             ),
                         )

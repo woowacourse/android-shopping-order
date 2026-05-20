@@ -30,7 +30,6 @@ class RecommendActivity : ComponentActivity() {
 
         setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val context = LocalContext.current
             val lifecycleOwner = LocalLifecycleOwner.current
 
             LaunchedEffect(Unit) {
@@ -43,7 +42,7 @@ class RecommendActivity : ComponentActivity() {
                     viewModel.uiEvents.collect { event ->
                         when (event) {
                             is RecommendEvent.ShowError -> {
-                                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@RecommendActivity, event.message, Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
