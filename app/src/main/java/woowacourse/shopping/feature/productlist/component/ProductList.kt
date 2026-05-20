@@ -41,7 +41,7 @@ fun ProductList(
             modifier
                 .fillMaxWidth(),
     ) {
-        if (isLoading) {
+        if (isLoading && products.isEmpty()) {
             items(20) {
                 ProductItem(
                     isLoading = isLoading,
