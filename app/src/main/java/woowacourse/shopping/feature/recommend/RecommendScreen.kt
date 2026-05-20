@@ -54,16 +54,35 @@ fun RecommendScreen(
             CartAppBar(onCloseClick = onCloseClick)
         },
     ) { innerPadding ->
-        Column(modifier = modifier.padding(innerPadding)) {
-            Text("이런 상품은 어떠세요?")
-            Text("* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.")
-            RecommendList(
-                isLoading = false,
-                products = uiState.recommendList,
-                onIncrease = viewModel::increase,
-                onDecrease = viewModel::decrease,
-                modifier = Modifier.weight(1f),
-            )
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+        ) {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .weight(1f),
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text("이런 상품은 어떠세요?", fontWeight = FontWeight.W700, fontSize = 24.sp)
+                Text(
+                    "* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.",
+                    fontWeight = FontWeight.W500,
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+                RecommendList(
+                    isLoading = false,
+                    products = uiState.recommendList,
+                    onIncrease = viewModel::increase,
+                    onDecrease = viewModel::decrease,
+                    modifier = Modifier,
+                )
+            }
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
