@@ -52,6 +52,7 @@ fun ProductDetailScreen(
     recentProductId: Long? = null,
     viewModel: ProductDetailViewModel = viewModel(factory = ProductDetailViewModel.Factory),
 ) {
+
     LaunchedEffect(Unit) {
         viewModel.initialLoading(
             productId = id,
@@ -66,12 +67,29 @@ fun ProductDetailScreen(
 
     val currentContext = LocalContext.current
 
+
+    LaunchedEffect(Unit) {
+        viewModel.event.collect { event ->
+            when (event) {
+                is ProductDetailEvent.Success -> {
+                    Toast.makeText(currentContext, event.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is ProductDetailEvent.Failed -> {
+                    Toast.makeText(currentContext, event.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     when {
         productState is ProductDetailLoadingState.Loading ||
-            recentState is ProductDetailLoadingState.Loading -> LoadingIndicator()
+                recentState is ProductDetailLoadingState.Loading -> LoadingIndicator()
 
         productState is ProductDetailLoadingState.Error ||
-            productState is ProductDetailLoadingState.None -> ProductDetailErrorScreen(activityFinish)
+                productState is ProductDetailLoadingState.None -> ProductDetailErrorScreen(
+            activityFinish
+        )
 
         productState is ProductDetailLoadingState.Success ->
             ProductDetailContent(
@@ -83,7 +101,6 @@ fun ProductDetailScreen(
                 decrease = viewModel::decrease,
                 onAddCartButton = {
                     viewModel.addToCart()
-                    Toast.makeText(currentContext, "장바구니에 담겼습니다.", Toast.LENGTH_SHORT).show()
                 },
                 onClickRecentButton = onClickRecentButton,
                 modifier = modifier,

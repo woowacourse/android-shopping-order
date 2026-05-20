@@ -5,8 +5,11 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -16,31 +19,14 @@ import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.feature.common.state.ProductUiModel
 
-data class ProductDetailUiState(
-    val productState: ProductDetailLoadingState = ProductDetailLoadingState.Loading,
-    val recentProductState: ProductDetailLoadingState = ProductDetailLoadingState.None,
-    val quantity: Int = 1,
-)
-
-sealed interface ProductDetailLoadingState {
-    data object None : ProductDetailLoadingState
-
-    data object Loading : ProductDetailLoadingState
-
-    data class Success(
-        val product: ProductUiModel,
-    ) : ProductDetailLoadingState
-
-    data class Error(
-        val errorString: String,
-    ) : ProductDetailLoadingState
-}
-
 class ProductDetailViewModel(
     private val application: ShoppingApplication,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductDetailUiState())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
+
+    private val _event = MutableSharedFlow<ProductDetailEvent>()
+    val event: SharedFlow<ProductDetailEvent> = _event.asSharedFlow()
 
     lateinit var productRepository: ProductRepository
     lateinit var cartRepository: CartRepository
@@ -123,6 +109,8 @@ class ProductDetailViewModel(
                 )
             val product = productRepository.getProduct(loadingState.product.id)
             cartRepository.setProductQuantity(product, previousQuantity + uiState.value.quantity)
+            _event.emit(ProductDetailEvent.Success("장바구니에 담기 성공했습니다."))
+
         }
     }
 
@@ -135,4 +123,24 @@ class ProductDetailViewModel(
                 }
             }
     }
+}
+
+sealed interface ProductDetailLoadingState {
+    data object None : ProductDetailLoadingState
+
+    data object Loading : ProductDetailLoadingState
+
+    data class Success(
+        val product: ProductUiModel,
+    ) : ProductDetailLoadingState
+
+    data class Error(
+        val errorString: String,
+    ) : ProductDetailLoadingState
+}
+
+sealed interface ProductDetailEvent {
+    data class Failed(val message: String) : ProductDetailEvent
+
+    data class Success(val message: String) : ProductDetailEvent
 }
