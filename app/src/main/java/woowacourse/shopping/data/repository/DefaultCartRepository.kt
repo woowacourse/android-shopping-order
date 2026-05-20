@@ -12,6 +12,7 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductName
 import woowacourse.shopping.domain.model.RemoveItemResult
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.error.Result
 
 class DefaultCartRepository(
     private val remoteDataSource: CartRemoteDataSource,
@@ -56,9 +57,13 @@ class DefaultCartRepository(
         val allCartContents = mutableSetOf<CartContent>()
         while (true) {
             val pagedCartContents = remoteDataSource.getCartItems(page, PAGE_SIZE)
-            allCartContents.addAll(pagedCartContents)
-            if (pagedCartContents.size < PAGE_SIZE) break
-            page += 1
+            if (pagedCartContents is Result.Success) {
+                allCartContents.addAll(pagedCartContents.data)
+                if (pagedCartContents.data.size < PAGE_SIZE) break
+                page += 1
+                continue
+            }
+            break
         }
         _cart.update {
             Cart(

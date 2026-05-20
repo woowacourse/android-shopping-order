@@ -12,6 +12,7 @@ import woowacourse.shopping.domain.model.Money
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductName
 import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.error.Result
 
 class DefaultProductRepository(
     private val remoteProductDataSource: ProductRemoteDataSource,
@@ -25,20 +26,24 @@ class DefaultProductRepository(
         page: Int,
         size: Int,
     ): Int {
-        val newProducts =
-            remoteProductDataSource.fetchProducts(page, size).map {
-                Product(
-                    id = it.id,
-                    name = ProductName(it.name),
-                    price = Money(it.price.toLong()),
-                    imageUrl = it.imageUrl,
-                    category = it.category,
-                )
+        val fetchProductsResult = remoteProductDataSource.fetchProducts(page, size)
+        if (fetchProductsResult is Result.Success) {
+            val newProducts =
+                fetchProductsResult.data.map {
+                    Product(
+                        id = it.id,
+                        name = ProductName(it.name),
+                        price = Money(it.price.toLong()),
+                        imageUrl = it.imageUrl,
+                        category = it.category,
+                    )
+                }
+            _products.update { products ->
+                (products + newProducts).distinctBy { it.id }
             }
-        _products.update { products ->
-            (products + newProducts).distinctBy { it.id }
+            return newProducts.size
         }
-        return newProducts.size
+        return 0
     }
 
     override fun getRecentProductsStream(size: Int): Flow<List<Product>> =
