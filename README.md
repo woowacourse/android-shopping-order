@@ -72,3 +72,19 @@
   - [x] 서버에서 카테고리 별 상품 리스트를 조회한다
   - [x] 추천 상품을 바로 장바구니에 추가할 수 있다
   - [x] 추천 상품을 장바구니에 추가하면 총 가격에 반영된다
+
+### 🧹 2차 피드백 반영 내용
+
+- [ ] ROOM에서 들고 있는 비즈니스 로직 Repository로 이동
+- [ ] UserAuthDataStore 코루틴 스코프 맴버 변수 추가
+- [ ] encodedUserAuthInfo의 쓰레드 풀을 Default로 변경
+- [ ] BASE_URL 네이밍 컨벤션 적용
+- [ ] 네트워크 api 호출에 대한 예외처리 추가
+  - [ ] api 호출의 결과를 Result 객체로 감싸기
+  - [ ] success와 failure에 대한 처리 추가
+- [ ] CatalogScreen 콜백 함수 람다 제거
+- [ ] ProductImage 이미지 로드 실패 시 표시할 에러 이미지 추가
+- [ ] RecentlyViewedProducts LazyRow의 key값의 index 결합 제거
+- [ ] 각 viewModel에 UiModel 도입
+- [ ] 액티비티 별 startActivity companion object 추가
+- [] AppContainer 추가 및 수동 의존성 주입 구현
