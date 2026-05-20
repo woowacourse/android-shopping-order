@@ -3,8 +3,6 @@ package woowacourse.shopping.ui.shopping
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +19,6 @@ import woowacourse.shopping.ui.common.recentlyviewed.RecentViewedProductsMapper
 
 private const val PAGE_SIZE = 20
 private const val RECENT_PRODUCT_LIMIT = 10
-private const val CART_SYNC_DELAY_MILLIS = 400L
 
 class ShoppingViewModel(
     private val productRepository: ProductRepository,
@@ -33,7 +30,6 @@ class ShoppingViewModel(
     val uiState: StateFlow<ShoppingUiState> = _uiState.asStateFlow()
 
     private var visibleCount = PAGE_SIZE
-    private val syncJobs = mutableMapOf<Long, Job>()
 
     init {
         observeNetworkState()
@@ -234,14 +230,15 @@ class ShoppingViewModel(
     ) {
         val contentState = _uiState.value.productListState as? ProductListUiState.Content ?: return
         var quantityDelta = 0
+        var targetQuantity = 0
 
         val updatedProducts =
             contentState.products.map { item ->
                 if (item.product.id != productId) return@map item
 
-                val nextQuantity = (item.quantity + delta).coerceAtLeast(0)
-                quantityDelta = nextQuantity - item.quantity
-                item.copy(quantity = nextQuantity)
+                targetQuantity = (item.quantity + delta).coerceAtLeast(0)
+                quantityDelta = targetQuantity - item.quantity
+                item.copy(quantity = targetQuantity)
             }
 
         if (quantityDelta == 0) return
@@ -254,31 +251,14 @@ class ShoppingViewModel(
             )
         }
 
-        scheduleCartSync(productId)
-    }
-
-    private fun scheduleCartSync(productId: Long) {
-        syncJobs.remove(productId)?.cancel()
-
-        syncJobs[productId] =
-            viewModelScope.launch {
-                delay(CART_SYNC_DELAY_MILLIS)
-
-                val contentState = _uiState.value.productListState as? ProductListUiState.Content ?: return@launch
-                val targetQuantity =
-                    contentState.products
-                        .firstOrNull { it.product.id == productId }
-                        ?.quantity ?: 0
-
-                cartRepository
-                    .setQuantity(productId, targetQuantity)
-                    .onFailure { throwable ->
-                        refreshCartState()
-                        updateErrorState(throwable)
-                    }
-
-                syncJobs.remove(productId)
-            }
+        viewModelScope.launch {
+            cartRepository
+                .setQuantity(productId, targetQuantity)
+                .onFailure { throwable ->
+                    refreshCartState()
+                    updateErrorState(throwable)
+                }
+        }
     }
 
     private fun updateErrorState(throwable: Throwable) {
