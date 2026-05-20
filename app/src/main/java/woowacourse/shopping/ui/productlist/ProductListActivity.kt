@@ -1,0 +1,148 @@
+@file:Suppress("FunctionName")
+
+package woowacourse.shopping.ui.productlist
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
+import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.di.AppViewModelFactory
+import woowacourse.shopping.ui.cart.ShoppingCartActivity
+import woowacourse.shopping.ui.cart.ShoppingCartViewModel
+import woowacourse.shopping.ui.component.MoreButton
+import woowacourse.shopping.ui.detail.DetailProductActivity
+import woowacourse.shopping.ui.theme.AndroidShoppingTheme
+
+class ProductListActivity : ComponentActivity() {
+    private val app: ShoppingApplication by lazy { application as ShoppingApplication }
+
+    private val viewModelFactory: AppViewModelFactory by lazy {
+        AppViewModelFactory(
+            appContainer = app.appContainer,
+        )
+    }
+
+    private val productListViewModel: ProductListViewModel by viewModels { viewModelFactory }
+    private val shoppingCartViewModel: ShoppingCartViewModel by viewModels { viewModelFactory }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+
+        observeScreenEvents()
+
+        setContent {
+            val uiState = productListViewModel.uiState.collectAsStateWithLifecycle()
+            val hasApiError = uiState.value.errorMessage != null
+            val visibleShoppingItems =
+                if (hasApiError) {
+                    emptyList()
+                } else {
+                    uiState.value.shoppingItems
+                }
+            val visibleRecentViewedItems =
+                if (hasApiError) {
+                    emptyList()
+                } else {
+                    uiState.value.recentViewedShoppingItems
+                }
+            val recentViewedListState = rememberLazyListState()
+            val latestRecentViewedProductId = visibleRecentViewedItems.firstOrNull()?.getProductId()
+
+            LaunchedEffect(latestRecentViewedProductId) {
+                if (latestRecentViewedProductId != null) {
+                    recentViewedListState.animateScrollToItem(index = 0)
+                }
+            }
+
+            AndroidShoppingTheme {
+                ProductListScreen(
+                    shoppingItems = visibleShoppingItems,
+                    recentViewedShoppingItems = visibleRecentViewedItems,
+                    recentViewedListState = recentViewedListState,
+                    shoppingCartTotalCount = if (hasApiError) 0 else uiState.value.shoppingCartTotalCount,
+                    isLoading = uiState.value.isLoading,
+                    onAddToCartClick = { shoppingItem ->
+                        shoppingCartViewModel.addOrIncreaseByProductId(
+                            productId = shoppingItem.getProductId(),
+                            amount = 1,
+                        )
+                    },
+                    onQuantityPlusClick = { shoppingItem ->
+                        shoppingCartViewModel.addOrIncreaseByProductId(
+                            productId = shoppingItem.getProductId(),
+                            amount = 1,
+                        )
+                    },
+                    onQuantityMinusClick = { shoppingItem ->
+                        shoppingCartViewModel.decreaseByProductId(shoppingItem.getProductId())
+                    },
+                    onProductClick = productListViewModel::onProductClick,
+                    onRecentViewedProductClick = productListViewModel::onProductClick,
+                    onNavigateToCartClick = productListViewModel::onNavigateToCartClick,
+                    bottomContent =
+                        if (uiState.value.canLoadNextPage) {
+                            {
+                                MoreButton(
+                                    onClick = productListViewModel::loadNextPage,
+                                )
+                            }
+                        } else {
+                            null
+                        },
+                )
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val shouldLoadInitialProducts =
+            !productListViewModel.uiState.value.hasLoadedProducts &&
+                !productListViewModel.uiState.value.isLoading
+        if (shouldLoadInitialProducts) {
+            requestProductsAndCart()
+        } else {
+            shoppingCartViewModel.requestCartItems()
+        }
+    }
+
+    private fun requestProductsAndCart() {
+        productListViewModel.requestProduct(size = MAX_PRODUCT_SIZE)
+        shoppingCartViewModel.requestCartItems()
+    }
+
+    private fun observeScreenEvents() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                productListViewModel.event.collect { event ->
+                    when (event) {
+                        is ProductListViewModel.ProductListEvent.NavigateToDetailProduct -> {
+                            DetailProductActivity.start(
+                                context = this@ProductListActivity,
+                                productId = event.productId,
+                            )
+                        }
+
+                        ProductListViewModel.ProductListEvent.NavigateToShoppingCart -> {
+                            ShoppingCartActivity.start(this@ProductListActivity)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private companion object {
+        private const val MAX_PRODUCT_SIZE = 20
+    }
+}

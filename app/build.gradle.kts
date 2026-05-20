@@ -1,7 +1,34 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("org.jetbrains.kotlin.kapt")
+}
+
+val properties =
+    Properties().apply {
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use { load(it) }
+        }
+    }
+
+fun asBuildConfigString(rawValue: String): String {
+    if (rawValue.startsWith("\"") && rawValue.endsWith("\"")) return rawValue
+    val escaped = rawValue.replace("\\", "\\\\").replace("\"", "\\\"")
+    return "\"$escaped\""
+}
+
+fun readConfig(
+    localPropertiesKey: String,
+    envKey: String,
+    defaultValue: String = "",
+): String {
+    return properties.getProperty(localPropertiesKey)
+        ?: providers.environmentVariable(envKey).orNull
+        ?: defaultValue
 }
 
 android {
@@ -16,9 +43,43 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "BASE_URL",
+            asBuildConfigString(
+                readConfig(
+                    "BASE_URL",
+                    "",
+                ),
+            ),
+        )
+
+        buildConfigField(
+            "String",
+            "API_USERNAME",
+            asBuildConfigString(readConfig("shoppingApiUsername", "")),
+        )
+        buildConfigField(
+            "String",
+            "API_PASSWORD",
+            asBuildConfigString(readConfig("shoppingApiPassword", "")),
+        )
     }
 
     buildTypes {
+        debug {
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                asBuildConfigString(
+                    readConfig(
+                        "DEBUG_BASE_URL",
+                        "",
+                    ),
+                ),
+            )
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -35,6 +96,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     testOptions {
         unitTests.all {
@@ -52,10 +114,33 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.datastore.core)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner.junit5)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.datastore.preferences)
+    kapt(libs.androidx.room.compiler)
+
+    implementation(libs.androidx.lifecycle.runtime.compose)
+
+    // define a BOM and its version
+    implementation(platform(libs.okhttp.bom))
+
+    // define any required OkHttp artifacts without version
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+    implementation(libs.mockwebserver)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit.kotlinx.serialization.converter)
 }
