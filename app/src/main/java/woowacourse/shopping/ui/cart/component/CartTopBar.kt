@@ -21,7 +21,7 @@ import woowacourse.shopping.ui.common.theme.Gray5
 import woowacourse.shopping.ui.common.theme.Typography
 
 @Composable
-fun CartHeader(
+fun CartTopBar(
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
 ) {
@@ -50,6 +50,6 @@ fun CartHeader(
 
 @Preview(showBackground = true)
 @Composable
-private fun CartHeaderPreview() {
-    CartHeader(onBackClick = {})
+private fun CartTopBarPreview() {
+    CartTopBar(onBackClick = {})
 }

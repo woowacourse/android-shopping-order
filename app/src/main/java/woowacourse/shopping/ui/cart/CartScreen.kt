@@ -20,7 +20,7 @@ import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.ui.cart.component.CartBody
 import woowacourse.shopping.ui.cart.component.CartBottomBar
-import woowacourse.shopping.ui.cart.component.CartHeader
+import woowacourse.shopping.ui.cart.component.CartTopBar
 import woowacourse.shopping.ui.cart.component.CartRecommendationBody
 import woowacourse.shopping.ui.cart.component.CartScreenSkeleton
 import woowacourse.shopping.ui.common.model.LoadState
@@ -122,7 +122,7 @@ fun CartScreen(
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
-        CartHeader(onBackClick = onBackClick)
+        CartTopBar(onBackClick = onBackClick)
 
         CartBody(
             cart = cart,
@@ -168,7 +168,7 @@ private fun RecommendScreen(
     Column(
         modifier = modifier,
     ) {
-        CartHeader(
+        CartTopBar(
             modifier = Modifier,
             onBackClick = onBackClick,
         )

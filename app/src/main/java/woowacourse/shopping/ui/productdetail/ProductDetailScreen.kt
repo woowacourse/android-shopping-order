@@ -17,7 +17,7 @@ import woowacourse.shopping.model.Product
 import woowacourse.shopping.ui.common.component.ShoppingLoading
 import woowacourse.shopping.ui.productdetail.component.CartAddButton
 import woowacourse.shopping.ui.productdetail.component.ProductDetailBody
-import woowacourse.shopping.ui.productdetail.component.ProductDetailHeader
+import woowacourse.shopping.ui.productdetail.component.ProductDetailTopBar
 
 @Composable
 fun ProductDetailScreen(
@@ -74,7 +74,7 @@ fun ProductDetailScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            ProductDetailHeader(onCloseClick = onCloseClick)
+            ProductDetailTopBar(onCloseClick = onCloseClick)
         },
         bottomBar = {
             CartAddButton(onClick = onAddToCartClick)

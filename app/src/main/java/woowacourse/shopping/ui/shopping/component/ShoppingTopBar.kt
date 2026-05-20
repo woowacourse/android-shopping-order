@@ -24,7 +24,7 @@ import woowacourse.shopping.ui.common.theme.PrimaryColor
 import woowacourse.shopping.ui.common.theme.Typography
 
 @Composable
-fun ShoppingHeader(
+fun ShoppingTopBar(
     cartCount: Int,
     modifier: Modifier = Modifier,
     onCartClick: () -> Unit,
@@ -69,6 +69,6 @@ fun ShoppingHeader(
 
 @Preview(showBackground = true)
 @Composable
-private fun ShoppingHeaderPreview() {
-    ShoppingHeader(cartCount = 6, onCartClick = {})
+private fun ShoppingTopBarPreview() {
+    ShoppingTopBar(cartCount = 6, onCartClick = {})
 }

@@ -19,7 +19,7 @@ import com.valentinilk.shimmer.shimmer
 @Composable
 fun CartScreenSkeleton(modifier: Modifier = Modifier) {
     Column(modifier = modifier.background(Color.White)) {
-        CartHeader { }
+        CartTopBar { }
 
         Column(
             modifier =

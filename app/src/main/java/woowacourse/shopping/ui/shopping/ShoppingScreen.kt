@@ -30,7 +30,7 @@ import woowacourse.shopping.model.Products
 import woowacourse.shopping.ui.common.model.ProductUiModel
 import woowacourse.shopping.ui.shopping.component.ProductGroup
 import woowacourse.shopping.ui.shopping.component.RecentProductGroup
-import woowacourse.shopping.ui.shopping.component.ShoppingHeader
+import woowacourse.shopping.ui.shopping.component.ShoppingTopBar
 import woowacourse.shopping.ui.shopping.component.ShoppingScreenSkeleton
 
 @Composable
@@ -111,7 +111,7 @@ fun ShoppingScreen(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        ShoppingHeader(
+        ShoppingTopBar(
             cartCount = cartCount,
             onCartClick = onCartClick,
         )

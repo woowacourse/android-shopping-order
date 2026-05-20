@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import woowacourse.shopping.ui.common.theme.Gray5
 
 @Composable
-fun ProductDetailHeader(
+fun ProductDetailTopBar(
     modifier: Modifier = Modifier,
     onCloseClick: () -> Unit,
 ) {
@@ -42,6 +42,6 @@ fun ProductDetailHeader(
 
 @Preview(showBackground = true)
 @Composable
-private fun ProductDetailHeaderPreview() {
-    ProductDetailHeader(onCloseClick = {})
+private fun ProductDetailTopBarPreview() {
+    ProductDetailTopBar(onCloseClick = {})
 }

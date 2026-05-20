@@ -20,7 +20,7 @@ import com.valentinilk.shimmer.shimmer
 @Composable
 fun ShoppingScreenSkeleton(modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        ShoppingHeader(
+        ShoppingTopBar(
             cartCount = 0,
             modifier = Modifier,
             onCartClick = {},
