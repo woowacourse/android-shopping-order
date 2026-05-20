@@ -12,9 +12,9 @@ import woowacourse.shopping.model.Page
 class RetrofitCartRepository(
     private val service: CartService,
 ) : CartRepository {
-    override suspend fun getAllCartItems(pageSize: Int): Cart {
-        val response = service.getCartItems()
-        val totalSize = response.totalPages * pageSize
+    override suspend fun getAllCartItems(): Cart {
+        val response = service.getCartItems(size = 1)
+        val totalSize = response.totalPages
         return service.getCartItems(0, totalSize).toDomain()
     }
 

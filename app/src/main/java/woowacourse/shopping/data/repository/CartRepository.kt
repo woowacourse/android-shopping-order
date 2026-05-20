@@ -5,7 +5,7 @@ import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Page
 
 interface CartRepository {
-    suspend fun getAllCartItems(pageSize: Int = 5): Cart
+    suspend fun getAllCartItems(): Cart
 
     suspend fun add(
         productId: Long,
