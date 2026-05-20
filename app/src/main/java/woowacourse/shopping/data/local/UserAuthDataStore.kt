@@ -72,7 +72,7 @@ class UserAuthDataStore(
             val credentials = "$name:$password"
             "Basic " + Base64.encodeToString(credentials.toByteArray(), Base64.NO_WRAP)
         }.stateIn(
-            scope = CoroutineScope(Dispatchers.IO),
+            scope = dataStoreScope + Dispatchers.Default,
             started = SharingStarted.Eagerly,
             initialValue = "Basic " + Base64.encodeToString("${userName.value}:${userPassword.value}".toByteArray(), Base64.NO_WRAP),
         )
