@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.model.Product
 import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
@@ -43,16 +44,8 @@ class ShoppingViewModel(
         if (_uiState.value.productListState is ProductListUiState.Loading) return
 
         viewModelScope.launch {
-            runCatching {
-                refreshRecentProducts()
-                refreshCartState()
-            }.onFailure { throwable ->
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        productListState = ProductListUiState.Error(throwable.toUserMessage()),
-                    )
-                }
-            }
+            refreshRecentProducts()
+            refreshCartState()
         }
     }
 
@@ -68,44 +61,73 @@ class ShoppingViewModel(
                 productListState = ProductListUiState.Loading,
             )
         }
-        runCatching {
-            val visibleProducts = productRepository.getProducts(0, visibleCount).toList()
-            val hasNext = productRepository.hasNext(visibleProducts.count() - 1)
-            val cartState = createCartState(visibleProducts)
-            val restoredRecentProducts = getRecentProducts()
 
-            _uiState.update { currentState ->
-                currentState.copy(
-                    productListState =
-                        ProductListUiState.Content(
-                            products = cartState.products,
-                            hasNext = hasNext,
-                        ),
-                    recentProducts = restoredRecentProducts,
-                    cartQuantity = cartState.cartQuantity,
-                )
-            }
-        }.onFailure { throwable ->
-            _uiState.update { currentState ->
-                currentState.copy(
-                    productListState = ProductListUiState.Error(throwable.toUserMessage()),
-                )
-            }
+        val visibleProducts =
+            productRepository
+                .getProducts(0, visibleCount)
+                .getOrElse { throwable ->
+                    updateErrorState(throwable)
+                    return
+                }.toList()
+
+        val hasNext =
+            productRepository
+                .hasNext(visibleProducts.count() - 1)
+                .getOrElse { throwable ->
+                    updateErrorState(throwable)
+                    return
+                }
+
+        val cartState =
+            createCartState(visibleProducts)
+                .getOrElse { throwable ->
+                    updateErrorState(throwable)
+                    return
+                }
+
+        val restoredRecentProducts =
+            getRecentProducts()
+                .getOrElse { throwable ->
+                    updateErrorState(throwable)
+                    return
+                }
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                productListState =
+                    ProductListUiState.Content(
+                        products = cartState.products,
+                        hasNext = hasNext,
+                    ),
+                recentProducts = restoredRecentProducts,
+                cartQuantity = cartState.cartQuantity,
+            )
         }
     }
 
     private suspend fun refreshRecentProducts() {
+        val recentProducts =
+            getRecentProducts()
+                .getOrElse { throwable ->
+                    updateErrorState(throwable)
+                    return
+                }
+
         _uiState.update { currentState ->
-            currentState.copy(
-                recentProducts = getRecentProducts(),
-            )
+            currentState.copy(recentProducts = recentProducts)
         }
     }
 
     private suspend fun refreshCartState() {
         val contentState = _uiState.value.productListState as? ProductListUiState.Content ?: return
         val visibleProducts = contentState.products.map { it.product }
-        val cartState = createCartState(visibleProducts)
+
+        val cartState =
+            createCartState(visibleProducts)
+                .getOrElse { throwable ->
+                    updateErrorState(throwable)
+                    return
+                }
 
         _uiState.update { currentState ->
             val latestContent = currentState.productListState as? ProductListUiState.Content ?: return@update currentState
@@ -119,40 +141,72 @@ class ShoppingViewModel(
         }
     }
 
-    private suspend fun getRecentProducts() =
-        recentProductRepository
-            .getRecentProducts(RECENT_PRODUCT_LIMIT)
-            .let { recentProducts ->
-                val recentProductsById = productRepository.findAllByIds(recentProducts.map { it.productId }.toSet())
-                RecentViewedProductsMapper.toProducts(
-                    recentProducts = recentProducts,
-                    productsById = recentProductsById,
-                )
-            }
+    private suspend fun getRecentProducts(): Result<List<Product>> {
+        val recentProducts = recentProductRepository.getRecentProducts(RECENT_PRODUCT_LIMIT)
 
-    private suspend fun createCartState(visibleProducts: List<woowacourse.shopping.model.Product>): ShoppingCartState {
-        val cartQuantity = getCartTotalQuantity()
-        val visibleCartItems = cartRepository.getCartItemsByProductIds(visibleProducts.map { it.id }.toSet())
-        val quantityByProductId = visibleCartItems.associate { it.productId to it.quantity }
+        val recentProductsById =
+            productRepository
+                .findAllByIds(recentProducts.map { it.productId }.toSet())
+                .getOrElse { throwable ->
+                    return Result.failure(throwable)
+                }
 
-        return ShoppingCartState(
-            products =
-                ShoppingProductUiStateMapper.toUiStates(
-                    products = visibleProducts,
-                    quantityByProductId = quantityByProductId,
-                ),
-            cartQuantity = cartQuantity,
+        return Result.success(
+            RecentViewedProductsMapper.toProducts(
+                recentProducts = recentProducts,
+                productsById = recentProductsById,
+            ),
         )
     }
 
-    private suspend fun getCartTotalQuantity(): Int {
-        val totalElements = cartRepository.count()
-        if (totalElements == 0) return 0
+    private suspend fun createCartState(visibleProducts: List<Product>): Result<ShoppingCartState> {
+        val cartQuantity =
+            getCartTotalQuantity()
+                .getOrElse { throwable ->
+                    return Result.failure(throwable)
+                }
 
-        return cartRepository
-            .getCartPage(page = 0, size = totalElements)
-            .items
-            .sumOf { it.quantity }
+        val visibleCartItems =
+            cartRepository
+                .getCartItemsByProductIds(visibleProducts.map { it.id }.toSet())
+                .getOrElse { throwable ->
+                    return Result.failure(throwable)
+                }
+
+        val quantityByProductId = visibleCartItems.associate { it.productId to it.quantity }
+
+        return Result.success(
+            ShoppingCartState(
+                products =
+                    ShoppingProductUiStateMapper.toUiStates(
+                        products = visibleProducts,
+                        quantityByProductId = quantityByProductId,
+                    ),
+                cartQuantity = cartQuantity,
+            ),
+        )
+    }
+
+    private suspend fun getCartTotalQuantity(): Result<Int> {
+        val totalElements =
+            cartRepository
+                .count()
+                .getOrElse { throwable ->
+                    return Result.failure(throwable)
+                }
+
+        if (totalElements == 0) {
+            return Result.success(0)
+        }
+
+        val cartPage =
+            cartRepository
+                .getCartPage(page = 0, size = totalElements)
+                .getOrElse { throwable ->
+                    return Result.failure(throwable)
+                }
+
+        return Result.success(cartPage.items.sumOf { it.quantity })
     }
 
     private data class ShoppingCartState(
@@ -216,19 +270,23 @@ class ShoppingViewModel(
                         .firstOrNull { it.product.id == productId }
                         ?.quantity ?: 0
 
-                runCatching {
-                    cartRepository.setQuantity(productId, targetQuantity)
-                }.onFailure { throwable ->
-                    refreshCartState()
-                    _uiState.update { current ->
-                        current.copy(
-                            productListState = ProductListUiState.Error(throwable.toUserMessage()),
-                        )
+                cartRepository
+                    .setQuantity(productId, targetQuantity)
+                    .onFailure { throwable ->
+                        refreshCartState()
+                        updateErrorState(throwable)
                     }
-                }
 
                 syncJobs.remove(productId)
             }
+    }
+
+    private fun updateErrorState(throwable: Throwable) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                productListState = ProductListUiState.Error(throwable.toUserMessage()),
+            )
+        }
     }
 
     private fun observeNetworkState() {

@@ -8,8 +8,9 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Product
+import woowacourse.shopping.repository.query.CartPageItem
 
 class CartRepositoryTest {
     private lateinit var repo: CartRepository
@@ -26,7 +27,10 @@ class CartRepositoryTest {
         runBlocking {
             repo.setQuantity(product1.id, 2)
 
-            val actual = repo.getCartItemsByProductIds(setOf(product1.id))
+            val actual =
+                repo
+                    .getCartItemsByProductIds(setOf(product1.id))
+                    .getOrThrow()
 
             assertTrue(actual.any { it.productId == product1.id && it.quantity == 2 })
         }
@@ -37,7 +41,10 @@ class CartRepositoryTest {
             repo.setQuantity(product1.id, 1)
             repo.setQuantity(product1.id, 0)
 
-            val actual = repo.getCartItemsByProductIds(setOf(product1.id))
+            val actual =
+                repo
+                    .getCartItemsByProductIds(setOf(product1.id))
+                    .getOrThrow()
 
             assertFalse(actual.any { it.productId == product1.id })
         }
@@ -47,9 +54,12 @@ class CartRepositoryTest {
         runBlocking {
             repo.setQuantity(product1.id, 0)
 
-            val actual = repo.getCartItemsByProductIds(setOf(product1.id))
+            val actual =
+                repo
+                    .getCartItemsByProductIds(setOf(product1.id))
+                    .getOrThrow()
 
-            assertEquals(emptyList<woowacourse.shopping.model.CartItem>(), actual)
+            assertEquals(emptyList<CartItem>(), actual)
         }
 
     @Test
@@ -57,17 +67,22 @@ class CartRepositoryTest {
         runBlocking {
             repo.setQuantity(product1.id, 1)
 
-            val actual = repo.getCartPage(page = repo.count() + 1, size = 20)
+            val count = repo.count().getOrThrow()
 
-            assertEquals(emptyList<woowacourse.shopping.repository.query.CartPageItem>(), actual.items)
+            val actual =
+                repo
+                    .getCartPage(page = count + 1, size = 20)
+                    .getOrThrow()
+
+            assertEquals(emptyList<CartPageItem>(), actual.items)
         }
 
     @Test
-    fun `음수 수량을 설정하면 예외가 발생한다`() {
-        assertThrows<IllegalArgumentException> {
-            runBlocking {
-                repo.setQuantity(product1.id, -1)
-            }
+    fun `음수 수량을 설정하면 실패 결과를 반환한다`() =
+        runBlocking {
+            val actual = repo.setQuantity(product1.id, -1)
+
+            assertTrue(actual.isFailure)
+            assertTrue(actual.exceptionOrNull() is IllegalArgumentException)
         }
-    }
 }

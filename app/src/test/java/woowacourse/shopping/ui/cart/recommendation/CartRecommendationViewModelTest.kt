@@ -47,7 +47,7 @@ class CartRecommendationViewModelTest {
         cartRepository =
             RecordingCartRepository().apply {
                 runTest {
-                    setQuantity(orderedProduct.id, 1)
+                    setQuantity(orderedProduct.id, 1).getOrThrow()
                 }
             }
         recentProductRepository =
@@ -103,7 +103,12 @@ class CartRecommendationViewModelTest {
                 listOf(listOf(101L, 102L)),
                 cartRepository.createdOrders,
             )
-            assertTrue(cartRepository.getCartItemsByProductIds(setOf(orderedProduct.id, recommendedProduct.id)).isEmpty())
+            assertTrue(
+                cartRepository
+                    .getCartItemsByProductIds(setOf(orderedProduct.id, recommendedProduct.id))
+                    .getOrThrow()
+                    .isEmpty(),
+            )
             assertEquals(1, viewModel.uiState.value.orderCompletedCount)
         }
 
@@ -223,8 +228,8 @@ class CartRecommendationViewModelTest {
             val selectedOrderProduct = product(id = 2L, category = "fruit")
 
             cartRepository = RecordingCartRepository()
-            cartRepository.setQuantity(selectedOrderProduct.id, 1)
-            cartRepository.setQuantity(dessertProduct.id, 1)
+            cartRepository.setQuantity(selectedOrderProduct.id, 1).getOrThrow()
+            cartRepository.setQuantity(dessertProduct.id, 1).getOrThrow()
             recentProductRepository =
                 FakeRecentProductRepository().apply {
                     recordView(dessertProduct.id)
@@ -257,7 +262,9 @@ class CartRecommendationViewModelTest {
 
             assertEquals(
                 listOf(CartItem(productId = recommendedProduct.id, quantity = 1)),
-                cartRepository.getCartItemsByProductIds(setOf(recommendedProduct.id)),
+                cartRepository
+                    .getCartItemsByProductIds(setOf(recommendedProduct.id))
+                    .getOrThrow(),
             )
         }
 
@@ -317,36 +324,44 @@ class CartRecommendationViewModelTest {
         private val cartItems = linkedMapOf<Long, StoredCartItem>()
         private var nextCartItemId = 101L
 
-        override suspend fun createOrder(cartItemIds: List<Long>) {
+        override suspend fun createOrder(cartItemIds: List<Long>): Result<Unit> {
             createdOrders += cartItemIds
             val orderedIds = cartItemIds.toSet()
             cartItems.entries.removeIf { (_, item) -> item.cartItemId in orderedIds }
+            return Result.success(Unit)
         }
 
         override suspend fun setQuantity(
             productId: Long,
             quantity: Int,
-        ) {
-            require(quantity >= 0) { "수량은 0 이상이어야 합니다." }
+        ): Result<Unit> {
+            if (quantity < 0) {
+                return Result.failure(
+                    IllegalArgumentException("수량은 0 이상이어야 합니다."),
+                )
+            }
 
             if (quantity == 0) {
                 cartItems.remove(productId)
-                return
+                return Result.success(Unit)
             }
 
             val existing = cartItems[productId]
+
             cartItems[productId] =
                 StoredCartItem(
                     cartItemId = existing?.cartItemId ?: nextCartItemId++,
                     productId = productId,
                     quantity = quantity,
                 )
+
+            return Result.success(Unit)
         }
 
         override suspend fun getCartPage(
             page: Int,
             size: Int,
-        ): CartPageResult {
+        ): Result<CartPageResult> {
             val safePage = page.coerceAtLeast(0)
             val safeSize = size.coerceAtLeast(0)
             val items = cartItems.values.toList()
@@ -355,37 +370,41 @@ class CartRecommendationViewModelTest {
             val safeFrom = fromIndex.coerceIn(0, totalElements)
             val safeTo = minOf(safeFrom + safeSize, totalElements)
 
-            return CartPageResult(
-                items =
-                    items.subList(safeFrom, safeTo).map { item ->
-                        CartPageItem(
-                            cartItemId = item.cartItemId,
+            return Result.success(
+                CartPageResult(
+                    items =
+                        items.subList(safeFrom, safeTo).map { item ->
+                            CartPageItem(
+                                cartItemId = item.cartItemId,
+                                productId = item.productId,
+                                quantity = item.quantity,
+                            )
+                        },
+                    totalElements = totalElements,
+                    totalPages =
+                        if (safeSize == 0 || totalElements == 0) {
+                            0
+                        } else {
+                            (totalElements - 1) / safeSize + 1
+                        },
+                    page = safePage,
+                ),
+            )
+        }
+
+        override suspend fun getCartItemsByProductIds(productIds: Set<Long>): Result<List<CartItem>> =
+            Result.success(
+                cartItems.values
+                    .filter { it.productId in productIds }
+                    .map { item ->
+                        CartItem(
                             productId = item.productId,
                             quantity = item.quantity,
                         )
                     },
-                totalElements = totalElements,
-                totalPages =
-                    if (safeSize == 0 || totalElements == 0) {
-                        0
-                    } else {
-                        (totalElements - 1) / safeSize + 1
-                    },
-                page = safePage,
             )
-        }
 
-        override suspend fun getCartItemsByProductIds(productIds: Set<Long>): List<CartItem> =
-            cartItems.values
-                .filter { it.productId in productIds }
-                .map { item ->
-                    CartItem(
-                        productId = item.productId,
-                        quantity = item.quantity,
-                    )
-                }
-
-        override suspend fun count(): Int = cartItems.size
+        override suspend fun count(): Result<Int> = Result.success(cartItems.size)
 
         private data class StoredCartItem(
             val cartItemId: Long,

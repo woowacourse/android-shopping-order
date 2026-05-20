@@ -9,14 +9,14 @@ interface ProductRepository {
     suspend fun getProducts(
         fromIndex: Int,
         limit: Int,
-    ): Products
+    ): Result<Products>
 
     suspend fun getProductsByCategory(
         category: String,
         limit: Int,
-    ): Products
+    ): Result<Products>
 
-    suspend fun hasNext(current: Int): Boolean
+    suspend fun hasNext(current: Int): Result<Boolean>
 
-    suspend fun findAllByIds(ids: Set<Long>): Map<Long, Product>
+    suspend fun findAllByIds(ids: Set<Long>): Result<Map<Long, Product>>
 }

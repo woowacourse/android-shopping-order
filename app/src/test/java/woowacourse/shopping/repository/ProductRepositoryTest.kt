@@ -21,7 +21,7 @@ class ProductRepositoryTest {
             val size = 20
             val offset = 0
 
-            val actual = repo.getProducts(offset, size).count()
+            val actual = repo.getProducts(offset, size).getOrThrow().count()
             val expected = 20
 
             assertEquals(expected, actual)
@@ -33,7 +33,7 @@ class ProductRepositoryTest {
             val totalSize = repo.size
             val moreThanTotalSize = totalSize + 1
 
-            val actual = repo.getProducts(0, moreThanTotalSize).count()
+            val actual = repo.getProducts(0, moreThanTotalSize).getOrThrow().count()
             val expected = repo.size
 
             assertEquals(expected, actual)
@@ -42,7 +42,7 @@ class ProductRepositoryTest {
     @Test
     fun `전체 데이터 개수보다 큰 오프셋을 요청했을 때 빈 결과를 반환한다`() =
         runBlocking {
-            val actual = repo.getProducts(repo.size + 1, 20).count()
+            val actual = repo.getProducts(repo.size + 1, 20).getOrThrow().count()
 
             assertEquals(0, actual)
         }
@@ -50,7 +50,7 @@ class ProductRepositoryTest {
     @Test
     fun `음수 limit을 요청했을 때 빈 결과를 반환한다`() =
         runBlocking {
-            val actual = repo.getProducts(0, -1).count()
+            val actual = repo.getProducts(0, -1).getOrThrow().count()
 
             assertEquals(0, actual)
         }
@@ -58,7 +58,7 @@ class ProductRepositoryTest {
     @Test
     fun `카테고리로 상품을 조회하면 해당 카테고리 상품만 반환한다`() =
         runBlocking {
-            val actual = repo.getProductsByCategory(category = "dessert", limit = 10).toList()
+            val actual = repo.getProductsByCategory(category = "dessert", limit = 10).getOrThrow().toList()
 
             assertEquals(8, actual.size)
             assertEquals(setOf("dessert"), actual.map { it.category }.toSet())

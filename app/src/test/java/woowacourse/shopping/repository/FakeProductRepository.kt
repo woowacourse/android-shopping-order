@@ -15,30 +15,41 @@ class FakeProductRepository(
     override suspend fun getProducts(
         fromIndex: Int,
         limit: Int,
-    ): Products {
+    ): Result<Products> {
         val safeFrom = fromIndex.coerceIn(0, products.count())
         val safeLimit = limit.coerceAtLeast(0)
         val safeTo = minOf(safeFrom + safeLimit, products.count())
 
-        return Products(products.toList().subList(safeFrom, safeTo))
+        return Result.success(
+            Products(
+                products.toList().subList(safeFrom, safeTo),
+            ),
+        )
     }
 
     override suspend fun getProductsByCategory(
         category: String,
         limit: Int,
-    ): Products =
-        Products(
-            products
-                .toList()
-                .filter { it.category == category }
-                .take(limit.coerceAtLeast(0)),
+    ): Result<Products> =
+        Result.success(
+            Products(
+                products
+                    .toList()
+                    .filter { it.category == category }
+                    .take(limit.coerceAtLeast(0)),
+            ),
         )
 
-    override suspend fun hasNext(current: Int): Boolean = current < products.toList().lastIndex
+    override suspend fun hasNext(current: Int): Result<Boolean> =
+        Result.success(
+            current < products.toList().lastIndex,
+        )
 
-    override suspend fun findAllByIds(ids: Set<Long>): Map<Long, Product> =
-        ids
-            .mapNotNull { id ->
-                productMap[id]?.let { id to it }
-            }.toMap()
+    override suspend fun findAllByIds(ids: Set<Long>): Result<Map<Long, Product>> =
+        Result.success(
+            ids
+                .mapNotNull { id ->
+                    productMap[id]?.let { id to it }
+                }.toMap(),
+        )
 }

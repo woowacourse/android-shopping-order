@@ -15,6 +15,7 @@ import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
+import woowacourse.shopping.repository.http.common.RemoteException
 import woowacourse.shopping.repository.query.CartPageItem
 import woowacourse.shopping.ui.cart.SelectedCartOrder
 import woowacourse.shopping.ui.shopping.ShoppingProductUiState
@@ -76,23 +77,16 @@ class CartRecommendationViewModel(
         if (!isSessionStarted) return
 
         viewModelScope.launch {
-            runCatching {
-                val recommendedProducts = getRecommendedProducts()
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        recommendedProducts = recommendedProducts,
-                        isRecommendedProductsLoading = false,
-                    )
-                }
-                refreshPendingOrder()
-            }.onFailure { throwable ->
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        isRecommendedProductsLoading = false,
-                        orderErrorMessage = throwable.message ?: "추천 상품을 불러오지 못했습니다.",
-                    )
-                }
+            val recommendedProducts = getRecommendedProducts()
+
+            _uiState.update { currentState ->
+                currentState.copy(
+                    recommendedProducts = recommendedProducts,
+                    isRecommendedProductsLoading = false,
+                )
             }
+
+            refreshPendingOrder()
         }
     }
 
@@ -124,29 +118,35 @@ class CartRecommendationViewModel(
                 )
             }
 
-            runCatching {
-                awaitRecommendedSyncs()
-                val cartItemIds = _uiState.value.pendingOrder.cartItemIds
-                check(cartItemIds.isNotEmpty()) { "주문할 상품이 없습니다." }
-                cartRepository.createOrder(cartItemIds)
-            }.onSuccess {
-                orderedProductIds.clear()
-                recommendedOrderItemDataByProductId.clear()
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        pendingOrder = PendingOrderUiState(),
-                        isOrdering = false,
-                        orderCompletedCount = currentState.orderCompletedCount + 1,
-                    )
-                }
-            }.onFailure { throwable ->
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        isOrdering = false,
-                        orderErrorMessage = throwable.message ?: "주문에 실패했습니다.",
-                    )
-                }
+            awaitRecommendedSyncs()
+
+            val cartItemIds = _uiState.value.pendingOrder.cartItemIds
+            if (cartItemIds.isEmpty()) {
+                updateOrderError("주문할 상품이 없습니다.")
+                return@launch
             }
+
+            cartRepository
+                .createOrder(cartItemIds)
+                .onSuccess {
+                    orderedProductIds.clear()
+                    recommendedOrderItemDataByProductId.clear()
+
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            pendingOrder = PendingOrderUiState(),
+                            isOrdering = false,
+                            orderCompletedCount = currentState.orderCompletedCount + 1,
+                        )
+                    }
+                }.onFailure { throwable ->
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            isOrdering = false,
+                            orderErrorMessage = throwable.toUserMessage("주문에 실패했습니다."),
+                        )
+                    }
+                }
         }
     }
 
@@ -164,22 +164,13 @@ class CartRecommendationViewModel(
                 )
             }
 
-            runCatching {
-                getRecommendedProducts()
-            }.onSuccess { recommendedProducts ->
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        recommendedProducts = recommendedProducts,
-                        isRecommendedProductsLoading = false,
-                    )
-                }
-            }.onFailure {
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        recommendedProducts = emptyList(),
-                        isRecommendedProductsLoading = false,
-                    )
-                }
+            val recommendedProducts = getRecommendedProducts()
+
+            _uiState.update { currentState ->
+                currentState.copy(
+                    recommendedProducts = recommendedProducts,
+                    isRecommendedProductsLoading = false,
+                )
             }
         }
     }
@@ -193,24 +184,32 @@ class CartRecommendationViewModel(
 
         val latestViewedProduct =
             productRepository
-                .findAllByIds(setOf(latestViewedProductId))[latestViewedProductId]
+                .findAllByIds(setOf(latestViewedProductId))
+                .getOrElse { return emptyList() }[latestViewedProductId]
                 ?: return emptyList()
+
         if (latestViewedProduct.category.isBlank()) return emptyList()
 
-        val cartProductIds = initialCartProductIds ?: resolveCartProductIds().also { initialCartProductIds = it }
+        val cartProductIds =
+            initialCartProductIds
+                ?: resolveCartProductIds().also { initialCartProductIds = it }
+
         val fetchLimit = RECOMMENDED_PRODUCTS_LIMIT + cartProductIds.size
+
         val recommendedProducts =
             productRepository
                 .getProductsByCategory(
                     category = latestViewedProduct.category,
                     limit = fetchLimit,
-                ).toList()
+                ).getOrElse { return emptyList() }
+                .toList()
                 .filterNot { it.id in cartProductIds }
                 .take(RECOMMENDED_PRODUCTS_LIMIT)
 
         val quantityByProductId =
             cartRepository
                 .getCartItemsByProductIds(recommendedProducts.map { it.id }.toSet())
+                .getOrElse { emptyList() }
                 .associate { it.productId to it.quantity }
 
         return ShoppingProductUiStateMapper.toUiStates(
@@ -242,33 +241,36 @@ class CartRecommendationViewModel(
         recommendedSyncJobs.remove(productId)?.cancel()
         recommendedSyncJobs[productId] =
             viewModelScope.launch {
-                runCatching {
-                    cartRepository.setQuantity(productId, targetQuantity)
-                    if (targetQuantity > 0) {
-                        orderedProductIds += productId
-                        recommendedOrderItemDataByProductId[productId] =
-                            OrderItemData(
-                                price = productPrice,
-                                quantity = targetQuantity,
-                            )
-                    } else {
-                        orderedProductIds -= productId
-                        recommendedOrderItemDataByProductId.remove(productId)
-                    }
-                    reloadRecommendedProducts()
-                    refreshPendingOrder()
-                }.onFailure { throwable ->
-                    reloadRecommendedProducts()
-                    refreshPendingOrder()
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            orderErrorMessage = throwable.message ?: "장바구니를 갱신하지 못했습니다.",
-                        )
-                    }
-                }
+                cartRepository
+                    .setQuantity(productId, targetQuantity)
+                    .onSuccess {
+                        if (targetQuantity > 0) {
+                            orderedProductIds += productId
+                            recommendedOrderItemDataByProductId[productId] =
+                                OrderItemData(
+                                    price = productPrice,
+                                    quantity = targetQuantity,
+                                )
+                        } else {
+                            orderedProductIds -= productId
+                            recommendedOrderItemDataByProductId.remove(productId)
+                        }
 
-                recommendedSyncJobs.remove(productId)
+                        reloadRecommendedProducts()
+                        refreshPendingOrder()
+                    }.onFailure { throwable ->
+                        reloadRecommendedProducts()
+                        refreshPendingOrder()
+
+                        _uiState.update { currentState ->
+                            currentState.copy(
+                                orderErrorMessage = throwable.toUserMessage("장바구니를 갱신하지 못했습니다."),
+                            )
+                        }
+                    }
             }
+
+        recommendedSyncJobs.remove(productId)
     }
 
     private fun updateRecommendedProductQuantity(
@@ -368,15 +370,28 @@ class CartRecommendationViewModel(
 
     private suspend fun resolveCartPageItems(productIds: Set<Long>?): List<CartPageItem> {
         if (productIds?.isEmpty() == true) return emptyList()
-        val totalCount = cartRepository.count()
+        val totalCount =
+            cartRepository
+                .count()
+                .getOrElse { return emptyList() }
         if (totalCount == 0) return emptyList()
 
         return cartRepository
             .getCartPage(page = 0, size = totalCount)
+            .getOrElse { return emptyList() }
             .items
             .filter { cartItem ->
                 productIds == null || cartItem.productId in productIds
             }
+    }
+
+    private fun updateOrderError(message: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                isOrdering = false,
+                orderErrorMessage = message,
+            )
+        }
     }
 
     private fun observeNetworkState() {
@@ -396,6 +411,7 @@ class CartRecommendationViewModel(
 }
 
 class CartRecommendationViewModelFactory : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
         CartRecommendationViewModel(
             productRepository = ShoppingRepositoryProvider.productRepository,
@@ -404,3 +420,9 @@ class CartRecommendationViewModelFactory : ViewModelProvider.Factory {
             networkMonitor = ShoppingRepositoryProvider.networkMonitor,
         ) as T
 }
+
+private fun Throwable.toUserMessage(defaultMessage: String): String =
+    when (this) {
+        is RemoteException -> userMessage
+        else -> message ?: defaultMessage
+    }

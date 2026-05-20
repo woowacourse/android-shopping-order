@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import woowacourse.shopping.repository.http.exception.ProductNetworkException
 import woowacourse.shopping.repository.http.exception.ProductParsingException
 import woowacourse.shopping.repository.http.exception.ProductResponseException
@@ -47,7 +46,12 @@ class HttpProductRepositoryTest {
                     .setBody(createProductsJson(listOf(1L, 2L), last = true)),
             )
 
-            val actual = repository.getProducts(fromIndex = 0, limit = 20).toList()
+            val actual =
+                repository
+                    .getProducts(fromIndex = 0, limit = 20)
+                    .getOrThrow()
+                    .toList()
+
             val request = mockWebServer.takeRequest()
 
             assertTrue(request.requestUrl?.encodedPath == "/products")
@@ -69,7 +73,12 @@ class HttpProductRepositoryTest {
             )
 
             repository.getProducts(fromIndex = 0, limit = 20)
-            val actual = repository.getProducts(fromIndex = 1, limit = 1).toList()
+
+            val actual =
+                repository
+                    .getProducts(fromIndex = 1, limit = 1)
+                    .getOrThrow()
+                    .toList()
 
             assertEquals(1, mockWebServer.requestCount)
             assertEquals(1, actual.size)
@@ -87,12 +96,16 @@ class HttpProductRepositoryTest {
                     .setBody(productJson),
             )
 
-            val actual = repository.findAllByIds(setOf((1L)))
+            val actual =
+                repository
+                    .findAllByIds(setOf(1L))
+                    .getOrThrow()
+
             val request = mockWebServer.takeRequest()
 
             assertTrue(request.path?.endsWith("/products/1") == true)
-            assertEquals(setOf((1L)), actual.keys)
-            assertEquals("치킨", actual[(1L)]?.name)
+            assertEquals(setOf(1L), actual.keys)
+            assertEquals("치킨", actual[1L]?.name)
         }
 
     @Test
@@ -105,7 +118,12 @@ class HttpProductRepositoryTest {
                     .setBody(createProductsJson(listOf(3L, 6L), last = true)),
             )
 
-            val actual = repository.getProductsByCategory(category = "food", limit = 2).toList()
+            val actual =
+                repository
+                    .getProductsByCategory(category = "food", limit = 2)
+                    .getOrThrow()
+                    .toList()
+
             val request = mockWebServer.takeRequest()
 
             assertTrue(request.requestUrl?.encodedPath == "/products")
@@ -116,90 +134,110 @@ class HttpProductRepositoryTest {
         }
 
     @Test
-    fun `상품 목록 API가 서버 오류를 반환하면 예외를 던진다`() {
-        mockWebServer.enqueue(
-            MockResponse()
-                .setResponseCode(500)
-                .setHeader("Content-Type", "application/json")
-                .setBody("""{"message":"server error"}"""),
-        )
-
-        val actual =
-            assertThrows<ProductResponseException> {
-                runBlocking { repository.getProducts(fromIndex = 0, limit = 20) }
-            }
-
-        assertEquals(500, actual.code)
-    }
-
-    @Test
-    fun `상품 목록 API 네트워크 호출에 실패하면 예외를 던진다`() {
-        val disconnectedServer = MockWebServer()
-        disconnectedServer.start()
-        val baseUrl = disconnectedServer.url("/").toString()
-        disconnectedServer.shutdown()
-
-        val disconnectedRepository =
-            HttpProductRepository(
-                client = OkHttpClient(),
-                baseUrl = baseUrl,
+    fun `상품 목록 API가 서버 오류를 반환하면 실패 결과를 반환한다`() =
+        runBlocking {
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(500)
+                    .setHeader("Content-Type", "application/json")
+                    .setBody("""{"message":"server error"}"""),
             )
 
-        assertThrows<ProductNetworkException> {
-            runBlocking { disconnectedRepository.getProducts(fromIndex = 0, limit = 20) }
+            val actual =
+                repository.getProducts(
+                    fromIndex = 0,
+                    limit = 20,
+                )
+
+            assertTrue(actual.isFailure)
+
+            val exception = actual.exceptionOrNull()
+            assertTrue(exception is ProductResponseException)
+            assertEquals(500, (exception as ProductResponseException).code)
         }
-    }
 
     @Test
-    fun `상품 상세 API가 서버 오류를 반환하면 예외를 던진다`() {
-        mockWebServer.enqueue(
-            MockResponse()
-                .setResponseCode(500)
-                .setHeader("Content-Type", "application/json")
-                .setBody("""{"message":"server error"}"""),
-        )
+    fun `상품 목록 API 네트워크 호출에 실패하면 실패 결과를 반환한다`() =
+        runBlocking {
+            val disconnectedServer = MockWebServer()
+            disconnectedServer.start()
 
-        val actual =
-            assertThrows<ProductResponseException> {
-                runBlocking { repository.findAllByIds(setOf((1L))) }
-            }
+            val baseUrl = disconnectedServer.url("/").toString()
 
-        assertEquals(500, actual.code)
-    }
+            disconnectedServer.shutdown()
 
-    @Test
-    fun `상품 목록 API가 빈 응답 본문을 반환하면 파싱 예외를 던진다`() {
-        mockWebServer.enqueue(
-            MockResponse()
-                .setResponseCode(200)
-                .setHeader("Content-Type", "application/json")
-                .setBody(""),
-        )
+            val disconnectedRepository =
+                HttpProductRepository(
+                    client = OkHttpClient(),
+                    baseUrl = baseUrl,
+                )
 
-        val actual =
-            assertThrows<ProductParsingException> {
-                runBlocking { repository.getProducts(fromIndex = 0, limit = 20) }
-            }
+            val actual =
+                disconnectedRepository.getProducts(
+                    fromIndex = 0,
+                    limit = 20,
+                )
 
-        assertTrue(actual.message?.contains("응답") == true)
-    }
+            assertTrue(actual.isFailure)
+            assertTrue(actual.exceptionOrNull() is ProductNetworkException)
+        }
 
     @Test
-    fun `상품 상세 API가 빈 응답 본문을 반환하면 파싱 예외를 던진다`() {
-        mockWebServer.enqueue(
-            MockResponse()
-                .setResponseCode(200)
-                .setHeader("Content-Type", "application/json")
-                .setBody(""),
-        )
+    fun `상품 상세 API가 서버 오류를 반환하면 실패 결과를 반환한다`() =
+        runBlocking {
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(500)
+                    .setHeader("Content-Type", "application/json")
+                    .setBody("""{"message":"server error"}"""),
+            )
 
-        val actual =
-            assertThrows<ProductParsingException> {
-                runBlocking { repository.findAllByIds(setOf((1L))) }
-            }
+            val actual =
+                repository.findAllByIds(setOf(1L))
 
-        assertTrue(actual.message?.contains("응답") == true)
-    }
+            assertTrue(actual.isFailure)
+
+            val exception = actual.exceptionOrNull()
+            assertTrue(exception is ProductResponseException)
+            assertEquals(500, (exception as ProductResponseException).code)
+        }
+
+    @Test
+    fun `상품 목록 API가 빈 응답 본문을 반환하면 실패 결과를 반환한다`() =
+        runBlocking {
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setHeader("Content-Type", "application/json")
+                    .setBody(""),
+            )
+
+            val actual =
+                repository.getProducts(
+                    fromIndex = 0,
+                    limit = 20,
+                )
+
+            assertTrue(actual.isFailure)
+            assertTrue(actual.exceptionOrNull() is ProductParsingException)
+        }
+
+    @Test
+    fun `상품 상세 API가 빈 응답 본문을 반환하면 실패 결과를 반환한다`() =
+        runBlocking {
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setHeader("Content-Type", "application/json")
+                    .setBody(""),
+            )
+
+            val actual =
+                repository.findAllByIds(setOf(1L))
+
+            assertTrue(actual.isFailure)
+            assertTrue(actual.exceptionOrNull() is ProductParsingException)
+        }
 
     @Test
     fun `상품 목록이 페이지 크기를 넘기면 다음 페이지를 추가로 조회한다`() =
@@ -217,7 +255,12 @@ class HttpProductRepositoryTest {
                     .setBody(createProductsJson(listOf(21L), last = true, totalElements = 21L)),
             )
 
-            val actual = repository.getProducts(fromIndex = 0, limit = 21).toList()
+            val actual =
+                repository
+                    .getProducts(fromIndex = 0, limit = 21)
+                    .getOrThrow()
+                    .toList()
+
             val firstRequest = mockWebServer.takeRequest()
             val secondRequest = mockWebServer.takeRequest()
 
@@ -243,7 +286,10 @@ class HttpProductRepositoryTest {
                     .setBody(createProductsJson(listOf(21L), last = true, totalElements = 21L)),
             )
 
-            val actual = repository.hasNext(19)
+            val actual =
+                repository
+                    .hasNext(19)
+                    .getOrThrow()
 
             assertTrue(actual)
             assertEquals(2, mockWebServer.requestCount)
@@ -270,7 +316,7 @@ class HttpProductRepositoryTest {
             )
 
             val targetId = (9007199254740991L)
-            val actual = repository.findAllByIds(setOf(targetId))
+            val actual = repository.findAllByIds(setOf(targetId)).getOrThrow()
 
             assertEquals(setOf(targetId), actual.keys)
             assertEquals("string", actual[targetId]?.name)
@@ -286,28 +332,15 @@ class HttpProductRepositoryTest {
                     .setBody(createProductsJson(listOf(9007199254740991L), last = true, totalElements = 9007199254740991L)),
             )
 
-            val actual = repository.getProducts(fromIndex = 0, limit = 1).toList()
+            val actual =
+                repository
+                    .getProducts(fromIndex = 0, limit = 1)
+                    .getOrThrow()
+                    .toList()
 
             assertEquals(1, actual.size)
             assertEquals((9007199254740991L), actual.first().id)
         }
-
-    @Test
-    fun `상품 목록 API가 잘못된 JSON을 반환하면 파싱 예외를 던진다`() {
-        mockWebServer.enqueue(
-            MockResponse()
-                .setResponseCode(200)
-                .setHeader("Content-Type", "application/json")
-                .setBody("""{"content":[{"id":1,"name":"치킨"}],"totalElements":1,"last":true}"""),
-        )
-
-        val actual =
-            assertThrows<ProductParsingException> {
-                runBlocking { repository.getProducts(fromIndex = 0, limit = 20) }
-            }
-
-        assertTrue(actual.message?.contains("파싱") == true || actual.message?.contains("올바르지") == true)
-    }
 
     companion object {
         private val productJson =

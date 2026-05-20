@@ -15,6 +15,7 @@ import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
+import woowacourse.shopping.repository.http.common.RemoteException
 import woowacourse.shopping.ui.common.recentlyviewed.RecentViewedProductsMapper
 
 private const val CART_SYNC_DELAY_MILLIS = 400L
@@ -36,17 +37,18 @@ class ProductDetailViewModel(
 
     fun loadProduct(productId: Long) {
         viewModelScope.launch {
-            runCatching {
-                val product = productRepository.findAllByIds(setOf(productId))[productId] ?: return@runCatching
-                recentProductRepository.recordView(product.id)
-                refreshProductDetail(product.id)
-            }.onFailure { throwable ->
-                _uiState.value =
-                    _uiState.value.copy(
-                        isAdding = false,
-                        errorMessage = throwable.message,
-                    )
-            }
+            val productsById =
+                productRepository
+                    .findAllByIds(setOf(productId))
+                    .getOrElse { throwable ->
+                        updateErrorState(throwable)
+                        return@launch
+                    }
+
+            val product = productsById[productId] ?: return@launch
+
+            recentProductRepository.recordView(product.id)
+            refreshProductDetail(product.id)
         }
     }
 
@@ -83,46 +85,71 @@ class ProductDetailViewModel(
 
                 val targetQuantity = _uiState.value.quantity
 
-                runCatching {
-                    cartRepository.setQuantity(productId, targetQuantity)
-                }.onFailure { throwable ->
-                    refreshProductDetail(productId)
-                    _uiState.update { current ->
-                        current.copy(
-                            isAdding = false,
-                            errorMessage = throwable.message,
-                        )
+                cartRepository
+                    .setQuantity(productId, targetQuantity)
+                    .onFailure { throwable ->
+                        refreshProductDetail(productId)
+                        updateErrorState(throwable)
                     }
-                }
             }
     }
 
     private suspend fun refreshProductDetail(productId: Long) {
-        val product = productRepository.findAllByIds(setOf(productId))[productId] ?: return
-        val lastViewedRecentProduct = recentProductRepository.getLatestViewedProductExcluding(productId)
+        val productsById =
+            productRepository
+                .findAllByIds(setOf(productId))
+                .getOrElse { throwable ->
+                    updateErrorState(throwable)
+                    return
+                }
+
+        val product = productsById[productId] ?: return
+
+        val lastViewedRecentProduct =
+            recentProductRepository.getLatestViewedProductExcluding(productId)
+
         val lastViewedProductsById =
-            productRepository.findAllByIds(
-                listOfNotNull(lastViewedRecentProduct?.productId).toSet(),
-            )
+            productRepository
+                .findAllByIds(
+                    listOfNotNull(lastViewedRecentProduct?.productId).toSet(),
+                ).getOrElse { throwable ->
+                    updateErrorState(throwable)
+                    return
+                }
+
         val lastViewedProduct =
             RecentViewedProductsMapper.toProduct(
                 recentProduct = lastViewedRecentProduct,
                 productsById = lastViewedProductsById,
             )
+
         val quantity =
             cartRepository
                 .getCartItemsByProductIds(setOf(productId))
-                .firstOrNull()
+                .getOrElse { throwable ->
+                    updateErrorState(throwable)
+                    return
+                }.firstOrNull()
                 ?.quantity ?: 0
 
-        _uiState.value =
-            _uiState.value.copy(
+        _uiState.update { current ->
+            current.copy(
                 product = product,
                 lastViewedProduct = lastViewedProduct,
                 quantity = quantity,
                 isAdding = false,
                 errorMessage = null,
             )
+        }
+    }
+
+    private fun updateErrorState(throwable: Throwable) {
+        _uiState.update { current ->
+            current.copy(
+                isAdding = false,
+                errorMessage = throwable.toUserMessage(),
+            )
+        }
     }
 
     private fun observeNetworkState() {
@@ -146,3 +173,9 @@ class ProductDetailViewModelFactory : ViewModelProvider.Factory {
             networkMonitor = ShoppingRepositoryProvider.networkMonitor,
         ) as T
 }
+
+private fun Throwable.toUserMessage(): String =
+    when (this) {
+        is RemoteException -> userMessage
+        else -> "알 수 없는 오류가 발생했습니다."
+    }

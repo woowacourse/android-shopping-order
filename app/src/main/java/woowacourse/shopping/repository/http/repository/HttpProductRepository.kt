@@ -65,29 +65,37 @@ class HttpProductRepository(
     override suspend fun getProducts(
         fromIndex: Int,
         limit: Int,
-    ): Products =
+    ): Result<Products> =
         withContext(Dispatchers.IO) {
             val safeFrom = fromIndex.coerceAtLeast(0)
             val safeLimit = limit.coerceAtLeast(0)
             val untilExclusive = safeFrom + safeLimit
 
-            ensureProductsLoaded(untilExclusive)
+            val loadResult = ensureProductsLoaded(untilExclusive)
+            if (loadResult.isFailure) {
+                return@withContext Result.failure(loadResult.exceptionOrNull()!!)
+            }
 
             val safeTo = minOf(untilExclusive, cachedProducts.size)
-            if (safeFrom >= safeTo) return@withContext Products(emptyList())
 
-            Products(cachedProducts.subList(safeFrom, safeTo))
+            if (safeFrom >= safeTo) {
+                Result.success(Products(emptyList()))
+            } else {
+                Result.success(Products(cachedProducts.subList(safeFrom, safeTo)))
+            }
         }
 
     override suspend fun getProductsByCategory(
         category: String,
         limit: Int,
-    ): Products =
+    ): Result<Products> =
         withContext(Dispatchers.IO) {
             val safeLimit = limit.coerceAtLeast(0)
-            if (category.isBlank() || safeLimit == 0) return@withContext Products(emptyList())
+            if (category.isBlank() || safeLimit == 0) {
+                return@withContext Result.success(Products(emptyList()))
+            }
 
-            val responseBody =
+            val responseResult =
                 executeRequest(
                     errorMessage = "카테고리 상품 목록 API 호출에 실패했습니다.",
                     request = {
@@ -99,74 +107,106 @@ class HttpProductRepository(
                     },
                 )
 
+            if (responseResult.isFailure) {
+                return@withContext Result.failure(responseResult.exceptionOrNull()!!)
+            }
+
+            val responseBody = responseResult.getOrNull()!!
+
             val fetchedProducts =
-                runCatching {
+                try {
                     responseBody
                         .content
                         .orEmpty()
                         .map { it.toProduct() }
-                }.getOrElse { throwable ->
-                    throw ProductParsingException(
-                        message = "카테고리 상품 목록 응답을 파싱할 수 없습니다.",
-                        cause = throwable,
+                } catch (throwable: Throwable) {
+                    return@withContext Result.failure(
+                        ProductParsingException(
+                            message = "카테고리 상품 목록 응답을 파싱할 수 없습니다.",
+                            cause = throwable,
+                        ),
                     )
                 }
 
             cachedProducts = (cachedProducts + fetchedProducts).distinctBy { it.id }
             totalCount = maxOf(totalCount, cachedProducts.size.toLong())
 
-            Products(fetchedProducts.take(safeLimit))
+            Result.success(Products(fetchedProducts.take(safeLimit)))
         }
 
-    override suspend fun hasNext(current: Int): Boolean =
+    override suspend fun hasNext(current: Int): Result<Boolean> =
         withContext(Dispatchers.IO) {
-            if (current < 0) return@withContext false
+            if (current < 0) return@withContext Result.success(false)
 
-            ensureProductsLoaded(current + 2)
-            current < size - 1
+            val loadResult = ensureProductsLoaded(current + 2)
+            if (loadResult.isFailure) {
+                return@withContext Result.failure(loadResult.exceptionOrNull()!!)
+            }
+
+            Result.success(current < size - 1)
         }
 
-    override suspend fun findAllByIds(ids: Set<Long>): Map<Long, Product> =
+    override suspend fun findAllByIds(ids: Set<Long>): Result<Map<Long, Product>> =
         withContext(Dispatchers.IO) {
-            if (ids.isEmpty()) return@withContext emptyMap()
+            if (ids.isEmpty()) return@withContext Result.success(emptyMap())
 
             val cachedProductsById = cachedProducts.associateBy { it.id }.toMutableMap()
             val missingIds = ids - cachedProductsById.keys
 
-            missingIds.forEach { productId ->
-                fetchProductById(productId)?.let { product ->
+            for (productId in missingIds) {
+                val productResult = fetchProductById(productId)
+
+                if (productResult.isFailure) {
+                    return@withContext Result.failure(productResult.exceptionOrNull()!!)
+                }
+
+                val product = productResult.getOrNull()
+                if (product != null) {
                     cachedProductsById[product.id] = product
                 }
             }
 
             cachedProducts = cachedProductsById.values.toList()
 
-            ids
-                .mapNotNull { productId ->
-                    cachedProductsById[productId]?.let { productId to it }
-                }.toMap()
+            val result =
+                ids
+                    .mapNotNull { productId ->
+                        cachedProductsById[productId]?.let { productId to it }
+                    }.toMap()
+
+            Result.success(result)
         }
 
-    private suspend fun ensureProductsLoaded(untilExclusive: Int) {
-        if (untilExclusive <= cachedProducts.size || lastPageLoaded) return
+    private suspend fun ensureProductsLoaded(untilExclusive: Int): Result<Unit> {
+        if (untilExclusive <= cachedProducts.size || lastPageLoaded) {
+            return Result.success(Unit)
+        }
 
         while (cachedProducts.size < untilExclusive && !lastPageLoaded) {
-            val responseBody =
+            val responseResult =
                 executeRequest(
                     errorMessage = "상품 목록 API 호출에 실패했습니다.",
                     request = { productApiService.getProducts(page = nextPage, size = NETWORK_PAGE_SIZE) },
                 )
 
+            if (responseResult.isFailure) {
+                return Result.failure(responseResult.exceptionOrNull()!!)
+            }
+
+            val responseBody = responseResult.getOrNull()!!
+
             val fetchedProducts =
-                runCatching {
+                try {
                     responseBody
                         .content
                         .orEmpty()
                         .map { it.toProduct() }
-                }.getOrElse { throwable ->
-                    throw ProductParsingException(
-                        message = "상품 목록 응답을 파싱할 수 없습니다.",
-                        cause = throwable,
+                } catch (throwable: Throwable) {
+                    return Result.failure(
+                        ProductParsingException(
+                            message = "상품 목록 응답을 파싱할 수 없습니다.",
+                            cause = throwable,
+                        ),
                     )
                 }
 
@@ -175,60 +215,84 @@ class HttpProductRepository(
             lastPageLoaded = responseBody.last ?: fetchedProducts.isEmpty()
             nextPage += 1
         }
+
+        return Result.success(Unit)
     }
 
-    private suspend fun fetchProductById(productId: Long): Product? {
-        val responseBody =
+    private suspend fun fetchProductById(productId: Long): Result<Product> {
+        val responseResult =
             executeRequest(
                 errorMessage = "상품 상세 API 호출에 실패했습니다.",
                 request = { productApiService.getProduct(id = productId) },
             )
 
+        if (responseResult.isFailure) {
+            return Result.failure(responseResult.exceptionOrNull()!!)
+        }
+
+        val responseBody = responseResult.getOrNull()!!
+
         val product =
-            runCatching {
+            try {
                 responseBody.toProduct()
-            }.getOrElse { throwable ->
-                throw ProductParsingException(
-                    message = "상품 상세 응답을 파싱할 수 없습니다.",
-                    cause = throwable,
+            } catch (throwable: Throwable) {
+                return Result.failure(
+                    ProductParsingException(
+                        message = "상품 상세 응답을 파싱할 수 없습니다.",
+                        cause = throwable,
+                    ),
                 )
             }
 
         cachedProducts = (cachedProducts + product).distinctBy { it.id }
         totalCount = maxOf(totalCount, cachedProducts.size.toLong())
-        return product
+
+        return Result.success(product)
     }
 
     private suspend fun <T> executeRequest(
         errorMessage: String,
         request: suspend () -> Response<T>,
-    ): T =
+    ): Result<T> =
         try {
             val response = request()
 
             if (!response.isSuccessful) {
-                throw ProductResponseException(
-                    code = response.code(),
-                    message = "$errorMessage code=${response.code()}",
+                Result.failure(
+                    ProductResponseException(
+                        code = response.code(),
+                        message = "$errorMessage code=${response.code()}",
+                    ),
                 )
-            }
+            } else {
+                val body = response.body()
 
-            response.body()
-                ?: throw ProductParsingException(
-                    message = "상품 API 응답 본문이 비어 있습니다.",
-                    cause = IllegalStateException("response body is null"),
-                )
+                if (body == null) {
+                    Result.failure(
+                        ProductParsingException(
+                            message = "상품 API 응답 본문이 비어 있습니다.",
+                            cause = IllegalStateException("response body is null"),
+                        ),
+                    )
+                } else {
+                    Result.success(body)
+                }
+            }
         } catch (exception: ProductRemoteException) {
-            throw exception
+            Result.failure(exception)
         } catch (exception: IOException) {
-            throw ProductNetworkException(
-                message = errorMessage,
-                cause = exception,
+            Result.failure(
+                ProductNetworkException(
+                    message = errorMessage,
+                    cause = exception,
+                ),
             )
         } catch (exception: SerializationException) {
-            throw ProductParsingException(
-                message = "상품 API 응답이 올바르지 않습니다.",
-                cause = exception,
+            Result.failure(
+                ProductParsingException(
+                    message = "상품 API 응답이 올바르지 않습니다.",
+                    cause = exception,
+                ),
             )
         }
 

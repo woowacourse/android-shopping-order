@@ -46,15 +46,7 @@ class CartViewModel(
             }
 
         viewModelScope.launch {
-            runCatching {
-                updatePage(currentPage)
-            }.onFailure { throwable ->
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        cartListState = CartListUiState.Error(throwable.toUserMessage()),
-                    )
-                }
-            }
+            updatePage(currentPage)
         }
     }
 
@@ -138,23 +130,30 @@ class CartViewModel(
                     cartListState = CartListUiState.Loading,
                 )
             }
-            runCatching {
-                updatePage(page)
-            }.onFailure { throwable ->
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        cartListState = CartListUiState.Error(throwable.toUserMessage()),
-                    )
-                }
-            }
+            updatePage(page)
         }
     }
 
     private suspend fun updatePage(page: Int) {
         val requestedPage = page.coerceAtLeast(1)
-        val cartPageResult = cartRepository.getCartPage(page = requestedPage - 1, size = PAGE_SIZE)
+
+        val cartPageResult =
+            cartRepository
+                .getCartPage(page = requestedPage - 1, size = PAGE_SIZE)
+                .getOrElse { throwable ->
+                    updateErrorState(throwable)
+                    return
+                }
+
+        val productMap =
+            productRepository
+                .findAllByIds(cartPageResult.items.map { it.productId }.toSet())
+                .getOrElse { throwable ->
+                    updateErrorState(throwable)
+                    return
+                }
+
         val currentPage = if (cartPageResult.totalPages == 0) 1 else cartPageResult.page + 1
-        val productMap = productRepository.findAllByIds(cartPageResult.items.map { it.productId }.toSet())
 
         val items =
             CartItemUiModelMapper.toUiModelsFromCartPage(
@@ -228,19 +227,23 @@ class CartViewModel(
 
                 val targetQuantity = findQuantity(productId) ?: 0
 
-                runCatching {
-                    cartRepository.setQuantity(productId, targetQuantity)
-                }.onFailure { throwable ->
-                    updatePage(currentPage)
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            cartListState = CartListUiState.Error(throwable.toUserMessage()),
-                        )
+                cartRepository
+                    .setQuantity(productId, targetQuantity)
+                    .onFailure { throwable ->
+                        updatePage(currentPage)
+                        updateErrorState(throwable)
                     }
-                }
 
                 syncJobs.remove(productId)
             }
+    }
+
+    private fun updateErrorState(throwable: Throwable) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                cartListState = CartListUiState.Error(throwable.toUserMessage()),
+            )
+        }
     }
 
     private fun clearDeselection(productId: Long) {
