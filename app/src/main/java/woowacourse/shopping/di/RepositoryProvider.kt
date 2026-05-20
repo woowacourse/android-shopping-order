@@ -40,7 +40,7 @@ object RepositoryProvider {
             authDataSource.saveToken(id, password)
             retrofitServices =
                 RetrofitServices(
-                    baseUrl = "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/",
+                    baseUrl = "http://192.168.2.152:3000/",
                     interceptor = AuthInterceptor(authDataSource.getToken()),
                 )
         }
