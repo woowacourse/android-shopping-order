@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -63,16 +64,29 @@ fun RecommendScreen(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
                         .weight(1f),
                 verticalArrangement = Arrangement.Center,
             ) {
-                Text("이런 상품은 어떠세요?", fontWeight = FontWeight.W700, fontSize = 24.sp)
-                Text(
-                    "* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.",
-                    fontWeight = FontWeight.W500,
-                    fontSize = 14.sp,
-                    color = Color.Gray
+                Column(
+                    modifier = Modifier.padding(start = 16.dp)
+                ) {
+                    Text("이런 상품은 어떠세요?", fontWeight = FontWeight.W700, fontSize = 24.sp)
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(10.dp)
+                    )
+                    Text(
+                        "* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.",
+                        fontWeight = FontWeight.W500,
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                }
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(24.dp)
                 )
                 RecommendList(
                     isLoading = false,

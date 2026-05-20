@@ -3,6 +3,7 @@ package woowacourse.shopping.feature.recommend
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
@@ -42,7 +43,7 @@ fun RecommendList(
                 quantity = it.quantity,
                 onIncrease = { onIncrease(it.id) },
                 onDecrease = { onDecrease(it.id) },
-                modifier = Modifier.width(100.dp),
+                modifier = Modifier.padding(horizontal = 10.dp).width(100.dp),
             )
         }
     }
