@@ -36,9 +36,4 @@ class ProductListActivity : ComponentActivity() {
             }
         }
     }
-
-    override fun onRestart() {
-        super.onRestart()
-        viewModel.refresh()
-    }
 }

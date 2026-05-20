@@ -58,11 +58,12 @@ class ProductListViewModel(
     init {
         observeRecentProducts()
         getMoreProducts()
+        initCartItem()
     }
 
-    fun refresh() {
+    fun initCartItem() {
         viewModelScope.launch {
-            refreshCart()
+            cartRepository.refreshCartItems()
         }
     }
 
@@ -82,7 +83,6 @@ class ProductListViewModel(
                     }
                     currentPage++
 
-                    refreshCart()
                     loadStateFlow.update { LoadState.Success }
                 }.onFailure { throwable ->
                     loadStateFlow.update {
@@ -98,7 +98,6 @@ class ProductListViewModel(
     fun addProduct(productId: Int) {
         viewModelScope.launch {
             cartRepository.addProduct(productId, 1)
-            refreshCart()
         }
     }
 
@@ -106,7 +105,6 @@ class ProductListViewModel(
         viewModelScope.launch {
             val target = cartFlow.value.findByProductId(productId) ?: return@launch
             cartRepository.updateQuantity(target.id, target.quantity.value + 1)
-            refreshCart()
         }
     }
 
@@ -115,7 +113,6 @@ class ProductListViewModel(
             val target = cartFlow.value.findByProductId(productId) ?: return@launch
 
             cartRepository.updateQuantity(target.id, target.quantity.value - 1)
-            refreshCart()
         }
     }
 
@@ -124,11 +121,6 @@ class ProductListViewModel(
             .getRecentProducts()
             .onEach { recentProductsFlow.value = it }
             .launchIn(viewModelScope)
-    }
-
-    private suspend fun refreshCart() {
-        val cartItems = cartRepository.getAllCartItems()
-        cartFlow.update { cartItems }
     }
 
     companion object {
