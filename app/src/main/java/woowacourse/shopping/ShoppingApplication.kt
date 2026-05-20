@@ -30,12 +30,12 @@ import woowacourse.shopping.data.repository.auth.AuthRepository
 import woowacourse.shopping.data.repository.auth.AuthRepositoryImpl
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
-import woowacourse.shopping.data.repository.cart.RecentProductRepositoryImpl
 import woowacourse.shopping.data.repository.order.OrderRepository
 import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
+import woowacourse.shopping.data.repository.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.data.source.auth.AuthDataSourceImpl
 import woowacourse.shopping.data.source.order.OrderDaoImpl
 import woowacourse.shopping.data.source.product.ProductDataSourceImpl
