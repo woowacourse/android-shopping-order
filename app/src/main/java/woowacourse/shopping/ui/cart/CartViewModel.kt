@@ -50,9 +50,9 @@ class CartViewModel(
         }
     }
 
-    private suspend fun getCartItemsByPage() {
+    private suspend fun getCartItemsByPage(page: Int = uiState.value.pageState.page) {
         val cartResult =
-            cartRepository.getCartItemsByPage(page = uiState.value.pageState.page, size = PAGE_SIZE)
+            cartRepository.getCartItemsByPage(page = page, size = PAGE_SIZE)
 
         val totalPrice =
             cartRepository.getTotalPrice(uiState.value.selectedCartState.selectedCartItems)
@@ -87,29 +87,35 @@ class CartViewModel(
 
     fun nextPage() {
         viewModelScope.launch {
+            val page = uiState.value.pageState.page + 1
+
+            getCartItemsByPage(page)
+
             _uiState.update {
                 it.copy(
                     pageState =
                         it.pageState.copy(
-                            page = uiState.value.pageState.page + 1,
+                            page = page,
                         ),
                 )
             }
-            getCartItemsByPage()
         }
     }
 
     fun previousPage() {
         viewModelScope.launch {
+            val page = uiState.value.pageState.page - 1
+
+            getCartItemsByPage(page)
+
             _uiState.update {
                 it.copy(
                     pageState =
                         it.pageState.copy(
-                            page = uiState.value.pageState.page - 1,
+                            page = page,
                         ),
                 )
             }
-            getCartItemsByPage()
         }
     }
 
