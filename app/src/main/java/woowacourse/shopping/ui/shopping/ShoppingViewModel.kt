@@ -35,24 +35,28 @@ class ShoppingViewModel(
     private val pageSize = 20
 
     init {
-        _uiState.update { it.copy(uiInfo = it.uiInfo.copy(isLoading = true)) }
-        observeNetwork()
-        observeCart()
-        observeRecentItems()
-        _uiState.update { it.copy(uiInfo = it.uiInfo.copy(isLoading = false)) }
+        viewModelScope.launch {
+            try {
+                _uiState.update { it.copy(uiInfo = it.uiInfo.copy(isLoading = true)) }
+                observeNetwork()
+                observeCart()
+                observeRecentItems()
+            } finally {
+                _uiState.update { it.copy(uiInfo = it.uiInfo.copy(isLoading = false)) }
+            }
+        }
+
     }
 
-    private fun observeNetwork() {
-        viewModelScope.launch {
-            networkObserver.observeNetwork().collect { isAvailable ->
-                _uiState.update {
-                    it.copy(uiInfo = it.uiInfo.copy(isNetworkAvailable = isAvailable))
-                }
+    private suspend fun observeNetwork() {
+        networkObserver.observeNetwork().collect { isAvailable ->
+            _uiState.update {
+                it.copy(uiInfo = it.uiInfo.copy(isNetworkAvailable = isAvailable))
+            }
 
-                if (isAvailable && _uiState.value.products.isEmpty()) {
-                    loadMore()
-                    loadRecentItems()
-                }
+            if (isAvailable && _uiState.value.products.isEmpty()) {
+                loadMore()
+                loadRecentItems()
             }
         }
     }
@@ -102,18 +106,16 @@ class ShoppingViewModel(
         loadProducts((offset / pageSize), pageSize)
     }
 
-    private fun observeRecentItems() {
-        viewModelScope.launch {
-            recentItemRepository.getRecentItems().collect { recentItems ->
-                _uiState.update {
-                    it.copy(
-                        recentItems =
-                            recentItems
-                                .map { productId ->
-                                    productRepository.getProductById(productId).toUiModel()
-                                }.toImmutableList(),
-                    )
-                }
+    private suspend fun observeRecentItems() {
+        recentItemRepository.getRecentItems().collect { recentItems ->
+            _uiState.update {
+                it.copy(
+                    recentItems =
+                        recentItems
+                            .map { productId ->
+                                productRepository.getProductById(productId).toUiModel()
+                            }.toImmutableList(),
+                )
             }
         }
     }
