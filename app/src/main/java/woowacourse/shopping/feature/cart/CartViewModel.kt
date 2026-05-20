@@ -7,8 +7,10 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -21,11 +23,6 @@ import woowacourse.shopping.domain.ProductNotFoundException
 import woowacourse.shopping.feature.common.state.CartItemUiModel
 import woowacourse.shopping.feature.common.state.ProductUiModel
 
-sealed interface CartEvent {
-    data class FatalError(
-        val message: String,
-    ) : CartEvent
-}
 
 data class CartUiState(
     val isLoading: Boolean = true,
@@ -47,6 +44,9 @@ class CartViewModel(
 
     private val _event = Channel<CartEvent>(Channel.BUFFERED)
     val event: Flow<CartEvent> = _event.receiveAsFlow()
+
+    private val _removeEvent = MutableSharedFlow<RemoveEvent>()
+    val removeEvent: Flow<RemoveEvent> = _removeEvent.asSharedFlow()
 
     lateinit var cartRepository: CartRepository
 
@@ -205,7 +205,7 @@ class CartViewModel(
             val contentId = cart.cartContents.firstOrNull { it.productId == productId }?.id ?: 0
             cartRepository.remove(productId)
 
-            var cartContents = pagination(uiState.value.page)
+            val cartContents = pagination(uiState.value.page)
 
             val page =
                 maxOf(
@@ -248,6 +248,8 @@ class CartViewModel(
                     totalPrice = newTotalPrice,
                 )
             }
+
+            _removeEvent.emit(RemoveEvent("해당 상품이 삭제되었습니다."))
         }
     }
 
@@ -308,3 +310,11 @@ class CartViewModel(
             }
     }
 }
+
+sealed interface CartEvent {
+    data class FatalError(
+        val message: String,
+    ) : CartEvent
+}
+
+data class RemoveEvent(val message: String)

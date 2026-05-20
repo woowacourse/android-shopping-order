@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.cart.component
+package woowacourse.shopping.feature.cart
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -33,10 +33,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.constants.MockData
-import woowacourse.shopping.feature.cart.CartContentId
-import woowacourse.shopping.feature.cart.CartEvent
-import woowacourse.shopping.feature.cart.CartUiState
-import woowacourse.shopping.feature.cart.CartViewModel
+import woowacourse.shopping.feature.cart.component.CartAppBar
+import woowacourse.shopping.feature.cart.component.CartItemList
+import woowacourse.shopping.feature.cart.component.PageNavigator
 import woowacourse.shopping.feature.common.state.CartItemUiModel
 import woowacourse.shopping.feature.common.state.ProductUiModel
 import woowacourse.shopping.feature.format.DecimalPriceFormatter
@@ -51,6 +50,7 @@ fun CartScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+
     LaunchedEffect(Unit) {
         viewModel.event.collect { event ->
             when (event) {
@@ -61,6 +61,13 @@ fun CartScreen(
             }
         }
     }
+
+    LaunchedEffect(Unit) {
+        viewModel.removeEvent.collect { event ->
+            Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     CartScreenContent(
         uiState = uiState,
         onToRecommendIntent = {

@@ -5,7 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import woowacourse.shopping.feature.cart.component.CartScreen
+import woowacourse.shopping.feature.cart.CartScreen
 import woowacourse.shopping.feature.productdetail.ProductDetailScreen
 import woowacourse.shopping.feature.productlist.ProductListScreen
 import woowacourse.shopping.feature.recommend.RecommendScreen
