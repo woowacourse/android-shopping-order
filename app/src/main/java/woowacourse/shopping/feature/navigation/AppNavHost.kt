@@ -71,7 +71,12 @@ fun AppNavHost() {
             RecommendScreen(
                 onCloseClick = { navController.popBackStack() },
                 onBuyClick = {
-                    navController.navigate(ProductList)
+                    navController.navigate(ProductList) {
+                        popUpTo(ProductList) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
                 },
                 contentIds = route.cartContentIds,
             )
