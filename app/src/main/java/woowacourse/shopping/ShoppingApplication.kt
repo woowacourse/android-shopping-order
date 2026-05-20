@@ -1,0 +1,63 @@
+package woowacourse.shopping
+
+import android.app.Application
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import woowacourse.shopping.backend.retrofit.RetrofitService
+import woowacourse.shopping.repository.AuthHeaderProvider
+import woowacourse.shopping.storage.datastore.AuthDataStore
+import woowacourse.shopping.storage.room.ShoppingDatabase
+
+class ShoppingApplication : Application() {
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    private val Context.authDataStore: DataStore<Preferences> by preferencesDataStore(
+        name = "auth_datastore",
+    )
+
+    lateinit var authDataStore: AuthDataStore
+        private set
+    lateinit var authHeaderProvider: AuthHeaderProvider
+        private set
+    lateinit var retrofitService: RetrofitService
+        private set
+
+    lateinit var appContainer: AppContainer
+        private set
+
+    override fun onCreate() {
+        super.onCreate()
+
+        authDataStore = AuthDataStore(applicationContext.authDataStore)
+        authHeaderProvider = AuthHeaderProvider(authDataStore)
+        retrofitService = RetrofitService(authHeaderProvider)
+
+        applicationScope.launch {
+            authDataStore.saveAuthInfo(
+                username = "chohs4164",
+                password = "password",
+            )
+        }
+
+        val shoppingDatabase = ShoppingDatabase.create(this)
+        appContainer =
+            AppContainer(
+                context = this,
+                shoppingItemDao = shoppingDatabase.shoppingItemDao(),
+                shoppingCartDao = shoppingDatabase.shoppingCartDao(),
+                applicationScope = applicationScope,
+            )
+    }
+
+    override fun onTerminate() {
+        super.onTerminate()
+        applicationScope.cancel()
+    }
+}
