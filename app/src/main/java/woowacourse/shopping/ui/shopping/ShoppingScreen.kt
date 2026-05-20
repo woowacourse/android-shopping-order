@@ -65,7 +65,7 @@ fun ShoppingScreen(
                                     onCartClick()
                                 },
                     )
-                    if (uiState.cartSize > 0) {
+                    if (uiState.cartSummary.cartSize > 0) {
                         Box(
                             modifier =
                                 Modifier
@@ -74,7 +74,7 @@ fun ShoppingScreen(
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
-                                text = uiState.cartSize.toString(),
+                                text = uiState.cartSummary.cartSize.toString(),
                                 fontSize = 14.sp,
                                 color = Color.White,
                                 fontWeight = FontWeight.W500,
@@ -87,16 +87,16 @@ fun ShoppingScreen(
         },
         modifier = modifier.statusBarsPadding(),
     ) { innerPadding ->
-        if (uiState.isNetworkAvailable) {
+        if (uiState.uiInfo.isNetworkAvailable) {
             ShoppingContents(
                 products = uiState.products,
                 recentItems = uiState.recentItems,
                 modifier = Modifier.padding(innerPadding),
                 onLoad = onLoad,
-                isLoading = uiState.isLoading,
+                isLoading = uiState.uiInfo.isLoading,
                 onProductClick = onProductClick,
                 onQuantityChange = onQuantityChange,
-                isCanLoadMore = uiState.canLoadMore,
+                isCanLoadMore = uiState.cartSummary.canLoadMore,
             )
         } else {
             NetworkErrorContent(

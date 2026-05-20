@@ -71,7 +71,7 @@ class ShoppingViewModelTest {
             mainDispatcherExtension.advanceUntilIdle()
 
             assertThat(viewModel.uiState.value.products).hasSize(25)
-            assertThat(viewModel.uiState.value.canLoadMore).isFalse()
+            assertThat(viewModel.uiState.value.cartSummary.canLoadMore).isFalse()
         }
 
     private fun createViewModel(
