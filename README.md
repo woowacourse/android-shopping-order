@@ -1,79 +1,35 @@
-# 쇼핑 주문 (0 ~ 2단계)
+# 쇼핑 주문 (3 ~ 4단계)
 
 ## 단계별 진행
 
-### 1단계 — 서버 연동
+## 🚀 3단계 - Navigation & Flow
 
-#### 기능 요구사항
+### 기능 요구사항
 
-- [x] 데이터가 로딩되기 전 상태에서 스켈레톤 UI 를 노출한다
+#### Compose Navigation으로 화면 전환을 구현한다
 
-#### 프로그래밍 요구사항
+- [] 상품 목록, 상품 상세, 장바구니, 상품 추천 화면을 Navigation Component로 구성한다.
+- [] 각 화면 이동은 NavController를 통해 처리한다.
+- [] 화면 이동 시 전달하는 데이터는 타입 안전한 Route를 사용한다.
+- [] 주문 완료 후 상품 목록으로 이동할 때 주문 흐름이 Back Stack에 남지 않도록 한다.
 
-- [x] 서버를 연동한다
-- [x] 기존에 작성한 테스트가 깨지면 안 된다
-- [x] 사용자 인증 정보를 저장한다 (적절한 저장 방법을 선택한다)
-- [x] 서버 통신을 위한 JSON 직렬화 라이브러리를 선택하고 PR 에 선택 이유를 남긴다
+#### UI 상태를 Flow로 관리한다
 
-#### 결정 사항 / TODO
+- [] ViewModel의 UI 상태를 StateFlow로 노출한다.
+- [] 장바구니 담기/삭제 등 단발성 이벤트는 SharedFlow로 처리한다.
+- [] Composable에서 상태를 구독할 때 collectAsStateWithLifecycle()을 사용한다.
 
-- [x] HTTP Client: **Retrofit** 도입
-- [x] JSON 직렬화 라이브러리 선택 (kotlinx-serialization 선택) — 선택 후 PR 에 이유 기재
-- [x] 사용자 인증 정보 저장 방식 선택 (DataStore 선택)
-- [x] DataSource 계층 구성
-    - [x] 기존 MockData DataSource
-    - [x] Retrofit DataSource
+### 프로그래밍 요구사항
 
-#### 서버 연동 목록
+#### Navigation
 
-- 상품
-    - [x] 상품 목록 조회
-    - [x] 상품 상세 조회
-- 장바구니
-    - [x] 장바구니 목록 조회
-    - [x] 장바구니 아이템 추가
-    - [x] 장바구니 아이템 삭제
-    - [x] 아이템 수량 변경
-    - [x] 아이템 수량 조회
-- 주문
-    - [ ] 주문하기
+- [] 기존 Activity 전환 방식을 제거하고 Compose Navigation(navigation-compose)으로 교체한다.
+- [] 모든 Route를 @Serializable 타입으로 선언한다.
+- [] NavController는 화면 Composable에 직접 전달하지 않는다. 이동 로직은 콜백 람다로 분리한다.
 
+#### Flow
 
-### 2단계 — 상품 추천
-
-#### 기능 요구사항
-- [x] 각 장바구니 상품 체크박스
-- [x] 전체 체크박스
-- [ ] 장바구니 화면에서 특정 상품만 골라 "주문하기" 버튼을 누를 수 있다
-- [ ] 별도의 화면에서 상품 추천 알고리즘으로 사용자에게 적절한 상품을 추천해 준다
-- [ ] 상품 추천 알고리즘
-    - [ ] 가장 최근에 본 상품의 카테고리를 기반으로 한다
-    - [ ] 최대 10개까지 노출한다
-    - [ ] 해당 카테고리 상품이 10개 미만이면 있는 개수만큼만 노출한다
-    - [ ] 장바구니에 이미 추가된 상품은 노출하지 않는다
-- [ ] 추천된 상품을 해당 화면에서 바로 장바구니에 추가하여 같이 주문할 수 있다
-
-#### 프로그래밍 요구사항
-
-- [ ] 기능 요구사항에 대한 테스트를 작성한다
-
-### 수정한 목록
-
-- [x] Retrofit이 지원하는 suspend로 변경함
-- [x] 도메인과 DTO의 contextId, productId를 String에서 Long타입으로 변경함
-- [x] ProductDto의 임포트를 변경함
-- [x] 조건식의 범위를 수정함
-- [x] 더보기 버튼 안됨
-- [x] 추천 상품 목록이 뜨지 않는 문제 해결
-- [x] 최근 본 상품이 없는 경우 발생하는 예외 처리 해결
-- [x] 유효하지 않은 import 제거
-- [x] 메인 스레드 블로킹 초기화 방식 개선하기
-- [x] API 명세 변경
-- [x] 장바구니 수량 증가 로직 수정하기
-- [x] Repository 의존성 분리
-- [x] http 디버깅 로직 수정하기
-- [x] 클래스의 시그니처 변경
-- [x] 중복되는 Retrofit 객체 생성
-- [x] guardFatal이 다른 예외도 받도록 수정
-- [x] RecommendViewModel 정합성 문제 수정
-- [x] RecentProductRepositoryImpl의 패키지 경로 변경
+- [] 기존 remember/mutableStateOf 기반 Compose State를 StateFlow/SharedFlow로 교체한다.
+- [] ViewModel의 상태는 MutableStateFlow로 선언하고 StateFlow로 노출한다.
+- [] 일회성 이벤트(스낵바 표시, 화면 이동 트리거 등)는 MutableSharedFlow를 사용한다.
+- [] Composable에서 collectAsState() 대신 collectAsStateWithLifecycle() 을 사용한다.
