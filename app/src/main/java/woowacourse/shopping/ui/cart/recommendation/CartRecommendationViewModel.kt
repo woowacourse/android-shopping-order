@@ -99,14 +99,14 @@ class CartRecommendationViewModel(
     }
 
     fun placeOrder() {
-        if (_uiState.value.pendingOrder.cartItemIds
-                .isEmpty() ||
-            _uiState.value.isOrdering
-        ) {
-            return
-        }
-
         viewModelScope.launch {
+            if (_uiState.value.pendingOrder.cartItemIds
+                    .isEmpty() ||
+                _uiState.value.isOrdering
+            ) {
+                return@launch
+            }
+
             _uiState.update { currentState ->
                 currentState.copy(
                     isOrdering = true,
