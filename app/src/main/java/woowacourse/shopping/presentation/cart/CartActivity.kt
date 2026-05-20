@@ -42,6 +42,7 @@ class CartActivity : ComponentActivity() {
                                     is CartEvent.DeleteSuccess -> context.getString(R.string.delete_item_success)
                                     is CartEvent.DeleteNotFound -> context.getString(R.string.not_found_item)
                                     is CartEvent.ShowError -> event.message
+                                    is CartEvent.ShowCancelReason -> event.message
                                 }
                             Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
                         }

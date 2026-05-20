@@ -56,13 +56,14 @@ class CartViewModel(
                     loadCartItems(result.cart)
                     _uiEvents.send(CartEvent.DeleteSuccess)
                 }
-
                 is RemoveItemResult.NotFoundItem -> {
                     _uiEvents.send(CartEvent.DeleteNotFound)
                 }
-
                 is RemoveItemResult.Error -> {
                     _uiEvents.send(CartEvent.ShowError(result.message))
+                }
+                is RemoveItemResult.Cancel -> {
+                    _uiEvents.send(CartEvent.ShowCancelReason(result.message))
                 }
             }
         }
@@ -244,6 +245,10 @@ sealed interface CartEvent {
     data object DeleteNotFound : CartEvent
 
     data class ShowError(
+        val message: String,
+    ) : CartEvent
+
+    data class ShowCancelReason(
         val message: String,
     ) : CartEvent
 }

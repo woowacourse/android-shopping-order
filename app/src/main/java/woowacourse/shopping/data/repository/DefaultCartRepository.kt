@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.coroutines.CancellationException
 import woowacourse.shopping.data.source.remote.CartRemoteDataSource
 import woowacourse.shopping.data.source.remote.dto.cart.CartContent
 import woowacourse.shopping.domain.model.AddItemResult
@@ -81,6 +82,8 @@ class DefaultCartRepository(
             val cartContent = getCartContents().find { it.product.id == productId } ?: return RemoveItemResult.NotFoundItem
             remoteDataSource.deleteItem(cartContent.id)
             RemoveItemResult.Success(getCart())
+        } catch (err: CancellationException) {
+            RemoveItemResult.Cancel("상품 삭제를 취소했습니다.")
         } catch (err: Exception) {
             RemoveItemResult.Error("삭제에 실패했습니다. 다시 시도헤주세요.")
         }
