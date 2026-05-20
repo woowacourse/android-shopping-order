@@ -77,7 +77,7 @@ class ShoppingViewModelTest {
     private fun createViewModel(
         productRepository: ProductRepository = FakeProductRepository(products = createProducts(size = 20)),
         cartRepository: CartRepository = FakeCartRepository(),
-        recentItemRepository: RecentItemRepository = RecentItemRepository(TestRecentItemDao(), productRepository),
+        recentItemRepository: RecentItemRepository = RecentItemRepository(TestRecentItemDao()),
         networkObserver: NetworkObserver = FakeNetworkObserver(isAvailable = true),
     ): ShoppingViewModel =
         ShoppingViewModel(
