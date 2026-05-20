@@ -38,12 +38,6 @@ class CartActivity : ComponentActivity() {
         CartRecommendationViewModelFactory()
     }
 
-    companion object {
-        fun startActivity(context: Context) {
-            context.startActivity(Intent(context, CartActivity::class.java))
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         cartViewModel.reloadVisibleState()
