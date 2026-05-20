@@ -160,6 +160,14 @@ class CartViewModel(
                 .setQuantity(productId, targetQuantity)
                 .onSuccess {
                     calculateTotals()
+
+                    withContentState { contentState ->
+                        if (contentState.items.isEmpty() && contentState.hasPrevious) {
+                            loadPage(contentState.currentPage - 1)
+                        } else {
+                            updatePage(contentState.currentPage)
+                        }
+                    }
                 }.onFailure { throwable ->
                     updatePage(currentPage)
                     updateErrorState(throwable)
