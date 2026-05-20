@@ -10,7 +10,7 @@ import retrofit2.Retrofit
 class RetrofitProvider(
     private val authHeaderProvider: () -> String,
 ) {
-    private val BASE_URL = "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/"
+    private val baseUrl = "http://127.0.0.1:8080"
 
     private val authInterceptor =
         Interceptor { chain ->
@@ -31,7 +31,7 @@ class RetrofitProvider(
     private val retrofit =
         Retrofit
             .Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(baseUrl)
             .client(okHttpClient)
             .addConverterFactory(Json { ignoreUnknownKeys = true }.asConverterFactory("application/json".toMediaType()))
             .build()

@@ -22,6 +22,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"http://127.0.0.1:8080/\"",
+            )
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -38,6 +45,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     testOptions {
         unitTests.all {
@@ -70,6 +78,9 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")
     implementation("androidx.datastore:datastore-preferences:1.1.3")
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.mockwebserver)
 
     ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit.jupiter)
