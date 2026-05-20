@@ -147,7 +147,7 @@ private fun CartContent(
         } else {
             items(
                 items = cartItems,
-                key = { it.product.id },
+                key = { it.id },
             ) { item ->
                 val product = item.product
                 CartCard(
