@@ -233,6 +233,7 @@ class CartViewModel(
                         lastViewedItem = recentProductRepo.getLastViewedProduct(),
                         allProductItems = productRepo.getProducts(0, 50),
                         allCartItem = cartRepo.getAllCartItems().items,
+                        MAX_RECOMMEND_ITEM_SIZE
                     )
                 val uiModel =
                     products.map {
@@ -303,6 +304,8 @@ class CartViewModel(
     }
 
     companion object {
+        const val MAX_RECOMMEND_ITEM_SIZE = 20
+
         fun provideFactory(
             container: AppContainer,
             pageSize: Int,
