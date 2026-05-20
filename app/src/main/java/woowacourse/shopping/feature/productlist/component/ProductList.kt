@@ -1,6 +1,5 @@
-package woowacourse.shopping.feature.productlist
+package woowacourse.shopping.feature.productlist.component
 
-import android.R.attr.onClick
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

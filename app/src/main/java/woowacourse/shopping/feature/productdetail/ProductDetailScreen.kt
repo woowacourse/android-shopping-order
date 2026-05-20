@@ -37,10 +37,10 @@ import woowacourse.shopping.R
 import woowacourse.shopping.feature.common.ProductQuantitySelector
 import woowacourse.shopping.feature.common.state.ProductUiModel
 import woowacourse.shopping.feature.format.DecimalPriceFormatter
-import woowacourse.shopping.feature.productdetail.viewmodel.ProductDetailLoadingState
-import woowacourse.shopping.feature.productdetail.viewmodel.ProductDetailViewModel
-import woowacourse.shopping.feature.productlist.LoadingIndicator
-import woowacourse.shopping.feature.productlist.PreviewableAsyncImage
+import woowacourse.shopping.feature.productdetail.component.ProductAppBar
+import woowacourse.shopping.feature.productdetail.component.RecentProductLetter
+import woowacourse.shopping.feature.productlist.component.LoadingIndicator
+import woowacourse.shopping.feature.productlist.component.PreviewableAsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

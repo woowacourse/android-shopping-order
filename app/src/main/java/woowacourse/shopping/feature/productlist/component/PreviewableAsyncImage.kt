@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.productlist
+package woowacourse.shopping.feature.productlist.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable

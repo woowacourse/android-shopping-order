@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature.recommend
 
-import android.R.attr.name
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -12,7 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import woowacourse.shopping.constants.MockData
 import woowacourse.shopping.feature.common.state.ProductUiModel
-import woowacourse.shopping.feature.productlist.ProductItem
+import woowacourse.shopping.feature.productlist.component.ProductItem
 
 @Composable
 fun RecommendList(

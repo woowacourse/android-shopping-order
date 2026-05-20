@@ -1,7 +1,5 @@
-package woowacourse.shopping.feature.productlist
+package woowacourse.shopping.feature.productlist.component
 
-import android.R.attr.name
-import android.R.attr.text
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn

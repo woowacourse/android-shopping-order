@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.productlist
+package woowacourse.shopping.feature.productlist.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

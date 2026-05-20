@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.productdetail
+package woowacourse.shopping.feature.productdetail.component
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api

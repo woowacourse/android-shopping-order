@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.productlist.viewmodel
+package woowacourse.shopping.feature.productlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
