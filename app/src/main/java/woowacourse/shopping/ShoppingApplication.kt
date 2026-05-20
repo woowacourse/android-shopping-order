@@ -18,7 +18,7 @@ class ShoppingApplication : Application() {
         RecentlyViewedProductRepositoryImpl(database.recentlyViewedProductDao())
     }
 
-    val userAuthDataStore by lazy { UserAuthDataStore(this) }
+    val userAuthDataStore by lazy { UserAuthDataStore(context = this) }
 
     private val retrofitClient by lazy {
         RetrofitProvider(

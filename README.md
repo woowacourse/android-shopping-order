@@ -76,7 +76,7 @@
 ### 🧹 2차 피드백 반영 내용
 
 - [x] ROOM에서 들고 있는 비즈니스 로직 Repository로 이동
-- [ ] UserAuthDataStore 코루틴 스코프 맴버 변수 추가
+- [x] UserAuthDataStore 코루틴 스코프 맴버 변수 추가
 - [ ] encodedUserAuthInfo의 쓰레드 풀을 Default로 변경
 - [ ] BASE_URL 네이밍 컨벤션 적용
 - [ ] 네트워크 api 호출에 대한 예외처리 추가

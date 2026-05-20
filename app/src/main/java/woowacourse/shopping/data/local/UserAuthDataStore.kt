@@ -7,11 +7,13 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.plus
 import woowacourse.shopping.ShoppingApplication
 
 private val Context.dataStore by preferencesDataStore(name = "auth_prefs")
@@ -26,12 +28,14 @@ class UserAuthDataStore(
         private val USER_PASSWORD = stringPreferencesKey("userPassword")
     }
 
+    val dataStoreScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
     val userName: StateFlow<String> =
         dataStoreContext.dataStore.data
             .map { preferences ->
                 preferences[USER_NAME] ?: "First_woosun"
             }.stateIn(
-                scope = CoroutineScope(Dispatchers.IO),
+                scope = dataStoreScope,
                 started = SharingStarted.Eagerly,
                 initialValue = "First_woosun",
             )
@@ -41,7 +45,7 @@ class UserAuthDataStore(
             .map { preferences ->
                 preferences[USER_PASSWORD] ?: "password"
             }.stateIn(
-                scope = CoroutineScope(Dispatchers.IO),
+                scope = dataStoreScope,
                 started = SharingStarted.Eagerly,
                 initialValue = "password",
             )
