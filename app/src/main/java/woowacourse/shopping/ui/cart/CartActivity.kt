@@ -16,7 +16,6 @@ class CartActivity : ComponentActivity() {
     private val container by lazy {
         (application as ShoppingApplication).appContainer
     }
-    val pageSize = 5
 
     @Suppress("UNCHECKED_CAST")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +26,7 @@ class CartActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val viewModel: CartViewModel =
                         viewModel(
-                            factory = CartViewModel.provideFactory(container, pageSize),
+                            factory = CartViewModel.provideFactory(container, PAGE_SIZE),
                         )
 
                     CartScreen(
@@ -39,5 +38,9 @@ class CartActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    companion object {
+        const val PAGE_SIZE = 5
     }
 }
