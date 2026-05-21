@@ -1,5 +1,6 @@
 package woowacourse.shopping
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -17,8 +18,27 @@ import woowacourse.shopping.ui.component.screen.ProductDetailScreen
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 import woowacourse.shopping.ui.viewmodel.ProductDetailViewModel
 import woowacourse.shopping.ui.viewmodel.ProductDetailViewModelFactory
+import kotlin.jvm.java
 
 class ProductDetailActivity : ComponentActivity() {
+
+    companion object {
+        const val SELECTED_PRODUCT_ID_KEY = "selected_product"
+        const val LATEST_VIEWED_PRODUCT_ID_KEY = "latest_viewed_product"
+
+        fun startActivity(
+            context: Context,
+            selectedProductId: Long,
+            lastViewedProductId: Long?,
+        ) {
+            val intent = Intent(context, ProductDetailActivity::class.java)
+            intent.putExtra(SELECTED_PRODUCT_ID_KEY, selectedProductId)
+            intent.putExtra(LATEST_VIEWED_PRODUCT_ID_KEY, lastViewedProductId)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            context.startActivity(intent)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
