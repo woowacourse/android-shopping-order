@@ -163,11 +163,7 @@ class CartViewModel(
         viewModelScope.launch {
             try {
                 cartRepo.add(product)
-                val cartId =
-                    cartRepo
-                        .getAllCartItems()
-                        .items
-                        .find { it.product.id == product.id }
+                val cartId = cartRepo.findCartItem(product.id)
                         ?.id
                         ?: throw IllegalArgumentException("추가하려는 상품 아이디(${product.id})로 장바구니 아이디를 조회할 수 없습니다. ")
 
@@ -196,7 +192,7 @@ class CartViewModel(
         viewModelScope.launch {
             try {
                 val cartItem =
-                    cartRepo.getAllCartItems().items.find { it.product.id == product.id }
+                    cartRepo.findCartItem(product.id)
                         ?: throw IllegalArgumentException("추가하려는 상품 아이디(${product.id})로 장바구니 아이디를 조회할 수 없습니다. ")
                 val cartId =
                     cartItem.id

@@ -70,6 +70,12 @@ class RoomCartRepository(
 
     override suspend fun getCartCount(): Int = cartDao.getSize()
 
+    override suspend fun findCartItem(id: Long): CartItem? {
+        val entity = cartDao.getCartItemById(id) ?: return null
+        val product = productRepository.findProduct(entity.productId) ?: return null
+        return CartItem(product = product, quantity = entity.quantity)
+    }
+
     private suspend fun toCartItems(): List<CartItem> {
         val cartEntities = cartDao.getAll()
 

@@ -12,8 +12,6 @@ interface CartRepository {
         quantity: Int = 1,
     )
 
-//    suspend fun add(item: Product)
-
     suspend fun decrease(item: Product)
 
     suspend fun delete(item: Product)
@@ -26,4 +24,6 @@ interface CartRepository {
     suspend fun getSize(): Int
 
     suspend fun getCartCount(): Int
+
+    suspend fun findCartItem(id: Long): CartItem?
 }
