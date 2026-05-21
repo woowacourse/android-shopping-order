@@ -47,21 +47,19 @@ class MainActivity : ComponentActivity() {
                         recentlyViewedProducts = uiState.recentlyViewedProducts,
                         onRecentlyViewedClick = { product ->
                             viewModel.updateHistory(product)
-                            val intent =
-                                Intent(this, ProductDetailActivity::class.java).apply {
-                                    putExtra(IntentKeys.SELECTED_PRODUCT_ID_KEY, product.id)
-                                    putExtra(IntentKeys.LATEST_VIEWED_PRODUCT_ID_KEY, lastViewedProductId)
-                                }
-                            startActivity(intent)
+                            ProductDetailActivity.startActivity(
+                                context = this,
+                                selectedProductId = product.id,
+                                lastViewedProductId = lastViewedProductId
+                            )
                         },
                         onItemClick = { product ->
                             viewModel.updateHistory(product)
-                            val intent =
-                                Intent(this, ProductDetailActivity::class.java).apply {
-                                    putExtra(IntentKeys.SELECTED_PRODUCT_ID_KEY, product.id)
-                                    putExtra(IntentKeys.LATEST_VIEWED_PRODUCT_ID_KEY, lastViewedProductId)
-                                }
-                            startActivity(intent)
+                            ProductDetailActivity.startActivity(
+                                context = this,
+                                selectedProductId = product.id,
+                                lastViewedProductId = lastViewedProductId
+                            )
                         },
                         onCartClick = {
                             val intent = Intent(this, CartActivity::class.java)
