@@ -68,13 +68,11 @@ class CartActivity : ComponentActivity() {
                     onSelectAllClick = { viewModel.onSelectAllClick() },
                     onOrderClick = {
                         if (uiState.checkedItemIds.isNotEmpty()) {
-                            val intent = Intent(this, RecommendationActivity::class.java)
-                            intent.putExtra(IntentKeys.SELECTED_TOTAL_PRICE, uiState.totalPrice)
-                            intent.putExtra(
-                                IntentKeys.SELECTED_CART_ITEM_IDS,
-                                uiState.checkedItemIds.toLongArray(),
+                            RecommendationActivity.startActivity(
+                                context = this,
+                                totalPrice = uiState.totalPrice,
+                                checkedIds =  uiState.checkedItemIds,
                             )
-                            startActivity(intent)
                         }
                     },
                     isAllChecked = viewModel.isAllChecked(),
