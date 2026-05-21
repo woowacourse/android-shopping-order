@@ -11,7 +11,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ui.component.screen.CatalogScreen
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 import woowacourse.shopping.ui.viewmodel.ShoppingViewModel
@@ -35,23 +37,21 @@ class MainActivity : ComponentActivity() {
                             (application as ShoppingApplication).productRepository,
                         ),
                 )
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val lastViewedProductId by viewModel.lastViewProductId.collectAsStateWithLifecycle()
             val cartState by viewModel.cart.collectAsStateWithLifecycle()
-            val viewHistory by viewModel.recentlyViewedProducts.collectAsStateWithLifecycle()
-            val currentProducts by viewModel.products.collectAsStateWithLifecycle()
-            val lastViewedProduct by viewModel.lastViewProductId.collectAsStateWithLifecycle()
-            val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
             AndroidshoppingTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     CatalogScreen(
-                        catalog = currentProducts,
-                        recentlyViewedProducts = viewHistory,
+                        catalog = uiState.products,
+                        recentlyViewedProducts = uiState.recentlyViewedProducts,
                         onRecentlyViewedClick = { product ->
                             viewModel.updateHistory(product)
                             val intent =
                                 Intent(this, ProductDetailActivity::class.java).apply {
                                     putExtra(IntentKeys.SELECTED_PRODUCT_ID_KEY, product.id)
-                                    putExtra(IntentKeys.LATEST_VIEWED_PRODUCT_ID_KEY, lastViewedProduct)
+                                    putExtra(IntentKeys.LATEST_VIEWED_PRODUCT_ID_KEY, lastViewedProductId)
                                 }
                             startActivity(intent)
                         },
@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
                             val intent =
                                 Intent(this, ProductDetailActivity::class.java).apply {
                                     putExtra(IntentKeys.SELECTED_PRODUCT_ID_KEY, product.id)
-                                    putExtra(IntentKeys.LATEST_VIEWED_PRODUCT_ID_KEY, lastViewedProduct)
+                                    putExtra(IntentKeys.LATEST_VIEWED_PRODUCT_ID_KEY, lastViewedProductId)
                                 }
                             startActivity(intent)
                         },
@@ -82,8 +82,8 @@ class MainActivity : ComponentActivity() {
                         onAddInCart = { viewModel.addToCart(it) },
                         isContainedInCart = { cartState.isContain(it) },
                         specificProductCount = { cartState.totalCountOfSpecificPurchaseProduct(it) },
-                        totalCount = cartState.totalCount(),
-                        isLoading = isLoading,
+                        totalCount = uiState.cartItemCount,
+                        isLoading = uiState.isLoading,
                     )
                 }
             }
@@ -92,8 +92,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        if (::viewModel.isInitialized) {
-            viewModel.fetchCart()
+        if(::viewModel.isInitialized) {
+            lifecycleScope.launch {
+                viewModel.fetchCart()
+            }
         }
     }
 }
