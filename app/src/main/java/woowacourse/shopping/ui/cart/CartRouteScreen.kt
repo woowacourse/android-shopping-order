@@ -14,15 +14,15 @@ import woowacourse.shopping.ui.cart.list.CartViewModel
 
 @Composable
 fun CartRouteScreen(
+    cartViewModel: CartViewModel,
     onBackClick: () -> Unit,
-    onOrderClick: () -> Unit,
-    viewModel: CartViewModel = viewModel()
+    onOrderClick: (SelectedCartOrder) -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by cartViewModel.uiState.collectAsStateWithLifecycle()
 
     LifecycleResumeEffect(Unit) {
-        viewModel.reloadVisibleState()
-        onPauseOrDispose {  }
+        cartViewModel.reloadVisibleState()
+        onPauseOrDispose { }
     }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -31,13 +31,16 @@ fun CartRouteScreen(
             isNetworkConnected = uiState.isNetworkConnected,
             modifier = Modifier.padding(innerPadding),
             onBackClick = onBackClick,
-            onOrderClick = onOrderClick,
-            onItemCheckedChange = viewModel::toggleItemSelection,
-            onDeleteClick = viewModel::delete,
-            onIncreaseQuantity = viewModel::increaseQuantity,
-            onDecreaseQuantity = viewModel::decreaseQuantity,
-            onPreviousClick = viewModel::loadPreviousPage,
-            onNextClick = viewModel::loadNextPage,
+            onOrderClick = {
+                val selectedCartOrder = cartViewModel.createSelectedCartOrder() ?: return@CartScreen
+                onOrderClick(selectedCartOrder)
+            },
+            onItemCheckedChange = cartViewModel::toggleItemSelection,
+            onDeleteClick = cartViewModel::delete,
+            onIncreaseQuantity = cartViewModel::increaseQuantity,
+            onDecreaseQuantity = cartViewModel::decreaseQuantity,
+            onPreviousClick = cartViewModel::loadPreviousPage,
+            onNextClick = cartViewModel::loadNextPage,
         )
     }
 }

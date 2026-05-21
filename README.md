@@ -99,7 +99,7 @@
 - [x] 상품 목록 화면을 Navigation destination으로 구성한다.
 - [x] 상품 상세 화면을 Navigation destination으로 구성한다.
 - [x] 장바구니 화면을 Navigation destination으로 구성한다.
-- [ ] 상품 추천 화면을 Navigation destination으로 구성한다.
+- [x] 상품 추천 화면을 Navigation destination으로 구성한다.
 - [ ] 기존 Activity 전환 방식을 제거하고 `navigation-compose` 기반으로 교체한다.
 - [ ] 모든 Route는 `@Serializable` 타입으로 선언한다.
 - [ ] 화면 이동은 `NavController`를 통해 처리한다.
