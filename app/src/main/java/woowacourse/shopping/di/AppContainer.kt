@@ -7,10 +7,12 @@ import woowacourse.shopping.data.remote.NetworkMonitor
 import woowacourse.shopping.data.remote.RetrofitClient
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.data.repository.PaymentRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.data.repository.network.RetrofitCartRepository
 import woowacourse.shopping.data.repository.network.RetrofitOrderRepository
+import woowacourse.shopping.data.repository.network.RetrofitPaymentRepository
 import woowacourse.shopping.data.repository.network.RetrofitProductRepository
 import woowacourse.shopping.data.repository.room.RoomRecentProductRepository
 
@@ -40,4 +42,6 @@ class AppContainer(
     }
     val orderRepository: OrderRepository =
         RetrofitOrderRepository(networkClient.orderService)
+    val paymentRepository: PaymentRepository =
+        RetrofitPaymentRepository(networkClient.paymentService)
 }

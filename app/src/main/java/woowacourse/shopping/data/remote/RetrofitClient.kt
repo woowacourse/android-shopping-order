@@ -12,6 +12,7 @@ import woowacourse.shopping.data.remote.auth.BasicAuthEncoder
 import woowacourse.shopping.data.remote.auth.MockInterceptor
 import woowacourse.shopping.data.remote.service.CartService
 import woowacourse.shopping.data.remote.service.OrderService
+import woowacourse.shopping.data.remote.service.PaymentService
 import woowacourse.shopping.data.remote.service.ProductService
 
 object RetrofitClient {
@@ -44,4 +45,5 @@ object RetrofitClient {
     val productService: ProductService by lazy { retrofit.create() }
     val cartService: CartService by lazy { retrofit.create() }
     val orderService: OrderService by lazy { retrofit.create() }
+    val paymentService: PaymentService by lazy { retrofit.create() }
 }
