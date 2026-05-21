@@ -15,19 +15,19 @@
   - [x] 상품 목록 Route (`Shopping`) 정의
   - [x] 상품 상세 Route (`ProductDetail`) 정의 — productId 파라미터 포함
   - [x] 장바구니 Route (`Cart`) 정의
-- [ ] NavHost 및 NavController 구성
+- [x] NavHost 및 NavController 구성
   - [x] 앱 루트에 단일 `NavHost` 배치 및 시작 목적지(상품 목록) 지정
-  - [ ] 각 Route에 대응하는 `composable<Route>` 블록 작성
-  - [ ] NavController는 화면 Composable에 직접 전달하지 않고 이동 콜백 람다로 분리
+  - [x] 각 Route에 대응하는 `composable<Route>` 블록 작성
+  - [x] NavController는 화면 Composable에 직접 전달하지 않고 이동 콜백 람다로 분리
 
 ### 화면 이동 및 Back Stack 제어
-- [ ] 화면 간 이동을 NavController 기반으로 처리
-  - [ ] 상품 목록 → 상품 상세 이동 시 productId 전달
-  - [ ] 상품 상세 → 장바구니 이동
-  - [ ] 장바구니 → 상품 추천 이동
-- [ ] 주문 완료 흐름의 Back Stack 정리
-  - [ ] 주문 완료 후 상품 목록으로 이동 시 `popUpTo`로 주문 관련 화면 제거
-  - [ ] `inclusive` 옵션을 적절히 설정하여 뒤로가기 시 주문 흐름이 남지 않도록 처리
+- [x] 화면 간 이동을 NavController 기반으로 처리
+  - [x] 상품 목록 → 상품 상세 이동 시 productId 전달
+  - [x] 상품 상세 → 장바구니 이동
+  - [x] 장바구니 → 상품 추천 이동
+- [x] 주문 완료 흐름의 Back Stack 정리
+  - [x] 주문 완료 후 상품 목록으로 이동 시 `popUpTo`로 주문 관련 화면 제거
+  - [x] `inclusive` 옵션을 적절히 설정하여 뒤로가기 시 주문 흐름이 남지 않도록 처리
 
 ### 도메인 로직 / UI 상태 관리 (Flow)
 - [ ] ViewModel의 UI 상태를 `StateFlow`로 노출

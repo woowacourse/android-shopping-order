@@ -6,7 +6,10 @@ import kotlinx.serialization.Serializable
 data object Shopping
 
 @Serializable
-data class ProductDetail(val id: Long)
+data class ProductDetail(
+    val id: Long,
+    val isFromBanner: Boolean = false
+)
 
 @Serializable
 data object Cart

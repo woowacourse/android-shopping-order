@@ -19,27 +19,45 @@ fun AppNavHost(
     ) {
         composable<Shopping> {
             ShoppingScreen(
-                viewModel = TODO(),
-                onCartClick = TODO(),
-                onProductClick = TODO(),
-                onRecentProductClick = TODO()
+                onCartClick = { navController.navigate(Cart) },
+                onProductClick = { navController.navigate(ProductDetail(it)) },
             )
         }
-        
+
         composable<ProductDetail> {
             ProductDetailScreen(
-                viewModel = TODO(),
-                onCloseClick = TODO(),
-                onAddToCartClick = TODO(),
-                onLastViewedProductClick = TODO()
+                onCloseClick = {
+                    navController.navigate(Shopping) {
+                        popUpTo<Shopping> { inclusive = false }
+                        launchSingleTop = true
+                    }
+                },
+                onAddToCartClick = {
+                    navController.navigate(Shopping) {
+                        popUpTo<Shopping> { inclusive = false }
+                        launchSingleTop = true
+                    }
+                },
+                onLastViewedProductClick = {
+                    navController.navigate(
+                        ProductDetail(
+                            id = it,
+                            isFromBanner = true
+                        )
+                    )
+                }
             )
         }
-        
+
         composable<Cart> {
             CartScreen(
-                viewModel = TODO(),
-                onBackClick = TODO(),
-                onOrderClick = TODO()
+                onBackClick = { navController.popBackStack() },
+                onOrderClick = {
+                    navController.navigate(Shopping) {
+                        popUpTo<Shopping> { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
     }
