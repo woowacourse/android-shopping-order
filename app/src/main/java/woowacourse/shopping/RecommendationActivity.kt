@@ -36,16 +36,13 @@ class RecommendationActivity : ComponentActivity() {
                         ),
                 )
 
-            val totalPrice by viewModel.totalPrice.collectAsStateWithLifecycle()
-            val checkedIds by viewModel.checkedItemIds.collectAsStateWithLifecycle()
-            val cartState by viewModel.allCartItems.collectAsStateWithLifecycle()
-            val recommendedProducts by viewModel.recommendedProducts.collectAsStateWithLifecycle()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                 CartRecommendationScreen(
-                    recommendedProducts = recommendedProducts,
-                    totalPrice = totalPrice,
-                    totalCount = checkedIds.size,
+                    recommendedProducts = uiState.recommendedProducts,
+                    totalPrice = uiState.totalPrice,
+                    totalCount = uiState.checkedIds.size,
                     onBackClick = { finish() },
                     onOrderClick = { finish() },
                     onAddInCart = { viewModel.addToCart(it) },
@@ -60,8 +57,8 @@ class RecommendationActivity : ComponentActivity() {
                             }
                         startActivity(intent)
                     },
-                    isContainedInCart = { id -> cartState.isContain(id) },
-                    itemCount = { id -> cartState.totalCountOfSpecificPurchaseProduct(id) },
+                    isContainedInCart = { id -> uiState.cart.isContain(id) },
+                    itemCount = { id -> uiState.cart.totalCountOfSpecificPurchaseProduct(id) },
                     modifier = Modifier.padding(innerPadding),
                 )
             }

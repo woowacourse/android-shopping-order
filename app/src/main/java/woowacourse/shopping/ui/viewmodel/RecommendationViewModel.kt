@@ -9,12 +9,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
+import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.repository.CartRepository
 import woowacourse.shopping.data.remote.server.repository.ProductRepository
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.Products
 import woowacourse.shopping.domain.PurchaseProduct
 import woowacourse.shopping.domain.PurchaseProducts
+import woowacourse.shopping.ui.state.RecommendationUiSate
 
 class RecommendationViewModel(
     private val cartRepository: CartRepository,
@@ -23,19 +25,13 @@ class RecommendationViewModel(
     initPrice: Int,
     initCheckedItemIds: List<Long>,
 ) : ViewModel() {
-    private val _lastViewedProductCategory = MutableStateFlow<String>("")
-    val lastViewedProductCategory = _lastViewedProductCategory.asStateFlow()
-    private val _recommendedProducts = MutableStateFlow(Products(emptyList()))
-    val recommendedProducts = _recommendedProducts.asStateFlow()
-
-    private val _checkedItemsIds = MutableStateFlow(initCheckedItemIds)
-    val checkedItemIds = _checkedItemsIds.asStateFlow()
-
-    private val _allCartItems = MutableStateFlow<PurchaseProducts>(PurchaseProducts())
-    val allCartItems = _allCartItems.asStateFlow()
-
-    private val _totalPrice = MutableStateFlow(initPrice)
-    val totalPrice = _totalPrice.asStateFlow()
+    private val _uiState = MutableStateFlow(
+        RecommendationUiSate(
+            totalPrice = initPrice,
+            checkedIds = initCheckedItemIds
+        )
+    )
+    val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -45,47 +41,51 @@ class RecommendationViewModel(
     }
 
     private suspend fun fetchRecommendations() {
-        try {
-            val latestId = recentlyViewedProductRepository.getLatestItem().first()
+        val latestId = recentlyViewedProductRepository.getLatestItem().first()
 
-            if (latestId != null) {
-                val product = productRepository.getProduct(latestId)
-                _lastViewedProductCategory.value = product.category
+        if (latestId != null) {
+            val product = productRepository.getProduct(latestId)
+            val lastViewedCategory = product.category
 
-                val categoryProducts =
-                    productRepository.getCategoryProducts(
-                        category = lastViewedProductCategory.value,
-                    )
+            val categoryProducts =
+                productRepository.getCategoryProducts(
+                    category = lastViewedCategory
+                )
 
-                val cartProductIds = allCartItems.value.purchaseProducts.map { it.product.id }
+            val cartProductIds = _uiState.value.cart.purchaseProducts.map { it.product.id }
 
-                val recommendations = categoryProducts.filter { it.id !in cartProductIds }
+            val recommendations = categoryProducts.filter { it.id !in cartProductIds }
 
-                _recommendedProducts.value = Products(recommendations)
-            }
-        } catch (_: Exception) {
-            _recommendedProducts.value = Products()
+            _uiState.update { it.copy(recommendedProducts = Products(recommendations)) }
         }
     }
 
     private suspend fun fetchCart() {
-        _allCartItems.update {
-            cartRepository.getPagedCart(0, 1000000)
+        when(val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.MAX_COUNT)) {
+            is ApiResult.Success -> _uiState.update { it.copy(cart = allCartItemResult.data) }
+            is ApiResult.Error -> ""
+            is ApiResult.Exception -> ""
         }
     }
 
     fun addToCart(purchaseProduct: PurchaseProduct) {
         viewModelScope.launch {
             val existingItem =
-                allCartItems.value.purchaseProducts.find {
+                _uiState.value.cart.purchaseProducts.find {
                     it.product.id == purchaseProduct.product.id
                 }
             if (existingItem != null) {
                 cartRepository.updateCount(existingItem.id, existingItem.count + 1)
             } else {
                 cartRepository.insert(purchaseProduct)
-                _checkedItemsIds.update { it + purchaseProduct.id }
-                _totalPrice.update { it + purchaseProduct.totalPrice() }
+                val newCheckedIds = _uiState.value.checkedIds + purchaseProduct.id
+                val newTotalPrice = _uiState.value.totalPrice + purchaseProduct.totalPrice()
+                _uiState.update {
+                    it.copy(
+                        totalPrice = newTotalPrice,
+                        checkedIds = newCheckedIds
+                    )
+                }
             }
             fetchCart()
         }
@@ -96,7 +96,7 @@ class RecommendationViewModel(
         updateAmount: Int,
     ) {
         viewModelScope.launch {
-            val target = allCartItems.value.findById(id)
+            val target = _uiState.value.cart.findById(id)
             if (target != null) {
                 val nextCount = target.count + updateAmount
                 if (nextCount >= 1) {
@@ -104,9 +104,9 @@ class RecommendationViewModel(
                     fetchCart()
                 }
                 if (updateAmount > 0) {
-                    _totalPrice.update { it + target.price() }
+                    _uiState.update { it.copy(totalPrice = it.totalPrice + updateAmount) }
                 } else {
-                    _totalPrice.update { it - target.price() }
+                    _uiState.update { it.copy(totalPrice = it.totalPrice - updateAmount) }
                 }
             }
         }
@@ -114,10 +114,10 @@ class RecommendationViewModel(
 
     fun removeWithID(id: Long) {
         viewModelScope.launch {
-            val target = allCartItems.value.findById(id)
+            val target = _uiState.value.cart.findById(id)
             if (target != null) {
                 cartRepository.deleteCartItem(target.id)
-                _totalPrice.update { it - target.price() }
+                _uiState.update { it.copy(totalPrice = it.totalPrice - target.totalPrice()) }
                 fetchCart()
             }
         }
