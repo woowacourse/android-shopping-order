@@ -79,13 +79,13 @@
 - [x] UserAuthDataStore 코루틴 스코프 맴버 변수 추가
 - [x] encodedUserAuthInfo의 쓰레드 풀을 Default로 변경
 - [x] BASE_URL 네이밍 컨벤션 적용
-- [ ] 네트워크 api 호출에 대한 예외처리 추가
-  - [ ] api 호출의 결과를 Result 객체로 감싸기
-  - [ ] success와 failure에 대한 처리 추가
+- [x] 네트워크 api 호출에 대한 예외처리 추가
+  - [x] api 호출의 결과를 Result 객체로 감싸기
+  - [x] success와 failure에 대한 처리 추가
 - [x] CatalogScreen 콜백 함수 람다 제거
 - [x] ProductImage 이미지 로드 실패 시 표시할 에러 이미지 추가
 - [x] RecentlyViewedProducts LazyRow의 key값의 index 결합 제거
 - [x] 각 viewModel에 UiModel 도입
 - [x] 액티비티 별 startActivity companion object 추가
-- [] screenComposable의 파라미터로 viewModel 주입
+- [x] screenComposable의 파라미터로 viewModel 주입
 - [x] composabled에 하드코딩된 문자열 strings.xml로 이동
