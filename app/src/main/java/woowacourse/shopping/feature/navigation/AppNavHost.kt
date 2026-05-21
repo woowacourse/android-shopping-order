@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import woowacourse.shopping.feature.cart.CartScreen
+import woowacourse.shopping.feature.payment.PaymentScreen
 import woowacourse.shopping.feature.productdetail.ProductDetailScreen
 import woowacourse.shopping.feature.productlist.ProductListScreen
 import woowacourse.shopping.feature.recommend.RecommendScreen
@@ -71,14 +72,23 @@ fun AppNavHost() {
             RecommendScreen(
                 onCloseClick = { navController.popBackStack() },
                 onBuyClick = {
+                    navController.navigate(Payment)
+                },
+                contentIds = route.cartContentIds,
+            )
+        }
+
+        composable<Payment> {
+            PaymentScreen(
+                onCloseClick = { navController.popBackStack() },
+                onPaymentClick = {
                     navController.navigate(ProductList) {
                         popUpTo(ProductList) {
                             inclusive = false
                         }
                         launchSingleTop = true
                     }
-                },
-                contentIds = route.cartContentIds,
+                }
             )
         }
     }

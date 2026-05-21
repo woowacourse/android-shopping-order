@@ -129,7 +129,6 @@ fun RecommendScreen(
                 TextButton(
                     onClick = {
                         viewModel.order(contentIds)
-                        Toast.makeText(currentContext, "주문이 완료되었습니다.", Toast.LENGTH_SHORT).show()
                         onBuyClick()
                     },
                     modifier =

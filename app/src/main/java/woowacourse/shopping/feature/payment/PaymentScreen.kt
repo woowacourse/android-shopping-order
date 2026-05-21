@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.payment
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,8 +27,12 @@ import woowacourse.shopping.feature.payment.component.PurchaseInfo
 
 @Composable
 fun PaymentScreen(
-    modifier: Modifier = Modifier
+    onCloseClick: () -> Unit,
+    onPaymentClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
+    val currentContext = LocalContext.current
+
     Scaffold(
         containerColor = Color.White,
         modifier =
@@ -35,7 +41,7 @@ fun PaymentScreen(
         topBar = {
             CommonAppBar(
                 title = "결제하기",
-                onCloseClick = {}
+                onCloseClick = onCloseClick
             )
         },
     ) { innerPadding ->
@@ -122,7 +128,10 @@ fun PaymentScreen(
                     .fillMaxWidth()
                     .height(78.dp)
                     .background(Color(0xff555555)),
-                onClick = {}
+                onClick = {
+                    onPaymentClick()
+                    Toast.makeText(currentContext, "주문이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+                }
             )
         }
     }
@@ -131,5 +140,8 @@ fun PaymentScreen(
 @Preview(showBackground = true)
 @Composable
 fun PaymentScreenPreview() {
-    PaymentScreen()
+    PaymentScreen(
+        onCloseClick = {},
+        onPaymentClick = {}
+    )
 }
