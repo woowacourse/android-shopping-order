@@ -24,6 +24,7 @@ fun ShoppingScreenSkeleton(modifier: Modifier = Modifier) {
             cartCount = 0,
             modifier = Modifier,
             onCartClick = {},
+            onSettingsClick = {}
         )
 
         ProductGroup(

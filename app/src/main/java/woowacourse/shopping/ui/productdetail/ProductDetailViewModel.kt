@@ -19,7 +19,7 @@ import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.di.AppContainer
-import woowacourse.shopping.navigation.ProductDetail
+import woowacourse.shopping.ui.navigation.ProductDetail
 import woowacourse.shopping.ui.common.error.ErrorMessageMapper
 
 class ProductDetailViewModel(

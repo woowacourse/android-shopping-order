@@ -41,6 +41,7 @@ private const val LOAD_SIZE = 20
 fun ShoppingScreen(
     onCartClick: () -> Unit,
     onProductClick: (Long) -> Unit,
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ShoppingViewModel = viewModel(
         factory = ShoppingViewModel.provideFactory(
@@ -93,6 +94,7 @@ fun ShoppingScreen(
                 onIncreaseClick = { viewModel.increase(it) },
                 onDecreaseClick = { viewModel.decrease(it) },
                 onRecentProductClick = { onProductClick(it.id) },
+                onSettingsClick = onSettingsClick,
             )
 
             if (state.isLoading) ShoppingScreenSkeleton()
@@ -107,13 +109,14 @@ fun ShoppingScreen(
     cartCount: Int,
     hasNext: Boolean,
     lazyGridState: LazyGridState,
-    modifier: Modifier = Modifier,
     onCartClick: () -> Unit,
     onProductClick: (Product) -> Unit,
     onMoreClick: () -> Unit,
     onIncreaseClick: (ProductUiModel) -> Unit,
     onDecreaseClick: (ProductUiModel) -> Unit,
     onRecentProductClick: (Product) -> Unit,
+    onSettingsClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
@@ -122,6 +125,7 @@ fun ShoppingScreen(
         ShoppingTopBar(
             cartCount = cartCount,
             onCartClick = onCartClick,
+            onSettingsClick = onSettingsClick,
         )
 
         if (recentProducts.any()) {
@@ -186,6 +190,7 @@ private fun ShoppingScreenPreview1() {
         onDecreaseClick = {},
         modifier = Modifier,
         onRecentProductClick = {},
+        onSettingsClick = {}
     )
 }
 
@@ -205,5 +210,6 @@ private fun ShoppingScreenPreview2() {
         onDecreaseClick = {},
         modifier = Modifier,
         onRecentProductClick = {},
+        onSettingsClick = {}
     )
 }

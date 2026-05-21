@@ -25,7 +25,7 @@ fun PaymentScreen(
         discountPrice = TODO(),
         deliveryFee = DELIVERY_FEE,
         totalPrice = TODO(),
-        modifier = TODO(),
+        modifier = modifier,
         onBackClick = TODO(),
         onCouponSelected = TODO(),
         onPayClick = TODO()
@@ -83,7 +83,7 @@ private fun PaymentScreenPreview() {
         Coupon.BuyXGetY(
             id = 2,
             code = "",
-            description = "",
+            description = "2개 구매 시 1개 무료 쿠폰",
             expirationDate = LocalDate.of(2026,8,31),
             buyQuantity = 3,
             getQuantity = 1

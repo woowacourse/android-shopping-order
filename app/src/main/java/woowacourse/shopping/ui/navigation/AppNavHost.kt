@@ -1,12 +1,14 @@
-package woowacourse.shopping.navigation
+package woowacourse.shopping.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import woowacourse.shopping.ui.cart.CartScreen
 import woowacourse.shopping.ui.productdetail.ProductDetailScreen
+import woowacourse.shopping.ui.settings.SettingsScreen
 import woowacourse.shopping.ui.shopping.ShoppingScreen
 
 @Composable
@@ -21,6 +23,7 @@ fun AppNavHost(
             ShoppingScreen(
                 onCartClick = { navController.navigate(Cart) },
                 onProductClick = { navController.navigate(ProductDetail(it)) },
+                onSettingsClick = { navController.navigate(Settings) }
             )
         }
 
@@ -58,6 +61,13 @@ fun AppNavHost(
                         launchSingleTop = true
                     }
                 }
+            )
+        }
+
+        composable<Settings> {
+            SettingsScreen(
+                onBackClick = { navController.popBackStack() },
+                modifier = Modifier
             )
         }
     }

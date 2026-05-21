@@ -1,4 +1,4 @@
-package woowacourse.shopping.navigation
+package woowacourse.shopping.ui.navigation
 
 import kotlinx.serialization.Serializable
 
@@ -13,3 +13,6 @@ data class ProductDetail(
 
 @Serializable
 data object Cart
+
+@Serializable
+data object Settings
