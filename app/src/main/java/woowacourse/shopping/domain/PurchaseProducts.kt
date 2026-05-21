@@ -36,6 +36,8 @@ class PurchaseProducts(
 
     fun totalCount() = purchaseProducts.sumOf { it.count }
 
+    fun size() = purchaseProducts.size
+
     fun isContain(id: Long): Boolean = purchaseProducts.any { it.productId() == id }
 
     fun findPurchaseProductById(id: Long): PurchaseProduct? = purchaseProducts.find { it.id == id }
