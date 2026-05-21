@@ -22,11 +22,10 @@ class CartViewModel(
     private val productRepo: ProductRepository,
     private val cartRepo: CartRepository,
     private val orderRepo: OrderRepository,
-    private val pageSize: Int,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState = _uiState.asStateFlow()
-    val pager = Pager(pageSize)
+    val pager = Pager(PAGE_SIZE)
 
     init {
         viewModelScope.launch {
@@ -253,7 +252,7 @@ class CartViewModel(
 
     private suspend fun refreshData() {
         val requestedPage = _uiState.value.currentPage
-        val cartPage = cartRepo.getCartPage(page = requestedPage, count = pageSize)
+        val cartPage = cartRepo.getCartPage(page = requestedPage, count = PAGE_SIZE)
         val totalPrice = calculatePrice()
         val totalSelectedCount = calculateTotalSelectedCount()
 
@@ -296,10 +295,11 @@ class CartViewModel(
 
     companion object {
         const val MAX_RECOMMEND_ITEM_SIZE = 20
+        const val PAGE_SIZE = 5
+
 
         fun provideFactory(
             container: AppContainer,
-            pageSize: Int,
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T =
@@ -308,7 +308,6 @@ class CartViewModel(
                         productRepo = container.productRepository,
                         cartRepo = container.cartRepository,
                         orderRepo = container.orderRepository,
-                        pageSize = pageSize,
                     ) as T
             }
     }

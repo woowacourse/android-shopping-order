@@ -26,7 +26,7 @@ class CartActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val viewModel: CartViewModel =
                         viewModel(
-                            factory = CartViewModel.provideFactory(container, PAGE_SIZE),
+                            factory = CartViewModel.provideFactory(container),
                         )
 
                     CartScreen(
@@ -38,9 +38,5 @@ class CartActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    companion object {
-        const val PAGE_SIZE = 5
     }
 }
