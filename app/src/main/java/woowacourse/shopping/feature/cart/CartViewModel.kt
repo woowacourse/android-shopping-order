@@ -5,12 +5,16 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.UiEvent
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartContent
@@ -34,6 +38,9 @@ class CartViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
+
+    private val _event = MutableSharedFlow<UiEvent>()
+    val event: SharedFlow<UiEvent> = _event.asSharedFlow()
 
     private var cart: Cart = Cart(emptyList())
 
@@ -76,7 +83,12 @@ class CartViewModel(
     private fun mergeCheckMap(
         cartContents: List<CartItemUiModel>,
         previous: Map<String, Boolean>,
-    ): Map<String, Boolean> = cartContents.associate { it.contentId to (previous[it.contentId] ?: false) }
+    ): Map<String, Boolean> = cartContents.associate {
+        it.contentId to (
+            previous[it.contentId]
+                ?: false
+            )
+    }
 
     private fun calculateTotalPrice(
         cartContents: List<CartItemUiModel>,
@@ -142,8 +154,14 @@ class CartViewModel(
     fun decrease(contentId: String) {
         launchCatching {
             _uiState.update { it.copy(isLoading = true) }
+            val prevCartContentSize = _uiState.value.paginatedCartContents.size
             cartRepository.decrease(contentId)
             cart = getCart()
+            val cartContents = pagination(uiState.value.page)
+            if (cartContents.size != prevCartContentSize) {
+                _event.emit(UiEvent.ShowSnackbar("상품이 삭제되었습니다."))
+            }
+
             applyContents(pagination(uiState.value.page))
         }
     }
@@ -154,6 +172,7 @@ class CartViewModel(
             cartRepository.remove(id)
             cart = getCart()
             applyContents(pagination(uiState.value.page))
+            _event.emit(UiEvent.ShowSnackbar("상품이 삭제되었습니다."))
         }
     }
 
@@ -173,7 +192,8 @@ class CartViewModel(
 
     fun cartItemCheck(productId: String) {
         val checkMap = _uiState.value.checkMap.toMutableMap()
-        checkMap[productId] = checkMap[productId]?.not() ?: false
+        checkMap[productId] = checkMap[productId]?.not()
+            ?: false
         val cartItemUiModels = _uiState.value.paginatedCartContents
         val totalPrice = calculateTotalPrice(cartItemUiModels, checkMap)
         _uiState.update { it.copy(checkMap = checkMap.toMap(), totalPrice = totalPrice) }

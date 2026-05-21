@@ -21,8 +21,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import woowacourse.shopping.UiEvent
 import woowacourse.shopping.feature.common.state.ErrorDialog
-import woowacourse.shopping.feature.productlist.ProductListEvent
 import woowacourse.shopping.feature.productlist.ProductListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +40,7 @@ fun ProductListScreen(
         vm.initialLoading()
         vm.event.collect { event ->
             when (event) {
-                is ProductListEvent.ShowSnackbar -> {
+                is UiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(event.message)
                 }
             }

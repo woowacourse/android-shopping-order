@@ -16,11 +16,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import woowacourse.shopping.UiEvent
 import woowacourse.shopping.constants.MockData
 import woowacourse.shopping.feature.cart.CartUiState
 import woowacourse.shopping.feature.cart.CartViewModel
@@ -45,8 +49,16 @@ fun CartScreen(
     modifier: Modifier = Modifier,
     viewModel: CartViewModel = viewModel(factory = CartViewModel.Factory),
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(Unit) {
         viewModel.initialLoading()
+        viewModel.event.collect { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(event.message)
+                }
+            }
+        }
     }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -64,6 +76,7 @@ fun CartScreen(
 
     CartScreenContent(
         uiState = uiState,
+        snackbarHostState = snackbarHostState,
         onToRecommendIntent = {
             onToRecommendIntent(
                 uiState.checkMap.entries.filter { it.value }.map {
@@ -101,8 +114,10 @@ fun CartScreenContent(
     canPrev: Boolean,
     canNext: Boolean,
     modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState,
 ) {
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = Color.White,
         modifier = modifier
             .fillMaxSize(),
@@ -215,6 +230,10 @@ private fun CartScreenContentPreview() {
                 )
             },
         ),
+        onToRecommendIntent = {},
+        onChecked = { _ -> },
+        onTotalCheck = {},
+        onCloseClick = {},
         onDelete = {},
         onIncrease = {},
         onDecrease = {},
@@ -222,9 +241,6 @@ private fun CartScreenContentPreview() {
         onNext = {},
         canPrev = true,
         canNext = true,
-        onCloseClick = {},
-        onChecked = { _ -> },
-        onTotalCheck = {},
-        onToRecommendIntent = {},
+        snackbarHostState = SnackbarHostState(),
     )
 }

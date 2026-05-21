@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.UiEvent
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
@@ -23,12 +24,6 @@ import woowacourse.shopping.domain.ProductNotFoundException
 import woowacourse.shopping.feature.common.state.AppError
 import woowacourse.shopping.feature.common.state.ProductUiModel
 import woowacourse.shopping.feature.common.state.toAppError
-
-sealed interface ProductListEvent {
-    data class ShowSnackbar(
-        val message: String,
-    ) : ProductListEvent
-}
 
 data class ProductListUiState(
     val productUiModels: List<ProductUiModel> = emptyList(),
@@ -49,8 +44,8 @@ class ProductListViewModel(
     private val _uiState = MutableStateFlow(ProductListUiState())
     val uiState: StateFlow<ProductListUiState> = _uiState.asStateFlow()
 
-    private val _event = MutableSharedFlow<ProductListEvent>()
-    val event: SharedFlow<ProductListEvent> = _event.asSharedFlow()
+    private val _event = MutableSharedFlow<UiEvent>()
+    val event: SharedFlow<UiEvent> = _event.asSharedFlow()
 
     private var products: List<Product> = emptyList()
     private var cart: Cart = Cart(emptyList())
@@ -96,7 +91,7 @@ class ProductListViewModel(
             }
             refreshCart()
             _uiState.update { it.copy(isLoading = false) }
-            _event.emit(ProductListEvent.ShowSnackbar("상품이 담겼습니다."))
+            _event.emit(UiEvent.ShowSnackbar("상품이 담겼습니다."))
         }
     }
 
