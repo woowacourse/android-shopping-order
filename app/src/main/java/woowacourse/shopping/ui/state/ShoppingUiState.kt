@@ -9,6 +9,7 @@ data class ShoppingUiState(
     val cart: PurchaseProducts = PurchaseProducts(),
     val currentIndex: Int = 0,
     val isLoading: Boolean = false,
+    val errorMsg: String? = null,
 ) {
     fun totalCartCount() = cart.totalCount()
 }
