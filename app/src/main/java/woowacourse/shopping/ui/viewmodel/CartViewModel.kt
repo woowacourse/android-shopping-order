@@ -31,7 +31,7 @@ class CartViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            val allItemsResult = cartRepository.getPagedCart(0, ViewModelConst.MAX_COUNT)
+            val allItemsResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
             val pagedItemsResult = cartRepository.getPagedCart(_uiState.value.currentPage, PAGE_SIZE)
 
             if(allItemsResult is ApiResult.Success && pagedItemsResult is ApiResult.Success) {

@@ -31,7 +31,7 @@ class ProductDetailViewModel(
 
     init {
         viewModelScope.launch {
-            val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.MAX_COUNT)
+            val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
             when(allCartItemResult) {
                 is ApiResult.Success -> _cart.update { allCartItemResult.data }
                 is ApiResult.Error -> ""

@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -8,7 +7,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -19,7 +17,6 @@ import woowacourse.shopping.data.remote.server.repository.ProductRepository
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.Products
 import woowacourse.shopping.domain.PurchaseProduct
-import woowacourse.shopping.domain.PurchaseProducts
 import woowacourse.shopping.ui.state.ShoppingUiState
 
 class ShoppingViewModel(
@@ -81,7 +78,7 @@ class ShoppingViewModel(
     }
 
     suspend fun fetchCart() {
-        when(val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.MAX_COUNT)) {
+        when(val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)) {
             is ApiResult.Success -> {
                 _uiState.update { it.copy(cart = allCartItemResult.data) }
             }

@@ -15,7 +15,6 @@ import woowacourse.shopping.data.remote.server.repository.ProductRepository
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.Products
 import woowacourse.shopping.domain.PurchaseProduct
-import woowacourse.shopping.domain.PurchaseProducts
 import woowacourse.shopping.ui.state.RecommendationUiSate
 
 class RecommendationViewModel(
@@ -61,7 +60,7 @@ class RecommendationViewModel(
     }
 
     private suspend fun fetchCart() {
-        when(val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.MAX_COUNT)) {
+        when(val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)) {
             is ApiResult.Success -> _uiState.update { it.copy(cart = allCartItemResult.data) }
             is ApiResult.Error -> ""
             is ApiResult.Exception -> ""
