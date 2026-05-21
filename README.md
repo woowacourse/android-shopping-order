@@ -1,23 +1,18 @@
 # 기능 구현 사항
 
-## UI
-- [x] 상품 목록 페이지에 데이터 로딩 전 스켈레톤 UI를 출력한다.
-- [x] 장바구니 페이지에 데이터 로딩 전 스켈레톤 UI를 출력한다.
+## Compose Navigation 화면 전환
+- [ ] 상품 목록, 상품 상세, 장바구니, 상품 추천 화면을 Navigation Component로 구성한다.
+- [ ] 각 화면 이동은 NavController를 통해 처리한다.
+    - 기존 Activity 전환 방식을 제거하고 Compose Navigation(navigation-compose)으로 교체한다.
+    - 모든 Route를 @Serializable 타입으로 선언한다.
+    - 화면 이동 시 전달하는 데이터는 타입 안전한 Route를 사용한다.
+    - NavController는 화면 Composable에 직접 전달하지 않는다. 이동 로직은 콜백 람다로 분리한다.
+- [ ] 주문 완료 후 상품 목록으로 이동할 때 주문 흐름이 Back Stack에 남지 않도록 한다.
 
-## 서버 연동
-- [x] 상품 목록 데이터를 불러온다.
-- [x] 단일 상품 데이터를 불러온다.
-- [x] 사용자 인증 정보(아이디, 패스워드)를 저장한다.
-
-## 장바구니
-- [x] 사용자의 장바구니 목록을 조회한다.
-- [x] 사용자의 장바구니에 아이템을 추가한다.
-- [x] 사용자의 장바구니에서 특정 id를 가진 상품을 삭제한다.
-- [x] 사용자의 장바구니의 상품 수량을 변경한다.
-- [x] 사용자의 장바구니의 총 상품 수량을 조회한다.
-- [x] 특정 상품만 골라 주문할 수 있다.
-- [x] 주문하기 버튼을 눌렀을 때 추천 상품 알고리즘 화면으로 이동한다.
-  - 선택된 상품은 장바구니와 독립된 결제 리스트에 담긴다.
-  - 마지막으로 본 상품의 카테고리와 일치한 상품으로 최대 10개 출력한다.
-  - 장바구니에 추가된 상품이면 출력하지 않는다.
-  - 추천된 상품을 추가하면 결제 리스트에 추가된다.
+## Flow
+- [ ] ViewModel의 UI 상태를 StateFlow로 노출한다.
+  - 기존 remember/mutableStateOf 기반 Compose State를 StateFlow/SharedFlow로 교체한다.
+  - ViewModel의 상태는 MutableStateFlow로 선언하고 StateFlow로 노출한다.
+- [ ] 장바구니 담기/삭제 등 단발성 이벤트는 SharedFlow로 처리한다.
+- [ ] 일회성 이벤트(스낵바 표시, 화면 이동 트리거 등)는 MutableSharedFlow를 사용한다.
+- [ ] Composable에서 상태를 구독할 때 collectAsStateWithLifecycle()을 사용한다.
