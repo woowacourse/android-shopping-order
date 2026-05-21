@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.remote
+package woowacourse.shopping.data.remote.auth
 
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor

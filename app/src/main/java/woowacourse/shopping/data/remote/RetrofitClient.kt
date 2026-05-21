@@ -9,6 +9,7 @@ import retrofit2.create
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.remote.auth.AuthInterceptor
 import woowacourse.shopping.data.remote.auth.BasicAuthEncoder
+import woowacourse.shopping.data.remote.auth.MockInterceptor
 import woowacourse.shopping.data.remote.service.CartService
 import woowacourse.shopping.data.remote.service.OrderService
 import woowacourse.shopping.data.remote.service.ProductService
@@ -16,7 +17,7 @@ import woowacourse.shopping.data.remote.service.ProductService
 object RetrofitClient {
     private val useMock = BuildConfig.IS_MOCK && android.os.Debug.isDebuggerConnected()
     private val BASE_URL = if (useMock) "http://localhost:8080/" else BuildConfig.BASE_URL
-    
+
     private val json =
         Json {
             ignoreUnknownKeys = true
