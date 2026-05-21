@@ -11,5 +11,5 @@ data class CartUiState(
     val isNextEnable: Boolean = false,
     val isPrevEnable: Boolean = false,
     val isPageable: Boolean = false,
-    val errorMessage: String? = null
+    val errorMsg: String? = null
 )
