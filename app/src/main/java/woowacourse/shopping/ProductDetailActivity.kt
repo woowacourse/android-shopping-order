@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -48,19 +49,18 @@ class ProductDetailActivity : ComponentActivity() {
                         ),
                 )
 
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
             AndroidshoppingTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    val count = viewModel.countState.collectAsStateWithLifecycle()
-                    val selectedProduct = viewModel.selectedProduct.collectAsStateWithLifecycle()
-                    val lastViewedProduct = viewModel.lastViewedProduct.collectAsStateWithLifecycle()
-                    selectedProduct.value?.let {
+                    uiState.product?.let {
                         ProductDetailScreen(
                             product = it,
-                            count = count.value,
-                            lastViewedProduct = lastViewedProduct.value,
+                            count = uiState.count,
+                            lastViewedProduct = uiState.lastViewProduct,
                             onLastViewedClick = {
                                 val intent = Intent(this, ProductDetailActivity::class.java)
-                                lastViewedProduct.value?.run {
+                                uiState.lastViewProduct?.run {
                                     viewModel.updateHistory(it)
                                     intent.putExtra(IntentKeys.SELECTED_PRODUCT_ID_KEY, it.id)
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -70,7 +70,7 @@ class ProductDetailActivity : ComponentActivity() {
                             onAdd = { viewModel.addCount() },
                             onMinus = { viewModel.minusCount() },
                             onAddRequest = {
-                                viewModel.addPurchaseProduct(PurchaseProduct(it.id, it, count.value))
+                                viewModel.addPurchaseProduct(PurchaseProduct(it.id, it, uiState.count))
                                 finish()
                             },
                             onClose = { finish() },

@@ -4,19 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
+import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.repository.CartRepository
 import woowacourse.shopping.data.remote.server.repository.ProductRepository
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.PurchaseProduct
 import woowacourse.shopping.domain.PurchaseProducts
+import woowacourse.shopping.ui.state.ProductDetailUIState
 
 class ProductDetailViewModel(
     private val cartRepository: CartRepository,
@@ -25,53 +23,50 @@ class ProductDetailViewModel(
     private val selectedProductId: Long,
     private val lastViewedProductId: Long?,
 ) : ViewModel() {
-    private val _count = MutableStateFlow(1)
-    val countState = _count.asStateFlow()
 
-    val selectedProduct: StateFlow<Product?> =
-        flow {
-            emit(productRepository.getProduct(selectedProductId))
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null,
-        )
-
+    private val _uiState = MutableStateFlow(ProductDetailUIState())
+    val uiState = _uiState.asStateFlow()
     private val _cart = MutableStateFlow(PurchaseProducts())
-    val cart = _cart.asStateFlow()
 
-    val lastViewedProduct: StateFlow<Product?> =
-        flow {
-            lastViewedProductId?.let {
-                emit(productRepository.getProduct(lastViewedProductId))
-            }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null,
-        )
 
     init {
         viewModelScope.launch {
-            _cart.update {
-                cartRepository.getPagedCart(0, 10000000)
+            val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.MAX_COUNT)
+            when(allCartItemResult) {
+                is ApiResult.Success -> _cart.update { allCartItemResult.data }
+                is ApiResult.Error -> ""
+                is ApiResult.Exception -> ""
             }
+            fetchProduct()
+        }
+    }
+
+    private suspend fun fetchProduct() {
+        val selectedProduct = productRepository.getProduct(selectedProductId)
+        if (lastViewedProductId != null){
+            val lastViewedProduct = productRepository.getProduct(lastViewedProductId)
+
+            _uiState.update { it.copy(product = selectedProduct, lastViewProduct = lastViewedProduct) }
+        } else {
+            _uiState.update { it.copy(product = selectedProduct) }
         }
     }
 
     fun addCount() {
-        _count.update { it + 1 }
+        val currentCount = _uiState.value.count
+        _uiState.update { it.copy(count = currentCount + 1) }
     }
 
     fun minusCount() {
-        if (countState.value > 1) {
-            _count.update { it - 1 }
+        val currentCount = _uiState.value.count
+        if (currentCount > 1) {
+            _uiState.update { it.copy(count = currentCount - 1) }
         }
     }
 
     fun addPurchaseProduct(purchaseProduct: PurchaseProduct) {
         viewModelScope.launch {
-            val existCartItem = cart.value.findById(purchaseProduct.productId())
+            val existCartItem = _cart.value.findById(purchaseProduct.productId())
             if (existCartItem != null) {
                 val newTotalCount = existCartItem.count + purchaseProduct.count
                 cartRepository.updateCount(existCartItem.id, newTotalCount)
