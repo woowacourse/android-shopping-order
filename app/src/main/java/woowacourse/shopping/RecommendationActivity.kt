@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import woowacourse.shopping.ui.component.route.RecommendationRoute
 import woowacourse.shopping.ui.component.screen.CartRecommendationScreen
 import woowacourse.shopping.ui.viewmodel.RecommendationViewModel
 import woowacourse.shopping.ui.viewmodel.RecommendationViewModelFactory
@@ -37,30 +38,19 @@ class RecommendationActivity : ComponentActivity() {
                         ),
                 )
 
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
             Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                CartRecommendationScreen(
-                    recommendedProducts = uiState.recommendedProducts,
-                    totalPrice = uiState.totalPrice,
-                    totalCount = uiState.checkedIds.size,
+                RecommendationRoute(
+                    viewModel = viewModel,
                     onBackClick = { finish() },
                     onOrderClick = { finish() },
-                    onAddInCart = { viewModel.addToCart(it) },
-                    onAdd = { id, amount -> viewModel.updateCountWithID(id, amount) },
-                    onMinus = { id, amount -> viewModel.updateCountWithID(id, amount) },
-                    onDelete = { id -> viewModel.removeWithID(id) },
-                    onItemClick = { product ->
-                        viewModel.updateHistory(product)
-                        val intent =
-                            Intent(this, ProductDetailActivity::class.java).apply {
-                                putExtra(IntentKeys.SELECTED_PRODUCT_ID_KEY, product.id)
-                            }
-                        startActivity(intent)
+                    onNavigateToProductDetail = { productId ->
+                        ProductDetailActivity.startActivity(
+                            context = this,
+                            selectedProductId = productId,
+                            lastViewedProductId = null
+                        )
                     },
-                    isContainedInCart = { id -> uiState.cart.isContain(id) },
-                    itemCount = { id -> uiState.cart.totalCountOfSpecificPurchaseProduct(id) },
-                    modifier = Modifier.padding(innerPadding),
+                    modifier = Modifier.padding(innerPadding)
                 )
             }
         }
