@@ -5,8 +5,11 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,6 +23,12 @@ import woowacourse.shopping.domain.ProductNotFoundException
 import woowacourse.shopping.feature.common.state.AppError
 import woowacourse.shopping.feature.common.state.ProductUiModel
 import woowacourse.shopping.feature.common.state.toAppError
+
+sealed interface ProductListEvent {
+    data class ShowSnackbar(
+        val message: String,
+    ) : ProductListEvent
+}
 
 data class ProductListUiState(
     val productUiModels: List<ProductUiModel> = emptyList(),
@@ -39,6 +48,9 @@ class ProductListViewModel(
 
     private val _uiState = MutableStateFlow(ProductListUiState())
     val uiState: StateFlow<ProductListUiState> = _uiState.asStateFlow()
+
+    private val _event = MutableSharedFlow<ProductListEvent>()
+    val event: SharedFlow<ProductListEvent> = _event.asSharedFlow()
 
     private var products: List<Product> = emptyList()
     private var cart: Cart = Cart(emptyList())
@@ -84,6 +96,7 @@ class ProductListViewModel(
             }
             refreshCart()
             _uiState.update { it.copy(isLoading = false) }
+            _event.emit(ProductListEvent.ShowSnackbar("상품이 담겼습니다."))
         }
     }
 
