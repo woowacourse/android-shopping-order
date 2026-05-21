@@ -21,14 +21,14 @@ fun AppNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = ShoppingRoute
+        startDestination = ShoppingRoute,
     ) {
         composable<ShoppingRoute> {
             ShoppingRouteScreen(
-                onCartClick = { navController.navigate(CartRoute)},
+                onCartClick = { navController.navigate(CartGraph) },
                 onProductClick = { productId ->
                     navController.navigate(ProductDetailRoute(productId))
-                }
+                },
             )
         }
 
@@ -40,7 +40,7 @@ fun AppNavHost(
                 onCloseClick = { navController.popBackStack() },
                 onLastViewedProductClick = { productId ->
                     navController.navigate(ProductDetailRoute(productId))
-                }
+                },
             )
         }
 
