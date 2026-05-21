@@ -25,6 +25,13 @@ android {
         )
     }
     buildTypes {
+        debug {
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"http://127.0.0.1:8080/\"",
+            )
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -79,6 +86,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.okhttp)
+    implementation(libs.okhttp3.mockwebserver)
     implementation(libs.retrofit)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit2.kotlinx.serialization.converter)

@@ -13,7 +13,6 @@ import kotlin.reflect.KClass
 
 object RetrofitClient {
     private const val BASE_URL = BuildConfig.BASE_URL
-    private const val TEMP_URL = "http://192.168.2.152:3000"
     private val json =
         Json {
             ignoreUnknownKeys = true
@@ -27,7 +26,7 @@ object RetrofitClient {
     private fun <T : Any> buildToService(clazz: KClass<T>): T =
         Retrofit
             .Builder()
-            .baseUrl(TEMP_URL)
+            .baseUrl(BASE_URL)
             .client(httpClient)
             .addConverterFactory(
                 json.asConverterFactory("application/json".toMediaType()),
