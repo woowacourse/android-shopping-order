@@ -25,7 +25,7 @@ import woowacourse.shopping.ui.productdetail.component.ProductDetailTopBar
 fun ProductDetailScreen(
     onCloseClick: () -> Unit,
     onAddToCartClick: () -> Unit,
-    onLastViewedProductClick: (Product) -> Unit,
+    onLastViewedProductClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProductDetailViewModel = viewModel(
         factory = ProductDetailViewModel.provideFactory(
@@ -56,7 +56,7 @@ fun ProductDetailScreen(
                 onIncreaseClick = { viewModel.increase() },
                 onDecreaseClick = { viewModel.decrease() },
                 lastViewedProduct = uiState.lastViewedProduct,
-                onLastViewedProductClick = onLastViewedProductClick,
+                onLastViewedProductClick = { onLastViewedProductClick(it.id) },
             )
         }
 

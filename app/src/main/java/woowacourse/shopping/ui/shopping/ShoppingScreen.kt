@@ -40,7 +40,7 @@ private const val LOAD_SIZE = 20
 @Composable
 fun ShoppingScreen(
     onCartClick: () -> Unit,
-    onProductClick: (Product) -> Unit,
+    onProductClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ShoppingViewModel = viewModel(
         factory = ShoppingViewModel.provideFactory(
@@ -88,11 +88,11 @@ fun ShoppingScreen(
                 hasNext = state.hasNext,
                 lazyGridState = lazyGridState,
                 onCartClick = onCartClick,
-                onProductClick = onProductClick,
+                onProductClick = { onProductClick(it.id) },
                 onMoreClick = { viewModel.loadMore() },
                 onIncreaseClick = { viewModel.increase(it) },
                 onDecreaseClick = { viewModel.decrease(it) },
-                onRecentProductClick = onProductClick,
+                onRecentProductClick = { onProductClick(it.id) },
             )
 
             if (state.isLoading) ShoppingScreenSkeleton()
