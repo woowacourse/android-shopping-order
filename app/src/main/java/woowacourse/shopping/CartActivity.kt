@@ -1,5 +1,6 @@
 package woowacourse.shopping
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -89,5 +90,12 @@ class CartActivity : ComponentActivity() {
     override fun onStart() {
         super.onStart()
         if (::viewModel.isInitialized) viewModel.fetchCart()
+    }
+
+    companion object {
+        fun startActivity(context: Context) {
+            val intent = Intent(context, CartActivity::class.java)
+            context.startActivity(intent)
+        }
     }
 }
