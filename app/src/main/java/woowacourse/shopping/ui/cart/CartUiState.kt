@@ -8,6 +8,7 @@ data class CartUiState(
     val pagedItems: List<CartItem> = emptyList(),
     val currentPage: Int = 1,
     val totalCartItemCount: Int = 0,
+    val totalPages: Int = 1,
     val pageSize: Int = 5,
     val selectedItemIds: Set<Long> = emptySet(),
     val totalPrice: Long = 0,
@@ -16,6 +17,5 @@ data class CartUiState(
     val isCartScreen: Boolean = true,
     val recommendItems: List<ProductUiModel> = emptyList(),
 ) {
-    val totalPages: Int get() = (totalCartItemCount - 1) / pageSize + 1
     val showPagination: Boolean get() = totalCartItemCount > pageSize
 }

@@ -2,6 +2,7 @@ package woowacourse.shopping.data.repository.network
 
 import woowacourse.shopping.data.model.Cart
 import woowacourse.shopping.data.model.CartItem
+import woowacourse.shopping.data.model.PageResult
 import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.data.remote.auth.BasicAuthEncoder
 import woowacourse.shopping.data.remote.dto.CartItemRequest
@@ -86,10 +87,10 @@ class RetrofitCartRepository(
         )
     }
 
-    override suspend fun getPagedItems(
+    override suspend fun getCartPage(
         page: Int,
         count: Int,
-    ): List<CartItem> {
+    ): PageResult<CartItem> {
         val response =
             service.getCartItems(
                 encoder.getHeader(),
@@ -97,17 +98,21 @@ class RetrofitCartRepository(
                 size = count,
             )
 
-        return response.content.map {
-            CartItem(
-                id = it.id,
-                product = it.product.toDomain(),
-                quantity = it.quantity,
-            )
-        }
+        return PageResult(
+            items =
+                response.content.map {
+                    CartItem(
+                        id = it.id,
+                        product = it.product.toDomain(),
+                        quantity = it.quantity,
+                    )
+                },
+            currentPage = response.number + 1,
+            pageSize = response.size,
+            totalCount = response.totalElements.toInt(),
+            totalPages = response.totalPages,
+        )
     }
-
-    override suspend fun getSize(): Int =
-        service.getCartItems(auth = encoder.getHeader(), size = 1).totalElements.toInt()
 
     override suspend fun getCartCount(): Int =
         service.getTotalCount(auth = encoder.getHeader()).quantity

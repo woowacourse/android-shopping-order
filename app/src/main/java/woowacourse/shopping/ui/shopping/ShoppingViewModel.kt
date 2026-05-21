@@ -18,7 +18,6 @@ import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.ui.common.model.ProductUiModel
-import woowacourse.shopping.ui.common.paging.Pager
 import java.io.IOException
 
 class ShoppingViewModel(
@@ -29,7 +28,6 @@ class ShoppingViewModel(
     private val loadSize: Int,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ShoppingUiState())
-    private val pager = Pager(loadSize)
     val uiState = _uiState.asStateFlow()
     val isNetworkConnected: StateFlow<Boolean> =
         networkMonitor.isConnected
@@ -55,18 +53,16 @@ class ShoppingViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                val initialProducts = productRepo.getProducts(0, loadSize)
-                val uiModels = mapToProductUiModels(initialProducts)
-
-                val hasNextPage = productRepo.hasNext(initialProducts.lastIndex)
-                val totalSize = productRepo.getSize()
+                val initialPage = productRepo.getProductPage(page = 1, count = loadSize)
+                val uiModels = mapToProductUiModels(initialPage.items)
                 val recentProducts = recentProductRepo.getRecentProducts()
 
                 _uiState.update {
                     it.copy(
+                        currentPage = initialPage.currentPage,
                         visibleProducts = uiModels,
-                        hasNext = hasNextPage,
-                        sizeInRepo = totalSize,
+                        hasNext = initialPage.hasNext,
+                        totalProductCount = initialPage.totalCount,
                         recentProducts = recentProducts,
                         errorMessage = null,
                     )
@@ -159,29 +155,22 @@ class ShoppingViewModel(
 
     fun loadMore() {
         val currentState = _uiState.value
-        if (!pager.canLoadMore(currentState.visibleProducts.size, currentState.sizeInRepo)) return
+        if (!currentState.hasNext) return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                val currentSize = _uiState.value.visibleProducts.size
-                val currentProducts = _uiState.value.visibleProducts
-                val newProducts =
-                    productRepo.getProducts(
-                        fromIndex = currentSize,
-                        count = loadSize,
-                    )
-                val newUiModels = mapToProductUiModels(newProducts)
-                val combineProducts = currentProducts + newUiModels
-                val totalSize = productRepo.getSize()
-                val hasNext = pager.canLoadMore(combineProducts.size, totalSize)
+                val nextPage = currentState.currentPage + 1
+                val pageResult = productRepo.getProductPage(page = nextPage, count = loadSize)
+                val newUiModels = mapToProductUiModels(pageResult.items)
+                val combineProducts = currentState.visibleProducts + newUiModels
 
                 _uiState.update {
                     it.copy(
-                        visibleCount = minOf(it.visibleCount + loadSize, totalSize),
+                        currentPage = pageResult.currentPage,
                         visibleProducts = combineProducts,
-                        hasNext = hasNext,
-                        sizeInRepo = totalSize,
+                        hasNext = pageResult.hasNext,
+                        totalProductCount = pageResult.totalCount,
                         errorMessage = null,
                     )
                 }

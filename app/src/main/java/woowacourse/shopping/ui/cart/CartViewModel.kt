@@ -227,7 +227,7 @@ class CartViewModel(
                 val products =
                     ProductRecommender.recommendProduct(
                         lastViewedItem = recentProductRepo.getLastViewedProduct(),
-                        allProductItems = productRepo.getProducts(0, 50),
+                        allProductItems = productRepo.getProductPage(page = 1, count = 50).items,
                         allCartItem = cartRepo.getAllCartItems().items,
                         MAX_RECOMMEND_ITEM_SIZE
                     )
@@ -252,23 +252,18 @@ class CartViewModel(
     }
 
     private suspend fun refreshData() {
-        val totalCartItemCount = cartRepo.getSize()
-        val totalPages = pager.getTotalPages(totalCartItemCount)
-        val validCurrentPage = _uiState.value.currentPage.coerceIn(1, totalPages)
+        val requestedPage = _uiState.value.currentPage
+        val cartPage = cartRepo.getCartPage(page = requestedPage, count = pageSize)
         val totalPrice = calculatePrice()
         val totalSelectedCount = calculateTotalSelectedCount()
-        val items =
-            cartRepo.getPagedItems(
-                page = validCurrentPage,
-                count = pageSize,
-            )
 
         _uiState.update {
             it.copy(
-                currentPage = validCurrentPage,
-                pagedItems = items,
-                totalCartItemCount = totalCartItemCount,
-                pageSize = pageSize,
+                currentPage = cartPage.currentPage,
+                pagedItems = cartPage.items,
+                totalCartItemCount = cartPage.totalCount,
+                totalPages = cartPage.totalPages,
+                pageSize = cartPage.pageSize,
                 totalPrice = totalPrice,
                 totalSelectedCount = totalSelectedCount,
             )

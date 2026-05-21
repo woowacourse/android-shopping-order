@@ -1,16 +1,13 @@
 package woowacourse.shopping.data.repository
 
+import woowacourse.shopping.data.model.PageResult
 import woowacourse.shopping.data.model.Product
 
 interface ProductRepository {
-    suspend fun getSize(): Int
-
-    suspend fun getProducts(
-        fromIndex: Int,
+    suspend fun getProductPage(
+        page: Int,
         count: Int,
-    ): List<Product>
-
-    suspend fun hasNext(currentIndex: Int): Boolean
+    ): PageResult<Product>
 
     suspend fun findProduct(id: Long): Product?
 }

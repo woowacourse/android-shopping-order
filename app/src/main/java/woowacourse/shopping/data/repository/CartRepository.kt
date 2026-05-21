@@ -2,6 +2,7 @@ package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.model.Cart
 import woowacourse.shopping.data.model.CartItem
+import woowacourse.shopping.data.model.PageResult
 import woowacourse.shopping.data.model.Product
 
 interface CartRepository {
@@ -16,12 +17,10 @@ interface CartRepository {
 
     suspend fun delete(item: Product)
 
-    suspend fun getPagedItems(
+    suspend fun getCartPage(
         page: Int,
         count: Int,
-    ): List<CartItem>
-
-    suspend fun getSize(): Int
+    ): PageResult<CartItem>
 
     suspend fun getCartCount(): Int
 
