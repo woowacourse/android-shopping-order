@@ -1,0 +1,374 @@
+package woowacourse.shopping.navigation
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
+import woowacourse.shopping.backend.retrofit.dto.OrderInfo
+import woowacourse.shopping.backend.retrofit.viewmodel.OrderViewModel
+import woowacourse.shopping.navigation.Route.Cart
+import woowacourse.shopping.navigation.Route.ProductDetail
+import woowacourse.shopping.navigation.Route.ProductList
+import woowacourse.shopping.model.ShoppingCartItem
+import woowacourse.shopping.model.ShoppingItem
+import woowacourse.shopping.ui.component.MoreButton
+import woowacourse.shopping.ui.component.PageNavigation
+import woowacourse.shopping.ui.recommend.ShoppingCartRecommendSection
+import woowacourse.shopping.ui.screen.DetailProductScreen
+import woowacourse.shopping.ui.screen.OrderButton
+import woowacourse.shopping.ui.screen.ProductListScreen
+import woowacourse.shopping.ui.screen.ShoppingCartScreen
+import woowacourse.shopping.ui.state.ShoppingCartState
+import woowacourse.shopping.ui.viewmodel.DetailProductViewModel
+import woowacourse.shopping.ui.viewmodel.ProductListViewModel
+import woowacourse.shopping.ui.viewmodel.ShoppingCartItemViewModel
+import woowacourse.shopping.ui.viewmodel.ShoppingCartRecommendViewModel
+import woowacourse.shopping.ui.viewmodel.ShoppingCartRecommendViewModel.ShoppingCartStep
+
+@Composable
+fun ShoppingNavHost(
+    navController: NavHostController,
+    viewModelFactory: ViewModelProvider.Factory,
+) {
+    NavHost(
+        navController = navController,
+        startDestination = ProductList,
+    ) {
+        composable<ProductList> { backStackEntry ->
+            val productListViewModel: ProductListViewModel = viewModel(
+                viewModelStoreOwner = backStackEntry,
+                factory = viewModelFactory
+            )
+
+            val uiState by productListViewModel.uiState.collectAsStateWithLifecycle()
+
+            LaunchedEffect(
+                uiState.shoppingItems.isEmpty(),
+                uiState.isLoading,
+                uiState.hasError,
+            ) {
+                if (uiState.shoppingItems.isEmpty() && !uiState.isLoading && !uiState.hasError) {
+                    productListViewModel.requestProducts(size = MAX_PRODUCT_SIZE)
+                }
+            }
+
+            LaunchedEffect(productListViewModel) {
+                productListViewModel.event.collect { event ->
+                    when (event) {
+                        is ProductListViewModel.ProductListEvent.NavigateToDetailProduct -> {
+                            navController.navigate(
+                                ProductDetail(
+                                    productId = event.productId,
+                                    showLastViewed = event.showLastViewed,
+                                ),
+                            )
+                        }
+
+                        ProductListViewModel.ProductListEvent.NavigateToShoppingCart -> {
+                            navController.navigate(Cart)
+                        }
+                    }
+                }
+            }
+
+            ProductListScreen(
+                shoppingItems = uiState.shoppingItems,
+                recentViewedShoppingItems = uiState.recentViewedShoppingItems,
+                shoppingCartTotalCount = uiState.shoppingCartTotalCount,
+                isNetworkConnected = uiState.isNetworkConnected,
+                state = uiState,
+                onAddToCartClick = { shoppingItem ->
+                    productListViewModel.addProductToCart(shoppingItem)
+                },
+                onQuantityPlusClick = { shoppingItem ->
+                    productListViewModel.increaseProductQuantity(shoppingItem)
+                },
+                onQuantityMinusClick = { shoppingItem ->
+                    productListViewModel.decreaseProductQuantity(shoppingItem)
+                },
+                onProductClick = productListViewModel::onProductClick,
+                onRecentViewedProductClick = productListViewModel::onRecentViewedProductClick,
+                onNavigateToCartClick = productListViewModel::onNavigateToCartClick,
+                bottomContent =
+                    if (uiState.canLoadNextPage) {
+                        {
+                            MoreButton(
+                                onClick = productListViewModel::loadNextPage,
+                            )
+                        }
+                    } else {
+                        null
+                    },
+            )
+        }
+
+        composable<ProductDetail> { backStackEntry ->
+            val route = backStackEntry.toRoute<ProductDetail>()
+            val productDetailViewModel: DetailProductViewModel = viewModel(
+                viewModelStoreOwner = backStackEntry,
+                factory = viewModelFactory
+            )
+
+            LaunchedEffect(route.productId, route.showLastViewed) {
+                productDetailViewModel.initialize(
+                    productId = route.productId,
+                    showLastViewed = route.showLastViewed,
+                )
+                productDetailViewModel.loadProductDetail(route.productId)
+            }
+
+            val uiState by productDetailViewModel.uiState.collectAsStateWithLifecycle()
+            val shoppingItem = uiState.shoppingItem
+            if (shoppingItem != null) {
+                DetailProductScreen(
+                    shoppingItem = shoppingItem,
+                    lastViewedShoppingItem = uiState.lastViewedShoppingItem,
+                    onAddToCartClick = {
+                        productDetailViewModel.addSelectedProductToCart()
+                        navController.popBackStack()
+                    },
+                    onLastViewedProductClick = { selectedProductId ->
+                        navController.navigate(
+                            ProductDetail(
+                                productId = selectedProductId,
+                                showLastViewed = false,
+                            )
+                        )
+                    },
+                    onBackClick = { navController.popBackStack() },
+                    quantity = uiState.selectedQuantity,
+                    quantityPrice = uiState.quantityPrice,
+                    onQuantityPlusClick = productDetailViewModel::increaseSelectedQuantity,
+                    onQuantityMinusClick = productDetailViewModel::decreaseSelectedQuantity,
+                )
+            }
+        }
+
+        composable<Cart> { backStackEntry ->
+            val shoppingCartViewModel: ShoppingCartItemViewModel = viewModel(
+                viewModelStoreOwner = backStackEntry,
+                factory = viewModelFactory
+            )
+
+            LaunchedEffect(shoppingCartViewModel) {
+                shoppingCartViewModel.requestCartItems()
+            }
+
+            LaunchedEffect(shoppingCartViewModel) {
+                shoppingCartViewModel.event.collect { event ->
+                    when (event) {
+                        ShoppingCartItemViewModel.ShoppingCartEvent.NavigateBack -> {
+                            navController.popBackStack()
+                        }
+                    }
+                }
+            }
+
+            val shoppingCartRecommendViewModel: ShoppingCartRecommendViewModel = viewModel(
+                viewModelStoreOwner = backStackEntry,
+                factory = viewModelFactory
+            )
+            val orderViewModel: OrderViewModel = viewModel(
+                viewModelStoreOwner = backStackEntry,
+                factory = viewModelFactory,
+            )
+            val shoppingCartItems by shoppingCartViewModel.shoppingCartItems.collectAsStateWithLifecycle()
+            val selectedCartItemIds by shoppingCartViewModel.selectedCartItemIds.collectAsStateWithLifecycle()
+            val selectedItemCount = selectedCartItemIds.size
+            val recommendUiState by shoppingCartRecommendViewModel.uiState.collectAsStateWithLifecycle()
+
+            val uiState by shoppingCartViewModel.uiState.collectAsStateWithLifecycle()
+            val isLoading = uiState.isLoading
+            val errorMessage = uiState.errorMessage
+            val hasApiError = errorMessage != null
+            val visibleItems =
+                if (hasApiError) {
+                    emptyList()
+                } else {
+                    shoppingCartItems.items
+                }
+            val visiblePagedItems =
+                if (hasApiError) {
+                    emptyList()
+                } else {
+                    shoppingCartItems.pagedItems
+                }
+            LaunchedEffect(shoppingCartItems, selectedCartItemIds) {
+                shoppingCartRecommendViewModel.updateCartSnapshot(
+                    shoppingCartItems = shoppingCartItems.items,
+                    selectedCartItemIds = selectedCartItemIds,
+                )
+            }
+            val state =
+                ShoppingCartState(
+                    items = visibleItems,
+                    selectedCartItemIds = selectedCartItemIds,
+                    isLoading = isLoading,
+                    errorMessage = errorMessage,
+                    currentPage = shoppingCartItems.currentPage,
+                    selectedItemCount = selectedItemCount,
+                    canOrder = selectedItemCount > 0 && !isLoading,
+                    canMoveToPreviousPage =
+                        if (hasApiError) false else shoppingCartItems.canMoveToPreviousPage,
+                    canMoveToNextPage = if (hasApiError) false else shoppingCartItems.canMoveToNextPage,
+                )
+
+            BackHandler(enabled = recommendUiState.currentStep == ShoppingCartStep.RECOMMENT) {
+                shoppingCartRecommendViewModel.moveToCart()
+            }
+            if (recommendUiState.currentStep == ShoppingCartStep.CART) {
+                ShoppingCartScreen(
+                    shoppingCartItems = visiblePagedItems,
+                    getQuantityPrice = shoppingCartViewModel::getQuantityPrice,
+                    state = state,
+                    onBackClick = shoppingCartViewModel::onBackClick,
+                    onRemoveShoppingItemClick = { shoppingCartItem ->
+                        shoppingCartViewModel.removeShoppingItem(shoppingCartItem)
+                    },
+                    onToggleShoppingItemSelectionClick = { cartItemId, isSelected ->
+                        shoppingCartViewModel.setShoppingCartItemSelection(
+                            cartItemId = cartItemId,
+                            isSelected = isSelected,
+                        )
+                    },
+                    onIncreaseShoppingItemQuantityClick = { shoppingCartItem ->
+                        shoppingCartViewModel.increaseShoppingItemQuantity(shoppingCartItem)
+                    },
+                    onDecreaseShoppingItemQuantityClick = { shoppingCartItem ->
+                        shoppingCartViewModel.decreaseShoppingItemQuantity(shoppingCartItem)
+                    },
+                ) {
+                    PageNavigation(
+                        currentPage = shoppingCartItems.currentPage,
+                        canMoveToPreviousPage = if (hasApiError) false else shoppingCartItems.canMoveToPreviousPage,
+                        canMoveToNextPage = if (hasApiError) false else shoppingCartItems.canMoveToNextPage,
+                        onBeforePageClick = shoppingCartViewModel::moveToPreviousPage,
+                        onNextPageClick = shoppingCartViewModel::moveToNextPage,
+                    )
+                    OrderButton(
+                        shoppingCartItems = shoppingCartItems.items,
+                        selectedCartItemIds = selectedCartItemIds,
+                        shoppingCartSelectItemCount = selectedItemCount,
+                        onOrderButtonClick = { selectedCartItemIds ->
+                            if (selectedCartItemIds.isEmpty()) {
+                                return@OrderButton
+                            }
+                            if (recommendUiState.recommendedShoppingItems.isNotEmpty()) {
+                                shoppingCartRecommendViewModel.moveToRecommend()
+                                return@OrderButton
+                            }
+
+                            submitOrder(
+                                orderViewModel = orderViewModel,
+                                shoppingCartViewModel = shoppingCartViewModel,
+                                shoppingCartRecommendViewModel = shoppingCartRecommendViewModel,
+                                baseSelectedCartItemIds = selectedCartItemIds.toSet(),
+                                recommendedShoppingItems = emptyList(),
+                                shoppingCartItems = shoppingCartItems.items,
+                            )
+                        },
+                        checked = shoppingCartItems.items.isNotEmpty() && selectedItemCount == shoppingCartItems.items.size,
+                        orderComplete = shoppingCartItems.items.isNotEmpty(),
+                        totalPrice = shoppingCartViewModel.getTotalPrice(
+                            shoppingCartItems = shoppingCartItems.items,
+                            selectedCartItemIds = selectedCartItemIds,
+                        ),
+                        onToggleShoppingItemSelectionClick = { cartItemIds, isSelected ->
+                            shoppingCartViewModel.setShoppingCartItemsSelection(
+                                cartItemIds = cartItemIds,
+                                isSelected = isSelected,
+                            )
+                        },
+                    )
+                }
+            } else {
+                ShoppingCartRecommendSection(
+                    recommendedShoppingItems = recommendUiState.recommendedShoppingItems,
+                    baseSelectedCartItemCount = selectedCartItemIds.size,
+                    totalPrice = recommendUiState.selectedCartTotalPrice + recommendUiState.selectedRecommendTotalPrice,
+                    onBackClick = shoppingCartViewModel::onBackClick,
+                    onOrderButtonClick = {
+                        submitOrder(
+                            orderViewModel = orderViewModel,
+                            shoppingCartViewModel = shoppingCartViewModel,
+                            shoppingCartRecommendViewModel = shoppingCartRecommendViewModel,
+                            baseSelectedCartItemIds = selectedCartItemIds,
+                            recommendedShoppingItems = recommendUiState.recommendedShoppingItems,
+                            shoppingCartItems = shoppingCartItems.items,
+                        )
+                    },
+                    onAddToCartClick = { shoppingItem ->
+                        shoppingCartViewModel.addOrIncreaseByProductId(
+                            productId = shoppingItem.getProductId(),
+                        )
+                    },
+                    onQuantityPlusClick = { shoppingItem ->
+                        shoppingCartViewModel.addOrIncreaseByProductId(
+                            productId = shoppingItem.getProductId(),
+                        )
+                    },
+                    onQuantityMinusClick = { shoppingItem ->
+                        shoppingCartViewModel.decreaseByProductId(
+                            productId = shoppingItem.getProductId(),
+                        )
+                    },
+                )
+            }
+        }
+    }
+}
+
+private fun submitOrder(
+    orderViewModel: OrderViewModel,
+    shoppingCartViewModel: ShoppingCartItemViewModel,
+    shoppingCartRecommendViewModel: ShoppingCartRecommendViewModel,
+    baseSelectedCartItemIds: Set<Long>,
+    recommendedShoppingItems: List<ShoppingItem>,
+    shoppingCartItems: List<ShoppingCartItem>,
+) {
+    val recommendedCartItemIds =
+        resolveRecommendedCartItemIds(
+            recommendedShoppingItems = recommendedShoppingItems,
+            shoppingCartItems = shoppingCartItems,
+        )
+    val orderedCartItemIds = linkedSetOf<Long>().apply {
+        addAll(baseSelectedCartItemIds)
+        addAll(recommendedCartItemIds)
+    }
+    if (orderedCartItemIds.isEmpty()) {
+        return
+    }
+
+    orderViewModel.order(
+        orderInfo = OrderInfo(cartItemIds = orderedCartItemIds.toList()),
+        onSuccess = {
+            shoppingCartViewModel.completeOrder(orderedCartItemIds) {
+                shoppingCartRecommendViewModel.moveToCart()
+            }
+        },
+    )
+}
+
+private fun resolveRecommendedCartItemIds(
+    recommendedShoppingItems: List<ShoppingItem>,
+    shoppingCartItems: List<ShoppingCartItem>,
+): Set<Long> {
+    val selectedRecommendedProductIds =
+        recommendedShoppingItems
+            .filter { shoppingItem -> shoppingItem.getQuantity() > 0 }
+            .map { shoppingItem -> shoppingItem.getProductId() }
+            .toSet()
+
+    return shoppingCartItems
+        .filter { shoppingCartItem -> shoppingCartItem.product.id in selectedRecommendedProductIds }
+        .mapTo(mutableSetOf()) { shoppingCartItem -> shoppingCartItem.getId() }
+}
+
+private const val MAX_PRODUCT_SIZE = 100

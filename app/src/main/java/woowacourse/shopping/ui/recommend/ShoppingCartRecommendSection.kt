@@ -1,6 +1,6 @@
 @file:Suppress("FunctionName")
 
-package woowacourse.shopping.ui.recomment
+package woowacourse.shopping.ui.recommend
 
 import androidx.compose.runtime.Composable
 import woowacourse.shopping.model.ShoppingItem
@@ -11,7 +11,7 @@ internal fun ShoppingCartRecommendSection(
     baseSelectedCartItemCount: Int,
     totalPrice: Int,
     onBackClick: () -> Unit,
-    onOrderButtonClick: (Set<Long>) -> Unit,
+    onOrderButtonClick: () -> Unit,
     onAddToCartClick: (ShoppingItem) -> Unit,
     onQuantityPlusClick: (ShoppingItem) -> Unit,
     onQuantityMinusClick: (ShoppingItem) -> Unit,
@@ -21,9 +21,7 @@ internal fun ShoppingCartRecommendSection(
         baseSelectedCartItemCount = baseSelectedCartItemCount,
         totalPrice = totalPrice,
         onBackClick = onBackClick,
-        onOrderButtonClick = { selectedProductIds ->
-            onOrderButtonClick(selectedProductIds.toSet())
-        },
+        onOrderButtonClick = onOrderButtonClick,
         onAddToCartClick = onAddToCartClick,
         onQuantityPlusClick = onQuantityPlusClick,
         onQuantityMinusClick = onQuantityMinusClick,

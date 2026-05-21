@@ -1,6 +1,6 @@
 @file:Suppress("FunctionName")
 
-package woowacourse.shopping.ui.recomment
+package woowacourse.shopping.ui.recommend
 
 import android.icu.text.DecimalFormat
 import androidx.compose.foundation.background
@@ -43,17 +43,17 @@ fun RecommentScreen(
     baseSelectedCartItemCount: Int,
     totalPrice: Int,
     onBackClick: () -> Unit,
-    onOrderButtonClick: (List<Long>) -> Unit,
+    onOrderButtonClick: () -> Unit,
     onAddToCartClick: (ShoppingItem) -> Unit,
     onQuantityPlusClick: (ShoppingItem) -> Unit,
     onQuantityMinusClick: (ShoppingItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val selectedIdsInCurrentList =
+    val selectedRecommendedProductIds =
         recommentProducts
             .filter { shoppingItem -> shoppingItem.getQuantity() > 0 }
             .map { shoppingItem -> shoppingItem.getProductId() }
-    val orderItemCount = baseSelectedCartItemCount + selectedIdsInCurrentList.size
+    val orderItemCount = baseSelectedCartItemCount + selectedRecommendedProductIds.size
     Scaffold(
         topBar = {
             ShoppingCartTopBar(
@@ -119,7 +119,6 @@ fun RecommentScreen(
             }
             OrderButton(
                 onOrderButtonClick = onOrderButtonClick,
-                selectedShoppingCartItemIds = selectedIdsInCurrentList,
                 orderItemCount = orderItemCount,
                 totalPrice = totalPrice,
             )
@@ -129,8 +128,7 @@ fun RecommentScreen(
 
 @Composable
 fun OrderButton(
-    onOrderButtonClick: (List<Long>) -> Unit,
-    selectedShoppingCartItemIds: List<Long>,
+    onOrderButtonClick: () -> Unit,
     orderItemCount: Int,
     totalPrice: Int,
     modifier: Modifier = Modifier,
@@ -157,7 +155,7 @@ fun OrderButton(
         )
 
         Button(
-            onClick = { onOrderButtonClick(selectedShoppingCartItemIds) },
+            onClick = onOrderButtonClick,
             modifier =
                 Modifier
                     .weight(1.5f)
