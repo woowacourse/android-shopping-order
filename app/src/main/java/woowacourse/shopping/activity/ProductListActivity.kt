@@ -77,11 +77,6 @@ class ProductListActivity : ComponentActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        requestProducts()
-    }
-
     private fun requestProducts() {
         productListViewModel.requestProducts(size = MAX_PRODUCT_SIZE)
     }

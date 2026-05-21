@@ -101,6 +101,25 @@ fun ProductListScreen(
                     }
                 }
             } else {
+                state.errorMessage?.let { message ->
+                    item(
+                        span = { GridItemSpan(maxLineSpan) },
+                    ) {
+                        Box(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                        ) {
+                            Text(
+                                text = message,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+                    }
+                }
+
                 if (!isNetworkConnected) {
                     item(span = { GridItemSpan(maxLineSpan) }) {
                         OfflineBanner()

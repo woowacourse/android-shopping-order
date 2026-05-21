@@ -60,9 +60,9 @@ class ProductListViewModel(
                 isLoading = false
                 errorMessage = null
                 publishUiState()
-            }.onFailure {
+            }.onFailure { throwable ->
                 isLoading = false
-                errorMessage = "상품 목록을 불러오지 못했습니다."
+                errorMessage = throwable.message ?: "상품 목록을 불러오지 못했습니다."
                 publishUiState()
             }
         }
