@@ -2,7 +2,9 @@ package woowacourse.shopping.ui.component.item
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import coil3.compose.AsyncImage
+import woowacourse.shopping.R
 
 @Composable
 fun ProductImage(
@@ -13,5 +15,7 @@ fun ProductImage(
         model = imageUri,
         contentDescription = "상품 사진",
         modifier = modifier,
+        error = painterResource(R.drawable.not_found_error),
+        fallback = painterResource(R.drawable.not_found_error),
     )
 }
