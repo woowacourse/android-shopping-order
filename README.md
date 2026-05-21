@@ -2,7 +2,7 @@
 
 ## Compose Navigation 화면 전환
 - [x] 상품 목록, 상품 상세, 장바구니, 상품 추천 화면을 Navigation Component로 구성한다.
-- [ ] 각 화면 이동은 NavController를 통해 처리한다.
+- [x] 각 화면 이동은 NavController를 통해 처리한다.
     - 기존 Activity 전환 방식을 제거하고 Compose Navigation(navigation-compose)으로 교체한다.
     - 모든 Route를 @Serializable 타입으로 선언한다.
     - 화면 이동 시 전달하는 데이터는 타입 안전한 Route를 사용한다.

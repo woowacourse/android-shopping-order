@@ -8,6 +8,7 @@ object ShoppingScreen
 @Serializable
 data class DetailScreen(
     val productId: Long,
+    val isFromLastSeen: Boolean = false,
 )
 
 @Serializable
@@ -15,5 +16,5 @@ object CartScreen
 
 @Serializable
 data class RecommendScreen(
-    val productsId: List<Long>,
+    val productIds: List<Long>,
 )
