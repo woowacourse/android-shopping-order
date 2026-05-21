@@ -88,3 +88,4 @@
 - [x] 각 viewModel에 UiModel 도입
 - [x] 액티비티 별 startActivity companion object 추가
 - [] screenComposable의 파라미터로 viewModel 주입
+- [] composabled에 하드코딩된 문자열 strings.xml로 이동
