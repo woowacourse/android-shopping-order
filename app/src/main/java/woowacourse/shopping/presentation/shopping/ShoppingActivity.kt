@@ -35,7 +35,7 @@ class ShoppingActivity : ComponentActivity() {
                     viewModel.initialize()
                 }
 
-                LaunchedEffect( lifecycleOwner) {
+                LaunchedEffect(lifecycleOwner) {
                     lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                         viewModel.uiEvents.collect { event ->
                             when (event) {
