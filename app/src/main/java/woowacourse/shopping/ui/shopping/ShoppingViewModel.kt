@@ -22,6 +22,7 @@ import woowacourse.shopping.data.remote.NetworkMonitor
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
+import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.model.Products
 import woowacourse.shopping.ui.common.error.ErrorMessageMapper
 import woowacourse.shopping.ui.common.model.ProductUiModel
@@ -221,20 +222,17 @@ class ShoppingViewModel(
         private const val TAG = "ShoppingViewModel"
 
         fun provideFactory(
-            applicationContext: Context,
-            productRepo: ProductRepository,
-            cartRepo: CartRepository,
-            recentProductRepo: RecentProductRepository,
+            container: AppContainer,
             loadSize: Int,
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T =
                     ShoppingViewModel(
-                        networkMonitor = NetworkMonitor(applicationContext),
-                        productRepo = productRepo,
-                        cartRepo = cartRepo,
-                        recentProductRepo = recentProductRepo,
+                        networkMonitor = container.networkMonitor,
+                        productRepo = container.productRepository,
+                        cartRepo = container.cartRepository,
+                        recentProductRepo = container.recentProductRepository,
                         loadSize = loadSize,
                     ) as T
             }

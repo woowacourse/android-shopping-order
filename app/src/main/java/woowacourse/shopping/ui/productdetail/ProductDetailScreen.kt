@@ -12,6 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import woowacourse.shopping.di.appContainer
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.ui.common.component.ShoppingLoading
@@ -21,11 +23,15 @@ import woowacourse.shopping.ui.productdetail.component.ProductDetailTopBar
 
 @Composable
 fun ProductDetailScreen(
-    viewModel: ProductDetailViewModel,
-    modifier: Modifier = Modifier,
     onCloseClick: () -> Unit,
     onAddToCartClick: () -> Unit,
     onLastViewedProductClick: (Product) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: ProductDetailViewModel = viewModel(
+        factory = ProductDetailViewModel.provideFactory(
+            container = appContainer(),
+        )
+    ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current

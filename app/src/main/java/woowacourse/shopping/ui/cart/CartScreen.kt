@@ -14,6 +14,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import woowacourse.shopping.di.appContainer
 import woowacourse.shopping.model.Cart
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Money
@@ -26,12 +28,19 @@ import woowacourse.shopping.ui.cart.component.CartScreenSkeleton
 import woowacourse.shopping.ui.common.model.LoadState
 import woowacourse.shopping.ui.common.model.ProductUiModel
 
+private const val PAGE_SIZE = 5
+
 @Composable
 fun CartScreen(
-    viewModel: CartViewModel,
-    modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
     onOrderClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: CartViewModel = viewModel(
+        factory = CartViewModel.provideFactory(
+            container = appContainer(),
+            pageSize = PAGE_SIZE
+        )
+    ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current

@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
+import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.ui.common.error.ErrorMessageMapper
 
 class ProductDetailViewModel(
@@ -124,9 +125,7 @@ class ProductDetailViewModel(
         private const val TAG = "ProductDetailViewModel"
 
         fun provideFactory(
-            productRepo: ProductRepository,
-            cartRepo: CartRepository,
-            recentProductRepo: RecentProductRepository,
+            container: AppContainer,
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
@@ -138,9 +137,9 @@ class ProductDetailViewModel(
 
                     return ProductDetailViewModel(
                         savedStateHandle = savedStateHandle,
-                        productRepo = productRepo,
-                        cartRepo = cartRepo,
-                        recentProductRepo = recentProductRepo,
+                        productRepo = container.productRepository,
+                        cartRepo = container.cartRepository,
+                        recentProductRepo = container.recentProductRepository,
                     ) as T
                 }
             }

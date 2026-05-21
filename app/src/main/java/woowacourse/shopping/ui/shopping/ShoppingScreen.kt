@@ -24,6 +24,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.di.appContainer
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.Products
@@ -33,13 +36,20 @@ import woowacourse.shopping.ui.shopping.component.RecentProductGroup
 import woowacourse.shopping.ui.shopping.component.ShoppingTopBar
 import woowacourse.shopping.ui.shopping.component.ShoppingScreenSkeleton
 
+private const val LOAD_SIZE = 20
+
 @Composable
 fun ShoppingScreen(
-    viewModel: ShoppingViewModel,
-    modifier: Modifier = Modifier,
     onCartClick: () -> Unit,
     onProductClick: (Product) -> Unit,
     onRecentProductClick: (Product) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: ShoppingViewModel = viewModel(
+        factory = ShoppingViewModel.provideFactory(
+            container = appContainer(),
+            loadSize = LOAD_SIZE
+        )
+    ),
 ) {
     val lazyGridState = rememberLazyGridState()
     val state by viewModel.uiState.collectAsStateWithLifecycle()

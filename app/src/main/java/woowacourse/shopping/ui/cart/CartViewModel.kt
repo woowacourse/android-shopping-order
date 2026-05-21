@@ -15,6 +15,7 @@ import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
+import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.recommender.ProductRecommender
 import woowacourse.shopping.ui.common.error.ErrorMessageMapper
@@ -377,19 +378,16 @@ class CartViewModel(
         private const val TAG = "CartViewModel"
 
         fun provideFactory(
-            cartRepo: CartRepository,
-            productRepo: ProductRepository,
-            orderRepo: OrderRepository,
-            recentProductRepo: RecentProductRepository,
+            container: AppContainer,
             pageSize: Int,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T = CartViewModel(
-                cartRepo = cartRepo,
+                cartRepo = container.cartRepository,
+                recentProductRepo = container.recentProductRepository,
+                productRepo = container.productRepository,
+                orderRepo = container.orderRepository,
                 pageSize = pageSize,
-                recentProductRepo = recentProductRepo,
-                productRepo = productRepo,
-                orderRepo = orderRepo,
             ) as T
         }
     }

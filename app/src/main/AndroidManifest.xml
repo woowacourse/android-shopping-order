@@ -6,35 +6,24 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name = ".ShoppingApplication"
-        android:networkSecurityConfig="@xml/network_security_config"
+        android:name=".ShoppingApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Shopping"
         tools:targetApi="31">
         <activity
-            android:name=".ui.cart.CartActivity"
-            android:exported="false"
-            android:label="CartActivity"
-            android:theme="@style/Theme.Shopping" />
-        <activity
-            android:name=".ui.productdetail.ProductDetailActivity"
-            android:exported="false"
-            android:label="ProductDetailActivity"
-            android:theme="@style/Theme.Shopping" />
-        <activity
-            android:name=".ui.shopping.ShoppingActivity"
+            android:name=".MainActivity"
             android:exported="true"
-            android:label="ShoppingActivity"
+            android:label="@string/title_activity_main"
             android:theme="@style/Theme.Shopping">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

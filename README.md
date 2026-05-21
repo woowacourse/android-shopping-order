@@ -5,10 +5,10 @@
 ### 환경 및 인프라 설정
 - [x] Compose Navigation 의존성 추가 및 프로젝트 구성
   - [x] `androidx.navigation:navigation-compose` 의존성 추가
-- [ ] 기존 Activity/Intent 기반 화면 전환 코드 제거
-  - [ ] 각 화면별 Activity 클래스 및 `startActivity` 호출부 제거
-  - [ ] `AndroidManifest.xml`에서 불필요한 Activity 선언 정리
-  - [ ] 진입점을 단일 Activity + NavHost 구조로 전환
+- [x] 기존 Activity/Intent 기반 화면 전환 코드 제거
+  - [x] 각 화면별 Activity 클래스 및 `startActivity` 호출부 제거
+  - [x] `AndroidManifest.xml`에서 불필요한 Activity 선언 정리
+  - [x] 진입점을 단일 Activity + NavHost 구조로 전환
 
 ### Navigation 구조 설계 (Route)
 - [x] 화면별 Route를 `@Serializable` 타입으로 선언
@@ -16,7 +16,7 @@
   - [x] 상품 상세 Route (`ProductDetail`) 정의 — productId 파라미터 포함
   - [x] 장바구니 Route (`Cart`) 정의
 - [ ] NavHost 및 NavController 구성
-  - [ ] 앱 루트에 단일 `NavHost` 배치 및 시작 목적지(상품 목록) 지정
+  - [x] 앱 루트에 단일 `NavHost` 배치 및 시작 목적지(상품 목록) 지정
   - [ ] 각 Route에 대응하는 `composable<Route>` 블록 작성
   - [ ] NavController는 화면 Composable에 직접 전달하지 않고 이동 콜백 람다로 분리
 
