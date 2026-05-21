@@ -32,19 +32,11 @@ class CartActivity : ComponentActivity() {
                         ),
                 )
 
-            val pagedCart by viewModel.pagedCart.collectAsStateWithLifecycle()
-            val currentPage by viewModel.currentPage.collectAsStateWithLifecycle()
-            val isPageable by viewModel.isPageable.collectAsStateWithLifecycle()
-            val nextEnable by viewModel.nextEnable.collectAsStateWithLifecycle()
-            val prevEnable by viewModel.prevEnable.collectAsStateWithLifecycle()
-            val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
-            val checkedItemIds by viewModel.checkedItemIds.collectAsStateWithLifecycle()
-            val totalPrice by viewModel.totalPrice.collectAsStateWithLifecycle()
-            val isAllChecked by viewModel.isAllChecked.collectAsStateWithLifecycle()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
                 CartScreen(
-                    cart = pagedCart,
+                    cart = uiState.items,
                     onClose = {
                         finish()
                     },
@@ -57,34 +49,34 @@ class CartActivity : ComponentActivity() {
                     onDelete = { id ->
                         viewModel.removeWithID(id)
                     },
-                    currentPage = currentPage,
+                    currentPage = uiState.currentPage,
                     onPrevious = {
                         viewModel.prev()
                     },
                     onNext = {
                         viewModel.next()
                     },
-                    previousEnable = prevEnable,
-                    nextEnable = nextEnable,
-                    isPageable = isPageable,
-                    isLoading = isLoading,
+                    previousEnable = uiState.isPrevEnable,
+                    nextEnable = uiState.isNextEnable,
+                    isPageable = uiState.isPageable,
+                    isLoading = uiState.isLoading,
                     onCheckedChanged = { viewModel.onItemChecked(it) },
-                    totalPrice = totalPrice,
-                    totalCount = checkedItemIds.size,
-                    isChecked = { id -> checkedItemIds.contains(id) },
+                    totalPrice = uiState.totalPrice,
+                    totalCount = uiState.checkedItemIds.size,
+                    isChecked = { id -> uiState.checkedItemIds.contains(id) },
                     onSelectAllClick = { viewModel.onSelectAllClick() },
                     onOrderClick = {
-                        if (checkedItemIds.isNotEmpty()) {
+                        if (uiState.checkedItemIds.isNotEmpty()) {
                             val intent = Intent(this, RecommendationActivity::class.java)
-                            intent.putExtra(IntentKeys.SELECTED_TOTAL_PRICE, totalPrice)
+                            intent.putExtra(IntentKeys.SELECTED_TOTAL_PRICE, uiState.totalPrice)
                             intent.putExtra(
                                 IntentKeys.SELECTED_CART_ITEM_IDS,
-                                checkedItemIds.toLongArray(),
+                                uiState.checkedItemIds.toLongArray(),
                             )
                             startActivity(intent)
                         }
                     },
-                    isAllChecked = isAllChecked,
+                    isAllChecked = viewModel.isAllChecked(),
                     modifier =
                         Modifier
                             .fillMaxSize()

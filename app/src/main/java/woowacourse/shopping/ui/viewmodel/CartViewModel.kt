@@ -4,57 +4,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.repository.CartRepository
 import woowacourse.shopping.domain.PurchaseProducts
+import woowacourse.shopping.ui.state.CartUiState
 
 class CartViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel() {
-    private val _currentPage: MutableStateFlow<Int> = MutableStateFlow(0)
 
-    val currentPage: StateFlow<Int> = _currentPage.asStateFlow()
-
-    private val _pagedCart: MutableStateFlow<PurchaseProducts> = MutableStateFlow(PurchaseProducts())
-    val pagedCart: StateFlow<PurchaseProducts> = _pagedCart.asStateFlow()
-
-    private val _cartItemCount: MutableStateFlow<Int> = MutableStateFlow(0)
-    val cartItemCount = _cartItemCount.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
+    private val _uiState = MutableStateFlow(CartUiState())
+    val uiState = _uiState.asStateFlow()
 
     private val _allCartItems = MutableStateFlow<PurchaseProducts>(PurchaseProducts())
-    private val _checkedItemIds = MutableStateFlow<List<Long>>(emptyList())
-    val checkedItemIds = _checkedItemIds.asStateFlow()
 
-    val isAllChecked: StateFlow<Boolean> =
-        combine(_allCartItems, _checkedItemIds) { allCart, checkIds ->
-            val allIds = allCart.purchaseProducts.map { it.id }
-            allIds.isNotEmpty() && checkIds.containsAll(allIds)
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false,
-        )
-
-    val totalPrice: StateFlow<Int> =
-        combine(_allCartItems, checkedItemIds) { allCart, checkedIds ->
-            allCart.purchaseProducts
-                .filter { it.id in checkedIds }
-                .sumOf { it.totalPrice() }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = 0,
-        )
+    private val _cartItemCount: MutableStateFlow<Int> = MutableStateFlow(0)
 
     init {
         fetchCart()
@@ -62,146 +29,131 @@ class CartViewModel(
 
     fun fetchCart() {
         viewModelScope.launch {
-            _isLoading.update { true }
+            _uiState.update { it.copy(isLoading = true) }
 
-            _allCartItems.update {
-                cartRepository.getPagedCart(0, 10000000)
+            val allItemsResult = cartRepository.getPagedCart(0, ViewModelConst.MAX_COUNT)
+            val pagedItemsResult = cartRepository.getPagedCart(_uiState.value.currentPage, PAGE_SIZE)
+
+            if(allItemsResult is ApiResult.Success && pagedItemsResult is ApiResult.Success) {
+                _allCartItems.update { allItemsResult.data }
+                _cartItemCount.update { _allCartItems.value.totalCount() }
+                val page = _uiState.value.currentPage
+                val selectedPrice = calculateTotalPrice(_allCartItems.value, _uiState.value.checkedItemIds)
+
+                _uiState.update { state ->
+                    state.copy(
+                        items = pagedItemsResult.data,
+                        isLoading = false,
+                        isNextEnable = page < (_allCartItems.value.size() - 1) / PAGE_SIZE,
+                        isPrevEnable = page > 0,
+                        isPageable = _allCartItems.value.size() > PAGE_SIZE,
+                        totalPrice = selectedPrice,
+                    )
+                }
+            } else {
+                val errorMsg = getErrorMessage(allItemsResult, pagedItemsResult)
+                _uiState.update { it.copy(errorMessage = errorMsg) }
             }
-            _pagedCart.update {
-                cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
-            }
-            _cartItemCount.update {
-                cartRepository.getCartItemCount()
-            }
-            _isLoading.update { false }
         }
     }
 
     fun next() {
-        _currentPage.update {
-            if (cartItemCount.value > (it + 1) * PAGE_SIZE) it + 1 else it
-        }
-        viewModelScope.launch {
-            _isLoading.update { true }
-            _pagedCart.update {
-                cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
-            }
-            _isLoading.update { false }
-        }
+        if(!_uiState.value.isNextEnable) return
+        _uiState.update { it.copy(currentPage = it.currentPage + 1) }
+        fetchCart()
     }
 
     fun prev() {
-        _currentPage.update { if (it > 0) it - 1 else 0 }
-        viewModelScope.launch {
-            _isLoading.update { true }
-            _pagedCart.update {
-                cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
-            }
-            _isLoading.update { false }
-        }
+        if(!_uiState.value.isPrevEnable) return
+        _uiState.update { it.copy(currentPage = it.currentPage - 1) }
+        fetchCart()
     }
-
-    val nextEnable: StateFlow<Boolean> =
-        combine(currentPage, cartItemCount) { page, count ->
-            page < (count - 1) / PAGE_SIZE
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false,
-        )
-
-    val prevEnable: StateFlow<Boolean> =
-        currentPage
-            .map { it > 0 }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = false,
-            )
-
-    val isPageable: StateFlow<Boolean> =
-        cartItemCount
-            .map { it > PAGE_SIZE }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = false,
-            )
 
     fun updateCountWithID(
         id: Long,
         updateAmount: Int,
     ) {
         viewModelScope.launch {
-            _isLoading.update { true }
-            val target = pagedCart.value.findPurchaseProductById(id)
-            if (target != null) {
-                val nextCount = target.count + updateAmount
-                if (nextCount >= 1) {
-                    cartRepository.updateCount(id, nextCount)
-                    _allCartItems.update { cartRepository.getPagedCart(0, 1000000) }
-                    _pagedCart.update {
-                        cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
-                    }
-                    _cartItemCount.update {
-                        cartRepository.getCartItemCount()
-                    }
-                }
+            val target = _allCartItems.value.findPurchaseProductById(id) ?: return@launch
+            val nextAmount = target.count + updateAmount
+            if(nextAmount < 1) return@launch
+
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            when (val result = cartRepository.updateCount(id, nextAmount)) {
+                is ApiResult.Success -> fetchCart()
+                is ApiResult.Error ->_uiState.update { it.copy(isLoading = false, errorMessage = "변경 실패 ${result.code}") }
+                is ApiResult.Exception -> _uiState.update { it.copy(isLoading = false, errorMessage = "오류 발생: ${result.e.message}") }
             }
-            _isLoading.update { false }
         }
     }
 
     fun removeWithID(id: Long) {
         viewModelScope.launch {
-            _isLoading.update { true }
-            cartRepository.deleteCartItem(id)
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            _allCartItems.update {
-                cartRepository.getPagedCart(0, 100000)
+            when(val result = cartRepository.deleteCartItem(id)) {
+                is ApiResult.Success -> {
+                    var newCheckedIds = emptyList<Long>()
+                    if (_uiState.value.checkedItemIds.contains(id)) {
+                        newCheckedIds = _uiState.value.checkedItemIds - id
+                    }
+                    var page = _uiState.value.currentPage
+                    if (page > 0 && page * PAGE_SIZE >= _allCartItems.value.purchaseProducts.size - 1) page -= 1
+                    _uiState.update { it.copy(checkedItemIds = newCheckedIds, currentPage = page) }
+                    fetchCart()
+                }
+                is ApiResult.Error -> _uiState.update { it.copy(isLoading = false, errorMessage = "삭제 실패: ${result.message}") }
+                is ApiResult.Exception ->_uiState.update { it.copy(isLoading = false, errorMessage = "오류 발생: ${result.e.message}") }
             }
-            _checkedItemIds.update { it - id }
-
-            val newTotalCount = cartRepository.getCartItemCount()
-            _cartItemCount.update {
-                newTotalCount
-            }
-
-            if (currentPage.value > 0 && currentPage.value * PAGE_SIZE >= newTotalCount) {
-                _currentPage.update { it - 1 }
-            }
-
-            _pagedCart.update {
-                cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
-            }
-
-            _isLoading.update { false }
         }
     }
 
     fun onItemChecked(id: Long) {
-        viewModelScope.launch {
-            _checkedItemIds.update {
-                if (it.contains(id)) {
-                    it - id
-                } else {
-                    it + id
-                }
+        _uiState.update { state ->
+            val newCheckedIds = if (state.checkedItemIds.contains(id)) {
+                state.checkedItemIds - id
+            } else {
+                state.checkedItemIds + id
             }
+            state.copy(
+                checkedItemIds = newCheckedIds,
+                totalPrice = calculateTotalPrice(_allCartItems.value, newCheckedIds)
+            )
         }
     }
 
     fun onSelectAllClick() {
         val allIds = _allCartItems.value.purchaseProducts.map { it.id }
-        if (isAllChecked.value) {
-            _checkedItemIds.update { emptyList() }
-        } else {
-            _checkedItemIds.update { allIds }
+        val isAllChecked = allIds.isNotEmpty() && _uiState.value.checkedItemIds.containsAll(allIds)
+        val newCheckIds = if (isAllChecked) emptyList<Long>() else allIds
+        _uiState.update {
+            it.copy(
+                checkedItemIds = newCheckIds,
+                totalPrice = calculateTotalPrice(_allCartItems.value, newCheckIds)
+            )
         }
     }
 
+    fun isAllChecked(): Boolean {
+        val allIds = _allCartItems.value.purchaseProducts.map { it.id }
+        return allIds.isNotEmpty() && _uiState.value.checkedItemIds.containsAll(allIds)
+    }
+
+    fun calculateTotalPrice(all: PurchaseProducts, checkedIds: List<Long>):Int {
+        return all.purchaseProducts
+            .filter { it.id in checkedIds }
+            .sumOf { it.totalPrice() }
+    }
+
+    fun getErrorMessage(vararg results: ApiResult<*>):String {
+        return results.filterIsInstance<ApiResult.Error>().firstOrNull()?.let { "서버 에러 ${it.code}" }
+            ?: results.filterIsInstance<ApiResult.Exception>().firstOrNull()?.let { "예외 발생 ${it.e.message}" }
+            ?: "알수 없는 에러가 발생했습니다."
+    }
+
     companion object {
-        private val PAGE_SIZE = 5
+        private const val PAGE_SIZE = 5
     }
 }
 
