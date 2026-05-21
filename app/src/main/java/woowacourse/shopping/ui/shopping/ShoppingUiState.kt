@@ -1,0 +1,18 @@
+package woowacourse.shopping.ui.shopping
+
+import woowacourse.shopping.data.model.Products
+import woowacourse.shopping.ui.common.model.ProductUiModel
+
+data class ShoppingUiState(
+    val isLoading: Boolean = false,
+    val currentPage: Int = 0,
+    val visibleProducts: List<ProductUiModel> = emptyList(),
+    val recentProducts: Products = Products(emptyList()),
+    val hasNext: Boolean = false,
+    val totalProductCount: Int = 0,
+    val cartCount: Int = 0,
+    val errorMessage: String? = null,
+) {
+    val shouldShowError: Boolean
+        get() = errorMessage != null && visibleProducts.isEmpty()
+}
