@@ -14,11 +14,7 @@
 - [ ] 기존 Activity 전환 방식을 제거하고 Compose Navigation(`navigation-compose`)으로 교체한다.
 
 ### 2. Flow를 이용한 상태 관리
-- [ ] ViewModel의 UI 상태를 `StateFlow`로 노출한다.
-- [ ] 기존 `remember`/`mutableStateOf` 기반 Compose State를 `StateFlow`/`SharedFlow`로 교체한다.
-- [ ] ViewModel의 상태는 `MutableStateFlow`로 선언하고 `StateFlow`로 노출한다.
-- [ ] 장바구니 담기/삭제, 스낵바 표시, 화면 이동 트리거 등 일회성 이벤트는 `SharedFlow`를 사용한다.
-- [ ] Composable에서 상태를 구독할 때 `collectAsStateWithLifecycle()`을 사용한다.
+- [ ] 장바구니 담기/삭제 등 단발성 이벤트를 SharedFlow로 처리한다.
 
 ---
 
