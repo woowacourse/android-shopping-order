@@ -50,11 +50,20 @@ class ShoppingViewModel(
     init {
         viewModelScope.launch {
             recentlyViewedProductsId.collect { ids ->
-                if(ids.isNullOrEmpty()) {
+                if (ids.isNullOrEmpty()) {
                     _uiState.update { it.copy(recentlyViewedProducts = Products()) }
                 } else {
-                    val recentlyViewedProducts = ids.map { id ->
-                        productRepository.getProduct(id)
+                    val recentlyViewedProducts = mutableListOf<Product>()
+                    ids.forEach { id ->
+                        when (val result = productRepository.getProduct(id)) {
+                            is ApiResult.Success -> recentlyViewedProducts.add(result.data)
+                            is ApiResult.Error -> _uiState.update {
+                                it.copy(isLoading = false, errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                            }
+                            is ApiResult.Exception -> _uiState.update {
+                                it.copy(isLoading = false, errorMsg = ERROR_LABEL + result.e.message)
+                            }
+                        }
                     }
                     _uiState.update { it.copy(recentlyViewedProducts = Products(recentlyViewedProducts)) }
                 }
@@ -68,22 +77,39 @@ class ShoppingViewModel(
 
     suspend fun fetchProducts() {
         _uiState.update { it.copy(isLoading = true) }
-        val products = productRepository.getProducts(uiState.value.currentIndex, PAGE_SIZE)
-        _uiState.update {
-            it.copy(
-                isLoading = false,
-                products = it.products + Products(products),
-            )
+        when (val result = productRepository.getProducts(uiState.value.currentIndex, PAGE_SIZE)) {
+            is ApiResult.Success -> {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        products = it.products + Products(result.data),
+                    )
+                }
+            }
+
+            is ApiResult.Error -> {
+                _uiState.update {
+                    it.copy(isLoading = false, errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                }
+            }
+
+            is ApiResult.Exception -> {
+                _uiState.update {
+                    it.copy(isLoading = false, errorMsg = ERROR_LABEL + result.e.message)
+                }
+            }
         }
     }
 
     suspend fun fetchCart() {
         when(val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)) {
-            is ApiResult.Success -> {
-                _uiState.update { it.copy(cart = allCartItemResult.data) }
+            is ApiResult.Success -> _uiState.update { it.copy(cart = allCartItemResult.data) }
+            is ApiResult.Error -> _uiState.update {
+                it.copy(errorMsg = NETWORK_ERROR_LABEL + allCartItemResult.code.toString())
             }
-            is ApiResult.Error -> ""
-            is ApiResult.Exception -> ""
+            is ApiResult.Exception -> _uiState.update {
+                it.copy(errorMsg = ERROR_LABEL + allCartItemResult.e.message)
+            }
         }
     }
 
@@ -94,11 +120,26 @@ class ShoppingViewModel(
                     it.product.id == purchaseProduct.product.id
                 }
             if (existingItem != null) {
-                cartRepository.updateCount(existingItem.id, existingItem.count + 1)
+                when (val result = cartRepository.updateCount(existingItem.id, existingItem.count + 1)){
+                    is ApiResult.Success -> {}
+                    is ApiResult.Error -> _uiState.update {
+                        it.copy(isLoading = false, errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                    }
+                    is ApiResult.Exception -> _uiState.update {
+                        it.copy(isLoading = false, errorMsg = NETWORK_ERROR_LABEL + result.e.message)
+                    }
+                }
             } else {
-                cartRepository.insert(purchaseProduct)
+                when(val result = cartRepository.insert(purchaseProduct)){
+                    is ApiResult.Success -> fetchCart()
+                    is ApiResult.Error -> _uiState.update {
+                        it.copy(isLoading = false, errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                    }
+                    is ApiResult.Exception -> _uiState.update {
+                        it.copy(isLoading = false, errorMsg = NETWORK_ERROR_LABEL + result.e.message)
+                    }
+                }
             }
-            fetchCart()
         }
     }
 
@@ -111,8 +152,15 @@ class ShoppingViewModel(
             if (target != null) {
                 val nextCount = target.count + updateAmount
                 if (nextCount >= 1) {
-                    cartRepository.updateCount(target.id, nextCount)
-                    fetchCart()
+                    when(val result = cartRepository.updateCount(target.id, nextCount)){
+                        is ApiResult.Success -> fetchCart()
+                        is ApiResult.Error -> _uiState.update {
+                            it.copy(isLoading = false, errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                        }
+                        is ApiResult.Exception -> _uiState.update {
+                            it.copy(isLoading = false, errorMsg = NETWORK_ERROR_LABEL + result.e.message)
+                        }
+                    }
                 }
             }
         }
@@ -142,8 +190,14 @@ class ShoppingViewModel(
         }
     }
 
+    fun onErrorMsgShown() {
+        _uiState.update { it.copy(errorMsg = null) }
+    }
+
     companion object {
-        private val PAGE_SIZE = 20
+        private const val PAGE_SIZE = 20
+        private const val NETWORK_ERROR_LABEL = "네트워크 에러: "
+        private const val ERROR_LABEL = "오류: "
     }
 }
 
