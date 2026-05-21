@@ -47,9 +47,7 @@ fun ShoppingRoute(
                 onNavigateToProductDetail(product.id, lastViewedProductId)
             },
             onCartClick = onNavigateToCart,
-            onLoadClick = {
-                viewModel.loadMore()
-            },
+            onLoadClick = viewModel::loadMore,
             onAdd = { id, updateAmount ->
                 viewModel.updateCountWithID(id, updateAmount)
             },

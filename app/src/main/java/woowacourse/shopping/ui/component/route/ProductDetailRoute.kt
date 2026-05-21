@@ -44,8 +44,8 @@ fun ProductDetailRoute(
                     viewModel.updateHistory(lastViewed)
                     onNavigateToProductDetail(lastViewed.id)
                 },
-                onAdd = { viewModel.addCount() },
-                onMinus = { viewModel.minusCount() },
+                onAdd = viewModel::addCount,
+                onMinus = viewModel::minusCount,
                 onAddRequest = {
                     viewModel.addPurchaseProduct(
                         PurchaseProduct(
