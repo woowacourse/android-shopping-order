@@ -20,6 +20,7 @@ import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
 import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
 import woowacourse.shopping.data.local.RecentProductDatabase
 import woowacourse.shopping.data.network.cart.CartService
+import woowacourse.shopping.data.network.mock.ShoppingMockServer
 import woowacourse.shopping.data.network.order.OrderService
 import woowacourse.shopping.data.network.product.ProductService
 import woowacourse.shopping.data.repository.auth.AuthRepository
@@ -44,10 +45,16 @@ class ShoppingApplication : Application() {
         private set
     lateinit var orderRepository: OrderRepository
         private set
+    private var mockServer: ShoppingMockServer? = null
 
     override fun onCreate() {
         super.onCreate()
         initDependencies()
+    }
+
+    override fun onTerminate() {
+        mockServer?.shutdown()
+        super.onTerminate()
     }
 
     private fun initDependencies() {
@@ -59,7 +66,13 @@ class ShoppingApplication : Application() {
         )
 
         val json = Json { ignoreUnknownKeys = true }
-        val baseUrl = BuildConfig.SHOPPING_BASE_URL.toHttpUrl()
+        val baseUrl = if (BuildConfig.SHOPPING_USE_MOCK_SERVER || BuildConfig.SHOPPING_BASE_URL.isBlank()) {
+            ShoppingMockServer(json)
+                .also { mockServer = it }
+                .start()
+        } else {
+            BuildConfig.SHOPPING_BASE_URL.toHttpUrl()
+        }
 
         val client = OkHttpClient.Builder()
             .addInterceptor { chain ->
