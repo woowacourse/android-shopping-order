@@ -28,39 +28,64 @@ class ProductDetailViewModel(
     val uiState = _uiState.asStateFlow()
     private val _cart = MutableStateFlow(PurchaseProducts())
 
-
     init {
         viewModelScope.launch {
             val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
-            when(allCartItemResult) {
+            when (allCartItemResult) {
                 is ApiResult.Success -> _cart.update { allCartItemResult.data }
-                is ApiResult.Error -> ""
-                is ApiResult.Exception -> ""
+                is ApiResult.Error -> _uiState.update { it.copy(errorMsg = NETWORK_ERROR_LABEL + allCartItemResult.code.toString()) }
+                is ApiResult.Exception -> _uiState.update { it.copy(errorMsg = ERROR_LABEL + allCartItemResult.e.message) }
             }
             fetchProduct()
         }
     }
 
     private suspend fun fetchProduct() {
-        val selectedProduct = productRepository.getProduct(selectedProductId)
-        if (lastViewedProductId != null){
-            val lastViewedProduct = productRepository.getProduct(lastViewedProductId)
+        when (val selectedProductResult = productRepository.getProduct(selectedProductId)) {
+            is ApiResult.Success -> {
+                val selectedProduct = selectedProductResult.data
+                if (lastViewedProductId != null) {
+                    when (val lastViewedProductResult =
+                        productRepository.getProduct(lastViewedProductId)) {
+                        is ApiResult.Success -> {
+                            _uiState.update {
+                                it.copy(
+                                    product = selectedProduct,
+                                    lastViewProduct = lastViewedProductResult.data,
+                                )
+                            }
+                        }
 
-            _uiState.update { it.copy(product = selectedProduct, lastViewProduct = lastViewedProduct) }
-        } else {
-            _uiState.update { it.copy(product = selectedProduct) }
-        }
-    }
+                        is ApiResult.Error -> {
+                            _uiState.update {
+                                it.copy(
+                                    product = selectedProduct,
+                                    errorMsg = NETWORK_ERROR_LABEL + lastViewedProductResult.code.toString(),
+                                )
+                            }
+                        }
 
-    fun addCount() {
-        val currentCount = _uiState.value.count
-        _uiState.update { it.copy(count = currentCount + 1) }
-    }
+                        is ApiResult.Exception -> {
+                            _uiState.update {
+                                it.copy(
+                                    product = selectedProduct,
+                                    errorMsg = ERROR_LABEL + lastViewedProductResult.e.message,
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    _uiState.update { it.copy(product = selectedProduct) }
+                }
+            }
 
-    fun minusCount() {
-        val currentCount = _uiState.value.count
-        if (currentCount > 1) {
-            _uiState.update { it.copy(count = currentCount - 1) }
+            is ApiResult.Error -> {
+                _uiState.update { it.copy(errorMsg = NETWORK_ERROR_LABEL + selectedProductResult.code.toString()) }
+            }
+
+            is ApiResult.Exception -> {
+                _uiState.update { it.copy(errorMsg = ERROR_LABEL + selectedProductResult.e.message) }
+            }
         }
     }
 
@@ -76,10 +101,31 @@ class ProductDetailViewModel(
         }
     }
 
+    fun addCount() {
+        val currentCount = _uiState.value.count
+        _uiState.update { it.copy(count = currentCount + 1) }
+    }
+
+    fun minusCount() {
+        val currentCount = _uiState.value.count
+        if (currentCount > 1) {
+            _uiState.update { it.copy(count = currentCount - 1) }
+        }
+    }
+
     fun updateHistory(product: Product) {
         viewModelScope.launch {
             recentlyViewedProductRepository.updateList(product)
         }
+    }
+
+    fun onErrorMsgShown() {
+        _uiState.update { it.copy(errorMsg = null) }
+    }
+
+    companion object {
+        private const val NETWORK_ERROR_LABEL = "네트워크 에러: "
+        private const val ERROR_LABEL = "오류: "
     }
 }
 
