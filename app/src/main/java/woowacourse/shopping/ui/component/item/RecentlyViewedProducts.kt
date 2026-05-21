@@ -10,10 +10,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import woowacourse.shopping.R
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.Products
 
@@ -31,7 +33,7 @@ fun RecentlyViewedProducts(
                 .padding(20.dp),
     ) {
         Text(
-            text = "최근 본 상품",
+            text = stringResource(R.string.label_recently_viewed_products),
             fontSize = 16.sp,
             fontWeight = FontWeight.W700,
         )

@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -108,7 +109,7 @@ private fun CartHeader(
     ) {
         Icon(
             painter = painterResource(R.drawable.ic_arrow_left),
-            contentDescription = "뒤로가기 버튼",
+            contentDescription = stringResource(R.string.cd_back_button),
             modifier =
                 Modifier
                     .size(40.dp)
@@ -117,7 +118,7 @@ private fun CartHeader(
         )
         Spacer(Modifier.padding(12.dp))
         Text(
-            text = "Cart",
+            text = stringResource(R.string.title_cart),
             fontWeight = FontWeight(500),
             fontSize = 20.sp,
             color = Color.White,

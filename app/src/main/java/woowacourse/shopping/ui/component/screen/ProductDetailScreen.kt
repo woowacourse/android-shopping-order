@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -75,7 +76,7 @@ private fun ProductDetailHeader(
     ) {
         Icon(
             painter = painterResource(R.drawable.ic_close),
-            contentDescription = "닫기 버튼",
+            contentDescription = stringResource(R.string.cd_close_button),
             modifier =
                 Modifier
                     .size(16.dp)
@@ -120,7 +121,7 @@ private fun ProductDetailBody(
                     .background(color = Color(0xFF04C09E)),
         ) {
             Text(
-                text = "장바구니 담기",
+                text = stringResource(R.string.btn_add_to_cart),
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
                 color = Color.White,

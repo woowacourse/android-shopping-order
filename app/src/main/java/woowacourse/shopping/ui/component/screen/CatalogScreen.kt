@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -88,7 +89,7 @@ private fun CatalogHeader(
                 .fillMaxWidth(),
     ) {
         Text(
-            text = "Shopping",
+            text = stringResource(R.string.title_shopping),
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold,
             color = Color.White,
@@ -96,7 +97,7 @@ private fun CatalogHeader(
         Row {
             Icon(
                 painter = painterResource(R.drawable.ic_cart),
-                contentDescription = "장바구니 아이콘",
+                contentDescription = stringResource(R.string.cd_cart_icon),
                 tint = Color.White,
                 modifier =
                     Modifier
@@ -190,7 +191,7 @@ private fun LoadBtn(
 ) {
     Icon(
         painter = painterResource(R.drawable.ic_add),
-        contentDescription = "더보기 버튼",
+        contentDescription = stringResource(R.string.cd_load_more_button),
         tint = Color.White,
         modifier =
             modifier

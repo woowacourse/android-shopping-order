@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -83,7 +84,7 @@ private fun RecommendationHeader(onBackClick: () -> Unit) {
     ) {
         Icon(
             painter = painterResource(R.drawable.ic_arrow_left),
-            contentDescription = "뒤로가기",
+            contentDescription = stringResource(R.string.cd_back_button),
             tint = Color.White,
             modifier =
                 Modifier
@@ -92,7 +93,7 @@ private fun RecommendationHeader(onBackClick: () -> Unit) {
         )
         Spacer(Modifier.padding(horizontal = 8.dp))
         Text(
-            text = "Cart",
+            text = stringResource(R.string.title_cart),
             color = Color.White,
             fontSize = 20.sp,
             fontWeight = FontWeight.Medium,
@@ -120,13 +121,13 @@ private fun RecommendationBody(
     ) {
         Spacer(Modifier.height(48.dp))
         Text(
-            text = "이런 상품은 어떠세요?",
+            text = stringResource(R.string.label_recommendation_title),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
         )
         Text(
-            text = "* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.",
+            text = stringResource(R.string.label_recommendation_description),
             fontSize = 12.sp,
             color = Color.Gray,
             modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
