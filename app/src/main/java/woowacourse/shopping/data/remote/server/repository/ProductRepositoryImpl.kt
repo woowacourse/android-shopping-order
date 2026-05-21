@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.remote.server.repository
 
+import retrofit2.HttpException
+import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.dto.product.toDomain
 import woowacourse.shopping.data.remote.server.dto.products.toDomain
 import woowacourse.shopping.data.remote.server.service.ProductService
@@ -11,21 +13,29 @@ class ProductRepositoryImpl(
     override suspend fun getProducts(
         page: Int,
         pageSize: Int,
-    ): List<Product> {
-        val response =
-            productService.requestProducts(
-                page = page,
-                size = pageSize,
-            )
-        return response.content.map { it.toDomain() }
+    ): ApiResult<List<Product>> {
+        return try {
+            val response =
+                productService.requestProducts(
+                    page = page,
+                    size = pageSize,
+                )
+            ApiResult.Success(response.content.map { it.toDomain() })
+        } catch (e: HttpException) {
+            ApiResult.Error(e.code(), e.message)
+        } catch (e: Exception) {
+            ApiResult.Exception(e)
+        }
     }
 
-    override suspend fun getProduct(id: Long): Product {
-        try {
+    override suspend fun getProduct(id: Long): ApiResult<Product> {
+        return try {
             val response = productService.requestProduct(id)
-            return response.toDomain()
+            ApiResult.Success(response.toDomain())
+        } catch (e: HttpException) {
+            ApiResult.Error(e.code(), e.message)
         } catch (e: Exception) {
-            throw e
+            ApiResult.Exception(e)
         }
     }
 
@@ -33,8 +43,14 @@ class ProductRepositoryImpl(
         page: Int,
         pageSize: Int,
         category: String,
-    ): List<Product> {
-        val response = productService.requestCategoryProducts(category = category)
-        return response.content.map { it.toDomain() }
+    ): ApiResult<List<Product>> {
+        return try {
+            val response = productService.requestCategoryProducts(category = category)
+            ApiResult.Success(response.content.map { it.toDomain() })
+        } catch (e: HttpException) {
+            ApiResult.Error(e.code(), e.message)
+        } catch (e: Exception) {
+            ApiResult.Exception(e)
+        }
     }
 }
