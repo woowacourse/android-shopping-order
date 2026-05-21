@@ -26,7 +26,7 @@ fun CouponCard(
     month: Int,
     day: Int,
     minimumPrice: Int,
-    onCheckedChange: (Boolean) -> Unit,
+    onCheckedChange: () -> Unit,
     modifier: Modifier = Modifier,
     checked: Boolean = false,
 ) {
@@ -49,7 +49,9 @@ fun CouponCard(
             Checkbox(
                 modifier = Modifier,
                 checked = checked,
-                onCheckedChange = onCheckedChange,
+                onCheckedChange = {
+                    onCheckedChange()
+                },
                 colors =
                     CheckboxDefaults.colors().copy(
                         checkedBoxColor = Color(0xFF04C09E),

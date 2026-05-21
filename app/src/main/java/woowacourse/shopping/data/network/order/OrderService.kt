@@ -8,10 +8,10 @@ import woowacourse.shopping.data.network.product.dto.ProductResponse
 
 interface OrderService {
     @POST("/orders")
-    fun orders(
+    suspend fun orders(
         @Header("accept")
         accept: String = "*/*",
         @Body
         cartItemIds: List<Long>,
-    ): Call<ProductResponse>
+    ): ProductResponse
 }

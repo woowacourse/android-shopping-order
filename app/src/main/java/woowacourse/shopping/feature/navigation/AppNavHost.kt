@@ -71,14 +71,19 @@ fun AppNavHost() {
             val route = backStackEntry.toRoute<Recommend>()
             RecommendScreen(
                 onCloseClick = { navController.popBackStack() },
-                onBuyClick = {
-                    navController.navigate(Payment)
+                onBuyClick = { cartContentIds ->
+                    navController.navigate(
+                        Payment(
+                            cartContentIds = cartContentIds
+                        )
+                    )
                 },
                 contentIds = route.cartContentIds,
             )
         }
 
-        composable<Payment> {
+        composable<Payment> { backStackEntry ->
+            val route = backStackEntry.toRoute<Payment>()
             PaymentScreen(
                 onCloseClick = { navController.popBackStack() },
                 onPaymentClick = {
@@ -88,7 +93,8 @@ fun AppNavHost() {
                         }
                         launchSingleTop = true
                     }
-                }
+                },
+                cartContentIds = route.cartContentIds
             )
         }
     }

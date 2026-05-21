@@ -21,13 +21,6 @@ import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.ProductNotFoundException
 import woowacourse.shopping.feature.common.state.ProductUiModel
 
-data class RecommendUiState(
-    val recommendList: List<ProductUiModel> = emptyList(),
-    val isLoading: Boolean = true,
-    val totalPrice: Int = 0,
-    val totalCount: Int = 0,
-)
-
 class RecommendViewModel(
     private val application: ShoppingApplication,
 ) : ViewModel() {
@@ -140,30 +133,23 @@ class RecommendViewModel(
             quantity = quantity,
         )
 
-    fun order(contentIds: List<Long>) {
-        viewModelScope.launch {
-            _uiState.value.recommendList.filter { it.quantity > 0 }.forEach {
-                cartRepository.increase(
-                    product =
-                        Product(
-                            id = it.id,
-                            name = it.name,
-                            price = Money(it.price),
-                            imageUrl = it.imageUrl,
-                        ),
-                    quantity = it.quantity,
-                )
-            }
-            val serverCart = cartRepository.loadCart()
-
-            val latestContents =
-                serverCart.cartContents.filter { cartContent ->
-                    products.map { it.id }.contains(cartContent.product.id)
-                }
-            orderRepository.orders(
-                cartItemIds = contentIds + latestContents.map { it.id },
+    suspend fun addRecommendToCart(): List<Long> {
+        _uiState.value.recommendList.filter { it.quantity > 0 }.forEach {
+            cartRepository.increase(
+                product =
+                    Product(
+                        id = it.id,
+                        name = it.name,
+                        price = Money(it.price),
+                        imageUrl = it.imageUrl,
+                    ),
+                quantity = it.quantity,
             )
         }
+        val serverCart = cartRepository.loadCart()
+        return serverCart.cartContents.filter { cartContent ->
+            products.map { it.id }.contains(cartContent.product.id)
+        }.map{ it.id }
     }
 
     private suspend fun refreshRecentProducts(): String {
