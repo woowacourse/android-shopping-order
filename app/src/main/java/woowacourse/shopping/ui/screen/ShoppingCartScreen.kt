@@ -104,7 +104,7 @@ fun ShoppingCartScreen(
                     shoppingCartItems.forEach { shoppingCartItem ->
                         ShoppingCartItems(
                             shoppingCartItem = shoppingCartItem,
-                            selected = shoppingCartItem.product.id in state.selectedProductIds,
+                            selected = shoppingCartItem.getId() in state.selectedCartItemIds,
                             quantityPrice = getQuantityPrice(shoppingCartItem),
                             onRemoveShoppingItemClick = onRemoveShoppingItemClick,
                             onToggleShoppingItemSelectionClick = onToggleShoppingItemSelectionClick,
@@ -155,7 +155,7 @@ private fun ShoppingCartItems(
                 ShoppingCartCheckBox(
                     checked = selected,
                     onCheckedChange = { isChecked ->
-                        onToggleShoppingItemSelectionClick(shoppingCartItem.product.id, isChecked)
+                        onToggleShoppingItemSelectionClick(shoppingCartItem.getId(), isChecked)
                     },
                 )
                 Text(
@@ -217,7 +217,7 @@ private fun ShoppingCartItems(
 @Composable
 fun OrderButton(
     shoppingCartItems: List<ShoppingCartItem>,
-    selectedProductIds: Set<Long>,
+    selectedCartItemIds: Set<Long>,
     shoppingCartSelectItemCount: Int,
     onToggleShoppingItemSelectionClick: (List<Long>, Boolean) -> Unit,
     onOrderButtonClick: (List<Long>) -> Unit,
@@ -244,7 +244,7 @@ fun OrderButton(
                     checked = checked,
                     onCheckedChange = { isChecked ->
                         onToggleShoppingItemSelectionClick(
-                            shoppingCartItems.map { shoppingCartItem -> shoppingCartItem.product.id },
+                            shoppingCartItems.map { shoppingCartItem -> shoppingCartItem.getId() },
                             isChecked,
                         )
                     },
@@ -269,7 +269,7 @@ fun OrderButton(
         )
 
         Button(
-            onClick = { onOrderButtonClick(selectedProductIds.toList()) },
+            onClick = { onOrderButtonClick(selectedCartItemIds.toList()) },
             modifier =
                 Modifier
                     .weight(1.5f)
@@ -301,7 +301,7 @@ private fun ShoppingCartOrderButtonPreview() {
     AndroidShoppingTheme {
         OrderButton(
             shoppingCartItems = emptyList(),
-            selectedProductIds = emptySet(),
+            selectedCartItemIds = emptySet(),
             shoppingCartSelectItemCount = 3,
             totalPrice = 3400000,
             checked = true,
