@@ -3,11 +3,11 @@ package woowacourse.shopping.presentation.recommend.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.RepositoryProvider
@@ -28,13 +28,13 @@ class RecommendViewModel(
     private val _uiState = MutableStateFlow(RecommendUiState())
     val uiState: StateFlow<RecommendUiState> = _uiState.asStateFlow()
 
-    private val _uiEvents = Channel<RecommendEvent>(Channel.BUFFERED)
-    val uiEvents = _uiEvents.receiveAsFlow()
+    private val _uiEvents = MutableSharedFlow<RecommendEvent>()
+    val uiEvents = _uiEvents.asSharedFlow()
 
     private val exceptionHandler =
         CoroutineExceptionHandler { _, _ ->
             viewModelScope.launch {
-                _uiEvents.send(RecommendEvent.ShowError("알 수 없는 오류가 발생했습니다."))
+                _uiEvents.emit(RecommendEvent.ShowError("알 수 없는 오류가 발생했습니다."))
             }
         }
 

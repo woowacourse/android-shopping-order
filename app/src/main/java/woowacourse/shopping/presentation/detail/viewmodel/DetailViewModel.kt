@@ -3,12 +3,11 @@ package woowacourse.shopping.presentation.detail.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.RepositoryProvider
@@ -28,15 +27,15 @@ class DetailViewModel(
     private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
 
-    private val _uiEvents = Channel<DetailEvent>(Channel.BUFFERED)
-    val uiEvents: Flow<DetailEvent> = _uiEvents.receiveAsFlow()
+    private val _uiEvents = MutableSharedFlow<DetailEvent>()
+    val uiEvents = _uiEvents.asSharedFlow()
 
     private var loadedProduct: Product? = null
 
     private val exceptionHandler =
         CoroutineExceptionHandler { _, _ ->
             viewModelScope.launch {
-                _uiEvents.send(DetailEvent.ShowError("알 수 없는 오류가 발생했습니다."))
+                _uiEvents.emit(DetailEvent.ShowError("알 수 없는 오류가 발생했습니다."))
             }
         }
 
@@ -76,7 +75,7 @@ class DetailViewModel(
                 }
             } catch (e: Exception) {
                 _uiState.value = DetailUiState.Error("상품 로딩에 실패했습니다.")
-                _uiEvents.send(DetailEvent.ShowError("상품 로딩에 실패했습니다."))
+                _uiEvents.emit(DetailEvent.ShowError("상품 로딩에 실패했습니다."))
             }
         }
     }
@@ -107,7 +106,7 @@ class DetailViewModel(
     ) {
         viewModelScope.launch(exceptionHandler) {
             addToCartUseCase(cartRepository, id, quantity)
-            _uiEvents.send(DetailEvent.NavigateToCart)
+            _uiEvents.emit(DetailEvent.NavigateToCart)
         }
     }
 }

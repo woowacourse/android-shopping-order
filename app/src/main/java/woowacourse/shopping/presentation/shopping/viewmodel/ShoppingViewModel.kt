@@ -5,11 +5,11 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okio.IOException
@@ -31,13 +31,13 @@ class ShoppingViewModel(
     private val _uiState = MutableStateFlow(ShoppingUiState())
     val uiState: StateFlow<ShoppingUiState> = _uiState.asStateFlow()
 
-    private val _uiEvents = Channel<ShoppingEvent>(Channel.BUFFERED)
-    val uiEvents = _uiEvents.receiveAsFlow()
+    private val _uiEvents = MutableSharedFlow<ShoppingEvent>()
+    val uiEvents = _uiEvents.asSharedFlow()
 
     private val exceptionHandler =
         CoroutineExceptionHandler { _, _ ->
             viewModelScope.launch {
-                _uiEvents.send(ShoppingEvent.ShowError("알 수 없는 오류가 발생했습니다."))
+                _uiEvents.emit(ShoppingEvent.ShowError("알 수 없는 오류가 발생했습니다."))
             }
         }
 

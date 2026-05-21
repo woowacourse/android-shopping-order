@@ -2,7 +2,7 @@ package woowacourse.shopping.presentation.cart.viewmodel
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -79,18 +79,27 @@ class CartViewModelTest {
     @Test
     fun `deleteItem은 성공 시 DeleteSuccess 이벤트를 발생시킨다`() =
         runTest {
+            val events = mutableListOf<CartEvent>()
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                viewModel.uiEvents.collect { events.add(it) }
+            }
             cartRepository.addItem(1L, 1)
 
             viewModel.deleteItem(1L)
 
-            assertThat(viewModel.uiEvents.first()).isEqualTo(CartEvent.DeleteSuccess)
+            assertThat(events).contains(CartEvent.DeleteSuccess)
         }
 
     @Test
     fun `deleteItem은 없는 상품이면 DeleteNotFound 이벤트를 발생시킨다`() =
         runTest {
+            val events = mutableListOf<CartEvent>()
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                viewModel.uiEvents.collect { events.add(it) }
+            }
+
             viewModel.deleteItem(999L)
 
-            assertThat(viewModel.uiEvents.first()).isEqualTo(CartEvent.DeleteNotFound)
+            assertThat(events).contains(CartEvent.DeleteNotFound)
         }
 }

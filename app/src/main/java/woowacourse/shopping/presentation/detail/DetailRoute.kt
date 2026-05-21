@@ -6,10 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import woowacourse.shopping.presentation.detail.model.DetailUiState
@@ -30,16 +28,14 @@ fun DetailRoute(
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
-    LaunchedEffect(lifecycleOwner) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.uiEvents.collect { event ->
-                when (event) {
-                    is DetailEvent.ShowError -> {
-                        Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
-                    }
-                    is DetailEvent.NavigateToCart -> {
-                        navController.navigate(CartScreen)
-                    }
+    LaunchedEffect(Unit) {
+        viewModel.uiEvents.collect { event ->
+            when (event) {
+                is DetailEvent.ShowError -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+                is DetailEvent.NavigateToCart -> {
+                    navController.navigate(CartScreen)
                 }
             }
         }

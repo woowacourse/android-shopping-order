@@ -3,12 +3,11 @@ package woowacourse.shopping.presentation.cart.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.RepositoryProvider
@@ -31,13 +30,13 @@ class CartViewModel(
 
     private var paymentItems = PaymentItems(emptySet())
 
-    private val _uiEvents = Channel<CartEvent>(Channel.BUFFERED)
-    val uiEvents: Flow<CartEvent> = _uiEvents.receiveAsFlow()
+    private val _uiEvents = MutableSharedFlow<CartEvent>()
+    val uiEvents = _uiEvents.asSharedFlow()
 
     private val exceptionHandler =
         CoroutineExceptionHandler { _, _ ->
             viewModelScope.launch {
-                _uiEvents.send(CartEvent.ShowError("알 수 없는 오류가 발생했습니다."))
+                _uiEvents.emit(CartEvent.ShowError("알 수 없는 오류가 발생했습니다."))
             }
         }
 
@@ -54,16 +53,16 @@ class CartViewModel(
             when (val result = cartRepository.deleteItem(productId)) {
                 is RemoveItemResult.Success -> {
                     loadCartItems(result.cart)
-                    _uiEvents.send(CartEvent.DeleteSuccess)
+                    _uiEvents.emit(CartEvent.DeleteSuccess)
                 }
                 is RemoveItemResult.NotFoundItem -> {
-                    _uiEvents.send(CartEvent.DeleteNotFound)
+                    _uiEvents.emit(CartEvent.DeleteNotFound)
                 }
                 is RemoveItemResult.Error -> {
-                    _uiEvents.send(CartEvent.ShowError(result.message))
+                    _uiEvents.emit(CartEvent.ShowError(result.message))
                 }
                 is RemoveItemResult.Cancel -> {
-                    _uiEvents.send(CartEvent.ShowCancelReason(result.message))
+                    _uiEvents.emit(CartEvent.ShowCancelReason(result.message))
                 }
             }
         }
@@ -81,7 +80,7 @@ class CartViewModel(
                 }
 
                 is AddItemResult.Error -> {
-                    _uiEvents.send(CartEvent.ShowError(result.message))
+                    _uiEvents.emit(CartEvent.ShowError(result.message))
                 }
             }
         }
@@ -98,7 +97,7 @@ class CartViewModel(
             ) {
                 is UpdateItemResult.Success -> loadCartItems(result.cart)
                 is UpdateItemResult.Error -> {
-                    _uiEvents.send(CartEvent.ShowError(result.message))
+                    _uiEvents.emit(CartEvent.ShowError(result.message))
                     loadCartItems()
                 }
             }
