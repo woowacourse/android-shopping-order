@@ -78,7 +78,7 @@ fun AppNavHost(
                     },
                     onOrderCompleted = {
                         navController.navigate(ShoppingRoute) {
-                            popUpTo(ShoppingRoute) { inclusive = false }
+                            popUpTo(CartGraph) { inclusive = true }
                             launchSingleTop = true
                         }
                     },
