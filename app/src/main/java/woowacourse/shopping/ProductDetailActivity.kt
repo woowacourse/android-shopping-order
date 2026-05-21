@@ -21,24 +21,6 @@ import woowacourse.shopping.ui.viewmodel.ProductDetailViewModelFactory
 import kotlin.jvm.java
 
 class ProductDetailActivity : ComponentActivity() {
-
-    companion object {
-        const val SELECTED_PRODUCT_ID_KEY = "selected_product"
-        const val LATEST_VIEWED_PRODUCT_ID_KEY = "latest_viewed_product"
-
-        fun startActivity(
-            context: Context,
-            selectedProductId: Long,
-            lastViewedProductId: Long?,
-        ) {
-            val intent = Intent(context, ProductDetailActivity::class.java)
-            intent.putExtra(SELECTED_PRODUCT_ID_KEY, selectedProductId)
-            intent.putExtra(LATEST_VIEWED_PRODUCT_ID_KEY, lastViewedProductId)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            context.startActivity(intent)
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -99,6 +81,23 @@ class ProductDetailActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+
+    companion object {
+        const val SELECTED_PRODUCT_ID_KEY = "selected_product"
+        const val LATEST_VIEWED_PRODUCT_ID_KEY = "latest_viewed_product"
+
+        fun startActivity(
+            context: Context,
+            selectedProductId: Long,
+            lastViewedProductId: Long?,
+        ) {
+            val intent = Intent(context, ProductDetailActivity::class.java)
+            intent.putExtra(SELECTED_PRODUCT_ID_KEY, selectedProductId)
+            intent.putExtra(LATEST_VIEWED_PRODUCT_ID_KEY, lastViewedProductId)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            context.startActivity(intent)
         }
     }
 }
