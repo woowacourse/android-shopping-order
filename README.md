@@ -96,7 +96,7 @@
 
 ### Navigation
 - [ ] Compose Navigation으로 화면 전환을 구현한다.
-- [ ] 상품 목록 화면을 Navigation destination으로 구성한다.
+- [x] 상품 목록 화면을 Navigation destination으로 구성한다.
 - [ ] 상품 상세 화면을 Navigation destination으로 구성한다.
 - [ ] 장바구니 화면을 Navigation destination으로 구성한다.
 - [ ] 상품 추천 화면을 Navigation destination으로 구성한다.

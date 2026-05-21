@@ -12,7 +12,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.rememberNavController
 import woowacourse.shopping.ui.cart.CartActivity
+import woowacourse.shopping.ui.navigation.AppNavHost
 import woowacourse.shopping.ui.productdetail.ProductDetailActivity
 import woowacourse.shopping.ui.theme.ShoppingTheme
 
@@ -28,28 +30,10 @@ class ShoppingActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val navController = rememberNavController()
 
             ShoppingTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ShoppingScreen(
-                        productListState = uiState.productListState,
-                        recentProducts = uiState.recentProducts,
-                        cartQuantity = uiState.cartQuantity,
-                        isNetworkConnected = uiState.isNetworkConnected,
-                        modifier = Modifier.padding(innerPadding),
-                        onCartClick = {
-                            startActivity(Intent(this, CartActivity::class.java))
-                        },
-                        onProductClick = {
-                            ProductDetailActivity.startActivity(this, it.id)
-                        },
-                        onMoreClick = viewModel::loadMore,
-                        onAddToCart = viewModel::addToCart,
-                        onIncreaseQuantity = viewModel::increaseQuantity,
-                        onDecreaseQuantity = viewModel::decreaseQuantity,
-                    )
-                }
+                AppNavHost(navController = navController)
             }
         }
     }
