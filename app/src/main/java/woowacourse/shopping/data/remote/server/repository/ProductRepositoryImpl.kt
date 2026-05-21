@@ -13,8 +13,8 @@ class ProductRepositoryImpl(
     override suspend fun getProducts(
         page: Int,
         pageSize: Int,
-    ): ApiResult<List<Product>> {
-        return try {
+    ): ApiResult<List<Product>> =
+        try {
             val response =
                 productService.requestProducts(
                     page = page,
@@ -26,10 +26,9 @@ class ProductRepositoryImpl(
         } catch (e: Exception) {
             ApiResult.Exception(e)
         }
-    }
 
-    override suspend fun getProduct(id: Long): ApiResult<Product> {
-        return try {
+    override suspend fun getProduct(id: Long): ApiResult<Product> =
+        try {
             val response = productService.requestProduct(id)
             ApiResult.Success(response.toDomain())
         } catch (e: HttpException) {
@@ -37,14 +36,13 @@ class ProductRepositoryImpl(
         } catch (e: Exception) {
             ApiResult.Exception(e)
         }
-    }
 
     override suspend fun getCategoryProducts(
         page: Int,
         pageSize: Int,
         category: String,
-    ): ApiResult<List<Product>> {
-        return try {
+    ): ApiResult<List<Product>> =
+        try {
             val response = productService.requestCategoryProducts(category = category)
             ApiResult.Success(response.content.map { it.toDomain() })
         } catch (e: HttpException) {
@@ -52,5 +50,4 @@ class ProductRepositoryImpl(
         } catch (e: Exception) {
             ApiResult.Exception(e)
         }
-    }
 }

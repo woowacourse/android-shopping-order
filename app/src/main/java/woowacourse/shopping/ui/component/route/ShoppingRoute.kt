@@ -19,7 +19,7 @@ fun ShoppingRoute(
     onNavigateToProductDetail: (productId: Long, lastViewedId: Long?) -> Unit,
     onNavigateToCart: () -> Unit,
     modifier: Modifier = Modifier,
-){
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val lastViewedProductId by viewModel.lastViewProductId.collectAsStateWithLifecycle()
 
@@ -33,7 +33,7 @@ fun ShoppingRoute(
     }
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        modifier = modifier
+        modifier = modifier,
     ) { innerPadding ->
         CatalogScreen(
             catalog = uiState.products,
@@ -60,7 +60,7 @@ fun ShoppingRoute(
             specificProductCount = { uiState.cart.totalCountOfSpecificPurchaseProduct(it) },
             totalCount = uiState.totalCartCount(),
             isLoading = uiState.isLoading,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
         )
     }
 }

@@ -23,7 +23,6 @@ class ProductDetailViewModel(
     private val selectedProductId: Long,
     private val lastViewedProductId: Long?,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(ProductDetailUIState())
     val uiState = _uiState.asStateFlow()
     private val _cart = MutableStateFlow(PurchaseProducts())
@@ -33,8 +32,18 @@ class ProductDetailViewModel(
             val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
             when (allCartItemResult) {
                 is ApiResult.Success -> _cart.update { allCartItemResult.data }
-                is ApiResult.Error -> _uiState.update { it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${allCartItemResult.code}") }
-                is ApiResult.Exception -> _uiState.update { it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}") }
+                is ApiResult.Error ->
+                    _uiState.update {
+                        it.copy(
+                            errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${allCartItemResult.code}",
+                        )
+                    }
+                is ApiResult.Exception ->
+                    _uiState.update {
+                        it.copy(
+                            errorMsg = "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}",
+                        )
+                    }
             }
             fetchProduct()
         }
@@ -45,8 +54,10 @@ class ProductDetailViewModel(
             is ApiResult.Success -> {
                 val selectedProduct = selectedProductResult.data
                 if (lastViewedProductId != null) {
-                    when (val lastViewedProductResult =
-                        productRepository.getProduct(lastViewedProductId)) {
+                    when (
+                        val lastViewedProductResult =
+                            productRepository.getProduct(lastViewedProductId)
+                    ) {
                         is ApiResult.Success -> {
                             _uiState.update {
                                 it.copy(
@@ -133,7 +144,8 @@ class ProductDetailViewModelFactory(
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ProductDetailViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST") return ProductDetailViewModel(
+            @Suppress("UNCHECKED_CAST")
+            return ProductDetailViewModel(
                 cartRepository,
                 recentlyViewedProductRepository,
                 productRepository,

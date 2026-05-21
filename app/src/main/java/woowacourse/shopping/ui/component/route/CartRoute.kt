@@ -56,7 +56,7 @@ fun CartRoute(
             onOrderClick = {
                 onOrderClick(uiState.totalPrice, uiState.checkedItemIds)
             },
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
         )
     }
 }

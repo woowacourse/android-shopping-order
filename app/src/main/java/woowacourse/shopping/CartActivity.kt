@@ -38,11 +38,11 @@ class CartActivity : ComponentActivity() {
                         viewModel = viewModel,
                         onClose = { finish() },
                         onOrderClick = { totalPrice, checkedIds ->
-                            if (checkedIds.isNotEmpty()){
+                            if (checkedIds.isNotEmpty()) {
                                 RecommendationActivity.startActivity(
                                     context = this,
                                     totalPrice = totalPrice,
-                                    checkedIds = checkedIds
+                                    checkedIds = checkedIds,
                                 )
                             }
                         },

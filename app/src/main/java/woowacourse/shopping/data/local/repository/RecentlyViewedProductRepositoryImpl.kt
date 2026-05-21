@@ -23,7 +23,7 @@ class RecentlyViewedProductRepositoryImpl(
         recentlyViewedProductDao.insert(RecentlyViewedProductEntity(id = product.id))
 
         val currentItems = recentlyViewedProductDao.getAll().first()
-        if(currentItems?.let { it.size > MAX_RECENT_COUNT } == true) {
+        if (currentItems?.let { it.size > MAX_RECENT_COUNT } == true) {
             val oldestItem = currentItems.last()
             recentlyViewedProductDao.deleteById(oldestItem.id)
         }

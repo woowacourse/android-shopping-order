@@ -51,7 +51,7 @@ fun RecommendationRoute(
             },
             isContainedInCart = { id -> uiState.cart.isContain(id) },
             itemCount = { id -> uiState.cart.totalCountOfSpecificPurchaseProduct(id) },
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
         )
     }
 }

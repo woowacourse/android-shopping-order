@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.ui.component.route.RecommendationRoute
-import woowacourse.shopping.ui.component.screen.CartRecommendationScreen
 import woowacourse.shopping.ui.viewmodel.RecommendationViewModel
 import woowacourse.shopping.ui.viewmodel.RecommendationViewModelFactory
 
@@ -47,10 +45,10 @@ class RecommendationActivity : ComponentActivity() {
                         ProductDetailActivity.startActivity(
                             context = this,
                             selectedProductId = productId,
-                            lastViewedProductId = null
+                            lastViewedProductId = null,
                         )
                     },
-                    modifier = Modifier.padding(innerPadding)
+                    modifier = Modifier.padding(innerPadding),
                 )
             }
         }
@@ -59,10 +57,11 @@ class RecommendationActivity : ComponentActivity() {
     companion object {
         const val SELECTED_CART_ITEM_IDS = "selected_cart_item_ids"
         const val SELECTED_TOTAL_PRICE = "selected_total_price"
+
         fun startActivity(
             context: Context,
             totalPrice: Int,
-            checkedIds: List<Long>
+            checkedIds: List<Long>,
         ) {
             val intent = Intent(context, RecommendationActivity::class.java)
             intent.putExtra(SELECTED_TOTAL_PRICE, totalPrice)

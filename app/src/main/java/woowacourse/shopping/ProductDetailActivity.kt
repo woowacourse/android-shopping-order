@@ -60,7 +60,7 @@ class ProductDetailActivity : ComponentActivity() {
                                 lastViewedProductId = null,
                             )
                         },
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
                     )
                 }
             }

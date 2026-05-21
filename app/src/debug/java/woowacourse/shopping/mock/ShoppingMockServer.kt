@@ -140,7 +140,6 @@ private class MockShoppingRepository {
             product(5, "자몽 톡톡 스무디", 4900, "SMOOTHIE"),
             product(6, "제로 레몬말차 아이스티", 3900, "TEA"),
             product(7, "저당 꿀배 XO야쿠르트", 4500, "BEVERAGE"),
-
             // ===== 왕메가 / 디카페인 =====
             product(8, "귤 톡톡 젤리스무디", 4900, "SMOOTHIE"),
             product(9, "왕메가카페라떼", 4500, "COFFEE"),
@@ -149,20 +148,17 @@ private class MockShoppingRepository {
             product(12, "왕메가사과유자", 4500, "TEA"),
             product(13, "왕메가헛개리카노", 3900, "COFFEE"),
             product(14, "(HOT)디카페인 헛개리카노", 2800, "DECAFFEINE"),
-
             // ===== 주스 / 디카페인 =====
             product(15, "코코넛 커피 스무디", 5300, "SMOOTHIE"),
             product(16, "딸기주스", 4500, "JUICE"),
             product(17, "딸기바나나주스", 4500, "JUICE"),
             product(18, "디카페인 에스프레소", 2500, "DECAFFEINE"),
-
             // ===== 디카페인 음료 =====
             product(19, "디카페인 카페라떼", 3500, "DECAFFEINE"),
             product(20, "디카페인 카푸치노", 3500, "DECAFFEINE"),
             product(21, "디카페인 바닐라라떼", 4200, "DECAFFEINE"),
             product(22, "디카페인 헤이즐넛 라떼", 4200, "DECAFFEINE"),
             product(23, "디카페인 카라멜마끼아또", 4500, "DECAFFEINE"),
-
             // ===== 시즌 라떼 / 핫 음료 =====
             product(24, "오레오초코라떼", 4500, "LATTE"),
             product(25, "토피넛라떼", 4500, "LATTE"),
@@ -173,7 +169,6 @@ private class MockShoppingRepository {
             product(30, "흑당라떼", 4500, "LATTE"),
             product(31, "흑당밀크티라떼", 4500, "LATTE"),
             product(32, "흑당버블라떼", 4500, "LATTE"),
-
             // ===== 에스프레소 클래식 =====
             product(33, "카페모카", 3500, "COFFEE"),
             product(34, "카푸치노", 3500, "COFFEE"),
@@ -183,7 +178,6 @@ private class MockShoppingRepository {
             product(38, "헤이즐넛아메리카노", 2500, "COFFEE"),
             product(39, "꿀아메리카노", 3500, "COFFEE"),
             product(40, "바닐라라떼", 3500, "COFFEE"),
-
             // ===== 스무디 / 프라페 =====
             product(41, "딸기요거트스무디", 5300, "SMOOTHIE"),
             product(42, "딸기퐁크러쉬", 5500, "FRAPPE"),
@@ -193,7 +187,6 @@ private class MockShoppingRepository {
             product(46, "바나나퐁크러쉬", 5500, "FRAPPE"),
             product(47, "초코허니퐁크러쉬", 5500, "FRAPPE"),
             product(48, "커피프라페", 4500, "FRAPPE"),
-
             // ===== 티 =====
             product(49, "캐모마일 (HOT)", 3500, "TEA"),
             product(50, "페퍼민트 (HOT)", 3500, "TEA"),
@@ -204,7 +197,6 @@ private class MockShoppingRepository {
             product(55, "페퍼민트 (ICE)", 3500, "TEA"),
             product(56, "복숭아아이스티", 3500, "TEA"),
             product(57, "유자차", 3900, "TEA"),
-
             // ===== 디저트 / 베이커리 =====
             product(58, "버터가 쫀득해떡", 2500, "DESSERT"),
             product(59, "내 맘대로 더블 젤라또 (딸기&요거트)", 5500, "DESSERT"),
@@ -219,7 +211,6 @@ private class MockShoppingRepository {
             product(68, "초코무스 케익", 5500, "DESSERT"),
             product(69, "티라미수 케익", 5500, "DESSERT"),
             product(70, "허니브레드", 7500, "BAKERY"),
-
             // ===== MD 상품 =====
             product(71, "작지만 강력한 마루 자석 세트(2종 랜덤)", 8000, "MD"),
             product(72, "나랑 같이 날아 츄! 우주선 빨대 텀블러", 19800, "MD"),
@@ -231,7 +222,11 @@ private class MockShoppingRepository {
             product(78, "캐치!티니핑 하츄핑 랜덤 피규어", 5000, "MD"),
         )
 
-    private val cartItems = linkedMapOf(1L to CartEntry(id = 1L, productId = 2L, quantity = 1), 2L to CartEntry(id = 2L, productId = 9L, quantity = 2))
+    private val cartItems =
+        linkedMapOf(
+            1L to CartEntry(id = 1L, productId = 2L, quantity = 1),
+            2L to CartEntry(id = 2L, productId = 9L, quantity = 2),
+        )
     private var nextCartItemId = 3L
 
     @Synchronized
@@ -350,7 +345,9 @@ private fun List<Content>.toPagedResponse(
     val totalElements = this.size
     val totalPages = if (totalElements == 0) 1 else ((totalElements - 1) / safeSize) + 1
     val pageItems = drop(safePage * safeSize).take(safeSize)
-    val sort = woowacourse.shopping.data.remote.server.dto.products.Sort(empty = true, sorted = false, unsorted = true)
+    val sort =
+        woowacourse.shopping.data.remote.server.dto.products
+            .Sort(empty = true, sorted = false, unsorted = true)
     return ProductsResponse(
         totalElements = totalElements.toLong(),
         totalPages = totalPages,
@@ -383,7 +380,9 @@ private fun List<ContentResponse>.toPagedResponse(
     val totalElements = this.size
     val totalPages = if (totalElements == 0) 1 else ((totalElements - 1) / safeSize) + 1
     val pageItems = drop(safePage * safeSize).take(safeSize)
-    val sort = woowacourse.shopping.data.remote.server.dto.cart.items.Sort(empty = true, sorted = false, unsorted = true)
+    val sort =
+        woowacourse.shopping.data.remote.server.dto.cart.items
+            .Sort(empty = true, sorted = false, unsorted = true)
     return CartItemsResponse(
         totalElements = totalElements.toLong(),
         totalPages = totalPages,

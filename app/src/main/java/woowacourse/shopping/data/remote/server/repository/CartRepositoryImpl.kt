@@ -12,8 +12,8 @@ import woowacourse.shopping.domain.PurchaseProducts
 class CartRepositoryImpl(
     private val cartService: CartService,
 ) : CartRepository {
-    override suspend fun insert(purchaseProduct: PurchaseProduct): ApiResult<Unit> {
-        return try {
+    override suspend fun insert(purchaseProduct: PurchaseProduct): ApiResult<Unit> =
+        try {
             cartService.postCartItems(
                 PostCartRequest(
                     productId = purchaseProduct.id,
@@ -26,13 +26,12 @@ class CartRepositoryImpl(
         } catch (e: Exception) {
             ApiResult.Exception(e)
         }
-    }
 
     override suspend fun updateCount(
         cartItemId: Long,
         newQuantity: Int,
-    ): ApiResult<Unit> {
-        return try {
+    ): ApiResult<Unit> =
+        try {
             cartService.patchQuantity(
                 cartItemId = cartItemId,
                 request = PatchQuantityRequest(newQuantity),
@@ -43,10 +42,9 @@ class CartRepositoryImpl(
         } catch (e: Exception) {
             ApiResult.Exception(e)
         }
-    }
 
-    override suspend fun deleteCartItem(purchaseProductId: Long): ApiResult<Unit> {
-        return try {
+    override suspend fun deleteCartItem(purchaseProductId: Long): ApiResult<Unit> =
+        try {
             cartService.deleteProduct(
                 productId = purchaseProductId,
             )
@@ -56,27 +54,25 @@ class CartRepositoryImpl(
         } catch (e: Exception) {
             ApiResult.Exception(e)
         }
-    }
 
-    override suspend fun getProductCount(): ApiResult<Int> {
-        return try {
+    override suspend fun getProductCount(): ApiResult<Int> =
+        try {
             val response = cartService.requestQuantity().quantity
             ApiResult.Success(response)
         } catch (e: HttpException) {
             ApiResult.Error(
                 code = e.code(),
-                message = e.message
+                message = e.message,
             )
         } catch (e: Exception) {
             ApiResult.Exception(e)
         }
-    }
 
     override suspend fun getPagedCart(
         page: Int,
         size: Int,
-    ): ApiResult<PurchaseProducts> {
-        return try {
+    ): ApiResult<PurchaseProducts> =
+        try {
             val response = cartService.requestCartItems(page, size)
             val cartItems =
                 response.content.map { content ->
@@ -88,10 +84,9 @@ class CartRepositoryImpl(
         } catch (e: Exception) {
             ApiResult.Exception(e)
         }
-    }
 
-    override suspend fun getCartItemCount(): ApiResult<Int>{
-        return try {
+    override suspend fun getCartItemCount(): ApiResult<Int> =
+        try {
             val response = cartService.requestCartItems(0, 1).totalElements.toInt()
             ApiResult.Success(response)
         } catch (e: HttpException) {
@@ -99,5 +94,4 @@ class CartRepositoryImpl(
         } catch (e: Exception) {
             ApiResult.Exception(e)
         }
-    }
 }

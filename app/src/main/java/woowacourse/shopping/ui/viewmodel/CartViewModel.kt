@@ -15,7 +15,6 @@ import woowacourse.shopping.ui.state.CartUiState
 class CartViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -84,19 +83,21 @@ class CartViewModel(
 
             when (val result = cartRepository.updateCount(id, nextAmount)) {
                 is ApiResult.Success -> fetchCart()
-                is ApiResult.Error -> _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMsg = "$ViewModelConst.NETWORK_ERROR_LABEL${result.code}"
-                    )
-                }
+                is ApiResult.Error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMsg = "$ViewModelConst.NETWORK_ERROR_LABEL${result.code}",
+                        )
+                    }
 
-                is ApiResult.Exception -> _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMsg = "$ViewModelConst.ERROR_LABEL${result.e.message}"
-                    )
-                }
+                is ApiResult.Exception ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMsg = "$ViewModelConst.ERROR_LABEL${result.e.message}",
+                        )
+                    }
             }
         }
     }
@@ -117,33 +118,36 @@ class CartViewModel(
                     fetchCart()
                 }
 
-                is ApiResult.Error -> _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMsg = "$ViewModelConst.NETWORK_ERROR_LABEL${result.code}"
-                    )
-                }
+                is ApiResult.Error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMsg = "$ViewModelConst.NETWORK_ERROR_LABEL${result.code}",
+                        )
+                    }
 
-                is ApiResult.Exception -> _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMsg = "$ViewModelConst.ERROR_LABEL${result.e.message}"
-                    )
-                }
+                is ApiResult.Exception ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMsg = "$ViewModelConst.ERROR_LABEL${result.e.message}",
+                        )
+                    }
             }
         }
     }
 
     fun onItemChecked(id: Long) {
         _uiState.update { state ->
-            val newCheckedIds = if (state.checkedItemIds.contains(id)) {
-                state.checkedItemIds - id
-            } else {
-                state.checkedItemIds + id
-            }
+            val newCheckedIds =
+                if (state.checkedItemIds.contains(id)) {
+                    state.checkedItemIds - id
+                } else {
+                    state.checkedItemIds + id
+                }
             state.copy(
                 checkedItemIds = newCheckedIds,
-                totalPrice = calculateTotalPrice(_allCartItems.value, newCheckedIds)
+                totalPrice = calculateTotalPrice(_allCartItems.value, newCheckedIds),
             )
         }
     }
@@ -155,7 +159,7 @@ class CartViewModel(
         _uiState.update {
             it.copy(
                 checkedItemIds = newCheckIds,
-                totalPrice = calculateTotalPrice(_allCartItems.value, newCheckIds)
+                totalPrice = calculateTotalPrice(_allCartItems.value, newCheckIds),
             )
         }
     }
@@ -165,19 +169,24 @@ class CartViewModel(
         return allIds.isNotEmpty() && _uiState.value.checkedItemIds.containsAll(allIds)
     }
 
-    fun calculateTotalPrice(all: PurchaseProducts, checkedIds: List<Long>): Int {
-        return all.purchaseProducts
+    fun calculateTotalPrice(
+        all: PurchaseProducts,
+        checkedIds: List<Long>,
+    ): Int =
+        all.purchaseProducts
             .filter { it.id in checkedIds }
             .sumOf { it.totalPrice() }
-    }
 
-    fun getErrorMessage(vararg results: ApiResult<*>): String {
-        return results.filterIsInstance<ApiResult.Error>().firstOrNull()
+    fun getErrorMessage(vararg results: ApiResult<*>): String =
+        results
+            .filterIsInstance<ApiResult.Error>()
+            .firstOrNull()
             ?.let { "$ViewModelConst.NETWORK_ERROR_LABEL${it.code}" }
-            ?: results.filterIsInstance<ApiResult.Exception>().firstOrNull()
+            ?: results
+                .filterIsInstance<ApiResult.Exception>()
+                .firstOrNull()
                 ?.let { "$ViewModelConst.ERROR_LABEL${it.e.message}" }
             ?: UNKNOWN_ERROR_LABEL
-    }
 
     fun onErrorMsgShown() {
         _uiState.update { it.copy(errorMsg = null) }
