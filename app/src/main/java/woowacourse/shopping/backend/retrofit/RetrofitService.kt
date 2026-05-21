@@ -11,8 +11,8 @@ import woowacourse.shopping.backend.retrofit.api.ShoppingCartRetrofit
 import woowacourse.shopping.backend.retrofit.dto.CartQuantity
 import woowacourse.shopping.backend.retrofit.dto.CartRequest
 import woowacourse.shopping.backend.retrofit.dto.OrderInfo
-import woowacourse.shopping.backend.retrofit.dto.Product
-import woowacourse.shopping.backend.retrofit.dto.ProductResponse
+import woowacourse.shopping.backend.retrofit.dto.productlist.Product
+import woowacourse.shopping.backend.retrofit.dto.productlist.ProductResponse
 import woowacourse.shopping.backend.retrofit.dto.ShoppingCartResponse
 import woowacourse.shopping.repository.AuthHeaderProvider
 import woowacourse.shopping.repository.AuthInterceptor

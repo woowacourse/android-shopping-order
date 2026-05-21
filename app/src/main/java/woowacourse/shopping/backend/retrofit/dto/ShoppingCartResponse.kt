@@ -1,6 +1,7 @@
 package woowacourse.shopping.backend.retrofit.dto
 
 import kotlinx.serialization.Serializable
+import woowacourse.shopping.backend.retrofit.dto.productlist.Content
 
 @Serializable
 data class ShoppingCartResponse(

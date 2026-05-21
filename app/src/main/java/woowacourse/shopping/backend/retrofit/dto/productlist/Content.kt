@@ -1,4 +1,4 @@
-package woowacourse.shopping.backend.retrofit.dto
+package woowacourse.shopping.backend.retrofit.dto.productlist
 
 import kotlinx.serialization.Serializable
 

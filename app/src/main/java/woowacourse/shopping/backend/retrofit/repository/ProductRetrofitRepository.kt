@@ -3,8 +3,8 @@ package woowacourse.shopping.backend.retrofit.repository
 import woowacourse.shopping.backend.retrofit.api.ProductRetrofit
 import woowacourse.shopping.backend.retrofit.bodyOrThrow
 import woowacourse.shopping.backend.retrofit.throwOnFailure
-import woowacourse.shopping.backend.retrofit.dto.Product
-import woowacourse.shopping.backend.retrofit.dto.ProductResponse
+import woowacourse.shopping.backend.retrofit.dto.productlist.Product
+import woowacourse.shopping.backend.retrofit.dto.productlist.ProductResponse
 
 class ProductRetrofitRepository(
     private val apiService: ProductRetrofit,

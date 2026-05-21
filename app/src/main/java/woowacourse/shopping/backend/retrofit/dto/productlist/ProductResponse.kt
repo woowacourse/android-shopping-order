@@ -1,6 +1,9 @@
-package woowacourse.shopping.backend.retrofit.dto
+package woowacourse.shopping.backend.retrofit.dto.productlist
 
 import kotlinx.serialization.Serializable
+import woowacourse.shopping.backend.retrofit.dto.Pageable
+import woowacourse.shopping.backend.retrofit.dto.PageableResponse
+import woowacourse.shopping.backend.retrofit.dto.Sort
 
 @Serializable
 data class ProductResponse(

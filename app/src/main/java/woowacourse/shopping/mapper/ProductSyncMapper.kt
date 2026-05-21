@@ -1,12 +1,12 @@
 package woowacourse.shopping.mapper
 
 import woowacourse.shopping.backend.retrofit.dto.Pageable
-import woowacourse.shopping.backend.retrofit.dto.ProductResponse
+import woowacourse.shopping.backend.retrofit.dto.productlist.ProductResponse
 import woowacourse.shopping.model.Price
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductTitle
 import woowacourse.shopping.model.ShoppingItem
-import woowacourse.shopping.backend.retrofit.dto.Product as ApiProduct
+import woowacourse.shopping.backend.retrofit.dto.productlist.Product as ApiProduct
 
 fun ApiProduct.toDomainProduct(): Product =
     Product(
