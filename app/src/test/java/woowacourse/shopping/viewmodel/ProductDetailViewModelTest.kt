@@ -58,10 +58,10 @@ class ProductDetailViewModelTest {
     fun `선택된 상품 ID로 서버에서 상품을 조회할 수 있다`() =
         runTest {
             backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                viewModel.selectedProduct.collect { }
+                viewModel.uiState.collect { }
             }
 
-            val product = viewModel.selectedProduct.value
+            val product = viewModel.uiState.value.product
 
             assertNotNull(product)
             assertEquals(testProductId, product?.id)
@@ -71,22 +71,22 @@ class ProductDetailViewModelTest {
     @Test
     fun `장바구니에 담을 상품의 수량을 조절할 수 있다`() =
         runTest {
-            assertEquals(1, viewModel.countState.value)
+            assertEquals(1, viewModel.uiState.value.count)
 
             viewModel.addCount()
-            assertEquals(2, viewModel.countState.value)
+            assertEquals(2, viewModel.uiState.value.count)
 
             viewModel.minusCount()
-            assertEquals(1, viewModel.countState.value)
+            assertEquals(1, viewModel.uiState.value.count)
         }
 
     @Test
     fun `수량은 1에서 더이상 감소하지 않는다`() =
         runTest {
-            assertEquals(1, viewModel.countState.value)
+            assertEquals(1, viewModel.uiState.value.count)
             viewModel.minusCount()
 
-            assertEquals(1, viewModel.countState.value)
+            assertEquals(1, viewModel.uiState.value.count)
         }
 
     @Test

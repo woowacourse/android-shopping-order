@@ -1,5 +1,6 @@
 package woowacourse.shopping.viewmodel.fakes
 
+import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.repository.ProductRepository
 import woowacourse.shopping.domain.Product
 
@@ -14,13 +15,13 @@ class FakeProductRepository : ProductRepository {
     override suspend fun getProducts(
         page: Int,
         pageSize: Int,
-    ): List<Product> = products
+    ): ApiResult<List<Product>> = ApiResult.Success(products)
 
-    override suspend fun getProduct(id: Long): Product = products.first { it.id == id }
+    override suspend fun getProduct(id: Long): ApiResult<Product> = ApiResult.Success(products.first { it.id == id })
 
     override suspend fun getCategoryProducts(
         page: Int,
         pageSize: Int,
         category: String,
-    ): List<Product> = products.filter { it.category == category }
+    ): ApiResult<List<Product>> = ApiResult.Success(products.filter { it.category == category })
 }

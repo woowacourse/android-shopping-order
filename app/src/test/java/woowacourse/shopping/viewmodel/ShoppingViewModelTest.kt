@@ -47,11 +47,11 @@ class ShoppingViewModelTest {
             val products = listOf(Product(id = 1L, name = "사과", price = 1000, imageUri = "uri", category = "과일"))
             fakeProductRepository.setProducts(products)
 
-            viewModel.fetchProducts(0)
+            viewModel.fetchProducts()
 
-            val actualProduct = viewModel.products
-            assertEquals(1, actualProduct.value.size())
-            assertEquals("사과", actualProduct.value.findWithId(1L)?.name)
+            val actualProduct = viewModel.uiState.value.products
+            assertEquals(1, actualProduct.size())
+            assertEquals("사과", actualProduct.findWithId(1L)?.name)
         }
 
     @Test
@@ -70,13 +70,13 @@ class ShoppingViewModelTest {
 
             val collectJob =
                 backgroundScope.launch(context = UnconfinedTestDispatcher(testScheduler)) {
-                    viewModel.cart.collect()
+                    viewModel.uiState.collect()
                 }
 
-            viewModel.fetchProducts(0)
+            viewModel.fetchProducts()
             viewModel.addToCart(PurchaseProduct(1L, product, 2))
 
-            val cart = viewModel.cart.value
+            val cart = viewModel.uiState.value.cart
             val cartItem = cart.findById(1L)
 
             assertEquals(2, cartItem?.count)
@@ -100,13 +100,13 @@ class ShoppingViewModelTest {
 
             val collectJob =
                 backgroundScope.launch(context = UnconfinedTestDispatcher(testScheduler)) {
-                    viewModel.recentlyViewedProducts.collect()
+                    viewModel.uiState.collect()
                 }
 
             viewModel.fetchProducts()
             viewModel.updateHistory(product)
 
-            val history = viewModel.recentlyViewedProducts.value
+            val history = viewModel.uiState.value.recentlyViewedProducts
 
             assertEquals(1L, history.products[0].id)
             assertEquals("테스트", history.products[0].name)
@@ -129,16 +129,16 @@ class ShoppingViewModelTest {
 
             val collectJob =
                 backgroundScope.launch(context = UnconfinedTestDispatcher(testScheduler)) {
-                    viewModel.cart.collect()
+                    viewModel.uiState.collect()
                 }
 
-            viewModel.fetchProducts(0)
+            viewModel.fetchProducts()
 
             viewModel.addToCart(PurchaseProduct(1L, product, 2))
 
             viewModel.updateCountWithID(1L, 3)
 
-            val purchaseProducts = viewModel.cart.value
+            val purchaseProducts = viewModel.uiState.value.cart
             assertEquals(5, purchaseProducts.findById(1L)?.count)
             collectJob.cancel()
         }

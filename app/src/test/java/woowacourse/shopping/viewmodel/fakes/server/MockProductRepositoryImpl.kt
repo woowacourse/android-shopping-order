@@ -5,6 +5,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.repository.ProductRepository
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.viewmodel.fakes.server.dto.MockProductResponse
@@ -19,32 +20,40 @@ class MockProductRepositoryImpl(
     override suspend fun getProducts(
         page: Int,
         pageSize: Int,
-    ): List<Product> =
+    ): ApiResult<List<Product>> =
         withContext(Dispatchers.IO) {
-            val offset = page * pageSize
-            val url = "${baseUrl}products?offset=$offset&limit=$pageSize"
+            try {
+                val offset = page * pageSize
+                val url = "${baseUrl}products?offset=$offset&limit=$pageSize"
 
-            val request = Request.Builder().url(url).build()
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) throw okio.IOException("Unexpected code $response")
+                val request = Request.Builder().url(url).build()
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) return@withContext ApiResult.Error(response.code, response.message)
 
-                val responseBody = response.body.string() ?: ""
-                val webResponse = json.decodeFromString<List<MockProductResponse>>(responseBody)
-                webResponse.map { it.toObject() }
+                    val responseBody = response.body.string() ?: ""
+                    val webResponse = json.decodeFromString<List<MockProductResponse>>(responseBody)
+                    ApiResult.Success(webResponse.map { it.toObject() })
+                }
+            } catch (e: Exception) {
+                ApiResult.Exception(e)
             }
         }
 
-    override suspend fun getProduct(id: Long): Product =
+    override suspend fun getProduct(id: Long): ApiResult<Product> =
         withContext(Dispatchers.IO) {
-            val url = "${baseUrl}products/$id"
+            try {
+                val url = "${baseUrl}products/$id"
 
-            val request = Request.Builder().url(url).build()
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) throw okio.IOException("Unexpected code $response")
+                val request = Request.Builder().url(url).build()
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) return@withContext ApiResult.Error(response.code, response.message)
 
-                val responseBody = response.body.string() ?: ""
-                val webResponse = json.decodeFromString<MockProductResponse>(responseBody)
-                webResponse.toObject()
+                    val responseBody = response.body.string() ?: ""
+                    val webResponse = json.decodeFromString<MockProductResponse>(responseBody)
+                    ApiResult.Success(webResponse.toObject())
+                }
+            } catch (e: Exception) {
+                ApiResult.Exception(e)
             }
         }
 
@@ -52,18 +61,22 @@ class MockProductRepositoryImpl(
         page: Int,
         pageSize: Int,
         category: String,
-    ): List<Product> =
+    ): ApiResult<List<Product>> =
         withContext(Dispatchers.IO) {
-            val offset = page * pageSize
-            val url = "${baseUrl}products?offset=$offset&limit=$pageSize"
+            try {
+                val offset = page * pageSize
+                val url = "${baseUrl}products?offset=$offset&limit=$pageSize"
 
-            val request = Request.Builder().url(url).build()
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) throw okio.IOException("Unexpected code $response")
+                val request = Request.Builder().url(url).build()
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) return@withContext ApiResult.Error(response.code, response.message)
 
-                val responseBody = response.body.string() ?: ""
-                val webResponse = json.decodeFromString<List<MockProductResponse>>(responseBody)
-                webResponse.map { it.toObject() }.filter { it.category == category }
+                    val responseBody = response.body.string() ?: ""
+                    val webResponse = json.decodeFromString<List<MockProductResponse>>(responseBody)
+                    ApiResult.Success(webResponse.map { it.toObject() }.filter { it.category == category })
+                }
+            } catch (e: Exception) {
+                ApiResult.Exception(e)
             }
         }
 }

@@ -76,7 +76,7 @@ class RecommendationViewModelTest {
             // then: 카테고리 상품 추천 목록을 불러온다
             assertEquals(
                 snack2.id,
-                viewModel.recommendedProducts.value.products[1]
+                viewModel.uiState.value.recommendedProducts.products[1]
                     .id,
             )
         }
@@ -112,6 +112,6 @@ class RecommendationViewModelTest {
             viewModel.updateCountWithID(1L, 2)
 
             // then: 결제할 가격에 반영된다
-            assertEquals(2000, viewModel.totalPrice.value)
+            assertEquals(2000, viewModel.uiState.value.totalPrice)
         }
 }

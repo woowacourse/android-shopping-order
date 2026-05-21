@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.repository.ProductRepository
 import woowacourse.shopping.viewmodel.fakes.server.MockProductRepositoryImpl
 import woowacourse.shopping.viewmodel.fakes.server.ProductWebServer
@@ -19,9 +20,10 @@ class ProductWebServerTest {
             val pageSize = 5
 
             // when
-            val products = repository.getProducts(page, pageSize)
+            val result = repository.getProducts(page, pageSize)
 
             // then
+            val products = (result as ApiResult.Success).data
             assertEquals(5, products.size)
             assertEquals(1L, products[0].id)
         }
@@ -33,9 +35,10 @@ class ProductWebServerTest {
             val targetId = 2L
 
             // when
-            val product = repository.getProduct(targetId)
+            val result = repository.getProduct(targetId)
 
             // then
+            val product = (result as ApiResult.Success).data
             assertEquals(2L, product.id)
             assertEquals("무엘사", product.name)
         }
@@ -46,13 +49,11 @@ class ProductWebServerTest {
             // given
             val invalidID = -1L
 
-            // when & then
-            val result =
-                runCatching {
-                    repository.getProduct(invalidID)
-                }
+            // when
+            val result = repository.getProduct(invalidID)
 
-            assertEquals(true, result.isFailure)
+            // then
+            assertEquals(true, result !is ApiResult.Success)
         }
 
     companion object {

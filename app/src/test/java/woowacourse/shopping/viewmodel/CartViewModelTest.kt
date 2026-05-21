@@ -46,33 +46,20 @@ class CartViewModelTest {
             testScheduler.advanceUntilIdle()
 
             backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                viewModel.currentPage.collect { }
+                viewModel.uiState.collect { }
             }
 
-            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                viewModel.nextEnable.collect { }
-            }
-
-            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                viewModel.prevEnable.collect { }
-            }
-
-            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                viewModel.cartItemCount.collect { }
-            }
-
-            assertEquals(0, viewModel.currentPage.value)
-            assertEquals(6, viewModel.cartItemCount.value)
-            assertFalse(viewModel.prevEnable.value)
-            assertTrue(viewModel.nextEnable.value)
+            assertEquals(0, viewModel.uiState.value.currentPage)
+            assertFalse(viewModel.uiState.value.isPrevEnable)
+            assertTrue(viewModel.uiState.value.isNextEnable)
 
             viewModel.next()
-            assertEquals(1, viewModel.currentPage.value)
-            assertTrue(viewModel.prevEnable.value)
-            assertFalse(viewModel.nextEnable.value)
+            assertEquals(1, viewModel.uiState.value.currentPage)
+            assertTrue(viewModel.uiState.value.isPrevEnable)
+            assertFalse(viewModel.uiState.value.isNextEnable)
 
             viewModel.prev()
-            assertEquals(0, viewModel.currentPage.value)
+            assertEquals(0, viewModel.uiState.value.currentPage)
         }
 
     @Test
@@ -86,17 +73,13 @@ class CartViewModelTest {
 
             viewModel = CartViewModel(fakeCartRepository)
             backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                viewModel.cartItemCount.collect { }
+                viewModel.uiState.collect { }
             }
 
-            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                viewModel.pagedCart.collect { }
-            }
-
-            assertEquals(5, viewModel.pagedCart.value.purchaseProducts.size)
+            assertEquals(5, viewModel.uiState.value.items.purchaseProducts.size)
 
             viewModel.next()
-            assertEquals(2, viewModel.pagedCart.value.purchaseProducts.size)
+            assertEquals(2, viewModel.uiState.value.items.purchaseProducts.size)
         }
 
     @Test
@@ -110,50 +93,40 @@ class CartViewModelTest {
 
             viewModel = CartViewModel(fakeCartRepository)
             backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                viewModel.cartItemCount.collect { }
-            }
-            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                viewModel.currentPage.collect { }
-            }
-            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                viewModel.pagedCart.collect { }
+                viewModel.uiState.collect { }
             }
 
             viewModel.next()
-            assertEquals(1, viewModel.currentPage.value)
+            assertEquals(1, viewModel.uiState.value.currentPage)
 
             viewModel.removeWithID(6L)
 
-            assertEquals(0, viewModel.currentPage.value)
+            assertEquals(0, viewModel.uiState.value.currentPage)
         }
 
     @Test
     fun `수량 변경 시 최종 수량이 서버에 전달된다`() =
         runTest {
-            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                viewModel.pagedCart.collect { }
-            }
-
             val product = Product(id = 1L, name = "상품1", price = 1000, imageUri = "uri", category = "카테고리")
             fakeCartRepository.insert(PurchaseProduct(1L, product, 5))
 
             viewModel = CartViewModel(fakeCartRepository)
             backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                viewModel.pagedCart.collect { }
+                viewModel.uiState.collect { }
             }
 
             viewModel.updateCountWithID(1L, 1)
 
             assertEquals(
                 6,
-                viewModel.pagedCart.value.purchaseProducts[0]
+                viewModel.uiState.value.items.purchaseProducts[0]
                     .count,
             )
 
             viewModel.updateCountWithID(1L, -2)
             assertEquals(
                 4,
-                viewModel.pagedCart.value.purchaseProducts[0]
+                viewModel.uiState.value.items.purchaseProducts[0]
                     .count,
             )
         }
