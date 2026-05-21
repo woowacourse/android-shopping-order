@@ -1,5 +1,6 @@
 package woowacourse.shopping
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -62,6 +63,21 @@ class RecommendationActivity : ComponentActivity() {
                     modifier = Modifier.padding(innerPadding),
                 )
             }
+        }
+    }
+
+    companion object {
+        const val SELECTED_CART_ITEM_IDS = "selected_cart_item_ids"
+        const val SELECTED_TOTAL_PRICE = "selected_total_price"
+        fun startActivity(
+            context: Context,
+            totalPrice: Int,
+            checkedIds: List<Long>
+        ) {
+            val intent = Intent(context, RecommendationActivity::class.java)
+            intent.putExtra(SELECTED_TOTAL_PRICE, totalPrice)
+            intent.putExtra(SELECTED_CART_ITEM_IDS, checkedIds.toLongArray())
+            context.startActivity(intent)
         }
     }
 }
