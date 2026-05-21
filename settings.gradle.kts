@@ -18,5 +18,6 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "android-shopping-order"
+rootProject.name = "android-shopping-cart"
 include(":app")
+include(":benchmark")
