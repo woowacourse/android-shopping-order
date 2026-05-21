@@ -1,7 +1,6 @@
 package woowacourse.shopping.mock
 
 import android.util.Log
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
 import okhttp3.mockwebserver.Dispatcher
@@ -52,12 +51,22 @@ private class ShoppingMockDispatcher : Dispatcher() {
         val url = request.requestUrl ?: return errorResponse(HttpURLConnection.HTTP_BAD_REQUEST)
         return when {
             request.method == "GET" && url.encodedPath == "/products" -> products(url)
-            request.method == "GET" && url.pathSegments.size == 2 && url.pathSegments[0] == "products" -> productDetail(url)
+            request.method == "GET" && url.pathSegments.size == 2 && url.pathSegments[0] == "products" -> productDetail(
+                url
+            )
+
             request.method == "GET" && url.encodedPath == "/cart-items" -> cartItems(url)
             request.method == "GET" && url.encodedPath == "/cart-items/counts" -> count()
             request.method == "POST" && url.encodedPath == "/cart-items" -> addCartItem(request)
-            request.method == "PATCH" && url.pathSegments.size == 2 && url.pathSegments[0] == "cart-items" -> updateCartItem(url, request)
-            request.method == "DELETE" && url.pathSegments.size == 2 && url.pathSegments[0] == "cart-items" -> deleteCartItem(url)
+            request.method == "PATCH" && url.pathSegments.size == 2 && url.pathSegments[0] == "cart-items" -> updateCartItem(
+                url,
+                request
+            )
+
+            request.method == "DELETE" && url.pathSegments.size == 2 && url.pathSegments[0] == "cart-items" -> deleteCartItem(
+                url
+            )
+
             request.method == "POST" && url.encodedPath == "/orders" -> order(request)
             else -> errorResponse(HttpURLConnection.HTTP_NOT_FOUND)
         }
@@ -70,8 +79,10 @@ private class ShoppingMockDispatcher : Dispatcher() {
     }
 
     private fun productDetail(url: HttpUrl): MockResponse {
-        val id = url.pathSegments[1].toLongOrNull() ?: return errorResponse(HttpURLConnection.HTTP_BAD_REQUEST)
-        val product = repository.getProduct(id) ?: return errorResponse(HttpURLConnection.HTTP_NOT_FOUND)
+        val id = url.pathSegments[1].toLongOrNull()
+            ?: return errorResponse(HttpURLConnection.HTTP_BAD_REQUEST)
+        val product =
+            repository.getProduct(id) ?: return errorResponse(HttpURLConnection.HTTP_NOT_FOUND)
         return jsonResponse(product)
     }
 
@@ -93,14 +104,16 @@ private class ShoppingMockDispatcher : Dispatcher() {
         url: HttpUrl,
         request: RecordedRequest,
     ): MockResponse {
-        val id = url.pathSegments[1].toLongOrNull() ?: return errorResponse(HttpURLConnection.HTTP_BAD_REQUEST)
+        val id = url.pathSegments[1].toLongOrNull()
+            ?: return errorResponse(HttpURLConnection.HTTP_BAD_REQUEST)
         val payload = json.decodeFromString<Quantity>(request.body.readUtf8())
         repository.updateCartItem(id, payload.quantity)
         return emptyResponse(HttpURLConnection.HTTP_OK)
     }
 
     private fun deleteCartItem(url: HttpUrl): MockResponse {
-        val id = url.pathSegments[1].toLongOrNull() ?: return errorResponse(HttpURLConnection.HTTP_BAD_REQUEST)
+        val id = url.pathSegments[1].toLongOrNull()
+            ?: return errorResponse(HttpURLConnection.HTTP_BAD_REQUEST)
         repository.deleteCartItem(id)
         return emptyResponse(HttpURLConnection.HTTP_NO_CONTENT)
     }

@@ -163,8 +163,8 @@ class CartViewModel(
             try {
                 cartRepo.add(product)
                 val cartId = cartRepo.findCartItem(product.id)
-                        ?.id
-                        ?: throw IllegalArgumentException("추가하려는 상품 아이디(${product.id})로 장바구니 아이디를 조회할 수 없습니다. ")
+                    ?.id
+                    ?: throw IllegalArgumentException("추가하려는 상품 아이디(${product.id})로 장바구니 아이디를 조회할 수 없습니다. ")
 
                 _uiState.update { state ->
                     val uiModel =
