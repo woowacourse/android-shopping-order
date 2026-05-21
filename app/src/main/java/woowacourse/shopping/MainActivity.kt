@@ -62,8 +62,7 @@ class MainActivity : ComponentActivity() {
                             )
                         },
                         onCartClick = {
-                            val intent = Intent(this, CartActivity::class.java)
-                            startActivity(intent)
+                            CartActivity.startActivity(this)
                         },
                         onLoadClick = {
                             viewModel.loadMore()
