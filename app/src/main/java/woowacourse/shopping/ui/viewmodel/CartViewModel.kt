@@ -52,7 +52,7 @@ class CartViewModel(
                 }
             } else {
                 val errorMsg = getErrorMessage(allItemsResult, pagedItemsResult)
-                _uiState.update { it.copy(errorMessage = errorMsg) }
+                _uiState.update { it.copy(errorMsg = errorMsg) }
             }
         }
     }
@@ -78,19 +78,19 @@ class CartViewModel(
             val nextAmount = target.count + updateAmount
             if(nextAmount < 1) return@launch
 
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update { it.copy(isLoading = true, errorMsg = null) }
 
             when (val result = cartRepository.updateCount(id, nextAmount)) {
                 is ApiResult.Success -> fetchCart()
-                is ApiResult.Error ->_uiState.update { it.copy(isLoading = false, errorMessage = "변경 실패 ${result.code}") }
-                is ApiResult.Exception -> _uiState.update { it.copy(isLoading = false, errorMessage = "오류 발생: ${result.e.message}") }
+                is ApiResult.Error ->_uiState.update { it.copy(isLoading = false, errorMsg = "$NETWORK_ERROR_LABEL${result.code}") }
+                is ApiResult.Exception -> _uiState.update { it.copy(isLoading = false, errorMsg = "$ERROR_LABEL${result.e.message}") }
             }
         }
     }
 
     fun removeWithID(id: Long) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update { it.copy(isLoading = true, errorMsg = null) }
 
             when(val result = cartRepository.deleteCartItem(id)) {
                 is ApiResult.Success -> {
@@ -103,8 +103,8 @@ class CartViewModel(
                     _uiState.update { it.copy(checkedItemIds = newCheckedIds, currentPage = page) }
                     fetchCart()
                 }
-                is ApiResult.Error -> _uiState.update { it.copy(isLoading = false, errorMessage = "삭제 실패: ${result.message}") }
-                is ApiResult.Exception ->_uiState.update { it.copy(isLoading = false, errorMessage = "오류 발생: ${result.e.message}") }
+                is ApiResult.Error -> _uiState.update { it.copy(isLoading = false, errorMsg = "$NETWORK_ERROR_LABEL${result.code}") }
+                is ApiResult.Exception ->_uiState.update { it.copy(isLoading = false, errorMsg = "$ERROR_LABEL${result.e.message}") }
             }
         }
     }
@@ -147,13 +147,20 @@ class CartViewModel(
     }
 
     fun getErrorMessage(vararg results: ApiResult<*>):String {
-        return results.filterIsInstance<ApiResult.Error>().firstOrNull()?.let { "서버 에러 ${it.code}" }
-            ?: results.filterIsInstance<ApiResult.Exception>().firstOrNull()?.let { "예외 발생 ${it.e.message}" }
-            ?: "알수 없는 에러가 발생했습니다."
+        return results.filterIsInstance<ApiResult.Error>().firstOrNull()?.let { "$NETWORK_ERROR_LABEL${it.code}" }
+            ?: results.filterIsInstance<ApiResult.Exception>().firstOrNull()?.let { "$ERROR_LABEL${it.e.message}" }
+            ?: UNKNOWN_ERROR_LABEL
+    }
+
+    fun onErrorMsgShown() {
+        _uiState.update { it.copy(errorMsg = null) }
     }
 
     companion object {
         private const val PAGE_SIZE = 5
+        private const val NETWORK_ERROR_LABEL = "네트워크 에러: "
+        private const val ERROR_LABEL = "오류: "
+        private const val UNKNOWN_ERROR_LABEL = "알수 없는 에러"
     }
 }
 
