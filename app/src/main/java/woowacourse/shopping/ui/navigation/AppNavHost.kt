@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import woowacourse.shopping.ui.cart.CartRouteScreen
 import woowacourse.shopping.ui.productdetail.ProductDetailRouteScreen
 import woowacourse.shopping.ui.shopping.ShoppingRouteScreen
 
@@ -33,6 +34,15 @@ fun AppNavHost(
                 onCloseClick = { navController.popBackStack() },
                 onLastViewedProductClick = { productId ->
                     navController.navigate(ProductDetailRoute(productId))
+                }
+            )
+        }
+
+        composable<CartRoute> {
+            CartRouteScreen(
+                onBackClick = { navController.popBackStack() },
+                onOrderClick = {
+                    
                 }
             )
         }
