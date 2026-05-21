@@ -41,9 +41,6 @@ class ShoppingViewModel(
                 initialValue = emptyList(),
             )
 
-    private val _cart = MutableStateFlow(PurchaseProducts())
-    val cart = _cart.asStateFlow()
-
     val lastViewProductId: StateFlow<Long?> =
         recentlyViewedProductRepository
             .getLatestItem()
@@ -84,11 +81,9 @@ class ShoppingViewModel(
     }
 
     suspend fun fetchCart() {
-        val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.MAX_COUNT)
-        when(allCartItemResult) {
+        when(val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.MAX_COUNT)) {
             is ApiResult.Success -> {
-                _cart.update { allCartItemResult.data }
-                _uiState.update { it.copy(cartItemCount = _cart.value.totalCount()) }
+                _uiState.update { it.copy(cart = allCartItemResult.data) }
             }
             is ApiResult.Error -> ""
             is ApiResult.Exception -> ""
@@ -98,7 +93,7 @@ class ShoppingViewModel(
     fun addToCart(purchaseProduct: PurchaseProduct) {
         viewModelScope.launch {
             val existingItem =
-                _cart.value.purchaseProducts.find {
+                _uiState.value.cart.purchaseProducts.find {
                     it.product.id == purchaseProduct.product.id
                 }
             if (existingItem != null) {
@@ -115,7 +110,7 @@ class ShoppingViewModel(
         updateAmount: Int,
     ) {
         viewModelScope.launch {
-            val target = _cart.value.findById(id)
+            val target = _uiState.value.cart.findById(id)
             if (target != null) {
                 val nextCount = target.count + updateAmount
                 if (nextCount >= 1) {
@@ -128,7 +123,7 @@ class ShoppingViewModel(
 
     fun removeWithID(id: Long) {
         viewModelScope.launch {
-            val target = _cart.value.findById(id)
+            val target = _uiState.value.cart.findById(id)
             if (target != null) {
                 cartRepository.deleteCartItem(target.id)
                 fetchCart()

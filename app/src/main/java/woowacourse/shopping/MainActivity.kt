@@ -39,7 +39,6 @@ class MainActivity : ComponentActivity() {
                 )
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val lastViewedProductId by viewModel.lastViewProductId.collectAsStateWithLifecycle()
-            val cartState by viewModel.cart.collectAsStateWithLifecycle()
 
             AndroidshoppingTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -80,9 +79,9 @@ class MainActivity : ComponentActivity() {
                         },
                         onDelete = { viewModel.removeWithID(it) },
                         onAddInCart = { viewModel.addToCart(it) },
-                        isContainedInCart = { cartState.isContain(it) },
-                        specificProductCount = { cartState.totalCountOfSpecificPurchaseProduct(it) },
-                        totalCount = uiState.cartItemCount,
+                        isContainedInCart = { uiState.cart.isContain(it) },
+                        specificProductCount = { uiState.cart.totalCountOfSpecificPurchaseProduct(it) },
+                        totalCount = uiState.totalCartCount(),
                         isLoading = uiState.isLoading,
                     )
                 }
