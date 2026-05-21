@@ -104,9 +104,9 @@ class RecommendationViewModel(
                     fetchCart()
                 }
                 if (updateAmount > 0) {
-                    _uiState.update { it.copy(totalPrice = it.totalPrice + updateAmount) }
+                    _uiState.update { it.copy(totalPrice = it.totalPrice + target.price()) }
                 } else {
-                    _uiState.update { it.copy(totalPrice = it.totalPrice - updateAmount) }
+                    _uiState.update { it.copy(totalPrice = it.totalPrice - target.price()) }
                 }
             }
         }
