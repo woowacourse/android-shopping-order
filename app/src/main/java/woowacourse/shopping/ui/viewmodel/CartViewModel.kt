@@ -32,13 +32,15 @@ class CartViewModel(
             _uiState.update { it.copy(isLoading = true) }
 
             val allItemsResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
-            val pagedItemsResult = cartRepository.getPagedCart(_uiState.value.currentPage, PAGE_SIZE)
+            val pagedItemsResult =
+                cartRepository.getPagedCart(_uiState.value.currentPage, PAGE_SIZE)
 
-            if(allItemsResult is ApiResult.Success && pagedItemsResult is ApiResult.Success) {
+            if (allItemsResult is ApiResult.Success && pagedItemsResult is ApiResult.Success) {
                 _allCartItems.update { allItemsResult.data }
                 _cartItemCount.update { _allCartItems.value.totalCount() }
                 val page = _uiState.value.currentPage
-                val selectedPrice = calculateTotalPrice(_allCartItems.value, _uiState.value.checkedItemIds)
+                val selectedPrice =
+                    calculateTotalPrice(_allCartItems.value, _uiState.value.checkedItemIds)
 
                 _uiState.update { state ->
                     state.copy(
@@ -58,13 +60,13 @@ class CartViewModel(
     }
 
     fun next() {
-        if(!_uiState.value.isNextEnable) return
+        if (!_uiState.value.isNextEnable) return
         _uiState.update { it.copy(currentPage = it.currentPage + 1) }
         fetchCart()
     }
 
     fun prev() {
-        if(!_uiState.value.isPrevEnable) return
+        if (!_uiState.value.isPrevEnable) return
         _uiState.update { it.copy(currentPage = it.currentPage - 1) }
         fetchCart()
     }
@@ -76,14 +78,25 @@ class CartViewModel(
         viewModelScope.launch {
             val target = _allCartItems.value.findPurchaseProductById(id) ?: return@launch
             val nextAmount = target.count + updateAmount
-            if(nextAmount < 1) return@launch
+            if (nextAmount < 1) return@launch
 
             _uiState.update { it.copy(isLoading = true, errorMsg = null) }
 
             when (val result = cartRepository.updateCount(id, nextAmount)) {
                 is ApiResult.Success -> fetchCart()
-                is ApiResult.Error ->_uiState.update { it.copy(isLoading = false, errorMsg = "$NETWORK_ERROR_LABEL${result.code}") }
-                is ApiResult.Exception -> _uiState.update { it.copy(isLoading = false, errorMsg = "$ERROR_LABEL${result.e.message}") }
+                is ApiResult.Error -> _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMsg = "$ViewModelConst.NETWORK_ERROR_LABEL${result.code}"
+                    )
+                }
+
+                is ApiResult.Exception -> _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMsg = "$ViewModelConst.ERROR_LABEL${result.e.message}"
+                    )
+                }
             }
         }
     }
@@ -92,7 +105,7 @@ class CartViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMsg = null) }
 
-            when(val result = cartRepository.deleteCartItem(id)) {
+            when (val result = cartRepository.deleteCartItem(id)) {
                 is ApiResult.Success -> {
                     var newCheckedIds = emptyList<Long>()
                     if (_uiState.value.checkedItemIds.contains(id)) {
@@ -103,8 +116,20 @@ class CartViewModel(
                     _uiState.update { it.copy(checkedItemIds = newCheckedIds, currentPage = page) }
                     fetchCart()
                 }
-                is ApiResult.Error -> _uiState.update { it.copy(isLoading = false, errorMsg = "$NETWORK_ERROR_LABEL${result.code}") }
-                is ApiResult.Exception ->_uiState.update { it.copy(isLoading = false, errorMsg = "$ERROR_LABEL${result.e.message}") }
+
+                is ApiResult.Error -> _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMsg = "$ViewModelConst.NETWORK_ERROR_LABEL${result.code}"
+                    )
+                }
+
+                is ApiResult.Exception -> _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMsg = "$ViewModelConst.ERROR_LABEL${result.e.message}"
+                    )
+                }
             }
         }
     }
@@ -140,15 +165,17 @@ class CartViewModel(
         return allIds.isNotEmpty() && _uiState.value.checkedItemIds.containsAll(allIds)
     }
 
-    fun calculateTotalPrice(all: PurchaseProducts, checkedIds: List<Long>):Int {
+    fun calculateTotalPrice(all: PurchaseProducts, checkedIds: List<Long>): Int {
         return all.purchaseProducts
             .filter { it.id in checkedIds }
             .sumOf { it.totalPrice() }
     }
 
-    fun getErrorMessage(vararg results: ApiResult<*>):String {
-        return results.filterIsInstance<ApiResult.Error>().firstOrNull()?.let { "$NETWORK_ERROR_LABEL${it.code}" }
-            ?: results.filterIsInstance<ApiResult.Exception>().firstOrNull()?.let { "$ERROR_LABEL${it.e.message}" }
+    fun getErrorMessage(vararg results: ApiResult<*>): String {
+        return results.filterIsInstance<ApiResult.Error>().firstOrNull()
+            ?.let { "$ViewModelConst.NETWORK_ERROR_LABEL${it.code}" }
+            ?: results.filterIsInstance<ApiResult.Exception>().firstOrNull()
+                ?.let { "$ViewModelConst.ERROR_LABEL${it.e.message}" }
             ?: UNKNOWN_ERROR_LABEL
     }
 
@@ -158,8 +185,6 @@ class CartViewModel(
 
     companion object {
         private const val PAGE_SIZE = 5
-        private const val NETWORK_ERROR_LABEL = "네트워크 에러: "
-        private const val ERROR_LABEL = "오류: "
         private const val UNKNOWN_ERROR_LABEL = "알수 없는 에러"
     }
 }

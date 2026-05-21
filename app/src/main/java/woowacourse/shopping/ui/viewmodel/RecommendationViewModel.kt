@@ -58,21 +58,21 @@ class RecommendationViewModel(
                         }
 
                         is ApiResult.Error -> _uiState.update {
-                            it.copy(errorMsg = NETWORK_ERROR_LABEL + categoryProductsResult.code.toString())
+                            it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${categoryProductsResult.code}")
                         }
 
                         is ApiResult.Exception -> _uiState.update {
-                            it.copy(errorMsg = ERROR_LABEL + categoryProductsResult.e.message)
+                            it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${categoryProductsResult.e.message}")
                         }
                     }
                 }
 
                 is ApiResult.Error -> _uiState.update {
-                    it.copy(errorMsg = NETWORK_ERROR_LABEL + productResult.code.toString())
+                    it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${productResult.code}")
                 }
 
                 is ApiResult.Exception -> _uiState.update {
-                    it.copy(errorMsg = ERROR_LABEL + productResult.e.message)
+                    it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${productResult.e.message}")
                 }
             }
         }
@@ -82,11 +82,11 @@ class RecommendationViewModel(
         when (val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)) {
             is ApiResult.Success -> _uiState.update { it.copy(cart = allCartItemResult.data) }
             is ApiResult.Error -> _uiState.update {
-                it.copy(errorMsg = NETWORK_ERROR_LABEL + allCartItemResult.code.toString())
+                it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${allCartItemResult.code}")
             }
 
             is ApiResult.Exception -> _uiState.update {
-                it.copy(errorMsg = ERROR_LABEL + allCartItemResult.e.message)
+                it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}")
             }
         }
     }
@@ -101,11 +101,11 @@ class RecommendationViewModel(
                 when (val result = cartRepository.updateCount(existingItem.id, existingItem.count + 1)) {
                     is ApiResult.Success -> fetchCart()
                     is ApiResult.Error -> _uiState.update {
-                        it.copy(errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                        it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
                     }
 
                     is ApiResult.Exception -> _uiState.update {
-                        it.copy(errorMsg = ERROR_LABEL + result.e.message)
+                        it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
                     }
                 }
             } else {
@@ -123,11 +123,11 @@ class RecommendationViewModel(
                     }
 
                     is ApiResult.Error -> _uiState.update {
-                        it.copy(errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                        it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
                     }
 
                     is ApiResult.Exception -> _uiState.update {
-                        it.copy(errorMsg = ERROR_LABEL + result.e.message)
+                        it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
                     }
                 }
             }
@@ -154,11 +154,11 @@ class RecommendationViewModel(
                         }
 
                         is ApiResult.Error -> _uiState.update {
-                            it.copy(errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                            it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
                         }
 
                         is ApiResult.Exception -> _uiState.update {
-                            it.copy(errorMsg = ERROR_LABEL + result.e.message)
+                            it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
                         }
                     }
                 }
@@ -177,11 +177,11 @@ class RecommendationViewModel(
                     }
 
                     is ApiResult.Error -> _uiState.update {
-                        it.copy(errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                        it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
                     }
 
                     is ApiResult.Exception -> _uiState.update {
-                        it.copy(errorMsg = ERROR_LABEL + result.e.message)
+                        it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
                     }
                 }
             }
@@ -196,11 +196,6 @@ class RecommendationViewModel(
 
     fun onErrorMsgShown() {
         _uiState.update { it.copy(errorMsg = null) }
-    }
-
-    companion object {
-        private const val NETWORK_ERROR_LABEL = "네트워크 에러: "
-        private const val ERROR_LABEL = "오류: "
     }
 }
 

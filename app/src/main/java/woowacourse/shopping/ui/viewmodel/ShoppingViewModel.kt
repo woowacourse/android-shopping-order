@@ -58,10 +58,10 @@ class ShoppingViewModel(
                         when (val result = productRepository.getProduct(id)) {
                             is ApiResult.Success -> recentlyViewedProducts.add(result.data)
                             is ApiResult.Error -> _uiState.update {
-                                it.copy(isLoading = false, errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                                it.copy(isLoading = false, errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
                             }
                             is ApiResult.Exception -> _uiState.update {
-                                it.copy(isLoading = false, errorMsg = ERROR_LABEL + result.e.message)
+                                it.copy(isLoading = false, errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
                             }
                         }
                     }
@@ -89,13 +89,13 @@ class ShoppingViewModel(
 
             is ApiResult.Error -> {
                 _uiState.update {
-                    it.copy(isLoading = false, errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                    it.copy(isLoading = false, errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
                 }
             }
 
             is ApiResult.Exception -> {
                 _uiState.update {
-                    it.copy(isLoading = false, errorMsg = ERROR_LABEL + result.e.message)
+                    it.copy(isLoading = false, errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
                 }
             }
         }
@@ -105,10 +105,10 @@ class ShoppingViewModel(
         when(val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)) {
             is ApiResult.Success -> _uiState.update { it.copy(cart = allCartItemResult.data) }
             is ApiResult.Error -> _uiState.update {
-                it.copy(errorMsg = NETWORK_ERROR_LABEL + allCartItemResult.code.toString())
+                it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${allCartItemResult.code}")
             }
             is ApiResult.Exception -> _uiState.update {
-                it.copy(errorMsg = ERROR_LABEL + allCartItemResult.e.message)
+                it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}")
             }
         }
     }
@@ -123,20 +123,20 @@ class ShoppingViewModel(
                 when (val result = cartRepository.updateCount(existingItem.id, existingItem.count + 1)){
                     is ApiResult.Success -> {}
                     is ApiResult.Error -> _uiState.update {
-                        it.copy(isLoading = false, errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                        it.copy(isLoading = false, errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
                     }
                     is ApiResult.Exception -> _uiState.update {
-                        it.copy(isLoading = false, errorMsg = NETWORK_ERROR_LABEL + result.e.message)
+                        it.copy(isLoading = false, errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
                     }
                 }
             } else {
                 when(val result = cartRepository.insert(purchaseProduct)){
                     is ApiResult.Success -> fetchCart()
                     is ApiResult.Error -> _uiState.update {
-                        it.copy(isLoading = false, errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                        it.copy(isLoading = false, errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
                     }
                     is ApiResult.Exception -> _uiState.update {
-                        it.copy(isLoading = false, errorMsg = NETWORK_ERROR_LABEL + result.e.message)
+                        it.copy(isLoading = false, errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
                     }
                 }
             }
@@ -155,10 +155,10 @@ class ShoppingViewModel(
                     when(val result = cartRepository.updateCount(target.id, nextCount)){
                         is ApiResult.Success -> fetchCart()
                         is ApiResult.Error -> _uiState.update {
-                            it.copy(isLoading = false, errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                            it.copy(isLoading = false, errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
                         }
                         is ApiResult.Exception -> _uiState.update {
-                            it.copy(isLoading = false, errorMsg = NETWORK_ERROR_LABEL + result.e.message)
+                            it.copy(isLoading = false, errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
                         }
                     }
                 }
@@ -196,8 +196,6 @@ class ShoppingViewModel(
 
     companion object {
         private const val PAGE_SIZE = 20
-        private const val NETWORK_ERROR_LABEL = "네트워크 에러: "
-        private const val ERROR_LABEL = "오류: "
     }
 }
 

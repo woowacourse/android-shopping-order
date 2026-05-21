@@ -33,8 +33,8 @@ class ProductDetailViewModel(
             val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
             when (allCartItemResult) {
                 is ApiResult.Success -> _cart.update { allCartItemResult.data }
-                is ApiResult.Error -> _uiState.update { it.copy(errorMsg = NETWORK_ERROR_LABEL + allCartItemResult.code.toString()) }
-                is ApiResult.Exception -> _uiState.update { it.copy(errorMsg = ERROR_LABEL + allCartItemResult.e.message) }
+                is ApiResult.Error -> _uiState.update { it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${allCartItemResult.code}") }
+                is ApiResult.Exception -> _uiState.update { it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}") }
             }
             fetchProduct()
         }
@@ -60,7 +60,7 @@ class ProductDetailViewModel(
                             _uiState.update {
                                 it.copy(
                                     product = selectedProduct,
-                                    errorMsg = NETWORK_ERROR_LABEL + lastViewedProductResult.code.toString(),
+                                    errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${lastViewedProductResult.code}",
                                 )
                             }
                         }
@@ -69,7 +69,7 @@ class ProductDetailViewModel(
                             _uiState.update {
                                 it.copy(
                                     product = selectedProduct,
-                                    errorMsg = ERROR_LABEL + lastViewedProductResult.e.message,
+                                    errorMsg = "${ViewModelConst.ERROR_LABEL}${lastViewedProductResult.e.message}",
                                 )
                             }
                         }
@@ -80,11 +80,11 @@ class ProductDetailViewModel(
             }
 
             is ApiResult.Error -> {
-                _uiState.update { it.copy(errorMsg = NETWORK_ERROR_LABEL + selectedProductResult.code.toString()) }
+                _uiState.update { it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${selectedProductResult.code}") }
             }
 
             is ApiResult.Exception -> {
-                _uiState.update { it.copy(errorMsg = ERROR_LABEL + selectedProductResult.e.message) }
+                _uiState.update { it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${selectedProductResult.e.message}") }
             }
         }
     }
@@ -122,11 +122,6 @@ class ProductDetailViewModel(
     fun onErrorMsgShown() {
         _uiState.update { it.copy(errorMsg = null) }
     }
-
-    companion object {
-        private const val NETWORK_ERROR_LABEL = "네트워크 에러: "
-        private const val ERROR_LABEL = "오류: "
-    }
 }
 
 class ProductDetailViewModelFactory(
@@ -138,8 +133,7 @@ class ProductDetailViewModelFactory(
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ProductDetailViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return ProductDetailViewModel(
+            @Suppress("UNCHECKED_CAST") return ProductDetailViewModel(
                 cartRepository,
                 recentlyViewedProductRepository,
                 productRepository,
