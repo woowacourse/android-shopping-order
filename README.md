@@ -6,12 +6,12 @@
 
 ## 기능 목록
 
-- [ ] 기존 Activity 전환 제거 및 단일 Activity + Compose Navigation 도입
-- [ ] @Serializable Route 타입 정의 (ProductList/ProductDetail/Cart/Recommend)
-- [ ] 상품 목록 -> 상품 상세 이동 및 값 전달
-- [ ] 상품 목록 -> 장바구니 이동
-- [ ] 장바구니 -> 상품 추천 이동 및 값 전달
-- [ ] 상품 추천에서 주문 완료 후 뒤로가기를 누르면 상품 목록으로 복귀한다.
+- [x] 기존 Activity 전환 제거 및 단일 Activity + Compose Navigation 도입
+- [x] @Serializable Route 타입 정의 (ProductList/ProductDetail/Cart/Recommend)
+- [x] 상품 목록 -> 상품 상세 이동 및 값 전달
+- [x] 상품 목록 -> 장바구니 이동
+- [x] 장바구니 -> 상품 추천 이동 및 값 전달
+- [x] 상품 추천에서 주문 완료 후 뒤로가기를 누르면 상품 목록으로 복귀한다.
 - [ ] 장바구니 담기 완료 이벤트 SharedFlow (스낵바)
 - [ ] 장바구니 삭제 완료 이벤트 SharedFlow (스낵바)
 

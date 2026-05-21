@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.constants.MockData
-import woowacourse.shopping.feature.cart.CartContentId
 import woowacourse.shopping.feature.cart.CartUiState
 import woowacourse.shopping.feature.cart.CartViewModel
 import woowacourse.shopping.feature.common.state.CartItemUiModel
@@ -41,9 +40,8 @@ import woowacourse.shopping.feature.format.DecimalPriceFormatter
 
 @Composable
 fun CartScreen(
-    onCloseClick: () -> Unit,
     activityFinish: () -> Unit,
-    onToRecommendIntent: (List<CartContentId>) -> Unit,
+    onToRecommendIntent: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CartViewModel = viewModel(factory = CartViewModel.Factory),
 ) {
@@ -69,11 +67,11 @@ fun CartScreen(
         onToRecommendIntent = {
             onToRecommendIntent(
                 uiState.checkMap.entries.filter { it.value }.map {
-                    CartContentId(it.key)
+                    it.key
                 },
             )
         },
-        onCloseClick = onCloseClick,
+        onCloseClick = activityFinish,
         onDelete = viewModel::deleteCartItem,
         onIncrease = viewModel::increase,
         onDecrease = viewModel::decrease,

@@ -1,0 +1,80 @@
+package woowacourse.shopping
+
+import androidx.compose.runtime.Composable
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import woowacourse.shopping.feature.cart.component.CartScreen
+import woowacourse.shopping.feature.productdetail.component.ProductDetailScreen
+import woowacourse.shopping.feature.productlist.component.ProductListScreen
+import woowacourse.shopping.feature.recommend.component.RecommendScreen
+
+@Composable
+fun AppNavHost() {
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = ProductListRoute,
+    ) {
+        composable<ProductListRoute> {
+            ProductListScreen(
+                onProductClick = { productId, recentProductId ->
+                    navController.navigate(ProductDetailRoute(productId, recentProductId))
+                },
+                onCartIconClick = {
+                    navController.navigate(CartRoute)
+                },
+                activityFinish = {
+                    navController.popBackStack()
+                },
+            )
+        }
+
+        composable<ProductDetailRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<ProductDetailRoute>()
+
+            ProductDetailScreen(
+                id = route.productId,
+                recentProductId = route.recentProductId,
+                activityFinish = { navController.popBackStack() },
+                onClickRecentButton = {
+                    if (route.recentProductId != null) {
+                        navController.navigate(
+                            ProductDetailRoute(
+                                productId = route.recentProductId,
+                                recentProductId = null,
+                            ),
+                        ) {
+                            popUpTo<ProductListRoute> {
+                                inclusive = false
+                            }
+                        }
+                    }
+                },
+            )
+        }
+
+        composable<CartRoute> {
+            CartScreen(
+                activityFinish = { navController.popBackStack() },
+                onToRecommendIntent = { cartContentIds ->
+                    navController.navigate(RecommendRoute(contentIds = cartContentIds)) {
+                        popUpTo<ProductListRoute> {
+                            inclusive = false
+                        }
+                    }
+                },
+            )
+        }
+
+        composable<RecommendRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<RecommendRoute>()
+            RecommendScreen(
+                onCloseClick = { navController.popBackStack() },
+                contentIds = route.contentIds,
+            )
+        }
+    }
+}
