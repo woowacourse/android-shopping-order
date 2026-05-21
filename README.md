@@ -82,7 +82,7 @@
 - [ ] 네트워크 api 호출에 대한 예외처리 추가
   - [ ] api 호출의 결과를 Result 객체로 감싸기
   - [ ] success와 failure에 대한 처리 추가
-- [ ] CatalogScreen 콜백 함수 람다 제거
+- [x] CatalogScreen 콜백 함수 람다 제거
 - [ ] ProductImage 이미지 로드 실패 시 표시할 에러 이미지 추가
 - [ ] RecentlyViewedProducts LazyRow의 key값의 index 결합 제거
 - [x] 각 viewModel에 UiModel 도입

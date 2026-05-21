@@ -59,19 +59,13 @@ fun CatalogScreen(
                 catalog = catalog,
                 recentlyViewedProducts = recentlyViewedProducts,
                 onRecentlyViewedClick = onRecentlyViewedClick,
-                onItemClick = { onItemClick(it) },
+                onItemClick = onItemClick,
                 onLoadClick = onLoadClick,
-                onAdd = { id, updateAmount ->
-                    onAdd(id, updateAmount)
-                },
-                onMinus = { id, updateAmount ->
-                    onMinus(id, updateAmount)
-                },
-                onDelete = { onDelete(it) },
-                onAddInCart = { onAddInCart(it) },
-                specificProductCount = {
-                    specificProductCount(it)
-                },
+                onAdd = onAdd,
+                onMinus = onMinus,
+                onDelete = onDelete,
+                onAddInCart = onAddInCart,
+                specificProductCount = specificProductCount,
                 isContainedInCart = isContainedInCart,
                 isLoading = isLoading,
             )
@@ -168,7 +162,7 @@ private fun CatalogBody(
                     onDelete = {
                         onDelete(catalog.getSingleItem(item).id)
                     },
-                    onAddInCart = { onAddInCart(it) },
+                    onAddInCart = onAddInCart,
                 )
             }
             if (isLoading) {
