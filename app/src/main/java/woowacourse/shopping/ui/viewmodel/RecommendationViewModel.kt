@@ -43,27 +43,51 @@ class RecommendationViewModel(
         val latestId = recentlyViewedProductRepository.getLatestItem().first()
 
         if (latestId != null) {
-            val product = productRepository.getProduct(latestId)
-            val lastViewedCategory = product.category
+            when (val productResult = productRepository.getProduct(latestId)) {
+                is ApiResult.Success -> {
+                    val product = productResult.data
+                    val lastViewedCategory = product.category
 
-            val categoryProducts =
-                productRepository.getCategoryProducts(
-                    category = lastViewedCategory
-                )
+                    when (val categoryProductsResult = productRepository.getCategoryProducts(category = lastViewedCategory)) {
+                        is ApiResult.Success -> {
+                            val categoryProducts = categoryProductsResult.data
+                            val cartProductIds = _uiState.value.cart.purchaseProducts.map { it.product.id }
+                            val recommendations = categoryProducts.filter { it.id !in cartProductIds }
 
-            val cartProductIds = _uiState.value.cart.purchaseProducts.map { it.product.id }
+                            _uiState.update { it.copy(recommendedProducts = Products(recommendations)) }
+                        }
 
-            val recommendations = categoryProducts.filter { it.id !in cartProductIds }
+                        is ApiResult.Error -> _uiState.update {
+                            it.copy(errorMsg = NETWORK_ERROR_LABEL + categoryProductsResult.code.toString())
+                        }
 
-            _uiState.update { it.copy(recommendedProducts = Products(recommendations)) }
+                        is ApiResult.Exception -> _uiState.update {
+                            it.copy(errorMsg = ERROR_LABEL + categoryProductsResult.e.message)
+                        }
+                    }
+                }
+
+                is ApiResult.Error -> _uiState.update {
+                    it.copy(errorMsg = NETWORK_ERROR_LABEL + productResult.code.toString())
+                }
+
+                is ApiResult.Exception -> _uiState.update {
+                    it.copy(errorMsg = ERROR_LABEL + productResult.e.message)
+                }
+            }
         }
     }
 
     private suspend fun fetchCart() {
-        when(val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)) {
+        when (val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)) {
             is ApiResult.Success -> _uiState.update { it.copy(cart = allCartItemResult.data) }
-            is ApiResult.Error -> ""
-            is ApiResult.Exception -> ""
+            is ApiResult.Error -> _uiState.update {
+                it.copy(errorMsg = NETWORK_ERROR_LABEL + allCartItemResult.code.toString())
+            }
+
+            is ApiResult.Exception -> _uiState.update {
+                it.copy(errorMsg = ERROR_LABEL + allCartItemResult.e.message)
+            }
         }
     }
 
@@ -74,19 +98,39 @@ class RecommendationViewModel(
                     it.product.id == purchaseProduct.product.id
                 }
             if (existingItem != null) {
-                cartRepository.updateCount(existingItem.id, existingItem.count + 1)
+                when (val result = cartRepository.updateCount(existingItem.id, existingItem.count + 1)) {
+                    is ApiResult.Success -> fetchCart()
+                    is ApiResult.Error -> _uiState.update {
+                        it.copy(errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                    }
+
+                    is ApiResult.Exception -> _uiState.update {
+                        it.copy(errorMsg = ERROR_LABEL + result.e.message)
+                    }
+                }
             } else {
-                cartRepository.insert(purchaseProduct)
-                val newCheckedIds = _uiState.value.checkedIds + purchaseProduct.id
-                val newTotalPrice = _uiState.value.totalPrice + purchaseProduct.totalPrice()
-                _uiState.update {
-                    it.copy(
-                        totalPrice = newTotalPrice,
-                        checkedIds = newCheckedIds
-                    )
+                when (val result = cartRepository.insert(purchaseProduct)) {
+                    is ApiResult.Success -> {
+                        val newCheckedIds = _uiState.value.checkedIds + purchaseProduct.id
+                        val newTotalPrice = _uiState.value.totalPrice + purchaseProduct.totalPrice()
+                        _uiState.update {
+                            it.copy(
+                                totalPrice = newTotalPrice,
+                                checkedIds = newCheckedIds
+                            )
+                        }
+                        fetchCart()
+                    }
+
+                    is ApiResult.Error -> _uiState.update {
+                        it.copy(errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                    }
+
+                    is ApiResult.Exception -> _uiState.update {
+                        it.copy(errorMsg = ERROR_LABEL + result.e.message)
+                    }
                 }
             }
-            fetchCart()
         }
     }
 
@@ -99,13 +143,24 @@ class RecommendationViewModel(
             if (target != null) {
                 val nextCount = target.count + updateAmount
                 if (nextCount >= 1) {
-                    cartRepository.updateCount(target.id, nextCount)
-                    fetchCart()
-                }
-                if (updateAmount > 0) {
-                    _uiState.update { it.copy(totalPrice = it.totalPrice + target.price()) }
-                } else {
-                    _uiState.update { it.copy(totalPrice = it.totalPrice - target.price()) }
+                    when (val result = cartRepository.updateCount(target.id, nextCount)) {
+                        is ApiResult.Success -> {
+                            fetchCart()
+                            if (updateAmount > 0) {
+                                _uiState.update { it.copy(totalPrice = it.totalPrice + target.price()) }
+                            } else {
+                                _uiState.update { it.copy(totalPrice = it.totalPrice - target.price()) }
+                            }
+                        }
+
+                        is ApiResult.Error -> _uiState.update {
+                            it.copy(errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                        }
+
+                        is ApiResult.Exception -> _uiState.update {
+                            it.copy(errorMsg = ERROR_LABEL + result.e.message)
+                        }
+                    }
                 }
             }
         }
@@ -115,9 +170,20 @@ class RecommendationViewModel(
         viewModelScope.launch {
             val target = _uiState.value.cart.findById(id)
             if (target != null) {
-                cartRepository.deleteCartItem(target.id)
-                _uiState.update { it.copy(totalPrice = it.totalPrice - target.totalPrice()) }
-                fetchCart()
+                when (val result = cartRepository.deleteCartItem(target.id)) {
+                    is ApiResult.Success -> {
+                        _uiState.update { it.copy(totalPrice = it.totalPrice - target.totalPrice()) }
+                        fetchCart()
+                    }
+
+                    is ApiResult.Error -> _uiState.update {
+                        it.copy(errorMsg = NETWORK_ERROR_LABEL + result.code.toString())
+                    }
+
+                    is ApiResult.Exception -> _uiState.update {
+                        it.copy(errorMsg = ERROR_LABEL + result.e.message)
+                    }
+                }
             }
         }
     }
@@ -126,6 +192,15 @@ class RecommendationViewModel(
         viewModelScope.launch {
             recentlyViewedProductRepository.updateList(product)
         }
+    }
+
+    fun onErrorMsgShown() {
+        _uiState.update { it.copy(errorMsg = null) }
+    }
+
+    companion object {
+        private const val NETWORK_ERROR_LABEL = "네트워크 에러: "
+        private const val ERROR_LABEL = "오류: "
     }
 }
 
