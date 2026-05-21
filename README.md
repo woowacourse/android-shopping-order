@@ -85,6 +85,6 @@
 - [ ] CatalogScreen 콜백 함수 람다 제거
 - [ ] ProductImage 이미지 로드 실패 시 표시할 에러 이미지 추가
 - [ ] RecentlyViewedProducts LazyRow의 key값의 index 결합 제거
-- [ ] 각 viewModel에 UiModel 도입
+- [x] 각 viewModel에 UiModel 도입
 - [ ] 액티비티 별 startActivity companion object 추가
 - [] screenComposable의 파라미터로 viewModel 주입
