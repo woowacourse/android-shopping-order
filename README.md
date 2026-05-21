@@ -30,20 +30,20 @@
   - [x] `inclusive` 옵션을 적절히 설정하여 뒤로가기 시 주문 흐름이 남지 않도록 처리
 
 ### 도메인 로직 / UI 상태 관리 (Flow)
-- [ ] ViewModel의 UI 상태를 `StateFlow`로 노출
-  - [ ] 내부 상태는 `MutableStateFlow`로 선언
-  - [ ] 외부 노출은 `asStateFlow()`를 통한 읽기 전용 `StateFlow`
-  - [ ] 기존 `remember` / `mutableStateOf` 기반 상태를 모두 교체
-- [ ] 일회성 이벤트를 `SharedFlow`로 처리
-  - [ ] 장바구니 담기 성공/실패 이벤트를 `MutableSharedFlow`로 발행
-  - [ ] 스낵바 표시, 화면 이동 트리거 등 단발성 이벤트 처리
-  - [ ] 이벤트 수신 후 재발행되지 않도록 replay/buffer 정책 검토
-- [ ] Composable에서 Lifecycle 인식 상태 구독
-  - [ ] `collectAsState()` 호출부를 `collectAsStateWithLifecycle()`로 교체
-  - [ ] 백그라운드 상태에서 불필요한 수집이 발생하지 않도록 보장
+- [x] ViewModel의 UI 상태를 `StateFlow`로 노출
+  - [x] 내부 상태는 `MutableStateFlow`로 선언
+  - [x] 외부 노출은 `asStateFlow()`를 통한 읽기 전용 `StateFlow`
+  - [x] 기존 `remember` / `mutableStateOf` 기반 상태를 모두 교체
+- [x] 일회성 이벤트를 `SharedFlow`로 처리
+  - [x] 장바구니 담기 성공/실패 이벤트를 `MutableSharedFlow`로 발행
+  - [x] 스낵바 표시, 화면 이동 트리거 등 단발성 이벤트 처리
+  - [x] 이벤트 수신 후 재발행되지 않도록 replay/buffer 정책 검토
+- [x] Composable에서 Lifecycle 인식 상태 구독
+  - [x] `collectAsState()` 호출부를 `collectAsStateWithLifecycle()`로 교체
+  - [x] 백그라운드 상태에서 불필요한 수집이 발생하지 않도록 보장
 
 ### 테스트
-- [ ] 기존 테스트 호환성 유지
+- [x] 기존 테스트 호환성 유지
 
 ---
 
