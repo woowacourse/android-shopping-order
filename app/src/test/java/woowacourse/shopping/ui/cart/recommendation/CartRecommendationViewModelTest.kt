@@ -4,6 +4,8 @@ package woowacourse.shopping.ui.cart.recommendation
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
@@ -96,6 +98,7 @@ class CartRecommendationViewModelTest {
                 viewModel.uiState.value.pendingOrder.totalPrice,
             )
 
+            val event = async { viewModel.events.first() }
             viewModel.placeOrder()
             advanceUntilIdle()
 
@@ -104,7 +107,7 @@ class CartRecommendationViewModelTest {
                 cartRepository.createdOrders,
             )
             assertTrue(cartRepository.getCartItemsByProductIds(setOf(orderedProduct.id, recommendedProduct.id)).isEmpty())
-            assertEquals(1, viewModel.uiState.value.orderCompletedCount)
+            assertEquals(CartRecommendationEvent.OrderCompleted, event.await())
         }
 
     @Test

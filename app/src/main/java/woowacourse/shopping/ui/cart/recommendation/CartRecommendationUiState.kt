@@ -7,8 +7,7 @@ data class CartRecommendationUiState(
     val isRecommendedProductsLoading: Boolean = false,
     val pendingOrder: PendingOrderUiState = PendingOrderUiState(),
     val isOrdering: Boolean = false,
-    val orderCompletedCount: Int = 0,
-    val orderErrorMessage: String? = null,
+    val isReturningToCart: Boolean = false,
     val isNetworkConnected: Boolean = true,
 )
 
@@ -18,3 +17,11 @@ data class PendingOrderUiState(
     val selectedCount: Int = 0,
     val totalPrice: Int = 0,
 )
+
+sealed interface CartRecommendationEvent {
+    data object OrderCompleted : CartRecommendationEvent
+
+    data class ShowMessage(
+        val message: String,
+    ) : CartRecommendationEvent
+}

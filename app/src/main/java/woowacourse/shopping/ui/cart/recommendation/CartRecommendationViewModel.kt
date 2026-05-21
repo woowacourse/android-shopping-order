@@ -3,7 +3,10 @@ package woowacourse.shopping.ui.cart.recommendation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -29,6 +32,12 @@ class CartRecommendationViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartRecommendationUiState())
     val uiState: StateFlow<CartRecommendationUiState> = _uiState.asStateFlow()
+    private val _events =
+        MutableSharedFlow<CartRecommendationEvent>(
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
+    val events: SharedFlow<CartRecommendationEvent> = _events
 
     private val recommendedSyncJobs = mutableMapOf<Long, Job>()
     private val orderedProductIds = linkedSetOf<Long>()
@@ -63,8 +72,7 @@ class CartRecommendationViewModel(
                         selectedCount = selectedCartOrder.items.size,
                         totalPrice = selectedCartOrder.items.sumOf { it.price * it.quantity },
                     ),
-                orderErrorMessage = null,
-                orderCompletedCount = 0,
+                isReturningToCart = false,
             )
         }
 
@@ -88,9 +96,9 @@ class CartRecommendationViewModel(
                 _uiState.update { currentState ->
                     currentState.copy(
                         isRecommendedProductsLoading = false,
-                        orderErrorMessage = throwable.message ?: "추천 상품을 불러오지 못했습니다.",
                     )
                 }
+                emitMessage(throwable.message ?: "추천 상품을 불러오지 못했습니다.")
             }
         }
     }
@@ -119,7 +127,6 @@ class CartRecommendationViewModel(
             _uiState.update { currentState ->
                 currentState.copy(
                     isOrdering = true,
-                    orderErrorMessage = null,
                 )
             }
 
@@ -135,23 +142,32 @@ class CartRecommendationViewModel(
                     currentState.copy(
                         pendingOrder = PendingOrderUiState(),
                         isOrdering = false,
-                        orderCompletedCount = currentState.orderCompletedCount + 1,
                     )
                 }
+                _events.emit(CartRecommendationEvent.OrderCompleted)
             }.onFailure { throwable ->
                 _uiState.update { currentState ->
                     currentState.copy(
                         isOrdering = false,
-                        orderErrorMessage = throwable.message ?: "주문에 실패했습니다.",
                     )
                 }
+                emitMessage(throwable.message ?: "주문에 실패했습니다.")
             }
         }
     }
 
-    fun clearOrderError() {
+    fun beginReturningToCart(): Boolean {
+        if (_uiState.value.isReturningToCart) return false
+
         _uiState.update { currentState ->
-            currentState.copy(orderErrorMessage = null)
+            currentState.copy(isReturningToCart = true)
+        }
+        return true
+    }
+
+    fun resetReturningToCart() {
+        _uiState.update { currentState ->
+            currentState.copy(isReturningToCart = false)
         }
     }
 
@@ -268,11 +284,7 @@ class CartRecommendationViewModel(
                 }.onFailure { throwable ->
                     reloadRecommendedProducts()
                     refreshPendingOrder()
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            orderErrorMessage = throwable.message ?: "장바구니를 갱신하지 못했습니다.",
-                        )
-                    }
+                    emitMessage(throwable.message ?: "장바구니를 갱신하지 못했습니다.")
                 }
 
                 recommendedSyncJobs.remove(productId)
@@ -395,6 +407,10 @@ class CartRecommendationViewModel(
                 }
             }
         }
+    }
+
+    private fun emitMessage(message: String) {
+        _events.tryEmit(CartRecommendationEvent.ShowMessage(message))
     }
 
     private data class OrderItemData(

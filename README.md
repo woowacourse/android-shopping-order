@@ -107,11 +107,11 @@
 - [x] 주문 완료 후 상품 목록으로 이동할 때 주문 흐름이 Back Stack에 남지 않도록 처리한다.
 
 ### Flow
-- [ ] 기존 `remember`, `mutableStateOf` 기반 상태를 `StateFlow`, `SharedFlow`로 교체한다.
-- [ ] ViewModel의 UI 상태는 `MutableStateFlow`로 관리한다.
-- [ ] 외부에는 `StateFlow`로 노출한다.
-- [ ] 스낵바, 화면 이동 같은 일회성 이벤트는 `MutableSharedFlow`를 사용한다.
-- [ ] Composable에서는 `collectAsState()` 대신 `collectAsStateWithLifecycle()`를 사용한다.
+- [x] 기존 `remember`, `mutableStateOf` 기반 상태를 `StateFlow`, `SharedFlow`로 교체한다.
+- [x] ViewModel의 UI 상태는 `MutableStateFlow`로 관리한다.
+- [x] 외부에는 `StateFlow`로 노출한다.
+- [x] 스낵바, 화면 이동 같은 일회성 이벤트는 `MutableSharedFlow`를 사용한다.
+- [x] Composable에서는 `collectAsState()` 대신 `collectAsStateWithLifecycle()`를 사용한다.
 
 ## 🧪 테스트 명세
 
