@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.R
-import woowacourse.shopping.feature.common.ProductQuantitySelector
+import woowacourse.shopping.feature.common.component.ProductQuantitySelector
 import woowacourse.shopping.feature.common.state.ProductUiModel
 import woowacourse.shopping.feature.format.DecimalPriceFormatter
 import woowacourse.shopping.feature.productdetail.component.ProductAppBar

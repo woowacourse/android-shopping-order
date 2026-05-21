@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.R
-import woowacourse.shopping.feature.common.ProductQuantitySelector
+import woowacourse.shopping.feature.common.component.ProductQuantitySelector
 import woowacourse.shopping.feature.format.DecimalPriceFormatter
 import woowacourse.shopping.feature.productlist.component.PreviewableAsyncImage
 

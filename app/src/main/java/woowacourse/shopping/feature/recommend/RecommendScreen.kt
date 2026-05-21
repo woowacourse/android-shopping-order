@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import woowacourse.shopping.feature.cart.component.CartAppBar
+import woowacourse.shopping.feature.common.component.CommonAppBar
 import woowacourse.shopping.feature.format.DecimalPriceFormatter
 
 @Composable
@@ -52,7 +52,10 @@ fun RecommendScreen(
             modifier
                 .fillMaxSize(),
         topBar = {
-            CartAppBar(onCloseClick = onCloseClick)
+            CommonAppBar(
+                title = "Cart",
+                onCloseClick = onCloseClick
+            )
         },
     ) { innerPadding ->
         Column(

@@ -1,4 +1,4 @@
-package woowacourse.shopping.feature.cart.component
+package woowacourse.shopping.feature.common.component
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,7 +21,8 @@ import woowacourse.shopping.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CartAppBar(
+fun CommonAppBar(
+    title: String,
     onCloseClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -41,7 +42,7 @@ fun CartAppBar(
         },
         title = {
             Text(
-                stringResource(R.string.cart_name),
+                title,
                 fontWeight = FontWeight.W900,
                 fontSize = 20.sp,
                 color = Color(0xffffffff),
@@ -61,5 +62,8 @@ fun CartAppBar(
 @Preview
 @Composable
 private fun CartAppBarPreview() {
-    CartAppBar(onCloseClick = {})
+    CommonAppBar(
+        title = "Cart",
+        onCloseClick = {}
+    )
 }

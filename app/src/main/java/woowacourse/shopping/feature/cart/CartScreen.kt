@@ -33,9 +33,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.constants.MockData
-import woowacourse.shopping.feature.cart.component.CartAppBar
 import woowacourse.shopping.feature.cart.component.CartItemList
 import woowacourse.shopping.feature.cart.component.PageNavigator
+import woowacourse.shopping.feature.common.component.CommonAppBar
 import woowacourse.shopping.feature.common.state.CartItemUiModel
 import woowacourse.shopping.feature.common.state.ProductUiModel
 import woowacourse.shopping.feature.format.DecimalPriceFormatter
@@ -113,7 +113,10 @@ fun CartScreenContent(
             modifier
                 .fillMaxSize(),
         topBar = {
-            CartAppBar(onCloseClick = onCloseClick)
+            CommonAppBar(
+                title = "Cart",
+                onCloseClick = onCloseClick
+            )
         },
     ) { innerPadding ->
         Box {
