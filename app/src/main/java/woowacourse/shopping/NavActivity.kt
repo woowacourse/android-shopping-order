@@ -8,10 +8,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import woowacourse.shopping.navigation.ProductDetail
-import woowacourse.shopping.navigation.ShoppingList
+import woowacourse.shopping.presentation.cart.CartItemListScreen
 import woowacourse.shopping.presentation.productdetail.ProductDetailScreen
 import woowacourse.shopping.presentation.productlist.ProductListScreen
+import woowacourse.shopping.presentation.recommend.RecommendItemScreen
 
 class NavActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +25,7 @@ class NavActivity : ComponentActivity() {
             ) {
                 composable<ShoppingList> {
                     ProductListScreen(
-                        onNavigateToCart = { },
+                        onNavigateToCart = { navController.navigate(route = CartItemList) },
                         onProductClick = { productId ->
                             navController.navigate(route = ProductDetail(productId))
                         },
@@ -43,6 +43,23 @@ class NavActivity : ComponentActivity() {
                                 }
                             }
                         },
+                        onBackClick = { navController.popBackStack() },
+                    )
+                }
+
+                composable<CartItemList> {
+                    CartItemListScreen(
+                        onBack = { navController.popBackStack() },
+                        onOrderClick = { productIds ->
+                            navController.navigate(route = RecommendItem(productIds))
+                        },
+                    )
+                }
+
+                composable<RecommendItem> { backStackEntry ->
+                    val route = backStackEntry.toRoute<RecommendItem>()
+                    RecommendItemScreen(
+                        productIds = route.productIds,
                         onBackClick = { navController.popBackStack() },
                     )
                 }

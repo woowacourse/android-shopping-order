@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.cart.viewmodel
+package woowacourse.shopping.presentation.cart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,7 +16,7 @@ import woowacourse.shopping.presentation.cart.model.CartUiState
 import woowacourse.shopping.presentation.cart.model.toUiModel
 import kotlin.math.min
 
-class CartViewModel(
+class CartItemListViewModel(
     private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
 ) : ViewModel() {
     private val cart = cartRepository.cart
@@ -25,8 +25,10 @@ class CartViewModel(
 
     val uiState =
         combine(cart, paymentItemIds, _uiState) { cart, paymentItemIds, state ->
-            val items = cart.items.map { it.toUiModel(isSelected = it.product.id in paymentItemIds) }
-            val payment = PaymentItems(cart.items.filter { it.product.id in paymentItemIds }.toSet())
+            val items =
+                cart.items.map { it.toUiModel(isSelected = it.product.id in paymentItemIds) }
+            val payment =
+                PaymentItems(cart.items.filter { it.product.id in paymentItemIds }.toSet())
             val fromIndex = state.page * PAGE_SIZE
             val toIndex = min(fromIndex + PAGE_SIZE, items.size)
             CartUiState(
@@ -42,7 +44,7 @@ class CartViewModel(
             )
         }.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Eagerly,
+            started = SharingStarted.Companion.Eagerly,
             initialValue = _uiState.value,
         )
 

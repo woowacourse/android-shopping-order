@@ -1,6 +1,5 @@
-package woowacourse.shopping.navigation
+package woowacourse.shopping
 
-import androidx.compose.runtime.Composable
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -11,6 +10,10 @@ data class ProductDetail(
     val productId: Long,
 )
 
-@Composable
-fun AppNavHost() {
-}
+@Serializable
+object CartItemList
+
+@Serializable
+data class RecommendItem(
+    val productIds: List<Long>,
+)

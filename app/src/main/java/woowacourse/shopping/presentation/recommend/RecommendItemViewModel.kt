@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.recommend.viewmodel
+package woowacourse.shopping.presentation.recommend
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,7 +18,7 @@ import woowacourse.shopping.presentation.common.model.toUiModel
 import woowacourse.shopping.presentation.productlist.model.ShoppingItemUiModel
 import woowacourse.shopping.presentation.recommend.model.RecommendUiState
 
-class RecommendViewModel(
+class RecommendItemViewModel(
     private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
     private val productRepository: ProductRepository = RepositoryProvider.productRepository,
 ) : ViewModel() {
@@ -42,13 +42,15 @@ class RecommendViewModel(
                 recommendProducts =
                     state.recommendProducts.map { item ->
                         item.copy(
-                            quantity = cart.items.find { it.product.id == item.product.id }?.quantity ?: 0,
+                            quantity =
+                                cart.items.find { it.product.id == item.product.id }?.quantity
+                                    ?: 0,
                         )
                     },
             )
         }.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Eagerly,
+            started = SharingStarted.Companion.Eagerly,
             initialValue = RecommendUiState(),
         )
 
@@ -69,7 +71,7 @@ class RecommendViewModel(
         }
     }
 
-    fun initializePaymentItems(productIds: LongArray) {
+    fun initializePaymentItems(productIds: List<Long>) {
         paymentItemIds.value = productIds.toSet()
     }
 

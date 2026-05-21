@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.recommend.ui.components
+package woowacourse.shopping.presentation.recommend.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,7 +18,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import woowacourse.shopping.R
 import woowacourse.shopping.presentation.productlist.components.ProductCard
@@ -30,7 +29,7 @@ import woowacourse.shopping.ui.theme.Gray50
 fun RecommendSection(
     onIncrease: (Long) -> Unit,
     onDecrease: (Long) -> Unit,
-    items: ImmutableList<ShoppingItemUiModel>,
+    items: List<ShoppingItemUiModel>,
     modifier: Modifier = Modifier,
 ) {
     Column(

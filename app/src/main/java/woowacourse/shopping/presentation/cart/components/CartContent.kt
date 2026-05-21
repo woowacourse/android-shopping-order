@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.cart.ui.components
+package woowacourse.shopping.presentation.cart.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import woowacourse.shopping.presentation.cart.model.CartItemUiModel
 import woowacourse.shopping.presentation.common.model.ProductUiModel
@@ -18,7 +17,7 @@ fun CartContent(
     onDeleteItem: (Long) -> Unit,
     onIncrease: (Long) -> Unit,
     onDecrease: (Long) -> Unit,
-    cartItems: ImmutableList<CartItemUiModel>,
+    cartItems: List<CartItemUiModel>,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(

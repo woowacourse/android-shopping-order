@@ -12,11 +12,12 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.fake.FakeCartRepository
 import woowacourse.shopping.fake.fakeProduct
+import woowacourse.shopping.presentation.cart.CartItemListViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CartViewModelTest {
+class CartItemListViewModelTest {
     private val dispatcher = UnconfinedTestDispatcher()
-    private lateinit var viewModel: CartViewModel
+    private lateinit var viewModel: CartItemListViewModel
     private lateinit var cartRepository: FakeCartRepository
 
     @BeforeEach
@@ -25,7 +26,7 @@ class CartViewModelTest {
         val productMap = (1L..10L).associateWith { fakeProduct(it) }
         cartRepository = FakeCartRepository(productMap)
         viewModel =
-            CartViewModel(cartRepository = cartRepository)
+            CartItemListViewModel(cartRepository = cartRepository)
     }
 
     @AfterEach

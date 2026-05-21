@@ -1,4 +1,4 @@
-package woowacourse.shopping.presentation.recommend.ui
+package woowacourse.shopping.presentation.recommend
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +15,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -22,23 +24,53 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.collections.immutable.toImmutableList
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.R
-import woowacourse.shopping.presentation.cart.ui.components.CartBottomBar
+import woowacourse.shopping.presentation.cart.components.CartBottomBar
 import woowacourse.shopping.presentation.common.components.ShoppingAppBar
-import woowacourse.shopping.presentation.recommend.model.RecommendUiState
-import woowacourse.shopping.presentation.recommend.ui.components.RecommendSection
+import woowacourse.shopping.presentation.common.model.ProductUiModel
+import woowacourse.shopping.presentation.productlist.model.ShoppingItemUiModel
+import woowacourse.shopping.presentation.recommend.components.RecommendSection
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 import woowacourse.shopping.util.formattedPrice
 
 @Composable
-fun RecommendScreen(
-    uiState: RecommendUiState,
+fun RecommendItemScreen(
+    productIds: List<Long>,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onBack: () -> Unit,
+    viewModel: RecommendItemViewModel = viewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.initializePaymentItems(productIds)
+        viewModel.loadRecommendProducts()
+    }
+
+    RecommendItemContent(
+        totalQuantity = uiState.totalQuantity,
+        totalPrice = uiState.totalPrice,
+        recommendProducts = uiState.recommendProducts,
+        onBackClick = onBackClick,
+        onOrderClick = { },
+        onIncreaseQuantity = viewModel::addItemToCart,
+        onDecreaseQuantity = viewModel::removeItemFromCart,
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun RecommendItemContent(
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit,
     onOrderClick: () -> Unit,
-    onIncrease: (Long) -> Unit,
-    onDecrease: (Long) -> Unit,
+    onIncreaseQuantity: (Long) -> Unit,
+    onDecreaseQuantity: (Long) -> Unit,
+    totalQuantity: Int,
+    totalPrice: Long,
+    recommendProducts: List<ShoppingItemUiModel>,
 ) {
     Scaffold(
         containerColor = Color.White,
@@ -52,7 +84,7 @@ fun RecommendScreen(
                         modifier =
                             Modifier
                                 .size(16.dp)
-                                .clickable { onBack() },
+                                .clickable { onBackClick() },
                     )
                     Spacer(modifier = Modifier.width(21.dp))
                     Text(
@@ -67,8 +99,8 @@ fun RecommendScreen(
         },
         bottomBar = {
             CartBottomBar(
-                purchaseItemCount = uiState.totalQuantity,
-                totalPrice = formattedPrice(uiState.totalPrice),
+                purchaseItemCount = totalQuantity,
+                totalPrice = formattedPrice(totalPrice),
                 onOrderClick = { onOrderClick() },
                 allCheckBox = {},
             )
@@ -81,9 +113,9 @@ fun RecommendScreen(
         ) {
             RecommendSection(
                 modifier = Modifier.padding(innerPadding),
-                items = uiState.recommendProducts.toImmutableList(),
-                onIncrease = onIncrease,
-                onDecrease = onDecrease,
+                items = recommendProducts,
+                onIncrease = onIncreaseQuantity,
+                onDecrease = onDecreaseQuantity,
             )
         }
     }
@@ -91,19 +123,26 @@ fun RecommendScreen(
 
 @Preview
 @Composable
-private fun RecommendScreenPreview() {
+private fun RecommendItemContentPreview() {
     AndroidshoppingTheme {
-        RecommendScreen(
-            uiState =
-                RecommendUiState(
-                    totalPrice = 5000,
-                    totalQuantity = 5,
-                    recommendProducts = emptyList(),
+        RecommendItemContent(
+            totalQuantity = 3,
+            totalPrice = 18000L,
+            recommendProducts =
+                listOf(
+                    ShoppingItemUiModel(
+                        product = ProductUiModel(id = 1L, name = "아메리카노", price = 6000L, imageUrl = ""),
+                        quantity = 1,
+                    ),
+                    ShoppingItemUiModel(
+                        product = ProductUiModel(id = 2L, name = "카페라떼", price = 6000L, imageUrl = ""),
+                        quantity = 2,
+                    ),
                 ),
-            onBack = {},
+            onBackClick = {},
             onOrderClick = {},
-            onIncrease = { },
-            onDecrease = {},
+            onIncreaseQuantity = {},
+            onDecreaseQuantity = {},
         )
     }
 }
