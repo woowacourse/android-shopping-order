@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import woowacourse.shopping.ui.common.formatter.formatPrice
 import woowacourse.shopping.ui.cart.list.CartViewModel
 import woowacourse.shopping.ui.cart.recommendation.CartRecommendationEvent
 import woowacourse.shopping.ui.cart.recommendation.CartRecommendationViewModel
@@ -62,7 +63,7 @@ fun CartRecommendationRouteScreen(
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         CartRecommendedProductsScreen(
             recommendedProducts = uiState.recommendedProducts,
-            totalPrice = "%,d원".format(uiState.pendingOrder.totalPrice),
+            totalPrice = formatPrice(uiState.pendingOrder.totalPrice),
             selectedCount = uiState.pendingOrder.selectedCount,
             isLoading = uiState.isRecommendedProductsLoading,
             isNetworkConnected = uiState.isNetworkConnected,

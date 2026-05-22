@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.order.component
+package woowacourse.shopping.ui.common.component.header
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
@@ -24,7 +24,8 @@ import woowacourse.shopping.ui.ShoppingTypography
 import woowacourse.shopping.ui.theme.ShoppingColors
 
 @Composable
-fun OrderHeader(
+fun NavigationHeader(
+    title: String,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
 ) {
@@ -46,7 +47,7 @@ fun OrderHeader(
         }
         Spacer(modifier = Modifier.size(21.dp))
         Text(
-            text = stringResource(R.string.order_title),
+            text = title,
             color = Color.White,
             style = ShoppingTypography.titleMedium,
         )
@@ -55,6 +56,9 @@ fun OrderHeader(
 
 @Preview(showBackground = true)
 @Composable
-private fun OrderHeaderPreview() {
-    OrderHeader(onBackClick = {})
+private fun NavigationHeaderPreview() {
+    NavigationHeader(
+        title = "Cart",
+        onBackClick = {},
+    )
 }

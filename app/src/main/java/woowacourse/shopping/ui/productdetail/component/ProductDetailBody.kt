@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.productdetail.component
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +22,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.ui.ShoppingTypography
 import woowacourse.shopping.ui.common.component.cartcontrol.QuantityStepper
+import woowacourse.shopping.ui.common.formatter.formatPrice
 import woowacourse.shopping.ui.fixture.MockProducts
 
 @Composable
@@ -55,7 +55,6 @@ fun ProductDetailBody(
     }
 }
 
-@SuppressLint("DefaultLocale")
 @Composable
 private fun ProductLabel(
     product: Product,
@@ -70,7 +69,6 @@ private fun ProductLabel(
         } else {
             product.price.value * quantity
         }
-    val formatted = String.format("%,d", totalPrice)
 
     Column(modifier = modifier) {
         Text(
@@ -90,7 +88,7 @@ private fun ProductLabel(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
-                text = stringResource(R.string.price_format, formatted),
+                text = formatPrice(totalPrice, withSpaceBeforeWon = true),
                 style = ShoppingTypography.detailPrice,
                 color = Color.Black,
             )

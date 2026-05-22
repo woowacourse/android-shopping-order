@@ -1,7 +1,6 @@
 package woowacourse.shopping.ui.cart.list.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,13 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import woowacourse.shopping.ui.common.component.card.shoppingOutlinedCard
 import woowacourse.shopping.ui.theme.ShoppingColors
 
 @Composable
@@ -44,9 +41,7 @@ fun CartItemSkeletonUnit(modifier: Modifier = Modifier) {
         modifier =
             modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(4.dp))
-                .background(Color.White)
-                .border(1.dp, ShoppingColors.Gray2, RoundedCornerShape(4.dp))
+                .shoppingOutlinedCard()
                 .padding(18.dp),
     ) {
         Row(

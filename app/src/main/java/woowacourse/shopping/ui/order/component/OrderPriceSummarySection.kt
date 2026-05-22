@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.R
+import woowacourse.shopping.ui.common.formatter.formatPrice
 import woowacourse.shopping.ui.order.OrderPreviewData
 import woowacourse.shopping.ui.order.OrderPriceSummaryUiModel
 import woowacourse.shopping.ui.theme.ShoppingColors
@@ -89,8 +90,6 @@ private fun PriceSummaryRow(
         )
     }
 }
-
-private fun formatPrice(price: Long): String = "%,d원".format(price)
 
 @Preview(showBackground = true)
 @Composable

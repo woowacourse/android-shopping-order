@@ -7,13 +7,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import woowacourse.shopping.R
 import woowacourse.shopping.model.Product
+import woowacourse.shopping.ui.common.component.button.PrimaryActionButton
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
 import woowacourse.shopping.ui.common.component.recentlyviewed.LastViewedProductCard
 import woowacourse.shopping.ui.fixture.MockProducts
-import woowacourse.shopping.ui.productdetail.component.CartAddButton
 import woowacourse.shopping.ui.productdetail.component.ProductDetailBody
 import woowacourse.shopping.ui.productdetail.component.ProductDetailHeader
 
@@ -56,8 +58,9 @@ fun ProductDetailScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        CartAddButton(
-            isEnabled = !isAdding,
+        PrimaryActionButton(
+            text = stringResource(R.string.cart_add_button),
+            enabled = !isAdding,
             onClick = onAddToCart,
         )
     }

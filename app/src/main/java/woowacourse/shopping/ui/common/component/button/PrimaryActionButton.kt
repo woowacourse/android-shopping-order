@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.order.component
+package woowacourse.shopping.ui.common.component.button
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,9 +16,10 @@ import woowacourse.shopping.ui.ShoppingTypography
 import woowacourse.shopping.ui.theme.ShoppingColors
 
 @Composable
-fun PaymentButton(
+fun PrimaryActionButton(
     text: String,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
     Box(
@@ -26,7 +27,7 @@ fun PaymentButton(
             modifier
                 .fillMaxWidth()
                 .background(ShoppingColors.BrandGreen)
-                .clickable(onClick = onClick),
+                .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -38,10 +39,10 @@ fun PaymentButton(
     }
 }
 
-@Composable
 @Preview
-private fun PaymentButtonPreview() {
-    PaymentButton(
+@Composable
+private fun PrimaryActionButtonPreview() {
+    PrimaryActionButton(
         text = "결제하기",
         onClick = {},
     )

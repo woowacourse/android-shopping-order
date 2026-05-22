@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.shopping.component
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,11 +26,11 @@ import woowacourse.shopping.model.Product
 import woowacourse.shopping.ui.ShoppingTypography
 import woowacourse.shopping.ui.common.component.cartcontrol.AddToCartButton
 import woowacourse.shopping.ui.common.component.cartcontrol.QuantityStepper
+import woowacourse.shopping.ui.common.formatter.formatPrice
 import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.shopping.ShoppingProductUiState
 import woowacourse.shopping.ui.theme.ShoppingColors
 
-@SuppressLint("DefaultLocale")
 @Composable
 fun ProductUnit(
     product: ShoppingProductUiState,
@@ -42,7 +41,6 @@ fun ProductUnit(
     onDecreaseQuantity: () -> Unit,
 ) {
     val price = product.product.price.value
-    val formatted = String.format("%,d", price)
     Column(
         modifier =
             modifier
@@ -90,7 +88,7 @@ fun ProductUnit(
             modifier = Modifier.padding(start = 6.dp, end = 9.dp),
         )
         Text(
-            text = stringResource(R.string.price_format, formatted),
+            text = formatPrice(price, withSpaceBeforeWon = true),
             color = ShoppingColors.Gray4,
             style = ShoppingTypography.productPrice,
             modifier = Modifier.padding(start = 6.dp),

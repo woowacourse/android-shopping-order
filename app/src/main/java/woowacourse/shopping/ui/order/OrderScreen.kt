@@ -11,10 +11,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import woowacourse.shopping.R
+import woowacourse.shopping.ui.common.component.button.PrimaryActionButton
+import woowacourse.shopping.ui.common.component.header.NavigationHeader
 import woowacourse.shopping.ui.order.component.OrderCouponSection
-import woowacourse.shopping.ui.order.component.OrderHeader
 import woowacourse.shopping.ui.order.component.OrderPriceSummarySection
-import woowacourse.shopping.ui.order.component.PaymentButton
 import woowacourse.shopping.ui.theme.ShoppingTheme
 
 @Composable
@@ -29,7 +29,10 @@ fun OrderScreen(
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
-        OrderHeader(onBackClick = onBackClick)
+        NavigationHeader(
+            title = stringResource(R.string.order_title),
+            onBackClick = onBackClick,
+        )
         Column(
             modifier =
                 Modifier
@@ -44,7 +47,7 @@ fun OrderScreen(
             )
             OrderPriceSummarySection(summary = priceSummary)
         }
-        PaymentButton(
+        PrimaryActionButton(
             text = stringResource(R.string.order_title),
             onClick = onPaymentClick,
         )

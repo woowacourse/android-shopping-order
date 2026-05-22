@@ -18,12 +18,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.model.Product
+import woowacourse.shopping.R
 import woowacourse.shopping.ui.cart.common.CartBottomBar
-import woowacourse.shopping.ui.cart.common.CartHeader
+import woowacourse.shopping.ui.common.component.header.NavigationHeader
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
 import woowacourse.shopping.ui.shopping.ShoppingProductUiState
 import woowacourse.shopping.ui.shopping.component.ProductUnit
@@ -47,7 +49,10 @@ fun CartRecommendedProductsScreen(
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
-        CartHeader(onBackClick = onBackClick)
+        NavigationHeader(
+            title = stringResource(R.string.cart_title),
+            onBackClick = onBackClick,
+        )
         if (!isNetworkConnected) {
             NetworkStatusBanner(modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp))
         }

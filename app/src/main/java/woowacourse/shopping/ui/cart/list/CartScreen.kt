@@ -13,7 +13,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import woowacourse.shopping.ui.cart.common.CartBottomBar
-import woowacourse.shopping.ui.cart.common.CartHeader
+import androidx.compose.ui.res.stringResource
+import woowacourse.shopping.R
+import woowacourse.shopping.ui.common.component.header.NavigationHeader
+import woowacourse.shopping.ui.common.formatter.formatPrice
 import woowacourse.shopping.ui.cart.list.component.CartItemBody
 import woowacourse.shopping.ui.cart.list.component.CartItemSkeletonBody
 import woowacourse.shopping.ui.cart.list.uistate.CartItemUiModel
@@ -43,7 +46,10 @@ fun CartScreen(
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
-        CartHeader(onBackClick = onBackClick)
+        NavigationHeader(
+            title = stringResource(R.string.cart_title),
+            onBackClick = onBackClick,
+        )
         if (!isNetworkConnected) {
             NetworkStatusBanner(modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp))
         }
@@ -116,8 +122,6 @@ fun CartScreen(
         )
     }
 }
-
-private fun formatPrice(totalPrice: Int): String = "%,d원".format(totalPrice)
 
 @Composable
 @Preview(showBackground = true)
