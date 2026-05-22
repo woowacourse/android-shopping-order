@@ -1,54 +1,64 @@
 # android-shopping-order
 
-# 🚀 1단계 - 서버 연동 & 2단계 - 상품 추천
+# 🚀 3단계 - Navigation & Flow & 4단계 - 주문
 
-## 1단계 구현 기능 목록
+## 3단계 구현 기능 목록
 
-### 인증 처리
+### Navigation 구조 전환
 
-- [x] 앱 실행 시 제공된 인증 정보를 로컬에 저장한다.
-- [x] 사용자 인증 정보를 API 요청 헤더에 포함한다.
-- [x] 네트워크 예외 상황을 처리한다.
+- [ ] `navigation-compose` 의존성 추가
+- [ ] 기존 Activity 기반 화면 전환 로직 제거
+- [ ] `startActivity()`, `finish()`, `onRestart()` 기반 흐름 제거
+- [ ] 단일 Activity에서 `NavHost`를 사용해 화면 전환 처리
+- [ ] 상품 목록 화면을 Navigation 목적지로 등록
+- [ ] 상품 상세 화면을 Navigation 목적지로 등록
+- [ ] 장바구니 화면을 Navigation 목적지로 등록
+- [ ] 상품 추천 화면을 Navigation 목적지로 등록
 
-### 상품 API 연동
+### Route 구성
 
-- [x] `page`, `size`기반으로 상품 목록을 조회 API을 연동한다.
-- [x] `id`를 통해 상품 상세 내용을 조회 API을 연동한다.
+- [ ] 모든 화면 Route를 `@Serializable` 타입으로 선언
+- [ ] 상품 상세 화면 이동 시 상품 ID를 Route로 전달
+- [ ] 장바구니 화면 Route 정의
+- [ ] 상품 추천 화면 Route 정의
+- [ ] 문자열 기반 Route 사용을 최소화
 
-### 장바구니 API 연동
+### 화면 이동 처리 개선
 
-- [x] 장바구니 조회 API을 연동한다.
-- [x] 장바구니 추가 API을 연동한다.
-- [x] 장바구니 수정 API을 연동한다.
-- [x] 장바구니 삭제 API을 연동한다.
+- [ ] 각 화면 이동을 `NavController`를 통해 처리
+- [ ] `NavController`를 화면 Composable에 직접 전달하지 않기
+- [ ] 화면 이동 로직을 콜백 람다로 분리
+- [ ] 상품 목록에서 상품 상세로 이동하는 콜백 연결
+- [ ] 상품 상세에서 장바구니로 이동하는 콜백 연결
+- [ ] 장바구니에서 주문 완료 후 상품 목록으로 이동하는 콜백 연결
+- [ ] 상품 추천은 CartScreen 내부 CartFlow 상태 분기로 처리 
 
-### 서버 연동
+### 주문 완료 후 Back Stack 정리
 
-- [x] Retrofit 기반으로 서버와 연동한다.
-- [x] Kotlinx Serialization 기반 JSON 직렬화를 적용한다.
-- [x] Interceptor를 정의하여 사용자 인증정보를 헤더에 포함한다.
+- [ ] 주문 완료 이벤트 발생 시 상품 목록 화면으로 이동
+- [ ] 주문 완료 후 장바구니/추천 화면이 Back Stack에 남지 않도록 처리
+- [ ] `popUpTo()`를 사용해 주문 흐름 제거
+- [ ] 뒤로가기 시 주문 완료 이전 화면으로 돌아가지 않도록 검증
 
-### 로딩 UI 개선
+### SharedFlow 기반 단발성 이벤트 처리
 
-- [x] 상품 목록 로딩 시 스켈레톤 UI를 표시한다.
-- [x] 장바구니 로딩 시 스켈레톤 UI를 표시한다.
+- [ ] 장바구니 추가 완료 이벤트를 `SharedFlow`로 처리
+- [ ] 장바구니 삭제 완료 이벤트를 `SharedFlow`로 처리
+- [ ] 주문 완료 이벤트를 `SharedFlow`로 처리
+- [ ] 스낵바 표시 이벤트를 `SharedFlow`로 처리
+- [ ] 화면 이동 트리거 이벤트를 `SharedFlow`로 처리
+- [ ] ViewModel의 `MutableSharedFlow`를 외부에 `SharedFlow`로 노출
 
-## 2단계 구현 기능 목록
+### 상품 추천 화면 처리
 
-### 장바구니 화면
+- [ ] 주문하기 버튼에서 CartFlow 전환 로직 구현
+- [ ] 추천 상품 추가/수정/삭제 시 CartViewModel의 메서드 호출
+- [ ] 주문 완료 시 CartFlow.CART에서 CartFlow.RECOMMEND로 진행
+- [ ] 주문 최종 완료 후 ProductListRoute로 탈출 (Back Stack 정리 포함)
 
-- [x] 장바구니 상품 선택 기능
-    - [x] 상품 별로 선택할 수 있다.
-    - [x] 전체 상품을 선택할 수 있다.
-    - [x] 선택된 상품의 금액과 개수를 표시한다.
-- [x] 주문하기
-    - [x] 주문하기 버튼 클릭 시 상품 추천 화면을 표시한다.
+### Compose 상태 관리 정리
 
-### 장바구니 - 추가 상품 추천 화면
-
-- [x] 가장 최근 상품의 카테고리와 동일한 상품 최대 10개를 노출한다.
-    - [x] 장바구니에 존재하는 상품이라면 노출하지 않는다.
-- [x] 상품을 추가/수정/삭제할 수 있다.
-- [x] 총 상품의 금액과 개수를 표시한다.
-- [x] 주문하기 버튼을 통해 주문한다.
-
+- [ ] 화면 전환과 관련된 로컬 Compose State 제거
+- [ ] Navigation 흐름은 ViewModel 이벤트 또는 상위 콜백으로 처리
+- [ ] 남아 있는 `remember/mutableStateOf` 사용 위치 점검
+- [ ] `ShimmerEffect`의 로컬 상태는 UI 측정용 예외로 유지할지 검토
