@@ -1,9 +1,13 @@
 package woowacourse.shopping.ui.order
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
@@ -31,13 +35,16 @@ fun OrderRouteScreen(
         }
     }
 
-    OrderScreen(
-        onBackClick = onBackClick,
-        coupons = uiState.coupons,
-        priceSummary = uiState.priceSummary,
-        isOrdering = uiState.isOrdering,
-        isPaymentEnabled = uiState.isPaymentEnabled,
-        isNetworkConnected = uiState.isNetworkConnected,
-        onPaymentClick = orderViewModel::placeOrder,
-    )
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        OrderScreen(
+            onBackClick = onBackClick,
+            modifier = Modifier.padding(innerPadding),
+            coupons = uiState.coupons,
+            priceSummary = uiState.priceSummary,
+            isOrdering = uiState.isOrdering,
+            isPaymentEnabled = uiState.isPaymentEnabled,
+            isNetworkConnected = uiState.isNetworkConnected,
+            onPaymentClick = orderViewModel::placeOrder,
+        )
+    }
 }
