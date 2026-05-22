@@ -82,7 +82,7 @@ open class ShoppingApplication : Application() {
 
         val json = Json { ignoreUnknownKeys = true }
         val baseUrl =
-            "http://127.0.0.1:8080/".toHttpUrl()
+            "http://192.168.2.176:8080".toHttpUrl()
 
         val client =
             OkHttpClient
