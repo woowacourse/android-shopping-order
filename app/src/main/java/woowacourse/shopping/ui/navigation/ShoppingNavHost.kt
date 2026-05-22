@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import woowacourse.shopping.AppContainer
+import woowacourse.shopping.ui.cart.CartEvent
 import woowacourse.shopping.ui.cart.CartScreen
 import woowacourse.shopping.ui.cart.CartViewModel
 import woowacourse.shopping.ui.component.CustomToastMessage
@@ -144,6 +145,7 @@ fun ShoppingNavHost(
         }
 
         composable<ShoppingRoute.Cart> {
+            val context = LocalContext.current
             val viewModel: CartViewModel =
                 viewModel(
                     factory =
@@ -152,6 +154,24 @@ fun ShoppingNavHost(
                         ),
                 )
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            LaunchedEffect(viewModel) {
+                viewModel.event.collect { event ->
+                    when (event) {
+                        CartEvent.DeleteCartItemFailure -> {
+                            CustomToastMessage(context, "장바구니 상품을 삭제하지 못했습니다.")
+                        }
+
+                        CartEvent.UpdateCartItemFailure -> {
+                            CustomToastMessage(context, "장바구니 상품 수량을 변경하지 못했습니다.")
+                        }
+
+                        CartEvent.NavigateToRecommend -> {
+                            navController.navigate(ShoppingRoute.Recommend)
+                        }
+                    }
+                }
+            }
 
             CartScreen(
                 uiState = uiState,
@@ -164,9 +184,7 @@ fun ShoppingNavHost(
                 onQuantityChange = viewModel::updateQuantity,
                 onCheckedChange = viewModel::checkItem,
                 isAllSelectClick = viewModel::isAllSelectClick,
-                onOrderClick = {
-                    navController.navigate(ShoppingRoute.Recommend)
-                },
+                onOrderClick = viewModel::order,
             )
         }
 
