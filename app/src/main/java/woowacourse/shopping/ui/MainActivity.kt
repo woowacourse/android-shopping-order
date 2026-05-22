@@ -57,17 +57,7 @@ class MainActivity : ComponentActivity() {
                             )
                             ShoppingRoute(
                                 viewModel = viewModel,
-                                onNavigateToProductDetail = { productId, lastViewedId ->
-                                    navController.navigate(
-                                        ProductDetail(
-                                            selectedProductId = productId,
-                                            lastViewedProductId = lastViewedId
-                                        )
-                                    )
-                                },
-                                onNavigateToCart = {
-                                    navController.navigate(Cart)
-                                },
+                                navController = navController,
                                 modifier = Modifier.padding(innerPadding)
                             )
                         }
