@@ -56,7 +56,7 @@ class AppContainer(
     }
 
     val recentItemRepository: RecentItemRepository by lazy {
-        RecentItemRepository(database.recentItemDao(), productRepository)
+        RecentItemRepository(database.recentItemDao())
     }
 
     val networkObserver: NetworkObserver by lazy {
