@@ -154,8 +154,19 @@ class ShoppingCartItemViewModel(
 
     fun removeShoppingItem(shoppingCartItem: ShoppingCartItem) {
         viewModelScope.launch {
-            shoppingCartRepository.remove(shoppingCartItem)
-            resetQuantity(shoppingCartItem.product.id)
+            runCatching {
+                shoppingCartRepository.remove(shoppingCartItem)
+                resetQuantity(shoppingCartItem.product.id)
+            }.onSuccess {
+                _event.tryEmit(ShoppingCartEvent.RemoveSuccess)
+            }.onFailure { throwable ->
+                _event.tryEmit(
+                    ShoppingCartEvent.RemoveFailure(
+                        throwable.message ?: "장바구니 아이템 삭제 실패"
+                    ),
+                )
+            }
+
         }
     }
 
@@ -255,7 +266,11 @@ class ShoppingCartItemViewModel(
         private const val INITIAL_PAGE = 0
     }
 
-    sealed interface ShoppingCartEvent {
-        data object NavigateBack : ShoppingCartEvent
-    }
+
+}
+
+sealed interface ShoppingCartEvent {
+    data object NavigateBack : ShoppingCartEvent
+    data object RemoveSuccess : ShoppingCartEvent
+    data class RemoveFailure(val message: String) : ShoppingCartEvent
 }

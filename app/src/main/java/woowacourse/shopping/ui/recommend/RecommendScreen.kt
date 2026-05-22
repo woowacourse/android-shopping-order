@@ -38,7 +38,7 @@ import woowacourse.shopping.ui.screen.ShoppingCartTopBar
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 @Composable
-fun RecommentScreen(
+fun RecommendScreen(
     recommentProducts: List<ShoppingItem>,
     baseSelectedCartItemCount: Int,
     totalPrice: Int,
@@ -170,9 +170,9 @@ fun OrderButton(
 
 @Preview(showBackground = true)
 @Composable
-private fun RecommentScreenPreview() {
+private fun RecommendScreenPreview() {
     AndroidShoppingTheme {
-        RecommentScreen(
+        RecommendScreen(
             recommentProducts =
                 listOf(
                     ShoppingItem(

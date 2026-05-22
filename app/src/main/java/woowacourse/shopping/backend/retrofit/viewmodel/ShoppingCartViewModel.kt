@@ -2,8 +2,11 @@ package woowacourse.shopping.backend.retrofit.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import woowacourse.shopping.backend.retrofit.dto.CartRequest
@@ -15,6 +18,8 @@ import woowacourse.shopping.model.ShoppingCartItem
 class ShoppingCartViewModel(
     private val shoppingCartRetrofitRepository: ShoppingCartRetrofitRepository,
 ) : ViewModel() {
+
+
     private val _shoppingCartItems = MutableStateFlow<List<ShoppingCartItem>>(emptyList())
     val shoppingCartItems: StateFlow<List<ShoppingCartItem>> = _shoppingCartItems.asStateFlow()
     private val _isLoading = MutableStateFlow(false)
@@ -122,8 +127,6 @@ class ShoppingCartViewModel(
             }
         }
     }
-
-
 
     fun getTotalPrice(shoppingCartItems: List<ShoppingCartItem>): Int =
         shoppingCartItems.sumOf { it.getProductQuantityPrice() }

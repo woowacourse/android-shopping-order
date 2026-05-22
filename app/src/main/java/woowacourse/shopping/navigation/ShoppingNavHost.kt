@@ -1,9 +1,11 @@
 package woowacourse.shopping.navigation
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -13,11 +15,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import woowacourse.shopping.backend.retrofit.dto.OrderInfo
 import woowacourse.shopping.backend.retrofit.viewmodel.OrderViewModel
+import woowacourse.shopping.model.ShoppingCartItem
+import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.navigation.Route.Cart
 import woowacourse.shopping.navigation.Route.ProductDetail
 import woowacourse.shopping.navigation.Route.ProductList
-import woowacourse.shopping.model.ShoppingCartItem
-import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.ui.component.MoreButton
 import woowacourse.shopping.ui.component.PageNavigation
 import woowacourse.shopping.ui.recommend.ShoppingCartRecommendSection
@@ -26,16 +28,20 @@ import woowacourse.shopping.ui.screen.OrderButton
 import woowacourse.shopping.ui.screen.ProductListScreen
 import woowacourse.shopping.ui.screen.ShoppingCartScreen
 import woowacourse.shopping.ui.state.ShoppingCartState
+import woowacourse.shopping.ui.viewmodel.DetailProductEvent
 import woowacourse.shopping.ui.viewmodel.DetailProductViewModel
 import woowacourse.shopping.ui.viewmodel.ProductListViewModel
+import woowacourse.shopping.ui.viewmodel.ShoppingCartEvent
 import woowacourse.shopping.ui.viewmodel.ShoppingCartItemViewModel
 import woowacourse.shopping.ui.viewmodel.ShoppingCartRecommendViewModel
 import woowacourse.shopping.ui.viewmodel.ShoppingCartRecommendViewModel.ShoppingCartStep
 
 @Composable
 fun ShoppingNavHost(
+    modifier: Modifier,
     navController: NavHostController,
     viewModelFactory: ViewModelProvider.Factory,
+    snackbarHostState: SnackbarHostState
 ) {
     NavHost(
         navController = navController,
@@ -99,9 +105,7 @@ fun ShoppingNavHost(
                 bottomContent =
                     if (uiState.canLoadNextPage) {
                         {
-                            MoreButton(
-                                onClick = productListViewModel::loadNextPage,
-                            )
+                            MoreButton(onClick = productListViewModel::loadNextPage)
                         }
                     } else {
                         null
@@ -110,11 +114,26 @@ fun ShoppingNavHost(
         }
 
         composable<ProductDetail> { backStackEntry ->
+
             val route = backStackEntry.toRoute<ProductDetail>()
             val productDetailViewModel: DetailProductViewModel = viewModel(
                 viewModelStoreOwner = backStackEntry,
                 factory = viewModelFactory
             )
+            LaunchedEffect(DetailProductViewModel) {
+                productDetailViewModel.event.collect { event ->
+                    when (event) {
+                        DetailProductEvent.AddToCartSuccess -> {
+                            navController.popBackStack()
+                            snackbarHostState.showSnackbar("장바구니에 담았습니다.")
+                        }
+
+                        is DetailProductEvent.AddToCartFailure -> {
+                            snackbarHostState.showSnackbar(event.message)
+                        }
+                    }
+                }
+            }
 
             LaunchedEffect(route.productId, route.showLastViewed) {
                 productDetailViewModel.initialize(
@@ -132,7 +151,6 @@ fun ShoppingNavHost(
                     lastViewedShoppingItem = uiState.lastViewedShoppingItem,
                     onAddToCartClick = {
                         productDetailViewModel.addSelectedProductToCart()
-                        navController.popBackStack()
                     },
                     onLastViewedProductClick = { selectedProductId ->
                         navController.navigate(
@@ -157,19 +175,29 @@ fun ShoppingNavHost(
                 factory = viewModelFactory
             )
 
-            LaunchedEffect(shoppingCartViewModel) {
-                shoppingCartViewModel.requestCartItems()
-            }
 
             LaunchedEffect(shoppingCartViewModel) {
                 shoppingCartViewModel.event.collect { event ->
                     when (event) {
-                        ShoppingCartItemViewModel.ShoppingCartEvent.NavigateBack -> {
+                        ShoppingCartEvent.NavigateBack -> {
                             navController.popBackStack()
+                        }
+
+                        ShoppingCartEvent.RemoveSuccess -> {
+                            snackbarHostState.showSnackbar("장바구니에서 삭제했습니다.")
+                        }
+
+                        is ShoppingCartEvent.RemoveFailure -> {
+                            snackbarHostState.showSnackbar(event.message)
                         }
                     }
                 }
             }
+
+            LaunchedEffect(shoppingCartViewModel) {
+                shoppingCartViewModel.requestCartItems()
+            }
+
 
             val shoppingCartRecommendViewModel: ShoppingCartRecommendViewModel = viewModel(
                 viewModelStoreOwner = backStackEntry,

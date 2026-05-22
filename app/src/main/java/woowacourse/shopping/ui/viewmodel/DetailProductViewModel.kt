@@ -2,8 +2,11 @@ package woowacourse.shopping.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import woowacourse.shopping.model.ShoppingItem
@@ -12,12 +15,19 @@ import woowacourse.shopping.repository.ShoppingItemRepository
 import woowacourse.shopping.storage.datastore.VisitStore
 import kotlin.uuid.ExperimentalUuidApi
 
+sealed interface DetailProductEvent {
+    data object AddToCartSuccess : DetailProductEvent
+    data class AddToCartFailure(val message: String) : DetailProductEvent
+}
+
 @OptIn(ExperimentalUuidApi::class)
 class DetailProductViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
     private val shoppingItemRepository: ShoppingItemRepository,
     private val visitStore: VisitStore,
 ) : ViewModel() {
+    private val _event = MutableSharedFlow<DetailProductEvent>(extraBufferCapacity = 1)
+    val event: SharedFlow<DetailProductEvent> = _event.asSharedFlow()
     private val _uiState = MutableStateFlow(DetailProductUiState())
     val uiState: StateFlow<DetailProductUiState> = _uiState.asStateFlow()
 
@@ -85,8 +95,18 @@ class DetailProductViewModel(
         if (quantity < 1) return
 
         viewModelScope.launch {
-            shoppingCartRepository.addIfAbsent(productId)
-            shoppingItemRepository.plusQuantity(productId, quantity)
+            runCatching {
+                shoppingCartRepository.addIfAbsent(productId)
+                shoppingItemRepository.plusQuantity(productId, quantity)
+            }.onSuccess {
+                _event.tryEmit(DetailProductEvent.AddToCartSuccess)
+            }.onFailure { throwable ->
+                _event.tryEmit(
+                    DetailProductEvent.AddToCartFailure(
+                        throwable.message ?: "장바구니 담기 실패",
+                    ),
+                )
+            }
         }
     }
 
@@ -133,6 +153,7 @@ class DetailProductViewModel(
             else -> recentProductIds.firstOrNull()
         }
     }
+
     data class DetailProductUiState(
         val shoppingItem: ShoppingItem? = null,
         val lastViewedShoppingItem: ShoppingItem? = null,
