@@ -13,7 +13,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.IntentKeys
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.domain.PurchaseProduct
+import woowacourse.shopping.domain.model.PurchaseProduct
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 
 class ProductDetailActivity : ComponentActivity() {

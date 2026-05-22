@@ -11,21 +11,20 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.local.entity.RecentlyViewedProductEntity
-import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
-import woowacourse.shopping.data.remote.server.repository.CartRepository
-import woowacourse.shopping.data.remote.server.repository.ProductRepository
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.Products
-import woowacourse.shopping.domain.PurchaseProduct
-import woowacourse.shopping.domain.PurchaseProducts
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Products
+import woowacourse.shopping.domain.model.PurchaseProduct
+import woowacourse.shopping.domain.model.PurchaseProducts
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentlyViewedProductRepository
 
 class ShoppingViewModel(
     private val cartRepository: CartRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
     private val productRepository: ProductRepository,
 ) : ViewModel() {
-    val recentlyViewedEntities: StateFlow<List<RecentlyViewedProductEntity>?> =
+    val recentlyViewedProductIds: StateFlow<List<Long>?> =
         recentlyViewedProductRepository
             .getAll()
             .stateIn(
@@ -42,10 +41,10 @@ class ShoppingViewModel(
 
 
     val recentlyViewedProducts: StateFlow<Products> =
-        combine(recentlyViewedEntities, products) { entities, allProducts ->
+        combine(recentlyViewedProductIds, products) { productIds, allProducts ->
             val productList =
-                entities?.mapNotNull { entity ->
-                    allProducts.findWithId(entity.id)
+                productIds?.mapNotNull { productId ->
+                    allProducts.findWithId(productId)
                 } ?: emptyList()
             Products(productList)
         }.stateIn(

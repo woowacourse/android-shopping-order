@@ -12,8 +12,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import retrofit2.Retrofit
 import woowacourse.shopping.data.remote.server.service.CartService
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.PurchaseProduct
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.PurchaseProduct
+import woowacourse.shopping.domain.repository.CartRepository
 
 class CartRepositoryTest {
     private lateinit var mockWebServer: MockWebServer

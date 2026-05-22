@@ -2,6 +2,8 @@ package woowacourse.shopping.domain
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.PurchaseProduct
 
 class PurchaseProductTest {
     @Test

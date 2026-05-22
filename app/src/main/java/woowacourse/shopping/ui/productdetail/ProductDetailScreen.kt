@@ -26,12 +26,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.R
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.ui.common.layout.CommonFrame
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.core.designsystem.component.layout.CommonFrame
 import woowacourse.shopping.ui.productdetail.component.LastViewedProduct
-import woowacourse.shopping.ui.common.ProductImage
-import woowacourse.shopping.ui.common.QuantitySelector
-import woowacourse.shopping.ui.common.toPriceString
+import woowacourse.shopping.core.designsystem.component.ProductImage
+import woowacourse.shopping.core.designsystem.component.QuantitySelector
+import woowacourse.shopping.core.designsystem.component.toPriceString
 
 @Composable
 fun ProductDetailScreen(

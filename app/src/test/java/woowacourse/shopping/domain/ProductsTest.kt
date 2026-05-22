@@ -3,6 +3,8 @@ package woowacourse.shopping.domain
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Products
 
 class ProductsTest {
     @Test

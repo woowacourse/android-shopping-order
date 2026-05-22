@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.common
+package woowacourse.shopping.core.designsystem.component
 
 import android.icu.text.DecimalFormat
 import androidx.compose.foundation.clickable
@@ -20,8 +20,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.PurchaseProduct
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.PurchaseProduct
 
 @Composable
 fun ShoppingItem(

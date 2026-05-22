@@ -14,13 +14,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
-import woowacourse.shopping.data.remote.server.repository.CartRepository
-import woowacourse.shopping.data.remote.server.repository.ProductRepository
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.Products
-import woowacourse.shopping.domain.PurchaseProduct
-import woowacourse.shopping.domain.PurchaseProducts
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Products
+import woowacourse.shopping.domain.model.PurchaseProduct
+import woowacourse.shopping.domain.model.PurchaseProducts
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentlyViewedProductRepository
 
 class RecommendationViewModel(
     private val cartRepository: CartRepository,

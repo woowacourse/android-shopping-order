@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.common
+package woowacourse.shopping.core.designsystem.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

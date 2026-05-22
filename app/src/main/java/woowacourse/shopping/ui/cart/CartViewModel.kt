@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.remote.server.repository.CartRepository
-import woowacourse.shopping.domain.PurchaseProducts
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.model.PurchaseProducts
 
 class CartViewModel(
     private val cartRepository: CartRepository,

@@ -14,8 +14,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.Products
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Products
 
 @Composable
 fun RecentlyViewedProducts(

@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.PurchaseProduct
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.PurchaseProduct
 import woowacourse.shopping.ui.cart.CartViewModel
 import woowacourse.shopping.viewmodel.fakes.FakeCartRepository
 

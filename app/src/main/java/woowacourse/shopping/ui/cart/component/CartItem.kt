@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.R
 import woowacourse.shopping.ui.cart.uimodel.CartInfo
-import woowacourse.shopping.ui.common.ProductImage
-import woowacourse.shopping.ui.common.QuantitySelector
+import woowacourse.shopping.core.designsystem.component.ProductImage
+import woowacourse.shopping.core.designsystem.component.QuantitySelector
 
 @Composable
 fun CartItem(

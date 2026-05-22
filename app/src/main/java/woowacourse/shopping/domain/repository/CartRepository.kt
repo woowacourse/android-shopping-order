@@ -1,7 +1,7 @@
-package woowacourse.shopping.data.remote.server.repository
+package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.PurchaseProduct
-import woowacourse.shopping.domain.PurchaseProducts
+import woowacourse.shopping.domain.model.PurchaseProduct
+import woowacourse.shopping.domain.model.PurchaseProducts
 
 interface CartRepository {
     suspend fun insert(purchaseProduct: PurchaseProduct)

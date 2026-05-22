@@ -1,7 +1,7 @@
 package woowacourse.shopping.viewmodel.fakes
 
-import woowacourse.shopping.data.remote.server.repository.ProductRepository
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.model.Product
 
 class FakeProductRepository : ProductRepository {
     private val products = mutableListOf<Product>()

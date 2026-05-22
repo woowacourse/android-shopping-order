@@ -3,26 +3,24 @@ package woowacourse.shopping.viewmodel.fakes
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import woowacourse.shopping.data.local.entity.RecentlyViewedProductEntity
-import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.repository.RecentlyViewedProductRepository
 
 class FakeRecentlyViewedProductRepository : RecentlyViewedProductRepository {
-    private val _history = MutableStateFlow<List<RecentlyViewedProductEntity>>(emptyList())
+    private val history = MutableStateFlow<List<Long>>(emptyList())
 
-    override fun getAll(): Flow<List<RecentlyViewedProductEntity>?> = _history
+    override fun getAll(): Flow<List<Long>?> = history
 
     override suspend fun updateList(product: Product) {
-        val current = _history.value.toMutableList()
-        current.removeAll { it.id == product.id }
-        current.add(0, RecentlyViewedProductEntity(product.id))
+        val current = history.value.toMutableList()
+        current.removeAll { it == product.id }
+        current.add(0, product.id)
         if (current.size > 10) {
-            _history.value = current.take(10)
+            history.value = current.take(10)
         } else {
-            _history.value = current
+            history.value = current
         }
     }
 
-    override fun getLatestItem(): Flow<Long?> =
-        _history.map { it.firstOrNull()?.id }
+    override fun getLatestItem(): Flow<Long?> = history.map { it.firstOrNull() }
 }

@@ -3,7 +3,7 @@ package woowacourse.shopping.data.remote.server.dto.cart.items
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import woowacourse.shopping.domain.PurchaseProduct
+import woowacourse.shopping.domain.model.PurchaseProduct
 
 @Serializable
 data class ContentResponse(

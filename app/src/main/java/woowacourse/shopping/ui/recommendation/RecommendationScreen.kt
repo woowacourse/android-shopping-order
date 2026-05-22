@@ -24,12 +24,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.R
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.Products
-import woowacourse.shopping.domain.PurchaseProduct
-import woowacourse.shopping.ui.common.layout.CommonFrame
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.Products
+import woowacourse.shopping.domain.model.PurchaseProduct
+import woowacourse.shopping.core.designsystem.component.layout.CommonFrame
 import woowacourse.shopping.ui.cart.component.CartBottomBar
-import woowacourse.shopping.ui.common.ShoppingItem
+import woowacourse.shopping.core.designsystem.component.ShoppingItem
 
 @Composable
 fun CartRecommendationScreen(

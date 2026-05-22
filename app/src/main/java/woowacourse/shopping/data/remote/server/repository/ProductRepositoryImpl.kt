@@ -3,7 +3,8 @@ package woowacourse.shopping.data.remote.server.repository
 import woowacourse.shopping.data.remote.server.service.ProductService
 import woowacourse.shopping.data.remote.server.dto.product.toDomain
 import woowacourse.shopping.data.remote.server.dto.products.toDomain
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepositoryImpl(
     private val productService: ProductService

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.data.remote.mock.ProductWebServer
-import woowacourse.shopping.data.remote.server.repository.ProductRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.data.remote.mock.MockProductRepositoryImpl
 
 class ProductWebServerTest {

@@ -1,6 +1,6 @@
-package woowacourse.shopping.data.remote.server.repository
+package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.model.Product
 
 interface ProductRepository {
     suspend fun getProducts(

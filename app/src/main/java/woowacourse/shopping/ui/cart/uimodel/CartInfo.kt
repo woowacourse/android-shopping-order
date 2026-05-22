@@ -1,8 +1,8 @@
 package woowacourse.shopping.ui.cart.uimodel
 
-import woowacourse.shopping.domain.PurchaseProduct
-import woowacourse.shopping.domain.PurchaseProducts
-import woowacourse.shopping.ui.common.toPriceString
+import woowacourse.shopping.domain.model.PurchaseProduct
+import woowacourse.shopping.domain.model.PurchaseProducts
+import woowacourse.shopping.core.designsystem.component.toPriceString
 
 data class CartInfo(
     val id: Long,

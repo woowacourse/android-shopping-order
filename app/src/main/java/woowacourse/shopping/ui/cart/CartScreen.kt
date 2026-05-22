@@ -34,7 +34,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.ui.cart.component.CartBottomBar
 import woowacourse.shopping.ui.cart.component.CartItem
 import woowacourse.shopping.ui.cart.uimodel.CartInfo
-import woowacourse.shopping.ui.common.layout.CommonFrame
+import woowacourse.shopping.core.designsystem.component.layout.CommonFrame
 
 @Composable
 fun CartScreen(

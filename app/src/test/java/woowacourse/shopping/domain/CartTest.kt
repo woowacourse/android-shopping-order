@@ -3,6 +3,10 @@ package woowacourse.shopping.domain
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.domain.model.Cart
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.PurchaseProduct
+import woowacourse.shopping.domain.model.PurchaseProducts
 
 class CartTest {
     @Test
@@ -12,7 +16,13 @@ class CartTest {
         val newPurchaseProduct =
             PurchaseProduct(
                 id = 1L,
-                product = Product(category = "category", id = 1L, imageUri = "image", name = "TwoHander", price = 10000),
+                product = Product(
+                    category = "category",
+                    id = 1L,
+                    imageUri = "image",
+                    name = "TwoHander",
+                    price = 10000
+                ),
             )
 
         val newCart = cart.add(newPurchaseProduct)
@@ -25,7 +35,13 @@ class CartTest {
         val newPurchaseProduct =
             PurchaseProduct(
                 id = 1L,
-                product = Product(category = "category", id = 1L, imageUri = "image", name = "TwoHander", price = 10000),
+                product = Product(
+                    category = "category",
+                    id = 1L,
+                    imageUri = "image",
+                    name = "TwoHander",
+                    price = 10000
+                ),
             )
 
         val targetId = newPurchaseProduct.productId
@@ -48,7 +64,13 @@ class CartTest {
         val newPurchaseProduct =
             PurchaseProduct(
                 id = 1L,
-                product = Product(category = "category", id = 1L, imageUri = "image", name = "TwoHander", price = 10000),
+                product = Product(
+                    category = "category",
+                    id = 1L,
+                    imageUri = "image",
+                    name = "TwoHander",
+                    price = 10000
+                ),
             )
 
         val targetId = newPurchaseProduct.productId
@@ -75,7 +97,13 @@ class CartTest {
         val newPurchaseProduct =
             PurchaseProduct(
                 id = 1L,
-                product = Product(category = "category", id = 1L, imageUri = "image", name = "TwoHander", price = 10000),
+                product = Product(
+                    category = "category",
+                    id = 1L,
+                    imageUri = "image",
+                    name = "TwoHander",
+                    price = 10000
+                ),
                 count = 10,
             )
 
@@ -97,7 +125,13 @@ class CartTest {
         val newPurchaseProduct =
             PurchaseProduct(
                 id = 1L,
-                product = Product(category = "category", id = 1L, imageUri = "image", name = "TwoHander", price = 10000),
+                product = Product(
+                    category = "category",
+                    id = 1L,
+                    imageUri = "image",
+                    name = "TwoHander",
+                    price = 10000
+                ),
                 count = 10,
             )
 
@@ -105,7 +139,11 @@ class CartTest {
             Cart(
                 purchaseProducts =
                     PurchaseProducts(
-                        purchaseProducts = listOf(newPurchaseProduct, newPurchaseProduct, newPurchaseProduct),
+                        purchaseProducts = listOf(
+                            newPurchaseProduct,
+                            newPurchaseProduct,
+                            newPurchaseProduct
+                        ),
                     ),
             )
 
