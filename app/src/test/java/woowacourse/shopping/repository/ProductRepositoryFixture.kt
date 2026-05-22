@@ -1,7 +1,7 @@
 package woowacourse.shopping.repository
 
-import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.product.Money
+import woowacourse.shopping.model.product.Product
 
 object ProductRepositoryFixture {
     val products: List<Product> =

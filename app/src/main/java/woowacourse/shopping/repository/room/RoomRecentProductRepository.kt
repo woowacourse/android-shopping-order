@@ -2,7 +2,7 @@ package woowacourse.shopping.repository.room
 
 import woowacourse.shopping.local.recent.RecentProductDao
 import woowacourse.shopping.local.recent.RecentProductEntity
-import woowacourse.shopping.model.RecentProduct
+import woowacourse.shopping.model.product.RecentProduct
 import woowacourse.shopping.repository.RecentProductRepository
 
 class RoomRecentProductRepository(

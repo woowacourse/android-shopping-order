@@ -1,8 +1,8 @@
 package woowacourse.shopping.repository.http.dto.product
 
 import kotlinx.serialization.Serializable
-import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.product.Money
+import woowacourse.shopping.model.product.Product
 
 @Serializable
 data class ProductResponseDto(

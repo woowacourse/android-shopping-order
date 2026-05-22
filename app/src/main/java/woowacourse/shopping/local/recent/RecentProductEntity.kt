@@ -2,7 +2,7 @@ package woowacourse.shopping.local.recent
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import woowacourse.shopping.model.RecentProduct
+import woowacourse.shopping.model.product.RecentProduct
 
 @Entity(tableName = "recent_products")
 data class RecentProductEntity(

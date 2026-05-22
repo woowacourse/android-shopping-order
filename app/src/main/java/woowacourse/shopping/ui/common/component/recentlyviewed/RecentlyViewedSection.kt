@@ -14,7 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import woowacourse.shopping.R
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.product.Product
 import woowacourse.shopping.ui.ShoppingTypography
 import woowacourse.shopping.ui.fixture.MockProducts
 

@@ -5,6 +5,7 @@ package woowacourse.shopping.model
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import woowacourse.shopping.model.product.RecentProduct
 
 class RecentProductTest {
     @Test

@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.shopping
 
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.product.Product
 
 object ShoppingProductUiStateMapper {
     fun toUiStates(

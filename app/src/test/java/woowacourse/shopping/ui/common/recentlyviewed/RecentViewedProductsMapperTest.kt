@@ -5,7 +5,7 @@ package woowacourse.shopping.ui.common.recentlyviewed
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.model.RecentProduct
+import woowacourse.shopping.model.product.RecentProduct
 import woowacourse.shopping.repository.ProductRepositoryFixture
 
 class RecentViewedProductsMapperTest {

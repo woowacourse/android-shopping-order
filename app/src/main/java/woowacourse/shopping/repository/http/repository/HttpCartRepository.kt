@@ -9,7 +9,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
-import woowacourse.shopping.model.CartItem
+import woowacourse.shopping.model.cart.CartItem
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.http.api.CartApiService
 import woowacourse.shopping.repository.http.dto.cart.CartItemQuantityUpdateRequestDto
