@@ -1,16 +1,17 @@
 package woowacourse.shopping.ui.cart.list
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import woowacourse.shopping.ui.cart.common.CartBottomBar
 import woowacourse.shopping.ui.cart.common.CartHeader
 import woowacourse.shopping.ui.cart.list.component.CartItemBody
@@ -77,17 +78,26 @@ fun CartScreen(
             }
 
             is CartListUiState.Error -> {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.errorContainer,
-                    shape = MaterialTheme.shapes.medium,
+                Column(
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .padding(18.dp),
                 ) {
-                    Text(
-                        text = cartListState.message ?: "상품을 불러오지 못했습니다.",
-                        color = MaterialTheme.colorScheme.onErrorContainer,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(16.dp),
-                    )
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.errorContainer,
+                        shape = MaterialTheme.shapes.medium,
+                    ) {
+                        Text(
+                            text = cartListState.message ?: "상품을 불러오지 못했습니다.",
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(16.dp),
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
                 }
             }
         }

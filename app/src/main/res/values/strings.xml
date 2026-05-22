@@ -20,4 +20,11 @@
     <string name="last_viewed_product_label">마지막으로 본 상품</string>
     <string name="content_description_decrease_quantity">수량 감소</string>
     <string name="content_description_increase_quantity">수량 증가</string>
+    <string name="order_title">결제하기</string>
+    <string name="order_coupon_expiration">만료일: %1$s</string>
+    <string name="order_coupon_minimum_amount">최소 주문 금액: %1$s</string>
+    <string name="order_price_label_order_amount">주문 금액</string>
+    <string name="order_price_label_coupon_discount">쿠폰 할인 금액</string>
+    <string name="order_price_label_delivery_fee">배송비</string>
+    <string name="order_price_label_total_payment">총 결제 금액</string>
 </resources>
