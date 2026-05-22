@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import kotlinx.coroutines.CancellationException
-import woowacourse.shopping.data.source.remote.CartRemoteDataSource
+import woowacourse.shopping.data.source.remote.datasource.CartRemoteDataSource
 import woowacourse.shopping.data.source.remote.dto.cart.CartContent
 import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.Cart

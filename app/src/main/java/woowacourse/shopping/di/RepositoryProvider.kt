@@ -8,9 +8,9 @@ import woowacourse.shopping.data.repository.DefaultRecentProductRepository
 import woowacourse.shopping.data.source.local.ShoppingDatabase
 import woowacourse.shopping.data.source.local.auth.AuthDataSource
 import woowacourse.shopping.data.source.local.auth.DefaultAuthDataSource
-import woowacourse.shopping.data.source.remote.CartRemoteDataSource
-import woowacourse.shopping.data.source.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.source.remote.RetrofitClient
+import woowacourse.shopping.data.source.remote.datasource.CartRemoteDataSource
+import woowacourse.shopping.data.source.remote.datasource.ProductRemoteDataSource
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository

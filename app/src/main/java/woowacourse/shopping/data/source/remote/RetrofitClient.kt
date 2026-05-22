@@ -18,7 +18,11 @@ class RetrofitClient(
             .addInterceptor(AuthInterceptor(authDataSource))
             .build()
 
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json =
+        Json {
+            ignoreUnknownKeys = true
+            classDiscriminator = "discountType"
+        }
 
     val retrofit: Retrofit =
         Retrofit

@@ -10,9 +10,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import woowacourse.shopping.data.source.local.auth.AuthDataSource
-import woowacourse.shopping.data.source.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.source.remote.RetrofitClient
-import woowacourse.shopping.di.RepositoryProvider.authDataSource
+import woowacourse.shopping.data.source.remote.datasource.ProductRemoteDataSource
 import woowacourse.shopping.domain.model.Money
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductName

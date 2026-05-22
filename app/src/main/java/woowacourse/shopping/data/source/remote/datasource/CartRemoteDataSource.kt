@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.source.remote
+package woowacourse.shopping.data.source.remote.datasource
 
 import retrofit2.Retrofit
 import woowacourse.shopping.data.source.remote.api.AddItemRequestBody
