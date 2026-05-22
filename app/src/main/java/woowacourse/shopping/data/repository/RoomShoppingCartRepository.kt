@@ -20,6 +20,18 @@ class RoomShoppingCartRepository(
     private val shoppingItemRepository: ShoppingItemRepository,
     private val shoppingCartRetrofitRepository: ShoppingCartRetrofitRepository,
 ) : ShoppingCartRepository {
+    /**
+     * 이번에는 Repository, Data source에 대해 고민해보면 좋을 것 같은데요.
+     *
+     * ShoppingCartRepository 는 interface입니다.
+     * 우리는 ShoppingCartRetrofitRepository와 RoomShoppingCartRepository를 가지고 있지만 RoomShoppingCartRepository만이 이를 구현하고 있어요.
+     * 왜 이런 구현이 되었을까요?
+     *
+     * ShoppingCartRetrofitRepository와 RoomShoppingCartRepository 둘의 차이점을 가만히 생각해보면, 데이터가 내부 DB에서 오는가, 외부 API를 통해 가져오는가 입니다.
+     *
+     * 데이터의 출처만 다를뿐, 어떤 정보를 반환해야 하는가는 같을겁니다.
+     * 이를 통해 한 번 개선해볼 수 있을까요?
+     */
     private val remoteStateMutex = Mutex()
     private var hasLoadedRemoteSnapshot: Boolean = false
     private var remoteCartItemIdByProductId: Map<Long, Int> = emptyMap()
