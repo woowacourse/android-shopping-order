@@ -3,8 +3,10 @@ package woowacourse.shopping.ui.cart.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -28,6 +30,9 @@ class CartViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState(cartListState = CartListUiState.Loading))
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
+
+    private val _snackbarEvent = MutableSharedFlow<String>()
+    val snackbarEvent = _snackbarEvent.asSharedFlow()
 
     init {
         observeNetworkState()
@@ -103,6 +108,10 @@ class CartViewModel(
     fun delete(productId: Long) {
         updateQuantity(productId = productId, targetQuantity = 0)
         clearDeselection(productId)
+
+        viewModelScope.launch {
+            _snackbarEvent.emit("장바구니에서 상품을 삭제했습니다.")
+        }
     }
 
     fun toggleItemSelection(

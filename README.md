@@ -14,7 +14,7 @@
 - [x] 기존 Activity 전환 방식을 제거하고 Compose Navigation(`navigation-compose`)으로 교체한다.
 
 ### 2. Flow를 이용한 상태 관리
-- [ ] 장바구니 담기/삭제 등 단발성 이벤트를 SharedFlow로 처리한다.
+- [x] 장바구니 담기/삭제 등 단발성 이벤트를 SharedFlow로 처리한다.
 
 ---
 

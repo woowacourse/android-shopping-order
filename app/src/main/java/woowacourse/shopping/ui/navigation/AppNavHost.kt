@@ -111,30 +111,42 @@ fun AppNavHost(innerPadding: PaddingValues) {
                 viewModel(
                     factory = CartViewModelFactory(),
                 )
+            val snackbarHostState = remember { SnackbarHostState() }
+
             val coroutineScope = rememberCoroutineScope()
 
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-            CartScreen(
-                uiState = uiState,
-                modifier = Modifier.padding(innerPadding),
-                onBackClick = { navController.popBackStack() },
-                onOrderClick = {
-                    coroutineScope.launch {
-                        val selectedIds = viewModel.getSelectedCartItemIds()
-                        if (selectedIds.isNotEmpty()) {
-                            navController.navigate(CartRecommendation(selectedIds.toLongArray()))
+            LaunchedEffect(Unit) {
+                viewModel.snackbarEvent.collect { message ->
+                    snackbarHostState.showSnackbar(message)
+                }
+            }
+
+            Scaffold(
+                snackbarHost = { SnackbarHost(snackbarHostState) },
+            ) { innerPadding ->
+                CartScreen(
+                    uiState = uiState,
+                    modifier = Modifier.padding(innerPadding),
+                    onBackClick = { navController.popBackStack() },
+                    onOrderClick = {
+                        coroutineScope.launch {
+                            val selectedIds = viewModel.getSelectedCartItemIds()
+                            if (selectedIds.isNotEmpty()) {
+                                navController.navigate(CartRecommendation(selectedIds.toLongArray()))
+                            }
                         }
-                    }
-                },
-                onItemCheckedChange = viewModel::toggleItemSelection,
-                onAllCheckedChange = viewModel::toggleAllSelection,
-                onDeleteClick = viewModel::delete,
-                onIncreaseQuantity = viewModel::increaseQuantity,
-                onDecreaseQuantity = viewModel::decreaseQuantity,
-                onPreviousClick = viewModel::loadPreviousPage,
-                onNextClick = viewModel::loadNextPage,
-            )
+                    },
+                    onItemCheckedChange = viewModel::toggleItemSelection,
+                    onAllCheckedChange = viewModel::toggleAllSelection,
+                    onDeleteClick = viewModel::delete,
+                    onIncreaseQuantity = viewModel::increaseQuantity,
+                    onDecreaseQuantity = viewModel::decreaseQuantity,
+                    onPreviousClick = viewModel::loadPreviousPage,
+                    onNextClick = viewModel::loadNextPage,
+                )
+            }
         }
 
         composable<CartRecommendation> {
