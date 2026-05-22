@@ -28,10 +28,12 @@ class ProductListViewModel(
     private val _event = Channel<ProductListEvent>(capacity = Channel.BUFFERED)
     val event = _event.receiveAsFlow()
 
-    private val productPageStateHolder = ProductPageStateHolder(shoppingItems = emptyList())
+    private val productPageStateHolder = ProductPageStateHolder(initialPage = DEFAULT_PAGE)
+    private var currentCategory: String? = null
+    private var currentPageSize: Int = DEFAULT_SIZE
+    private var isRequestingPage: Boolean = false
 
     init {
-        productPageStateHolder.updateItems(shoppingItemRepository.shoppingItems.value)
         refreshUiState()
         observeSources()
     }
@@ -43,29 +45,62 @@ class ProductListViewModel(
         force: Boolean = false,
     ) {
         if (_uiState.value.isLoading) return
+        val shouldReset =
+            force ||
+                !_uiState.value.hasLoadedProducts ||
+                currentCategory != category
+        if (!shouldReset) return
 
-        refreshUiState(
-            isLoading = true,
-            errorMessage = null,
+        currentCategory = category
+        currentPageSize = size
+        productPageStateHolder.reset(startPage = page)
+        requestPage(
+            page = page,
+            replaceExistingProducts = true,
+            showInitialLoading = true,
         )
+    }
+
+    fun loadNextPage() {
+        if (isRequestingPage) return
+        requestPage(
+            page = productPageStateHolder.peekNextPage(),
+            replaceExistingProducts = false,
+            showInitialLoading = false,
+        )
+    }
+
+    private fun requestPage(
+        page: Int,
+        replaceExistingProducts: Boolean,
+        showInitialLoading: Boolean,
+    ) {
+        if (isRequestingPage) return
+        isRequestingPage = true
+        if (showInitialLoading) {
+            refreshUiState(
+                isLoading = true,
+                errorMessage = null,
+            )
+        } else {
+            refreshUiState(
+                errorMessage = null,
+            )
+        }
         viewModelScope.launch {
             runCatching {
-                productRepository.requestAllProducts(
-                    startPage = page,
-                    size = size,
-                    category = category,
-                    force = force,
+                productRepository.requestProductPage(
+                    page = page,
+                    size = currentPageSize,
+                    category = currentCategory,
                 )
-            }.onSuccess { loadedProducts ->
-                if (loadedProducts == null) {
-                    refreshUiState(
-                        isLoading = false,
-                        errorMessage = null,
-                    )
-                    return@onSuccess
-                }
-                shoppingItemRepository.replaceProducts(loadedProducts)
-                productPageStateHolder.restoreCurrentPage(DEFAULT_PAGE)
+            }.onSuccess { pageResult ->
+                shoppingItemRepository.upsertProducts(pageResult.products)
+                productPageStateHolder.onPageLoaded(
+                    productIds = pageResult.products.map { product -> product.id },
+                    hasNextPage = pageResult.hasNextPage,
+                    replaceExisting = replaceExistingProducts,
+                )
                 refreshUiState(
                     isLoading = false,
                     errorMessage = null,
@@ -75,18 +110,17 @@ class ProductListViewModel(
                 refreshUiState(
                     isLoading = false,
                     errorMessage =
-                        throwable
-                            .toApiFailure()
-                            .toUserMessage(defaultMessage = "상품 목록을 불러오지 못했습니다."),
+                        if (showInitialLoading) {
+                            throwable
+                                .toApiFailure()
+                                .toUserMessage(defaultMessage = "상품 목록을 불러오지 못했습니다.")
+                        } else {
+                            _uiState.value.errorMessage
+                        },
                 )
             }
+            isRequestingPage = false
         }
-    }
-
-    fun loadNextPage() {
-        if (!productPageStateHolder.canMoveToNextPage()) return
-        productPageStateHolder.nextPage()
-        refreshUiState()
     }
 
     fun onProductClick(productId: Long) {
@@ -103,8 +137,7 @@ class ProductListViewModel(
 
     private fun observeSources() {
         viewModelScope.launch {
-            shoppingItemRepository.shoppingItems.collect { latestShoppingItems ->
-                productPageStateHolder.updateItems(latestShoppingItems)
+            shoppingItemRepository.shoppingItems.collect {
                 refreshUiState()
             }
         }
@@ -124,15 +157,19 @@ class ProductListViewModel(
         val recentViewedProductIds = visitStore.recentVisitedProductIds.value
         val shoppingItemByProductId =
             allShoppingItems.associateBy { shoppingItem -> shoppingItem.getProductId() }
+        val displayedShoppingItems =
+            productPageStateHolder
+                .displayedProductIds()
+                .mapNotNull { productId -> shoppingItemByProductId[productId] }
         _uiState.update { currentState ->
             currentState.copy(
                 isLoading = isLoading,
                 errorMessage = errorMessage,
                 hasLoadedProducts = hasLoadedProducts,
-                shoppingItems = productPageStateHolder.getItems(),
+                shoppingItems = displayedShoppingItems,
                 recentViewedShoppingItems = recentViewedProductIds.mapNotNull { productId -> shoppingItemByProductId[productId] },
                 shoppingCartTotalCount = allShoppingItems.sumOf { shoppingItem -> shoppingItem.getQuantity() },
-                canLoadNextPage = productPageStateHolder.canMoveToNextPage(),
+                canLoadNextPage = hasLoadedProducts && productPageStateHolder.canLoadNextPage(),
             )
         }
     }

@@ -234,9 +234,9 @@ class RoomShoppingCartRepository(
     }
 
     private suspend fun syncLocalState(shoppingCartItems: List<ShoppingCartItem>) {
-        shoppingCartItems.forEach { shoppingCartItem ->
-            shoppingItemRepository.upsertProduct(shoppingCartItem.product)
-        }
+        shoppingItemRepository.upsertProducts(
+            shoppingCartItems.map { shoppingCartItem -> shoppingCartItem.product },
+        )
         val quantityByProductId =
             shoppingCartItems.associate { shoppingCartItem ->
                 shoppingCartItem.product.id to shoppingCartItem.getQuantity()

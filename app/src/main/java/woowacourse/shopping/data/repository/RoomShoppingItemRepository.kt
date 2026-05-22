@@ -22,20 +22,11 @@ class RoomShoppingItemRepository(
             .map { entities -> entities.map { entity -> entity.toDomain() } }
             .stateIn(scope, SharingStarted.Eagerly, emptyList())
 
-    override suspend fun upsertProduct(product: Product) {
-        val preservedQuantity = shoppingItemDao.getQuantityOrNull(product.id) ?: 0
-        shoppingItemDao.insertAll(
-            listOf(
-                ShoppingItemEntity(
-                    productId = product.id,
-                    title = product.getTitle(),
-                    price = product.getPrice(),
-                    imageUrl = product.imageUrl,
-                    category = product.category,
-                    quantity = preservedQuantity,
-                ),
-            ),
-        )
+    override suspend fun upsertProducts(products: List<Product>) {
+        if (products.isEmpty()) return
+        val quantityByProductId = loadExistingQuantities(products)
+        val entities = products.toEntities(quantityByProductId)
+        shoppingItemDao.insertAll(entities)
     }
 
     override suspend fun replaceProducts(products: List<Product>) {
@@ -43,21 +34,8 @@ class RoomShoppingItemRepository(
             shoppingItemDao.deleteAll()
             return
         }
-        val quantityByProductId =
-            shoppingItemDao
-                .getAll()
-                .associate { entity -> entity.productId to entity.quantity }
-        val entities =
-            products.map { product ->
-                ShoppingItemEntity(
-                    productId = product.id,
-                    title = product.getTitle(),
-                    price = product.getPrice(),
-                    imageUrl = product.imageUrl,
-                    category = product.category,
-                    quantity = quantityByProductId[product.id] ?: 0,
-                )
-            }
+        val quantityByProductId = loadExistingQuantities(products)
+        val entities = products.toEntities(quantityByProductId)
         shoppingItemDao.insertAll(entities)
         shoppingItemDao.deleteByProductIdsNotIn(entities.map { entity -> entity.productId })
     }
@@ -87,5 +65,24 @@ class RoomShoppingItemRepository(
                 ?: throw IllegalArgumentException("해당 상품을 찾을 수 없습니다.")
         val updatedQuantity = (currentQuantity + delta).coerceAtLeast(0)
         shoppingItemDao.updateQuantity(productId, updatedQuantity)
+    }
+
+    private fun List<Product>.toEntities(quantityByProductId: Map<Long, Int>): List<ShoppingItemEntity> =
+        map { product ->
+            ShoppingItemEntity(
+                productId = product.id,
+                title = product.getTitle(),
+                price = product.getPrice(),
+                imageUrl = product.imageUrl,
+                category = product.category,
+                quantity = quantityByProductId[product.id] ?: 0,
+            )
+        }
+
+    private suspend fun loadExistingQuantities(products: List<Product>): Map<Long, Int> {
+        val productIds = products.map { product -> product.id }.distinct()
+        return shoppingItemDao
+            .getQuantitiesByProductIds(productIds)
+            .associate { row -> row.productId to row.quantity }
     }
 }

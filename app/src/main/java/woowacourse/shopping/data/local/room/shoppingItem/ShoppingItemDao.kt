@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.local.room.shoppingItem
 
+import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -17,6 +18,15 @@ interface ShoppingItemDao {
     @Query("SELECT quantity FROM shopping_items WHERE product_id = :productId LIMIT 1")
     suspend fun getQuantityOrNull(productId: Long): Int?
 
+    @Query(
+        """
+        SELECT product_id, quantity
+        FROM shopping_items
+        WHERE product_id IN (:productIds)
+        """,
+    )
+    suspend fun getQuantitiesByProductIds(productIds: List<Long>): List<ShoppingItemQuantityRow>
+
     @Query("UPDATE shopping_items SET quantity = :quantity WHERE product_id = :productId")
     suspend fun updateQuantity(
         productId: Long,
@@ -32,3 +42,10 @@ interface ShoppingItemDao {
     @Query("DELETE FROM shopping_items WHERE product_id NOT IN (:productIds)")
     suspend fun deleteByProductIdsNotIn(productIds: List<Long>): Int
 }
+
+data class ShoppingItemQuantityRow(
+    @ColumnInfo(name = "product_id")
+    val productId: Long,
+    @ColumnInfo(name = "quantity")
+    val quantity: Int,
+)

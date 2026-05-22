@@ -86,7 +86,7 @@ class DetailProductViewModel(
                         id = productId,
                     )
             }.onSuccess { detailProduct ->
-                shoppingItemRepository.upsertProduct(detailProduct)
+                shoppingItemRepository.upsertProducts(listOf(detailProduct))
             }.onFailure {
                 requestedProductIds.remove(productId)
             }
