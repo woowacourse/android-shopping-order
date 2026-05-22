@@ -27,11 +27,5 @@ fun CartUiState.toUiState(
         isAllChecked = selection.isAllSelected(cartItems),
         selectedCartItems = selection.ids,
         selectedCartItemCount = selection.selectedCount,
-        recommendProducts =
-            if (isOrder) {
-                recommendProducts.mapper(cartItems)
-            } else {
-                recommendProducts
-            },
     )
 }
