@@ -2,7 +2,7 @@
 
 ### Navigation
 
-- [ ] Compose Navigation 의존성 추가
+- [x] Compose Navigation 의존성 추가
 - [ ] Route 정의
   - Shopping
   - ProductDetail

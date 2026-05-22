@@ -1,34 +1,44 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("kotlin-parcelize")
     alias(libs.plugins.ksp)
-    kotlin("plugin.serialization") version "2.1.0"
+    alias(libs.plugins.serialization)
 }
 
 android {
     namespace = "woowacourse.shopping"
     compileSdk = 36
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
+        val properties = Properties().apply {
+            load(project.rootProject.file("local.properties").inputStream())
+        }
+
         applicationId = "woowacourse.shopping"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
+        buildConfigField("String", "BASE_URL", properties.getProperty("BASE_URL"))
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
-        debug {
-            buildConfigField(
-                "String",
-                "BASE_URL",
-                "\"http://127.0.0.1:8080/\"",
-            )
-        }
+//        debug {
+//            buildConfigField(
+//                "String",
+//                "BASE_URL",
+//                "\"http://127.0.0.1:8080/\"",
+//            )
+//        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -81,6 +91,9 @@ dependencies {
 
     implementation(libs.okhttp)
     implementation(libs.okhttp.mockwebserver)
+
+    implementation(libs.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 
     ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit.jupiter)
