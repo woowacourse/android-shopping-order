@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.remote.retrofit.repository
+package woowacourse.shopping.data.datasource.remote.product
 
 import woowacourse.shopping.data.mapper.toDomainProduct
 import woowacourse.shopping.data.mapper.toDomainProducts
@@ -6,7 +6,7 @@ import woowacourse.shopping.data.remote.retrofit.api.ProductRetrofitInterface
 import woowacourse.shopping.data.remote.retrofit.dto.ProductResponse
 import woowacourse.shopping.domain.model.Product
 
-class ProductRetrofitRepository(
+class ProductRemoteDataSource(
     private val apiService: ProductRetrofitInterface,
 ) {
     suspend fun requestProductPage(

@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.data.datasource.remote.product.ProductRemoteDataSource
 import woowacourse.shopping.data.local.datastore.VisitStore
-import woowacourse.shopping.data.remote.retrofit.repository.ProductRetrofitRepository
 import woowacourse.shopping.data.remote.retrofit.toApiFailure
 import woowacourse.shopping.data.remote.retrofit.toUserMessage
 import woowacourse.shopping.domain.model.ShoppingItem
@@ -19,7 +19,7 @@ import woowacourse.shopping.domain.repository.ShoppingItemRepository
 class ProductListViewModel(
     private val shoppingItemRepository: ShoppingItemRepository,
     private val visitStore: VisitStore,
-    private val productRepository: ProductRetrofitRepository,
+    private val productRepository: ProductRemoteDataSource,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProductListUiState())

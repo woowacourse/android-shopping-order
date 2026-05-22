@@ -1,47 +1,31 @@
-package woowacourse.shopping.data.repository
+package woowacourse.shopping.data.repository.cart
 
 import android.os.SystemClock
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import woowacourse.shopping.data.datasource.local.cart.ShoppingCartLocalDataSource
+import woowacourse.shopping.data.datasource.remote.cart.ShoppingCartRemoteDataSource
 import woowacourse.shopping.data.mapper.toCartQuantity
 import woowacourse.shopping.data.mapper.toDomainShoppingCartItems
-import woowacourse.shopping.data.local.room.shoppingcart.ShoppingCartDao
-import woowacourse.shopping.data.local.room.shoppingcart.ShoppingCartEntity
-import woowacourse.shopping.data.local.room.shoppingcart.toDomain
 import woowacourse.shopping.data.remote.retrofit.dto.CartRequest
-import woowacourse.shopping.data.remote.retrofit.repository.ShoppingCartRetrofitRepository
 import woowacourse.shopping.domain.model.ShoppingCartItem
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.repository.ShoppingItemRepository
 
-class RoomShoppingCartRepository(
-    private val shoppingCartDao: ShoppingCartDao,
+class ShoppingCartRepositoryImpl(
+    private val shoppingCartLocalDataSource: ShoppingCartLocalDataSource,
     private val shoppingItemRepository: ShoppingItemRepository,
-    private val shoppingCartRetrofitRepository: ShoppingCartRetrofitRepository,
+    private val shoppingCartRemoteDataSource: ShoppingCartRemoteDataSource,
 ) : ShoppingCartRepository {
-    /**
-     * 이번에는 Repository, Data source에 대해 고민해보면 좋을 것 같은데요.
-     *
-     * ShoppingCartRepository 는 interface입니다.
-     * 우리는 ShoppingCartRetrofitRepository와 RoomShoppingCartRepository를 가지고 있지만 RoomShoppingCartRepository만이 이를 구현하고 있어요.
-     * 왜 이런 구현이 되었을까요?
-     *
-     * ShoppingCartRetrofitRepository와 RoomShoppingCartRepository 둘의 차이점을 가만히 생각해보면, 데이터가 내부 DB에서 오는가, 외부 API를 통해 가져오는가 입니다.
-     *
-     * 데이터의 출처만 다를뿐, 어떤 정보를 반환해야 하는가는 같을겁니다.
-     * 이를 통해 한 번 개선해볼 수 있을까요?
-     */
+
     private val remoteStateMutex = Mutex()
     private var hasLoadedRemoteSnapshot: Boolean = false
     private var lastRemoteSnapshotLoadedElapsedMs: Long = 0L
     private var remoteCartItemIdByProductId: Map<Long, Int> = emptyMap()
 
     override fun observeShoppingItems(): Flow<List<ShoppingCartItem>> =
-        shoppingCartDao
-            .observeShoppingCartItemRows()
-            .map { shoppingCartItemRows -> shoppingCartItemRows.map { shoppingCartItemRow -> shoppingCartItemRow.toDomain() } }
+        shoppingCartLocalDataSource.observeShoppingCartItems()
 
     override suspend fun requestCartItems(
         page: Int,
@@ -74,7 +58,7 @@ class RoomShoppingCartRepository(
         sort: List<String>?,
     ) {
         val remoteCartItems =
-            shoppingCartRetrofitRepository
+            shoppingCartRemoteDataSource
                 .requestCartItems(
                     page = page,
                     size = size,
@@ -99,7 +83,7 @@ class RoomShoppingCartRepository(
         val updatedQuantity = currentQuantity + amount
         val remoteCartItemId = remoteCartItemIdByProductId[productId]
         if (remoteCartItemId == null) {
-            shoppingCartRetrofitRepository.addCartItem(
+            shoppingCartRemoteDataSource.addCartItem(
                 product = CartRequest(productId = productId, quantity = amount),
             )
             val resolvedRemoteCartItemId = resolveRemoteCartItemIdInternal(productId = productId)
@@ -107,7 +91,7 @@ class RoomShoppingCartRepository(
                 remoteCartItemIdByProductId += productId to resolvedRemoteCartItemId
             }
         } else {
-            shoppingCartRetrofitRepository.updateQuantityCartItem(
+            shoppingCartRemoteDataSource.updateQuantityCartItem(
                 id = remoteCartItemId,
                 product = updatedQuantity.toCartQuantity(),
             )
@@ -126,10 +110,10 @@ class RoomShoppingCartRepository(
         val currentQuantity = getLocalQuantity(productId)
         val updatedQuantity = currentQuantity - 1
         if (updatedQuantity <= 0) {
-            shoppingCartRetrofitRepository.deleteCartItem(id = remoteCartItemId)
+            shoppingCartRemoteDataSource.deleteCartItem(id = remoteCartItemId)
             remoteCartItemIdByProductId -= productId
         } else {
-            shoppingCartRetrofitRepository.updateQuantityCartItem(
+            shoppingCartRemoteDataSource.updateQuantityCartItem(
                 id = remoteCartItemId,
                 product = updatedQuantity.toCartQuantity(),
             )
@@ -145,7 +129,7 @@ class RoomShoppingCartRepository(
         ensureRemoteSnapshotLoadedInternal()
 
         val remoteCartItemId = resolveRemoteCartItemIdInternal(productId = productId) ?: return
-        shoppingCartRetrofitRepository.deleteCartItem(id = remoteCartItemId)
+        shoppingCartRemoteDataSource.deleteCartItem(id = remoteCartItemId)
         remoteCartItemIdByProductId -= productId
         applyLocalQuantityOrRefresh(
             productId = productId,
@@ -262,15 +246,11 @@ class RoomShoppingCartRepository(
     }
 
     private suspend fun addLocalIfAbsent(productId: Long) {
-        shoppingCartDao.insert(
-            ShoppingCartEntity(
-                productId = productId,
-            ),
-        )
+        shoppingCartLocalDataSource.addIfAbsent(productId)
     }
 
     private suspend fun removeLocalByProductId(productId: Long) {
-        shoppingCartDao.deleteByProductId(productId)
+        shoppingCartLocalDataSource.removeByProductId(productId)
     }
 
     private companion object {

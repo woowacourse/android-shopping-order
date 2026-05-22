@@ -1,17 +1,17 @@
-package woowacourse.shopping.data.remote.retrofit.repository
+package woowacourse.shopping.data.datasource.remote.cart
 
 import woowacourse.shopping.data.remote.retrofit.api.ShoppingCartRetrofitInterface
 import woowacourse.shopping.data.remote.retrofit.dto.CartQuantity
 import woowacourse.shopping.data.remote.retrofit.dto.CartRequest
 import woowacourse.shopping.data.remote.retrofit.dto.ShoppingCartResponse
 
-class ShoppingCartRetrofitRepository(
+class RetrofitShoppingCartRemoteDataSource(
     private val apiService: ShoppingCartRetrofitInterface,
-) {
-    suspend fun requestCartItems(
-        page: Int = DEFAULT_PAGE,
-        size: Int = DEFAULT_SIZE,
-        sort: List<String>? = null,
+) : ShoppingCartRemoteDataSource {
+    override suspend fun requestCartItems(
+        page: Int,
+        size: Int,
+        sort: List<String>?,
     ): ShoppingCartResponse {
         return apiService.requestCartItems(
             page = page,
@@ -20,17 +20,17 @@ class ShoppingCartRetrofitRepository(
         )
     }
 
-    suspend fun addCartItem(product: CartRequest): Unit =
+    override suspend fun addCartItem(product: CartRequest): Unit =
         apiService.addCartItem(
             product = product,
         )
 
-    suspend fun deleteCartItem(id: Int): Unit =
+    override suspend fun deleteCartItem(id: Int): Unit =
         apiService.deleteCartItem(
             id = id,
         )
 
-    suspend fun updateQuantityCartItem(
+    override suspend fun updateQuantityCartItem(
         id: Int,
         product: CartQuantity,
     ): Unit =
@@ -38,9 +38,4 @@ class ShoppingCartRetrofitRepository(
             id = id,
             product = product,
         )
-
-    companion object {
-        private const val DEFAULT_PAGE = 0
-        private const val DEFAULT_SIZE = 5
-    }
 }

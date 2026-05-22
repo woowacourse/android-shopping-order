@@ -1,18 +1,18 @@
-package woowacourse.shopping.data.repository
+package woowacourse.shopping.data.repository.item
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.ShoppingItem
 import woowacourse.shopping.data.local.room.shoppingItem.ShoppingItemDao
 import woowacourse.shopping.data.local.room.shoppingItem.ShoppingItemEntity
 import woowacourse.shopping.data.local.room.shoppingItem.toDomain
+import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ShoppingItem
 import woowacourse.shopping.domain.repository.ShoppingItemRepository
 
-class RoomShoppingItemRepository(
+class ShoppingItemRepositoryImpl(
     private val shoppingItemDao: ShoppingItemDao,
     scope: CoroutineScope,
 ) : ShoppingItemRepository {
