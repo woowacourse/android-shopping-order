@@ -8,10 +8,10 @@
   - ProductDetail
   - Cart
   - Recommendation
-- [ ] Single Activity 전환
+- [x] Single Activity 전환
   - [x] AndroidManifest 수정
-  - [ ] MainActivity 이외의 Activity 제거
-  - [ ] 각 Route 객체 연결
+  - [x] MainActivity 이외의 Activity 제거
+  - [x] 각 Route 객체 연결
 
 ### Flow
 
