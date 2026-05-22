@@ -76,7 +76,11 @@ fun AppNavHost() {
                         Payment(
                             cartContentIds = cartContentIds
                         )
-                    )
+                    ) {
+                        popUpTo(ProductList) {
+                            inclusive = false
+                        }
+                    }
                 },
                 contentIds = route.cartContentIds,
             )

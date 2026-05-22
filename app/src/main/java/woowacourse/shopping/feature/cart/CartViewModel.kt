@@ -63,13 +63,12 @@ class CartViewModel(
     fun initialLoading() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            cart = getCart()
-            val cartContents =
-                pagination(
-                    page = 1,
-                )
+            cart = cartRepository.loadCart()
+            val cartContents = pagination(
+                page = 1,
+            )
             val checkMap: Map<Long, Boolean> =
-                cartContents.map { it.contentId }.associateWith { false }
+                cart.cartContents.map { it.id }.associateWith { false }
             _uiState.update {
                 it.copy(
                     isLoading = false,
@@ -80,6 +79,7 @@ class CartViewModel(
                 )
             }
         }
+
     }
 
     private suspend fun getCart(): Cart {
@@ -97,13 +97,10 @@ class CartViewModel(
         viewModelScope.launch {
             val page = uiState.value.page - 1
             val cartContents = pagination(page)
-            val checkMap: Map<Long, Boolean> =
-                cartContents.map { it.contentId }.associateWith { false }
             _uiState.update {
                 it.copy(
                     page = page,
                     paginatedCartContents = cartContents,
-                    checkMap = checkMap,
                     isFirstPage = page == 1,
                     isLastPage = page >= lastPage(initialPageSize),
                 )
@@ -115,13 +112,10 @@ class CartViewModel(
         viewModelScope.launch {
             val page = uiState.value.page + 1
             val cartContents = pagination(page)
-            val checkMap: Map<Long, Boolean> =
-                cartContents.map { it.contentId }.associateWith { false }
             _uiState.update {
                 it.copy(
                     page = page,
                     paginatedCartContents = cartContents,
-                    checkMap = checkMap,
                     isFirstPage = page == 1,
                     isLastPage = page >= lastPage(initialPageSize),
                 )
@@ -268,15 +262,14 @@ class CartViewModel(
         )
     }
 
-    fun cartItemCheck(productId: Long) {
+    fun cartItemCheck(contentId: Long) {
         val checkMap = _uiState.value.checkMap.toMutableMap()
-        checkMap[productId] = checkMap[productId]?.not()
+        checkMap[contentId] = checkMap[contentId]?.not()
             ?: false
-        val cartItemUiModels = _uiState.value.paginatedCartContents
         val totalPrice =
-            cartItemUiModels
-                .filter { checkMap[it.contentId] == true }
-                .sumOf { it.productUiModel.price * it.productUiModel.quantity }
+            cart.cartContents
+                .filter { checkMap[it.id] == true }
+                .sumOf { it.product.priceAmount() * it.quantity }
         _uiState.update {
             it.copy(
                 checkMap = checkMap.toMap(),
@@ -287,17 +280,19 @@ class CartViewModel(
     }
 
     fun totalCheck() {
-        val productUiModels = _uiState.value.paginatedCartContents
+        val isAllChecked = _uiState.value.checkMap.all { it.value }
+        val nextCheckState = !isAllChecked
 
-        val check =
-            _uiState.value.checkMap
-                .all { it.value }
-                .not()
-        val newCheckMap = productUiModels.map { it.contentId }.associateWith { check }
+        val newCheckMap = _uiState.value.checkMap.keys.associateWith { nextCheckState }
 
-        val checkProductIds = newCheckMap.filter { it.value }.map { it.key }
-        val totalPrice = productUiModels.filter{ checkProductIds.contains(it.contentId) }.sumOf { it.productUiModel.price * it.productUiModel.quantity}
-        val totalCount = newCheckMap.filter{ it.value }.size
+        val totalPrice = if (nextCheckState) {
+            cart.cartContents.sumOf {
+                it.product.priceAmount() * it.quantity
+            }
+        } else {
+            0
+        }
+        val totalCount = if (nextCheckState) newCheckMap.size else 0
 
         _uiState.update {
             it.copy(
@@ -318,6 +313,7 @@ class CartViewModel(
             }
     }
 }
+
 
 sealed interface CartEvent {
     data class FatalError(
