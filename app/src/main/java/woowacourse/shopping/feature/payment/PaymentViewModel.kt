@@ -18,6 +18,7 @@ import woowacourse.shopping.constants.MockData
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.order.OrderRepository
 import woowacourse.shopping.data.repository.product.ProductRepository
+import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.coupon.BuyXGetYCoupon
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
@@ -51,30 +52,37 @@ class PaymentViewModel(
             cartRepository = appDependencies.cartRepository
             orderRepository = appDependencies.orderRepository
             couponList = MockData.MOCK_COUPONS
+        }
+    }
 
-            val couponCheckMap = couponList.filter {
-                val isDiscountable = when (it) {
-                    is FixedDiscountCoupon -> {
-                        it.isDiscountable(uiState.value.totalPrice)
-                    }
+    fun loadCart(cartContentIds: List<Long>) {
+        viewModelScope.launch {
+            val cart = cartRepository.loadCart()
+            val targetContents = cart.cartContents.filter { it.id in cartContentIds }
+            val totalPrice = targetContents.sumOf { it.quantity * it.product.priceAmount() }
+            _uiState.update {
+                it.copy(
+                    totalPrice = totalPrice,
+                    totalPaymentPrice = totalPrice + it.shippingFee
+                )
+            }
+            loadCoupon()
+        }
+    }
 
-                    is FreeShippingCoupon -> {
-                        it.isDiscountable(uiState.value.totalPrice)
-                    }
+    fun loadCoupon() {
+        val currentTotalPrice = _uiState.value.totalPrice
 
-                    is BuyXGetYCoupon -> {
-                        it.isDiscountable(uiState.value.totalPrice)
-                    }
-
-                    is PercentageDiscountCoupon -> {
-                        it.isDiscountingTime(LocalDateTime.now().toLocalTime())
-                    }
-                }
+        viewModelScope.launch {
+            val couponChooseList = couponList.filter {
+                val isDiscountable = couponValid(it, cartRepository.loadCart(), currentTotalPrice)
                 isDiscountable && !it.isExpired(LocalDate.now())
-            }.associate { it.code to false }
+            }
+
+            val couponCheckMap = couponChooseList.associate { it.code to false }
             _uiState.value = _uiState.value.copy(
                 couponCheckMap = couponCheckMap,
-                couponList = couponList.map {
+                couponList = couponChooseList.map {
                     CouponUiModel(
                         code = it.code,
                         title = it.description,
@@ -105,20 +113,6 @@ class PaymentViewModel(
         }
     }
 
-    fun loadCart(cartContentIds: List<Long>) {
-        viewModelScope.launch {
-            val cart = cartRepository.loadCart()
-            val targetContents = cart.cartContents.filter { it.id in cartContentIds }
-            val totalPrice = targetContents.sumOf { it.quantity * it.product.priceAmount() }
-            _uiState.update {
-                it.copy(
-                    totalPrice = totalPrice,
-                    totalPaymentPrice = totalPrice + it.shippingFee
-                )
-            }
-        }
-    }
-
     fun couponCheck(code: String) {
         viewModelScope.launch {
             val coupon = couponList.find { it.code == code } ?: return@launch
@@ -127,25 +121,7 @@ class PaymentViewModel(
             val isCurrentlyChecked = currentMap[code] ?: false
 
             if (!isCurrentlyChecked) {
-                val isValid = when (coupon) {
-                    is FixedDiscountCoupon -> {
-                        coupon.isDiscountable(uiState.value.totalPrice)
-                    }
-
-                    is FreeShippingCoupon -> {
-                        coupon.isDiscountable(uiState.value.totalPrice)
-                    }
-
-                    is BuyXGetYCoupon -> {
-                        val cart = cartRepository.loadCart()
-                        val maxQuantity = cart.cartContents.maxOfOrNull { it.quantity } ?: 0
-                        coupon.isDiscountable(maxQuantity)
-                    }
-
-                    is PercentageDiscountCoupon -> {
-                        coupon.isDiscountingTime(LocalDateTime.now().toLocalTime())
-                    }
-                }
+                val isValid = couponValid(coupon, cartRepository.loadCart(), uiState.value.totalPrice)
 
                 if (isValid) {
                     _couponEvent.emit(CouponEvent.Success("쿠폰 적용이 되었습니다."))
@@ -175,8 +151,7 @@ class PaymentViewModel(
 
                     is BuyXGetYCoupon -> {
                         val cart = cartRepository.loadCart()
-                        val maxQuantityProduct =
-                            cart.cartContents.maxByOrNull { it.quantity }?.product
+                        val maxQuantityProduct = cart.cartContents.maxByOrNull { it.quantity }?.product
                         newCouponDiscountPrice = activeCoupon.calculateDiscountPrice(
                             maxQuantityProduct?.priceAmount() ?: 0
                         )
@@ -198,6 +173,28 @@ class PaymentViewModel(
                     couponDiscountPrice = newCouponDiscountPrice,
                     totalPaymentPrice = it.totalPrice + newShippingFee - newCouponDiscountPrice
                 )
+            }
+        }
+    }
+
+    fun couponValid(coupon: Coupon, cart: Cart, currentTotalPrice: Int): Boolean {
+        return when (coupon) {
+            is FixedDiscountCoupon -> {
+                coupon.isDiscountable(currentTotalPrice)
+            }
+
+            is FreeShippingCoupon -> {
+                coupon.isDiscountable(currentTotalPrice)
+            }
+
+            is BuyXGetYCoupon -> {
+                val maxQuantityContent = cart.cartContents.maxByOrNull { it.quantity }
+                val maxQuantity = maxQuantityContent?.quantity ?: 0
+                coupon.isDiscountable(maxQuantity) && maxQuantity > 2
+            }
+
+            is PercentageDiscountCoupon -> {
+                coupon.isDiscountingTime(LocalDateTime.now().toLocalTime())
             }
         }
     }

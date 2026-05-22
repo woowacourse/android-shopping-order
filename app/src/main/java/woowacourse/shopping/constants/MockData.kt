@@ -30,26 +30,26 @@ object MockData {
             code = "FIXED5000",
             description = "5,000원 할인 쿠폰",
             minimumAmount = 100000,
-            expirationDate = LocalDate.of(2024, 11, 30),
+            expirationDate = LocalDate.of(2026, 11, 30),
             discount = 5000
         ),
         BuyXGetYCoupon(
             code = "BOGO",
             description = "2개 구매 시 1개 무료 쿠폰",
-            expirationDate = LocalDate.of(2024, 5, 30),
+            expirationDate = LocalDate.of(2026, 5, 30),
             buyQuantity = 2,
             getQuantity = 1
         ),
         FreeShippingCoupon(
             code = "FREESHIPPING",
             description = "5만원 이상 구매 시 무료 배송 쿠폰",
-            expirationDate = LocalDate.of(2024, 12, 31),
+            expirationDate = LocalDate.of(2026, 12, 31),
             minimumAmount = 50000
         ),
         PercentageDiscountCoupon(
             code = "MIRACLESALE",
             description = "일찍일어나는 새가 피곤함 쿠폰",
-            expirationDate = LocalDate.of(2024, 7, 31),
+            expirationDate = LocalDate.of(2026, 7, 31),
             discount = 0.30f,
             startTime = LocalTime.of(4, 0, 0),
             endTime = LocalTime.of(7, 0, 0)
