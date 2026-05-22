@@ -8,6 +8,8 @@ data class PaymentItems(
 
     fun getProductIds(): List<Long> = paymentItems.map { it.product.id }
 
+    fun getPaymentItems() = paymentItems
+
     fun isContain(productId: Long): Boolean = paymentItems.any { it.product.id == productId }
 
     fun quantityOf(productId: Long): Int = paymentItems.find { it.product.id == productId }?.quantity ?: 0

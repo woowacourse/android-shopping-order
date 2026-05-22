@@ -12,6 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import woowacourse.shopping.presentation.navigation.PaymentScreen
+import woowacourse.shopping.presentation.navigation.toParam
 import woowacourse.shopping.presentation.recommend.ui.RecommendScreen
 import woowacourse.shopping.presentation.recommend.viewmodel.RecommendEvent
 import woowacourse.shopping.presentation.recommend.viewmodel.RecommendViewModel
@@ -49,6 +50,7 @@ fun RecommendRoute(
         onOrderClick = {
             navController.navigate(
                 PaymentScreen(
+                    orderItems = uiState.paymentItems.getPaymentItems().map { it.toParam() },
                     orderAmount = uiState.totalPrice,
                 ),
             )

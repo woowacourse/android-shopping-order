@@ -21,5 +21,6 @@ data class RecommendScreen(
 
 @Serializable
 data class PaymentScreen(
+    val orderItems: List<OrderItem>,
     val orderAmount: Long,
 )

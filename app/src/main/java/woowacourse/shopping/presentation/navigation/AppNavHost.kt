@@ -10,6 +10,7 @@ import woowacourse.shopping.presentation.detail.DetailRoute
 import woowacourse.shopping.presentation.payment.PaymentRoute
 import woowacourse.shopping.presentation.recommend.RecommendRoute
 import woowacourse.shopping.presentation.shopping.ShoppingRoute
+import kotlin.reflect.typeOf
 
 @Composable
 fun AppNavHost() {
@@ -48,10 +49,16 @@ fun AppNavHost() {
             )
         }
 
-        composable<PaymentScreen> { backStackEntry ->
+        composable<PaymentScreen>(
+            typeMap =
+                mapOf(
+                    typeOf<List<OrderItem>>() to OrderItemListType,
+                ),
+        ) { backStackEntry ->
             val route: PaymentScreen = backStackEntry.toRoute()
 
             PaymentRoute(
+                orderItems = route.orderItems,
                 orderAmount = route.orderAmount,
                 navController = navController,
             )
