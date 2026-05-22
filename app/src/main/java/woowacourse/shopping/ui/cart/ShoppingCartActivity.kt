@@ -53,26 +53,23 @@ class ShoppingCartActivity : ComponentActivity() {
         observeScreenEvents()
 
         setContent {
-            val shoppingCartItems by shoppingCartViewModel.shoppingCartItems.collectAsStateWithLifecycle()
-            val selectedProductIds by shoppingCartViewModel.selectedProductIds.collectAsStateWithLifecycle()
+            val cartUiState by shoppingCartViewModel.uiState.collectAsStateWithLifecycle()
             val recommendUiState by shoppingCartRecommendViewModel.uiState.collectAsStateWithLifecycle()
 
-            val screenState =
-                shoppingCartViewModel.screenState.collectAsStateWithLifecycle()
-            val isLoading = shoppingCartViewModel.isLoading.collectAsStateWithLifecycle()
-            val errorMessage = shoppingCartViewModel.errorMessage.collectAsStateWithLifecycle()
-            val hasApiError = errorMessage.value != null
+            val hasApiError = cartUiState.errorMessage != null
+            val shoppingCartItems = cartUiState.shoppingCartItems
+            val selectedProductIds = cartUiState.selectedProductIds
             val visibleItems =
                 if (hasApiError) {
                     emptyList()
                 } else {
-                    screenState.value.items
+                    shoppingCartItems
                 }
             val visiblePagedItems =
                 if (hasApiError) {
                     emptyList()
                 } else {
-                    screenState.value.pagedItems
+                    cartUiState.pagedItems
                 }
             val selectableCartProductIds =
                 visibleItems
@@ -94,14 +91,14 @@ class ShoppingCartActivity : ComponentActivity() {
                 ShoppingCartState(
                     items = visibleItems,
                     selectedProductIds = selectedVisibleProductIds,
-                    isLoading = isLoading.value,
-                    errorMessage = errorMessage.value,
-                    currentPage = screenState.value.currentPage,
+                    isLoading = cartUiState.isLoading,
+                    errorMessage = cartUiState.errorMessage,
+                    currentPage = cartUiState.currentPage,
                     selectedItemCount = selectedItemCount,
-                    canOrder = selectedItemCount > 0 && !isLoading.value,
+                    canOrder = selectedItemCount > 0 && !cartUiState.isLoading,
                     canMoveToPreviousPage =
-                        if (hasApiError) false else screenState.value.canMoveToPreviousPage,
-                    canMoveToNextPage = if (hasApiError) false else screenState.value.canMoveToNextPage,
+                        if (hasApiError) false else cartUiState.canMoveToPreviousPage,
+                    canMoveToNextPage = if (hasApiError) false else cartUiState.canMoveToNextPage,
                 )
 
             AndroidShoppingTheme {
@@ -131,9 +128,9 @@ class ShoppingCartActivity : ComponentActivity() {
                         },
                     ) {
                         PageNavigation(
-                            currentPage = screenState.value.currentPage,
-                            canMoveToPreviousPage = if (hasApiError) false else screenState.value.canMoveToPreviousPage,
-                            canMoveToNextPage = if (hasApiError) false else screenState.value.canMoveToNextPage,
+                            currentPage = cartUiState.currentPage,
+                            canMoveToPreviousPage = if (hasApiError) false else cartUiState.canMoveToPreviousPage,
+                            canMoveToNextPage = if (hasApiError) false else cartUiState.canMoveToNextPage,
                             onBeforePageClick = shoppingCartViewModel::moveToPreviousPage,
                             onNextPageClick = shoppingCartViewModel::moveToNextPage,
                         )

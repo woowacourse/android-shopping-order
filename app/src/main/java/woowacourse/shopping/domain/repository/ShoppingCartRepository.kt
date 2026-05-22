@@ -10,6 +10,7 @@ interface ShoppingCartRepository {
         page: Int = 0,
         size: Int = 20,
         sort: List<String>? = null,
+        force: Boolean = false,
     )
 
     suspend fun addOrIncreaseByProductId(

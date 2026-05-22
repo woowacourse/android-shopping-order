@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.repository
 
+import android.os.SystemClock
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
@@ -34,6 +35,7 @@ class RoomShoppingCartRepository(
      */
     private val remoteStateMutex = Mutex()
     private var hasLoadedRemoteSnapshot: Boolean = false
+    private var lastRemoteSnapshotLoadedElapsedMs: Long = 0L
     private var remoteCartItemIdByProductId: Map<Long, Int> = emptyMap()
 
     override fun observeShoppingItems(): Flow<List<ShoppingCartItem>> =
@@ -45,7 +47,9 @@ class RoomShoppingCartRepository(
         page: Int,
         size: Int,
         sort: List<String>?,
+        force: Boolean,
     ) = remoteStateMutex.withLock {
+        if (!force && isRemoteSnapshotFresh()) return@withLock
         requestCartItemsInternal(page = page, size = size, sort = sort)
     }
 
@@ -81,7 +85,7 @@ class RoomShoppingCartRepository(
                 remoteCartItem.product.id to remoteCartItem.getId().toInt()
             }
         syncLocalState(remoteCartItems)
-        hasLoadedRemoteSnapshot = true
+        markRemoteSnapshotLoaded()
     }
 
     private suspend fun addOrIncreaseByProductIdInternal(
@@ -112,6 +116,7 @@ class RoomShoppingCartRepository(
             productId = productId,
             targetQuantity = updatedQuantity,
         )
+        markRemoteSnapshotLoaded()
     }
 
     private suspend fun decreaseByProductIdInternal(productId: Long) {
@@ -133,6 +138,7 @@ class RoomShoppingCartRepository(
             productId = productId,
             targetQuantity = updatedQuantity.coerceAtLeast(0),
         )
+        markRemoteSnapshotLoaded()
     }
 
     private suspend fun removeByProductIdInternal(productId: Long) {
@@ -145,6 +151,7 @@ class RoomShoppingCartRepository(
             productId = productId,
             targetQuantity = 0,
         )
+        markRemoteSnapshotLoaded()
     }
 
     private suspend fun ensureRemoteSnapshotLoadedInternal() {
@@ -154,6 +161,16 @@ class RoomShoppingCartRepository(
             size = DEFAULT_SIZE,
             sort = null,
         )
+    }
+
+    private fun isRemoteSnapshotFresh(): Boolean {
+        if (!hasLoadedRemoteSnapshot) return false
+        return SystemClock.elapsedRealtime() - lastRemoteSnapshotLoadedElapsedMs < REMOTE_CACHE_DURATION_MS
+    }
+
+    private fun markRemoteSnapshotLoaded() {
+        hasLoadedRemoteSnapshot = true
+        lastRemoteSnapshotLoadedElapsedMs = SystemClock.elapsedRealtime()
     }
 
     private suspend fun resolveRemoteCartItemIdInternal(productId: Long): Int? {
@@ -259,5 +276,6 @@ class RoomShoppingCartRepository(
     private companion object {
         private const val DEFAULT_PAGE = 0
         private const val DEFAULT_SIZE = 20
+        private const val REMOTE_CACHE_DURATION_MS = 30_000L
     }
 }
