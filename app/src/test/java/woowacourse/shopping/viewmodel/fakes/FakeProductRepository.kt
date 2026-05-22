@@ -1,0 +1,27 @@
+package woowacourse.shopping.viewmodel.fakes
+
+import woowacourse.shopping.data.remote.server.apiresult.ApiResult
+import woowacourse.shopping.data.remote.server.repository.ProductRepository
+import woowacourse.shopping.domain.Product
+
+class FakeProductRepository : ProductRepository {
+    private val products = mutableListOf<Product>()
+
+    fun setProducts(newProducts: List<Product>) {
+        products.clear()
+        products.addAll(newProducts)
+    }
+
+    override suspend fun getProducts(
+        page: Int,
+        pageSize: Int,
+    ): ApiResult<List<Product>> = ApiResult.Success(products)
+
+    override suspend fun getProduct(id: Long): ApiResult<Product> = ApiResult.Success(products.first { it.id == id })
+
+    override suspend fun getCategoryProducts(
+        page: Int,
+        pageSize: Int,
+        category: String,
+    ): ApiResult<List<Product>> = ApiResult.Success(products.filter { it.category == category })
+}
