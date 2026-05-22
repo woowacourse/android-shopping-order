@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import woowacourse.shopping.domain.model.product.Category
 import woowacourse.shopping.domain.model.product.Product
 
 interface RecentProductRepository {

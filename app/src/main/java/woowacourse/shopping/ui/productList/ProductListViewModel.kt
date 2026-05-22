@@ -87,7 +87,7 @@ class ProductListViewModel(
 
     private suspend fun refreshCart() {
         val cartItems = cartRepository.getAllCartItems()
-        cartFlow.value = Cart(cartItems.items)
+        cartFlow.value = Cart(cartItems)
     }
 
     private fun loadNextPage() {

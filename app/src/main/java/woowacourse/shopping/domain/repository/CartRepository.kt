@@ -13,7 +13,7 @@ interface CartRepository {
 
     suspend fun getCartItemsCount(): Int
 
-    suspend fun getAllCartItems(): PagedCartItems
+    suspend fun getAllCartItems(): CartItems
 
     suspend fun addProduct(
         product: Product,

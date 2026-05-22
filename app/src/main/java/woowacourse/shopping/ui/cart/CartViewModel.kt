@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.domain.model.cart.CartItem
 import woowacourse.shopping.domain.model.cart.CartItems
 import woowacourse.shopping.domain.model.cart.Quantity
 import woowacourse.shopping.domain.model.product.Product
@@ -86,11 +87,10 @@ class CartViewModel(
     private fun loadRecommendProduct() {
         viewModelScope.launch {
             val recommended = recentProductRepository.getMostRecentProduct() ?: return@launch
-            val recommendedCategory = recommended.category.value
+            val recommendedCategory = recommended.category
             val productList = productRepository.getCategoryProducts(recommendedCategory, 0, 100)
             val cartProducts =
                 cartRepository.getAllCartItems()
-                    .items
                     .values
                     .map { it.product }
                     .toSet()
@@ -111,11 +111,10 @@ class CartViewModel(
     fun addCartItem(product: Product) {
         viewModelScope.launch {
             cartRepository.addProduct(product)
-
             refreshCartItems()
-            val cartItem =
-                _pagedCartItems.value?.items?.values?.find { it.product.id == product.id } ?: return@launch
 
+            val allItems = cartRepository.getAllCartItems()
+            val cartItem = allItems.findByProductId(product.id) ?: return@launch
             _selectedItems.update {
                 it + cartItem.id
             }
@@ -124,8 +123,7 @@ class CartViewModel(
 
     fun increaseRecommendProduct(productId: Int) {
         viewModelScope.launch {
-            val target =
-                _pagedCartItems.value?.items?.values?.find { it.product.id == productId } ?: return@launch
+            val target = findCartItemByProductId(productId) ?: return@launch
             cartRepository.increase(target.id, Quantity(target.quantity.value + 1))
             refreshCartItems()
         }
@@ -133,8 +131,7 @@ class CartViewModel(
 
     fun decreaseRecommendProduct(productId: Int) {
         viewModelScope.launch {
-            val target =
-                _pagedCartItems.value?.items?.values?.find { it.product.id == productId } ?: return@launch
+            val target = findCartItemByProductId(productId) ?: return@launch
 
             if (target.quantity.value == 1) {
                 cartRepository.remove(target.id)
@@ -145,10 +142,9 @@ class CartViewModel(
             refreshCartItems()
         }
     }
-
     fun increase(cartId: Int) {
         viewModelScope.launch {
-            val target = _pagedCartItems.value?.items?.values?.find { it.id == cartId } ?: return@launch
+            val target = findCartItemByCartId(cartId) ?: return@launch
             cartRepository.increase(cartId, Quantity(target.quantity.value + 1))
             refreshCartItems()
         }
@@ -156,7 +152,7 @@ class CartViewModel(
 
     fun decrease(cartId: Int) {
         viewModelScope.launch {
-            val target = _pagedCartItems.value?.items?.values?.find { it.id == cartId } ?: return@launch
+            val target = findCartItemByCartId(cartId) ?: return@launch
             if (target.quantity.value == 1) {
                 cartRepository.remove(cartId)
                 _selectedItems.update { it - cartId }
@@ -178,8 +174,7 @@ class CartViewModel(
         val allCartIds = allCartItems.values.map { it.id }.toSet()
         _selectedItems.update { selectedItems ->
             val isAllSelected =
-                allCartIds.isNotEmpty() &&
-                        allCartIds.all { it in selectedItems }
+                allCartIds.isNotEmpty() && allCartIds.all { it in selectedItems }
 
             if (isAllSelected) {
                 selectedItems - allCartIds
@@ -220,8 +215,10 @@ class CartViewModel(
 
         currentPage = page
         _pagedCartItems.update { pagedResult }
-        _allCartItems.update { allResult.items }
+        _allCartItems.update { allResult }
     }
+    private fun findCartItemByProductId(productId: Int): CartItem? = _allCartItems.value?.values?.find { it.product.id == productId }
+    private fun findCartItemByCartId(cartId: Int): CartItem? = _allCartItems.value?.values?.find { it.id == cartId }
 
     companion object {
         private const val PAGE_SIZE = 5

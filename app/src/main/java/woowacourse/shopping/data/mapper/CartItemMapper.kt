@@ -7,13 +7,15 @@ import woowacourse.shopping.domain.model.cart.CartItems
 import woowacourse.shopping.domain.model.cart.Quantity
 import woowacourse.shopping.ui.cart.PagedCartItems
 
-fun CartResponseDto.toDomain(): PagedCartItems =
+fun CartResponseDto.toPagedCartItems(): PagedCartItems =
     PagedCartItems(
         items = CartItems(content.toDomain()),
         isLast = last,
         isFirst = first,
         totalPages = totalPages,
     )
+
+fun CartResponseDto.toCartItems(): CartItems = CartItems(content.toDomain())
 
 fun List<CartItemDto>.toDomain(): List<CartItem> = map { it.toDomain() }
 

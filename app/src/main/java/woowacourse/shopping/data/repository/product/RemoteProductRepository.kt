@@ -2,6 +2,7 @@ package woowacourse.shopping.data.repository.product
 
 import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
 import woowacourse.shopping.data.mapper.toDomain
+import woowacourse.shopping.domain.model.product.Category
 import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.model.product.Products
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -18,7 +19,7 @@ class RemoteProductRepository(
     }
 
     override suspend fun getCategoryProducts(
-        category: String,
+        category: Category,
         page: Int,
         pageSize: Int,
     ): Products {

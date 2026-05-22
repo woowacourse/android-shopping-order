@@ -1,7 +1,9 @@
 package woowacourse.shopping.data.repository.cart
 
 import woowacourse.shopping.data.datasource.cart.CartDataSource
+import woowacourse.shopping.data.mapper.toCartItems
 import woowacourse.shopping.data.mapper.toDomain
+import woowacourse.shopping.data.mapper.toPagedCartItems
 import woowacourse.shopping.domain.model.cart.CartItems
 import woowacourse.shopping.domain.model.cart.Quantity
 import woowacourse.shopping.domain.model.product.Product
@@ -14,11 +16,11 @@ class CartRepositoryImpl(
     override suspend fun getCartItems(
         page: Int,
         size: Int,
-    ): PagedCartItems = cartRemoteDataSource.getCartItems(page, size).toDomain()
+    ): PagedCartItems = cartRemoteDataSource.getCartItems(page, size).toPagedCartItems()
 
     override suspend fun getCartItemsCount(): Int = cartRemoteDataSource.getCartItemsCount()
 
-    override suspend fun getAllCartItems(): PagedCartItems = cartRemoteDataSource.getCartItems(0, Int.MAX_VALUE).toDomain()
+    override suspend fun getAllCartItems(): CartItems = cartRemoteDataSource.getCartItems(0, Int.MAX_VALUE).toCartItems()
 
     override suspend fun addProduct(
         product: Product,
