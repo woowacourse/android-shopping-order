@@ -110,14 +110,9 @@ class CartViewModel(
 
     fun addCartItem(product: Product) {
         viewModelScope.launch {
-            cartRepository.addProduct(product)
+            val cartId = cartRepository.addProduct(product)
+            _selectedItems.update { it + cartId }
             refreshCartItems()
-
-            val allItems = cartRepository.getAllCartItems()
-            val cartItem = allItems.findByProductId(product.id) ?: return@launch
-            _selectedItems.update {
-                it + cartItem.id
-            }
         }
     }
 
@@ -219,7 +214,6 @@ class CartViewModel(
     }
     private fun findCartItemByProductId(productId: Int): CartItem? = _allCartItems.value?.values?.find { it.product.id == productId }
     private fun findCartItemByCartId(cartId: Int): CartItem? = _allCartItems.value?.values?.find { it.id == cartId }
-
     companion object {
         private const val PAGE_SIZE = 5
 

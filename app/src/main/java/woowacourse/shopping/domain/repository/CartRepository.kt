@@ -18,7 +18,7 @@ interface CartRepository {
     suspend fun addProduct(
         product: Product,
         quantity: Quantity = Quantity.ONE,
-    )
+    ): Int
 
     suspend fun increase(
         cartId: Int,

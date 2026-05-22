@@ -25,8 +25,10 @@ class CartRepositoryImpl(
     override suspend fun addProduct(
         product: Product,
         quantity: Quantity,
-    ) {
+    ): Int {
         cartRemoteDataSource.addCartItem(product.id, quantity)
+        return getAllCartItems().findByProductId(product.id)?.id
+            ?: throw IllegalStateException("장바구니에 상품이 추가되지 않았습니다.")
     }
 
     override suspend fun increase(
