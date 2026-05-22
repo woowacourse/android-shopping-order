@@ -86,7 +86,7 @@ class CartRepositoryImpl(
         val response =
             api.getCartItems(
                 page = 0,
-                size = Int.MAX_VALUE,
+                size = 10,
             )
 
         cartItems += response.content.map { it.toDomain() }
