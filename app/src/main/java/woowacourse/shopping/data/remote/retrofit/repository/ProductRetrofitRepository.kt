@@ -1,7 +1,5 @@
 package woowacourse.shopping.data.remote.retrofit.repository
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import woowacourse.shopping.data.mapper.toDomainProduct
 import woowacourse.shopping.data.mapper.toDomainProducts
 import woowacourse.shopping.data.remote.retrofit.api.ProductRetrofitInterface
@@ -17,27 +15,24 @@ class ProductRetrofitRepository(
         size: Int,
         sort: List<String>? = null,
         category: String?,
-    ): ProductPageResult =
-        withContext(Dispatchers.IO) {
-            val response: ProductResponse =
-                apiService.requestProducts(
-                    page = page,
-                    size = size,
-                    sort = sort,
-                    category = category,
-                )
-            ProductPageResult(
-                products = response.toDomainProducts(),
-                hasNextPage = !response.last,
+    ): ProductPageResult {
+        val response: ProductResponse =
+            apiService.requestProducts(
+                page = page,
+                size = size,
+                sort = sort,
+                category = category,
             )
-        }
+        return ProductPageResult(
+            products = response.toDomainProducts(),
+            hasNextPage = !response.last,
+        )
+    }
 
     suspend fun requestProductDetail(id: Long): Product =
-        withContext(Dispatchers.IO) {
-            apiService.requestProductDetail(
-                id = id,
-            ).toDomainProduct()
-        }
+        apiService.requestProductDetail(
+            id = id,
+        ).toDomainProduct()
 
     data class ProductPageResult(
         val products: List<Product>,
