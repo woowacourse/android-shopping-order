@@ -6,6 +6,9 @@ import kotlinx.serialization.Serializable
 data object ShoppingRoute
 
 @Serializable
+data object SettingRoute
+
+@Serializable
 data class ProductDetailRoute(
     val productId: Long,
 )

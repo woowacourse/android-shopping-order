@@ -15,6 +15,7 @@ import woowacourse.shopping.ui.cart.recommendation.CartRecommendationViewModel
 import woowacourse.shopping.ui.order.OrderRouteScreen
 import woowacourse.shopping.ui.order.OrderViewModel
 import woowacourse.shopping.ui.productdetail.ProductDetailRouteScreen
+import woowacourse.shopping.ui.setting.SettingRouteScreen
 import woowacourse.shopping.ui.shopping.ShoppingRouteScreen
 
 @Composable
@@ -28,9 +29,16 @@ fun AppNavHost(
         composable<ShoppingRoute> {
             ShoppingRouteScreen(
                 onCartClick = { navController.navigate(CartGraph) },
+                onSettingClick = { navController.navigate(SettingRoute) },
                 onProductClick = { productId ->
                     navController.navigate(ProductDetailRoute(productId))
                 },
+            )
+        }
+
+        composable<SettingRoute> {
+            SettingRouteScreen(
+                onBackClick = { navController.popBackStack() },
             )
         }
 
