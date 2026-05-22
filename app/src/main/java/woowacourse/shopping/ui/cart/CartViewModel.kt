@@ -102,7 +102,6 @@ class CartViewModel(
 
     fun removeCartItem(cartId: Int) {
         viewModelScope.launch {
-            _pagedCartItems.update { null }
             _selectedItems.update { it - cartId }
             cartRepository.remove(cartId)
             refreshCartItems()
@@ -111,11 +110,9 @@ class CartViewModel(
 
     fun addCartItem(product: Product) {
         viewModelScope.launch {
-            _pagedCartItems.update { null }
             cartRepository.addProduct(product)
 
-            val result = cartRepository.getAllCartItems()
-            _pagedCartItems.update { result }
+            refreshCartItems()
             val cartItem =
                 _pagedCartItems.value?.items?.values?.find { it.product.id == product.id } ?: return@launch
 
@@ -129,10 +126,8 @@ class CartViewModel(
         viewModelScope.launch {
             val target =
                 _pagedCartItems.value?.items?.values?.find { it.product.id == productId } ?: return@launch
-
             cartRepository.increase(target.id, Quantity(target.quantity.value + 1))
-            val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
-            _pagedCartItems.update { result }
+            refreshCartItems()
         }
     }
 
@@ -147,36 +142,28 @@ class CartViewModel(
             } else {
                 cartRepository.decrease(target.id, Quantity(target.quantity.value - 1))
             }
-            val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
-
-            _pagedCartItems.update { result }
+            refreshCartItems()
         }
     }
 
     fun increase(cartId: Int) {
         viewModelScope.launch {
             val target = _pagedCartItems.value?.items?.values?.find { it.id == cartId } ?: return@launch
-
             cartRepository.increase(cartId, Quantity(target.quantity.value + 1))
-            val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
-
-            _pagedCartItems.update { result }
+            refreshCartItems()
         }
     }
 
     fun decrease(cartId: Int) {
         viewModelScope.launch {
             val target = _pagedCartItems.value?.items?.values?.find { it.id == cartId } ?: return@launch
-
             if (target.quantity.value == 1) {
                 cartRepository.remove(cartId)
                 _selectedItems.update { it - cartId }
             } else {
                 cartRepository.decrease(cartId, Quantity(target.quantity.value - 1))
             }
-            val result = cartRepository.getCartItems(currentPage, PAGE_SIZE)
-
-            _pagedCartItems.update { result }
+            refreshCartItems()
         }
     }
 
@@ -189,7 +176,6 @@ class CartViewModel(
     fun toggleAllSelection() {
         val allCartItems = _allCartItems.value ?: return
         val allCartIds = allCartItems.values.map { it.id }.toSet()
-
         _selectedItems.update { selectedItems ->
             val isAllSelected =
                 allCartIds.isNotEmpty() &&
