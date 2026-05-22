@@ -6,7 +6,7 @@
 
 ### Navigation 구조 전환
 
-- [ ] `navigation-compose` 의존성 추가
+- [x] `navigation-compose` 의존성 추가
 - [ ] 기존 Activity 기반 화면 전환 로직 제거
 - [ ] `startActivity()`, `finish()`, `onRestart()` 기반 흐름 제거
 - [ ] 단일 Activity에서 `NavHost`를 사용해 화면 전환 처리

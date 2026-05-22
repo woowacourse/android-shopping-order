@@ -114,6 +114,9 @@ dependencies {
     // serialization
     implementation(libs.kotlinx.serialization.json)
 
+    // navigation
+    implementation(libs.navigation.compose)
+
     debugImplementation(libs.okhttp.mockwebserver)
     testImplementation("org.assertj:assertj-core:3.27.3")
 
