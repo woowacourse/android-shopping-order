@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart
+package woowacourse.shopping.ui.cart.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

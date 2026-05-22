@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart
+package woowacourse.shopping.ui.recommend
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,7 +21,7 @@ import woowacourse.shopping.ui.shopping.component.ProductCard
 import woowacourse.shopping.ui.theme.Gray50
 
 @Composable
-fun RecommendProductContent(
+fun RecommendContent(
     products: ImmutableList<ProductUiModel>,
     onQuantityChange: (String, Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -73,8 +73,8 @@ fun RecommendProductContent(
 
 @Preview
 @Composable
-private fun RecommendProductContentPreview() {
-    RecommendProductContent(
+private fun RecommendContentPreview() {
+    RecommendContent(
         products = persistentListOf(),
         onQuantityChange = { _, _ -> },
     )

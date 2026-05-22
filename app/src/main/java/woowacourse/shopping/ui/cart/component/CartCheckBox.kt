@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart
+package woowacourse.shopping.ui.cart.component
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckBox

@@ -1,6 +1,5 @@
-package woowacourse.shopping.ui.cart
+package woowacourse.shopping.ui.cart.component
 
-import android.R.attr.contentDescription
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
