@@ -52,7 +52,9 @@ fun CartRoute(
             isAllChecked = viewModel.isAllChecked(),
             onSelectAllClick = viewModel::onSelectAllClick,
             onOrderClick = {
-                onOrderClick(uiState.totalPrice, uiState.checkedItemIds)
+                if (uiState.checkedItemIds.isNotEmpty()){
+                    onOrderClick(uiState.totalPrice, uiState.checkedItemIds)
+                }
             },
             modifier = Modifier.padding(innerPadding),
         )
