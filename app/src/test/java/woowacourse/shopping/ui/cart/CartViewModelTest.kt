@@ -6,12 +6,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import woowacourse.shopping.MainDispatcherExtension
-import woowacourse.shopping.data.repository.RecentItemRepositoryImpl
 import woowacourse.shopping.mockup.MockCartRepository
-import woowacourse.shopping.mockup.MockProductRepository
-import woowacourse.shopping.mockup.MockRecentItemDao
 import woowacourse.shopping.mockup.createCartItems
-import woowacourse.shopping.mockup.createProducts
 import woowacourse.shopping.model.CartItem
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -98,13 +94,8 @@ class CartViewModelTest {
             assertThat(viewModel.uiState.value.totalPrice).isEqualTo(2000)
         }
 
-    private fun createViewModel(cartItems: List<CartItem>): CartViewModel {
-        val productRepository = MockProductRepository(createProducts(size = 10))
-
-        return CartViewModel(
+    private fun createViewModel(cartItems: List<CartItem>): CartViewModel =
+        CartViewModel(
             cartRepository = MockCartRepository(cartItems),
-            recentItemRepository = RecentItemRepositoryImpl(MockRecentItemDao(), productRepository),
-            productRepository = productRepository,
         )
-    }
 }
