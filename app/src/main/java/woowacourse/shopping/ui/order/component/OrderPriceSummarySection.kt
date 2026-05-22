@@ -1,12 +1,9 @@
 package woowacourse.shopping.ui.order.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,10 +15,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.R
+import woowacourse.shopping.ui.common.component.divider.SectionDivider
 import woowacourse.shopping.ui.common.formatter.formatPrice
 import woowacourse.shopping.ui.order.OrderPreviewData
 import woowacourse.shopping.ui.order.OrderPriceSummaryUiModel
-import woowacourse.shopping.ui.theme.ShoppingColors
 
 @Composable
 fun OrderPriceSummarySection(
@@ -29,31 +26,19 @@ fun OrderPriceSummarySection(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        OrderSectionDivider()
         summary.items.forEach { item ->
             PriceSummaryRow(
                 label = stringResource(item.labelResId),
                 price = item.price,
             )
         }
-        OrderSectionDivider()
+        SectionDivider()
         PriceSummaryRow(
             label = stringResource(R.string.order_price_label_total_payment),
             price = summary.totalPaymentPrice,
             isEmphasized = true,
         )
     }
-}
-
-@Composable
-private fun OrderSectionDivider(modifier: Modifier = Modifier) {
-    Spacer(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .height(14.dp)
-                .background(ShoppingColors.Gray1),
-    )
 }
 
 @Composable

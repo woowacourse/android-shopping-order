@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import woowacourse.shopping.R
 import woowacourse.shopping.ui.common.component.button.PrimaryActionButton
+import woowacourse.shopping.ui.common.component.divider.SectionDivider
 import woowacourse.shopping.ui.common.component.header.NavigationHeader
 import woowacourse.shopping.ui.order.component.OrderCouponSection
 import woowacourse.shopping.ui.order.component.OrderPriceSummarySection
@@ -37,15 +38,25 @@ fun OrderScreen(
             modifier =
                 Modifier
                     .weight(1f)
-                    .fillMaxWidth()
-                    .padding(horizontal = 18.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+                    .fillMaxWidth(),
         ) {
-            OrderCouponSection(
-                coupons = coupons,
-                onCouponCheckedChange = onCouponCheckedChange,
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 18.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                OrderCouponSection(
+                    coupons = coupons,
+                    onCouponCheckedChange = onCouponCheckedChange,
+                )
+            }
+            SectionDivider()
+            OrderPriceSummarySection(
+                summary = priceSummary,
+                modifier = Modifier.fillMaxWidth(),
             )
-            OrderPriceSummarySection(summary = priceSummary)
         }
         PrimaryActionButton(
             text = stringResource(R.string.order_title),
