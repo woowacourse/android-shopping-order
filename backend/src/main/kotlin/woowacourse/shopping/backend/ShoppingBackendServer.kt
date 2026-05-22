@@ -348,22 +348,49 @@ private data class MutableCartItem(
 )
 
 private object ProductSeedData {
+    private const val PRODUCT_IMAGE_URL = "https://cdn.frame-less.co.kr/news/photo/202510/1344_3681_750.jpg"
+
     val products: List<ProductResponse> =
-        List(24) { index ->
-            val category =
-                when (index % 3) {
-                    0 -> "dessert"
-                    1 -> "fruit"
-                    else -> "snack"
-                }
-            ProductResponse(
-                id = (index + 1).toLong(),
-                name = "상품${index + 1}",
-                price = 10_000 + index * 1_000,
-                imageUrl = "https://example.com/product-${index + 1}.png",
-                category = category,
-            )
-        }
+        listOf(
+            product(id = 1L, name = "다람", price = 10_000, category = "dessert"),
+            product(id = 2L, name = "뽀야미", price = 11_000, category = "dessert"),
+            product(id = 3L, name = "바닐라", price = 12_000, category = "dessert"),
+            product(id = 4L, name = "애플", price = 13_000, category = "fruit"),
+            product(id = 6L, name = "글루민", price = 15_000, category = "snack"),
+            product(id = 5L, name = "샤니", price = 14_000, category = "snack"),
+            product(id = 7L, name = "다람2", price = 10_000, category = "dessert"),
+            product(id = 8L, name = "뽀야미2", price = 11_000, category = "dessert"),
+            product(id = 9L, name = "바닐라2", price = 12_000, category = "dessert"),
+            product(id = 10L, name = "애플2", price = 13_000, category = "fruit"),
+            product(id = 12L, name = "글루민2", price = 15_000, category = "snack"),
+            product(id = 11L, name = "샤니2", price = 14_000, category = "snack"),
+            product(id = 13L, name = "다람3", price = 10_000, category = "dessert"),
+            product(id = 14L, name = "뽀야미3", price = 11_000, category = "dessert"),
+            product(id = 15L, name = "바닐라3", price = 12_000, category = "dessert"),
+            product(id = 16L, name = "애플3", price = 13_000, category = "fruit"),
+            product(id = 18L, name = "글루민3", price = 15_000, category = "snack"),
+            product(id = 17L, name = "샤니3", price = 14_000, category = "snack"),
+            product(id = 19L, name = "다람4", price = 10_000, category = "dessert"),
+            product(id = 20L, name = "뽀야미4", price = 11_000, category = "dessert"),
+            product(id = 21L, name = "바닐라4", price = 12_000, category = "dessert"),
+            product(id = 22L, name = "애플4", price = 13_000, category = "fruit"),
+            product(id = 24L, name = "글루민4", price = 15_000, category = "snack"),
+            product(id = 23L, name = "샤니4", price = 14_000, category = "snack"),
+        )
+
+    private fun product(
+        id: Long,
+        name: String,
+        price: Int,
+        category: String,
+    ): ProductResponse =
+        ProductResponse(
+            id = id,
+            name = name,
+            price = price,
+            imageUrl = PRODUCT_IMAGE_URL,
+            category = category,
+        )
 }
 
 @Serializable
