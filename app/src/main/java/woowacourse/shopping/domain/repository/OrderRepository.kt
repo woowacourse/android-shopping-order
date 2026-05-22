@@ -1,7 +1,7 @@
-package woowacourse.shopping.data.datasource.remote.order
+package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.data.remote.retrofit.dto.OrderInfo
 
-interface OrderRemoteDataSource {
+interface OrderRepository {
     suspend fun order(orderInfo: OrderInfo)
 }

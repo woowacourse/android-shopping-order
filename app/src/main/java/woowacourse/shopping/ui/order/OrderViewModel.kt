@@ -5,13 +5,13 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.datasource.remote.order.OrderRemoteDataSource
 import woowacourse.shopping.data.remote.retrofit.dto.OrderInfo
 import woowacourse.shopping.data.remote.retrofit.toApiFailure
 import woowacourse.shopping.data.remote.retrofit.toUserMessage
+import woowacourse.shopping.domain.repository.OrderRepository
 
 class OrderViewModel(
-    private val orderRepository: OrderRemoteDataSource,
+    private val orderRepository: OrderRepository,
 ) : ViewModel() {
     private val _event = Channel<OrderEvent>(capacity = Channel.BUFFERED)
     val event = _event.receiveAsFlow()

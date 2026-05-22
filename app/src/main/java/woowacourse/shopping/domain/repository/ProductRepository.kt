@@ -1,8 +1,8 @@
-package woowacourse.shopping.data.datasource.remote.product
+package woowacourse.shopping.domain.repository
 
 import woowacourse.shopping.domain.model.Product
 
-interface ProductRemoteDataSource {
+interface ProductRepository {
     suspend fun requestProductPage(
         page: Int,
         size: Int,

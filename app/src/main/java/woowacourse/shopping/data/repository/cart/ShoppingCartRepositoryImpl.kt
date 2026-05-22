@@ -2,30 +2,32 @@ package woowacourse.shopping.data.repository.cart
 
 import android.os.SystemClock
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import woowacourse.shopping.data.datasource.local.cart.ShoppingCartLocalDataSource
 import woowacourse.shopping.data.datasource.remote.cart.ShoppingCartRemoteDataSource
 import woowacourse.shopping.data.mapper.toCartQuantity
 import woowacourse.shopping.data.mapper.toDomainShoppingCartItems
 import woowacourse.shopping.data.remote.retrofit.dto.CartRequest
 import woowacourse.shopping.domain.model.ShoppingCartItem
+import woowacourse.shopping.domain.model.ShoppingItem
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.repository.ShoppingItemRepository
 
 class ShoppingCartRepositoryImpl(
-    private val shoppingCartLocalDataSource: ShoppingCartLocalDataSource,
     private val shoppingItemRepository: ShoppingItemRepository,
     private val shoppingCartRemoteDataSource: ShoppingCartRemoteDataSource,
 ) : ShoppingCartRepository {
+
+    private val cartItemsState = MutableStateFlow<List<ShoppingCartItem>>(emptyList())
 
     private val remoteStateMutex = Mutex()
     private var hasLoadedRemoteSnapshot: Boolean = false
     private var lastRemoteSnapshotLoadedElapsedMs: Long = 0L
     private var remoteCartItemIdByProductId: Map<Long, Int> = emptyMap()
 
-    override fun observeShoppingItems(): Flow<List<ShoppingCartItem>> =
-        shoppingCartLocalDataSource.observeShoppingCartItems()
+    override fun observeShoppingItems(): Flow<List<ShoppingCartItem>> = cartItemsState.asStateFlow()
 
     override suspend fun requestCartItems(
         page: Int,
@@ -64,11 +66,14 @@ class ShoppingCartRepositoryImpl(
                     size = size,
                     sort = sort,
                 ).toDomainShoppingCartItems()
+
         remoteCartItemIdByProductId =
             remoteCartItems.associate { remoteCartItem ->
                 remoteCartItem.product.id to remoteCartItem.getId().toInt()
             }
-        syncLocalState(remoteCartItems)
+
+        syncShoppingItemsState(remoteCartItems)
+        cartItemsState.value = remoteCartItems
         markRemoteSnapshotLoaded()
     }
 
@@ -79,26 +84,31 @@ class ShoppingCartRepositoryImpl(
         if (amount <= 0) return
         ensureRemoteSnapshotLoadedInternal()
 
-        val currentQuantity = getLocalQuantity(productId)
+        val currentQuantity = getCurrentCartQuantity(productId)
         val updatedQuantity = currentQuantity + amount
         val remoteCartItemId = remoteCartItemIdByProductId[productId]
+
         if (remoteCartItemId == null) {
             shoppingCartRemoteDataSource.addCartItem(
                 product = CartRequest(productId = productId, quantity = amount),
             )
-            val resolvedRemoteCartItemId = resolveRemoteCartItemIdInternal(productId = productId)
-            if (resolvedRemoteCartItemId != null) {
-                remoteCartItemIdByProductId += productId to resolvedRemoteCartItemId
-            }
-        } else {
-            shoppingCartRemoteDataSource.updateQuantityCartItem(
-                id = remoteCartItemId,
-                product = updatedQuantity.toCartQuantity(),
+            requestCartItemsInternal(
+                page = DEFAULT_PAGE,
+                size = DEFAULT_SIZE,
+                sort = null,
             )
+            return
         }
-        applyLocalQuantityOrRefresh(
+
+        shoppingCartRemoteDataSource.updateQuantityCartItem(
+            id = remoteCartItemId,
+            product = updatedQuantity.toCartQuantity(),
+        )
+
+        applyLocalStateOrRefresh(
             productId = productId,
             targetQuantity = updatedQuantity,
+            remoteCartItemId = remoteCartItemId.toLong(),
         )
         markRemoteSnapshotLoaded()
     }
@@ -107,8 +117,9 @@ class ShoppingCartRepositoryImpl(
         ensureRemoteSnapshotLoadedInternal()
 
         val remoteCartItemId = resolveRemoteCartItemIdInternal(productId = productId) ?: return
-        val currentQuantity = getLocalQuantity(productId)
+        val currentQuantity = getCurrentCartQuantity(productId)
         val updatedQuantity = currentQuantity - 1
+
         if (updatedQuantity <= 0) {
             shoppingCartRemoteDataSource.deleteCartItem(id = remoteCartItemId)
             remoteCartItemIdByProductId -= productId
@@ -118,9 +129,11 @@ class ShoppingCartRepositoryImpl(
                 product = updatedQuantity.toCartQuantity(),
             )
         }
-        applyLocalQuantityOrRefresh(
+
+        applyLocalStateOrRefresh(
             productId = productId,
             targetQuantity = updatedQuantity.coerceAtLeast(0),
+            remoteCartItemId = remoteCartItemId.toLong(),
         )
         markRemoteSnapshotLoaded()
     }
@@ -131,9 +144,11 @@ class ShoppingCartRepositoryImpl(
         val remoteCartItemId = resolveRemoteCartItemIdInternal(productId = productId) ?: return
         shoppingCartRemoteDataSource.deleteCartItem(id = remoteCartItemId)
         remoteCartItemIdByProductId -= productId
-        applyLocalQuantityOrRefresh(
+
+        applyLocalStateOrRefresh(
             productId = productId,
             targetQuantity = 0,
+            remoteCartItemId = remoteCartItemId.toLong(),
         )
         markRemoteSnapshotLoaded()
     }
@@ -146,6 +161,12 @@ class ShoppingCartRepositoryImpl(
             sort = null,
         )
     }
+
+    private fun getCurrentCartQuantity(productId: Long): Int =
+        cartItemsState.value
+            .firstOrNull { shoppingCartItem -> shoppingCartItem.product.id == productId }
+            ?.getQuantity()
+            ?: 0
 
     private fun isRemoteSnapshotFresh(): Boolean {
         if (!hasLoadedRemoteSnapshot) return false
@@ -160,6 +181,7 @@ class ShoppingCartRepositoryImpl(
     private suspend fun resolveRemoteCartItemIdInternal(productId: Long): Int? {
         val existingRemoteCartItemId = remoteCartItemIdByProductId[productId]
         if (existingRemoteCartItemId != null) return existingRemoteCartItemId
+
         requestCartItemsInternal(
             page = DEFAULT_PAGE,
             size = DEFAULT_SIZE,
@@ -168,25 +190,24 @@ class ShoppingCartRepositoryImpl(
         return remoteCartItemIdByProductId[productId]
     }
 
-    private suspend fun applyLocalQuantityOrRefresh(
+    private suspend fun applyLocalStateOrRefresh(
         productId: Long,
         targetQuantity: Int,
+        remoteCartItemId: Long,
     ) {
-        if (applyLocalQuantity(productId = productId, targetQuantity = targetQuantity)) return
+        val appliedQuantity = applyLocalQuantity(productId = productId, targetQuantity = targetQuantity)
+        val appliedCartCache = applyCartCache(productId = productId, targetQuantity = targetQuantity, remoteCartItemId = remoteCartItemId)
+
+        if (appliedQuantity && appliedCartCache) {
+            return
+        }
+
         requestCartItemsInternal(
             page = DEFAULT_PAGE,
             size = DEFAULT_SIZE,
             sort = null,
         )
     }
-
-    private fun getLocalQuantity(productId: Long): Int =
-        shoppingItemRepository
-            .shoppingItems
-            .value
-            .firstOrNull { shoppingItem -> shoppingItem.getProductId() == productId }
-            ?.getQuantity()
-            ?: 0
 
     private suspend fun applyLocalQuantity(
         productId: Long,
@@ -209,22 +230,69 @@ class ShoppingCartRepositoryImpl(
             targetQuantity < currentQuantity ->
                 shoppingItemRepository.minusQuantity(productId, currentQuantity - targetQuantity)
         }
-        if (targetQuantity > 0) {
-            addLocalIfAbsent(productId)
-        } else {
-            removeLocalByProductId(productId)
-        }
         return true
     }
 
-    private suspend fun syncLocalState(shoppingCartItems: List<ShoppingCartItem>) {
+    private fun applyCartCache(
+        productId: Long,
+        targetQuantity: Int,
+        remoteCartItemId: Long,
+    ): Boolean {
+        val currentCartItems = cartItemsState.value
+        val targetIndex =
+            currentCartItems.indexOfFirst { shoppingCartItem ->
+                shoppingCartItem.product.id == productId
+            }
+
+        if (targetQuantity <= 0) {
+            if (targetIndex == -1) return true
+            cartItemsState.value =
+                currentCartItems.filterIndexed { index, _ ->
+                    index != targetIndex
+                }
+            return true
+        }
+
+        val product =
+            shoppingItemRepository
+                .shoppingItems
+                .value
+                .firstOrNull { shoppingItem -> shoppingItem.getProductId() == productId }
+                ?.getProduct()
+                ?: return false
+
+        val updatedCartItem =
+            ShoppingCartItem(
+                id = remoteCartItemId,
+                shoppingItem =
+                    ShoppingItem(
+                        product = product,
+                        quantity = targetQuantity,
+                    ),
+            )
+
+        if (targetIndex == -1) {
+            cartItemsState.value = currentCartItems + updatedCartItem
+            return true
+        }
+
+        cartItemsState.value =
+            currentCartItems.toMutableList().apply {
+                this[targetIndex] = updatedCartItem
+            }
+        return true
+    }
+
+    private suspend fun syncShoppingItemsState(shoppingCartItems: List<ShoppingCartItem>) {
         shoppingItemRepository.upsertProducts(
             shoppingCartItems.map { shoppingCartItem -> shoppingCartItem.product },
         )
+
         val quantityByProductId =
             shoppingCartItems.associate { shoppingCartItem ->
                 shoppingCartItem.product.id to shoppingCartItem.getQuantity()
             }
+
         val localShoppingItems = shoppingItemRepository.shoppingItems.value
         localShoppingItems.forEach { shoppingItem ->
             val productId = shoppingItem.getProductId()
@@ -237,20 +305,7 @@ class ShoppingCartRepositoryImpl(
                 targetQuantity < currentQuantity ->
                     shoppingItemRepository.minusQuantity(productId, currentQuantity - targetQuantity)
             }
-            if (targetQuantity > 0) {
-                addLocalIfAbsent(productId)
-            } else {
-                removeLocalByProductId(productId)
-            }
         }
-    }
-
-    private suspend fun addLocalIfAbsent(productId: Long) {
-        shoppingCartLocalDataSource.addIfAbsent(productId)
-    }
-
-    private suspend fun removeLocalByProductId(productId: Long) {
-        shoppingCartLocalDataSource.removeByProductId(productId)
     }
 
     private companion object {
