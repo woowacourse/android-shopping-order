@@ -18,3 +18,8 @@ object CartScreen
 data class RecommendScreen(
     val productIds: List<Long>,
 )
+
+@Serializable
+data class PaymentScreen(
+    val orderAmount: Long,
+)

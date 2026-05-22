@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import woowacourse.shopping.presentation.cart.CartRoute
 import woowacourse.shopping.presentation.detail.DetailRoute
+import woowacourse.shopping.presentation.payment.PaymentRoute
 import woowacourse.shopping.presentation.recommend.RecommendRoute
 import woowacourse.shopping.presentation.shopping.ShoppingRoute
 
@@ -43,6 +44,15 @@ fun AppNavHost() {
 
             RecommendRoute(
                 productIds = route.productIds,
+                navController = navController,
+            )
+        }
+
+        composable<PaymentScreen> { backStackEntry ->
+            val route: PaymentScreen = backStackEntry.toRoute()
+
+            PaymentRoute(
+                orderAmount = route.orderAmount,
                 navController = navController,
             )
         }

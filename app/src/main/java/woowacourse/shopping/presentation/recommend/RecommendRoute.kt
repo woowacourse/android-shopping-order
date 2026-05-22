@@ -11,6 +11,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import woowacourse.shopping.presentation.navigation.PaymentScreen
 import woowacourse.shopping.presentation.recommend.ui.RecommendScreen
 import woowacourse.shopping.presentation.recommend.viewmodel.RecommendEvent
 import woowacourse.shopping.presentation.recommend.viewmodel.RecommendViewModel
@@ -45,7 +46,13 @@ fun RecommendRoute(
     RecommendScreen(
         uiState = uiState,
         onBack = navController::popBackStack,
-        onOrderClick = {},
+        onOrderClick = {
+            navController.navigate(
+                PaymentScreen(
+                    orderAmount = uiState.totalPrice,
+                ),
+            )
+        },
         onIncrease = viewModel::increase,
         onDecrease = viewModel::decrease,
     )

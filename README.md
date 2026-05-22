@@ -17,7 +17,7 @@
 - [x] Composable에서 상태를 구독할 때 collectAsStateWithLifecycle()을 사용한다.
 
 ## 결제 
-- [ ] 결제 UI 구현
+- [x] 결제 UI 구현
 - [ ] 사용 가능한 쿠폰을 조회한다
 - [ ] 결제 UI 에서 쿠폰을 적용한다
   - 쿠폰은 1개만 적용 가능하다
