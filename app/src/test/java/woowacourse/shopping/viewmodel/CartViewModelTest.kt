@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.PurchaseProduct
-import woowacourse.shopping.ui.viewmodel.CartViewModel
+import woowacourse.shopping.ui.cart.CartViewModel
 import woowacourse.shopping.viewmodel.fakes.FakeCartRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)

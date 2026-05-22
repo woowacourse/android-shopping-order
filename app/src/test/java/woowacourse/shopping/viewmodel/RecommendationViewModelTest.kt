@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.PurchaseProduct
-import woowacourse.shopping.ui.viewmodel.RecommendationViewModel
+import woowacourse.shopping.ui.recommendation.RecommendationViewModel
 import woowacourse.shopping.viewmodel.fakes.FakeCartRepository
 import woowacourse.shopping.viewmodel.fakes.FakeProductRepository
 import woowacourse.shopping.viewmodel.fakes.FakeRecentlyViewedProductRepository

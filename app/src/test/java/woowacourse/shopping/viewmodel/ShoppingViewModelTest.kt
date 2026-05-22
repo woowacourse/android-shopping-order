@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.PurchaseProduct
-import woowacourse.shopping.ui.viewmodel.ShoppingViewModel
+import woowacourse.shopping.ui.shopping.ShoppingViewModel
 import woowacourse.shopping.viewmodel.fakes.FakeCartRepository
 import woowacourse.shopping.viewmodel.fakes.FakeProductRepository
 import woowacourse.shopping.viewmodel.fakes.FakeRecentlyViewedProductRepository
