@@ -2,6 +2,128 @@
 
 ## 단계별 진행
 
+### 4단계 - 주문 & 알림
+
+## 단위 테스트 목록 (TDD)
+
+### Domain: Coupon / CouponPolicy
+
+- [ ] FixedDiscountCoupon은 최소 주문 금액 미만이면 적용 불가다
+- [ ] FixedDiscountCoupon은 최소 주문 금액 이상이면 5,000원을 할인한다
+- [ ] BogoCoupon은 장바구니에 동일 상품이 3개 이상 있어야 적용 가능하다
+- [ ] BogoCoupon은 3개 이상 담긴 상품이 여러 개일 때 가장 비싼 상품 1개 가격을 할인한다
+- [ ] BogoCoupon은 3개 이상인 상품이 없으면 적용 불가다
+- [ ] FreeShippingCoupon은 최소 주문 금액(50,000원) 미만이면 적용 불가다
+- [ ] FreeShippingCoupon은 적용 시 배송비를 0원으로 만든다
+- [ ] MiracleSaleCoupon은 04:00 ~ 07:00 시간대가 아니면 적용 불가다
+- [ ] MiracleSaleCoupon은 적용 시 총 상품 금액의 30%를 할인한다
+- [ ] FREESHIPPING 쿠폰 적용 시 배송비는 0원이다
+- [ ] 쿠폰은 만료일을 초과하면 사용할 수 없다
+
+### ViewModel: PurchaseViewModel
+- [ ] 적용 가능한 쿠폰 목록을 조회한다
+- [ ] 쿠폰은 하나만 선택 가능하다
+- [ ] 결제하기 호출 시 orders가 호출된다
+- [ ] 주문 성공 시 SharedFlow로 스낵바를 출력한다
+- [ ] 주문 성공 시 장바구니의 주문 상품이 초기화된다
+- [ ] 주문 상품 합계는 선택된 장바구니 항목들의 (가격 x 수량) 합과 같다
+- [ ] 쿠폰 선택 시 총 결제 금액이 재계산된다
+- [ ] 총 결제 금액 = 주문 금액 - 쿠폰 할인 + 배송비다
+
+### ViewModel: SettingsViewModel (미결제 알림 On/Off)
+
+- [ ] 초기 상태를 저장소에서 가져오거나 기본값으로 처리한다
+- [ ] 토글 시 알림 설정값이 저장소에 즉시 반영된다
+- [ ] 저장된 알림 설정값은 앱 재시작 후에도 동일하게 노출된다
+
+## UI 테스트 목록 (Compose + Navigation)
+
+### Navigation: 결제 완료 흐름
+- [ ] 결제하기 버튼을 누르면 ProductList 라우트로 이동한다
+- [ ] 결제 완료 후 Back Stack에 Purchase/Recommend/Cart 라우트가 남지 않는다
+- [ ] 결제 완료 후 ProductList에서 뒤로가기를 누르면 앱이 종료된다
+
+### Navigation: 일반 흐름
+- [ ] 상품 목록에서 상품 카드를 누르면 ProductDetail 라우트로 이동한다
+- [ ] 상품 상세에서 전달된 productId로 화면이 렌더링된다
+- [ ] 장바구니에서 주문하기를 누르면 Recommend 라우트로 이동한다
+- [ ] 상품 추천에서 결제하기를 누르면 Purchase 라우트로 이동한다
+
+### PurchaseScreen 렌더링
+- [ ] 주문 상품 금액, 배송비(3,000원), 총 결제 금액이 화면에 표시된다
+- [ ] 적용 가능한 쿠폰 목록이 화면에 표시된다
+- [ ] 쿠폰을 선택하면 단 하나만 체크 상태가 유지된다
+- [ ] 쿠폰 선택 시 총 결제 금액 표시가 갱신된다
+
+### 스낵바 / 이벤트
+- [ ] 장바구니 담기 완료 시 스낵바가 노출된다
+- [ ] 장바구니 삭제 완료 시 스낵바가 노출된다
+- [ ] 결제 완료 시 스낵바(또는 토스트)가 노출된다
+
+### 알림 / 권한
+- [ ] 결제 화면 진입 시 POST_NOTIFICATIONS 권한 요청 Dialog가 노출된다 (Android 13+)
+- [ ] 알림 클릭 시 Purchase 라우트로 진입한다
+
+## 기능 목록
+
+### 주문/결제
+- [ ] 장바구니에 담긴 상품을 최종 주문할 수 있다
+- [ ] 결제 화면에서 주문 상품 금액, 배송비(기본 3,000원), 총 결제 금액을 표시한다
+- [ ] 결제 화면에서 적용 가능한 쿠폰 목록을 조회할 수 있다
+- [ ] 결제 화면에서 쿠폰을 하나만 적용할 수 있다
+- [ ] 결제하기 버튼을 누르면 최종 주문이 완료된다
+- [ ] 최종 주문이 완료되면 상품 목록으로 이동한다 (Back Stack 정리)
+- [ ] 최종 주문이 완료되면 장바구니에서 주문된 상품이 초기화된다
+
+### 쿠폰
+- [ ] FIXED5000 (5,000원 할인, 최소 주문 100,000원, 만료일 2026-11-30) 적용
+- [ ] BOGO (2개 구매 시 1개 무료, 동일 상품 3개 이상, 만료일 2026-05-30) 적용
+- [ ] BOGO 적용 시 3개 이상 담긴 상품 중 1개당 가격이 가장 비싼 상품 기준 할인
+- [ ] FREESHIPPING (5만원 이상 무료 배송, 도서/산간 포함, 만료일 2026-08-31) 적용
+- [ ] MIRACLESALE (30% 할인, 04:00 ~ 07:00, 만료일 2026-07-31) 적용
+
+### 설정 & 알림
+- [ ] 설정 화면에서 미결제 알림 기능을 On/Off 할 수 있다
+- [ ] 알림 설정값이 SharedPreferences에 저장되어 앱 재실행에도 유지된다
+- [ ] 알림 설정이 On일 때 결제 화면 진입 시 5분 후 알림을 예약한다
+- [ ] 결제 완료 또는 결제 화면 재진입 시 예약된 알림을 취소한다
+- [ ] 5분 안에 결제하지 않으면 "아직 결제가 완료되지 않았어요" 알림을 노출한다
+- [ ] 알림을 클릭하면 결제 화면으로 이동한다
+- [ ] POST_NOTIFICATIONS 권한을 요청한다 (Android 13+)
+
+#### 기능 요구사항
+
+- 장바구니에 담긴 상품을 최종 주문할 수 있다.
+    - 배송비는 기본 3,000원이다.
+- 결제 화면에서 적용 가능한 쿠폰을 조회하고 적용할 수 있다.
+    - 쿠폰은 1개만 적용 가능하다.
+- 결제 수단은 구현하지 않는다.
+    - 결제하기 버튼을 누르면 바로 최종 주문이 완료된다.
+    - 최종 주문이 완료되면 상품 목록으로 이동한다.
+- 설정에서 미결제 알림 기능을 On/Off 할 수 있다.
+    - 앱을 재실행해도 설정이 유지되어야 한다.
+- 결제 화면에 진입하면 5분 후 알림을 예약한다.
+    - 결제를 완료하거나 결제 화면으로 돌아오면 예약된 알림을 취소한다.
+    - 5분 안에 결제하지 않으면 "아직 결제가 완료되지 않았어요" 알림을 노출한다.
+    - 알림을 클릭하면 결제 화면으로 이동한다.
+
+#### API 구현 상세
+
+- 최종 주문이 완료되면 장바구니에서 주문된 상품이 초기화되는 것이 정상이다.
+- 쿠폰을 사용해도 사라지지 않는 것이 정상이다.
+
+#### 프로그래밍 요구사항
+
+### 알림
+
+- AlarmManager를 사용해 결제 화면 진입 시 5분 후 알림을 예약한다.
+- 결제 완료 또는 결제 화면 재진입 시 AlarmManager로 예약된 알림을 취소한다.
+- BroadcastReceiver를 구현해 알람을 수신하고 NotificationManager로 알림을 노출한다.
+- 알림 권한(POST_NOTIFICATIONS)을 요청한다.
+- 알림 권한 Dialog 및 Notification은 기본 UI를 그대로 사용한다.
+    - 단, Notification의 아이콘은 커스텀한다.
+- 알림 On/Off 설정은 SharedPreferences로 저장한다.
+
 ### 3단계 — Navigation & Flow
 
 ## 기능 목록
@@ -26,21 +148,21 @@
 
 ### UI 상태를 Flow로 관리한다
 
-- ViewModel의 UI 상태를`StateFlow`로 노출한다.
-- 장바구니 담기/삭제 등 단발성 이벤트는`SharedFlow`로 처리한다.
-- Composable에서 상태를 구독할 때`collectAsStateWithLifecycle()`을 사용한다.
+- ViewModel의 UI 상태를StateFlow로 노출한다.
+- 장바구니 담기/삭제 등 단발성 이벤트는SharedFlow로 처리한다.
+- Composable에서 상태를 구독할 때collectAsStateWithLifecycle()을 사용한다.
 
 #### 프로그래밍 요구사항
 
 ### Navigation
 
-- 기존 Activity 전환 방식을 제거하고Compose Navigation(`navigation-compose`)으로 교체한다.
-- 모든 Route를`@Serializable`타입으로 선언한다.
+- 기존 Activity 전환 방식을 제거하고Compose Navigation(navigation-compose)으로 교체한다.
+- 모든 Route를@Serializable타입으로 선언한다.
 - NavController는 화면 Composable에 직접 전달하지 않는다. 이동 로직은 콜백 람다로 분리한다.
 
 ### Flow
 
-- 기존`remember`/`mutableStateOf`기반 Compose State를`StateFlow`/`SharedFlow`로 교체한다.
-- ViewModel의 상태는`MutableStateFlow`로 선언하고`StateFlow`로 노출한다.
-- 일회성 이벤트(스낵바 표시, 화면 이동 트리거 등)는`MutableSharedFlow`를 사용한다.
-- Composable에서`collectAsState()`대신`collectAsStateWithLifecycle()`을 사용한다.
+- 기존remember/mutableStateOf기반 Compose State를StateFlow/SharedFlow로 교체한다.
+- ViewModel의 상태는MutableStateFlow로 선언하고StateFlow로 노출한다.
+- 일회성 이벤트(스낵바 표시, 화면 이동 트리거 등)는MutableSharedFlow를 사용한다.
+- Composable에서collectAsState()대신collectAsStateWithLifecycle()을 사용한다.
