@@ -3,9 +3,11 @@ package woowacourse.shopping.ui.shopping
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -25,9 +27,10 @@ class ShoppingViewModel(
     private val productRepository: ProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ShoppingUiState())
-
     val uiState = _uiState.asStateFlow()
 
+    private val _event = MutableSharedFlow<ShoppingEvent>()
+    val event = _event.asSharedFlow()
     val recentlyViewedProductsId: StateFlow<List<Long>?> =
         recentlyViewedProductRepository
             .getAll()
@@ -42,7 +45,7 @@ class ShoppingViewModel(
             .getLatestItem()
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
+                started = SharingStarted.Eagerly,
                 initialValue = null,
             )
 
@@ -57,16 +60,19 @@ class ShoppingViewModel(
                         when (val result = productRepository.getProduct(id)) {
                             is ApiResult.Success -> recentlyViewedProducts.add(result.data)
                             is ApiResult.Error ->
-                                _uiState.update {
-                                    it.copy(isLoading = false, errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
-                                }
+                                _event.emit(ShoppingEvent.ShowSnackBar("최근 본 상품 목록을 불러오는데 실패했습니다."))
+
                             is ApiResult.Exception ->
-                                _uiState.update {
-                                    it.copy(isLoading = false, errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
-                                }
+                                _event.emit(ShoppingEvent.ShowSnackBar("최근 본 상품 목록을 불러오는데 실패했습니다."))
                         }
                     }
-                    _uiState.update { it.copy(recentlyViewedProducts = Products(recentlyViewedProducts)) }
+                    _uiState.update {
+                        it.copy(
+                            recentlyViewedProducts = Products(
+                                recentlyViewedProducts
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -88,31 +94,27 @@ class ShoppingViewModel(
                 }
             }
 
-            is ApiResult.Error -> {
-                _uiState.update {
-                    it.copy(isLoading = false, errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
-                }
-            }
+            is ApiResult.Error -> _event.emit(
+                ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${result.code}")
+            )
 
-            is ApiResult.Exception -> {
-                _uiState.update {
-                    it.copy(isLoading = false, errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
-                }
-            }
+            is ApiResult.Exception -> _event.emit(
+                ShoppingEvent.ShowSnackBar("${ViewModelConst.ERROR_LABEL} ${result.e.message}")
+            )
         }
     }
 
     suspend fun fetchCart() {
-        when (val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)) {
+        when (val allCartItemResult =
+            cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)) {
             is ApiResult.Success -> _uiState.update { it.copy(cart = allCartItemResult.data) }
-            is ApiResult.Error ->
-                _uiState.update {
-                    it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${allCartItemResult.code}")
-                }
-            is ApiResult.Exception ->
-                _uiState.update {
-                    it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}")
-                }
+            is ApiResult.Error -> _event.emit(
+                ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${allCartItemResult.code}")
+            )
+
+            is ApiResult.Exception -> _event.emit(
+                ShoppingEvent.ShowSnackBar("${ViewModelConst.ERROR_LABEL} ${allCartItemResult.e.message}")
+            )
         }
     }
 
@@ -123,28 +125,20 @@ class ShoppingViewModel(
                     it.product.id == purchaseProduct.product.id
                 }
             if (existingItem != null) {
-                when (val result = cartRepository.updateCount(existingItem.id, existingItem.count + 1)) {
-                    is ApiResult.Success -> {}
-                    is ApiResult.Error ->
-                        _uiState.update {
-                            it.copy(isLoading = false, errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
-                        }
-                    is ApiResult.Exception ->
-                        _uiState.update {
-                            it.copy(isLoading = false, errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
-                        }
-                }
+                updateCountWithID(existingItem.id, existingItem.count + 1)
             } else {
                 when (val result = cartRepository.insert(purchaseProduct)) {
-                    is ApiResult.Success -> fetchCart()
-                    is ApiResult.Error ->
-                        _uiState.update {
-                            it.copy(isLoading = false, errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
-                        }
-                    is ApiResult.Exception ->
-                        _uiState.update {
-                            it.copy(isLoading = false, errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
-                        }
+                    is ApiResult.Success -> {
+                        _event.emit(ShoppingEvent.ShowSnackBar(ADD_TO_CART))
+                        fetchCart()
+                    }
+                    is ApiResult.Error -> _event.emit(
+                        ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${result.code}")
+                    )
+
+                    is ApiResult.Exception -> _event.emit(
+                        ShoppingEvent.ShowSnackBar("${ViewModelConst.ERROR_LABEL} ${result.e.message}")
+                    )
                 }
             }
         }
@@ -160,15 +154,18 @@ class ShoppingViewModel(
                 val nextCount = target.count + updateAmount
                 if (nextCount >= 1) {
                     when (val result = cartRepository.updateCount(target.id, nextCount)) {
-                        is ApiResult.Success -> fetchCart()
-                        is ApiResult.Error ->
-                            _uiState.update {
-                                it.copy(isLoading = false, errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
-                            }
-                        is ApiResult.Exception ->
-                            _uiState.update {
-                                it.copy(isLoading = false, errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
-                            }
+                        is ApiResult.Success -> {
+                            _event.emit(ShoppingEvent.ShowSnackBar(UPDATE_AMOUNT))
+                            fetchCart()
+                        }
+
+                        is ApiResult.Error -> _event.emit(
+                            ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${result.code}")
+                        )
+
+                        is ApiResult.Exception -> _event.emit(
+                            ShoppingEvent.ShowSnackBar("${ViewModelConst.ERROR_LABEL} ${result.e.message}")
+                        )
                     }
                 }
             }
@@ -199,12 +196,27 @@ class ShoppingViewModel(
         }
     }
 
-    fun onErrorMsgShown() {
-        _uiState.update { it.copy(errorMsg = null) }
+    fun moveToCart() {
+        viewModelScope.launch {
+            _event.emit(ShoppingEvent.NavigateToCart)
+        }
+    }
+
+    fun moveToProductDetail(selectedId: Long) {
+        viewModelScope.launch {
+            _event.emit(
+                ShoppingEvent.NavigateToProductDetail(
+                    selectedProductId = selectedId,
+                    lastViewedProductId = lastViewProductId.value
+                )
+            )
+        }
     }
 
     companion object {
         private const val PAGE_SIZE = 20
+        private const val ADD_TO_CART = "장바구니에 상품을 추가했습니다."
+        private const val UPDATE_AMOUNT = "상품의 수량을 변경했습니다."
     }
 }
 
