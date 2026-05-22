@@ -40,7 +40,7 @@ object RepositoryProvider {
             authDataSource.saveToken(id, password)
             retrofitServices =
                 RetrofitServices(
-                    baseUrl = "http://192.168.2.152:3000/",
+                    baseUrl = "https://android-shopping-server.onrender.com/",
                     interceptor = AuthInterceptor(authDataSource.getToken()),
                 )
         }
