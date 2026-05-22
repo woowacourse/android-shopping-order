@@ -1,10 +1,14 @@
 package woowacourse.shopping.constants
 
-import woowacourse.shopping.domain.Coupon
-import woowacourse.shopping.domain.CouponCode
+import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.Money
 import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.coupon.BuyXGetYCoupon
+import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
+import woowacourse.shopping.domain.coupon.FreeShippingCoupon
+import woowacourse.shopping.domain.coupon.PercentageDiscountCoupon
 import java.time.LocalDate
+import java.time.LocalTime
 
 object MockData {
     private const val IMAGE_BASE_URL =
@@ -22,53 +26,33 @@ object MockData {
         }
 
     val MOCK_COUPONS: List<Coupon> = listOf(
-        Coupon(
-            code = CouponCode.FIXED5000,
-            title = "5,000원 할인 쿠폰",
-            discountPrice = 5000,
-            minimumPrice = 100000,
-            expiryDate = LocalDate.of(2024, 11, 30),
-            buyCount = 0,
-            discountRatio = 0f,
-            serviceCount = 0,
-            availableStartTime = 0,
-            availableEndTime = 24
+        FixedDiscountCoupon(
+            code = "FIXED5000",
+            description = "5,000원 할인 쿠폰",
+            minimumAmount = 100000,
+            expirationDate = LocalDate.of(2024, 11, 30),
+            discount = 5000
         ),
-        Coupon(
-            code = CouponCode.BOGO,
-            title = "2개 구매 시 1개 무료 쿠폰",
-            discountPrice = 0,
-            minimumPrice = 0,
-            buyCount = 2,
-            discountRatio = 0f,
-            serviceCount = 1,
-            availableStartTime = 0,
-            availableEndTime = 24,
-            expiryDate = LocalDate.of(2024, 5, 30),
+        BuyXGetYCoupon(
+            code = "BOGO",
+            description = "2개 구매 시 1개 무료 쿠폰",
+            expirationDate = LocalDate.of(2024, 5, 30),
+            buyQuantity = 2,
+            getQuantity = 1
         ),
-        Coupon(
-            code = CouponCode.FREESHIPPING,
-            title = "5만원 이상 구매 시 무료 배송 쿠폰",
-            discountPrice = 3000,
-            minimumPrice = 50000,
-            expiryDate = LocalDate.of(2024, 8, 31),
-            buyCount = 0,
-            discountRatio = 0f,
-            serviceCount = 0,
-            availableStartTime = 0,
-            availableEndTime = 24
+        FreeShippingCoupon(
+            code = "FREESHIPPING",
+            description = "5만원 이상 구매 시 무료 배송 쿠폰",
+            expirationDate = LocalDate.of(2024, 12, 31),
+            minimumAmount = 50000
         ),
-        Coupon(
-            code = CouponCode.MIRACLESALE,
-            title = "일찍일어나는 새가 피곤함 쿠폰",
-            discountPrice = 3000,
-            minimumPrice = 0,
-            expiryDate = LocalDate.of(2024, 7, 31),
-            buyCount = 0,
-            discountRatio = 0.3f,
-            serviceCount = 0,
-            availableStartTime = 4,
-            availableEndTime = 7
+        PercentageDiscountCoupon(
+            code = "MIRACLESALE",
+            description = "일찍일어나는 새가 피곤함 쿠폰",
+            expirationDate = LocalDate.of(2024, 7, 31),
+            discount = 0.30f,
+            startTime = LocalTime.of(4, 0, 0),
+            endTime = LocalTime.of(7, 0, 0)
         )
     )
 }

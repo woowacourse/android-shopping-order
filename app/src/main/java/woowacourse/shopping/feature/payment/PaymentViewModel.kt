@@ -18,7 +18,14 @@ import woowacourse.shopping.constants.MockData
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.order.OrderRepository
 import woowacourse.shopping.data.repository.product.ProductRepository
-import woowacourse.shopping.domain.CouponCode
+import woowacourse.shopping.domain.coupon.BuyXGetYCoupon
+import woowacourse.shopping.domain.coupon.Coupon
+import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
+import woowacourse.shopping.domain.coupon.FreeShippingCoupon
+import woowacourse.shopping.domain.coupon.PercentageDiscountCoupon
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 class PaymentViewModel(
     private val application: ShoppingApplication,
@@ -32,11 +39,10 @@ class PaymentViewModel(
     private val _paymentEvent = MutableSharedFlow<PaymentEvent>()
     val paymentEvent: SharedFlow<PaymentEvent> = _paymentEvent.asSharedFlow()
 
-    private val couponList = MockData.MOCK_COUPONS
-
     lateinit var productRepository: ProductRepository
     lateinit var cartRepository: CartRepository
     lateinit var orderRepository: OrderRepository
+    lateinit var couponList: List<Coupon>
 
     init {
         viewModelScope.launch {
@@ -44,18 +50,54 @@ class PaymentViewModel(
             productRepository = appDependencies.productRepository
             cartRepository = appDependencies.cartRepository
             orderRepository = appDependencies.orderRepository
+            couponList = MockData.MOCK_COUPONS
 
-            val couponCheckMap = couponList.associate { CouponCode.toCodeString(it.code) to false }
+            val couponCheckMap = couponList.filter {
+                val isDiscountable = when (it) {
+                    is FixedDiscountCoupon -> {
+                        it.isDiscountable(uiState.value.totalPrice)
+                    }
+
+                    is FreeShippingCoupon -> {
+                        it.isDiscountable(uiState.value.totalPrice)
+                    }
+
+                    is BuyXGetYCoupon -> {
+                        it.isDiscountable(uiState.value.totalPrice)
+                    }
+
+                    is PercentageDiscountCoupon -> {
+                        it.isDiscountingTime(LocalDateTime.now().toLocalTime())
+                    }
+                }
+                isDiscountable && !it.isExpired(LocalDate.now())
+            }.associate { it.code to false }
             _uiState.value = _uiState.value.copy(
                 couponCheckMap = couponCheckMap,
                 couponList = couponList.map {
                     CouponUiModel(
-                        code = CouponCode.toCodeString(it.code),
-                        title = it.title,
-                        year = it.expiryDate.year,
-                        month = it.expiryDate.monthValue,
-                        day = it.expiryDate.dayOfMonth,
-                        minimumPrice = it.minimumPrice
+                        code = it.code,
+                        title = it.description,
+                        year = it.expirationDate.year,
+                        month = it.expirationDate.monthValue,
+                        day = it.expirationDate.dayOfMonth,
+                        minimumPrice = when (it) {
+                            is FixedDiscountCoupon -> {
+                                it.minimumAmount
+                            }
+
+                            is FreeShippingCoupon -> {
+                                it.minimumAmount
+                            }
+
+                            is BuyXGetYCoupon -> {
+                                0
+                            }
+
+                            is PercentageDiscountCoupon -> {
+                                0
+                            }
+                        }
                     )
                 },
                 shippingFee = 3000
@@ -66,7 +108,7 @@ class PaymentViewModel(
     fun loadCart(cartContentIds: List<Long>) {
         viewModelScope.launch {
             val cart = cartRepository.loadCart()
-            val targetContents = cart.cartContents.filter{ it.id in cartContentIds }
+            val targetContents = cart.cartContents.filter { it.id in cartContentIds }
             val totalPrice = targetContents.sumOf { it.quantity * it.product.priceAmount() }
             _uiState.update {
                 it.copy(
@@ -79,66 +121,82 @@ class PaymentViewModel(
 
     fun couponCheck(code: String) {
         viewModelScope.launch {
-            val cart = cartRepository.loadCart()
-            val twoMoreCartItems = cart.cartContents.filter {
-                it.quantity > 2
+            val coupon = couponList.find { it.code == code } ?: return@launch
+
+            val currentMap = _uiState.value.couponCheckMap.toMutableMap()
+            val isCurrentlyChecked = currentMap[code] ?: false
+
+            if (!isCurrentlyChecked) {
+                val isValid = when (coupon) {
+                    is FixedDiscountCoupon -> {
+                        coupon.isDiscountable(uiState.value.totalPrice)
+                    }
+
+                    is FreeShippingCoupon -> {
+                        coupon.isDiscountable(uiState.value.totalPrice)
+                    }
+
+                    is BuyXGetYCoupon -> {
+                        val cart = cartRepository.loadCart()
+                        val maxQuantity = cart.cartContents.maxOfOrNull { it.quantity } ?: 0
+                        coupon.isDiscountable(maxQuantity)
+                    }
+
+                    is PercentageDiscountCoupon -> {
+                        coupon.isDiscountingTime(LocalDateTime.now().toLocalTime())
+                    }
+                }
+
+                if (isValid) {
+                    _couponEvent.emit(CouponEvent.Success("쿠폰 적용이 되었습니다."))
+                    currentMap.keys.forEach { currentMap[it] = false }
+                    currentMap[code] = true
+                } else {
+                    _couponEvent.emit(CouponEvent.Failed("쿠폰 적용이 불가능합니다."))
+                }
+            } else {
+                currentMap[code] = false
             }
 
-            val newCouponCheckMap = when (CouponCode.fromCodeString(code)) {
-                CouponCode.FIXED5000 -> {
-                    if (cart.cartContents.sumOf { it.quantity * it.product.priceAmount() } >= 100000) {
-                        _couponEvent.emit(CouponEvent.Success("쿠폰 적용이 되었습니다."))
-                        _uiState.value.couponCheckMap.toMutableMap().apply {
-                            this[code] = this[code]?.not() ?: false
-                        }.toMap()
-                    } else {
-                        _couponEvent.emit(CouponEvent.Failed("주문 금액이 10만원 이상이 아닙니다."))
-                        _uiState.value.couponCheckMap
-                    }
-                }
+            var newShippingFee = 3000
+            var newCouponDiscountPrice = 0
 
-                CouponCode.BOGO -> {
-                    if (twoMoreCartItems.isNotEmpty()) {
-                        _couponEvent.emit(CouponEvent.Success("쿠폰 적용이 되었습니다."))
-                        _uiState.value.couponCheckMap.toMutableMap().apply {
-                            this[code] = this[code]?.not() ?: false
-                        }.toMap()
-                    } else {
-                        _couponEvent.emit(CouponEvent.Failed("2개 이상 구매한 상품이 존재하지 않습니다."))
-                        _uiState.value.couponCheckMap
+            val activeCouponCode = currentMap.entries.find { it.value }?.key
+            if (activeCouponCode != null) {
+                val activeCoupon = couponList.find { it.code == activeCouponCode }
+                when (activeCoupon) {
+                    is FixedDiscountCoupon -> {
+                        newCouponDiscountPrice = activeCoupon.discount
                     }
-                }
 
-                CouponCode.FREESHIPPING -> {
-                    if (cart.cartContents.sumOf { it.quantity * it.product.priceAmount() } >= 50000) {
-                        _couponEvent.emit(CouponEvent.Success("쿠폰 적용이 되었습니다."))
-                        _uiState.value.couponCheckMap.toMutableMap().apply {
-                            this[code] = this[code]?.not() ?: false
-                        }.toMap()
-                    } else {
-                        _couponEvent.emit(CouponEvent.Failed("주문 금액이 5만원 이상이 아닙니다."))
-                        _uiState.value.couponCheckMap
+                    is FreeShippingCoupon -> {
+                        newShippingFee = 0
                     }
-                }
 
-                CouponCode.MIRACLESALE -> {
-                    _uiState.value.couponCheckMap.toMutableMap().apply {
-                        this[code] = this[code]?.not() ?: false
-                    }.toMap()
+                    is BuyXGetYCoupon -> {
+                        val cart = cartRepository.loadCart()
+                        val maxQuantityProduct =
+                            cart.cartContents.maxByOrNull { it.quantity }?.product
+                        newCouponDiscountPrice = activeCoupon.calculateDiscountPrice(
+                            maxQuantityProduct?.priceAmount() ?: 0
+                        )
+                    }
+
+                    is PercentageDiscountCoupon -> {
+                        newCouponDiscountPrice =
+                            activeCoupon.calculateDiscountPrice(uiState.value.totalPrice)
+                    }
+
+                    else -> {}
                 }
             }
-
-            val shippingFee = if (newCouponCheckMap[CouponCode.toCodeString(CouponCode.FREESHIPPING)] == true) 0 else 3000
-            val couponDiscountPrice = if (newCouponCheckMap[CouponCode.toCodeString(CouponCode.FIXED5000)] == true) 5000 else 0
-            val couponRateDiscountPrice = if (newCouponCheckMap[CouponCode.toCodeString(CouponCode.MIRACLESALE)] == true) (_uiState.value.totalPrice * 0.30).toInt() else 0
-            val couponTwoMoreDiscountPrice = if (newCouponCheckMap[CouponCode.toCodeString(CouponCode.BOGO)] == true) twoMoreCartItems.maxOf{ it.product.priceAmount() } else 0
 
             _uiState.update {
                 it.copy(
-                    couponCheckMap = newCouponCheckMap,
-                    shippingFee = shippingFee,
-                    couponDiscountPrice = couponDiscountPrice + couponRateDiscountPrice + couponTwoMoreDiscountPrice,
-                    totalPaymentPrice = it.totalPrice + shippingFee - couponDiscountPrice - couponRateDiscountPrice - couponTwoMoreDiscountPrice
+                    couponCheckMap = currentMap,
+                    shippingFee = newShippingFee,
+                    couponDiscountPrice = newCouponDiscountPrice,
+                    totalPaymentPrice = it.totalPrice + newShippingFee - newCouponDiscountPrice
                 )
             }
         }
@@ -150,7 +208,7 @@ class PaymentViewModel(
                 orderRepository.orders(cartContentIds)
                 _paymentEvent.emit(PaymentEvent.Success("주문이 완료되었습니다."))
             } catch (e: Exception) {
-                _paymentEvent.emit(PaymentEvent.Failed("주문에 실패하였습니다."))
+                _paymentEvent.emit(PaymentEvent.Failed("주문에 실패하였습니다. ${e.message}"))
             }
         }
     }
