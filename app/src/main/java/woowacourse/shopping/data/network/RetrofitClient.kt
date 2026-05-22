@@ -9,6 +9,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.create
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.network.cart.RetrofitCartService
+import woowacourse.shopping.data.network.coupon.RetrofitCouponService
 import woowacourse.shopping.data.network.order.OrderService
 import woowacourse.shopping.data.network.product.RetrofitProductService
 
@@ -62,5 +63,5 @@ object RetrofitClient {
     val productService: RetrofitProductService by lazy { retrofit.create() }
     val cartService: RetrofitCartService by lazy { retrofit.create() }
     val orderService: OrderService by lazy { retrofit.create() }
-    // val couponService: RetrofitCouponService by lazy { retrofit.create() }
+    val couponService: RetrofitCouponService by lazy { retrofit.create() }
 }

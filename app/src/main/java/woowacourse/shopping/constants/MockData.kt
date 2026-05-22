@@ -1,5 +1,6 @@
 package woowacourse.shopping.constants
 
+import woowacourse.shopping.data.network.coupon.dto.AvailableTime
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.Money
 import woowacourse.shopping.domain.Product
@@ -50,9 +51,11 @@ object MockData {
             code = "MIRACLESALE",
             description = "일찍일어나는 새가 피곤함 쿠폰",
             expirationDate = LocalDate.of(2026, 7, 31),
-            discount = 0.30f,
-            startTime = LocalTime.of(4, 0, 0),
-            endTime = LocalTime.of(7, 0, 0)
+            discount = 30,
+            availableTime = AvailableTime(
+                start = "04:00:00",
+                end = "07:00:00"
+            )
         )
     )
 }

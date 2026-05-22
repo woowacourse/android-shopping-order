@@ -1,5 +1,6 @@
 package woowacourse.shopping.domain.coupon
 
+import woowacourse.shopping.data.network.coupon.dto.AvailableTime
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -7,17 +8,20 @@ data class PercentageDiscountCoupon(
     override val code: String,
     override val description: String,
     override val expirationDate: LocalDate,
-    val discount: Float,
-    val startTime: LocalTime,
-    val endTime: LocalTime
+    val discount: Int,
+    val availableTime: AvailableTime
 ) : Coupon(
     code = code,
     description = description,
     expirationDate = expirationDate,
 ) {
     override fun calculateDiscountPrice(orderPrice: Int): Int {
-        return (orderPrice * discount).toInt()
+        return (orderPrice * discount) / 100
     }
 
-    fun isDiscountingTime(curTime: LocalTime): Boolean = curTime in (startTime..endTime)
+    fun isDiscountingTime(curTime: LocalTime): Boolean {
+        val startTime = LocalTime.parse(availableTime.start)
+        val endTime = LocalTime.parse(availableTime.end)
+        return curTime.isAfter(startTime) && curTime.isBefore(endTime)
+    }
 }

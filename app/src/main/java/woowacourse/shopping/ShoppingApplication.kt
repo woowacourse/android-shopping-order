@@ -12,25 +12,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import okhttp3.Credentials
-import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.data.local.RecentProductDatabase
 import woowacourse.shopping.data.network.RetrofitClient
 import woowacourse.shopping.data.network.cart.CartRetrofitDaoImpl
-import woowacourse.shopping.data.network.cart.RetrofitCartService
-import woowacourse.shopping.data.network.order.OrderService
+import woowacourse.shopping.data.network.coupon.CouponDaoImpl
 import woowacourse.shopping.data.network.product.ProductRetrofitDaoImpl
-import woowacourse.shopping.data.network.product.RetrofitProductService
 import woowacourse.shopping.data.network.startMockWebServer
 import woowacourse.shopping.data.repository.auth.AuthRepository
 import woowacourse.shopping.data.repository.auth.AuthRepositoryImpl
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
+import woowacourse.shopping.data.repository.coupon.CouponRepository
+import woowacourse.shopping.data.repository.coupon.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.order.OrderRepository
 import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.product.ProductRepository
@@ -38,6 +32,7 @@ import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.data.source.auth.AuthDataSourceImpl
+import woowacourse.shopping.data.source.coupon.CouponDataSourceImpl
 import woowacourse.shopping.data.source.order.OrderDaoImpl
 import woowacourse.shopping.data.source.product.ProductDataSourceImpl
 
@@ -47,6 +42,7 @@ data class AppDependencies(
     val productRepository: ProductRepository,
     val cartRepository: CartRepository,
     val recentProductRepository: RecentProductRepository,
+    val couponRepository: CouponRepository,
     val orderRepository: OrderRepository,
 )
 
@@ -114,6 +110,18 @@ open class ShoppingApplication : Application() {
                 recentProductDao = recentProductDatabase.recentProductDao(),
             )
 
+        val coupon: CouponRepository =
+            CouponRepositoryImpl(
+                dataSource =
+                    CouponDataSourceImpl(
+                        couponDao =
+                            CouponDaoImpl(
+                                couponService = RetrofitClient.couponService,
+                            ),
+                    ),
+            )
+
+
         val order: OrderRepository =
             OrderRepositoryImpl(
                 orderDao =
@@ -126,6 +134,7 @@ open class ShoppingApplication : Application() {
             productRepository = product,
             cartRepository = cart,
             recentProductRepository = recent,
+            couponRepository = coupon,
             orderRepository = order,
         )
     }

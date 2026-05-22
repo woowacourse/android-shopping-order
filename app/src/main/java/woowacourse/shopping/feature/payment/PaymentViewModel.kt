@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.constants.MockData
 import woowacourse.shopping.data.repository.cart.CartRepository
+import woowacourse.shopping.data.repository.coupon.CouponRepository
 import woowacourse.shopping.data.repository.order.OrderRepository
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.domain.Cart
@@ -43,6 +44,7 @@ class PaymentViewModel(
     lateinit var productRepository: ProductRepository
     lateinit var cartRepository: CartRepository
     lateinit var orderRepository: OrderRepository
+    lateinit var couponRepository: CouponRepository
     lateinit var couponList: List<Coupon>
 
     init {
@@ -51,7 +53,8 @@ class PaymentViewModel(
             productRepository = appDependencies.productRepository
             cartRepository = appDependencies.cartRepository
             orderRepository = appDependencies.orderRepository
-            couponList = MockData.MOCK_COUPONS
+            couponRepository = appDependencies.couponRepository
+            couponList = couponRepository.loadCoupons()
         }
     }
 
@@ -74,6 +77,7 @@ class PaymentViewModel(
         val currentTotalPrice = _uiState.value.totalPrice
 
         viewModelScope.launch {
+            couponList = couponRepository.loadCoupons()
             val couponChooseList = couponList.filter {
                 val isDiscountable = couponValid(it, cartRepository.loadCart(), currentTotalPrice)
                 isDiscountable && !it.isExpired(LocalDate.now())
