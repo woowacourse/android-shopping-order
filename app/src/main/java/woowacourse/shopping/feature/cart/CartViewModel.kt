@@ -288,8 +288,6 @@ class CartViewModel(
 
     fun totalCheck() {
         val productUiModels = _uiState.value.paginatedCartContents
-        val totalPrice =
-            productUiModels.sumOf { it.productUiModel.price * it.productUiModel.quantity }
 
         val check =
             _uiState.value.checkMap
@@ -297,7 +295,17 @@ class CartViewModel(
                 .not()
         val newCheckMap = productUiModels.map { it.contentId }.associateWith { check }
 
-        _uiState.update { it.copy(checkMap = newCheckMap.toMap(), totalPrice = totalPrice) }
+        val checkProductIds = newCheckMap.filter { it.value }.map { it.key }
+        val totalPrice = productUiModels.filter{ checkProductIds.contains(it.contentId) }.sumOf { it.productUiModel.price * it.productUiModel.quantity}
+        val totalCount = newCheckMap.filter{ it.value }.size
+
+        _uiState.update {
+            it.copy(
+                checkMap = newCheckMap.toMap(),
+                totalPrice = totalPrice,
+                totalCount = totalCount
+            )
+        }
     }
 
     companion object {
