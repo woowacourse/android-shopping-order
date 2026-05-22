@@ -32,12 +32,22 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"http://127.0.0.1:8080/\"",
+                "\"http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/\"",
             )
+            buildConfigField("boolean", "IS_MOCK", "true")
         }
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/\"",
+            )
+            buildConfigField("boolean", "IS_MOCK", "false")
         }
     }
     compileOptions {
