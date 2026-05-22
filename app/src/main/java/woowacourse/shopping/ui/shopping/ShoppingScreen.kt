@@ -31,6 +31,11 @@ import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import woowacourse.shopping.ui.component.ShoppingAppBar
 import woowacourse.shopping.ui.model.ProductUiModel
+import woowacourse.shopping.ui.shopping.component.LoadButton
+import woowacourse.shopping.ui.shopping.component.NetworkErrorContent
+import woowacourse.shopping.ui.shopping.component.ProductCard
+import woowacourse.shopping.ui.shopping.component.ProductCardSkeleton
+import woowacourse.shopping.ui.shopping.component.RecentItemsSection
 import woowacourse.shopping.ui.theme.Green40
 
 @Composable
@@ -138,7 +143,7 @@ private fun ShoppingContents(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.padding(top = 20.dp, start = 20.dp, end = 20.dp),
         ) {
-            if (isLoading) {
+            if (isLoading && products.isEmpty()) {
                 items(count = 6) {
                     ProductCardSkeleton()
                 }
@@ -159,6 +164,13 @@ private fun ShoppingContents(
                             onQuantityChange(product.id, quantity)
                         },
                     )
+                }
+                if (isLoading) {
+                    item(
+                        span = { GridItemSpan(2) },
+                    ) {
+                        ProductCardSkeleton()
+                    }
                 }
                 if (isCanLoadMore) {
                     item(

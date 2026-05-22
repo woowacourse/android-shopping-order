@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.shopping
+package woowacourse.shopping.ui.shopping.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll

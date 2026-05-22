@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import woowacourse.shopping.ui.model.ProductUiModel
-import woowacourse.shopping.ui.shopping.ProductCard
+import woowacourse.shopping.ui.shopping.component.ProductCard
 import woowacourse.shopping.ui.theme.Gray50
 
 @Composable

@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.navigation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -64,6 +65,12 @@ fun ShoppingNavHost(
         composable<ShoppingRoute.Detail> { backStackEntry ->
             val route = backStackEntry.toRoute<ShoppingRoute.Detail>()
             val context = LocalContext.current
+            BackHandler {
+                navController.popBackStack(
+                    route = ShoppingRoute.Shopping,
+                    inclusive = false,
+                )
+            }
             val viewModel: DetailViewModel =
                 viewModel(
                     factory =
@@ -85,7 +92,10 @@ fun ShoppingNavHost(
                         }
 
                         DetailEvent.NavigateBack -> {
-                            navController.popBackStack()
+                            navController.popBackStack(
+                                route = ShoppingRoute.Shopping,
+                                inclusive = false,
+                            )
                         }
 
                         DetailEvent.ShowProductNotFoundMessage -> {
@@ -115,7 +125,10 @@ fun ShoppingNavHost(
             DetailScreen(
                 uiState = uiState,
                 onCloseClick = {
-                    navController.popBackStack()
+                    navController.popBackStack(
+                        route = ShoppingRoute.Shopping,
+                        inclusive = false,
+                    )
                 },
                 onQuantityChange = viewModel::updateQuantity,
                 onAddToCart = viewModel::addToCart,
