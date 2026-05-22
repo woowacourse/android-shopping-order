@@ -10,6 +10,7 @@ import woowacourse.shopping.network.auth.AppAuthConfig
 import woowacourse.shopping.network.auth.BasicAuthHeaderFactory
 import woowacourse.shopping.network.auth.BasicAuthInterceptor
 import woowacourse.shopping.repository.http.cart.HttpCartRepository
+import woowacourse.shopping.repository.http.coupon.HttpCouponRepository
 import woowacourse.shopping.repository.http.product.HttpProductRepository
 import woowacourse.shopping.repository.room.RoomRecentProductRepository
 
@@ -30,6 +31,9 @@ object ShoppingRepositoryProvider {
     lateinit var cartRepository: CartRepository
         private set
 
+    lateinit var couponRepository: CouponRepository
+        private set
+
     lateinit var recentProductRepository: RecentProductRepository
         private set
 
@@ -40,6 +44,7 @@ object ShoppingRepositoryProvider {
         if (
             ::productRepository.isInitialized &&
             ::cartRepository.isInitialized &&
+            ::couponRepository.isInitialized &&
             ::recentProductRepository.isInitialized &&
             ::networkMonitor.isInitialized
         ) {
@@ -54,6 +59,11 @@ object ShoppingRepositoryProvider {
             )
         cartRepository =
             HttpCartRepository(
+                client = httpClient,
+                baseUrl = BuildConfig.API_BASE_URL,
+            )
+        couponRepository =
+            HttpCouponRepository(
                 client = httpClient,
                 baseUrl = BuildConfig.API_BASE_URL,
             )

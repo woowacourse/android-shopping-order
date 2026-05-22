@@ -18,18 +18,25 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.model.Coupon
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.CartRepositoryFixture
+import woowacourse.shopping.repository.CouponRepository
 import woowacourse.shopping.repository.query.CartPageResult
 import woowacourse.shopping.ui.cart.SelectedCartOrder
 import woowacourse.shopping.ui.cart.SelectedCartOrderItem
+import java.time.Clock
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class OrderViewModelTest {
     private lateinit var dispatcher: TestDispatcher
     private lateinit var cartRepository: RecordingCartRepository
+    private lateinit var couponRepository: FakeCouponRepository
     private lateinit var viewModel: OrderViewModel
 
     private val shrimpCracker = CartRepositoryFixture.shrimpCracker
@@ -41,10 +48,46 @@ class OrderViewModelTest {
         Dispatchers.setMain(dispatcher)
 
         cartRepository = RecordingCartRepository()
+        couponRepository =
+            FakeCouponRepository(
+                coupons =
+                    listOf(
+                        Coupon(
+                            id = 1L,
+                            code = "FIXED5000",
+                            title = "5,000원 할인 쿠폰",
+                            description = "",
+                            expirationDate = LocalDate.of(2026, 12, 31),
+                            minimumOrderAmount = 100_000,
+                            fixedDiscountAmount = 5_000,
+                        ),
+                        Coupon(
+                            id = 2L,
+                            code = "FREESHIPPING",
+                            title = "무료 배송 쿠폰",
+                            description = "",
+                            expirationDate = LocalDate.of(2026, 10, 31),
+                            minimumOrderAmount = 50_000,
+                            freeShipping = true,
+                        ),
+                        Coupon(
+                            id = 3L,
+                            code = "MIRACLESALE",
+                            title = "미라클 세일 30% 할인 쿠폰",
+                            description = "",
+                            expirationDate = LocalDate.of(2026, 9, 30),
+                            percentageDiscountRate = 30,
+                            availableFromHour = 4,
+                            availableToHourExclusive = 7,
+                        ),
+                    ),
+            )
         viewModel =
             OrderViewModel(
                 cartRepository = cartRepository,
+                couponRepository = couponRepository,
                 networkMonitor = FakeNetworkMonitor(),
+                clock = Clock.fixed(Instant.parse("2026-05-22T05:00:00Z"), ZoneId.of("UTC")),
             )
 
         dispatcher.scheduler.advanceUntilIdle()
@@ -85,6 +128,30 @@ class OrderViewModelTest {
         assertEquals(10_500L, uiState.priceSummary.totalPaymentPrice)
         assertTrue(uiState.isPaymentEnabled)
     }
+
+    @Test
+    fun `주문 화면 진입 시 현재 주문에 적용 가능한 쿠폰 목록을 조회한다`() =
+        runTest(dispatcher.scheduler) {
+            viewModel.startOrder(
+                SelectedCartOrder(
+                    items =
+                        listOf(
+                            SelectedCartOrderItem(
+                                cartItemId = 101L,
+                                productId = shrimpCracker.id,
+                                price = 60_000,
+                                quantity = 2,
+                            ),
+                        ),
+                ),
+            )
+            advanceUntilIdle()
+
+            assertEquals(
+                listOf("5,000원 할인 쿠폰", "무료 배송 쿠폰", "미라클 세일 30% 할인 쿠폰"),
+                viewModel.uiState.value.coupons.map { it.title },
+            )
+        }
 
     @Test
     fun `결제하기 버튼을 누르면 주문을 생성하고 완료 이벤트를 보낸다`() =
@@ -128,6 +195,12 @@ class OrderViewModelTest {
 
     private class FakeNetworkMonitor : NetworkMonitor {
         override val isNetworkConnected = MutableStateFlow(true)
+    }
+
+    private class FakeCouponRepository(
+        private val coupons: List<Coupon>,
+    ) : CouponRepository {
+        override suspend fun getCoupons(): List<Coupon> = coupons
     }
 
     private class RecordingCartRepository : CartRepository {

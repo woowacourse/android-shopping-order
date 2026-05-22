@@ -44,6 +44,7 @@ fun OrderRouteScreen(
             isOrdering = uiState.isOrdering,
             isPaymentEnabled = uiState.isPaymentEnabled,
             isNetworkConnected = uiState.isNetworkConnected,
+            onCouponCheckedChange = orderViewModel::toggleCouponSelection,
             onPaymentClick = orderViewModel::placeOrder,
         )
     }
