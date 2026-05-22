@@ -32,9 +32,7 @@ class CartViewModel(
     init {
         observeNetworkState()
         loadPage(1)
-        viewModelScope.launch {
-            calculateTotals()
-        }
+        viewModelScope.launch { calculateTotals() }
     }
 
     fun reloadVisibleState() {
@@ -45,6 +43,7 @@ class CartViewModel(
 
         viewModelScope.launch {
             updatePage(currentPage)
+            calculateTotals()
         }
     }
 
@@ -160,6 +159,11 @@ class CartViewModel(
             refreshVisibleSelections()
         }
     }
+
+    suspend fun getSelectedCartItemIds(): List<Long> =
+        createSelectedCartOrder()?.items?.map {
+            it.cartItemId
+        } ?: emptyList()
 
     private fun updateQuantity(
         productId: Long,

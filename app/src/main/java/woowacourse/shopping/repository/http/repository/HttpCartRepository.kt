@@ -118,46 +118,49 @@ class HttpCartRepository(
 
         val existingCartItem = existingCartItemResult.getOrNull()
 
-        return when {
-            existingCartItem == null && quantity == 0 -> {
-                Result.success(Unit)
+        val result =
+            when {
+                existingCartItem == null && quantity == 0 -> {
+                    Result.success(Unit)
+                }
+
+                existingCartItem == null -> {
+                    val result =
+                        execute("장바구니 추가 API 호출에 실패했습니다.") {
+                            cartApiService.addCartItem(
+                                CartItemRequestDto(
+                                    productId = productId,
+                                    quantity = quantity,
+                                ),
+                            )
+                        }
+
+                    result.toUnitResult()
+                }
+
+                quantity == 0 -> {
+                    val result =
+                        execute("장바구니 삭제 API 호출에 실패했습니다.") {
+                            cartApiService.deleteCartItem(existingCartItem.id)
+                        }
+
+                    result.toUnitResult()
+                }
+
+                else -> {
+                    val result =
+                        execute("장바구니 수량 변경 API 호출에 실패했습니다.") {
+                            cartApiService.updateCartItemQuantity(
+                                id = existingCartItem.id,
+                                body = CartItemQuantityUpdateRequestDto(quantity = quantity),
+                            )
+                        }
+
+                    result.toUnitResult()
+                }
             }
 
-            existingCartItem == null -> {
-                val result =
-                    execute("장바구니 추가 API 호출에 실패했습니다.") {
-                        cartApiService.addCartItem(
-                            CartItemRequestDto(
-                                productId = productId,
-                                quantity = quantity,
-                            ),
-                        )
-                    }
-
-                result.toUnitResult()
-            }
-
-            quantity == 0 -> {
-                val result =
-                    execute("장바구니 삭제 API 호출에 실패했습니다.") {
-                        cartApiService.deleteCartItem(existingCartItem.id)
-                    }
-
-                result.toUnitResult()
-            }
-
-            else -> {
-                val result =
-                    execute("장바구니 수량 변경 API 호출에 실패했습니다.") {
-                        cartApiService.updateCartItemQuantity(
-                            id = existingCartItem.id,
-                            body = CartItemQuantityUpdateRequestDto(quantity = quantity),
-                        )
-                    }
-
-                result.toUnitResult()
-            }
-        }
+        return result
     }
 
     override suspend fun getCartItemsByProductIds(productIds: Set<Long>): Result<List<CartItem>> {

@@ -22,16 +22,6 @@
             android:authorities="${applicationId}.mockserverinitializer"
             android:exported="false" />
         <activity
-            android:name=".ui.cart.CartActivity"
-            android:exported="false"
-            android:label="@string/title_activity_cart"
-            android:theme="@style/Theme.Shopping" />
-        <activity
-            android:name=".ui.productdetail.ProductDetailActivity"
-            android:exported="false"
-            android:label="@string/title_activity_product_detail"
-            android:theme="@style/Theme.Shopping" />
-        <activity
             android:name=".ui.shopping.ShoppingActivity"
             android:exported="true"
             android:label="@string/title_activity_shopping"

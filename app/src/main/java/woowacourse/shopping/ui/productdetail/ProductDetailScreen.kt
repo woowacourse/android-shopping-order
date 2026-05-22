@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import woowacourse.shopping.model.Product
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
 import woowacourse.shopping.ui.common.component.recentlyviewed.LastViewedProductCard
 import woowacourse.shopping.ui.fixture.MockProducts
@@ -19,37 +18,38 @@ import woowacourse.shopping.ui.productdetail.component.ProductDetailHeader
 
 @Composable
 fun ProductDetailScreen(
-    product: Product,
-    lastViewedProduct: Product?,
-    quantity: Int,
-    isAdding: Boolean,
-    isNetworkConnected: Boolean,
+    uiState: ProductDetailUiState,
     modifier: Modifier = Modifier,
     onCloseClick: () -> Unit,
+    onLastViewedProductClick: (Long) -> Unit,
     onAddToCart: () -> Unit,
-    onLastViewedProductClick: (Product) -> Unit,
     onIncreaseQuantity: () -> Unit,
     onDecreaseQuantity: () -> Unit,
 ) {
+    val product = uiState.product
+    val lastViewedProduct = uiState.lastViewedProduct
+
     Column(modifier = modifier.fillMaxSize()) {
         ProductDetailHeader(onCloseClick = onCloseClick)
 
-        if (!isNetworkConnected) {
+        if (!uiState.isNetworkConnected) {
             NetworkStatusBanner(modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp))
         }
 
-        ProductDetailBody(
-            product = product,
-            quantity = quantity,
-            onIncreaseQuantity = onIncreaseQuantity,
-            onDecreaseQuantity = onDecreaseQuantity,
-        )
+        if (product != null) {
+            ProductDetailBody(
+                product = product,
+                quantity = uiState.quantity,
+                onIncreaseQuantity = onIncreaseQuantity,
+                onDecreaseQuantity = onDecreaseQuantity,
+            )
+        }
 
         if (lastViewedProduct != null) {
             LastViewedProductCard(
                 name = lastViewedProduct.name,
                 modifier = Modifier.padding(horizontal = 18.dp),
-                onClick = { onLastViewedProductClick(lastViewedProduct) },
+                onClick = { onLastViewedProductClick(lastViewedProduct.id) },
             )
             Spacer(modifier = Modifier.size(16.dp))
         }
@@ -57,7 +57,7 @@ fun ProductDetailScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         CartAddButton(
-            isEnabled = !isAdding,
+            isEnabled = !uiState.isAdding,
             onClick = onAddToCart,
         )
     }
@@ -68,11 +68,13 @@ fun ProductDetailScreen(
 private fun ProductDetailScreenAddToCartPreview() {
     val product = MockProducts.APPLE
     ProductDetailScreen(
-        product = product,
-        lastViewedProduct = MockProducts.BBOYAMI,
-        quantity = 0,
-        isAdding = false,
-        isNetworkConnected = true,
+        uiState =
+            ProductDetailUiState(
+                lastViewedProduct = MockProducts.BBOYAMI,
+                quantity = 0,
+                isAdding = false,
+                isNetworkConnected = true,
+            ),
         onCloseClick = {},
         onAddToCart = {},
         onLastViewedProductClick = {},
@@ -86,11 +88,13 @@ private fun ProductDetailScreenAddToCartPreview() {
 private fun ProductDetailScreenQuantityPreview() {
     val product = MockProducts.APPLE
     ProductDetailScreen(
-        product = product,
-        lastViewedProduct = MockProducts.BBOYAMI,
-        quantity = 2,
-        isAdding = false,
-        isNetworkConnected = true,
+        uiState =
+            ProductDetailUiState(
+                lastViewedProduct = MockProducts.BBOYAMI,
+                quantity = 2,
+                isAdding = false,
+                isNetworkConnected = true,
+            ),
         onCloseClick = {},
         onAddToCart = {},
         onLastViewedProductClick = {},

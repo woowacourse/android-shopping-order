@@ -7,7 +7,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import woowacourse.shopping.model.Product
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
 import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.shopping.component.ShoppingBody
@@ -15,13 +14,10 @@ import woowacourse.shopping.ui.shopping.component.ShoppingHeader
 
 @Composable
 fun ShoppingScreen(
-    productListState: ProductListUiState,
-    recentProducts: List<Product>,
-    cartQuantity: Int,
-    isNetworkConnected: Boolean,
+    uiState: ShoppingUiState,
     modifier: Modifier = Modifier,
     onCartClick: () -> Unit,
-    onProductClick: (Product) -> Unit,
+    onProductClick: (Long) -> Unit,
     onMoreClick: () -> Unit,
     onAddToCart: (Long) -> Unit,
     onIncreaseQuantity: (Long) -> Unit,
@@ -32,17 +28,17 @@ fun ShoppingScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         ShoppingHeader(
-            cartQuantity = cartQuantity,
+            cartQuantity = uiState.cartQuantity,
             onCartClick = onCartClick,
         )
 
-        if (!isNetworkConnected) {
+        if (!uiState.isNetworkConnected) {
             NetworkStatusBanner(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp))
         }
 
         ShoppingBody(
-            productListState = productListState,
-            recentProducts = recentProducts,
+            productListState = uiState.productListState,
+            recentProducts = uiState.recentProducts,
             modifier =
                 Modifier
                     .padding(20.dp)
@@ -60,20 +56,13 @@ fun ShoppingScreen(
 @Composable
 private fun ShoppingScreenPreview() {
     ShoppingScreen(
-        productListState =
-            ProductListUiState.Content(
-                products =
-                    MockProducts.products.take(6).mapIndexed { index, product ->
-                        ShoppingProductUiState(
-                            product = product,
-                            quantity = if (index < 2) 0 else 1,
-                        )
-                    },
-                hasNext = true,
+        uiState =
+            ShoppingUiState(
+                productListState = ProductListUiState.Loading,
+                recentProducts = MockProducts.products.take(4),
+                cartQuantity = 4,
+                isNetworkConnected = true,
             ),
-        recentProducts = MockProducts.products.take(4),
-        cartQuantity = 4,
-        isNetworkConnected = true,
         onCartClick = {},
         onProductClick = {},
         onMoreClick = {},

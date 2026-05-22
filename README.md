@@ -5,13 +5,13 @@
 ## 기능 구현 목록 
 
 ### 1. Compose Navigation 화면 전환
-- [ ] Compose Navigation을 사용하여 화면 전환을 구현한다.
-- [ ] 상품 목록, 상품 상세, 장바구니, 상품 추천 화면을 Navigation Component로 구성한다.
-- [ ] 각 화면 이동은 `NavController`를 통해 처리하며, Composable에 직접 전달하지 않고 콜백 람다로 분리한다.
-- [ ] 화면 이동 시 전달하는 데이터는 타입 안전한(Type-safe) Route를 사용한다.
-- [ ] 모든 Route는 `@Serializable` 타입으로 선언한다.
-- [ ] 주문 완료 후 상품 목록으로 이동할 때 주문 흐름이 Back Stack에 남지 않도록 처리한다.
-- [ ] 기존 Activity 전환 방식을 제거하고 Compose Navigation(`navigation-compose`)으로 교체한다.
+- [x] Compose Navigation을 사용하여 화면 전환을 구현한다.
+- [x] 상품 목록, 상품 상세, 장바구니, 상품 추천 화면을 Navigation Component로 구성한다.
+- [x] 각 화면 이동은 `NavController`를 통해 처리하며, Composable에 직접 전달하지 않고 콜백 람다로 분리한다.
+- [x] 화면 이동 시 전달하는 데이터는 타입 안전한(Type-safe) Route를 사용한다.
+- [x] 모든 Route는 `@Serializable` 타입으로 선언한다.
+- [x] 주문 완료 후 상품 목록으로 이동할 때 주문 흐름이 Back Stack에 남지 않도록 처리한다.
+- [x] 기존 Activity 전환 방식을 제거하고 Compose Navigation(`navigation-compose`)으로 교체한다.
 
 ### 2. Flow를 이용한 상태 관리
 - [ ] 장바구니 담기/삭제 등 단발성 이벤트를 SharedFlow로 처리한다.

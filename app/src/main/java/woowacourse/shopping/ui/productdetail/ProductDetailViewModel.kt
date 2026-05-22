@@ -1,8 +1,13 @@
 package woowacourse.shopping.ui.productdetail
 
+import ProductDetail
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.navigation.toRoute
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,32 +22,39 @@ import woowacourse.shopping.repository.http.common.RemoteException
 import woowacourse.shopping.ui.common.recentlyviewed.RecentViewedProductsMapper
 
 class ProductDetailViewModel(
+    savedStateHandle: SavedStateHandle,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
     private val networkMonitor: NetworkMonitor,
 ) : ViewModel() {
+    private val route: ProductDetail = savedStateHandle.toRoute()
+    private val productId = route.productId
+
     private val _uiState = MutableStateFlow(ProductDetailUiState())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
 
     init {
         observeNetworkState()
+        loadProduct()
     }
 
-    fun loadProduct(productId: Long) {
+    fun loadProduct() {
         viewModelScope.launch {
-            val productsById =
-                productRepository
-                    .findAllByIds(setOf(productId))
-                    .getOrElse { throwable ->
-                        updateErrorState(throwable)
-                        return@launch
+            productRepository
+                .findAllByIds(setOf(productId))
+                .onSuccess { productsById ->
+                    val foundProduct = productsById[productId]
+
+                    if (foundProduct != null) {
+                        recentProductRepository.recordView(foundProduct.id)
+                        refreshProductDetail(foundProduct.id)
+                    } else {
+                        updateErrorState(Exception("상품을 찾을 수 없습니다."))
                     }
-
-            val product = productsById[productId] ?: return@launch
-
-            recentProductRepository.recordView(product.id)
-            refreshProductDetail(product.id)
+                }.onFailure { throwable ->
+                    updateErrorState(throwable)
+                }
         }
     }
 
@@ -152,13 +164,20 @@ class ProductDetailViewModel(
 
 class ProductDetailViewModelFactory : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T =
-        ProductDetailViewModel(
+    override fun <T : ViewModel> create(
+        modelClass: Class<T>,
+        extras: CreationExtras,
+    ): T {
+        val savedStateHandle = extras.createSavedStateHandle()
+
+        return ProductDetailViewModel(
+            savedStateHandle = savedStateHandle,
             productRepository = ShoppingRepositoryProvider.productRepository,
             cartRepository = ShoppingRepositoryProvider.cartRepository,
             recentProductRepository = ShoppingRepositoryProvider.recentProductRepository,
             networkMonitor = ShoppingRepositoryProvider.networkMonitor,
         ) as T
+    }
 }
 
 private fun Throwable.toUserMessage(): String =

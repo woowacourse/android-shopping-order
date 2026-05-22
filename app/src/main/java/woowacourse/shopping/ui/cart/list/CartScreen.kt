@@ -23,7 +23,7 @@ import woowacourse.shopping.ui.fixture.MockProducts
 
 @Composable
 fun CartScreen(
-    cartUiState: CartUiState,
+    uiState: CartUiState,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
     onOrderClick: () -> Unit,
@@ -35,15 +35,14 @@ fun CartScreen(
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
 ) {
-    val cartListState = cartUiState.cartListState
+    val cartListState = uiState.cartListState
     val cartItems = (cartListState as? CartListUiState.Content)?.items.orEmpty()
-    val selectedItems = cartItems.filter { it.isSelected }
 
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
         CartHeader(onBackClick = onBackClick)
-        if (!cartUiState.isNetworkConnected) {
+        if (!uiState.isNetworkConnected) {
             NetworkStatusBanner(modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp))
         }
 
@@ -92,18 +91,16 @@ fun CartScreen(
             }
         }
         CartBottomBar(
-            totalPrice = formatPrice(cartUiState.totalPrice),
-            selectedCount = cartUiState.totalSelectedCount,
+            totalPrice = uiState.totalPrice,
+            selectedCount = uiState.totalSelectedCount,
             onOrderClick = onOrderClick,
             modifier = Modifier.fillMaxWidth(),
             showSelectAll = cartItems.isNotEmpty(),
-            isAllSelected = cartUiState.isAllSelected,
+            isAllSelected = uiState.isAllSelected,
             onAllSelectedChanged = onAllCheckedChange,
         )
     }
 }
-
-private fun formatPrice(totalPrice: Int): String = "%,d원".format(totalPrice)
 
 @Composable
 @Preview(showBackground = true)
@@ -128,7 +125,7 @@ private fun CartScreenPreview() {
             ),
         )
     CartScreen(
-        cartUiState =
+        uiState =
             CartUiState(
                 totalPrice = 10000,
                 totalSelectedCount = 2,
@@ -150,7 +147,7 @@ private fun CartScreenPreview() {
 @Preview(showBackground = true, name = "장바구니 로딩")
 private fun CartScreenLoadingPreview() {
     CartScreen(
-        cartUiState =
+        uiState =
             CartUiState(
                 totalPrice = 10000,
                 totalSelectedCount = 2,
@@ -172,7 +169,7 @@ private fun CartScreenLoadingPreview() {
 @Preview(showBackground = true, name = "장바구니 에러")
 private fun CartScreenErrorPreview() {
     CartScreen(
-        cartUiState =
+        uiState =
             CartUiState(
                 totalPrice = 10000,
                 totalSelectedCount = 2,

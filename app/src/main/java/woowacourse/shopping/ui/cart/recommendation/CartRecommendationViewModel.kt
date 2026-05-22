@@ -1,8 +1,13 @@
 package woowacourse.shopping.ui.cart.recommendation
 
+import CartRecommendation
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.navigation.toRoute
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,18 +22,21 @@ import woowacourse.shopping.repository.RecentProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
 import woowacourse.shopping.repository.http.common.RemoteException
 import woowacourse.shopping.repository.query.CartPageItem
-import woowacourse.shopping.ui.cart.SelectedCartOrder
 import woowacourse.shopping.ui.shopping.ShoppingProductUiState
 import woowacourse.shopping.ui.shopping.ShoppingProductUiStateMapper
 
 private const val RECOMMENDED_PRODUCTS_LIMIT = 10
 
 class CartRecommendationViewModel(
+    savedStateHandle: SavedStateHandle,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
     private val networkMonitor: NetworkMonitor,
 ) : ViewModel() {
+    private val route: CartRecommendation = savedStateHandle.toRoute()
+    private val selectedCartItemIds = route.selectedCartItemIds.toSet()
+
     private val _uiState = MutableStateFlow(CartRecommendationUiState())
     val uiState: StateFlow<CartRecommendationUiState> = _uiState.asStateFlow()
 
@@ -42,35 +50,76 @@ class CartRecommendationViewModel(
 
     init {
         observeNetworkState()
+        startOrder()
     }
 
-    fun startOrder(selectedCartOrder: SelectedCartOrder) {
-        excludedProductIds = selectedCartOrder.items.map { it.productId }.toSet()
-        orderedProductIds.clear()
-        orderedProductIds += excludedProductIds
-        baseOrderItemDataByProductId =
-            selectedCartOrder.items.associate { item ->
-                item.productId to OrderItemData(price = item.price, quantity = item.quantity)
+    fun startOrder() {
+        if (selectedCartItemIds.isEmpty()) return
+
+        viewModelScope.launch {
+            val totalCount = cartRepository.count().getOrDefault(0)
+            if (totalCount == 0) return@launch
+
+            val allCartItems =
+                cartRepository
+                    .getCartPage(
+                        page = 0,
+                        size = totalCount,
+                    ).getOrNull()
+                    ?.items ?: return@launch
+
+            val selectedCartItems =
+                allCartItems.filter {
+                    it.cartItemId in selectedCartItemIds
+                }
+            if (selectedCartItems.isEmpty()) return@launch
+
+            val productIds =
+                selectedCartItems
+                    .map {
+                        it.productId
+                    }.toSet()
+
+            val productsById =
+                productRepository
+                    .findAllByIds(productIds)
+                    .getOrDefault(emptyMap())
+
+            excludedProductIds = productIds
+            orderedProductIds.clear()
+            orderedProductIds += excludedProductIds
+
+            baseOrderItemDataByProductId =
+                selectedCartItems.associate { item ->
+                    val price = productsById[item.productId]?.price?.value ?: 0
+                    item.productId to OrderItemData(price, item.quantity)
+                }
+            recommendedOrderItemDataByProductId.clear()
+            isSessionStarted = true
+            initialCartProductIds = null
+
+            val totalPrice =
+                selectedCartItems.sumOf { item ->
+                    val price = productsById[item.productId]?.price?.value ?: 0
+                    price * item.quantity
+                }
+
+            _uiState.update { currentState ->
+                currentState.copy(
+                    pendingOrder =
+                        PendingOrderUiState(
+                            cartItemIds = selectedCartItems.map { it.cartItemId },
+                            excludedProductIds = excludedProductIds,
+                            selectedCount = selectedCartItemIds.size,
+                            totalPrice = totalPrice,
+                        ),
+                    orderErrorMessage = null,
+                    orderCompletedCount = 0,
+                )
             }
-        recommendedOrderItemDataByProductId.clear()
-        isSessionStarted = true
-        initialCartProductIds = null
 
-        _uiState.update { currentState ->
-            currentState.copy(
-                pendingOrder =
-                    PendingOrderUiState(
-                        cartItemIds = selectedCartOrder.items.map { it.cartItemId },
-                        excludedProductIds = excludedProductIds,
-                        selectedCount = selectedCartOrder.items.size,
-                        totalPrice = selectedCartOrder.items.sumOf { it.price * it.quantity },
-                    ),
-                orderErrorMessage = null,
-                orderCompletedCount = 0,
-            )
+            loadRecommendedProducts()
         }
-
-        loadRecommendedProducts()
     }
 
     fun reloadVisibleState() {
@@ -397,13 +446,20 @@ class CartRecommendationViewModel(
 
 class CartRecommendationViewModelFactory : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T =
-        CartRecommendationViewModel(
+    override fun <T : ViewModel> create(
+        modelClass: Class<T>,
+        extras: CreationExtras,
+    ): T {
+        val savedStateHandle = extras.createSavedStateHandle()
+
+        return CartRecommendationViewModel(
+            savedStateHandle = savedStateHandle,
             productRepository = ShoppingRepositoryProvider.productRepository,
             cartRepository = ShoppingRepositoryProvider.cartRepository,
             recentProductRepository = ShoppingRepositoryProvider.recentProductRepository,
             networkMonitor = ShoppingRepositoryProvider.networkMonitor,
         ) as T
+    }
 }
 
 private fun Throwable.toUserMessage(defaultMessage: String): String =

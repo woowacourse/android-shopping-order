@@ -34,7 +34,7 @@ fun ShoppingBody(
     productListState: ProductListUiState,
     recentProducts: List<Product>,
     modifier: Modifier = Modifier,
-    onProductClick: (Product) -> Unit,
+    onProductClick: (Long) -> Unit,
     onMoreClick: () -> Unit,
     onAddToCart: (Long) -> Unit,
     onIncreaseQuantity: (Long) -> Unit,
@@ -81,7 +81,7 @@ fun ShoppingBody(
                 ) { product ->
                     ProductUnit(
                         product = product,
-                        onClick = { onProductClick(product.product) },
+                        onClick = { onProductClick(product.product.id) },
                         onAddToCart = { onAddToCart(product.product.id) },
                         onIncreaseQuantity = { onIncreaseQuantity(product.product.id) },
                         onDecreaseQuantity = { onDecreaseQuantity(product.product.id) },
