@@ -73,7 +73,7 @@ open class ShoppingApplication : Application() {
 
         var token = auth.load()
         if (token.isBlank()) {
-            token = Credentials.basic("CommitTheKermit", "password")
+            token = Credentials.basic("NoeyhOj", "password")
             auth.save(token)
         }
 
