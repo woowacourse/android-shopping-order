@@ -8,14 +8,18 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.ui.cart.CartEvent.*
 import java.io.IOException
 
 class CartViewModel(
@@ -23,6 +27,9 @@ class CartViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
+
+    private val _event = MutableSharedFlow<CartEvent>()
+    val event: SharedFlow<CartEvent> = _event.asSharedFlow()
 
     private val selectedCartItems = MutableStateFlow<ImmutableList<String>>(persistentListOf())
     private val page = MutableStateFlow(0)
@@ -83,7 +90,15 @@ class CartViewModel(
 
     fun deleteItem(cartId: String) {
         viewModelScope.launch {
-            cartRepository.deleteItem(cartId)
+            runCatching {
+                cartRepository.deleteItem(cartId)
+            }.onFailure { throwable ->
+                if (throwable is IOException || throwable is HttpException) {
+                    _event.emit(DeleteCartItemFailure)
+                } else {
+                    throw throwable
+                }
+            }
         }
     }
 
@@ -92,7 +107,15 @@ class CartViewModel(
         quantity: Int,
     ) {
         viewModelScope.launch {
-            cartRepository.setCartItem(productId, quantity = quantity)
+            runCatching {
+                cartRepository.setCartItem(productId, quantity = quantity)
+            }.onFailure { throwable ->
+                if (throwable is IOException || throwable is HttpException) {
+                    _event.emit(UpdateCartItemFailure)
+                } else {
+                    throw throwable
+                }
+            }
         }
     }
 
@@ -115,6 +138,12 @@ class CartViewModel(
             } else {
                 cartItems.map { it.id }.toImmutableList()
             }
+        }
+    }
+
+    fun order() {
+        viewModelScope.launch {
+            _event.emit(NavigateToRecommend)
         }
     }
 
