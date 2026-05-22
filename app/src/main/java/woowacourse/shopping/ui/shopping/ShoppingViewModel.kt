@@ -35,15 +35,13 @@ class ShoppingViewModel(
     private val pageSize = 20
 
     init {
+
+        loadProducts(size = pageSize)
+
         viewModelScope.launch {
-            try {
-                _uiState.update { it.copy(uiInfo = it.uiInfo.copy(isLoading = true)) }
-                observeNetwork()
-                observeCart()
-                observeRecentItems()
-            } finally {
-                _uiState.update { it.copy(uiInfo = it.uiInfo.copy(isLoading = false)) }
-            }
+            observeNetwork()
+            observeRecentItems()
+            loadRecentItems()
         }
     }
 
@@ -52,26 +50,30 @@ class ShoppingViewModel(
             _uiState.update {
                 it.copy(uiInfo = it.uiInfo.copy(isNetworkAvailable = isAvailable))
             }
-
-            if (isAvailable && _uiState.value.products.isEmpty()) {
-                loadMore()
-                loadRecentItems()
-            }
         }
     }
 
     fun loadProducts(
         page: Int = 0,
-        size: Int = offset,
+        size: Int = if (offset == 0) pageSize else offset,
     ) {
         viewModelScope.launch {
             _uiState.update { it.copy(uiInfo = it.uiInfo.copy(cartErrorMessage = null)) }
             runCatching {
+                _uiState.update {
+                    it.copy(
+                        uiInfo =
+                            it.uiInfo.copy(
+                                isLoading = true,
+                            ),
+                    )
+                }
                 val apiResult =
                     productRepository.getProducts(page = page, size = size)
                 val cartItemQuantity = cartRepository.getTotalCartItemQuantity()
 
-                offset += apiResult.products.size
+                if (offset == 0) offset = apiResult.products.size
+
                 _uiState.update {
                     it.copy(
                         products =
@@ -89,6 +91,15 @@ class ShoppingViewModel(
                         uiInfo = it.uiInfo.copy(cartErrorMessage = null),
                     )
                 }
+            }.onSuccess {
+                _uiState.update {
+                    it.copy(
+                        uiInfo =
+                            it.uiInfo.copy(
+                                isLoading = false,
+                            ),
+                    )
+                }
             }.onFailure { throwable ->
                 if (throwable is IOException || throwable is HttpException) {
                     _uiState.update {
@@ -99,10 +110,6 @@ class ShoppingViewModel(
                 }
             }
         }
-    }
-
-    private fun observeCart() {
-        loadProducts((offset / pageSize), pageSize)
     }
 
     private suspend fun observeRecentItems() {
@@ -136,8 +143,10 @@ class ShoppingViewModel(
         if (!_uiState.value.uiInfo.isNetworkAvailable || !_uiState.value.cartSummary.canLoadMore || _uiState.value.uiInfo.isLoading) return
 
         viewModelScope.launch {
+            _uiState.update { it.copy(uiInfo = it.uiInfo.copy(isLoading = true)) }
             try {
-                val apiResult = productRepository.getProducts(page = (offset / pageSize), size = pageSize)
+                val apiResult =
+                    productRepository.getProducts(page = (offset / pageSize), size = pageSize)
                 val loadProducts =
                     apiResult.products.map {
                         val quantity = cartRepository.getCartItemQuantity(it.id)
@@ -155,7 +164,7 @@ class ShoppingViewModel(
             } catch (_: IOException) {
                 _uiState.update { it }
             } finally {
-                loadProducts()
+                _uiState.update { it.copy(uiInfo = it.uiInfo.copy(isLoading = false)) }
             }
         }
     }

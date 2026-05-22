@@ -20,5 +20,5 @@ data class UiInfoState(
 data class CartSummaryState(
     val cartQuantities: Map<String, Int> = emptyMap(),
     val cartSize: Int = 0,
-    val canLoadMore: Boolean = true,
+    val canLoadMore: Boolean = false,
 )
