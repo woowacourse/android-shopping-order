@@ -25,6 +25,7 @@ fun ShoppingScreen(
     isNetworkConnected: Boolean,
     modifier: Modifier = Modifier,
     onCartClick: () -> Unit,
+    onSettingClick: () -> Unit,
     onProductClick: (Product) -> Unit,
     onMoreClick: () -> Unit,
     onAddToCart: (Long) -> Unit,
@@ -38,6 +39,7 @@ fun ShoppingScreen(
         ShoppingHeader(
             cartQuantity = cartQuantity,
             onCartClick = onCartClick,
+            onSettingClick = onSettingClick,
         )
 
         if (!isNetworkConnected) {
@@ -94,6 +96,7 @@ private fun ShoppingScreenPreview() {
         cartQuantity = 4,
         isNetworkConnected = true,
         onCartClick = {},
+        onSettingClick = {},
         onProductClick = {},
         onMoreClick = {},
         onAddToCart = {},

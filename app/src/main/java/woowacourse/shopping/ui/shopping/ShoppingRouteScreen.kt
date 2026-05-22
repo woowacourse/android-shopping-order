@@ -13,6 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun ShoppingRouteScreen(
     onCartClick: () -> Unit,
+    onSettingClick: () -> Unit,
     onProductClick: (Long) -> Unit,
     viewModel: ShoppingViewModel = viewModel(),
 ) {
@@ -31,6 +32,7 @@ fun ShoppingRouteScreen(
             isNetworkConnected = uiState.isNetworkConnected,
             modifier = Modifier.padding(innerPadding),
             onCartClick = onCartClick,
+            onSettingClick = onSettingClick,
             onProductClick = { product -> onProductClick(product.id) },
             onMoreClick = viewModel::loadMore,
             onAddToCart = viewModel::addToCart,
