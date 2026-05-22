@@ -16,16 +16,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.ProductRepository
-import woowacourse.shopping.data.repository.RecentItemRepository
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.ui.model.mapper.toUiModel
 import java.io.IOException
 
 class CartViewModel(
     private val cartRepository: CartRepository,
-    private val recentItemRepository: RecentItemRepository,
-    private val productRepository: ProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
@@ -99,22 +93,6 @@ class CartViewModel(
     ) {
         viewModelScope.launch {
             cartRepository.setCartItem(productId, quantity = quantity)
-
-            if (_uiState.value.isOrder) {
-                cartRepository
-                    .cartItems
-                    .value
-                    .firstOrNull { it.product.id == productId }
-                    ?.let { cartItem ->
-                        selectedCartItems.update { selectedItems ->
-                            if (cartItem.id in selectedItems) {
-                                selectedItems
-                            } else {
-                                (selectedItems + cartItem.id).toImmutableList()
-                            }
-                        }
-                    }
-            }
         }
     }
 
@@ -140,55 +118,14 @@ class CartViewModel(
         }
     }
 
-    suspend fun loadRecommendProducts(): List<Product> {
-        val productId = recentItemRepository.getLastViewedItem()?.id
-
-        return productId?.let {
-            val category = productRepository.getProductById(productId).category
-            productRepository
-                .getProducts(
-                    category = category,
-                    page = 0,
-                    size = 10,
-                ).products
-        } ?: emptyList()
-    }
-
-    fun setOrder() {
-        viewModelScope.launch {
-            val cartItems = cartRepository.cartItems.value
-            val cartProductIds = cartItems.map { it.product.id }.toSet()
-            val recommendProducts =
-                loadRecommendProducts()
-                    .filter { product ->
-                        product.id !in cartProductIds
-                    }.map { product ->
-                        product.toUiModel(quantity = null)
-                    }.toImmutableList()
-
-            _uiState.update {
-                it.copy(
-                    isOrder = true,
-                    recommendProducts = recommendProducts,
-                )
-            }
-        }
-    }
-
     companion object {
         private const val PAGE_SIZE = 5
 
-        fun provideFactory(
-            cartRepository: CartRepository,
-            recentItemRepository: RecentItemRepository,
-            productRepository: ProductRepository,
-        ): ViewModelProvider.Factory =
+        fun provideFactory(cartRepository: CartRepository): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
                     CartViewModel(
                         cartRepository = cartRepository,
-                        recentItemRepository = recentItemRepository,
-                        productRepository = productRepository,
                     )
                 }
             }
