@@ -18,3 +18,6 @@ data object CartRoute
 
 @Serializable
 data object CartRecommendationRoute
+
+@Serializable
+data object OrderRoute

@@ -12,6 +12,7 @@ import woowacourse.shopping.ui.cart.CartRecommendationRouteScreen
 import woowacourse.shopping.ui.cart.CartRouteScreen
 import woowacourse.shopping.ui.cart.list.CartViewModel
 import woowacourse.shopping.ui.cart.recommendation.CartRecommendationViewModel
+import woowacourse.shopping.ui.order.OrderScreen
 import woowacourse.shopping.ui.productdetail.ProductDetailRouteScreen
 import woowacourse.shopping.ui.shopping.ShoppingRouteScreen
 
@@ -50,15 +51,19 @@ fun AppNavHost(
                     navController.getBackStackEntry(CartGraph)
                 }
                 val cartViewModel: CartViewModel = viewModel(parentEntry)
-                val recommendationViewModel: CartRecommendationViewModel = viewModel(parentEntry)
 
                 CartRouteScreen(
                     cartViewModel = cartViewModel,
                     onBackClick = { navController.popBackStack() },
-                    onOrderClick = { selectedCartOrder ->
-                        recommendationViewModel.startOrder(selectedCartOrder)
-                        navController.navigate(CartRecommendationRoute)
+                    onOrderClick = {
+                        navController.navigate(OrderRoute)
                     },
+                )
+            }
+
+            composable<OrderRoute> {
+                OrderScreen(
+                    onBackClick = { navController.popBackStack() },
                 )
             }
 
