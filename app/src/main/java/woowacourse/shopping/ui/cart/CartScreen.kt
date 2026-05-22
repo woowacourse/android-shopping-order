@@ -25,6 +25,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import woowacourse.shopping.ui.cart.component.CartBottomBar
+import woowacourse.shopping.ui.cart.component.CartCard
+import woowacourse.shopping.ui.cart.component.CartCardSkeleton
+import woowacourse.shopping.ui.cart.component.CartPageSection
 import woowacourse.shopping.ui.component.ShoppingAppBar
 import woowacourse.shopping.ui.model.CartItemUiModel
 import woowacourse.shopping.ui.model.ProductUiModel

@@ -3,6 +3,8 @@ package woowacourse.shopping.ui.cart
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import woowacourse.shopping.model.CartItem
+import woowacourse.shopping.ui.cart.component.CartSelection
+import woowacourse.shopping.ui.cart.component.paginate
 import woowacourse.shopping.ui.model.mapper.toUiModel
 
 fun CartUiState.toUiState(
