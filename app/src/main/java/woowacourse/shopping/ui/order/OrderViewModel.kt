@@ -16,7 +16,6 @@ import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.CouponRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
-import woowacourse.shopping.ui.common.formatter.formatPrice
 import woowacourse.shopping.ui.cart.SelectedCartOrder
 import java.time.Clock
 import java.time.LocalDate
@@ -43,6 +42,8 @@ class OrderViewModel(
     val events: SharedFlow<OrderEvent> = _events
 
     private var pendingOrder: SelectedCartOrder? = null
+    private var availableCouponsById: Map<Long, Coupon> = emptyMap()
+    private var selectedCouponId: Long? = null
 
     init {
         observeNetworkState()
@@ -50,6 +51,8 @@ class OrderViewModel(
 
     fun startOrder(selectedCartOrder: SelectedCartOrder) {
         pendingOrder = selectedCartOrder
+        availableCouponsById = emptyMap()
+        selectedCouponId = null
 
         _uiState.update { currentState ->
             currentState.copy(
@@ -74,10 +77,12 @@ class OrderViewModel(
                 cartRepository.createOrder(targetOrder.items.map { it.cartItemId })
             }.onSuccess {
                 pendingOrder = null
+                availableCouponsById = emptyMap()
+                selectedCouponId = null
                 _uiState.update { currentState ->
                     currentState.copy(
                         coupons = emptyList(),
-                        priceSummary = emptyPriceSummary(),
+                        priceSummary = createEmptyPriceSummary(),
                         isOrdering = false,
                     )
                 }
@@ -95,6 +100,8 @@ class OrderViewModel(
         couponId: Long,
         isSelected: Boolean,
     ) {
+        selectedCouponId = if (isSelected) couponId else null
+
         _uiState.update { currentState ->
             currentState.copy(
                 coupons =
@@ -107,6 +114,7 @@ class OrderViewModel(
                     },
             )
         }
+        recalculatePriceSummary()
     }
 
     private fun observeNetworkState() {
@@ -125,12 +133,16 @@ class OrderViewModel(
                 couponRepository
                     .getCoupons()
                     .filter { coupon -> coupon.isApplicable(selectedCartOrder) }
+                    .also { coupons -> availableCouponsById = coupons.associateBy(Coupon::id) }
                     .map { coupon -> coupon.toUiModel() }
             }.onSuccess { coupons ->
                 _uiState.update { currentState ->
                     currentState.copy(coupons = coupons)
                 }
+                recalculatePriceSummary()
             }.onFailure {
+                availableCouponsById = emptyMap()
+                selectedCouponId = null
                 _uiState.update { currentState ->
                     currentState.copy(coupons = emptyList())
                 }
@@ -139,9 +151,22 @@ class OrderViewModel(
         }
     }
 
-    private fun SelectedCartOrder.toPriceSummary(): OrderPriceSummaryUiModel {
+    private fun recalculatePriceSummary() {
+        val order = pendingOrder ?: return
+        val selectedCoupon = selectedCouponId?.let(availableCouponsById::get)
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                priceSummary = order.toPriceSummary(selectedCoupon),
+            )
+        }
+    }
+
+    private fun SelectedCartOrder.toPriceSummary(selectedCoupon: Coupon? = null): OrderPriceSummaryUiModel {
         val orderAmount = items.sumOf { it.price.toLong() * it.quantity }
-        val deliveryFee = if (orderAmount > 0) DEFAULT_DELIVERY_FEE else 0
+        val couponDiscount = selectedCoupon.resolveDiscount(this).coerceAtMost(orderAmount)
+        val deliveryFee = selectedCoupon.resolveDeliveryFee(orderAmount)
+        val totalPaymentPrice = (orderAmount - couponDiscount + deliveryFee).coerceAtLeast(0)
 
         return OrderPriceSummaryUiModel(
             items =
@@ -152,14 +177,14 @@ class OrderViewModel(
                     ),
                     OrderPriceLineUiModel(
                         labelResId = R.string.order_price_label_coupon_discount,
-                        price = 0,
+                        price = -couponDiscount,
                     ),
                     OrderPriceLineUiModel(
                         labelResId = R.string.order_price_label_delivery_fee,
                         price = deliveryFee,
                     ),
                 ),
-            totalPaymentPrice = orderAmount + deliveryFee,
+            totalPaymentPrice = totalPaymentPrice,
         )
     }
 
@@ -193,9 +218,55 @@ class OrderViewModel(
             title = title,
             expirationDateText = expirationDate.format(COUPON_DATE_FORMATTER),
             minimumOrderAmountText =
-                minimumOrderAmount?.let(::formatPrice) ?: "없음",
+                minimumOrderAmount?.let(::formatMinimumOrderAmount) ?: "없음",
             isSelected = false,
         )
+
+    private fun Coupon?.resolveDiscount(selectedCartOrder: SelectedCartOrder): Long {
+        val coupon = this ?: return 0
+
+        coupon.fixedDiscountAmount?.let { return it.toLong() }
+        coupon.percentageDiscountRate?.let { rate ->
+            return selectedCartOrder.items.sumOf { it.price.toLong() * it.quantity } * rate / 100
+        }
+        if (coupon.bogoEligible) {
+            val requiredQuantity = coupon.requiredSameProductQuantity ?: return 0
+            return selectedCartOrder.items
+                .filter { item -> item.quantity >= requiredQuantity }
+                .maxOfOrNull { item -> item.price.toLong() }
+                ?: 0
+        }
+
+        return 0
+    }
+
+    private fun Coupon?.resolveDeliveryFee(orderAmount: Long): Long {
+        if (orderAmount <= 0) return 0
+        if (this?.freeShipping == true) return 0
+        return DEFAULT_DELIVERY_FEE
+    }
+
+    private fun createEmptyPriceSummary(): OrderPriceSummaryUiModel =
+        OrderPriceSummaryUiModel(
+            items =
+                listOf(
+                    OrderPriceLineUiModel(
+                        labelResId = R.string.order_price_label_order_amount,
+                        price = 0,
+                    ),
+                    OrderPriceLineUiModel(
+                        labelResId = R.string.order_price_label_coupon_discount,
+                        price = 0,
+                    ),
+                    OrderPriceLineUiModel(
+                        labelResId = R.string.order_price_label_delivery_fee,
+                        price = 0,
+                    ),
+                ),
+            totalPaymentPrice = 0,
+        )
+
+    private fun formatMinimumOrderAmount(amount: Int): String = "%,d원".format(amount)
 
     private fun emitMessage(message: String) {
         _events.tryEmit(OrderEvent.ShowMessage(message))

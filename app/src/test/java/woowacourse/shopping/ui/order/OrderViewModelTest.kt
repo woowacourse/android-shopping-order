@@ -72,10 +72,29 @@ class OrderViewModelTest {
                         ),
                         Coupon(
                             id = 3L,
+                            code = "BOGO",
+                            title = "3개 구매 1개 가격 할인 쿠폰",
+                            description = "",
+                            expirationDate = LocalDate.of(2026, 9, 30),
+                            requiredSameProductQuantity = 3,
+                            bogoEligible = true,
+                        ),
+                        Coupon(
+                            id = 4L,
                             code = "MIRACLESALE",
                             title = "미라클 세일 30% 할인 쿠폰",
                             description = "",
                             expirationDate = LocalDate.of(2026, 9, 30),
+                            percentageDiscountRate = 30,
+                            availableFromHour = 4,
+                            availableToHourExclusive = 7,
+                        ),
+                        Coupon(
+                            id = 5L,
+                            code = "MIRACLESALE",
+                            title = "미라클 세일 30% 할인 쿠폰",
+                            description = "",
+                            expirationDate = LocalDate.of(2026, 5, 1),
                             percentageDiscountRate = 30,
                             availableFromHour = 4,
                             availableToHourExclusive = 7,
@@ -154,6 +173,120 @@ class OrderViewModelTest {
         }
 
     @Test
+    fun `쿠폰은 한 번에 하나만 선택할 수 있다`() =
+        runTest(dispatcher.scheduler) {
+            viewModel.startOrder(
+                selectedCartOrder(totalPrice = 120_000, quantity = 2),
+            )
+            advanceUntilIdle()
+
+            viewModel.toggleCouponSelection(couponId = 1L, isSelected = true)
+            viewModel.toggleCouponSelection(couponId = 2L, isSelected = true)
+
+            assertEquals(
+                mapOf(
+                    1L to false,
+                    2L to true,
+                    4L to false,
+                ),
+                viewModel.uiState.value.coupons.associate { it.id to it.isSelected },
+            )
+        }
+
+    @Test
+    fun `정액 할인 쿠폰을 선택하면 할인 금액과 총 결제 금액이 반영된다`() =
+        runTest(dispatcher.scheduler) {
+            viewModel.startOrder(
+                selectedCartOrder(totalPrice = 120_000, quantity = 2),
+            )
+            advanceUntilIdle()
+
+            viewModel.toggleCouponSelection(couponId = 1L, isSelected = true)
+
+            val summary = viewModel.uiState.value.priceSummary
+            assertEquals(-5_000L, summary.items[1].price)
+            assertEquals(118_000L, summary.totalPaymentPrice)
+        }
+
+    @Test
+    fun `무료 배송 쿠폰을 선택하면 배송비가 0원이 된다`() =
+        runTest(dispatcher.scheduler) {
+            viewModel.startOrder(
+                selectedCartOrder(totalPrice = 60_000, quantity = 1),
+            )
+            advanceUntilIdle()
+
+            viewModel.toggleCouponSelection(couponId = 2L, isSelected = true)
+
+            val summary = viewModel.uiState.value.priceSummary
+            assertEquals(0L, summary.items[1].price)
+            assertEquals(0L, summary.items[2].price)
+            assertEquals(60_000L, summary.totalPaymentPrice)
+        }
+
+    @Test
+    fun `미라클 세일 쿠폰을 선택하면 주문 금액의 30퍼센트를 할인한다`() =
+        runTest(dispatcher.scheduler) {
+            viewModel.startOrder(
+                selectedCartOrder(totalPrice = 100_000, quantity = 1),
+            )
+            advanceUntilIdle()
+
+            viewModel.toggleCouponSelection(couponId = 4L, isSelected = true)
+
+            val summary = viewModel.uiState.value.priceSummary
+            assertEquals(-30_000L, summary.items[1].price)
+            assertEquals(73_000L, summary.totalPaymentPrice)
+        }
+
+    @Test
+    fun `보고 쿠폰을 선택하면 수량 조건을 만족하는 상품 중 가장 비싼 한 개 가격만 할인한다`() =
+        runTest(dispatcher.scheduler) {
+            viewModel.startOrder(
+                SelectedCartOrder(
+                    items =
+                        listOf(
+                            SelectedCartOrderItem(
+                                cartItemId = 101L,
+                                productId = shrimpCracker.id,
+                                price = 15_000,
+                                quantity = 3,
+                            ),
+                            SelectedCartOrderItem(
+                                cartItemId = 102L,
+                                productId = sourCandy.id,
+                                price = 20_000,
+                                quantity = 3,
+                            ),
+                        ),
+                ),
+            )
+            advanceUntilIdle()
+
+            assertTrue(viewModel.uiState.value.coupons.any { it.id == 3L })
+
+            viewModel.toggleCouponSelection(couponId = 3L, isSelected = true)
+
+            val summary = viewModel.uiState.value.priceSummary
+            assertEquals(-20_000L, summary.items[1].price)
+            assertEquals(88_000L, summary.totalPaymentPrice)
+        }
+
+    @Test
+    fun `조건에 맞지 않거나 만료된 쿠폰은 목록에 포함되지 않는다`() =
+        runTest(dispatcher.scheduler) {
+            viewModel.startOrder(
+                selectedCartOrder(totalPrice = 20_000, quantity = 2),
+            )
+            advanceUntilIdle()
+
+            assertEquals(
+                listOf(4L),
+                viewModel.uiState.value.coupons.map { it.id },
+            )
+        }
+
+    @Test
     fun `결제하기 버튼을 누르면 주문을 생성하고 완료 이벤트를 보낸다`() =
         runTest(dispatcher.scheduler) {
             cartRepository.setCartItems(
@@ -196,6 +329,22 @@ class OrderViewModelTest {
     private class FakeNetworkMonitor : NetworkMonitor {
         override val isNetworkConnected = MutableStateFlow(true)
     }
+
+    private fun selectedCartOrder(
+        totalPrice: Int,
+        quantity: Int,
+    ): SelectedCartOrder =
+        SelectedCartOrder(
+            items =
+                listOf(
+                    SelectedCartOrderItem(
+                        cartItemId = 101L,
+                        productId = shrimpCracker.id,
+                        price = totalPrice / quantity,
+                        quantity = quantity,
+                    ),
+                ),
+        )
 
     private class FakeCouponRepository(
         private val coupons: List<Coupon>,
