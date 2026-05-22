@@ -48,7 +48,7 @@ class CartRepositoryImpl(
 
     override suspend fun remove(contentId: Long) {
         val existing =
-            loadAll().firstOrNull { it.hasProductId(contentId) }
+            loadAll().firstOrNull { it.id == contentId }
                 ?: return
         cartServerDao.deleteById(existing.id)
     }

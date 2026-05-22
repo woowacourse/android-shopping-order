@@ -14,7 +14,7 @@ data class BuyXGetYCoupon(
     expirationDate = expirationDate,
 ) {
     override fun calculateDiscountPrice(orderPrice: Int): Int {
-        return orderPrice
+        return orderPrice * getQuantity
     }
 
     fun isDiscountable(orderQuantity: Int): Boolean = orderQuantity >= buyQuantity

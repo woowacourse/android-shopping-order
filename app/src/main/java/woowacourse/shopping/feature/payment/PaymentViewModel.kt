@@ -194,7 +194,7 @@ class PaymentViewModel(
             is BuyXGetYCoupon -> {
                 val maxQuantityContent = cart.cartContents.maxByOrNull { it.quantity }
                 val maxQuantity = maxQuantityContent?.quantity ?: 0
-                coupon.isDiscountable(maxQuantity) && maxQuantity > 2
+                coupon.isDiscountable(maxQuantity) && maxQuantity >= coupon.getQuantity + coupon.buyQuantity
             }
 
             is PercentageDiscountCoupon -> {
@@ -207,6 +207,9 @@ class PaymentViewModel(
         viewModelScope.launch {
             try {
                 orderRepository.orders(cartContentIds)
+                cartContentIds.forEach {
+                    cartRepository.remove(it)
+                }
                 _paymentEvent.emit(PaymentEvent.Success("주문이 완료되었습니다."))
             } catch (e: Exception) {
                 _paymentEvent.emit(PaymentEvent.Failed("주문에 실패하였습니다. ${e.message}"))

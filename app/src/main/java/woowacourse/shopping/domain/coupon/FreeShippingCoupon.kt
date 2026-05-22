@@ -13,7 +13,7 @@ data class FreeShippingCoupon(
     expirationDate = expirationDate,
 ) {
     override fun calculateDiscountPrice(orderPrice: Int): Int {
-        TODO("Not yet implemented")
+        return 3000
     }
 
     fun isDiscountable(orderPrice: Int): Boolean = orderPrice >= minimumAmount
