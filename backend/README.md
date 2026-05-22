@@ -14,6 +14,7 @@
 
 - `GET /products?page={page}&size={size}&category={category?}`
 - `GET /products/{id}`
+- `GET /coupons`
 - `GET /cart-items?page={page}&size={size}`
 - `POST /cart-items`
 - `PATCH /cart-items/{id}`
@@ -25,4 +26,5 @@
 
 - 데이터는 서버 메모리에만 저장된다.
 - 상품 데이터는 Android 테스트 fixture와 같은 형태의 24개 샘플 상품으로 초기화된다.
+- 쿠폰 데이터는 README 4단계 요구사항을 기준으로 한 정적 샘플 정책 정보(`FIXED5000`, `BOGO`, `FREESHIPPING`, `MIRACLESALE`)를 반환한다.
 - `POST /orders`는 전달된 `cartItemIds`를 장바구니에서 제거한다.

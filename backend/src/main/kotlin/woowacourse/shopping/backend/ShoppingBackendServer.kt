@@ -57,6 +57,7 @@ class ShoppingBackendServer(
             exchange.requestMethod == "GET" && exchange.requestPath == "/health" -> handleHealth(exchange)
             exchange.requestMethod == "GET" && exchange.requestPath == "/products" -> handleGetProducts(exchange)
             exchange.requestMethod == "GET" && exchange.requestPath.startsWith("/products/") -> handleGetProduct(exchange)
+            exchange.requestMethod == "GET" && exchange.requestPath == "/coupons" -> handleGetCoupons(exchange)
             exchange.requestMethod == "GET" && exchange.requestPath == "/cart-items" -> handleGetCartItems(exchange)
             exchange.requestMethod == "POST" && exchange.requestPath == "/cart-items" -> handleAddCartItem(exchange)
             exchange.requestMethod == "PATCH" && exchange.requestPath.startsWith("/cart-items/") -> handleUpdateCartItem(exchange)
@@ -77,6 +78,7 @@ class ShoppingBackendServer(
                         "GET /health",
                         "GET /products?page={page}&size={size}&category={category?}",
                         "GET /products/{id}",
+                        "GET /coupons",
                         "GET /cart-items?page={page}&size={size}",
                         "POST /cart-items",
                         "PATCH /cart-items/{id}",
@@ -106,6 +108,10 @@ class ShoppingBackendServer(
         val product = store.getProduct(productId)
             ?: return exchange.respondJson(404, ErrorResponse("상품을 찾을 수 없습니다."))
         exchange.respondJson(200, product)
+    }
+
+    private fun handleGetCoupons(exchange: HttpExchange) {
+        exchange.respondJson(200, CouponListResponse(store.getCoupons()))
     }
 
     private fun handleGetCartItems(exchange: HttpExchange) {
@@ -175,6 +181,7 @@ class ShoppingBackendServer(
             when (body) {
                 is ProductResponse -> json.encodeToString(body)
                 is ProductPageResponse -> json.encodeToString(body)
+                is CouponListResponse -> json.encodeToString(body)
                 is CartItemResponse -> json.encodeToString(body)
                 is CartPageResponse -> json.encodeToString(body)
                 is CartItemCountResponse -> json.encodeToString(body)
@@ -238,6 +245,8 @@ private class InMemoryShoppingStore {
         synchronized(lock) {
             productsById[productId]
         }
+
+    fun getCoupons(): List<CouponResponse> = CouponSeedData.coupons
 
     fun getCartItems(
         page: Int,
@@ -393,6 +402,49 @@ private object ProductSeedData {
         )
 }
 
+private object CouponSeedData {
+    val coupons: List<CouponResponse> =
+        listOf(
+            CouponResponse(
+                id = 1L,
+                code = "FIXED5000",
+                title = "5,000원 할인 쿠폰",
+                description = "100,000원 이상 주문 시 5,000원을 할인합니다.",
+                expirationDate = "2026-12-31",
+                minimumOrderAmount = 100_000,
+                fixedDiscountAmount = 5_000,
+            ),
+            CouponResponse(
+                id = 2L,
+                code = "BOGO",
+                title = "3개 구매 1개 가격 할인 쿠폰",
+                description = "동일한 상품을 3개 담으면 가장 비싼 상품 1개 가격만큼 할인합니다.",
+                expirationDate = "2026-11-30",
+                requiredSameProductQuantity = 3,
+                bogoEligible = true,
+            ),
+            CouponResponse(
+                id = 3L,
+                code = "FREESHIPPING",
+                title = "무료 배송 쿠폰",
+                description = "50,000원 이상 주문 시 배송비를 무료로 처리합니다.",
+                expirationDate = "2026-10-31",
+                minimumOrderAmount = 50_000,
+                freeShipping = true,
+            ),
+            CouponResponse(
+                id = 4L,
+                code = "MIRACLESALE",
+                title = "미라클 세일 30% 할인 쿠폰",
+                description = "오전 4시부터 7시 사이 주문 금액의 30%를 할인합니다.",
+                expirationDate = "2026-09-30",
+                percentageDiscountRate = 30,
+                availableFromHour = 4,
+                availableToHourExclusive = 7,
+            ),
+        )
+}
+
 @Serializable
 private data class ProductResponse(
     val id: Long,
@@ -407,6 +459,28 @@ private data class ProductPageResponse(
     val content: List<ProductResponse>,
     val totalElements: Long,
     val last: Boolean,
+)
+
+@Serializable
+private data class CouponListResponse(
+    val coupons: List<CouponResponse>,
+)
+
+@Serializable
+private data class CouponResponse(
+    val id: Long,
+    val code: String,
+    val title: String,
+    val description: String,
+    val expirationDate: String,
+    val minimumOrderAmount: Int? = null,
+    val fixedDiscountAmount: Int? = null,
+    val percentageDiscountRate: Int? = null,
+    val requiredSameProductQuantity: Int? = null,
+    val freeShipping: Boolean = false,
+    val bogoEligible: Boolean = false,
+    val availableFromHour: Int? = null,
+    val availableToHourExclusive: Int? = null,
 )
 
 @Serializable

@@ -39,7 +39,7 @@ class ShoppingBackendServerTest {
         val body = json.decodeFromString<ProductPagePayload>(response.body())
         assertEquals(2, body.content.size)
         assertTrue(body.content.all { it.category == "dessert" })
-        assertEquals(8, body.totalElements)
+        assertEquals(12, body.totalElements)
         assertFalse(body.last)
     }
 
@@ -51,7 +51,31 @@ class ShoppingBackendServerTest {
         assertEquals(200, rootResponse.statusCode())
         assertEquals(200, healthResponse.statusCode())
         assertTrue(rootResponse.body().contains("Shopping backend is running."))
+        assertTrue(rootResponse.body().contains("GET /coupons"))
         assertEquals("ok", json.decodeFromString<HealthPayload>(healthResponse.body()).status)
+    }
+
+    @Test
+    fun `쿠폰 목록과 정책 정보를 조회할 수 있다`() {
+        val response = get("/coupons")
+
+        assertEquals(200, response.statusCode())
+
+        val body = json.decodeFromString<CouponListPayload>(response.body())
+        assertEquals(listOf("FIXED5000", "BOGO", "FREESHIPPING", "MIRACLESALE"), body.coupons.map { it.code })
+
+        val fixedCoupon = body.coupons.first { it.code == "FIXED5000" }
+        assertEquals(100_000, fixedCoupon.minimumOrderAmount)
+        assertEquals(5_000, fixedCoupon.fixedDiscountAmount)
+
+        val freeShippingCoupon = body.coupons.first { it.code == "FREESHIPPING" }
+        assertTrue(freeShippingCoupon.freeShipping)
+        assertEquals(50_000, freeShippingCoupon.minimumOrderAmount)
+
+        val miracleSaleCoupon = body.coupons.first { it.code == "MIRACLESALE" }
+        assertEquals(30, miracleSaleCoupon.percentageDiscountRate)
+        assertEquals(4, miracleSaleCoupon.availableFromHour)
+        assertEquals(7, miracleSaleCoupon.availableToHourExclusive)
     }
 
     @Test
@@ -136,6 +160,22 @@ private data class ProductPagePayload(
 private data class ProductPayload(
     val id: Long,
     val category: String,
+)
+
+@Serializable
+private data class CouponListPayload(
+    val coupons: List<CouponPayload>,
+)
+
+@Serializable
+private data class CouponPayload(
+    val code: String,
+    val minimumOrderAmount: Int? = null,
+    val fixedDiscountAmount: Int? = null,
+    val percentageDiscountRate: Int? = null,
+    val freeShipping: Boolean = false,
+    val availableFromHour: Int? = null,
+    val availableToHourExclusive: Int? = null,
 )
 
 @Serializable
