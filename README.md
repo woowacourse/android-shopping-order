@@ -9,7 +9,7 @@
   - Cart
   - Recommendation
 - [ ] Single Activity 전환
-  - [ ] AndroidManifest 수정
+  - [x] AndroidManifest 수정
   - [ ] MainActivity 이외의 Activity 제거
   - [ ] 각 Route 객체 연결
 
