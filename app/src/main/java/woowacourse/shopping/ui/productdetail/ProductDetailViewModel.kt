@@ -8,8 +8,10 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.navigation.toRoute
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -33,6 +35,9 @@ class ProductDetailViewModel(
 
     private val _uiState = MutableStateFlow(ProductDetailUiState())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
+
+    private val _snackbarEvent = MutableSharedFlow<String>()
+    val snackbarEvent = _snackbarEvent.asSharedFlow()
 
     init {
         observeNetworkState()
@@ -59,7 +64,10 @@ class ProductDetailViewModel(
     }
 
     fun addToCart() {
-        increaseQuantity()
+        viewModelScope.launch {
+            increaseQuantity()
+            _snackbarEvent.emit("장바구니에 상품을 담았습니다.")
+        }
     }
 
     fun increaseQuantity() = changeQuantity(delta = 1)
