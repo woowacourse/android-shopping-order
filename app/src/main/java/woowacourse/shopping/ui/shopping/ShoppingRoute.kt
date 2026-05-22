@@ -12,26 +12,51 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavController
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import woowacourse.shopping.ui.navigation.Cart
+import woowacourse.shopping.ui.navigation.ProductDetail
 
 @Composable
 fun ShoppingRoute(
     viewModel: ShoppingViewModel,
-    onNavigateToProductDetail: (productId: Long, lastViewedId: Long?) -> Unit,
-    onNavigateToCart: () -> Unit,
+    navController: NavController,
     modifier: Modifier = Modifier,
 ) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val lastViewedProductId by viewModel.lastViewProductId.collectAsStateWithLifecycle()
     val composableScope = rememberCoroutineScope()
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(uiState.errorMsg) {
-        uiState.errorMsg?.let { message ->
-            snackbarHostState.showSnackbar(message)
-            viewModel.onErrorMsgShown()
+    LaunchedEffect(Unit) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            var snackbarJob: Job? = null
+            viewModel.event.collect { event ->
+                when (event) {
+                    is ShoppingEvent.ShowSnackBar -> {
+                        snackbarJob?.cancel()
+                        snackbarJob = launch {
+                            snackbarHostState.showSnackbar(
+                                event.message,
+                            )
+                        }
+                    }
+
+                    is ShoppingEvent.NavigateToCart -> navController.navigate(Cart)
+                    is ShoppingEvent.NavigateToProductDetail -> navController.navigate(
+                        ProductDetail(
+                            selectedProductId = event.selectedProductId,
+                            lastViewedProductId = event.lastViewedProductId
+                        )
+                    )
+                }
+            }
         }
     }
 
@@ -50,13 +75,13 @@ fun ShoppingRoute(
             recentlyViewedProducts = uiState.recentlyViewedProducts,
             onRecentlyViewedClick = { product ->
                 viewModel.updateHistory(product)
-                onNavigateToProductDetail(product.id, lastViewedProductId)
+                viewModel.moveToProductDetail(product.id)
             },
             onItemClick = { product ->
                 viewModel.updateHistory(product)
-                onNavigateToProductDetail(product.id, lastViewedProductId)
+                viewModel.moveToProductDetail(product.id)
             },
-            onCartClick = onNavigateToCart,
+            onCartClick = viewModel::moveToCart,
             onLoadClick = viewModel::loadMore,
             onAdd = { id, updateAmount ->
                 viewModel.updateCountWithID(id, updateAmount)
