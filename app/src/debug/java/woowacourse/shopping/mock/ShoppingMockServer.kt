@@ -12,6 +12,12 @@ import woowacourse.shopping.repository.http.dto.cart.CartItemRequestDto
 import woowacourse.shopping.repository.http.dto.cart.CartItemResponseDto
 import woowacourse.shopping.repository.http.dto.cart.CartPageResponseDto
 import woowacourse.shopping.repository.http.dto.cart.OrderRequestDto
+import woowacourse.shopping.repository.http.dto.coupon.AvailableTimeDto
+import woowacourse.shopping.repository.http.dto.coupon.BuyXGetYCouponResponseDto
+import woowacourse.shopping.repository.http.dto.coupon.CouponResponseDto
+import woowacourse.shopping.repository.http.dto.coupon.FixedDiscountCouponResponseDto
+import woowacourse.shopping.repository.http.dto.coupon.FreeShippingCouponResponseDto
+import woowacourse.shopping.repository.http.dto.coupon.PercentageDiscountCouponResponseDto
 import woowacourse.shopping.repository.http.dto.product.ProductPageResponseDto
 import woowacourse.shopping.repository.http.dto.product.ProductResponseDto
 import java.net.HttpURLConnection
@@ -52,6 +58,7 @@ private class ShoppingMockDispatcher : Dispatcher() {
             request.method == "PATCH" && url.pathSegments.size == 2 && url.pathSegments[0] == "cart-items" -> updateCartItem(url, request)
             request.method == "DELETE" && url.pathSegments.size == 2 && url.pathSegments[0] == "cart-items" -> deleteCartItem(url)
             request.method == "POST" && url.encodedPath == "/orders" -> order(request)
+            request.method == "GET" && url.encodedPath == "/coupons" -> coupons()
             else -> errorResponse(HttpURLConnection.HTTP_NOT_FOUND)
         }
     }
@@ -105,6 +112,8 @@ private class ShoppingMockDispatcher : Dispatcher() {
         return emptyResponse(HttpURLConnection.HTTP_OK)
     }
 
+    private fun coupons(): MockResponse = jsonResponse(repository.getCoupons())
+
     private fun jsonResponse(body: Any): MockResponse =
         MockResponse()
             .setResponseCode(HttpURLConnection.HTTP_OK)
@@ -115,6 +124,7 @@ private class ShoppingMockDispatcher : Dispatcher() {
                     is ProductResponseDto -> json.encodeToString(body)
                     is CartPageResponseDto -> json.encodeToString(body)
                     is CartItemCountResponseDto -> json.encodeToString(body)
+                    is List<*> -> json.encodeToString(body as List<CouponResponseDto>)
                     else -> error("Unsupported response type: ${body::class.java.simpleName}")
                 },
             )
@@ -224,6 +234,41 @@ private class MockShoppingRepository {
     private val cartItems = linkedMapOf<Long, CartEntry>()
     private var nextCartItemId = 1L
 
+    private val coupons =
+        listOf(
+            FixedDiscountCouponResponseDto(
+                id = 1L,
+                code = "FIXED5000",
+                description = "5,000원 할인 쿠폰",
+                expirationDate = "2024-11-30",
+                discount = 5000,
+                minimumAmount = 100000,
+            ),
+            BuyXGetYCouponResponseDto(
+                id = 2L,
+                code = "BOGO",
+                description = "2개 구매 시 1개 무료 쿠폰",
+                expirationDate = "2024-05-30",
+                buyQuantity = 2,
+                getQuantity = 1,
+            ),
+            FreeShippingCouponResponseDto(
+                id = 3L,
+                code = "FREESHIPPING",
+                description = "5만원 이상 구매 시 무료 배송 쿠폰",
+                expirationDate = "2024-08-31",
+                minimumAmount = 50000,
+            ),
+            PercentageDiscountCouponResponseDto(
+                id = 4L,
+                code = "MIRACLESALE",
+                description = "미라클모닝 30% 할인 쿠폰",
+                expirationDate = "2024-07-31",
+                discount = 30,
+                availableTime = AvailableTimeDto(start = "04:00:00", end = "07:00:00"),
+            ),
+        )
+
     @Synchronized
     fun getProducts(
         page: Int,
@@ -295,6 +340,9 @@ private class MockShoppingRepository {
     fun order(cartItemIds: List<Long>) {
         cartItemIds.forEach(cartItems::remove)
     }
+
+    @Synchronized
+    fun getCoupons(): List<CouponResponseDto> = coupons
 
     private fun product(
         id: Long,
