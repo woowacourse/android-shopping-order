@@ -18,8 +18,6 @@ class ShoppingCartRecommendViewModel(
     private val _uiState = MutableStateFlow(ShoppingCartRecommendUiState())
     val uiState: StateFlow<ShoppingCartRecommendUiState> = _uiState.asStateFlow()
 
-    private var allShoppingItems: List<ShoppingItem> = shoppingItemRepository.shoppingItems.value
-    private var recentViewedProductIds: List<Long> = visitStore.recentVisitedProductIds.value
     private var shoppingCartItems: List<ShoppingCartItem> = emptyList()
     private var selectedCartProductIds: Set<Long> = emptySet()
     private var recommendBaseCartProductIds: Set<Long> = emptySet()
@@ -71,14 +69,12 @@ class ShoppingCartRecommendViewModel(
 
     private fun observeSources() {
         viewModelScope.launch {
-            shoppingItemRepository.shoppingItems.collect { latestShoppingItems ->
-                allShoppingItems = latestShoppingItems
+            shoppingItemRepository.shoppingItems.collect {
                 publishUiState()
             }
         }
         viewModelScope.launch {
-            visitStore.recentVisitedProductIds.collect { latestRecentViewedIds ->
-                recentViewedProductIds = latestRecentViewedIds
+            visitStore.recentVisitedProductIds.collect {
                 publishUiState()
             }
         }
@@ -89,6 +85,8 @@ class ShoppingCartRecommendViewModel(
     }
 
     private fun createUiState(currentStep: ShoppingCartStep): ShoppingCartRecommendUiState {
+        val allShoppingItems = shoppingItemRepository.shoppingItems.value
+        val recentViewedProductIds = visitStore.recentVisitedProductIds.value
         val shoppingItemByProductId =
             allShoppingItems.associateBy { shoppingItem -> shoppingItem.getProductId() }
         val mostRecentViewedProductId = recentViewedProductIds.firstOrNull()
