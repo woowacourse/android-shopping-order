@@ -221,12 +221,8 @@ private class MockShoppingRepository {
             product(78L, "캐치!티니핑 하츄핑 랜덤 피규어", 5000, "MD"),
         )
 
-    private val cartItems =
-        linkedMapOf(
-            1L to CartEntry(id = 1L, productId = 2L, quantity = 1),
-            2L to CartEntry(id = 2L, productId = 9L, quantity = 2),
-        )
-    private var nextCartItemId = 3L
+    private val cartItems = linkedMapOf<Long, CartEntry>()
+    private var nextCartItemId = 1L
 
     @Synchronized
     fun getProducts(
