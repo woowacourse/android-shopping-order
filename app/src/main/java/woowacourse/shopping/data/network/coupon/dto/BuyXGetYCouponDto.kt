@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-@SerialName("BUY_X_GET_Y")
+@SerialName("buyXgetY")
 data class BuyXGetYCouponDto(
     override val id: Long? = null,
     override val code: String = "",
@@ -12,5 +12,5 @@ data class BuyXGetYCouponDto(
     override val expirationDate: String,
     val buyQuantity: Int? = null,
     val getQuantity: Int? = null,
-    override val discountType: String? = "BUY_X_GET_Y"
+    override val discountType: String? = "buyXgetY"
 ) : CouponDto

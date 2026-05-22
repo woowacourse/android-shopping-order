@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-@SerialName("PERCENTAGE_DISCOUNT")
+@SerialName("percentage")
 data class PercentageDiscountCouponDto(
     override val id: Long? = null,
     override val code: String = "",
@@ -12,5 +12,5 @@ data class PercentageDiscountCouponDto(
     override val expirationDate: String,
     val discount: Int? = null,
     val availableTime: AvailableTime? = null,
-    override val discountType: String? = "PERCENTAGE_DISCOUNT"
+    override val discountType: String? = "percentage"
 ) : CouponDto

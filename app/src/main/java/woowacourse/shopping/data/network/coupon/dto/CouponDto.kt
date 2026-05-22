@@ -6,6 +6,7 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 import woowacourse.shopping.domain.coupon.BuyXGetYCoupon
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
+import woowacourse.shopping.domain.coupon.FreeShippingCoupon
 import woowacourse.shopping.domain.coupon.PercentageDiscountCoupon
 import java.time.LocalDate
 import java.time.LocalTime
@@ -50,12 +51,11 @@ fun CouponDto.toDomain(): Coupon {
             )
         )
 
-        is FreeShippingCouponDto -> FixedDiscountCoupon(
+        is FreeShippingCouponDto -> FreeShippingCoupon(
             code = code,
             description = description,
             expirationDate = LocalDate.parse(expirationDate),
             minimumAmount = minimumAmount ?: 0,
-            discount = 0
         )
     }
 }
