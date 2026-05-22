@@ -10,18 +10,18 @@
 - [ ] 기존 Activity 기반 화면 전환 로직 제거
 - [ ] `startActivity()`, `finish()`, `onRestart()` 기반 흐름 제거
 - [ ] 단일 Activity에서 `NavHost`를 사용해 화면 전환 처리
-- [ ] 상품 목록 화면을 Navigation 목적지로 등록
-- [ ] 상품 상세 화면을 Navigation 목적지로 등록
-- [ ] 장바구니 화면을 Navigation 목적지로 등록
-- [ ] 상품 추천 화면을 Navigation 목적지로 등록
+- [x] 상품 목록 화면을 Navigation 목적지로 등록
+- [x] 상품 상세 화면을 Navigation 목적지로 등록
+- [x] 장바구니 화면을 Navigation 목적지로 등록
+- [x] 상품 추천 화면을 Navigation 목적지로 등록
 
 ### Route 구성
 
-- [ ] 모든 화면 Route를 `@Serializable` 타입으로 선언
-- [ ] 상품 상세 화면 이동 시 상품 ID를 Route로 전달
-- [ ] 장바구니 화면 Route 정의
-- [ ] 상품 추천 화면 Route 정의
-- [ ] 문자열 기반 Route 사용을 최소화
+- [x] 모든 화면 Route를 `@Serializable` 타입으로 선언
+- [x] 상품 상세 화면 이동 시 상품 ID를 Route로 전달
+- [x] 장바구니 화면 Route 정의
+- [x] 상품 추천 화면 Route 정의
+- [x] 문자열 기반 Route 사용을 최소화
 
 ### 화면 이동 처리 개선
 
