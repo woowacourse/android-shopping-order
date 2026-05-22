@@ -14,6 +14,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.ui.common.component.button.PrimaryActionButton
 import woowacourse.shopping.ui.common.component.divider.SectionDivider
 import woowacourse.shopping.ui.common.component.header.NavigationHeader
+import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
 import woowacourse.shopping.ui.order.component.OrderCouponSection
 import woowacourse.shopping.ui.order.component.OrderPriceSummarySection
 import woowacourse.shopping.ui.theme.ShoppingTheme
@@ -24,6 +25,9 @@ fun OrderScreen(
     modifier: Modifier = Modifier,
     coupons: List<OrderCouponUiModel> = OrderPreviewData.coupons,
     priceSummary: OrderPriceSummaryUiModel = OrderPreviewData.priceSummary,
+    isOrdering: Boolean = false,
+    isPaymentEnabled: Boolean = true,
+    isNetworkConnected: Boolean = true,
     onCouponCheckedChange: (Long, Boolean) -> Unit = { _, _ -> },
     onPaymentClick: () -> Unit = {},
 ) {
@@ -34,32 +38,43 @@ fun OrderScreen(
             title = stringResource(R.string.order_title),
             onBackClick = onBackClick,
         )
+        if (!isNetworkConnected) {
+            NetworkStatusBanner(modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp))
+        }
         Column(
             modifier =
                 Modifier
                     .weight(1f)
                     .fillMaxWidth(),
         ) {
-            Column(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 18.dp, vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
-                OrderCouponSection(
-                    coupons = coupons,
-                    onCouponCheckedChange = onCouponCheckedChange,
-                )
+            if (coupons.isNotEmpty()) {
+                Column(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 18.dp, vertical = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                ) {
+                    OrderCouponSection(
+                        coupons = coupons,
+                        onCouponCheckedChange = onCouponCheckedChange,
+                    )
+                }
+                SectionDivider()
             }
-            SectionDivider()
             OrderPriceSummarySection(
                 summary = priceSummary,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
         PrimaryActionButton(
-            text = stringResource(R.string.order_title),
+            text =
+                if (isOrdering) {
+                    stringResource(R.string.order_processing)
+                } else {
+                    stringResource(R.string.order_title)
+                },
+            enabled = isPaymentEnabled,
             onClick = onPaymentClick,
         )
     }

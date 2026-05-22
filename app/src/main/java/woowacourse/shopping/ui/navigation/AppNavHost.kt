@@ -12,7 +12,8 @@ import woowacourse.shopping.ui.cart.CartRecommendationRouteScreen
 import woowacourse.shopping.ui.cart.CartRouteScreen
 import woowacourse.shopping.ui.cart.list.CartViewModel
 import woowacourse.shopping.ui.cart.recommendation.CartRecommendationViewModel
-import woowacourse.shopping.ui.order.OrderScreen
+import woowacourse.shopping.ui.order.OrderRouteScreen
+import woowacourse.shopping.ui.order.OrderViewModel
 import woowacourse.shopping.ui.productdetail.ProductDetailRouteScreen
 import woowacourse.shopping.ui.shopping.ShoppingRouteScreen
 
@@ -51,19 +52,33 @@ fun AppNavHost(
                     navController.getBackStackEntry(CartGraph)
                 }
                 val cartViewModel: CartViewModel = viewModel(parentEntry)
+                val orderViewModel: OrderViewModel = viewModel(parentEntry)
 
                 CartRouteScreen(
                     cartViewModel = cartViewModel,
                     onBackClick = { navController.popBackStack() },
-                    onOrderClick = {
+                    onOrderClick = { selectedCartOrder ->
+                        orderViewModel.startOrder(selectedCartOrder)
                         navController.navigate(OrderRoute)
                     },
                 )
             }
 
-            composable<OrderRoute> {
-                OrderScreen(
+            composable<OrderRoute> { backStackEntry ->
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry(CartGraph)
+                }
+                val orderViewModel: OrderViewModel = viewModel(parentEntry)
+
+                OrderRouteScreen(
+                    orderViewModel = orderViewModel,
                     onBackClick = { navController.popBackStack() },
+                    onOrderCompleted = {
+                        navController.navigate(ShoppingRoute) {
+                            popUpTo(CartGraph) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    },
                 )
             }
 

@@ -20,6 +20,7 @@
     <string name="content_description_decrease_quantity">수량 감소</string>
     <string name="content_description_increase_quantity">수량 증가</string>
     <string name="order_title">결제하기</string>
+    <string name="order_processing">주문 처리 중…</string>
     <string name="order_coupon_expiration">만료일: %1$s</string>
     <string name="order_coupon_minimum_amount">최소 주문 금액: %1$s</string>
     <string name="order_price_label_order_amount">주문 금액</string>

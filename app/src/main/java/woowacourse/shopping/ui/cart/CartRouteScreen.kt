@@ -5,10 +5,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ui.cart.list.CartScreen
 import woowacourse.shopping.ui.cart.list.CartViewModel
 
@@ -19,6 +20,7 @@ fun CartRouteScreen(
     onOrderClick: (SelectedCartOrder) -> Unit,
 ) {
     val uiState by cartViewModel.uiState.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
     LifecycleResumeEffect(Unit) {
         cartViewModel.reloadVisibleState()
@@ -32,8 +34,12 @@ fun CartRouteScreen(
             modifier = Modifier.padding(innerPadding),
             onBackClick = onBackClick,
             onOrderClick = {
-                val selectedCartOrder = cartViewModel.createSelectedCartOrder() ?: return@CartScreen
-                onOrderClick(selectedCartOrder)
+                scope.launch {
+                    cartViewModel.awaitPendingChanges()
+                    cartViewModel.reloadVisibleStateImmediately()
+                    val selectedCartOrder = cartViewModel.createSelectedCartOrder() ?: return@launch
+                    onOrderClick(selectedCartOrder)
+                }
             },
             onItemCheckedChange = cartViewModel::toggleItemSelection,
             onDeleteClick = cartViewModel::delete,

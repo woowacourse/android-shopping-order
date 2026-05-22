@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
@@ -57,6 +58,10 @@ class CartViewModel(
         if (!contentState.hasNext) return
 
         loadPage(contentState.currentPage + 1)
+    }
+
+    suspend fun awaitPendingChanges() {
+        syncJobs.values.toList().joinAll()
     }
 
     fun createSelectedCartOrder(): SelectedCartOrder? {
