@@ -115,7 +115,7 @@ class PurchaseViewModel(
     fun couponDiscount(coupon: Coupon) {
         var couponDiscountPrice = 0
         var shippingPrice = 3000
-        var totalDiscountedPrice: Int = uiState.value.originalPrice
+        var totalDiscountedPrice: Int = uiState.value.originalPrice + shippingPrice
         when (coupon) {
             is BuyXGetYCoupon -> {
                 couponDiscountPrice = coupon.discountAmount(
