@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature.purchase
 
-import coil3.util.CoilUtils.result
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -33,9 +32,9 @@ class PurchaseViewModelTest {
         )
 
         // when: 쿠폰 목록을 조회할 때
-        viewModel.getCoupons()
+        viewModel.initialLoading()
 
-        val result = viewModel.uiState.value.coupons
+        val result = viewModel.uiState.value.couponUiModels
 
         // then: 모든 쿠폰 목록이 조회된다
         assertThat(result).hasSize(allCoupons.size)
@@ -51,7 +50,6 @@ class PurchaseViewModelTest {
             couponRepository = FakeCouponRepository(allCoupons),
             cartRepository = FakeCartRepository(),
         )
-        viewModel.getCoupons()
         viewModel.initialLoading()
 
         // when: 쿠폰을 선택했을 때

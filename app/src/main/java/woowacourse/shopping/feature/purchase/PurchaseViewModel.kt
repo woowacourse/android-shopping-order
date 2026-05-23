@@ -33,7 +33,7 @@ import woowacourse.shopping.domain.coupon.PercentageCoupon
 
 data class PurchaseUiState(
     val isLoading: Boolean = false,
-    val coupons: List<Coupon> = emptyList(),
+    val couponUiModels: List<CouponUiModel> = emptyList(),
     val selectedCouponId: String? = null,
     val originalPrice: Int = 0,
     val couponDiscountPrice: Int = 0,
@@ -65,8 +65,15 @@ class PurchaseViewModel(
             val contentIds = contentIds
             cartContents = cart.cartContents.filter { contentIds.contains(it.id) }
             val originalPrice = originalPrice
+            val uiModels = getCoupons()
 
-            _uiState.update { it.copy(originalPrice = originalPrice) }
+            _uiState.update {
+                it.copy(
+                    originalPrice = originalPrice,
+                    totalDiscountedPrice = originalPrice + uiState.value.shippingPrice,
+                    couponUiModels = uiModels,
+                )
+            }
         }
     }
 
@@ -74,12 +81,9 @@ class PurchaseViewModel(
         cart = cartRepository.loadCart()
     }
 
-    fun getCoupons() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            coupons = couponRepository.getAllCoupons()
-            _uiState.update { it.copy(isLoading = false, coupons = coupons) }
-        }
+    private suspend fun getCoupons(): List<CouponUiModel> {
+        coupons = couponRepository.getAllCoupons()
+        return coupons.map { it.toUiModel() }
     }
 
     fun couponSelect(couponId: String) {
@@ -153,32 +157,32 @@ class PurchaseViewModel(
     }
 
     fun Coupon.toUiModel(): CouponUiModel = when (this) {
-        is FixedDiscountCoupon -> CouponUiModel(
+        is FixedDiscountCoupon -> CouponUiModel.FixedDiscount(
             id = id,
-            title = description,
-            validUntil = expirationDate.toString(),
-            minimumPrice = "최소 주문 금액: ${minimumPrice}원 이상",
+            description = description,
+            expirationDate = expirationDate,
+            minimumPrice = minimumPrice,
         )
 
-        is FreeShippingCoupon -> CouponUiModel(
+        is FreeShippingCoupon -> CouponUiModel.FreeShipping(
             id = id,
-            title = description,
-            validUntil = expirationDate.toString(),
-            minimumPrice = "최소 주문 금액: ${minimumPrice}원 이상",
+            description = description,
+            expirationDate = expirationDate,
+            minimumPrice = this.minimumPrice,
         )
 
-        is BuyXGetYCoupon -> CouponUiModel(
+        is BuyXGetYCoupon -> CouponUiModel.BuyXGetY(
             id = id,
-            title = description,
-            validUntil = expirationDate.toString(),
-            minimumPrice = "",
+            description = description,
+            expirationDate = expirationDate,
         )
 
-        is PercentageCoupon -> CouponUiModel(
+        is PercentageCoupon -> CouponUiModel.Percentage(
             id = id,
-            title = description,
-            validUntil = expirationDate.toString(),
-            minimumPrice = "",
+            description = description,
+            expirationDate = expirationDate,
+            startTime = this.startTime,
+            endTime = this.startTime,
         )
     }
 

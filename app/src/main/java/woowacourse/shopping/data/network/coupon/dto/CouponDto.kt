@@ -13,25 +13,25 @@ import woowacourse.shopping.domain.coupon.PercentageCoupon
 @Serializable
 data class CouponDto(
     @SerialName("availableTime")
-    val availableTime: AvailableTime,
+    val availableTime: AvailableTime? = null,
     @SerialName("buyQuantity")
-    val buyQuantity: Int,
+    val buyQuantity: Int? = null,
     @SerialName("code")
     val code: String,
     @SerialName("description")
     val description: String,
     @SerialName("discount")
-    val discount: Int,
+    val discount: Int? = null,
     @SerialName("discountType")
     val discountType: String,
     @SerialName("expirationDate")
     val expirationDate: String,
     @SerialName("getQuantity")
-    val getQuantity: Int,
+    val getQuantity: Int? = null,
     @SerialName("id")
     val id: Int,
     @SerialName("minimumAmount")
-    val minimumAmount: Int,
+    val minimumAmount: Int? = null,
 ) {
     fun toDomain(): Coupon? {
         val validUntil = LocalDate.parse(expirationDate)
@@ -40,33 +40,36 @@ data class CouponDto(
                 id = id.toString(),
                 description = description,
                 expirationDate = validUntil,
-                minimumPrice = minimumAmount,
-                discountPrice = discount,
+                minimumPrice = minimumAmount ?: 0,
+                discountPrice = discount ?: 0,
             )
 
             "buyXgetY" -> BuyXGetYCoupon(
                 id = id.toString(),
                 description = description,
                 expirationDate = validUntil,
-                buyQuantity = buyQuantity,
-                getQuantity = getQuantity,
+                buyQuantity = buyQuantity ?: 0,
+                getQuantity = getQuantity ?: 0,
             )
 
             "freeShipping" -> FreeShippingCoupon(
                 id = id.toString(),
                 description = description,
                 expirationDate = validUntil,
-                minimumPrice = minimumAmount,
+                minimumPrice = minimumAmount ?: 0,
             )
 
-            "percentage" -> PercentageCoupon(
-                id = id.toString(),
-                description = description,
-                expirationDate = validUntil,
-                discountRate = discount.toDouble(),
-                startTime = LocalTime.parse(availableTime.start),
-                endTime = LocalTime.parse(availableTime.end),
-            )
+            "percentage" -> {
+                val time = availableTime ?: return null
+                PercentageCoupon(
+                    id = id.toString(),
+                    description = description,
+                    expirationDate = validUntil,
+                    discountRate = (discount ?: 0).toDouble(),
+                    startTime = LocalTime.parse(time.start),
+                    endTime = LocalTime.parse(time.end),
+                )
+            }
 
             else -> null
         }

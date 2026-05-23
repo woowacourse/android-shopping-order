@@ -24,6 +24,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,10 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import java.time.format.DateTimeFormatter
 import woowacourse.shopping.constants.MockData
-import woowacourse.shopping.domain.coupon.BuyXGetYCoupon
-import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
-import woowacourse.shopping.domain.coupon.FreeShippingCoupon
-import woowacourse.shopping.domain.coupon.PercentageCoupon
+import woowacourse.shopping.feature.format.DecimalPriceFormatter
 import woowacourse.shopping.feature.purchase.component.PurchaseAppBar
 
 @Composable
@@ -53,6 +51,10 @@ fun PurchaseScreen(
     viewModel: PurchaseViewModel = viewModel(factory = PurchaseViewModel.Factory),
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.initialLoading()
+    }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 //
@@ -114,7 +116,7 @@ fun PurchaseScreenContent(
                 ) {
                     items(
                         key = { it.id },
-                        items = uiState.coupons,
+                        items = uiState.couponUiModels,
                     ) {
                         Column(
                             modifier = Modifier
@@ -145,29 +147,29 @@ fun PurchaseScreenContent(
                                 color = Color(0xff555555),
                             )
                             when (it) {
-                                is BuyXGetYCoupon -> Text(
-                                    "최소 주문 금액: $it",
+
+                                is CouponUiModel.BuyXGetY -> null
+                                is CouponUiModel.FixedDiscount -> Text(
+                                    "최소 주문 금액: ${DecimalPriceFormatter().format(it.minimumPrice)}",
                                     fontWeight = FontWeight.W400,
                                     fontSize = 12.sp,
                                     color = Color(0xff555555),
                                 )
 
-                                is FixedDiscountCoupon -> Text(
+                                is CouponUiModel.FreeShipping -> Text(
                                     "최소 주문 금액: ${it.minimumPrice}",
                                     fontWeight = FontWeight.W400,
                                     fontSize = 12.sp,
                                     color = Color(0xff555555),
                                 )
 
-                                is FreeShippingCoupon -> Text(
-                                    "최소 주문 금액: ${it.minimumPrice}",
-                                    fontWeight = FontWeight.W400,
-                                    fontSize = 12.sp,
-                                    color = Color(0xff555555),
-                                )
-
-                                is PercentageCoupon -> Text(
-                                    "할인 적용 시간: $it",
+                                is CouponUiModel.Percentage -> Text(
+                                    "할인 적용 시간: ${it.startTime.format(DateTimeFormatter.ofPattern("HH:mm"))}" +
+                                        " ~ ${
+                                            it.endTime.format(
+                                                DateTimeFormatter.ofPattern("HH:mm"),
+                                            )
+                                        }",
                                     fontWeight = FontWeight.W400,
                                     fontSize = 12.sp,
                                     color = Color(0xff555555),
@@ -194,21 +196,36 @@ fun PurchaseScreenContent(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text("주문 금액", fontWeight = FontWeight.W700, fontSize = 18.sp)
-                    Text("1203원", fontWeight = FontWeight.W500, fontSize = 18.sp, color = Color(0xff333333))
+                    Text(
+                        DecimalPriceFormatter().format(uiState.originalPrice),
+                        fontWeight = FontWeight.W500,
+                        fontSize = 18.sp,
+                        color = Color(0xff333333),
+                    )
                 }
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text("쿠폰 할인 금액", fontWeight = FontWeight.W700, fontSize = 18.sp)
-                    Text("1203원", fontWeight = FontWeight.W500, fontSize = 18.sp, color = Color(0xff333333))
+                    Text(
+                        DecimalPriceFormatter().format(uiState.couponDiscountPrice),
+                        fontWeight = FontWeight.W500,
+                        fontSize = 18.sp,
+                        color = Color(0xff333333),
+                    )
                 }
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text("배송비", fontWeight = FontWeight.W700, fontSize = 18.sp)
-                    Text("1203원", fontWeight = FontWeight.W500, fontSize = 18.sp, color = Color(0xff333333))
+                    Text(
+                        DecimalPriceFormatter().format(uiState.shippingPrice),
+                        fontWeight = FontWeight.W500,
+                        fontSize = 18.sp,
+                        color = Color(0xff333333),
+                    )
                 }
             }
             HorizontalDivider(
@@ -223,7 +240,12 @@ fun PurchaseScreenContent(
                     .padding(horizontal = 18.dp),
             ) {
                 Text("총 결제 금액", fontWeight = FontWeight.W700, fontSize = 18.sp)
-                Text("1203원", fontWeight = FontWeight.W500, fontSize = 18.sp, color = Color(0xff333333))
+                Text(
+                    DecimalPriceFormatter().format(uiState.totalDiscountedPrice),
+                    fontWeight = FontWeight.W500,
+                    fontSize = 18.sp,
+                    color = Color(0xff333333),
+                )
             }
             Spacer(modifier.weight(1f))
             TextButton(
@@ -244,7 +266,7 @@ fun PurchaseScreenContent(
 private fun PurchaseScreenContentPreview() {
     PurchaseScreenContent(
         uiState = PurchaseUiState(
-            coupons = MockData.MOCK_COUPONS,
+            couponUiModels = MockData.MOCK_COUPONS,
         ),
         onCloseClick = { },
         snackbarHostState = SnackbarHostState(),

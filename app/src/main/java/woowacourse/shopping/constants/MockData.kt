@@ -4,11 +4,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import woowacourse.shopping.domain.Money
 import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.coupon.BuyXGetYCoupon
-import woowacourse.shopping.domain.coupon.Coupon
-import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
-import woowacourse.shopping.domain.coupon.FreeShippingCoupon
-import woowacourse.shopping.domain.coupon.PercentageCoupon
+import woowacourse.shopping.feature.purchase.CouponUiModel
 
 object MockData {
     private const val IMAGE_BASE_URL =
@@ -24,28 +20,25 @@ object MockData {
         )
     }
 
-    val MOCK_COUPONS: List<Coupon> = listOf(
-        FixedDiscountCoupon(
+    val MOCK_COUPONS: List<CouponUiModel> = listOf(
+        CouponUiModel.FixedDiscount(
             id = "FIXED5000",
             description = "5,000원 할인 쿠폰",
             expirationDate = LocalDate.of(2026, 11, 30),
             minimumPrice = 100_000,
-            discountPrice = 5_000,
         ),
-        BuyXGetYCoupon(
+        CouponUiModel.BuyXGetY(
             id = "BOGO",
             description = "2개 구매 시 1개 무료 쿠폰",
-            buyQuantity = 2,
-            getQuantity = 1,
             expirationDate = LocalDate.of(2026, 5, 30),
         ),
-        FreeShippingCoupon(
+        CouponUiModel.FreeShipping(
             id = "FREESHIPPING",
             description = "5만원 이상 구매 시 무료 배송 쿠폰",
             expirationDate = LocalDate.of(2026, 8, 31),
             minimumPrice = 50_000,
         ),
-        PercentageCoupon(
+        CouponUiModel.Percentage(
             id = "MIRACLESALE",
             description = "미라클모닝 30% 할인 쿠폰",
             expirationDate = LocalDate.of(2026, 7, 31),
