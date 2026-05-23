@@ -19,3 +19,8 @@ data class Recommendation(
     val totalPrice: Int,
     val checkedIds: List<Long>,
 )
+
+@Serializable
+data class Payment(
+    val checkedIds: List<Long>
+)
