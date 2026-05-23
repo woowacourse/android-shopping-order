@@ -5,9 +5,9 @@ import androidx.room.Room
 import kotlinx.coroutines.runBlocking
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.DefaultCartRepository
-import woowacourse.shopping.data.repository.DefaultOrderRepository
+import woowacourse.shopping.data.repository.DefaultPaymentRepository
 import woowacourse.shopping.data.repository.DefaultProductRepository
-import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.data.repository.PaymentRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.source.local.ShoppingDatabase
 import woowacourse.shopping.data.source.local.auth.AuthDataSource
@@ -68,8 +68,8 @@ object RepositoryProvider {
         )
     }
 
-    val orderRepository: OrderRepository by lazy {
-        DefaultOrderRepository(
+    val paymentRepository: PaymentRepository by lazy {
+        DefaultPaymentRepository(
             remoteCouponDataSource = retrofitServices.couponService,
         )
     }

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.data.repository.PaymentRepository
 import woowacourse.shopping.di.RepositoryProvider
 import woowacourse.shopping.domain.model.PaymentItems
 
@@ -21,7 +21,7 @@ data class OrderUiState(
 
 class OrderViewModel(
     private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
-    private val orderRepository: OrderRepository = RepositoryProvider.orderRepository,
+    private val paymentRepository: PaymentRepository = RepositoryProvider.paymentRepository,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<OrderUiState> = MutableStateFlow(OrderUiState())
     private val cart = cartRepository.cart
@@ -44,7 +44,7 @@ class OrderViewModel(
     init {
         viewModelScope.launch {
             cartRepository.loadCart()
-            orderRepository.getCoupons()
+            paymentRepository.getCoupons()
         }
     }
 
