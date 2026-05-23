@@ -23,7 +23,7 @@ class BuyXGetYCoupon(
 
         val target =
             cartContents
-                .filter { it.quantity > buyQuantity + getQuantity }
+                .filter { it.quantity >= buyQuantity + getQuantity }
                 .maxBy { it.product.priceAmount() }
         val highestPrice = target.product.priceAmount()
         val getMultiple = target.quantity / (buyQuantity + getQuantity)
