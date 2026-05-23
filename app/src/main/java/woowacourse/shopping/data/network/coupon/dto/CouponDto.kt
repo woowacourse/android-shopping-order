@@ -29,9 +29,16 @@ data class CouponDto(
     fun toDomain(): Coupon? {
         val validUntil = LocalDate.parse(expirationDate)
         return when (discountType) {
-            FIXED_DISCOUNT -> FixedDiscountCoupon(validUntil)
+            FIXED_DISCOUNT -> FixedDiscountCoupon(
+                validUntil = validUntil,
+                minimumPrice = minimumAmount ?: 100_000,
+                discountPrice = discount ?: 5_000,
+            )
             BOGO -> BogoCoupon(validUntil)
-            FREE_SHIPPING -> FreeShippingCoupon(validUntil)
+            FREE_SHIPPING -> FreeShippingCoupon(
+                validUntil = validUntil,
+                minimumPrice = minimumAmount ?: 50_000,
+            )
             MIRACLE_MORNING -> MiracleMorningCoupon(validUntil)
             else -> null
         }

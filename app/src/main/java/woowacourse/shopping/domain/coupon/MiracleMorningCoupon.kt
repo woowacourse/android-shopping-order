@@ -5,6 +5,7 @@ import java.time.LocalTime
 
 class MiracleMorningCoupon(
     override val validUntil: LocalDate,
+    val discountRate: Double = 0.3,
 ) : Coupon {
     override fun isApplicable(context: OrderContext): Boolean {
         if (LocalDate.now().isAfter(validUntil)) return false
@@ -15,12 +16,6 @@ class MiracleMorningCoupon(
 
     override fun discountAmount(context: OrderContext): Int {
         if (!isApplicable(context)) return 0
-        val totalPrice = context.totalPrice
-
-        return (totalPrice * DISCOUNT_RATE).toInt()
-    }
-
-    companion object {
-        const val DISCOUNT_RATE = 0.3
+        return (context.totalPrice * discountRate).toInt()
     }
 }

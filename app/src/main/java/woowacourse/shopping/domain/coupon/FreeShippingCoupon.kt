@@ -4,18 +4,13 @@ import java.time.LocalDate
 
 class FreeShippingCoupon(
     override val validUntil: LocalDate,
+    val minimumPrice: Int = 50_000,
+    val shippingFee: Int = 3_000,
 ) : Coupon {
     override fun isApplicable(context: OrderContext): Boolean {
         if (LocalDate.now().isAfter(validUntil)) return false
-        val totalPrice = context.totalPrice
-
-        return totalPrice >= FREE_SHIPPING_THRESHOLD
+        return context.totalPrice >= minimumPrice
     }
 
-    override fun discountAmount(context: OrderContext): Int = if (isApplicable(context)) return FREE_SHIPPING_FEE else return 0
-
-    companion object {
-        const val FREE_SHIPPING_THRESHOLD = 50_000
-        const val FREE_SHIPPING_FEE = 3_000
-    }
+    override fun discountAmount(context: OrderContext): Int = if (isApplicable(context)) shippingFee else 0
 }
