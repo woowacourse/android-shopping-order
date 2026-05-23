@@ -1,6 +1,8 @@
 package woowacourse.shopping
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -40,6 +42,9 @@ import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
 import woowacourse.shopping.data.repository.setting.SettingRepository
 import woowacourse.shopping.data.repository.setting.SettingRepositoryImpl
+import woowacourse.shopping.feature.notification.AlarmPaymentNotificationScheduler
+import woowacourse.shopping.feature.notification.AlarmReceiver
+import woowacourse.shopping.feature.notification.PaymentNotificationScheduler
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -56,11 +61,25 @@ class ShoppingApplication : Application() {
         private set
     lateinit var settingRepository: SettingRepository
         private set
+    lateinit var paymentNotificationScheduler: PaymentNotificationScheduler
+        private set
     private var mockServer: ShoppingMockServer? = null
 
     override fun onCreate() {
         super.onCreate()
         initDependencies()
+        createPaymentNotificationChannel()
+        paymentNotificationScheduler = AlarmPaymentNotificationScheduler(applicationContext)
+    }
+
+    private fun createPaymentNotificationChannel() {
+        val channel = NotificationChannel(
+            AlarmReceiver.CHANNEL_ID,
+            AlarmReceiver.CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_DEFAULT,
+        )
+        val manager = getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(channel)
     }
 
     override fun onTerminate() {

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.toRoute
+import java.time.LocalDateTime
 import java.time.LocalTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +31,7 @@ import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
 import woowacourse.shopping.domain.coupon.FreeShippingCoupon
 import woowacourse.shopping.domain.coupon.OrderContext
 import woowacourse.shopping.domain.coupon.PercentageCoupon
+import woowacourse.shopping.feature.notification.PaymentNotificationScheduler
 
 data class PurchaseUiState(
     val isLoading: Boolean = false,
@@ -48,6 +50,7 @@ class PurchaseViewModel(
     private val couponRepository: CouponRepository,
     private val cartRepository: CartRepository,
     private val settingRepository: SettingRepository,
+    private val paymentNotificationScheduler: PaymentNotificationScheduler,
 ) : ViewModel() {
     private var coupons: List<Coupon> = emptyList()
     private var cartContents: List<CartContent> = emptyList()
@@ -66,6 +69,8 @@ class PurchaseViewModel(
 
             cartContents = cart.cartContents.filter { contentIds.contains(it.id) }
 
+            reserveNotification()
+
             val uiModels = getCoupons()
             _uiState.update {
                 it.copy(
@@ -79,6 +84,11 @@ class PurchaseViewModel(
 
     private suspend fun reserveNotification() {
         if (settingRepository.isPaymentNotificationEnabled()) {
+            paymentNotificationScheduler.scheduleAt(
+                at = LocalDateTime.now().plusSeconds(10),
+                contentIds = contentIds,
+                totalPrice = originalPrice,
+            )
         }
     }
 
@@ -156,7 +166,6 @@ class PurchaseViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             orderRepository.orders(contentIds)
-
             _event.emit(PurchaseUiEvent.PurchaseComplete("주문이 완료되었습니다."))
         }
     }
@@ -203,6 +212,7 @@ class PurchaseViewModel(
                     couponRepository = app.couponRepository,
                     cartRepository = app.cartRepository,
                     settingRepository = app.settingRepository,
+                    paymentNotificationScheduler = app.paymentNotificationScheduler,
                 )
             }
         }

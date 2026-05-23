@@ -13,12 +13,12 @@ import woowacourse.shopping.feature.recommend.component.RecommendScreen
 import woowacourse.shopping.feature.setting.component.SettingScreen
 
 @Composable
-fun AppNavHost() {
+fun AppNavHost(startDestination: Any = ProductListRoute) {
     val navController = rememberNavController()
 
     NavHost(
         navController = navController,
-        startDestination = ProductListRoute,
+        startDestination = startDestination,
     ) {
         composable<ProductListRoute> {
             ProductListScreen(

@@ -1,7 +1,7 @@
 package woowacourse.shopping
 
 import android.Manifest
-import android.app.ProgressDialog.show
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -11,9 +11,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import kotlinx.coroutines.launch
+import woowacourse.shopping.feature.notification.AlarmReceiver
 import woowacourse.shopping.theme.AndroidshoppingTheme
 
 class MainActivity : ComponentActivity() {
@@ -23,11 +27,28 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AndroidshoppingTheme {
+                var startDestination by remember { mutableStateOf<Any>(resolveStartDestination(intent)) }
+
                 LaunchedEffect(Unit) {
                     requestNotificationPermission()
                 }
-                AppNavHost()
+                AppNavHost(startDestination = startDestination)
             }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+    }
+
+    private fun resolveStartDestination(intent: Intent): Any {
+        val contentIds = intent.getStringArrayListExtra(AlarmReceiver.EXTRA_CONTENT_IDS)
+        val totalPrice = intent.getIntExtra(AlarmReceiver.EXTRA_TOTAL_PRICE, 0)
+        return if (!contentIds.isNullOrEmpty()) {
+            PurchaseRoute(contentIds = contentIds, totalPrice = totalPrice)
+        } else {
+            ProductListRoute
         }
     }
 
@@ -53,7 +74,8 @@ class MainActivity : ComponentActivity() {
     ) { isGranted: Boolean ->
         if (isGranted) {
             Toast.makeText(applicationContext, "알림이 허용되었습니다.", Toast.LENGTH_SHORT).show()
-        } else
+        } else {
             Toast.makeText(applicationContext, "알림이 거부되었습니다.", Toast.LENGTH_SHORT).show()
+        }
     }
 }
