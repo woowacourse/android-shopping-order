@@ -87,7 +87,7 @@ fun CartRoute(
             onClose = viewModel::navigateToShopping,
             onAdd = { id, amount -> viewModel.updateAmountTrigger(id, amount) },
             onMinus = { id, amount -> viewModel.updateAmountTrigger(id, amount) },
-            onDelete = viewModel::removeWithID,
+            onDelete = viewModel::removeItemTrigger,
             isPageable = uiState.isPageable,
             previousEnable = uiState.isPrevEnable,
             nextEnable = uiState.isNextEnable,
