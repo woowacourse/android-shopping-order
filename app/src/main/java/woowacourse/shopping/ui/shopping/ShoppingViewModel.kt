@@ -7,8 +7,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
@@ -30,6 +33,9 @@ class ShoppingViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ShoppingUiState())
     val uiState: StateFlow<ShoppingUiState> = _uiState.asStateFlow()
+
+    private val _uiEvent = MutableSharedFlow<ShoppingUiEvent>()
+    val uiEvent: SharedFlow<ShoppingUiEvent> = _uiEvent.asSharedFlow()
 
     private var offset = 0
     private val pageSize = 20
@@ -58,7 +64,6 @@ class ShoppingViewModel(
         size: Int = if (offset == 0) pageSize else offset,
     ) {
         viewModelScope.launch {
-            _uiState.update { it.copy(uiInfo = it.uiInfo.copy(cartErrorMessage = null)) }
             runCatching {
                 _uiState.update {
                     it.copy(
@@ -88,7 +93,6 @@ class ShoppingViewModel(
                                 cartSize = cartItemQuantity,
                                 canLoadMore = !apiResult.isLastPage,
                             ),
-                        uiInfo = it.uiInfo.copy(cartErrorMessage = null),
                     )
                 }
             }.onSuccess {
@@ -102,9 +106,7 @@ class ShoppingViewModel(
                 }
             }.onFailure { throwable ->
                 if (throwable is IOException || throwable is HttpException) {
-                    _uiState.update {
-                        it.copy(uiInfo = it.uiInfo.copy(cartErrorMessage = "카트 업데이트 오류"))
-                    }
+                    _uiEvent.emit(ShoppingUiEvent.ShowToastMessage("카트 업데이트 오류"))
                 } else {
                     throw throwable
                 }
@@ -143,7 +145,6 @@ class ShoppingViewModel(
         if (!_uiState.value.uiInfo.isNetworkAvailable || !_uiState.value.cartSummary.canLoadMore || _uiState.value.uiInfo.isLoading) return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(uiInfo = it.uiInfo.copy(isLoading = true)) }
             try {
                 val apiResult =
                     productRepository.getProducts(page = (offset / pageSize), size = pageSize)
@@ -163,8 +164,6 @@ class ShoppingViewModel(
                 }
             } catch (_: IOException) {
                 _uiState.update { it }
-            } finally {
-                _uiState.update { it.copy(uiInfo = it.uiInfo.copy(isLoading = false)) }
             }
         }
     }
@@ -178,14 +177,24 @@ class ShoppingViewModel(
                 cartRepository.setCartItem(productId = productId, quantity = quantity)
             }.onFailure { throwable ->
                 if (throwable is IOException || throwable is HttpException) {
-                    _uiState.update {
-                        it.copy(uiInfo = it.uiInfo.copy(cartErrorMessage = "카트 아이템 오류입니다."))
-                    }
+                    _uiEvent.emit(ShoppingUiEvent.ShowToastMessage("카트 아이템 오류입니다."))
                 } else {
                     throw throwable
                 }
             }
             loadProducts()
+        }
+    }
+
+    fun onProductClick(productId: String) {
+        viewModelScope.launch {
+            _uiEvent.emit(ShoppingUiEvent.NavToDetail(productId))
+        }
+    }
+
+    fun onCartClick() {
+        viewModelScope.launch {
+            _uiEvent.emit(ShoppingUiEvent.NavToCart)
         }
     }
 

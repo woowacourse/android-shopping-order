@@ -13,7 +13,6 @@ data class ShoppingUiState(
 
 data class UiInfoState(
     val isLoading: Boolean = false,
-    val cartErrorMessage: String? = null,
     val isNetworkAvailable: Boolean = true,
 )
 
