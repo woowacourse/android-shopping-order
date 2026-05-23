@@ -3,23 +3,16 @@
 ## 🎯 기능 목록
 
 ### 환경 및 인프라 설정
-- [ ] 알림 권한(POST_NOTIFICATIONS) 처리
-  - [ ] `ContextCompat.checkSelfPermission`으로 권한 보유 여부 확인
-  - [ ] Android 13(TIRAMISU) 이상에서만 권한 요청 수행
-  - [ ] `registerForActivityResult`를 활용한 권한 요청 런처 구현
-  - [ ] `shouldShowRequestPermissionRationale` 분기로 거부 케이스 처리
-  - [ ] Android 12 이하에서는 권한 요청 없이 정상 동작
-- [ ] AlarmManager 기반 알림 스케줄링 인프라 구축
+- [x] 알림 권한(POST_NOTIFICATIONS) 처리
+  - [x] Android 13(TIRAMISU) 이상에서 `registerForActivityResult` 런처로 권한 요청
+  - [x] Android 12 이하에서는 권한 요청 없이 정상 동작
+- [ ] AlarmManager 기반 알림 스케줄링
   - [ ] 결제 화면 진입 시 5분 후 알림 예약
-  - [ ] 결제 완료 또는 결제 화면 재진입 시 예약된 알림 취소
-- [ ] BroadcastReceiver 구현 및 등록
-  - [ ] AlarmManager로부터 브로드캐스트 수신
-  - [ ] NotificationManager를 통해 알림 노출
-  - [ ] Notification 아이콘은 커스텀 리소스로 지정
-  - [ ] 권한 요청 Dialog와 Notification 본체는 기본 UI 사용
-- [ ] SharedPreferences를 통한 설정값 영속화
-  - [ ] `settings` 이름의 SharedPreferences에 알림 On/Off 값 저장
-  - [ ] 앱 재실행 시에도 저장된 설정값 유지
+  - [ ] 결제 완료 또는 결제 화면 재진입 시 예약 취소
+- [ ] BroadcastReceiver 구현
+  - [ ] 알람 수신 후 NotificationManager로 알림 노출
+  - [ ] Notification 아이콘은 커스텀 리소스 사용 (Dialog/Notification 본체는 기본 UI)
+- [ ] SharedPreferences(`settings`)로 알림 On/Off 영속화
 
 ### 도메인 로직 / 쿠폰 정책
 - [x] 쿠폰 조회 및 적용 가능 여부 판별
@@ -45,24 +38,22 @@
   - [x] (상품 총액 - 쿠폰 할인) + 배송비(기본 3,000원) 공식으로 계산
 
 ### UI / API 계층
-- [ ] 결제 화면 진입
+- [ ] 결제 화면
   - [x] 적용 가능한 쿠폰 목록 조회 및 노출
-  - [x] 쿠폰 적용 시 할인 금액 / 최종 결제 금액 실시간 반영
-  - [ ] 화면 진입 시점에 5분 알림 예약
+  - [x] 쿠폰 적용 시 할인/최종 금액 실시간 반영
+  - [ ] 진입 시점에 5분 알림 예약
 - [ ] 결제하기 동작
   - [x] 결제하기 버튼 클릭 시 즉시 최종 주문 완료 (결제 수단 화면 없음)
-  - [x] 주문 완료 후 장바구니에서 주문된 상품만 초기화
-  - [x] 사용한 쿠폰은 차감 없이 그대로 유지
-  - [x] 주문 완료 후 상품 목록 화면으로 이동
-  - [ ] 결제 완료 시 예약된 알림 취소
+  - [x] 주문된 상품만 장바구니에서 제거, 쿠폰은 그대로 유지
+  - [x] 주문 완료 후 상품 목록으로 이동
+  - [ ] 예약된 알림 취소
 - [ ] 설정 화면
-  - [x] 미결제 알림 On/Off 토글 제공
-  - [ ] 토글 변경 시 SharedPreferences에 즉시 저장
-  - [ ] 앱 재실행 후에도 마지막 설정 상태 복원
+  - [x] 미결제 알림 On/Off 토글
+  - [ ] 토글 변경 시 SharedPreferences 즉시 저장 및 재실행 시 복원
 - [ ] 미결제 알림 동작
-  - [ ] 결제 화면 진입 후 5분 내 결제하지 않으면 "아직 결제가 완료되지 않았어요" 알림 노출
-  - [ ] 알림 설정이 Off인 경우 알림이 노출되지 않음
-  - [ ] 알림 클릭 시 결제 화면으로 이동(Deep Link / PendingIntent)
+  - [ ] 5분 내 미결제 시 "아직 결제가 완료되지 않았어요" 알림 노출
+  - [ ] 알림 설정 Off면 노출되지 않음
+  - [ ] 알림 클릭 시 결제 화면으로 이동 (PendingIntent)
 
 ---
 
