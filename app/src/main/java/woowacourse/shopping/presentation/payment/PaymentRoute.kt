@@ -13,6 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import kotlinx.collections.immutable.toImmutableList
 import woowacourse.shopping.presentation.navigation.OrderItem
+import woowacourse.shopping.presentation.navigation.ShoppingScreen
 import woowacourse.shopping.presentation.payment.ui.PaymentScreen
 import woowacourse.shopping.presentation.payment.viewmodel.PaymentEvent
 import woowacourse.shopping.presentation.payment.viewmodel.PaymentViewModel
@@ -35,11 +36,18 @@ fun PaymentRoute(
     LaunchedEffect(Unit) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.uiEvents.collect { event ->
-                val toastMessage =
-                    when (event) {
-                        is PaymentEvent.ShowError -> event.message
+                when (event) {
+                    is PaymentEvent.ShowError -> {
+                        Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                     }
-                Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
+                    is PaymentEvent.OrderSuccess -> {
+                        navController.navigate(ShoppingScreen) {
+                            popUpTo(ShoppingScreen) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                        Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
     }
@@ -47,7 +55,7 @@ fun PaymentRoute(
     PaymentScreen(
         orderAmount = orderAmount,
         onBackClick = navController::popBackStack,
-        onPayClick = {},
+        onPayClick = viewModel::submitOrder,
         onSelectCoupon = viewModel::selectCoupon,
         selectedCouponId = uiState.selectedCouponId,
         coupons = uiState.availableCoupons.toImmutableList(),

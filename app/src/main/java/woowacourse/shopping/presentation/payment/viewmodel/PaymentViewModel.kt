@@ -18,6 +18,7 @@ import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.PaymentItems
 import woowacourse.shopping.domain.model.PriceModifiers
 import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.navigation.OrderItem
 import woowacourse.shopping.presentation.payment.model.PaymentUiState
@@ -27,6 +28,7 @@ import java.time.LocalDateTime
 class PaymentViewModel(
     private val productRepository: ProductRepository = RepositoryProvider.productRepository,
     private val couponRepository: CouponRepository = RepositoryProvider.couponRepository,
+    private val orderRepository: OrderRepository = RepositoryProvider.orderRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PaymentUiState())
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
@@ -84,6 +86,18 @@ class PaymentViewModel(
         }
     }
 
+    fun submitOrder() {
+        val items = paymentItems ?: return
+        val cartItemIds = items.getPaymentItems().map { it.id }
+        viewModelScope.launch {
+            runCatching { orderRepository.requestOrder(cartItemIds) }
+                .onSuccess { _uiEvents.emit(PaymentEvent.OrderSuccess("주문이 완료되었습니다!")) }
+                .onFailure {
+                    _uiEvents.emit(PaymentEvent.ShowError("주문 중 오류가 발생했습니다."))
+                }
+        }
+    }
+
     private fun calculateAmounts(
         coupon: Coupon?,
         items: PaymentItems,
@@ -132,6 +146,10 @@ class PaymentViewModel(
 
 sealed interface PaymentEvent {
     data class ShowError(
+        val message: String,
+    ) : PaymentEvent
+
+    data class OrderSuccess(
         val message: String,
     ) : PaymentEvent
 }
