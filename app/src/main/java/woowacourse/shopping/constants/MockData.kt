@@ -1,6 +1,7 @@
 package woowacourse.shopping.constants
 
 import java.time.LocalDate
+import java.time.LocalTime
 import woowacourse.shopping.domain.Money
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.coupon.BuyXGetYCoupon
@@ -48,7 +49,8 @@ object MockData {
             id = "MIRACLESALE",
             description = "미라클모닝 30% 할인 쿠폰",
             expirationDate = LocalDate.of(2026, 7, 31),
-            discountRate = 0.3,
+            startTime = LocalTime.of(4, 0),
+            endTime = LocalTime.of(7, 0),
         ),
     )
 }

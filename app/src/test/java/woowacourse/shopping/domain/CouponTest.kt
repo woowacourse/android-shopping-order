@@ -136,7 +136,11 @@ class CouponTest {
     fun `MiracleMorningCoupon은 04시 이전 그리고 07시 이후면 적용할 수 없다`() {
         // given: 시간이 03시, 08시 리스트가 주어지고 미라클모닝 30% 할인 쿠폰이 주어진다
         val price = 50_000
-        val coupon = PercentageCoupon(expirationDate = LocalDate.of(2026, 11, 30))
+        val coupon = PercentageCoupon(
+            startTime = LocalTime.of(4, 0),
+            endTime = LocalTime.of(7, 0),
+            expirationDate = LocalDate.of(2026, 11, 30),
+        )
         val times = listOf(LocalTime.of(3, 0), LocalTime.of(8, 0))
 
         // when: 할인이 가능한지 확인할 때
@@ -150,7 +154,10 @@ class CouponTest {
     fun `MiracleMorningCoupon은 04시 이후 그리고 07시 이전이면 적용할 수 있다`() {
         // given: 시간이 04시, 05:30, 07시 리스트가 주어지고 미라클모닝 30% 할인 쿠폰이 주어진다
         val price = 50_000
-        val coupon = PercentageCoupon(expirationDate = LocalDate.of(2026, 11, 30))
+        val coupon = PercentageCoupon(
+            startTime = LocalTime.of(4, 0),
+            endTime = LocalTime.of(7, 0), expirationDate = LocalDate.of(2026, 11, 30),
+        )
         val times = listOf(LocalTime.of(4, 0), LocalTime.of(5, 30), LocalTime.of(7, 0))
 
         // when: 할인이 가능한지 확인할 때
@@ -164,7 +171,10 @@ class CouponTest {
     fun `MiracleMorningCoupon은 적용 시 총 상품 금액의 30퍼센트를 할인한다`() {
         // given: 시간이 05:30으로 주어지고 미라클모닝 30% 할인 쿠폰이 주어진다
         val price = 50_000
-        val coupon = PercentageCoupon(expirationDate = LocalDate.of(2026, 11, 30))
+        val coupon = PercentageCoupon(
+            startTime = LocalTime.of(4, 0),
+            endTime = LocalTime.of(7, 0), expirationDate = LocalDate.of(2026, 11, 30),
+        )
         val time = LocalTime.of(5, 30)
 
         // when: 할인이 가능한지 확인할 때
@@ -192,7 +202,10 @@ class CouponTest {
                 expirationDate = expiredDate,
             ),
             FreeShippingCoupon(expirationDate = expiredDate),
-            PercentageCoupon(expirationDate = expiredDate),
+            PercentageCoupon(
+                startTime = LocalTime.of(4, 0),
+                endTime = LocalTime.of(7, 0), expirationDate = expiredDate,
+            ),
         )
 
         // when: 각 쿠폰의 적용 가능 여부를 확인할 때

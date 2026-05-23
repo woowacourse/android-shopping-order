@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.network.coupon.dto
 
 import java.time.LocalDate
+import java.time.LocalTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import woowacourse.shopping.domain.coupon.BuyXGetYCoupon
@@ -41,7 +42,6 @@ data class CouponDto(
                 expirationDate = validUntil,
                 minimumPrice = minimumAmount,
                 discountPrice = discount,
-
             )
 
             "buyXgetY" -> BuyXGetYCoupon(
@@ -62,7 +62,10 @@ data class CouponDto(
             "percentage" -> PercentageCoupon(
                 id = id.toString(),
                 description = description,
-                validUntil,
+                expirationDate = validUntil,
+                discountRate = discount.toDouble(),
+                startTime = LocalTime.parse(availableTime.start),
+                endTime = LocalTime.parse(availableTime.end),
             )
 
             else -> null
