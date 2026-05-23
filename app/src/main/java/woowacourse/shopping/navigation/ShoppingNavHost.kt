@@ -130,14 +130,8 @@ fun ShoppingNavHost(
 
             val uiState by productListViewModel.uiState.collectAsStateWithLifecycle()
 
-            LaunchedEffect(
-                uiState.shoppingItems.isEmpty(),
-                uiState.isLoading,
-                uiState.hasError,
-            ) {
-                if (uiState.shoppingItems.isEmpty() && !uiState.isLoading && !uiState.hasError) {
-                    productListViewModel.requestProducts(size = MAX_PRODUCT_SIZE)
-                }
+            LaunchedEffect(productListViewModel) {
+                productListViewModel.requestProducts(size = MAX_PRODUCT_SIZE)
             }
 
             LaunchedEffect(productListViewModel) {

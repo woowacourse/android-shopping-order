@@ -46,7 +46,11 @@ class ProductListViewModel(
     }
 
     fun requestProducts(size: Int) {
-        isLoading = true
+        if (isLoading) {
+            return
+        }
+        val shouldShowLoading = allShoppingItems.isEmpty()
+        isLoading = shouldShowLoading
         errorMessage = null
         publishUiState()
 

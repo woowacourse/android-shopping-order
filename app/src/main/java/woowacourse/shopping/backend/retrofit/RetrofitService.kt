@@ -1,5 +1,6 @@
 package woowacourse.shopping.backend.retrofit
 
+import android.util.Log
 import kotlinx.coroutines.CancellationException
 import okhttp3.OkHttpClient
 import retrofit2.Response
@@ -12,6 +13,7 @@ import woowacourse.shopping.backend.retrofit.api.ShoppingCartRetrofit
 import woowacourse.shopping.backend.retrofit.dto.CartQuantity
 import woowacourse.shopping.backend.retrofit.dto.CartRequest
 import woowacourse.shopping.backend.retrofit.dto.OrderInfo
+import woowacourse.shopping.backend.retrofit.dto.coupon.CouponResponse
 import woowacourse.shopping.backend.retrofit.dto.productlist.Product
 import woowacourse.shopping.backend.retrofit.dto.productlist.ProductResponse
 import woowacourse.shopping.backend.retrofit.dto.ShoppingCartResponse
@@ -63,6 +65,8 @@ class RetrofitService(
         mockRetrofit?.create(ProductRetrofit::class.java)
     private val mockShoppingCartApiService: ShoppingCartRetrofit? =
         mockRetrofit?.create(ShoppingCartRetrofit::class.java)
+    private val mockCouponApiService: CouponRetrofit? =
+        mockRetrofit?.create(CouponRetrofit::class.java)
 
     val orderApiService: OrderRetrofit =
         createOrderApiService()
@@ -71,7 +75,7 @@ class RetrofitService(
     val shoppingCartApiService: ShoppingCartRetrofit =
         createShoppingCartApiService()
     val couponApiService: CouponRetrofit =
-        remoteCouponApiService
+        createCouponApiService()
 
     private fun createProductApiService(): ProductRetrofit {
         val fallbackApi = mockProductApiService ?: return remoteProductApiService
@@ -236,6 +240,19 @@ class RetrofitService(
         }
     }
 
+    private fun createCouponApiService(): CouponRetrofit {
+        val fallbackApi = mockCouponApiService ?: return remoteCouponApiService
+
+        return object : CouponRetrofit {
+            override suspend fun getCoupons(accept: String): List<CouponResponse> =
+                callWithFallbackValue(
+                    endpoint = "GET /coupons",
+                    remoteCall = { remoteCouponApiService.getCoupons(accept = accept) },
+                    mockCall = { fallbackApi.getCoupons(accept = accept) },
+                )
+        }
+    }
+
     private suspend fun <T> callWithFallback(
         endpoint: String,
         remoteCall: suspend () -> Response<T>,
@@ -244,21 +261,49 @@ class RetrofitService(
         return try {
             val remoteResponse = remoteCall()
             if (!remoteResponse.isSuccessful) {
+                Log.w(
+                    TAG,
+                    "Remote request failed for $endpoint with HTTP ${remoteResponse.code()}, using mock fallback.",
+                )
                 mockCall()
             } else {
+                Log.d(TAG, "Remote request succeeded for $endpoint.")
                 remoteResponse
             }
         } catch (exception: CancellationException) {
             throw exception
         } catch (exception: IOException) {
+            Log.w(TAG, "Remote request failed for $endpoint with IOException, using mock fallback.", exception)
             mockCall()
         } catch (exception: Exception) {
+            Log.w(TAG, "Remote request failed for $endpoint with unexpected exception, using mock fallback.", exception)
             mockCall()
         }
     }
 
-    companion object {
+    private suspend fun <T> callWithFallbackValue(
+        endpoint: String,
+        remoteCall: suspend () -> T,
+        mockCall: suspend () -> T,
+    ): T {
+        return try {
+            remoteCall().also {
+                Log.d(TAG, "Remote request succeeded for $endpoint.")
+            }
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (exception: IOException) {
+            Log.w(TAG, "Remote request failed for $endpoint with IOException, using mock fallback.", exception)
+            mockCall()
+        } catch (exception: Exception) {
+            Log.w(TAG, "Remote request failed for $endpoint with unexpected exception, using mock fallback.", exception)
+            mockCall()
+        }
+    }
+
+    private companion object {
+        private const val TAG = "RetrofitService"
         private const val BASE_URL =
-            "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/"
+            "http://techcourse-lv2-alb-250216202.ap-northeast-2.elb.amazonaws.com/"
     }
 }

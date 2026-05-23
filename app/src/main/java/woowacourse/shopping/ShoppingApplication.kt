@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import woowacourse.shopping.backend.mock.InAppMockShoppingServer
 import woowacourse.shopping.backend.retrofit.RetrofitService
 import woowacourse.shopping.repository.AuthHeaderProvider
@@ -41,13 +41,12 @@ class ShoppingApplication : Application() {
         authHeaderProvider = AuthHeaderProvider(authDataStore)
         val mockBaseUrl = createMockBaseUrlOrNull()
         retrofitService =
-            if (mockBaseUrl != null) {
-                RetrofitService(authHeaderProvider, baseUrl = mockBaseUrl)
-            } else {
-                RetrofitService(authHeaderProvider)
-            }
+            RetrofitService(
+                authHeaderProvider = authHeaderProvider,
+                mockBaseUrl = mockBaseUrl,
+            )
 
-        applicationScope.launch {
+        runBlocking {
             authDataStore.saveAuthInfo(
                 username = "chohs4164",
                 password = "password",
