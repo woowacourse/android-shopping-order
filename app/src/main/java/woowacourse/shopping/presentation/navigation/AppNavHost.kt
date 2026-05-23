@@ -9,6 +9,7 @@ import woowacourse.shopping.presentation.cart.CartRoute
 import woowacourse.shopping.presentation.detail.DetailRoute
 import woowacourse.shopping.presentation.payment.PaymentRoute
 import woowacourse.shopping.presentation.recommend.RecommendRoute
+import woowacourse.shopping.presentation.setting.SettingRoute
 import woowacourse.shopping.presentation.shopping.ShoppingRoute
 import kotlin.reflect.typeOf
 
@@ -60,6 +61,12 @@ fun AppNavHost() {
             PaymentRoute(
                 orderItems = route.orderItems,
                 orderAmount = route.orderAmount,
+                navController = navController,
+            )
+        }
+
+        composable<SettingScreen> {
+            SettingRoute(
                 navController = navController,
             )
         }

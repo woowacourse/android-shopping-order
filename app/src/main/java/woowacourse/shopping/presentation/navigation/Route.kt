@@ -24,3 +24,6 @@ data class PaymentScreen(
     val orderItems: List<OrderItem>,
     val orderAmount: Long,
 )
+
+@Serializable
+object SettingScreen

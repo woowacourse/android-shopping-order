@@ -1,16 +1,23 @@
 package woowacourse.shopping.presentation.shopping.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +48,7 @@ private const val SKELETON_CARD_SIZE = 8
 fun ShoppingScreen(
     uiState: ShoppingUiState,
     onNavigateToCart: () -> Unit,
+    onNavigateToSetting: () -> Unit,
     onLoadMore: () -> Unit,
     onIncrease: (Long) -> Unit,
     onDecrease: (Long) -> Unit,
@@ -61,6 +69,16 @@ fun ShoppingScreen(
                         lineHeight = 24.sp,
                         modifier = Modifier.weight(1f),
                     )
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = stringResource(R.string.setting),
+                        tint = Color.White,
+                        modifier =
+                            Modifier
+                                .size(24.dp)
+                                .clickable { onNavigateToSetting() },
+                    )
+                    Spacer(modifier = Modifier.width(24.dp))
                     CartIcon(
                         quantity = uiState.totalQuantity,
                         isShowCartQuantityIcon = uiState.isShowCartQuantityIcon,
@@ -175,6 +193,7 @@ private fun ShoppingScreenPreview() {
     ShoppingScreen(
         uiState = ShoppingUiState(),
         onNavigateToCart = {},
+        onNavigateToSetting = {},
         onProductCardClick = {},
         onDecrease = {},
         onIncrease = {},

@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import woowacourse.shopping.presentation.navigation.CartScreen
 import woowacourse.shopping.presentation.navigation.DetailScreen
+import woowacourse.shopping.presentation.navigation.SettingScreen
 import woowacourse.shopping.presentation.shopping.ui.ShoppingScreen
 import woowacourse.shopping.presentation.shopping.viewmodel.ShoppingEvent
 import woowacourse.shopping.presentation.shopping.viewmodel.ShoppingViewModel
@@ -56,6 +57,7 @@ fun ShoppingRoute(
     ShoppingScreen(
         uiState = uiState,
         onNavigateToCart = { navController.navigate(CartScreen) },
+        onNavigateToSetting = { navController.navigate(SettingScreen) },
         onProductCardClick = { id -> navController.navigate(DetailScreen(productId = id)) },
         onIncrease = { viewModel.increase(it) },
         onDecrease = { viewModel.decrease(it) },
