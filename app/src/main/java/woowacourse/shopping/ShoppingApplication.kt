@@ -16,10 +16,12 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.data.datasource.auth.AuthRemoteDataSource
 import woowacourse.shopping.data.datasource.cart.CartRemoteDataSource
+import woowacourse.shopping.data.datasource.coupon.CouponRemoteDataSource
 import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
 import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
 import woowacourse.shopping.data.local.RecentProductDatabase
 import woowacourse.shopping.data.network.cart.CartService
+import woowacourse.shopping.data.network.coupon.CouponService
 import woowacourse.shopping.data.network.mock.ShoppingMockServer
 import woowacourse.shopping.data.network.order.OrderService
 import woowacourse.shopping.data.network.product.ProductService
@@ -28,6 +30,8 @@ import woowacourse.shopping.data.repository.auth.AuthRepositoryImpl
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.repository.cart.RecentProductRepositoryImpl
+import woowacourse.shopping.data.repository.coupon.CouponRepository
+import woowacourse.shopping.data.repository.coupon.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.order.OrderRepository
 import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.product.ProductRepository
@@ -44,6 +48,8 @@ class ShoppingApplication : Application() {
     lateinit var recentProductRepository: RecentProductRepository
         private set
     lateinit var orderRepository: OrderRepository
+        private set
+    lateinit var couponRepository: CouponRepository
         private set
     private var mockServer: ShoppingMockServer? = null
 
@@ -93,6 +99,7 @@ class ShoppingApplication : Application() {
         val productService = retrofit.create(ProductService::class.java)
         val cartService = retrofit.create(CartService::class.java)
         val orderService = retrofit.create(OrderService::class.java)
+        val couponService = retrofit.create(CouponService::class.java)
 
         val recentProductDatabase = Room.databaseBuilder(
             applicationContext,
@@ -113,10 +120,17 @@ class ShoppingApplication : Application() {
             orderDataSource = OrderRemoteDataSource(orderService = orderService),
         )
 
+        val coupon: CouponRepository = CouponRepositoryImpl(
+            couponDataSource = CouponRemoteDataSource(
+                couponService = couponService,
+            ),
+        )
+
         productRepository = product
         cartRepository = cart
         recentProductRepository = recent
         orderRepository = order
+        couponRepository = coupon
     }
 
     private fun issueBasicCredential(): String? {
