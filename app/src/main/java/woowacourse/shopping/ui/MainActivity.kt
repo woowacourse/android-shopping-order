@@ -76,17 +76,8 @@ class MainActivity : ComponentActivity() {
                             )
                             ProductDetailRoute(
                                 viewModel = viewModel,
-                                onClose = { navController.popBackStack() },
-                                onNavigateToProductDetail = { id ->
-                                    navController.navigate(
-                                        ProductDetail(
-                                            selectedProductId = id
-                                        )
-                                    ){
-                                        popUpTo<Shopping>()
-                                    }
-                                },
-                                modifier = Modifier.padding(innerPadding)
+                                navController = navController,
+                                modifier = Modifier.padding(innerPadding),
                             )
                         }
 
