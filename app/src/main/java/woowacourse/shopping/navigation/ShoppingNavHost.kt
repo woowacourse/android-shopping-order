@@ -15,19 +15,25 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import woowacourse.shopping.backend.retrofit.dto.OrderInfo
 import woowacourse.shopping.backend.retrofit.viewmodel.OrderViewModel
+import woowacourse.shopping.model.Order
+import woowacourse.shopping.model.OrderItem
+import woowacourse.shopping.model.Price
 import woowacourse.shopping.model.ShoppingCartItem
 import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.navigation.Route.Cart
+import woowacourse.shopping.navigation.Route.Coupon
 import woowacourse.shopping.navigation.Route.ProductDetail
 import woowacourse.shopping.navigation.Route.ProductList
-import woowacourse.shopping.ui.component.MoreButton
-import woowacourse.shopping.ui.component.PageNavigation
-import woowacourse.shopping.ui.recommend.ShoppingCartRecommendSection
+import woowacourse.shopping.ui.component.cart.PageNavigation
+import woowacourse.shopping.ui.component.cart.ShoppingCartOrderButton
+import woowacourse.shopping.ui.component.productlist.MoreButton
+import woowacourse.shopping.ui.screen.CouponScreen
 import woowacourse.shopping.ui.screen.DetailProductScreen
-import woowacourse.shopping.ui.screen.OrderButton
 import woowacourse.shopping.ui.screen.ProductListScreen
+import woowacourse.shopping.ui.screen.ShoppingCartRecommendSection
 import woowacourse.shopping.ui.screen.ShoppingCartScreen
 import woowacourse.shopping.ui.state.ShoppingCartState
+import woowacourse.shopping.ui.viewmodel.CouponViewModel
 import woowacourse.shopping.ui.viewmodel.DetailProductEvent
 import woowacourse.shopping.ui.viewmodel.DetailProductViewModel
 import woowacourse.shopping.ui.viewmodel.ProductListViewModel
@@ -36,6 +42,69 @@ import woowacourse.shopping.ui.viewmodel.ShoppingCartItemViewModel
 import woowacourse.shopping.ui.viewmodel.ShoppingCartRecommendViewModel
 import woowacourse.shopping.ui.viewmodel.ShoppingCartRecommendViewModel.ShoppingCartStep
 
+private fun navigateToCoupon(
+    navController: NavHostController,
+    couponViewModel: CouponViewModel,
+    baseSelectedCartItemIds: Set<Long>,
+    recommendedShoppingItems: List<ShoppingItem>,
+    shoppingCartItems: List<ShoppingCartItem>,
+) {
+    val orderedCartItemIds =
+        createOrderedCartItemIds(
+            baseSelectedCartItemIds = baseSelectedCartItemIds,
+            recommendedShoppingItems = recommendedShoppingItems,
+            shoppingCartItems = shoppingCartItems,
+        )
+
+    if (orderedCartItemIds.isEmpty()) return
+
+    couponViewModel.initialize(
+        order = createOrder(
+            orderedCartItemIds = orderedCartItemIds,
+            shoppingCartItems = shoppingCartItems,
+        ),
+        orderedCartItemIds = orderedCartItemIds,
+    )
+    couponViewModel.loadCoupons()
+    navController.navigate(Coupon)
+}
+
+private fun createOrderedCartItemIds(
+    baseSelectedCartItemIds: Set<Long>,
+    recommendedShoppingItems: List<ShoppingItem>,
+    shoppingCartItems: List<ShoppingCartItem>,
+): Set<Long> {
+    val recommendedCartItemIds =
+        resolveRecommendedCartItemIds(
+            recommendedShoppingItems = recommendedShoppingItems,
+            shoppingCartItems = shoppingCartItems,
+        )
+
+    return linkedSetOf<Long>().apply {
+        addAll(baseSelectedCartItemIds)
+        addAll(recommendedCartItemIds)
+    }
+}
+
+private fun createOrder(
+    orderedCartItemIds: Set<Long>,
+    shoppingCartItems: List<ShoppingCartItem>,
+): Order =
+    Order(
+        items =
+            shoppingCartItems
+                .filter { it.getId() in orderedCartItemIds }
+                .map { it.toOrderItem() },
+    )
+
+private fun ShoppingCartItem.toOrderItem(): OrderItem =
+    OrderItem(
+        productId = product.id,
+        unitPrice = Price(product.getPrice()),
+        quantity = getQuantity(),
+    )
+
+
 @Composable
 fun ShoppingNavHost(
     modifier: Modifier,
@@ -43,6 +112,12 @@ fun ShoppingNavHost(
     viewModelFactory: ViewModelProvider.Factory,
     snackbarHostState: SnackbarHostState
 ) {
+    val shoppingCartViewModel: ShoppingCartItemViewModel = viewModel(factory = viewModelFactory)
+    val shoppingCartRecommendViewModel: ShoppingCartRecommendViewModel =
+        viewModel(factory = viewModelFactory)
+    val orderViewModel: OrderViewModel = viewModel(factory = viewModelFactory)
+    val couponViewModel: CouponViewModel = viewModel(factory = viewModelFactory)
+
     NavHost(
         navController = navController,
         startDestination = ProductList,
@@ -169,13 +244,7 @@ fun ShoppingNavHost(
             }
         }
 
-        composable<Cart> { backStackEntry ->
-            val shoppingCartViewModel: ShoppingCartItemViewModel = viewModel(
-                viewModelStoreOwner = backStackEntry,
-                factory = viewModelFactory
-            )
-
-
+        composable<Cart> {
             LaunchedEffect(shoppingCartViewModel) {
                 shoppingCartViewModel.event.collect { event ->
                     when (event) {
@@ -198,15 +267,6 @@ fun ShoppingNavHost(
                 shoppingCartViewModel.requestCartItems()
             }
 
-
-            val shoppingCartRecommendViewModel: ShoppingCartRecommendViewModel = viewModel(
-                viewModelStoreOwner = backStackEntry,
-                factory = viewModelFactory
-            )
-            val orderViewModel: OrderViewModel = viewModel(
-                viewModelStoreOwner = backStackEntry,
-                factory = viewModelFactory,
-            )
             val shoppingCartItems by shoppingCartViewModel.shoppingCartItems.collectAsStateWithLifecycle()
             val selectedCartItemIds by shoppingCartViewModel.selectedCartItemIds.collectAsStateWithLifecycle()
             val selectedItemCount = selectedCartItemIds.size
@@ -280,25 +340,23 @@ fun ShoppingNavHost(
                         onBeforePageClick = shoppingCartViewModel::moveToPreviousPage,
                         onNextPageClick = shoppingCartViewModel::moveToNextPage,
                     )
-                    OrderButton(
+                    ShoppingCartOrderButton(
                         shoppingCartItems = shoppingCartItems.items,
                         selectedCartItemIds = selectedCartItemIds,
                         shoppingCartSelectItemCount = selectedItemCount,
                         onOrderButtonClick = { selectedCartItemIds ->
                             if (selectedCartItemIds.isEmpty()) {
-                                return@OrderButton
+                                return@ShoppingCartOrderButton
                             }
                             if (recommendUiState.recommendedShoppingItems.isNotEmpty()) {
                                 shoppingCartRecommendViewModel.moveToRecommend()
-                                return@OrderButton
+                                return@ShoppingCartOrderButton
                             }
-
-                            submitOrder(
-                                orderViewModel = orderViewModel,
-                                shoppingCartViewModel = shoppingCartViewModel,
-                                shoppingCartRecommendViewModel = shoppingCartRecommendViewModel,
+                            navigateToCoupon(
+                                navController = navController,
+                                couponViewModel = couponViewModel,
                                 baseSelectedCartItemIds = selectedCartItemIds.toSet(),
-                                recommendedShoppingItems = emptyList(),
+                                recommendedShoppingItems = recommendUiState.recommendedShoppingItems,
                                 shoppingCartItems = shoppingCartItems.items,
                             )
                         },
@@ -323,11 +381,10 @@ fun ShoppingNavHost(
                     totalPrice = recommendUiState.selectedCartTotalPrice + recommendUiState.selectedRecommendTotalPrice,
                     onBackClick = shoppingCartViewModel::onBackClick,
                     onOrderButtonClick = {
-                        submitOrder(
-                            orderViewModel = orderViewModel,
-                            shoppingCartViewModel = shoppingCartViewModel,
-                            shoppingCartRecommendViewModel = shoppingCartRecommendViewModel,
-                            baseSelectedCartItemIds = selectedCartItemIds,
+                        navigateToCoupon(
+                            navController = navController,
+                            couponViewModel = couponViewModel,
+                            baseSelectedCartItemIds = selectedCartItemIds.toSet(),
                             recommendedShoppingItems = recommendUiState.recommendedShoppingItems,
                             shoppingCartItems = shoppingCartItems.items,
                         )
@@ -350,6 +407,24 @@ fun ShoppingNavHost(
                 )
             }
         }
+        composable<Coupon> {
+            val uiState by couponViewModel.uiState.collectAsStateWithLifecycle()
+
+            CouponScreen(
+                uiState = uiState,
+                onBackClick = { navController.popBackStack() },
+                onCouponSelect = couponViewModel::selectCoupon,
+                onPay = {
+                    submitOrder(
+                        orderViewModel = orderViewModel,
+                        shoppingCartViewModel = shoppingCartViewModel,
+                        shoppingCartRecommendViewModel = shoppingCartRecommendViewModel,
+                        orderedCartItemIds = couponViewModel.getOrderedCartItemIds(),
+                        onSuccess = { navController.popBackStack() },
+                    )
+                },
+            )
+        }
     }
 }
 
@@ -357,28 +432,17 @@ private fun submitOrder(
     orderViewModel: OrderViewModel,
     shoppingCartViewModel: ShoppingCartItemViewModel,
     shoppingCartRecommendViewModel: ShoppingCartRecommendViewModel,
-    baseSelectedCartItemIds: Set<Long>,
-    recommendedShoppingItems: List<ShoppingItem>,
-    shoppingCartItems: List<ShoppingCartItem>,
+    orderedCartItemIds: Set<Long>,
+    onSuccess: () -> Unit = {},
 ) {
-    val recommendedCartItemIds =
-        resolveRecommendedCartItemIds(
-            recommendedShoppingItems = recommendedShoppingItems,
-            shoppingCartItems = shoppingCartItems,
-        )
-    val orderedCartItemIds = linkedSetOf<Long>().apply {
-        addAll(baseSelectedCartItemIds)
-        addAll(recommendedCartItemIds)
-    }
-    if (orderedCartItemIds.isEmpty()) {
-        return
-    }
+    if (orderedCartItemIds.isEmpty()) return
 
     orderViewModel.order(
         orderInfo = OrderInfo(cartItemIds = orderedCartItemIds.toList()),
         onSuccess = {
             shoppingCartViewModel.completeOrder(orderedCartItemIds) {
                 shoppingCartRecommendViewModel.moveToCart()
+                onSuccess()
             }
         },
     )

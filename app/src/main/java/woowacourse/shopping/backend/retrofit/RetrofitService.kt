@@ -5,6 +5,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import woowacourse.shopping.backend.retrofit.api.CouponRetrofit
 import woowacourse.shopping.backend.retrofit.api.OrderRetrofit
 import woowacourse.shopping.backend.retrofit.api.ProductRetrofit
 import woowacourse.shopping.backend.retrofit.api.ShoppingCartRetrofit
@@ -53,6 +54,8 @@ class RetrofitService(
         remoteRetrofit.create(ProductRetrofit::class.java)
     private val remoteShoppingCartApiService: ShoppingCartRetrofit =
         remoteRetrofit.create(ShoppingCartRetrofit::class.java)
+    private val remoteCouponApiService: CouponRetrofit =
+        remoteRetrofit.create(CouponRetrofit::class.java)
 
     private val mockOrderApiService: OrderRetrofit? =
         mockRetrofit?.create(OrderRetrofit::class.java)
@@ -67,6 +70,8 @@ class RetrofitService(
         createProductApiService()
     val shoppingCartApiService: ShoppingCartRetrofit =
         createShoppingCartApiService()
+    val couponApiService: CouponRetrofit =
+        remoteCouponApiService
 
     private fun createProductApiService(): ProductRetrofit {
         val fallbackApi = mockProductApiService ?: return remoteProductApiService
