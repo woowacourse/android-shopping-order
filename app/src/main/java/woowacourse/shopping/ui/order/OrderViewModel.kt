@@ -2,8 +2,9 @@ package woowacourse.shopping.ui.order
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.retrofit.dto.OrderInfo
 import woowacourse.shopping.data.remote.retrofit.toApiFailure
@@ -13,8 +14,8 @@ import woowacourse.shopping.domain.repository.OrderRepository
 class OrderViewModel(
     private val orderRepository: OrderRepository,
 ) : ViewModel() {
-    private val _event = Channel<OrderEvent>(capacity = Channel.BUFFERED)
-    val event = _event.receiveAsFlow()
+    private val _event = MutableSharedFlow<OrderEvent>(extraBufferCapacity = 1)
+    val event: SharedFlow<OrderEvent> = _event.asSharedFlow()
 
     fun order(
         orderInfo: OrderInfo,
@@ -27,10 +28,10 @@ class OrderViewModel(
                         orderInfo = orderInfo,
                     )
             }.onSuccess {
-                _event.send(OrderEvent.Success)
+                _event.emit(OrderEvent.Success)
                 onSuccess?.invoke()
             }.onFailure { throwable ->
-                _event.send(
+                _event.emit(
                     OrderEvent.Failure(
                         throwable
                             .toApiFailure()

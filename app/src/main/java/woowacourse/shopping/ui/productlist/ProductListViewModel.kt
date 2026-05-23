@@ -2,11 +2,12 @@ package woowacourse.shopping.ui.productlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.datastore.VisitStore
@@ -25,8 +26,8 @@ class ProductListViewModel(
     private val _uiState = MutableStateFlow(ProductListUiState())
     val uiState: StateFlow<ProductListUiState> = _uiState.asStateFlow()
 
-    private val _event = Channel<ProductListEvent>(capacity = Channel.BUFFERED)
-    val event = _event.receiveAsFlow()
+    private val _event = MutableSharedFlow<ProductListEvent>(extraBufferCapacity = 1)
+    val event: SharedFlow<ProductListEvent> = _event.asSharedFlow()
 
     private val productPageStateHolder = ProductPageStateHolder(initialPage = DEFAULT_PAGE)
     private var currentCategory: String? = null
@@ -124,15 +125,11 @@ class ProductListViewModel(
     }
 
     fun onProductClick(productId: Long) {
-        viewModelScope.launch {
-            _event.send(ProductListEvent.NavigateToDetailProduct(productId))
-        }
+        _event.tryEmit(ProductListEvent.NavigateToDetailProduct(productId))
     }
 
     fun onNavigateToCartClick() {
-        viewModelScope.launch {
-            _event.send(ProductListEvent.NavigateToShoppingCart)
-        }
+        _event.tryEmit(ProductListEvent.NavigateToShoppingCart)
     }
 
     private fun observeSources() {

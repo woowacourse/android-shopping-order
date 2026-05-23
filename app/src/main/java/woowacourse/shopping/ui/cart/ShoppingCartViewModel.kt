@@ -2,11 +2,12 @@ package woowacourse.shopping.ui.cart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.retrofit.toApiFailure
@@ -20,9 +21,6 @@ class ShoppingCartViewModel(
 
     private val shoppingCartPageStateHolder =
         ShoppingCartPageStateHolder(shoppingCartItems = emptyList())
-
-    private val _event = Channel<ShoppingCartEvent>(capacity = Channel.BUFFERED)
-    val event = _event.receiveAsFlow()
 
     private val _uiState = MutableStateFlow(ShoppingCartUiState())
     val uiState: StateFlow<ShoppingCartUiState> = _uiState.asStateFlow()
@@ -44,12 +42,6 @@ class ShoppingCartViewModel(
     fun moveToNextPage() {
         shoppingCartPageStateHolder.nextPage()
         refreshUiState()
-    }
-
-    fun onBackClick() {
-        viewModelScope.launch {
-            _event.send(ShoppingCartEvent.NavigateBack)
-        }
     }
 
     fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int =
@@ -221,10 +213,6 @@ class ShoppingCartViewModel(
         val canMoveToPreviousPage: Boolean = false,
         val canMoveToNextPage: Boolean = false,
     )
-
-    sealed interface ShoppingCartEvent {
-        data object NavigateBack : ShoppingCartEvent
-    }
 
     private companion object {
         private const val INITIAL_PAGE = 0
