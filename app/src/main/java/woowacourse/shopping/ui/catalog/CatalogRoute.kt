@@ -1,0 +1,91 @@
+package woowacourse.shopping.ui.catalog
+
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
+import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.ui.navigation.ShoppingRoute
+
+fun NavGraphBuilder.catalogRoute(
+    shoppingApplication: ShoppingApplication,
+    contentPadding: PaddingValues,
+    onProductClick: (selectedProductId: Long, lastViewedProductId: Long?) -> Unit,
+    onCartClick: () -> Unit,
+) {
+    composable<ShoppingRoute.Catalog> {
+        catalogRouteContent(
+            shoppingApplication = shoppingApplication,
+            contentPadding = contentPadding,
+            onProductClick = onProductClick,
+            onCartClick = onCartClick,
+        )
+    }
+}
+
+@Composable
+private fun catalogRouteContent(
+    shoppingApplication: ShoppingApplication,
+    contentPadding: PaddingValues,
+    onProductClick: (selectedProductId: Long, lastViewedProductId: Long?) -> Unit,
+    onCartClick: () -> Unit,
+) {
+    val viewModel =
+        viewModel<ShoppingViewModel>(
+            factory =
+                ShoppingViewModelFactory(
+                    shoppingApplication.cartRepository,
+                    shoppingApplication.recentlyViewedProductRepository,
+                    shoppingApplication.productRepository,
+                ),
+        )
+
+    LifecycleEventEffect(Lifecycle.Event.ON_START) {
+        viewModel.fetchCart()
+    }
+
+    val cartState by viewModel.cart.collectAsStateWithLifecycle()
+    val viewHistory by viewModel.recentlyViewedProducts.collectAsStateWithLifecycle()
+    val currentProducts by viewModel.products.collectAsStateWithLifecycle()
+    val lastViewedProductId by viewModel.lastViewProductId.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+
+    CatalogScreen(
+        catalog = currentProducts,
+        recentlyViewedProducts = viewHistory,
+        onRecentlyViewedClick = { product ->
+            viewModel.updateHistory(product)
+            onProductClick(product.id, lastViewedProductId)
+        },
+        onItemClick = { product ->
+            viewModel.updateHistory(product)
+            onProductClick(product.id, lastViewedProductId)
+        },
+        onCartClick = onCartClick,
+        onLoadClick = {
+            viewModel.loadMore()
+        },
+        modifier = Modifier.padding(contentPadding),
+        onAdd = { id, updateAmount ->
+            viewModel.updateCountWithID(id, updateAmount)
+        },
+        onMinus = { id, updateAmount ->
+            viewModel.updateCountWithID(id, updateAmount)
+        },
+        onDelete = { viewModel.removeWithID(it) },
+        onAddInCart = { viewModel.addToCart(it) },
+        isContainedInCart = { cartState.isContain(it) },
+        specificProductCount = {
+            cartState.totalCountOfSpecificPurchaseProduct(it)
+        },
+        totalCount = cartState.totalCount(),
+        isLoading = isLoading,
+    )
+}
