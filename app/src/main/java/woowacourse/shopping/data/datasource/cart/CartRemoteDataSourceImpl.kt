@@ -18,7 +18,7 @@ class CartRemoteDataSourceImpl(
         size: Int,
     ): CartResponseDto = cartApi.getCartItems(page, size)
 
-    override suspend fun getCartItemsCount(): Int = cartApi.getCartItemsCount()
+    override suspend fun getCartItemsCount(): Int = cartApi.getCartItemsCount().quantity
 
     override suspend fun addCartItem(
         productId: Int,

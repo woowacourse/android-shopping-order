@@ -8,6 +8,7 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import woowacourse.shopping.data.remote.dto.CartItemCountResponseDto
 import woowacourse.shopping.data.remote.dto.CartResponseDto
 import woowacourse.shopping.domain.model.cart.Quantity
 
@@ -19,7 +20,7 @@ interface CartApi {
     ): CartResponseDto
 
     @GET("cart-items/counts")
-    suspend fun getCartItemsCount(): Int
+    suspend fun getCartItemsCount(): CartItemCountResponseDto
 
     @POST("cart-items")
     suspend fun addCartItem(
