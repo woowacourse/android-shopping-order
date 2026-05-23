@@ -12,14 +12,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,7 +38,6 @@ fun PurchaseScreen(
     modifier: Modifier = Modifier,
     viewModel: PurchaseViewModel = viewModel(factory = PurchaseViewModel.Factory),
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.initialLoading()
@@ -55,22 +51,9 @@ fun PurchaseScreen(
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-//
-//    ErrorDialog(
-//        error = uiState.error,
-//        onDismiss = {
-//            viewModel.dismissError()
-//            activityFinish()
-//        },
-//        onRetry = {
-//            viewModel.dismissError()
-//            viewModel.initialLoading()
-//        },
-//    )
 
     PurchaseScreenContent(
         uiState = uiState,
-        snackbarHostState = snackbarHostState,
         selectedCouponId = uiState.selectedCouponId,
         onCheckClick = viewModel::couponSelect,
         onCloseClick = activityFinish,
@@ -86,11 +69,9 @@ fun PurchaseScreenContent(
     onCheckClick: (String) -> Unit,
     onCloseClick: () -> Unit,
     onPurchaseClick: () -> Unit,
-    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = Color.White,
         modifier = modifier
             .fillMaxSize(),
@@ -186,7 +167,6 @@ private fun PurchaseScreenContentPreview() {
             couponUiModels = MockData.MOCK_COUPONS,
         ),
         onCloseClick = { },
-        snackbarHostState = SnackbarHostState(),
         selectedCouponId = "1",
         onCheckClick = { },
         onPurchaseClick = {},
