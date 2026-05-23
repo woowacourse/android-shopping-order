@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import woowacourse.shopping.feature.MainDispatcherExtension
 import woowacourse.shopping.feature.fake.FakeCartRepository
-import woowacourse.shopping.feature.fake.FakeOrderRepository
 import woowacourse.shopping.feature.fake.FakeProductRepository
 import woowacourse.shopping.feature.fake.FakeRecentProductRepository
 import woowacourse.shopping.fixture.TestCartContentFixture
@@ -26,8 +25,8 @@ class RecommendViewModelTest {
         viewModel = RecommendViewModel(
             productRepository = FakeProductRepository(initial = TestProductFixture.products(5)),
             cartRepository = FakeCartRepository(productCatalog = beverageProducts + clothesProducts),
-            orderRepository = FakeOrderRepository(),
             recentProductRepository = FakeRecentProductRepository(),
+
         )
 
         // when:  initialLoading 을 호출할 때
@@ -45,7 +44,6 @@ class RecommendViewModelTest {
                 initial = beverageProducts + clothesProducts,
             ),
             cartRepository = FakeCartRepository(productCatalog = beverageProducts + clothesProducts),
-            orderRepository = FakeOrderRepository(),
             recentProductRepository = FakeRecentProductRepository(initial = listOf(clothesProducts.first().id)),
         )
 
@@ -65,7 +63,6 @@ class RecommendViewModelTest {
                 initial = beverageProducts + clothesProducts,
             ),
             cartRepository = FakeCartRepository(productCatalog = beverageProducts + clothesProducts),
-            orderRepository = FakeOrderRepository(),
             recentProductRepository = FakeRecentProductRepository(initial = listOf(clothesProducts.first().id)),
         )
         // when:  초기 로딩을 호출할 때
@@ -84,7 +81,6 @@ class RecommendViewModelTest {
                 initial = beverageProducts.take(5),
             ),
             cartRepository = FakeCartRepository(productCatalog = beverageProducts.take(5)),
-            orderRepository = FakeOrderRepository(),
             recentProductRepository = FakeRecentProductRepository(initial = listOf(beverageProducts.first().id)),
         )
         // when: 초기 로딩을 호출할 때
@@ -106,7 +102,6 @@ class RecommendViewModelTest {
                 initial = TestCartContentFixture.cartContentsOf(beverageProducts.take(2)),
                 productCatalog = beverageProducts,
             ),
-            orderRepository = FakeOrderRepository(),
             recentProductRepository = FakeRecentProductRepository(initial = listOf(beverageProducts.first().id)),
         )
         // when:  초기 로딩을 호출할 때
@@ -132,7 +127,6 @@ class RecommendViewModelTest {
                 initial = beverageProducts,
             ),
             cartRepository = cartRepo,
-            orderRepository = FakeOrderRepository(),
             recentProductRepository = FakeRecentProductRepository(initial = listOf(beverageProducts.first().id)),
         )
         viewModel.initialLoading()
