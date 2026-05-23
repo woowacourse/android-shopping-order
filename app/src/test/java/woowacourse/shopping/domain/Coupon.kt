@@ -3,31 +3,11 @@ package woowacourse.shopping.domain
 import java.time.LocalDate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.domain.coupon.Coupon
+import woowacourse.shopping.domain.coupon.BogoCoupon
 import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
 import woowacourse.shopping.domain.coupon.OrderContext
 import woowacourse.shopping.fixture.TestCartContentFixture
 import woowacourse.shopping.fixture.TestProductFixture
-
-class BogoCoupon(
-    override val validUntil: LocalDate,
-) : Coupon {
-    override fun isApplicable(context: OrderContext): Boolean {
-        val cartContents = context.items
-
-        return cartContents.any { it.quantity >= 3 }
-    }
-
-    override fun discountAmount(context: OrderContext): Int {
-        val cartContents = context.items
-
-        val productPrices =
-            cartContents.mapNotNull { if (it.quantity >= 3) it.product.priceAmount() else null }
-
-        val highestDiscountPrice = productPrices.max()
-        return highestDiscountPrice
-    }
-}
 
 class CouponTest {
     @Test
