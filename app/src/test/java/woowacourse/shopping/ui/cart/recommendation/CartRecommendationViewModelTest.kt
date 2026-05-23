@@ -42,8 +42,8 @@ class CartRecommendationViewModelTest {
     private lateinit var recentProductRepository: FakeRecentProductRepository
     private lateinit var viewModel: CartRecommendationViewModel
 
-    private val orderedProduct = ProductRepositoryFixture.products[0] // ID: 1, Category: dessert
-    private val recommendedProduct = ProductRepositoryFixture.products[1] // ID: 2, Category: fruit
+    private val orderedProduct = ProductRepositoryFixture.products[0]
+    private val recommendedProduct = ProductRepositoryFixture.products[1]
 
     @BeforeEach
     fun setUp() {
@@ -95,10 +95,8 @@ class CartRecommendationViewModelTest {
             viewModel.applyRecommendations()
             advanceUntilIdle()
 
-            // 주문은 생성되지 않아야 함
             assertTrue(cartRepository.createdOrders.isEmpty())
 
-            // 장바구니에 추천 상품이 추가되어 있어야 함
             val cartItems =
                 cartRepository
                     .getCartItemsByProductIds(setOf(recommendedProduct.id))
