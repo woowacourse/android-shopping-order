@@ -55,7 +55,7 @@
 
 #### 알림
 - [x] AlarmManager를 사용해 결제 화면 진입 시 5분 후 알림을 예약한다.
-- [ ] 결제 완료 또는 결제 화면 재진입 시 AlarmManager로 예약된 알림을 취소한다.
+- [x] 결제 완료 또는 결제 화면 재진입 시 AlarmManager로 예약된 알림을 취소한다.
 - [x] BroadcastReceiver를 구현해 알람을 수신하고 NotificationManager로 알림을 노출한다.
 - [x] 알림 권한(POST_NOTIFICATIONS)을 요청한다.
 - [x] 알림 권한 Dialog 및 Notification은 기본 UI를 그대로 사용한다.

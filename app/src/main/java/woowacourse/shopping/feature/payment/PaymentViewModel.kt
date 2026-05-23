@@ -239,6 +239,7 @@ class PaymentViewModel(
                 cartContentIds.forEach {
                     cartRepository.remove(it)
                 }
+                cancelPaymentAlarm()
                 _paymentEvent.emit(PaymentEvent.Success("주문이 완료되었습니다."))
             } catch (e: Exception) {
                 _paymentEvent.emit(PaymentEvent.Failed("주문에 실패하였습니다. ${e.message}"))
