@@ -6,16 +6,16 @@
 
 #### Navigation
 
-- [ ] NavHost 기반 화면 전환으로 변경
-- [ ] Route를 @Serializable 타입으로 선언
-- [ ] 주문 완료 후 Back Stack 정리
-- [ ] NavController 직접 전달 없이 콜백으로 이동 처리
+- [x] NavHost 기반 화면 전환으로 변경
+- [x] Route를 @Serializable 타입으로 선언
+- [x] 주문 완료 후 Back Stack 정리
+- [x] NavController 직접 전달 없이 콜백으로 이동 처리
 
 #### Flow
 
-- [ ] 화면 상태를 StateFlow로 통합
-- [ ] 일회성 이벤트를 SharedFlow로 처리
-- [ ] collectAsStateWithLifecycle() 적용
+- [x] 화면 상태를 StateFlow로 통합
+- [x] 일회성 이벤트를 SharedFlow로 처리
+- [x] collectAsStateWithLifecycle() 적용
 
 ---
 
