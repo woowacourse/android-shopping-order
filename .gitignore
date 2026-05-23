@@ -39,3 +39,4 @@ google-services.json
 .DS_Store
 
 .env
+app/src/main/res/xml/network_security_config.xml
