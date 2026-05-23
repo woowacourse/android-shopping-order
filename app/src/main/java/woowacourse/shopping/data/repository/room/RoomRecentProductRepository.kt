@@ -2,8 +2,8 @@ package woowacourse.shopping.data.repository.room
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
-import woowacourse.shopping.data.local.dao.RecentProductDao
-import woowacourse.shopping.data.local.entity.RecentProductEntity
+import woowacourse.shopping.data.local.room.dao.RecentProductDao
+import woowacourse.shopping.data.local.room.entity.RecentProductEntity
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.model.product.Product

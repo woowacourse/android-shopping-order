@@ -2,7 +2,7 @@ package woowacourse.shopping.di
 
 import android.content.Context
 import androidx.room.Room
-import woowacourse.shopping.data.local.Database
+import woowacourse.shopping.data.local.room.Database
 import woowacourse.shopping.data.remote.NetworkMonitor
 import woowacourse.shopping.data.remote.RetrofitClient
 import woowacourse.shopping.data.repository.CartRepository

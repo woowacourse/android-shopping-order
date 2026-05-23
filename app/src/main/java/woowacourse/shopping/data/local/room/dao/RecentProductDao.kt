@@ -1,11 +1,11 @@
-package woowacourse.shopping.data.local.dao
+package woowacourse.shopping.data.local.room.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
-import woowacourse.shopping.data.local.entity.RecentProductEntity
+import woowacourse.shopping.data.local.room.entity.RecentProductEntity
 
 @Dao
 interface RecentProductDao {
