@@ -15,12 +15,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.repository.cart.CartRepository
-import woowacourse.shopping.data.repository.order.OrderRepository
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartContent
-import woowacourse.shopping.domain.OrderResult
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.ProductNotFoundException
 import woowacourse.shopping.feature.common.state.AppError
@@ -30,14 +28,12 @@ import woowacourse.shopping.feature.common.state.toAppError
 data class RecommendUiState(
     val recommendList: List<ProductUiModel> = emptyList(),
     val isLoading: Boolean = true,
-    val dialog: OrderDialogUiState = OrderDialogUiState.None,
     val error: AppError? = null,
 )
 
 class RecommendViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
-    private val orderRepository: OrderRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RecommendUiState())
@@ -171,23 +167,13 @@ class RecommendViewModel(
             }
             val allContentIds = cartContentIds + latestContents.map { it.id }
 
-            val result = orderRepository.orders(cartItemIds = allContentIds)
-            when (result) {
-                OrderResult.Success -> _event.emit(
-                    RecommendEvent.NavigateToPurchase(
-                        contentIds = allContentIds,
-                        totalPrice = totalPrice,
-                    ),
-                )
-                OrderResult.AuthExpired -> _uiState.update { it.copy(dialog = OrderDialogUiState.AuthExpired) }
-                OrderResult.ServerError -> _uiState.update { it.copy(dialog = OrderDialogUiState.ServerError) }
-                OrderResult.NetworkError -> _uiState.update { it.copy(dialog = OrderDialogUiState.NetworkError) }
-            }
+            _event.emit(
+                RecommendEvent.NavigateToPurchase(
+                    contentIds = allContentIds,
+                    totalPrice = totalPrice,
+                ),
+            )
         }
-    }
-
-    fun dismissDialog() {
-        _uiState.update { it.copy(dialog = OrderDialogUiState.None) }
     }
 
     private suspend fun refreshRecentProducts(): String? {
@@ -207,7 +193,6 @@ class RecommendViewModel(
                 RecommendViewModel(
                     app.productRepository,
                     app.cartRepository,
-                    app.orderRepository,
                     app.recentProductRepository,
                 )
             }

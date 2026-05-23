@@ -73,6 +73,8 @@ fun PurchaseScreen(
     PurchaseScreenContent(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
+        selectedCouponId = uiState.selectedCouponId,
+        onCheckClick = viewModel::couponSelect,
         onCloseClick = activityFinish,
         modifier = modifier,
 
@@ -82,6 +84,8 @@ fun PurchaseScreen(
 @Composable
 fun PurchaseScreenContent(
     uiState: PurchaseUiState,
+    selectedCouponId: String?,
+    onCheckClick: (String) -> Unit,
     onCloseClick: () -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
@@ -127,9 +131,9 @@ fun PurchaseScreenContent(
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Checkbox(
-                                    checked = false,
-                                    onCheckedChange = {
-                                        //                                    onTotalCheck()
+                                    checked = it.id == selectedCouponId,
+                                    onCheckedChange = { _ ->
+                                        onCheckClick(it.id)
                                     },
                                     colors = CheckboxDefaults.colors().copy(
                                         checkedBoxColor = Color(0xFF04C09E),
@@ -270,5 +274,7 @@ private fun PurchaseScreenContentPreview() {
         ),
         onCloseClick = { },
         snackbarHostState = SnackbarHostState(),
+        selectedCouponId = "1",
+        onCheckClick = { },
     )
 }

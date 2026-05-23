@@ -119,15 +119,6 @@ fun RecommendScreen(
         }
     }
 
-    OrderResultDialog(
-        state = uiState.dialog,
-        onDismiss = viewModel::dismissDialog,
-        onRetry = {
-            viewModel.dismissDialog()
-            viewModel.order(contentIds)
-        },
-    )
-
     ErrorDialog(
         error = uiState.error,
         onDismiss = {
