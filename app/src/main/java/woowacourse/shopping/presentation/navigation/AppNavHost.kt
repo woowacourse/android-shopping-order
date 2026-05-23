@@ -24,7 +24,7 @@ import woowacourse.shopping.presentation.shopping.ShoppingRoute
 import kotlin.reflect.typeOf
 
 @Composable
-fun AppNavHost() {
+fun AppNavHost(startDestinationFromNotification: Any? = null) {
     val navController = rememberNavController()
     val settingRepository = remember { RepositoryProvider.settingRepository }
     val context = LocalContext.current
@@ -35,6 +35,13 @@ fun AppNavHost() {
         ) { isGranted ->
             settingRepository.setPaymentPendingNotificationEnabled(isGranted)
         }
+
+    LaunchedEffect(startDestinationFromNotification) {
+        if (startDestinationFromNotification != null) {
+            navController.navigate(startDestinationFromNotification)
+        }
+    }
+
     LaunchedEffect(Unit) {
         if (!settingRepository.hasAskedNotificationPermission()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

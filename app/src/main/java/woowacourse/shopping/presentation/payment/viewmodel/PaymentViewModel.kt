@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import woowacourse.shopping.di.RepositoryProvider
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Coupon
@@ -45,9 +46,6 @@ class PaymentViewModel(
 
     fun onScreenEntered(orderItems: List<OrderItem>) {
         notificationScheduler.cancel()
-        if (settingRepository.isPaymentPendingNotificationEnabled()) {
-            notificationScheduler.schedule()
-        }
         loadAvailableCoupons(orderItems)
     }
 
@@ -105,6 +103,11 @@ class PaymentViewModel(
                         totalAmount = orderAmount + DEFAULT_DELIVERY_FEE,
                         selectedCouponId = null,
                     )
+                }
+
+                if (settingRepository.isPaymentPendingNotificationEnabled()) {
+                    val orderItemsJson = Json.encodeToString(orderItems)
+                    notificationScheduler.schedule(orderItemsJson, orderAmount)
                 }
             }.onFailure {
                 _uiEvents.emit(PaymentEvent.ShowError("쿠폰을 불러오지 못했습니다."))

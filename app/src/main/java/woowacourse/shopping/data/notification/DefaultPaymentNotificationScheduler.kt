@@ -15,17 +15,27 @@ class DefaultPaymentNotificationScheduler(
         context.getSystemService<AlarmManager>()
             ?: error("오류가 발생했습니다.")
 
-    override fun schedule() {
+    override fun schedule(
+        orderItemsJson: String,
+        orderAmount: Long,
+    ) {
         val triggerAt = System.currentTimeMillis() + DELAY_MS
-        alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent())
+        alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent(orderItemsJson, orderAmount))
     }
 
     override fun cancel() {
-        alarmManager.cancel(pendingIntent())
+        alarmManager.cancel(pendingIntent("", 0L))
     }
 
-    private fun pendingIntent(): PendingIntent {
-        val intent = Intent(context, PaymentNotificationReceiver::class.java)
+    private fun pendingIntent(
+        orderItemJson: String,
+        orderAmount: Long,
+    ): PendingIntent {
+        val intent =
+            Intent(context, PaymentNotificationReceiver::class.java).apply {
+                putExtra(EXTRA_ORDER_ITEMS_JSON, orderItemJson)
+                putExtra(EXTRA_ORDER_AMOUNT, orderAmount)
+            }
         return PendingIntent.getBroadcast(
             context,
             REQUEST_CODE,
@@ -35,7 +45,9 @@ class DefaultPaymentNotificationScheduler(
     }
 
     companion object {
-        private const val DELAY_MS = 5 * 60 * 1000L
+        private const val DELAY_MS = 5 * 1000L
         private const val REQUEST_CODE = 2001
+        private const val EXTRA_ORDER_ITEMS_JSON = "extra_order_items_json"
+        private const val EXTRA_ORDER_AMOUNT = "extra_order_amount"
     }
 }
