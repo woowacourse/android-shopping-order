@@ -1,0 +1,74 @@
+package woowacourse.shopping.data.remote.server.dto.coupon.item
+
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+import woowacourse.shopping.domain.coupon.BuyXGetYCoupon
+import woowacourse.shopping.domain.coupon.Coupon
+import woowacourse.shopping.domain.coupon.FixedCoupon
+import woowacourse.shopping.domain.coupon.FreeShippingCoupon
+import woowacourse.shopping.domain.coupon.PercentCoupon
+import java.time.LocalDate
+import java.time.LocalTime
+
+@Serializable
+data class CouponResultItem(
+    @SerialName("availableTime")
+    val availableTime: AvailableTime,
+    @SerialName("buyQuantity")
+    val buyQuantity: Int,
+    @SerialName("code")
+    val code: String,
+    @SerialName("description")
+    val description: String,
+    @SerialName("discount")
+    val discount: Int,
+    @SerialName("discountType")
+    val discountType: String,
+    @SerialName("expirationDate")
+    val expirationDate: String,
+    @SerialName("getQuantity")
+    val getQuantity: Int,
+    @SerialName("id")
+    val id: Long,
+    @SerialName("minimumAmount")
+    val minimumAmount: Int
+)
+
+fun CouponResultItem.toDomain(): Coupon {
+    val expiryDate = LocalDate.parse(expirationDate)
+    val startTime = LocalTime.parse(availableTime.start)
+    val endTime = LocalTime.parse(availableTime.end)
+    return when (discountType) {
+        "fixed" -> FixedCoupon(
+            code = code,
+            expirationDate = expiryDate,
+            discountAmount = discount,
+            minOrderCost = minimumAmount,
+            description = description
+        )
+        "buyXgetY" -> BuyXGetYCoupon(
+            code = code,
+            description = description,
+            expirationDate = expiryDate,
+            buyQuantity = buyQuantity,
+            getQuantity = getQuantity
+        )
+        "freeShipping" -> FreeShippingCoupon(
+            code = code,
+            description = description,
+            expirationDate = expiryDate,
+            minimumAmount = minimumAmount,
+        )
+        "percentage" -> PercentCoupon(
+            code = code,
+            description = description,
+            expirationDate = expiryDate,
+            discountPercent = discount/100L,
+            startTime = startTime,
+            endTime = endTime
+        )
+        else -> throw IllegalArgumentException("Unknown discount type: $discountType")
+    }
+}

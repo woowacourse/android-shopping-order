@@ -31,7 +31,7 @@
   - [x] 쿠폰 Repository 정의
   - [x] 쿠폰 api 호출 함수 정의
     - [x] ApiResult를 통한 예외처리 적용
-  - [ ] 쿠폰 DTO 정의
+  - [x] 쿠폰 DTO 정의
 
 - [ ] 주문
   - [x] 주문 Api 호출 정의
