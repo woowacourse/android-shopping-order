@@ -67,7 +67,7 @@ fun ProductList(
                     isLoading = isLoading,
                     imageUrl = it.imageUrl,
                     name = it.name,
-                    price = it.formattedPrice(it.quantity),
+                    price = it.formattedPrice(1),
                     quantity = it.quantity,
                     onIncrease = { onIncrease(it.id) },
                     onDecrease = { onDecrease(it.id) },

@@ -9,9 +9,3 @@ class DecimalPriceFormatter(
 
     override fun format(price: Int) = "${format.format(price)}$suffix"
 }
-
-// class DecimalPriceFormatter(val format: Format, val suffix: String) : Formatter(format) {
-//    override fun apply(price: Int): String {
-//        return "${format.format(price)}$suffix"
-//    }
-// }
