@@ -28,6 +28,6 @@ fun CartUiState.toUiState(
         totalPrice = selection.totalPrice(cartItems).amount,
         isAllChecked = selection.isAllSelected(cartItems),
         selectedCartItems = selection.ids,
-        selectedCartItemCount = selection.selectedCount,
+        selectedCartItemCount = selection.selectedCount(cartItems),
     )
 }

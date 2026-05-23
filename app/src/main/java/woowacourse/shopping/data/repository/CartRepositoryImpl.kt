@@ -1,8 +1,12 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import woowacourse.shopping.data.remote.api.CartApi
 import woowacourse.shopping.data.remote.dto.request.AddCartRequestBody
 import woowacourse.shopping.data.remote.dto.request.UpdateCartRequestBody
@@ -19,8 +23,12 @@ class CartRepositoryImpl(
     private val _cartItems = MutableStateFlow<List<CartItem>>(emptyList())
     override val cartItems: StateFlow<List<CartItem>> = _cartItems.asStateFlow()
 
+    private val _selectedCartItemIds = MutableStateFlow<ImmutableList<String>>(persistentListOf())
+    override val selectedCartItemIds: StateFlow<ImmutableList<String>> = _selectedCartItemIds.asStateFlow()
+
     override suspend fun refreshCartItems() {
         _cartItems.value = getAllRemoteCartItems()
+        syncSelectedCartItems()
     }
 
     override suspend fun getCartItemQuantity(productId: String): Int? = getCartItem(productId)?.quantity
@@ -46,6 +54,40 @@ class CartRepositoryImpl(
         refreshCartItems()
     }
 
+    override fun toggleCartItemSelection(cartItemId: String) {
+        _selectedCartItemIds.update { selectedItemsId ->
+            if (cartItemId in selectedItemsId) {
+                (selectedItemsId - cartItemId).toImmutableList()
+            } else {
+                (selectedItemsId + cartItemId).toImmutableList()
+            }
+        }
+    }
+
+    override fun selectCartItem(cartItemId: String) {
+        _selectedCartItemIds.update { selectedItemsId ->
+            if (cartItemId in selectedItemsId) {
+                selectedItemsId
+            } else {
+                (selectedItemsId + cartItemId).toImmutableList()
+            }
+        }
+    }
+
+    override fun unselectCartItem(cartItemId: String) {
+        _selectedCartItemIds.update { selectedItemsId ->
+            (selectedItemsId - cartItemId).toImmutableList()
+        }
+    }
+
+    override fun selectAllCartItems() {
+        _selectedCartItemIds.value = cartItems.value.map { it.id }.toImmutableList()
+    }
+
+    override fun clearCartItemSelection() {
+        _selectedCartItemIds.value = persistentListOf()
+    }
+
     private suspend fun getAllRemoteCartItems(): List<CartItem> {
         val response =
             api.getCartItems(
@@ -57,6 +99,14 @@ class CartRepositoryImpl(
     }
 
     private fun getCartItem(productId: String): CartItem? = cartItems.value.firstOrNull { it.product.id == productId }
+
+    private fun syncSelectedCartItems() {
+        val cartItemIds = cartItems.value.map { it.id }.toSet()
+
+        _selectedCartItemIds.update { selectedItemsId ->
+            selectedItemsId.filter { it in cartItemIds }.toImmutableList()
+        }
+    }
 
     private suspend fun addCartItem(
         productId: String,

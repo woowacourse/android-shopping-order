@@ -5,9 +5,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -30,7 +27,6 @@ class CartViewModel(
     private val _event = MutableSharedFlow<CartEvent>()
     val event: SharedFlow<CartEvent> = _event.asSharedFlow()
 
-    private val selectedCartItems = MutableStateFlow<ImmutableList<String>>(persistentListOf())
     private val page = MutableStateFlow(0)
 
     init {
@@ -42,7 +38,7 @@ class CartViewModel(
         viewModelScope.launch {
             combine(
                 cartRepository.cartItems,
-                selectedCartItems,
+                cartRepository.selectedCartItemIds,
                 page,
             ) { cartItems, selectedItems, page ->
                 _uiState.value.toUiState(
@@ -56,9 +52,6 @@ class CartViewModel(
 
                 if (nextState.page != page.value) {
                     page.value = nextState.page
-                }
-                if (nextState.selectedCartItems != selectedCartItems.value) {
-                    selectedCartItems.value = nextState.selectedCartItems
                 }
             }
         }
@@ -119,24 +112,14 @@ class CartViewModel(
     }
 
     fun checkItem(cartItemId: String) {
-        selectedCartItems.update { selectedItemsId ->
-            if (cartItemId in selectedItemsId) {
-                (selectedItemsId - cartItemId).toImmutableList()
-            } else {
-                (selectedItemsId + cartItemId).toImmutableList()
-            }
-        }
+        cartRepository.toggleCartItemSelection(cartItemId)
     }
 
     fun isAllSelectClick() {
-        val cartItems = cartRepository.cartItems.value
-
-        selectedCartItems.update {
-            if (_uiState.value.isAllChecked) {
-                persistentListOf()
-            } else {
-                cartItems.map { it.id }.toImmutableList()
-            }
+        if (_uiState.value.isAllChecked) {
+            cartRepository.clearCartItemSelection()
+        } else {
+            cartRepository.selectAllCartItems()
         }
     }
 
