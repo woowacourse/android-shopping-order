@@ -12,6 +12,11 @@ sealed interface ShoppingRoute {
         val lastViewedProductId: Long?,
     ) : ShoppingRoute
 
-    data object Cart: ShoppingRoute
-    data object Recommendation: ShoppingRoute
+    @Serializable
+    data object Cart : ShoppingRoute
+
+    @Serializable
+    data class Recommendation(
+        val selectedCartItemIds: List<Long>,
+    ) : ShoppingRoute
 }
