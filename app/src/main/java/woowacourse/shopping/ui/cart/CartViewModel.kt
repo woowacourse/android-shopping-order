@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.ui.cart.CartEvent.*
 import java.io.IOException
 
 class CartViewModel(
@@ -94,7 +93,7 @@ class CartViewModel(
                 cartRepository.deleteItem(cartId)
             }.onFailure { throwable ->
                 if (throwable is IOException || throwable is HttpException) {
-                    _event.emit(DeleteCartItemFailure)
+                    _event.emit(CartEvent.DeleteCartItemFailure)
                 } else {
                     throw throwable
                 }
@@ -111,7 +110,7 @@ class CartViewModel(
                 cartRepository.setCartItem(productId, quantity = quantity)
             }.onFailure { throwable ->
                 if (throwable is IOException || throwable is HttpException) {
-                    _event.emit(UpdateCartItemFailure)
+                    _event.emit(CartEvent.UpdateCartItemFailure)
                 } else {
                     throw throwable
                 }
@@ -143,7 +142,7 @@ class CartViewModel(
 
     fun order() {
         viewModelScope.launch {
-            _event.emit(NavigateToRecommend)
+            _event.emit(CartEvent.NavigateToRecommend)
         }
     }
 
