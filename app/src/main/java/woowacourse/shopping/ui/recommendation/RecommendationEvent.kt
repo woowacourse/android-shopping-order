@@ -10,6 +10,5 @@ sealed interface RecommendationEvent {
     data class RemoveFromCart(val targetId: Long) : RecommendationEvent
 
     data class NavigateToPayment(val checkedIds: List<Long>) : RecommendationEvent
-    data class NavigateToProductDetail(val selectedProductId: Long) : RecommendationEvent
     object NavigateToCart : RecommendationEvent
 }

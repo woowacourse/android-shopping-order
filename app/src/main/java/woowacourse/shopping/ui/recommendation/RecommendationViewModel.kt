@@ -283,16 +283,6 @@ class RecommendationViewModel(
         }
     }
 
-    fun navigateToProductDetail(selectedProductId: Long) {
-        viewModelScope.launch {
-            _event.emit(
-                RecommendationEvent.NavigateToProductDetail(
-                    selectedProductId
-                )
-            )
-        }
-    }
-
     fun navigateToCart() {
         viewModelScope.launch {
             _event.emit(

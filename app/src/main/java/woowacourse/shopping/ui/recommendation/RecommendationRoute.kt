@@ -69,13 +69,6 @@ fun RecommendationRoute(
                                 checkedIds = event.checkedIds
                             )
                         )
-
-                    is RecommendationEvent.NavigateToProductDetail ->
-                        navController.navigate(
-                            ProductDetail(
-                                event.selectedProductId
-                            )
-                        )
                 }
             }
         }
@@ -101,10 +94,6 @@ fun RecommendationRoute(
             onAdd = viewModel::updateAmountTrigger,
             onMinus = viewModel::updateAmountTrigger,
             onDelete = viewModel::removeFromCartTrigger,
-            onItemClick = { product ->
-                viewModel.updateHistory(product)
-                viewModel.navigateToProductDetail(product.id)
-            },
             isContainedInCart = { id -> uiState.cart.isContain(id) },
             itemCount = { id -> uiState.cart.totalCountOfSpecificPurchaseProduct(id) },
             modifier = Modifier.padding(innerPadding),
