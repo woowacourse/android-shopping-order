@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature.recommend
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
@@ -133,7 +132,7 @@ class RecommendViewModel(
             quantity = quantity,
         )
 
-    suspend fun addRecommendToCart(): List<Long> {
+    suspend fun addRecommendToCart(contentIds: List<Long>): List<Long> {
         _uiState.value.recommendList.filter { it.quantity > 0 }.forEach {
             cartRepository.increase(
                 product =
@@ -146,9 +145,10 @@ class RecommendViewModel(
                 quantity = it.quantity,
             )
         }
+        val newContents = _uiState.value.recommendList.map { it.id }
         val serverCart = cartRepository.loadCart()
         return serverCart.cartContents.filter { cartContent ->
-            products.map { it.id }.contains(cartContent.product.id)
+            cartContent.id in contentIds || cartContent.productId in newContents
         }.map{ it.id }
     }
 

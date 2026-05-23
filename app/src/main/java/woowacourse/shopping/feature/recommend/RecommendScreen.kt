@@ -131,8 +131,7 @@ fun RecommendScreen(
                 TextButton(
                     onClick = {
                         scope.launch {
-                            val newIds = viewModel.addRecommendToCart()
-                            val totalIds = newIds + contentIds
+                            val totalIds = viewModel.addRecommendToCart(contentIds)
                             onBuyClick(totalIds)
                         }
                     },
