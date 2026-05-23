@@ -79,8 +79,14 @@ class CartViewModel(
     val orderCompleteEvent: SharedFlow<Unit> = _orderCompleteEvent.asSharedFlow()
 
     init {
-        loadPage(0)
-        loadRecommendProduct()
+        refresh()
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            refreshCartItems()
+            loadRecommendProduct()
+        }
     }
 
     private fun loadPage(page: Int) {
@@ -110,6 +116,7 @@ class CartViewModel(
         viewModelScope.launch {
             _selectedItems.update { it - cartId }
             cartRepository.remove(cartId)
+
             refreshCartItems()
         }
     }
@@ -212,13 +219,24 @@ class CartViewModel(
     }
 
     private suspend fun refreshCartItems(page: Int = currentPage) {
-        val pagedResult = cartRepository.getCartItems(page, PAGE_SIZE)
         val allResult = cartRepository.getAllCartItems()
+        val cartItemTypeCount = allResult.values.size
+        val targetPage = page.coerceAtMost(totalPage(cartItemTypeCount))
 
-        currentPage = page
+        val pagedResult = cartRepository.getCartItems(targetPage, PAGE_SIZE)
+
+        currentPage = targetPage
         _pagedCartItems.update { pagedResult }
         _allCartItems.update { allResult }
     }
+
+    private fun totalPage(totalCount: Int): Int =
+        if (totalCount == 0) {
+            0
+        } else {
+            (totalCount - 1) / PAGE_SIZE
+        }
+
     private fun findCartItemByProductId(productId: Int): CartItem? = _allCartItems.value?.values?.find { it.product.id == productId }
     private fun findCartItemByCartId(cartId: Int): CartItem? = _allCartItems.value?.values?.find { it.id == cartId }
     companion object {
