@@ -2,17 +2,20 @@ package woowacourse.shopping.data.repository.cart
 
 import woowacourse.shopping.data.datasource.cart.CartDataSource
 import woowacourse.shopping.data.mapper.toCartItems
-import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.data.mapper.toPagedCartItems
 import woowacourse.shopping.domain.model.cart.CartItems
 import woowacourse.shopping.domain.model.cart.Quantity
 import woowacourse.shopping.domain.model.product.Product
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.ui.cart.PagedCartItems
 
 class CartRepositoryImpl(
     private val cartRemoteDataSource: CartDataSource,
 ) : CartRepository {
+    private val _cartEvents = MutableSharedFlow<Unit>(replay = 0)
+    override val cartEvents: SharedFlow<Unit> = _cartEvents
     override suspend fun getCartItems(
         page: Int,
         size: Int,
@@ -27,6 +30,7 @@ class CartRepositoryImpl(
         quantity: Quantity,
     ): Int {
         cartRemoteDataSource.addCartItem(product.id, quantity)
+        _cartEvents.emit(Unit)
         return getAllCartItems().findByProductId(product.id)?.id
             ?: throw IllegalStateException("장바구니에 상품이 추가되지 않았습니다.")
     }
@@ -36,6 +40,7 @@ class CartRepositoryImpl(
         quantity: Quantity,
     ) {
         cartRemoteDataSource.updateCartItem(cartId, quantity)
+        _cartEvents.emit(Unit)
     }
 
     override suspend fun decrease(
@@ -43,13 +48,16 @@ class CartRepositoryImpl(
         quantity: Quantity,
     ) {
         cartRemoteDataSource.updateCartItem(cartId, quantity)
+        _cartEvents.emit(Unit)
     }
 
     override suspend fun remove(cartId: Int) {
         cartRemoteDataSource.deleteCartItem(cartId)
+        _cartEvents.emit(Unit)
     }
 
     override suspend fun order(cartItemIds: List<Int>) {
         cartRemoteDataSource.order(cartItemIds)
+        _cartEvents.emit(Unit)
     }
 }

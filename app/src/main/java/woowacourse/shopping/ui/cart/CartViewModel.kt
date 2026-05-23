@@ -80,6 +80,11 @@ class CartViewModel(
 
     init {
         refresh()
+        viewModelScope.launch {
+            cartRepository.cartEvents.collect {
+                refresh()
+            }
+        }
     }
 
     fun refresh() {

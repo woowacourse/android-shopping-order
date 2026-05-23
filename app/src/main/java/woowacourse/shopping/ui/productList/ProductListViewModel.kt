@@ -43,6 +43,11 @@ class ProductListViewModel(
         viewModelScope.launch {
             refreshCart()
         }
+        viewModelScope.launch {
+            cartRepository.cartEvents.collect {
+                refreshCart()
+            }
+        }
 
     }
 

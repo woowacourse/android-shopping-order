@@ -71,6 +71,7 @@ fun AppNavHost(
                         navController.popBackStack()
                     },
                     onAddToCartClick = {
+                        productDetailViewModel.addToCart()
                         navController.navigate(CartRoute)
                     },
                     onLastViewedProductClick = { product ->
