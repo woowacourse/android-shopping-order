@@ -73,7 +73,7 @@ fun PaymentScreen(
     LaunchedEffect(Unit) {
         viewModel.loadCart(cartContentIds)
         viewModel.cancelPaymentAlarm()
-        viewModel.startPaymentAlarm()
+        viewModel.startPaymentAlarm(cartContentIds)
     }
 
     Scaffold(

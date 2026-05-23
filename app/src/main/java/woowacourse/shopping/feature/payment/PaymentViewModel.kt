@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.AlarmReceiver
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.constants.MockData
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.coupon.CouponRepository
 import woowacourse.shopping.data.repository.order.OrderRepository
@@ -32,7 +31,6 @@ import woowacourse.shopping.domain.coupon.FreeShippingCoupon
 import woowacourse.shopping.domain.coupon.PercentageDiscountCoupon
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
 
 class PaymentViewModel(
     private val application: ShoppingApplication,
@@ -65,12 +63,17 @@ class PaymentViewModel(
         }
     }
 
-    fun startPaymentAlarm() {
+    fun startPaymentAlarm(cartContentIds: List<Long>) {
         if (!sharedPref.getBoolean("notification", true)) return
-        val intent = Intent(application, AlarmReceiver::class.java)
+        val intent = Intent(application, AlarmReceiver::class.java).apply {
+            putExtra("cartContentIds", cartContentIds.toLongArray())
+        }
 
         val pendingIntent = PendingIntent.getBroadcast(
-            application, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            application,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -80,7 +83,12 @@ class PaymentViewModel(
 
     fun cancelPaymentAlarm() {
         val intent = Intent(application, AlarmReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(application, 0, intent, PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getBroadcast(
+            application,
+            0,
+            intent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        )
         pendingIntent?.let {
             val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             alarmManager.cancel(it)
@@ -154,7 +162,8 @@ class PaymentViewModel(
             val isCurrentlyChecked = currentMap[code] ?: false
 
             if (!isCurrentlyChecked) {
-                val isValid = couponValid(coupon, cartRepository.loadCart(), uiState.value.totalPrice)
+                val isValid =
+                    couponValid(coupon, cartRepository.loadCart(), uiState.value.totalPrice)
 
                 if (isValid) {
                     _couponEvent.emit(CouponEvent.Success("쿠폰 적용이 되었습니다."))
@@ -184,7 +193,8 @@ class PaymentViewModel(
 
                     is BuyXGetYCoupon -> {
                         val cart = cartRepository.loadCart()
-                        val maxQuantityProduct = cart.cartContents.maxByOrNull { it.quantity }?.product
+                        val maxQuantityProduct =
+                            cart.cartContents.maxByOrNull { it.quantity }?.product
                         newCouponDiscountPrice = activeCoupon.calculateDiscountPrice(
                             maxQuantityProduct?.priceAmount() ?: 0
                         )

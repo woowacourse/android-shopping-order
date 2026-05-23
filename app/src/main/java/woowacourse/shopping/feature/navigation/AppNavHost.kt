@@ -4,12 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import woowacourse.shopping.feature.cart.CartScreen
 import woowacourse.shopping.feature.payment.PaymentScreen
 import woowacourse.shopping.feature.productdetail.ProductDetailScreen
 import woowacourse.shopping.feature.productlist.ProductListScreen
 import woowacourse.shopping.feature.recommend.RecommendScreen
+import woowacourse.shopping.feature.setting.SettingScreen
 
 @Composable
 fun AppNavHost() {
@@ -86,7 +88,11 @@ fun AppNavHost() {
             )
         }
 
-        composable<Payment> { backStackEntry ->
+        composable<Payment>(
+            deepLinks = listOf(
+                navDeepLink<Payment>(basePath = "shopping://payment")
+            )
+        ) { backStackEntry ->
             val route = backStackEntry.toRoute<Payment>()
             PaymentScreen(
                 onCloseClick = { navController.popBackStack() },
