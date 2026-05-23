@@ -1,5 +1,8 @@
-package woowacourse.shopping.model
+package woowacourse.shopping.model.coupon
 
+import woowacourse.shopping.model.coupon.AvailableTime
+import woowacourse.shopping.model.coupon.CouponContext
+import woowacourse.shopping.model.Money
 import java.time.Clock
 import java.time.LocalDate
 

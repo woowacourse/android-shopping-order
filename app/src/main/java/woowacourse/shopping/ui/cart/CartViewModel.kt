@@ -16,7 +16,7 @@ import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.di.AppContainer
-import woowacourse.shopping.model.CartItem
+import woowacourse.shopping.model.cart.CartItem
 import woowacourse.shopping.recommender.ProductRecommender
 import woowacourse.shopping.ui.common.error.ErrorMessageMapper
 import woowacourse.shopping.ui.common.model.LoadState

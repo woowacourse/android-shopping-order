@@ -1,7 +1,7 @@
 package woowacourse.shopping.recommender
 
-import woowacourse.shopping.model.CartItem
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.cart.CartItem
+import woowacourse.shopping.model.product.Product
 
 object ProductRecommender {
     const val MAX_PRODUCT_SIZE = 10

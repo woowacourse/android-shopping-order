@@ -3,10 +3,7 @@ package woowacourse.shopping.ui.payment.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,31 +16,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import woowacourse.shopping.model.AvailableTime
-import woowacourse.shopping.model.Coupon
 import woowacourse.shopping.model.Money
+import woowacourse.shopping.model.coupon.AvailableTime
+import woowacourse.shopping.model.coupon.Coupon
 import woowacourse.shopping.ui.common.theme.Gray5
 import java.time.LocalDate
 import java.time.LocalTime
 
 @Composable
 fun PaymentBody(
-    selectedCouponId: Long,
+    selectedCouponId: Long?,
     coupons: List<Coupon>,
-    originalPrice: Int,
-    discountPrice: Int,
-    deliveryFee: Int,
-    totalPrice: Int,
+    originalPrice: Long,
+    discountPrice: Long,
+    deliveryFee: Long,
+    totalPrice: Long,
     modifier: Modifier = Modifier,
     onCouponSelected: (Long) -> Unit,
 ) {
     LazyColumn(
-        modifier
-            .fillMaxSize()
-            .padding(top = 30.dp, bottom = 76.dp),
+        modifier,
     ) {
         item {
-            Header(modifier = Modifier.padding(bottom = 20.dp, start = 18.dp, end = 18.dp))
+            Header(modifier = Modifier.padding(top = 30.dp, bottom = 20.dp, start = 18.dp, end = 18.dp))
         }
 
         items(coupons) { coupon ->
@@ -71,13 +66,16 @@ fun PaymentBody(
         }
 
         item {
-            Spacer(modifier = Modifier.height(21.dp))
-            HorizontalDivider(thickness = 7.dp, color = Color(0xFFEBEBEB))
+            HorizontalDivider(
+                modifier = Modifier.padding(top = 21.dp),
+                thickness = 7.dp,
+                color = Color(0xFFEBEBEB)
+            )
         }
 
         item {
             OrderSummary(
-                originalPrice = originalPrice,
+                subtotal = originalPrice,
                 couponDiscount = discountPrice,
                 deliveryFee = deliveryFee,
                 modifier = Modifier.padding(horizontal = 18.dp, vertical = 21.dp)
@@ -92,7 +90,7 @@ fun PaymentBody(
             PriceRow(
                 text = "총 결제 금액",
                 price = totalPrice,
-                modifier = Modifier.padding(top = 21.dp, start = 18.dp, end = 18.dp)
+                modifier = Modifier.padding(vertical = 21.dp, horizontal = 18.dp)
             )
         }
     }
@@ -121,16 +119,16 @@ private fun Header(modifier: Modifier = Modifier) {
 
 @Composable
 private fun OrderSummary(
-    originalPrice: Int,
-    couponDiscount: Int,
-    deliveryFee: Int,
+    subtotal: Long,
+    couponDiscount: Long,
+    deliveryFee: Long,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        PriceRow(text = "주문 금액", price = originalPrice)
+        PriceRow(text = "주문 금액", price = subtotal)
         PriceRow(text = "쿠폰 할인 금액", price = couponDiscount)
         PriceRow(text = "배송비", price = deliveryFee)
     }
@@ -139,7 +137,7 @@ private fun OrderSummary(
 @Composable
 private fun PriceRow(
     text: String,
-    price: Int,
+    price: Long,
     modifier: Modifier = Modifier
 ) {
     val price = "%,d".format(price)
@@ -223,7 +221,7 @@ private fun HeaderPreview() {
 @Composable
 private fun OrderSummaryPreview() {
     OrderSummary(
-        originalPrice = 204200,
+        subtotal = 204200,
         couponDiscount = -5000,
         deliveryFee = 3000,
         modifier = Modifier,

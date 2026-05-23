@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import woowacourse.shopping.model.Coupon
+import woowacourse.shopping.model.coupon.Coupon
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.ui.payment.component.PaymentBody
 import woowacourse.shopping.ui.payment.component.PaymentBottomBar

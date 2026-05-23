@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.repository.inmemory
 
-import woowacourse.shopping.model.Cart
+import woowacourse.shopping.model.cart.Cart
 import woowacourse.shopping.model.User
 
 object InMemoryUserRepository {

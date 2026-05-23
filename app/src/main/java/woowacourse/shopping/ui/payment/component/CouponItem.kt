@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import woowacourse.shopping.model.AvailableTime
+import woowacourse.shopping.model.coupon.AvailableTime
 import woowacourse.shopping.ui.common.component.ShoppingCheckbox
 import woowacourse.shopping.ui.common.theme.Gray5
 import java.time.LocalDate

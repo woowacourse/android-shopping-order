@@ -6,8 +6,8 @@ import woowacourse.shopping.data.local.dao.RecentProductDao
 import woowacourse.shopping.data.local.entity.RecentProductEntity
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.Products
+import woowacourse.shopping.model.product.Product
+import woowacourse.shopping.model.product.Products
 
 class RoomRecentProductRepository(
     private val recentProductDao: RecentProductDao,

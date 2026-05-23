@@ -1,4 +1,4 @@
-package woowacourse.shopping.model
+package woowacourse.shopping.model.coupon
 
 import java.time.Clock
 import java.time.LocalTime

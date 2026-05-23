@@ -1,4 +1,6 @@
-package woowacourse.shopping.model
+package woowacourse.shopping.model.cart
+
+import woowacourse.shopping.model.cart.CartItem
 
 data class Cart(
     val items: List<CartItem>,

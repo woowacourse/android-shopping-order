@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.remote.dto
 
 import kotlinx.serialization.Serializable
-import woowacourse.shopping.model.AvailableTime
+import woowacourse.shopping.model.coupon.AvailableTime
 import java.time.LocalTime
 
 @Serializable

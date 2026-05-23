@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.common.model
 
-import woowacourse.shopping.model.Cart
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.cart.Cart
+import woowacourse.shopping.model.product.Product
 
 object ProductUiModelMapper {
     fun fromProducts(products: List<Product>, cart: Cart): List<ProductUiModel> =
