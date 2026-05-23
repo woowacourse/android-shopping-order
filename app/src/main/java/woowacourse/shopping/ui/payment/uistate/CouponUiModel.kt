@@ -6,6 +6,5 @@ data class CouponUiModel(
     val description: String,
     val expirationDate: String,
     val minimumAmount: String?,
-    val isAvailable: Boolean = true,
     val isSelected: Boolean = false,
 )

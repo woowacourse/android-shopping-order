@@ -12,6 +12,8 @@ import woowacourse.shopping.repository.CouponRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
 import woowacourse.shopping.ui.payment.uistate.CouponUiModelMapper
 import woowacourse.shopping.ui.payment.uistate.PaymentUiState
+import java.time.LocalDate
+import java.time.LocalTime
 
 class PaymentViewModel(
     private val couponRepository: CouponRepository,
@@ -29,7 +31,12 @@ class PaymentViewModel(
             couponRepository
                 .getCoupons()
                 .onSuccess { fetchedCoupons ->
-                    val couponUiModels = fetchedCoupons.map { CouponUiModelMapper.toUiModel(it) }
+                    val currentDate = LocalDate.now()
+                    val currentTime = LocalTime.now()
+                    val couponUiModels =
+                        fetchedCoupons
+                            .filter { it.isApplicable(currentDate, currentTime) }
+                            .map { CouponUiModelMapper.toUiModel(it) }
                     _uiState.update {
                         it.copy(
                             coupons = couponUiModels,

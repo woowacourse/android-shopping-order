@@ -1,6 +1,7 @@
 package woowacourse.shopping.model.coupon
 
 import woowacourse.shopping.model.product.Money
+import java.time.LocalDate
 import java.time.LocalTime
 
 sealed interface Coupon {
@@ -8,6 +9,14 @@ sealed interface Coupon {
     val code: String
     val description: String
     val expirationDate: String
+
+    fun isApplicable(
+        currentDate: LocalDate,
+        currentTime: LocalTime,
+    ): Boolean {
+        val expiration = LocalDate.parse(expirationDate)
+        return !currentDate.isAfter(expiration)
+    }
 
     data class FixedDiscount(
         override val id: Long,
@@ -43,5 +52,13 @@ sealed interface Coupon {
         val discountPercentage: Int,
         val availableStartTime: LocalTime,
         val availableEndTime: LocalTime,
-    ) : Coupon
+    ) : Coupon {
+        override fun isApplicable(
+            currentDate: LocalDate,
+            currentTime: LocalTime,
+        ): Boolean {
+            if (!super.isApplicable(currentDate, currentTime)) return false
+            return currentTime in availableStartTime..availableEndTime
+        }
+    }
 }
