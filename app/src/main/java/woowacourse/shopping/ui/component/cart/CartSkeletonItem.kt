@@ -1,6 +1,6 @@
 @file:Suppress("FunctionName")
 
-package woowacourse.shopping.ui.component
+package woowacourse.shopping.ui.component.cart
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
