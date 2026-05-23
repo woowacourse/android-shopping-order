@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
@@ -103,6 +104,15 @@ private fun ShoppingCartItem.toOrderItem(): OrderItem =
         unitPrice = Price(product.getPrice()),
         quantity = getQuantity(),
     )
+
+private fun navigateToProductList(navController: NavHostController) {
+    navController.navigate(ProductList) {
+        popUpTo(navController.graph.findStartDestination().id) {
+            inclusive = false
+        }
+        launchSingleTop = true
+    }
+}
 
 
 @Composable
@@ -414,7 +424,7 @@ fun ShoppingNavHost(
                         shoppingCartViewModel = shoppingCartViewModel,
                         shoppingCartRecommendViewModel = shoppingCartRecommendViewModel,
                         orderedCartItemIds = couponViewModel.getOrderedCartItemIds(),
-                        onSuccess = { navController.popBackStack() },
+                        onSuccess = { navigateToProductList(navController) },
                     )
                 },
             )
