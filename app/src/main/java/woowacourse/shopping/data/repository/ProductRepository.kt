@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.repository
+package woowacourse.shopping.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow

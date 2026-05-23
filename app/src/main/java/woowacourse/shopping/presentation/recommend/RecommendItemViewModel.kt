@@ -8,12 +8,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.di.RepositoryProvider
 import woowacourse.shopping.domain.addToCartUseCase
 import woowacourse.shopping.domain.model.PaymentItems
 import woowacourse.shopping.domain.recommendProductUseCase
-import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.common.model.toUiModel
 import woowacourse.shopping.presentation.productlist.model.ShoppingItemUiModel
 import woowacourse.shopping.presentation.recommend.model.RecommendUiState
@@ -50,7 +50,7 @@ class RecommendItemViewModel(
             )
         }.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Companion.Eagerly,
+            started = SharingStarted.Eagerly,
             initialValue = RecommendUiState(),
         )
 
@@ -70,6 +70,8 @@ class RecommendItemViewModel(
             }
         }
     }
+
+    fun getPaymentItemIds(): List<Long> = paymentItemIds.value.toList()
 
     fun initializePaymentItems(productIds: List<Long>) {
         paymentItemIds.value = productIds.toSet()

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -39,6 +40,7 @@ import woowacourse.shopping.util.formattedPrice
 fun RecommendItemScreen(
     productIds: List<Long>,
     onBackClick: () -> Unit,
+    onOrderClick: (List<Long>) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: RecommendItemViewModel = viewModel(),
 ) {
@@ -54,7 +56,7 @@ fun RecommendItemScreen(
         totalPrice = uiState.totalPrice,
         recommendProducts = uiState.recommendProducts,
         onBackClick = onBackClick,
-        onOrderClick = { },
+        onOrderClick = { onOrderClick(viewModel.getPaymentItemIds()) },
         onIncreaseQuantity = viewModel::addItemToCart,
         onDecreaseQuantity = viewModel::removeItemFromCart,
         modifier = modifier,
@@ -103,6 +105,7 @@ fun RecommendItemContent(
                 totalPrice = formattedPrice(totalPrice),
                 onOrderClick = { onOrderClick() },
                 allCheckBox = {},
+                modifier = Modifier.navigationBarsPadding(),
             )
         },
         modifier = modifier.statusBarsPadding(),

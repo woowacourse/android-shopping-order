@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import woowacourse.shopping.presentation.cart.CartItemListScreen
+import woowacourse.shopping.presentation.order.OrderScreen
 import woowacourse.shopping.presentation.productdetail.ProductDetailScreen
 import woowacourse.shopping.presentation.productlist.ProductListScreen
 import woowacourse.shopping.presentation.recommend.RecommendItemScreen
@@ -59,6 +60,17 @@ class NavActivity : ComponentActivity() {
                 composable<RecommendItem> { backStackEntry ->
                     val route = backStackEntry.toRoute<RecommendItem>()
                     RecommendItemScreen(
+                        productIds = route.productIds,
+                        onBackClick = { navController.popBackStack() },
+                        onOrderClick = { productIds ->
+                            navController.navigate(route = OrderItem(productIds))
+                        },
+                    )
+                }
+
+                composable<OrderItem> { backStackEntry ->
+                    val route = backStackEntry.toRoute<OrderItem>()
+                    OrderScreen(
                         productIds = route.productIds,
                         onBackClick = { navController.popBackStack() },
                     )

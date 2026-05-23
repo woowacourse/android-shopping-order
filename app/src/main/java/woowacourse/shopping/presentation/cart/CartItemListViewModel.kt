@@ -8,10 +8,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.di.RepositoryProvider
 import woowacourse.shopping.domain.addToCartUseCase
 import woowacourse.shopping.domain.model.PaymentItems
-import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.cart.model.CartUiState
 import woowacourse.shopping.presentation.cart.model.toUiModel
 import kotlin.math.min

@@ -39,6 +39,7 @@ fun CartBottomBar(
         modifier =
             modifier
                 .fillMaxWidth()
+//                .navigationBarsPadding()
                 .height(IntrinsicSize.Min),
     ) {
         Row(

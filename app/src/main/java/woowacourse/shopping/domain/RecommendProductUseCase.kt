@@ -1,9 +1,9 @@
 package woowacourse.shopping.domain
 
 import kotlinx.coroutines.flow.firstOrNull
+import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
 
 suspend fun recommendProductUseCase(
     productRepository: ProductRepository,

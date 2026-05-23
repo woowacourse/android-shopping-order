@@ -2,11 +2,11 @@ package woowacourse.shopping.fake
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.RemoveItemResult
-import woowacourse.shopping.domain.repository.CartRepository
 
 class FakeCartRepository(
     private val products: Map<Long, Product> = emptyMap(),

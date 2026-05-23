@@ -17,3 +17,8 @@ object CartItemList
 data class RecommendItem(
     val productIds: List<Long>,
 )
+
+@Serializable
+data class OrderItem(
+    val productIds: List<Long>,
+)

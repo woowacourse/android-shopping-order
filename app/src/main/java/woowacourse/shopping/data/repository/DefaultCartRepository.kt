@@ -3,6 +3,7 @@ package woowacourse.shopping.data.repository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.source.remote.CartRemoteDataSource
 import woowacourse.shopping.data.source.remote.dto.cart.response.CartContent
 import woowacourse.shopping.domain.model.Cart
@@ -11,7 +12,6 @@ import woowacourse.shopping.domain.model.Money
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductName
 import woowacourse.shopping.domain.model.RemoveItemResult
-import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.error.Result
 
 class DefaultCartRepository(
