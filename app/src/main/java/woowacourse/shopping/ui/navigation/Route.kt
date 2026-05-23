@@ -1,3 +1,5 @@
+package woowacourse.shopping.ui.navigation
+
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -13,7 +15,7 @@ object Cart
 
 @Serializable
 data class CartRecommendation(
-    val selectedCartItemIds: LongArray,
+    val selectedCartItemIds: List<Long>,
 )
 
 @Serializable

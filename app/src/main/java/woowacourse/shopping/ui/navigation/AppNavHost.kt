@@ -1,10 +1,5 @@
 package woowacourse.shopping.ui.navigation
 
-import Cart
-import CartRecommendation
-import Payment
-import ProductDetail
-import ProductList
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -138,7 +133,7 @@ fun AppNavHost(innerPadding: PaddingValues) {
                         coroutineScope.launch {
                             val selectedIds = viewModel.getSelectedCartItemIds()
                             if (selectedIds.isNotEmpty()) {
-                                navController.navigate(CartRecommendation(selectedIds.toLongArray()))
+                                navController.navigate(CartRecommendation(selectedIds))
                             }
                         }
                     },

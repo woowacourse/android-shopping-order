@@ -2,7 +2,6 @@
 
 package woowacourse.shopping.ui.cart.recommendation
 
-import CartRecommendation
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.toRoute
 import io.mockk.every
@@ -34,6 +33,7 @@ import woowacourse.shopping.repository.FakeRecentProductRepository
 import woowacourse.shopping.repository.ProductRepositoryFixture
 import woowacourse.shopping.repository.query.CartPageItem
 import woowacourse.shopping.repository.query.CartPageResult
+import woowacourse.shopping.ui.navigation.CartRecommendation
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CartRecommendationViewModelTest {
@@ -64,7 +64,7 @@ class CartRecommendationViewModelTest {
 
         val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
         every { savedStateHandle.toRoute<CartRecommendation>() } returns
-            CartRecommendation(selectedCartItemIds = longArrayOf(101L))
+            CartRecommendation(selectedCartItemIds = listOf(101L))
 
         viewModel =
             CartRecommendationViewModel(
@@ -125,7 +125,7 @@ class CartRecommendationViewModelTest {
                 }
             val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
             every { savedStateHandle.toRoute<CartRecommendation>() } returns
-                CartRecommendation(selectedCartItemIds = longArrayOf(101L))
+                CartRecommendation(selectedCartItemIds = listOf(101L))
 
             viewModel =
                 CartRecommendationViewModel(
@@ -170,7 +170,7 @@ class CartRecommendationViewModelTest {
                 }
             val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
             every { savedStateHandle.toRoute<CartRecommendation>() } returns
-                CartRecommendation(selectedCartItemIds = longArrayOf(101L))
+                CartRecommendation(selectedCartItemIds = listOf(101L))
 
             viewModel =
                 CartRecommendationViewModel(
@@ -207,7 +207,7 @@ class CartRecommendationViewModelTest {
                 }
             val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
             every { savedStateHandle.toRoute<CartRecommendation>() } returns
-                CartRecommendation(selectedCartItemIds = longArrayOf(101L))
+                CartRecommendation(selectedCartItemIds = listOf(101L))
 
             viewModel =
                 CartRecommendationViewModel(
@@ -243,7 +243,7 @@ class CartRecommendationViewModelTest {
                 }
             val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
             every { savedStateHandle.toRoute<CartRecommendation>() } returns
-                CartRecommendation(selectedCartItemIds = longArrayOf(101L))
+                CartRecommendation(selectedCartItemIds = listOf(101L))
 
             viewModel =
                 CartRecommendationViewModel(

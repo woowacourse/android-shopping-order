@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.cart.recommendation
 
-import CartRecommendation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -22,6 +21,7 @@ import woowacourse.shopping.repository.RecentProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
 import woowacourse.shopping.repository.http.common.RemoteException
 import woowacourse.shopping.repository.query.CartPageItem
+import woowacourse.shopping.ui.navigation.CartRecommendation
 import woowacourse.shopping.ui.shopping.ShoppingProductUiState
 import woowacourse.shopping.ui.shopping.ShoppingProductUiStateMapper
 

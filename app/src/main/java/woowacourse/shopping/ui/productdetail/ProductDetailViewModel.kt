@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.productdetail
 
-import ProductDetail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -22,6 +21,7 @@ import woowacourse.shopping.repository.RecentProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
 import woowacourse.shopping.repository.http.common.RemoteException
 import woowacourse.shopping.ui.common.recentlyviewed.RecentViewedProductsMapper
+import woowacourse.shopping.ui.navigation.ProductDetail
 
 class ProductDetailViewModel(
     savedStateHandle: SavedStateHandle,
