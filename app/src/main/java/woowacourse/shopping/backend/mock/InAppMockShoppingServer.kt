@@ -17,6 +17,8 @@ import woowacourse.shopping.backend.retrofit.dto.productlist.Product
 import woowacourse.shopping.backend.retrofit.dto.productlist.ProductResponse
 import woowacourse.shopping.backend.retrofit.dto.ShoppingCartPageable
 import woowacourse.shopping.backend.retrofit.dto.ShoppingCartResponse
+import woowacourse.shopping.backend.retrofit.dto.coupon.AvailableTimeResponse
+import woowacourse.shopping.backend.retrofit.dto.coupon.CouponResponse
 import woowacourse.shopping.backend.retrofit.dto.Sort
 import java.net.HttpURLConnection
 import java.net.InetAddress
@@ -74,6 +76,7 @@ private class ShoppingMockDispatcher : Dispatcher() {
             request.method == "PATCH" && url.pathSegments.size == 2 && url.pathSegments[0] == "cart-items" -> updateCartItem(url, request)
             request.method == "DELETE" && url.pathSegments.size == 2 && url.pathSegments[0] == "cart-items" -> deleteCartItem(url)
             request.method == "POST" && url.encodedPath == "/orders" -> order(request)
+            request.method == "GET" && url.encodedPath == "/coupons" -> coupons()
             else -> errorResponse(HttpURLConnection.HTTP_NOT_FOUND)
         }
     }
@@ -139,6 +142,8 @@ private class ShoppingMockDispatcher : Dispatcher() {
         return emptyResponse(HttpURLConnection.HTTP_OK)
     }
 
+    private fun coupons(): MockResponse = jsonResponse(repository.getCoupons())
+
     private fun jsonResponse(body: Any): MockResponse =
         MockResponse()
             .setResponseCode(HttpURLConnection.HTTP_OK)
@@ -149,6 +154,10 @@ private class ShoppingMockDispatcher : Dispatcher() {
                     is Product -> json.encodeToString(body)
                     is ShoppingCartResponse -> json.encodeToString(body)
                     is CartQuantity -> json.encodeToString(body)
+                    is List<*> -> when (body.firstOrNull()) {
+                        null, is CouponResponse -> json.encodeToString(body.filterIsInstance<CouponResponse>())
+                        else -> error("Unsupported list response type: ${body.firstOrNull()!!::class.java.simpleName}")
+                    }
                     else -> error("Unsupported response type: ${body::class.java.simpleName}")
                 },
             )
@@ -341,6 +350,97 @@ private class MockShoppingRepository {
         }
     }
 
+    fun getCoupons(): List<CouponResponse> =
+        listOf(
+            fixedCoupon(1, "FIXED1000", "1,000원 할인 쿠폰", 1_000, 10_000),
+            fixedCoupon(2, "FIXED2000", "2,000원 할인 쿠폰", 2_000, 15_000),
+            fixedCoupon(3, "FIXED3000", "3,000원 할인 쿠폰", 3_000, 20_000),
+            fixedCoupon(4, "FIXED5000", "5,000원 할인 쿠폰", 5_000, 30_000),
+            fixedCoupon(5, "FIXED10000", "10,000원 할인 쿠폰", 10_000, 50_000),
+            percentageCoupon(6, "PERCENT5", "5% 할인 쿠폰", 5, "00:00:00", "23:59:59"),
+            percentageCoupon(7, "PERCENT10", "10% 할인 쿠폰", 10, "00:00:00", "23:59:59"),
+            percentageCoupon(8, "LUNCH15", "점심시간 15% 할인 쿠폰", 15, "11:00:00", "14:00:00"),
+            percentageCoupon(9, "DINNER20", "저녁시간 20% 할인 쿠폰", 20, "17:00:00", "21:00:00"),
+            percentageCoupon(10, "NIGHT30", "심야 30% 할인 쿠폰", 30, "22:00:00", "23:59:59"),
+            buyXGetYCoupon(11, "BUY1GET1", "1+1 쿠폰", 1, 1),
+            buyXGetYCoupon(12, "BUY2GET1", "2+1 쿠폰", 2, 1),
+            buyXGetYCoupon(13, "BUY3GET1", "3+1 쿠폰", 3, 1),
+            buyXGetYCoupon(14, "BUY3GET2", "3+2 쿠폰", 3, 2),
+            buyXGetYCoupon(15, "BUY5GET3", "5+3 쿠폰", 5, 3),
+            freeShippingCoupon(16, "FREESHIP0", "무료 배송 쿠폰 (조건 없음)", 0),
+            freeShippingCoupon(17, "FREESHIP10000", "10,000원 이상 구매 시 무료 배송", 10_000),
+            freeShippingCoupon(18, "FREESHIP20000", "20,000원 이상 구매 시 무료 배송", 20_000),
+            freeShippingCoupon(19, "FREESHIP30000", "30,000원 이상 구매 시 무료 배송", 30_000),
+            freeShippingCoupon(20, "FREESHIP50000", "50,000원 이상 구매 시 무료 배송", 50_000),
+        )
+
+    private fun fixedCoupon(
+        id: Long,
+        code: String,
+        description: String,
+        discount: Int,
+        minimumAmount: Int,
+    ): CouponResponse =
+        CouponResponse(
+            id = id,
+            code = code,
+            description = description,
+            expirationDate = COUPON_EXPIRATION_DATE,
+            discountType = "fixed",
+            discount = discount,
+            minimumAmount = minimumAmount,
+        )
+
+    private fun percentageCoupon(
+        id: Long,
+        code: String,
+        description: String,
+        discount: Int,
+        start: String,
+        end: String,
+    ): CouponResponse =
+        CouponResponse(
+            id = id,
+            code = code,
+            description = description,
+            expirationDate = COUPON_EXPIRATION_DATE,
+            discountType = "percentage",
+            discount = discount,
+            availableTime = AvailableTimeResponse(start = start, end = end),
+        )
+
+    private fun buyXGetYCoupon(
+        id: Long,
+        code: String,
+        description: String,
+        buyQuantity: Int,
+        getQuantity: Int,
+    ): CouponResponse =
+        CouponResponse(
+            id = id,
+            code = code,
+            description = description,
+            expirationDate = COUPON_EXPIRATION_DATE,
+            discountType = "buyXgetY",
+            buyQuantity = buyQuantity,
+            getQuantity = getQuantity,
+        )
+
+    private fun freeShippingCoupon(
+        id: Long,
+        code: String,
+        description: String,
+        minimumAmount: Int,
+    ): CouponResponse =
+        CouponResponse(
+            id = id,
+            code = code,
+            description = description,
+            expirationDate = COUPON_EXPIRATION_DATE,
+            discountType = "freeShipping",
+            minimumAmount = minimumAmount,
+        )
+
     private fun product(
         id: Long,
         name: String,
@@ -437,3 +537,5 @@ private data class CartEntry(
     val productId: Long,
     var quantity: Int,
 )
+
+private const val COUPON_EXPIRATION_DATE = "2026-12-31"
