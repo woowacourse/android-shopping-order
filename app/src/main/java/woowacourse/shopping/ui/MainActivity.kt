@@ -18,9 +18,13 @@ import woowacourse.shopping.ui.cart.CartRoute
 import woowacourse.shopping.ui.cart.CartViewModel
 import woowacourse.shopping.ui.cart.CartViewModelFactory
 import woowacourse.shopping.ui.navigation.Cart
+import woowacourse.shopping.ui.navigation.Payment
 import woowacourse.shopping.ui.navigation.ProductDetail
 import woowacourse.shopping.ui.navigation.Recommendation
 import woowacourse.shopping.ui.navigation.Shopping
+import woowacourse.shopping.ui.payment.PaymentRoute
+import woowacourse.shopping.ui.payment.PaymentViewModel
+import woowacourse.shopping.ui.payment.PaymentViewModelFactory
 import woowacourse.shopping.ui.productdetail.ProductDetailRoute
 import woowacourse.shopping.ui.productdetail.ProductDetailViewModel
 import woowacourse.shopping.ui.productdetail.ProductDetailViewModelFactory
@@ -107,6 +111,24 @@ class MainActivity : ComponentActivity() {
                                 )
                             )
                             RecommendationRoute(
+                                viewModel = viewModel,
+                                navController = navController,
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        }
+
+                        composable<Payment> { backStackEntry ->
+                            val route: Payment = backStackEntry.toRoute()
+
+                            val viewModel: PaymentViewModel = viewModel(
+                                factory = PaymentViewModelFactory(
+                                    cartRepository = app.cartRepository,
+                                    couponRepository = app.couponRepository,
+                                    orderRepository = app.orderRepository,
+                                    checkedItemIds = route.checkedIds
+                                )
+                            )
+                            PaymentRoute(
                                 viewModel = viewModel,
                                 navController = navController,
                                 modifier = Modifier.padding(innerPadding)
