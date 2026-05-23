@@ -10,6 +10,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import woowacourse.shopping.ui.nav.Cart
 import woowacourse.shopping.ui.nav.Detail
+import woowacourse.shopping.ui.nav.Shopping
 
 @Composable
 fun DetailRoute(
@@ -27,26 +28,26 @@ fun DetailRoute(
     val context = LocalContext.current
 
     LaunchedEffect(viewModel) {
-        viewModel.event.collect { event ->
+        viewModel.uiEvent.collect { event ->
             when (event) {
-                DetailEvent.NavigateToCart -> {
+                DetailUiEvent.Dismiss -> {
+                    navController.navigate(Shopping) {
+                        popUpTo<Shopping> {
+                            inclusive = true
+                        }
+                    }
+                }
+
+                DetailUiEvent.NavToCart -> {
                     navController.navigate(Cart)
                 }
 
-                DetailEvent.NavigateBack -> {
-                    navController.popBackStack()
+                is DetailUiEvent.NavToDetail -> {
+                    navController.navigate(Detail(productId = event.productId))
                 }
 
-                DetailEvent.ShowProductNotFoundMessage -> {
-                    Toast.makeText(context, "상품을 찾을 수 없습니다.", Toast.LENGTH_SHORT)
-                }
-
-                DetailEvent.ShowProductLoadFailureMessage -> {
-                    Toast.makeText(context, "상품 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT)
-                }
-
-                DetailEvent.ShowAddCartFailureMessage -> {
-                    Toast.makeText(context, "장바구니에 상품을 담지 못했습니다.", Toast.LENGTH_SHORT)
+                is DetailUiEvent.ShowToastMessage -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT)
                 }
             }
         }
@@ -54,9 +55,9 @@ fun DetailRoute(
 
     DetailScreen(
         uiState = uiState,
-        onCloseClick = { navController.popBackStack() },
+        onCloseClick = viewModel::onDismiss,
         onQuantityChange = viewModel::updateQuantity,
         onAddToCart = viewModel::addToCart,
-        onRecentItemClick = { navController.navigate(Detail(productId = it)) },
+        onRecentItemClick = viewModel::navToDetail,
     )
 }

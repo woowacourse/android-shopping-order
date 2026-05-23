@@ -6,19 +6,19 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentItemRepository
 import woowacourse.shopping.ui.model.mapper.toUiModel
-import java.io.IOException
+import kotlin.coroutines.cancellation.CancellationException
 
 class DetailViewModel(
     private val id: String,
@@ -29,8 +29,8 @@ class DetailViewModel(
     private val _uiState = MutableStateFlow(DetailUiState())
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
 
-    private val _event = Channel<DetailEvent>()
-    val event = _event.receiveAsFlow()
+    private val _uiEvent = MutableSharedFlow<DetailUiEvent>()
+    val uiEvent: SharedFlow<DetailUiEvent> = _uiEvent.asSharedFlow()
 
     private val hideRecentItem: Boolean = false
 
@@ -60,15 +60,11 @@ class DetailViewModel(
                         recentItem = lastViewedItem?.toUiModel(),
                         totalPrice = product.getPrice() * quantity,
                     )
-            } catch (_: IllegalArgumentException) {
-                _event.send(DetailEvent.ShowProductNotFoundMessage)
-                _event.send(DetailEvent.NavigateBack)
-            } catch (_: IOException) {
-                _event.send(DetailEvent.ShowProductLoadFailureMessage)
-                _event.send(DetailEvent.NavigateBack)
-            } catch (_: HttpException) {
-                _event.send(DetailEvent.ShowProductLoadFailureMessage)
-                _event.send(DetailEvent.NavigateBack)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _uiEvent.emit(DetailUiEvent.ShowToastMessage(e.message ?: "알 수 없는 오류가 발생했습니다."))
+                _uiEvent.emit(DetailUiEvent.Dismiss)
             }
         }
     }
@@ -88,14 +84,26 @@ class DetailViewModel(
             try {
                 val product = productRepository.getProductById(id)
                 cartRepository.setCartItem(product.id, _uiState.value.quantity)
-                _event.send(DetailEvent.NavigateToCart)
-            } catch (_: IllegalArgumentException) {
-                _event.send(DetailEvent.ShowAddCartFailureMessage)
-            } catch (_: IOException) {
-                _event.send(DetailEvent.ShowAddCartFailureMessage)
-            } catch (_: HttpException) {
-                _event.send(DetailEvent.ShowAddCartFailureMessage)
+
+                _uiEvent.emit(DetailUiEvent.NavToCart)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _uiEvent.emit(DetailUiEvent.ShowToastMessage(e.message ?: "알 수 없는 오류가 발생했습니다."))
+                _uiEvent.emit(DetailUiEvent.Dismiss)
             }
+        }
+    }
+
+    fun onDismiss() {
+        viewModelScope.launch {
+            _uiEvent.emit(DetailUiEvent.Dismiss)
+        }
+    }
+
+    fun navToDetail(productId: String) {
+        viewModelScope.launch {
+            _uiEvent.emit(DetailUiEvent.NavToDetail(productId = productId))
         }
     }
 
