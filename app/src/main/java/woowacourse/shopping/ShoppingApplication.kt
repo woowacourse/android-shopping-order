@@ -69,11 +69,9 @@ open class ShoppingApplication : Application() {
                     ),
             )
 
-        var token = auth.load()
-        if (token.isBlank()) {
-            token = Credentials.basic("NoeyhOj", "password")
-            auth.save(token)
-        }
+        val token = auth.load() ?: Credentials.basic("NoeyhOj", "password")
+
+        auth.save(token)
 
         RetrofitClient.setToken(token)
 

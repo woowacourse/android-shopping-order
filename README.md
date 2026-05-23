@@ -68,3 +68,4 @@
 - [x] 서버와 연결되어 있는 DAO 구현체 제거 및 DataSoruce로 변경
 - [x] CartViewModel의 메소드 리펙터링
 - [x] 사용하지 않는 주석 로직 삭제
+- [x] Auth의 load 시그니처를 nullable로 변경
