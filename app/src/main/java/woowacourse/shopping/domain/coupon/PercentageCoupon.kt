@@ -16,10 +16,7 @@ class PercentageCoupon(
         if (LocalDate.now().isAfter(expirationDate)) return false
         val now = context.now
 
-        return now.isAfter(
-            startTime.minusSeconds(1),
-        ) &&
-            now.isBefore(endTime.plusSeconds(1))
+        return now.isAfter(startTime) && now.isBefore(endTime)
     }
 
     override fun discountAmount(context: OrderContext): Int {

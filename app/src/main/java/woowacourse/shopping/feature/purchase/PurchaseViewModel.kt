@@ -131,6 +131,7 @@ class PurchaseViewModel(
             is PercentageCoupon -> {
                 couponDiscountPrice = coupon.discountAmount(
                     OrderContext(
+                        totalPrice = totalDiscountedPrice,
                         now = LocalTime.now(),
                     ),
                 )
@@ -182,7 +183,7 @@ class PurchaseViewModel(
             description = description,
             expirationDate = expirationDate,
             startTime = this.startTime,
-            endTime = this.startTime,
+            endTime = this.endTime,
         )
     }
 
