@@ -5,10 +5,11 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 data class PercentCoupon(
+    override val id: Int,
     override val code: String,
     override val description: String,
     override val expirationDate: LocalDate,
-    val discountPercent: Long,
+    val discountPercent: Double,
     val startTime: LocalTime,
     val endTime: LocalTime,
 ) : Coupon {

@@ -4,6 +4,7 @@ import woowacourse.shopping.domain.Order
 import java.time.LocalDate
 
 data class BuyXGetYCoupon(
+    override val id: Int,
     override val code: String,
     override val description: String,
     override val expirationDate: LocalDate,

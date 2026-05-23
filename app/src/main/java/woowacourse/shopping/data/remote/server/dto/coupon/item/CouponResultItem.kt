@@ -42,13 +42,15 @@ fun CouponResultItem.toDomain(): Coupon {
     val endTime = LocalTime.parse(availableTime.end)
     return when (discountType) {
         "fixed" -> FixedCoupon(
+            id = id.toInt(),
             code = code,
             expirationDate = expiryDate,
             discountAmount = discount,
-            minOrderCost = minimumAmount,
+            minimumAmount = minimumAmount,
             description = description
         )
         "buyXgetY" -> BuyXGetYCoupon(
+            id = id.toInt(),
             code = code,
             description = description,
             expirationDate = expiryDate,
@@ -56,16 +58,18 @@ fun CouponResultItem.toDomain(): Coupon {
             getQuantity = getQuantity
         )
         "freeShipping" -> FreeShippingCoupon(
+            id = id.toInt(),
             code = code,
             description = description,
             expirationDate = expiryDate,
             minimumAmount = minimumAmount,
         )
         "percentage" -> PercentCoupon(
+            id = id.toInt(),
             code = code,
             description = description,
             expirationDate = expiryDate,
-            discountPercent = discount/100L,
+            discountPercent = discount/100.0,
             startTime = startTime,
             endTime = endTime
         )
