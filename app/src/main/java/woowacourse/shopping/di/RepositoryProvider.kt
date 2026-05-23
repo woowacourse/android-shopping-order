@@ -2,6 +2,7 @@ package woowacourse.shopping.di
 
 import android.content.Context
 import androidx.room.Room
+import woowacourse.shopping.data.notification.DefaultPaymentNotificationScheduler
 import woowacourse.shopping.data.repository.DefaultCartRepository
 import woowacourse.shopping.data.repository.DefaultCouponRepository
 import woowacourse.shopping.data.repository.DefaultOrderRepository
@@ -23,6 +24,7 @@ import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.repository.SettingRepository
+import woowacourse.shopping.domain.scheduler.PaymentNotificationScheduler
 
 object RepositoryProvider {
     private lateinit var appContext: Context
@@ -82,5 +84,9 @@ object RepositoryProvider {
         DefaultSettingRepository(
             dataSource = DefaultSettingDataSource(appContext),
         )
+    }
+
+    val paymentNotificationScheduler: PaymentNotificationScheduler by lazy {
+        DefaultPaymentNotificationScheduler(appContext)
     }
 }

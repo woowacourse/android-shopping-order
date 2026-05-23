@@ -20,6 +20,8 @@ import woowacourse.shopping.domain.model.PriceModifiers
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.SettingRepository
+import woowacourse.shopping.domain.scheduler.PaymentNotificationScheduler
 import woowacourse.shopping.presentation.navigation.OrderItem
 import woowacourse.shopping.presentation.payment.model.PaymentUiState
 import woowacourse.shopping.presentation.payment.model.toUiModel
@@ -29,6 +31,8 @@ class PaymentViewModel(
     private val productRepository: ProductRepository = RepositoryProvider.productRepository,
     private val couponRepository: CouponRepository = RepositoryProvider.couponRepository,
     private val orderRepository: OrderRepository = RepositoryProvider.orderRepository,
+    private val settingRepository: SettingRepository = RepositoryProvider.settingRepository,
+    private val notificationScheduler: PaymentNotificationScheduler = RepositoryProvider.paymentNotificationScheduler,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PaymentUiState())
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
@@ -39,7 +43,46 @@ class PaymentViewModel(
     private var paymentItems: PaymentItems? = null
     private var availableCouponsDomain: List<Coupon> = emptyList()
 
-    fun loadAvailableCoupons(orderItems: List<OrderItem>) {
+    fun onScreenEntered(orderItems: List<OrderItem>) {
+        notificationScheduler.cancel()
+        if (settingRepository.isPaymentPendingNotificationEnabled()) {
+            notificationScheduler.schedule()
+        }
+        loadAvailableCoupons(orderItems)
+    }
+
+    fun selectCoupon(couponId: Long) {
+        val items = paymentItems ?: return
+
+        val newSelectedId = if (uiState.value.selectedCouponId == couponId) null else couponId
+        val selected = newSelectedId?.let { id -> availableCouponsDomain.find { it.id == id } }
+        val orderPricing = calculateAmounts(selected, items)
+
+        _uiState.update {
+            it.copy(
+                selectedCouponId = if (it.selectedCouponId == couponId) null else couponId,
+                discountAmount = orderPricing.discountAmount,
+                deliveryFee = orderPricing.deliveryFee,
+                totalAmount = orderPricing.totalAmount,
+            )
+        }
+    }
+
+    fun submitOrder() {
+        val items = paymentItems ?: return
+        val cartItemIds = items.getPaymentItems().map { it.id }
+        viewModelScope.launch {
+            runCatching { orderRepository.requestOrder(cartItemIds) }
+                .onSuccess {
+                    notificationScheduler.cancel()
+                    _uiEvents.emit(PaymentEvent.OrderSuccess("주문이 완료되었습니다!"))
+                }.onFailure {
+                    _uiEvents.emit(PaymentEvent.ShowError("주문 중 오류가 발생했습니다."))
+                }
+        }
+    }
+
+    private fun loadAvailableCoupons(orderItems: List<OrderItem>) {
         viewModelScope.launch {
             runCatching {
                 val items = buildPaymentItems(orderItems)
@@ -66,35 +109,6 @@ class PaymentViewModel(
             }.onFailure {
                 _uiEvents.emit(PaymentEvent.ShowError("쿠폰을 불러오지 못했습니다."))
             }
-        }
-    }
-
-    fun selectCoupon(couponId: Long) {
-        val items = paymentItems ?: return
-
-        val newSelectedId = if (uiState.value.selectedCouponId == couponId) null else couponId
-        val selected = newSelectedId?.let { id -> availableCouponsDomain.find { it.id == id } }
-        val orderPricing = calculateAmounts(selected, items)
-
-        _uiState.update {
-            it.copy(
-                selectedCouponId = if (it.selectedCouponId == couponId) null else couponId,
-                discountAmount = orderPricing.discountAmount,
-                deliveryFee = orderPricing.deliveryFee,
-                totalAmount = orderPricing.totalAmount,
-            )
-        }
-    }
-
-    fun submitOrder() {
-        val items = paymentItems ?: return
-        val cartItemIds = items.getPaymentItems().map { it.id }
-        viewModelScope.launch {
-            runCatching { orderRepository.requestOrder(cartItemIds) }
-                .onSuccess { _uiEvents.emit(PaymentEvent.OrderSuccess("주문이 완료되었습니다!")) }
-                .onFailure {
-                    _uiEvents.emit(PaymentEvent.ShowError("주문 중 오류가 발생했습니다."))
-                }
         }
     }
 

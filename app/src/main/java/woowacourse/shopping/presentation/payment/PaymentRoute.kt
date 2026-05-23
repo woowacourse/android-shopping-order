@@ -30,7 +30,7 @@ fun PaymentRoute(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.loadAvailableCoupons(orderItems)
+        viewModel.onScreenEntered(orderItems)
     }
 
     LaunchedEffect(Unit) {
