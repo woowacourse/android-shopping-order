@@ -162,6 +162,10 @@ class CartViewModel(
                 selectedCartState =
                     it.selectedCartState.copy(
                         selectedCartItems = selectedItems,
+                        isAllChecked =
+                            _uiState.value.items.all { item ->
+                                selectedItems.contains(item.id)
+                            },
                     ),
             )
         }
@@ -178,9 +182,12 @@ class CartViewModel(
     fun isAllSelectClick() {
         val selectedItems =
             if (_uiState.value.selectedCartState.isAllChecked) {
-                emptyList()
+                _uiState.value.selectedCartState.selectedCartItems -
+                    _uiState.value.items
+                        .map { it.id }
+                        .toImmutableList()
             } else {
-                _uiState.value.items.map { it.id }
+                _uiState.value.selectedCartState.selectedCartItems + _uiState.value.items.map { it.id }
             }.toImmutableList()
 
         _uiState.update {
