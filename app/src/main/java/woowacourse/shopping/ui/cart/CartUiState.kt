@@ -21,7 +21,6 @@ data class PageState(
 
 data class UiInfoState(
     val isLoading: Boolean = true,
-    val errorMessage: String? = null,
     val isOrder: Boolean = false,
 )
 

@@ -7,8 +7,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,6 +29,9 @@ class CartViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
+
+    private val _uiEvent = MutableSharedFlow<CartUiEvent>()
+    val uiEvent: SharedFlow<CartUiEvent> = _uiEvent.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -224,6 +230,12 @@ class CartViewModel(
                             }.toImmutableList(),
                 )
             }
+        }
+    }
+
+    fun onBackClick() {
+        viewModelScope.launch {
+            _uiEvent.emit(CartUiEvent.NavToBack)
         }
     }
 
