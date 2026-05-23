@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.localdb.mapper
+package woowacourse.shopping.data.remote.mapper
 
 import woowacourse.shopping.data.remote.dto.response.cart.CartDto
 import woowacourse.shopping.data.remote.dto.response.cart.CartProductDto

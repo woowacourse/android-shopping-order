@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.localdb.mapper.toDomain
 import woowacourse.shopping.data.remote.api.CartApi
 import woowacourse.shopping.data.remote.dto.request.AddCartRequestBody
 import woowacourse.shopping.data.remote.dto.request.UpdateCartRequestBody
+import woowacourse.shopping.data.remote.mapper.toDomain
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Money
 
