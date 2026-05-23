@@ -37,6 +37,7 @@ import woowacourse.shopping.feature.purchase.component.PurchaseAppBar
 @Composable
 fun PurchaseScreen(
     activityFinish: () -> Unit,
+    onPurchaseComplete: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PurchaseViewModel = viewModel(factory = PurchaseViewModel.Factory),
 ) {
@@ -44,6 +45,13 @@ fun PurchaseScreen(
 
     LaunchedEffect(Unit) {
         viewModel.initialLoading()
+        viewModel.event.collect { event ->
+            when (event) {
+                is PurchaseUiEvent.PurchaseComplete -> {
+                    onPurchaseComplete()
+                }
+            }
+        }
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -66,8 +74,8 @@ fun PurchaseScreen(
         selectedCouponId = uiState.selectedCouponId,
         onCheckClick = viewModel::couponSelect,
         onCloseClick = activityFinish,
+        onPurchaseClick = viewModel::purchase,
         modifier = modifier,
-
     )
 }
 
@@ -77,6 +85,7 @@ fun PurchaseScreenContent(
     selectedCouponId: String?,
     onCheckClick: (String) -> Unit,
     onCloseClick: () -> Unit,
+    onPurchaseClick: () -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
@@ -150,13 +159,20 @@ fun PurchaseScreenContent(
             )
             Spacer(modifier.weight(1f))
             TextButton(
-                onClick = {},
+                onClick = {
+                    onPurchaseClick()
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp)
                     .background(Color(0xff04c09e)),
             ) {
-                Text("결제하기", fontWeight = FontWeight.W700, color = Color(0xffffffff))
+                Text(
+                    "결제하기",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.W700,
+                    color = Color(0xffffffff),
+                )
             }
         }
     }
@@ -173,5 +189,6 @@ private fun PurchaseScreenContentPreview() {
         snackbarHostState = SnackbarHostState(),
         selectedCouponId = "1",
         onCheckClick = { },
+        onPurchaseClick = {},
     )
 }

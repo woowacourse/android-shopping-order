@@ -89,6 +89,9 @@ fun AppNavHost() {
         composable<PurchaseRoute> {
             PurchaseScreen(
                 activityFinish = { navController.popBackStack() },
+                onPurchaseComplete = {
+                    navController.popBackStack(ProductListRoute, inclusive = false)
+                },
             )
         }
     }

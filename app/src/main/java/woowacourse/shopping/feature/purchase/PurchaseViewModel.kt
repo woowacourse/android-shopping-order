@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.PurchaseRoute
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.UiEvent
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.coupon.CouponRepository
 import woowacourse.shopping.data.repository.order.OrderRepository
@@ -53,8 +52,8 @@ class PurchaseViewModel(
     private val _uiState = MutableStateFlow(PurchaseUiState())
     val uiState: StateFlow<PurchaseUiState> = _uiState.asStateFlow()
 
-    private val _event = MutableSharedFlow<UiEvent>()
-    val event: SharedFlow<UiEvent> = _event.asSharedFlow()
+    private val _event = MutableSharedFlow<PurchaseUiEvent>()
+    val event: SharedFlow<PurchaseUiEvent> = _event.asSharedFlow()
 
     private var cart: Cart = Cart(emptyList())
 
@@ -147,13 +146,12 @@ class PurchaseViewModel(
         }
     }
 
-    fun order(cartContentIds: List<String>) {
+    fun purchase() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            orderRepository.orders(cartContentIds)
+            orderRepository.orders(contentIds)
 
-            _uiState.update { it.copy(isLoading = false) }
-            _event.emit(UiEvent.ShowSnackbar("주문되었습니다."))
+            _event.emit(PurchaseUiEvent.PurchaseComplete("주문이 완료되었습니다."))
         }
     }
 
