@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -16,6 +17,7 @@ fun ShoppingNavHost(
     navController: NavHostController,
     shoppingApplication: ShoppingApplication,
     contentPadding: PaddingValues,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -26,6 +28,7 @@ fun ShoppingNavHost(
         catalogRoute(
             shoppingApplication = shoppingApplication,
             contentPadding = contentPadding,
+            snackbarHostState = snackbarHostState,
             onProductClick = { selectedProductId, lastViewedProductId ->
                 navController.navigate(
                     ShoppingRoute.ProductDetail(
@@ -44,6 +47,7 @@ fun ShoppingNavHost(
         productDetailRoute(
             shoppingApplication = shoppingApplication,
             contentPadding = contentPadding,
+            snackbarHostState = snackbarHostState,
             onLastViewedProductClick = { selectedProductId, lastViewedProductId ->
                 navController.navigate(
                     ShoppingRoute.ProductDetail(
@@ -60,6 +64,7 @@ fun ShoppingNavHost(
         cartRoute(
             shoppingApplication = shoppingApplication,
             contentPadding = contentPadding,
+            snackbarHostState = snackbarHostState,
             onBackClick = { navController.popBackStack() },
             onOrderClick = { selectedCartItemIds ->
                 navController.navigate(
@@ -73,6 +78,7 @@ fun ShoppingNavHost(
         recommendationRoute(
             shoppingApplication = shoppingApplication,
             contentPadding = contentPadding,
+            snackbarHostState = snackbarHostState,
             onItemClick = { selectedProductId ->
                 navController.navigate(
                     ShoppingRoute.ProductDetail(

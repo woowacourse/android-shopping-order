@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.productdetail
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -11,12 +12,14 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.ui.event.UiEventHandler
 import woowacourse.shopping.domain.model.PurchaseProduct
 import woowacourse.shopping.ui.navigation.ShoppingRoute
 
 fun NavGraphBuilder.productDetailRoute(
     shoppingApplication: ShoppingApplication,
     contentPadding: PaddingValues,
+    snackbarHostState: SnackbarHostState,
     onLastViewedProductClick: (selectedProductId: Long, lastViewedProductId: Long) -> Unit,
     onBackClick: () -> Unit,
 ) {
@@ -28,6 +31,7 @@ fun NavGraphBuilder.productDetailRoute(
             selectedProductId = route.selectedProductId,
             lastViewedProductId = route.lastViewedProductId,
             contentPadding = contentPadding,
+            snackbarHostState = snackbarHostState,
             onLastViewedProductClick = onLastViewedProductClick,
             onBackClick = onBackClick,
         )
@@ -40,6 +44,7 @@ private fun ProductDetailRouteContent(
     selectedProductId: Long,
     lastViewedProductId: Long?,
     contentPadding: PaddingValues,
+    snackbarHostState: SnackbarHostState,
     onLastViewedProductClick: (selectedProductId: Long, lastViewedProductId: Long) -> Unit,
     onBackClick: () -> Unit,
 ) {
@@ -55,6 +60,12 @@ private fun ProductDetailRouteContent(
                     lastViewedProductId = lastViewedProductId,
                 ),
         )
+
+    UiEventHandler(
+        uiEvent = viewModel.uiEvent,
+        snackbarHostState = snackbarHostState,
+    )
+
     val count by viewModel.countState.collectAsStateWithLifecycle()
     val selectedProduct by viewModel.selectedProduct.collectAsStateWithLifecycle()
     val lastViewedProduct by viewModel.lastViewedProduct.collectAsStateWithLifecycle()
@@ -72,13 +83,14 @@ private fun ProductDetailRouteContent(
             onMinus = { viewModel.minusCount() },
             onAddRequest = {
                 viewModel.addPurchaseProduct(
-                    PurchaseProduct(
-                        product.id,
-                        product,
-                        count,
-                    ),
+                    purchaseProduct =
+                        PurchaseProduct(
+                            product.id,
+                            product,
+                            count,
+                        ),
+                    onSuccess = onBackClick,
                 )
-                onBackClick()
             },
             onClose = onBackClick,
             modifier = Modifier.padding(contentPadding),

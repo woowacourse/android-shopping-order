@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.catalog
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -12,18 +13,21 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.ui.event.UiEventHandler
 import woowacourse.shopping.ui.navigation.ShoppingRoute
 
 fun NavGraphBuilder.catalogRoute(
     shoppingApplication: ShoppingApplication,
     contentPadding: PaddingValues,
+    snackbarHostState: SnackbarHostState,
     onProductClick: (selectedProductId: Long, lastViewedProductId: Long?) -> Unit,
     onCartClick: () -> Unit,
 ) {
     composable<ShoppingRoute.Catalog> {
-        catalogRouteContent(
+        CatalogRouteContent(
             shoppingApplication = shoppingApplication,
             contentPadding = contentPadding,
+            snackbarHostState = snackbarHostState,
             onProductClick = onProductClick,
             onCartClick = onCartClick,
         )
@@ -31,9 +35,10 @@ fun NavGraphBuilder.catalogRoute(
 }
 
 @Composable
-private fun catalogRouteContent(
+private fun CatalogRouteContent(
     shoppingApplication: ShoppingApplication,
     contentPadding: PaddingValues,
+    snackbarHostState: SnackbarHostState,
     onProductClick: (selectedProductId: Long, lastViewedProductId: Long?) -> Unit,
     onCartClick: () -> Unit,
 ) {
@@ -46,6 +51,11 @@ private fun catalogRouteContent(
                     shoppingApplication.productRepository,
                 ),
         )
+
+    UiEventHandler(
+        uiEvent = viewModel.uiEvent,
+        snackbarHostState = snackbarHostState,
+    )
 
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
         viewModel.fetchCart()

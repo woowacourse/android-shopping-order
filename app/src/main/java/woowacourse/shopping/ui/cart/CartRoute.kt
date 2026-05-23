@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.cart
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -11,12 +12,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.ui.event.UiEventHandler
 import woowacourse.shopping.ui.cart.uimodel.toUiModel
 import woowacourse.shopping.ui.navigation.ShoppingRoute
 
 fun NavGraphBuilder.cartRoute(
     shoppingApplication: ShoppingApplication,
     contentPadding: PaddingValues,
+    snackbarHostState: SnackbarHostState,
     onBackClick: () -> Unit,
     onOrderClick: (selectedCartItemIds: List<Long>) -> Unit,
 ) {
@@ -24,6 +27,7 @@ fun NavGraphBuilder.cartRoute(
         cartContent(
             shoppingApplication = shoppingApplication,
             contentPadding = contentPadding,
+            snackbarHostState = snackbarHostState,
             onBackClick = onBackClick,
             onOrderClick = onOrderClick,
         )
@@ -34,6 +38,7 @@ fun NavGraphBuilder.cartRoute(
 private fun cartContent(
     shoppingApplication: ShoppingApplication,
     contentPadding: PaddingValues,
+    snackbarHostState: SnackbarHostState,
     onBackClick: () -> Unit,
     onOrderClick: (selectedCartItemIds: List<Long>) -> Unit,
 ) {
@@ -44,6 +49,12 @@ private fun cartContent(
                     cartRepository = shoppingApplication.cartRepository,
                 ),
         )
+
+    UiEventHandler(
+        uiEvent = viewModel.uiEvent,
+        snackbarHostState = snackbarHostState,
+    )
+
     val pagedCart by viewModel.pagedCart.collectAsStateWithLifecycle()
     val currentPage by viewModel.currentPage.collectAsStateWithLifecycle()
     val isPageable by viewModel.isPageable.collectAsStateWithLifecycle()
