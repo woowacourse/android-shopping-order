@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.cart
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -15,6 +16,7 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.PurchaseProduct
 import woowacourse.shopping.testing.fakes.FakeCartRepository
 import woowacourse.shopping.testing.MainDispatcherExtension
+import woowacourse.shopping.ui.event.UiEvent
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CartViewModelTest {
@@ -156,11 +158,14 @@ class CartViewModelTest {
         }
 
         fakeCartRepository.shouldFail = true
+        val event = async(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiEvent.first() }
 
         viewModel.updateCountWithID(1L, 1)
 
-        val errorMsg = viewModel.errorEvent.first()
-        assertEquals("수량 변경에 실패했습니다. 다시 시도해주세요.", errorMsg)
+        assertEquals(
+            UiEvent.ShowMessage("수량 변경에 실패했습니다. 다시 시도해주세요."),
+            event.await(),
+        )
 
         assertFalse(viewModel.isLoading.value)
     }
@@ -178,11 +183,14 @@ class CartViewModelTest {
         }
 
         fakeCartRepository.shouldFail = true
+        val event = async(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiEvent.first() }
 
         viewModel.removeWithID(1L)
 
-        val errorMsg = viewModel.errorEvent.first()
-        assertEquals("아이템 삭제에 실패했습니다.", errorMsg)
+        assertEquals(
+            UiEvent.ShowMessage("아이템 삭제에 실패했습니다."),
+            event.await(),
+        )
 
         assertFalse(viewModel.isLoading.value)
     }

@@ -3,9 +3,13 @@ package woowacourse.shopping.ui.recommendation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -21,13 +25,16 @@ import woowacourse.shopping.domain.model.PurchaseProducts
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyViewedProductRepository
+import woowacourse.shopping.ui.event.UiEvent
 
 class RecommendationViewModel(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
     initialSelectedIds: List<Long> = emptyList(),
-): ViewModel() {
+) : ViewModel() {
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
 
     private val _selectedItemIds = MutableStateFlow<List<Long>>(initialSelectedIds)
     val selectedItemIds = _selectedItemIds.asStateFlow()
@@ -39,6 +46,7 @@ class RecommendationViewModel(
             initialValue = null
         )
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val lastViewedProduct: StateFlow<Product?> = lastViewProductId.flatMapLatest { id ->
         flow {
             if (id != null && id != 0L) {
@@ -126,15 +134,20 @@ class RecommendationViewModel(
 
     fun addToCart(purchaseProduct: PurchaseProduct) {
         viewModelScope.launch {
-            val existingItem = allCartItems.value.purchaseProducts.find {
-                it.product.id == purchaseProduct.product.id
+            try {
+                val existingItem = allCartItems.value.purchaseProducts.find {
+                    it.product.id == purchaseProduct.product.id
+                }
+                if (existingItem != null) {
+                    cartRepository.updateCount(existingItem.id, existingItem.count + 1)
+                } else {
+                    cartRepository.insert(purchaseProduct)
+                }
+                fetchCart()
+                _uiEvent.emit(UiEvent.ShowMessage("장바구니에 담았습니다."))
+            } catch (e: Exception) {
+                _uiEvent.emit(UiEvent.ShowMessage("장바구니 담기에 실패했습니다."))
             }
-            if (existingItem != null) {
-                cartRepository.updateCount(existingItem.id, existingItem.count + 1)
-            }else {
-                cartRepository.insert(purchaseProduct)
-            }
-            fetchCart()
         }
     }
 
@@ -156,10 +169,15 @@ class RecommendationViewModel(
 
     fun removeWithID(id: Long) {
         viewModelScope.launch {
-            val target = allCartItems.value.findById(id)
-            if(target != null){
-                cartRepository.deleteCartItem(target.id)
-                fetchCart()
+            try {
+                val target = allCartItems.value.findById(id)
+                if (target != null) {
+                    cartRepository.deleteCartItem(target.id)
+                    fetchCart()
+                    _uiEvent.emit(UiEvent.ShowMessage("상품을 삭제했습니다."))
+                }
+            } catch (e: Exception) {
+                _uiEvent.emit(UiEvent.ShowMessage("상품 삭제에 실패했습니다."))
             }
         }
     }

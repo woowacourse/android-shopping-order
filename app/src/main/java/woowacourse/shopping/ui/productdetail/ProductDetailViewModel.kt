@@ -3,9 +3,12 @@ package woowacourse.shopping.ui.productdetail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
@@ -17,6 +20,7 @@ import woowacourse.shopping.domain.model.PurchaseProducts
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyViewedProductRepository
+import woowacourse.shopping.ui.event.UiEvent
 
 class ProductDetailViewModel(
     private val cartRepository: CartRepository,
@@ -25,6 +29,9 @@ class ProductDetailViewModel(
     private val selectedProductId: Long,
     private val lastViewedProductId: Long?,
 ) : ViewModel() {
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
+
     private val _count = MutableStateFlow(1)
     val countState = _count.asStateFlow()
 
@@ -67,14 +74,23 @@ class ProductDetailViewModel(
         }
     }
 
-    fun addPurchaseProduct(purchaseProduct: PurchaseProduct) {
+    fun addPurchaseProduct(
+        purchaseProduct: PurchaseProduct,
+        onSuccess: () -> Unit = {},
+    ) {
         viewModelScope.launch {
-            val existCartItem = cart.value.findById(purchaseProduct.productId)
-            if(existCartItem != null) {
-                val newTotalCount = existCartItem.count + purchaseProduct.count
-                cartRepository.updateCount(existCartItem.id, newTotalCount)
-            } else {
-                cartRepository.insert(purchaseProduct)
+            try {
+                val existCartItem = cart.value.findById(purchaseProduct.productId)
+                if (existCartItem != null) {
+                    val newTotalCount = existCartItem.count + purchaseProduct.count
+                    cartRepository.updateCount(existCartItem.id, newTotalCount)
+                } else {
+                    cartRepository.insert(purchaseProduct)
+                }
+                _uiEvent.emit(UiEvent.ShowMessage("장바구니에 담았습니다."))
+                onSuccess()
+            } catch (e: Exception) {
+                _uiEvent.emit(UiEvent.ShowMessage("장바구니 담기에 실패했습니다."))
             }
         }
     }

@@ -3,25 +3,27 @@ package woowacourse.shopping.ui.cart
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.model.PurchaseProducts
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.ui.event.UiEvent
 
 class CartViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel() {
-    private val _errorEvent = Channel<String>()
-    val errorEvent = _errorEvent.receiveAsFlow()
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
 
     private val _currentPage: MutableStateFlow<Int> = MutableStateFlow(0)
 
@@ -160,7 +162,7 @@ class CartViewModel(
                     cartRepository.getCartItemCount()
                 }
             } catch (e: Exception) {
-                _errorEvent.send("수량 변경에 실패했습니다. 다시 시도해주세요.")
+                _uiEvent.emit(UiEvent.ShowMessage("수량 변경에 실패했습니다. 다시 시도해주세요."))
             } finally {
                 _isLoading.update { false }
             }
@@ -193,8 +195,9 @@ class CartViewModel(
                 }
 
                 _checkedItemIds.update { it - id }
+                _uiEvent.emit(UiEvent.ShowMessage("상품을 삭제했습니다."))
             } catch (e: Exception) {
-                _errorEvent.send("아이템 삭제에 실패했습니다.")
+                _uiEvent.emit(UiEvent.ShowMessage("아이템 삭제에 실패했습니다."))
             } finally {
                 _isLoading.update { false }
             }
