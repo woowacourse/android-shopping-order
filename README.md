@@ -28,9 +28,9 @@
 
 - [ ] 쿠폰
   - [x] 쿠폰 도메인 객체 정의
-  - [ ] 쿠폰 Repository 정의
-  - [ ] 쿠폰 api 호출 함수 정의
-    - [ ] ApiResult를 통한 예외처리 적용
+  - [x] 쿠폰 Repository 정의
+  - [x] 쿠폰 api 호출 함수 정의
+    - [x] ApiResult를 통한 예외처리 적용
   - [ ] 쿠폰 DTO 정의
 
 - [ ] 주문
