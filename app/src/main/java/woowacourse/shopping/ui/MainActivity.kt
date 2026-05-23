@@ -89,15 +89,7 @@ class MainActivity : ComponentActivity() {
                             )
                             CartRoute(
                                 viewModel = viewModel,
-                                onClose = { navController.popBackStack() },
-                                onOrderClick = { totalPrice, checkedIds ->
-                                    navController.navigate(
-                                        Recommendation(
-                                            totalPrice = totalPrice,
-                                            checkedIds = checkedIds
-                                        ),
-                                    )
-                                },
+                                navController = navController,
                                 modifier = Modifier.padding(innerPadding)
                             )
                         }
