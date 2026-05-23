@@ -15,6 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import woowacourse.shopping.ui.navigation.Shopping
 
 @Composable
 fun PaymentRoute(
@@ -30,17 +31,17 @@ fun PaymentRoute(
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.event.collect { event ->
                 when (event) {
-                    is PaymentEvent.SnackbarEvent -> {
-                        launch {
-                            snackbarHostState.showSnackbar(event.message)
+                    is PaymentEvent.SnackbarEvent -> launch {
+                        snackbarHostState.showSnackbar(event.message)
+                    }
+                    is PaymentEvent.Order -> viewModel.processOrder()
+                    is PaymentEvent.NavigateBack -> navController.popBackStack()
+                    is PaymentEvent.NavigateToShopping -> navController
+                        .navigate(Shopping) {
+                            popUpTo<Shopping> {
+                                inclusive = false
+                            }
                         }
-                    }
-                    is PaymentEvent.Order -> {
-                        viewModel.processOrder()
-                    }
-                    is PaymentEvent.NavigateBack -> {
-                        navController.popBackStack()
-                    }
                 }
             }
         }

@@ -86,9 +86,14 @@ class PaymentViewModel(
     fun processOrder() {
         viewModelScope.launch {
             when (val result = orderRepository.order(uiState.value.order)) {
-                is ApiResult.Success -> _event.emit(
-                    PaymentEvent.SnackbarEvent("주문이 완료되었습니다.")
-                )
+                is ApiResult.Success -> {
+                    _event.emit(
+                        PaymentEvent.SnackbarEvent("주문이 완료되었습니다.")
+                    )
+                    _event.emit(
+                        PaymentEvent.NavigateToShopping
+                    )
+                }
                 is ApiResult.Error -> _event.emit(
                     PaymentEvent.SnackbarEvent("${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
                 )
