@@ -6,16 +6,26 @@ import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
 import woowacourse.shopping.domain.coupon.OrderContext
+import woowacourse.shopping.fixture.TestCartContentFixture
+import woowacourse.shopping.fixture.TestProductFixture
 
 class BogoCoupon(
     override val validUntil: LocalDate,
 ) : Coupon {
     override fun isApplicable(context: OrderContext): Boolean {
-        TODO("Not yet implemented")
+        val cartContents = context.items
+
+        return cartContents.any { it.quantity >= 3 }
     }
 
     override fun discountAmount(context: OrderContext): Int {
-        TODO("Not yet implemented")
+        val cartContents = context.items
+
+        val productPrices =
+            cartContents.mapNotNull { if (it.quantity >= 3) it.product.priceAmount() else null }
+
+        val highestDiscountPrice = productPrices.max()
+        return highestDiscountPrice
     }
 }
 
@@ -48,24 +58,56 @@ class CouponTest {
 
     @Test
     fun `BogoCoupon은 장바구니에 동일 상품이 3개 이상 있어야 적용 가능하다`() {
-    }
+        // given: 장바구니에 동일한 상품이 3개 존재하고 쿠폰이 주어진다
+        val cartContent = TestCartContentFixture.cartContent(quantity = 3)
+        val cart = Cart(
+            cartContents = listOf(cartContent),
+        )
+        val coupon = BogoCoupon(validUntil = LocalDate.of(2026, 11, 30))
+        val price = cart.cartContents.sumOf { it.quantity * it.product.priceAmount() }
 
-    @Test
-    fun `BogoCoupon은 3개 이상 담긴 상품이 여러 개일 때 가장 비싼 상품 1개 가격을 할인한다`() {
-        // given:
+        // when: 할인 금액을 계산할 때
+        val applicable = coupon.isApplicable(OrderContext(items = cart.cartContents))
 
-        // when:
-
-        // then:
+        // then: 할인을 적용할 수 있다
+        assertThat(applicable).isEqualTo(true)
     }
 
     @Test
     fun `BogoCoupon은 3개 이상인 상품이 없으면 적용 불가다`() {
-        // given:
+        // given: 장바구니에 동일한 상품이 2개 존재하고 쿠폰이 주어진다
+        val cartContent = TestCartContentFixture.cartContent(quantity = 2)
+        val cart = Cart(
+            cartContents = listOf(cartContent),
+        )
+        val coupon = BogoCoupon(validUntil = LocalDate.of(2026, 11, 30))
+        val price = cart.cartContents.sumOf { it.quantity * it.product.priceAmount() }
 
-        // when:
+        // when: 할인 금액을 계산할 때
+        val applicable = coupon.isApplicable(OrderContext(items = cart.cartContents))
 
-        // then:
+        // then: 할인을 적용할 수 없다
+        assertThat(applicable).isEqualTo(false)
+    }
+
+    @Test
+    fun `BogoCoupon은 3개 이상 담긴 상품이 여러 개일 때 가장 비싼 상품 1개 가격을 할인한다`() {
+        // given: 장바구니에 동일한 상품이 3개 존재하고 쿠폰이 주어진다
+        val cartContent = TestCartContentFixture.cartContent(quantity = 3)
+        val expensiveCartContent = TestCartContentFixture.cartContent(
+            quantity = 3, product = TestProductFixture.product(price = 5000),
+        )
+        val cart = Cart(
+            cartContents = listOf(cartContent, expensiveCartContent),
+        )
+        val coupon = BogoCoupon(validUntil = LocalDate.of(2026, 11, 30))
+        val price = cart.cartContents.sumOf { it.quantity * it.product.priceAmount() }
+
+        // when: 할인 금액을 계산할 때
+        val discountedPrice = price - coupon.discountAmount(OrderContext(items = cart.cartContents))
+
+        // then: 할인이 적용된다
+        assertThat(discountedPrice).isEqualTo(price - expensiveCartContent.product.priceAmount())
     }
 
     @Test
