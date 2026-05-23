@@ -108,15 +108,7 @@ class MainActivity : ComponentActivity() {
                             )
                             RecommendationRoute(
                                 viewModel = viewModel,
-                                onBackClick = {
-                                    navController.popBackStack()
-                                },
-                                onOrderClick = {
-                                    navController.popBackStack(Shopping, inclusive = false)
-                                },
-                                onNavigateToProductDetail = { id ->
-                                    navController.navigate(ProductDetail(id))
-                                },
+                                navController = navController,
                                 modifier = Modifier.padding(innerPadding)
                             )
                         }
