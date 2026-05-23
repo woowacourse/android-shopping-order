@@ -36,8 +36,8 @@
 - [x] BogoCoupon은 장바구니에 동일 상품이 3개 이상 있어야 적용 가능하다
 - [x] BogoCoupon은 3개 이상인 상품이 없으면 적용 불가다
 - [x] BogoCoupon은 3개 이상 담긴 상품이 여러 개일 때 가장 비싼 상품 1개 가격을 할인한다
-- [ ] FreeShippingCoupon은 최소 주문 금액(50,000원) 미만이면 적용 불가다
-- [ ] FreeShippingCoupon은 적용 시 배송비를 0원으로 만든다
+- [x] FreeShippingCoupon은 최소 주문 금액(50,000원) 미만이면 적용 불가다
+- [x] FreeShippingCoupon은 적용 시 배송비를 0원으로 만든다
 - [ ] MiracleSaleCoupon은 04:00 ~ 07:00 시간대가 아니면 적용 불가다
 - [ ] MiracleSaleCoupon은 적용 시 총 상품 금액의 30%를 할인한다
 - [ ] 쿠폰은 만료일을 초과하면 사용할 수 없다

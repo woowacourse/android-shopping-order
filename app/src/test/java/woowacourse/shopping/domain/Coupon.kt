@@ -4,10 +4,28 @@ import java.time.LocalDate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.coupon.BogoCoupon
+import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
 import woowacourse.shopping.domain.coupon.OrderContext
 import woowacourse.shopping.fixture.TestCartContentFixture
 import woowacourse.shopping.fixture.TestProductFixture
+
+class FreeShippingCoupon(
+    override val validUntil: LocalDate,
+) : Coupon {
+    override fun isApplicable(context: OrderContext): Boolean {
+        val totalPrice = context.totalPrice
+
+        return totalPrice >= FREE_SHIPPING_THRESHOLD
+    }
+
+    override fun discountAmount(context: OrderContext): Int = if (isApplicable(context)) return FREE_SHIPPING_FEE else return 0
+
+    companion object {
+        const val FREE_SHIPPING_THRESHOLD = 50_000
+        const val FREE_SHIPPING_FEE = 3_000
+    }
+}
 
 class CouponTest {
     @Test
@@ -92,29 +110,29 @@ class CouponTest {
 
     @Test
     fun `FreeShippingCoupon은 최소 주문 금액(50,000원) 미만이면 적용 불가다`() {
-        // given:
+        // given: 주문 금액 45_000과 무료배송 쿠폰이 주어진다
+        val price = 45_000
+        val coupon = FreeShippingCoupon(validUntil = LocalDate.of(2026, 11, 30))
 
-        // when:
+        // when: 할인 금액을 계산할 때
+        val applicable = coupon.isApplicable(OrderContext(price))
 
-        // then:
+        // then: 할인을 적용할 수 없다
+        assertThat(applicable).isEqualTo(false)
     }
 
     @Test
     fun `FreeShippingCoupon은 적용 시 배송비를 0원으로 만든다`() {
-        // given:
+        // given: 주문 금액 50_000과 무료배송 쿠폰이 주어진다
+        val price = 50_000
+        val shippingPrice = 3_000
+        val coupon = FreeShippingCoupon(validUntil = LocalDate.of(2026, 11, 30))
 
-        // when:
+        // when: 할인 금액을 계산할 때
+        val discountedPrice = shippingPrice - coupon.discountAmount(OrderContext(price))
 
-        // then:
-    }
-
-    @Test
-    fun `FREESHIPPING 쿠폰 적용 시 배송비는 0원이다`() {
-        // given:
-
-        // when:
-
-        // then:
+        // then: 할인을 적용할 수 없다
+        assertThat(discountedPrice).isEqualTo(0)
     }
 
     @Test
