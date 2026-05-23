@@ -8,24 +8,81 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavController
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import woowacourse.shopping.ui.navigation.ProductDetail
+import woowacourse.shopping.ui.navigation.Shopping
 
 @Composable
 fun RecommendationRoute(
     viewModel: RecommendationViewModel,
-    onBackClick: () -> Unit,
-    onOrderClick: () -> Unit,
-    onNavigateToProductDetail: (Long) -> Unit,
+    navController: NavController,
     modifier: Modifier = Modifier,
 ) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val composableScope = rememberCoroutineScope()
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(uiState.errorMsg) {
-        uiState.errorMsg?.let { message ->
-            snackbarHostState.showSnackbar(message)
-            viewModel.onErrorMsgShown()
+    LaunchedEffect(Unit) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+            var snackbarJob:  Job? = null
+            viewModel.event.collect { event ->
+                when(event) {
+                    is RecommendationEvent.SnackbarEvent -> {
+                        snackbarJob?.cancel()
+                        snackbarJob = launch {
+                            snackbarHostState.showSnackbar(
+                                event.errorMsg
+                            )
+                        }
+                    }
+
+                    is RecommendationEvent.AddToCart ->
+                        viewModel.addToCart(event.purchaseProduct)
+
+                    is RecommendationEvent.UpdateAmount ->
+                        viewModel.updateCountWithID(
+                            id = event.targetID,
+                            updateAmount = event.updateAmount
+                        )
+
+                    is RecommendationEvent.RemoveFromCart ->
+                        viewModel.removeWithID(event.targetId)
+
+                    is RecommendationEvent.NavigateToCart ->
+                        navController.popBackStack()
+
+                    is RecommendationEvent.NavigateToPayment ->
+                        navController.navigate(Shopping){
+                            popUpTo<Shopping> {
+                                inclusive = true
+                            }
+                        }
+
+                    is RecommendationEvent.NavigateToProductDetail ->
+                        navController.navigate(
+                            ProductDetail(
+                                event.selectedProductId
+                            )
+                        )
+                }
+            }
+        }
+    }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        composableScope.launch {
+            viewModel.fetchCart()
         }
     }
 
@@ -37,15 +94,15 @@ fun RecommendationRoute(
             recommendedProducts = uiState.recommendedProducts,
             totalPrice = uiState.totalPrice,
             totalCount = uiState.checkedIds.size,
-            onBackClick = onBackClick,
-            onOrderClick = onOrderClick,
-            onAddInCart = viewModel::addToCart,
-            onAdd = viewModel::updateCountWithID,
-            onMinus = viewModel::updateCountWithID,
-            onDelete = viewModel::removeWithID,
+            onBackClick = viewModel::navigateToCart,
+            onOrderClick = { viewModel.navigateToPayment(emptyList()) },
+            onAddInCart = viewModel::addToCartTrigger,
+            onAdd = viewModel::updateAmountTrigger,
+            onMinus = viewModel::updateAmountTrigger,
+            onDelete = viewModel::removeFromCartTrigger,
             onItemClick = { product ->
                 viewModel.updateHistory(product)
-                onNavigateToProductDetail(product.id)
+                viewModel.navigateToProductDetail(product.id)
             },
             isContainedInCart = { id -> uiState.cart.isContain(id) },
             itemCount = { id -> uiState.cart.totalCountOfSpecificPurchaseProduct(id) },

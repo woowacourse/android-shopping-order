@@ -3,7 +3,9 @@ package woowacourse.shopping.ui.recommendation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
@@ -33,6 +35,9 @@ class RecommendationViewModel(
         )
     val uiState = _uiState.asStateFlow()
 
+    private val _event = MutableSharedFlow<RecommendationEvent>()
+    val event = _event.asSharedFlow()
+
     init {
         viewModelScope.launch {
             fetchCart()
@@ -61,42 +66,56 @@ class RecommendationViewModel(
                         }
 
                         is ApiResult.Error ->
-                            _uiState.update {
-                                it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${categoryProductsResult.code}")
-                            }
+                            _event.emit(
+                                RecommendationEvent.SnackbarEvent(
+                                    "${ViewModelConst.NETWORK_ERROR_LABEL}${categoryProductsResult.message}"
+                                )
+                            )
 
                         is ApiResult.Exception ->
-                            _uiState.update {
-                                it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${categoryProductsResult.e.message}")
-                            }
+                            _event.emit(
+                                RecommendationEvent.SnackbarEvent(
+                                    "${ViewModelConst.ERROR_LABEL}${categoryProductsResult.e.message}"
+                                )
+                            )
                     }
                 }
 
                 is ApiResult.Error ->
-                    _uiState.update {
-                        it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${productResult.code}")
-                    }
+                    _event.emit(
+                        RecommendationEvent.SnackbarEvent(
+                            "${ViewModelConst.NETWORK_ERROR_LABEL}${productResult.code}"
+                        )
+                    )
 
                 is ApiResult.Exception ->
-                    _uiState.update {
-                        it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${productResult.e.message}")
-                    }
+                    _event.emit(
+                        RecommendationEvent.SnackbarEvent(
+                            "${ViewModelConst.ERROR_LABEL}${productResult.e.message}"
+                        )
+                    )
             }
         }
     }
 
-    private suspend fun fetchCart() {
-        when (val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)) {
+    suspend fun fetchCart() {
+        when (val allCartItemResult =
+            cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)) {
             is ApiResult.Success -> _uiState.update { it.copy(cart = allCartItemResult.data) }
+
             is ApiResult.Error ->
-                _uiState.update {
-                    it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${allCartItemResult.code}")
-                }
+                _event.emit(
+                    RecommendationEvent.SnackbarEvent(
+                        "${ViewModelConst.NETWORK_ERROR_LABEL}${allCartItemResult.code}"
+                    )
+                )
 
             is ApiResult.Exception ->
-                _uiState.update {
-                    it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}")
-                }
+                _event.emit(
+                    RecommendationEvent.SnackbarEvent(
+                        "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}"
+                    )
+                )
         }
     }
 
@@ -110,14 +129,18 @@ class RecommendationViewModel(
                 when (val result = cartRepository.updateCount(existingItem.id, existingItem.count + 1)) {
                     is ApiResult.Success -> fetchCart()
                     is ApiResult.Error ->
-                        _uiState.update {
-                            it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
-                        }
+                        _event.emit(
+                            RecommendationEvent.SnackbarEvent(
+                                "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}"
+                            )
+                        )
 
                     is ApiResult.Exception ->
-                        _uiState.update {
-                            it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
-                        }
+                        _event.emit(
+                            RecommendationEvent.SnackbarEvent(
+                                "${ViewModelConst.ERROR_LABEL}${result.e.message}"
+                            )
+                        )
                 }
             } else {
                 when (val result = cartRepository.insert(purchaseProduct)) {
@@ -134,14 +157,18 @@ class RecommendationViewModel(
                     }
 
                     is ApiResult.Error ->
-                        _uiState.update {
-                            it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
-                        }
+                        _event.emit(
+                            RecommendationEvent.SnackbarEvent(
+                                "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}"
+                            )
+                        )
 
                     is ApiResult.Exception ->
-                        _uiState.update {
-                            it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
-                        }
+                        _event.emit(
+                            RecommendationEvent.SnackbarEvent(
+                                "${ViewModelConst.ERROR_LABEL}${result.e.message}"
+                            )
+                        )
                 }
             }
         }
@@ -167,14 +194,18 @@ class RecommendationViewModel(
                         }
 
                         is ApiResult.Error ->
-                            _uiState.update {
-                                it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
-                            }
+                            _event.emit(
+                                RecommendationEvent.SnackbarEvent(
+                                    "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}"
+                                )
+                            )
 
                         is ApiResult.Exception ->
-                            _uiState.update {
-                                it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
-                            }
+                            _event.emit(
+                                RecommendationEvent.SnackbarEvent(
+                                    "${ViewModelConst.ERROR_LABEL}${result.e.message}"
+                                )
+                            )
                     }
                 }
             }
@@ -192,14 +223,18 @@ class RecommendationViewModel(
                     }
 
                     is ApiResult.Error ->
-                        _uiState.update {
-                            it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
-                        }
+                        _event.emit(
+                            RecommendationEvent.SnackbarEvent(
+                                "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}"
+                            )
+                        )
 
                     is ApiResult.Exception ->
-                        _uiState.update {
-                            it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${result.e.message}")
-                        }
+                        _event.emit(
+                            RecommendationEvent.SnackbarEvent(
+                                "${ViewModelConst.ERROR_LABEL}${result.e.message}"
+                            )
+                        )
                 }
             }
         }
@@ -211,8 +246,59 @@ class RecommendationViewModel(
         }
     }
 
-    fun onErrorMsgShown() {
-        _uiState.update { it.copy(errorMsg = null) }
+    fun addToCartTrigger(purchaseProduct: PurchaseProduct) {
+        viewModelScope.launch {
+            _event.emit(
+                RecommendationEvent.AddToCart(
+                    purchaseProduct
+                )
+            )
+        }
+    }
+
+    fun updateAmountTrigger(targetId: Long, updateAmount: Int) {
+        viewModelScope.launch {
+            _event.emit(
+                RecommendationEvent.UpdateAmount(
+                    targetID = targetId,
+                    updateAmount = updateAmount
+                )
+            )
+        }
+    }
+
+    fun removeFromCartTrigger(targetId: Long) {
+        viewModelScope.launch {
+            _event.emit(
+                RecommendationEvent.RemoveFromCart(targetId)
+            )
+        }
+    }
+
+    fun navigateToPayment(checkedIds: List<Long>) {
+        viewModelScope.launch {
+            _event.emit(
+                RecommendationEvent.NavigateToPayment(checkedIds)
+            )
+        }
+    }
+
+    fun navigateToProductDetail(selectedProductId: Long) {
+        viewModelScope.launch {
+            _event.emit(
+                RecommendationEvent.NavigateToProductDetail(
+                    selectedProductId
+                )
+            )
+        }
+    }
+
+    fun navigateToCart() {
+        viewModelScope.launch {
+            _event.emit(
+                RecommendationEvent.NavigateToCart
+            )
+        }
     }
 }
 
