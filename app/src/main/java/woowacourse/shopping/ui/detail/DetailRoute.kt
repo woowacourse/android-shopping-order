@@ -13,11 +13,14 @@ import woowacourse.shopping.ui.nav.Detail
 
 @Composable
 fun DetailRoute(
+    productId: String,
     navController: NavController,
     viewModel: DetailViewModel =
         viewModel(
             factory =
-                DetailViewModel.Factory,
+                DetailViewModel.Factory(
+                    productId = productId,
+                ),
         ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

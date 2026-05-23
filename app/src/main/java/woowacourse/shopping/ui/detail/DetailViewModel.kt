@@ -1,10 +1,8 @@
 package woowacourse.shopping.ui.detail
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -23,7 +21,7 @@ import woowacourse.shopping.ui.model.mapper.toUiModel
 import java.io.IOException
 
 class DetailViewModel(
-    private val savedStateHandle: SavedStateHandle,
+    private val id: String,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentItemRepository: RecentItemRepository,
@@ -34,8 +32,7 @@ class DetailViewModel(
     private val _event = Channel<DetailEvent>()
     val event = _event.receiveAsFlow()
 
-    private val id: String? = savedStateHandle[PRODUCT_ID]
-    private val hideRecentItem: Boolean = savedStateHandle[HIDE_RECENT_ITEM] ?: false
+    private val hideRecentItem: Boolean = false
 
     init {
         loadProduct()
@@ -44,8 +41,6 @@ class DetailViewModel(
     private fun loadProduct() {
         viewModelScope.launch {
             try {
-                if (id == null) return@launch
-
                 val product = productRepository.getProductById(id)
                 val lastViewId = recentItemRepository.getLastViewedItem()
                 val lastViewedItem =
@@ -91,8 +86,6 @@ class DetailViewModel(
     fun addToCart() {
         viewModelScope.launch {
             try {
-                if (id == null) return@launch
-
                 val product = productRepository.getProductById(id)
                 cartRepository.setCartItem(product.id, _uiState.value.quantity)
                 _event.send(DetailEvent.NavigateToCart)
@@ -107,17 +100,13 @@ class DetailViewModel(
     }
 
     companion object {
-        private const val PRODUCT_ID = "id"
-        private const val HIDE_RECENT_ITEM = "hide_recent_item"
-
-        val Factory: ViewModelProvider.Factory =
+        fun Factory(productId: String): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
                     val app = this[APPLICATION_KEY] as ShoppingApplication
-                    val savedStateHandle = createSavedStateHandle()
 
                     DetailViewModel(
-                        savedStateHandle = savedStateHandle,
+                        id = productId,
                         cartRepository = app.appContainer.cartRepository,
                         productRepository = app.appContainer.productRepository,
                         recentItemRepository = app.appContainer.recentItemRepository,

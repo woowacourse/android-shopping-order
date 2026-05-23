@@ -96,7 +96,7 @@ class DetailViewModelTest {
             ),
     ): DetailViewModel =
         DetailViewModel(
-            savedStateHandle = savedStateHandle,
+            id = "1",
             productRepository = productRepository,
             cartRepository = cartRepository,
             recentItemRepository = RecentItemRepository(recentItemDao),
