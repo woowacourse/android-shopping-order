@@ -139,21 +139,6 @@ class DetailProductViewModel(
         )
     }
 
-    private fun resolveLastViewedProductId(
-        productId: Long,
-        recentProductIds: List<Long>,
-    ): Long? {
-        if (recentProductIds.isEmpty()) {
-            return null
-        }
-        val currentProductIndex = recentProductIds.indexOf(productId)
-        return when {
-            currentProductIndex == 0 -> null
-            currentProductIndex > 0 -> recentProductIds[currentProductIndex - 1]
-            else -> recentProductIds.firstOrNull()
-        }
-    }
-
     data class DetailProductUiState(
         val shoppingItem: ShoppingItem? = null,
         val lastViewedShoppingItem: ShoppingItem? = null,
@@ -163,5 +148,21 @@ class DetailProductViewModel(
 
     companion object {
         private const val DEFAULT_QUANTITY = 1
+    }
+}
+
+internal fun resolveLastViewedProductId(
+    productId: Long,
+    recentProductIds: List<Long>,
+): Long? {
+    if (recentProductIds.isEmpty()) {
+        return null
+    }
+
+    val currentProductIndex = recentProductIds.indexOf(productId)
+    return when {
+        currentProductIndex == 0 -> recentProductIds.getOrNull(1)
+        currentProductIndex > 0 -> recentProductIds[currentProductIndex - 1]
+        else -> recentProductIds.firstOrNull()
     }
 }
