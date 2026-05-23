@@ -119,6 +119,16 @@ class RecommendationViewModel(
         }
     }
 
+    suspend fun fetchTotalPrice() {
+        _uiState.update { state ->
+            val totalPrice =
+                state.cart.purchaseProducts
+                    .filter { it.id in state.checkedIds }
+                    .sumOf { it.totalPrice() }
+            state.copy(totalPrice = totalPrice)
+        }
+    }
+
     fun addToCart(purchaseProduct: PurchaseProduct) {
         viewModelScope.launch {
             val existingItem =
@@ -127,7 +137,11 @@ class RecommendationViewModel(
                 }
             if (existingItem != null) {
                 when (val result = cartRepository.updateCount(existingItem.id, existingItem.count + 1)) {
-                    is ApiResult.Success -> fetchCart()
+                    is ApiResult.Success -> {
+                        fetchCart()
+                        fetchTotalPrice()
+                    }
+
                     is ApiResult.Error ->
                         _event.emit(
                             RecommendationEvent.SnackbarEvent(
@@ -145,15 +159,12 @@ class RecommendationViewModel(
             } else {
                 when (val result = cartRepository.insert(purchaseProduct)) {
                     is ApiResult.Success -> {
-                        val newCheckedIds = _uiState.value.checkedIds + purchaseProduct.id
-                        val newTotalPrice = _uiState.value.totalPrice + purchaseProduct.totalPrice()
-                        _uiState.update {
-                            it.copy(
-                                totalPrice = newTotalPrice,
-                                checkedIds = newCheckedIds,
-                            )
-                        }
                         fetchCart()
+                        val addedItem = _uiState.value.cart.findById(purchaseProduct.product.id)
+                        if (addedItem != null) {
+                            _uiState.update { it.copy(checkedIds = it.checkedIds + addedItem.id) }
+                            fetchTotalPrice()
+                        }
                     }
 
                     is ApiResult.Error ->
@@ -186,11 +197,7 @@ class RecommendationViewModel(
                     when (val result = cartRepository.updateCount(target.id, nextCount)) {
                         is ApiResult.Success -> {
                             fetchCart()
-                            if (updateAmount > 0) {
-                                _uiState.update { it.copy(totalPrice = it.totalPrice + target.price()) }
-                            } else {
-                                _uiState.update { it.copy(totalPrice = it.totalPrice - target.price()) }
-                            }
+                            fetchTotalPrice()
                         }
 
                         is ApiResult.Error ->
@@ -218,8 +225,9 @@ class RecommendationViewModel(
             if (target != null) {
                 when (val result = cartRepository.deleteCartItem(target.id)) {
                     is ApiResult.Success -> {
-                        _uiState.update { it.copy(totalPrice = it.totalPrice - target.totalPrice()) }
+                        _uiState.update { it.copy(checkedIds = it.checkedIds - target.id) }
                         fetchCart()
+                        fetchTotalPrice()
                     }
 
                     is ApiResult.Error ->
@@ -237,12 +245,6 @@ class RecommendationViewModel(
                         )
                 }
             }
-        }
-    }
-
-    fun updateHistory(product: Product) {
-        viewModelScope.launch {
-            recentlyViewedProductRepository.updateList(product)
         }
     }
 
