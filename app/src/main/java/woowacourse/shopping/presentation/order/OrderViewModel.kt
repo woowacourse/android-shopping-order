@@ -2,13 +2,16 @@ package woowacourse.shopping.presentation.order
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.PaymentRepository
+import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.di.RepositoryProvider
 import woowacourse.shopping.domain.model.PaymentItems
 import woowacourse.shopping.domain.model.payment.BuyXGetYCoupon
@@ -26,9 +29,21 @@ import woowacourse.shopping.util.formattedPrice
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+sealed class OrderEvent {
+    abstract val message: String
+
+    data class Success(
+        override val message: String,
+    ) : OrderEvent()
+
+    data class Fail(
+        override val message: String,
+    ) : OrderEvent()
+}
+
 class OrderViewModel(
     private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
-    private val paymentRepository: PaymentRepository = RepositoryProvider.paymentRepository,
+    private val orderRepository: OrderRepository = RepositoryProvider.orderRepository,
 ) : ViewModel() {
     private val cart = cartRepository.cart
     private val paymentItemIds = MutableStateFlow(emptySet<Long>())
@@ -64,10 +79,13 @@ class OrderViewModel(
             initialValue = OrderUiState(),
         )
 
+    private val _event = MutableSharedFlow<OrderEvent>()
+    val event: SharedFlow<OrderEvent> = _event.asSharedFlow()
+
     init {
         viewModelScope.launch {
             cartRepository.loadCart()
-            val result = paymentRepository.getCoupons()
+            val result = orderRepository.getCoupons()
             if (result is Result.Success) {
                 coupons.value = result.data
             }
@@ -102,4 +120,19 @@ class OrderViewModel(
                     else -> null
                 },
         )
+
+    fun orderCartItems() {
+        viewModelScope.launch {
+            val orderResult =
+                orderRepository.orderCartItems(
+                    cart.value.items
+                        .filter { it.product.id in paymentItemIds.value }
+                        .map { it.id },
+                )
+            when (orderResult) {
+                is Result.Error<*, *> -> _event.emit(OrderEvent.Fail("결제 주문이 실패했습니다"))
+                is Result.Success<*, *> -> _event.emit(OrderEvent.Success("결제가 성공했습니다"))
+            }
+        }
+    }
 }

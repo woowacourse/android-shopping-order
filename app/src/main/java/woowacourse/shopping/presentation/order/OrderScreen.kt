@@ -1,5 +1,6 @@
 package woowacourse.shopping.presentation.order
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -28,12 +29,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.R
 import woowacourse.shopping.presentation.common.components.ShoppingAppBar
@@ -48,13 +53,27 @@ import woowacourse.shopping.util.formattedPrice
 fun OrderScreen(
     productIds: List<Long>,
     onBackClick: () -> Unit,
+    onOrderSuccess: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: OrderViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.initializePaymentItems(productIds)
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.event.collect { event ->
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                when (event) {
+                    is OrderEvent.Success -> {
+                        onOrderSuccess()
+                    }
+                    is OrderEvent.Fail -> {}
+                }
+            }
+        }
     }
 
     OrderContent(
@@ -64,6 +83,7 @@ fun OrderScreen(
         discountAmount = uiState.discountAmount,
         deliveryFee = uiState.deliveryFee,
         finalPrice = uiState.finalPrice,
+        onOrderClick = viewModel::orderCartItems,
         onBackClick = onBackClick,
         onCouponSelect = { viewModel.selectCoupon(it) },
         modifier = modifier,
@@ -78,6 +98,7 @@ fun OrderContent(
     discountAmount: Long,
     deliveryFee: Long,
     finalPrice: Long,
+    onOrderClick: () -> Unit,
     onBackClick: () -> Unit,
     onCouponSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -114,7 +135,8 @@ fun OrderContent(
                         .fillMaxWidth()
                         .navigationBarsPadding()
                         .height(56.dp)
-                        .background(Green40),
+                        .background(Green40)
+                        .clickable { onOrderClick() },
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -213,7 +235,14 @@ private fun PriceSummarySection(
         Spacer(modifier = Modifier.height(16.dp))
         PriceRow(
             label = "쿠폰 할인 금액",
-            value = if (couponDiscountPrice > 0) "-${formattedPrice(couponDiscountPrice)}" else formattedPrice(0L),
+            value =
+                if (couponDiscountPrice > 0) {
+                    "-${formattedPrice(couponDiscountPrice)}"
+                } else {
+                    formattedPrice(
+                        0L,
+                    )
+                },
         )
         Spacer(modifier = Modifier.height(16.dp))
         PriceRow(label = "배송비", value = formattedPrice(deliveryFee))
@@ -274,6 +303,22 @@ private fun PriceRow(
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+private fun OrderContentPreview() {
+    OrderContent(
+        coupons = sampleCoupons,
+        selectedCoupon = sampleCoupons[0],
+        totalPrice = 204_200L,
+        discountAmount = 5_000L,
+        deliveryFee = 3_000L,
+        finalPrice = 202_200L,
+        onOrderClick = { },
+        onBackClick = {},
+        onCouponSelect = {},
+    )
+}
+
 private val sampleCoupons =
     listOf(
         CouponUiModel(
@@ -288,18 +333,3 @@ private val sampleCoupons =
             expirationDate = "2024년 11월 30일",
         ),
     )
-
-@Preview(showBackground = true)
-@Composable
-private fun OrderContentPreview() {
-    OrderContent(
-        coupons = sampleCoupons,
-        selectedCoupon = sampleCoupons[0],
-        totalPrice = 204_200L,
-        discountAmount = 5_000L,
-        deliveryFee = 3_000L,
-        finalPrice = 202_200L,
-        onBackClick = {},
-        onCouponSelect = {},
-    )
-}

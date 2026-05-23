@@ -73,6 +73,11 @@ class NavActivity : ComponentActivity() {
                     OrderScreen(
                         productIds = route.productIds,
                         onBackClick = { navController.popBackStack() },
+                        onOrderSuccess = {
+                            navController.navigate(ShoppingList) {
+                                popUpTo(ShoppingList) { inclusive = false }
+                            }
+                        },
                     )
                 }
             }

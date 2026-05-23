@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.source.remote.api
 
+import android.util.Log
 import retrofit2.HttpException
 import woowacourse.shopping.error.NetworkError
 import woowacourse.shopping.error.Result
@@ -9,6 +10,7 @@ suspend fun <T> safeNetworkApiCall(call: suspend () -> T): Result<T, NetworkErro
     try {
         Result.Success(call())
     } catch (err: HttpException) {
+        Log.d("error", err.toString())
         Result.Error(
             when (err.code()) {
                 400 -> NetworkError.BadRequest
