@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,6 +34,7 @@ import woowacourse.shopping.R
 @Composable
 fun ProductListAppBar(
     onCartIconClick: () -> Unit,
+    onSettingIconClick: () -> Unit,
     cartQuantities: Int,
     modifier: Modifier = Modifier,
 ) {
@@ -78,6 +81,14 @@ fun ProductListAppBar(
                         ),
                     )
                 }
+                IconButton(
+                    onClick = onSettingIconClick,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = stringResource(R.string.setting_description),
+                    )
+                }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -93,7 +104,8 @@ fun ProductListAppBar(
 @Composable
 private fun ProductListAppBarPreview() {
     ProductListAppBar(
-        {},
+        onCartIconClick = {},
+        onSettingIconClick = {},
         cartQuantities = 2,
     )
 }

@@ -3,6 +3,10 @@
     <string name="cart_name">Cart</string>
 
     <string name="cart_description">장바구니로 이동</string>
+    <string name="setting_description">설정으로 이동</string>
+    <string name="setting_title">설정</string>
+    <string name="setting_payment_notification">미결제 알림</string>
+    <string name="setting_payment_notification_description">미결제 상품이 있을 때 알림을 받습니다.</string>
     <string name="left_arrow_description">뒤로 가기</string>
     <string name="close_description">닫기</string>
     <string name="load_more_description">상품 더보기</string>
