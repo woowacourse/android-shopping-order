@@ -7,6 +7,8 @@ import woowacourse.shopping.feature.MainDispatcherExtension
 import woowacourse.shopping.feature.fake.FakeCartRepository
 import woowacourse.shopping.feature.fake.FakeCouponRepository
 import woowacourse.shopping.feature.fake.FakeOrderRepository
+import woowacourse.shopping.feature.fake.FakePaymentNotificationScheduler
+import woowacourse.shopping.feature.fake.FakeSettingRepository
 import woowacourse.shopping.fixture.TestCartContentFixture
 import woowacourse.shopping.fixture.TestCouponFixture
 import woowacourse.shopping.fixture.TestProductFixture
@@ -29,6 +31,8 @@ class PurchaseViewModelTest {
             orderRepository = FakeOrderRepository(),
             couponRepository = FakeCouponRepository(allCoupons),
             cartRepository = FakeCartRepository(),
+            settingRepository = FakeSettingRepository(),
+            paymentNotificationScheduler = FakePaymentNotificationScheduler(),
         )
 
         // when: 쿠폰 목록을 조회할 때
@@ -49,6 +53,8 @@ class PurchaseViewModelTest {
             orderRepository = FakeOrderRepository(),
             couponRepository = FakeCouponRepository(allCoupons),
             cartRepository = FakeCartRepository(),
+            settingRepository = FakeSettingRepository(),
+            paymentNotificationScheduler = FakePaymentNotificationScheduler(),
         )
         viewModel.initialLoading()
 
