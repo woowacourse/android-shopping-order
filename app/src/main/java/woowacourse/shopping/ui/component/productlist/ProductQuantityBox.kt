@@ -1,9 +1,8 @@
 @file:Suppress("FunctionName")
 
-package woowacourse.shopping.ui.component
+package woowacourse.shopping.ui.component.productlist
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -35,7 +34,7 @@ fun ProductQuantityBox(
                 .background(MaterialTheme.colorScheme.background),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        QuantityAction(
+        ProductQuantityAction(
             text = "-",
             onClick = onQuantityMinusClick,
             modifier =
@@ -57,30 +56,13 @@ fun ProductQuantityBox(
             )
         }
 
-        QuantityAction(
+        ProductQuantityAction(
             text = "+",
             onClick = onQuantityPlusClick,
             modifier =
                 Modifier
                     .width(32.dp)
                     .fillMaxHeight(),
-        )
-    }
-}
-
-@Composable
-private fun QuantityAction(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier.clickable(onClick = onClick),
-    ) {
-        Text(
-            text = text,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

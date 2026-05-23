@@ -46,8 +46,8 @@ import woowacourse.shopping.model.Price
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductTitle
 import woowacourse.shopping.model.ShoppingItem
-import woowacourse.shopping.ui.component.ProductItem
-import woowacourse.shopping.ui.component.ProductListSkeletonItem
+import woowacourse.shopping.ui.component.productlist.ProductItem
+import woowacourse.shopping.ui.component.productlist.ProductListSkeletonItem
 import woowacourse.shopping.ui.state.ProductListUiState
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
