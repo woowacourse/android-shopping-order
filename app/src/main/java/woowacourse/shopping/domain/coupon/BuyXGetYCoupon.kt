@@ -1,24 +1,30 @@
 package woowacourse.shopping.domain.coupon
 
 import java.time.LocalDate
-import java.time.LocalTime
 import java.util.UUID
 
-class MiracleMorningCoupon(
+class BuyXGetYCoupon(
     override val id: String = UUID.randomUUID().toString(),
     override val description: String = "",
     override val expirationDate: LocalDate,
-    val discountRate: Double = 0.3,
+    val buyQuantity: Int,
+    val getQuantity: Int,
 ) : Coupon {
     override fun isApplicable(context: OrderContext): Boolean {
         if (LocalDate.now().isAfter(expirationDate)) return false
-        val now = context.now
+        val cartContents = context.items
 
-        return now.isAfter(LocalTime.of(3, 59, 59)) && now.isBefore(LocalTime.of(7, 0, 1))
+        return cartContents.any { it.quantity >= 3 }
     }
 
     override fun discountAmount(context: OrderContext): Int {
         if (!isApplicable(context)) return 0
-        return (context.totalPrice * discountRate).toInt()
+        val cartContents = context.items
+
+        val productPrices =
+            cartContents.mapNotNull { if (it.quantity >= 3) it.product.priceAmount() else null }
+
+        val highestDiscountPrice = productPrices.max()
+        return highestDiscountPrice
     }
 }

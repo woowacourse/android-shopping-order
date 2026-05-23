@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
@@ -35,6 +36,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import java.time.format.DateTimeFormatter
+import woowacourse.shopping.constants.MockData
+import woowacourse.shopping.domain.coupon.BuyXGetYCoupon
+import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
+import woowacourse.shopping.domain.coupon.FreeShippingCoupon
+import woowacourse.shopping.domain.coupon.PercentageCoupon
 import woowacourse.shopping.feature.purchase.component.PurchaseAppBar
 
 @Composable
@@ -103,8 +110,12 @@ fun PurchaseScreenContent(
                     modifier = Modifier
                         .height(250.dp)
                         .padding(vertical = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    item {
+                    items(
+                        key = { it.id },
+                        items = uiState.coupons,
+                    ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -124,38 +135,44 @@ fun PurchaseScreenContent(
                                     modifier = Modifier.size(24.dp),
                                 )
                                 Spacer(Modifier.width(5.dp))
-                                Text("Title", fontWeight = FontWeight.W700, fontSize = 18.sp)
+                                Text(it.description, fontWeight = FontWeight.W700, fontSize = 18.sp)
                             }
                             Spacer(Modifier.height(5.dp))
-                            Text("만료일 : 2024년 11월 30일", fontWeight = FontWeight.W400, fontSize = 12.sp, color = Color(0xff555555))
-                            Text("최소 주문 금액: ", fontWeight = FontWeight.W400, fontSize = 12.sp, color = Color(0xff555555))
-                        }
-                    }
-                    item {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(shape = RoundedCornerShape(4.dp))
-                                .border(width = 1.dp, color = Color(0xffaaaaaa))
-                                .padding(horizontal = 16.dp, vertical = 18.dp),
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(
-                                    checked = false,
-                                    onCheckedChange = {
-                                        //                                    onTotalCheck()
-                                    },
-                                    colors = CheckboxDefaults.colors().copy(
-                                        checkedBoxColor = Color(0xFF04C09E),
-                                    ),
-                                    modifier = Modifier.size(24.dp),
+                            Text(
+                                "만료일 : ${it.expirationDate.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일"))}",
+                                fontWeight = FontWeight.W400,
+                                fontSize = 12.sp,
+                                color = Color(0xff555555),
+                            )
+                            when (it) {
+                                is BuyXGetYCoupon -> Text(
+                                    "최소 주문 금액: $it",
+                                    fontWeight = FontWeight.W400,
+                                    fontSize = 12.sp,
+                                    color = Color(0xff555555),
                                 )
-                                Spacer(Modifier.width(5.dp))
-                                Text("Title", fontWeight = FontWeight.W700, fontSize = 18.sp)
+
+                                is FixedDiscountCoupon -> Text(
+                                    "최소 주문 금액: ${it.minimumPrice}",
+                                    fontWeight = FontWeight.W400,
+                                    fontSize = 12.sp,
+                                    color = Color(0xff555555),
+                                )
+
+                                is FreeShippingCoupon -> Text(
+                                    "최소 주문 금액: ${it.minimumPrice}",
+                                    fontWeight = FontWeight.W400,
+                                    fontSize = 12.sp,
+                                    color = Color(0xff555555),
+                                )
+
+                                is PercentageCoupon -> Text(
+                                    "할인 적용 시간: $it",
+                                    fontWeight = FontWeight.W400,
+                                    fontSize = 12.sp,
+                                    color = Color(0xff555555),
+                                )
                             }
-                            Spacer(Modifier.height(5.dp))
-                            Text("만료일 : 2024년 11월 30일", fontWeight = FontWeight.W400, fontSize = 12.sp, color = Color(0xff555555))
-                            Text("최소 주문 금액: ", fontWeight = FontWeight.W400, fontSize = 12.sp, color = Color(0xff555555))
                         }
                     }
                 }
@@ -226,7 +243,9 @@ fun PurchaseScreenContent(
 @Composable
 private fun PurchaseScreenContentPreview() {
     PurchaseScreenContent(
-        uiState = PurchaseUiState(),
+        uiState = PurchaseUiState(
+            coupons = MockData.MOCK_COUPONS,
+        ),
         onCloseClick = { },
         snackbarHostState = SnackbarHostState(),
     )

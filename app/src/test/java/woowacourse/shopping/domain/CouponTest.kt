@@ -4,11 +4,11 @@ import java.time.LocalDate
 import java.time.LocalTime
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.domain.coupon.BogoCoupon
+import woowacourse.shopping.domain.coupon.BuyXGetYCoupon
 import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
 import woowacourse.shopping.domain.coupon.FreeShippingCoupon
-import woowacourse.shopping.domain.coupon.MiracleMorningCoupon
 import woowacourse.shopping.domain.coupon.OrderContext
+import woowacourse.shopping.domain.coupon.PercentageCoupon
 import woowacourse.shopping.fixture.TestCartContentFixture
 import woowacourse.shopping.fixture.TestProductFixture
 
@@ -46,7 +46,11 @@ class CouponTest {
         val cart = Cart(
             cartContents = listOf(cartContent),
         )
-        val coupon = BogoCoupon(expirationDate = LocalDate.of(2026, 11, 30))
+        val coupon = BuyXGetYCoupon(
+            buyQuantity = 2,
+            getQuantity = 1,
+            expirationDate = LocalDate.of(2026, 11, 30),
+        )
         val price = cart.cartContents.sumOf { it.quantity * it.product.priceAmount() }
 
         // when: 할인 금액을 계산할 때
@@ -63,7 +67,11 @@ class CouponTest {
         val cart = Cart(
             cartContents = listOf(cartContent),
         )
-        val coupon = BogoCoupon(expirationDate = LocalDate.of(2026, 11, 30))
+        val coupon = BuyXGetYCoupon(
+            buyQuantity = 2,
+            getQuantity = 1,
+            expirationDate = LocalDate.of(2026, 11, 30),
+        )
         val price = cart.cartContents.sumOf { it.quantity * it.product.priceAmount() }
 
         // when: 할인 금액을 계산할 때
@@ -83,7 +91,11 @@ class CouponTest {
         val cart = Cart(
             cartContents = listOf(cartContent, expensiveCartContent),
         )
-        val coupon = BogoCoupon(expirationDate = LocalDate.of(2026, 11, 30))
+        val coupon = BuyXGetYCoupon(
+            buyQuantity = 2,
+            getQuantity = 1,
+            expirationDate = LocalDate.of(2026, 11, 30),
+        )
         val price = cart.cartContents.sumOf { it.quantity * it.product.priceAmount() }
 
         // when: 할인 금액을 계산할 때
@@ -124,7 +136,7 @@ class CouponTest {
     fun `MiracleMorningCoupon은 04시 이전 그리고 07시 이후면 적용할 수 없다`() {
         // given: 시간이 03시, 08시 리스트가 주어지고 미라클모닝 30% 할인 쿠폰이 주어진다
         val price = 50_000
-        val coupon = MiracleMorningCoupon(expirationDate = LocalDate.of(2026, 11, 30))
+        val coupon = PercentageCoupon(expirationDate = LocalDate.of(2026, 11, 30))
         val times = listOf(LocalTime.of(3, 0), LocalTime.of(8, 0))
 
         // when: 할인이 가능한지 확인할 때
@@ -138,7 +150,7 @@ class CouponTest {
     fun `MiracleMorningCoupon은 04시 이후 그리고 07시 이전이면 적용할 수 있다`() {
         // given: 시간이 04시, 05:30, 07시 리스트가 주어지고 미라클모닝 30% 할인 쿠폰이 주어진다
         val price = 50_000
-        val coupon = MiracleMorningCoupon(expirationDate = LocalDate.of(2026, 11, 30))
+        val coupon = PercentageCoupon(expirationDate = LocalDate.of(2026, 11, 30))
         val times = listOf(LocalTime.of(4, 0), LocalTime.of(5, 30), LocalTime.of(7, 0))
 
         // when: 할인이 가능한지 확인할 때
@@ -152,7 +164,7 @@ class CouponTest {
     fun `MiracleMorningCoupon은 적용 시 총 상품 금액의 30퍼센트를 할인한다`() {
         // given: 시간이 05:30으로 주어지고 미라클모닝 30% 할인 쿠폰이 주어진다
         val price = 50_000
-        val coupon = MiracleMorningCoupon(expirationDate = LocalDate.of(2026, 11, 30))
+        val coupon = PercentageCoupon(expirationDate = LocalDate.of(2026, 11, 30))
         val time = LocalTime.of(5, 30)
 
         // when: 할인이 가능한지 확인할 때
@@ -174,9 +186,13 @@ class CouponTest {
         )
         val coupons = listOf(
             FixedDiscountCoupon(expirationDate = expiredDate),
-            BogoCoupon(expirationDate = expiredDate),
+            BuyXGetYCoupon(
+                buyQuantity = 2,
+                getQuantity = 1,
+                expirationDate = expiredDate,
+            ),
             FreeShippingCoupon(expirationDate = expiredDate),
-            MiracleMorningCoupon(expirationDate = expiredDate),
+            PercentageCoupon(expirationDate = expiredDate),
         )
 
         // when: 각 쿠폰의 적용 가능 여부를 확인할 때

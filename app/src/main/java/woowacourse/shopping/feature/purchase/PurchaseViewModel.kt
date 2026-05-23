@@ -24,12 +24,12 @@ import woowacourse.shopping.data.repository.coupon.CouponRepository
 import woowacourse.shopping.data.repository.order.OrderRepository
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartContent
-import woowacourse.shopping.domain.coupon.BogoCoupon
+import woowacourse.shopping.domain.coupon.BuyXGetYCoupon
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
 import woowacourse.shopping.domain.coupon.FreeShippingCoupon
-import woowacourse.shopping.domain.coupon.MiracleMorningCoupon
 import woowacourse.shopping.domain.coupon.OrderContext
+import woowacourse.shopping.domain.coupon.PercentageCoupon
 
 data class PurchaseUiState(
     val isLoading: Boolean = false,
@@ -97,7 +97,7 @@ class PurchaseViewModel(
         var shippingPrice = 3000
         var totalDiscountedPrice: Int = uiState.value.originalPrice
         when (coupon) {
-            is BogoCoupon -> {
+            is BuyXGetYCoupon -> {
                 couponDiscountPrice = coupon.discountAmount(
                     OrderContext(
                         items = cartContents,
@@ -124,7 +124,7 @@ class PurchaseViewModel(
                 totalDiscountedPrice -= shippingPrice
             }
 
-            is MiracleMorningCoupon -> {
+            is PercentageCoupon -> {
                 couponDiscountPrice = coupon.discountAmount(
                     OrderContext(
                         now = LocalTime.now(),
@@ -167,14 +167,14 @@ class PurchaseViewModel(
             minimumPrice = "최소 주문 금액: ${minimumPrice}원 이상",
         )
 
-        is BogoCoupon -> CouponUiModel(
+        is BuyXGetYCoupon -> CouponUiModel(
             id = id,
             title = description,
             validUntil = expirationDate.toString(),
             minimumPrice = "",
         )
 
-        is MiracleMorningCoupon -> CouponUiModel(
+        is PercentageCoupon -> CouponUiModel(
             id = id,
             title = description,
             validUntil = expirationDate.toString(),

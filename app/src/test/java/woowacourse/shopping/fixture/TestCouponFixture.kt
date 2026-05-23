@@ -1,10 +1,10 @@
 package woowacourse.shopping.fixture
 
 import java.time.LocalDate
-import woowacourse.shopping.domain.coupon.BogoCoupon
+import woowacourse.shopping.domain.coupon.BuyXGetYCoupon
 import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
 import woowacourse.shopping.domain.coupon.FreeShippingCoupon
-import woowacourse.shopping.domain.coupon.MiracleMorningCoupon
+import woowacourse.shopping.domain.coupon.PercentageCoupon
 
 object TestCouponFixture {
 
@@ -27,8 +27,12 @@ object TestCouponFixture {
     val FREE_SHIP_30000 = FreeShippingCoupon(expirationDate = EXPIRATION_DATE, minimumPrice = 30_000)
     val FREE_SHIP_50000 = FreeShippingCoupon(expirationDate = EXPIRATION_DATE, minimumPrice = 50_000)
 
-    val BOGO = BogoCoupon(expirationDate = EXPIRATION_DATE)
-    val MIRACLE_MORNING = MiracleMorningCoupon(expirationDate = EXPIRATION_DATE)
+    val BOGO = BuyXGetYCoupon(
+        expirationDate = EXPIRATION_DATE,
+        buyQuantity = 2,
+        getQuantity = 1,
+    )
+    val MIRACLE_MORNING = PercentageCoupon(expirationDate = EXPIRATION_DATE)
 
     val ALL = listOf(
         FIXED_1000, FIXED_2000, FIXED_3000, FIXED_5000, FIXED_10000,

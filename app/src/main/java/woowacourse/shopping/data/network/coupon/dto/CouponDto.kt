@@ -3,57 +3,63 @@ package woowacourse.shopping.data.network.coupon.dto
 import java.time.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import woowacourse.shopping.domain.coupon.BogoCoupon
+import woowacourse.shopping.domain.coupon.BuyXGetYCoupon
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
 import woowacourse.shopping.domain.coupon.FreeShippingCoupon
-import woowacourse.shopping.domain.coupon.MiracleMorningCoupon
+import woowacourse.shopping.domain.coupon.PercentageCoupon
 
 @Serializable
 data class CouponDto(
-    @SerialName("id")
-    val id: Long,
+    @SerialName("availableTime")
+    val availableTime: AvailableTime,
+    @SerialName("buyQuantity")
+    val buyQuantity: Int,
     @SerialName("code")
     val code: String,
     @SerialName("description")
     val description: String,
-    @SerialName("expirationDate")
-    val expirationDate: String,
+    @SerialName("discount")
+    val discount: Int,
     @SerialName("discountType")
     val discountType: String,
-    @SerialName("discount")
-    val discount: Int? = null,
+    @SerialName("expirationDate")
+    val expirationDate: String,
+    @SerialName("getQuantity")
+    val getQuantity: Int,
+    @SerialName("id")
+    val id: Int,
     @SerialName("minimumAmount")
-    val minimumAmount: Int? = null,
+    val minimumAmount: Int,
 ) {
     fun toDomain(): Coupon? {
         val validUntil = LocalDate.parse(expirationDate)
         return when (discountType) {
-            FIXED_DISCOUNT -> FixedDiscountCoupon(
+            "fixed" -> FixedDiscountCoupon(
                 id = id.toString(),
                 description = description,
                 expirationDate = validUntil,
-                minimumPrice = minimumAmount
-                    ?: 100_000,
-                discountPrice = discount
-                    ?: 5_000,
+                minimumPrice = minimumAmount,
+                discountPrice = discount,
+
             )
 
-            BOGO -> BogoCoupon(
-                id = id.toString(),
-                description = description,
-                validUntil,
-            )
-
-            FREE_SHIPPING -> FreeShippingCoupon(
+            "buyXgetY" -> BuyXGetYCoupon(
                 id = id.toString(),
                 description = description,
                 expirationDate = validUntil,
-                minimumPrice = minimumAmount
-                    ?: 50_000,
+                buyQuantity = buyQuantity,
+                getQuantity = getQuantity,
             )
 
-            MIRACLE_MORNING -> MiracleMorningCoupon(
+            "freeShipping" -> FreeShippingCoupon(
+                id = id.toString(),
+                description = description,
+                expirationDate = validUntil,
+                minimumPrice = minimumAmount,
+            )
+
+            "percentage" -> PercentageCoupon(
                 id = id.toString(),
                 description = description,
                 validUntil,
@@ -61,12 +67,5 @@ data class CouponDto(
 
             else -> null
         }
-    }
-
-    companion object {
-        private const val FIXED_DISCOUNT = "FIXED_DISCOUNT"
-        private const val BOGO = "BOGO"
-        private const val FREE_SHIPPING = "FREE_SHIPPING"
-        private const val MIRACLE_MORNING = "MIRACLE_MORNING"
     }
 }
