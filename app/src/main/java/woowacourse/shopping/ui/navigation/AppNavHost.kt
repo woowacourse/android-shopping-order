@@ -41,7 +41,7 @@ fun AppNavHost(innerPadding: PaddingValues) {
 
     NavHost(
         navController = navController,
-        startDestination = Payment,
+        startDestination = ProductList,
     ) {
         composable<ProductList> {
             val viewModel: ShoppingViewModel =
@@ -159,6 +159,16 @@ fun AppNavHost(innerPadding: PaddingValues) {
                 )
 
             val uiState by recommendationViewModel.uiState.collectAsStateWithLifecycle()
+
+            LaunchedEffect(uiState.orderCompletedCount) {
+                if (uiState.orderCompletedCount > 0) {
+                    navController.navigate(Payment) {
+                        popUpTo<CartRecommendation> {
+                            inclusive = true
+                        }
+                    }
+                }
+            }
 
             LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
                 cartViewModel.reloadVisibleState()
