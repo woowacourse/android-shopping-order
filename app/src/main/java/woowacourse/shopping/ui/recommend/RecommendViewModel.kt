@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -20,6 +22,7 @@ import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentItemRepository
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Product
+import woowacourse.shopping.ui.cart.component.CartSelection
 import woowacourse.shopping.ui.model.mapper.toUiModel
 import java.io.IOException
 
@@ -43,8 +46,13 @@ class RecommendViewModel(
 
     private fun observeCartItems() {
         viewModelScope.launch {
-            cartRepository.cartItems.collect { cartItems ->
-                renderProducts(cartItems)
+            combine(
+                cartRepository.cartItems,
+                cartRepository.selectedCartItemIds,
+            ) { cartItems, selectedItems ->
+                cartItems to selectedItems
+            }.collect { (cartItems, selectedItems) ->
+                renderProducts(cartItems, selectedItems)
             }
         }
     }
@@ -56,7 +64,10 @@ class RecommendViewModel(
             try {
                 cartRepository.refreshCartItems()
                 recommendProducts = fetchRecommendProducts()
-                renderProducts(cartRepository.cartItems.value)
+                renderProducts(
+                    cartItems = cartRepository.cartItems.value,
+                    selectedItems = cartRepository.selectedCartItemIds.value,
+                )
             } catch (_: IOException) {
                 _uiState.update { it.copy(errorMessage = "추천 상품을 불러오지 못했습니다.") }
             } catch (_: HttpException) {
@@ -86,7 +97,11 @@ class RecommendViewModel(
             .filter { product -> product.id !in cartProductIds }
     }
 
-    private fun renderProducts(cartItems: List<CartItem>) {
+    private fun renderProducts(
+        cartItems: List<CartItem>,
+        selectedItems: ImmutableList<String>,
+    ) {
+        val selection = CartSelection(selectedItems).filterSameIds(cartItems)
         val quantityByProductId = cartItems.associate { it.product.id to it.quantity }
 
         _uiState.update {
@@ -95,6 +110,8 @@ class RecommendViewModel(
                     recommendProducts
                         .map { product -> product.toUiModel(quantity = quantityByProductId[product.id]) }
                         .toImmutableList(),
+                totalPrice = selection.totalPrice(cartItems).amount,
+                totalCount = selection.selectedCount(cartItems),
             )
         }
     }
@@ -106,6 +123,15 @@ class RecommendViewModel(
         viewModelScope.launch {
             try {
                 cartRepository.setCartItem(productId, quantity)
+                cartRepository.cartItems.value
+                    .firstOrNull { cartItem -> cartItem.product.id == productId }
+                    ?.let { cartItem ->
+                        if (quantity > 0) {
+                            cartRepository.selectCartItem(cartItem.id)
+                        } else {
+                            cartRepository.unselectCartItem(cartItem.id)
+                        }
+                    }
             } catch (_: IOException) {
                 _event.emit(RecommendEvent.UpdateCartItemFailure)
             } catch (_: HttpException) {

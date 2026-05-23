@@ -8,4 +8,6 @@ data class RecommendUiState(
     val products: ImmutableList<ProductUiModel> = persistentListOf(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val totalPrice: Long = 0,
+    val totalCount: Int = 0,
 )

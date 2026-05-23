@@ -3,6 +3,7 @@ package woowacourse.shopping.ui.recommend
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -25,6 +26,7 @@ import woowacourse.shopping.ui.component.ShoppingAppBar
 fun RecommendScreen(
     uiState: RecommendUiState,
     onBackClick: () -> Unit,
+    onOrderClick: () -> Unit,
     onQuantityChange: (String, Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -50,6 +52,14 @@ fun RecommendScreen(
                         modifier = Modifier.weight(1f),
                     )
                 },
+            )
+        },
+        bottomBar = {
+            RecommendBottomBar(
+                totalPrice = uiState.totalPrice,
+                totalCount = uiState.totalCount,
+                onOrderClick = onOrderClick,
+                modifier = Modifier.fillMaxWidth(),
             )
         },
         modifier = modifier.systemBarsPadding(),
@@ -86,6 +96,7 @@ private fun RecommendScreenPreview() {
     RecommendScreen(
         uiState = RecommendUiState(),
         onBackClick = {},
+        onOrderClick = {},
         onQuantityChange = { _, _ -> },
     )
 }
