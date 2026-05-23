@@ -197,13 +197,23 @@ fun AppNavHost(innerPadding: PaddingValues) {
 
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+            LaunchedEffect(uiState.isOrderCompleted) {
+                if (uiState.isOrderCompleted) {
+                    navController.navigate(ProductList) {
+                        popUpTo<ProductList> {
+                            inclusive = true
+                        }
+                    }
+                }
+            }
+
             PaymentScreen(
                 uiState = uiState,
                 onBackClick = { navController.popBackStack() },
                 onCouponCheckedChange = { couponId, _ ->
                     viewModel.selectCoupon(couponId)
                 },
-                onPaymentClick = { },
+                onPaymentClick = viewModel::pay,
                 modifier = Modifier.padding(innerPadding),
             )
         }

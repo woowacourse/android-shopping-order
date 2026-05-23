@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.model.coupon.Coupon
 import woowacourse.shopping.model.order.OrderItem
 import woowacourse.shopping.model.product.Money
 import woowacourse.shopping.repository.CartRepository
@@ -30,6 +31,8 @@ class PaymentViewModel(
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
 
     private var orderItems: List<OrderItem> = emptyList()
+    private var cartItemIds: List<Long> = emptyList()
+    private var coupons: List<Coupon> = emptyList()
 
     init {
         loadOrderItems()
@@ -46,6 +49,7 @@ class PaymentViewModel(
             cartRepository
                 .getCartPage(0, totalCount.coerceAtLeast(1))
                 .onSuccess { cartPage ->
+                    cartItemIds = cartPage.items.map { it.cartItemId }
                     val productIds = cartPage.items.map { it.productId }.toSet()
 
                     productRepository
@@ -71,22 +75,62 @@ class PaymentViewModel(
         }
     }
 
+    fun pay() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            cartRepository
+                .createOrder(cartItemIds)
+                .onSuccess {
+                    _uiState.update { it.copy(isLoading = false, isOrderCompleted = true) }
+                }.onFailure { throwable ->
+                    _uiState.update { it.copy(isLoading = false, errorMessage = throwable.message) }
+                }
+        }
+    }
+
     private fun calculateAmounts() {
         val totalProductPrice =
             orderItems.fold(Money.ZERO) { acc, item ->
                 acc + (item.price * item.quantity)
             }
-        val shippingFee = if (totalProductPrice == Money.ZERO) Money.ZERO else Money(3000)
-        val totalPaymentAmount = totalProductPrice + shippingFee
+        val baseShippingFee = if (totalProductPrice == Money.ZERO) Money.ZERO else Money(3000)
+
+        val selectedCouponUiModel = _uiState.value.coupons.find { it.isSelected }
+        val selectedCoupon = coupons.find { it.id == selectedCouponUiModel?.id }
+
+        val discountAmount =
+            selectedCoupon?.discountPolicy?.calculateDiscount(
+                items = orderItems,
+                totalProductAmount = totalProductPrice,
+                shippingFee = baseShippingFee,
+            ) ?: Money.ZERO
+
+        val finalShippingFee =
+            if (selectedCoupon is Coupon.FreeShipping && discountAmount > Money.ZERO) {
+                Money.ZERO
+            } else {
+                baseShippingFee
+            }
+
+        val actualProductDiscount = if (selectedCoupon is Coupon.FreeShipping) Money.ZERO else discountAmount
+        val finalProductPrice = (totalProductPrice - actualProductDiscount).coerceAtLeast(Money.ZERO)
+
+        val totalPaymentAmount = finalProductPrice + finalShippingFee
+
+        val formattedDiscount = formatMoney(actualProductDiscount)
+        val couponDiscountDisplay = if (actualProductDiscount > Money.ZERO) "-$formattedDiscount" else formattedDiscount
 
         _uiState.update {
             it.copy(
                 orderAmount = formatMoney(totalProductPrice),
-                deliveryFee = formatMoney(shippingFee),
+                couponDiscountAmount = couponDiscountDisplay,
+                deliveryFee = formatMoney(finalShippingFee),
                 totalPaymentAmount = formatMoney(totalPaymentAmount),
             )
         }
     }
+
+    private fun Money.coerceAtLeast(minimumValue: Money): Money = if (this < minimumValue) minimumValue else this
 
     private fun formatMoney(money: Money): String = NumberFormat.getInstance(Locale.KOREA).format(money.value) + "원"
 
@@ -98,16 +142,17 @@ class PaymentViewModel(
                 .onSuccess { fetchedCoupons ->
                     val currentDate = LocalDate.now()
                     val currentTime = LocalTime.now()
-                    val couponUiModels =
-                        fetchedCoupons
-                            .filter { it.isApplicable(currentDate, currentTime) }
-                            .map { CouponUiModelMapper.toUiModel(it) }
+                    val applicableCoupons = fetchedCoupons.filter { it.isApplicable(currentDate, currentTime) }
+                    coupons = applicableCoupons
+
+                    val couponUiModels = applicableCoupons.map { CouponUiModelMapper.toUiModel(it) }
                     _uiState.update {
                         it.copy(
                             coupons = couponUiModels,
                             isLoading = false,
                         )
                     }
+                    calculateAmounts()
                 }.onFailure { throwable ->
                     _uiState.update { it.copy(isLoading = false, errorMessage = throwable.message) }
                 }
@@ -126,6 +171,7 @@ class PaymentViewModel(
                 }
             currentState.copy(coupons = updatedCoupons)
         }
+        calculateAmounts()
     }
 }
 

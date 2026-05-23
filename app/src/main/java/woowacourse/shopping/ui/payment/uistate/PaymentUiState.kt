@@ -7,5 +7,6 @@ data class PaymentUiState(
     val deliveryFee: String = "3,000원",
     val totalPaymentAmount: String = "0원",
     val isLoading: Boolean = false,
+    val isOrderCompleted: Boolean = false,
     val errorMessage: String? = null,
 )
