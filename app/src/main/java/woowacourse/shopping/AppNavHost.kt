@@ -61,11 +61,7 @@ fun AppNavHost() {
             CartScreen(
                 activityFinish = { navController.popBackStack() },
                 onToRecommendIntent = { cartContentIds ->
-                    navController.navigate(RecommendRoute(contentIds = cartContentIds)) {
-                        popUpTo<ProductListRoute> {
-                            inclusive = false
-                        }
-                    }
+                    navController.navigate(RecommendRoute(contentIds = cartContentIds))
                 },
             )
         }
@@ -81,7 +77,7 @@ fun AppNavHost() {
                             totalPrice = totalPrice,
                         ),
                     ) {
-                        popUpTo<ProductListRoute> {
+                        popUpTo<RecommendRoute> {
                             inclusive = true
                         }
                     }
@@ -90,11 +86,8 @@ fun AppNavHost() {
             )
         }
 
-        composable<PurchaseRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<PurchaseRoute>()
+        composable<PurchaseRoute> {
             PurchaseScreen(
-                contentIds = route.contentIds,
-                totalPrice = route.totalPrice,
                 activityFinish = { navController.popBackStack() },
             )
         }

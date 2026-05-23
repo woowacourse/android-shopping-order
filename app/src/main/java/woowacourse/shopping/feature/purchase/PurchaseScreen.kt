@@ -45,8 +45,6 @@ import woowacourse.shopping.feature.purchase.component.PurchaseAppBar
 @Composable
 fun PurchaseScreen(
     activityFinish: () -> Unit,
-    contentIds: List<String>,
-    totalPrice: Int,
     modifier: Modifier = Modifier,
     viewModel: PurchaseViewModel = viewModel(factory = PurchaseViewModel.Factory),
 ) {
