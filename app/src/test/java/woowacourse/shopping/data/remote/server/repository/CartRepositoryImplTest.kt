@@ -16,7 +16,7 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.PurchaseProduct
 import woowacourse.shopping.domain.repository.CartRepository
 
-class CartRepositoryTest {
+class CartRepositoryImplTest {
     private lateinit var mockWebServer: MockWebServer
     private lateinit var cartService: CartService
     private lateinit var cartRepository: CartRepository
