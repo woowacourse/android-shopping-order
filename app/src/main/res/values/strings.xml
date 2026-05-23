@@ -20,4 +20,8 @@
     <string name="last_viewed_product_label">마지막으로 본 상품</string>
     <string name="content_description_decrease_quantity">수량 감소</string>
     <string name="content_description_increase_quantity">수량 증가</string>
+    <string name="payment_title">결제하기</string>
+    <string name="payment_button">결제하기</string>
+    <string name="expiration_date_label">만료일:</string>
+    <string name="minimum_order_amount_label">최소 주문 금액:</string>
 </resources>

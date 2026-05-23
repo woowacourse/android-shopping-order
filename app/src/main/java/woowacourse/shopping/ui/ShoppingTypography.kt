@@ -58,4 +58,10 @@ object ShoppingTypography {
             fontSize = 20.sp,
             fontWeight = FontWeight.W700,
         )
+
+    val paymentAmount =
+        TextStyle(
+            fontSize = 18.sp,
+            fontWeight = FontWeight.W500,
+        )
 }

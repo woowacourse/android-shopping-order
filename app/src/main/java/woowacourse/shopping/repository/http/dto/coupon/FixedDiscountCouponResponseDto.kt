@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-@SerialName("FIXED")
+@SerialName("fixed")
 data class FixedDiscountCouponResponseDto(
     override val id: Long,
     override val code: String,
@@ -12,5 +12,4 @@ data class FixedDiscountCouponResponseDto(
     override val expirationDate: String,
     val discount: Int,
     val minimumAmount: Int,
-    override val discountType: String = "FIXED",
 ) : CouponResponseDto()

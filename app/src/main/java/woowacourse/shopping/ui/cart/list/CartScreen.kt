@@ -9,15 +9,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import woowacourse.shopping.R
 import woowacourse.shopping.ui.cart.common.CartBottomBar
-import woowacourse.shopping.ui.cart.common.CartHeader
 import woowacourse.shopping.ui.cart.list.component.CartItemBody
 import woowacourse.shopping.ui.cart.list.component.CartItemSkeletonBody
 import woowacourse.shopping.ui.cart.list.uistate.CartItemUiModel
 import woowacourse.shopping.ui.cart.list.uistate.CartListUiState
 import woowacourse.shopping.ui.cart.list.uistate.CartUiState
+import woowacourse.shopping.ui.common.component.Header
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
 import woowacourse.shopping.ui.fixture.MockProducts
 
@@ -41,7 +43,10 @@ fun CartScreen(
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
-        CartHeader(onBackClick = onBackClick)
+        Header(
+            text = stringResource(R.string.cart_title),
+            onBackClick = onBackClick,
+        )
         if (!uiState.isNetworkConnected) {
             NetworkStatusBanner(modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp))
         }

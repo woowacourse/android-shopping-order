@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.navigation
 
 import Cart
 import CartRecommendation
+import Payment
 import ProductDetail
 import ProductList
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,6 +30,9 @@ import woowacourse.shopping.ui.cart.list.CartViewModelFactory
 import woowacourse.shopping.ui.cart.recommendation.CartRecommendationViewModel
 import woowacourse.shopping.ui.cart.recommendation.CartRecommendationViewModelFactory
 import woowacourse.shopping.ui.cart.recommendation.CartRecommendedProductsScreen
+import woowacourse.shopping.ui.payment.PaymentScreen
+import woowacourse.shopping.ui.payment.PaymentViewModel
+import woowacourse.shopping.ui.payment.PaymentViewModelFactory
 import woowacourse.shopping.ui.productdetail.ProductDetailScreen
 import woowacourse.shopping.ui.productdetail.ProductDetailViewModel
 import woowacourse.shopping.ui.productdetail.ProductDetailViewModelFactory
@@ -42,7 +46,7 @@ fun AppNavHost(innerPadding: PaddingValues) {
 
     NavHost(
         navController = navController,
-        startDestination = ProductList,
+        startDestination = Payment,
     ) {
         composable<ProductList> {
             val viewModel: ShoppingViewModel =
@@ -177,6 +181,25 @@ fun AppNavHost(innerPadding: PaddingValues) {
                 onDecreaseQuantity = recommendationViewModel::decreaseRecommendedProductQuantity,
                 onOrderClick = recommendationViewModel::placeOrder,
                 onBackClick = { navController.popBackStack() },
+            )
+        }
+
+        composable<Payment> {
+            val viewModel: PaymentViewModel =
+                viewModel(
+                    factory = PaymentViewModelFactory(),
+                )
+
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            PaymentScreen(
+                uiState = uiState,
+                onBackClick = { navController.popBackStack() },
+                onCouponCheckedChange = { couponId, _ ->
+                    viewModel.selectCoupon(couponId)
+                },
+                onPaymentClick = { },
+                modifier = Modifier.padding(innerPadding),
             )
         }
     }

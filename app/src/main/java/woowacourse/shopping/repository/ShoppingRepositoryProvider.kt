@@ -14,9 +14,13 @@ import woowacourse.shopping.repository.http.repository.HttpProductRepository
 import woowacourse.shopping.repository.room.RoomRecentProductRepository
 
 object ShoppingRepositoryProvider {
-    private val httpClient: OkHttpClient by lazy {
-        OkHttpClient
-            .Builder()
+    private val baseClient: OkHttpClient by lazy {
+        OkHttpClient.Builder().build()
+    }
+
+    private val authClient: OkHttpClient by lazy {
+        baseClient
+            .newBuilder()
             .addInterceptor(
                 BasicAuthInterceptor {
                     BasicAuthHeaderFactory.create()
@@ -53,17 +57,17 @@ object ShoppingRepositoryProvider {
         val database = ShoppingDatabase.getInstance(context)
         productRepository =
             HttpProductRepository(
-                client = httpClient,
+                client = authClient,
                 baseUrl = BuildConfig.BASE_URL,
             )
         cartRepository =
             HttpCartRepository(
-                client = httpClient,
+                client = authClient,
                 baseUrl = BuildConfig.BASE_URL,
             )
         couponRepository =
             HttpCouponRepository(
-                client = httpClient,
+                client = baseClient,
                 baseUrl = BuildConfig.BASE_URL,
             )
 

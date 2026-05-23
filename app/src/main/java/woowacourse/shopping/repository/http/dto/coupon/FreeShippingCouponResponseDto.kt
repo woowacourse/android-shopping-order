@@ -4,12 +4,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-@SerialName("FREE_SHIPPING")
+@SerialName("freeShipping")
 data class FreeShippingCouponResponseDto(
     override val id: Long,
     override val code: String,
     override val description: String,
     override val expirationDate: String,
     val minimumAmount: Int,
-    override val discountType: String = "FREE_SHIPPING",
 ) : CouponResponseDto()

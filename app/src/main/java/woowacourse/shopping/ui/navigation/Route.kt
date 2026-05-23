@@ -15,3 +15,6 @@ object Cart
 data class CartRecommendation(
     val selectedCartItemIds: LongArray,
 )
+
+@Serializable
+object Payment
