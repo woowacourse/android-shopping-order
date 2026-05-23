@@ -14,17 +14,21 @@ class BuyXGetYCoupon(
         if (LocalDate.now().isAfter(expirationDate)) return false
         val cartContents = context.items
 
-        return cartContents.any { it.quantity >= 3 }
+        return cartContents.any { it.quantity >= buyQuantity + getQuantity }
     }
 
     override fun discountAmount(context: OrderContext): Int {
         if (!isApplicable(context)) return 0
         val cartContents = context.items
 
-        val productPrices =
-            cartContents.mapNotNull { if (it.quantity >= 3) it.product.priceAmount() else null }
+        val target =
+            cartContents
+                .filter { it.quantity > buyQuantity + getQuantity }
+                .maxBy { it.product.priceAmount() }
+        val highestPrice = target.product.priceAmount()
+        val getMultiple = target.quantity / (buyQuantity + getQuantity)
 
-        val highestDiscountPrice = productPrices.max()
+        val highestDiscountPrice = highestPrice * getMultiple * getQuantity
         return highestDiscountPrice
     }
 }
