@@ -3,8 +3,8 @@ package woowacourse.shopping.domain.model.payment
 import java.time.LocalDate
 
 abstract class Coupon(
-    private val code: String,
-    private val expirationDate: LocalDate,
+    val code: String,
+    val expirationDate: LocalDate,
 ) {
     fun apply(order: Order): Order {
         if (expirationDate < order.dateTime.toLocalDate()) throw IllegalArgumentException("이미 만료된 쿠폰입니다.")

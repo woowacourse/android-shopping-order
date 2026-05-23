@@ -3,6 +3,7 @@ package woowacourse.shopping.data.repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import woowacourse.shopping.data.repository.ProductRepository
@@ -47,11 +48,9 @@ class DefaultProductRepository(
     }
 
     override fun getRecentProductsStream(size: Int): Flow<List<Product>> =
-        recentProductDao
-            .getRecentStream(size)
-            .map { entities ->
-                entities.mapNotNull { getProductById(it.productId) }
-            }
+        combine(recentProductDao.getRecentStream(size), _products) { entities, products ->
+            entities.mapNotNull { entity -> products.find { it.id == entity.productId } }
+        }
 
     override suspend fun upsertRecentProduct(id: Long) {
         recentProductDao.upsertRecentProduct(

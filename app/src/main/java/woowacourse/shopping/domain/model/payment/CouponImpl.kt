@@ -5,8 +5,8 @@ import java.time.LocalDate
 class FixedAmountCoupon(
     code: String,
     expirationDate: LocalDate,
-    private val minimumAmount: Long,
-    private val discountAmount: Long,
+    val minimumAmount: Long,
+    val discountAmount: Long,
 ) : Coupon(code, expirationDate) {
     override fun doApply(order: Order): Order {
         if (order.items.totalPrice < minimumAmount) return order
@@ -17,7 +17,7 @@ class FixedAmountCoupon(
 class PercentageCoupon(
     code: String,
     expirationDate: LocalDate,
-    private val discountRate: Int,
+    val discountRate: Int,
 ) : Coupon(code, expirationDate) {
     override fun doApply(order: Order): Order {
         val discountAmount = (order.items.totalPrice * discountRate / 100.0).toInt()
@@ -28,8 +28,8 @@ class PercentageCoupon(
 class BuyXGetYCoupon(
     code: String,
     expirationDate: LocalDate,
-    private val buyQuantity: Long,
-    private val freeGetQuantity: Long,
+    val buyQuantity: Long,
+    val freeGetQuantity: Long,
 ) : Coupon(code, expirationDate) {
     override fun doApply(order: Order): Order {
         val cartItems = order.items.getItems()
@@ -40,10 +40,7 @@ class BuyXGetYCoupon(
         return order.copy(
             discountAmount =
                 order.discountAmount + (
-                    (
-                        maxPriceApplicableCartItem?.product?.price?.amount
-                            ?: 0
-                    ) * freeGetQuantity
+                    (maxPriceApplicableCartItem?.product?.price?.amount ?: 0) * freeGetQuantity
                 ),
         )
     }
@@ -52,7 +49,7 @@ class BuyXGetYCoupon(
 class FreeShippingCoupon(
     code: String,
     expirationDate: LocalDate,
-    private val minimumAmount: Long,
+    val minimumAmount: Long,
 ) : Coupon(code, expirationDate) {
     override fun doApply(order: Order): Order =
         when (order.deliveryLocation) {
@@ -60,7 +57,6 @@ class FreeShippingCoupon(
                 if (order.items.totalPrice < minimumAmount) return order
                 order.copy(deliveryFee = DeliveryFee(0))
             }
-
             DeliveryLocation.STANDARD -> order
         }
 }
