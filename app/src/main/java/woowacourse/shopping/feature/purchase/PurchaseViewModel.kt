@@ -84,8 +84,9 @@ class PurchaseViewModel(
 
     private suspend fun reserveNotification() {
         if (settingRepository.isPaymentNotificationEnabled()) {
+            paymentNotificationScheduler.cancel()
             paymentNotificationScheduler.scheduleAt(
-                at = LocalDateTime.now().plusSeconds(10),
+                at = LocalDateTime.now().plusMinutes(5),
                 contentIds = contentIds,
                 totalPrice = originalPrice,
             )
@@ -166,6 +167,7 @@ class PurchaseViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             orderRepository.orders(contentIds)
+            paymentNotificationScheduler.cancel()
             _event.emit(PurchaseUiEvent.PurchaseComplete("주문이 완료되었습니다."))
         }
     }

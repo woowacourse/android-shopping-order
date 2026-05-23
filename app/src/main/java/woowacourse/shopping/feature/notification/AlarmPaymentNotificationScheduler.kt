@@ -38,6 +38,19 @@ class AlarmPaymentNotificationScheduler(
         )
     }
 
+    override fun cancel() {
+        val intent = Intent(context, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+
+        alarmManager.cancel(pendingIntent)
+        pendingIntent.cancel()
+    }
+
     companion object {
         private const val REQUEST_CODE = 0
     }

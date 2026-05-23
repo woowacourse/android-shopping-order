@@ -8,4 +8,6 @@ interface PaymentNotificationScheduler {
         contentIds: List<String>,
         totalPrice: Int,
     )
+
+    fun cancel()
 }
