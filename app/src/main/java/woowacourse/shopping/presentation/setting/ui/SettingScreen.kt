@@ -60,7 +60,7 @@ fun SettingScreen(
             modifier = Modifier.padding(innerPadding),
         ) {
             SettingRow(
-                label = stringResource(R.string.notification),
+                label = stringResource(R.string.payment_pending_notification),
                 isChecked = isNotificationEnabled,
                 onCheckedChange = onToggleNotification,
             )

@@ -1,7 +1,11 @@
 package woowacourse.shopping.data.source.local.setting
 
 interface SettingDataSource {
-    fun isNotificationEnabled(): Boolean
+    fun isPaymentPendingNotificationEnabled(): Boolean
 
-    fun setNotificationEnabled(enabled: Boolean)
+    fun setPaymentPendingNotificationEnabled(enabled: Boolean)
+
+    fun hasAskedNotificationPermission(): Boolean
+
+    fun markNotificationPermissionAsked()
 }

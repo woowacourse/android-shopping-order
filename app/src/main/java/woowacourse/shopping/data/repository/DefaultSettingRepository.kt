@@ -6,7 +6,13 @@ import woowacourse.shopping.domain.repository.SettingRepository
 class DefaultSettingRepository(
     private val dataSource: SettingDataSource,
 ) : SettingRepository {
-    override fun isNotificationEnabled(): Boolean = dataSource.isNotificationEnabled()
+    override fun isPaymentPendingNotificationEnabled(): Boolean = dataSource.isPaymentPendingNotificationEnabled()
 
-    override fun setNotificationEnabled(enabled: Boolean) = dataSource.setNotificationEnabled(enabled)
+    override fun setPaymentPendingNotificationEnabled(enabled: Boolean) = dataSource.setPaymentPendingNotificationEnabled(enabled)
+
+    override fun hasAskedNotificationPermission(): Boolean = dataSource.hasAskedNotificationPermission()
+
+    override fun markNotificationPermissionAsked() {
+        dataSource.markNotificationPermissionAsked()
+    }
 }

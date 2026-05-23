@@ -15,13 +15,13 @@ class SettingViewModel(
     private val _uiState =
         MutableStateFlow(
             SettingUiState(
-                isNotificationEnabled = settingRepository.isNotificationEnabled(),
+                isPaymentPendingNotificationEnabled = settingRepository.isPaymentPendingNotificationEnabled(),
             ),
         )
     val uiState: StateFlow<SettingUiState> = _uiState.asStateFlow()
 
-    fun toggleNotification(enabled: Boolean) {
-        settingRepository.setNotificationEnabled(enabled)
-        _uiState.update { it.copy(isNotificationEnabled = enabled) }
+    fun togglePaymentPendingNotification(enabled: Boolean) {
+        settingRepository.setPaymentPendingNotificationEnabled(enabled)
+        _uiState.update { it.copy(isPaymentPendingNotificationEnabled = enabled) }
     }
 }

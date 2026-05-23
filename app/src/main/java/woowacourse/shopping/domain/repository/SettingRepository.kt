@@ -1,7 +1,11 @@
 package woowacourse.shopping.domain.repository
 
 interface SettingRepository {
-    fun isNotificationEnabled(): Boolean
+    fun isPaymentPendingNotificationEnabled(): Boolean
 
-    fun setNotificationEnabled(enabled: Boolean)
+    fun setPaymentPendingNotificationEnabled(enabled: Boolean)
+
+    fun hasAskedNotificationPermission(): Boolean
+
+    fun markNotificationPermissionAsked()
 }

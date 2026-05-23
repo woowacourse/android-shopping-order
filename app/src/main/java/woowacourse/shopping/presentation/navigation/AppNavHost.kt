@@ -1,10 +1,20 @@
 package woowacourse.shopping.presentation.navigation
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import woowacourse.shopping.di.RepositoryProvider
 import woowacourse.shopping.presentation.cart.CartRoute
 import woowacourse.shopping.presentation.detail.DetailRoute
 import woowacourse.shopping.presentation.payment.PaymentRoute
@@ -16,6 +26,34 @@ import kotlin.reflect.typeOf
 @Composable
 fun AppNavHost() {
     val navController = rememberNavController()
+    val settingRepository = remember { RepositoryProvider.settingRepository }
+    val context = LocalContext.current
+
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) { isGranted ->
+            settingRepository.setPaymentPendingNotificationEnabled(isGranted)
+        }
+    LaunchedEffect(Unit) {
+        if (!settingRepository.hasAskedNotificationPermission()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val alreadyGranted =
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.POST_NOTIFICATIONS,
+                    ) == PackageManager.PERMISSION_GRANTED
+                if (!alreadyGranted) {
+                    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                } else {
+                    settingRepository.setPaymentPendingNotificationEnabled(true)
+                }
+            } else {
+                settingRepository.setPaymentPendingNotificationEnabled(true)
+            }
+            settingRepository.markNotificationPermissionAsked()
+        }
+    }
 
     NavHost(
         navController = navController,

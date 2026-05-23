@@ -15,8 +15,8 @@ fun SettingRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     SettingScreen(
-        isNotificationEnabled = uiState.isNotificationEnabled,
-        onToggleNotification = viewModel::toggleNotification,
+        isNotificationEnabled = uiState.isPaymentPendingNotificationEnabled,
+        onToggleNotification = viewModel::togglePaymentPendingNotification,
         onBack = onBack,
     )
 }

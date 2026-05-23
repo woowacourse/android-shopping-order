@@ -9,16 +9,25 @@ class DefaultSettingDataSource(
 ) : SettingDataSource {
     private val sharedPreference = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
 
-    override fun isNotificationEnabled(): Boolean = sharedPreference.getBoolean(NOTIFICATION, false)
+    override fun isPaymentPendingNotificationEnabled(): Boolean = sharedPreference.getBoolean(PAYMENT_PENDING_NOTIFICATION, false)
 
-    override fun setNotificationEnabled(enabled: Boolean) {
+    override fun setPaymentPendingNotificationEnabled(enabled: Boolean) {
         sharedPreference.edit(commit = true) {
-            putBoolean(NOTIFICATION, enabled)
+            putBoolean(PAYMENT_PENDING_NOTIFICATION, enabled)
+        }
+    }
+
+    override fun hasAskedNotificationPermission(): Boolean = sharedPreference.getBoolean(ASKED_NOTIFICATION_PERMISSION, false)
+
+    override fun markNotificationPermissionAsked() {
+        sharedPreference.edit(commit = true) {
+            putBoolean(ASKED_NOTIFICATION_PERMISSION, true)
         }
     }
 
     companion object {
         private const val PREFS_NAME = "settings"
-        private const val NOTIFICATION = "notification"
+        private const val PAYMENT_PENDING_NOTIFICATION = "payment_pending_notification"
+        private const val ASKED_NOTIFICATION_PERMISSION = "asked_notification_permission"
     }
 }
