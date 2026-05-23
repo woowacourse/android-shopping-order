@@ -1,5 +1,10 @@
 package woowacourse.shopping.model.coupon
 
+import woowacourse.shopping.model.order.BuyXGetYDiscountPolicy
+import woowacourse.shopping.model.order.DiscountPolicy
+import woowacourse.shopping.model.order.FixedDiscountPolicy
+import woowacourse.shopping.model.order.FreeShippingDiscountPolicy
+import woowacourse.shopping.model.order.PercentageDiscountPolicy
 import woowacourse.shopping.model.product.Money
 import java.time.LocalDate
 import java.time.LocalTime
@@ -9,6 +14,7 @@ sealed interface Coupon {
     val code: String
     val description: String
     val expirationDate: String
+    val discountPolicy: DiscountPolicy
 
     fun isApplicable(
         currentDate: LocalDate,
@@ -25,7 +31,9 @@ sealed interface Coupon {
         override val expirationDate: String,
         val discount: Money,
         val minimumAmount: Money,
-    ) : Coupon
+    ) : Coupon {
+        override val discountPolicy: DiscountPolicy = FixedDiscountPolicy(discount, minimumAmount)
+    }
 
     data class BuyXGetY(
         override val id: Long,
@@ -34,7 +42,9 @@ sealed interface Coupon {
         override val expirationDate: String,
         val buyQuantity: Int,
         val getQuantity: Int,
-    ) : Coupon
+    ) : Coupon {
+        override val discountPolicy: DiscountPolicy = BuyXGetYDiscountPolicy(buyQuantity, getQuantity)
+    }
 
     data class FreeShipping(
         override val id: Long,
@@ -42,7 +52,9 @@ sealed interface Coupon {
         override val description: String,
         override val expirationDate: String,
         val minimumAmount: Money,
-    ) : Coupon
+    ) : Coupon {
+        override val discountPolicy: DiscountPolicy = FreeShippingDiscountPolicy(minimumAmount)
+    }
 
     data class PercentageDiscount(
         override val id: Long,
@@ -53,6 +65,8 @@ sealed interface Coupon {
         val availableStartTime: LocalTime,
         val availableEndTime: LocalTime,
     ) : Coupon {
+        override val discountPolicy: DiscountPolicy = PercentageDiscountPolicy(discountPercentage)
+
         override fun isApplicable(
             currentDate: LocalDate,
             currentTime: LocalTime,
