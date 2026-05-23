@@ -1,12 +1,13 @@
-package woowacourse.shopping.data.network.cart
+package woowacourse.shopping.data.source.cart
 
+import woowacourse.shopping.data.network.cart.RetrofitCartService
 import woowacourse.shopping.data.network.cart.dto.CartItemInsertDto
 import woowacourse.shopping.data.network.cart.dto.Quantity
 import woowacourse.shopping.domain.CartContent
 
-class CartRetrofitDaoImpl(
+class CartServerDataSourceImpl(
     val retrofitCartService: RetrofitCartService,
-) : CartServerDao {
+) : CartServerDataSource {
     override suspend fun pagination(
         startIndex: Int,
         pageSize: Int,

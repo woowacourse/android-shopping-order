@@ -1,8 +1,8 @@
-package woowacourse.shopping.data.network.cart
+package woowacourse.shopping.data.source.cart
 
 import woowacourse.shopping.domain.CartContent
 
-interface CartServerDao {
+interface CartServerDataSource {
     suspend fun pagination(
         startIndex: Int,
         pageSize: Int,

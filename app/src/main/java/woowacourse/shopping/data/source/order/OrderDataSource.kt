@@ -1,5 +1,5 @@
 package woowacourse.shopping.data.source.order
 
-interface OrderDao {
+interface OrderDataSource {
     suspend fun orders(cartItemIds: List<Long>)
 }

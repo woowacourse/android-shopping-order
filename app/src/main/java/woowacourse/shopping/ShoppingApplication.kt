@@ -15,9 +15,6 @@ import kotlinx.coroutines.launch
 import okhttp3.Credentials
 import woowacourse.shopping.data.local.RecentProductDatabase
 import woowacourse.shopping.data.network.RetrofitClient
-import woowacourse.shopping.data.network.cart.CartRetrofitDaoImpl
-import woowacourse.shopping.data.network.coupon.CouponDaoImpl
-import woowacourse.shopping.data.network.product.ProductRetrofitDaoImpl
 import woowacourse.shopping.data.network.startMockWebServer
 import woowacourse.shopping.data.repository.auth.AuthRepository
 import woowacourse.shopping.data.repository.auth.AuthRepositoryImpl
@@ -32,9 +29,10 @@ import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.data.source.auth.AuthDataSourceImpl
+import woowacourse.shopping.data.source.cart.CartServerDataSourceImpl
 import woowacourse.shopping.data.source.coupon.CouponDataSourceImpl
-import woowacourse.shopping.data.source.order.OrderDaoImpl
-import woowacourse.shopping.data.source.product.ProductDataSourceImpl
+import woowacourse.shopping.data.source.order.OrderServerDataSourceImpl
+import woowacourse.shopping.data.source.product.ProductServerDataSourceImpl
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -89,19 +87,15 @@ open class ShoppingApplication : Application() {
 
         val product: ProductRepository =
             ProductRepositoryImpl(
-                dataSource =
-                    ProductDataSourceImpl(
-                        productDao =
-                            ProductRetrofitDaoImpl(
-                                retrofitProductService = RetrofitClient.productService,
-                            ),
-                    ),
+                dataSource = ProductServerDataSourceImpl(
+                    retrofitProductService = RetrofitClient.productService,
+                ),
             )
 
         val cart: CartRepository =
             CartRepositoryImpl(
-                cartServerDao =
-                    CartRetrofitDaoImpl(
+                cartServerDataSource =
+                    CartServerDataSourceImpl(
                         retrofitCartService = RetrofitClient.cartService,
                     ),
             )
@@ -112,20 +106,17 @@ open class ShoppingApplication : Application() {
 
         val coupon: CouponRepository =
             CouponRepositoryImpl(
-                dataSource =
+                couponDataSource =
                     CouponDataSourceImpl(
-                        couponDao =
-                            CouponDaoImpl(
-                                couponService = RetrofitClient.couponService,
-                            ),
+                        couponService = RetrofitClient.couponService,
                     ),
             )
 
 
         val order: OrderRepository =
             OrderRepositoryImpl(
-                orderDao =
-                    OrderDaoImpl(
+                orderDataSource =
+                    OrderServerDataSourceImpl(
                         orderService = RetrofitClient.orderService,
                     ),
             )

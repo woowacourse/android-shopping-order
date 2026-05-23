@@ -65,3 +65,4 @@
 ## 리뷰 반영 사항
 
 - [x] SerialName 제거
+- [x] 서버와 연결되어 있는 DAO 구현체 제거 및 DataSoruce로 변경

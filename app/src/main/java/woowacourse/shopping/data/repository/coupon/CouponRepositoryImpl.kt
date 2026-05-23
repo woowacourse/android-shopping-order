@@ -5,9 +5,9 @@ import woowacourse.shopping.data.source.coupon.CouponDataSource
 import woowacourse.shopping.domain.coupon.Coupon
 
 class CouponRepositoryImpl(
-    private val dataSource: CouponDataSource,
+    private val couponDataSource: CouponDataSource,
 ) : CouponRepository {
     override suspend fun loadCoupons(): List<Coupon> {
-        return dataSource.loadCoupons()
+        return couponDataSource.loadCoupons()
     }
 }

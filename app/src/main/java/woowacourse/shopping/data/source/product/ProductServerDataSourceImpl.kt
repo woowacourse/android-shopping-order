@@ -1,15 +1,16 @@
-package woowacourse.shopping.data.network.product
+package woowacourse.shopping.data.source.product
 
+import woowacourse.shopping.data.network.product.RetrofitProductService
 import woowacourse.shopping.domain.Product
 
-class ProductRetrofitDaoImpl(
+class ProductServerDataSourceImpl(
     val retrofitProductService: RetrofitProductService,
-) : ProductDao {
-    override suspend fun findAllProduct(
+) : ProductDataSource {
+    override suspend fun loadProducts(
         startIndex: Int,
         pageSize: Int,
         sort: List<String>,
-        category: String?,
+        category: String?
     ): Pair<List<Product>, Boolean> {
         val response =
             retrofitProductService
@@ -25,7 +26,7 @@ class ProductRetrofitDaoImpl(
         return Pair(body.content.map { it.toDomain() }, body.last)
     }
 
-    override suspend fun findById(id: Long): Product {
+    override suspend fun getProduct(id: Long): Product {
         val response =
             retrofitProductService
                 .getProductDetail(id = id)
@@ -39,4 +40,5 @@ class ProductRetrofitDaoImpl(
                 ?: error("empty body")
         return body.toDomain()
     }
+
 }
