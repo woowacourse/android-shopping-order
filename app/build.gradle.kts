@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.datastore.preferences)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 
