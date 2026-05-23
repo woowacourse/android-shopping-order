@@ -3,21 +3,21 @@ package woowacourse.shopping.ui.navigation
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object Shopping
+data object ShoppingRoute
 
 @Serializable
-data class ProductDetail(
+data class ProductDetailRoute(
     val id: Long,
     val isFromBanner: Boolean = false
 )
 
 @Serializable
-data object Cart
+data object CartRoute
 
 @Serializable
-data class Payment(
+data class PaymentRoute(
     val ids: List<Long>
 )
 
 @Serializable
-data object Settings
+data object SettingsRoute

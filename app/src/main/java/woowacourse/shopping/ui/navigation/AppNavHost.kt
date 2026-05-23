@@ -18,33 +18,33 @@ fun AppNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Shopping
+        startDestination = ShoppingRoute
     ) {
-        composable<Shopping> {
+        composable<ShoppingRoute> {
             ShoppingScreen(
-                onCartClick = { navController.navigate(Cart) },
-                onProductClick = { navController.navigate(ProductDetail(it)) },
-                onSettingsClick = { navController.navigate(Settings) }
+                onCartClick = { navController.navigate(CartRoute) },
+                onProductClick = { navController.navigate(ProductDetailRoute(it)) },
+                onSettingsClick = { navController.navigate(SettingsRoute) }
             )
         }
 
-        composable<ProductDetail> {
+        composable<ProductDetailRoute> {
             ProductDetailScreen(
                 onCloseClick = {
-                    navController.navigate(Shopping) {
-                        popUpTo<Shopping> { inclusive = false }
+                    navController.navigate(ShoppingRoute) {
+                        popUpTo<ShoppingRoute> { inclusive = false }
                         launchSingleTop = true
                     }
                 },
                 onAddToCartClick = {
-                    navController.navigate(Shopping) {
-                        popUpTo<Shopping> { inclusive = false }
+                    navController.navigate(ShoppingRoute) {
+                        popUpTo<ShoppingRoute> { inclusive = false }
                         launchSingleTop = true
                     }
                 },
                 onLastViewedProductClick = {
                     navController.navigate(
-                        ProductDetail(
+                        ProductDetailRoute(
                             id = it,
                             isFromBanner = true
                         )
@@ -53,18 +53,26 @@ fun AppNavHost(
             )
         }
 
-        composable<Cart> {
+        composable<CartRoute> {
             CartScreen(
                 onBackClick = { navController.popBackStack() },
-                onOrderClick = { navController.navigate(Payment(emptyList())) }
+                onOrderClick = { navController.navigate(PaymentRoute(it.toList())) }
             )
         }
 
-        composable<Payment> {
-            PaymentScreen()
+        composable<PaymentRoute> {
+            PaymentScreen(
+                onBackClick = { navController.popBackStack() },
+                onPayClick = {
+                    navController.navigate(ShoppingRoute) {
+                        popUpTo<ShoppingRoute> { inclusive = false }
+                        launchSingleTop = true
+                    }
+                },
+            )
         }
 
-        composable<Settings> {
+        composable<SettingsRoute> {
             SettingsScreen(
                 onBackClick = { navController.popBackStack() },
                 modifier = Modifier
