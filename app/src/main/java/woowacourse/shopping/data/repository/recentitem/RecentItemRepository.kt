@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.repository
+package woowacourse.shopping.data.repository.recentitem
 
 import kotlinx.coroutines.flow.Flow
 import woowacourse.shopping.model.Product

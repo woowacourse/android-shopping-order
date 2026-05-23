@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.cart.CartRepository
 import java.io.IOException
 
 class CartViewModel(

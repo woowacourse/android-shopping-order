@@ -1,10 +1,11 @@
-package woowacourse.shopping.data.repository
+package woowacourse.shopping.data.repository.recentitem
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import woowacourse.shopping.data.localdb.dao.RecentItemDao
 import woowacourse.shopping.data.localdb.mapper.toDomain
 import woowacourse.shopping.data.localdb.mapper.toEntity
+import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.model.Product
 
 class RecentItemRepositoryImpl(

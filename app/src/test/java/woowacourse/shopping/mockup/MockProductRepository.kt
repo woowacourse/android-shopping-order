@@ -1,7 +1,7 @@
 package woowacourse.shopping.mockup
 
-import woowacourse.shopping.data.repository.ProductRepository
-import woowacourse.shopping.data.repository.ProductResponseResult
+import woowacourse.shopping.data.repository.product.ProductRepository
+import woowacourse.shopping.data.repository.product.ProductResponseResult
 import woowacourse.shopping.model.Product
 
 class MockProductRepository(

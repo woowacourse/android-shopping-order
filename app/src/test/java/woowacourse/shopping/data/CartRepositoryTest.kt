@@ -12,7 +12,7 @@ import woowacourse.shopping.data.remote.dto.response.cart.CartDto
 import woowacourse.shopping.data.remote.dto.response.cart.CartProductDto
 import woowacourse.shopping.data.remote.dto.response.cart.CartQuantityResponse
 import woowacourse.shopping.data.remote.dto.response.cart.CartResponse
-import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 
 class CartRepositoryTest {
     @Test

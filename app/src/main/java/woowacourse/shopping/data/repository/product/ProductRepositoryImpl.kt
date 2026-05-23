@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.repository
+package woowacourse.shopping.data.repository.product
 
 import woowacourse.shopping.data.remote.api.ProductApi
 import woowacourse.shopping.data.remote.dto.response.product.ProductResponse

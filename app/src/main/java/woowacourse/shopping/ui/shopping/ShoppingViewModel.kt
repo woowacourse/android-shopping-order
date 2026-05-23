@@ -14,9 +14,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import woowacourse.shopping.data.remote.NetworkObserver
-import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.ProductRepository
-import woowacourse.shopping.data.repository.RecentItemRepository
+import woowacourse.shopping.data.repository.cart.CartRepository
+import woowacourse.shopping.data.repository.product.ProductRepository
+import woowacourse.shopping.data.repository.recentitem.RecentItemRepository
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.ui.model.mapper.toUiModel

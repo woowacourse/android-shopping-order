@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.model.CartItem
 
 class MockCartRepository(

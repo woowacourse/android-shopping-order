@@ -12,9 +12,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.ProductRepository
-import woowacourse.shopping.data.repository.RecentItemRepository
+import woowacourse.shopping.data.repository.cart.CartRepository
+import woowacourse.shopping.data.repository.product.ProductRepository
+import woowacourse.shopping.data.repository.recentitem.RecentItemRepository
 import woowacourse.shopping.ui.model.mapper.toUiModel
 import java.io.IOException
 
