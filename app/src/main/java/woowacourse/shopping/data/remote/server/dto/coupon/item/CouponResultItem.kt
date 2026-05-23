@@ -15,31 +15,29 @@ import java.time.LocalTime
 @Serializable
 data class CouponResultItem(
     @SerialName("availableTime")
-    val availableTime: AvailableTime,
+    val availableTime: AvailableTime? = null,
     @SerialName("buyQuantity")
-    val buyQuantity: Int,
+    val buyQuantity: Int = 0,
     @SerialName("code")
     val code: String,
     @SerialName("description")
     val description: String,
     @SerialName("discount")
-    val discount: Int,
+    val discount: Int = 0,
     @SerialName("discountType")
     val discountType: String,
     @SerialName("expirationDate")
     val expirationDate: String,
     @SerialName("getQuantity")
-    val getQuantity: Int,
+    val getQuantity: Int = 0,
     @SerialName("id")
     val id: Long,
     @SerialName("minimumAmount")
-    val minimumAmount: Int
+    val minimumAmount: Int = 0
 )
 
 fun CouponResultItem.toDomain(): Coupon {
     val expiryDate = LocalDate.parse(expirationDate)
-    val startTime = LocalTime.parse(availableTime.start)
-    val endTime = LocalTime.parse(availableTime.end)
     return when (discountType) {
         "fixed" -> FixedCoupon(
             id = id.toInt(),
@@ -70,8 +68,8 @@ fun CouponResultItem.toDomain(): Coupon {
             description = description,
             expirationDate = expiryDate,
             discountPercent = discount/100.0,
-            startTime = startTime,
-            endTime = endTime
+            startTime = LocalTime.parse(availableTime?.start),
+            endTime = LocalTime.parse(availableTime?.end)
         )
         else -> throw IllegalArgumentException("Unknown discount type: $discountType")
     }
