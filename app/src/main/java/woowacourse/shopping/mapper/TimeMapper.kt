@@ -1,7 +1,7 @@
 package woowacourse.shopping.mapper
 
-import woowacourse.shopping.backend.retrofit.dto.coupon.AvailableTime
 import woowacourse.shopping.backend.retrofit.dto.coupon.AvailableTimeResponse
+import woowacourse.shopping.model.coupon.AvailableTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
