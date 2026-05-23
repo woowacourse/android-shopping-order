@@ -14,6 +14,9 @@ data class ProductDetail(
 object Cart
 
 @Serializable
+object Settings
+
+@Serializable
 data class CartRecommendation(
     val selectedCartItemIds: List<Long>,
 )

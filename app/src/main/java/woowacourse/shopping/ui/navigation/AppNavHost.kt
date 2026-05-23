@@ -1,5 +1,10 @@
 package woowacourse.shopping.ui.navigation
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -11,6 +16,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -18,7 +25,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import kotlinx.coroutines.launch
+import woowacourse.shopping.local.SettingsPreferences
+import woowacourse.shopping.receiver.AlarmHelper
 import woowacourse.shopping.ui.cart.list.CartScreen
 import woowacourse.shopping.ui.cart.list.CartViewModel
 import woowacourse.shopping.ui.cart.list.CartViewModelFactory
@@ -31,6 +41,8 @@ import woowacourse.shopping.ui.payment.PaymentViewModelFactory
 import woowacourse.shopping.ui.productdetail.ProductDetailScreen
 import woowacourse.shopping.ui.productdetail.ProductDetailViewModel
 import woowacourse.shopping.ui.productdetail.ProductDetailViewModelFactory
+import woowacourse.shopping.ui.settings.SettingsScreen
+import woowacourse.shopping.ui.settings.SettingsViewModel
 import woowacourse.shopping.ui.shopping.ShoppingScreen
 import woowacourse.shopping.ui.shopping.ShoppingViewModel
 import woowacourse.shopping.ui.shopping.ShoppingViewModelFactory
@@ -38,6 +50,26 @@ import woowacourse.shopping.ui.shopping.ShoppingViewModelFactory
 @Composable
 fun AppNavHost(innerPadding: PaddingValues) {
     val navController = rememberNavController()
+    val context = LocalContext.current
+
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+        ) { isGranted ->
+            // Permission result handled if needed
+        }
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS,
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
 
     NavHost(
         navController = navController,
@@ -62,10 +94,28 @@ fun AppNavHost(innerPadding: PaddingValues) {
                     navController.navigate(ProductDetail(productId))
                 },
                 onCartClick = { navController.navigate(Cart) },
+                onSettingsClick = { navController.navigate(Settings) },
                 onMoreClick = viewModel::loadMore,
                 onAddToCart = viewModel::addToCart,
                 onIncreaseQuantity = viewModel::increaseQuantity,
                 onDecreaseQuantity = viewModel::decreaseQuantity,
+            )
+        }
+
+        composable<Settings> {
+            val settingsPreferences = remember { SettingsPreferences(context) }
+            val viewModel: SettingsViewModel =
+                viewModel(
+                    factory = SettingsViewModel.factory(settingsPreferences),
+                )
+
+            val isPaymentReminderEnabled by viewModel.isPaymentReminderEnabled.collectAsStateWithLifecycle()
+
+            SettingsScreen(
+                isPaymentReminderEnabled = isPaymentReminderEnabled,
+                onTogglePaymentReminder = viewModel::togglePaymentReminder,
+                onBackClick = { navController.popBackStack() },
+                modifier = Modifier.padding(innerPadding),
             )
         }
 
@@ -189,7 +239,12 @@ fun AppNavHost(innerPadding: PaddingValues) {
             )
         }
 
-        composable<Payment> {
+        composable<Payment>(
+            deepLinks =
+                listOf(
+                    navDeepLink { uriPattern = "shopping://payment" },
+                ),
+        ) {
             val viewModel: PaymentViewModel =
                 viewModel(
                     factory = PaymentViewModelFactory(),
@@ -197,8 +252,13 @@ fun AppNavHost(innerPadding: PaddingValues) {
 
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+            LaunchedEffect(Unit) {
+                AlarmHelper.schedulePaymentReminder(context)
+            }
+
             LaunchedEffect(uiState.isOrderCompleted) {
                 if (uiState.isOrderCompleted) {
+                    AlarmHelper.cancelPaymentReminder(context)
                     navController.navigate(ProductList) {
                         popUpTo<ProductList> {
                             inclusive = true
@@ -209,7 +269,10 @@ fun AppNavHost(innerPadding: PaddingValues) {
 
             PaymentScreen(
                 uiState = uiState,
-                onBackClick = { navController.popBackStack() },
+                onBackClick = {
+                    AlarmHelper.cancelPaymentReminder(context)
+                    navController.popBackStack()
+                },
                 onCouponCheckedChange = { couponId, _ ->
                     viewModel.selectCoupon(couponId)
                 },

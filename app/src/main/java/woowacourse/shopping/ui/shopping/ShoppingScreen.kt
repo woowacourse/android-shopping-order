@@ -17,6 +17,7 @@ fun ShoppingScreen(
     uiState: ShoppingUiState,
     modifier: Modifier = Modifier,
     onCartClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     onProductClick: (Long) -> Unit,
     onMoreClick: () -> Unit,
     onAddToCart: (Long) -> Unit,
@@ -30,6 +31,7 @@ fun ShoppingScreen(
         ShoppingHeader(
             cartQuantity = uiState.cartQuantity,
             onCartClick = onCartClick,
+            onSettingsClick = onSettingsClick,
         )
 
         if (!uiState.isNetworkConnected) {
@@ -64,6 +66,7 @@ private fun ShoppingScreenPreview() {
                 isNetworkConnected = true,
             ),
         onCartClick = {},
+        onSettingsClick = {},
         onProductClick = {},
         onMoreClick = {},
         onAddToCart = {},
