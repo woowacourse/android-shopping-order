@@ -5,33 +5,12 @@ import java.time.LocalTime
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.coupon.BogoCoupon
-import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
 import woowacourse.shopping.domain.coupon.FreeShippingCoupon
+import woowacourse.shopping.domain.coupon.MiracleMorningCoupon
 import woowacourse.shopping.domain.coupon.OrderContext
 import woowacourse.shopping.fixture.TestCartContentFixture
 import woowacourse.shopping.fixture.TestProductFixture
-
-class MiracleMorningCoupon(
-    override val validUntil: LocalDate,
-) : Coupon {
-    override fun isApplicable(context: OrderContext): Boolean {
-        val now = context.now
-
-        return now.isAfter(LocalTime.of(3, 59, 59)) && now.isBefore(LocalTime.of(7, 0, 1))
-    }
-
-    override fun discountAmount(context: OrderContext): Int {
-        if (!isApplicable(context)) return 0
-        val totalPrice = context.totalPrice
-
-        return (totalPrice * DISCOUNT_RATE).toInt()
-    }
-
-    companion object {
-        const val DISCOUNT_RATE = 0.3
-    }
-}
 
 class CouponTest {
     @Test
