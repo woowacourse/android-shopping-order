@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Shopping</string>
-    <string name="title_activity_detail_product">DetailProductActivity</string>
-    <string name="title_activity_shopping_cart">ShoppingCartActivity</string>
     <string name="product_not_found_message">상품을 찾을 수 없습니다</string>
     <string name="cart_icon_description">장바구니 아이콘</string>
     <string name="product_image_content_description">%1$s 상품 이미지</string>

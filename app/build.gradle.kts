@@ -80,6 +80,21 @@ android {
                 ),
             )
         }
+        create("realDebug") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".realdebug"
+            versionNameSuffix = "-realdebug"
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                asBuildConfigString(
+                    readConfig(
+                        "BASE_URL",
+                        "",
+                    ),
+                ),
+            )
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -139,4 +154,6 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit.kotlinx.serialization.converter)
+
+    implementation(libs.androidx.navigation.compose)
 }
