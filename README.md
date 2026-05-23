@@ -61,3 +61,7 @@
 - [x] 알림 권한 Dialog 및 Notification은 기본 UI를 그대로 사용한다.
     - [x] 단, Notification의 아이콘은 커스텀한다.
 - [x] 알림 On/Off 설정은 SharedPreferences로 저장한다. 
+
+## 리뷰 반영 사항
+
+- [x] SerialName 제거
