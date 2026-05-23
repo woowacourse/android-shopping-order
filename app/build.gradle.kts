@@ -24,9 +24,9 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/\"",
+                "\"http://techcourse-lv2-alb-250216202.ap-northeast-2.elb.amazonaws.com/\"",
             )
-            buildConfigField("boolean", "IS_MOCK", "true")
+            buildConfigField("String", "MOCK_URL", "\"http://10.0.2.2:8080/\"")
         }
         release {
             isMinifyEnabled = false
@@ -37,9 +37,9 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/\"",
+                "\"http://techcourse-lv2-alb-250216202.ap-northeast-2.elb.amazonaws.com/\"",
             )
-            buildConfigField("boolean", "IS_MOCK", "false")
+            buildConfigField("String", "MOCK_URL", "\"\"")
         }
     }
     compileOptions {
