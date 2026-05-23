@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -68,12 +69,16 @@ class CartViewModel(
                 page = 1,
             )
             val checkMap: Map<Long, Boolean> =
-                cart.cartContents.map { it.id }.associateWith { false }
+                cart.cartContents.map { it.id }.associateWith { true }
             _uiState.update {
                 it.copy(
                     isLoading = false,
                     paginatedCartContents = cartContents,
                     checkMap = checkMap,
+                    totalPrice = cart.cartContents
+                        .filter { checkMap[it.id] == true }
+                        .sumOf { it.product.priceAmount() * it.quantity },
+                    totalCount = checkMap.count { it.value },
                     isFirstPage = it.page == 1,
                     isLastPage = it.page >= lastPage(initialPageSize),
                 )
@@ -161,17 +166,23 @@ class CartViewModel(
 
             viewModelScope.launch {
                 cartRepository.decrease(product.id)
-                cart = getCart()
+
                 val cartContents = pagination(uiState.value.page)
-                val page =
-                    maxOf(
-                        1,
-                        if (cartContents.isEmpty()) uiState.value.page - 1 else uiState.value.page,
-                    )
+                val updateCartContents = getCartContents(cartContents)
+                val page = getPage(cartContents)
+
+                cart = getCart()
+                val updateContentKeys = cart.cartContents.map { it.id }
+                val newCheckMap = _uiState.value.checkMap.filter{ it.key in updateContentKeys }.toMap()
+
                 _uiState.update {
                     it.copy(
-                        paginatedCartContents = cartContents.ifEmpty { pagination(page - 1) },
-                        totalPrice = it.totalPrice - if (it.checkMap[contentId] == true) product.priceAmount() else 0,
+                        paginatedCartContents = updateCartContents,
+                        checkMap = newCheckMap,
+                        totalPrice = cart.cartContents
+                            .filter { newCheckMap[it.id] == true }
+                            .sumOf { it.product.priceAmount() * it.quantity },
+                        totalCount = newCheckMap.count { it.value },
                         isFirstPage = page == 1,
                         isLastPage = page >= lastPage(initialPageSize),
                         page = page,
@@ -195,51 +206,27 @@ class CartViewModel(
 
     fun deleteCartItem(productId: Long) {
         viewModelScope.launch {
-            cart = getCart()
             val contentId = cart.cartContents.firstOrNull { it.productId == productId }?.id ?: 0
-            cartRepository.remove(productId)
-
+            cartRepository.remove(contentId)
             val cartContents = pagination(uiState.value.page)
-
-            val page =
-                maxOf(
-                    1,
-                    if (cartContents.isEmpty()) uiState.value.page - 1 else uiState.value.page,
-                )
-
-            val finalCartContents =
-                if (cartContents.isEmpty() && page != uiState.value.page) {
-                    pagination(page)
-                } else {
-                    cartContents
-                }
+            val updateCartContents = getCartContents(cartContents)
+            val page = getPage(cartContents)
 
             cart = getCart()
-            val newCheckMap = _uiState.value.checkMap.toMutableMap()
-            newCheckMap.remove(contentId)
-
-            finalCartContents.forEach { item ->
-                if (!newCheckMap.containsKey(item.contentId)) {
-                    newCheckMap[item.contentId] = false
-                }
-            }
-
-            val newTotalPrice =
-                cart.cartContents
-                    .filter { newCheckMap[it.id] == true }
-                    .sumOf { it.product.priceAmount() * it.quantity }
-
-            val newTotalCount = newCheckMap.filter { it.value }.size
+            val updateContentKeys = cart.cartContents.map { it.id }
+            val newCheckMap = _uiState.value.checkMap.filter{ it.key in updateContentKeys }.toMap()
 
             _uiState.update {
                 it.copy(
-                    paginatedCartContents = finalCartContents,
+                    paginatedCartContents = updateCartContents,
                     page = page,
                     isFirstPage = page == 1,
                     isLastPage = page >= lastPage(initialPageSize),
-                    checkMap = newCheckMap.toMap(),
-                    totalCount = newTotalCount,
-                    totalPrice = newTotalPrice,
+                    checkMap = newCheckMap,
+                    totalCount = newCheckMap.count { it.value },
+                    totalPrice = cart.cartContents
+                        .filter { newCheckMap[it.id] == true }
+                        .sumOf { it.product.priceAmount() * it.quantity },
                 )
             }
 
@@ -300,6 +287,21 @@ class CartViewModel(
                 totalPrice = totalPrice,
                 totalCount = totalCount
             )
+        }
+    }
+
+    private fun getPage(cartContents: List<CartItemUiModel>): Int = maxOf(
+        1,
+        if (cartContents.isEmpty()) uiState.value.page - 1 else uiState.value.page,
+    )
+
+    private suspend fun getCartContents(cartContents: List<CartItemUiModel>): List<CartItemUiModel> {
+        val page = getPage(cartContents)
+
+        return if (cartContents.isEmpty() && page != uiState.value.page) {
+            pagination(page)
+        } else {
+            cartContents
         }
     }
 
