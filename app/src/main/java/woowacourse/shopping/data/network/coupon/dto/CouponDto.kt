@@ -65,7 +65,7 @@ data class CouponDto(
                     id = id.toString(),
                     description = description,
                     expirationDate = validUntil,
-                    discountRate = (discount ?: 0).toDouble(),
+                    discountRate = (discount ?: 0).toDouble() * 0.01,
                     startTime = LocalTime.parse(time.start),
                     endTime = LocalTime.parse(time.end),
                 )
