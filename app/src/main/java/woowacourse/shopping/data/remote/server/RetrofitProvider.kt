@@ -10,7 +10,7 @@ import retrofit2.Retrofit
 class RetrofitProvider(
     private val authHeaderProvider: () -> String?
 ) {
-    private val BASE_URL = "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/"
+    private val BASE_URL = "http://techcourse-lv2-alb-250216202.ap-northeast-2.elb.amazonaws.com/"
 
     private val authInterceptor = Interceptor { chain ->
         val originalRequest = chain.request()
