@@ -45,8 +45,7 @@ class CartViewModel(
     private var cart: Cart = Cart(emptyList())
 
     fun initialLoading() {
-        launchCatching {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+        loadingCatching {
             cart = getCart()
             val cartContents = pagination(page = 1)
             applyContents(cartContents)
@@ -57,12 +56,15 @@ class CartViewModel(
         _uiState.update { it.copy(error = null) }
     }
 
-    private fun launchCatching(block: suspend () -> Unit) {
+    private fun loadingCatching(block: suspend () -> Unit) {
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
             try {
                 block()
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, error = e.toAppError()) }
+                _uiState.update { it.copy(error = e.toAppError()) }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -83,28 +85,36 @@ class CartViewModel(
     private fun mergeCheckMap(
         cartContents: List<CartItemUiModel>,
         previous: Map<String, Boolean>,
-    ): Map<String, Boolean> = cartContents.associate {
-        it.contentId to (
-            previous[it.contentId]
-                ?: false
-            )
+    ): Map<String, Boolean> {
+        return cartContents.associate {
+            it.contentId to (
+                previous[it.contentId]
+                    ?: false
+                )
+        }
     }
 
     private fun calculateTotalPrice(
         cartContents: List<CartItemUiModel>,
         checkMap: Map<String, Boolean>,
-    ): Int = cartContents
-        .filter { checkMap[it.contentId] == true }
-        .sumOf { it.productUiModel.price * it.productUiModel.quantity }
+    ): Int {
+        return cartContents
+            .filter { checkMap[it.contentId] == true }
+            .sumOf { it.productUiModel.price * it.productUiModel.quantity }
+    }
 
     private suspend fun getCart(): Cart {
         val cart = cartRepository.loadCart()
         return cart
     }
 
-    fun isStartPage(): Boolean = uiState.value.page == 1
+    fun isStartPage(): Boolean {
+        return uiState.value.page == 1
+    }
 
-    fun isEndPage(): Boolean = uiState.value.page >= lastPage(initialPageSize)
+    fun isEndPage(): Boolean {
+        return uiState.value.page >= lastPage(initialPageSize)
+    }
 
     private fun lastPage(pageSize: Int): Int {
         val size = cart.cartContentsSizeOf()
@@ -115,8 +125,7 @@ class CartViewModel(
     fun moveToPreviousPage() {
         val page = uiState.value.page - 1
         _uiState.update { it.copy(page = page) }
-        launchCatching {
-            _uiState.update { it.copy(isLoading = true) }
+        loadingCatching {
             applyContents(pagination(page))
         }
     }
@@ -124,8 +133,7 @@ class CartViewModel(
     fun moveToNextPage() {
         val page = uiState.value.page + 1
         _uiState.update { it.copy(page = page) }
-        launchCatching {
-            _uiState.update { it.copy(isLoading = true) }
+        loadingCatching {
             applyContents(pagination(page))
         }
     }
@@ -141,10 +149,9 @@ class CartViewModel(
     }
 
     fun increase(contentId: String) {
-        launchCatching {
-            _uiState.update { it.copy(isLoading = true) }
+        loadingCatching {
             val quantity = cart.cartContents.firstOrNull { it.id == contentId }?.quantity
-                ?: return@launchCatching
+                ?: return@loadingCatching
             cartRepository.updateQuantity(contentId, quantity + 1)
             cart = getCart()
             applyContents(pagination(uiState.value.page))
@@ -152,8 +159,7 @@ class CartViewModel(
     }
 
     fun decrease(contentId: String) {
-        launchCatching {
-            _uiState.update { it.copy(isLoading = true) }
+        loadingCatching {
             val prevCartContentSize = _uiState.value.paginatedCartContents.size
             cartRepository.decrease(contentId)
             cart = getCart()
@@ -167,8 +173,7 @@ class CartViewModel(
     }
 
     fun deleteCartItem(id: String) {
-        launchCatching {
-            _uiState.update { it.copy(isLoading = true) }
+        loadingCatching {
             cartRepository.remove(id)
             cart = getCart()
             applyContents(pagination(uiState.value.page))

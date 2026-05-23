@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.constants.MockData
+import woowacourse.shopping.feature.common.state.ErrorDialog
 import woowacourse.shopping.feature.purchase.component.CouponElement
 import woowacourse.shopping.feature.purchase.component.PriceLine
 import woowacourse.shopping.feature.purchase.component.PurchaseAppBar
@@ -59,6 +60,17 @@ fun PurchaseScreen(
         onCloseClick = activityFinish,
         onPurchaseClick = viewModel::purchase,
         modifier = modifier,
+    )
+    ErrorDialog(
+        error = uiState.error,
+        onDismiss = {
+            viewModel.dismissError()
+            activityFinish()
+        },
+        onRetry = {
+            viewModel.dismissError()
+            viewModel.initialLoading()
+        },
     )
 }
 

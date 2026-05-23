@@ -31,6 +31,8 @@ import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
 import woowacourse.shopping.domain.coupon.FreeShippingCoupon
 import woowacourse.shopping.domain.coupon.OrderContext
 import woowacourse.shopping.domain.coupon.PercentageCoupon
+import woowacourse.shopping.feature.common.state.AppError
+import woowacourse.shopping.feature.common.state.toAppError
 import woowacourse.shopping.feature.notification.PaymentNotificationScheduler
 
 data class PurchaseUiState(
@@ -41,6 +43,7 @@ data class PurchaseUiState(
     val couponDiscountPrice: Int = 0,
     val shippingPrice: Int = 3000,
     val totalDiscountedPrice: Int = 0,
+    val error: AppError? = null,
 )
 
 class PurchaseViewModel(
@@ -63,8 +66,7 @@ class PurchaseViewModel(
     private var cart: Cart = Cart(emptyList())
 
     fun initialLoading() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+        loadingCatching {
             refreshCart()
 
             cartContents = cart.cartContents.filter { contentIds.contains(it.id) }
@@ -164,8 +166,7 @@ class PurchaseViewModel(
     }
 
     fun purchase() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+        loadingCatching {
             orderRepository.orders(contentIds)
             paymentNotificationScheduler.cancel()
             _event.emit(PurchaseUiEvent.PurchaseComplete("주문이 완료되었습니다."))
@@ -200,6 +201,23 @@ class PurchaseViewModel(
             startTime = this.startTime,
             endTime = this.endTime,
         )
+    }
+
+    private fun loadingCatching(block: suspend () -> Unit) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            try {
+                block()
+            } catch (e: Exception) {
+                _uiState.update { it.copy(error = e.toAppError()) }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
+    fun dismissError() {
+        _uiState.update { it.copy(error = null) }
     }
 
     companion object {
