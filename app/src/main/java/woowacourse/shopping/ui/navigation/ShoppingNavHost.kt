@@ -16,7 +16,7 @@ import woowacourse.shopping.AppContainer
 import woowacourse.shopping.ui.cart.CartEvent
 import woowacourse.shopping.ui.cart.CartScreen
 import woowacourse.shopping.ui.cart.CartViewModel
-import woowacourse.shopping.ui.component.customToastMessage
+import woowacourse.shopping.ui.util.customToastMessage
 import woowacourse.shopping.ui.detail.DetailEvent
 import woowacourse.shopping.ui.detail.DetailScreen
 import woowacourse.shopping.ui.detail.DetailViewModel
