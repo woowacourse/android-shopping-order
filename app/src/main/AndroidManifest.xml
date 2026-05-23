@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".ShoppingApplication"
@@ -16,21 +17,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Shopping"
         tools:targetApi="31">
-        <activity
-            android:name=".feature.recommend.RecommendActivity"
-            android:exported="false"
-            android:label="@string/title_activity_recommend"
-            android:theme="@style/Theme.Shopping" />
-        <activity
-            android:name=".feature.productdetail.ProductDetailActivity"
-            android:exported="false"
-            android:label="@string/title_activity_product_detail"
-            android:theme="@style/Theme.Shopping" />
-        <activity
-            android:name=".feature.cart.CartActivity"
-            android:exported="false"
-            android:label="@string/title_activity_cart"
-            android:theme="@style/Theme.Shopping" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

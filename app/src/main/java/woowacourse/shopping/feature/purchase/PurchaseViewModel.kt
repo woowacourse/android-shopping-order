@@ -21,6 +21,7 @@ import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.coupon.CouponRepository
 import woowacourse.shopping.data.repository.order.OrderRepository
+import woowacourse.shopping.data.repository.setting.SettingRepository
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartContent
 import woowacourse.shopping.domain.coupon.BuyXGetYCoupon
@@ -46,6 +47,7 @@ class PurchaseViewModel(
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
     private val cartRepository: CartRepository,
+    private val settingRepository: SettingRepository,
 ) : ViewModel() {
     private var coupons: List<Coupon> = emptyList()
     private var cartContents: List<CartContent> = emptyList()
@@ -61,11 +63,10 @@ class PurchaseViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             refreshCart()
-            val contentIds = contentIds
-            cartContents = cart.cartContents.filter { contentIds.contains(it.id) }
-            val originalPrice = originalPrice
-            val uiModels = getCoupons()
 
+            cartContents = cart.cartContents.filter { contentIds.contains(it.id) }
+
+            val uiModels = getCoupons()
             _uiState.update {
                 it.copy(
                     originalPrice = originalPrice,
@@ -73,6 +74,11 @@ class PurchaseViewModel(
                     couponUiModels = uiModels,
                 )
             }
+        }
+    }
+
+    private suspend fun reserveNotification() {
+        if (settingRepository.isPaymentNotificationEnabled()) {
         }
     }
 
@@ -196,6 +202,7 @@ class PurchaseViewModel(
                     orderRepository = app.orderRepository,
                     couponRepository = app.couponRepository,
                     cartRepository = app.cartRepository,
+                    settingRepository = app.settingRepository,
                 )
             }
         }
