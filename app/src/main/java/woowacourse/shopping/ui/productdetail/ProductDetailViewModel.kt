@@ -11,10 +11,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import androidx.navigation.toRoute
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.di.AppContainer
+import woowacourse.shopping.ui.nav.ProductDetail
 import java.io.IOException
 
 class ProductDetailViewModel(
@@ -22,12 +24,12 @@ class ProductDetailViewModel(
     private val productRepo: ProductRepository,
     private val cartRepo: CartRepository,
     private val recentProductRepo: RecentProductRepository,
-    private val productId: Long,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductDetailUiState())
     val uiState = _uiState.asStateFlow()
-    private val isFromBanner: Boolean =
-        savedStateHandle[ProductDetailActivity.EXTRA_IS_FROM_BANNER] ?: false
+    private val detailRoute = savedStateHandle.toRoute<ProductDetail>()
+    private val productId: Long = detailRoute.productId
+    private val isFromBanner: Boolean = detailRoute.isFromBanner
 
     init {
         loadProduct()
@@ -114,7 +116,6 @@ class ProductDetailViewModel(
 
     companion object {
         fun provideFactory(
-            receivedProductId: Long,
             container: AppContainer,
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
@@ -128,9 +129,7 @@ class ProductDetailViewModel(
                         productRepo = container.productRepository,
                         cartRepo = container.cartRepository,
                         recentProductRepo = container.recentProductRepository,
-                        productId = receivedProductId,
                     ) as T
             }
-
     }
 }
