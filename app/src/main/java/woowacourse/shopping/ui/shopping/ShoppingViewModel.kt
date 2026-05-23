@@ -213,6 +213,41 @@ class ShoppingViewModel(
         }
     }
 
+    fun addToCartTrigger(purchaseProduct: PurchaseProduct) {
+        viewModelScope.launch {
+            _event.emit(
+                ShoppingEvent.AddToCart(purchaseProduct)
+            )
+        }
+    }
+
+    fun updateCountTrigger(productId: Long, updateAmount: Int) {
+        viewModelScope.launch {
+            _event.emit(
+                ShoppingEvent.UpdateCount(
+                    productID = productId,
+                    updateAmount = updateAmount
+                )
+            )
+        }
+    }
+
+    fun removeFromCartTrigger(purchaseProductId: Long){
+        viewModelScope.launch {
+            _event.emit(
+                ShoppingEvent.RemoveFormCart(purchaseProductId)
+            )
+        }
+    }
+
+    fun loadMoreTrigger() {
+        viewModelScope.launch {
+            _event.emit(
+                ShoppingEvent.LoadMore
+            )
+        }
+    }
+
     companion object {
         private const val PAGE_SIZE = 20
         private const val ADD_TO_CART = "장바구니에 상품을 추가했습니다."

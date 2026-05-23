@@ -55,6 +55,15 @@ fun ShoppingRoute(
                             lastViewedProductId = event.lastViewedProductId
                         )
                     )
+                    is ShoppingEvent.AddToCart -> viewModel.addToCart(event.purchaseProduct)
+                    is ShoppingEvent.UpdateCount -> viewModel.updateCountWithID(
+                        id = event.productID,
+                        updateAmount = event.updateAmount
+                    )
+                    is ShoppingEvent.RemoveFormCart -> viewModel.removeWithID(
+                        event.purchaseProductId
+                    )
+                    is ShoppingEvent.LoadMore -> viewModel.fetchProducts()
                 }
             }
         }
@@ -82,15 +91,21 @@ fun ShoppingRoute(
                 viewModel.moveToProductDetail(product.id)
             },
             onCartClick = viewModel::moveToCart,
-            onLoadClick = viewModel::loadMore,
+            onLoadClick = viewModel::loadMoreTrigger,
             onAdd = { id, updateAmount ->
-                viewModel.updateCountWithID(id, updateAmount)
+                viewModel.updateCountTrigger(
+                    productId = id,
+                    updateAmount = updateAmount
+                )
             },
             onMinus = { id, updateAmount ->
-                viewModel.updateCountWithID(id, updateAmount)
+                viewModel.updateCountTrigger(
+                    productId = id,
+                    updateAmount = updateAmount
+                )
             },
-            onDelete = { viewModel.removeWithID(it) },
-            onAddInCart = { viewModel.addToCart(it) },
+            onDelete = { viewModel.removeFromCartTrigger(it) },
+            onAddInCart = { viewModel.addToCartTrigger(it) },
             isContainedInCart = { uiState.cart.isContain(it) },
             specificProductCount = { uiState.cart.totalCountOfSpecificPurchaseProduct(it) },
             totalCount = uiState.totalCartCount(),
