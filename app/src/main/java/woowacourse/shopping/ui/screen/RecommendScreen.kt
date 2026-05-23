@@ -1,6 +1,6 @@
 @file:Suppress("FunctionName")
 
-package woowacourse.shopping.ui.recommend
+package woowacourse.shopping.ui.screen
 
 import android.icu.text.DecimalFormat
 import androidx.compose.foundation.background
@@ -33,8 +33,8 @@ import woowacourse.shopping.model.Price
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductTitle
 import woowacourse.shopping.model.ShoppingItem
-import woowacourse.shopping.ui.component.ProductItem
-import woowacourse.shopping.ui.screen.ShoppingCartTopBar
+import woowacourse.shopping.ui.component.productlist.ProductItem
+import woowacourse.shopping.ui.component.cart.ShoppingCartTopBar
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 @Composable

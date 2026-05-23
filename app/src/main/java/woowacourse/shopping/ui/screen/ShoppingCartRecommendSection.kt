@@ -1,6 +1,6 @@
 @file:Suppress("FunctionName")
 
-package woowacourse.shopping.ui.recommend
+package woowacourse.shopping.ui.screen
 
 import androidx.compose.runtime.Composable
 import woowacourse.shopping.model.ShoppingItem
