@@ -31,6 +31,7 @@ fun ProductListScreen(
     vm: ProductListViewModel = viewModel(factory = ProductListViewModel.Factory),
     onProductClick: (String, String?) -> Unit,
     onCartIconClick: () -> Unit,
+    onSettingIconClick: () -> Unit,
     activityFinish: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -69,6 +70,7 @@ fun ProductListScreen(
         topBar = {
             ProductListAppBar(
                 onCartIconClick = onCartIconClick,
+                onSettingIconClick = onSettingIconClick,
                 cartQuantities = state.cartTotalQuantity,
             )
         },
@@ -134,6 +136,7 @@ private fun PreviewProductListScreen() {
     ProductListScreen(
         onProductClick = { _, _ -> },
         onCartIconClick = { },
+        onSettingIconClick = { },
         activityFinish = { },
     )
 }

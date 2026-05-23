@@ -24,3 +24,6 @@ data class PurchaseRoute(
     val contentIds: List<String>,
     val totalPrice: Int,
 )
+
+@Serializable
+object SettingRoute

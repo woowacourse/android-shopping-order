@@ -10,6 +10,7 @@ import woowacourse.shopping.feature.productdetail.component.ProductDetailScreen
 import woowacourse.shopping.feature.productlist.component.ProductListScreen
 import woowacourse.shopping.feature.purchase.PurchaseScreen
 import woowacourse.shopping.feature.recommend.component.RecommendScreen
+import woowacourse.shopping.feature.setting.component.SettingScreen
 
 @Composable
 fun AppNavHost() {
@@ -26,6 +27,9 @@ fun AppNavHost() {
                 },
                 onCartIconClick = {
                     navController.navigate(CartRoute)
+                },
+                onSettingIconClick = {
+                    navController.navigate(SettingRoute)
                 },
                 activityFinish = {
                     navController.popBackStack()
@@ -92,6 +96,12 @@ fun AppNavHost() {
                 onPurchaseComplete = {
                     navController.popBackStack(ProductListRoute, inclusive = false)
                 },
+            )
+        }
+
+        composable<SettingRoute> {
+            SettingScreen(
+                onBackClick = { navController.popBackStack() },
             )
         }
     }
