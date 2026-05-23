@@ -3,7 +3,9 @@ package woowacourse.shopping.ui.cart
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -18,6 +20,9 @@ class CartViewModel(
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState = _uiState.asStateFlow()
 
+    private val _event = MutableSharedFlow<CartEvent>()
+    val event = _event.asSharedFlow()
+
     private val _allCartItems = MutableStateFlow<PurchaseProducts>(PurchaseProducts())
 
     private val _cartItemCount: MutableStateFlow<Int> = MutableStateFlow(0)
@@ -26,7 +31,7 @@ class CartViewModel(
         fetchCart()
     }
 
-    fun fetchCart() {
+    private fun fetchCart() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
@@ -53,7 +58,9 @@ class CartViewModel(
                 }
             } else {
                 val errorMsg = getErrorMessage(allItemsResult, pagedItemsResult)
-                _uiState.update { it.copy(errorMsg = errorMsg) }
+                _event.emit(
+                    CartEvent.SnackbarEvent(errorMsg)
+                )
             }
         }
     }
@@ -79,32 +86,38 @@ class CartViewModel(
             val nextAmount = target.count + updateAmount
             if (nextAmount < 1) return@launch
 
-            _uiState.update { it.copy(isLoading = true, errorMsg = null) }
+            _uiState.update { it.copy(isLoading = true) }
 
             when (val result = cartRepository.updateCount(id, nextAmount)) {
                 is ApiResult.Success -> fetchCart()
-                is ApiResult.Error ->
+                is ApiResult.Error -> {
                     _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMsg = "${ViewModelConst}.NETWORK_ERROR_LABEL${result.code}",
-                        )
+                        it.copy(isLoading = false)
                     }
+                    _event.emit(
+                        CartEvent.SnackbarEvent(
+                            "${ViewModelConst}.NETWORK_ERROR_LABEL${result.code}"
+                        )
+                    )
+                }
 
-                is ApiResult.Exception ->
+                is ApiResult.Exception -> {
                     _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMsg = "${ViewModelConst}.ERROR_LABEL${result.e.message}",
-                        )
+                        it.copy(isLoading = false)
                     }
+                    _event.emit(
+                        CartEvent.SnackbarEvent(
+                            "${ViewModelConst}.ERROR_LABEL${result.e.message}"
+                        )
+                    )
+                }
             }
         }
     }
 
     fun removeWithID(id: Long) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMsg = null) }
+            _uiState.update { it.copy(isLoading = true) }
 
             when (val result = cartRepository.deleteCartItem(id)) {
                 is ApiResult.Success -> {
@@ -118,21 +131,27 @@ class CartViewModel(
                     fetchCart()
                 }
 
-                is ApiResult.Error ->
+                is ApiResult.Error -> {
                     _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMsg = "${ViewModelConst}.NETWORK_ERROR_LABEL${result.code}",
-                        )
+                        it.copy(isLoading = false)
                     }
+                    _event.emit(
+                        CartEvent.SnackbarEvent(
+                            "${ViewModelConst}.NETWORK_ERROR_LABEL${result.code}"
+                        )
+                    )
+                }
 
-                is ApiResult.Exception ->
+                is ApiResult.Exception -> {
                     _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMsg = "${ViewModelConst}.ERROR_LABEL${result.e.message}",
-                        )
+                        it.copy(isLoading = false)
                     }
+                    _event.emit(
+                        CartEvent.SnackbarEvent(
+                            "${ViewModelConst}.ERROR_LABEL${result.e.message}"
+                        )
+                    )
+                }
             }
         }
     }
@@ -188,8 +207,60 @@ class CartViewModel(
                 ?.let { "${ViewModelConst}.ERROR_LABEL${it.e.message}" }
             ?: UNKNOWN_ERROR_LABEL
 
-    fun onErrorMsgShown() {
-        _uiState.update { it.copy(errorMsg = null) }
+    fun navigateToShopping() {
+        viewModelScope.launch {
+            _event.emit(
+                CartEvent.NavigateToShopping
+            )
+        }
+    }
+
+    fun navigateToRecommendation(totalPrice: Int, checkedIds: List<Long>) {
+        if (checkedIds.isNotEmpty()) {
+            viewModelScope.launch {
+                _event.emit(
+                    CartEvent.NavigateToRecommendation(
+                        totalPrice = totalPrice,
+                        checkedIds = checkedIds
+                    )
+                )
+            }
+        }
+    }
+
+    fun updateAmountTrigger(targetId: Long, updateAmount: Int) {
+        viewModelScope.launch {
+            _event.emit(
+                CartEvent.UpdateCount(
+                    targetId = targetId,
+                    updateAmount = updateAmount
+                )
+            )
+        }
+    }
+
+    fun removeItemTrigger(targetId: Long) {
+        viewModelScope.launch {
+            _event.emit(
+                CartEvent.RemoveFromCart(targetId)
+            )
+        }
+    }
+
+    fun nextPageTrigger() {
+        viewModelScope.launch {
+            _event.emit(
+                CartEvent.NextPage
+            )
+        }
+    }
+
+    fun prevPageTrigger() {
+        viewModelScope.launch {
+            _event.emit(
+                CartEvent.PrevPage
+            )
+        }
     }
 
     companion object {
