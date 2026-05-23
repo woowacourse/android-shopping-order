@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.remote.server.repository
 
+import kotlinx.coroutines.CancellationException
 import retrofit2.HttpException
 import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.dto.product.toDomain
@@ -25,6 +26,8 @@ class ProductRepositoryImpl(
             ApiResult.Error(e.code(), e.message)
         } catch (e: Exception) {
             ApiResult.Exception(e)
+        } catch (e: CancellationException) {
+            throw e
         }
 
     override suspend fun getProduct(id: Long): ApiResult<Product> =
@@ -35,6 +38,8 @@ class ProductRepositoryImpl(
             ApiResult.Error(e.code(), e.message)
         } catch (e: Exception) {
             ApiResult.Exception(e)
+        } catch (e: CancellationException) {
+            throw e
         }
 
     override suspend fun getCategoryProducts(
@@ -49,5 +54,7 @@ class ProductRepositoryImpl(
             ApiResult.Error(e.code(), e.message)
         } catch (e: Exception) {
             ApiResult.Exception(e)
+        } catch (e: CancellationException) {
+            throw e
         }
 }

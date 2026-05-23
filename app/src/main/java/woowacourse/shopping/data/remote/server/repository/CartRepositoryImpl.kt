@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.remote.server.repository
 
+import kotlinx.coroutines.CancellationException
 import retrofit2.HttpException
 import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.dto.cart.items.PatchQuantityRequest
@@ -25,6 +26,8 @@ class CartRepositoryImpl(
             ApiResult.Error(e.code(), e.message)
         } catch (e: Exception) {
             ApiResult.Exception(e)
+        } catch (e: CancellationException) {
+            throw e
         }
 
     override suspend fun updateCount(
@@ -41,6 +44,8 @@ class CartRepositoryImpl(
             ApiResult.Error(e.code(), e.message)
         } catch (e: Exception) {
             ApiResult.Exception(e)
+        } catch (e: CancellationException) {
+            throw e
         }
 
     override suspend fun deleteCartItem(purchaseProductId: Long): ApiResult<Unit> =
@@ -53,6 +58,8 @@ class CartRepositoryImpl(
             ApiResult.Error(e.code(), e.message)
         } catch (e: Exception) {
             ApiResult.Exception(e)
+        } catch (e: CancellationException) {
+            throw e
         }
 
     override suspend fun getProductCount(): ApiResult<Int> =
@@ -66,6 +73,8 @@ class CartRepositoryImpl(
             )
         } catch (e: Exception) {
             ApiResult.Exception(e)
+        } catch (e: CancellationException) {
+            throw e
         }
 
     override suspend fun getPagedCart(
@@ -83,6 +92,8 @@ class CartRepositoryImpl(
             ApiResult.Error(e.code(), e.message)
         } catch (e: Exception) {
             ApiResult.Exception(e)
+        } catch (e: CancellationException) {
+            throw e
         }
 
     override suspend fun getCartItemCount(): ApiResult<Int> =
@@ -93,5 +104,7 @@ class CartRepositoryImpl(
             ApiResult.Error(e.code(), e.message)
         } catch (e: Exception) {
             ApiResult.Exception(e)
+        } catch (e: CancellationException) {
+            throw e
         }
 }
