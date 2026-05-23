@@ -17,7 +17,7 @@ class CouponTest {
     fun `FixedDiscountCoupon은 최소 주문 금액 미만이면 적용 불가다`() {
         // given: 주문 금액이 50000원이고 쿠폰이 주어진다.
         val price = 50_000
-        val coupon = FixedDiscountCoupon(validUntil = LocalDate.of(2026, 11, 30))
+        val coupon = FixedDiscountCoupon(expirationDate = LocalDate.of(2026, 11, 30))
 
         // when: 할인 금액을 계산할 때
         val discountedPrice = price - coupon.discountAmount(OrderContext(totalPrice = price))
@@ -30,7 +30,7 @@ class CouponTest {
     fun `FixedDiscountCoupon은 최소 주문 금액 이상이면 5,000원을 할인한다`() {
         // given: 주문 금액이 100_000원이고 쿠폰이 주어진다.
         val price = 100_000
-        val coupon = FixedDiscountCoupon(validUntil = LocalDate.of(2026, 11, 30))
+        val coupon = FixedDiscountCoupon(expirationDate = LocalDate.of(2026, 11, 30))
 
         // when: 할인 금액을 계산할 때
         val discountedPrice = price - coupon.discountAmount(OrderContext(totalPrice = price))
@@ -46,7 +46,7 @@ class CouponTest {
         val cart = Cart(
             cartContents = listOf(cartContent),
         )
-        val coupon = BogoCoupon(validUntil = LocalDate.of(2026, 11, 30))
+        val coupon = BogoCoupon(expirationDate = LocalDate.of(2026, 11, 30))
         val price = cart.cartContents.sumOf { it.quantity * it.product.priceAmount() }
 
         // when: 할인 금액을 계산할 때
@@ -63,7 +63,7 @@ class CouponTest {
         val cart = Cart(
             cartContents = listOf(cartContent),
         )
-        val coupon = BogoCoupon(validUntil = LocalDate.of(2026, 11, 30))
+        val coupon = BogoCoupon(expirationDate = LocalDate.of(2026, 11, 30))
         val price = cart.cartContents.sumOf { it.quantity * it.product.priceAmount() }
 
         // when: 할인 금액을 계산할 때
@@ -83,7 +83,7 @@ class CouponTest {
         val cart = Cart(
             cartContents = listOf(cartContent, expensiveCartContent),
         )
-        val coupon = BogoCoupon(validUntil = LocalDate.of(2026, 11, 30))
+        val coupon = BogoCoupon(expirationDate = LocalDate.of(2026, 11, 30))
         val price = cart.cartContents.sumOf { it.quantity * it.product.priceAmount() }
 
         // when: 할인 금액을 계산할 때
@@ -97,7 +97,7 @@ class CouponTest {
     fun `FreeShippingCoupon은 최소 주문 금액(50,000원) 미만이면 적용 불가다`() {
         // given: 주문 금액 45_000과 무료배송 쿠폰이 주어진다
         val price = 45_000
-        val coupon = FreeShippingCoupon(validUntil = LocalDate.of(2026, 11, 30))
+        val coupon = FreeShippingCoupon(expirationDate = LocalDate.of(2026, 11, 30))
 
         // when: 할인 금액을 계산할 때
         val applicable = coupon.isApplicable(OrderContext(price))
@@ -111,7 +111,7 @@ class CouponTest {
         // given: 주문 금액 50_000과 무료배송 쿠폰이 주어진다
         val price = 50_000
         val shippingPrice = 3_000
-        val coupon = FreeShippingCoupon(validUntil = LocalDate.of(2026, 11, 30))
+        val coupon = FreeShippingCoupon(expirationDate = LocalDate.of(2026, 11, 30))
 
         // when: 할인 금액을 계산할 때
         val discountedPrice = shippingPrice - coupon.discountAmount(OrderContext(price))
@@ -124,7 +124,7 @@ class CouponTest {
     fun `MiracleMorningCoupon은 04시 이전 그리고 07시 이후면 적용할 수 없다`() {
         // given: 시간이 03시, 08시 리스트가 주어지고 미라클모닝 30% 할인 쿠폰이 주어진다
         val price = 50_000
-        val coupon = MiracleMorningCoupon(validUntil = LocalDate.of(2026, 11, 30))
+        val coupon = MiracleMorningCoupon(expirationDate = LocalDate.of(2026, 11, 30))
         val times = listOf(LocalTime.of(3, 0), LocalTime.of(8, 0))
 
         // when: 할인이 가능한지 확인할 때
@@ -138,7 +138,7 @@ class CouponTest {
     fun `MiracleMorningCoupon은 04시 이후 그리고 07시 이전이면 적용할 수 있다`() {
         // given: 시간이 04시, 05:30, 07시 리스트가 주어지고 미라클모닝 30% 할인 쿠폰이 주어진다
         val price = 50_000
-        val coupon = MiracleMorningCoupon(validUntil = LocalDate.of(2026, 11, 30))
+        val coupon = MiracleMorningCoupon(expirationDate = LocalDate.of(2026, 11, 30))
         val times = listOf(LocalTime.of(4, 0), LocalTime.of(5, 30), LocalTime.of(7, 0))
 
         // when: 할인이 가능한지 확인할 때
@@ -152,7 +152,7 @@ class CouponTest {
     fun `MiracleMorningCoupon은 적용 시 총 상품 금액의 30퍼센트를 할인한다`() {
         // given: 시간이 05:30으로 주어지고 미라클모닝 30% 할인 쿠폰이 주어진다
         val price = 50_000
-        val coupon = MiracleMorningCoupon(validUntil = LocalDate.of(2026, 11, 30))
+        val coupon = MiracleMorningCoupon(expirationDate = LocalDate.of(2026, 11, 30))
         val time = LocalTime.of(5, 30)
 
         // when: 할인이 가능한지 확인할 때
@@ -173,10 +173,10 @@ class CouponTest {
             now = LocalTime.of(5, 30),
         )
         val coupons = listOf(
-            FixedDiscountCoupon(validUntil = expiredDate),
-            BogoCoupon(validUntil = expiredDate),
-            FreeShippingCoupon(validUntil = expiredDate),
-            MiracleMorningCoupon(validUntil = expiredDate),
+            FixedDiscountCoupon(expirationDate = expiredDate),
+            BogoCoupon(expirationDate = expiredDate),
+            FreeShippingCoupon(expirationDate = expiredDate),
+            MiracleMorningCoupon(expirationDate = expiredDate),
         )
 
         // when: 각 쿠폰의 적용 가능 여부를 확인할 때

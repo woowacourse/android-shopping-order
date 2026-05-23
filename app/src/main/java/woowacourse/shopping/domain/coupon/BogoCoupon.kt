@@ -1,12 +1,15 @@
 package woowacourse.shopping.domain.coupon
 
 import java.time.LocalDate
+import java.util.UUID
 
 class BogoCoupon(
-    override val validUntil: LocalDate,
+    override val id: String = UUID.randomUUID().toString(),
+    override val description: String = "",
+    override val expirationDate: LocalDate,
 ) : Coupon {
     override fun isApplicable(context: OrderContext): Boolean {
-        if (LocalDate.now().isAfter(validUntil)) return false
+        if (LocalDate.now().isAfter(expirationDate)) return false
         val cartContents = context.items
 
         return cartContents.any { it.quantity >= 3 }

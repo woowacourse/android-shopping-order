@@ -30,16 +30,35 @@ data class CouponDto(
         val validUntil = LocalDate.parse(expirationDate)
         return when (discountType) {
             FIXED_DISCOUNT -> FixedDiscountCoupon(
-                validUntil = validUntil,
-                minimumPrice = minimumAmount ?: 100_000,
-                discountPrice = discount ?: 5_000,
+                id = id.toString(),
+                description = description,
+                expirationDate = validUntil,
+                minimumPrice = minimumAmount
+                    ?: 100_000,
+                discountPrice = discount
+                    ?: 5_000,
             )
-            BOGO -> BogoCoupon(validUntil)
+
+            BOGO -> BogoCoupon(
+                id = id.toString(),
+                description = description,
+                validUntil,
+            )
+
             FREE_SHIPPING -> FreeShippingCoupon(
-                validUntil = validUntil,
-                minimumPrice = minimumAmount ?: 50_000,
+                id = id.toString(),
+                description = description,
+                expirationDate = validUntil,
+                minimumPrice = minimumAmount
+                    ?: 50_000,
             )
-            MIRACLE_MORNING -> MiracleMorningCoupon(validUntil)
+
+            MIRACLE_MORNING -> MiracleMorningCoupon(
+                id = id.toString(),
+                description = description,
+                validUntil,
+            )
+
             else -> null
         }
     }

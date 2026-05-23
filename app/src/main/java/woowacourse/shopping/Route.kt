@@ -18,3 +18,9 @@ object CartRoute
 data class RecommendRoute(
     val contentIds: List<String>,
 )
+
+@Serializable
+data class PurchaseRoute(
+    val contentIds: List<String>,
+    val totalPrice: Int,
+)
