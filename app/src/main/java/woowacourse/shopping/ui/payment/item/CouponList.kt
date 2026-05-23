@@ -40,7 +40,6 @@ fun CouponList(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .height(550.dp)
             .padding(all = 18.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
@@ -57,8 +56,7 @@ fun CouponList(
             color = Color(0xFF555555)
         )
         LazyColumn(
-            modifier = Modifier
-                .height(350.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(items = coupons, key = { it.id }) { coupon ->

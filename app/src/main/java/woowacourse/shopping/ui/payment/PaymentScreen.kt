@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.payment
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -61,7 +62,7 @@ fun PaymentScreen(
             discount = discount,
             onOrder = onOrder,
         ) },
-        modifier = modifier
+        modifier = modifier.fillMaxSize()
     )
 }
 
@@ -112,6 +113,7 @@ fun PaymentBody(
             coupons = coupons,
             selectedCoupon = selectedCoupon,
             onCouponSelect = onCouponSelect,
+            modifier = Modifier.weight(1f)
         )
         HorizontalDivider()
         ReceiptItem(
