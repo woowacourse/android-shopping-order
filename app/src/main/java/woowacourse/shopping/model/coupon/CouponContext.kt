@@ -6,6 +6,7 @@ import java.time.Clock
 
 data class CouponContext(
     val items: List<CartItem>,
-    val totalAmount: Money,
+    val subtotal: Money,
+    val shippingFee: Money,
     val clock: Clock
 )

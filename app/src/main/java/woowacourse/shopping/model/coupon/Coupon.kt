@@ -1,7 +1,5 @@
 package woowacourse.shopping.model.coupon
 
-import woowacourse.shopping.model.coupon.AvailableTime
-import woowacourse.shopping.model.coupon.CouponContext
 import woowacourse.shopping.model.Money
 import java.time.Clock
 import java.time.LocalDate
@@ -14,6 +12,8 @@ sealed interface Coupon {
 
     fun isUsable(context: CouponContext): Boolean
 
+    fun discount(context: CouponContext): Discount
+
     data class FixedDiscount(
         override val id: Long?,
         override val code: String,
@@ -24,8 +24,10 @@ sealed interface Coupon {
     ) : Coupon {
         override fun isUsable(context: CouponContext): Boolean {
             if (!isNotExpired(expirationDate = expirationDate, clock = context.clock)) return false
-            return context.totalAmount >= minimumAmount
+            return context.subtotal >= minimumAmount
         }
+
+        override fun discount(context: CouponContext): Discount = Discount.OnTotal(discount)
     }
 
     data class BuyXGetY(
@@ -41,6 +43,13 @@ sealed interface Coupon {
             val filtered = context.items.filter { it.quantity >= (buyQuantity + getQuantity) }
             return filtered.isNotEmpty()
         }
+
+        override fun discount(context: CouponContext): Discount {
+            val filtered = context.items.filter { it.quantity >= (buyQuantity + getQuantity) }
+            val targetItem = filtered.maxBy { it.totalPrice }
+            val discount = targetItem.product.price * getQuantity
+            return Discount.OnTotal(discount)
+        }
     }
 
     data class FreeShipping(
@@ -52,8 +61,10 @@ sealed interface Coupon {
     ) : Coupon {
         override fun isUsable(context: CouponContext): Boolean {
             if (!isNotExpired(expirationDate = expirationDate, clock = context.clock)) return false
-            return context.totalAmount >= minimumAmount
+            return context.subtotal >= minimumAmount
         }
+
+        override fun discount(context: CouponContext): Discount = Discount.OnShipping(context.shippingFee)
     }
 
     data class PercentageDiscount(
@@ -67,6 +78,11 @@ sealed interface Coupon {
         override fun isUsable(context: CouponContext): Boolean {
             if (!isNotExpired(expirationDate = expirationDate, clock = context.clock)) return false
             return availableTime.isAvailableNow(context.clock)
+        }
+
+        override fun discount(context: CouponContext): Discount {
+            val discount = context.subtotal * discountPercent / 100
+            return Discount.OnTotal(discount)
         }
     }
 }

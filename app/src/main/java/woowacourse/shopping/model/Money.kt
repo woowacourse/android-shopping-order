@@ -10,5 +10,7 @@ value class Money(
 
     operator fun times(quantity: Int): Money = Money(this.value * quantity)
 
+    operator fun div(divisor: Int): Money = Money(this.value / divisor)
+
     override fun compareTo(other: Money): Int = this.value.compareTo(other.value)
 }
