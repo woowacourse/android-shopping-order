@@ -3,7 +3,9 @@ package woowacourse.shopping.ui.productdetail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,6 +27,9 @@ class ProductDetailViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductDetailUIState())
     val uiState = _uiState.asStateFlow()
+
+    private val _event = MutableSharedFlow<ProductDetailEvent>()
+    val event = _event.asSharedFlow()
     private val _cart = MutableStateFlow(PurchaseProducts())
 
     init {
@@ -32,18 +37,16 @@ class ProductDetailViewModel(
             val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
             when (allCartItemResult) {
                 is ApiResult.Success -> _cart.update { allCartItemResult.data }
-                is ApiResult.Error ->
-                    _uiState.update {
-                        it.copy(
-                            errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${allCartItemResult.code}",
-                        )
-                    }
+                is ApiResult.Error -> _event.emit(
+                    ProductDetailEvent.SnackbarEvent(
+                        "${ViewModelConst.NETWORK_ERROR_LABEL}${allCartItemResult.code}"
+                    )
+                )
+
                 is ApiResult.Exception ->
-                    _uiState.update {
-                        it.copy(
-                            errorMsg = "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}",
-                        )
-                    }
+                    ProductDetailEvent.SnackbarEvent(
+                        "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}"
+                    )
             }
             fetchProduct()
         }
@@ -69,20 +72,24 @@ class ProductDetailViewModel(
 
                         is ApiResult.Error -> {
                             _uiState.update {
-                                it.copy(
-                                    product = selectedProduct,
-                                    errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${lastViewedProductResult.code}",
-                                )
+                                it.copy(product = selectedProduct)
                             }
+                            _event.emit(
+                                ProductDetailEvent.SnackbarEvent(
+                                    "${ViewModelConst.NETWORK_ERROR_LABEL}${lastViewedProductResult.code}"
+                                )
+                            )
                         }
 
                         is ApiResult.Exception -> {
                             _uiState.update {
-                                it.copy(
-                                    product = selectedProduct,
-                                    errorMsg = "${ViewModelConst.ERROR_LABEL}${lastViewedProductResult.e.message}",
-                                )
+                                it.copy(product = selectedProduct)
                             }
+                            _event.emit(
+                                ProductDetailEvent.SnackbarEvent(
+                                    "${ViewModelConst.ERROR_LABEL}${lastViewedProductResult.e.message}",
+                                )
+                            )
                         }
                     }
                 } else {
@@ -90,13 +97,17 @@ class ProductDetailViewModel(
                 }
             }
 
-            is ApiResult.Error -> {
-                _uiState.update { it.copy(errorMsg = "${ViewModelConst.NETWORK_ERROR_LABEL}${selectedProductResult.code}") }
-            }
+            is ApiResult.Error -> _event.emit(
+                ProductDetailEvent.SnackbarEvent(
+                    "${ViewModelConst.NETWORK_ERROR_LABEL}${selectedProductResult.code}"
+                )
+            )
 
-            is ApiResult.Exception -> {
-                _uiState.update { it.copy(errorMsg = "${ViewModelConst.ERROR_LABEL}${selectedProductResult.e.message}") }
-            }
+            is ApiResult.Exception -> _event.emit(
+                ProductDetailEvent.SnackbarEvent(
+                    "${ViewModelConst.ERROR_LABEL}${selectedProductResult.e.message}"
+                )
+            )
         }
     }
 
@@ -130,8 +141,20 @@ class ProductDetailViewModel(
         }
     }
 
-    fun onErrorMsgShown() {
-        _uiState.update { it.copy(errorMsg = null) }
+    fun moveToLastViewedProduct(productId: Long) {
+        viewModelScope.launch {
+            _event.emit(
+                ProductDetailEvent.MoveToLastViewedProductDetail(productId)
+            )
+        }
+    }
+
+    fun moveToShopping() {
+        viewModelScope.launch {
+            _event.emit(
+                ProductDetailEvent.MoveToShopping
+            )
+        }
     }
 }
 
