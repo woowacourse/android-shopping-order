@@ -58,6 +58,6 @@
 - [ ] 결제 완료 또는 결제 화면 재진입 시 AlarmManager로 예약된 알림을 취소한다.
 - [ ] BroadcastReceiver를 구현해 알람을 수신하고 NotificationManager로 알림을 노출한다.
 - [ ] 알림 권한(POST_NOTIFICATIONS)을 요청한다.
-- [ ] 알림 권한 Dialog 및 Notification은 기본 UI를 그대로 사용한다.
-    - [ ] 단, Notification의 아이콘은 커스텀한다.
+- [x] 알림 권한 Dialog 및 Notification은 기본 UI를 그대로 사용한다.
+    - [x] 단, Notification의 아이콘은 커스텀한다.
 - [ ] 알림 On/Off 설정은 SharedPreferences로 저장한다. 
