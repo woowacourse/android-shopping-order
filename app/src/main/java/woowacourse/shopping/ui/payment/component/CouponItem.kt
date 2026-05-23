@@ -5,8 +5,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,6 +27,7 @@ fun CouponItem(
         modifier =
             modifier
                 .fillMaxWidth()
+                .height(104.dp)
                 .clip(RoundedCornerShape(4.dp))
                 .background(Color.White)
                 .border(1.dp, ShoppingColors.Gray2, RoundedCornerShape(4.dp))
@@ -39,7 +40,7 @@ fun CouponItem(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        Spacer(Modifier.size(20.dp))
+        Spacer(Modifier.height(8.dp))
 
         CouponDetails(
             expirationDate = item.expirationDate,
