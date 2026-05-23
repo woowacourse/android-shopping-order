@@ -14,4 +14,6 @@ data class Order(
     fun calculateFinalPrice(discount: Discount): Int {
         return (totalProductPrice + shippingFee) - discount.totalAmount
     }
+
+    fun getAllIds(): List<Long> = purchaseProducts.map { it.id }
 }
