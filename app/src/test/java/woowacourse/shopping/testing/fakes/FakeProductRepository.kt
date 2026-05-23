@@ -1,4 +1,4 @@
-package woowacourse.shopping.viewmodel.fakes
+package woowacourse.shopping.testing.fakes
 
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.model.Product

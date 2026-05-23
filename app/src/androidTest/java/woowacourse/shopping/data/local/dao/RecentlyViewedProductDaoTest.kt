@@ -1,4 +1,4 @@
-package woowacourse.shopping
+package woowacourse.shopping.data.local.dao
 
 import android.content.Context
 import androidx.room.Room
@@ -9,7 +9,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
-import woowacourse.shopping.data.local.dao.RecentlyViewedProductDao
 import woowacourse.shopping.data.local.database.DataBase
 import woowacourse.shopping.data.local.entity.RecentlyViewedProductEntity
 

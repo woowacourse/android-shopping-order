@@ -1,4 +1,4 @@
-package woowacourse.shopping.viewmodel
+package woowacourse.shopping.ui.productdetail
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.extension.RegisterExtension
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.ui.productdetail.ProductDetailViewModel
-import woowacourse.shopping.viewmodel.fakes.FakeCartRepository
-import woowacourse.shopping.viewmodel.fakes.FakeProductRepository
-import woowacourse.shopping.viewmodel.fakes.FakeRecentlyViewedProductRepository
+import woowacourse.shopping.testing.fakes.FakeCartRepository
+import woowacourse.shopping.testing.fakes.FakeProductRepository
+import woowacourse.shopping.testing.fakes.FakeRecentlyViewedProductRepository
+import woowacourse.shopping.testing.MainDispatcherExtension
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ProductDetailViewModelTest {
