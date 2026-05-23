@@ -38,9 +38,13 @@ import woowacourse.shopping.util.formattedPrice
 fun PaymentScreen(
     orderAmount: Long,
     coupons: ImmutableList<CouponUiModel>,
+    selectedCouponId: Long?,
     onSelectCoupon: (Long) -> Unit,
     onBackClick: () -> Unit,
     onPayClick: () -> Unit,
+    discountAmount: Long,
+    deliveryFee: Int,
+    totalAmount: Long,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -80,15 +84,16 @@ fun PaymentScreen(
         ) {
             CouponSection(
                 coupons = coupons,
+                selectedCouponId = selectedCouponId,
                 onSelectCoupon = { onSelectCoupon(it) },
                 modifier = Modifier.padding(horizontal = 18.dp),
             )
             HorizontalDivider(thickness = 2.dp)
             PaymentSummary(
                 orderAmount = formattedPrice(orderAmount),
-                discountAmount = formattedPrice(5000),
-                deliveryFee = formattedPrice(3000),
-                totalPayAmount = formattedPrice(10000),
+                discountAmount = formattedPrice(discountAmount),
+                deliveryFee = formattedPrice(deliveryFee.toLong()),
+                totalPayAmount = formattedPrice(totalAmount),
             )
         }
     }
@@ -97,6 +102,7 @@ fun PaymentScreen(
 @Composable
 private fun CouponSection(
     coupons: ImmutableList<CouponUiModel>,
+    selectedCouponId: Long?,
     onSelectCoupon: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -111,6 +117,7 @@ private fun CouponSection(
                     .height(300.dp)
                     .padding(vertical = 20.dp),
             coupons = coupons,
+            selectedCouponId = selectedCouponId,
             onSelect = { onSelectCoupon(it) },
         )
     }
@@ -124,28 +131,24 @@ private fun PaymentScreenPreview() {
             CouponUiModel(
                 id = 1L,
                 name = "5,000원 할인 쿠폰",
-                isSelected = true,
                 expiredDate = "2026년 5월 22일",
                 minPayAmount = null,
             ),
             CouponUiModel(
-                id = 1L,
+                id = 2L,
                 name = "5,000원 할인 쿠폰",
-                isSelected = false,
                 expiredDate = "2026년 5월 22일",
                 minPayAmount = "10000",
             ),
             CouponUiModel(
-                id = 1L,
+                id = 3L,
                 name = "5,000원 할인 쿠폰",
-                isSelected = false,
                 expiredDate = "2026년 5월 22일",
                 minPayAmount = "10000",
             ),
             CouponUiModel(
-                id = 1L,
+                id = 4L,
                 name = "5,000원 할인 쿠폰",
-                isSelected = false,
                 expiredDate = "2026년 5월 22일",
                 minPayAmount = "10000",
             ),
@@ -153,11 +156,15 @@ private fun PaymentScreenPreview() {
 
     AndroidshoppingTheme {
         PaymentScreen(
+            selectedCouponId = 2L,
             orderAmount = 1000,
             onBackClick = {},
             onPayClick = {},
             onSelectCoupon = {},
             coupons = coupons,
+            discountAmount = 1000,
+            deliveryFee = 3000,
+            totalAmount = 4000,
         )
     }
 }

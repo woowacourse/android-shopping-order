@@ -16,6 +16,7 @@ import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 @Composable
 fun CouponSelector(
     coupons: ImmutableList<CouponUiModel>,
+    selectedCouponId: Long?,
     onSelect: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -25,6 +26,7 @@ fun CouponSelector(
     ) {
         items(coupons) { coupon ->
             CouponCard(
+                isSelected = selectedCouponId == coupon.id,
                 coupon = coupon,
                 onClick = { onSelect(coupon.id) },
             )
@@ -40,14 +42,12 @@ private fun CouponSelectorPreview() {
             CouponUiModel(
                 id = 1L,
                 name = "5,000원 할인 쿠폰",
-                isSelected = true,
                 expiredDate = "2026년 5월 22일",
                 minPayAmount = "10000",
             ),
             CouponUiModel(
                 id = 1L,
                 name = "5,000원 할인 쿠폰",
-                isSelected = false,
                 expiredDate = "2026년 5월 22일",
                 minPayAmount = "10000",
             ),
@@ -55,6 +55,7 @@ private fun CouponSelectorPreview() {
     AndroidshoppingTheme {
         CouponSelector(
             coupons = coupons,
+            selectedCouponId = 1L,
             onSelect = { },
         )
     }

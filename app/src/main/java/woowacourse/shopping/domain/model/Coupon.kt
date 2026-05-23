@@ -14,7 +14,7 @@ sealed class Coupon {
         now: LocalDateTime,
     ): Boolean
 
-    abstract fun discountAmount(cart: Cart): Money
+    abstract fun discountAmount(items: PaymentItems): Money
 
     protected fun isNotExpired(now: LocalDateTime): Boolean = !now.toLocalDate().isAfter(expirationDate)
 
@@ -30,7 +30,7 @@ sealed class Coupon {
             now: LocalDateTime,
         ): Boolean = isNotExpired(now) && items.totalPrice >= minimumAmount
 
-        override fun discountAmount(cart: Cart): Money = Money(amount = discount)
+        override fun discountAmount(items: PaymentItems): Money = Money(amount = discount)
     }
 
     data class BuyXGetY(
@@ -43,11 +43,16 @@ sealed class Coupon {
         override fun isApplicable(
             items: PaymentItems,
             now: LocalDateTime,
-        ): Boolean = isNotExpired(now) && items.getPaymentItems().any { it.quantity >= buyQuantity + getQuantity }
+        ): Boolean =
+            isNotExpired(now) &&
+                items
+                    .getPaymentItems()
+                    .any { it.quantity >= buyQuantity + getQuantity }
 
-        override fun discountAmount(cart: Cart): Money {
+        override fun discountAmount(items: PaymentItems): Money {
             val target =
-                cart.items
+                items
+                    .getPaymentItems()
                     .filter { it.quantity >= buyQuantity + getQuantity }
                     .maxByOrNull { it.product.price.amount } ?: return Money(amount = 0)
             return target.product.price * getQuantity
@@ -65,7 +70,7 @@ sealed class Coupon {
             now: LocalDateTime,
         ): Boolean = isNotExpired(now) && items.totalPrice >= minimumAmount
 
-        override fun discountAmount(cart: Cart): Money = Money(amount = 3000)
+        override fun discountAmount(items: PaymentItems): Money = Money(amount = 3000)
     }
 
     data class Percentage(
@@ -80,6 +85,6 @@ sealed class Coupon {
             now: LocalDateTime,
         ): Boolean = isNotExpired(now) && availableTime.contains(now.toLocalTime())
 
-        override fun discountAmount(cart: Cart): Money = Money(amount = cart.totalPrice.amount * discount / 100)
+        override fun discountAmount(items: PaymentItems): Money = Money(amount = items.totalPrice.amount * discount / 100)
     }
 }

@@ -29,6 +29,7 @@ import woowacourse.shopping.ui.theme.Gray50
 @Composable
 fun CouponCard(
     coupon: CouponUiModel,
+    isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -52,7 +53,7 @@ fun CouponCard(
                 horizontalArrangement = Arrangement.Start,
             ) {
                 CartCheckBox(
-                    isSelected = coupon.isSelected,
+                    isSelected = isSelected,
                     onClick = onClick,
                 )
                 Text(
@@ -99,11 +100,11 @@ private fun CouponContent(
 private fun CouponCardPreview() {
     AndroidshoppingTheme {
         CouponCard(
+            isSelected = true,
             coupon =
                 CouponUiModel(
                     id = 1L,
                     name = "5,000원 할인 쿠폰",
-                    isSelected = true,
                     expiredDate = "2026년 5월 22일",
                     minPayAmount = "10000",
                 ),
@@ -117,11 +118,11 @@ private fun CouponCardPreview() {
 private fun CouponCardNoExpiredDatePreview() {
     AndroidshoppingTheme {
         CouponCard(
+            isSelected = false,
             coupon =
                 CouponUiModel(
                     id = 1L,
                     name = "5,000원 할인 쿠폰",
-                    isSelected = true,
                     expiredDate = null,
                     minPayAmount = "10000",
                 ),
@@ -135,11 +136,11 @@ private fun CouponCardNoExpiredDatePreview() {
 private fun CouponCardNoMinPayAmountPreview() {
     AndroidshoppingTheme {
         CouponCard(
+            isSelected = false,
             coupon =
                 CouponUiModel(
                     id = 1L,
                     name = "5,000원 할인 쿠폰",
-                    isSelected = true,
                     expiredDate = "2026년 5월 22일",
                     minPayAmount = null,
                 ),

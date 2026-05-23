@@ -48,7 +48,11 @@ fun PaymentRoute(
         orderAmount = orderAmount,
         onBackClick = navController::popBackStack,
         onPayClick = {},
-        onSelectCoupon = {},
+        onSelectCoupon = viewModel::selectCoupon,
+        selectedCouponId = uiState.selectedCouponId,
         coupons = uiState.availableCoupons.toImmutableList(),
+        discountAmount = uiState.discountAmount,
+        deliveryFee = uiState.deliveryFee,
+        totalAmount = uiState.totalAmount,
     )
 }
