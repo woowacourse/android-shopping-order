@@ -19,6 +19,7 @@ import woowacourse.shopping.data.datasource.cart.CartRemoteDataSource
 import woowacourse.shopping.data.datasource.coupon.CouponRemoteDataSource
 import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
 import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
+import woowacourse.shopping.data.datasource.setting.SettingLocalDataSource
 import woowacourse.shopping.data.local.RecentProductDatabase
 import woowacourse.shopping.data.network.cart.CartService
 import woowacourse.shopping.data.network.coupon.CouponService
@@ -37,6 +38,8 @@ import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
+import woowacourse.shopping.data.repository.setting.SettingRepository
+import woowacourse.shopping.data.repository.setting.SettingRepositoryImpl
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -50,6 +53,8 @@ class ShoppingApplication : Application() {
     lateinit var orderRepository: OrderRepository
         private set
     lateinit var couponRepository: CouponRepository
+        private set
+    lateinit var settingRepository: SettingRepository
         private set
     private var mockServer: ShoppingMockServer? = null
 
@@ -126,11 +131,18 @@ class ShoppingApplication : Application() {
             ),
         )
 
+        val setting: SettingRepository = SettingRepositoryImpl(
+            dataSource = SettingLocalDataSource(
+                dataStore = applicationContext.dataStore,
+            ),
+        )
+
         productRepository = product
         cartRepository = cart
         recentProductRepository = recent
         orderRepository = order
         couponRepository = coupon
+        settingRepository = setting
     }
 
     private fun issueBasicCredential(): String? {
