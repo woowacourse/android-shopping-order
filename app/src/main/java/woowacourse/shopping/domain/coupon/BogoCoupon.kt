@@ -12,6 +12,7 @@ class BogoCoupon(
     }
 
     override fun discountAmount(context: OrderContext): Int {
+        if (!isApplicable(context)) return 0
         val cartContents = context.items
 
         val productPrices =
