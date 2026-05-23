@@ -39,7 +39,19 @@ fun SettingRow(
 
 @Preview(showBackground = true)
 @Composable
-private fun SettingRowPreview() {
+private fun SettingRowEnabledPreview() {
+    AndroidshoppingTheme {
+        SettingRow(
+            label = "알림",
+            isChecked = true,
+            onCheckedChange = { },
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SettingRowDisabledPreview() {
     AndroidshoppingTheme {
         SettingRow(
             label = "알림",

@@ -67,7 +67,7 @@ fun AppNavHost() {
 
         composable<SettingScreen> {
             SettingRoute(
-                navController = navController,
+                onBack = navController::popBackStack,
             )
         }
     }

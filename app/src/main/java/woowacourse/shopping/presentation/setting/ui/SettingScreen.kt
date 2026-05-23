@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.setting.ui
 
-import android.R.attr.label
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -26,7 +25,11 @@ import woowacourse.shopping.presentation.setting.ui.components.SettingRow
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 
 @Composable
-fun SettingScreen(onBack: () -> Unit) {
+fun SettingScreen(
+    isNotificationEnabled: Boolean,
+    onToggleNotification: (Boolean) -> Unit,
+    onBack: () -> Unit,
+) {
     Scaffold(
         containerColor = Color.White,
         topBar = {
@@ -58,8 +61,8 @@ fun SettingScreen(onBack: () -> Unit) {
         ) {
             SettingRow(
                 label = stringResource(R.string.notification),
-                isChecked = false,
-                onCheckedChange = { },
+                isChecked = isNotificationEnabled,
+                onCheckedChange = onToggleNotification,
             )
         }
     }
@@ -70,6 +73,8 @@ fun SettingScreen(onBack: () -> Unit) {
 private fun SettingScreenPreview() {
     AndroidshoppingTheme {
         SettingScreen(
+            onToggleNotification = {},
+            isNotificationEnabled = true,
             onBack = {},
         )
     }

@@ -1,0 +1,27 @@
+package woowacourse.shopping.presentation.setting.viewmodel
+
+import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.domain.repository.SettingRepository
+import woowacourse.shopping.presentation.setting.model.SettingUiState
+
+class SettingViewModel(
+    private val settingRepository: SettingRepository = RepositoryProvider.settingRepository,
+) : ViewModel() {
+    private val _uiState =
+        MutableStateFlow(
+            SettingUiState(
+                isNotificationEnabled = settingRepository.isNotificationEnabled(),
+            ),
+        )
+    val uiState: StateFlow<SettingUiState> = _uiState.asStateFlow()
+
+    fun toggleNotification(enabled: Boolean) {
+        settingRepository.setNotificationEnabled(enabled)
+        _uiState.update { it.copy(isNotificationEnabled = enabled) }
+    }
+}

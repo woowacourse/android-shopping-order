@@ -7,9 +7,11 @@ import woowacourse.shopping.data.repository.DefaultCouponRepository
 import woowacourse.shopping.data.repository.DefaultOrderRepository
 import woowacourse.shopping.data.repository.DefaultProductRepository
 import woowacourse.shopping.data.repository.DefaultRecentProductRepository
+import woowacourse.shopping.data.repository.DefaultSettingRepository
 import woowacourse.shopping.data.source.local.ShoppingDatabase
 import woowacourse.shopping.data.source.local.auth.AuthDataSource
 import woowacourse.shopping.data.source.local.auth.DefaultAuthDataSource
+import woowacourse.shopping.data.source.local.setting.DefaultSettingDataSource
 import woowacourse.shopping.data.source.remote.RetrofitClient
 import woowacourse.shopping.data.source.remote.datasource.CartRemoteDataSource
 import woowacourse.shopping.data.source.remote.datasource.CouponRemoteDataSource
@@ -20,6 +22,7 @@ import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.repository.SettingRepository
 
 object RepositoryProvider {
     private lateinit var appContext: Context
@@ -72,6 +75,12 @@ object RepositoryProvider {
     val orderRepository: OrderRepository by lazy {
         DefaultOrderRepository(
             remoteDataSource = OrderRemoteDataSource(retrofitClient.retrofit),
+        )
+    }
+
+    val settingRepository: SettingRepository by lazy {
+        DefaultSettingRepository(
+            dataSource = DefaultSettingDataSource(appContext),
         )
     }
 }
