@@ -224,7 +224,7 @@ class CartViewModel(
     private fun syncPaymentDerivedState(cart: Cart) {
         _uiState.update {
             it.copy(
-                totalPrice = paymentItems.totalPrice,
+                totalPrice = paymentItems.totalPrice.amount,
                 totalQuantity = paymentItems.totalQuantity,
                 isSelectAll =
                     cart.items.isNotEmpty() &&

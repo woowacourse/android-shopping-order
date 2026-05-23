@@ -7,6 +7,6 @@ data class RecommendUiState(
     val recommendProducts: List<ShoppingItemUiModel> = emptyList(),
     val paymentItems: PaymentItems = PaymentItems(emptySet()),
 ) {
-    val totalPrice: Long get() = paymentItems.totalPrice
+    val totalPrice: Long get() = paymentItems.totalPrice.amount
     val totalQuantity: Int get() = paymentItems.totalQuantity
 }

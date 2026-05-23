@@ -1,5 +1,6 @@
 package woowacourse.shopping.domain.model
 
+import androidx.compose.ui.Modifier.Companion.any
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -9,7 +10,7 @@ sealed class Coupon {
     abstract val expirationDate: LocalDate
 
     abstract fun isApplicable(
-        cart: Cart,
+        items: PaymentItems,
         now: LocalDateTime,
     ): Boolean
 
@@ -25,9 +26,9 @@ sealed class Coupon {
         val minimumAmount: Money,
     ) : Coupon() {
         override fun isApplicable(
-            cart: Cart,
+            items: PaymentItems,
             now: LocalDateTime,
-        ): Boolean = isNotExpired(now) && cart.totalPrice >= minimumAmount
+        ): Boolean = isNotExpired(now) && items.totalPrice >= minimumAmount
 
         override fun discountAmount(cart: Cart): Money = Money(amount = discount)
     }
@@ -40,9 +41,9 @@ sealed class Coupon {
         val getQuantity: Int,
     ) : Coupon() {
         override fun isApplicable(
-            cart: Cart,
+            items: PaymentItems,
             now: LocalDateTime,
-        ): Boolean = isNotExpired(now) && cart.items.any { it.quantity >= buyQuantity + getQuantity }
+        ): Boolean = isNotExpired(now) && items.getPaymentItems().any { it.quantity >= buyQuantity + getQuantity }
 
         override fun discountAmount(cart: Cart): Money {
             val target =
@@ -60,9 +61,9 @@ sealed class Coupon {
         val minimumAmount: Money,
     ) : Coupon() {
         override fun isApplicable(
-            cart: Cart,
+            items: PaymentItems,
             now: LocalDateTime,
-        ): Boolean = isNotExpired(now) && cart.totalPrice >= minimumAmount
+        ): Boolean = isNotExpired(now) && items.totalPrice >= minimumAmount
 
         override fun discountAmount(cart: Cart): Money = Money(amount = 3000)
     }
@@ -75,7 +76,7 @@ sealed class Coupon {
         val availableTime: AvailableTime,
     ) : Coupon() {
         override fun isApplicable(
-            cart: Cart,
+            items: PaymentItems,
             now: LocalDateTime,
         ): Boolean = isNotExpired(now) && availableTime.contains(now.toLocalTime())
 

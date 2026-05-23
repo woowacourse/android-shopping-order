@@ -18,6 +18,7 @@ sealed interface CouponResponse {
         override val description: String,
         override val expirationDate: String,
         val discount: Long,
+        val minimumAmount: Long,
     ) : CouponResponse
 
     @Serializable
