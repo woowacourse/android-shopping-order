@@ -16,6 +16,7 @@ import woowacourse.shopping.di.RepositoryProvider
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.PaymentItems
+import woowacourse.shopping.domain.model.PriceModifiers
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.navigation.OrderItem
@@ -71,14 +72,14 @@ class PaymentViewModel(
 
         val newSelectedId = if (uiState.value.selectedCouponId == couponId) null else couponId
         val selected = newSelectedId?.let { id -> availableCouponsDomain.find { it.id == id } }
-        val (discount, delivery) = calculateAmounts(selected, items)
+        val orderPricing = calculateAmounts(selected, items)
 
         _uiState.update {
             it.copy(
                 selectedCouponId = if (it.selectedCouponId == couponId) null else couponId,
-                discountAmount = discount,
-                deliveryFee = delivery,
-                totalAmount = it.orderAmount + delivery - discount,
+                discountAmount = orderPricing.discountAmount,
+                deliveryFee = orderPricing.deliveryFee,
+                totalAmount = orderPricing.totalAmount,
             )
         }
     }
@@ -86,11 +87,26 @@ class PaymentViewModel(
     private fun calculateAmounts(
         coupon: Coupon?,
         items: PaymentItems,
-    ): Pair<Long, Int> =
+    ): PriceModifiers =
         when (coupon) {
-            null -> 0L to DEFAULT_DELIVERY_FEE
-            is Coupon.FreeShipping -> 0L to 0
-            else -> coupon.discountAmount(items).amount to DEFAULT_DELIVERY_FEE
+            null ->
+                PriceModifiers(
+                    orderAmount = items.totalPrice.amount,
+                    discountAmount = 0L,
+                    deliveryFee = DEFAULT_DELIVERY_FEE,
+                )
+            is Coupon.FreeShipping ->
+                PriceModifiers(
+                    orderAmount = items.totalPrice.amount,
+                    discountAmount = 0L,
+                    deliveryFee = 0,
+                )
+            else ->
+                PriceModifiers(
+                    orderAmount = items.totalPrice.amount,
+                    discountAmount = coupon.discountAmount(items).amount,
+                    deliveryFee = DEFAULT_DELIVERY_FEE,
+                )
         }
 
     private suspend fun buildPaymentItems(items: List<OrderItem>): PaymentItems =
@@ -98,7 +114,13 @@ class PaymentViewModel(
             val cartItems =
                 items
                     .map { item ->
-                        async { CartItem(productRepository.getProductById(item.productId), item.quantity) }
+                        async {
+                            CartItem(
+                                id = item.cartItemId,
+                                product = productRepository.getProductById(item.productId),
+                                quantity = item.quantity,
+                            )
+                        }
                     }.awaitAll()
             PaymentItems(cartItems.toSet())
         }

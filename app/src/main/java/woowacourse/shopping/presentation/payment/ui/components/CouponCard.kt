@@ -25,6 +25,7 @@ import woowacourse.shopping.presentation.payment.model.CouponUiModel
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 import woowacourse.shopping.ui.theme.Gray40
 import woowacourse.shopping.ui.theme.Gray50
+import woowacourse.shopping.util.formattedPrice
 
 @Composable
 fun CouponCard(
@@ -87,7 +88,7 @@ private fun CouponContent(
         }
         if (minPayAmount != null) {
             Text(
-                text = "${stringResource(R.string.minimum_order_amount)} ${minPayAmount}원",
+                text = "${stringResource(R.string.minimum_order_amount)} $minPayAmount",
                 fontSize = 12.sp,
                 color = Gray50,
             )
@@ -106,7 +107,7 @@ private fun CouponCardPreview() {
                     id = 1L,
                     name = "5,000원 할인 쿠폰",
                     expiredDate = "2026년 5월 22일",
-                    minPayAmount = "10000",
+                    minPayAmount = formattedPrice(10000),
                 ),
             onClick = {},
         )
@@ -124,7 +125,7 @@ private fun CouponCardNoExpiredDatePreview() {
                     id = 1L,
                     name = "5,000원 할인 쿠폰",
                     expiredDate = null,
-                    minPayAmount = "10000",
+                    minPayAmount = formattedPrice(10000),
                 ),
             onClick = {},
         )

@@ -34,20 +34,22 @@ class DefaultCartRepository(
         val items =
             cartContents.map {
                 CartItem(
-                    Product(
-                        id = it.product.id,
-                        name =
-                            ProductName(
-                                it.product.name,
-                            ),
-                        price =
-                            Money(
-                                it.product.price.toLong(),
-                            ),
-                        imageUrl = it.product.imageUrl,
-                        category = it.product.category,
-                    ),
-                    it.quantity,
+                    id = it.id,
+                    product =
+                        Product(
+                            id = it.product.id,
+                            name =
+                                ProductName(
+                                    it.product.name,
+                                ),
+                            price =
+                                Money(
+                                    it.product.price.toLong(),
+                                ),
+                            imageUrl = it.product.imageUrl,
+                            category = it.product.category,
+                        ),
+                    quantity = it.quantity,
                 )
             }
 
@@ -59,18 +61,19 @@ class DefaultCartRepository(
         quantity: Int,
     ): AddItemResult {
         val cartBefore = getCart()
-        val isAlreadyInCart = cartBefore.items.any { it.product.id == id }
+        val existing = cartBefore.items.find { it.product.id == id }
 
         return try {
-            remoteDataSource.addItem(
-                id = id,
-                quantity = quantity,
-            )
-            val updatedCart = getCart()
-            if (isAlreadyInCart) {
-                AddItemResult.Incremented(updatedCart)
+            if (existing == null) {
+                remoteDataSource.addItem(id = id, quantity = quantity)
+                AddItemResult.NewAdded(getCart())
             } else {
-                AddItemResult.NewAdded(updatedCart)
+                val newQuantity = existing.quantity + quantity
+                remoteDataSource.changeQuantity(
+                    id = existing.id,
+                    quantity = newQuantity,
+                )
+                AddItemResult.Incremented(getCart())
             }
         } catch (err: Exception) {
             AddItemResult.Error("장바구니 담기에 실패했습니다.")

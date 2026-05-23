@@ -9,12 +9,14 @@ import woowacourse.shopping.domain.model.CartItem
 
 @Serializable
 data class OrderItem(
+    val cartItemId: Long,
     val productId: Long,
     val quantity: Int,
 )
 
 fun CartItem.toParam() =
     OrderItem(
+        cartItemId = id,
         productId = product.id,
         quantity = quantity,
     )
