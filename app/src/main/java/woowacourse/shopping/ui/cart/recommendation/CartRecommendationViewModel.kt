@@ -113,7 +113,7 @@ class CartRecommendationViewModel(
                             selectedCount = selectedCartItemIds.size,
                             totalPrice = totalPrice,
                         ),
-                    orderErrorMessage = null,
+                    errorMessage = null,
                     orderCompletedCount = 0,
                 )
             }
@@ -147,77 +147,40 @@ class CartRecommendationViewModel(
         changeRecommendedProductQuantity(productId, delta = -1)
     }
 
-    fun placeOrder() {
+    fun applyRecommendations() {
         viewModelScope.launch {
-            if (_uiState.value.isOrdering) return@launch
+            if (_uiState.value.isApplying) return@launch
 
             _uiState.update {
                 it.copy(
-                    isOrdering = true,
-                    orderErrorMessage = null,
+                    isApplying = true,
+                    errorMessage = null,
                 )
             }
-
-            val additionalCartItemIds = mutableListOf<Long>()
 
             for ((productId, orderData) in recommendedOrderItemDataByProductId) {
                 val result = cartRepository.setQuantity(productId, orderData.quantity)
                 if (result.isFailure) {
-                    updateOrderError("추천 상품을 주문할 수 없습니다.")
+                    updateError("추천 상품을 장바구니에 담을 수 없습니다.")
                     return@launch
                 }
             }
 
-            if (recommendedOrderItemDataByProductId.isNotEmpty()) {
-                val totalCount = cartRepository.count().getOrDefault(0)
-                val allCartItems =
-                    cartRepository
-                        .getCartPage(0, totalCount)
-                        .getOrNull()
-                        ?.items ?: emptyList()
-
-                recommendedOrderItemDataByProductId.keys.forEach { addedProductId ->
-                    val newCartItemId =
-                        allCartItems
-                            .find {
-                                it.productId == addedProductId
-                            }?.cartItemId
-
-                    if (newCartItemId != null) {
-                        additionalCartItemIds.add(newCartItemId)
-                    }
-                }
-
-                val baseCartItemIds = _uiState.value.pendingOrder.cartItemIds
-                val finalCartItemIdsToOrder = baseCartItemIds + additionalCartItemIds
-
-                if (finalCartItemIdsToOrder.isEmpty()) {
-                    updateOrderError("주문할 상품이 없습니다")
-                    return@launch
-                }
-
-                cartRepository
-                    .createOrder(finalCartItemIdsToOrder)
-                    .onSuccess {
-                        orderedProductIds.clear()
-                        recommendedOrderItemDataByProductId.clear()
-                        _uiState.update { currentState ->
-                            currentState.copy(
-                                pendingOrder = PendingOrderUiState(),
-                                isOrdering = false,
-                                orderCompletedCount = currentState.orderCompletedCount + 1,
-                            )
-                        }
-                    }.onFailure { throwable ->
-                        updateOrderError(throwable.toUserMessage("주문에 실패했습니다."))
-                    }
+            orderedProductIds.clear()
+            recommendedOrderItemDataByProductId.clear()
+            _uiState.update { currentState ->
+                currentState.copy(
+                    pendingOrder = PendingOrderUiState(),
+                    isApplying = false,
+                    orderCompletedCount = currentState.orderCompletedCount + 1,
+                )
             }
         }
     }
 
-    fun clearOrderError() {
+    fun clearError() {
         _uiState.update { currentState ->
-            currentState.copy(orderErrorMessage = null)
+            currentState.copy(errorMessage = null)
         }
     }
 
@@ -419,11 +382,11 @@ class CartRecommendationViewModel(
             }
     }
 
-    private fun updateOrderError(message: String) {
+    private fun updateError(message: String) {
         _uiState.update { currentState ->
             currentState.copy(
-                isOrdering = false,
-                orderErrorMessage = message,
+                isApplying = false,
+                errorMessage = message,
             )
         }
     }

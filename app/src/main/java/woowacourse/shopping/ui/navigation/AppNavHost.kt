@@ -174,7 +174,7 @@ fun AppNavHost(innerPadding: PaddingValues) {
                 onAddToCart = recommendationViewModel::addRecommendedProduct,
                 onIncreaseQuantity = recommendationViewModel::addRecommendedProduct,
                 onDecreaseQuantity = recommendationViewModel::decreaseRecommendedProductQuantity,
-                onOrderClick = recommendationViewModel::placeOrder,
+                onOrderClick = recommendationViewModel::applyRecommendations,
                 onBackClick = { navController.popBackStack() },
             )
         }

@@ -85,26 +85,26 @@ class CartRecommendationViewModelTest {
     }
 
     @Test
-    fun `추천 상품을 추가하고 바로 주문하면 추가한 상품까지 주문에 포함되고 장바구니에서 제거된다`() =
+    fun `추천 상품을 추가하고 주문 버튼을 누르면 추천 상품이 장바구니에 반영되지만 주문은 생성되지 않는다`() =
         runTest(dispatcher.scheduler) {
             advanceUntilIdle()
 
             viewModel.addRecommendedProduct(recommendedProduct.id)
             advanceUntilIdle()
 
-            assertEquals(
-                setOf(101L),
-                viewModel.uiState.value.pendingOrder.cartItemIds
-                    .toSet(),
-            )
-
-            viewModel.placeOrder()
+            viewModel.applyRecommendations()
             advanceUntilIdle()
 
-            assertEquals(
-                listOf(listOf(101L, 102L)),
-                cartRepository.createdOrders,
-            )
+            // 주문은 생성되지 않아야 함
+            assertTrue(cartRepository.createdOrders.isEmpty())
+
+            // 장바구니에 추천 상품이 추가되어 있어야 함
+            val cartItems =
+                cartRepository
+                    .getCartItemsByProductIds(setOf(recommendedProduct.id))
+                    .getOrThrow()
+            assertEquals(1, cartItems.size)
+            assertEquals(recommendedProduct.id, cartItems[0].productId)
         }
 
     @Test
