@@ -11,20 +11,10 @@ import woowacourse.shopping.feature.recommend.OrderDialogUiState
 fun OrderResultDialog(
     state: OrderDialogUiState,
     onDismiss: () -> Unit,
-    onCompleted: () -> Unit,
     onRetry: () -> Unit,
 ) {
     when (state) {
         OrderDialogUiState.None -> Unit
-
-        OrderDialogUiState.Success -> AlertDialog(
-            onDismissRequest = onCompleted,
-            title = { Text("주문 완료") },
-            text = { Text("주문이 정상적으로 접수되었습니다.") },
-            confirmButton = {
-                TextButton(onClick = onCompleted) { Text("확인") }
-            },
-        )
 
         OrderDialogUiState.AuthExpired -> AlertDialog(
             onDismissRequest = onDismiss,
@@ -67,7 +57,6 @@ private fun OrderResultDialogPreviewAuth() {
     OrderResultDialog(
         state = OrderDialogUiState.AuthExpired,
         onDismiss = { },
-        onCompleted = { },
         onRetry = { },
     )
 }
@@ -78,7 +67,6 @@ private fun OrderResultDialogPreviewServer() {
     OrderResultDialog(
         state = OrderDialogUiState.ServerError,
         onDismiss = { },
-        onCompleted = { },
         onRetry = { },
     )
 }

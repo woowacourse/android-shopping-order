@@ -5,8 +5,11 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -39,6 +42,9 @@ class RecommendViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RecommendUiState())
     val uiState: StateFlow<RecommendUiState> = _uiState.asStateFlow()
+
+    private val _event = MutableSharedFlow<RecommendEvent>()
+    val event: SharedFlow<RecommendEvent> = _event.asSharedFlow()
 
     private var products: List<Product> = emptyList()
     private var serverCart: Cart = Cart(emptyList())
@@ -152,6 +158,7 @@ class RecommendViewModel(
 
     fun order(cartContentIds: List<String>) {
         viewModelScope.launch {
+            val totalPrice = getTotalPrice(cartContentIds)
             val products = memoryCart.cartContents.map { it.product }
             memoryCart.cartContents.forEach {
                 cartRepository.insert(it.product.id, quantity = it.quantity)
@@ -162,23 +169,25 @@ class RecommendViewModel(
             val latestContents = serverCart.cartContents.filter { cartContent ->
                 products.map { it.id }.contains(cartContent.product.id)
             }
+            val allContentIds = cartContentIds + latestContents.map { it.id }
 
-            val result = orderRepository.orders(
-                cartItemIds = cartContentIds + latestContents.map { it.id },
-            )
-            _uiState.update { it.copy(dialog = result.toDialogState()) }
+            val result = orderRepository.orders(cartItemIds = allContentIds)
+            when (result) {
+                OrderResult.Success -> _event.emit(
+                    RecommendEvent.NavigateToPurchase(
+                        contentIds = allContentIds,
+                        totalPrice = totalPrice,
+                    ),
+                )
+                OrderResult.AuthExpired -> _uiState.update { it.copy(dialog = OrderDialogUiState.AuthExpired) }
+                OrderResult.ServerError -> _uiState.update { it.copy(dialog = OrderDialogUiState.ServerError) }
+                OrderResult.NetworkError -> _uiState.update { it.copy(dialog = OrderDialogUiState.NetworkError) }
+            }
         }
     }
 
     fun dismissDialog() {
         _uiState.update { it.copy(dialog = OrderDialogUiState.None) }
-    }
-
-    private fun OrderResult.toDialogState(): OrderDialogUiState = when (this) {
-        OrderResult.Success -> OrderDialogUiState.Success
-        OrderResult.AuthExpired -> OrderDialogUiState.AuthExpired
-        OrderResult.ServerError -> OrderDialogUiState.ServerError
-        OrderResult.NetworkError -> OrderDialogUiState.NetworkError
     }
 
     private suspend fun refreshRecentProducts(): String? {

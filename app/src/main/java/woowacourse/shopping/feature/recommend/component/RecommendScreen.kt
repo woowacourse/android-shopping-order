@@ -28,19 +28,25 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.feature.cart.component.CartAppBar
 import woowacourse.shopping.feature.common.state.ErrorDialog
 import woowacourse.shopping.feature.format.DecimalPriceFormatter
+import woowacourse.shopping.feature.recommend.RecommendEvent
 import woowacourse.shopping.feature.recommend.RecommendViewModel
 
 @Composable
 fun RecommendScreen(
-    viewModel: RecommendViewModel = viewModel(
-        factory = RecommendViewModel.Companion.Factory,
-    ),
+    viewModel: RecommendViewModel = viewModel(factory = RecommendViewModel.Factory),
     onCloseClick: () -> Unit,
+    onOrderClick: (List<String>, Int) -> Unit,
     contentIds: List<String>,
     modifier: Modifier = Modifier,
 ) {
     LaunchedEffect(Unit) {
         viewModel.initialLoading()
+        viewModel.event.collect { event ->
+            when (event) {
+                is RecommendEvent.NavigateToPurchase ->
+                    onOrderClick(event.contentIds, event.totalPrice)
+            }
+        }
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -116,10 +122,6 @@ fun RecommendScreen(
     OrderResultDialog(
         state = uiState.dialog,
         onDismiss = viewModel::dismissDialog,
-        onCompleted = {
-            viewModel.dismissDialog()
-            onCloseClick()
-        },
         onRetry = {
             viewModel.dismissDialog()
             viewModel.order(contentIds)
@@ -145,5 +147,6 @@ private fun RecommendScreenPreview() {
     RecommendScreen(
         onCloseClick = {},
         contentIds = emptyList(),
+        onOrderClick = { _, _ -> },
     )
 }

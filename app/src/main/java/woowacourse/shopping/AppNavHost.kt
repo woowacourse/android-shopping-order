@@ -8,6 +8,7 @@ import androidx.navigation.toRoute
 import woowacourse.shopping.feature.cart.component.CartScreen
 import woowacourse.shopping.feature.productdetail.component.ProductDetailScreen
 import woowacourse.shopping.feature.productlist.component.ProductListScreen
+import woowacourse.shopping.feature.purchase.PurchaseScreen
 import woowacourse.shopping.feature.recommend.component.RecommendScreen
 
 @Composable
@@ -73,7 +74,28 @@ fun AppNavHost() {
             val route = backStackEntry.toRoute<RecommendRoute>()
             RecommendScreen(
                 onCloseClick = { navController.popBackStack() },
+                onOrderClick = { contentIds, totalPrice ->
+                    navController.navigate(
+                        PurchaseRoute(
+                            contentIds = contentIds,
+                            totalPrice = totalPrice,
+                        ),
+                    ) {
+                        popUpTo<ProductListRoute> {
+                            inclusive = true
+                        }
+                    }
+                },
                 contentIds = route.contentIds,
+            )
+        }
+
+        composable<PurchaseRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<PurchaseRoute>()
+            PurchaseScreen(
+                contentIds = route.contentIds,
+                totalPrice = route.totalPrice,
+                activityFinish = { navController.popBackStack() },
             )
         }
     }
