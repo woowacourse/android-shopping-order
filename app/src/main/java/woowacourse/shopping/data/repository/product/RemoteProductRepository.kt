@@ -23,7 +23,7 @@ class RemoteProductRepository(
         page: Int,
         pageSize: Int,
     ): Products {
-        val result = productRemoteDataSource.getProducts(page, pageSize)
+        val result = productRemoteDataSource.getCategoryProducts(category.value, page, pageSize)
         return result.toDomain()
     }
 

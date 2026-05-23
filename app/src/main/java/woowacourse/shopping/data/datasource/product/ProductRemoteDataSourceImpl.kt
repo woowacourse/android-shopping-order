@@ -12,5 +12,11 @@ class ProductRemoteDataSourceImpl(
         size: Int,
     ): ProductsResponseDto = productApi.getProducts(page = page, size = size)
 
+    override suspend fun getCategoryProducts(
+        category: String?,
+        page: Int,
+        size: Int,
+    ): ProductsResponseDto = productApi.getProducts(category = category, page = page, size = size)
+
     override suspend fun getProduct(id: Int): ProductResponseDto = productApi.getProductDetail(id)
 }
