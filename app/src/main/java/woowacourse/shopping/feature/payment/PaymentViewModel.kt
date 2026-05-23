@@ -1,5 +1,9 @@
 package woowacourse.shopping.feature.payment
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
@@ -13,6 +17,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.AlarmReceiver
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.constants.MockData
 import woowacourse.shopping.data.repository.cart.CartRepository
@@ -47,6 +52,8 @@ class PaymentViewModel(
     lateinit var couponRepository: CouponRepository
     lateinit var couponList: List<Coupon>
 
+    private val sharedPref = application.getSharedPreferences("setting", Context.MODE_PRIVATE)
+
     init {
         viewModelScope.launch {
             val appDependencies = application.appDependenciesDeferred.await()
@@ -55,6 +62,28 @@ class PaymentViewModel(
             orderRepository = appDependencies.orderRepository
             couponRepository = appDependencies.couponRepository
             couponList = couponRepository.loadCoupons()
+        }
+    }
+
+    fun startPaymentAlarm() {
+        if (!sharedPref.getBoolean("notification", true)) return
+        val intent = Intent(application, AlarmReceiver::class.java)
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            application, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val triggerTime = System.currentTimeMillis() + (5 * 60 * 1000)
+        alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+    }
+
+    fun cancelPaymentAlarm() {
+        val intent = Intent(application, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(application, 0, intent, PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE)
+        pendingIntent?.let {
+            val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.cancel(it)
         }
     }
 
