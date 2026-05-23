@@ -16,10 +16,11 @@ import woowacourse.shopping.AppContainer
 import woowacourse.shopping.ui.cart.CartEvent
 import woowacourse.shopping.ui.cart.CartScreen
 import woowacourse.shopping.ui.cart.CartViewModel
-import woowacourse.shopping.ui.component.CustomToastMessage
+import woowacourse.shopping.ui.component.customToastMessage
 import woowacourse.shopping.ui.detail.DetailEvent
 import woowacourse.shopping.ui.detail.DetailScreen
 import woowacourse.shopping.ui.detail.DetailViewModel
+import woowacourse.shopping.ui.recommend.RecommendEvent
 import woowacourse.shopping.ui.recommend.RecommendScreen
 import woowacourse.shopping.ui.recommend.RecommendViewModel
 import woowacourse.shopping.ui.shopping.ShoppingScreen
@@ -100,21 +101,21 @@ fun ShoppingNavHost(
                         }
 
                         DetailEvent.ShowProductNotFoundMessage -> {
-                            CustomToastMessage(
+                            customToastMessage(
                                 context,
                                 "상품을 찾을 수 없습니다.",
                             )
                         }
 
                         DetailEvent.ShowProductLoadFailureMessage -> {
-                            CustomToastMessage(
+                            customToastMessage(
                                 context,
                                 "상품 정보를 불러오지 못했습니다.",
                             )
                         }
 
                         DetailEvent.ShowAddCartFailureMessage -> {
-                            CustomToastMessage(
+                            customToastMessage(
                                 context,
                                 "장바구니에 상품을 담지 못했습니다.",
                             )
@@ -159,11 +160,11 @@ fun ShoppingNavHost(
                 viewModel.event.collect { event ->
                     when (event) {
                         CartEvent.DeleteCartItemFailure -> {
-                            CustomToastMessage(context, "장바구니 상품을 삭제하지 못했습니다.")
+                            customToastMessage(context, "장바구니 상품을 삭제하지 못했습니다.")
                         }
 
                         CartEvent.UpdateCartItemFailure -> {
-                            CustomToastMessage(context, "장바구니 상품 수량을 변경하지 못했습니다.")
+                            customToastMessage(context, "장바구니 상품 수량을 변경하지 못했습니다.")
                         }
 
                         CartEvent.NavigateToRecommend -> {
@@ -189,6 +190,7 @@ fun ShoppingNavHost(
         }
 
         composable<ShoppingRoute.Recommend> {
+            val context = LocalContext.current
             val viewModel: RecommendViewModel =
                 viewModel(
                     factory =
@@ -198,6 +200,16 @@ fun ShoppingNavHost(
                             productRepository = appContainer.productRepository,
                         ),
                 )
+            LaunchedEffect(viewModel) {
+                viewModel.event.collect { event ->
+                    when (event) {
+                        RecommendEvent.UpdateCartItemFailure -> {
+                            customToastMessage(context, "장바구니 상품을 변경하지 못했습니다.")
+                        }
+                    }
+                }
+            }
+
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             RecommendScreen(

@@ -6,8 +6,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -27,6 +30,9 @@ class RecommendViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RecommendUiState(isLoading = true))
     val uiState: StateFlow<RecommendUiState> = _uiState.asStateFlow()
+
+    private val _event = MutableSharedFlow<RecommendEvent>()
+    val event: SharedFlow<RecommendEvent> = _event.asSharedFlow()
 
     private var recommendProducts: List<Product> = emptyList()
 
@@ -101,9 +107,9 @@ class RecommendViewModel(
             try {
                 cartRepository.setCartItem(productId, quantity)
             } catch (_: IOException) {
-                _uiState.update { it.copy(errorMessage = "장바구니 상품을 변경하지 못했습니다.") }
+                _event.emit(RecommendEvent.UpdateCartItemFailure)
             } catch (_: HttpException) {
-                _uiState.update { it.copy(errorMessage = "장바구니 상품을 변경하지 못했습니다.") }
+                _event.emit(RecommendEvent.UpdateCartItemFailure)
             }
         }
     }
