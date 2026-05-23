@@ -16,16 +16,16 @@ private const val DELIVERY_FEE = 3000
 
 @Composable
 fun PaymentScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     PaymentScreen(
         selectedCouponId = TODO(),
         coupons = TODO(),
-        originalPrice = TODO(),
-        discountPrice = TODO(),
-        deliveryFee = DELIVERY_FEE,
-        totalPrice = TODO(),
-        modifier = modifier,
+        subtotal = TODO(),
+        couponDiscount = TODO(),
+        deliveryFee = TODO(),
+        finalAmount = TODO(),
+        modifier = TODO(),
         onBackClick = TODO(),
         onCouponSelected = TODO(),
         onPayClick = TODO()
@@ -36,10 +36,10 @@ fun PaymentScreen(
 fun PaymentScreen(
     selectedCouponId: Long,
     coupons: List<Coupon>,
-    originalPrice: Int,
-    discountPrice: Int,
+    subtotal: Int,
+    couponDiscount: Int,
     deliveryFee: Int,
-    totalPrice: Int,
+    finalAmount: Int,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
     onCouponSelected: (Long) -> Unit,
@@ -54,10 +54,10 @@ fun PaymentScreen(
         PaymentBody(
             selectedCouponId = selectedCouponId,
             coupons = coupons,
-            originalPrice = originalPrice,
-            discountPrice = discountPrice,
+            originalPrice = subtotal,
+            discountPrice = couponDiscount,
             deliveryFee = deliveryFee,
-            totalPrice = totalPrice,
+            totalPrice = finalAmount,
             modifier = Modifier.weight(1f),
             onCouponSelected = onCouponSelected,
         )
@@ -92,10 +92,10 @@ private fun PaymentScreenPreview() {
     PaymentScreen(
         selectedCouponId = 2,
         coupons = coupons,
-        originalPrice = 20000,
-        discountPrice = 1000,
+        subtotal = 20000,
+        couponDiscount = -1000,
         deliveryFee = 3000,
-        totalPrice = 22000,
+        finalAmount = 22000,
         modifier = Modifier,
         onBackClick = {},
         onCouponSelected = {},

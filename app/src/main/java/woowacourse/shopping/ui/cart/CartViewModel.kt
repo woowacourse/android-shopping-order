@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.di.AppContainer
@@ -26,7 +25,6 @@ class CartViewModel(
     private val recentProductRepo: RecentProductRepository,
     private val productRepo: ProductRepository,
     private val cartRepo: CartRepository,
-    private val orderRepo: OrderRepository,
     private val pageSize: Int,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState(pageSize = pageSize))
@@ -234,17 +232,6 @@ class CartViewModel(
         }
     }
 
-    fun order(selectedIds: List<Long>) {
-        viewModelScope.launch {
-            try {
-                orderRepo.requestOrder(selectedIds)
-                _events.send("주문이 완료되었어요.")
-            } catch (e: Exception) {
-                handleError("order", e, "주문에 실패했어요.")
-            }
-        }
-    }
-
     fun increaseInRecommendScreen(uiModel: ProductUiModel) {
         viewModelScope.launch {
             try {
@@ -386,7 +373,6 @@ class CartViewModel(
                 cartRepo = container.cartRepository,
                 recentProductRepo = container.recentProductRepository,
                 productRepo = container.productRepository,
-                orderRepo = container.orderRepository,
                 pageSize = pageSize,
             ) as T
         }

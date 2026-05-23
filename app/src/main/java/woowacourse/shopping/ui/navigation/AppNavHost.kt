@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import woowacourse.shopping.ui.cart.CartScreen
+import woowacourse.shopping.ui.payment.PaymentScreen
 import woowacourse.shopping.ui.productdetail.ProductDetailScreen
 import woowacourse.shopping.ui.settings.SettingsScreen
 import woowacourse.shopping.ui.shopping.ShoppingScreen
@@ -55,13 +56,12 @@ fun AppNavHost(
         composable<Cart> {
             CartScreen(
                 onBackClick = { navController.popBackStack() },
-                onOrderClick = {
-                    navController.navigate(Shopping) {
-                        popUpTo<Shopping> { inclusive = false }
-                        launchSingleTop = true
-                    }
-                }
+                onOrderClick = { navController.navigate(Payment(emptyList())) }
             )
+        }
+
+        composable<Payment> {
+            PaymentScreen()
         }
 
         composable<Settings> {

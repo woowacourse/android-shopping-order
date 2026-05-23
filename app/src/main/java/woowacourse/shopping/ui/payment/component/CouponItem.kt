@@ -4,8 +4,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,10 +40,10 @@ fun CouponItem(
 
     Column(
         modifier = modifier
-            .size(width = 324.dp, height = 104.dp)
+            .width(324.dp)
             .border(width = 1.dp, color = Color(0xFFAAAAAA), shape = RoundedCornerShape(4.dp))
             .padding(start = 16.dp, top = 18.dp, bottom = 18.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         CheckboxAndTitle(
             checked = checked,
@@ -51,7 +52,10 @@ fun CouponItem(
         )
 
         Column(
-            modifier = Modifier.padding(start = 3.dp)
+            modifier = Modifier
+                .padding(start = 3.dp)
+                .heightIn(min = 36.dp),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
             ExtraInfoText(
                 text = "만료일: $date"
@@ -64,7 +68,11 @@ fun CouponItem(
             if (availableTime != null) {
                 val formatter = DateTimeFormatter.ofPattern("a h시", Locale.KOREAN)
                 ExtraInfoText(
-                    text = "사용 가능 시간: ${availableTime.start.format(formatter)}부터 ${availableTime.end.format(formatter)}까지"
+                    text = "사용 가능 시간: ${availableTime.start.format(formatter)}부터 ${
+                        availableTime.end.format(
+                            formatter
+                        )
+                    }까지"
                 )
             }
         }
@@ -136,6 +144,19 @@ private fun CouponItemPreview2() {
         expirationDate = LocalDate.of(2026, 11, 30),
         minimumAmount = null,
         availableTime = AvailableTime(start = LocalTime.of(4, 0), end = LocalTime.of(15, 0))
+    )
+}
+
+@Preview(showBackground = true, name = "만료일만")
+@Composable
+private fun CouponItemPreview3() {
+    CouponItem(
+        checked = true,
+        couponName = "무료 쿠폰",
+        onCheckedChange = {},
+        expirationDate = LocalDate.of(2026, 11, 30),
+        minimumAmount = null,
+        availableTime = null
     )
 }
 

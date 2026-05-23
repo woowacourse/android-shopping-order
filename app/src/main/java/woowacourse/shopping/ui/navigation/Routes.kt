@@ -15,4 +15,9 @@ data class ProductDetail(
 data object Cart
 
 @Serializable
+data class Payment(
+    val ids: List<Long>
+)
+
+@Serializable
 data object Settings
