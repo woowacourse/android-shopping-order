@@ -27,11 +27,7 @@ class CartViewModel(
 
     private val _cartItemCount: MutableStateFlow<Int> = MutableStateFlow(0)
 
-    init {
-        fetchCart()
-    }
-
-    private fun fetchCart() {
+    fun fetchCart() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
