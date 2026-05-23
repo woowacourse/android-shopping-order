@@ -8,4 +8,12 @@ data class Payment(
     val shippingFee: Money,
 ) {
     val finalAmount: Money get() = subtotal - couponDiscount + shippingFee
+
+    companion object {
+        val EMPTY = Payment(
+            subtotal = Money(0),
+            couponDiscount = Money(0),
+            shippingFee = Money(0),
+        )
+    }
 }

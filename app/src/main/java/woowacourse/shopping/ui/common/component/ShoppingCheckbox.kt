@@ -13,8 +13,8 @@ import woowacourse.shopping.ui.common.theme.PrimaryColor
 @Composable
 fun ShoppingCheckbox(
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    onCheckedChange: (Boolean) -> Unit = {},
 ) {
     Checkbox(
         checked = checked,

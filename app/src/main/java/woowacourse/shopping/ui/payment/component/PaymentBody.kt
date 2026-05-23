@@ -59,9 +59,7 @@ fun PaymentBody(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 10.dp, start = 18.dp, end = 18.dp),
-                onCheckedChange = {
-                    if (it) onCouponSelected(couponId)
-                }
+                onClick = { onCouponSelected(couponId) }
             )
         }
 

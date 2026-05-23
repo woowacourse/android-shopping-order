@@ -19,7 +19,7 @@ import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.di.AppContainer
-import woowacourse.shopping.ui.navigation.ProductDetail
+import woowacourse.shopping.ui.navigation.ProductDetailRoute
 import woowacourse.shopping.ui.common.error.ErrorMessageMapper
 
 class ProductDetailViewModel(
@@ -30,7 +30,7 @@ class ProductDetailViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductDetailUiState())
     private val _events = Channel<String>(Channel.BUFFERED)
-    private val route: ProductDetail = savedStateHandle.toRoute()
+    private val route: ProductDetailRoute = savedStateHandle.toRoute()
     private val productId: Long = route.id
     private val isFromBanner: Boolean = route.isFromBanner
 
