@@ -4,28 +4,11 @@ import java.time.LocalDate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.coupon.BogoCoupon
-import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
+import woowacourse.shopping.domain.coupon.FreeShippingCoupon
 import woowacourse.shopping.domain.coupon.OrderContext
 import woowacourse.shopping.fixture.TestCartContentFixture
 import woowacourse.shopping.fixture.TestProductFixture
-
-class FreeShippingCoupon(
-    override val validUntil: LocalDate,
-) : Coupon {
-    override fun isApplicable(context: OrderContext): Boolean {
-        val totalPrice = context.totalPrice
-
-        return totalPrice >= FREE_SHIPPING_THRESHOLD
-    }
-
-    override fun discountAmount(context: OrderContext): Int = if (isApplicable(context)) return FREE_SHIPPING_FEE else return 0
-
-    companion object {
-        const val FREE_SHIPPING_THRESHOLD = 50_000
-        const val FREE_SHIPPING_FEE = 3_000
-    }
-}
 
 class CouponTest {
     @Test
