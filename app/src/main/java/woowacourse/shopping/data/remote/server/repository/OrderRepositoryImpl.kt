@@ -5,13 +5,17 @@ import retrofit2.HttpException
 import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.dto.order.OrderRequest
 import woowacourse.shopping.data.remote.server.service.OrderService
+import woowacourse.shopping.domain.Order
 
 class OrderRepositoryImpl(
     private val orderService: OrderService
 ): OrderRepository {
-    override suspend fun order(request: OrderRequest): ApiResult<Unit> {
+    override suspend fun order(order: Order): ApiResult<Unit> {
         return try {
-            orderService.requestOrder(request)
+            val newRequest = OrderRequest(
+                ids = order.getAllIds()
+            )
+            orderService.requestOrder(newRequest)
             ApiResult.Success(Unit)
         } catch (e: HttpException) {
             ApiResult.Error(
