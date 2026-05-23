@@ -5,7 +5,10 @@ import java.time.LocalDate
 class FixedDiscountCoupon(
     override val validUntil: LocalDate,
 ) : Coupon {
-    override fun isApplicable(context: OrderContext): Boolean = context.totalPrice >= MINIMUM_PRICE
+    override fun isApplicable(context: OrderContext): Boolean {
+        if (LocalDate.now().isAfter(validUntil)) return false
+        return context.totalPrice >= MINIMUM_PRICE
+    }
 
     override fun discountAmount(context: OrderContext): Int = if (isApplicable(context)) DISCOUNT_PRICE else 0
 

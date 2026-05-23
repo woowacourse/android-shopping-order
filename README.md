@@ -41,7 +41,7 @@
 - [x] MiracleMorningCoupon은 04시 이전 그리고 07시 이후면 적용할 수 없다
 - [x] MiracleMorningCoupon은 04시 이후 그리고 07시 이전이면 적용할 수 있다
 - [x] MiracleMorningCoupon은 적용 시 총 상품 금액의 30%를 할인한다
-- [ ] 쿠폰은 만료일을 초과하면 사용할 수 없다
+- [x] 쿠폰은 만료일을 초과하면 사용할 수 없다
 
 ### ViewModel: PurchaseViewModel
 

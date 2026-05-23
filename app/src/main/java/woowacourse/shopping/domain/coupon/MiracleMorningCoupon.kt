@@ -7,6 +7,7 @@ class MiracleMorningCoupon(
     override val validUntil: LocalDate,
 ) : Coupon {
     override fun isApplicable(context: OrderContext): Boolean {
+        if (LocalDate.now().isAfter(validUntil)) return false
         val now = context.now
 
         return now.isAfter(LocalTime.of(3, 59, 59)) && now.isBefore(LocalTime.of(7, 0, 1))

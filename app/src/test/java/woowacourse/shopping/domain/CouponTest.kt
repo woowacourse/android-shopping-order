@@ -164,10 +164,25 @@ class CouponTest {
 
     @Test
     fun `쿠폰은 만료일을 초과하면 사용할 수 없다`() {
-        // given:
+        // given: 다른 조건은 모두 정상값이고 만료일만 오늘 이전인 2025-05-23로 설정된 쿠폰들이 주어진다
+        val expiredDate = LocalDate.of(2025, 5, 23)
+        val cartContent = TestCartContentFixture.cartContent(quantity = 3)
+        val context = OrderContext(
+            totalPrice = 100_000,
+            items = listOf(cartContent),
+            now = LocalTime.of(5, 30),
+        )
+        val coupons = listOf(
+            FixedDiscountCoupon(validUntil = expiredDate),
+            BogoCoupon(validUntil = expiredDate),
+            FreeShippingCoupon(validUntil = expiredDate),
+            MiracleMorningCoupon(validUntil = expiredDate),
+        )
 
-        // when:
+        // when: 각 쿠폰의 적용 가능 여부를 확인할 때
+        val applicable = coupons.map { it.isApplicable(context) }
 
-        // then:
+        // then: 모든 쿠폰을 적용할 수 없다
+        assertThat(applicable.all { it }).isEqualTo(false)
     }
 }

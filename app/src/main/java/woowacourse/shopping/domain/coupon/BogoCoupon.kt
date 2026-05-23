@@ -6,6 +6,7 @@ class BogoCoupon(
     override val validUntil: LocalDate,
 ) : Coupon {
     override fun isApplicable(context: OrderContext): Boolean {
+        if (LocalDate.now().isAfter(validUntil)) return false
         val cartContents = context.items
 
         return cartContents.any { it.quantity >= 3 }

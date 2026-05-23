@@ -6,6 +6,7 @@ class FreeShippingCoupon(
     override val validUntil: LocalDate,
 ) : Coupon {
     override fun isApplicable(context: OrderContext): Boolean {
+        if (LocalDate.now().isAfter(validUntil)) return false
         val totalPrice = context.totalPrice
 
         return totalPrice >= FREE_SHIPPING_THRESHOLD
