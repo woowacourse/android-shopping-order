@@ -18,6 +18,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import woowacourse.shopping.ui.navigation.Payment
 import woowacourse.shopping.ui.navigation.ProductDetail
 import woowacourse.shopping.ui.navigation.Shopping
 
@@ -34,10 +35,10 @@ fun RecommendationRoute(
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
-            var snackbarJob:  Job? = null
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            var snackbarJob: Job? = null
             viewModel.event.collect { event ->
-                when(event) {
+                when (event) {
                     is RecommendationEvent.SnackbarEvent -> {
                         snackbarJob?.cancel()
                         snackbarJob = launch {
@@ -63,11 +64,11 @@ fun RecommendationRoute(
                         navController.popBackStack()
 
                     is RecommendationEvent.NavigateToPayment ->
-                        navController.navigate(Shopping){
-                            popUpTo<Shopping> {
-                                inclusive = true
-                            }
-                        }
+                        navController.navigate(
+                            Payment(
+                                checkedIds = event.checkedIds
+                            )
+                        )
 
                     is RecommendationEvent.NavigateToProductDetail ->
                         navController.navigate(
@@ -95,7 +96,7 @@ fun RecommendationRoute(
             totalPrice = uiState.totalPrice,
             totalCount = uiState.checkedIds.size,
             onBackClick = viewModel::navigateToCart,
-            onOrderClick = { viewModel.navigateToPayment(emptyList()) },
+            onOrderClick = { viewModel.navigateToPayment(uiState.checkedIds) },
             onAddInCart = viewModel::addToCartTrigger,
             onAdd = viewModel::updateAmountTrigger,
             onMinus = viewModel::updateAmountTrigger,
