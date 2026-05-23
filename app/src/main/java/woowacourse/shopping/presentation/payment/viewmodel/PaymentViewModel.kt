@@ -44,6 +44,7 @@ class PaymentViewModel(
             }.onSuccess { coupons ->
                 _uiState.update { it.copy(availableCoupons = coupons) }
             }.onFailure { error ->
+                println(error)
                 _uiEvents.emit(PaymentEvent.ShowError("쿠폰을 불러오지 못했습니다."))
             }
         }

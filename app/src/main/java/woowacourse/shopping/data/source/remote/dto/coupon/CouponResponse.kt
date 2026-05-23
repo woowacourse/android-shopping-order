@@ -11,7 +11,7 @@ sealed interface CouponResponse {
     val expirationDate: String
 
     @Serializable
-    @SerialName("FIXED")
+    @SerialName("fixed")
     data class Fixed(
         override val id: Long,
         override val code: String,
@@ -22,7 +22,7 @@ sealed interface CouponResponse {
     ) : CouponResponse
 
     @Serializable
-    @SerialName("BUY_X_GET_Y")
+    @SerialName("buyXgetY")
     data class BuyXGetY(
         override val id: Long,
         override val code: String,
@@ -33,7 +33,7 @@ sealed interface CouponResponse {
     ) : CouponResponse
 
     @Serializable
-    @SerialName("FREE_SHIPPING")
+    @SerialName("freeShipping")
     data class FreeShipping(
         override val id: Long,
         override val code: String,
@@ -43,7 +43,7 @@ sealed interface CouponResponse {
     ) : CouponResponse
 
     @Serializable
-    @SerialName("PERCENTAGE")
+    @SerialName("percentage")
     data class Percentage(
         override val id: Long,
         override val code: String,
