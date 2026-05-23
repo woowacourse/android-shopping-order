@@ -40,19 +40,24 @@ import java.time.LocalTime
 fun PaymentScreen(
     coupons: List<Coupon>,
     order: Order,
+    selectedCoupon: Coupon?,
+    onCouponSelect: (Coupon?) -> Unit,
     discount: Discount,
     onOrder: () -> Unit,
+    onClose: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     CommonFrame(
         headerContent = {
             PaymentHeader(
-                onClose = { },
+                onClose = onClose,
             )
         },
         bodyContent = { PaymentBody(
             coupons = coupons,
             order = order,
+            selectedCoupon = selectedCoupon,
+            onCouponSelect = onCouponSelect,
             discount = discount,
             onOrder = onOrder,
         ) },
@@ -93,6 +98,8 @@ private fun PaymentHeader(
 fun PaymentBody(
     coupons: List<Coupon>,
     order: Order,
+    selectedCoupon: Coupon?,
+    onCouponSelect: (Coupon?) -> Unit,
     discount: Discount,
     onOrder: () -> Unit,
     modifier: Modifier = Modifier
@@ -103,6 +110,8 @@ fun PaymentBody(
         CouponList(
             order = order,
             coupons = coupons,
+            selectedCoupon = selectedCoupon,
+            onCouponSelect = onCouponSelect,
         )
         HorizontalDivider()
         ReceiptItem(
@@ -158,6 +167,9 @@ private fun PaymentScreenPreview() {
             isRemoteArea = false
         ),
         discount = Discount(),
-        onOrder = {  },
+        onOrder = { },
+        selectedCoupon = null,
+        onCouponSelect = {  },
+        onClose = {  },
     )
 }

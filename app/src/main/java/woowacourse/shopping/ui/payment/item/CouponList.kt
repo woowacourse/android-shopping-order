@@ -33,6 +33,8 @@ import woowacourse.shopping.R
 fun CouponList(
     order: Order,
     coupons: List<Coupon>,
+    selectedCoupon: Coupon?,
+    onCouponSelect: (Coupon?) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -60,7 +62,13 @@ fun CouponList(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(items = coupons, key = { it.id }) { coupon ->
-                if (coupon.isEligible(order)) CouponItem(coupon = coupon)
+                if (coupon.isEligible(order)) {
+                    CouponItem(
+                        coupon = coupon,
+                        isSelected = selectedCoupon?.id == coupon.id,
+                        onSelect = { onCouponSelect(it) }
+                    )
+                }
             }
         }
     }
@@ -109,6 +117,8 @@ private fun CouponListPreview() {
             shippingFee = 3000,
             currentTime = LocalDateTime.now(),
             isRemoteArea = false
-        )
+        ),
+        selectedCoupon = null,
+        onCouponSelect = {  },
     )
 }

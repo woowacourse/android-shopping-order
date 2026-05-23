@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.payment.item
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +34,8 @@ import woowacourse.shopping.R
 @Composable
 fun CouponItem(
     coupon: Coupon,
+    isSelected: Boolean,
+    onSelect: (Coupon) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -44,14 +47,19 @@ fun CouponItem(
                 color = Color(0xFFAAAAAA),
                 shape = RoundedCornerShape(4.dp),
             )
+            .clickable(
+                onClick = { onSelect(coupon) }
+            )
     ) {
         Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(
-                checked = true,
-                onCheckedChange = {  },
+                checked = isSelected,
+                onCheckedChange = {
+                    onSelect(coupon)
+                },
             )
             Text(
                 text = coupon.description,
@@ -107,7 +115,9 @@ private fun CouponItemPreview1() {
             expirationDate = LocalDate.now(),
             discountAmount = 5000,
             minimumAmount = 100000
-        )
+        ),
+        isSelected = true,
+        onSelect = {  },
     )
 }
 
@@ -122,6 +132,8 @@ private fun CouponItemPreview2() {
             expirationDate = LocalDate.now(),
             minimumAmount = 0
         ),
+        isSelected = false,
+        onSelect = {  },
     )
 }
 
@@ -138,6 +150,8 @@ private fun CouponItemPreview3() {
             startTime = LocalTime.of(11, 0),
             endTime = LocalTime.of(14, 0),
         ),
+        isSelected = false,
+        onSelect = {  },
     )
 }
 
@@ -153,5 +167,7 @@ private fun CouponItemPreview4() {
             buyQuantity = 3,
             getQuantity = 1
         ),
+        isSelected = true,
+        onSelect = {  },
     )
 }
