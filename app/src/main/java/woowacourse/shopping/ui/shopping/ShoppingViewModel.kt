@@ -41,13 +41,36 @@ class ShoppingViewModel(
     private val pageSize = 20
 
     init {
-
-        loadProducts(size = pageSize)
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    uiInfo =
+                        it.uiInfo.copy(
+                            isLoading = true,
+                        ),
+                )
+            }
+            try {
+                loadProducts(size = pageSize)
+                loadRecentItems()
+            } finally {
+                _uiState.update {
+                    it.copy(
+                        uiInfo =
+                            it.uiInfo.copy(
+                                isLoading = false,
+                            ),
+                    )
+                }
+            }
+        }
 
         viewModelScope.launch {
             observeNetwork()
+        }
+
+        viewModelScope.launch {
             observeRecentItems()
-            loadRecentItems()
         }
     }
 
@@ -59,59 +82,42 @@ class ShoppingViewModel(
         }
     }
 
-    fun loadProducts(
+    suspend fun loadProducts(
         page: Int = 0,
         size: Int = if (offset == 0) pageSize else offset,
     ) {
-        viewModelScope.launch {
-            runCatching {
-                _uiState.update {
-                    it.copy(
-                        uiInfo =
-                            it.uiInfo.copy(
-                                isLoading = true,
-                            ),
-                    )
-                }
-                val apiResult =
-                    productRepository.getProducts(page = page, size = size)
-                val cartItemQuantity = cartRepository.getTotalCartItemQuantity()
+//        viewModelScope.launch {
+        runCatching {
+            val apiResult =
+                productRepository.getProducts(page = page, size = size)
+            val cartItemQuantity = cartRepository.getTotalCartItemQuantity()
 
-                if (offset == 0) offset = apiResult.products.size
+            if (offset == 0) offset = apiResult.products.size
 
-                _uiState.update {
-                    it.copy(
-                        products =
-                            apiResult.products
-                                .map { product ->
-                                    val quantity =
-                                        cartRepository.getCartItemQuantity(productId = product.id)
-                                    product.toUiModel(quantity = quantity)
-                                }.toImmutableList(),
-                        cartSummary =
-                            it.cartSummary.copy(
-                                cartSize = cartItemQuantity,
-                                canLoadMore = !apiResult.isLastPage,
-                            ),
-                    )
-                }
-            }.onSuccess {
-                _uiState.update {
-                    it.copy(
-                        uiInfo =
-                            it.uiInfo.copy(
-                                isLoading = false,
-                            ),
-                    )
-                }
-            }.onFailure { throwable ->
-                if (throwable is IOException || throwable is HttpException) {
-                    _uiEvent.emit(ShoppingUiEvent.ShowToastMessage("카트 업데이트 오류"))
-                } else {
-                    throw throwable
-                }
+            _uiState.update {
+                it.copy(
+                    products =
+                        apiResult.products
+                            .map { product ->
+                                val quantity =
+                                    cartRepository.getCartItemQuantity(productId = product.id)
+                                product.toUiModel(quantity = quantity)
+                            }.toImmutableList(),
+                    cartSummary =
+                        it.cartSummary.copy(
+                            cartSize = cartItemQuantity,
+                            canLoadMore = !apiResult.isLastPage,
+                        ),
+                )
+            }
+        }.onFailure { throwable ->
+            if (throwable is IOException || throwable is HttpException) {
+                _uiEvent.emit(ShoppingUiEvent.ShowToastMessage("카트 업데이트 오류"))
+            } else {
+                throw throwable
             }
         }
+//        }
     }
 
     private suspend fun observeRecentItems() {
