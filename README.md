@@ -50,6 +50,34 @@
   - 만료일: 2024년 7월 31일
 ```
 
+## 구현 목표 설계
+```
+쿠폰
+├── title
+├── lastDay
+└── benefit: CouponBenefit
+    ├── AmountDiscount
+    │   ├── discountAmount
+    │   └── minimumOrderAmount
+    │
+    ├── BuyTwoGetOne
+    │   ├── requiredQuantity
+    │   └── freeQuantity
+    │
+    ├── FreeShipping
+    │   └── minimumOrderAmount
+    │
+    └── MorningCleaning
+        ├── condition
+        └── benefitDescription
+```
+```
+CouponBenefit sealed interface
+├── AmountDiscount
+├── BuyTwoGetOne
+├── FreeShipping
+└── MorningCleaning
+```
 ### ✅ 체크리스트
 
 #### 주문
