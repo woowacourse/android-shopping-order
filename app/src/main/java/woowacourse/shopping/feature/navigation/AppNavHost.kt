@@ -31,6 +31,9 @@ fun AppNavHost() {
                         )
                     )
                 },
+                onSettingClick = {
+                    navController.navigate(Setting)
+                },
                 onCartIconClick = {
                     navController.navigate(Cart)
                 },
@@ -54,6 +57,12 @@ fun AppNavHost() {
                         )
                     )
                 },
+            )
+        }
+
+        composable<Setting> {
+            SettingScreen(
+                onCloseClick = { navController.popBackStack() }
             )
         }
 
