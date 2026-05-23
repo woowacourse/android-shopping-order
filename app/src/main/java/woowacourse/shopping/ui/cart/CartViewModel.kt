@@ -5,9 +5,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -31,6 +34,7 @@ class CartViewModel(
     private val _recommendProducts = MutableStateFlow<List<Product>>(emptyList())
     private val _isCartOrRecommend = MutableStateFlow(CartFlow.CART)
     private val _allCartItems = MutableStateFlow<CartItems?>(null)
+    private val _orderCompleteEvent = MutableSharedFlow<Unit>()
     private var currentPage = 0
 
     val uiState: StateFlow<CartUiState> =
@@ -71,6 +75,8 @@ class CartViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = CartUiState.Loading,
         )
+
+    val orderCompleteEvent: SharedFlow<Unit> = _orderCompleteEvent.asSharedFlow()
 
     init {
         loadPage(0)
@@ -201,6 +207,7 @@ class CartViewModel(
 
         viewModelScope.launch {
             cartRepository.order(selectedItems.toList())
+            _orderCompleteEvent.emit(Unit)
         }
     }
 

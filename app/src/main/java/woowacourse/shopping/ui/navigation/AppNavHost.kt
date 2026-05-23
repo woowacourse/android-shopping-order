@@ -95,6 +95,14 @@ fun AppNavHost(
                     onClickClose = {
                         navController.popBackStack()
                     },
+                    onOrderComplete = {
+                        navController.navigate(ProductListRoute) {
+                            popUpTo<CartRoute> {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    },
                 )
             }
         }
