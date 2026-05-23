@@ -63,7 +63,7 @@ fun ShoppingRoute(
                     is ShoppingEvent.RemoveFormCart -> viewModel.removeWithID(
                         event.purchaseProductId
                     )
-                    is ShoppingEvent.LoadMore -> viewModel.fetchProducts()
+                    is ShoppingEvent.LoadMore -> viewModel.loadMore()
                 }
             }
         }
