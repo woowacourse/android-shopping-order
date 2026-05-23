@@ -1,14 +1,37 @@
 package woowacourse.shopping.domain
 
 import java.time.LocalDate
+import java.time.LocalTime
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.coupon.BogoCoupon
+import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
 import woowacourse.shopping.domain.coupon.FreeShippingCoupon
 import woowacourse.shopping.domain.coupon.OrderContext
 import woowacourse.shopping.fixture.TestCartContentFixture
 import woowacourse.shopping.fixture.TestProductFixture
+
+class MiracleMorningCoupon(
+    override val validUntil: LocalDate,
+) : Coupon {
+    override fun isApplicable(context: OrderContext): Boolean {
+        val now = context.now
+
+        return now.isAfter(LocalTime.of(3, 59, 59)) && now.isBefore(LocalTime.of(7, 0, 1))
+    }
+
+    override fun discountAmount(context: OrderContext): Int {
+        if (!isApplicable(context)) return 0
+        val totalPrice = context.totalPrice
+
+        return (totalPrice * DISCOUNT_RATE).toInt()
+    }
+
+    companion object {
+        const val DISCOUNT_RATE = 0.3
+    }
+}
 
 class CouponTest {
     @Test
@@ -119,21 +142,45 @@ class CouponTest {
     }
 
     @Test
-    fun `MiracleSaleCoupon은 04시부터 07시 시간대가 아니면 적용 불가다`() {
-        // given:
+    fun `MiracleMorningCoupon은 04시 이전 그리고 07시 이후면 적용할 수 없다`() {
+        // given: 시간이 03시, 08시 리스트가 주어지고 미라클모닝 30% 할인 쿠폰이 주어진다
+        val price = 50_000
+        val coupon = MiracleMorningCoupon(validUntil = LocalDate.of(2026, 11, 30))
+        val times = listOf(LocalTime.of(3, 0), LocalTime.of(8, 0))
 
-        // when:
+        // when: 할인이 가능한지 확인할 때
+        val applicable = times.map { coupon.isApplicable(OrderContext(now = it)) }
 
-        // then:
+        // then: 할인을 적용할 수 없다
+        assertThat(applicable.all { it }).isEqualTo(false)
     }
 
     @Test
-    fun `MiracleSaleCoupon은 적용 시 총 상품 금액의 30퍼센트를 할인한다`() {
-        // given:
+    fun `MiracleMorningCoupon은 04시 이후 그리고 07시 이전이면 적용할 수 있다`() {
+        // given: 시간이 04시, 05:30, 07시 리스트가 주어지고 미라클모닝 30% 할인 쿠폰이 주어진다
+        val price = 50_000
+        val coupon = MiracleMorningCoupon(validUntil = LocalDate.of(2026, 11, 30))
+        val times = listOf(LocalTime.of(4, 0), LocalTime.of(5, 30), LocalTime.of(7, 0))
 
-        // when:
+        // when: 할인이 가능한지 확인할 때
+        val applicable = times.map { coupon.isApplicable(OrderContext(now = it)) }
 
-        // then:
+        // then: 할인을 적용할 수 없다
+        assertThat(applicable.all { it }).isEqualTo(true)
+    }
+
+    @Test
+    fun `MiracleMorningCoupon은 적용 시 총 상품 금액의 30퍼센트를 할인한다`() {
+        // given: 시간이 05:30으로 주어지고 미라클모닝 30% 할인 쿠폰이 주어진다
+        val price = 50_000
+        val coupon = MiracleMorningCoupon(validUntil = LocalDate.of(2026, 11, 30))
+        val time = LocalTime.of(5, 30)
+
+        // when: 할인이 가능한지 확인할 때
+        val discounted = price - coupon.discountAmount(OrderContext(totalPrice = price, now = time))
+
+        // then: 할인을 적용할 수 없다
+        assertThat(discounted).isEqualTo(35000)
     }
 
     @Test
