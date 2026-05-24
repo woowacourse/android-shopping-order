@@ -38,8 +38,8 @@ import woowacourse.shopping.ui.cart.ShoppingCartTopBar
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 @Composable
-fun RecommentScreen(
-    recommentProducts: List<ShoppingItem>,
+fun RecommendScreen(
+    recommendedProducts: List<ShoppingItem>,
     baseSelectedCartItemCount: Int,
     totalPrice: Int,
     onBackClick: () -> Unit,
@@ -50,7 +50,7 @@ fun RecommentScreen(
     modifier: Modifier = Modifier,
 ) {
     val selectedIdsInCurrentList =
-        recommentProducts
+        recommendedProducts
             .filter { shoppingItem -> shoppingItem.getQuantity() > 0 }
             .map { shoppingItem -> shoppingItem.getProductId() }
     val orderItemCount = baseSelectedCartItemCount + selectedIdsInCurrentList.size
@@ -87,7 +87,7 @@ fun RecommentScreen(
                 )
             }
 
-            if (recommentProducts.isEmpty()) {
+            if (recommendedProducts.isEmpty()) {
                 Text(
                     text = "추천 상품이 없습니다.",
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -102,8 +102,8 @@ fun RecommentScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     items(
-                        items = recommentProducts,
-                        key = { recommentProduct -> recommentProduct.getProductId() },
+                        items = recommendedProducts,
+                        key = { recommendedProduct -> recommendedProduct.getProductId() },
                     ) { shoppingItem ->
 
                         ProductItem(
@@ -172,10 +172,10 @@ fun OrderButton(
 
 @Preview(showBackground = true)
 @Composable
-private fun RecommentScreenPreview() {
+private fun RecommendScreenPreview() {
     AndroidShoppingTheme {
-        RecommentScreen(
-            recommentProducts =
+        RecommendScreen(
+            recommendedProducts =
                 listOf(
                     ShoppingItem(
                         product =

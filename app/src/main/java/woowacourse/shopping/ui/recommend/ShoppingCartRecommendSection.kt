@@ -16,8 +16,8 @@ internal fun ShoppingCartRecommendSection(
     onQuantityPlusClick: (ShoppingItem) -> Unit,
     onQuantityMinusClick: (ShoppingItem) -> Unit,
 ) {
-    RecommentScreen(
-        recommentProducts = recommendedShoppingItems,
+    RecommendScreen(
+        recommendedProducts = recommendedShoppingItems,
         baseSelectedCartItemCount = baseSelectedCartItemCount,
         totalPrice = totalPrice,
         onBackClick = onBackClick,

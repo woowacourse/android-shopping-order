@@ -72,16 +72,11 @@ fun ShoppingCartRouteContent(
         )
     }
 
-    val state =
-        ShoppingCartState(
-            selectedProductIds = selectedVisibleProductIds,
-            isLoading = cartUiState.isLoading,
-        )
-
     ShoppingCartScreen(
         shoppingCartItems = visiblePagedItems,
+        selectedProductIds = selectedVisibleProductIds,
+        isLoading = cartUiState.isLoading,
         getQuantityPrice = shoppingCartViewModel::getQuantityPrice,
-        state = state,
         onBackClick = onNavigateBack,
         onRemoveShoppingItemClick = { shoppingCartItem ->
             shoppingCartViewModel.removeShoppingItem(shoppingCartItem)

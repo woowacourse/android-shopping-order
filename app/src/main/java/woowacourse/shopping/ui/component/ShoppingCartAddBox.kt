@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ShoppingCardAddBox(
+fun ShoppingCartAddBox(
     onShoppingCartAddClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -50,8 +50,8 @@ fun ShoppingCardAddBox(
 
 @Composable
 @Preview()
-private fun ShoppingCardAddBoxPreview() {
-    ShoppingCardAddBox(
+private fun ShoppingCartAddBoxPreview() {
+    ShoppingCartAddBox(
         onShoppingCartAddClick = {},
     )
 }
