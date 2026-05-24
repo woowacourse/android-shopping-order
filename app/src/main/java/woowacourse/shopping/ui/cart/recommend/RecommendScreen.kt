@@ -6,12 +6,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import woowacourse.shopping.ui.cart.CartEvent
 import woowacourse.shopping.ui.cart.CartTopAppBar
 import woowacourse.shopping.ui.cart.CartViewModel
 
@@ -20,18 +18,10 @@ fun RecommendScreen(
     cartViewModel: CartViewModel,
     recommendViewModel: RecommendViewModel,
     onClickClose: () -> Unit,
-    onOrderSuccess: () -> Unit,
+    onNavigateToOrder: (List<Int>) -> Unit,
 ) {
     val cartUiState by cartViewModel.cartUiState.collectAsStateWithLifecycle()
     val recommendUiState by recommendViewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(cartViewModel.events) {
-        cartViewModel.events.collect { event ->
-            when (event) {
-                CartEvent.OrderSuccess -> onOrderSuccess()
-            }
-        }
-    }
 
     Column(
         modifier =
@@ -53,7 +43,7 @@ fun RecommendScreen(
             onAddClick = cartViewModel::addCartItem,
             onIncrease = recommendViewModel::increaseRecommendProduct,
             onDecrease = recommendViewModel::decreaseRecommendProduct,
-            onClickOrder = cartViewModel::onClickOrder,
+            onClickOrder = { onNavigateToOrder(cartViewModel.selectedCartIds.value.toList()) },
             modifier = Modifier.weight(1f),
         )
     }

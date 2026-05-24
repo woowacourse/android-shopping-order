@@ -5,12 +5,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -26,11 +24,9 @@ class CartViewModel(
 ) : ViewModel() {
     private val cartItemsFlow: StateFlow<CartItems> = cartRepository.cartItems
     private val selectedItemsFlow = MutableStateFlow<Set<Int>>(emptySet())
+    val selectedCartIds: StateFlow<Set<Int>> = selectedItemsFlow.asStateFlow()
     private val currentPageIdxFlow = MutableStateFlow(0)
     private val cartLoadStateFlow = MutableStateFlow<LoadState>(LoadState.Initial)
-
-    private val _events = MutableSharedFlow<CartEvent>()
-    val events: SharedFlow<CartEvent> = _events.asSharedFlow()
 
     val cartUiState: StateFlow<CartUiState> =
         combine(
@@ -168,17 +164,6 @@ class CartViewModel(
         currentPageIdxFlow.update { it - 1 }
     }
 
-    fun onClickOrder() {
-        viewModelScope.launch {
-            runCatching {
-                cartRepository.order(selectedItemsFlow.value.toList())
-                _events.emit(CartEvent.OrderSuccess)
-            }.onFailure { throwable ->
-                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
-            }
-        }
-    }
-
     companion object {
         private const val PAGE_SIZE = 5
 
@@ -193,8 +178,4 @@ class CartViewModel(
                 }
             }
     }
-}
-
-sealed interface CartEvent {
-    data object OrderSuccess : CartEvent
 }
