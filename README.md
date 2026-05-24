@@ -42,12 +42,11 @@
 
 ### SharedFlow 기반 단발성 이벤트 처리
 
-- [ ] 장바구니 추가 완료 이벤트를 `SharedFlow`로 처리
-- [ ] 장바구니 삭제 완료 이벤트를 `SharedFlow`로 처리
+- [x] 장바구니 추가 완료 이벤트를 `SharedFlow`로 처리
+- [x] 장바구니 삭제 완료 이벤트를 `SharedFlow`로 처리
 - [x] 주문 완료 이벤트를 `SharedFlow`로 처리
-- [ ] 스낵바 표시 이벤트를 `SharedFlow`로 처리
-- [ ] 화면 이동 트리거 이벤트를 `SharedFlow`로 처리
-- [ ] ViewModel의 `MutableSharedFlow`를 외부에 `SharedFlow`로 노출
+- [x] 스낵바 표시 이벤트를 `SharedFlow`로 처리
+- [x] ViewModel의 `MutableSharedFlow`를 외부에 `SharedFlow`로 노출
 
 ### 상품 추천 화면 처리
 

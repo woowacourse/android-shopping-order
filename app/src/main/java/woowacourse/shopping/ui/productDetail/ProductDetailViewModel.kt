@@ -5,9 +5,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.cart.Cart
 import woowacourse.shopping.domain.model.cart.Quantity
@@ -15,6 +18,7 @@ import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.ui.UiEvent
 
 class ProductDetailViewModel(
     val productId: Int,
@@ -26,6 +30,8 @@ class ProductDetailViewModel(
     private val _uiState = MutableStateFlow<ProductDetailUiState>(ProductDetailUiState.Loading)
     private val cartFlow = MutableStateFlow(Cart())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
+    private val _uiEventFlow = MutableSharedFlow<UiEvent>()
+    val uiEvent: SharedFlow<UiEvent> = _uiEventFlow.asSharedFlow()
 
     init {
         loadProduct()
@@ -94,6 +100,7 @@ class ProductDetailViewModel(
             } else {
                 cartRepository.addProduct(current.product, Quantity(current.selectedQuantity))
             }
+            _uiEventFlow.emit(UiEvent.ShowSnackbar("장바구니에 담았습니다"))
         }
     }
 

@@ -3,7 +3,12 @@ package woowacourse.shopping.ui.navigation
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -11,7 +16,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import kotlinx.coroutines.delay
 import woowacourse.shopping.di.AppContainer
+import woowacourse.shopping.ui.UiEvent
 import woowacourse.shopping.ui.cart.CartScreen
 import woowacourse.shopping.ui.cart.CartViewModel
 import woowacourse.shopping.ui.productDetail.ProductDetailScreen
@@ -38,7 +45,19 @@ fun AppNavHost(
                     recentProductRepository = appContainer.recentProductRepository,
                 ),
             )
-            Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            val snackbarHostState = remember { SnackbarHostState() }
+            LaunchedEffect(productListViewModel) {
+                productListViewModel.uiEvent.collect { event ->
+                    when (event) {
+                        is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
+                        UiEvent.NavigateToProductList -> Unit
+                    }
+                }
+            }
+            Scaffold(
+                snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+                modifier = Modifier.fillMaxSize(),
+            ) { innerPadding ->
                 ProductListScreen(
                     modifier = Modifier.padding(innerPadding),
                     viewModel = productListViewModel,
@@ -63,7 +82,29 @@ fun AppNavHost(
                     recentProductRepository = appContainer.recentProductRepository,
                 ),
             )
-            Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            val snackbarHostState = remember { SnackbarHostState() }
+            val shouldNavigateToCart = remember { mutableStateOf(false) }
+
+            LaunchedEffect(productDetailViewModel) {
+                productDetailViewModel.uiEvent.collect { event ->
+                    when (event) {
+                        is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
+                        UiEvent.NavigateToProductList -> Unit
+                    }
+                }
+            }
+
+            LaunchedEffect(shouldNavigateToCart.value) {
+                if (shouldNavigateToCart.value) {
+                    delay(1500)
+                    navController.navigate(CartRoute)
+                }
+            }
+
+            Scaffold(
+                snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+                modifier = Modifier.fillMaxSize(),
+            ) { innerPadding ->
                 ProductDetailScreen(
                     modifier = Modifier.padding(innerPadding),
                     viewModel = productDetailViewModel,
@@ -72,7 +113,7 @@ fun AppNavHost(
                     },
                     onAddToCartClick = {
                         productDetailViewModel.addToCart()
-                        navController.navigate(CartRoute)
+                        shouldNavigateToCart.value = true
                     },
                     onLastViewedProductClick = { product ->
                         navController.navigate(ProductDetailRoute(productId = product.id))
@@ -89,20 +130,30 @@ fun AppNavHost(
                     productRepository = appContainer.productRepository,
                 ),
             )
-            Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                CartScreen(
-                    modifier = Modifier.padding(innerPadding),
-                    viewModel = cartViewModel,
-                    onClickClose = {
-                        navController.popBackStack()
-                    },
-                    onOrderComplete = {
-                        navController.navigate(ProductListRoute) {
+            val snackbarHostState = remember { SnackbarHostState() }
+            LaunchedEffect(cartViewModel) {
+                cartViewModel.uiEvent.collect { event ->
+                    when (event) {
+                        is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
+
+                        UiEvent.NavigateToProductList -> navController.navigate(ProductListRoute) {
                             popUpTo<CartRoute> {
                                 inclusive = true
                             }
                             launchSingleTop = true
                         }
+                    }
+                }
+            }
+            Scaffold(
+                snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+                modifier = Modifier.fillMaxSize(),
+            ) { innerPadding ->
+                CartScreen(
+                    modifier = Modifier.padding(innerPadding),
+                    viewModel = cartViewModel,
+                    onClickClose = {
+                        navController.popBackStack()
                     },
                 )
             }

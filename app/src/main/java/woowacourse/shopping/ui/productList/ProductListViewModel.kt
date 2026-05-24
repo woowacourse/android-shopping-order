@@ -5,9 +5,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -18,6 +21,7 @@ import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.ui.UiEvent
 
 class ProductListViewModel(
     private val productRepository: ProductRepository,
@@ -27,6 +31,9 @@ class ProductListViewModel(
     private val pagingState = MutableStateFlow(PagingState())
     private val recentProductsFlow = MutableStateFlow<List<Product>>(emptyList())
     private val cartFlow = MutableStateFlow(Cart())
+
+    private val _uiEventFlow = MutableSharedFlow<UiEvent>()
+    val uiEvent: SharedFlow<UiEvent> = _uiEventFlow.asSharedFlow()
 
     val uiState: StateFlow<ProductListUiState> =
         combine(pagingState, cartFlow, recentProductsFlow) { paging, cart, recents ->
@@ -59,6 +66,7 @@ class ProductListViewModel(
         viewModelScope.launch {
             cartRepository.addProduct(product)
             refreshCart()
+            _uiEventFlow.emit(UiEvent.ShowSnackbar("장바구니에 담았습니다"))
         }
     }
 

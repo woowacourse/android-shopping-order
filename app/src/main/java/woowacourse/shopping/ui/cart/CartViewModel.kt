@@ -22,6 +22,7 @@ import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.ui.UiEvent
 import woowacourse.shopping.ui.util.toUiModel
 
 class CartViewModel(
@@ -34,7 +35,7 @@ class CartViewModel(
     private val _recommendProducts = MutableStateFlow<List<Product>>(emptyList())
     private val _isCartOrRecommend = MutableStateFlow(CartFlow.CART)
     private val _allCartItems = MutableStateFlow<CartItems?>(null)
-    private val _orderCompleteEvent = MutableSharedFlow<Unit>()
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
     private var currentPage = 0
 
     val uiState: StateFlow<CartUiState> =
@@ -76,7 +77,7 @@ class CartViewModel(
             initialValue = CartUiState.Loading,
         )
 
-    val orderCompleteEvent: SharedFlow<Unit> = _orderCompleteEvent.asSharedFlow()
+    val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
 
     init {
         refresh()
@@ -123,6 +124,7 @@ class CartViewModel(
             cartRepository.remove(cartId)
 
             refreshCartItems()
+            _uiEvent.emit(UiEvent.ShowSnackbar("장바구니에서 삭제했습니다"))
         }
     }
 
@@ -131,6 +133,7 @@ class CartViewModel(
             val cartId = cartRepository.addProduct(product)
             _selectedItems.update { it + cartId }
             refreshCartItems()
+            _uiEvent.emit(UiEvent.ShowSnackbar("장바구니에 추가했습니다"))
         }
     }
 
@@ -219,7 +222,8 @@ class CartViewModel(
 
         viewModelScope.launch {
             cartRepository.order(selectedItems.toList())
-            _orderCompleteEvent.emit(Unit)
+            _uiEvent.emit(UiEvent.ShowSnackbar("주문이 완료되었습니다"))
+            _uiEvent.emit(UiEvent.NavigateToProductList)
         }
     }
 
