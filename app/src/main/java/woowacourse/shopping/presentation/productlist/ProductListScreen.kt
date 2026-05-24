@@ -6,11 +6,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,6 +44,7 @@ import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 @Composable
 fun ProductListScreen(
     onNavigateToCart: () -> Unit,
+    onNavigateToNotificationSetting: () -> Unit,
     onProductClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProductListViewModel = viewModel(),
@@ -53,6 +59,7 @@ fun ProductListScreen(
         totalQuantity = uiState.totalQuantity,
         errorMessage = uiState.errorMessage,
         onNavigateToCartClick = onNavigateToCart,
+        onNavigateToNotificationSettings = onNavigateToNotificationSetting,
         onLoadMoreClick = viewModel::loadMoreProducts,
         onIncreaseQuantityClick = viewModel::addItemToCart,
         onDecreaseQuantityClick = viewModel::removeItemFromCart,
@@ -70,6 +77,7 @@ fun ProductListContent(
     totalQuantity: Int,
     errorMessage: String?,
     onNavigateToCartClick: () -> Unit,
+    onNavigateToNotificationSettings: () -> Unit,
     onLoadMoreClick: () -> Unit,
     onIncreaseQuantityClick: (Long) -> Unit,
     onDecreaseQuantityClick: (Long) -> Unit,
@@ -94,6 +102,14 @@ fun ProductListContent(
                         isShowCartQuantityIcon = totalQuantity > 0,
                         onNavigateToCart = onNavigateToCartClick,
                     )
+                    IconButton(onClick = onNavigateToNotificationSettings) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "알림 설정",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
                 },
                 modifier = modifier.fillMaxWidth(),
             )
@@ -208,6 +224,7 @@ private fun ProductListContentPreview() {
             totalQuantity = 7,
             errorMessage = null,
             onNavigateToCartClick = {},
+            onNavigateToNotificationSettings = {},
             onLoadMoreClick = {},
             onIncreaseQuantityClick = {},
             onDecreaseQuantityClick = {},

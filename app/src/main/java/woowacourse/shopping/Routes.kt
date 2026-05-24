@@ -22,3 +22,6 @@ data class RecommendItem(
 data class OrderItem(
     val productIds: List<Long>,
 )
+
+@Serializable
+object NotificationSetting

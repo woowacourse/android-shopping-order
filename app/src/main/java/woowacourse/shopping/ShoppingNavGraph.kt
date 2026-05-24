@@ -10,6 +10,7 @@ import woowacourse.shopping.presentation.order.OrderScreen
 import woowacourse.shopping.presentation.productdetail.ProductDetailScreen
 import woowacourse.shopping.presentation.productlist.ProductListScreen
 import woowacourse.shopping.presentation.recommend.RecommendItemScreen
+import woowacourse.shopping.presentation.settings.NotificationSettingScreen
 
 @Composable
 fun ShoppingNavGraph(
@@ -24,9 +25,16 @@ fun ShoppingNavGraph(
         composable<ShoppingList> {
             ProductListScreen(
                 onNavigateToCart = { navController.navigate(route = CartItemList) },
+                onNavigateToNotificationSetting = { navController.navigate(route = NotificationSetting) },
                 onProductClick = { productId ->
                     navController.navigate(route = ProductDetail(productId))
                 },
+            )
+        }
+
+        composable<NotificationSetting> {
+            NotificationSettingScreen(
+                onBackClick = { navController.popBackStack() },
             )
         }
 
