@@ -86,7 +86,6 @@ class ShoppingViewModel(
         page: Int = 0,
         size: Int = if (offset == 0) pageSize else offset,
     ) {
-//        viewModelScope.launch {
         runCatching {
             val apiResult =
                 productRepository.getProducts(page = page, size = size)
@@ -117,7 +116,6 @@ class ShoppingViewModel(
                 throw throwable
             }
         }
-//        }
     }
 
     private suspend fun observeRecentItems() {
@@ -201,6 +199,12 @@ class ShoppingViewModel(
     fun onCartClick() {
         viewModelScope.launch {
             _uiEvent.emit(ShoppingUiEvent.NavToCart)
+        }
+    }
+
+    fun navToSetting() {
+        viewModelScope.launch {
+            _uiEvent.emit(ShoppingUiEvent.NavToSetting)
         }
     }
 

@@ -13,3 +13,6 @@ data class Detail(
 
 @Serializable
 object Cart
+
+@Serializable
+object Setting

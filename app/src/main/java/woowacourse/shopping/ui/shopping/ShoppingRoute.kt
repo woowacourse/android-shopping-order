@@ -10,6 +10,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import woowacourse.shopping.ui.nav.Cart
 import woowacourse.shopping.ui.nav.Detail
+import woowacourse.shopping.ui.nav.Setting
 
 @Composable
 fun ShoppingRoute(
@@ -24,6 +25,10 @@ fun ShoppingRoute(
             when (event) {
                 ShoppingUiEvent.NavToCart -> {
                     navController.navigate(Cart)
+                }
+
+                ShoppingUiEvent.NavToSetting -> {
+                    navController.navigate(Setting)
                 }
 
                 is ShoppingUiEvent.NavToDetail -> {
@@ -43,5 +48,6 @@ fun ShoppingRoute(
         onProductClick = { viewModel.onProductClick(it) },
         onCartClick = { viewModel.onCartClick() },
         onQuantityChange = viewModel::updateQuantity,
+        onSettingClick = viewModel::navToSetting,
     )
 }
