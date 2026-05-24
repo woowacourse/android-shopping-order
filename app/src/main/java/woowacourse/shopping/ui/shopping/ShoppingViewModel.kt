@@ -1,7 +1,8 @@
-package woowacourse.shopping.ui.shopping
+﻿package woowacourse.shopping.ui.shopping
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.remote.NetworkObserver
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
@@ -142,19 +144,16 @@ class ShoppingViewModel(
     }
 
     companion object {
-        fun provideFactory(
-            productRepository: ProductRepository,
-            cartRepository: CartRepository,
-            recentItemRepository: RecentItemRepository,
-            networkObserver: NetworkObserver,
-        ): ViewModelProvider.Factory =
+        val Factory: ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
+                    val appContainer = (this[APPLICATION_KEY] as ShoppingApplication).appContainer
+
                     ShoppingViewModel(
-                        productRepository = productRepository,
-                        cartRepository = cartRepository,
-                        recentItemRepository = recentItemRepository,
-                        networkObserver = networkObserver,
+                        productRepository = appContainer.productRepository,
+                        cartRepository = appContainer.cartRepository,
+                        recentItemRepository = appContainer.recentItemRepository,
+                        networkObserver = appContainer.networkObserver,
                     )
                 }
             }

@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,15 +29,47 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import woowacourse.shopping.ui.component.ShoppingAppBar
 import woowacourse.shopping.ui.model.ProductUiModel
 import woowacourse.shopping.ui.model.RecentUiModel
 import woowacourse.shopping.ui.theme.Green40
 
 @Composable
+fun ShoppingScreenRoute(
+    onProductClick: (Long) -> Unit,
+    onCartClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    shoppingViewModel: ShoppingViewModel = viewModel(factory = ShoppingViewModel.Factory),
+) {
+    val uiState by shoppingViewModel.uiState.collectAsStateWithLifecycle()
+
+    ShoppingScreen(
+        products = uiState.products,
+        recentItems = uiState.recentItems,
+        cartSize = uiState.cartSize,
+        isNetworkAvailable = uiState.isNetworkAvailable,
+        isLoading = uiState.isLoading,
+        canLoadMore = uiState.canLoadMore,
+        onLoad = shoppingViewModel::loadMore,
+        onProductClick = onProductClick,
+        onCartClick = onCartClick,
+        onQuantityChange = shoppingViewModel::updateQuantity,
+        modifier = modifier,
+    )
+}
+
+@Composable
 fun ShoppingScreen(
-    uiState: ShoppingUiState,
+    products: ImmutableList<ProductUiModel>,
+    recentItems: ImmutableList<RecentUiModel>,
+    cartSize: Int,
+    isNetworkAvailable: Boolean,
+    isLoading: Boolean,
+    canLoadMore: Boolean,
     onLoad: () -> Unit,
     onProductClick: (Long) -> Unit,
     onCartClick: () -> Unit,
@@ -66,7 +99,7 @@ fun ShoppingScreen(
                                     onCartClick()
                                 },
                     )
-                    if (uiState.cartSize > 0) {
+                    if (cartSize > 0) {
                         Box(
                             modifier =
                                 Modifier
@@ -75,7 +108,7 @@ fun ShoppingScreen(
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
-                                text = uiState.cartSize.toString(),
+                                text = cartSize.toString(),
                                 fontSize = 14.sp,
                                 color = Color.White,
                                 fontWeight = FontWeight.W500,
@@ -83,21 +116,21 @@ fun ShoppingScreen(
                         }
                     }
                 },
-                modifier = modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
             )
         },
         modifier = modifier.statusBarsPadding(),
     ) { innerPadding ->
-        if (uiState.isNetworkAvailable) {
+        if (isNetworkAvailable) {
             ShoppingContents(
-                products = uiState.products,
-                recentItems = uiState.recentItems,
+                products = products,
+                recentItems = recentItems,
                 modifier = Modifier.padding(innerPadding),
                 onLoad = onLoad,
-                isLoading = uiState.isLoading,
+                isLoading = isLoading,
                 onProductClick = onProductClick,
                 onQuantityChange = onQuantityChange,
-                isCanLoadMore = uiState.canLoadMore,
+                isCanLoadMore = canLoadMore,
             )
         } else {
             NetworkErrorContent(
@@ -177,10 +210,15 @@ private fun ShoppingContents(
 @Composable
 private fun ShoppingScreenPreview() {
     ShoppingScreen(
-        uiState = ShoppingUiState(),
         onLoad = {},
         onProductClick = {},
         onCartClick = {},
         onQuantityChange = { _, _ -> },
+        products = persistentListOf(),
+        recentItems = persistentListOf(),
+        cartSize = 1,
+        isNetworkAvailable = true,
+        isLoading = false,
+        canLoadMore = true,
     )
 }
