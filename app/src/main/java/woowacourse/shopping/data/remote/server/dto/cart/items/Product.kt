@@ -18,7 +18,7 @@ data class ProductResponse(
     @SerialName("price")
     val price: Int
 )
-fun ProductResponse.toDomain() = Product(
+fun ProductResponse.toDomainProduct() = Product(
     category = category,
     id = id,
     imageUri = imageUrl.ifBlank { "https://via.placeholder.com/300" },

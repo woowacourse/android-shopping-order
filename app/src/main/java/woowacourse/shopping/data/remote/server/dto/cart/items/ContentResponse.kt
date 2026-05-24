@@ -14,8 +14,8 @@ data class ContentResponse(
     @SerialName("quantity")
     val quantity: Int
 )
-fun ContentResponse.toDomain() = PurchaseProduct(
+fun ContentResponse.toDomainPurchaseProduct() = PurchaseProduct(
     id = id,
-    product = product.toDomain(),
+    product = product.toDomainProduct(),
     count = quantity
 )

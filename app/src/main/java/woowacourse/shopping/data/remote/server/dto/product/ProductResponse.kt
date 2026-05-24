@@ -18,7 +18,7 @@ data class ProductResponse(
     @SerialName("price")
     val price: Int
 )
-fun ProductResponse.toDomain() =
+fun ProductResponse.toDomainProduct() =
     Product(
         category = category,
         id = id,

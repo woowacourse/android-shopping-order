@@ -2,7 +2,7 @@ package woowacourse.shopping.data.remote.server.repository
 
 import woowacourse.shopping.data.remote.server.dto.cart.items.PatchQuantityRequest
 import woowacourse.shopping.data.remote.server.dto.cart.items.PostCartRequest
-import woowacourse.shopping.data.remote.server.dto.cart.items.toDomain
+import woowacourse.shopping.data.remote.server.dto.cart.items.toDomainPurchaseProduct
 import woowacourse.shopping.data.remote.server.service.CartService
 import woowacourse.shopping.domain.model.PurchaseProduct
 import woowacourse.shopping.domain.model.PurchaseProducts
@@ -47,7 +47,7 @@ class CartRepositoryImpl(private val cartService: CartService) : CartRepository 
         try {
             val response = cartService.requestCartItems(page, size)
             val cartItems = response.content.map { content->
-                content.toDomain()
+                content.toDomainPurchaseProduct()
             }
             return PurchaseProducts(cartItems)
         } catch (e: Exception) {
