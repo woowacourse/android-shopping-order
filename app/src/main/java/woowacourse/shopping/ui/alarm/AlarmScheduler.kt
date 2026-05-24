@@ -30,6 +30,7 @@ class AlarmScheduler(context: Context) {
                 triggerTime,
                 pendingIntent
             )
+            return
         }
 
         try {
