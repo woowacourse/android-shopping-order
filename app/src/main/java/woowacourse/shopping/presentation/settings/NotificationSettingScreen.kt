@@ -19,10 +19,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 import woowacourse.shopping.ui.theme.Gray30
 import woowacourse.shopping.ui.theme.Gray50
@@ -39,13 +38,14 @@ import woowacourse.shopping.ui.theme.Green40
 fun NotificationSettingScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: NotificationSettingViewModel = viewModel(),
 ) {
-    var isNotificationEnabled by remember { mutableStateOf(true) }
+    val isNotificationEnabled by viewModel.isNotificationEnabled.collectAsState()
 
     NotificationSettingsContent(
         isNotificationEnabled = isNotificationEnabled,
         onBackClick = onBackClick,
-        onCheckedChange = { isNotificationEnabled = it },
+        onCheckedChange = viewModel::changeNotification,
         modifier = modifier,
     )
 }

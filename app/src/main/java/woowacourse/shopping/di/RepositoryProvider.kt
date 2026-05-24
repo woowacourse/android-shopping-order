@@ -13,6 +13,7 @@ import woowacourse.shopping.data.source.local.ShoppingDatabase
 import woowacourse.shopping.data.source.local.auth.AuthDataSource
 import woowacourse.shopping.data.source.local.auth.CryptoManager
 import woowacourse.shopping.data.source.local.auth.DefaultAuthDataSource
+import woowacourse.shopping.data.source.local.notification.NotificationDataSource
 import woowacourse.shopping.data.source.remote.CartRemoteDataSource
 import woowacourse.shopping.data.source.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.source.remote.api.AuthInterceptor
@@ -23,6 +24,8 @@ object RepositoryProvider {
     private lateinit var database: ShoppingDatabase
 
     private lateinit var retrofitServices: RetrofitServices
+
+    lateinit var notificationDataSource: NotificationDataSource
 
     fun init(
         context: Context,
@@ -40,6 +43,10 @@ object RepositoryProvider {
 
         runBlocking {
             authDataSource.saveToken(id, password)
+            notificationDataSource =
+                NotificationDataSource(
+                    appContext.getSharedPreferences("notification", Context.MODE_PRIVATE),
+                )
             retrofitServices =
                 RetrofitServices(
                     baseUrl = "https://android-shopping-server.onrender.com/",
