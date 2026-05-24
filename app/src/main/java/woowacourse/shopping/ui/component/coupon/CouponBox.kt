@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.component.coupon
 
-import android.icu.text.DecimalFormat
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +30,7 @@ import woowacourse.shopping.model.coupon.FixedDiscountCoupon
 import woowacourse.shopping.model.coupon.FreeShippingCoupon
 import woowacourse.shopping.model.coupon.PercentageDiscountCoupon
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
+import java.text.DecimalFormat
 import java.time.LocalDate
 import java.time.LocalTime
 

@@ -1,7 +1,10 @@
 package woowacourse.shopping.ui.screen
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -25,7 +28,9 @@ import java.time.LocalTime
 @Composable
 fun CouponScreen(
     uiState: CouponUiState,
+    isNotificationEnabled: Boolean,
     onBackClick: () -> Unit,
+    onNotificationEnabledChange: (Boolean) -> Unit,
     onCouponSelect: (Long) -> Unit,
     onPay: () -> Unit,
     modifier: Modifier = Modifier,
@@ -41,7 +46,8 @@ fun CouponScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState()),
         ) {
             CouponHeaderSection()
             CouponList(
@@ -49,7 +55,7 @@ fun CouponScreen(
                 selectedCouponId = uiState.selectedCouponId,
                 onCouponSelect = onCouponSelect,
                 modifier = Modifier
-                    .weight(1f)
+                    .heightIn(max = 220.dp)
                     .padding(bottom = 12.dp),
             )
             CouponSummarySection(
@@ -57,6 +63,8 @@ fun CouponScreen(
                 discountAmount = uiState.discountAmount,
                 shippingFee = uiState.shippingFee,
                 totalPaymentAmount = uiState.totalPaymentAmount,
+                isNotificationEnabled = isNotificationEnabled,
+                onNotificationEnabledChange = onNotificationEnabledChange,
                 onPay = onPay,
             )
         }
@@ -107,7 +115,9 @@ private fun CouponScreenPreview() {
                 ),
                 selectedCouponId = 1L,
             ),
+            isNotificationEnabled = true,
             onBackClick = {},
+            onNotificationEnabledChange = {},
             onCouponSelect = {},
             onPay = {},
         )
