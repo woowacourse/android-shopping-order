@@ -19,8 +19,6 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ui.navigation.Payment
-import woowacourse.shopping.ui.navigation.ProductDetail
-import woowacourse.shopping.ui.navigation.Shopping
 
 @Composable
 fun RecommendationRoute(
@@ -64,11 +62,7 @@ fun RecommendationRoute(
                         navController.popBackStack()
 
                     is RecommendationEvent.NavigateToPayment ->
-                        navController.navigate(
-                            Payment(
-                                checkedIds = event.checkedIds
-                            )
-                        )
+                        navController.navigate(Payment)
                 }
             }
         }

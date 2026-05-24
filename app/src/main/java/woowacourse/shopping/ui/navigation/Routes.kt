@@ -21,6 +21,4 @@ data class Recommendation(
 )
 
 @Serializable
-data class Payment(
-    val checkedIds: List<Long>
-)
+object Payment
