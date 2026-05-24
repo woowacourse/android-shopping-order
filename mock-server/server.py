@@ -69,6 +69,37 @@ SEED_PRODUCTS: list[dict[str, Any]] = [
 
 SORT_META = {"empty": False, "sorted": True, "unsorted": False}
 
+COUPONS: list[dict[str, Any]] = [
+    {
+        "id": 1,
+        "code": "FIXED1000",
+        "description": "1,000원 할인 쿠폰",
+        "expirationDate": "2026-12-31",
+        "discount": 1000,
+        "minimumAmount": 10000,
+        "discountType": "fixed",
+    },
+    {
+        "id": 2,
+        "code": "FIXED5000",
+        "description": "5,000원 할인 쿠폰",
+        "expirationDate": "2026-12-31",
+        "discount": 5000,
+        "minimumAmount": 30000,
+        "discountType": "fixed",
+    },
+    {
+        "id": 3,
+        "code": "PERCENT10",
+        "description": "10% 할인 쿠폰",
+        "expirationDate": "2026-12-31",
+        "discount": 10,
+        "minimumAmount": 0,
+        "availableTime": {"start": "00:00:00", "end": "23:59:59"},
+        "discountType": "percentage",
+    },
+]
+
 
 @dataclass
 class CartItem:
@@ -321,6 +352,10 @@ class MockShoppingRequestHandler(BaseHTTPRequestHandler):
             sort = query.get("sort")
             response = STORE.build_cart_page(page=page, size=size, sort=sort)
             self._send_json(HTTPStatus.OK, response)
+            return
+
+        if path == "/coupons":
+            self._send_json(HTTPStatus.OK, COUPONS)
             return
 
         self._not_found()
