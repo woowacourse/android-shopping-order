@@ -47,4 +47,4 @@
   - [x] AndroidManifest <receiver> 등록
 - [x] 예약된 시간이 되면 BroadcastReceiver를 호출
 - [x] onReceive 메서드 내에서 알림 빌드
-- [ ] 알림 클릭시 결제 화면으로 이동
+- [x] 알림 클릭시 결제 화면으로 이동
