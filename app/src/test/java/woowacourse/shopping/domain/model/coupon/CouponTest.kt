@@ -43,6 +43,14 @@ class CouponTest {
         coupon.discountAmount(order) shouldBe 6_000
     }
 
+    @Test
+    fun `무료 배송 쿠폰은 최소 주문 금액 이상일 때 배송비를 0원으로 만든다`() {
+        val coupon = freeShippingCoupon()
+        val order = orderOf(purchaseProduct(price = 50_000, count = 1))
+
+        coupon.deliveryFee(order, defaultDeliveryFee = 3_000) shouldBe 0
+    }
+
     private fun fixedAmountCoupon() =
         FixedAmountCoupon(
             code = "FIXED5000",
@@ -59,6 +67,14 @@ class CouponTest {
             expirationDate = LocalDate.of(2024, 5, 30),
             purchaseQuantity = 2,
             freeQuantity = 1,
+        )
+
+    private fun freeShippingCoupon() =
+        FreeShippingCoupon(
+            code = "FREESHIPPING",
+            name = "5만원 이상 구매 시 무료 배송 쿠폰",
+            expirationDate = LocalDate.of(2024, 8, 31),
+            minimumOrderAmount = 50_000,
         )
 
     private fun orderOf(vararg purchaseProducts: PurchaseProduct) =
