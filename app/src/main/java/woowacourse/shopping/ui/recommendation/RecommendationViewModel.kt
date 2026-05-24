@@ -10,11 +10,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.data.local.repository.OutstandingProductRepository
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.repository.CartRepository
 import woowacourse.shopping.data.remote.server.repository.ProductRepository
-import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.Products
 import woowacourse.shopping.domain.PurchaseProduct
 import woowacourse.shopping.ui.ViewModelConst
@@ -23,6 +23,7 @@ class RecommendationViewModel(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
+    private val outstandingProductRepository: OutstandingProductRepository,
     initPrice: Int,
     initCheckedItemIds: List<Long>,
 ) : ViewModel() {
@@ -119,7 +120,7 @@ class RecommendationViewModel(
         }
     }
 
-    suspend fun fetchTotalPrice() {
+    fun fetchTotalPrice() {
         _uiState.update { state ->
             val totalPrice =
                 state.cart.purchaseProducts
@@ -279,6 +280,8 @@ class RecommendationViewModel(
 
     fun navigateToPayment(checkedIds: List<Long>) {
         viewModelScope.launch {
+            outstandingProductRepository.deleteAll()
+            outstandingProductRepository.insertAll(checkedIds)
             _event.emit(
                 RecommendationEvent.NavigateToPayment(checkedIds)
             )
@@ -298,6 +301,7 @@ class RecommendationViewModelFactory(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
+    private val outstandingProductRepository: OutstandingProductRepository,
     private val initPrice: Int,
     private val initCheckItemIds: List<Long>,
 ) : ViewModelProvider.Factory {
@@ -308,6 +312,7 @@ class RecommendationViewModelFactory(
                 cartRepository,
                 productRepository,
                 recentlyViewedProductRepository,
+                outstandingProductRepository,
                 initPrice,
                 initCheckItemIds,
             ) as T

@@ -3,6 +3,7 @@ package woowacourse.shopping
 import android.app.Application
 import woowacourse.shopping.data.local.UserAuthDataStore
 import woowacourse.shopping.data.local.database.DataBase
+import woowacourse.shopping.data.local.repository.OutstandingProductRepositoryImpl
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepositoryImpl
 import woowacourse.shopping.data.remote.server.RetrofitProvider
 import woowacourse.shopping.data.remote.server.repository.CartRepositoryImpl
@@ -20,6 +21,10 @@ class ShoppingApplication : Application() {
 
     val recentlyViewedProductRepository by lazy {
         RecentlyViewedProductRepositoryImpl(database.recentlyViewedProductDao())
+    }
+
+    val outstandingProductRepository by lazy {
+        OutstandingProductRepositoryImpl(database.outstandingProductDao())
     }
 
     val userAuthDataStore by lazy { UserAuthDataStore(context = this) }

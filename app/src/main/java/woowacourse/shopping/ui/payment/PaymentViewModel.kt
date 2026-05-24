@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.data.local.repository.OutstandingProductRepository
 import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.repository.CartRepository
 import woowacourse.shopping.data.remote.server.repository.CouponRepository
@@ -23,7 +24,7 @@ class PaymentViewModel(
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
-    private val checkedItemIds: List<Long>
+    private val outstandingProductRepository: OutstandingProductRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PaymentUiState())
@@ -42,6 +43,7 @@ class PaymentViewModel(
 
             val cartResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
             val couponResult = couponRepository.getCoupons()
+            val checkedItemIds = outstandingProductRepository.getAll()
 
             if (cartResult is ApiResult.Success && couponResult is ApiResult.Success) {
                 val checkedProducts = cartResult.data.purchaseProducts.filter { it.id in checkedItemIds }
@@ -122,7 +124,7 @@ class PaymentViewModelFactory(
     private val cartRepository: CartRepository,
     private val couponRepository: CouponRepository,
     private val orderRepository: OrderRepository,
-    private val checkedItemIds: List<Long>
+    private val outstandingProductRepository: OutstandingProductRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PaymentViewModel::class.java)) {
@@ -131,7 +133,7 @@ class PaymentViewModelFactory(
                 cartRepository = cartRepository,
                 orderRepository = orderRepository,
                 couponRepository = couponRepository,
-                checkedItemIds = checkedItemIds,
+                outstandingProductRepository = outstandingProductRepository
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

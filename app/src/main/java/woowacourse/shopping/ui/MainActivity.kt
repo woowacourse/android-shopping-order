@@ -106,8 +106,9 @@ class MainActivity : ComponentActivity() {
                                     cartRepository = app.cartRepository,
                                     productRepository = app.productRepository,
                                     recentlyViewedProductRepository = app.recentlyViewedProductRepository,
+                                    outstandingProductRepository = app.outstandingProductRepository,
                                     initPrice = route.totalPrice,
-                                    initCheckItemIds = route.checkedIds
+                                    initCheckItemIds = route.checkedIds,
                                 )
                             )
                             RecommendationRoute(
@@ -117,15 +118,13 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable<Payment> { backStackEntry ->
-                            val route: Payment = backStackEntry.toRoute()
-
+                        composable<Payment> {
                             val viewModel: PaymentViewModel = viewModel(
                                 factory = PaymentViewModelFactory(
                                     cartRepository = app.cartRepository,
                                     couponRepository = app.couponRepository,
                                     orderRepository = app.orderRepository,
-                                    checkedItemIds = route.checkedIds
+                                    outstandingProductRepository = app.outstandingProductRepository
                                 )
                             )
                             PaymentRoute(

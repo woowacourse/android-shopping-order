@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import woowacourse.shopping.data.local.dao.OutstandingProductDao
 import woowacourse.shopping.data.local.dao.RecentlyViewedProductDao
 import woowacourse.shopping.data.local.entity.OutstandingProductEntity
 import woowacourse.shopping.data.local.entity.RecentlyViewedProductEntity
@@ -25,9 +26,8 @@ val MIGRATION_6_7 =
             )
             db.execSQL(
                 """
-                    CERATE TABLE IF NOT EXISTS `outstanding_products`(
-                        `cartItemId` INTEGER NOT NULL
-                        PRIMARY KEY (`cartItemId`)
+                    CREATE TABLE IF NOT EXISTS `outstanding_products` (
+                        `cartItemId` INTEGER NOT NULL PRIMARY KEY
                     )
                 """.trimIndent()
             )
@@ -40,6 +40,7 @@ val MIGRATION_6_7 =
 )
 abstract class DataBase : RoomDatabase() {
     abstract fun recentlyViewedProductDao(): RecentlyViewedProductDao
+    abstract fun outstandingProductDao(): OutstandingProductDao
 
     companion object {
         @Volatile
