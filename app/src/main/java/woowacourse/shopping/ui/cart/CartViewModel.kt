@@ -32,8 +32,7 @@ class CartViewModel(
     private val _pagedCart: MutableStateFlow<PurchaseProducts> = MutableStateFlow(PurchaseProducts())
     val pagedCart: StateFlow<PurchaseProducts> = _pagedCart.asStateFlow()
 
-    private val _cartItemCount: MutableStateFlow<Int> = MutableStateFlow(0)
-    val cartItemCount = _cartItemCount.asStateFlow()
+    private val _hasNextPage = MutableStateFlow(false)
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
@@ -64,16 +63,8 @@ class CartViewModel(
         viewModelScope.launch {
             _isLoading.update { true }
 
-            val firstPage = cartRepository.getPagedCart(0, PAGE_SIZE)
-            _pagedCart.update { firstPage }
-            
-            val totalCount = cartRepository.getCartItemCount()
-            _cartItemCount.update { totalCount }
-            
-            if (totalCount > 0) {
-                val allData = cartRepository.getPagedCart(0, totalCount)
-                _allCartItems.update { allData }
-            }
+            _currentPage.update { 0 }
+            loadPage(0, resetKnownCartItems = true)
 
             _isLoading.update { false }
         }
@@ -84,37 +75,30 @@ class CartViewModel(
     }
 
     fun next() {
-        _currentPage.update {
-            if (cartItemCount.value > (it + 1) * PAGE_SIZE) it + 1 else it
-        }
         viewModelScope.launch {
+            if (_hasNextPage.value.not()) return@launch
+
             _isLoading.update { true }
-            _pagedCart.update {
-                cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
-            }
+            val nextPage = currentPage.value + 1
+            _currentPage.update { nextPage }
+            loadPage(nextPage)
             _isLoading.update { false }
         }
     }
 
     fun prev() {
-        _currentPage.update { if (it > 0) it - 1 else 0 }
         viewModelScope.launch {
+            if (currentPage.value == 0) return@launch
+
             _isLoading.update { true }
-            _pagedCart.update {
-                cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
-            }
+            val prevPage = currentPage.value - 1
+            _currentPage.update { prevPage }
+            loadPage(prevPage)
             _isLoading.update { false }
         }
     }
 
-    val nextEnable: StateFlow<Boolean> =
-        combine(currentPage, cartItemCount) { page, count ->
-            page < (count - 1) / PAGE_SIZE
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false,
-        )
+    val nextEnable: StateFlow<Boolean> = _hasNextPage.asStateFlow()
 
     val prevEnable: StateFlow<Boolean> =
         currentPage
@@ -126,13 +110,13 @@ class CartViewModel(
             )
 
     val isPageable: StateFlow<Boolean> =
-        cartItemCount
-            .map { it > PAGE_SIZE }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = false,
-            )
+        combine(currentPage, _hasNextPage) { page, hasNextPage ->
+            page > 0 || hasNextPage
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false,
+        )
 
     fun updateCountWithID(
         id: Long,
@@ -147,20 +131,7 @@ class CartViewModel(
             try {
                 cartRepository.updateCount(id, nextCount)
                 
-                _allCartItems.update { allCart ->
-                    PurchaseProducts(
-                        allCart.purchaseProducts.map {
-                            if (it.id == id) it.copy(count = nextCount) else it
-                        }
-                    )
-                }
-
-                _pagedCart.update {
-                    cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
-                }
-                _cartItemCount.update {
-                    cartRepository.getCartItemCount()
-                }
+                updateKnownCartItemCount(id, nextCount)
             } catch (e: Exception) {
                 _uiEvent.emit(UiEvent.ShowMessage("수량 변경에 실패했습니다. 다시 시도해주세요."))
             } finally {
@@ -175,23 +146,17 @@ class CartViewModel(
             try {
                 cartRepository.deleteCartItem(id)
 
-                val newTotalCount = cartRepository.getCartItemCount()
-                _cartItemCount.update {
-                    newTotalCount
-                }
+                removeKnownCartItem(id)
 
-                if (currentPage.value > 0 && currentPage.value * PAGE_SIZE >= newTotalCount) {
-                    _currentPage.update { it - 1 }
-                }
-
-                _pagedCart.update {
-                    cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
-                }
-
-                _allCartItems.update { allCart ->
-                    PurchaseProducts(
-                        allCart.purchaseProducts.filter { it.id != id }
-                    )
+                val page = cartRepository.getCartPage(currentPage.value, PAGE_SIZE)
+                if (currentPage.value > 0 && page.items.purchaseProducts.isEmpty()) {
+                    val previousPage = currentPage.value - 1
+                    _currentPage.update { previousPage }
+                    loadPage(previousPage)
+                } else {
+                    _pagedCart.update { page.items }
+                    _hasNextPage.update { page.isLast.not() }
+                    mergeKnownCartItems(page.items)
                 }
 
                 _checkedItemIds.update { it - id }
@@ -218,16 +183,73 @@ class CartViewModel(
 
     fun onSelectAllClick() {
         viewModelScope.launch {
-            _checkedItemIds.update { list ->
-                val allIds = _allCartItems.value.purchaseProducts.map { it.id }
-                if (list.containsAll(allIds)) {
-                    emptyList()
-                } else {
-                    allIds
+            _isLoading.update { true }
+            try {
+                val allCartItems = cartRepository.getAllCartItems(PAGE_SIZE)
+                _allCartItems.update { allCartItems }
+                val allIds = allCartItems.purchaseProducts.map { it.id }
+                _checkedItemIds.update { list ->
+                    if (list.containsAll(allIds)) {
+                        emptyList()
+                    } else {
+                        allIds
+                    }
                 }
+            } finally {
+                _isLoading.update { false }
             }
         }
     }
+
+    private suspend fun loadPage(
+        page: Int,
+        resetKnownCartItems: Boolean = false,
+    ) {
+        val cartPage = cartRepository.getCartPage(page, PAGE_SIZE)
+        _pagedCart.update { cartPage.items }
+        _hasNextPage.update { cartPage.isLast.not() }
+        if (resetKnownCartItems) {
+            _allCartItems.update { cartPage.items }
+        } else {
+            mergeKnownCartItems(cartPage.items)
+        }
+    }
+
+    private fun mergeKnownCartItems(cartItems: PurchaseProducts) {
+        _allCartItems.update { knownItems ->
+            val newItems = cartItems.purchaseProducts
+            PurchaseProducts(
+                knownItems.purchaseProducts
+                    .filterNot { knownItem -> newItems.any { it.id == knownItem.id } } + newItems,
+            )
+        }
+    }
+
+    private fun updateKnownCartItemCount(
+        id: Long,
+        count: Int,
+    ) {
+        _pagedCart.update { it.updateCartItemCount(id, count) }
+        _allCartItems.update { it.updateCartItemCount(id, count) }
+    }
+
+    private fun removeKnownCartItem(id: Long) {
+        _pagedCart.update { it.removeCartItem(id) }
+        _allCartItems.update { it.removeCartItem(id) }
+    }
+
+    private fun PurchaseProducts.updateCartItemCount(
+        id: Long,
+        count: Int,
+    ): PurchaseProducts =
+        PurchaseProducts(
+            purchaseProducts.map {
+                if (it.id == id) it.copy(count = count) else it
+            },
+        )
+
+    private fun PurchaseProducts.removeCartItem(id: Long): PurchaseProducts =
+        PurchaseProducts(purchaseProducts.filter { it.id != id })
 
     companion object {
         private const val PAGE_SIZE = 5

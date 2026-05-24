@@ -1,5 +1,6 @@
 package woowacourse.shopping.domain.repository
 
+import woowacourse.shopping.domain.model.CartPage
 import woowacourse.shopping.domain.model.PurchaseProduct
 import woowacourse.shopping.domain.model.PurchaseProducts
 
@@ -12,7 +13,13 @@ interface CartRepository {
 
     suspend fun getProductCount(): Int
 
-    suspend fun getPagedCart(page: Int, size: Int): PurchaseProducts
+    suspend fun getCartPage(page: Int, size: Int): CartPage
 
-    suspend fun getCartItemCount(): Int
+    suspend fun getAllCartItems(pageSize: Int = DEFAULT_CART_PAGE_SIZE): PurchaseProducts
+
+    suspend fun findCartItemByProductId(productId: Long, pageSize: Int = DEFAULT_CART_PAGE_SIZE): PurchaseProduct?
+
+    companion object {
+        const val DEFAULT_CART_PAGE_SIZE = 5
+    }
 }

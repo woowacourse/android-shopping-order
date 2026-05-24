@@ -58,8 +58,10 @@ class ProductDetailViewModel(
 
     init {
         viewModelScope.launch {
-            _cart.update {
-                cartRepository.getPagedCart(0, 10000000)
+            cartRepository.findCartItemByProductId(selectedProductId)?.let { cartItem ->
+                _cart.update {
+                    PurchaseProducts(listOf(cartItem))
+                }
             }
         }
     }
@@ -84,6 +86,9 @@ class ProductDetailViewModel(
                 if (existCartItem != null) {
                     val newTotalCount = existCartItem.count + purchaseProduct.count
                     cartRepository.updateCount(existCartItem.id, newTotalCount)
+                    _cart.update {
+                        PurchaseProducts(listOf(existCartItem.copy(count = newTotalCount)))
+                    }
                 } else {
                     cartRepository.insert(purchaseProduct)
                 }

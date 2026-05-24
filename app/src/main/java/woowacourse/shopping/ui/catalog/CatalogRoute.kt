@@ -66,6 +66,7 @@ private fun CatalogRouteContent(
     val currentProducts by viewModel.products.collectAsStateWithLifecycle()
     val lastViewedProductId by viewModel.lastViewProductId.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val cartProductCount by viewModel.cartProductCount.collectAsStateWithLifecycle()
 
     CatalogScreen(
         catalog = currentProducts,
@@ -95,7 +96,7 @@ private fun CatalogRouteContent(
         specificProductCount = {
             cartState.totalCountOfSpecificPurchaseProduct(it)
         },
-        totalCount = cartState.totalCount(),
+        totalCount = cartProductCount,
         isLoading = isLoading,
     )
 }

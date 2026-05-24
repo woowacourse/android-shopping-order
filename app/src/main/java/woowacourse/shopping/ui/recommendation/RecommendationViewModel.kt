@@ -127,7 +127,7 @@ class RecommendationViewModel(
     fun fetchCart() {
         viewModelScope.launch {
             _allCartItems.update {
-                cartRepository.getPagedCart(0, 1000000)
+                cartRepository.getAllCartItems(CART_PAGE_SIZE)
             }
         }
     }
@@ -140,10 +140,11 @@ class RecommendationViewModel(
                 }
                 if (existingItem != null) {
                     cartRepository.updateCount(existingItem.id, existingItem.count + 1)
+                    updateKnownCartItemCount(existingItem.id, existingItem.count + 1)
                 } else {
                     cartRepository.insert(purchaseProduct)
+                    fetchCart()
                 }
-                fetchCart()
                 _uiEvent.emit(UiEvent.ShowMessage("장바구니에 담았습니다."))
             } catch (e: Exception) {
                 _uiEvent.emit(UiEvent.ShowMessage("장바구니 담기에 실패했습니다."))
@@ -161,7 +162,7 @@ class RecommendationViewModel(
                 val nextCount = target.count + updateAmount
                 if(nextCount >= 1) {
                     cartRepository.updateCount(target.id, nextCount)
-                    fetchCart()
+                    updateKnownCartItemCount(target.id, nextCount)
                 }
             }
         }
@@ -173,13 +174,36 @@ class RecommendationViewModel(
                 val target = allCartItems.value.findById(id)
                 if (target != null) {
                     cartRepository.deleteCartItem(target.id)
-                    fetchCart()
+                    removeKnownCartItem(target.id)
                     _uiEvent.emit(UiEvent.ShowMessage("상품을 삭제했습니다."))
                 }
             } catch (e: Exception) {
                 _uiEvent.emit(UiEvent.ShowMessage("상품 삭제에 실패했습니다."))
             }
         }
+    }
+
+    private fun updateKnownCartItemCount(
+        id: Long,
+        count: Int,
+    ) {
+        _allCartItems.update { cart ->
+            PurchaseProducts(
+                cart.purchaseProducts.map {
+                    if (it.id == id) it.copy(count = count) else it
+                },
+            )
+        }
+    }
+
+    private fun removeKnownCartItem(id: Long) {
+        _allCartItems.update { cart ->
+            PurchaseProducts(cart.purchaseProducts.filter { it.id != id })
+        }
+    }
+
+    companion object {
+        private const val CART_PAGE_SIZE = 5
     }
 }
 

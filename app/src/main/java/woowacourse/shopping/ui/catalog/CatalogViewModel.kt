@@ -46,6 +46,8 @@ class ShoppingViewModel(
     private val _cart = MutableStateFlow(PurchaseProducts())
     val cart = _cart.asStateFlow()
 
+    private val _cartProductCount = MutableStateFlow(0)
+    val cartProductCount = _cartProductCount.asStateFlow()
 
     val recentlyViewedProducts: StateFlow<Products> =
         combine(recentlyViewedProductIds, products) { productIds, allProducts ->
@@ -94,8 +96,11 @@ class ShoppingViewModel(
 
     fun fetchCart() {
         viewModelScope.launch {
+            _cartProductCount.update {
+                cartRepository.getProductCount()
+            }
             _cart.update {
-                cartRepository.getPagedCart(0, 1000000)
+                cartRepository.getAllCartItems(CART_PAGE_SIZE)
             }
         }
     }
@@ -109,10 +114,13 @@ class ShoppingViewModel(
                 }
                 if (existingItem != null) {
                     cartRepository.updateCount(existingItem.id, existingItem.count + 1)
+                    updateKnownCartItemCount(existingItem.id, existingItem.count + 1)
+                    updateKnownCartProductCount(1)
                 } else {
                     cartRepository.insert(purchaseProduct)
+                    updateKnownCartProductCount(purchaseProduct.count)
+                    fetchCart()
                 }
-                fetchCart()
                 _uiEvent.emit(UiEvent.ShowMessage("장바구니에 담았습니다."))
             } catch (e: Exception) {
                 _uiEvent.emit(UiEvent.ShowMessage("장바구니 담기에 실패했습니다."))
@@ -130,7 +138,8 @@ class ShoppingViewModel(
                 val nextCount = target.count + updateAmount
                 if(nextCount >= 1) {
                     cartRepository.updateCount(target.id, nextCount)
-                    fetchCart()
+                    updateKnownCartItemCount(target.id, nextCount)
+                    updateKnownCartProductCount(updateAmount)
                 }
             }
         }
@@ -142,7 +151,8 @@ class ShoppingViewModel(
                 val target = cart.value.findById(id)
                 if (target != null) {
                     cartRepository.deleteCartItem(target.id)
-                    fetchCart()
+                    removeKnownCartItem(target.id)
+                    updateKnownCartProductCount(-target.count)
                     _uiEvent.emit(UiEvent.ShowMessage("상품을 삭제했습니다."))
                 }
             } catch (e: Exception) {
@@ -163,8 +173,32 @@ class ShoppingViewModel(
         fetchProducts(currentIndex.value)
     }
 
+    private fun updateKnownCartItemCount(
+        id: Long,
+        count: Int,
+    ) {
+        _cart.update { cart ->
+            PurchaseProducts(
+                cart.purchaseProducts.map {
+                    if (it.id == id) it.copy(count = count) else it
+                },
+            )
+        }
+    }
+
+    private fun removeKnownCartItem(id: Long) {
+        _cart.update { cart ->
+            PurchaseProducts(cart.purchaseProducts.filter { it.id != id })
+        }
+    }
+
+    private fun updateKnownCartProductCount(amount: Int) {
+        _cartProductCount.update { (it + amount).coerceAtLeast(0) }
+    }
+
     companion object {
         private val PAGE_SIZE = 20
+        private const val CART_PAGE_SIZE = 5
     }
 }
 
