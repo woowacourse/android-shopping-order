@@ -4,6 +4,7 @@ import android.content.Context
 import kotlinx.coroutines.CoroutineScope
 import woowacourse.shopping.data.datasource.remote.cart.RetrofitShoppingCartRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.order.RetrofitOrderRemoteDataSource
+import woowacourse.shopping.data.datasource.remote.payment.RetrofitCouponRemoteDataSource
 import woowacourse.shopping.data.datasource.remote.product.RetrofitProductRemoteDataSource
 import woowacourse.shopping.data.local.datastore.DataStoreVisitStore
 import woowacourse.shopping.data.local.datastore.VisitStore
@@ -11,7 +12,9 @@ import woowacourse.shopping.data.remote.retrofit.RetrofitService
 import woowacourse.shopping.data.repository.cart.ShoppingCartRepositoryImpl
 import woowacourse.shopping.data.repository.item.ShoppingItemRepositoryImpl
 import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
+import woowacourse.shopping.data.repository.payment.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
+import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
@@ -53,5 +56,13 @@ class AppContainer(
         DataStoreVisitStore(
             context = context,
             scope = applicationScope,
+        )
+
+    val couponRepository: CouponRepository =
+        CouponRepositoryImpl(
+            couponRemoteDataSource =
+                RetrofitCouponRemoteDataSource(
+                    retrofitService.couponApiService,
+                ),
         )
 }

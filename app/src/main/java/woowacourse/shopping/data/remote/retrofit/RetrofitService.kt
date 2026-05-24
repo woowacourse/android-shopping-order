@@ -9,6 +9,7 @@ import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.remote.AcceptHeaderInterceptor
 import woowacourse.shopping.data.remote.AuthHeaderProvider
 import woowacourse.shopping.data.remote.AuthInterceptor
+import woowacourse.shopping.data.remote.retrofit.api.CouponRetrofitInterface
 import woowacourse.shopping.data.remote.retrofit.api.OrderRetrofitInterface
 import woowacourse.shopping.data.remote.retrofit.api.ProductRetrofitInterface
 import woowacourse.shopping.data.remote.retrofit.api.ShoppingCartRetrofitInterface
@@ -43,4 +44,6 @@ class RetrofitService(
         retrofit.create(ProductRetrofitInterface::class.java)
     val shoppingCartApiService: ShoppingCartRetrofitInterface =
         retrofit.create(ShoppingCartRetrofitInterface::class.java)
+    val couponApiService: CouponRetrofitInterface =
+        retrofit.create(CouponRetrofitInterface::class.java)
 }
