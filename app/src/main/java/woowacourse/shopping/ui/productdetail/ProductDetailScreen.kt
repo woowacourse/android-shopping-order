@@ -193,24 +193,18 @@ private fun ProductDetailInfo(
 @Preview(showBackground = true)
 @Composable
 private fun ProductDetailScreenPreview1() {
+    val mockProduct = Product(
+            imageUri = "hello",
+            name = "너무너무너무긴아이템이름",
+            price = 100000,
+            category = "a",
+            id = 1L,
+        )
+
     ProductDetailScreen(
-        product =
-            Product(
-                imageUri = "hello",
-                name = "너무너무너무긴아이템이름",
-                price = 100000,
-                category = "a",
-                id = 1L,
-            ),
+        product = mockProduct,
         count = 0,
-        lastViewedProduct =
-            Product(
-                imageUri = "hello",
-                name = "너무너무너무긴아이템이름",
-                price = 100000,
-                category = "a",
-                id = 1L,
-            ),
+        lastViewedProduct = mockProduct,
         onLastViewedClick = {},
         onAddRequest = {},
         onClose = {},

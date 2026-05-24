@@ -155,12 +155,20 @@ private fun ProductPrice(
 @Preview
 @Composable
 private fun CartItemPreview() {
+    val mockCartProduct = CartInfo(
+            id = 1L,
+            productImageUrl = "",
+            productName = "리자몽",
+            formattedPrice = "10,000원",
+            quantity = 1,
+        )
+
     CartItem(
-        product = CartInfo.PREVIEW,
+        product = mockCartProduct,
         onAdd = { id, count -> },
         onMinus = { id, count -> },
         onDelete = { },
-        onCheckedChanged = {  },
-        isChecked = true
+        onCheckedChanged = { },
+        isChecked = true,
     )
 }

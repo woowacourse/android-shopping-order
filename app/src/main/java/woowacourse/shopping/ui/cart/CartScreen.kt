@@ -234,16 +234,19 @@ private fun btnAvailable(btnFlag: Boolean): Color = if (btnFlag) Color(0xFF04C09
 @Preview
 @Composable
 private fun CartScreenPreview() {
+    val mockCartProduct = CartInfo(
+            id = 1L,
+            productImageUrl = "",
+            productName = "리자몽",
+            formattedPrice = "10,000원",
+            quantity = 1,
+        )
+    val mockCartProducts = List(4) { index -> mockCartProduct.copy(id = index + 1L) }
+
     CartScreen(
         uiState =
             CartUiState(
-                cartItems =
-                    listOf(
-                        CartInfo.PREVIEW,
-                        CartInfo.PREVIEW,
-                        CartInfo.PREVIEW,
-                        CartInfo.PREVIEW,
-                    ),
+                cartItems = mockCartProducts,
                 currentPage = 0,
                 isPageable = true,
                 previousEnable = false,
@@ -251,7 +254,7 @@ private fun CartScreenPreview() {
                 isLoading = true,
                 totalPrice = 10000,
                 totalCount = 10000,
-                checkedItemIds = listOf(CartInfo.PREVIEW.id),
+                checkedItemIds = listOf(mockCartProduct.id),
             ),
         onClose = {},
         onAdd = { id, type -> },

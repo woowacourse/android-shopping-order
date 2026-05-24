@@ -154,29 +154,14 @@ private fun RecommendationBody(
 @Preview(showBackground = true)
 @Composable
 internal fun CartRecommendationScreenPreview() {
-    val mockProducts = Products(listOf(
-        Product(
+    val mockProduct = Product(
             category = "default",
-            id = 1,
+            id = 1L,
             imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
             name = "PET보틀-정사각형(400ml)",
-            price = 10000
-        ),
-        Product(
-            category = "default",
-            id = 2,
-            imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
-            name ="PET보틀-정사각형(400ml)",
-            price = 10000
-        ),
-        Product(
-            category = "default",
-            id = 3,
-            imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
-            name ="PET보틀-정사각형(400ml)",
-            price = 10000
+            price = 10000,
         )
-    ))
+    val mockProducts = Products(List(3) { index -> mockProduct.copy(id = index + 1L) })
 
     CartRecommendationScreen(
         recommendedProducts = mockProducts,
@@ -184,11 +169,11 @@ internal fun CartRecommendationScreenPreview() {
         totalCount = 3,
         onBackClick = {},
         onOrderClick = {},
-        onAddInCart = {  },
+        onAddInCart = { },
         onAdd = { id, amount -> },
         onMinus = { id, amount -> },
-        onDelete = {  },
-        onItemClick = {  },
+        onDelete = { },
+        onItemClick = { },
         isContainedInCart = { false },
         itemCount = { 0 },
     )

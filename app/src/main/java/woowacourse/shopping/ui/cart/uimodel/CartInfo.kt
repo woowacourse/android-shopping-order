@@ -10,18 +10,7 @@ data class CartInfo(
     val productName: String,
     val formattedPrice: String,
     val quantity: Int,
-) {
-    companion object {
-        val PREVIEW =
-            CartInfo(
-                id = 1L,
-                productImageUrl = "",
-                productName = "리자몽",
-                formattedPrice = "10,000원",
-                quantity = 1,
-            )
-    }
-}
+)
 
 fun PurchaseProduct.toUiModel(): CartInfo =
     CartInfo(

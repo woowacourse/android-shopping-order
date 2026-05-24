@@ -210,73 +210,14 @@ private fun LoadBtn(
 @Preview(showBackground = true)
 @Composable
 private fun CatalogScreenPreview() {
-    val catalog =
-        Products(
-            listOf(
-                Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),
-                Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),
-            ),
+    val mockProduct = Product(
+            imageUri = "hello",
+            name = "너무너무너무긴아이템이름",
+            price = 100000,
+            category = "카테고리",
+            id = 1L,
         )
+    val catalog = Products(List(10) { index -> mockProduct.copy(id = index + 1L) })
 
     CatalogScreen(
         catalog,
@@ -299,66 +240,15 @@ private fun CatalogScreenPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun CatalogScreenPreview2() {
-    val catalog =
-        Products(
-            listOf(
-                Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),Product(
-                    imageUri = "hello",
-                    name = "너무너무너무긴아이템이름",
-                    price = 100000,
-                    category = "카테고리",
-                    id = 1L,
-                ),
-            ),
+    val previewProduct =
+        Product(
+            imageUri = "hello",
+            name = "너무너무너무긴아이템이름",
+            price = 100000,
+            category = "카테고리",
+            id = 1L,
         )
+    val catalog = Products(List(9) { index -> previewProduct.copy(id = index + 1L) })
 
     CatalogScreen(
         catalog,

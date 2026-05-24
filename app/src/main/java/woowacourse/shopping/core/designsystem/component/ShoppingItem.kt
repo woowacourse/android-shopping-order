@@ -119,15 +119,17 @@ fun Int.toPriceString(): String {
 @Preview(showBackground = true)
 @Composable
 private fun ShoppingItemPreview1() {
-    ShoppingItem(
-        { 0 },
-        Product(
+    val mockProduct = Product(
             imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
             name = "매우매우긴상품명입니다",
             price = 1000000000,
             category = "카테고리",
-            id = 1,
-        ),
+            id = 1L,
+        )
+
+    ShoppingItem(
+        { 0 },
+        mockProduct,
         onClick = {},
         onAdd = {},
         onMinus = {},
@@ -140,15 +142,18 @@ private fun ShoppingItemPreview1() {
 @Preview(showBackground = true)
 @Composable
 private fun ShoppingItemPreview2() {
-    ShoppingItem(
-        { 1 },
+    val previewProduct =
         Product(
             imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
             name = "매우매우긴상품명입니다",
             price = 1000000000,
             category = "카테고리",
-            id = 1,
-        ),
+            id = 1L,
+        )
+
+    ShoppingItem(
+        { 1 },
+        previewProduct,
         onClick = {},
         onAdd = {},
         onMinus = {},

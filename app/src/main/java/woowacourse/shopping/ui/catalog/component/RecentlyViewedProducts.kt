@@ -53,68 +53,17 @@ fun RecentlyViewedProducts(
 @Preview(showBackground = true)
 @Composable
 private fun RecentlyViewedProductsPreview() {
+    val mockProduct = Product(
+            imageUri = "hello",
+            name = "너무너무너무긴아이템이름",
+            price = 100000,
+            category = "카테고리",
+            id = 1L,
+        )
+    val previewProducts = Products(List(9) { index -> mockProduct.copy(id = index + 1L) })
+
     RecentlyViewedProducts(
-        Products(
-            products =
-                listOf(
-                    Product(
-                        imageUri = "hello",
-                        name = "너무너무너무긴아이템이름",
-                        price = 100000,
-                        category = "카테고리",
-                        id = 1L,
-                    ),
-                    Product(
-                        imageUri = "hello",
-                        name = "너무너무너무긴아이템이름",
-                        price = 100000,
-                        category = "카테고리",
-                        id = 1L,
-                    ),Product(
-                        imageUri = "hello",
-                        name = "너무너무너무긴아이템이름",
-                        price = 100000,
-                        category = "카테고리",
-                        id = 1L,
-                    ),Product(
-                        imageUri = "hello",
-                        name = "너무너무너무긴아이템이름",
-                        price = 100000,
-                        category = "카테고리",
-                        id = 1L,
-                    ),Product(
-                        imageUri = "hello",
-                        name = "너무너무너무긴아이템이름",
-                        price = 100000,
-                        category = "카테고리",
-                        id = 1L,
-                    ),Product(
-                        imageUri = "hello",
-                        name = "너무너무너무긴아이템이름",
-                        price = 100000,
-                        category = "카테고리",
-                        id = 1L,
-                    ),Product(
-                        imageUri = "hello",
-                        name = "너무너무너무긴아이템이름",
-                        price = 100000,
-                        category = "카테고리",
-                        id = 1L,
-                    ),Product(
-                        imageUri = "hello",
-                        name = "너무너무너무긴아이템이름",
-                        price = 100000,
-                        category = "카테고리",
-                        id = 1L,
-                    ),Product(
-                        imageUri = "hello",
-                        name = "너무너무너무긴아이템이름",
-                        price = 100000,
-                        category = "카테고리",
-                        id = 1L,
-                    ),
-                ),
-        ),
+        previewProducts,
         onClick = { },
     )
 }
