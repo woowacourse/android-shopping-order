@@ -1,6 +1,10 @@
 package woowacourse.shopping
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import woowacourse.shopping.data.local.NotificationSettingStorage
 import woowacourse.shopping.data.local.UserAuthDataStore
 import woowacourse.shopping.data.local.database.DataBase
@@ -15,6 +19,8 @@ import woowacourse.shopping.data.remote.server.service.CartService
 import woowacourse.shopping.data.remote.server.service.CouponService
 import woowacourse.shopping.data.remote.server.service.OrderService
 import woowacourse.shopping.data.remote.server.service.ProductService
+import woowacourse.shopping.ui.alarm.AlarmScheduler
+import woowacourse.shopping.ui.alarm.PaymentAlarmReceiver
 import kotlin.jvm.java
 
 class ShoppingApplication : Application() {
@@ -73,10 +79,29 @@ class ShoppingApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         notificationSetting = NotificationSettingStorage(this)
+        alarmScheduler = AlarmScheduler(this)
+        createNotificationChannel()
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "payment reminder"
+            val descriptionText = "결제 미완료시 알림 표시"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(
+                PaymentAlarmReceiver.CHANNEL_ID,
+                name,
+                importance
+            ).apply { description = descriptionText }
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
     }
 
     companion object {
         lateinit var notificationSetting: NotificationSettingStorage
+            private set
+        lateinit var alarmScheduler: AlarmScheduler
             private set
     }
 }
