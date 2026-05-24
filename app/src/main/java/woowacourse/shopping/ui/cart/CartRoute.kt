@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -38,17 +37,18 @@ fun CartRoute(
                 when (event) {
                     is CartEvent.SnackbarEvent -> {
                         snackbatJob?.cancel()
-                        snackbatJob = launch {
-                            snackbarHostState.showSnackbar(
-                                event.errorMsg
-                            )
-                        }
+                        snackbatJob =
+                            launch {
+                                snackbarHostState.showSnackbar(
+                                    event.errorMsg,
+                                )
+                            }
                     }
 
                     is CartEvent.UpdateCount ->
                         viewModel.updateCountWithID(
                             id = event.targetId,
-                            updateAmount = event.updateAmount
+                            updateAmount = event.updateAmount,
                         )
 
                     is CartEvent.RemoveFromCart ->
@@ -60,12 +60,13 @@ fun CartRoute(
 
                     is CartEvent.NavigateToShopping -> navController.popBackStack()
 
-                    is CartEvent.NavigateToRecommendation -> navController.navigate(
-                        Recommendation(
-                            totalPrice = event.totalPrice,
-                            checkedIds = event.checkedIds
+                    is CartEvent.NavigateToRecommendation ->
+                        navController.navigate(
+                            Recommendation(
+                                totalPrice = event.totalPrice,
+                                checkedIds = event.checkedIds,
+                            ),
                         )
-                    )
                 }
             }
         }
@@ -101,7 +102,7 @@ fun CartRoute(
             onOrderClick = {
                 viewModel.navigateToRecommendation(
                     totalPrice = uiState.totalPrice,
-                    checkedIds = uiState.checkedItemIds
+                    checkedIds = uiState.checkedItemIds,
                 )
             },
             modifier = Modifier.padding(innerPadding),

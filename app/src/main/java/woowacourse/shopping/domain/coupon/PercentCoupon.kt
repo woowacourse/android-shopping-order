@@ -14,7 +14,7 @@ data class PercentCoupon(
     val endTime: LocalTime,
 ) : Coupon {
     override fun isEligible(order: Order): Boolean {
-        if(isExpired(order.currentTime)) return false
+        if (isExpired(order.currentTime)) return false
         val time = order.currentTime.toLocalTime()
         return time in startTime..endTime
     }
@@ -23,5 +23,4 @@ data class PercentCoupon(
         val discountAmount = (order.totalProductPrice * discountPercent).toInt()
         return Discount(productDiscount = discountAmount)
     }
-
 }

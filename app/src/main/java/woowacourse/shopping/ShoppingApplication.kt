@@ -89,11 +89,12 @@ class ShoppingApplication : Application() {
             val name = "payment reminder"
             val descriptionText = "결제 미완료시 알림 표시"
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(
-                PaymentAlarmReceiver.CHANNEL_ID,
-                name,
-                importance
-            ).apply { description = descriptionText }
+            val channel =
+                NotificationChannel(
+                    PaymentAlarmReceiver.CHANNEL_ID,
+                    name,
+                    importance,
+                ).apply { description = descriptionText }
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }

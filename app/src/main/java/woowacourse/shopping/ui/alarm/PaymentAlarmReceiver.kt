@@ -14,36 +14,43 @@ import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.MainActivity
 
 class PaymentAlarmReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         val shoppingContext = context.applicationContext
 
         val notificationSetting = ShoppingApplication.notificationSetting
         if (!notificationSetting.isNotificationEnabled()) return
 
-        val toPaymentIntent = Intent(shoppingContext, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("navigate_to", "payment")
-        }
+        val toPaymentIntent =
+            Intent(shoppingContext, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                putExtra("navigate_to", "payment")
+            }
 
-        val tapIntent = PendingIntent.getActivity(
-            shoppingContext,
-            PENDING_REQUEST_CODE,
-            toPaymentIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val tapIntent =
+            PendingIntent.getActivity(
+                shoppingContext,
+                PENDING_REQUEST_CODE,
+                toPaymentIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
 
-        val builder = NotificationCompat.Builder(shoppingContext, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(PAYMENT_NOTIFICATION_TITLE)
-            .setContentText(PAYMENT_NOTIFICATION_CONTENT)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentIntent(tapIntent)
-            .setAutoCancel(true)
+        val builder =
+            NotificationCompat
+                .Builder(shoppingContext, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle(PAYMENT_NOTIFICATION_TITLE)
+                .setContentText(PAYMENT_NOTIFICATION_CONTENT)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(tapIntent)
+                .setAutoCancel(true)
 
         val notificationManager = NotificationManagerCompat.from(shoppingContext)
         if (ActivityCompat.checkSelfPermission(
                 shoppingContext,
-                Manifest.permission.POST_NOTIFICATIONS
+                Manifest.permission.POST_NOTIFICATIONS,
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             notificationManager.notify(NOTIFICATION_ID, builder.build())

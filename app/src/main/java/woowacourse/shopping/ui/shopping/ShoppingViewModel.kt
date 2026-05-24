@@ -28,11 +28,12 @@ class ShoppingViewModel(
     private val productRepository: ProductRepository,
     private val notificationSettingStorage: NotificationSettingStorage,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(
-        ShoppingUiState(
-            notificationAllowed = notificationSettingStorage.isNotificationEnabled()
+    private val _uiState =
+        MutableStateFlow(
+            ShoppingUiState(
+                notificationAllowed = notificationSettingStorage.isNotificationEnabled(),
+            ),
         )
-    )
     val uiState = _uiState.asStateFlow()
 
     private val _event = MutableSharedFlow<ShoppingEvent>()
@@ -74,9 +75,10 @@ class ShoppingViewModel(
                     }
                     _uiState.update {
                         it.copy(
-                            recentlyViewedProducts = Products(
-                                recentlyViewedProducts
-                            )
+                            recentlyViewedProducts =
+                                Products(
+                                    recentlyViewedProducts,
+                                ),
                         )
                     }
                 }
@@ -100,27 +102,33 @@ class ShoppingViewModel(
                 }
             }
 
-            is ApiResult.Error -> _event.emit(
-                ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${result.code}")
-            )
+            is ApiResult.Error ->
+                _event.emit(
+                    ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${result.code}"),
+                )
 
-            is ApiResult.Exception -> _event.emit(
-                ShoppingEvent.ShowSnackBar("${ViewModelConst.ERROR_LABEL} ${result.e.message}")
-            )
+            is ApiResult.Exception ->
+                _event.emit(
+                    ShoppingEvent.ShowSnackBar("${ViewModelConst.ERROR_LABEL} ${result.e.message}"),
+                )
         }
     }
 
     suspend fun fetchCart() {
-        when (val allCartItemResult =
-            cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)) {
+        when (
+            val allCartItemResult =
+                cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
+        ) {
             is ApiResult.Success -> _uiState.update { it.copy(cart = allCartItemResult.data) }
-            is ApiResult.Error -> _event.emit(
-                ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${allCartItemResult.code}")
-            )
+            is ApiResult.Error ->
+                _event.emit(
+                    ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${allCartItemResult.code}"),
+                )
 
-            is ApiResult.Exception -> _event.emit(
-                ShoppingEvent.ShowSnackBar("${ViewModelConst.ERROR_LABEL} ${allCartItemResult.e.message}")
-            )
+            is ApiResult.Exception ->
+                _event.emit(
+                    ShoppingEvent.ShowSnackBar("${ViewModelConst.ERROR_LABEL} ${allCartItemResult.e.message}"),
+                )
         }
     }
 
@@ -139,13 +147,15 @@ class ShoppingViewModel(
                         fetchCart()
                     }
 
-                    is ApiResult.Error -> _event.emit(
-                        ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${result.code}")
-                    )
+                    is ApiResult.Error ->
+                        _event.emit(
+                            ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${result.code}"),
+                        )
 
-                    is ApiResult.Exception -> _event.emit(
-                        ShoppingEvent.ShowSnackBar("${ViewModelConst.ERROR_LABEL} ${result.e.message}")
-                    )
+                    is ApiResult.Exception ->
+                        _event.emit(
+                            ShoppingEvent.ShowSnackBar("${ViewModelConst.ERROR_LABEL} ${result.e.message}"),
+                        )
                 }
             }
         }
@@ -166,13 +176,15 @@ class ShoppingViewModel(
                             fetchCart()
                         }
 
-                        is ApiResult.Error -> _event.emit(
-                            ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${result.code}")
-                        )
+                        is ApiResult.Error ->
+                            _event.emit(
+                                ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${result.code}"),
+                            )
 
-                        is ApiResult.Exception -> _event.emit(
-                            ShoppingEvent.ShowSnackBar("${ViewModelConst.ERROR_LABEL} ${result.e.message}")
-                        )
+                        is ApiResult.Exception ->
+                            _event.emit(
+                                ShoppingEvent.ShowSnackBar("${ViewModelConst.ERROR_LABEL} ${result.e.message}"),
+                            )
                     }
                 }
             }
@@ -214,8 +226,8 @@ class ShoppingViewModel(
             _event.emit(
                 ShoppingEvent.NavigateToProductDetail(
                     selectedProductId = selectedId,
-                    lastViewedProductId = lastViewProductId.value
-                )
+                    lastViewedProductId = lastViewProductId.value,
+                ),
             )
         }
     }
@@ -223,18 +235,21 @@ class ShoppingViewModel(
     fun addToCartTrigger(purchaseProduct: PurchaseProduct) {
         viewModelScope.launch {
             _event.emit(
-                ShoppingEvent.AddToCart(purchaseProduct)
+                ShoppingEvent.AddToCart(purchaseProduct),
             )
         }
     }
 
-    fun updateCountTrigger(productId: Long, updateAmount: Int) {
+    fun updateCountTrigger(
+        productId: Long,
+        updateAmount: Int,
+    ) {
         viewModelScope.launch {
             _event.emit(
                 ShoppingEvent.UpdateCount(
                     productID = productId,
-                    updateAmount = updateAmount
-                )
+                    updateAmount = updateAmount,
+                ),
             )
         }
     }
@@ -242,7 +257,7 @@ class ShoppingViewModel(
     fun removeFromCartTrigger(purchaseProductId: Long) {
         viewModelScope.launch {
             _event.emit(
-                ShoppingEvent.RemoveFormCart(purchaseProductId)
+                ShoppingEvent.RemoveFormCart(purchaseProductId),
             )
         }
     }
@@ -250,7 +265,7 @@ class ShoppingViewModel(
     fun loadMoreTrigger() {
         viewModelScope.launch {
             _event.emit(
-                ShoppingEvent.LoadMore
+                ShoppingEvent.LoadMore,
             )
         }
     }
@@ -283,7 +298,7 @@ class ShoppingViewModelFactory(
                 cartRepository,
                 recentlyViewedProductRepository,
                 productRepository,
-                notificationSettingStorage
+                notificationSettingStorage,
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

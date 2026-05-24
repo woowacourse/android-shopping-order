@@ -7,6 +7,6 @@ import woowacourse.shopping.data.remote.server.dto.order.OrderRequest
 interface OrderService {
     @POST("orders")
     suspend fun requestOrder(
-        @Body request: OrderRequest
+        @Body request: OrderRequest,
     )
 }

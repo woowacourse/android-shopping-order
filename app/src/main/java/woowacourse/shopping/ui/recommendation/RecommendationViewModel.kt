@@ -69,15 +69,15 @@ class RecommendationViewModel(
                         is ApiResult.Error ->
                             _event.emit(
                                 RecommendationEvent.SnackbarEvent(
-                                    "${ViewModelConst.NETWORK_ERROR_LABEL}${categoryProductsResult.message}"
-                                )
+                                    "${ViewModelConst.NETWORK_ERROR_LABEL}${categoryProductsResult.message}",
+                                ),
                             )
 
                         is ApiResult.Exception ->
                             _event.emit(
                                 RecommendationEvent.SnackbarEvent(
-                                    "${ViewModelConst.ERROR_LABEL}${categoryProductsResult.e.message}"
-                                )
+                                    "${ViewModelConst.ERROR_LABEL}${categoryProductsResult.e.message}",
+                                ),
                             )
                     }
                 }
@@ -85,37 +85,39 @@ class RecommendationViewModel(
                 is ApiResult.Error ->
                     _event.emit(
                         RecommendationEvent.SnackbarEvent(
-                            "${ViewModelConst.NETWORK_ERROR_LABEL}${productResult.code}"
-                        )
+                            "${ViewModelConst.NETWORK_ERROR_LABEL}${productResult.code}",
+                        ),
                     )
 
                 is ApiResult.Exception ->
                     _event.emit(
                         RecommendationEvent.SnackbarEvent(
-                            "${ViewModelConst.ERROR_LABEL}${productResult.e.message}"
-                        )
+                            "${ViewModelConst.ERROR_LABEL}${productResult.e.message}",
+                        ),
                     )
             }
         }
     }
 
     suspend fun fetchCart() {
-        when (val allCartItemResult =
-            cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)) {
+        when (
+            val allCartItemResult =
+                cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
+        ) {
             is ApiResult.Success -> _uiState.update { it.copy(cart = allCartItemResult.data) }
 
             is ApiResult.Error ->
                 _event.emit(
                     RecommendationEvent.SnackbarEvent(
-                        "${ViewModelConst.NETWORK_ERROR_LABEL}${allCartItemResult.code}"
-                    )
+                        "${ViewModelConst.NETWORK_ERROR_LABEL}${allCartItemResult.code}",
+                    ),
                 )
 
             is ApiResult.Exception ->
                 _event.emit(
                     RecommendationEvent.SnackbarEvent(
-                        "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}"
-                    )
+                        "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}",
+                    ),
                 )
         }
     }
@@ -146,15 +148,15 @@ class RecommendationViewModel(
                     is ApiResult.Error ->
                         _event.emit(
                             RecommendationEvent.SnackbarEvent(
-                                "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}"
-                            )
+                                "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}",
+                            ),
                         )
 
                     is ApiResult.Exception ->
                         _event.emit(
                             RecommendationEvent.SnackbarEvent(
-                                "${ViewModelConst.ERROR_LABEL}${result.e.message}"
-                            )
+                                "${ViewModelConst.ERROR_LABEL}${result.e.message}",
+                            ),
                         )
                 }
             } else {
@@ -171,15 +173,15 @@ class RecommendationViewModel(
                     is ApiResult.Error ->
                         _event.emit(
                             RecommendationEvent.SnackbarEvent(
-                                "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}"
-                            )
+                                "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}",
+                            ),
                         )
 
                     is ApiResult.Exception ->
                         _event.emit(
                             RecommendationEvent.SnackbarEvent(
-                                "${ViewModelConst.ERROR_LABEL}${result.e.message}"
-                            )
+                                "${ViewModelConst.ERROR_LABEL}${result.e.message}",
+                            ),
                         )
                 }
             }
@@ -204,15 +206,15 @@ class RecommendationViewModel(
                         is ApiResult.Error ->
                             _event.emit(
                                 RecommendationEvent.SnackbarEvent(
-                                    "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}"
-                                )
+                                    "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}",
+                                ),
                             )
 
                         is ApiResult.Exception ->
                             _event.emit(
                                 RecommendationEvent.SnackbarEvent(
-                                    "${ViewModelConst.ERROR_LABEL}${result.e.message}"
-                                )
+                                    "${ViewModelConst.ERROR_LABEL}${result.e.message}",
+                                ),
                             )
                     }
                 }
@@ -234,15 +236,15 @@ class RecommendationViewModel(
                     is ApiResult.Error ->
                         _event.emit(
                             RecommendationEvent.SnackbarEvent(
-                                "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}"
-                            )
+                                "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}",
+                            ),
                         )
 
                     is ApiResult.Exception ->
                         _event.emit(
                             RecommendationEvent.SnackbarEvent(
-                                "${ViewModelConst.ERROR_LABEL}${result.e.message}"
-                            )
+                                "${ViewModelConst.ERROR_LABEL}${result.e.message}",
+                            ),
                         )
                 }
             }
@@ -253,19 +255,22 @@ class RecommendationViewModel(
         viewModelScope.launch {
             _event.emit(
                 RecommendationEvent.AddToCart(
-                    purchaseProduct
-                )
+                    purchaseProduct,
+                ),
             )
         }
     }
 
-    fun updateAmountTrigger(targetId: Long, updateAmount: Int) {
+    fun updateAmountTrigger(
+        targetId: Long,
+        updateAmount: Int,
+    ) {
         viewModelScope.launch {
             _event.emit(
                 RecommendationEvent.UpdateAmount(
                     targetID = targetId,
-                    updateAmount = updateAmount
-                )
+                    updateAmount = updateAmount,
+                ),
             )
         }
     }
@@ -273,7 +278,7 @@ class RecommendationViewModel(
     fun removeFromCartTrigger(targetId: Long) {
         viewModelScope.launch {
             _event.emit(
-                RecommendationEvent.RemoveFromCart(targetId)
+                RecommendationEvent.RemoveFromCart(targetId),
             )
         }
     }
@@ -283,7 +288,7 @@ class RecommendationViewModel(
             outstandingProductRepository.deleteAll()
             outstandingProductRepository.insertAll(checkedIds)
             _event.emit(
-                RecommendationEvent.NavigateToPayment(checkedIds)
+                RecommendationEvent.NavigateToPayment(checkedIds),
             )
         }
     }
@@ -291,7 +296,7 @@ class RecommendationViewModel(
     fun navigateToCart() {
         viewModelScope.launch {
             _event.emit(
-                RecommendationEvent.NavigateToCart
+                RecommendationEvent.NavigateToCart,
             )
         }
     }

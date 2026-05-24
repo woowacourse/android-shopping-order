@@ -15,10 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import woowacourse.shopping.R
 import woowacourse.shopping.domain.coupon.BuyXGetYCoupon
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.FixedCoupon
@@ -28,32 +30,29 @@ import woowacourse.shopping.ui.shopping.items.toPriceString
 import java.time.LocalDate
 import java.time.LocalTime
 
-import androidx.compose.ui.res.stringResource
-import woowacourse.shopping.R
-
 @Composable
 fun CouponItem(
     coupon: Coupon,
     isSelected: Boolean,
     onSelect: (Coupon) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(104.dp)
-            .border(
-                width = 1.dp,
-                color = Color(0xFFAAAAAA),
-                shape = RoundedCornerShape(4.dp),
-            )
-            .clickable(
-                onClick = { onSelect(coupon) }
-            )
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(104.dp)
+                .border(
+                    width = 1.dp,
+                    color = Color(0xFFAAAAAA),
+                    shape = RoundedCornerShape(4.dp),
+                ).clickable(
+                    onClick = { onSelect(coupon) },
+                ),
     ) {
         Row(
             horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(
                 checked = isSelected,
@@ -65,7 +64,7 @@ fun CouponItem(
                 text = coupon.description,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.W700,
-                color = Color(0xFF555555)
+                color = Color(0xFF555555),
             )
         }
         Text(
@@ -73,34 +72,36 @@ fun CouponItem(
             fontWeight = FontWeight.W400,
             fontSize = 12.sp,
             color = Color(0xFF555555),
-            modifier = Modifier.padding(start = 16.dp)
+            modifier = Modifier.padding(start = 16.dp),
         )
-        when(coupon){
-            is FixedCoupon -> Text(
-                text = stringResource(R.string.label_min_order_amount, coupon.minimumAmount.toPriceString()),
-                fontWeight = FontWeight.W400,
-                fontSize = 12.sp,
-                color = Color(0xFF555555),
-                modifier = Modifier.padding(start = 16.dp)
-            )
+        when (coupon) {
+            is FixedCoupon ->
+                Text(
+                    text = stringResource(R.string.label_min_order_amount, coupon.minimumAmount.toPriceString()),
+                    fontWeight = FontWeight.W400,
+                    fontSize = 12.sp,
+                    color = Color(0xFF555555),
+                    modifier = Modifier.padding(start = 16.dp),
+                )
 
-            is FreeShippingCoupon -> Text(
-                text = stringResource(R.string.label_min_order_amount, coupon.minimumAmount.toPriceString()),
-                fontWeight = FontWeight.W400,
-                fontSize = 12.sp,
-                color = Color(0xFF555555),
-                modifier = Modifier.padding(start = 16.dp)
-            )
+            is FreeShippingCoupon ->
+                Text(
+                    text = stringResource(R.string.label_min_order_amount, coupon.minimumAmount.toPriceString()),
+                    fontWeight = FontWeight.W400,
+                    fontSize = 12.sp,
+                    color = Color(0xFF555555),
+                    modifier = Modifier.padding(start = 16.dp),
+                )
 
-            is PercentCoupon -> Text(
-                text = stringResource(R.string.label_available_time, coupon.startTime, coupon.endTime),
-                fontWeight = FontWeight.W400,
-                fontSize = 12.sp,
-                color = Color(0xFF555555),
-                modifier = Modifier.padding(start = 16.dp)
-            )
+            is PercentCoupon ->
+                Text(
+                    text = stringResource(R.string.label_available_time, coupon.startTime, coupon.endTime),
+                    fontWeight = FontWeight.W400,
+                    fontSize = 12.sp,
+                    color = Color(0xFF555555),
+                    modifier = Modifier.padding(start = 16.dp),
+                )
         }
-
     }
 }
 
@@ -108,16 +109,17 @@ fun CouponItem(
 @Composable
 private fun CouponItemPreview1() {
     CouponItem(
-        coupon = FixedCoupon(
-            id = 1,
-            code = "asd",
-            description = "5000원 할인 쿠폰",
-            expirationDate = LocalDate.now(),
-            discountAmount = 5000,
-            minimumAmount = 100000
-        ),
+        coupon =
+            FixedCoupon(
+                id = 1,
+                code = "asd",
+                description = "5000원 할인 쿠폰",
+                expirationDate = LocalDate.now(),
+                discountAmount = 5000,
+                minimumAmount = 100000,
+            ),
         isSelected = true,
-        onSelect = {  },
+        onSelect = { },
     )
 }
 
@@ -125,15 +127,16 @@ private fun CouponItemPreview1() {
 @Composable
 private fun CouponItemPreview2() {
     CouponItem(
-        coupon = FreeShippingCoupon(
-            id = 2,
-            code = "fads",
-            description = "무료 배송 쿠폰",
-            expirationDate = LocalDate.now(),
-            minimumAmount = 0
-        ),
+        coupon =
+            FreeShippingCoupon(
+                id = 2,
+                code = "fads",
+                description = "무료 배송 쿠폰",
+                expirationDate = LocalDate.now(),
+                minimumAmount = 0,
+            ),
         isSelected = false,
-        onSelect = {  },
+        onSelect = { },
     )
 }
 
@@ -141,17 +144,18 @@ private fun CouponItemPreview2() {
 @Composable
 private fun CouponItemPreview3() {
     CouponItem(
-        coupon = PercentCoupon(
-            id = 3,
-            code = "asd",
-            description = "점심시간 15% 할인 쿠폰",
-            expirationDate = LocalDate.now(),
-            discountPercent = 0.15,
-            startTime = LocalTime.of(11, 0),
-            endTime = LocalTime.of(14, 0),
-        ),
+        coupon =
+            PercentCoupon(
+                id = 3,
+                code = "asd",
+                description = "점심시간 15% 할인 쿠폰",
+                expirationDate = LocalDate.now(),
+                discountPercent = 0.15,
+                startTime = LocalTime.of(11, 0),
+                endTime = LocalTime.of(14, 0),
+            ),
         isSelected = false,
-        onSelect = {  },
+        onSelect = { },
     )
 }
 
@@ -159,15 +163,16 @@ private fun CouponItemPreview3() {
 @Composable
 private fun CouponItemPreview4() {
     CouponItem(
-        coupon = BuyXGetYCoupon(
-            id = 4,
-            code = "sdhja",
-            description = "3+1 쿠폰",
-            expirationDate = LocalDate.now(),
-            buyQuantity = 3,
-            getQuantity = 1
-        ),
+        coupon =
+            BuyXGetYCoupon(
+                id = 4,
+                code = "sdhja",
+                description = "3+1 쿠폰",
+                expirationDate = LocalDate.now(),
+                buyQuantity = 3,
+                getQuantity = 1,
+            ),
         isSelected = true,
-        onSelect = {  },
+        onSelect = { },
     )
 }

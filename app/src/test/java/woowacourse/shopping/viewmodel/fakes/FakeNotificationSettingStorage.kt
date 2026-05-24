@@ -9,7 +9,5 @@ class FakeNotificationSettingStorage : NotificationSettingStorage {
         isEnabled = enabled
     }
 
-    override fun isNotificationEnabled(): Boolean {
-        return isEnabled
-    }
+    override fun isNotificationEnabled(): Boolean = isEnabled
 }

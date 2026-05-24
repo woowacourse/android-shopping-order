@@ -5,7 +5,5 @@ import woowacourse.shopping.data.remote.server.repository.OrderRepository
 import woowacourse.shopping.domain.Order
 
 class FakeOrderRepository : OrderRepository {
-    override suspend fun order(order: Order): ApiResult<Unit> {
-        return ApiResult.Success(Unit)
-    }
+    override suspend fun order(order: Order): ApiResult<Unit> = ApiResult.Success(Unit)
 }

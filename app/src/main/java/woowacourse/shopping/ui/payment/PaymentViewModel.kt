@@ -29,9 +29,7 @@ class PaymentViewModel(
     private val outstandingProductRepository: OutstandingProductRepository,
     private val settingStorage: NotificationSettingStorage,
     private val alarmScheduler: AlarmScheduler,
-
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(PaymentUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -40,7 +38,7 @@ class PaymentViewModel(
 
     init {
         alarmScheduler.cancel()
-        if(settingStorage.isNotificationEnabled()) {
+        if (settingStorage.isNotificationEnabled()) {
             alarmScheduler.createAlarmSchedule(ALARM_DELAY)
         }
         fetchInitialData()
@@ -56,27 +54,29 @@ class PaymentViewModel(
 
             if (cartResult is ApiResult.Success && couponResult is ApiResult.Success) {
                 val checkedProducts = cartResult.data.purchaseProducts.filter { it.id in checkedItemIds }
-                val order = Order(
-                    purchaseProducts = checkedProducts,
-                    currentTime = LocalDateTime.now(),
-                    isRemoteArea = false
-                )
+                val order =
+                    Order(
+                        purchaseProducts = checkedProducts,
+                        currentTime = LocalDateTime.now(),
+                        isRemoteArea = false,
+                    )
                 _uiState.update {
                     it.copy(
                         order = order,
                         coupons = couponResult.data,
-                        isLoading = false
+                        isLoading = false,
                     )
                 }
             } else {
                 _uiState.update { it.copy(isLoading = false) }
-                val errorMessage = when {
-                    cartResult is ApiResult.Error -> "${ViewModelConst.NETWORK_ERROR_LABEL}${cartResult.code}"
-                    cartResult is ApiResult.Exception -> "${ViewModelConst.ERROR_LABEL}${cartResult.e.message}"
-                    couponResult is ApiResult.Error -> "${ViewModelConst.NETWORK_ERROR_LABEL}${couponResult.code}"
-                    couponResult is ApiResult.Exception -> "${ViewModelConst.ERROR_LABEL}${couponResult.e.message}"
-                    else -> "Unknown Error"
-                }
+                val errorMessage =
+                    when {
+                        cartResult is ApiResult.Error -> "${ViewModelConst.NETWORK_ERROR_LABEL}${cartResult.code}"
+                        cartResult is ApiResult.Exception -> "${ViewModelConst.ERROR_LABEL}${cartResult.e.message}"
+                        couponResult is ApiResult.Error -> "${ViewModelConst.NETWORK_ERROR_LABEL}${couponResult.code}"
+                        couponResult is ApiResult.Exception -> "${ViewModelConst.ERROR_LABEL}${couponResult.e.message}"
+                        else -> "Unknown Error"
+                    }
                 _event.emit(PaymentEvent.SnackbarEvent(errorMessage))
             }
         }
@@ -88,7 +88,7 @@ class PaymentViewModel(
                 val discount = coupon?.calculateDiscount(state.order) ?: Discount()
                 state.copy(
                     selectedCoupon = coupon,
-                    discount = discount
+                    discount = discount,
                 )
             }
         }
@@ -100,20 +100,21 @@ class PaymentViewModel(
                 is ApiResult.Success -> {
                     alarmScheduler.cancel()
                     _event.emit(
-                        PaymentEvent.SnackbarEvent("주문이 완료되었습니다.")
+                        PaymentEvent.SnackbarEvent("주문이 완료되었습니다."),
                     )
                     _event.emit(
-                        PaymentEvent.NavigateToShopping
+                        PaymentEvent.NavigateToShopping,
                     )
                 }
-                is ApiResult.Error -> _event.emit(
-                    PaymentEvent.SnackbarEvent("${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}")
-                )
-                is ApiResult.Exception -> _event.emit(
-                    PaymentEvent.SnackbarEvent("${ViewModelConst.ERROR_LABEL}${result.e.message}")
-                )
+                is ApiResult.Error ->
+                    _event.emit(
+                        PaymentEvent.SnackbarEvent("${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}"),
+                    )
+                is ApiResult.Exception ->
+                    _event.emit(
+                        PaymentEvent.SnackbarEvent("${ViewModelConst.ERROR_LABEL}${result.e.message}"),
+                    )
             }
-
         }
     }
 
@@ -151,7 +152,7 @@ class PaymentViewModelFactory(
                 couponRepository = couponRepository,
                 outstandingProductRepository = outstandingProductRepository,
                 settingStorage = settingStorage,
-                alarmScheduler = alarmScheduler
+                alarmScheduler = alarmScheduler,
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

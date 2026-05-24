@@ -1,7 +1,6 @@
 package woowacourse.shopping.ui.payment
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -46,7 +45,7 @@ fun PaymentScreen(
     discount: Discount,
     onOrder: () -> Unit,
     onClose: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     CommonFrame(
         headerContent = {
@@ -54,15 +53,17 @@ fun PaymentScreen(
                 onClose = onClose,
             )
         },
-        bodyContent = { PaymentBody(
-            coupons = coupons,
-            order = order,
-            selectedCoupon = selectedCoupon,
-            onCouponSelect = onCouponSelect,
-            discount = discount,
-            onOrder = onOrder,
-        ) },
-        modifier = modifier.fillMaxSize()
+        bodyContent = {
+            PaymentBody(
+                coupons = coupons,
+                order = order,
+                selectedCoupon = selectedCoupon,
+                onCouponSelect = onCouponSelect,
+                discount = discount,
+                onOrder = onOrder,
+            )
+        },
+        modifier = modifier.fillMaxSize(),
     )
 }
 
@@ -72,7 +73,8 @@ private fun PaymentHeader(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
+        modifier =
+            modifier
                 .fillMaxSize(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -103,22 +105,22 @@ fun PaymentBody(
     onCouponSelect: (Coupon?) -> Unit,
     discount: Discount,
     onOrder: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) {
         CouponList(
             order = order,
             coupons = coupons,
             selectedCoupon = selectedCoupon,
             onCouponSelect = onCouponSelect,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
         HorizontalDivider()
         ReceiptItem(
             order = order,
-            discount = discount
+            discount = discount,
         )
         OrderBtn(onOrder = onOrder)
     }
@@ -128,50 +130,52 @@ fun PaymentBody(
 @Composable
 private fun PaymentScreenPreview() {
     PaymentScreen(
-        coupons = listOf(
-            FixedCoupon(
-                id = 1,
-                code = "asd",
-                description = "5000원 할인 쿠폰",
-                expirationDate = LocalDate.now(),
-                discountAmount = 5000,
-                minimumAmount = 100000
+        coupons =
+            listOf(
+                FixedCoupon(
+                    id = 1,
+                    code = "asd",
+                    description = "5000원 할인 쿠폰",
+                    expirationDate = LocalDate.now(),
+                    discountAmount = 5000,
+                    minimumAmount = 100000,
+                ),
+                FreeShippingCoupon(
+                    id = 2,
+                    code = "fads",
+                    description = "무료 배송 쿠폰",
+                    expirationDate = LocalDate.now(),
+                    minimumAmount = 0,
+                ),
+                PercentCoupon(
+                    id = 3,
+                    code = "asd",
+                    description = "점심시간 15% 할인 쿠폰",
+                    expirationDate = LocalDate.now(),
+                    discountPercent = 0.15,
+                    startTime = LocalTime.of(11, 0),
+                    endTime = LocalTime.of(14, 0),
+                ),
+                BuyXGetYCoupon(
+                    id = 4,
+                    code = "sdhja",
+                    description = "3+1 쿠폰",
+                    expirationDate = LocalDate.now(),
+                    buyQuantity = 3,
+                    getQuantity = 1,
+                ),
             ),
-            FreeShippingCoupon(
-                id = 2,
-                code = "fads",
-                description = "무료 배송 쿠폰",
-                expirationDate = LocalDate.now(),
-                minimumAmount = 0
+        order =
+            Order(
+                purchaseProducts = emptyList(),
+                shippingFee = 3000,
+                currentTime = LocalDateTime.now(),
+                isRemoteArea = false,
             ),
-            PercentCoupon(
-                id = 3,
-                code = "asd",
-                description = "점심시간 15% 할인 쿠폰",
-                expirationDate = LocalDate.now(),
-                discountPercent = 0.15,
-                startTime = LocalTime.of(11, 0),
-                endTime = LocalTime.of(14, 0),
-            ),
-            BuyXGetYCoupon(
-                id = 4,
-                code = "sdhja",
-                description = "3+1 쿠폰",
-                expirationDate = LocalDate.now(),
-                buyQuantity = 3,
-                getQuantity = 1
-            )
-        ),
-        order = Order(
-            purchaseProducts = emptyList(),
-            shippingFee = 3000,
-            currentTime = LocalDateTime.now(),
-            isRemoteArea = false
-        ),
         discount = Discount(),
         onOrder = { },
         selectedCoupon = null,
-        onCouponSelect = {  },
-        onClose = {  },
+        onCouponSelect = { },
+        onClose = { },
     )
 }

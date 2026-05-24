@@ -31,8 +31,8 @@ import woowacourse.shopping.R
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.Products
 import woowacourse.shopping.domain.PurchaseProduct
-import woowacourse.shopping.ui.common.frame.CommonFrame
 import woowacourse.shopping.ui.cart.item.CartCountLabel
+import woowacourse.shopping.ui.common.frame.CommonFrame
 import woowacourse.shopping.ui.shopping.items.LoadCatalog
 import woowacourse.shopping.ui.shopping.items.RecentlyViewedProducts
 import woowacourse.shopping.ui.shopping.items.ShoppingItem
@@ -111,14 +111,15 @@ private fun CatalogHeader(
             Icon(
                 painter = painterResource(R.drawable.ic_notification),
                 contentDescription = stringResource(R.string.cb_notification_icon),
-                tint = Color.White
+                tint = Color.White,
             )
             Switch(
                 checked = allowNotification,
                 onCheckedChange = { onSwitchNotification() },
-                colors = SwitchDefaults.colors(
-                    checkedTrackColor = Color(0xFF04C09E)
-                )
+                colors =
+                    SwitchDefaults.colors(
+                        checkedTrackColor = Color(0xFF04C09E),
+                    ),
             )
         }
         Row {
@@ -229,7 +230,6 @@ private fun LoadBtn(
                 .clickable(onClick = onLoad),
     )
 }
-
 
 @Preview(showBackground = true)
 @Composable

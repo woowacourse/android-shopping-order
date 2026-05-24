@@ -44,18 +44,19 @@ import woowacourse.shopping.ui.shopping.ShoppingViewModelFactory
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 
 class MainActivity : ComponentActivity() {
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        ShoppingApplication.notificationSetting.setNotificationEnabled(isGranted)
-    }
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) { isGranted ->
+            ShoppingApplication.notificationSetting.setNotificationEnabled(isGranted)
+        }
 
     private fun checkNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val permission = Manifest.permission.POST_NOTIFICATIONS
             if (ContextCompat.checkSelfPermission(
                     this,
-                    permission
+                    permission,
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
                 requestPermissionLauncher.launch(permission)
@@ -87,33 +88,37 @@ class MainActivity : ComponentActivity() {
                         startDestination = Shopping,
                     ) {
                         composable<Shopping> {
-                            val viewModel: ShoppingViewModel = viewModel(
-                                factory = ShoppingViewModelFactory(
-                                    cartRepository = app.cartRepository,
-                                    recentlyViewedProductRepository = app.recentlyViewedProductRepository,
-                                    productRepository = app.productRepository,
-                                    notificationSettingStorage = ShoppingApplication.notificationSetting,
+                            val viewModel: ShoppingViewModel =
+                                viewModel(
+                                    factory =
+                                        ShoppingViewModelFactory(
+                                            cartRepository = app.cartRepository,
+                                            recentlyViewedProductRepository = app.recentlyViewedProductRepository,
+                                            productRepository = app.productRepository,
+                                            notificationSettingStorage = ShoppingApplication.notificationSetting,
+                                        ),
                                 )
-                            )
                             ShoppingRoute(
                                 viewModel = viewModel,
                                 navController = navController,
-                                modifier = Modifier.padding(innerPadding)
+                                modifier = Modifier.padding(innerPadding),
                             )
                         }
 
                         composable<ProductDetail> { backStackEntry ->
                             val route: ProductDetail = backStackEntry.toRoute()
 
-                            val viewModel: ProductDetailViewModel = viewModel(
-                                factory = ProductDetailViewModelFactory(
-                                    cartRepository = app.cartRepository,
-                                    recentlyViewedProductRepository = app.recentlyViewedProductRepository,
-                                    productRepository = app.productRepository,
-                                    selectedProductId = route.selectedProductId,
-                                    lastViewedProductId = route.lastViewedProductId
+                            val viewModel: ProductDetailViewModel =
+                                viewModel(
+                                    factory =
+                                        ProductDetailViewModelFactory(
+                                            cartRepository = app.cartRepository,
+                                            recentlyViewedProductRepository = app.recentlyViewedProductRepository,
+                                            productRepository = app.productRepository,
+                                            selectedProductId = route.selectedProductId,
+                                            lastViewedProductId = route.lastViewedProductId,
+                                        ),
                                 )
-                            )
                             ProductDetailRoute(
                                 viewModel = viewModel,
                                 navController = navController,
@@ -122,53 +127,59 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable<Cart> {
-                            val viewModel: CartViewModel = viewModel(
-                                factory = CartViewModelFactory(
-                                    cartRepository = app.cartRepository
+                            val viewModel: CartViewModel =
+                                viewModel(
+                                    factory =
+                                        CartViewModelFactory(
+                                            cartRepository = app.cartRepository,
+                                        ),
                                 )
-                            )
                             CartRoute(
                                 viewModel = viewModel,
                                 navController = navController,
-                                modifier = Modifier.padding(innerPadding)
+                                modifier = Modifier.padding(innerPadding),
                             )
                         }
 
                         composable<Recommendation> { backStackEntry ->
                             val route: Recommendation = backStackEntry.toRoute()
 
-                            val viewModel: RecommendationViewModel = viewModel(
-                                factory = RecommendationViewModelFactory(
-                                    cartRepository = app.cartRepository,
-                                    productRepository = app.productRepository,
-                                    recentlyViewedProductRepository = app.recentlyViewedProductRepository,
-                                    outstandingProductRepository = app.outstandingProductRepository,
-                                    initPrice = route.totalPrice,
-                                    initCheckItemIds = route.checkedIds,
+                            val viewModel: RecommendationViewModel =
+                                viewModel(
+                                    factory =
+                                        RecommendationViewModelFactory(
+                                            cartRepository = app.cartRepository,
+                                            productRepository = app.productRepository,
+                                            recentlyViewedProductRepository = app.recentlyViewedProductRepository,
+                                            outstandingProductRepository = app.outstandingProductRepository,
+                                            initPrice = route.totalPrice,
+                                            initCheckItemIds = route.checkedIds,
+                                        ),
                                 )
-                            )
                             RecommendationRoute(
                                 viewModel = viewModel,
                                 navController = navController,
-                                modifier = Modifier.padding(innerPadding)
+                                modifier = Modifier.padding(innerPadding),
                             )
                         }
 
                         composable<Payment> {
-                            val viewModel: PaymentViewModel = viewModel(
-                                factory = PaymentViewModelFactory(
-                                    cartRepository = app.cartRepository,
-                                    couponRepository = app.couponRepository,
-                                    orderRepository = app.orderRepository,
-                                    outstandingProductRepository = app.outstandingProductRepository,
-                                    settingStorage = ShoppingApplication.notificationSetting,
-                                    alarmScheduler = ShoppingApplication.alarmScheduler
+                            val viewModel: PaymentViewModel =
+                                viewModel(
+                                    factory =
+                                        PaymentViewModelFactory(
+                                            cartRepository = app.cartRepository,
+                                            couponRepository = app.couponRepository,
+                                            orderRepository = app.orderRepository,
+                                            outstandingProductRepository = app.outstandingProductRepository,
+                                            settingStorage = ShoppingApplication.notificationSetting,
+                                            alarmScheduler = ShoppingApplication.alarmScheduler,
+                                        ),
                                 )
-                            )
                             PaymentRoute(
                                 viewModel = viewModel,
                                 navController = navController,
-                                modifier = Modifier.padding(innerPadding)
+                                modifier = Modifier.padding(innerPadding),
                             )
                         }
                     }

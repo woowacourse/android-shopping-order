@@ -6,7 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class OrderRequest(
     @SerialName("cartItemIds")
-    val ids: List<Long>
-) {
-
-}
+    val ids: List<Long>,
+)

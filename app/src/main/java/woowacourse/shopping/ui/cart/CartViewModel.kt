@@ -59,7 +59,7 @@ class CartViewModel(
             } else {
                 val errorMsg = getErrorMessage(allItemsResult, pagedItemsResult)
                 _event.emit(
-                    CartEvent.SnackbarEvent(errorMsg)
+                    CartEvent.SnackbarEvent(errorMsg),
                 )
             }
         }
@@ -96,8 +96,8 @@ class CartViewModel(
                     }
                     _event.emit(
                         CartEvent.SnackbarEvent(
-                            "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}"
-                        )
+                            "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}",
+                        ),
                     )
                 }
 
@@ -107,8 +107,8 @@ class CartViewModel(
                     }
                     _event.emit(
                         CartEvent.SnackbarEvent(
-                            "${ViewModelConst.ERROR_LABEL}${result.e.message}"
-                        )
+                            "${ViewModelConst.ERROR_LABEL}${result.e.message}",
+                        ),
                     )
                 }
             }
@@ -134,8 +134,8 @@ class CartViewModel(
                     }
                     _event.emit(
                         CartEvent.SnackbarEvent(
-                            "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}"
-                        )
+                            "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}",
+                        ),
                     )
                 }
 
@@ -145,8 +145,8 @@ class CartViewModel(
                     }
                     _event.emit(
                         CartEvent.SnackbarEvent(
-                            "${ViewModelConst.ERROR_LABEL}${result.e.message}"
-                        )
+                            "${ViewModelConst.ERROR_LABEL}${result.e.message}",
+                        ),
                     )
                 }
             }
@@ -207,31 +207,37 @@ class CartViewModel(
     fun navigateToShopping() {
         viewModelScope.launch {
             _event.emit(
-                CartEvent.NavigateToShopping
+                CartEvent.NavigateToShopping,
             )
         }
     }
 
-    fun navigateToRecommendation(totalPrice: Int, checkedIds: List<Long>) {
+    fun navigateToRecommendation(
+        totalPrice: Int,
+        checkedIds: List<Long>,
+    ) {
         if (checkedIds.isNotEmpty()) {
             viewModelScope.launch {
                 _event.emit(
                     CartEvent.NavigateToRecommendation(
                         totalPrice = totalPrice,
-                        checkedIds = checkedIds
-                    )
+                        checkedIds = checkedIds,
+                    ),
                 )
             }
         }
     }
 
-    fun updateAmountTrigger(targetId: Long, updateAmount: Int) {
+    fun updateAmountTrigger(
+        targetId: Long,
+        updateAmount: Int,
+    ) {
         viewModelScope.launch {
             _event.emit(
                 CartEvent.UpdateCount(
                     targetId = targetId,
-                    updateAmount = updateAmount
-                )
+                    updateAmount = updateAmount,
+                ),
             )
         }
     }
@@ -239,7 +245,7 @@ class CartViewModel(
     fun removeItemTrigger(targetId: Long) {
         viewModelScope.launch {
             _event.emit(
-                CartEvent.RemoveFromCart(targetId)
+                CartEvent.RemoveFromCart(targetId),
             )
         }
     }
@@ -247,7 +253,7 @@ class CartViewModel(
     fun nextPageTrigger() {
         viewModelScope.launch {
             _event.emit(
-                CartEvent.NextPage
+                CartEvent.NextPage,
             )
         }
     }
@@ -255,7 +261,7 @@ class CartViewModel(
     fun prevPageTrigger() {
         viewModelScope.launch {
             _event.emit(
-                CartEvent.PrevPage
+                CartEvent.PrevPage,
             )
         }
     }

@@ -11,6 +11,7 @@ interface Coupon {
     val expirationDate: LocalDate
 
     fun isEligible(order: Order): Boolean
+
     fun calculateDiscount(order: Order): Discount
 
     fun isExpired(now: LocalDateTime): Boolean = now.toLocalDate().isAfter(expirationDate)

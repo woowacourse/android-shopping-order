@@ -11,9 +11,7 @@ class FixedCoupon(
     val discountAmount: Int,
     val minimumAmount: Int,
 ) : Coupon {
-    override fun isEligible(order: Order): Boolean =
-        !isExpired(order.currentTime) && order.totalProductPrice >= minimumAmount
+    override fun isEligible(order: Order): Boolean = !isExpired(order.currentTime) && order.totalProductPrice >= minimumAmount
 
-    override fun calculateDiscount(order: Order): Discount =
-        Discount(productDiscount = discountAmount)
+    override fun calculateDiscount(order: Order): Discount = Discount(productDiscount = discountAmount)
 }

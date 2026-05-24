@@ -21,7 +21,7 @@ import woowacourse.shopping.ui.navigation.Shopping
 fun PaymentRoute(
     viewModel: PaymentViewModel,
     navController: NavController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -31,17 +31,19 @@ fun PaymentRoute(
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.event.collect { event ->
                 when (event) {
-                    is PaymentEvent.SnackbarEvent -> launch {
-                        snackbarHostState.showSnackbar(event.message)
-                    }
+                    is PaymentEvent.SnackbarEvent ->
+                        launch {
+                            snackbarHostState.showSnackbar(event.message)
+                        }
                     is PaymentEvent.Order -> viewModel.processOrder()
                     is PaymentEvent.NavigateBack -> navController.popBackStack()
-                    is PaymentEvent.NavigateToShopping -> navController
-                        .navigate(Shopping) {
-                            popUpTo<Shopping> {
-                                inclusive = false
+                    is PaymentEvent.NavigateToShopping ->
+                        navController
+                            .navigate(Shopping) {
+                                popUpTo<Shopping> {
+                                    inclusive = false
+                                }
                             }
-                        }
                 }
             }
         }
@@ -49,7 +51,7 @@ fun PaymentRoute(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        modifier = modifier
+        modifier = modifier,
     ) { innerPadding ->
         PaymentScreen(
             coupons = uiState.coupons,
@@ -59,7 +61,7 @@ fun PaymentRoute(
             discount = uiState.discount,
             onOrder = viewModel::orderTrigger,
             onClose = viewModel::navigateBack,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
         )
     }
 }

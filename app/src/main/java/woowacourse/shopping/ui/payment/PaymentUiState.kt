@@ -10,5 +10,5 @@ data class PaymentUiState(
     val order: Order = Order(emptyList(), currentTime = LocalDateTime.now(), isRemoteArea = false),
     val selectedCoupon: Coupon? = null,
     val discount: Discount = Discount(),
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
 )

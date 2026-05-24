@@ -41,30 +41,34 @@ fun ShoppingRoute(
                 when (event) {
                     is ShoppingEvent.ShowSnackBar -> {
                         snackbarJob?.cancel()
-                        snackbarJob = launch {
-                            snackbarHostState.showSnackbar(
-                                event.message,
-                            )
-                        }
+                        snackbarJob =
+                            launch {
+                                snackbarHostState.showSnackbar(
+                                    event.message,
+                                )
+                            }
                     }
 
                     is ShoppingEvent.NavigateToCart -> navController.navigate(Cart)
-                    is ShoppingEvent.NavigateToProductDetail -> navController.navigate(
-                        ProductDetail(
-                            selectedProductId = event.selectedProductId,
-                            lastViewedProductId = event.lastViewedProductId
+                    is ShoppingEvent.NavigateToProductDetail ->
+                        navController.navigate(
+                            ProductDetail(
+                                selectedProductId = event.selectedProductId,
+                                lastViewedProductId = event.lastViewedProductId,
+                            ),
                         )
-                    )
 
                     is ShoppingEvent.AddToCart -> viewModel.addToCart(event.purchaseProduct)
-                    is ShoppingEvent.UpdateCount -> viewModel.updateCountWithID(
-                        id = event.productID,
-                        updateAmount = event.updateAmount
-                    )
+                    is ShoppingEvent.UpdateCount ->
+                        viewModel.updateCountWithID(
+                            id = event.productID,
+                            updateAmount = event.updateAmount,
+                        )
 
-                    is ShoppingEvent.RemoveFormCart -> viewModel.removeWithID(
-                        event.purchaseProductId
-                    )
+                    is ShoppingEvent.RemoveFormCart ->
+                        viewModel.removeWithID(
+                            event.purchaseProductId,
+                        )
 
                     is ShoppingEvent.LoadMore -> viewModel.loadMore()
                 }
@@ -98,13 +102,13 @@ fun ShoppingRoute(
             onAdd = { id, updateAmount ->
                 viewModel.updateCountTrigger(
                     productId = id,
-                    updateAmount = updateAmount
+                    updateAmount = updateAmount,
                 )
             },
             onMinus = { id, updateAmount ->
                 viewModel.updateCountTrigger(
                     productId = id,
-                    updateAmount = updateAmount
+                    updateAmount = updateAmount,
                 )
             },
             onDelete = { viewModel.removeFromCartTrigger(it) },

@@ -39,11 +39,12 @@ fun RecommendationRoute(
                 when (event) {
                     is RecommendationEvent.SnackbarEvent -> {
                         snackbarJob?.cancel()
-                        snackbarJob = launch {
-                            snackbarHostState.showSnackbar(
-                                event.errorMsg
-                            )
-                        }
+                        snackbarJob =
+                            launch {
+                                snackbarHostState.showSnackbar(
+                                    event.errorMsg,
+                                )
+                            }
                     }
 
                     is RecommendationEvent.AddToCart ->
@@ -52,7 +53,7 @@ fun RecommendationRoute(
                     is RecommendationEvent.UpdateAmount ->
                         viewModel.updateCountWithID(
                             id = event.targetID,
-                            updateAmount = event.updateAmount
+                            updateAmount = event.updateAmount,
                         )
 
                     is RecommendationEvent.RemoveFromCart ->

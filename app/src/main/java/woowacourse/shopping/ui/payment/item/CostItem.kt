@@ -17,7 +17,7 @@ import woowacourse.shopping.ui.shopping.items.toPriceString
 fun CostItem(
     label: String,
     cost: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -44,6 +44,6 @@ fun CostItem(
 private fun CostItemPreview() {
     CostItem(
         label = "총 결제 금액",
-        cost = 202000
+        cost = 202000,
     )
 }

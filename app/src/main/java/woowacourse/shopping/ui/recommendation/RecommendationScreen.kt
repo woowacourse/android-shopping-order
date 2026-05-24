@@ -28,8 +28,8 @@ import woowacourse.shopping.R
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.Products
 import woowacourse.shopping.domain.PurchaseProduct
-import woowacourse.shopping.ui.common.frame.CommonFrame
 import woowacourse.shopping.ui.cart.item.CartBottomBar
+import woowacourse.shopping.ui.common.frame.CommonFrame
 import woowacourse.shopping.ui.shopping.items.ShoppingItem
 
 @Composable
@@ -143,7 +143,7 @@ private fun RecommendationBody(
                     onAdd = { onAdd(product.id, 1) },
                     onMinus = { onMinus(product.id, -1) },
                     onDelete = { onDelete(product.id) },
-                    onClick = {  },
+                    onClick = { },
                 )
             }
         }

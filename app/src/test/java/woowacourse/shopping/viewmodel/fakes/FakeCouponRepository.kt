@@ -11,7 +11,5 @@ class FakeCouponRepository : CouponRepository {
         coupons = newCoupons
     }
 
-    override suspend fun getCoupons(): ApiResult<List<Coupon>> {
-        return ApiResult.Success(coupons)
-    }
+    override suspend fun getCoupons(): ApiResult<List<Coupon>> = ApiResult.Success(coupons)
 }

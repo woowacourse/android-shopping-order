@@ -28,9 +28,9 @@ import androidx.compose.ui.unit.sp
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.ui.common.frame.CommonFrame
-import woowacourse.shopping.ui.productdetail.item.LastViewedProduct
 import woowacourse.shopping.ui.common.item.ProductImage
 import woowacourse.shopping.ui.common.item.QuantitySelector
+import woowacourse.shopping.ui.productdetail.item.LastViewedProduct
 import woowacourse.shopping.ui.shopping.items.toPriceString
 
 @Composable

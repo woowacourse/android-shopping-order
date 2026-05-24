@@ -18,9 +18,10 @@ android {
     }
 
     defaultConfig {
-        val properties = Properties().apply {
-            load(project.rootProject.file("local.properties").inputStream())
-        }
+        val properties =
+            Properties().apply {
+                load(project.rootProject.file("local.properties").inputStream())
+            }
 
         applicationId = "woowacourse.shopping"
         minSdk = 26

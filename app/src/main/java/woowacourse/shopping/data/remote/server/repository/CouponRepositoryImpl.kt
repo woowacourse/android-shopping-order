@@ -8,7 +8,7 @@ import woowacourse.shopping.data.remote.server.service.CouponService
 import woowacourse.shopping.domain.coupon.Coupon
 
 class CouponRepositoryImpl(
-    private val couponService: CouponService
+    private val couponService: CouponService,
 ) : CouponRepository {
     override suspend fun getCoupons(): ApiResult<List<Coupon>> =
         try {

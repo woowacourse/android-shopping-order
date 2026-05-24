@@ -38,18 +38,19 @@ fun ProductDetailRoute(
                 when (event) {
                     is ProductDetailEvent.SnackbarEvent -> {
                         snackbarJob?.cancel()
-                        snackbarJob = launch {
-                            snackbarHostState.showSnackbar(
-                                event.errorMsg,
-                            )
-                        }
+                        snackbarJob =
+                            launch {
+                                snackbarHostState.showSnackbar(
+                                    event.errorMsg,
+                                )
+                            }
                     }
                     is ProductDetailEvent.MoveToLastViewedProductDetail ->
                         navController.navigate(
                             ProductDetail(
                                 selectedProductId = event.lastViewedProductId,
-                            )
-                        ){
+                            ),
+                        ) {
                             popUpTo<Shopping>()
                         }
                     is ProductDetailEvent.MoveToShopping ->

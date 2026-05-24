@@ -4,7 +4,7 @@ import woowacourse.shopping.data.local.dao.OutstandingProductDao
 import woowacourse.shopping.data.local.entity.OutstandingProductEntity
 
 class OutstandingProductRepositoryImpl(
-    private val outstandingProductDao: OutstandingProductDao
+    private val outstandingProductDao: OutstandingProductDao,
 ) : OutstandingProductRepository {
     override suspend fun getAll(): List<Long> {
         val items = outstandingProductDao.getAll()

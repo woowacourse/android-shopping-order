@@ -37,15 +37,16 @@ class ProductDetailViewModel(
             val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
             when (allCartItemResult) {
                 is ApiResult.Success -> _cart.update { allCartItemResult.data }
-                is ApiResult.Error -> _event.emit(
-                    ProductDetailEvent.SnackbarEvent(
-                        "${ViewModelConst.NETWORK_ERROR_LABEL}${allCartItemResult.code}"
+                is ApiResult.Error ->
+                    _event.emit(
+                        ProductDetailEvent.SnackbarEvent(
+                            "${ViewModelConst.NETWORK_ERROR_LABEL}${allCartItemResult.code}",
+                        ),
                     )
-                )
 
                 is ApiResult.Exception ->
                     ProductDetailEvent.SnackbarEvent(
-                        "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}"
+                        "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}",
                     )
             }
             fetchProduct()
@@ -76,8 +77,8 @@ class ProductDetailViewModel(
                             }
                             _event.emit(
                                 ProductDetailEvent.SnackbarEvent(
-                                    "${ViewModelConst.NETWORK_ERROR_LABEL}${lastViewedProductResult.code}"
-                                )
+                                    "${ViewModelConst.NETWORK_ERROR_LABEL}${lastViewedProductResult.code}",
+                                ),
                             )
                         }
 
@@ -88,7 +89,7 @@ class ProductDetailViewModel(
                             _event.emit(
                                 ProductDetailEvent.SnackbarEvent(
                                     "${ViewModelConst.ERROR_LABEL}${lastViewedProductResult.e.message}",
-                                )
+                                ),
                             )
                         }
                     }
@@ -97,17 +98,19 @@ class ProductDetailViewModel(
                 }
             }
 
-            is ApiResult.Error -> _event.emit(
-                ProductDetailEvent.SnackbarEvent(
-                    "${ViewModelConst.NETWORK_ERROR_LABEL}${selectedProductResult.code}"
+            is ApiResult.Error ->
+                _event.emit(
+                    ProductDetailEvent.SnackbarEvent(
+                        "${ViewModelConst.NETWORK_ERROR_LABEL}${selectedProductResult.code}",
+                    ),
                 )
-            )
 
-            is ApiResult.Exception -> _event.emit(
-                ProductDetailEvent.SnackbarEvent(
-                    "${ViewModelConst.ERROR_LABEL}${selectedProductResult.e.message}"
+            is ApiResult.Exception ->
+                _event.emit(
+                    ProductDetailEvent.SnackbarEvent(
+                        "${ViewModelConst.ERROR_LABEL}${selectedProductResult.e.message}",
+                    ),
                 )
-            )
         }
     }
 
@@ -144,7 +147,7 @@ class ProductDetailViewModel(
     fun moveToLastViewedProduct(productId: Long) {
         viewModelScope.launch {
             _event.emit(
-                ProductDetailEvent.MoveToLastViewedProductDetail(productId)
+                ProductDetailEvent.MoveToLastViewedProductDetail(productId),
             )
         }
     }
@@ -152,7 +155,7 @@ class ProductDetailViewModel(
     fun moveToShopping() {
         viewModelScope.launch {
             _event.emit(
-                ProductDetailEvent.MoveToShopping
+                ProductDetailEvent.MoveToShopping,
             )
         }
     }

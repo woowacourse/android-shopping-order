@@ -11,23 +11,27 @@ import java.time.LocalTime
 
 class PercentCouponTest {
     private val expirationDate = LocalDate.of(2026, 12, 31)
-    private val coupon = PercentCoupon(
-        id = 2,
-        code = "PERCENT10",
-        description = "10% 할인",
-        expirationDate = expirationDate,
-        discountPercent = 0.1,
-        startTime = LocalTime.of(10, 0),
-        endTime = LocalTime.of(22, 0)
-    )
+    private val coupon =
+        PercentCoupon(
+            id = 2,
+            code = "PERCENT10",
+            description = "10% 할인",
+            expirationDate = expirationDate,
+            discountPercent = 0.1,
+            startTime = LocalTime.of(10, 0),
+            endTime = LocalTime.of(22, 0),
+        )
 
-    private fun createOrder(totalPrice: Int, currentTime: LocalDateTime): Order {
+    private fun createOrder(
+        totalPrice: Int,
+        currentTime: LocalDateTime,
+    ): Order {
         val product = Product("카테고리", 1L, "uri", "상품", totalPrice)
         val purchaseProduct = PurchaseProduct(1, product, 1)
         return Order(
             purchaseProducts = listOf(purchaseProduct),
             currentTime = currentTime,
-            isRemoteArea = false
+            isRemoteArea = false,
         )
     }
 

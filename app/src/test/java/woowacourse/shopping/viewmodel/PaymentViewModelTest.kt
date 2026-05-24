@@ -47,77 +47,86 @@ class PaymentViewModelTest {
     }
 
     private fun initViewModel() {
-        viewModel = PaymentViewModel(
-            cartRepository = cartRepository,
-            orderRepository = orderRepository,
-            couponRepository = couponRepository,
-            outstandingProductRepository = outstandingProductRepository,
-            settingStorage = notificationStorage,
-            alarmScheduler = alarmScheduler
-        )
+        viewModel =
+            PaymentViewModel(
+                cartRepository = cartRepository,
+                orderRepository = orderRepository,
+                couponRepository = couponRepository,
+                outstandingProductRepository = outstandingProductRepository,
+                settingStorage = notificationStorage,
+                alarmScheduler = alarmScheduler,
+            )
     }
 
     @Test
-    fun `초기화 시 장바구니에서 선택된 상품들만 주문 목록에 포함한다`() = runTest {
-        // given
-        val product1 = Product("과자", 1L, "uri", "상품1", 1000)
-        val product2 = Product("음료", 2L, "uri", "상품2", 2000)
-        val pp1 = PurchaseProduct(10L, product1, 2)
-        val pp2 = PurchaseProduct(20L, product2, 1)
-        
-        cartRepository.insert(pp1)
-        cartRepository.insert(pp2)
-        outstandingProductRepository.insertAll(listOf(10L))
+    fun `초기화 시 장바구니에서 선택된 상품들만 주문 목록에 포함한다`() =
+        runTest {
+            // given
+            val product1 = Product("과자", 1L, "uri", "상품1", 1000)
+            val product2 = Product("음료", 2L, "uri", "상품2", 2000)
+            val pp1 = PurchaseProduct(10L, product1, 2)
+            val pp2 = PurchaseProduct(20L, product2, 1)
 
-        // when
-        initViewModel()
+            cartRepository.insert(pp1)
+            cartRepository.insert(pp2)
+            outstandingProductRepository.insertAll(listOf(10L))
 
-        // then
-        assertEquals(1, viewModel.uiState.value.order.purchaseProducts.size)
-        assertEquals(10L, viewModel.uiState.value.order.purchaseProducts[0].id)
-        assertEquals(2000, viewModel.uiState.value.order.totalProductPrice)
-    }
+            // when
+            initViewModel()
 
-    @Test
-    fun `쿠폰을 선택하면 할인 금액이 계산된다`() = runTest {
-        // given
-        val product = Product("과자", 1L, "uri", "상품1", 10000)
-        val pp = PurchaseProduct(10L, product, 1)
-        cartRepository.insert(pp)
-        outstandingProductRepository.insertAll(listOf(10L))
-        
-        val coupon = FixedCoupon(1, "FIXED", "1000원 할인", LocalDate.now().plusDays(7), 1000, 5000)
-        couponRepository.setCoupons(listOf(coupon))
-
-        initViewModel()
-
-        // when
-        viewModel.selectCoupon(coupon)
-
-        // then
-        assertEquals(coupon, viewModel.uiState.value.selectedCoupon)
-        assertEquals(1000, viewModel.uiState.value.discount.totalAmount)
-    }
-
-    @Test
-    fun `주문 성공 시 쇼핑 화면으로 이동한다`() = runTest {
-        // given
-        initViewModel()
-        testScheduler.advanceUntilIdle()
-        val initialCancelCount = alarmScheduler.cancelCalledCount
-
-        val events = mutableListOf<PaymentEvent>()
-        val collectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.event.collect { events.add(it) }
+            // then
+            assertEquals(1, viewModel.uiState.value.order.purchaseProducts.size)
+            assertEquals(
+                10L,
+                viewModel.uiState.value.order.purchaseProducts[0]
+                    .id,
+            )
+            assertEquals(2000, viewModel.uiState.value.order.totalProductPrice)
         }
 
-        // when
-        viewModel.processOrder()
+    @Test
+    fun `쿠폰을 선택하면 할인 금액이 계산된다`() =
+        runTest {
+            // given
+            val product = Product("과자", 1L, "uri", "상품1", 10000)
+            val pp = PurchaseProduct(10L, product, 1)
+            cartRepository.insert(pp)
+            outstandingProductRepository.insertAll(listOf(10L))
 
-        // then
-        assertEquals(initialCancelCount + 1, alarmScheduler.cancelCalledCount)
-        assertTrue(events.contains(PaymentEvent.NavigateToShopping))
-        
-        collectJob.cancel()
-    }
+            val coupon = FixedCoupon(1, "FIXED", "1000원 할인", LocalDate.now().plusDays(7), 1000, 5000)
+            couponRepository.setCoupons(listOf(coupon))
+
+            initViewModel()
+
+            // when
+            viewModel.selectCoupon(coupon)
+
+            // then
+            assertEquals(coupon, viewModel.uiState.value.selectedCoupon)
+            assertEquals(1000, viewModel.uiState.value.discount.totalAmount)
+        }
+
+    @Test
+    fun `주문 성공 시 쇼핑 화면으로 이동한다`() =
+        runTest {
+            // given
+            initViewModel()
+            testScheduler.advanceUntilIdle()
+            val initialCancelCount = alarmScheduler.cancelCalledCount
+
+            val events = mutableListOf<PaymentEvent>()
+            val collectJob =
+                launch(UnconfinedTestDispatcher()) {
+                    viewModel.event.collect { events.add(it) }
+                }
+
+            // when
+            viewModel.processOrder()
+
+            // then
+            assertEquals(initialCancelCount + 1, alarmScheduler.cancelCalledCount)
+            assertTrue(events.contains(PaymentEvent.NavigateToShopping))
+
+            collectJob.cancel()
+        }
 }

@@ -26,10 +26,10 @@ val MIGRATION_6_7 =
             )
             db.execSQL(
                 """
-                    CREATE TABLE IF NOT EXISTS `outstanding_products` (
-                        `cartItemId` INTEGER NOT NULL PRIMARY KEY
-                    )
-                """.trimIndent()
+                CREATE TABLE IF NOT EXISTS `outstanding_products` (
+                    `cartItemId` INTEGER NOT NULL PRIMARY KEY
+                )
+                """.trimIndent(),
             )
         }
     }
@@ -40,6 +40,7 @@ val MIGRATION_6_7 =
 )
 abstract class DataBase : RoomDatabase() {
     abstract fun recentlyViewedProductDao(): RecentlyViewedProductDao
+
     abstract fun outstandingProductDao(): OutstandingProductDao
 
     companion object {

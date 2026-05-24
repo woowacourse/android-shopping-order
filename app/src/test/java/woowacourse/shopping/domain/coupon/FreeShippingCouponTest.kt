@@ -6,26 +6,29 @@ import woowacourse.shopping.domain.Order
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.PurchaseProduct
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 class FreeShippingCouponTest {
     private val expirationDate = LocalDate.of(2026, 12, 31)
-    private val coupon = FreeShippingCoupon(
-        id = 3,
-        code = "FREESHIP",
-        description = "무료 배송",
-        expirationDate = expirationDate,
-        minimumAmount = 15000
-    )
+    private val coupon =
+        FreeShippingCoupon(
+            id = 3,
+            code = "FREESHIP",
+            description = "무료 배송",
+            expirationDate = expirationDate,
+            minimumAmount = 15000,
+        )
 
-    private fun createOrder(totalPrice: Int, shippingFee: Int): Order {
+    private fun createOrder(
+        totalPrice: Int,
+        shippingFee: Int,
+    ): Order {
         val product = Product("카테고리", 1L, "uri", "상품", totalPrice)
         val purchaseProduct = PurchaseProduct(1, product, 1)
         return Order(
             purchaseProducts = listOf(purchaseProduct),
             shippingFee = shippingFee,
             currentTime = expirationDate.atStartOfDay(),
-            isRemoteArea = false
+            isRemoteArea = false,
         )
     }
 
