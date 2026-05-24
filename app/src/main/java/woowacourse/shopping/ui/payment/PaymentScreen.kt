@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package woowacourse.shopping.ui.payment
 
 import androidx.compose.foundation.Image
@@ -36,11 +38,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import java.text.DecimalFormat
 import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.CouponBenefit
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
+import java.text.DecimalFormat
 
 @Composable
 fun PaymentScreen(
@@ -55,7 +57,7 @@ fun PaymentScreen(
     onCouponCheckedChange: (Long, Boolean) -> Unit,
     onPaymentReminderEnabledChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    bottomContent: @Composable () -> Unit = {}
+    bottomContent: @Composable () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -274,7 +276,6 @@ private fun SummaryRow(
     }
 }
 
-
 @Composable
 fun PaymentButton(
     onPaymentButtonClick: () -> Unit,
@@ -349,4 +350,5 @@ private fun CouponCardPreview() {
         )
     }
 }
+
 private const val PRICE_FORMAT: String = "#,###원"

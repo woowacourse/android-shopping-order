@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.remote.retrofit
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import okhttp3.OkHttpClient
-import okhttp3.MediaType.Companion.toMediaType
 import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.remote.AcceptHeaderInterceptor

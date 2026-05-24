@@ -33,8 +33,8 @@ import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductTitle
 import woowacourse.shopping.domain.model.ShoppingItem
-import woowacourse.shopping.ui.component.ProductItem
 import woowacourse.shopping.ui.cart.ShoppingCartTopBar
+import woowacourse.shopping.ui.component.ProductItem
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 @Composable

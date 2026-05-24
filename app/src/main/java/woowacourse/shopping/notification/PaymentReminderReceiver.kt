@@ -29,8 +29,8 @@ class PaymentReminderReceiver : BroadcastReceiver() {
             Intent(context, ShoppingActivity::class.java).apply {
                 flags =
                     Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP
                 putExtra(EXTRA_OPEN_PAYMENT_FROM_REMINDER, true)
                 putExtra(EXTRA_SELECTED_PRODUCT_IDS, selectedProductIds)
             }

@@ -29,7 +29,8 @@ class RetrofitProductRemoteDataSource(
     }
 
     override suspend fun requestProductDetail(id: Long): Product =
-        apiService.requestProductDetail(
-            id = id,
-        ).toDomainProduct()
+        apiService
+            .requestProductDetail(
+                id = id,
+            ).toDomainProduct()
 }

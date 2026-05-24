@@ -2,10 +2,10 @@ package woowacourse.shopping.ui.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.datastore.VisitStore
 import woowacourse.shopping.domain.model.ShoppingItem
@@ -115,9 +115,7 @@ class DetailProductViewModel(
         )
     }
 
-    private fun resolveLastViewedProductId(
-        recentProductIds: List<Long>,
-    ): Long? = recentProductIds.firstOrNull()
+    private fun resolveLastViewedProductId(recentProductIds: List<Long>): Long? = recentProductIds.firstOrNull()
 
     data class DetailProductUiState(
         val shoppingItem: ShoppingItem? = null,

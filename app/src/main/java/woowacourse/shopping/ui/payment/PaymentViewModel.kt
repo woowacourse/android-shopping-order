@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalTime
 import woowacourse.shopping.data.remote.retrofit.toApiFailure
 import woowacourse.shopping.data.remote.retrofit.toUserMessage
 import woowacourse.shopping.domain.model.Coupon
@@ -16,6 +15,7 @@ import woowacourse.shopping.domain.model.ShoppingCartItem
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.PaymentReminderSettingsRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
+import java.time.LocalTime
 
 class PaymentViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,

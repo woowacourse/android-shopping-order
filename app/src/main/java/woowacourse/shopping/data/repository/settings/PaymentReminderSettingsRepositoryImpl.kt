@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.repository.settings
 
 import android.content.Context
-import woowacourse.shopping.domain.repository.PaymentReminderSettingsRepository
 import androidx.core.content.edit
+import woowacourse.shopping.domain.repository.PaymentReminderSettingsRepository
 
 class PaymentReminderSettingsRepositoryImpl(
     context: Context,
@@ -13,8 +13,7 @@ class PaymentReminderSettingsRepositoryImpl(
             Context.MODE_PRIVATE,
         )
 
-    override fun isEnabled(): Boolean =
-        sharedPreferences.getBoolean(KEY_PAYMENT_REMINDER_ENABLED, DEFAULT_PAYMENT_REMINDER_ENABLED)
+    override fun isEnabled(): Boolean = sharedPreferences.getBoolean(KEY_PAYMENT_REMINDER_ENABLED, DEFAULT_PAYMENT_REMINDER_ENABLED)
 
     override fun setEnabled(enabled: Boolean) {
         sharedPreferences

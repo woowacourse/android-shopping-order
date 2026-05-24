@@ -26,6 +26,5 @@ class ProductRepositoryImpl(
         )
     }
 
-    override suspend fun requestProductDetail(id: Long): Product =
-        productRemoteDataSource.requestProductDetail(id = id)
+    override suspend fun requestProductDetail(id: Long): Product = productRemoteDataSource.requestProductDetail(id = id)
 }

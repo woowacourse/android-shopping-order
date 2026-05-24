@@ -5,6 +5,5 @@ import woowacourse.shopping.data.remote.retrofit.dto.CouponItem
 
 interface CouponRetrofitInterface {
     @GET("/coupons")
-    suspend fun requestCoupons(
-    ): List<CouponItem>
+    suspend fun requestCoupons(): List<CouponItem>
 }

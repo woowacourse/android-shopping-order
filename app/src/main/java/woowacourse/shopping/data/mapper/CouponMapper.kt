@@ -25,7 +25,10 @@ private fun CouponItem.toDomainCouponBenefit(): CouponBenefit {
                 minimumOrderAmount = minimumAmount,
             )
 
-        normalizedType == TYPE_BUY_X_GET_Y || normalizedType == TYPE_BOGO || normalizedCode.startsWith(BOGO_PREFIX) || normalizedCode.startsWith(BUY_PREFIX) ->
+        normalizedType == TYPE_BUY_X_GET_Y ||
+            normalizedType == TYPE_BOGO ||
+            normalizedCode.startsWith(BOGO_PREFIX) ||
+            normalizedCode.startsWith(BUY_PREFIX) ->
             CouponBenefit.BuyTwoGetOne(
                 requiredQuantity = buyQuantity,
                 freeQuantity = getQuantity,

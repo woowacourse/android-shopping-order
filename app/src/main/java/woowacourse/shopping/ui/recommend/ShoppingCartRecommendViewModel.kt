@@ -6,10 +6,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import woowacourse.shopping.data.local.datastore.VisitStore
 import woowacourse.shopping.domain.model.ShoppingCartItem
 import woowacourse.shopping.domain.model.ShoppingItem
 import woowacourse.shopping.domain.repository.ShoppingItemRepository
-import woowacourse.shopping.data.local.datastore.VisitStore
 
 class ShoppingCartRecommendViewModel(
     private val shoppingItemRepository: ShoppingItemRepository,

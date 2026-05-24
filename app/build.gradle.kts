@@ -25,11 +25,10 @@ fun readConfig(
     localPropertiesKey: String,
     envKey: String,
     defaultValue: String = "",
-): String {
-    return properties.getProperty(localPropertiesKey)
+): String =
+    properties.getProperty(localPropertiesKey)
         ?: providers.environmentVariable(envKey).orNull
         ?: defaultValue
-}
 
 android {
     namespace = "woowacourse.shopping"

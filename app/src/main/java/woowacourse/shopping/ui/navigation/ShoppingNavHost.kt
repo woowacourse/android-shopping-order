@@ -5,11 +5,11 @@ package woowacourse.shopping.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.navigation.toRoute
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import woowacourse.shopping.di.AppViewModelFactory
 import woowacourse.shopping.ui.cart.ShoppingCartRouteContent
 import woowacourse.shopping.ui.detail.DetailRouteContent

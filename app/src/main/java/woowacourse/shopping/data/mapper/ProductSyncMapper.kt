@@ -1,11 +1,10 @@
 package woowacourse.shopping.data.mapper
 
+import woowacourse.shopping.data.remote.retrofit.dto.ProductDto
 import woowacourse.shopping.data.remote.retrofit.dto.ProductResponse
 import woowacourse.shopping.domain.model.Price
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductTitle
-import woowacourse.shopping.domain.model.ShoppingItem
-import woowacourse.shopping.data.remote.retrofit.dto.ProductDto
 
 fun ProductDto.toDomainProduct(): Product =
     Product(

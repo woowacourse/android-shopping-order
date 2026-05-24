@@ -3,8 +3,8 @@
 package woowacourse.shopping.ui.payment
 
 import android.content.pm.PackageManager
-import android.os.Build
 import android.icu.text.DecimalFormat
+import android.os.Build
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -13,11 +13,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.core.content.ContextCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.remote.retrofit.dto.OrderInfo
@@ -129,8 +129,7 @@ fun PaymentRouteContent(
 }
 
 @Composable
-private fun formatPrice(price: Int): String =
-    DecimalFormat(stringResource(R.string.price_format_pattern)).format(price)
+private fun formatPrice(price: Int): String = DecimalFormat(stringResource(R.string.price_format_pattern)).format(price)
 
 private fun hasPostNotificationsPermission(context: android.content.Context): Boolean {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true

@@ -15,7 +15,6 @@ import woowacourse.shopping.domain.repository.ShoppingCartRepository
 class ShoppingCartViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
 ) : ViewModel() {
-
     private val shoppingCartPageStateHolder =
         ShoppingCartPageStateHolder(shoppingCartItems = emptyList())
 
@@ -41,8 +40,7 @@ class ShoppingCartViewModel(
         refreshUiState()
     }
 
-    fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int =
-        shoppingCartItem.getProductQuantityPrice()
+    fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int = shoppingCartItem.getProductQuantityPrice()
 
     fun requestCartItems(force: Boolean = false) {
         if (_uiState.value.isLoading) return
@@ -146,7 +144,9 @@ class ShoppingCartViewModel(
     }
 
     private fun getValidProductIds(): Set<Long> =
-        _uiState.value.shoppingCartItems.map { shoppingCartItem -> shoppingCartItem.product.id }.toSet()
+        _uiState.value.shoppingCartItems
+            .map { shoppingCartItem -> shoppingCartItem.product.id }
+            .toSet()
 
     private fun executeCartMutation(
         defaultMessage: String,

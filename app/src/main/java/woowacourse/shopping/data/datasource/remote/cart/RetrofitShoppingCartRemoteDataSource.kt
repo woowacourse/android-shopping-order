@@ -12,13 +12,12 @@ class RetrofitShoppingCartRemoteDataSource(
         page: Int,
         size: Int,
         sort: List<String>?,
-    ): ShoppingCartResponse {
-        return apiService.requestCartItems(
+    ): ShoppingCartResponse =
+        apiService.requestCartItems(
             page = page,
             size = size,
             sort = sort,
         )
-    }
 
     override suspend fun addCartItem(product: CartRequest): Unit =
         apiService.addCartItem(

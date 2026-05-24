@@ -19,7 +19,6 @@ class ShoppingCartRepositoryImpl(
     private val shoppingItemRepository: ShoppingItemRepository,
     private val shoppingCartRemoteDataSource: ShoppingCartRemoteDataSource,
 ) : ShoppingCartRepository {
-
     private val cartItemsState = MutableStateFlow<List<ShoppingCartItem>>(emptyList())
 
     private val remoteStateMutex = Mutex()
@@ -46,13 +45,15 @@ class ShoppingCartRepositoryImpl(
         addOrIncreaseByProductIdInternal(productId = productId, amount = amount)
     }
 
-    override suspend fun decreaseByProductId(productId: Long) = remoteStateMutex.withLock {
-        decreaseByProductIdInternal(productId = productId)
-    }
+    override suspend fun decreaseByProductId(productId: Long) =
+        remoteStateMutex.withLock {
+            decreaseByProductIdInternal(productId = productId)
+        }
 
-    override suspend fun removeByProductId(productId: Long) = remoteStateMutex.withLock {
-        removeByProductIdInternal(productId = productId)
-    }
+    override suspend fun removeByProductId(productId: Long) =
+        remoteStateMutex.withLock {
+            removeByProductIdInternal(productId = productId)
+        }
 
     private suspend fun requestCartItemsInternal(
         page: Int,
