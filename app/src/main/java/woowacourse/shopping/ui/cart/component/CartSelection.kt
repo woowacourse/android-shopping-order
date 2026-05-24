@@ -18,13 +18,12 @@ data class CartSelection(
 
     fun isAllSelected(cartItems: List<CartItem>): Boolean =
         cartItems.isNotEmpty() &&
-                cartItems.all { it.id in ids }
+            cartItems.all { it.id in ids }
 
     fun totalPrice(cartItems: List<CartItem>): Money =
         cartItems
             .filter { it.id in ids }
             .fold(Money(0)) { acc, cartItem -> acc + cartItem.getTotalPrice() }
 
-    fun selectedCount(cartItems: List<CartItem>): Int =
-        cartItems.filter { it.id in ids }.sumOf { it.quantity }
+    fun selectedCount(cartItems: List<CartItem>): Int = cartItems.filter { it.id in ids }.sumOf { it.quantity }
 }

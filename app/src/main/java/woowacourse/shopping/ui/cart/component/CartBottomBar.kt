@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import woowacourse.shopping.ui.component.CheckBox
 import woowacourse.shopping.ui.theme.Gray50
 import woowacourse.shopping.ui.theme.Green40
 import woowacourse.shopping.ui.util.formattedPrice
@@ -46,7 +47,7 @@ fun CartBottomBar(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                CartCheckBox(
+                CheckBox(
                     onCheckedChange = {
                         onAllCheckedChange()
                     },

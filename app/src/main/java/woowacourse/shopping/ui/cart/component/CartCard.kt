@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import woowacourse.shopping.ui.component.CheckBox
 import woowacourse.shopping.ui.component.ProductAsyncImage
 import woowacourse.shopping.ui.component.QuantitySelector
 import woowacourse.shopping.ui.theme.Gray40
@@ -63,7 +64,7 @@ fun CartCard(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                CartCheckBox(
+                CheckBox(
                     onCheckedChange = onCheckedChange,
                     isChecked = isChecked,
                 )
