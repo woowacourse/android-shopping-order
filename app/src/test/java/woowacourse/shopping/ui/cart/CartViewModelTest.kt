@@ -57,12 +57,7 @@ class CartViewModelTest {
             viewModel.prevEnable.collect { }
         }
 
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            viewModel.cartItemCount.collect { }
-        }
-
         assertEquals(0, viewModel.currentPage.value)
-        assertEquals(6, viewModel.cartItemCount.value)
         assertFalse(viewModel.prevEnable.value)
         assertTrue(viewModel.nextEnable.value)
 
@@ -84,10 +79,6 @@ class CartViewModelTest {
 
         viewModel = CartViewModel(fakeCartRepository)
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            viewModel.cartItemCount.collect { }
-        }
-
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.pagedCart.collect { }
         }
 
@@ -106,9 +97,6 @@ class CartViewModelTest {
 
         viewModel = CartViewModel(fakeCartRepository)
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            viewModel.cartItemCount.collect { }
-        }
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.currentPage.collect { }
         }
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -118,7 +106,10 @@ class CartViewModelTest {
         viewModel.next()
         assertEquals(1, viewModel.currentPage.value)
 
+        val event = async(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiEvent.first() }
         viewModel.removeWithID(6L)
+        assertEquals(UiEvent.ShowMessage("상품을 삭제했습니다."), event.await())
+        testScheduler.advanceUntilIdle()
 
         assertEquals(0, viewModel.currentPage.value)
     }
@@ -143,6 +134,43 @@ class CartViewModelTest {
 
         viewModel.updateCountWithID(1L, -2)
         assertEquals(4, viewModel.pagedCart.value.purchaseProducts[0].count)
+    }
+
+    @Test
+    fun `수량 변경 성공 시 장바구니 전체를 다시 조회하지 않고 로컬 상태만 갱신한다`() = runTest {
+        val product = Product(id = 1L, name = "상품1", price = 1000, imageUri = "uri", category = "카테고리")
+        fakeCartRepository.insert(PurchaseProduct(1L, product, 5))
+
+        viewModel = CartViewModel(fakeCartRepository)
+        testScheduler.advanceUntilIdle()
+        fakeCartRepository.pageRequests.clear()
+
+        viewModel.updateCountWithID(1L, 1)
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(6, viewModel.pagedCart.value.purchaseProducts[0].count)
+        assertEquals(emptyList<FakeCartRepository.PageRequest>(), fakeCartRepository.pageRequests)
+    }
+
+    @Test
+    fun `전체 장바구니 조회는 마지막 페이지까지 작은 페이지 단위로 반복한다`() = runTest {
+        val products = (1..7).map {
+            Product(id = it.toLong(), name = "상품$it", price = 1000, imageUri = "uri", category = "카테고리")
+        }
+        products.forEach { fakeCartRepository.insert(PurchaseProduct(it.id, it, 1)) }
+
+        fakeCartRepository.pageRequests.clear()
+
+        val cartItems = fakeCartRepository.getAllCartItems(pageSize = 5)
+
+        assertEquals(7, cartItems.purchaseProducts.size)
+        assertEquals(
+            listOf(
+                FakeCartRepository.PageRequest(page = 0, size = 5),
+                FakeCartRepository.PageRequest(page = 1, size = 5),
+            ),
+            fakeCartRepository.pageRequests,
+        )
     }
 
     @Test

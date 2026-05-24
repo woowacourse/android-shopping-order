@@ -76,6 +76,7 @@ class ShoppingViewModelTest {
 
         assertEquals(2, cartItem?.count)
         assertEquals(2000, cartItem?.totalPrice)
+        assertEquals(2, viewModel.cartProductCount.value)
 
         collectJob.cancel()
     }
@@ -129,6 +130,7 @@ class ShoppingViewModelTest {
 
         val purchaseProducts = viewModel.cart.value
         assertEquals(5, purchaseProducts.findById(1L)?.count)
+        assertEquals(5, viewModel.cartProductCount.value)
         collectJob.cancel()
     }
 }

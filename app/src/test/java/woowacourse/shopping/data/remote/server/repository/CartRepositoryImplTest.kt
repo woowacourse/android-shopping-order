@@ -8,6 +8,7 @@ import mockwebserver3.MockWebServer
 import okhttp3.MediaType.Companion.toMediaType
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import retrofit2.Retrofit
@@ -109,4 +110,77 @@ class CartRepositoryImplTest {
         val request = mockWebServer.takeRequest()
         assertEquals("/cart-items/counts", request.target)
     }
+
+    @Test
+    fun `페이지 크기보다 적은 장바구니 아이템이 오면 마지막 페이지로 판단한다`() = runBlocking {
+        // given
+        mockWebServer.enqueue(
+            MockResponse.Builder()
+                .code(200)
+                .body(cartItemsResponseBody(numberOfElements = 2, size = 5, last = false))
+                .addHeader("Content-Type", "application/json")
+                .build()
+        )
+
+        // when
+        val cartPage = cartRepository.getCartPage(page = 0, size = 5)
+
+        // then
+        assertEquals(2, cartPage.items.purchaseProducts.size)
+        assertTrue(cartPage.isLast)
+
+        val request = mockWebServer.takeRequest()
+        assertEquals("/cart-items?page=0&size=5", request.target)
+    }
+
+    private fun cartItemsResponseBody(
+        numberOfElements: Int,
+        size: Int,
+        last: Boolean,
+    ): String =
+        """
+        {
+          "content": [
+            {
+              "id": 1,
+              "product": {
+                "category": "카테고리",
+                "id": 1,
+                "imageUrl": "url",
+                "name": "상품1",
+                "price": 1000
+              },
+              "quantity": 1
+            },
+            {
+              "id": 2,
+              "product": {
+                "category": "카테고리",
+                "id": 2,
+                "imageUrl": "url",
+                "name": "상품2",
+                "price": 2000
+              },
+              "quantity": 1
+            }
+          ],
+          "empty": false,
+          "first": true,
+          "last": $last,
+          "number": 0,
+          "numberOfElements": $numberOfElements,
+          "pageable": {
+            "offset": 0,
+            "pageNumber": 0,
+            "pageSize": $size,
+            "paged": true,
+            "sort": { "empty": true, "sorted": false, "unsorted": true },
+            "unpaged": false
+          },
+          "size": $size,
+          "sort": { "empty": true, "sorted": false, "unsorted": true },
+          "totalElements": $numberOfElements,
+          "totalPages": 1
+        }
+        """.trimIndent()
 }

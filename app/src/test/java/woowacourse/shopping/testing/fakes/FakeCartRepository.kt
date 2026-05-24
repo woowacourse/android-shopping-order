@@ -1,12 +1,14 @@
 package woowacourse.shopping.testing.fakes
 
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.model.CartPage
 import woowacourse.shopping.domain.model.PurchaseProduct
 import woowacourse.shopping.domain.model.PurchaseProducts
 
 class FakeCartRepository : CartRepository {
     private val _db = mutableListOf<PurchaseProduct>()
     var shouldFail: Boolean = false
+    val pageRequests = mutableListOf<PageRequest>()
 
     override suspend fun insert(purchaseProduct: PurchaseProduct) {
         if (shouldFail) throw Exception("Network Error")
@@ -42,16 +44,62 @@ class FakeCartRepository : CartRepository {
         return _db.sumOf { it.count }
     }
 
-    override suspend fun getPagedCart(page: Int, size: Int): PurchaseProducts {
+    override suspend fun getCartPage(page: Int, size: Int): CartPage {
         if (shouldFail) throw Exception("Network Error")
+        pageRequests += PageRequest(page, size)
         val start = page * size
-        if (start >= _db.size) return PurchaseProducts(emptyList())
+        if (start >= _db.size) {
+            return CartPage(
+                items = PurchaseProducts(emptyList()),
+                isLast = true,
+            )
+        }
         val end = minOf(start + size, _db.size)
-        return PurchaseProducts(_db.subList(start, end))
+        val items = _db.subList(start, end).toList()
+        return CartPage(
+            items = PurchaseProducts(items),
+            isLast = end >= _db.size || items.size < size,
+        )
     }
 
-    override suspend fun getCartItemCount(): Int {
-        if (shouldFail) throw Exception("Network Error")
-        return _db.size
+    override suspend fun getAllCartItems(pageSize: Int): PurchaseProducts {
+        require(pageSize > 0) { "페이지 크기는 1 이상이어야 합니다." }
+
+        val allItems = mutableListOf<PurchaseProduct>()
+        var page = 0
+
+        while (true) {
+            val cartPage = getCartPage(page, pageSize)
+            allItems += cartPage.items.purchaseProducts
+
+            if (cartPage.isLast) break
+            page++
+        }
+
+        return PurchaseProducts(allItems)
     }
+
+    override suspend fun findCartItemByProductId(
+        productId: Long,
+        pageSize: Int,
+    ): PurchaseProduct? {
+        require(pageSize > 0) { "페이지 크기는 1 이상이어야 합니다." }
+
+        var page = 0
+
+        while (true) {
+            val cartPage = getCartPage(page, pageSize)
+            val foundItem = cartPage.items.findById(productId)
+
+            if (foundItem != null) return foundItem
+            if (cartPage.isLast) return null
+
+            page++
+        }
+    }
+
+    data class PageRequest(
+        val page: Int,
+        val size: Int,
+    )
 }
