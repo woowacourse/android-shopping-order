@@ -8,6 +8,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.data.remote.api.CartApi
+import woowacourse.shopping.data.remote.api.CouponApi
 import woowacourse.shopping.data.remote.api.OrderApi
 import woowacourse.shopping.data.remote.api.ProductApi
 import java.util.concurrent.TimeUnit
@@ -19,6 +20,7 @@ object RetrofitProvider {
     private val json: Json =
         Json {
             ignoreUnknownKeys = true
+            classDiscriminator = "discountType"
         }
     private val contentType = "application/json".toMediaType()
 
@@ -62,5 +64,9 @@ object RetrofitProvider {
 
     val orderApi: OrderApi by lazy {
         retrofit.create(OrderApi::class.java)
+    }
+
+    val couponApi: CouponApi by lazy {
+        retrofit.create(CouponApi::class.java)
     }
 }
