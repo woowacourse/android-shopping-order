@@ -72,3 +72,4 @@
 - [x] Cart 예외 처리 추가
 - [x] 불필요한 커스텀 exception 제거
 - [x] retrofit에서 발생하는 커스텀 예외 제거 및 에러 핸들링 추가
+- [x] viewModel에 연결되어있는 application 분리

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import retrofit2.HttpException
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.repository.cart.CartRepository
@@ -24,7 +25,9 @@ import woowacourse.shopping.feature.common.state.ProductUiModel
 import java.io.IOException
 
 class ProductListViewModel(
-    private val application: ShoppingApplication,
+    private val productRepository: ProductRepository,
+    private val cartRepository: CartRepository,
+    private val recentProductRepository: RecentProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductListUiState())
     val uiState: StateFlow<ProductListUiState> = _uiState.asStateFlow()
@@ -32,16 +35,9 @@ class ProductListViewModel(
     private val _event = Channel<ProductListEvent>(Channel.BUFFERED)
     val event: Flow<ProductListEvent> = _event.receiveAsFlow()
 
-    lateinit var productRepository: ProductRepository
-    lateinit var cartRepository: CartRepository
-    lateinit var recentProductRepository: RecentProductRepository
 
     init {
         viewModelScope.launch {
-            val appDependencies = application.appDependenciesDeferred.await()
-            productRepository = appDependencies.productRepository
-            cartRepository = appDependencies.cartRepository
-            recentProductRepository = appDependencies.recentProductRepository
             initialLoading()
         }
     }
@@ -193,8 +189,11 @@ class ProductListViewModel(
             viewModelFactory {
                 initializer {
                     val app = this[APPLICATION_KEY] as ShoppingApplication
+                    val appDependencies = runBlocking { app.appDependenciesDeferred.await() }
                     ProductListViewModel(
-                        app,
+                        productRepository = appDependencies.productRepository,
+                        cartRepository = appDependencies.cartRepository,
+                        recentProductRepository = appDependencies.recentProductRepository,
                     )
                 }
             }

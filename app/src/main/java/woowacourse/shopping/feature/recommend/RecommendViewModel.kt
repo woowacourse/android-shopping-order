@@ -10,9 +10,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.repository.cart.CartRepository
-import woowacourse.shopping.data.repository.order.OrderRepository
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
 import woowacourse.shopping.domain.Money
@@ -20,27 +20,14 @@ import woowacourse.shopping.domain.Product
 import woowacourse.shopping.feature.common.state.ProductUiModel
 
 class RecommendViewModel(
-    private val application: ShoppingApplication,
+    private val productRepository: ProductRepository,
+    private val cartRepository: CartRepository,
+    private val recentProductRepository: RecentProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RecommendUiState())
     val uiState: StateFlow<RecommendUiState> = _uiState.asStateFlow()
 
     private var products: List<Product> = emptyList()
-
-    lateinit var productRepository: ProductRepository
-    lateinit var cartRepository: CartRepository
-    lateinit var recentProductRepository: RecentProductRepository
-    lateinit var orderRepository: OrderRepository
-
-    init {
-        viewModelScope.launch {
-            val appDependencies = application.appDependenciesDeferred.await()
-            productRepository = appDependencies.productRepository
-            cartRepository = appDependencies.cartRepository
-            recentProductRepository = appDependencies.recentProductRepository
-            orderRepository = appDependencies.orderRepository
-        }
-    }
 
     fun initialLoading(contentIds: List<Long>) {
         viewModelScope.launch {
@@ -64,7 +51,8 @@ class RecommendViewModel(
                         category = category,
                     ).first
 
-            val duplicationProducts = products.filter { !serverCart.getProductList().map { it.id }.contains(it.id) }
+            val duplicationProducts =
+                products.filter { !serverCart.getProductList().map { it.id }.contains(it.id) }
             val checkCart = serverCart.cartContents.filter { it.id in contentIds }
 
             _uiState.update {
@@ -146,7 +134,7 @@ class RecommendViewModel(
         val serverCart = cartRepository.loadCart()
         return serverCart.cartContents.filter { cartContent ->
             cartContent.id in contentIds || cartContent.productId in newContents
-        }.map{ it.id }
+        }.map { it.id }
     }
 
     private suspend fun refreshRecentProducts(): String {
@@ -161,7 +149,12 @@ class RecommendViewModel(
             viewModelFactory {
                 initializer {
                     val app = this[APPLICATION_KEY] as ShoppingApplication
-                    RecommendViewModel(app)
+                    val appDependencies = runBlocking { app.appDependenciesDeferred.await() }
+                    RecommendViewModel(
+                        appDependencies.productRepository,
+                        appDependencies.cartRepository,
+                        appDependencies.recentProductRepository
+                    )
                 }
             }
     }
