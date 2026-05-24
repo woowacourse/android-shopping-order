@@ -15,11 +15,17 @@ interface CartItemQuantityDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: CartItemQuantityEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(items: List<CartItemQuantityEntity>)
+
     @Query("SELECT * FROM cart_item_quantities WHERE productId = :productId")
     suspend fun findByProductId(productId: Long): CartItemQuantityEntity?
 
     @Query("DELETE FROM cart_item_quantities WHERE productId = :productId")
     suspend fun deleteByProductId(productId: Long)
+
+    @Query("DELETE FROM cart_item_quantities WHERE cartItemId = :cartItemId")
+    suspend fun deleteByCartItemId(cartItemId: Long)
 
     @Query("DELETE FROM cart_item_quantities")
     suspend fun clear()

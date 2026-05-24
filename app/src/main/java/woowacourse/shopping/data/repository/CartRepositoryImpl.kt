@@ -1,5 +1,9 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import woowacourse.shopping.data.localdb.dao.CartItemQuantityDao
+import woowacourse.shopping.data.localdb.entity.CartItemQuantityEntity
 import woowacourse.shopping.data.remote.api.CartApi
 import woowacourse.shopping.data.remote.dto.request.AddCartRequestBody
 import woowacourse.shopping.data.remote.dto.request.UpdateCartRequestBody
@@ -9,101 +13,131 @@ import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductName
+import kotlin.coroutines.cancellation.CancellationException
 
 class CartRepositoryImpl(
     private val cartApi: CartApi,
+    private val cartItemQuantityDao: CartItemQuantityDao,
 ) : CartRepository {
-    override suspend fun getTotalPrice(cartIds: List<Long>): Money {
-        val cartItems = getAllCartItems()
+    override suspend fun getCartItemsByPage(
+        page: Int,
+        size: Int,
+    ): Result<CartResponseResult> =
+        try {
+            val response =
+                cartApi.getCartItems(
+                    page = page,
+                    size = size,
+                )
+            val cartItems = response.content.map { it.toDomain() }
+            val lastPage = response.last
+            val totalElement = response.totalElements
 
-        return cartItems
-            .filter { cartIds.contains(it.id) }
-            .fold(Money(0)) { acc, cartItem ->
-                acc + cartItem.product.price * cartItem.quantity
+            Result.success(CartResponseResult(cartItems, lastPage, totalElement))
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    override suspend fun setCartItem(
+        productId: Long,
+        quantity: Int,
+    ): Result<Unit> =
+        try {
+            require(quantity >= 0) { "수량은 0이상이어야 합니다." }
+
+            val savedCartItem = cartItemQuantityDao.findByProductId(productId)
+
+            if (quantity == 0) {
+                savedCartItem?.let {
+                    cartApi.deleteCartItem(it.cartItemId)
+
+                    cartItemQuantityDao.deleteByProductId(productId)
+                }
+                return Result.success(Unit)
             }
-    }
 
-    private suspend fun getAllCartItems(): List<CartItem> {
-        val cartItems = mutableListOf<CartItem>()
+            if (savedCartItem == null) {
+                cartApi.addCartItem(
+                    AddCartRequestBody(
+                        productId = productId,
+                        quantity = quantity,
+                    ),
+                )
+                refreshCartQuantity()
+            } else {
+                cartApi.updateCartItem(
+                    id = savedCartItem.cartItemId,
+                    updateCartRequestBody =
+                        UpdateCartRequestBody(
+                            quantity = quantity,
+                        ),
+                )
 
+                cartItemQuantityDao.insert(
+                    savedCartItem.copy(
+                        quantity =
+                        quantity,
+                    ),
+                )
+            }
+
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    override suspend fun deleteItem(cartItemId: Long): Result<Unit> =
+        try {
+            cartApi.deleteCartItem(cartItemId)
+
+            cartItemQuantityDao.deleteByCartItemId(cartItemId)
+
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    override suspend fun getTotalCartItemQuantity(): Result<Int> =
+        try {
+            val response = cartApi.getCartItemsQuantity().quantity
+            Result.success(response)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    override fun getCartQuantityMap(): Flow<Map<Long, Int>> =
+        cartItemQuantityDao.getAll().map { entities ->
+            entities.associate { entity ->
+                entity.productId to entity.quantity
+            }
+        }
+
+    private suspend fun refreshCartQuantity() {
         val response =
             cartApi.getCartItems(
                 page = 0,
                 size = MAX_CART_ITEM_LIMIT,
             )
 
-        cartItems += response.content.map { it.toDomain() }
-
-        return cartItems
-    }
-
-    override suspend fun getCartItemsByPage(
-        page: Int,
-        size: Int,
-    ): CartResponseResult {
-        val apiResult =
-            cartApi
-                .getCartItems(
-                    page = page,
-                    size = size,
+        val entities =
+            response.content.map { cartItem ->
+                CartItemQuantityEntity(
+                    productId = cartItem.product.id,
+                    cartItemId = cartItem.id,
+                    quantity = cartItem.quantity,
                 )
+            }
 
-        val cartItems = apiResult.content.map { it.toDomain() }
-        val lastPage = apiResult.last
-
-        return CartResponseResult(cartItems, lastPage)
-    }
-
-    private suspend fun getCartItem(productId: Long): CartItem? {
-        val cartItems = getAllCartItems()
-
-        return cartItems.firstOrNull { it.product.id == productId }
-    }
-
-    override suspend fun getCartItemQuantity(productId: Long): Int? = getCartItem(productId)?.quantity
-
-    override suspend fun setCartItem(
-        productId: Long,
-        quantity: Int,
-    ) {
-        val cartItem = getCartItem(productId)
-
-        if (cartItem == null) {
-            addCartItem(productId, quantity)
-            return
-        }
-
-        updateQuantity(cartItem.id, quantity)
-    }
-
-    override suspend fun deleteItem(cartItemId: Long) {
-        cartApi.deleteCartItem(id = cartItemId)
-    }
-
-    override suspend fun getTotalCartItemQuantity(): Int = cartApi.getCartItemsQuantity().quantity
-
-    override suspend fun getCartItemsCount(): Int = getAllCartItems().size
-
-    private suspend fun addCartItem(
-        productId: Long,
-        quantity: Int,
-    ) {
-        cartApi.addCartItem(
-            AddCartRequestBody(
-                productId = productId,
-                quantity = quantity,
-            ),
-        )
-    }
-
-    private suspend fun updateQuantity(
-        cartItemId: Long,
-        quantity: Int,
-    ) {
-        cartApi.updateCartItem(
-            id = cartItemId,
-            updateCartRequestBody = UpdateCartRequestBody(quantity = quantity),
-        )
+        cartItemQuantityDao.clear()
+        cartItemQuantityDao.insertAll(entities)
     }
 
     private fun CartItemResponse.toDomain(): CartItem =
@@ -130,4 +164,5 @@ class CartRepositoryImpl(
 data class CartResponseResult(
     val cartItems: List<CartItem>,
     val isLastPage: Boolean,
+    val totalElement: Long,
 )

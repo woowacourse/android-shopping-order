@@ -38,7 +38,7 @@ class AppContainer(
     }
 
     val cartRepository: CartRepository by lazy {
-        CartRepositoryImpl(cartApi = retrofitService.create(CartApi::class.java))
+        CartRepositoryImpl(cartApi = retrofitService.create(CartApi::class.java), cartItemQuantityDao = database.cartItemQuantityDao())
     }
 
     val recentItemRepository: RecentItemRepository by lazy {
