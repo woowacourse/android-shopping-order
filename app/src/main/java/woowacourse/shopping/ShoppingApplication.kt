@@ -14,6 +14,7 @@ import woowacourse.shopping.data.local.datastore.AuthDataStore
 import woowacourse.shopping.data.remote.AuthHeaderProvider
 import woowacourse.shopping.data.remote.retrofit.RetrofitService
 import woowacourse.shopping.di.AppContainer
+import woowacourse.shopping.notification.createPaymentReminderNotificationChannel
 
 class ShoppingApplication : Application() {
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -34,6 +35,8 @@ class ShoppingApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        createPaymentReminderNotificationChannel(applicationContext)
 
         authDataStore = AuthDataStore(applicationContext.authDataStore)
         authHeaderProvider = AuthHeaderProvider(authDataStore)

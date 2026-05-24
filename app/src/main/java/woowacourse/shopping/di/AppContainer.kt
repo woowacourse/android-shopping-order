@@ -14,11 +14,14 @@ import woowacourse.shopping.data.repository.item.ShoppingItemRepositoryImpl
 import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.payment.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.settings.PaymentReminderSettingsRepositoryImpl
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.repository.PaymentReminderSettingsRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.repository.ShoppingItemRepository
+import woowacourse.shopping.notification.PaymentReminderAlarmScheduler
 
 class AppContainer(
     context: Context,
@@ -65,4 +68,10 @@ class AppContainer(
                     retrofitService.couponApiService,
                 ),
         )
+
+    val paymentReminderSettingsRepository: PaymentReminderSettingsRepository =
+        PaymentReminderSettingsRepositoryImpl(context)
+
+    val paymentReminderAlarmScheduler: PaymentReminderAlarmScheduler =
+        PaymentReminderAlarmScheduler(context)
 }
