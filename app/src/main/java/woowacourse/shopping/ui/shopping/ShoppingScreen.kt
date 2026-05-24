@@ -14,6 +14,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -51,10 +53,19 @@ fun ShoppingScreen(
     onAddInCart: (PurchaseProduct) -> Unit,
     isLoading: Boolean,
     isContainedInCart: (Long) -> Boolean,
+    allowNotification: Boolean,
+    onSwitchNotification: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     CommonFrame(
-        headerContent = { CatalogHeader(totalCount, onCartClick) },
+        headerContent = {
+            CatalogHeader(
+                totalCount,
+                onCartClick,
+                allowNotification = allowNotification,
+                onSwitchNotification = onSwitchNotification,
+            )
+        },
         bodyContent = {
             CatalogBody(
                 catalog = catalog,
@@ -79,6 +90,8 @@ fun ShoppingScreen(
 private fun CatalogHeader(
     totalCount: Int,
     onCartClick: () -> Unit,
+    allowNotification: Boolean,
+    onSwitchNotification: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -94,6 +107,20 @@ private fun CatalogHeader(
             fontWeight = FontWeight.SemiBold,
             color = Color.White,
         )
+        Row {
+            Icon(
+                painter = painterResource(R.drawable.ic_notification),
+                contentDescription = stringResource(R.string.cb_notification_icon),
+                tint = Color.White
+            )
+            Switch(
+                checked = allowNotification,
+                onCheckedChange = { onSwitchNotification() },
+                colors = SwitchDefaults.colors(
+                    checkedTrackColor = Color(0xFF04C09E)
+                )
+            )
+        }
         Row {
             Icon(
                 painter = painterResource(R.drawable.ic_cart),
@@ -203,6 +230,7 @@ private fun LoadBtn(
     )
 }
 
+
 @Preview(showBackground = true)
 @Composable
 private fun ShoppingScreenPreview() {
@@ -213,71 +241,71 @@ private fun ShoppingScreenPreview() {
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
+                    category = "패션",
                     id = 1L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
-                    id = 1L,
+                    category = "가전",
+                    id = 2L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
-                    id = 1L,
+                    category = "식품",
+                    id = 3L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
-                    id = 1L,
+                    category = "도서",
+                    id = 4L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
-                    id = 1L,
+                    category = "완구",
+                    id = 5L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
-                    id = 1L,
+                    category = "가구",
+                    id = 6L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
-                    id = 1L,
+                    category = "스포츠",
+                    id = 7L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
-                    id = 1L,
+                    category = "잡화",
+                    id = 8L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
-                    id = 1L,
+                    category = "뷰티",
+                    id = 9L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
-                    id = 1L,
+                    category = "반려동물",
+                    id = 10L,
                 ),
             ),
         )
@@ -287,7 +315,7 @@ private fun ShoppingScreenPreview() {
         catalog,
         onRecentlyViewedClick = {},
         totalCount = 10,
-        specificProductCount = { it -> 0 },
+        specificProductCount = { 0 },
         onItemClick = { },
         onCartClick = { },
         onLoadClick = { },
@@ -295,8 +323,10 @@ private fun ShoppingScreenPreview() {
         onMinus = { id, type -> },
         onDelete = { },
         onAddInCart = { },
-        isContainedInCart = { it -> true },
+        isContainedInCart = { true },
         isLoading = false,
+        allowNotification = false,
+        onSwitchNotification = { },
     )
 }
 
@@ -310,64 +340,64 @@ private fun ShoppingScreenPreview2() {
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
+                    category = "패션",
                     id = 1L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
-                    id = 1L,
+                    category = "가전",
+                    id = 2L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
-                    id = 1L,
+                    category = "식품",
+                    id = 3L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
-                    id = 1L,
+                    category = "도서",
+                    id = 4L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
-                    id = 1L,
+                    category = "완구",
+                    id = 5L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
-                    id = 1L,
+                    category = "가구",
+                    id = 6L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
-                    id = 1L,
+                    category = "스포츠",
+                    id = 7L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
-                    id = 1L,
+                    category = "잡화",
+                    id = 8L,
                 ),
                 Product(
                     imageUri = "hello",
                     name = "너무너무너무긴아이템이름",
                     price = 100000,
-                    category = "",
-                    id = 1L,
+                    category = "뷰티",
+                    id = 9L,
                 ),
             ),
         )
@@ -377,7 +407,7 @@ private fun ShoppingScreenPreview2() {
         Products(),
         onRecentlyViewedClick = {},
         totalCount = 10,
-        specificProductCount = { it -> 0 },
+        specificProductCount = { 0 },
         onItemClick = { },
         onCartClick = { },
         onLoadClick = { },
@@ -385,7 +415,9 @@ private fun ShoppingScreenPreview2() {
         onMinus = { id, type -> },
         onDelete = { },
         onAddInCart = { },
-        isContainedInCart = { it -> true },
+        isContainedInCart = { true },
         isLoading = true,
+        allowNotification = true,
+        onSwitchNotification = { },
     )
 }

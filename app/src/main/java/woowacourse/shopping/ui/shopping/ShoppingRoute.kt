@@ -55,14 +55,17 @@ fun ShoppingRoute(
                             lastViewedProductId = event.lastViewedProductId
                         )
                     )
+
                     is ShoppingEvent.AddToCart -> viewModel.addToCart(event.purchaseProduct)
                     is ShoppingEvent.UpdateCount -> viewModel.updateCountWithID(
                         id = event.productID,
                         updateAmount = event.updateAmount
                     )
+
                     is ShoppingEvent.RemoveFormCart -> viewModel.removeWithID(
                         event.purchaseProductId
                     )
+
                     is ShoppingEvent.LoadMore -> viewModel.loadMore()
                 }
             }
@@ -110,6 +113,8 @@ fun ShoppingRoute(
             specificProductCount = { uiState.cart.totalCountOfSpecificPurchaseProduct(it) },
             totalCount = uiState.totalCartCount(),
             isLoading = uiState.isLoading,
+            allowNotification = uiState.notificationAllowed,
+            onSwitchNotification = viewModel::changeNotificationAllow,
             modifier = Modifier.padding(innerPadding),
         )
     }

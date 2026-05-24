@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.data.local.NotificationSettingStorage
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.repository.CartRepository
@@ -25,8 +27,13 @@ class ShoppingViewModel(
     private val cartRepository: CartRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
     private val productRepository: ProductRepository,
+    private val notificationStorage: NotificationSettingStorage,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(ShoppingUiState())
+    private val _uiState = MutableStateFlow(
+        ShoppingUiState(
+            notificationAllowed = notificationStorage.isNotificationEnabled()
+        )
+    )
     val uiState = _uiState.asStateFlow()
 
     private val _event = MutableSharedFlow<ShoppingEvent>()
@@ -132,6 +139,7 @@ class ShoppingViewModel(
                         _event.emit(ShoppingEvent.ShowSnackBar(ADD_TO_CART))
                         fetchCart()
                     }
+
                     is ApiResult.Error -> _event.emit(
                         ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${result.code}")
                     )
@@ -232,7 +240,7 @@ class ShoppingViewModel(
         }
     }
 
-    fun removeFromCartTrigger(purchaseProductId: Long){
+    fun removeFromCartTrigger(purchaseProductId: Long) {
         viewModelScope.launch {
             _event.emit(
                 ShoppingEvent.RemoveFormCart(purchaseProductId)
@@ -248,6 +256,14 @@ class ShoppingViewModel(
         }
     }
 
+    fun changeNotificationAllow() {
+        viewModelScope.launch {
+            val currentState = _uiState.value.notificationAllowed
+            notificationStorage.setNotificationEnabled(currentState.not())
+            _uiState.update { it.copy(notificationAllowed = currentState.not()) }
+        }
+    }
+
     companion object {
         private const val PAGE_SIZE = 20
         private const val ADD_TO_CART = "장바구니에 상품을 추가했습니다."
@@ -259,6 +275,7 @@ class ShoppingViewModelFactory(
     private val cartRepository: CartRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
     private val productRepository: ProductRepository,
+    private val notificationStorage: NotificationSettingStorage,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ShoppingViewModel::class.java)) {
@@ -267,6 +284,7 @@ class ShoppingViewModelFactory(
                 cartRepository,
                 recentlyViewedProductRepository,
                 productRepository,
+                notificationStorage
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
