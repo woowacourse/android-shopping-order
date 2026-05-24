@@ -10,9 +10,9 @@ import woowacourse.shopping.data.datasource.recent.RecentProductDataSource
 import woowacourse.shopping.data.datasource.recent.RoomRecentProductDataSource
 import woowacourse.shopping.data.local.ShoppingDatabase
 import woowacourse.shopping.data.remote.RetrofitProvider
-import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
-import woowacourse.shopping.data.repository.product.RemoteProductRepository
-import woowacourse.shopping.data.repository.recent.LocalRecentProductRepository
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
@@ -42,7 +42,7 @@ class AppContainer(
         RoomRecentProductDataSource(database.recentProductDao())
 
     val cartRepository: CartRepository = CartRepositoryImpl(cartDataSource)
-    val productRepository: ProductRepository = RemoteProductRepository(productRemoteDataSource)
+    val productRepository: ProductRepository = ProductRepositoryImpl(productRemoteDataSource)
     val recentProductRepository: RecentProductRepository =
-        LocalRecentProductRepository(recentProductDataSource)
+        RecentProductRepositoryImpl(recentProductDataSource)
 }
