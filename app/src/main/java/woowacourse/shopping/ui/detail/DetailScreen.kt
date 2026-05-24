@@ -47,7 +47,7 @@ import woowacourse.shopping.ui.util.formattedPrice
 
 @Composable
 fun DetailScreenRoute(
-    onNavigateToCart: () -> Unit,
+    onNavigateToShopping: () -> Unit,
     onNavigateBack: () -> Unit,
     onRecentItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -59,7 +59,7 @@ fun DetailScreenRoute(
     LaunchedEffect(detailViewModel) {
         detailViewModel.event.collect { event ->
             when (event) {
-                DetailEvent.NavigateToCart -> onNavigateToCart()
+                DetailEvent.NavigateToShopping -> onNavigateToShopping()
                 DetailEvent.NavigateBack -> onNavigateBack()
                 DetailEvent.ShowProductNotFoundMessage -> {
                     Toast.makeText(context, "상품을 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()

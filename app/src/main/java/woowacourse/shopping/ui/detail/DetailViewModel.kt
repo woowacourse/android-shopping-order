@@ -89,7 +89,7 @@ class DetailViewModel(
                     productId = id,
                     quantity = _uiState.value.quantity,
                 ).onSuccess {
-                    _event.send(DetailEvent.NavigateToCart)
+                    _event.send(DetailEvent.NavigateToShopping)
                 }.onFailure {
                     _event.send(DetailEvent.ShowAddCartFailureMessage)
                 }
