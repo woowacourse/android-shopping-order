@@ -12,17 +12,17 @@ class AlarmScheduler(context: Context) {
     private val alarmManager =
         applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-    fun createAlarmSchedule(delayTime: Long) {
+    fun createAlarmSchedule(delayMillis: Long) {
         val intent = Intent(applicationContext, PaymentAlarmReceiver::class.java)
 
         val pendingIntent = PendingIntent.getBroadcast(
             applicationContext,
-            ALARM_ID,
+            PAYMENT_ALARM_ID,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val triggerTime = System.currentTimeMillis() + delayTime
+        val triggerTime = System.currentTimeMillis() + delayMillis
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
             alarmManager.set(
@@ -52,7 +52,7 @@ class AlarmScheduler(context: Context) {
         val intent = Intent(applicationContext, PaymentAlarmReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
             applicationContext,
-            ALARM_ID,
+            PAYMENT_ALARM_ID,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -60,6 +60,6 @@ class AlarmScheduler(context: Context) {
     }
 
     companion object {
-        private const val ALARM_ID = 1
+        private const val PAYMENT_ALARM_ID = 1
     }
 }

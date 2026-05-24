@@ -17,8 +17,8 @@ class PaymentAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val shoppingContext = context.applicationContext
 
-        val storage = ShoppingApplication.notificationSetting
-        if (!storage.isNotificationEnabled()) return
+        val notificationSetting = ShoppingApplication.notificationSetting
+        if (!notificationSetting.isNotificationEnabled()) return
 
         val toPaymentIntent = Intent(shoppingContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
