@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.ui.order.OrderViewModel
 import woowacourse.shopping.ui.cart.ShoppingCartViewModel
 import woowacourse.shopping.ui.detail.DetailProductViewModel
+import woowacourse.shopping.ui.payment.PaymentViewModel
 import woowacourse.shopping.ui.productlist.ProductListViewModel
 import woowacourse.shopping.ui.recommend.ShoppingCartRecommendViewModel
 
@@ -41,6 +42,12 @@ class AppViewModelFactory(
 
             modelClass.isAssignableFrom(OrderViewModel::class.java) ->
                 OrderViewModel(orderRepository = appContainer.orderRepository) as T
+
+            modelClass.isAssignableFrom(PaymentViewModel::class.java) ->
+                PaymentViewModel(
+                    shoppingCartRepository = appContainer.shoppingCartRepository,
+                    couponRepository = appContainer.couponRepository,
+                ) as T
 
             else -> throw IllegalArgumentException("지원하지 않는 ViewModel: ${modelClass.name}")
         }
