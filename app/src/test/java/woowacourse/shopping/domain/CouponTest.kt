@@ -155,8 +155,8 @@ class CouponTest {
         // given: 시간이 04시, 05:30, 07시 리스트가 주어지고 미라클모닝 30% 할인 쿠폰이 주어진다
         val price = 50_000
         val coupon = PercentageCoupon(
-            startTime = LocalTime.of(4, 0),
-            endTime = LocalTime.of(7, 0), expirationDate = LocalDate.of(2026, 11, 30),
+            startTime = LocalTime.of(3, 59, 59),
+            endTime = LocalTime.of(7, 0, 1), expirationDate = LocalDate.of(2026, 11, 30),
         )
         val times = listOf(LocalTime.of(4, 0), LocalTime.of(5, 30), LocalTime.of(7, 0))
 

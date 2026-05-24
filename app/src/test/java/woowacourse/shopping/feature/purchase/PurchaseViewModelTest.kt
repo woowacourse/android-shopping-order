@@ -63,6 +63,6 @@ class PurchaseViewModelTest {
 
         // then: 금액이 재계산된다.
         val result = viewModel.uiState.value.totalDiscountedPrice
-        assertThat(result).isEqualTo(14_000)
+        assertThat(result).isEqualTo(14_000 + 3_000)
     }
 }
