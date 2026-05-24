@@ -7,13 +7,12 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import woowacourse.shopping.data.local.dao.RecentlyViewedProductDao
+import woowacourse.shopping.data.local.entity.OutstandingProductEntity
 import woowacourse.shopping.data.local.entity.RecentlyViewedProductEntity
 
-val MIGRATION_5_6 =
-    object : Migration(5, 6) {
+val MIGRATION_6_7 =
+    object : Migration(6, 7) {
         override fun migrate(db: SupportSQLiteDatabase) {
-            db.execSQL("DROP TABLE `purchase_products`")
-
             db.execSQL("DROP TABLE `recently_viewed_products`")
             db.execSQL(
                 """                
@@ -24,12 +23,20 @@ val MIGRATION_5_6 =
                 )
                 """.trimIndent(),
             )
+            db.execSQL(
+                """
+                    CERATE TABLE IF NOT EXISTS `outstanding_products`(
+                        `cartItemId` INTEGER NOT NULL
+                        PRIMARY KEY (`cartItemId`)
+                    )
+                """.trimIndent()
+            )
         }
     }
 
 @Database(
-    entities = [RecentlyViewedProductEntity::class],
-    version = 6,
+    entities = [RecentlyViewedProductEntity::class, OutstandingProductEntity::class],
+    version = 7,
 )
 abstract class DataBase : RoomDatabase() {
     abstract fun recentlyViewedProductDao(): RecentlyViewedProductDao
@@ -46,7 +53,7 @@ abstract class DataBase : RoomDatabase() {
                         context = dataBaseContext,
                         klass = DataBase::class.java,
                         name = "shopping_database",
-                    ).addMigrations(MIGRATION_5_6)
+                    ).addMigrations(MIGRATION_6_7)
                     .build()
                     .also { instance = it }
             }
