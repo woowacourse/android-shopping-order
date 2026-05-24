@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.constant.Format.formatPrice
-import woowacourse.shopping.ui.cart.RecommendUiState
+import woowacourse.shopping.ui.cart.recommend.RecommendUiState
 import woowacourse.shopping.ui.productList.ProductCard
 
 @Composable

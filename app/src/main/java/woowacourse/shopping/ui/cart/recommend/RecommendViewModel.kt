@@ -17,7 +17,7 @@ import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.ui.cart.RecommendUiState
+import woowacourse.shopping.ui.cart.recommend.RecommendUiState
 import woowacourse.shopping.ui.util.LoadState
 import woowacourse.shopping.ui.util.toUiModel
 

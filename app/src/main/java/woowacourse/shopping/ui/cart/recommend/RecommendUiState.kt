@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart
+package woowacourse.shopping.ui.cart.recommend
 
 import woowacourse.shopping.ui.productList.ProductUiModel
 import woowacourse.shopping.ui.util.LoadState
