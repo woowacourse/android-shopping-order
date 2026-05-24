@@ -10,6 +10,7 @@ import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.PurchaseProduct
 import woowacourse.shopping.ui.recommendation.RecommendationViewModel
 import woowacourse.shopping.viewmodel.fakes.FakeCartRepository
+import woowacourse.shopping.viewmodel.fakes.FakeOutstandingProductRepository
 import woowacourse.shopping.viewmodel.fakes.FakeProductRepository
 import woowacourse.shopping.viewmodel.fakes.FakeRecentlyViewedProductRepository
 
@@ -22,6 +23,7 @@ class RecommendationViewModelTest {
     private lateinit var cartRepository: FakeCartRepository
     private lateinit var productRepository: FakeProductRepository
     private lateinit var recentlyViewedProductRepository: FakeRecentlyViewedProductRepository
+    private lateinit var outstandingProductRepository: FakeOutstandingProductRepository
     private lateinit var viewModel: RecommendationViewModel
 
     @BeforeEach
@@ -29,6 +31,7 @@ class RecommendationViewModelTest {
         cartRepository = FakeCartRepository()
         productRepository = FakeProductRepository()
         recentlyViewedProductRepository = FakeRecentlyViewedProductRepository()
+        outstandingProductRepository = FakeOutstandingProductRepository()
     }
 
     @Test
@@ -69,6 +72,7 @@ class RecommendationViewModelTest {
                     cartRepository = cartRepository,
                     productRepository = productRepository,
                     recentlyViewedProductRepository = recentlyViewedProductRepository,
+                    outstandingProductRepository = outstandingProductRepository,
                     initPrice = 0,
                     initCheckedItemIds = emptyList(),
                 )
@@ -104,12 +108,13 @@ class RecommendationViewModelTest {
                     cartRepository = cartRepository,
                     productRepository = productRepository,
                     recentlyViewedProductRepository = recentlyViewedProductRepository,
+                    outstandingProductRepository = outstandingProductRepository,
                     initPrice = 1000,
-                    initCheckedItemIds = emptyList(),
+                    initCheckedItemIds = listOf(1L),
                 )
 
             // when: 상품의 개수를 변경하면
-            viewModel.updateCountWithID(1L, 2)
+            viewModel.updateCountWithID(1L, 1)
 
             // then: 결제할 가격에 반영된다
             assertEquals(2000, viewModel.uiState.value.totalPrice)
