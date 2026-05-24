@@ -47,11 +47,7 @@ class MainActivity : ComponentActivity() {
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        if (isGranted) {
-            ShoppingApplication.notificationSetting.setNotificationEnabled(true)
-        } else {
-            ShoppingApplication.notificationSetting.setNotificationEnabled(false)
-        }
+        ShoppingApplication.notificationSetting.setNotificationEnabled(isGranted)
     }
 
     private fun checkNotificationPermission() {
