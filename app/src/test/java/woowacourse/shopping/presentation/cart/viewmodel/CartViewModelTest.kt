@@ -11,8 +11,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.fake.repository.FakeCartRepository
 import woowacourse.shopping.fake.fakeProduct
+import woowacourse.shopping.fake.repository.FakeCartRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CartViewModelTest {
