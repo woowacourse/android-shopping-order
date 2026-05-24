@@ -50,6 +50,7 @@ fun CouponItem(
         CheckboxAndTitle(
             checked = checked,
             couponName = couponName,
+            onClick = onClick
         )
 
         Column(
@@ -84,6 +85,7 @@ fun CouponItem(
 private fun CheckboxAndTitle(
     checked: Boolean,
     couponName: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -91,7 +93,7 @@ private fun CheckboxAndTitle(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        ShoppingCheckbox(checked)
+        ShoppingCheckbox(checked, onCheckedChange = { onClick() })
         Text(
             text = couponName,
             color = Gray5,
@@ -163,5 +165,6 @@ private fun CheckboxAndTitlePreview() {
     CheckboxAndTitle(
         checked = true,
         couponName = "5,000원 할인 쿠폰",
+        onClick = {}
     )
 }
