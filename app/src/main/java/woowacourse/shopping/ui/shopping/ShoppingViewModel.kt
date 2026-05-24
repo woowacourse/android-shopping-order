@@ -59,18 +59,11 @@ class ShoppingViewModel(
                                 .map { product ->
                                     product.copy(quantity = quantityMap[product.id] ?: 0)
                                 }.toImmutableList(),
+                        cartSize = quantityMap.values.sum(),
                     )
                 }
             }
         }
-    }
-
-    private suspend fun refreshCartSize() {
-        cartRepository
-            .getTotalCartItemQuantity()
-            .onSuccess { cartSize ->
-                _uiState.update { it.copy(cartSize = cartSize) }
-            }
     }
 
     private fun observeRecentItems() {
@@ -106,10 +99,6 @@ class ShoppingViewModel(
                 .getProducts(page = offset / pageSize, size = pageSize)
                 .onSuccess { result ->
                     val quantityMap = cartRepository.getCartQuantityMap().first()
-                    val cartSize =
-                        cartRepository
-                            .getTotalCartItemQuantity()
-                            .getOrDefault(_uiState.value.cartSize)
 
                     val loadProducts =
                         result.products.map { product ->
@@ -121,7 +110,7 @@ class ShoppingViewModel(
                     _uiState.update { state ->
                         state.copy(
                             products = (state.products + loadProducts).toImmutableList(),
-                            cartSize = cartSize,
+                            cartSize = quantityMap.values.sum(),
                             canLoadMore = result.isLastPage.not(),
                             cartErrorMessage = null,
                         )
@@ -143,7 +132,7 @@ class ShoppingViewModel(
             cartRepository
                 .setCartItem(productId = productId, quantity = quantity)
                 .onSuccess {
-                    refreshCartSize()
+                    _uiState.update { it.copy(cartErrorMessage = null) }
                 }.onFailure {
                     _uiState.update {
                         it.copy(cartErrorMessage = "카트 아이템 오류입니다.")

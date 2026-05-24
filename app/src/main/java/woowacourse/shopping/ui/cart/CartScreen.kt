@@ -153,7 +153,7 @@ private fun CartContent(
                 val product = item.product
                 CartCard(
                     productName = product.name,
-                    price = product.price,
+                    price = item.totalPrice,
                     imageUrl = product.imageUrl,
                     quantity = item.quantity,
                     onQuantityChange = { quantity ->
