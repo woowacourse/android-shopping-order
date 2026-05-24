@@ -10,6 +10,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.data.remote.api.CartApi
 import woowacourse.shopping.data.remote.api.OrderApi
 import woowacourse.shopping.data.remote.api.ProductApi
+import woowacourse.shopping.data.remote.api.CouponApi
 import java.util.concurrent.TimeUnit
 import kotlin.getValue
 import woowacourse.shopping.BuildConfig
@@ -65,5 +66,9 @@ object RetrofitProvider {
 
     val orderApi: OrderApi by lazy {
         retrofit.create(OrderApi::class.java)
+    }
+
+    val couponApi: CouponApi by lazy {
+        retrofit.create(CouponApi::class.java)
     }
 }
