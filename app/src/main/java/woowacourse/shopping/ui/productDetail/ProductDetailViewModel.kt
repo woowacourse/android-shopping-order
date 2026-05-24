@@ -17,8 +17,6 @@ import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.ui.productDetail.ProductDetailActivity.Companion.EXTRA_OPENED_FROM_LAST_VIEWED
-import woowacourse.shopping.ui.productDetail.ProductDetailActivity.Companion.EXTRA_PRODUCT_ID
 import woowacourse.shopping.ui.util.LoadState
 
 class ProductDetailViewModel(
@@ -129,6 +127,9 @@ class ProductDetailViewModel(
     }
 
     companion object {
+        const val EXTRA_PRODUCT_ID = "product_id"
+        const val EXTRA_OPENED_FROM_LAST_VIEWED = "opened_from_last_viewed"
+
         val Factory: ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
