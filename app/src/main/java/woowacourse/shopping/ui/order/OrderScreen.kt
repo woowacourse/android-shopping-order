@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -31,6 +33,8 @@ fun OrderScreen(
     onCouponCheckedChange: (Long, Boolean) -> Unit = { _, _ -> },
     onPaymentClick: () -> Unit = {},
 ) {
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
@@ -45,7 +49,9 @@ fun OrderScreen(
             modifier =
                 Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .verticalScroll(scrollState)
+                    .padding(bottom = 16.dp),
         ) {
             if (coupons.isNotEmpty()) {
                 Column(
