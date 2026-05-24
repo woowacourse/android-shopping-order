@@ -39,6 +39,10 @@ class PaymentViewModel(
     val event = _event.asSharedFlow()
 
     init {
+        alarmScheduler.cancel()
+        if(settingStorage.isNotificationEnabled()) {
+            alarmScheduler.createAlarmSchedule(ALARM_DELAY)
+        }
         fetchInitialData()
     }
 
@@ -122,6 +126,10 @@ class PaymentViewModel(
         viewModelScope.launch {
             _event.emit(PaymentEvent.NavigateBack)
         }
+    }
+
+    companion object {
+        private const val ALARM_DELAY = 10000L
     }
 }
 
