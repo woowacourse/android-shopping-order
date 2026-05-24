@@ -30,6 +30,7 @@ import woowacourse.shopping.domain.usecase.BuildPaymentItemsUseCase
 import woowacourse.shopping.domain.usecase.CalculateOrderPricingUseCase
 import woowacourse.shopping.domain.usecase.GetAvailableCouponsUseCase
 import woowacourse.shopping.domain.usecase.GetLastSeenProductUseCase
+import woowacourse.shopping.domain.usecase.GetRecommendProductsUseCase
 import woowacourse.shopping.domain.usecase.PlaceOrderUseCase
 import woowacourse.shopping.domain.usecase.SetPaymentPushAlarmUseCase
 
@@ -123,5 +124,13 @@ object AppModule {
 
     val setPaymentPushAlarmUseCase: SetPaymentPushAlarmUseCase by lazy {
         SetPaymentPushAlarmUseCase(settingRepository = settingRepository, notificationScheduler = paymentNotificationScheduler)
+    }
+
+    val getRecommendProductsUseCase: GetRecommendProductsUseCase by lazy {
+        GetRecommendProductsUseCase(
+            recentProductRepository = recentProductRepository,
+            cartRepository = cartRepository,
+            productRepository = productRepository,
+        )
     }
 }

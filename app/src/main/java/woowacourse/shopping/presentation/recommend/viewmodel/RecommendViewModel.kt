@@ -11,22 +11,23 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.AppModule
+import woowacourse.shopping.di.AppModule.cartRepository
 import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.PaymentItems
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.UpdateItemResult
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.GetRecommendProductsUseCase
 import woowacourse.shopping.presentation.common.model.toUiModel
 import woowacourse.shopping.presentation.recommend.model.RecommendUiState
 import woowacourse.shopping.presentation.shopping.model.ShoppingItemUiModel
 
 class RecommendViewModel(
+    private val addToCartUseCase: AddToCartUseCase = AppModule.addToCartUseCase,
+    private val getRecommendProductsUseCase: GetRecommendProductsUseCase = AppModule.getRecommendProductsUseCase,
     private val cartRepository: CartRepository = AppModule.cartRepository,
-    private val productRepository: ProductRepository = AppModule.productRepository,
-    private val recentProductRepository: RecentProductRepository = AppModule.recentProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RecommendUiState())
     val uiState: StateFlow<RecommendUiState> = _uiState.asStateFlow()
@@ -45,23 +46,8 @@ class RecommendViewModel(
 
     fun loadRecommendProducts() {
         viewModelScope.launch(exceptionHandler) {
-            val recentProducts = recentProductRepository.getRecentProducts(1)
-            if (recentProducts.isEmpty()) return@launch
-            val inCartProductIds = cartRepository.getCart().items.map { it.product.id }
-            val sameCategoryProducts =
-                productRepository.getProducts(
-                    offset = 0,
-                    limit = RECOMMEND_PRODUCT_SIZE,
-                    category = recentProducts[0].category,
-                )
-            val recommend =
-                sameCategoryProducts
-                    .products
-                    .filter { product -> product.id !in inCartProductIds }
-                    .take(10)
-
+            val recommend = getRecommendProductsUseCase()
             recommendProducts = recommend
-
             _uiState.update {
                 it.copy(
                     recommendProducts =
@@ -95,7 +81,7 @@ class RecommendViewModel(
 
     fun increase(productId: Long) {
         viewModelScope.launch(exceptionHandler) {
-            when (val result = cartRepository.addItem(productId)) {
+            when (val result = addToCartUseCase(productId)) {
                 is AddItemResult.NewAdded -> applyCart(result.cart, productId)
                 is AddItemResult.Incremented -> applyCart(result.cart, productId)
                 is AddItemResult.Error -> _uiEvents.emit(RecommendEvent.ShowError(result.message))

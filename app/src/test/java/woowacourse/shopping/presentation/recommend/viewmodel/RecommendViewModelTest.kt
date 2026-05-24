@@ -9,6 +9,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.GetRecommendProductsUseCase
 import woowacourse.shopping.fake.fakeProduct
 import woowacourse.shopping.fake.repository.FakeCartRepository
 import woowacourse.shopping.fake.repository.FakeProductRepository
@@ -42,8 +44,8 @@ class RecommendViewModelTest {
         viewModel =
             RecommendViewModel(
                 cartRepository = cartRepository,
-                productRepository = productRepository,
-                recentProductRepository = recentProductRepository,
+                addToCartUseCase = AddToCartUseCase(cartRepository),
+                getRecommendProductsUseCase = GetRecommendProductsUseCase(recentProductRepository, cartRepository, productRepository),
             )
     }
 
