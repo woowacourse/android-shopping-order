@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -56,14 +57,16 @@ import woowacourse.shopping.ui.util.LoadState
 fun ProductDetailScreen(
     onCloseClick: () -> Unit,
     viewModel: ProductDetailViewModel,
-    modifier: Modifier = Modifier,
     onAddToCartClick: () -> Unit = {},
     onLastViewedProductClick: (Product) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ProductDetailScreenContent(
-        modifier = modifier,
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .systemBarsPadding(),
         uiState = uiState,
         onCloseClick = onCloseClick,
         onIncreaseClick = viewModel::increaseQuantity,

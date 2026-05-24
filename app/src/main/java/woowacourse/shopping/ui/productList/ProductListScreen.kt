@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -50,7 +51,6 @@ import androidx.compose.foundation.lazy.items as lazyRowItems
 
 @Composable
 fun ProductListScreen(
-    modifier: Modifier = Modifier,
     viewModel: ProductListViewModel,
     onCartClick: () -> Unit = {},
     onProductClick: (Int) -> Unit = {},
@@ -58,7 +58,10 @@ fun ProductListScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ProductListScreenContent(
-        modifier = modifier,
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .systemBarsPadding(),
         uiState = uiState,
         onAddClick = viewModel::addProduct,
         onIncrease = viewModel::increaseQuantity,

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -56,11 +57,13 @@ fun CartScreen(
     viewModel: CartViewModel,
     onClickClose: () -> Unit,
     onNavigateToRecommend: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.cartUiState.collectAsStateWithLifecycle()
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .systemBarsPadding(),
     ) {
         CartTopAppBar(
             modifier =
@@ -70,7 +73,7 @@ fun CartScreen(
             onClick = onClickClose,
         )
         CartScreenContent(
-            modifier = modifier,
+            modifier = Modifier.weight(1f),
             uiState = uiState,
             onClickRemoveItem = viewModel::removeCartItem,
             onClickIncrease = viewModel::increaseCartItemQuantity,
@@ -107,8 +110,7 @@ private fun CartScreenContent(
 
         is LoadState.Loading -> {
             LoadingContent(
-                modifier =
-                modifier,
+                modifier = modifier,
             )
         }
 
