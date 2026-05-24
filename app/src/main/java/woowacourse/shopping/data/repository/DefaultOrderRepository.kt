@@ -1,5 +1,7 @@
 package woowacourse.shopping.data.repository
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import woowacourse.shopping.data.source.remote.api.OrderItemsRequest
 import woowacourse.shopping.data.source.remote.api.OrderService
 import woowacourse.shopping.data.source.remote.api.safeNetworkApiCall
@@ -14,19 +16,25 @@ import woowacourse.shopping.domain.model.payment.FixedAmountCoupon
 import woowacourse.shopping.domain.model.payment.FreeShippingCoupon
 import woowacourse.shopping.domain.model.payment.PercentageCoupon
 import woowacourse.shopping.error.Error
-import woowacourse.shopping.error.NetworkError
 import woowacourse.shopping.error.Result
 import java.time.LocalDate
+import java.time.LocalTime
 
 class DefaultOrderRepository(
     private val remoteOrderDataSource: OrderService,
 ) : OrderRepository {
-    override suspend fun getCoupons(): Result<List<Coupon>, NetworkError> =
-        safeNetworkApiCall {
-            remoteOrderDataSource.getCoupons().map { couponResponse ->
-                couponResponse.toCoupon()
+    private val _coupons = MutableStateFlow<List<Coupon>>(emptyList())
+    override val coupons = _coupons.asStateFlow()
+
+    override suspend fun loadCoupons() {
+        val result =
+            safeNetworkApiCall {
+                remoteOrderDataSource.getCoupons().map { it.toCoupon() }
             }
+        if (result is Result.Success) {
+            _coupons.value = result.data
         }
+    }
 
     override suspend fun orderCartItems(cartItemIds: List<Long>): Result<Unit, Error> =
         safeNetworkApiCall {
@@ -67,6 +75,8 @@ private fun CouponResponse.toCoupon(): Coupon =
                 code = this.code,
                 expirationDate = LocalDate.parse(this.expirationDate),
                 discountRate = this.discount,
+                availableTimeStart = LocalTime.parse(this.availableTime.start),
+                availableTimeEnd = LocalTime.parse(this.availableTime.end),
             )
         }
     }

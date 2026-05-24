@@ -1,6 +1,7 @@
 package woowacourse.shopping.domain.model.payment
 
 import java.time.LocalDate
+import java.time.LocalTime
 
 class FixedAmountCoupon(
     code: String,
@@ -18,6 +19,8 @@ class PercentageCoupon(
     code: String,
     expirationDate: LocalDate,
     val discountRate: Int,
+    val availableTimeStart: LocalTime? = null,
+    val availableTimeEnd: LocalTime? = null,
 ) : Coupon(code, expirationDate) {
     override fun doApply(order: Order): Order {
         val discountAmount = (order.items.totalPrice * discountRate / 100.0).toInt()
