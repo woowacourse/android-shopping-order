@@ -3,9 +3,13 @@ package woowacourse.shopping.ui.util
 import woowacourse.shopping.constant.Format.formatPrice
 import woowacourse.shopping.domain.cart.CartItem
 import woowacourse.shopping.domain.cart.CartItems
+import woowacourse.shopping.domain.coupon.Coupon
+import woowacourse.shopping.domain.coupon.Coupons
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.Products
 import woowacourse.shopping.ui.cart.CartItemUiModel
+import woowacourse.shopping.ui.order.CouponUiModel
+import woowacourse.shopping.ui.order.DiscountConditionUiModel
 import woowacourse.shopping.ui.productList.ProductUiModel
 
 fun List<CartItem>.toUiModel(selectedItems: Set<Int>): List<CartItemUiModel> =
@@ -39,3 +43,33 @@ fun Product.toUiModel(cartAmount: Int): ProductUiModel =
         cartAmount = cartAmount.toString(),
         showAmountController = cartAmount > 0,
     )
+
+fun Coupons.toUiModel(selectedCoupon: Coupon? = null): List<CouponUiModel> =
+    this.coupons.map { coupon ->
+        CouponUiModel(
+            id = coupon.id,
+            description = coupon.description,
+            expiredDate = coupon.expirationDate.toString(),
+            condition = coupon.toConditions(),
+            isSelected = coupon == selectedCoupon,
+        )
+    }
+
+private fun Coupon.toConditions(): DiscountConditionUiModel? =
+    when (this) {
+        is Coupon.FixedCoupon -> {
+            val condition = if (minimumAmount == 0) "없음" else formatPrice(minimumAmount)
+            DiscountConditionUiModel("최소 주문 금액", condition)
+        }
+
+        is Coupon.PercentageCoupon -> {
+            DiscountConditionUiModel("사용 가능 시간", "${availableTime.start} ~ ${availableTime.end}")
+        }
+
+        is Coupon.BuyXGetYCoupon -> null
+
+        is Coupon.FreeShipping -> {
+            val condition = if (minimumAmount == 0) "없음" else formatPrice(minimumAmount)
+            DiscountConditionUiModel("최소 주문 금액", condition)
+        }
+    }

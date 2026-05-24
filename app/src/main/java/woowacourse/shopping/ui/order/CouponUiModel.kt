@@ -4,7 +4,7 @@ data class CouponUiModel(
     val id: Int,
     val description: String,
     val expiredDate: String,
-    val conditions: List<DiscountConditionUiModel> = emptyList(),
+    val condition: DiscountConditionUiModel? = null,
     val isSelected: Boolean,
 )
 
