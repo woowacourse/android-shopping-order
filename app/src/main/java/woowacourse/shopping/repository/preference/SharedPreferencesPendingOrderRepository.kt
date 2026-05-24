@@ -3,8 +3,8 @@ package woowacourse.shopping.repository.preference
 import android.content.Context
 import android.content.SharedPreferences
 import kotlinx.serialization.json.Json
+import woowacourse.shopping.model.SelectedCartOrder
 import woowacourse.shopping.repository.PendingOrderRepository
-import woowacourse.shopping.ui.cart.SelectedCartOrder
 
 private const val PREFERENCE_NAME = "shopping_pending_order"
 private const val KEY_PENDING_ORDER = "pending_order"

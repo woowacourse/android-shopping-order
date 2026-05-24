@@ -20,14 +20,14 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Coupon
+import woowacourse.shopping.model.SelectedCartOrder
+import woowacourse.shopping.model.SelectedCartOrderItem
 import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.CartRepositoryFixture
 import woowacourse.shopping.repository.CouponRepository
 import woowacourse.shopping.repository.PendingOrderRepository
 import woowacourse.shopping.repository.query.CartPageResult
-import woowacourse.shopping.ui.cart.SelectedCartOrder
-import woowacourse.shopping.ui.cart.SelectedCartOrderItem
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate

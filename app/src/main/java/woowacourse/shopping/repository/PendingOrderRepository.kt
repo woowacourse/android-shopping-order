@@ -1,6 +1,6 @@
 package woowacourse.shopping.repository
 
-import woowacourse.shopping.ui.cart.SelectedCartOrder
+import woowacourse.shopping.model.SelectedCartOrder
 
 interface PendingOrderRepository {
     fun getPendingOrder(): SelectedCartOrder?

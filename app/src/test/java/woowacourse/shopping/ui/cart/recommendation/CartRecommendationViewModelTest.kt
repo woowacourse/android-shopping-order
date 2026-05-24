@@ -21,6 +21,8 @@ import org.junit.jupiter.api.Test
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.SelectedCartOrder
+import woowacourse.shopping.model.SelectedCartOrderItem
 import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.FakeProductRepository
@@ -28,8 +30,6 @@ import woowacourse.shopping.repository.FakeRecentProductRepository
 import woowacourse.shopping.repository.ProductRepositoryFixture
 import woowacourse.shopping.repository.query.CartPageItem
 import woowacourse.shopping.repository.query.CartPageResult
-import woowacourse.shopping.ui.cart.SelectedCartOrder
-import woowacourse.shopping.ui.cart.SelectedCartOrderItem
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CartRecommendationViewModelTest {

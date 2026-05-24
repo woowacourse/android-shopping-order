@@ -12,14 +12,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.model.Coupon
+import woowacourse.shopping.model.SelectedCartOrder
+import woowacourse.shopping.model.deliveryFeeFor
+import woowacourse.shopping.model.discountAmountFor
+import woowacourse.shopping.model.isApplicableTo
 import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.CouponRepository
 import woowacourse.shopping.repository.PendingOrderRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
-import woowacourse.shopping.ui.cart.SelectedCartOrder
 import java.time.Clock
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -154,7 +156,7 @@ class OrderViewModel(
             runCatching {
                 couponRepository
                     .getCoupons()
-                    .filter { coupon -> coupon.isApplicable(selectedCartOrder) }
+                    .filter { coupon -> coupon.isApplicableTo(selectedCartOrder, clock) }
                     .also { coupons -> availableCouponsById = coupons.associateBy(Coupon::id) }
                     .map { coupon -> coupon.toUiModel() }
             }.onSuccess { coupons ->
@@ -185,9 +187,9 @@ class OrderViewModel(
     }
 
     private fun SelectedCartOrder.toPriceSummary(selectedCoupon: Coupon? = null): OrderPriceSummaryUiModel {
-        val orderAmount = items.sumOf { it.price.toLong() * it.quantity }
-        val couponDiscount = selectedCoupon.resolveDiscount(this).coerceAtMost(orderAmount)
-        val deliveryFee = selectedCoupon.resolveDeliveryFee(orderAmount)
+        val orderAmount = totalOrderAmount()
+        val couponDiscount = selectedCoupon.discountAmountFor(this).coerceAtMost(orderAmount)
+        val deliveryFee = selectedCoupon.deliveryFeeFor(orderAmount, DEFAULT_DELIVERY_FEE)
         val totalPaymentPrice = (orderAmount - couponDiscount + deliveryFee).coerceAtLeast(0)
 
         return OrderPriceSummaryUiModel(
@@ -210,30 +212,6 @@ class OrderViewModel(
         )
     }
 
-    private fun Coupon.isApplicable(selectedCartOrder: SelectedCartOrder): Boolean {
-        val today = LocalDate.now(clock)
-        if (expirationDate.isBefore(today)) return false
-
-        val orderAmount = selectedCartOrder.items.sumOf { it.price * it.quantity }
-        if (minimumOrderAmount != null && orderAmount < minimumOrderAmount) return false
-
-        if (bogoEligible) {
-            val requiredQuantity = requiredSameProductQuantity ?: return false
-            val hasEnoughSameProduct =
-                selectedCartOrder.items.any { item ->
-                    item.quantity >= requiredQuantity
-                }
-            if (!hasEnoughSameProduct) return false
-        }
-
-        if (availableFromHour != null && availableToHourExclusive != null) {
-            val currentHour = clock.instant().atZone(clock.zone).hour
-            if (currentHour !in availableFromHour until availableToHourExclusive) return false
-        }
-
-        return true
-    }
-
     private fun Coupon.toUiModel(): OrderCouponUiModel =
         OrderCouponUiModel(
             id = id,
@@ -243,30 +221,6 @@ class OrderViewModel(
                 minimumOrderAmount?.let(::formatMinimumOrderAmount) ?: "없음",
             isSelected = false,
         )
-
-    private fun Coupon?.resolveDiscount(selectedCartOrder: SelectedCartOrder): Long {
-        val coupon = this ?: return 0
-
-        coupon.fixedDiscountAmount?.let { return it.toLong() }
-        coupon.percentageDiscountRate?.let { rate ->
-            return selectedCartOrder.items.sumOf { it.price.toLong() * it.quantity } * rate / 100
-        }
-        if (coupon.bogoEligible) {
-            val requiredQuantity = coupon.requiredSameProductQuantity ?: return 0
-            return selectedCartOrder.items
-                .filter { item -> item.quantity >= requiredQuantity }
-                .maxOfOrNull { item -> item.price.toLong() }
-                ?: 0
-        }
-
-        return 0
-    }
-
-    private fun Coupon?.resolveDeliveryFee(orderAmount: Long): Long {
-        if (orderAmount <= 0) return 0
-        if (this?.freeShipping == true) return 0
-        return DEFAULT_DELIVERY_FEE
-    }
 
     private fun createEmptyPriceSummary(): OrderPriceSummaryUiModel =
         OrderPriceSummaryUiModel(

@@ -11,11 +11,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import woowacourse.shopping.network.NetworkMonitor
+import woowacourse.shopping.model.SelectedCartOrder
+import woowacourse.shopping.model.SelectedCartOrderItem
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
-import woowacourse.shopping.ui.cart.SelectedCartOrder
-import woowacourse.shopping.ui.cart.SelectedCartOrderItem
 import woowacourse.shopping.ui.cart.list.uistate.CartItemUiModelMapper
 import woowacourse.shopping.ui.cart.list.uistate.CartListUiState
 import woowacourse.shopping.ui.cart.list.uistate.CartUiState

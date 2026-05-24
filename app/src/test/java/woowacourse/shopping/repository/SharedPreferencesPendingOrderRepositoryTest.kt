@@ -6,9 +6,9 @@ import android.content.SharedPreferences
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.model.SelectedCartOrder
+import woowacourse.shopping.model.SelectedCartOrderItem
 import woowacourse.shopping.repository.preference.SharedPreferencesPendingOrderRepository
-import woowacourse.shopping.ui.cart.SelectedCartOrder
-import woowacourse.shopping.ui.cart.SelectedCartOrderItem
 
 class SharedPreferencesPendingOrderRepositoryTest {
     @Test
