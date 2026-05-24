@@ -11,12 +11,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,26 +27,48 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun OrderScreen() {
+fun OrderScreen(
+    orderViewModel: OrderViewModel,
+    onClickClose: () -> Unit,
+    onOrderSuccess: () -> Unit,
+) {
+    val uiState by orderViewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(orderViewModel.events) {
+        orderViewModel.events.collect { event ->
+            when (event) {
+                OrderEvent.OrderSuccess -> onOrderSuccess()
+            }
+        }
+    }
+
     Column {
-        PaymentTopAppBar(onNavigateBack = { /*TODO*/ })
+        PaymentTopAppBar(onNavigateBack = onClickClose)
         OrderScreenContent(
+            uiState = uiState,
+            onCouponClick = orderViewModel::selectCoupon,
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .weight(1f),
         )
-        PaymentBottomBar({ /*TODO*/ })
+        PaymentBottomBar(orderViewModel::order)
     }
 }
 
 @Composable
-fun OrderScreenContent(modifier: Modifier = Modifier) {
+fun OrderScreenContent(
+    uiState: OrderUiState,
+    onCouponClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item {
             Column(
@@ -63,12 +88,15 @@ fun OrderScreenContent(modifier: Modifier = Modifier) {
                 )
             }
         }
-        item {
-//            CouponCard(
-//                modifier = Modifier
-//                    .padding(16.dp)
-//                    .fillMaxWidth()
-//            )
+        items(items = uiState.coupons, key = { it.id }) { coupon ->
+            CouponCard(
+                coupon = coupon,
+                onClick = { onCouponClick(coupon.id) },
+                modifier =
+                    Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth(),
+            )
         }
 
         item {
@@ -81,9 +109,9 @@ fun OrderScreenContent(modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                PriceRow("주문 금액", "1,200,000원", modifier = Modifier.fillMaxWidth())
-                PriceRow("쿠폰 할인 금액", "-5,000원", modifier = Modifier.fillMaxWidth())
-                PriceRow("주문 금액", "3,000원", modifier = Modifier.fillMaxWidth())
+                PriceRow("주문 금액", uiState.totalPrice, modifier = Modifier.fillMaxWidth())
+                PriceRow("쿠폰 할인 금액", uiState.discountAmount, modifier = Modifier.fillMaxWidth())
+                PriceRow("배송비", uiState.shippingFee, modifier = Modifier.fillMaxWidth())
             }
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 18.dp),
@@ -92,7 +120,7 @@ fun OrderScreenContent(modifier: Modifier = Modifier) {
             )
             PriceRow(
                 "총 결제 금액",
-                "1,200,000원",
+                uiState.amountToPay,
                 modifier =
                     Modifier
                         .fillMaxWidth()
@@ -181,6 +209,29 @@ private fun PaymentTopAppBar(onNavigateBack: () -> Unit) {
 @Composable
 fun OrderScreenPreview() {
     OrderScreenContent(
+        uiState =
+            OrderUiState(
+                totalPrice = "100,000원",
+                discountAmount = "10,000원",
+                shippingFee = "30,000원",
+                amountToPay = "90,000원",
+                coupons =
+                    listOf(
+                        CouponUiModel(
+                            id = 1,
+                            description = "신규 회원",
+                            expiredDate = "2023.06.30",
+                            isSelected = true,
+                        ),
+                        CouponUiModel(
+                            id = 2,
+                            description = "신규 회원",
+                            expiredDate = "2023.06.30",
+                            isSelected = false,
+                        ),
+                    ),
+            ),
+        onCouponClick = {},
         modifier =
             Modifier
                 .fillMaxSize(),

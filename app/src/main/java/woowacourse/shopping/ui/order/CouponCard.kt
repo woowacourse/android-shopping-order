@@ -55,8 +55,8 @@ fun CouponCard(
             )
         }
         DiscountCondition("만료일", coupon.expiredDate)
-        coupon.conditions.forEach { condition ->
-            DiscountCondition(condition.type, condition.content)
+        coupon.condition?.let {
+            DiscountCondition(it.type, it.content)
         }
     }
 }
@@ -83,12 +83,10 @@ fun CouponCardPreview() {
                 id = 0,
                 description = "5,000원 할인",
                 expiredDate = "2023.08.31",
-                conditions =
-                    listOf(
-                        DiscountConditionUiModel(
-                            "최소 주문 금액",
-                            "100,000원",
-                        ),
+                condition =
+                    DiscountConditionUiModel(
+                        "최소 주문 금액",
+                        "100,000원",
                     ),
                 isSelected = true,
             ),
