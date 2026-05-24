@@ -20,6 +20,7 @@ import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentItemRepository
+import woowacourse.shopping.data.repository.RecentItemRepositoryImpl
 
 class AppContainer(
     private val context: Context,
@@ -41,7 +42,7 @@ class AppContainer(
     }
 
     val recentItemRepository: RecentItemRepository by lazy {
-        RecentItemRepository(database.recentItemDao())
+        RecentItemRepositoryImpl(database.recentItemDao())
     }
 
     val networkObserver: NetworkObserver by lazy {

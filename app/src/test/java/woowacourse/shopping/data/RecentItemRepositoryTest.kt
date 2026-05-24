@@ -1,4 +1,4 @@
-package woowacourse.shopping.data
+﻿package woowacourse.shopping.data
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -6,138 +6,148 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.data.localdb.dao.RecentItemDao
 import woowacourse.shopping.data.localdb.entity.RecentItemEntity
-import woowacourse.shopping.data.repository.ProductRepository
-import woowacourse.shopping.data.repository.ProductResponseResult
 import woowacourse.shopping.data.repository.RecentItemRepository
+import woowacourse.shopping.data.repository.RecentItemRepositoryImpl
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductName
 
 class RecentItemRepositoryTest {
-    private val product =
-        Product(
-            id = "1",
-            name = ProductName("product"),
-            price = Money(2000),
-            imageUrl = "image-url",
-            category = "book",
-        )
+    private lateinit var recentItemDao: TestRecentItemDao
+    private lateinit var repository: RecentItemRepository
+
+    @BeforeEach
+    fun setUp() {
+        recentItemDao = TestRecentItemDao()
+        repository = RecentItemRepositoryImpl(recentItemDao)
+    }
 
     @Test
-    fun `최근 본 상품을 저장하고 오래된 상품을 삭제한다`() =
+    fun `최근 본 상품 목록을 추가할 수 있다`() =
         runTest {
-            val dao = TestRecentItemDao()
-            val repository = RecentItemRepository(dao, FakeProductRepository(listOf(product)))
-
-            repository.addRecentItem(product)
-
-            val savedItem = dao.getRecentItemById(product.id)
-            assertThat(savedItem?.id).isEqualTo(product.id)
-            assertThat(dao.deleteOldItemCount).isEqualTo(1)
-        }
-
-    @Test
-    fun `최근 본 상품 엔티티 목록을 도메인 상품으로 변환한다`() =
-        runTest {
-            val dao = TestRecentItemDao()
-            val repository = RecentItemRepository(dao, FakeProductRepository(listOf(product)))
-            dao.insert(product.toRecentItemEntity(timestamp = 100L))
+            (1L..2L).forEach {
+                repository.addRecentItem(createProduct(it))
+            }
 
             val recentItems = repository.getRecentItems().first()
 
-            assertThat(recentItems).hasSize(1)
-            assertThat(recentItems[0].id).isEqualTo(product.id)
-            assertThat(recentItems[0].getName()).isEqualTo(product.getName())
-            assertThat(recentItems[0].getPrice()).isEqualTo(product.getPrice())
-            assertThat(recentItems[0].imageUrl).isEqualTo(product.imageUrl)
+            assertThat(recentItems.map { it.productId }).containsExactly(2L, 1L)
         }
 
     @Test
-    fun `마지막으로 본 상품을 반환한다`() =
+    fun `최근 본 상품 목록을 최신순으로 조회할 수 있다`() =
         runTest {
-            val dao = TestRecentItemDao()
-            val repository = RecentItemRepository(dao, FakeProductRepository(listOf(createProduct(id = "1"), createProduct(id = "2"))))
-            dao.insert(createProduct(id = "1").toRecentItemEntity(timestamp = 100L))
-            dao.insert(createProduct(id = "2").toRecentItemEntity(timestamp = 200L))
+            (1L..2L).forEach {
+                recentItemDao.insert(
+                    recentItemEntity(
+                        productId = it,
+                        timestamp = it,
+                    ),
+                )
+            }
 
-            val lastViewedItem = repository.getLastViewedItem()
+            val recentItems = repository.getRecentItems().first()
 
-            assertThat(lastViewedItem?.id).isEqualTo("2")
+            assertThat(recentItems.map { it.productId }).containsExactly(2L, 1L)
         }
 
     @Test
-    fun `최근 본 상품이 없으면 마지막으로 본 상품은 널을 반환한다`() =
+    fun `최근 본 상품 목록은 최대 10개까지만 반환한다`() =
         runTest {
-            val repository = RecentItemRepository(TestRecentItemDao(), FakeProductRepository(emptyList()))
+            (1L..11L).forEach {
+                recentItemDao.insert(
+                    recentItemEntity(
+                        productId = it,
+                        timestamp = it,
+                    ),
+                )
+            }
 
-            val lastViewedItem = repository.getLastViewedItem()
+            val recentItems = repository.getRecentItems().first()
 
-            assertThat(lastViewedItem).isNull()
+            assertThat(recentItems.map { it.productId }).containsExactly(11L, 10L, 9L, 8L, 7L, 6L, 5L, 4L, 3L, 2L)
         }
 
-    private fun createProduct(id: String): Product =
+    @Test
+    fun `마지막으로 본 상품 id를 반환한다`() =
+        runTest {
+            (1L..2L).forEach {
+                recentItemDao.insert(
+                    recentItemEntity(
+                        productId = it,
+                        timestamp = it,
+                    ),
+                )
+            }
+
+            val lastViewedItemId = repository.getLastViewedItemId()
+
+            assertThat(lastViewedItemId).isEqualTo(2L)
+        }
+
+    @Test
+    fun `최근 본 상품이 없으면 마지막으로 본 상품 id는 null을 반환한다`() =
+        runTest {
+            val lastViewedItemId = repository.getLastViewedItemId()
+
+            assertThat(lastViewedItemId).isNull()
+        }
+
+    private fun createProduct(
+        productId: Long,
+        name: String = "product$productId",
+        imageUrl: String = "image$productId",
+    ): Product =
         Product(
-            id = id,
-            name = ProductName("product$id"),
+            id = productId,
+            name = ProductName(name),
             price = Money(1000),
-            imageUrl = "image$id",
+            imageUrl = imageUrl,
             category = "book",
         )
 
-    private fun Product.toRecentItemEntity(timestamp: Long): RecentItemEntity =
+    private fun recentItemEntity(
+        productId: Long,
+        name: String = "product$productId",
+        imageUrl: String = "image$productId",
+        timestamp: Long,
+    ): RecentItemEntity =
         RecentItemEntity(
-            id = id,
+            productId = productId,
+            name = name,
+            imageUrl = imageUrl,
             timestamp = timestamp,
         )
 
     private class TestRecentItemDao : RecentItemDao {
         private val items = MutableStateFlow<List<RecentItemEntity>>(emptyList())
-        var deleteOldItemCount = 0
-            private set
 
         override suspend fun insert(item: RecentItemEntity) {
-            items.value = items.value.filterNot { it.id == item.id } + item
+            items.value = items.value.filterNot { it.productId == item.productId } + item
         }
 
-        override fun getRecentItems(): Flow<List<RecentItemEntity>> =
-            items.map { entities ->
-                entities.sortedWith(compareByDescending<RecentItemEntity> { it.timestamp }.thenByDescending { it.id }).take(10)
-            }
+        override fun getRecentItems(limit: Int): Flow<List<RecentItemEntity>> = items.map { entities -> entities.recently(limit) }
 
-        override suspend fun getRecentItemById(id: String): RecentItemEntity? = items.value.firstOrNull { it.id == id }
+        override suspend fun getRecentItemByProductId(productId: Long): RecentItemEntity? =
+            items.value.firstOrNull { it.productId == productId }
 
-        override suspend fun deleteOldItem() {
-            deleteOldItemCount++
-            val recentIds =
+        override suspend fun deleteItemsExceedingLimit(limit: Int) {
+            val recentProductIds =
                 items.value
-                    .sortedWith(compareByDescending<RecentItemEntity> { it.timestamp }.thenByDescending { it.id })
-                    .take(10)
-                    .map { it.id }
+                    .recently(limit)
+                    .map { it.productId }
                     .toSet()
-            items.value = items.value.filter { it.id in recentIds }
+            items.value = items.value.filter { it.productId in recentProductIds }
         }
 
-        override suspend fun getLastViewedItem(): RecentItemEntity? =
-            items.value.maxWithOrNull(compareBy<RecentItemEntity> { it.timestamp }.thenBy { it.id })
-    }
+        override suspend fun getLastViewedItem(): RecentItemEntity? = items.value.recently(limit = 1).firstOrNull()
 
-    private class FakeProductRepository(
-        private val products: List<Product>,
-    ) : ProductRepository {
-        override suspend fun getProducts(
-            category: String,
-            page: Int,
-            size: Int,
-        ): ProductResponseResult {
-            val fromIndex = page * size
-            val pageProducts = products.drop(fromIndex).take(size)
-            return ProductResponseResult(pageProducts, isLastPage = fromIndex + pageProducts.size >= products.size)
-        }
-
-        override suspend fun getProductById(id: String): Product =
-            products.firstOrNull { it.id == id } ?: throw IllegalArgumentException("Product not found")
+        private fun List<RecentItemEntity>.recently(limit: Int): List<RecentItemEntity> =
+            sortedWith(compareByDescending<RecentItemEntity> { it.timestamp }.thenByDescending { it.productId })
+                .take(limit)
     }
 }
