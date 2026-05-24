@@ -16,9 +16,15 @@ class FakeProductRepository(
         category: String?,
     ): ImmutableList<Product> {
         if (shouldFail) throw IOException()
-        if (offset >= products.size) return emptyList<Product>().toImmutableList()
-        val toIndex = minOf(offset + limit, products.size)
-        return products.subList(offset, toIndex).toImmutableList()
+        val filtered =
+            if (category == null) {
+                products
+            } else {
+                products.filter { it.category == category }
+            }
+        if (offset >= filtered.size) return emptyList<Product>().toImmutableList()
+        val toIndex = minOf(offset + limit, filtered.size)
+        return filtered.subList(offset, toIndex).toImmutableList()
     }
 
     override suspend fun getProductById(id: Long): Product = products.first { it.id == id }
