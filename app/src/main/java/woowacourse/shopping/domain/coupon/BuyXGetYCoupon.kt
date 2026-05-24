@@ -12,7 +12,7 @@ data class BuyXGetYCoupon(
     val getQuantity: Int
 ): Coupon {
     override fun isEligible(order: Order): Boolean =
-        !isExpired(order.currentTime) && order.purchaseProducts.any { it.count >= 3 }
+        !isExpired(order.currentTime) && order.purchaseProducts.any { it.count >= buyQuantity }
 
     override fun calculateDiscount(order: Order): Discount {
         val maxPrice = order.purchaseProducts
