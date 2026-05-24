@@ -20,6 +20,7 @@ import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentItemRepository
 import woowacourse.shopping.ui.model.mapper.toUiModel
+import woowacourse.shopping.ui.navigation.Detail
 
 class DetailViewModel(
     savedStateHandle: SavedStateHandle,
@@ -27,7 +28,7 @@ class DetailViewModel(
     private val cartRepository: CartRepository,
     private val recentItemRepository: RecentItemRepository,
 ) : ViewModel() {
-    private val id: Long = savedStateHandle[PRODUCT_ID] ?: 0L
+    private val id: Long = savedStateHandle[Detail::productId.name] ?: 0L
 
     private val _uiState = MutableStateFlow(DetailUiState())
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
@@ -97,8 +98,6 @@ class DetailViewModel(
     }
 
     companion object {
-        private const val PRODUCT_ID = "productId"
-
         val Factory: ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
