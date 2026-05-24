@@ -1,6 +1,5 @@
 package woowacourse.shopping.presentation.payment.viewmodel
 
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -12,10 +11,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.di.RepositoryProvider.couponRepository
-import woowacourse.shopping.di.RepositoryProvider.orderRepository
-import woowacourse.shopping.di.RepositoryProvider.productRepository
-import woowacourse.shopping.di.RepositoryProvider.settingRepository
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.Money
 import woowacourse.shopping.fake.FakePaymentNotificationScheduler

@@ -1,6 +1,5 @@
 package woowacourse.shopping.fake.repository
 
-import io.kotest.assertions.shouldFail
 import okio.IOException
 import woowacourse.shopping.domain.repository.OrderRepository
 
