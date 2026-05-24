@@ -13,12 +13,23 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 
 class MainActivity : ComponentActivity() {
+    private val alarmScheduler by lazy {
+        AlarmScheduler(
+            context = this,
+            requestCode = 0,
+            receiver = OrderAlarmBroadCastReceiver::class.java,
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         requestNotificationPermission()
         setContent {
-            ShoppingNavGraph()
+            ShoppingNavGraph(
+                onEnterOrder = { alarmScheduler.schedule(1000L) },
+                onOrderSuccess = { alarmScheduler.cancel() },
+            )
         }
     }
 

@@ -12,7 +12,10 @@ import woowacourse.shopping.presentation.productlist.ProductListScreen
 import woowacourse.shopping.presentation.recommend.RecommendItemScreen
 
 @Composable
-fun ShoppingNavGraph() {
+fun ShoppingNavGraph(
+    onEnterOrder: () -> Unit,
+    onOrderSuccess: () -> Unit,
+) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
@@ -67,7 +70,9 @@ fun ShoppingNavGraph() {
             OrderScreen(
                 productIds = route.productIds,
                 onBackClick = { navController.popBackStack() },
+                onEnterOrder = onEnterOrder,
                 onOrderSuccess = {
+                    onOrderSuccess()
                     navController.navigate(ShoppingList) {
                         popUpTo(ShoppingList) { inclusive = false }
                     }

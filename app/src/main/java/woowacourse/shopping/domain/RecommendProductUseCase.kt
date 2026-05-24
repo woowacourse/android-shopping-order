@@ -12,7 +12,8 @@ suspend fun recommendProductUseCase(
     val cart = cartRepository.cart
     val recentProducts =
         productRepository.getRecentProductsStream(1).firstOrNull() ?: return emptyList()
-    val sameCategoryProducts = productRepository.products.value.filter { it.category == recentProducts[0].category }
+    val recentProduct = recentProducts.firstOrNull() ?: return emptyList()
+    val sameCategoryProducts = productRepository.products.value.filter { it.category == recentProduct.category }
     return sameCategoryProducts
         .filter { product ->
             product.id !in cart.value.items.map { it.product.id }

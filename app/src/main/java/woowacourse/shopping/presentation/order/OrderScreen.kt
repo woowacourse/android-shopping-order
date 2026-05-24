@@ -54,6 +54,7 @@ fun OrderScreen(
     productIds: List<Long>,
     onBackClick: () -> Unit,
     onOrderSuccess: () -> Unit,
+    onEnterOrder: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: OrderViewModel = viewModel(),
 ) {
@@ -62,6 +63,7 @@ fun OrderScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
+        onEnterOrder()
         viewModel.initializePaymentItems(productIds)
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.event.collect { event ->
