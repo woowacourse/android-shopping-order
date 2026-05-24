@@ -1,8 +1,8 @@
 package woowacourse.shopping.ui.uimodel
 
 import woowacourse.shopping.core.designsystem.component.toPriceString
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.Products
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.product.Products
 
 data class ProductUiModel(
     val id: Long,

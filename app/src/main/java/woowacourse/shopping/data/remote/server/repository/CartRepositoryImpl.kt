@@ -4,9 +4,9 @@ import woowacourse.shopping.data.remote.server.dto.cart.items.PatchQuantityReque
 import woowacourse.shopping.data.remote.server.dto.cart.items.PostCartRequest
 import woowacourse.shopping.data.remote.server.dto.cart.items.toDomainPurchaseProduct
 import woowacourse.shopping.data.remote.server.service.CartService
-import woowacourse.shopping.domain.model.CartPage
-import woowacourse.shopping.domain.model.PurchaseProduct
-import woowacourse.shopping.domain.model.PurchaseProducts
+import woowacourse.shopping.domain.model.cart.CartPage
+import woowacourse.shopping.domain.model.order.PurchaseProduct
+import woowacourse.shopping.domain.model.order.PurchaseProducts
 import woowacourse.shopping.domain.repository.CartRepository
 
 class CartRepositoryImpl(private val cartService: CartService) : CartRepository {

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.data.local.dao.RecentlyViewedProductDao
 import woowacourse.shopping.data.local.entity.RecentlyViewedProductEntity
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.RecentlyViewedProductRepository
 
 class RecentlyViewedProductRepositoryImplTest {

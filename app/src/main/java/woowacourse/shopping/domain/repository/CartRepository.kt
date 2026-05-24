@@ -1,8 +1,8 @@
 package woowacourse.shopping.domain.repository
 
-import woowacourse.shopping.domain.model.CartPage
-import woowacourse.shopping.domain.model.PurchaseProduct
-import woowacourse.shopping.domain.model.PurchaseProducts
+import woowacourse.shopping.domain.model.cart.CartPage
+import woowacourse.shopping.domain.model.order.PurchaseProduct
+import woowacourse.shopping.domain.model.order.PurchaseProducts
 
 interface CartRepository {
     suspend fun insert(purchaseProduct: PurchaseProduct)

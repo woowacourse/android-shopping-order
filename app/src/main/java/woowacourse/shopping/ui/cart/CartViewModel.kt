@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.domain.model.PurchaseProducts
+import woowacourse.shopping.domain.model.order.PurchaseProducts
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.ui.event.UiEvent
 

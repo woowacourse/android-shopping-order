@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.uimodel
 
-import woowacourse.shopping.domain.model.PurchaseProduct
-import woowacourse.shopping.domain.model.PurchaseProducts
+import woowacourse.shopping.domain.model.order.PurchaseProduct
+import woowacourse.shopping.domain.model.order.PurchaseProducts
 
 data class CartProductUiModel(
     val id: Long,

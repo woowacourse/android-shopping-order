@@ -1,7 +1,7 @@
 package woowacourse.shopping.testing.fakes
 
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.product.Product
 
 class FakeProductRepository : ProductRepository {
     private val products = mutableListOf<Product>()

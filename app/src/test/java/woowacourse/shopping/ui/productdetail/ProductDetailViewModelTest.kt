@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.extension.RegisterExtension
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.testing.fakes.FakeCartRepository
 import woowacourse.shopping.testing.fakes.FakeProductRepository
 import woowacourse.shopping.testing.fakes.FakeRecentlyViewedProductRepository

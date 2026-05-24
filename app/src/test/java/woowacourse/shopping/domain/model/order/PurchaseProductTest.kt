@@ -1,7 +1,8 @@
-package woowacourse.shopping.domain.model
+package woowacourse.shopping.domain.model.order
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import woowacourse.shopping.domain.model.product.Product
 
 class PurchaseProductTest {
     @Test

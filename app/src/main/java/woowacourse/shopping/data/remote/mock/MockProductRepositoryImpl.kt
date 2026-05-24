@@ -8,7 +8,7 @@ import okhttp3.Request
 import woowacourse.shopping.data.remote.mock.dto.WebServerResponse
 import woowacourse.shopping.data.remote.mock.dto.toObject
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.product.Product
 
 class MockProductRepositoryImpl(
     private val client: OkHttpClient,

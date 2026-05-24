@@ -1,9 +1,9 @@
 package woowacourse.shopping.testing.fakes
 
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.model.CartPage
-import woowacourse.shopping.domain.model.PurchaseProduct
-import woowacourse.shopping.domain.model.PurchaseProducts
+import woowacourse.shopping.domain.model.cart.CartPage
+import woowacourse.shopping.domain.model.order.PurchaseProduct
+import woowacourse.shopping.domain.model.order.PurchaseProducts
 
 class FakeCartRepository : CartRepository {
     private val _db = mutableListOf<PurchaseProduct>()

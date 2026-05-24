@@ -1,7 +1,8 @@
-package woowacourse.shopping.domain.model
+package woowacourse.shopping.domain.model.order
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import woowacourse.shopping.domain.model.product.Product
 
 @Parcelize
 data class PurchaseProduct(

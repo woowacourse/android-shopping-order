@@ -13,7 +13,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.domain.model.PurchaseProduct
+import woowacourse.shopping.domain.model.order.PurchaseProduct
 import woowacourse.shopping.ui.event.UiEventHandler
 import woowacourse.shopping.ui.uimodel.toCartProductUiModel
 import woowacourse.shopping.ui.uimodel.toProductUiModel
@@ -24,7 +24,7 @@ fun NavGraphBuilder.recommendationRoute(
     contentPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
     onItemClick: (selectedProductId: Long) -> Unit,
-    onOrderClick: () -> Unit,
+    onOrderClick: (selectedCartItemIds: List<Long>) -> Unit,
     onBackClick: () -> Unit,
 ) {
     composable<ShoppingRoute.Recommendation> { backStackEntry ->
@@ -49,7 +49,7 @@ private fun RecommendationRouteContent(
     contentPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
     onBackClick: () -> Unit,
-    onOrderClick: () -> Unit,
+    onOrderClick: (selectedCartItemIds: List<Long>) -> Unit,
     onItemClick: (selectedProductId: Long) -> Unit,
 ) {
     val viewModel: RecommendationViewModel =
@@ -84,7 +84,7 @@ private fun RecommendationRouteContent(
     CartRecommendationScreen(
         uiState = uiState,
         onBackClick = onBackClick,
-        onOrderClick = onOrderClick,
+        onOrderClick = { onOrderClick(selectedCartItemIds) },
         onAddInCart = { productId ->
             recommendedProducts.findWithId(productId)?.let { product ->
                 viewModel.addToCart(PurchaseProduct(product.id, product))

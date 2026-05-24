@@ -13,7 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.domain.model.PurchaseProduct
+import woowacourse.shopping.domain.model.order.PurchaseProduct
 import woowacourse.shopping.ui.event.UiEventHandler
 import woowacourse.shopping.ui.uimodel.toCartProductUiModel
 import woowacourse.shopping.ui.uimodel.toProductUiModel

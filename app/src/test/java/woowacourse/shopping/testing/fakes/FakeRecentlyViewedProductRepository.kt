@@ -3,7 +3,7 @@ package woowacourse.shopping.testing.fakes
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.RecentlyViewedProductRepository
 
 class FakeRecentlyViewedProductRepository : RecentlyViewedProductRepository {

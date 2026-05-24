@@ -3,7 +3,7 @@ package woowacourse.shopping.data.remote.server.repository
 import woowacourse.shopping.data.remote.server.service.ProductService
 import woowacourse.shopping.data.remote.server.dto.product.toDomainProduct
 import woowacourse.shopping.data.remote.server.dto.products.toDomainProduct
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 
 class ProductRepositoryImpl(
