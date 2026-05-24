@@ -1,4 +1,4 @@
-package woowacourse.shopping.fake
+package woowacourse.shopping.fake.dispatcher
 
 import kotlinx.serialization.json.Json
 import mockwebserver3.Dispatcher

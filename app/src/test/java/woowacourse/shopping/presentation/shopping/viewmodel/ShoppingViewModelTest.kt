@@ -7,12 +7,11 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.assertj.core.api.Assertions
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.fake.FakeCartRepository
-import woowacourse.shopping.fake.FakeProductRepository
-import woowacourse.shopping.fake.FakeRecentProductRepository
+import woowacourse.shopping.fake.repository.FakeCartRepository
+import woowacourse.shopping.fake.repository.FakeProductRepository
+import woowacourse.shopping.fake.repository.FakeRecentProductRepository
 import woowacourse.shopping.fake.fakeProduct
 
 @OptIn(ExperimentalCoroutinesApi::class)

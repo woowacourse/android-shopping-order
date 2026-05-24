@@ -10,9 +10,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.fake.FakeCartRepository
-import woowacourse.shopping.fake.FakeProductRepository
-import woowacourse.shopping.fake.FakeRecentProductRepository
+import woowacourse.shopping.fake.repository.FakeCartRepository
+import woowacourse.shopping.fake.repository.FakeProductRepository
+import woowacourse.shopping.fake.repository.FakeRecentProductRepository
 import woowacourse.shopping.fake.fakeProduct
 import woowacourse.shopping.presentation.detail.model.DetailUiState
 

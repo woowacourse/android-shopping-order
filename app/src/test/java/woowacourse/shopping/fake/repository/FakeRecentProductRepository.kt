@@ -1,4 +1,4 @@
-package woowacourse.shopping.fake
+package woowacourse.shopping.fake.repository
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList

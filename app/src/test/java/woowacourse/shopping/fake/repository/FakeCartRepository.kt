@@ -1,4 +1,4 @@
-package woowacourse.shopping.fake
+package woowacourse.shopping.fake.repository
 
 import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.Cart

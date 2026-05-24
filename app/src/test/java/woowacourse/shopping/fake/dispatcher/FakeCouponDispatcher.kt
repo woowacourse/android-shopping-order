@@ -1,4 +1,4 @@
-package woowacourse.shopping.fake
+package woowacourse.shopping.fake.dispatcher
 
 import mockwebserver3.Dispatcher
 import mockwebserver3.MockResponse

@@ -15,7 +15,7 @@ import woowacourse.shopping.data.source.remote.datasource.ProductRemoteDataSourc
 import woowacourse.shopping.domain.model.Money
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductName
-import woowacourse.shopping.fake.FakeProductDispatcher
+import woowacourse.shopping.fake.dispatcher.FakeProductDispatcher
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultProductRepositoryTest {

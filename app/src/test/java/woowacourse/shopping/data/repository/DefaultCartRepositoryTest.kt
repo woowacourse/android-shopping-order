@@ -9,7 +9,7 @@ import woowacourse.shopping.data.source.local.auth.AuthDataSource
 import woowacourse.shopping.data.source.remote.RetrofitClient
 import woowacourse.shopping.data.source.remote.datasource.CartRemoteDataSource
 import woowacourse.shopping.data.source.remote.dto.cart.Product
-import woowacourse.shopping.fake.FakeCartDispatcher
+import woowacourse.shopping.fake.dispatcher.FakeCartDispatcher
 
 class DefaultCartRepositoryTest {
     private lateinit var server: MockWebServer

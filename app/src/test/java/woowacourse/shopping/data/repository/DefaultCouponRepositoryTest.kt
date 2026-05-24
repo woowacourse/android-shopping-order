@@ -11,7 +11,7 @@ import woowacourse.shopping.data.source.remote.RetrofitClient
 import woowacourse.shopping.data.source.remote.datasource.CouponRemoteDataSource
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.Money
-import woowacourse.shopping.fake.FakeCouponDispatcher
+import woowacourse.shopping.fake.dispatcher.FakeCouponDispatcher
 
 class DefaultCouponRepositoryTest {
     private lateinit var server: MockWebServer
