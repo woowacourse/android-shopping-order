@@ -55,6 +55,7 @@ import woowacourse.shopping.ui.util.LoadState
 fun CartScreen(
     viewModel: CartViewModel,
     onClickClose: () -> Unit,
+    onNavigateToRecommend: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.cartUiState.collectAsStateWithLifecycle()
@@ -66,9 +67,7 @@ fun CartScreen(
                 Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-            onClick = {
-                onClickClose()
-            },
+            onClick = onClickClose,
         )
         CartScreenContent(
             modifier = modifier,
@@ -87,7 +86,7 @@ fun CartScreen(
             selectAllButtonVisible = true,
             isAllSelected = uiState.isAllSelected,
             onClickSelectAll = viewModel::toggleAllSelection,
-            onClickOrder = viewModel::onClickOrder,
+            onClickOrder = onNavigateToRecommend,
         )
     }
 }
