@@ -9,6 +9,7 @@ kotlin = "2.3.0"
 coreKtx = "1.18.0"
 espressoCore = "3.7.0"
 kotlinxCollectionsImmutable = "0.4.0"
+kotlinxCoroutinesAndroid = "1.11.0"
 kotlinxSerializationJson = "1.11.0"
 lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.13.0"
@@ -60,6 +61,7 @@ json = { module = "org.json:json", version.ref = "json" }
 kotest-runner-junit5 = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest-runner-junit5" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }

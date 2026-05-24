@@ -44,9 +44,4 @@ class ShoppingActivity : ComponentActivity() {
             }
         }
     }
-
-    override fun onRestart() {
-        super.onRestart()
-        viewModel.loadProducts()
-    }
 }

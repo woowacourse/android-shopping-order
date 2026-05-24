@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import woowacourse.shopping.ui.component.ShoppingAppBar
 import woowacourse.shopping.ui.model.ProductUiModel
+import woowacourse.shopping.ui.model.RecentUiModel
 import woowacourse.shopping.ui.theme.Green40
 
 @Composable
@@ -112,7 +113,7 @@ fun ShoppingScreen(
 @Composable
 private fun ShoppingContents(
     products: ImmutableList<ProductUiModel>,
-    recentItems: ImmutableList<ProductUiModel>,
+    recentItems: ImmutableList<RecentUiModel>,
     onLoad: () -> Unit,
     isLoading: Boolean,
     isCanLoadMore: Boolean,

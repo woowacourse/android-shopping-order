@@ -12,14 +12,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import woowacourse.shopping.data.remote.NetworkObserver
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentItemRepository
 import woowacourse.shopping.ui.model.mapper.toUiModel
-import java.io.IOException
-import kotlin.coroutines.cancellation.CancellationException
 
 class ShoppingViewModel(
     private val productRepository: ProductRepository,
@@ -35,7 +32,7 @@ class ShoppingViewModel(
 
     init {
         observeNetwork()
-        observeCart()
+        observeCartQuantities()
         observeRecentItems()
     }
 
@@ -47,84 +44,44 @@ class ShoppingViewModel(
 
                 if (isAvailable && _uiState.value.products.isEmpty()) {
                     loadMore()
-                    loadRecentItems()
                 }
             }
         }
     }
 
-    fun loadProducts(
-        page: Int = 0,
-        size: Int = offset,
-    ) {
+    private fun observeCartQuantities() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = _uiState.value.products.isEmpty(), cartErrorMessage = null) }
-            runCatching {
-                val apiResult =
-                    productRepository.getProducts(page = page, size = size)
-                val cartItemQuantity = cartRepository.getTotalCartItemQuantity()
-
-                offset += apiResult.products.size
-                _uiState.update {
-                    it.copy(
+            cartRepository.getCartQuantityMap().collect { quantityMap ->
+                _uiState.update { state ->
+                    state.copy(
                         products =
-                            apiResult.products
+                            state.products
                                 .map { product ->
-                                    val quantity =
-                                        cartRepository.getCartItemQuantity(productId = product.id)
-                                    product.toUiModel(quantity = quantity)
+                                    product.copy(quantity = quantityMap[product.id] ?: 0)
                                 }.toImmutableList(),
-                        cartSize = cartItemQuantity,
-                        cartErrorMessage = null,
-                        canLoadMore = !apiResult.isLastPage,
                     )
                 }
-            }.onFailure { throwable ->
-                if (throwable is IOException || throwable is HttpException) {
-                    _uiState.update {
-                        it.copy(cartErrorMessage = "카트 업데이트 오류")
-                    }
-                } else {
-                    throw throwable
-                }
             }
-
-            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
-    private fun observeCart() {
-        loadProducts((offset / pageSize), pageSize)
+    private suspend fun refreshCartSize() {
+        cartRepository
+            .getTotalCartItemQuantity()
+            .onSuccess { cartSize ->
+                _uiState.update { it.copy(cartSize = cartSize) }
+            }
     }
 
     private fun observeRecentItems() {
         viewModelScope.launch {
-            recentItemRepository.getRecentItemIds().collect { ids ->
-                if (ids.isEmpty()) return@collect
+            recentItemRepository.getRecentItems().collect { products ->
+                if (products.isEmpty()) return@collect
 
-                val products = productRepository.getProductsByIds(ids)
                 _uiState.update { state ->
                     state.copy(
                         recentItems = products.map { it.toUiModel() }.toImmutableList(),
                     )
-                }
-            }
-        }
-    }
-
-    fun loadRecentItems() {
-        viewModelScope.launch {
-            try {
-                val ids = recentItemRepository.getRecentItemIds().first()
-                if (ids.isEmpty()) return@launch
-
-                val products = productRepository.getProductsByIds(ids)
-                _uiState.update { it.copy(recentItems = products.map { product -> product.toUiModel() }.toImmutableList()) }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (_: Exception) {
-                _uiState.update { state ->
-                    state.copy(cartErrorMessage = "최근 상품 목록을 불러오지 못했습니다.")
                 }
             }
         }
@@ -138,35 +95,43 @@ class ShoppingViewModel(
         ) {
             return
         }
-
         viewModelScope.launch {
-            _uiState.update { it.copy(isPagingMore = true) }
-            try {
-                val apiResult = productRepository.getProducts(page = (offset / pageSize), size = pageSize)
-                val loadProducts =
-                    apiResult.products.map {
-                        val quantity = cartRepository.getCartItemQuantity(it.id)
-                        it.toUiModel(quantity = quantity)
-                    }
-
-                offset += loadProducts.size
-
-                _uiState.value =
-                    _uiState.value.copy(
-                        products = (_uiState.value.products + loadProducts).toImmutableList(),
-                        canLoadMore = !apiResult.isLastPage,
-                    )
-            } catch (_: IOException) {
-                _uiState.update { state ->
-                    state.copy(cartErrorMessage = "상품을 추가로 불러오는 데 실패했습니다.")
-                }
-            } catch (_: HttpException) {
-                _uiState.update { state ->
-                    state.copy(cartErrorMessage = "서버 통신 오류가 발생했습니다.")
-                }
-            } finally {
-                _uiState.update { it.copy(isPagingMore = false) }
+            _uiState.update {
+                it.copy(
+                    isPagingMore = true,
+                    cartErrorMessage = null,
+                )
             }
+            productRepository
+                .getProducts(page = offset / pageSize, size = pageSize)
+                .onSuccess { result ->
+                    val quantityMap = cartRepository.getCartQuantityMap().first()
+                    val cartSize =
+                        cartRepository
+                            .getTotalCartItemQuantity()
+                            .getOrDefault(_uiState.value.cartSize)
+
+                    val loadProducts =
+                        result.products.map { product ->
+                            product.toUiModel(quantity = quantityMap[product.id] ?: 0)
+                        }
+
+                    offset += loadProducts.size
+
+                    _uiState.update { state ->
+                        state.copy(
+                            products = (state.products + loadProducts).toImmutableList(),
+                            cartSize = cartSize,
+                            canLoadMore = result.isLastPage.not(),
+                            cartErrorMessage = null,
+                        )
+                    }
+                }.onFailure {
+                    _uiState.update { state ->
+                        state.copy(cartErrorMessage = "상품을 불러오지 못했습니다.")
+                    }
+                }
+            _uiState.update { it.copy(isPagingMore = false) }
         }
     }
 
@@ -175,18 +140,15 @@ class ShoppingViewModel(
         quantity: Int,
     ) {
         viewModelScope.launch {
-            runCatching {
-                cartRepository.setCartItem(productId = productId, quantity = quantity)
-            }.onFailure { throwable ->
-                if (throwable is IOException || throwable is HttpException) {
+            cartRepository
+                .setCartItem(productId = productId, quantity = quantity)
+                .onSuccess {
+                    refreshCartSize()
+                }.onFailure {
                     _uiState.update {
                         it.copy(cartErrorMessage = "카트 아이템 오류입니다.")
                     }
-                } else {
-                    throw throwable
                 }
-            }
-            loadProducts()
         }
     }
 
