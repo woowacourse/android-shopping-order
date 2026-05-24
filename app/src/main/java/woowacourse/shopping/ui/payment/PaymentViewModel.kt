@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.data.local.NotificationSettingStorage
 import woowacourse.shopping.data.local.repository.OutstandingProductRepository
 import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.repository.CartRepository
@@ -18,6 +19,7 @@ import woowacourse.shopping.domain.Order
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.Discount
 import woowacourse.shopping.ui.ViewModelConst
+import woowacourse.shopping.ui.alarm.AlarmScheduler
 import java.time.LocalDateTime
 
 class PaymentViewModel(
@@ -25,6 +27,9 @@ class PaymentViewModel(
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
     private val outstandingProductRepository: OutstandingProductRepository,
+    private val settingStorage: NotificationSettingStorage,
+    private val alarmScheduler: AlarmScheduler,
+
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PaymentUiState())
@@ -124,7 +129,9 @@ class PaymentViewModelFactory(
     private val cartRepository: CartRepository,
     private val couponRepository: CouponRepository,
     private val orderRepository: OrderRepository,
-    private val outstandingProductRepository: OutstandingProductRepository
+    private val outstandingProductRepository: OutstandingProductRepository,
+    private val settingStorage: NotificationSettingStorage,
+    private val alarmScheduler: AlarmScheduler,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PaymentViewModel::class.java)) {
@@ -133,7 +140,9 @@ class PaymentViewModelFactory(
                 cartRepository = cartRepository,
                 orderRepository = orderRepository,
                 couponRepository = couponRepository,
-                outstandingProductRepository = outstandingProductRepository
+                outstandingProductRepository = outstandingProductRepository,
+                settingStorage = settingStorage,
+                alarmScheduler = alarmScheduler
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

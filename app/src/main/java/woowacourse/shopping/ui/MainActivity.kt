@@ -154,7 +154,9 @@ class MainActivity : ComponentActivity() {
                                     cartRepository = app.cartRepository,
                                     couponRepository = app.couponRepository,
                                     orderRepository = app.orderRepository,
-                                    outstandingProductRepository = app.outstandingProductRepository
+                                    outstandingProductRepository = app.outstandingProductRepository,
+                                    settingStorage = ShoppingApplication.notificationSetting,
+                                    alarmScheduler = ShoppingApplication.alarmScheduler
                                 )
                             )
                             PaymentRoute(
