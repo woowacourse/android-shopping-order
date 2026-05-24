@@ -18,11 +18,13 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import woowacourse.shopping.ui.model.ProductUiModel
 import woowacourse.shopping.ui.shopping.ProductCard
+import woowacourse.shopping.ui.shopping.ProductCardSkeleton
 import woowacourse.shopping.ui.theme.Gray50
 
 @Composable
 fun RecommendProductContent(
     products: ImmutableList<ProductUiModel>,
+    isLoading: Boolean,
     onQuantityChange: (Long, Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -49,22 +51,32 @@ fun RecommendProductContent(
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            items(
-                items = products,
-                key = { it.id },
-            ) {
-                ProductCard(
-                    onQuantityChange = { quantity ->
-                        onQuantityChange(it.id, quantity)
-                    },
-                    productName = it.name,
-                    imageUrl = it.imageUrl,
-                    price = it.price,
-                    quantity = it.quantity ?: 0,
-                    modifier =
-                        Modifier
-                            .width(154.dp),
-                )
+            when {
+                isLoading ->
+                    items(
+                        count = 3,
+                    ) {
+                        ProductCardSkeleton(modifier = Modifier.width(154.dp))
+                    }
+
+                else ->
+                    items(
+                        items = products,
+                        key = { it.id },
+                    ) {
+                        ProductCard(
+                            onQuantityChange = { quantity ->
+                                onQuantityChange(it.id, quantity)
+                            },
+                            productName = it.name,
+                            imageUrl = it.imageUrl,
+                            price = it.price,
+                            quantity = it.quantity ?: 0,
+                            modifier =
+                                Modifier
+                                    .width(154.dp),
+                        )
+                    }
             }
         }
     }
@@ -75,6 +87,7 @@ fun RecommendProductContent(
 private fun RecommendProductContentPreview() {
     RecommendProductContent(
         products = persistentListOf(),
+        isLoading = false,
         onQuantityChange = { _, _ -> },
     )
 }
