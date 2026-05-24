@@ -1,13 +1,11 @@
 package woowacourse.shopping.data.repository
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import woowacourse.shopping.data.remote.api.ProductApi
 import woowacourse.shopping.data.remote.dto.response.products.ProductResponse
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductName
+import kotlin.coroutines.cancellation.CancellationException
 
 class ProductRepositoryImpl(
     private val productApi: ProductApi,
@@ -16,39 +14,40 @@ class ProductRepositoryImpl(
         category: String,
         page: Int,
         size: Int,
-    ): ProductResponseResult {
-        val apiResult =
-            if (category.isEmpty()) {
-                productApi
-                    .getProducts(
+    ): Result<ProductResponseResult> =
+        try {
+            val response =
+                if (category.isEmpty()) {
+                    productApi.getProducts(
                         page = page,
                         size = size,
                     )
-            } else {
-                productApi.getProductsByCategory(
-                    category = category,
-                    page = page,
-                    size = size,
-                )
-            }
+                } else {
+                    productApi.getProductsByCategory(
+                        category = category,
+                        page = page,
+                        size = size,
+                    )
+                }
+            Result.success(
+                ProductResponseResult(
+                    products = response.content.map { it.toDomain() },
+                    isLastPage = response.last,
+                ),
+            )
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
 
-        val products = apiResult.content.map { it.toDomain() }
-        val lastPage = apiResult.last
-
-        return ProductResponseResult(products, lastPage)
-    }
-
-    override suspend fun getProductById(id: Long): Product = productApi.getProductById(id).toDomain()
-
-    override suspend fun getProductsByIds(ids: List<Long>): List<Product> =
-        coroutineScope {
-            ids
-                .map { id ->
-                    async {
-                        runCatching { getProductById(id) }.getOrNull()
-                    }
-                }.awaitAll()
-                .filterNotNull()
+    override suspend fun getProductById(id: Long): Result<Product> =
+        try {
+            Result.success(productApi.getProductById(id).toDomain())
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.failure(e)
         }
 
     private fun ProductResponse.toDomain(): Product =
