@@ -17,7 +17,10 @@ import kotlin.uuid.ExperimentalUuidApi
 
 sealed interface DetailProductEvent {
     data object AddToCartSuccess : DetailProductEvent
-    data class AddToCartFailure(val message: String) : DetailProductEvent
+
+    data class AddToCartFailure(
+        val message: String,
+    ) : DetailProductEvent
 }
 
 @OptIn(ExperimentalUuidApi::class)
@@ -67,7 +70,6 @@ class DetailProductViewModel(
         }
         publishUiState()
     }
-
 
     fun loadProductDetail(productId: Long) {
         viewModelScope.launch {

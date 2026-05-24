@@ -13,9 +13,7 @@ import androidx.compose.ui.unit.sp
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 @Composable
-fun RecommendHeaderSection(
-    modifier: Modifier = Modifier,
-) {
+fun RecommendHeaderSection(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.padding(16.dp),
     ) {

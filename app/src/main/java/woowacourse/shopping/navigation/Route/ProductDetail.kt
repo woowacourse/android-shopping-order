@@ -3,7 +3,7 @@ package woowacourse.shopping.navigation.Route
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ProductDetail (
+data class ProductDetail(
     val productId: Long,
-    val showLastViewed: Boolean
+    val showLastViewed: Boolean,
 )

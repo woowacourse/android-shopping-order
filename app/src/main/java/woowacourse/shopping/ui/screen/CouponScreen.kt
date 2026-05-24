@@ -1,11 +1,11 @@
 package woowacourse.shopping.ui.screen
 
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -44,19 +44,21 @@ fun CouponScreen(
         modifier = modifier.fillMaxSize(),
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState()),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .verticalScroll(rememberScrollState()),
         ) {
             CouponHeaderSection()
             CouponList(
                 coupons = uiState.coupons,
                 selectedCouponId = uiState.selectedCouponId,
                 onCouponSelect = onCouponSelect,
-                modifier = Modifier
-                    .heightIn(max = 220.dp)
-                    .padding(bottom = 12.dp),
+                modifier =
+                    Modifier
+                        .heightIn(max = 220.dp)
+                        .padding(bottom = 12.dp),
             )
             CouponSummarySection(
                 orderAmount = uiState.orderAmount,
@@ -76,45 +78,48 @@ fun CouponScreen(
 private fun CouponScreenPreview() {
     AndroidShoppingTheme {
         CouponScreen(
-            uiState = CouponUiState(
-                coupons = listOf(
-                    FixedDiscountCoupon(
-                        id = 1L,
-                        code = "FIXED5000",
-                        description = "5,000원 할인 쿠폰",
-                        expirationDate = LocalDate.of(2026, 12, 31),
-                        discount = 5_000,
-                        minimumAmount = 30_000,
-                    ),
-                    FreeShippingCoupon(
-                        id = 2L,
-                        code = "FREESHIP50000",
-                        description = "5만원 이상 무료 배송",
-                        expirationDate = LocalDate.of(2026, 12, 31),
-                        minimumAmount = 50_000,
-                    ),
-                    BuyXGetYCoupon(
-                        id = 3L,
-                        code = "BUY2GET1",
-                        description = "2+1 쿠폰",
-                        expirationDate = LocalDate.of(2026, 12, 31),
-                        buyQuantity = 2,
-                        getQuantity = 1,
-                    ),
-                    PercentageDiscountCoupon(
-                        id = 4L,
-                        code = "MORNING30",
-                        description = "오전 30% 할인 쿠폰",
-                        expirationDate = LocalDate.of(2026, 12, 31),
-                        discountPercentage = 30,
-                        availableTime = AvailableTime(
-                            start = LocalTime.of(4, 0),
-                            end = LocalTime.of(7, 0),
+            uiState =
+                CouponUiState(
+                    coupons =
+                        listOf(
+                            FixedDiscountCoupon(
+                                id = 1L,
+                                code = "FIXED5000",
+                                description = "5,000원 할인 쿠폰",
+                                expirationDate = LocalDate.of(2026, 12, 31),
+                                discount = 5_000,
+                                minimumAmount = 30_000,
+                            ),
+                            FreeShippingCoupon(
+                                id = 2L,
+                                code = "FREESHIP50000",
+                                description = "5만원 이상 무료 배송",
+                                expirationDate = LocalDate.of(2026, 12, 31),
+                                minimumAmount = 50_000,
+                            ),
+                            BuyXGetYCoupon(
+                                id = 3L,
+                                code = "BUY2GET1",
+                                description = "2+1 쿠폰",
+                                expirationDate = LocalDate.of(2026, 12, 31),
+                                buyQuantity = 2,
+                                getQuantity = 1,
+                            ),
+                            PercentageDiscountCoupon(
+                                id = 4L,
+                                code = "MORNING30",
+                                description = "오전 30% 할인 쿠폰",
+                                expirationDate = LocalDate.of(2026, 12, 31),
+                                discountPercentage = 30,
+                                availableTime =
+                                    AvailableTime(
+                                        start = LocalTime.of(4, 0),
+                                        end = LocalTime.of(7, 0),
+                                    ),
+                            ),
                         ),
-                    ),
+                    selectedCouponId = 1L,
                 ),
-                selectedCouponId = 1L,
-            ),
             isNotificationEnabled = true,
             onBackClick = {},
             onNotificationEnabledChange = {},

@@ -6,6 +6,5 @@ data class AvailableTime(
     val start: LocalTime,
     val end: LocalTime,
 ) {
-    fun contains(time: LocalTime): Boolean =
-        !time.isBefore(start) && !time.isAfter(end)
+    fun contains(time: LocalTime): Boolean = !time.isBefore(start) && !time.isAfter(end)
 }

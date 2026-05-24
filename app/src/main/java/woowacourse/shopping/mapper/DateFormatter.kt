@@ -5,6 +5,4 @@ import java.time.format.DateTimeFormatter
 
 private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-fun String.toLocalDate(): LocalDate {
-    return LocalDate.parse(this, dateFormatter)
-}
+fun String.toLocalDate(): LocalDate = LocalDate.parse(this, dateFormatter)

@@ -46,6 +46,7 @@ fun ShoppingCartTopBar(
         modifier = modifier,
     )
 }
+
 @Composable
 @Preview(showBackground = true)
 private fun ShoppingCartTopBarPreview() {

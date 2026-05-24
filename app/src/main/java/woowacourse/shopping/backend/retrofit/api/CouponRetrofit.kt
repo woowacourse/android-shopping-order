@@ -7,6 +7,6 @@ import woowacourse.shopping.backend.retrofit.dto.coupon.CouponResponse
 interface CouponRetrofit {
     @GET("/coupons")
     suspend fun getCoupons(
-        @Header("Accept") accept: String = "application/json"
+        @Header("Accept") accept: String = "application/json",
     ): List<CouponResponse>
 }

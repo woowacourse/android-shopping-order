@@ -1,7 +1,6 @@
 package woowacourse.shopping.backend.retrofit.sync
 
 import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.ShoppingCartItem
 import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.repository.ShoppingCartRepository
 import woowacourse.shopping.repository.ShoppingItemRepository

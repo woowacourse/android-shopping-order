@@ -4,4 +4,3 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 object ProductList
-

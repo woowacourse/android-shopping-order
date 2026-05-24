@@ -100,7 +100,7 @@ class ShoppingCartRecommendViewModel(
                 allShoppingItems
                     .filter { shoppingItem ->
                         shoppingItem.getProduct().category == mostRecentViewedCategory &&
-                                shoppingItem.getProductId() !in excludedProductIdsForRecommend
+                            shoppingItem.getProductId() !in excludedProductIdsForRecommend
                     }.take(MAX_RECOMMEND_PRODUCTS)
             }
         val selectedCartTotalPrice =

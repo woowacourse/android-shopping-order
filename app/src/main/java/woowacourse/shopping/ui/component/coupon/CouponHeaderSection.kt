@@ -14,9 +14,7 @@ import androidx.compose.ui.unit.sp
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 @Composable
-fun CouponHeaderSection(
-    modifier: Modifier = Modifier,
-) {
+fun CouponHeaderSection(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.padding(18.dp),
     ) {

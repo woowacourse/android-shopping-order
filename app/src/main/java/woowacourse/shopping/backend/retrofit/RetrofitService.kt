@@ -13,10 +13,10 @@ import woowacourse.shopping.backend.retrofit.api.ShoppingCartRetrofit
 import woowacourse.shopping.backend.retrofit.dto.CartQuantity
 import woowacourse.shopping.backend.retrofit.dto.CartRequest
 import woowacourse.shopping.backend.retrofit.dto.OrderInfo
+import woowacourse.shopping.backend.retrofit.dto.ShoppingCartResponse
 import woowacourse.shopping.backend.retrofit.dto.coupon.CouponResponse
 import woowacourse.shopping.backend.retrofit.dto.productlist.Product
 import woowacourse.shopping.backend.retrofit.dto.productlist.ProductResponse
-import woowacourse.shopping.backend.retrofit.dto.ShoppingCartResponse
 import woowacourse.shopping.repository.AuthHeaderProvider
 import woowacourse.shopping.repository.AuthInterceptor
 import java.io.IOException
@@ -257,8 +257,8 @@ class RetrofitService(
         endpoint: String,
         remoteCall: suspend () -> Response<T>,
         mockCall: suspend () -> Response<T>,
-    ): Response<T> {
-        return try {
+    ): Response<T> =
+        try {
             val remoteResponse = remoteCall()
             if (!remoteResponse.isSuccessful) {
                 Log.w(
@@ -279,14 +279,13 @@ class RetrofitService(
             Log.w(TAG, "Remote request failed for $endpoint with unexpected exception, using mock fallback.", exception)
             mockCall()
         }
-    }
 
     private suspend fun <T> callWithFallbackValue(
         endpoint: String,
         remoteCall: suspend () -> T,
         mockCall: suspend () -> T,
-    ): T {
-        return try {
+    ): T =
+        try {
             remoteCall().also {
                 Log.d(TAG, "Remote request succeeded for $endpoint.")
             }
@@ -299,7 +298,6 @@ class RetrofitService(
             Log.w(TAG, "Remote request failed for $endpoint with unexpected exception, using mock fallback.", exception)
             mockCall()
         }
-    }
 
     private companion object {
         private const val TAG = "RetrofitService"

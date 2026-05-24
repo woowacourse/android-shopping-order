@@ -13,12 +13,18 @@ data class FixedDiscountCoupon(
     val discount: Int,
     val minimumAmount: Int,
 ) : Coupon() {
-    override fun canApply(order: Order, now: LocalDateTime): Boolean {
+    override fun canApply(
+        order: Order,
+        now: LocalDateTime,
+    ): Boolean {
         if (isExpired(now.toLocalDate())) return false
         return order.totalAmount().toInt() >= minimumAmount
     }
 
-    override fun discountAmount(order: Order, now: LocalDateTime): Price {
+    override fun discountAmount(
+        order: Order,
+        now: LocalDateTime,
+    ): Price {
         if (!canApply(order, now)) return Price(0)
         return Price(discount)
     }

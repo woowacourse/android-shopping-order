@@ -4,10 +4,10 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.compose.BackHandler
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -16,14 +16,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
@@ -39,6 +39,7 @@ import woowacourse.shopping.navigation.Route.Coupon
 import woowacourse.shopping.navigation.Route.ProductDetail
 import woowacourse.shopping.navigation.Route.ProductList
 import woowacourse.shopping.notification.PaymentReminderAlarmScheduler
+import woowacourse.shopping.storage.sharedpreferences.NotificationPreferenceRepository
 import woowacourse.shopping.ui.component.cart.PageNavigation
 import woowacourse.shopping.ui.component.cart.ShoppingCartOrderButton
 import woowacourse.shopping.ui.component.productlist.MoreButton
@@ -56,7 +57,6 @@ import woowacourse.shopping.ui.viewmodel.ShoppingCartEvent
 import woowacourse.shopping.ui.viewmodel.ShoppingCartItemViewModel
 import woowacourse.shopping.ui.viewmodel.ShoppingCartRecommendViewModel
 import woowacourse.shopping.ui.viewmodel.ShoppingCartRecommendViewModel.ShoppingCartStep
-import woowacourse.shopping.storage.sharedpreferences.NotificationPreferenceRepository
 
 private fun navigateToCoupon(
     navController: NavHostController,
@@ -75,10 +75,11 @@ private fun navigateToCoupon(
     if (orderedCartItemIds.isEmpty()) return
 
     couponViewModel.initialize(
-        order = createOrder(
-            orderedCartItemIds = orderedCartItemIds,
-            shoppingCartItems = shoppingCartItems,
-        ),
+        order =
+            createOrder(
+                orderedCartItemIds = orderedCartItemIds,
+                shoppingCartItems = shoppingCartItems,
+            ),
         orderedCartItemIds = orderedCartItemIds,
     )
     couponViewModel.loadCoupons()
@@ -129,13 +130,12 @@ private fun navigateToProductList(navController: NavHostController) {
     }
 }
 
-
 @Composable
 fun ShoppingNavHost(
     modifier: Modifier,
     navController: NavHostController,
     viewModelFactory: ViewModelProvider.Factory,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
 ) {
     val shoppingCartViewModel: ShoppingCartItemViewModel = viewModel(factory = viewModelFactory)
     val shoppingCartRecommendViewModel: ShoppingCartRecommendViewModel =
@@ -148,10 +148,11 @@ fun ShoppingNavHost(
         startDestination = ProductList,
     ) {
         composable<ProductList> { backStackEntry ->
-            val productListViewModel: ProductListViewModel = viewModel(
-                viewModelStoreOwner = backStackEntry,
-                factory = viewModelFactory
-            )
+            val productListViewModel: ProductListViewModel =
+                viewModel(
+                    viewModelStoreOwner = backStackEntry,
+                    factory = viewModelFactory,
+                )
 
             val uiState by productListViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -210,10 +211,11 @@ fun ShoppingNavHost(
         composable<ProductDetail> { backStackEntry ->
 
             val route = backStackEntry.toRoute<ProductDetail>()
-            val productDetailViewModel: DetailProductViewModel = viewModel(
-                viewModelStoreOwner = backStackEntry,
-                factory = viewModelFactory
-            )
+            val productDetailViewModel: DetailProductViewModel =
+                viewModel(
+                    viewModelStoreOwner = backStackEntry,
+                    factory = viewModelFactory,
+                )
             LaunchedEffect(DetailProductViewModel) {
                 productDetailViewModel.event.collect { event ->
                     when (event) {
@@ -251,7 +253,7 @@ fun ShoppingNavHost(
                             ProductDetail(
                                 productId = selectedProductId,
                                 showLastViewed = false,
-                            )
+                            ),
                         )
                     },
                     onBackClick = { navController.popBackStack() },
@@ -381,10 +383,11 @@ fun ShoppingNavHost(
                         },
                         checked = shoppingCartItems.items.isNotEmpty() && selectedItemCount == shoppingCartItems.items.size,
                         orderComplete = shoppingCartItems.items.isNotEmpty(),
-                        totalPrice = shoppingCartViewModel.getTotalPrice(
-                            shoppingCartItems = shoppingCartItems.items,
-                            selectedCartItemIds = selectedCartItemIds,
-                        ),
+                        totalPrice =
+                            shoppingCartViewModel.getTotalPrice(
+                                shoppingCartItems = shoppingCartItems.items,
+                                selectedCartItemIds = selectedCartItemIds,
+                            ),
                         onToggleShoppingItemSelectionClick = { cartItemIds, isSelected ->
                             shoppingCartViewModel.setShoppingCartItemsSelection(
                                 cartItemIds = cartItemIds,

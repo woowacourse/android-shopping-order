@@ -11,11 +11,15 @@ sealed class Coupon {
     abstract val description: String
     abstract val expirationDate: LocalDate
 
-    fun isExpired(today: LocalDate): Boolean =
-        today.isAfter(expirationDate)
+    fun isExpired(today: LocalDate): Boolean = today.isAfter(expirationDate)
 
-    abstract fun canApply(order: Order, now: LocalDateTime): Boolean
+    abstract fun canApply(
+        order: Order,
+        now: LocalDateTime,
+    ): Boolean
 
-    abstract fun discountAmount(order: Order, now: LocalDateTime): Price
+    abstract fun discountAmount(
+        order: Order,
+        now: LocalDateTime,
+    ): Price
 }
-

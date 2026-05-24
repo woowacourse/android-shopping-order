@@ -60,7 +60,8 @@ class PaymentReminderReceiver : BroadcastReceiver() {
 
         // 실제 알림 객체 생성
         val notification =
-            NotificationCompat.Builder(context, "payment_reminder_channel")
+            NotificationCompat
+                .Builder(context, "payment_reminder_channel")
                 .setSmallIcon(R.drawable.ic_payment_reminder_notification)
                 .setContentTitle(context.getString(R.string.payment_reminder_notification_title))
                 .setContentText(context.getString(R.string.payment_reminder_notification_message))

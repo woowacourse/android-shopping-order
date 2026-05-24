@@ -19,12 +19,18 @@ data class BuyXGetYCoupon(
         require(getQuantity > 0) { "무료 수량은 1 이상이어야 합니다." }
     }
 
-    override fun canApply(order: Order, now: LocalDateTime): Boolean {
+    override fun canApply(
+        order: Order,
+        now: LocalDateTime,
+    ): Boolean {
         if (isExpired(now.toLocalDate())) return false
         return findDiscountTarget(order) != null
     }
 
-    override fun discountAmount(order: Order, now: LocalDateTime): Price {
+    override fun discountAmount(
+        order: Order,
+        now: LocalDateTime,
+    ): Price {
         if (isExpired(now.toLocalDate())) return Price(0)
 
         val target = findDiscountTarget(order) ?: return Price(0)

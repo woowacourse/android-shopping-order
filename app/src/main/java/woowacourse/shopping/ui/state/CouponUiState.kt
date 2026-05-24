@@ -10,5 +10,5 @@ data class CouponUiState(
     val shippingFee: Int = 3_000,
     val totalPaymentAmount: Int = 0,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 )

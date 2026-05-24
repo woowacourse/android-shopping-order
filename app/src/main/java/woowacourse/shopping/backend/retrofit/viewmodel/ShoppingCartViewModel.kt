@@ -2,11 +2,8 @@ package woowacourse.shopping.backend.retrofit.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import woowacourse.shopping.backend.retrofit.dto.CartRequest
@@ -18,8 +15,6 @@ import woowacourse.shopping.model.ShoppingCartItem
 class ShoppingCartViewModel(
     private val shoppingCartRetrofitRepository: ShoppingCartRetrofitRepository,
 ) : ViewModel() {
-
-
     private val _shoppingCartItems = MutableStateFlow<List<ShoppingCartItem>>(emptyList())
     val shoppingCartItems: StateFlow<List<ShoppingCartItem>> = _shoppingCartItems.asStateFlow()
     private val _isLoading = MutableStateFlow(false)
@@ -128,8 +123,7 @@ class ShoppingCartViewModel(
         }
     }
 
-    fun getTotalPrice(shoppingCartItems: List<ShoppingCartItem>): Int =
-        shoppingCartItems.sumOf { it.getProductQuantityPrice() }
+    fun getTotalPrice(shoppingCartItems: List<ShoppingCartItem>): Int = shoppingCartItems.sumOf { it.getProductQuantityPrice() }
 
     private suspend fun loadCartItems(): List<ShoppingCartItem> {
         val shoppingCartItems =
@@ -138,8 +132,7 @@ class ShoppingCartViewModel(
                     page = DEFAULT_PAGE,
                     size = DEFAULT_SIZE,
                     sort = null,
-                )
-                .toDomainShoppingCartItems()
+                ).toDomainShoppingCartItems()
         syncShoppingCartItems(shoppingCartItems)
         return shoppingCartItems
     }
@@ -151,7 +144,6 @@ class ShoppingCartViewModel(
         shoppingCartItems.firstOrNull { shoppingCartItem ->
             shoppingCartItem.product.id == productId
         }
-
 
     private fun syncShoppingCartItems(shoppingCartItems: List<ShoppingCartItem>) {
         _shoppingCartItems.value = shoppingCartItems

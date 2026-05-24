@@ -18,10 +18,11 @@ fun ShoppingCartCheckBox(
         onCheckedChange = onCheckedChange,
         enabled = enabled,
         modifier = modifier,
-        colors = CheckboxDefaults.colors(
-            uncheckedColor = MaterialTheme.colorScheme.outline,
-            disabledCheckedColor = MaterialTheme.colorScheme.outline,
-            disabledUncheckedColor = MaterialTheme.colorScheme.outline,
-        ),
+        colors =
+            CheckboxDefaults.colors(
+                uncheckedColor = MaterialTheme.colorScheme.outline,
+                disabledCheckedColor = MaterialTheme.colorScheme.outline,
+                disabledUncheckedColor = MaterialTheme.colorScheme.outline,
+            ),
     )
 }

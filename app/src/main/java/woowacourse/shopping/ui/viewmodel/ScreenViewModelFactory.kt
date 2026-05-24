@@ -16,7 +16,6 @@ class ScreenViewModelFactory(
     private val appContainer: AppContainer,
     val retrofitService: RetrofitService,
 ) : ViewModelProvider.Factory {
-
     private val productRetrofitRepository: ProductRetrofitRepository =
         ProductRetrofitRepository(retrofitService.productApiService)
     private val shoppingCartRetrofitRepository: ShoppingCartRetrofitRepository =

@@ -19,8 +19,8 @@ import woowacourse.shopping.model.ProductTitle
 import woowacourse.shopping.model.ShoppingCartItem
 import woowacourse.shopping.model.ShoppingItem
 import woowacourse.shopping.ui.component.cart.CartSkeletonItem
-import woowacourse.shopping.ui.component.cart.ShoppingCartTopBar
 import woowacourse.shopping.ui.component.cart.ShoppingCartItemCard
+import woowacourse.shopping.ui.component.cart.ShoppingCartTopBar
 import woowacourse.shopping.ui.state.ShoppingCartState
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 

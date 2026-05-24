@@ -41,10 +41,12 @@ class ShoppingActivity : ComponentActivity() {
                     },
                 ) { innerPadding ->
                     ShoppingNavHost(
-                        modifier = androidx.compose.ui.Modifier.padding(innerPadding),
+                        modifier =
+                            androidx.compose.ui.Modifier
+                                .padding(innerPadding),
                         navController = navController,
                         viewModelFactory = screenViewModelFactory,
-                        snackbarHostState = snackbarHostState
+                        snackbarHostState = snackbarHostState,
                     )
                 }
             }

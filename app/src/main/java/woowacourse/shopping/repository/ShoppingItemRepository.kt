@@ -15,8 +15,7 @@ interface ShoppingItemRepository {
 
     suspend fun getQuantity(productId: Long): Int
 
-    suspend fun fetchProductById(productId: Long): ShoppingItem? =
-        shoppingItems.value.find { productId == it.getProductId() }
+    suspend fun fetchProductById(productId: Long): ShoppingItem? = shoppingItems.value.find { productId == it.getProductId() }
 
     suspend fun plusQuantity(
         productId: Long,
@@ -27,6 +26,4 @@ interface ShoppingItemRepository {
         productId: Long,
         amount: Int = 1,
     )
-
-
 }

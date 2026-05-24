@@ -10,11 +10,10 @@ class NotificationPreferenceRepository(
     private val sharedPreferences: SharedPreferences =
         context.applicationContext.getSharedPreferences(
             "notification_settings",
-            Context.MODE_PRIVATE
+            Context.MODE_PRIVATE,
         )
 
-    fun isNotificationEnabled(): Boolean =
-        sharedPreferences.getBoolean("is_notification_enabled", true)
+    fun isNotificationEnabled(): Boolean = sharedPreferences.getBoolean("is_notification_enabled", true)
 
     fun setNotificationEnabled(enabled: Boolean) {
         sharedPreferences

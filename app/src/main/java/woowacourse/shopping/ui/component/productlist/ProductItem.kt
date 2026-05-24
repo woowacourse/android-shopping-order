@@ -87,12 +87,13 @@ fun ProductItem(
 private fun ProductItemPreview() {
     AndroidShoppingTheme {
         ProductItem(
-            product = Product(
-                id = 1L,
-                title = ProductTitle("샘플 상품"),
-                price = Price(12_000),
-                imageUrl = "",
-            ),
+            product =
+                Product(
+                    id = 1L,
+                    title = ProductTitle("샘플 상품"),
+                    price = Price(12_000),
+                    imageUrl = "",
+                ),
             quantity = 1,
             onAddToCartClick = {},
             onQuantityPlusClick = {},

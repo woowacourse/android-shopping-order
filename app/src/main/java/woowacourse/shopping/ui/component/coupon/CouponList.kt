@@ -28,9 +28,10 @@ fun CouponList(
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 18.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 18.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(bottom = 16.dp),
     ) {
@@ -90,9 +91,10 @@ private val previewCoupons: List<Coupon> =
             description = "오전 30% 할인 쿠폰",
             expirationDate = LocalDate.of(2026, 12, 31),
             discountPercentage = 30,
-            availableTime = AvailableTime(
-                start = LocalTime.of(4, 0),
-                end = LocalTime.of(7, 0),
-            ),
+            availableTime =
+                AvailableTime(
+                    start = LocalTime.of(4, 0),
+                    end = LocalTime.of(7, 0),
+                ),
         ),
     )

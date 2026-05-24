@@ -76,9 +76,10 @@ fun CouponSummarySection(
         )
         Button(
             onClick = onPay,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
             shape = RectangleShape,
         ) {
             Text(stringResource(R.string.payment))
@@ -110,7 +111,6 @@ private fun PaymentReminderToggleRow(
                 onCheckedChange = onNotificationEnabledChange,
             )
         }
-
     }
 }
 
@@ -140,8 +140,7 @@ private fun CouponAmountRow(
 }
 
 @Composable
-private fun Int.toPriceText(): String =
-    DecimalFormat(stringResource(R.string.price_format_pattern)).format(this)
+private fun Int.toPriceText(): String = DecimalFormat(stringResource(R.string.price_format_pattern)).format(this)
 
 @Composable
 private fun Int.toDiscountPriceText(): String =

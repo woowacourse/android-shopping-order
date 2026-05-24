@@ -42,16 +42,16 @@ fun CouponBox(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .defaultMinSize(minHeight = 104.dp)
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
-                shape = RoundedCornerShape(4.dp),
-            )
-            .clickable(onClick = onSelect)
-            .padding(vertical = 6.dp),
+        modifier =
+            modifier
+                .defaultMinSize(minHeight = 104.dp)
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline,
+                    shape = RoundedCornerShape(4.dp),
+                ).clickable(onClick = onSelect)
+                .padding(vertical = 6.dp),
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -101,22 +101,22 @@ private fun Coupon.minimumAmountTextOrNull(): String? {
     }
 }
 
-private fun LocalDate.toExpirationText(): String =
-    "만료일: ${year}년 ${monthValue}월 ${dayOfMonth}일"
+private fun LocalDate.toExpirationText(): String = "만료일: ${year}년 ${monthValue}월 ${dayOfMonth}일"
 
 @Preview(showBackground = true)
 @Composable
 private fun CouponBoxPreview() {
     AndroidShoppingTheme {
         CouponBox(
-            coupon = FixedDiscountCoupon(
-                id = 1L,
-                code = "FIXED5000",
-                description = "5,000원 할인 쿠폰",
-                expirationDate = LocalDate.of(2026, 12, 31),
-                discount = 5_000,
-                minimumAmount = 30_000,
-            ),
+            coupon =
+                FixedDiscountCoupon(
+                    id = 1L,
+                    code = "FIXED5000",
+                    description = "5,000원 할인 쿠폰",
+                    expirationDate = LocalDate.of(2026, 12, 31),
+                    discount = 5_000,
+                    minimumAmount = 30_000,
+                ),
             isSelected = true,
             onSelect = {},
         )
@@ -128,17 +128,19 @@ private fun CouponBoxPreview() {
 private fun PercentageCouponBoxPreview() {
     AndroidShoppingTheme {
         CouponBox(
-            coupon = PercentageDiscountCoupon(
-                id = 2L,
-                code = "MORNING30",
-                description = "오전 30% 할인 쿠폰",
-                expirationDate = LocalDate.of(2026, 12, 31),
-                discountPercentage = 30,
-                availableTime = AvailableTime(
-                    start = LocalTime.of(4, 0),
-                    end = LocalTime.of(7, 0),
+            coupon =
+                PercentageDiscountCoupon(
+                    id = 2L,
+                    code = "MORNING30",
+                    description = "오전 30% 할인 쿠폰",
+                    expirationDate = LocalDate.of(2026, 12, 31),
+                    discountPercentage = 30,
+                    availableTime =
+                        AvailableTime(
+                            start = LocalTime.of(4, 0),
+                            end = LocalTime.of(7, 0),
+                        ),
                 ),
-            ),
             isSelected = false,
             onSelect = {},
         )

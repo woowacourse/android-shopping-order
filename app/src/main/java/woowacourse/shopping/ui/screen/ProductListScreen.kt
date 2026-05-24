@@ -239,8 +239,7 @@ private fun RecentViewedItem(
                 .background(
                     color = MaterialTheme.colorScheme.background,
                     shape = RoundedCornerShape(8.dp),
-                )
-                .clickable { onRecentViewedProductClick(product.id) }
+                ).clickable { onRecentViewedProductClick(product.id) }
                 .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {

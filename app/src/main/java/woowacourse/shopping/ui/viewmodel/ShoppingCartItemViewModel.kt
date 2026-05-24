@@ -69,18 +69,14 @@ class ShoppingCartItemViewModel(
         }
     }
 
-    fun addOrIncreaseByProductId(
-        productId: Long,
-    ) {
+    fun addOrIncreaseByProductId(productId: Long) {
         viewModelScope.launch {
             shoppingCartRepository.addIfAbsent(productId)
             shoppingItemRepository.plusQuantity(productId = productId)
         }
     }
 
-    fun decreaseByProductId(
-        productId: Long,
-    ) {
+    fun decreaseByProductId(productId: Long) {
         viewModelScope.launch {
             val currentQuantity = shoppingItemRepository.getQuantity(productId)
             if (currentQuantity == 0) {
@@ -107,7 +103,8 @@ class ShoppingCartItemViewModel(
         isSelected: Boolean,
     ) {
         val validCartItemIds =
-            _shoppingCartItems.value.items.map { shoppingCartItem -> shoppingCartItem.getId() }
+            _shoppingCartItems.value.items
+                .map { shoppingCartItem -> shoppingCartItem.getId() }
                 .toSet()
         if (cartItemId !in validCartItemIds) return
         _selectedCartItemIds.value =
@@ -126,7 +123,8 @@ class ShoppingCartItemViewModel(
         isSelected: Boolean,
     ) {
         val validCartItemIds =
-            _shoppingCartItems.value.items.map { shoppingCartItem -> shoppingCartItem.getId() }
+            _shoppingCartItems.value.items
+                .map { shoppingCartItem -> shoppingCartItem.getId() }
                 .toSet()
         val targetCartItemIds = cartItemIds.toSet().intersect(validCartItemIds)
         if (isSelected) {
@@ -162,16 +160,14 @@ class ShoppingCartItemViewModel(
             }.onFailure { throwable ->
                 _event.tryEmit(
                     ShoppingCartEvent.RemoveFailure(
-                        throwable.message ?: "장바구니 아이템 삭제 실패"
+                        throwable.message ?: "장바구니 아이템 삭제 실패",
                     ),
                 )
             }
-
         }
     }
 
-    fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int =
-        shoppingCartItem.getProductQuantityPrice()
+    fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int = shoppingCartItem.getProductQuantityPrice()
 
     fun refresh() {
         publishCurrentPageState()
@@ -207,8 +203,11 @@ class ShoppingCartItemViewModel(
         errorMessage: String? = _uiState.value.errorMessage,
     ) {
         val validSelectedCartItemIds =
-            _selectedCartItemIds.value.intersect(items.map { shoppingCartItem -> shoppingCartItem.getId() }
-                .toSet())
+            _selectedCartItemIds.value.intersect(
+                items
+                    .map { shoppingCartItem -> shoppingCartItem.getId() }
+                    .toSet(),
+            )
         _selectedCartItemIds.value = validSelectedCartItemIds
 
         val shoppingCartItemsState = createShoppingCartItemsState(items)
@@ -265,12 +264,14 @@ class ShoppingCartItemViewModel(
     companion object {
         private const val INITIAL_PAGE = 0
     }
-
-
 }
 
 sealed interface ShoppingCartEvent {
     data object NavigateBack : ShoppingCartEvent
+
     data object RemoveSuccess : ShoppingCartEvent
-    data class RemoveFailure(val message: String) : ShoppingCartEvent
+
+    data class RemoveFailure(
+        val message: String,
+    ) : ShoppingCartEvent
 }

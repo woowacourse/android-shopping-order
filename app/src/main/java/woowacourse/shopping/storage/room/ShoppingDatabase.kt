@@ -22,11 +22,9 @@ abstract class ShoppingDatabase : RoomDatabase() {
     companion object {
         private const val DATABASE_NAME = "shopping.db"
 
-
         fun create(context: Context): ShoppingDatabase =
             Room
                 .databaseBuilder(context, ShoppingDatabase::class.java, DATABASE_NAME)
                 .build()
-
     }
 }
