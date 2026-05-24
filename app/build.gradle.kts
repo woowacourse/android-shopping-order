@@ -18,6 +18,7 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("long", "PAYMENT_ALARM_DELAY_MILLIS", "300000L")
     }
     buildTypes {
         debug {
@@ -27,6 +28,7 @@ android {
                 "\"http://techcourse-lv2-alb-250216202.ap-northeast-2.elb.amazonaws.com/\"",
             )
             buildConfigField("String", "MOCK_URL", "\"http://10.0.2.2:8080/\"")
+            buildConfigField("long", "PAYMENT_ALARM_DELAY_MILLIS", "10000L")
         }
         release {
             isMinifyEnabled = false

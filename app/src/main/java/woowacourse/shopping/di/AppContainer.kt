@@ -16,6 +16,7 @@ import woowacourse.shopping.data.repository.network.RetrofitOrderRepository
 import woowacourse.shopping.data.repository.network.RetrofitPaymentRepository
 import woowacourse.shopping.data.repository.network.RetrofitProductRepository
 import woowacourse.shopping.data.repository.room.RoomRecentProductRepository
+import woowacourse.shopping.notification.PaymentAlarmScheduler
 
 class AppContainer(
     context: Context,
@@ -48,4 +49,7 @@ class AppContainer(
         RetrofitOrderRepository(networkClient.orderService)
     val paymentRepository: PaymentRepository =
         RetrofitPaymentRepository(networkClient.paymentService)
+    val paymentAlarmScheduler: PaymentAlarmScheduler by lazy {
+        PaymentAlarmScheduler(context)
+    }
 }

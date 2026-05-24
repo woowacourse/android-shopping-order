@@ -1,6 +1,8 @@
 package woowacourse.shopping
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -9,29 +11,44 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import woowacourse.shopping.ui.common.theme.ShoppingTheme
 import woowacourse.shopping.ui.navigation.AppNavHost
 
 class MainActivity : ComponentActivity() {
+    private val navigateToPayment = MutableStateFlow(false)
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            // TODO("권한 허용됨")
-        } else {
-            // TODO("거부됨")
-        }
-    }
+    ) { }
 
+    @SuppressLint("FlowOperatorInvokedInComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             ShoppingTheme {
-                AppNavHost()
+                AppNavHost(
+                    navigateToPaymentSignal = navigateToPayment.asStateFlow(),
+                    onPaymentNavigated = {
+                        navigateToPayment.value = false
+                    }
+                )
             }
         }
         askNotificationPermission()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        if (intent.getBooleanExtra(EXTRA_NAVIGATE_TO_PAYMENT, false)) {
+            navigateToPayment.value = true
+        }
     }
 
     private fun askNotificationPermission() {

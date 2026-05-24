@@ -2,12 +2,16 @@ package woowacourse.shopping.ui.navigation
 
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.flow.StateFlow
 import woowacourse.shopping.notification.PaymentReminderReceiver
 import woowacourse.shopping.ui.cart.CartScreen
 import woowacourse.shopping.ui.payment.PaymentScreen
@@ -17,8 +21,21 @@ import woowacourse.shopping.ui.shopping.ShoppingScreen
 
 @Composable
 fun AppNavHost(
-    navController: NavHostController = rememberNavController()
+    navigateToPaymentSignal: StateFlow<Boolean>,
+    onPaymentNavigated: () -> Unit,
 ) {
+    val navController = rememberNavController()
+    val shouldNavigate by navigateToPaymentSignal.collectAsStateWithLifecycle()
+
+    LaunchedEffect(shouldNavigate) {
+        if (shouldNavigate) {
+            navController.navigate(CartRoute) {
+                launchSingleTop = true
+            }
+            onPaymentNavigated()
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = ShoppingRoute

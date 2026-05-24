@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.payment
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -22,6 +23,7 @@ import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.order.Order
 import woowacourse.shopping.model.order.PaymentCalculator
+import woowacourse.shopping.notification.PaymentAlarmScheduler
 import woowacourse.shopping.ui.common.error.ErrorMessageMapper
 import woowacourse.shopping.ui.navigation.PaymentRoute
 import java.time.Clock
@@ -33,7 +35,8 @@ class PaymentViewModel(
     private val paymentRepo: PaymentRepository,
     private val cartRepo: CartRepository,
     private val orderRepo: OrderRepository,
-    private val calculator: PaymentCalculator = PaymentCalculator()
+    private val calculator: PaymentCalculator = PaymentCalculator(),
+    private val alarmScheduler: PaymentAlarmScheduler,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PaymentUiState())
     private val _events = Channel<String>(Channel.BUFFERED)
@@ -47,6 +50,12 @@ class PaymentViewModel(
         loadOrder()
     }
 
+    @SuppressLint("ScheduleExactAlarm")
+    fun onScreenEnter() {
+        alarmScheduler.cancel()
+        alarmScheduler.schedule()
+    }
+
     fun updateSelectedId(id: Long) {
         if (_uiState.value.selectedCouponId == id) _uiState.update { it.copy(selectedCouponId = null) }
         else _uiState.update { it.copy(selectedCouponId = id) }
@@ -57,6 +66,7 @@ class PaymentViewModel(
     fun pay() {
         viewModelScope.launch {
             try {
+                alarmScheduler.cancel()
                 orderRepo.requestOrder(ids)
             } catch (e: Exception) {
                 handleError("pay", e, "결제를 할 수 없어요.")
@@ -134,6 +144,7 @@ class PaymentViewModel(
                         paymentRepo = container.paymentRepository,
                         cartRepo = container.cartRepository,
                         orderRepo = container.orderRepository,
+                        alarmScheduler = container.paymentAlarmScheduler
                     ) as T
                 }
             }

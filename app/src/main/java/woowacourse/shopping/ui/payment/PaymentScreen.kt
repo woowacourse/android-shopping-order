@@ -36,6 +36,10 @@ fun PaymentScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
+        viewModel.onScreenEnter()
+    }
+
+    LaunchedEffect(Unit) {
         viewModel.events.collect { message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
