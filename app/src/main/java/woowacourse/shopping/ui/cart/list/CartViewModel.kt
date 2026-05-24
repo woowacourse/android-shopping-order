@@ -177,7 +177,8 @@ class CartViewModel(
     private fun shouldMoveToPreviousPage(
         requestedPage: Int,
         cartPageResult: woowacourse.shopping.repository.query.CartPageResult,
-    ): Boolean = requestedPage > 1 && cartPageResult.totalPages > 0 && cartPageResult.items.isEmpty() && requestedPage > cartPageResult.totalPages
+    ): Boolean =
+        requestedPage > 1 && cartPageResult.totalPages > 0 && cartPageResult.items.isEmpty() && requestedPage > cartPageResult.totalPages
 
     private suspend fun reloadPage(page: Int) {
         runCatching {

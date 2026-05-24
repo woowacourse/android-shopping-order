@@ -14,11 +14,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ui.cart.SelectedCartOrder
-import woowacourse.shopping.ui.common.formatter.formatPrice
 import woowacourse.shopping.ui.cart.list.CartViewModel
 import woowacourse.shopping.ui.cart.recommendation.CartRecommendationEvent
 import woowacourse.shopping.ui.cart.recommendation.CartRecommendationViewModel
 import woowacourse.shopping.ui.cart.recommendation.CartRecommendedProductsScreen
+import woowacourse.shopping.ui.common.formatter.formatPrice
 
 @Composable
 fun CartRecommendationRouteScreen(

@@ -18,8 +18,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.model.Coupon
 import woowacourse.shopping.model.CartItem
+import woowacourse.shopping.model.Coupon
 import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.CartRepositoryFixture
@@ -172,7 +172,8 @@ class OrderViewModelTest {
 
             assertEquals(
                 listOf("5,000원 할인 쿠폰", "무료 배송 쿠폰", "미라클 세일 30% 할인 쿠폰"),
-                viewModel.uiState.value.coupons.map { it.title },
+                viewModel.uiState.value.coupons
+                    .map { it.title },
             )
         }
 
@@ -218,7 +219,8 @@ class OrderViewModelTest {
                     2L to true,
                     4L to false,
                 ),
-                viewModel.uiState.value.coupons.associate { it.id to it.isSelected },
+                viewModel.uiState.value.coupons
+                    .associate { it.id to it.isSelected },
             )
         }
 
@@ -292,7 +294,10 @@ class OrderViewModelTest {
             )
             advanceUntilIdle()
 
-            assertTrue(viewModel.uiState.value.coupons.any { it.id == 3L })
+            assertTrue(
+                viewModel.uiState.value.coupons
+                    .any { it.id == 3L },
+            )
 
             viewModel.toggleCouponSelection(couponId = 3L, isSelected = true)
 
@@ -311,7 +316,8 @@ class OrderViewModelTest {
 
             assertEquals(
                 listOf(4L),
-                viewModel.uiState.value.coupons.map { it.id },
+                viewModel.uiState.value.coupons
+                    .map { it.id },
             )
         }
 

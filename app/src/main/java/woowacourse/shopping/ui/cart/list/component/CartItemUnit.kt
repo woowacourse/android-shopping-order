@@ -28,8 +28,8 @@ import coil3.compose.AsyncImage
 import woowacourse.shopping.R
 import woowacourse.shopping.ui.ShoppingTypography
 import woowacourse.shopping.ui.cart.common.CartCheckbox
-import woowacourse.shopping.ui.common.component.card.shoppingOutlinedCard
 import woowacourse.shopping.ui.cart.list.uistate.CartItemUiModel
+import woowacourse.shopping.ui.common.component.card.shoppingOutlinedCard
 import woowacourse.shopping.ui.common.component.cartcontrol.QuantityStepper
 import woowacourse.shopping.ui.common.formatter.formatPrice
 import woowacourse.shopping.ui.fixture.MockProducts

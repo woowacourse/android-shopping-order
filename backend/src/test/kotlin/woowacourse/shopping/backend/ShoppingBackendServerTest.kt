@@ -142,8 +142,7 @@ class ShoppingBackendServerTest {
                 .method(
                     method,
                     body?.let { HttpRequest.BodyPublishers.ofString(it) } ?: HttpRequest.BodyPublishers.noBody(),
-                )
-                .header("Content-Type", "application/json")
+                ).header("Content-Type", "application/json")
 
         return client.send(builder.build(), HttpResponse.BodyHandlers.ofString())
     }

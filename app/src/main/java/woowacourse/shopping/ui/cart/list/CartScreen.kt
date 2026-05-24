@@ -5,23 +5,23 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import woowacourse.shopping.ui.cart.common.CartBottomBar
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import woowacourse.shopping.R
-import woowacourse.shopping.ui.common.component.header.NavigationHeader
-import woowacourse.shopping.ui.common.formatter.formatPrice
+import woowacourse.shopping.ui.cart.common.CartBottomBar
 import woowacourse.shopping.ui.cart.list.component.CartItemBody
 import woowacourse.shopping.ui.cart.list.component.CartItemSkeletonBody
 import woowacourse.shopping.ui.cart.list.uistate.CartItemUiModel
 import woowacourse.shopping.ui.cart.list.uistate.CartListUiState
+import woowacourse.shopping.ui.common.component.header.NavigationHeader
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
+import woowacourse.shopping.ui.common.formatter.formatPrice
 import woowacourse.shopping.ui.fixture.MockProducts
 
 @Composable

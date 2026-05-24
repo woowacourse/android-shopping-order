@@ -10,8 +10,7 @@ private const val KEY_UNPAID_NOTIFICATION_ENABLED = "unpaid_notification_enabled
 class SharedPreferencesNotificationSettingRepository(
     private val sharedPreferences: SharedPreferences,
 ) : NotificationSettingRepository {
-    override fun isUnpaidNotificationEnabled(): Boolean =
-        sharedPreferences.getBoolean(KEY_UNPAID_NOTIFICATION_ENABLED, false)
+    override fun isUnpaidNotificationEnabled(): Boolean = sharedPreferences.getBoolean(KEY_UNPAID_NOTIFICATION_ENABLED, false)
 
     override fun setUnpaidNotificationEnabled(isEnabled: Boolean) {
         sharedPreferences

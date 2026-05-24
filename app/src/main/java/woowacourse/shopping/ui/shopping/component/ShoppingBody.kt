@@ -22,8 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.model.Product
+import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.shopping.ProductListUiState
 import woowacourse.shopping.ui.shopping.ShoppingProductUiState
 import woowacourse.shopping.ui.theme.ShoppingColors

@@ -23,7 +23,7 @@ fun ProductDetailRouteScreen(
         viewModel.loadProduct(productId)
     }
 
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding->
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         val product = uiState.product ?: return@Scaffold
 
         ProductDetailScreen(
@@ -39,7 +39,7 @@ fun ProductDetailRouteScreen(
                 onLastViewedProductClick(product.id)
             },
             onIncreaseQuantity = viewModel::increaseQuantity,
-            onDecreaseQuantity = viewModel::decreaseQuantity
+            onDecreaseQuantity = viewModel::decreaseQuantity,
         )
     }
 }

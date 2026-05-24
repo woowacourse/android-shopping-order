@@ -75,9 +75,10 @@ fun AppNavHost(
 
         navigation<CartGraph>(startDestination = CartRoute) {
             composable<CartRoute> { backStackEntry ->
-                val parentEntry = remember(backStackEntry) {
-                    navController.getBackStackEntry(CartGraph)
-                }
+                val parentEntry =
+                    remember(backStackEntry) {
+                        navController.getBackStackEntry(CartGraph)
+                    }
                 val cartViewModel: CartViewModel = viewModel(parentEntry)
                 val recommendationViewModel: CartRecommendationViewModel = viewModel(parentEntry)
 
@@ -93,9 +94,10 @@ fun AppNavHost(
 
             composable<OrderRoute> { backStackEntry ->
                 val route = backStackEntry.toRoute<OrderRoute>()
-                val parentEntry = remember(backStackEntry) {
-                    navController.getBackStackEntry(CartGraph)
-                }
+                val parentEntry =
+                    remember(backStackEntry) {
+                        navController.getBackStackEntry(CartGraph)
+                    }
                 val orderViewModel: OrderViewModel = viewModel(parentEntry)
 
                 OrderRouteScreen(
@@ -118,9 +120,10 @@ fun AppNavHost(
             }
 
             composable<CartRecommendationRoute> { backStackEntry ->
-                val parentEntry = remember(backStackEntry) {
-                    navController.getBackStackEntry(CartGraph)
-                }
+                val parentEntry =
+                    remember(backStackEntry) {
+                        navController.getBackStackEntry(CartGraph)
+                    }
                 val cartViewModel: CartViewModel = viewModel(parentEntry)
                 val recommendationViewModel: CartRecommendationViewModel = viewModel(parentEntry)
                 val orderViewModel: OrderViewModel = viewModel(parentEntry)

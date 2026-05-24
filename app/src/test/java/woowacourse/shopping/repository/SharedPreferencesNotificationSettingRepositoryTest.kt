@@ -50,7 +50,8 @@ class SharedPreferencesNotificationSettingRepositoryTest {
             defValues: MutableSet<String>?,
         ): MutableSet<String>? =
             @Suppress("UNCHECKED_CAST")
-            (values[key] as? MutableSet<String>) ?: defValues
+            (values[key] as? MutableSet<String>)
+                ?: defValues
 
         override fun getInt(
             key: String?,

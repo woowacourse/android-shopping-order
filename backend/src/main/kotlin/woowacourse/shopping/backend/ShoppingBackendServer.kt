@@ -103,10 +103,12 @@ class ShoppingBackendServer(
     }
 
     private fun handleGetProduct(exchange: HttpExchange) {
-        val productId = exchange.requestPath.substringAfterLast("/").toLongOrNull()
-            ?: throw IllegalArgumentException("유효한 상품 ID가 필요합니다.")
-        val product = store.getProduct(productId)
-            ?: return exchange.respondJson(404, ErrorResponse("상품을 찾을 수 없습니다."))
+        val productId =
+            exchange.requestPath.substringAfterLast("/").toLongOrNull()
+                ?: throw IllegalArgumentException("유효한 상품 ID가 필요합니다.")
+        val product =
+            store.getProduct(productId)
+                ?: return exchange.respondJson(404, ErrorResponse("상품을 찾을 수 없습니다."))
         exchange.respondJson(200, product)
     }
 
@@ -127,8 +129,9 @@ class ShoppingBackendServer(
     }
 
     private fun handleUpdateCartItem(exchange: HttpExchange) {
-        val cartItemId = exchange.requestPath.substringAfterLast("/").toLongOrNull()
-            ?: throw IllegalArgumentException("유효한 장바구니 항목 ID가 필요합니다.")
+        val cartItemId =
+            exchange.requestPath.substringAfterLast("/").toLongOrNull()
+                ?: throw IllegalArgumentException("유효한 장바구니 항목 ID가 필요합니다.")
         val request = exchange.readJson<CartItemQuantityUpdateRequest>()
         val updated = store.updateCartItem(cartItemId = cartItemId, quantity = request.quantity)
         if (!updated) {
@@ -139,8 +142,9 @@ class ShoppingBackendServer(
     }
 
     private fun handleDeleteCartItem(exchange: HttpExchange) {
-        val cartItemId = exchange.requestPath.substringAfterLast("/").toLongOrNull()
-            ?: throw IllegalArgumentException("유효한 장바구니 항목 ID가 필요합니다.")
+        val cartItemId =
+            exchange.requestPath.substringAfterLast("/").toLongOrNull()
+                ?: throw IllegalArgumentException("유효한 장바구니 항목 ID가 필요합니다.")
         store.deleteCartItem(cartItemId)
         exchange.respondStatus(204)
     }
