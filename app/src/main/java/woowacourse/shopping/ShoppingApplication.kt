@@ -4,8 +4,8 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
-import woowacourse.shopping.data.local.NotificationSettingSettingStorageImpl
 import woowacourse.shopping.data.local.NotificationSettingStorage
+import woowacourse.shopping.data.local.NotificationSettingStorageImpl
 import woowacourse.shopping.data.local.UserAuthDataStore
 import woowacourse.shopping.data.local.database.DataBase
 import woowacourse.shopping.data.local.repository.OutstandingProductRepositoryImpl
@@ -20,6 +20,7 @@ import woowacourse.shopping.data.remote.server.service.CouponService
 import woowacourse.shopping.data.remote.server.service.OrderService
 import woowacourse.shopping.data.remote.server.service.ProductService
 import woowacourse.shopping.ui.alarm.AlarmScheduler
+import woowacourse.shopping.ui.alarm.AlarmSchedulerImpl
 import woowacourse.shopping.ui.alarm.PaymentAlarmReceiver
 import kotlin.jvm.java
 
@@ -78,8 +79,8 @@ class ShoppingApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        notificationSetting = NotificationSettingSettingStorageImpl(this)
-        alarmScheduler = AlarmScheduler(this)
+        notificationSetting = NotificationSettingStorageImpl(this)
+        alarmScheduler = AlarmSchedulerImpl(this)
         createNotificationChannel()
     }
 
