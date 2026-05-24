@@ -31,20 +31,21 @@ fun CouponCard(
     checked: Boolean = false,
 ) {
     Column(
-        modifier = modifier
-            .padding(vertical = 18.dp, horizontal = 18.dp)
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = Color.Gray,
-                shape = RoundedCornerShape(5.dp)
-            ),
+        modifier =
+            modifier
+                .padding(vertical = 18.dp, horizontal = 18.dp)
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = Color.Gray,
+                    shape = RoundedCornerShape(5.dp),
+                ),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.Start
+        horizontalAlignment = Alignment.Start,
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
+            horizontalArrangement = Arrangement.Start,
         ) {
             Checkbox(
                 modifier = Modifier,
@@ -60,12 +61,12 @@ fun CouponCard(
             Text(
                 title,
                 fontSize = 18.sp,
-                fontWeight = FontWeight.W700
+                fontWeight = FontWeight.W700,
             )
         }
         Column(
             modifier = Modifier.padding(start = 16.dp, bottom = 18.dp),
-            verticalArrangement = Arrangement.Top
+            verticalArrangement = Arrangement.Top,
         ) {
             Text("만료일: ${year}년 ${month.toString().padStart(2, '0')}월 ${day}일")
             Text(if (minimumPrice > 0) "최소 주문 금액: ${String.format("%,d", minimumPrice)}원" else "")
@@ -83,6 +84,6 @@ fun CouponCardPreview() {
         day = 21,
         minimumPrice = 5000,
         checked = false,
-        onCheckedChange = {}
+        onCheckedChange = {},
     )
 }

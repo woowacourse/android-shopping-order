@@ -1,6 +1,5 @@
 package woowacourse.shopping.feature.recommend
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,7 +21,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -56,14 +54,15 @@ fun RecommendScreen(
         topBar = {
             CommonAppBar(
                 title = "Cart",
-                onCloseClick = onCloseClick
+                onCloseClick = onCloseClick,
             )
         },
     ) { innerPadding ->
         Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier =
+                modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
         ) {
             Column(
                 modifier =
@@ -73,25 +72,27 @@ fun RecommendScreen(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Column(
-                    modifier = Modifier.padding(start = 16.dp)
+                    modifier = Modifier.padding(start = 16.dp),
                 ) {
                     Text("이런 상품은 어떠세요?", fontWeight = FontWeight.W700, fontSize = 24.sp)
                     Spacer(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(10.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(10.dp),
                     )
                     Text(
                         "* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.",
                         fontWeight = FontWeight.W500,
                         fontSize = 14.sp,
-                        color = Color.Gray
+                        color = Color.Gray,
                     )
                 }
                 Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(24.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(24.dp),
                 )
                 RecommendList(
                     isLoading = false,

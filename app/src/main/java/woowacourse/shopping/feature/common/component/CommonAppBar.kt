@@ -64,6 +64,6 @@ fun CommonAppBar(
 private fun CartAppBarPreview() {
     CommonAppBar(
         title = "Cart",
-        onCloseClick = {}
+        onCloseClick = {},
     )
 }

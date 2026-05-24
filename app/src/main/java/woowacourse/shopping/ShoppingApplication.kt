@@ -85,9 +85,10 @@ open class ShoppingApplication : Application() {
 
         val product: ProductRepository =
             ProductRepositoryImpl(
-                dataSource = ProductServerDataSourceImpl(
-                    retrofitProductService = RetrofitClient.productService,
-                ),
+                dataSource =
+                    ProductServerDataSourceImpl(
+                        retrofitProductService = RetrofitClient.productService,
+                    ),
             )
 
         val cart: CartRepository =
@@ -109,7 +110,6 @@ open class ShoppingApplication : Application() {
                         couponService = RetrofitClient.couponService,
                     ),
             )
-
 
         val order: OrderRepository =
             OrderRepositoryImpl(

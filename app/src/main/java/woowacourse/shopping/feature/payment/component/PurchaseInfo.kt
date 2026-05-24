@@ -16,12 +16,13 @@ import androidx.compose.ui.unit.sp
 fun PurchaseInfo(
     infoText: String,
     price: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .fillMaxWidth(),
+        modifier =
+            modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(infoText, fontSize = 18.sp, fontWeight = FontWeight.W700)
@@ -34,6 +35,6 @@ fun PurchaseInfo(
 fun PurchaseInfoPreview() {
     PurchaseInfo(
         infoText = "주문 금액",
-        price = 50000
+        price = 50000,
     )
 }

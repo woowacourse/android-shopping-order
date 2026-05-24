@@ -52,7 +52,6 @@ fun ProductDetailScreen(
     recentProductId: Long? = null,
     viewModel: ProductDetailViewModel = viewModel(factory = ProductDetailViewModel.Factory),
 ) {
-
     LaunchedEffect(Unit) {
         viewModel.initialLoading(
             productId = id,
@@ -75,12 +74,13 @@ fun ProductDetailScreen(
 
     when {
         productState is ProductDetailLoadingState.Loading ||
-                recentState is ProductDetailLoadingState.Loading -> LoadingIndicator()
+            recentState is ProductDetailLoadingState.Loading -> LoadingIndicator()
 
         productState is ProductDetailLoadingState.Error ||
-                productState is ProductDetailLoadingState.None -> ProductDetailErrorScreen(
-            activityFinish
-        )
+            productState is ProductDetailLoadingState.None ->
+            ProductDetailErrorScreen(
+                activityFinish,
+            )
 
         productState is ProductDetailLoadingState.Success ->
             ProductDetailContent(

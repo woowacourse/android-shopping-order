@@ -11,6 +11,5 @@ data class FreeShippingCouponDto(
     override val description: String,
     override val expirationDate: String,
     val minimumAmount: Int? = null,
-    override val discountType: String? = "freeShipping"
-
+    override val discountType: String? = "freeShipping",
 ) : CouponDto

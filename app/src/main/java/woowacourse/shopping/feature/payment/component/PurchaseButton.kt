@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 fun PurchaseButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    text: String = "결제하기"
+    text: String = "결제하기",
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -53,6 +53,6 @@ fun PurchaseButton(
 @Composable
 fun PurchaseButtonPreview() {
     PurchaseButton(
-        onClick = {}
+        onClick = {},
     )
 }

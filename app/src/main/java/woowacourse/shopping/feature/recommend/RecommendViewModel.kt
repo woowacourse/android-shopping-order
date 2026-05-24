@@ -37,7 +37,10 @@ class RecommendViewModel(
         }
     }
 
-    fun loadRecommendList(pageSize: Int, contentIds: List<Long>) {
+    fun loadRecommendList(
+        pageSize: Int,
+        contentIds: List<Long>,
+    ) {
         viewModelScope.launch {
             val category = refreshRecentProducts()
             val serverCart = cartRepository.loadCart()
@@ -132,9 +135,10 @@ class RecommendViewModel(
         }
         val newContents = _uiState.value.recommendList.map { it.id }
         val serverCart = cartRepository.loadCart()
-        return serverCart.cartContents.filter { cartContent ->
-            cartContent.id in contentIds || cartContent.productId in newContents
-        }.map { it.id }
+        return serverCart.cartContents
+            .filter { cartContent ->
+                cartContent.id in contentIds || cartContent.productId in newContents
+            }.map { it.id }
     }
 
     private suspend fun refreshRecentProducts(): String {
@@ -153,7 +157,7 @@ class RecommendViewModel(
                     RecommendViewModel(
                         appDependencies.productRepository,
                         appDependencies.cartRepository,
-                        appDependencies.recentProductRepository
+                        appDependencies.recentProductRepository,
                     )
                 }
             }

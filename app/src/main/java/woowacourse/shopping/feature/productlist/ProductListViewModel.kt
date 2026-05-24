@@ -22,7 +22,6 @@ import woowacourse.shopping.data.repository.recentproduct.RecentProductRepositor
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.feature.common.state.ProductUiModel
-import java.io.IOException
 
 class ProductListViewModel(
     private val productRepository: ProductRepository,
@@ -34,7 +33,6 @@ class ProductListViewModel(
 
     private val _event = Channel<ProductListEvent>(Channel.BUFFERED)
     val event: Flow<ProductListEvent> = _event.receiveAsFlow()
-
 
     init {
         viewModelScope.launch {

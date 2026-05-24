@@ -12,5 +12,5 @@ data class BuyXGetYCouponDto(
     override val expirationDate: String,
     val buyQuantity: Int? = null,
     val getQuantity: Int? = null,
-    override val discountType: String? = "buyXgetY"
+    override val discountType: String? = "buyXgetY",
 ) : CouponDto

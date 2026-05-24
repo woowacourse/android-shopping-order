@@ -27,8 +27,8 @@ fun AppNavHost() {
                     navController.navigate(
                         ProductDetail(
                             id = productId,
-                            recentProductId = recentProductId
-                        )
+                            recentProductId = recentProductId,
+                        ),
                     )
                 },
                 onSettingClick = {
@@ -53,8 +53,8 @@ fun AppNavHost() {
                     navController.navigate(
                         ProductDetail(
                             id = id,
-                            recentProductId = route.recentProductId
-                        )
+                            recentProductId = route.recentProductId,
+                        ),
                     )
                 },
             )
@@ -62,7 +62,7 @@ fun AppNavHost() {
 
         composable<Setting> {
             SettingScreen(
-                onCloseClick = { navController.popBackStack() }
+                onCloseClick = { navController.popBackStack() },
             )
         }
 
@@ -71,10 +71,14 @@ fun AppNavHost() {
                 onCloseClick = { navController.popBackStack() },
                 activityFinish = { navController.popBackStack() },
                 onToRecommendIntent = { cartContentIds ->
-                    navController.navigate(Recommend(cartContentIds.map {
-                        it.id
-                    }))
-                }
+                    navController.navigate(
+                        Recommend(
+                            cartContentIds.map {
+                                it.id
+                            },
+                        ),
+                    )
+                },
             )
         }
 
@@ -85,8 +89,8 @@ fun AppNavHost() {
                 onBuyClick = { cartContentIds ->
                     navController.navigate(
                         Payment(
-                            cartContentIds = cartContentIds
-                        )
+                            cartContentIds = cartContentIds,
+                        ),
                     ) {
                         popUpTo(ProductList) {
                             inclusive = false
@@ -98,9 +102,10 @@ fun AppNavHost() {
         }
 
         composable<Payment>(
-            deepLinks = listOf(
-                navDeepLink<Payment>(basePath = "shopping://payment")
-            )
+            deepLinks =
+                listOf(
+                    navDeepLink<Payment>(basePath = "shopping://payment"),
+                ),
         ) { backStackEntry ->
             val route = backStackEntry.toRoute<Payment>()
             PaymentScreen(
@@ -113,7 +118,7 @@ fun AppNavHost() {
                         launchSingleTop = true
                     }
                 },
-                cartContentIds = route.cartContentIds
+                cartContentIds = route.cartContentIds,
             )
         }
     }

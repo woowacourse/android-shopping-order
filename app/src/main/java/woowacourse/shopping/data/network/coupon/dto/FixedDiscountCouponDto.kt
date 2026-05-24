@@ -12,5 +12,5 @@ data class FixedDiscountCouponDto(
     override val expirationDate: String,
     val discount: Int? = null,
     val minimumAmount: Int? = null,
-    override val discountType: String? = "fixed"
+    override val discountType: String? = "fixed",
 ) : CouponDto

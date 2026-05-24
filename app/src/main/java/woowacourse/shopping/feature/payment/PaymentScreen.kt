@@ -37,7 +37,7 @@ fun PaymentScreen(
     onCloseClick: () -> Unit,
     onPaymentClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: PaymentViewModel = viewModel(factory = PaymentViewModel.Factory)
+    viewModel: PaymentViewModel = viewModel(factory = PaymentViewModel.Factory),
 ) {
     val currentContext = LocalContext.current
 
@@ -84,36 +84,39 @@ fun PaymentScreen(
         topBar = {
             CommonAppBar(
                 title = "결제하기",
-                onCloseClick = onCloseClick
+                onCloseClick = onCloseClick,
             )
         },
     ) { innerPadding ->
         Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier =
+                modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(3f),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(3f),
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text("적용 가능한 쿠폰", fontWeight = FontWeight.W700, fontSize = 24.sp)
                 Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(10.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(10.dp),
                 )
                 Text(
                     "* 쿠폰은 1개만 적용 가능합니다.",
                     fontWeight = FontWeight.W500,
                     fontSize = 14.sp,
-                    color = Color.Gray
+                    color = Color.Gray,
                 )
 
                 LazyColumn(
-                    modifier = Modifier.padding(horizontal = 18.dp)
+                    modifier = Modifier.padding(horizontal = 18.dp),
                 ) {
                     items(uiState.couponList) {
                         CouponCard(
@@ -125,7 +128,7 @@ fun PaymentScreen(
                             checked = uiState.couponCheckMap[it.code] ?: false,
                             onCheckedChange = {
                                 viewModel.couponCheck(it.code)
-                            }
+                            },
                         )
                     }
                 }
@@ -134,41 +137,44 @@ fun PaymentScreen(
             HorizontalDivider(color = Color.LightGray, thickness = 7.dp)
 
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
             ) {
                 PurchaseInfo(
                     infoText = "주문 금액",
-                    price = uiState.totalPrice
+                    price = uiState.totalPrice,
                 )
                 PurchaseInfo(
                     infoText = "쿠폰 할인 금액",
-                    price = uiState.couponDiscountPrice * -1
+                    price = uiState.couponDiscountPrice * -1,
                 )
                 PurchaseInfo(
                     infoText = "배송비",
-                    price = uiState.shippingFee
+                    price = uiState.shippingFee,
                 )
             }
 
             HorizontalDivider(color = Color.LightGray, thickness = 7.dp)
 
             PurchaseInfo(
-                modifier = Modifier
-                    .weight(1f),
+                modifier =
+                    Modifier
+                        .weight(1f),
                 infoText = "총 결제 금액",
-                price = uiState.totalPaymentPrice
+                price = uiState.totalPaymentPrice,
             )
 
             PurchaseButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(78.dp)
-                    .background(Color(0xff555555)),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(78.dp)
+                        .background(Color(0xff555555)),
                 onClick = {
                     viewModel.order(cartContentIds)
-                }
+                },
             )
         }
     }
@@ -180,6 +186,6 @@ fun PaymentScreenPreview() {
     PaymentScreen(
         onCloseClick = {},
         onPaymentClick = {},
-        cartContentIds = emptyList()
+        cartContentIds = emptyList(),
     )
 }

@@ -1,21 +1,13 @@
 package woowacourse.shopping.feature.setting
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
-import android.provider.Settings
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -33,19 +25,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import woowacourse.shopping.AlarmReceiver
-import woowacourse.shopping.feature.common.component.CommonAppBar
 import androidx.core.content.edit
+import woowacourse.shopping.feature.common.component.CommonAppBar
 
 @Composable
 fun SettingScreen(
     onCloseClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val sharedPref = remember {
-        context.getSharedPreferences("setting", Context.MODE_PRIVATE)
-    }
+    val sharedPref =
+        remember {
+            context.getSharedPreferences("setting", Context.MODE_PRIVATE)
+        }
     var isNotificationEnabled by remember {
         mutableStateOf(sharedPref.getBoolean("notification", true))
     }
@@ -66,31 +58,32 @@ fun SettingScreen(
         topBar = {
             CommonAppBar(
                 title = "Setting",
-                onCloseClick = onCloseClick
+                onCloseClick = onCloseClick,
             )
         },
     ) { innerPadding ->
         Column(
-            modifier = modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
+            modifier =
+                modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(
                 modifier = Modifier.padding(12.dp).fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-               Text("결제 알림 설정", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-               Switch(
-                   checked = isNotificationEnabled,
-                   onCheckedChange = {
-                       isNotificationEnabled = it
-                       sharedPref.edit { putBoolean("notification", it) }
-                       showToastMessage(it)
-                   }
-               )
+                Text("결제 알림 설정", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Switch(
+                    checked = isNotificationEnabled,
+                    onCheckedChange = {
+                        isNotificationEnabled = it
+                        sharedPref.edit { putBoolean("notification", it) }
+                        showToastMessage(it)
+                    },
+                )
             }
             HorizontalDivider()
         }
@@ -101,6 +94,6 @@ fun SettingScreen(
 @Composable
 fun SettingScreenPreview() {
     SettingScreen(
-        onCloseClick = {}
+        onCloseClick = {},
     )
 }

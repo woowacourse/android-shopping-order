@@ -12,5 +12,5 @@ data class PercentageDiscountCouponDto(
     override val expirationDate: String,
     val discount: Int? = null,
     val availableTime: AvailableTime? = null,
-    override val discountType: String? = "percentage"
+    override val discountType: String? = "percentage",
 ) : CouponDto

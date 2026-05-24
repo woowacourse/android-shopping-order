@@ -5,7 +5,7 @@ import woowacourse.shopping.data.network.coupon.dto.toDomain
 import woowacourse.shopping.domain.coupon.Coupon
 
 class CouponDataSourceImpl(
-    private val couponService: RetrofitCouponService
+    private val couponService: RetrofitCouponService,
 ) : CouponDataSource {
     override suspend fun loadCoupons(): List<Coupon> {
         val body = couponService.requestCoupons()

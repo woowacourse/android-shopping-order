@@ -9,15 +9,13 @@ data class PercentageDiscountCoupon(
     override val description: String,
     override val expirationDate: LocalDate,
     val discount: Int,
-    val availableTime: AvailableTime
+    val availableTime: AvailableTime,
 ) : Coupon(
-    code = code,
-    description = description,
-    expirationDate = expirationDate,
-) {
-    override fun calculateDiscountPrice(orderPrice: Int): Int {
-        return (orderPrice * discount) / 100
-    }
+        code = code,
+        description = description,
+        expirationDate = expirationDate,
+    ) {
+    override fun calculateDiscountPrice(orderPrice: Int): Int = (orderPrice * discount) / 100
 
     fun isDiscountingTime(curTime: LocalTime): Boolean {
         val startTime = LocalTime.parse(availableTime.start)

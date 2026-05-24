@@ -101,7 +101,6 @@ class ProductDetailViewModel(
             val product = productRepository.getProduct(loadingState.product.id)
             cartRepository.setProductQuantity(product, previousQuantity + uiState.value.quantity)
             _event.emit(AddEvent("장바구니에 담기 성공했습니다."))
-
         }
     }
 
@@ -134,4 +133,6 @@ sealed interface ProductDetailLoadingState {
     ) : ProductDetailLoadingState
 }
 
-data class AddEvent(val message: String)
+data class AddEvent(
+    val message: String,
+)

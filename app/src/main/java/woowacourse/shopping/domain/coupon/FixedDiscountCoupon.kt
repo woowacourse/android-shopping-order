@@ -7,15 +7,13 @@ data class FixedDiscountCoupon(
     override val description: String,
     override val expirationDate: LocalDate,
     val discount: Int,
-    val minimumAmount: Int
+    val minimumAmount: Int,
 ) : Coupon(
-    code = code,
-    description = description,
-    expirationDate = expirationDate,
-) {
-    override fun calculateDiscountPrice(orderPrice: Int): Int {
-        return orderPrice - discount
-    }
+        code = code,
+        description = description,
+        expirationDate = expirationDate,
+    ) {
+    override fun calculateDiscountPrice(orderPrice: Int): Int = orderPrice - discount
 
     fun isDiscountable(orderPrice: Int): Boolean = orderPrice >= minimumAmount
 }

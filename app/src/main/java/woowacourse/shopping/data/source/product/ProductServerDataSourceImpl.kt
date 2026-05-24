@@ -10,7 +10,7 @@ class ProductServerDataSourceImpl(
         startIndex: Int,
         pageSize: Int,
         sort: List<String>,
-        category: String?
+        category: String?,
     ): Pair<List<Product>, Boolean> {
         val body =
             retrofitProductService
@@ -26,5 +26,4 @@ class ProductServerDataSourceImpl(
 
         return body.toDomain()
     }
-
 }

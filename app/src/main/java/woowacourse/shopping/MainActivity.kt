@@ -1,7 +1,6 @@
 package woowacourse.shopping
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -15,13 +14,12 @@ import woowacourse.shopping.feature.navigation.AppNavHost
 import woowacourse.shopping.feature.productlist.ui.theme.AndroidshoppingTheme
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         requestNotificationPermission()
 
-        if  (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
         enableEdgeToEdge()
@@ -35,7 +33,8 @@ class MainActivity : ComponentActivity() {
 
     private fun requestNotificationPermission() {
         if (ContextCompat.checkSelfPermission(
-                this, Manifest.permission.POST_NOTIFICATIONS
+                this,
+                Manifest.permission.POST_NOTIFICATIONS,
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -50,13 +49,14 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            Toast.makeText(this, "알림 권한을 활성화하였습니다.", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "알림 권한을 거부하셨습니다.", Toast.LENGTH_SHORT).show()
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                Toast.makeText(this, "알림 권한을 활성화하였습니다.", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "알림 권한을 거부하셨습니다.", Toast.LENGTH_SHORT).show()
+            }
         }
-    }
 }

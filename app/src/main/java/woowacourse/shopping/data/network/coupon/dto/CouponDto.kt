@@ -22,40 +22,44 @@ sealed interface CouponDto {
     val discountType: String?
 }
 
-fun CouponDto.toDomain(): Coupon {
-    return when (this) {
-        is FixedDiscountCouponDto -> FixedDiscountCoupon(
-            code = code,
-            description = description,
-            expirationDate = LocalDate.parse(expirationDate),
-            discount = discount ?: 0,
-            minimumAmount = minimumAmount ?: 0
-        )
-
-        is BuyXGetYCouponDto -> BuyXGetYCoupon(
-            code = code,
-            description = description,
-            expirationDate = LocalDate.parse(expirationDate),
-            buyQuantity = buyQuantity ?: 0,
-            getQuantity = getQuantity ?: 0
-        )
-
-        is PercentageDiscountCouponDto -> PercentageDiscountCoupon(
-            code = code,
-            description = description,
-            expirationDate = LocalDate.parse(expirationDate),
-            discount = discount ?: 0,
-            availableTime = availableTime ?: AvailableTime(
-                start = LocalTime.MIN.toString(),
-                end = LocalTime.MAX.toString()
+fun CouponDto.toDomain(): Coupon =
+    when (this) {
+        is FixedDiscountCouponDto ->
+            FixedDiscountCoupon(
+                code = code,
+                description = description,
+                expirationDate = LocalDate.parse(expirationDate),
+                discount = discount ?: 0,
+                minimumAmount = minimumAmount ?: 0,
             )
-        )
 
-        is FreeShippingCouponDto -> FreeShippingCoupon(
-            code = code,
-            description = description,
-            expirationDate = LocalDate.parse(expirationDate),
-            minimumAmount = minimumAmount ?: 0,
-        )
+        is BuyXGetYCouponDto ->
+            BuyXGetYCoupon(
+                code = code,
+                description = description,
+                expirationDate = LocalDate.parse(expirationDate),
+                buyQuantity = buyQuantity ?: 0,
+                getQuantity = getQuantity ?: 0,
+            )
+
+        is PercentageDiscountCouponDto ->
+            PercentageDiscountCoupon(
+                code = code,
+                description = description,
+                expirationDate = LocalDate.parse(expirationDate),
+                discount = discount ?: 0,
+                availableTime =
+                    availableTime ?: AvailableTime(
+                        start = LocalTime.MIN.toString(),
+                        end = LocalTime.MAX.toString(),
+                    ),
+            )
+
+        is FreeShippingCouponDto ->
+            FreeShippingCoupon(
+                code = code,
+                description = description,
+                expirationDate = LocalDate.parse(expirationDate),
+                minimumAmount = minimumAmount ?: 0,
+            )
     }
-}

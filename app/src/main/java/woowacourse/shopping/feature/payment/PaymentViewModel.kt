@@ -65,16 +65,18 @@ class PaymentViewModel(
 
     fun startPaymentAlarm(cartContentIds: List<Long>) {
         if (!sharedPref.getBoolean("notification", true)) return
-        val intent = Intent(application, AlarmReceiver::class.java).apply {
-            putExtra("cartContentIds", cartContentIds.toLongArray())
-        }
+        val intent =
+            Intent(application, AlarmReceiver::class.java).apply {
+                putExtra("cartContentIds", cartContentIds.toLongArray())
+            }
 
-        val pendingIntent = PendingIntent.getBroadcast(
-            application,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val pendingIntent =
+            PendingIntent.getBroadcast(
+                application,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
 
         val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val triggerTime = System.currentTimeMillis() + (5 * 60 * 1000)
@@ -83,12 +85,13 @@ class PaymentViewModel(
 
     fun cancelPaymentAlarm() {
         val intent = Intent(application, AlarmReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(
-            application,
-            0,
-            intent,
-            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
-        )
+        val pendingIntent =
+            PendingIntent.getBroadcast(
+                application,
+                0,
+                intent,
+                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
+            )
         pendingIntent?.let {
             val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             alarmManager.cancel(it)
@@ -103,7 +106,7 @@ class PaymentViewModel(
             _uiState.update {
                 it.copy(
                     totalPrice = totalPrice,
-                    totalPaymentPrice = totalPrice + it.shippingFee
+                    totalPaymentPrice = totalPrice + it.shippingFee,
                 )
             }
             loadCoupon()
@@ -115,42 +118,46 @@ class PaymentViewModel(
 
         viewModelScope.launch {
             couponList = couponRepository.loadCoupons()
-            val couponChooseList = couponList.filter {
-                val isDiscountable = couponValid(it, cartRepository.loadCart(), currentTotalPrice)
-                isDiscountable && !it.isExpired(LocalDate.now())
-            }
+            val couponChooseList =
+                couponList.filter {
+                    val isDiscountable = couponValid(it, cartRepository.loadCart(), currentTotalPrice)
+                    isDiscountable && !it.isExpired(LocalDate.now())
+                }
 
             val couponCheckMap = couponChooseList.associate { it.code to false }
-            _uiState.value = _uiState.value.copy(
-                couponCheckMap = couponCheckMap,
-                couponList = couponChooseList.map {
-                    CouponUiModel(
-                        code = it.code,
-                        title = it.description,
-                        year = it.expirationDate.year,
-                        month = it.expirationDate.monthValue,
-                        day = it.expirationDate.dayOfMonth,
-                        minimumPrice = when (it) {
-                            is FixedDiscountCoupon -> {
-                                it.minimumAmount
-                            }
+            _uiState.value =
+                _uiState.value.copy(
+                    couponCheckMap = couponCheckMap,
+                    couponList =
+                        couponChooseList.map {
+                            CouponUiModel(
+                                code = it.code,
+                                title = it.description,
+                                year = it.expirationDate.year,
+                                month = it.expirationDate.monthValue,
+                                day = it.expirationDate.dayOfMonth,
+                                minimumPrice =
+                                    when (it) {
+                                        is FixedDiscountCoupon -> {
+                                            it.minimumAmount
+                                        }
 
-                            is FreeShippingCoupon -> {
-                                it.minimumAmount
-                            }
+                                        is FreeShippingCoupon -> {
+                                            it.minimumAmount
+                                        }
 
-                            is BuyXGetYCoupon -> {
-                                0
-                            }
+                                        is BuyXGetYCoupon -> {
+                                            0
+                                        }
 
-                            is PercentageDiscountCoupon -> {
-                                0
-                            }
-                        }
-                    )
-                },
-                shippingFee = 3000
-            )
+                                        is PercentageDiscountCoupon -> {
+                                            0
+                                        }
+                                    },
+                            )
+                        },
+                    shippingFee = 3000,
+                )
         }
     }
 
@@ -195,9 +202,10 @@ class PaymentViewModel(
                         val cart = cartRepository.loadCart()
                         val maxQuantityProduct =
                             cart.cartContents.maxByOrNull { it.quantity }?.product
-                        newCouponDiscountPrice = activeCoupon.calculateDiscountPrice(
-                            maxQuantityProduct?.priceAmount() ?: 0
-                        )
+                        newCouponDiscountPrice =
+                            activeCoupon.calculateDiscountPrice(
+                                maxQuantityProduct?.priceAmount() ?: 0,
+                            )
                     }
 
                     is PercentageDiscountCoupon -> {
@@ -214,14 +222,18 @@ class PaymentViewModel(
                     couponCheckMap = currentMap,
                     shippingFee = newShippingFee,
                     couponDiscountPrice = newCouponDiscountPrice,
-                    totalPaymentPrice = it.totalPrice + newShippingFee - newCouponDiscountPrice
+                    totalPaymentPrice = it.totalPrice + newShippingFee - newCouponDiscountPrice,
                 )
             }
         }
     }
 
-    fun couponValid(coupon: Coupon, cart: Cart, currentTotalPrice: Int): Boolean {
-        return when (coupon) {
+    fun couponValid(
+        coupon: Coupon,
+        cart: Cart,
+        currentTotalPrice: Int,
+    ): Boolean =
+        when (coupon) {
             is FixedDiscountCoupon -> {
                 coupon.isDiscountable(currentTotalPrice)
             }
@@ -240,7 +252,6 @@ class PaymentViewModel(
                 coupon.isDiscountingTime(LocalDateTime.now().toLocalTime())
             }
         }
-    }
 
     fun order(cartContentIds: List<Long>) {
         viewModelScope.launch {
@@ -268,14 +279,13 @@ class PaymentViewModel(
     }
 }
 
-
 data class PaymentUiState(
     val couponCheckMap: Map<String, Boolean> = emptyMap(),
     val couponList: List<CouponUiModel> = emptyList(),
     val totalPrice: Int = 0,
     val couponDiscountPrice: Int = 0,
     val shippingFee: Int = 0,
-    val totalPaymentPrice: Int = 0
+    val totalPaymentPrice: Int = 0,
 )
 
 data class CouponUiModel(
@@ -288,11 +298,21 @@ data class CouponUiModel(
 )
 
 sealed interface CouponEvent {
-    data class Success(val message: String) : CouponEvent
-    data class Failed(val message: String) : CouponEvent
+    data class Success(
+        val message: String,
+    ) : CouponEvent
+
+    data class Failed(
+        val message: String,
+    ) : CouponEvent
 }
 
 sealed interface PaymentEvent {
-    data class Success(val message: String) : PaymentEvent
-    data class Failed(val message: String) : PaymentEvent
+    data class Success(
+        val message: String,
+    ) : PaymentEvent
+
+    data class Failed(
+        val message: String,
+    ) : PaymentEvent
 }

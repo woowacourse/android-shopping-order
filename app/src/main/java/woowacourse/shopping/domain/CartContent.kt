@@ -13,8 +13,7 @@ class CartContent(
 
     fun hasProductId(id: Long): Boolean = productId == id
 
-    fun addQuantity(target: CartContent): CartContent =
-        CartContent(product, quantity + target.quantity, id = target.id)
+    fun addQuantity(target: CartContent): CartContent = CartContent(product, quantity + target.quantity, id = target.id)
 
     fun decreaseQuantity(target: CartContent): CartContent {
         require(target.quantity <= quantity) { "존재하는 수량보다 많이 뺄 수 없습니다." }

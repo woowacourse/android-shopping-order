@@ -3,11 +3,10 @@ package woowacourse.shopping.domain
 class Cart(
     val cartContents: List<CartContent>,
 ) {
-    private fun duplicateCartItem(newCartContent: CartContent): CartContent? {
-        return cartContents.firstOrNull { cartContent ->
+    private fun duplicateCartItem(newCartContent: CartContent): CartContent? =
+        cartContents.firstOrNull { cartContent ->
             cartContent.hasProductId(newCartContent.productId)
         }
-    }
 
     fun plusCartContent(newCartContent: CartContent): Cart {
         val duplicateCartItem =
@@ -30,7 +29,6 @@ class Cart(
     }
 
     fun minusCartContent(newCartContent: CartContent): Cart {
-
         require(this.hasCartContent(newCartContent)) { "존재하지 않는 상품입니다." }
 
         val duplicateCartItem = duplicateCartItem(newCartContent)!!
@@ -67,7 +65,8 @@ class Cart(
 
     fun getProductList(): List<Product> = cartContents.map { it.product }
 
-    fun hasCartContent(newCartContent: CartContent?): Boolean = cartContents.any { cartContent ->
-        cartContent.hasProductId(newCartContent?.productId ?: 0)
-    }
+    fun hasCartContent(newCartContent: CartContent?): Boolean =
+        cartContents.any { cartContent ->
+            cartContent.hasProductId(newCartContent?.productId ?: 0)
+        }
 }

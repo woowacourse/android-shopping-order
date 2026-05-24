@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.network
 
-import android.os.Debug
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -37,15 +36,15 @@ object RetrofitClient {
                 if (useMock) {
                     chain.proceed(request)
                 } else {
-                    val newRequest = request.newBuilder()
-                        .apply {
-                            authToken?.let { addHeader("Authorization", it) }
-                        }
-                        .build()
+                    val newRequest =
+                        request
+                            .newBuilder()
+                            .apply {
+                                authToken?.let { addHeader("Authorization", it) }
+                            }.build()
                     chain.proceed(newRequest)
                 }
-            }
-            .apply {
+            }.apply {
                 if (useMock) {
                     addInterceptor(MockInterceptor())
                 }
