@@ -47,6 +47,7 @@ class AppViewModelFactory(
                 PaymentViewModel(
                     shoppingCartRepository = appContainer.shoppingCartRepository,
                     couponRepository = appContainer.couponRepository,
+                    paymentReminderSettingsRepository = appContainer.paymentReminderSettingsRepository,
                 ) as T
 
             else -> throw IllegalArgumentException("지원하지 않는 ViewModel: ${modelClass.name}")

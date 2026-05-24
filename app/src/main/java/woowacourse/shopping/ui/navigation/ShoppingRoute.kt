@@ -20,6 +20,7 @@ data object RecommendRoute
 @Serializable
 data class PaymentRoute(
     val selectedProductIds: List<Long>,
+    val fromReminder: Boolean = false,
 )
 
 @Serializable

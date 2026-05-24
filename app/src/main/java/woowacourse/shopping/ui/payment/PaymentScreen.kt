@@ -21,6 +21,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -49,8 +50,10 @@ fun PaymentScreen(
     couponDiscountPrice: String,
     deliveryPrice: String,
     totalPrice: String,
+    isPaymentReminderEnabled: Boolean,
     onBackClick: () -> Unit,
     onCouponCheckedChange: (Long, Boolean) -> Unit,
+    onPaymentReminderEnabledChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     bottomContent: @Composable () -> Unit = {}
 ) {
@@ -75,6 +78,20 @@ fun PaymentScreen(
                         .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(R.string.payment_reminder_toggle_title),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Switch(
+                        checked = isPaymentReminderEnabled,
+                        onCheckedChange = onPaymentReminderEnabledChange,
+                    )
+                }
                 Text(
                     text = "적용 가능한 쿠폰",
                     fontSize = 18.sp,
@@ -311,8 +328,10 @@ private fun PaymentScreenPreview() {
             couponDiscountPrice = "5,000원",
             deliveryPrice = "3,000원",
             totalPrice = "118,000원",
+            isPaymentReminderEnabled = true,
             onBackClick = {},
             onCouponCheckedChange = { _, _ -> },
+            onPaymentReminderEnabledChange = {},
         )
     }
 }

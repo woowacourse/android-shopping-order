@@ -3,6 +3,7 @@
 package woowacourse.shopping.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.navigation.toRoute
 import androidx.navigation.compose.NavHost
@@ -17,8 +18,19 @@ import woowacourse.shopping.ui.productlist.ProductListRouteContent
 import woowacourse.shopping.ui.recommend.ShoppingCartRecommendRouteContent
 
 @Composable
-fun ShoppingNavHost(viewModelFactory: AppViewModelFactory) {
+fun ShoppingNavHost(
+    viewModelFactory: AppViewModelFactory,
+    pendingPaymentRoute: PaymentRoute?,
+    onPendingPaymentRouteHandled: () -> Unit = {},
+) {
     val navController = rememberNavController()
+
+    LaunchedEffect(pendingPaymentRoute) {
+        val route = pendingPaymentRoute ?: return@LaunchedEffect
+        navController.navigate(CartGraphRoute)
+        navController.navigate(route)
+        onPendingPaymentRouteHandled()
+    }
 
     NavHost(
         navController = navController,
@@ -109,6 +121,7 @@ fun ShoppingNavHost(viewModelFactory: AppViewModelFactory) {
                     viewModelFactory = viewModelFactory,
                     sharedViewModelStoreOwner = cartGraphEntry,
                     selectedProductIds = route.selectedProductIds.toSet(),
+                    fromReminder = route.fromReminder,
                     onNavigateBack = {
                         navController.popBackStack()
                     },

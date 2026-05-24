@@ -14,13 +14,20 @@ import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.CouponBenefit
 import woowacourse.shopping.domain.model.ShoppingCartItem
 import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.PaymentReminderSettingsRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 
 class PaymentViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
     private val couponRepository: CouponRepository,
+    private val paymentReminderSettingsRepository: PaymentReminderSettingsRepository,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(PaymentUiState())
+    private val _uiState =
+        MutableStateFlow(
+            PaymentUiState(
+                isPaymentReminderEnabled = paymentReminderSettingsRepository.isEnabled(),
+            ),
+        )
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
 
     private var hasLoadedCoupons: Boolean = false
@@ -111,6 +118,15 @@ class PaymentViewModel(
             coupons = _uiState.value.coupons,
             selectedCouponId = nextSelectedCouponId,
         )
+    }
+
+    fun setPaymentReminderEnabled(enabled: Boolean) {
+        paymentReminderSettingsRepository.setEnabled(enabled)
+        _uiState.update { currentState ->
+            currentState.copy(
+                isPaymentReminderEnabled = enabled,
+            )
+        }
     }
 
     private fun observeShoppingCartItems() {
@@ -230,6 +246,7 @@ class PaymentViewModel(
     data class PaymentUiState(
         val isLoadingCoupons: Boolean = false,
         val errorMessage: String? = null,
+        val isPaymentReminderEnabled: Boolean = true,
         val shoppingCartItems: List<ShoppingCartItem> = emptyList(),
         val coupons: List<Coupon> = emptyList(),
         val selectedCouponId: Long? = null,
