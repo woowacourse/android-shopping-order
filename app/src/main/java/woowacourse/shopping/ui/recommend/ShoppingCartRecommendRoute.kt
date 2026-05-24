@@ -9,10 +9,8 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import woowacourse.shopping.data.remote.retrofit.dto.OrderInfo
 import woowacourse.shopping.di.AppViewModelFactory
 import woowacourse.shopping.ui.cart.ShoppingCartViewModel
-import woowacourse.shopping.ui.order.OrderViewModel
 import woowacourse.shopping.ui.recommend.ShoppingCartRecommendViewModel.ShoppingCartStep
 
 @Composable
@@ -20,7 +18,7 @@ fun ShoppingCartRecommendRouteContent(
     viewModelFactory: AppViewModelFactory,
     sharedViewModelStoreOwner: ViewModelStoreOwner,
     onNavigateBack: () -> Unit,
-    onOrderCompleted: () -> Unit,
+    onNavigateToPayment: (Set<Long>) -> Unit,
 ) {
     val shoppingCartRecommendViewModel: ShoppingCartRecommendViewModel =
         viewModel(
@@ -28,11 +26,6 @@ fun ShoppingCartRecommendRouteContent(
             factory = viewModelFactory,
         )
     val shoppingCartViewModel: ShoppingCartViewModel =
-        viewModel(
-            viewModelStoreOwner = sharedViewModelStoreOwner,
-            factory = viewModelFactory,
-        )
-    val orderViewModel: OrderViewModel =
         viewModel(
             viewModelStoreOwner = sharedViewModelStoreOwner,
             factory = viewModelFactory,
@@ -77,22 +70,8 @@ fun ShoppingCartRecommendRouteContent(
         },
         onOrderButtonClick = { selectedRecommendProductIds ->
             val selectedOrderProductIds = selectedVisibleProductIds + selectedRecommendProductIds
-            val cartItemIds =
-                shoppingCartItems
-                    .filter { shoppingCartItem ->
-                        shoppingCartItem.product.id in selectedOrderProductIds
-                    }.map { shoppingCartItem -> shoppingCartItem.getId() }
-
-            if (cartItemIds.isEmpty()) return@ShoppingCartRecommendSection
-
-            orderViewModel.order(
-                orderInfo = OrderInfo(cartItemIds = cartItemIds),
-                onSuccess = {
-                    shoppingCartRecommendViewModel.moveToCart()
-                    shoppingCartViewModel.requestCartItems(force = true)
-                    onOrderCompleted()
-                },
-            )
+            if (selectedOrderProductIds.isEmpty()) return@ShoppingCartRecommendSection
+            onNavigateToPayment(selectedOrderProductIds)
         },
         onAddToCartClick = { shoppingItem ->
             shoppingCartViewModel.addOrIncreaseByProductId(

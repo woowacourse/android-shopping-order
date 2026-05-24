@@ -18,4 +18,9 @@ data object CartRoute
 data object RecommendRoute
 
 @Serializable
+data class PaymentRoute(
+    val selectedProductIds: List<Long>,
+)
+
+@Serializable
 data object CartGraphRoute

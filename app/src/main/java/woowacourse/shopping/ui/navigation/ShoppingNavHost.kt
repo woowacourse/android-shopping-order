@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import woowacourse.shopping.di.AppViewModelFactory
 import woowacourse.shopping.ui.cart.ShoppingCartRouteContent
 import woowacourse.shopping.ui.detail.DetailRouteContent
+import woowacourse.shopping.ui.payment.PaymentRouteContent
 import woowacourse.shopping.ui.productlist.ProductListRouteContent
 import woowacourse.shopping.ui.recommend.ShoppingCartRecommendRouteContent
 
@@ -87,6 +88,27 @@ fun ShoppingNavHost(viewModelFactory: AppViewModelFactory) {
                 ShoppingCartRecommendRouteContent(
                     viewModelFactory = viewModelFactory,
                     sharedViewModelStoreOwner = cartGraphEntry,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onNavigateToPayment = { selectedProductIds ->
+                        navController.navigate(
+                            PaymentRoute(selectedProductIds = selectedProductIds.toList()),
+                        )
+                    },
+                )
+            }
+
+            composable<PaymentRoute> { backStackEntry ->
+                val cartGraphEntry =
+                    remember(backStackEntry) {
+                        navController.getBackStackEntry(CartGraphRoute)
+                    }
+                val route = backStackEntry.toRoute<PaymentRoute>()
+                PaymentRouteContent(
+                    viewModelFactory = viewModelFactory,
+                    sharedViewModelStoreOwner = cartGraphEntry,
+                    selectedProductIds = route.selectedProductIds.toSet(),
                     onNavigateBack = {
                         navController.popBackStack()
                     },
