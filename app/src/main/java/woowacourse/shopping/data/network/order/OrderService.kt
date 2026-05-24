@@ -1,9 +1,9 @@
 package woowacourse.shopping.data.network.order
 
-import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Header
 import retrofit2.http.POST
+import woowacourse.shopping.data.network.order.dto.OrderRequestDto
 
 interface OrderService {
     @POST("/orders")
@@ -11,6 +11,6 @@ interface OrderService {
         @Header("accept")
         accept: String = "*/*",
         @Body
-        cartItemIds: List<Long>,
-    ): Response<Unit>
+        orderRequest: OrderRequestDto,
+    ): Unit
 }

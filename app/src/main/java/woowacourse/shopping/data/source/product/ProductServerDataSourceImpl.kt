@@ -12,32 +12,18 @@ class ProductServerDataSourceImpl(
         sort: List<String>,
         category: String?
     ): Pair<List<Product>, Boolean> {
-        val response =
+        val body =
             retrofitProductService
                 .requestProducts(page = startIndex, size = pageSize, category = category)
 
-        check(response.isSuccessful) {
-            val errorBody = response.errorBody()?.string()
-            "products 요청 실패: ${response.code()},  Message: $errorBody"
-        }
-        val body =
-            response.body()
-                ?: error("empty body")
         return Pair(body.content.map { it.toDomain() }, body.last)
     }
 
     override suspend fun getProduct(id: Long): Product {
-        val response =
+        val body =
             retrofitProductService
                 .getProductDetail(id = id)
 
-        check(response.isSuccessful) {
-            val errorBody = response.errorBody()?.string()
-            "products 요청 실패: ${response.code()},  Message: $errorBody"
-        }
-        val body =
-            response.body()
-                ?: error("empty body")
         return body.toDomain()
     }
 

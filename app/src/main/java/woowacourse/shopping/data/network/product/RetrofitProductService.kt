@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.network.product
 
-import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -22,7 +21,7 @@ interface RetrofitProductService {
         page: Int = 0,
         @Query("size")
         size: Int = 1,
-    ): Response<ProductResponse>
+    ): ProductResponse
 
     @POST("/products")
     suspend fun insertProducts(
@@ -30,7 +29,7 @@ interface RetrofitProductService {
         accept: String = "*/*",
         @Body
         product: ProductDto,
-    ): Response<Unit>
+    ): Unit
 
     @GET("/products/{id}")
     suspend fun getProductDetail(
@@ -38,7 +37,7 @@ interface RetrofitProductService {
         accept: String = "*/*",
         @Path("id")
         id: Long = 0,
-    ): Response<ProductDto>
+    ): ProductDto
 
     @DELETE("/products/{id}")
     suspend fun deleteProductDetail(
@@ -46,5 +45,5 @@ interface RetrofitProductService {
         accept: String = "*/*",
         @Path("id")
         id: Long = 0,
-    ): Response<Unit>
+    ): Unit
 }

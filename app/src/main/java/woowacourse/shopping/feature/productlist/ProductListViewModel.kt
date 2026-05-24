@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.product.ProductRepository
@@ -20,6 +21,7 @@ import woowacourse.shopping.data.repository.recentproduct.RecentProductRepositor
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.feature.common.state.ProductUiModel
+import java.io.IOException
 
 class ProductListViewModel(
     private val application: ShoppingApplication,
@@ -40,8 +42,8 @@ class ProductListViewModel(
             productRepository = appDependencies.productRepository
             cartRepository = appDependencies.cartRepository
             recentProductRepository = appDependencies.recentProductRepository
+            initialLoading()
         }
-        initialLoading()
     }
 
     private var products: List<Product> = emptyList()
@@ -49,57 +51,89 @@ class ProductListViewModel(
 
     fun initialLoading() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            refreshCart()
-            fetchAndAppendProducts(20)
-            refreshRecentProducts()
-            _uiState.update { it.copy(isLoading = false) }
+            try {
+                _uiState.update { it.copy(isLoading = true) }
+                refreshCart()
+                fetchAndAppendProducts(20)
+                refreshRecentProducts()
+            } catch (e: HttpException) {
+                _event.send(ProductListEvent.FatalError("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."))
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
     }
 
     fun loadingFetch() {
         viewModelScope.launch {
-            fetchAndAppendProducts(20)
+            try {
+                fetchAndAppendProducts(20)
+            } catch (e: Exception) {
+                _event.send(ProductListEvent.FatalError("추가 상품을 불러오는데 실패했습니다."))
+            }
         }
     }
 
     fun increase(productId: Long) {
         viewModelScope.launch {
-            if (products.none { it.id == productId }) return@launch
-            val product = products.first { it.id == productId }
-            cartRepository.increase(product)
-            refreshCart()
+            try {
+                if (products.none { it.id == productId }) return@launch
+                val product = products.first { it.id == productId }
+                cartRepository.increase(product)
+                refreshCart()
+            } catch (e: Exception) {
+                _event.send(ProductListEvent.FatalError("장바구니 담기에 실패했습니다."))
+            }
         }
     }
 
     fun decrease(productId: Long) {
         viewModelScope.launch {
-            cartRepository.decrease(productId)
-            refreshCart()
+            try {
+                cartRepository.decrease(productId)
+                refreshCart()
+            } catch (e: Exception) {
+                _event.send(ProductListEvent.FatalError("수량 변경에 실패했습니다."))
+            }
         }
     }
 
     fun insertRecentProduct(productId: Long) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            recentProductRepository.insert(productId)
-            _uiState.update { it.copy(isLoading = false) }
+            try {
+                _uiState.update { it.copy(isLoading = true) }
+                recentProductRepository.insert(productId)
+            } catch (e: Exception) {
+                _event.send(ProductListEvent.FatalError("최근 본 상품에 추가하는데 실패했습니다."))
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
     }
 
     fun loadRecentProducts() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            refreshRecentProducts()
-            _uiState.update { it.copy(isLoading = false) }
+            try {
+                _uiState.update { it.copy(isLoading = true) }
+                refreshRecentProducts()
+            } catch (e: Exception) {
+                _event.send(ProductListEvent.FatalError("최근 본 상품을 불러오는데 실패했습니다."))
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
     }
 
     fun cartRefresh() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            refreshCart()
-            _uiState.update { it.copy(isLoading = false) }
+            try {
+                _uiState.update { it.copy(isLoading = true) }
+                refreshCart()
+            } catch (e: Exception) {
+                _event.send(ProductListEvent.FatalError("장바구니 정보를 갱신하는데 실패했습니다."))
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
     }
 
