@@ -1,22 +1,31 @@
-package woowacourse.shopping.ui.cart
+﻿package woowacourse.shopping.ui.cart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.ProductRepository
+import woowacourse.shopping.data.repository.RecentItemRepository
+import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.ui.model.CartItemUiModel
 import woowacourse.shopping.ui.model.mapper.toUiModel
 
 class CartViewModel(
     private val cartRepository: CartRepository,
+    private val productRepository: ProductRepository,
+    private val recentItemRepository: RecentItemRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
@@ -128,6 +137,153 @@ class CartViewModel(
         }
     }
 
+    fun updateQuantityAndSelect(
+        productId: Long,
+        quantity: Int,
+    ) {
+        viewModelScope.launch {
+            val previousCartItemId =
+                cartRepository
+                    .getAllCartItems()
+                    .getOrNull()
+                    ?.firstOrNull { it.product.id == productId }
+                    ?.id
+
+            cartRepository
+                .setCartItem(productId, quantity = quantity)
+                .onSuccess {
+                    updateRecommendProductQuantity(productId, quantity)
+                    if (quantity == 0) {
+                        removeSelectedCartItem(previousCartItemId)
+                    } else {
+                        selectCartItem(productId)
+                    }
+                    getCartItemsByPage()
+                }.onFailure {
+                    _uiState.update { it.copy(errorMessage = "수량 변경에 실패했습니다.") }
+                }
+        }
+    }
+
+    fun loadRecommendProducts() {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isRecommendLoading = true,
+                    recommendErrorMessage = null,
+                )
+            }
+
+            val lastViewedItemId = recentItemRepository.getLastViewedItemId()
+            if (lastViewedItemId == null) {
+                _uiState.update {
+                    it.copy(
+                        isRecommendLoading = false,
+                        recommendProducts = persistentListOf(),
+                    )
+                }
+                return@launch
+            }
+
+            val lastViewedProduct =
+                productRepository
+                    .getProductById(lastViewedItemId)
+                    .getOrElse {
+                        _uiState.update {
+                            it.copy(
+                                isRecommendLoading = false,
+                                recommendErrorMessage = "추천 상품을 불러오지 못했습니다.",
+                            )
+                        }
+                        return@launch
+                    }
+
+            productRepository
+                .getProducts(
+                    category = lastViewedProduct.category,
+                    page = RECOMMEND_PRODUCT_PAGE,
+                    size = RECOMMEND_PRODUCT_SIZE,
+                ).onSuccess { result ->
+                    val quantityMap = cartRepository.getCartQuantityMap().first()
+                    val cartProductIds = quantityMap.keys
+                    val recommendProducts =
+                        result.products
+                            .filterNot { product -> product.id in cartProductIds }
+                            .map { product -> product.toUiModel(quantity = 0) }
+                            .toImmutableList()
+
+                    _uiState.update {
+                        it.copy(
+                            recommendProducts = recommendProducts,
+                            isRecommendLoading = false,
+                            recommendErrorMessage = null,
+                        )
+                    }
+                }.onFailure {
+                    _uiState.update {
+                        it.copy(
+                            isRecommendLoading = false,
+                            recommendErrorMessage = "추천 상품을 불러오지 못했습니다.",
+                        )
+                    }
+                }
+        }
+    }
+
+    private suspend fun selectCartItem(productId: Long) {
+        cartRepository
+            .getAllCartItems()
+            .onSuccess { cartItems ->
+                val cartItem = cartItems.firstOrNull { it.product.id == productId } ?: return@onSuccess
+                _uiState.update { state ->
+                    val selectedCartItems = state.selectedCartItems + (cartItem.id to cartItem.toSelectedCartItem())
+
+                    state.copy(
+                        selectedCartItems = selectedCartItems,
+                        totalCartQuantity = calculateTotalQuantity(selectedCartItems),
+                        totalPrice = calculateTotalPrice(selectedCartItems),
+                        errorMessage = null,
+                    )
+                }
+            }.onFailure {
+                _uiState.update { it.copy(errorMessage = "선택한 상품을 주문에 추가하지 못했습니다.") }
+            }
+    }
+
+    private fun removeSelectedCartItem(cartItemId: Long?) {
+        if (cartItemId == null) return
+
+        _uiState.update { state ->
+            val selectedCartItems = state.selectedCartItems - cartItemId
+
+            state.copy(
+                selectedCartItems = selectedCartItems,
+                totalCartQuantity = calculateTotalQuantity(selectedCartItems),
+                totalPrice = calculateTotalPrice(selectedCartItems),
+                errorMessage = null,
+            )
+        }
+    }
+
+    private fun updateRecommendProductQuantity(
+        productId: Long,
+        quantity: Int,
+    ) {
+        _uiState.update { state ->
+            state.copy(
+                recommendProducts =
+                    state.recommendProducts
+                        .map { product ->
+                            if (product.id == productId) {
+                                product.copy(quantity = quantity)
+                            } else {
+                                product
+                            }
+                        }.toImmutableList(),
+            )
+        }
+    }
+
     fun checkItem(cartItemId: Long) {
         _uiState.update { state ->
             val item = state.items.firstOrNull { it.id == cartItemId } ?: return@update state
@@ -216,18 +372,30 @@ class CartViewModel(
             quantity = quantity,
         )
 
+    private fun CartItem.toSelectedCartItem(): SelectedCartItem =
+        SelectedCartItem(
+            totalPrice = getTotalPrice().amount,
+            quantity = quantity,
+        )
+
     private fun calculateTotalPrice(selectedCartItems: Map<Long, SelectedCartItem>): Long = selectedCartItems.values.sumOf { it.totalPrice }
 
     private fun calculateTotalQuantity(selectedCartItems: Map<Long, SelectedCartItem>): Int = selectedCartItems.values.sumOf { it.quantity }
 
     companion object {
         private const val PAGE_SIZE = 5
+        private const val RECOMMEND_PRODUCT_PAGE = 0
+        private const val RECOMMEND_PRODUCT_SIZE = 10
 
-        fun provideFactory(cartRepository: CartRepository): ViewModelProvider.Factory =
+        val Factory: ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
+                    val appContainer = (this[APPLICATION_KEY] as ShoppingApplication).appContainer
+
                     CartViewModel(
-                        cartRepository = cartRepository,
+                        cartRepository = appContainer.cartRepository,
+                        productRepository = appContainer.productRepository,
+                        recentItemRepository = appContainer.recentItemRepository,
                     )
                 }
             }

@@ -18,6 +18,8 @@ data class CartUiState(
     val selectedCartItems: Map<Long, SelectedCartItem> = emptyMap(),
     val isOrder: Boolean = false,
     val recommendProducts: ImmutableList<ProductUiModel> = persistentListOf(),
+    val isRecommendLoading: Boolean = false,
+    val recommendErrorMessage: String? = null,
 )
 
 data class SelectedCartItem(
