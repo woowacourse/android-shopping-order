@@ -3,7 +3,7 @@ package woowacourse.shopping.data.local
 import android.content.Context
 import androidx.core.content.edit
 
-class NotificationSettingSettingStorageImpl(context: Context) : NotificationSettingStorage {
+class NotificationSettingStorageImpl(context: Context) : NotificationSettingStorage {
 
     private val appContext = context.applicationContext
     private val sharedPreferences = appContext.getSharedPreferences(
