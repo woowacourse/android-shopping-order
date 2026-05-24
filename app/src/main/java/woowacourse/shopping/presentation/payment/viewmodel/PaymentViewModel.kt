@@ -2,9 +2,6 @@ package woowacourse.shopping.presentation.payment.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,27 +9,25 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import woowacourse.shopping.di.AppModule
-import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.PaymentItems
-import woowacourse.shopping.domain.model.PriceModifiers
-import woowacourse.shopping.domain.repository.CouponRepository
-import woowacourse.shopping.domain.repository.OrderRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.SettingRepository
 import woowacourse.shopping.domain.scheduler.PaymentNotificationScheduler
+import woowacourse.shopping.domain.usecase.BuildPaymentItemsUseCase
+import woowacourse.shopping.domain.usecase.CalculateOrderPricingUseCase
+import woowacourse.shopping.domain.usecase.GetAvailableCouponsUseCase
+import woowacourse.shopping.domain.usecase.PlaceOrderUseCase
+import woowacourse.shopping.domain.usecase.SetPaymentPushAlarmUseCase
 import woowacourse.shopping.presentation.navigation.OrderItem
 import woowacourse.shopping.presentation.payment.model.PaymentUiState
 import woowacourse.shopping.presentation.payment.model.toUiModel
-import java.time.LocalDateTime
 
 class PaymentViewModel(
-    private val productRepository: ProductRepository = AppModule.productRepository,
-    private val couponRepository: CouponRepository = AppModule.couponRepository,
-    private val orderRepository: OrderRepository = AppModule.orderRepository,
-    private val settingRepository: SettingRepository = AppModule.settingRepository,
+    private val calculateOrderPricingUseCase: CalculateOrderPricingUseCase = AppModule.calculateOrderPricingUseCase,
+    private val buildPaymentItemsUseCase: BuildPaymentItemsUseCase = AppModule.buildPaymentItemsUseCase,
+    private val getAvailableCouponsUseCase: GetAvailableCouponsUseCase = AppModule.getAvailableCouponsUseCase,
+    private val placeOrderUseCase: PlaceOrderUseCase = AppModule.placeOrderUseCase,
+    private val setPaymentPushAlarmUseCase: SetPaymentPushAlarmUseCase = AppModule.setPaymentPushAlarmUseCase,
     private val notificationScheduler: PaymentNotificationScheduler = AppModule.paymentNotificationScheduler,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PaymentUiState())
@@ -54,7 +49,7 @@ class PaymentViewModel(
 
         val newSelectedId = if (uiState.value.selectedCouponId == couponId) null else couponId
         val selected = newSelectedId?.let { id -> availableCouponsDomain.find { it.id == id } }
-        val orderPricing = calculateAmounts(selected, items)
+        val orderPricing = calculateOrderPricingUseCase(selected, items)
 
         _uiState.update {
             it.copy(
@@ -68,27 +63,18 @@ class PaymentViewModel(
 
     fun submitOrder() {
         val items = paymentItems ?: return
-        val cartItemIds = items.getPaymentItems().map { it.id }
         viewModelScope.launch {
-            runCatching { orderRepository.requestOrder(cartItemIds) }
-                .onSuccess {
-                    notificationScheduler.cancel()
-                    _uiEvents.emit(PaymentEvent.OrderSuccess("주문이 완료되었습니다!"))
-                }.onFailure {
-                    _uiEvents.emit(PaymentEvent.ShowError("주문 중 오류가 발생했습니다."))
-                }
+            runCatching { placeOrderUseCase(items) }
+                .onSuccess { _uiEvents.emit(PaymentEvent.OrderSuccess("주문이 완료되었습니다!")) }
+                .onFailure { _uiEvents.emit(PaymentEvent.ShowError("주문 중 오류가 발생했습니다.")) }
         }
     }
 
     private fun loadAvailableCoupons(orderItems: List<OrderItem>) {
         viewModelScope.launch {
             runCatching {
-                val items = buildPaymentItems(orderItems)
-                val now = LocalDateTime.now()
-                val coupons =
-                    couponRepository
-                        .getCoupons()
-                        .filter { it.isApplicable(items, now) }
+                val items = buildPaymentItemsUseCase(orderItems)
+                val coupons = getAvailableCouponsUseCase(items)
                 items to coupons
             }.onSuccess { (items, coupons) ->
                 paymentItems = items
@@ -104,57 +90,12 @@ class PaymentViewModel(
                         selectedCouponId = null,
                     )
                 }
-
-                if (settingRepository.isPaymentPendingNotificationEnabled()) {
-                    val orderItemsJson = Json.encodeToString(orderItems)
-                    notificationScheduler.schedule(orderItemsJson, orderAmount)
-                }
+                setPaymentPushAlarmUseCase(orderItems, orderAmount)
             }.onFailure {
                 _uiEvents.emit(PaymentEvent.ShowError("쿠폰을 불러오지 못했습니다."))
             }
         }
     }
-
-    private fun calculateAmounts(
-        coupon: Coupon?,
-        items: PaymentItems,
-    ): PriceModifiers =
-        when (coupon) {
-            null ->
-                PriceModifiers(
-                    orderAmount = items.totalPrice.amount,
-                    discountAmount = 0L,
-                    deliveryFee = DEFAULT_DELIVERY_FEE,
-                )
-            is Coupon.FreeShipping ->
-                PriceModifiers(
-                    orderAmount = items.totalPrice.amount,
-                    discountAmount = 0L,
-                    deliveryFee = 0,
-                )
-            else ->
-                PriceModifiers(
-                    orderAmount = items.totalPrice.amount,
-                    discountAmount = coupon.discountAmount(items).amount,
-                    deliveryFee = DEFAULT_DELIVERY_FEE,
-                )
-        }
-
-    private suspend fun buildPaymentItems(items: List<OrderItem>): PaymentItems =
-        coroutineScope {
-            val cartItems =
-                items
-                    .map { item ->
-                        async {
-                            CartItem(
-                                id = item.cartItemId,
-                                product = productRepository.getProductById(item.productId),
-                                quantity = item.quantity,
-                            )
-                        }
-                    }.awaitAll()
-            PaymentItems(cartItems.toSet())
-        }
 
     companion object {
         private const val DEFAULT_DELIVERY_FEE = 3000

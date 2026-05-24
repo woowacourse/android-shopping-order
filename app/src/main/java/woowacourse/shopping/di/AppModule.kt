@@ -26,7 +26,12 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.repository.SettingRepository
 import woowacourse.shopping.domain.scheduler.PaymentNotificationScheduler
 import woowacourse.shopping.domain.usecase.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.BuildPaymentItemsUseCase
+import woowacourse.shopping.domain.usecase.CalculateOrderPricingUseCase
+import woowacourse.shopping.domain.usecase.GetAvailableCouponsUseCase
 import woowacourse.shopping.domain.usecase.GetLastSeenProductUseCase
+import woowacourse.shopping.domain.usecase.PlaceOrderUseCase
+import woowacourse.shopping.domain.usecase.SetPaymentPushAlarmUseCase
 
 object AppModule {
     private lateinit var appContext: Context
@@ -98,5 +103,25 @@ object AppModule {
 
     val getLastSeenProductUseCase: GetLastSeenProductUseCase by lazy {
         GetLastSeenProductUseCase(recentProductRepository = recentProductRepository)
+    }
+
+    val calculateOrderPricingUseCase: CalculateOrderPricingUseCase by lazy {
+        CalculateOrderPricingUseCase()
+    }
+
+    val buildPaymentItemsUseCase: BuildPaymentItemsUseCase by lazy {
+        BuildPaymentItemsUseCase(productRepository = productRepository)
+    }
+
+    val getAvailableCouponsUseCase: GetAvailableCouponsUseCase by lazy {
+        GetAvailableCouponsUseCase(couponRepository = couponRepository)
+    }
+
+    val placeOrderUseCase: PlaceOrderUseCase by lazy {
+        PlaceOrderUseCase(orderRepository = orderRepository, notificationScheduler = paymentNotificationScheduler)
+    }
+
+    val setPaymentPushAlarmUseCase: SetPaymentPushAlarmUseCase by lazy {
+        SetPaymentPushAlarmUseCase(settingRepository = settingRepository, notificationScheduler = paymentNotificationScheduler)
     }
 }

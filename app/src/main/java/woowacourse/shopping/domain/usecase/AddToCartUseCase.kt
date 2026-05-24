@@ -10,8 +10,8 @@ class AddToCartUseCase(
     suspend operator fun invoke(
         productId: Long,
         quantity: Int = 1,
-    ): AddItemResult {
-        return try {
+    ): AddItemResult =
+        try {
             val item = cartRepository.getCart().items.find { it.product.id == productId }
 
             if (item != null) {
@@ -27,5 +27,4 @@ class AddToCartUseCase(
         } catch (e: Exception) {
             AddItemResult.Error("장바구니 담기에 실패했습니다.")
         }
-    }
 }

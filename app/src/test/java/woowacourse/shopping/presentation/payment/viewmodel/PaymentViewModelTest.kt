@@ -13,6 +13,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.Money
+import woowacourse.shopping.domain.usecase.BuildPaymentItemsUseCase
+import woowacourse.shopping.domain.usecase.CalculateOrderPricingUseCase
+import woowacourse.shopping.domain.usecase.GetAvailableCouponsUseCase
+import woowacourse.shopping.domain.usecase.PlaceOrderUseCase
+import woowacourse.shopping.domain.usecase.SetPaymentPushAlarmUseCase
 import woowacourse.shopping.fake.FakePaymentNotificationScheduler
 import woowacourse.shopping.fake.fakeProduct
 import woowacourse.shopping.fake.repository.FakeCouponRepository
@@ -53,10 +58,11 @@ class PaymentViewModelTest {
 
         viewModel =
             PaymentViewModel(
-                productRepository = productRepository,
-                couponRepository = couponRepository,
-                orderRepository = orderRepository,
-                settingRepository = settingRepository,
+                buildPaymentItemsUseCase = BuildPaymentItemsUseCase(productRepository),
+                calculateOrderPricingUseCase = CalculateOrderPricingUseCase(),
+                getAvailableCouponsUseCase = GetAvailableCouponsUseCase(couponRepository),
+                placeOrderUseCase = PlaceOrderUseCase(orderRepository, notificationScheduler),
+                setPaymentPushAlarmUseCase = SetPaymentPushAlarmUseCase(settingRepository, notificationScheduler),
                 notificationScheduler = notificationScheduler,
             )
     }
@@ -247,10 +253,11 @@ class PaymentViewModelTest {
     private fun recreateViewModel() {
         viewModel =
             PaymentViewModel(
-                productRepository = productRepository,
-                couponRepository = couponRepository,
-                orderRepository = orderRepository,
-                settingRepository = settingRepository,
+                buildPaymentItemsUseCase = BuildPaymentItemsUseCase(productRepository),
+                calculateOrderPricingUseCase = CalculateOrderPricingUseCase(),
+                getAvailableCouponsUseCase = GetAvailableCouponsUseCase(couponRepository),
+                placeOrderUseCase = PlaceOrderUseCase(orderRepository, notificationScheduler),
+                setPaymentPushAlarmUseCase = SetPaymentPushAlarmUseCase(settingRepository, notificationScheduler),
                 notificationScheduler = notificationScheduler,
             )
     }

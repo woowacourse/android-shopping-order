@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.AppModule
+import woowacourse.shopping.di.AppModule.addToCartUseCase
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
@@ -52,13 +53,11 @@ class DetailViewModel(
                 loadedProduct = loaded
 
                 val lastSeen =
-                    runCatching {
-                        if (!isFromLastSeen) {
-                            getLastSeenProductUseCase.invoke()?.toUiModel()
-                        } else {
-                            null
-                        }
-                    }.getOrNull()
+                    if (!isFromLastSeen) {
+                        getLastSeenProductUseCase.invoke()?.toUiModel()
+                    } else {
+                        null
+                    }
 
                 _uiState.value =
                     DetailUiState.Success(

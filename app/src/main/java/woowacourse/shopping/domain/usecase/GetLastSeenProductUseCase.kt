@@ -6,7 +6,8 @@ import woowacourse.shopping.domain.repository.RecentProductRepository
 class GetLastSeenProductUseCase(
     private val recentProductRepository: RecentProductRepository,
 ) {
-    suspend operator fun invoke(): Product? = runCatching {
-        recentProductRepository.getRecentProducts(limit = 1).firstOrNull()
-    }.getOrNull()
+    suspend operator fun invoke(): Product? =
+        runCatching {
+            recentProductRepository.getRecentProducts(limit = 1).firstOrNull()
+        }.getOrNull()
 }

@@ -31,7 +31,7 @@ class CartViewModelTest {
         viewModel =
             CartViewModel(
                 addToCartUseCase = addToCart,
-                cartRepository = cartRepository
+                cartRepository = cartRepository,
             )
     }
 
