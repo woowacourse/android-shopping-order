@@ -74,15 +74,8 @@ fun ShoppingCartRouteContent(
 
     val state =
         ShoppingCartState(
-            items = visibleItems,
             selectedProductIds = selectedVisibleProductIds,
             isLoading = cartUiState.isLoading,
-            errorMessage = cartUiState.errorMessage,
-            currentPage = cartUiState.currentPage,
-            selectedItemCount = selectedItemCount,
-            canOrder = selectedItemCount > 0 && !cartUiState.isLoading,
-            canMoveToPreviousPage = if (hasApiError) false else cartUiState.canMoveToPreviousPage,
-            canMoveToNextPage = if (hasApiError) false else cartUiState.canMoveToNextPage,
         )
 
     ShoppingCartScreen(

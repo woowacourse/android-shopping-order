@@ -391,28 +391,7 @@ private fun ShoppingCartScreenPreview() {
                 ),
             state =
                 ShoppingCartState(
-                    items =
-                        listOf(
-                            ShoppingCartItem(
-                                id = 1L,
-                                shoppingItem =
-                                    ShoppingItem(
-                                        product =
-                                            Product(
-                                                id = 1L,
-                                                title = ProductTitle("샘플 상품"),
-                                                price = Price(12000),
-                                                imageUrl = "https://example.com/image.jpg",
-                                            ),
-                                        quantity = 1,
-                                    ),
-                            ),
-                        ),
                     isLoading = true,
-                    errorMessage = null,
-                    currentPage = 0,
-                    canMoveToPreviousPage = false,
-                    canMoveToNextPage = false,
                 ),
             getQuantityPrice = { shoppingCartItem -> shoppingCartItem.getProductQuantityPrice() },
             onBackClick = {},
