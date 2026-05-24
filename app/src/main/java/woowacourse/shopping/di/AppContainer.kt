@@ -2,6 +2,7 @@ package woowacourse.shopping.di
 
 import android.content.Context
 import androidx.room.Room
+import woowacourse.shopping.data.local.SettingsPreferences
 import woowacourse.shopping.data.local.room.Database
 import woowacourse.shopping.data.remote.NetworkMonitor
 import woowacourse.shopping.data.remote.RetrofitClient
@@ -30,6 +31,9 @@ class AppContainer(
     private val networkClient = RetrofitClient
 
     val networkMonitor: NetworkMonitor by lazy { NetworkMonitor(context) }
+    val settingsPreferences: SettingsPreferences by lazy {
+        SettingsPreferences(context)
+    }
     val productRepository: ProductRepository =
         RetrofitProductRepository(networkClient.productService)
     val cartRepository: CartRepository =

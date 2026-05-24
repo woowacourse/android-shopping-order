@@ -12,7 +12,7 @@
 - [ ] BroadcastReceiver 구현
   - [ ] 알람 수신 후 NotificationManager로 알림 노출
   - [ ] Notification 아이콘은 커스텀 리소스 사용 (Dialog/Notification 본체는 기본 UI)
-- [ ] SharedPreferences(`settings`)로 알림 On/Off 영속화
+- [x] SharedPreferences(`settings`)로 알림 On/Off 영속화
 
 ### 도메인 로직 / 쿠폰 정책
 - [x] 쿠폰 조회 및 적용 가능 여부 판별
@@ -47,9 +47,9 @@
   - [x] 주문된 상품만 장바구니에서 제거, 쿠폰은 그대로 유지
   - [x] 주문 완료 후 상품 목록으로 이동
   - [ ] 예약된 알림 취소
-- [ ] 설정 화면
+- [x] 설정 화면
   - [x] 미결제 알림 On/Off 토글
-  - [ ] 토글 변경 시 SharedPreferences 즉시 저장 및 재실행 시 복원
+  - [x] 토글 변경 시 SharedPreferences 즉시 저장 및 재실행 시 복원
 - [ ] 미결제 알림 동작
   - [ ] 5분 내 미결제 시 "아직 결제가 완료되지 않았어요" 알림 노출
   - [ ] 알림 설정 Off면 노출되지 않음
