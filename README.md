@@ -57,8 +57,7 @@
 
 ### Compose 상태 관리 정리
 
-- [ ] 화면 전환과 관련된 로컬 Compose State 제거
-- [ ] Navigation 흐름은 ViewModel 이벤트 또는 상위 콜백으로 처리
-- [ ] 남아 있는 `remember/mutableStateOf` 사용 위치 점검
-- [ ] `ShimmerEffect`의 로컬 상태는 UI 측정용 예외로 유지할지 검토
+- [x] 화면 전환과 관련된 로컬 Compose State 제거
+- [x] Navigation 흐름은 ViewModel 이벤트 또는 상위 콜백으로 처리
+
 

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import woowacourse.shopping.domain.model.cart.Cart
 import woowacourse.shopping.domain.model.cart.Quantity
 import woowacourse.shopping.domain.model.product.Product
@@ -101,6 +102,8 @@ class ProductDetailViewModel(
                 cartRepository.addProduct(current.product, Quantity(current.selectedQuantity))
             }
             _uiEventFlow.emit(UiEvent.ShowSnackbar("장바구니에 담았습니다"))
+            delay(1000)
+            _uiEventFlow.emit(UiEvent.NavigateToCart)
         }
     }
 

@@ -7,7 +7,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -16,7 +15,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import kotlinx.coroutines.delay
 import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.ui.UiEvent
 import woowacourse.shopping.ui.cart.CartScreen
@@ -50,6 +48,7 @@ fun AppNavHost(
                 productListViewModel.uiEvent.collect { event ->
                     when (event) {
                         is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
+                        UiEvent.NavigateToCart -> Unit
                         UiEvent.NavigateToProductList -> Unit
                     }
                 }
@@ -83,21 +82,14 @@ fun AppNavHost(
                 ),
             )
             val snackbarHostState = remember { SnackbarHostState() }
-            val shouldNavigateToCart = remember { mutableStateOf(false) }
 
             LaunchedEffect(productDetailViewModel) {
                 productDetailViewModel.uiEvent.collect { event ->
                     when (event) {
                         is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
+                        UiEvent.NavigateToCart -> navController.navigate(CartRoute)
                         UiEvent.NavigateToProductList -> Unit
                     }
-                }
-            }
-
-            LaunchedEffect(shouldNavigateToCart.value) {
-                if (shouldNavigateToCart.value) {
-                    delay(1500)
-                    navController.navigate(CartRoute)
                 }
             }
 
@@ -113,7 +105,6 @@ fun AppNavHost(
                     },
                     onAddToCartClick = {
                         productDetailViewModel.addToCart()
-                        shouldNavigateToCart.value = true
                     },
                     onLastViewedProductClick = { product ->
                         navController.navigate(ProductDetailRoute(productId = product.id))
@@ -135,6 +126,7 @@ fun AppNavHost(
                 cartViewModel.uiEvent.collect { event ->
                     when (event) {
                         is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
+                        UiEvent.NavigateToCart -> Unit
 
                         UiEvent.NavigateToProductList -> navController.navigate(ProductListRoute) {
                             popUpTo<CartRoute> {
