@@ -90,6 +90,44 @@ class CartRepositoryImpl(
             Result.failure(e)
         }
 
+    override suspend fun addCartItemQuantity(
+        productId: Long,
+        quantity: Int,
+    ): Result<Unit> =
+        try {
+            require(quantity > 0) { "추가 수량은 1 이상이어야 합니다." }
+
+            val savedCartItem = cartItemQuantityDao.findByProductId(productId)
+
+            if (savedCartItem == null) {
+                cartApi.addCartItem(
+                    AddCartRequestBody(
+                        productId = productId,
+                        quantity = quantity,
+                    ),
+                )
+                refreshCartQuantity()
+            } else {
+                val nextQuantity = savedCartItem.quantity + quantity
+
+                cartApi.updateCartItem(
+                    id = savedCartItem.cartItemId,
+                    updateCartRequestBody = UpdateCartRequestBody(quantity = nextQuantity),
+                )
+
+                cartItemQuantityDao.insert(
+                    savedCartItem.copy(
+                        quantity = nextQuantity,
+                    ),
+                )
+            }
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
     override suspend fun deleteItem(cartItemId: Long): Result<Unit> =
         try {
             cartApi.deleteCartItem(cartItemId)

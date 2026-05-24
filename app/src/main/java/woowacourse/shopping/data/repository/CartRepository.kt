@@ -14,6 +14,11 @@ interface CartRepository {
         quantity: Int,
     ): Result<Unit>
 
+    suspend fun addCartItemQuantity(
+        productId: Long,
+        quantity: Int,
+    ): Result<Unit>
+
     suspend fun deleteItem(cartItemId: Long): Result<Unit>
 
     suspend fun getTotalCartItemQuantity(): Result<Int>

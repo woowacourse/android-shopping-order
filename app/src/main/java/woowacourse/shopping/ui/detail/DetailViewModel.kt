@@ -10,12 +10,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentItemRepository
 import woowacourse.shopping.ui.model.mapper.toUiModel
-import kotlin.coroutines.cancellation.CancellationException
 
 class DetailViewModel(
     private val id: Long,
@@ -36,67 +36,61 @@ class DetailViewModel(
 
     private fun loadProduct() {
         viewModelScope.launch {
-            try {
-                val product = productRepository.getProductById(id)
-
-                val quantity = cartRepository.getCartItemQuantity(id) ?: 1
-
-                val lastViewedItem =
-                    if (hideRecentItem) {
-                        null
-                    } else {
-                        val lastViewedItemId = recentItemRepository.getLastViewedItemId()
-                        if (lastViewedItemId != null && lastViewedItemId != id) {
-                            runCatching { productRepository.getProductById(lastViewedItemId) }.getOrNull()
-                        } else {
+            productRepository
+                .getProductById(id)
+                .onSuccess { product ->
+                    val lastViewItem =
+                        if (hideRecentItem) {
                             null
+                        } else {
+                            val lastViewedItemId = recentItemRepository.getLastViewedItemId()
+                            if (lastViewedItemId != null && lastViewedItemId != id) {
+                                productRepository.getProductById(lastViewedItemId).getOrNull()
+                            } else {
+                                null
+                            }
                         }
+                    recentItemRepository.addRecentItem(product)
+                    _uiState.update {
+                        it.copy(
+                            product = product.toUiModel(),
+                            recentItem = lastViewItem?.takeIf { it.id != id }?.toUiModel(),
+                            totalPrice = product.getPrice(),
+                        )
                     }
-
-                recentItemRepository.addRecentItemId(id)
-
-                _uiState.value =
-                    _uiState.value.copy(
-                        product = product.toUiModel(),
-                        quantity = quantity,
-                        recentItem = lastViewedItem?.takeIf { it.id != id }?.toUiModel(),
-                        totalPrice = product.getPrice() * quantity,
-                    )
-            } catch (e: CancellationException) {
-                throw e
-            } catch (_: IllegalArgumentException) {
-                _event.send(DetailEvent.ShowProductNotFoundMessage)
-                _event.send(DetailEvent.NavigateBack)
-            } catch (_: Exception) {
-                _event.send(DetailEvent.ShowProductLoadFailureMessage)
-                _event.send(DetailEvent.NavigateBack)
-            }
+                }.onFailure { e ->
+                    if (e is IllegalArgumentException) {
+                        _event.send(DetailEvent.ShowProductNotFoundMessage)
+                    } else {
+                        _event.send(DetailEvent.ShowProductLoadFailureMessage)
+                    }
+                    _event.send(DetailEvent.NavigateBack)
+                }
         }
     }
 
     fun updateQuantity(quantity: Int) {
         val nextQuantity = quantity.coerceAtLeast(1)
 
-        _uiState.value =
-            _uiState.value.copy(
+        _uiState.update {
+            it.copy(
                 quantity = nextQuantity,
-                totalPrice = _uiState.value.product.price * nextQuantity,
+                totalPrice = it.product.price * nextQuantity,
             )
+        }
     }
 
     fun addToCart() {
         viewModelScope.launch {
-            try {
-                val product = productRepository.getProductById(id)
-                cartRepository.setCartItem(product.id, _uiState.value.quantity)
-                _event.send(DetailEvent.NavigateToCart)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (_: IllegalArgumentException) {
-                _event.send(DetailEvent.ShowAddCartFailureMessage)
-            } catch (_: Exception) {
-                _event.send(DetailEvent.ShowAddCartFailureMessage)
-            }
+            cartRepository
+                .addCartItemQuantity(
+                    productId = id,
+                    quantity = _uiState.value.quantity,
+                ).onSuccess {
+                    _event.send(DetailEvent.NavigateToCart)
+                }.onFailure {
+                    _event.send(DetailEvent.ShowAddCartFailureMessage)
+                }
         }
     }
 
