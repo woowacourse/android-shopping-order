@@ -22,6 +22,7 @@ import woowacourse.shopping.ui.cart.CartViewModel
 import woowacourse.shopping.ui.detail.DetailEvent
 import woowacourse.shopping.ui.detail.DetailScreen
 import woowacourse.shopping.ui.detail.DetailViewModel
+import woowacourse.shopping.ui.pay.PayEvent
 import woowacourse.shopping.ui.pay.PayScreen
 import woowacourse.shopping.ui.pay.PayViewModel
 import woowacourse.shopping.ui.recommend.RecommendEvent
@@ -271,19 +272,34 @@ fun ShoppingNavHost(
                 )
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+            LaunchedEffect(viewModel) {
+                viewModel.event.collect { event ->
+                    when (event) {
+                        PayEvent.NavigateToShopping -> {
+                            payReminderAlarm.cancel()
+
+                            navController.navigate(ShoppingRoute.Shopping) {
+                                popUpTo(ShoppingRoute.Shopping) {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                            }
+                        }
+
+                        PayEvent.CompletePayFailure -> {
+                            customToastMessage(context, "결제를 완료하지 못했습니다.")
+                        }
+                    }
+                }
+            }
+
             PayScreen(
                 uiState = uiState,
                 onBackClick = {
                     navController.popBackStack()
                 },
                 onPayClick = {
-                    payReminderAlarm.cancel()
-
-                    navController.navigate(ShoppingRoute.Shopping) {
-                        popUpTo(ShoppingRoute.Shopping) {
-                            inclusive = false
-                        }
-                    }
+                    viewModel.completePay()
                 },
                 onCouponClick = viewModel::selectCoupon,
             )

@@ -40,6 +40,13 @@ class MockCartRepository(
         unselectCartItem(cartItemId)
     }
 
+    override suspend fun deleteSelectedItems() {
+        val selectedCartItemIds = selectedCartItemIds.value
+
+        _cartItems.value = _cartItems.value.filterNot { it.id in selectedCartItemIds }
+        clearCartItemSelection()
+    }
+
     override suspend fun getCartItemQuantity(productId: String): Int? =
         _cartItems.value.firstOrNull { it.product.id == productId }?.quantity
 

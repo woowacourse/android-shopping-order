@@ -6,8 +6,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
@@ -28,6 +31,9 @@ class PayViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PayUiState(isLoading = true))
     val uiState: StateFlow<PayUiState> = _uiState.asStateFlow()
+
+    private val _event = MutableSharedFlow<PayEvent>()
+    val event: SharedFlow<PayEvent> = _event.asSharedFlow()
 
     private var coupons: List<Coupon> = emptyList()
     private var selectedCartItems: List<CartItem> = emptyList()
@@ -88,6 +94,22 @@ class PayViewModel(
             )
         }
         renderPayState()
+    }
+
+    fun completePay() {
+        viewModelScope.launch {
+            runCatching {
+                cartRepository.deleteSelectedItems()
+            }.onSuccess {
+                _event.emit(PayEvent.NavigateToShopping)
+            }.onFailure { throwable ->
+                if (throwable is IOException || throwable is HttpException) {
+                    _event.emit(PayEvent.CompletePayFailure)
+                } else {
+                    throw throwable
+                }
+            }
+        }
     }
 
     private fun renderPayState() {
