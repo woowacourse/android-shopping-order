@@ -16,15 +16,17 @@ import woowacourse.shopping.AppContainer
 import woowacourse.shopping.ui.cart.CartEvent
 import woowacourse.shopping.ui.cart.CartScreen
 import woowacourse.shopping.ui.cart.CartViewModel
-import woowacourse.shopping.ui.util.customToastMessage
 import woowacourse.shopping.ui.detail.DetailEvent
 import woowacourse.shopping.ui.detail.DetailScreen
 import woowacourse.shopping.ui.detail.DetailViewModel
+import woowacourse.shopping.ui.pay.PayScreen
+import woowacourse.shopping.ui.pay.PayViewModel
 import woowacourse.shopping.ui.recommend.RecommendEvent
 import woowacourse.shopping.ui.recommend.RecommendScreen
 import woowacourse.shopping.ui.recommend.RecommendViewModel
 import woowacourse.shopping.ui.shopping.ShoppingScreen
 import woowacourse.shopping.ui.shopping.ShoppingViewModel
+import woowacourse.shopping.ui.util.customToastMessage
 
 @Composable
 fun ShoppingNavHost(
@@ -217,7 +219,37 @@ fun ShoppingNavHost(
                 onBackClick = {
                     navController.popBackStack()
                 },
+                onOrderClick = {
+                    navController.navigate(ShoppingRoute.Pay)
+                },
                 onQuantityChange = viewModel::updateQuantity,
+            )
+        }
+
+        composable<ShoppingRoute.Pay> {
+            val viewModel: PayViewModel =
+                viewModel(
+                    factory =
+                        PayViewModel.provideFactory(
+                            couponRepository = appContainer.couponRepository,
+                            cartRepository = appContainer.cartRepository,
+                        ),
+                )
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            PayScreen(
+                uiState = uiState,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onPayClick = {
+                    navController.navigate(ShoppingRoute.Shopping) {
+                        popUpTo(ShoppingRoute.Shopping) {
+                            inclusive = false
+                        }
+                    }
+                },
+                onCouponClick = viewModel::selectCoupon,
             )
         }
     }
