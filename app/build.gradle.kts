@@ -19,29 +19,12 @@ val localProperties =
         }
     }
 
-val envProperties =
-    Properties().apply {
-        val file = rootProject.file(".env")
-        if (file.exists()) {
-            file.inputStream().use(::load)
-        }
-    }
-
 fun readLocalProperty(key: String): String = localProperties.getProperty(key).orEmpty()
-
-fun readEnvProperty(key: String): String = envProperties.getProperty(key).orEmpty()
 
 fun requireLocalProperty(key: String): String =
     readLocalProperty(key).ifBlank {
         throw GradleException("local.properties에 `$key`를 설정해야 합니다.")
     }
-
-fun requireApiBaseUrl(): String =
-    readEnvProperty("API_BASE_URL")
-        .ifBlank { readLocalProperty("api.baseUrl") }
-        .ifBlank {
-            throw GradleException(".env에 `API_BASE_URL`을 설정해야 합니다.")
-        }
 
 fun String.asBuildConfigString(): String = "\"" + replace("\\", "\\\\").replace("\"", "\\\"") + "\""
 
@@ -59,11 +42,9 @@ android {
 
         val authUserId = requireLocalProperty("auth.userId")
         val authPassword = requireLocalProperty("auth.password")
-        val apiBaseUrl = requireApiBaseUrl()
 
         buildConfigField("String", "AUTH_USER_ID", authUserId.asBuildConfigString())
         buildConfigField("String", "AUTH_PASSWORD", authPassword.asBuildConfigString())
-        buildConfigField("String", "API_BASE_URL", apiBaseUrl.asBuildConfigString())
     }
 
     buildTypes {

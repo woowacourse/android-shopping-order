@@ -5,5 +5,5 @@ import retrofit2.http.GET
 
 interface CouponApiService {
     @GET("coupons")
-    suspend fun getCoupons(): Response<CouponListResponseDto>
+    suspend fun getCoupons(): Response<List<CouponResponseDto>>
 }

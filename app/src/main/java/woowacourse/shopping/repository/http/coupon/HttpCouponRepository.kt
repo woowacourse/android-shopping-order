@@ -49,7 +49,7 @@ class HttpCouponRepository(
                 )
 
             runCatching {
-                responseBody.coupons.map(CouponResponseDto::toDomain)
+                responseBody.map(CouponResponseDto::toDomain)
             }.getOrElse { throwable ->
                 throw CouponParsingException("쿠폰 목록 응답을 파싱할 수 없습니다.", throwable)
             }

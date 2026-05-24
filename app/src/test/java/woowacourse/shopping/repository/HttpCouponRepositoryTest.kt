@@ -47,28 +47,46 @@ class HttpCouponRepositoryTest {
                     .setHeader("Content-Type", "application/json")
                     .setBody(
                         """
-                        {
-                          "coupons": [
-                            {
-                              "id": 1,
-                              "code": "FIXED5000",
-                              "title": "5,000원 할인 쿠폰",
-                              "description": "100,000원 이상 주문 시 5,000원을 할인합니다.",
-                              "expirationDate": "2026-12-31",
-                              "minimumOrderAmount": 100000,
-                              "fixedDiscountAmount": 5000
+                        [
+                          {
+                            "id": 1,
+                            "code": "FIXED5000",
+                            "description": "5,000원 할인 쿠폰",
+                            "expirationDate": "2026-12-31",
+                            "minimumAmount": 100000,
+                            "discount": 5000,
+                            "discountType": "fixed"
+                          },
+                          {
+                            "id": 2,
+                            "code": "FREESHIP50000",
+                            "description": "50,000원 이상 구매 시 무료 배송",
+                            "expirationDate": "2026-10-31",
+                            "minimumAmount": 50000,
+                            "discountType": "freeShipping"
+                          },
+                          {
+                            "id": 3,
+                            "code": "LUNCH15",
+                            "description": "점심시간 15% 할인 쿠폰",
+                            "expirationDate": "2026-12-31",
+                            "discount": 15,
+                            "availableTime": {
+                              "start": "11:00:00",
+                              "end": "14:00:00"
                             },
-                            {
-                              "id": 2,
-                              "code": "FREESHIPPING",
-                              "title": "무료 배송 쿠폰",
-                              "description": "50,000원 이상 주문 시 배송비를 무료로 처리합니다.",
-                              "expirationDate": "2026-10-31",
-                              "minimumOrderAmount": 50000,
-                              "freeShipping": true
-                            }
-                          ]
-                        }
+                            "discountType": "percentage"
+                          },
+                          {
+                            "id": 4,
+                            "code": "BUY2GET1",
+                            "description": "2+1 쿠폰",
+                            "expirationDate": "2026-12-31",
+                            "buyQuantity": 2,
+                            "getQuantity": 1,
+                            "discountType": "buyXgetY"
+                          }
+                        ]
                         """.trimIndent(),
                     ),
             )
@@ -77,10 +95,13 @@ class HttpCouponRepositoryTest {
             val request = mockWebServer.takeRequest()
 
             assertEquals("/coupons", request.requestUrl?.encodedPath)
-            assertEquals(2, actual.size)
+            assertEquals(4, actual.size)
             assertEquals("FIXED5000", actual.first().code)
             assertEquals(LocalDate.of(2026, 12, 31), actual.first().expirationDate)
-            assertTrue(actual.last().freeShipping)
+            assertTrue(actual[1].freeShipping)
+            assertEquals(11, actual[2].availableFromHour)
+            assertEquals(14, actual[2].availableToHourExclusive)
+            assertEquals(3, actual[3].requiredSameProductQuantity)
         }
 
     @Test
