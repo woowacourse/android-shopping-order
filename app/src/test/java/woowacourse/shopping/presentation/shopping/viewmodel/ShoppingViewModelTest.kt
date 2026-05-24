@@ -25,7 +25,7 @@ class ShoppingViewModelTest {
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(dispatcher)
-        val products = (1L..20L).map { fakeProduct(it) }
+        val products = (1L..35L).map { fakeProduct(it) }
         productRepository = FakeProductRepository(products)
         cartRepository = FakeCartRepository()
         recentProductRepository = FakeRecentProductRepository(products)

@@ -69,9 +69,9 @@ class DefaultProductRepositoryTest {
         offset: Int,
         limit: Int,
     ) = runTest {
-        val products = defaultProductRepository.getProducts(offset, limit)
+        val products = defaultProductRepository.getProducts(offset / limit, limit)
         advanceUntilIdle()
-        assertThat(products.size).isEqualTo(limit)
+        assertThat(products.products.size).isEqualTo(limit)
     }
 
     @Test

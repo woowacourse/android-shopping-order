@@ -1,8 +1,7 @@
 package woowacourse.shopping.fake.repository
 
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.model.ProductsPage
 import woowacourse.shopping.domain.repository.ProductRepository
 import java.io.IOException
 
@@ -14,7 +13,7 @@ class FakeProductRepository(
         offset: Int,
         limit: Int,
         category: String?,
-    ): ImmutableList<Product> {
+    ): ProductsPage {
         if (shouldFail) throw IOException()
         val filtered =
             if (category == null) {
@@ -22,9 +21,12 @@ class FakeProductRepository(
             } else {
                 products.filter { it.category == category }
             }
-        if (offset >= filtered.size) return emptyList<Product>().toImmutableList()
+        if (offset >= filtered.size) return ProductsPage(emptyList(), isLast = true)
         val toIndex = minOf(offset + limit, filtered.size)
-        return filtered.subList(offset, toIndex).toImmutableList()
+        return ProductsPage(
+            products = filtered.subList(offset, toIndex),
+            isLast = toIndex >= filtered.size,
+        )
     }
 
     override suspend fun getProductById(id: Long): Product = products.first { it.id == id }

@@ -56,9 +56,9 @@ class RecommendViewModel(
                 )
             val recommend =
                 sameCategoryProducts
-                    .filter { product ->
-                        product.id !in inCartProductIds
-                    }.take(10)
+                    .products
+                    .filter { product -> product.id !in inCartProductIds }
+                    .take(10)
 
             recommendProducts = recommend
 

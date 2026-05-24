@@ -2,8 +2,6 @@ package woowacourse.shopping.presentation.shopping.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,11 +12,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okio.IOException
 import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.domain.model.ProductsPage
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.presentation.common.addToCartUseCase
-import woowacourse.shopping.presentation.common.model.ProductUiModel
 import woowacourse.shopping.presentation.common.model.toUiModel
 import woowacourse.shopping.presentation.shopping.model.ShoppingItemUiModel
 import woowacourse.shopping.presentation.shopping.model.ShoppingUiState
@@ -109,14 +107,12 @@ class ShoppingViewModel(
         }
     }
 
-    private suspend fun getProductData(
+    private suspend fun getProductsPage(
         offset: Int,
         limit: Int,
-    ): ImmutableList<ProductUiModel> =
+    ): ProductsPage =
         productRepository
             .getProducts(offset, limit)
-            .map { it.toUiModel() }
-            .toImmutableList()
 
     private suspend fun loadNext() {
         if (uiState.value.isLoading) return
@@ -127,16 +123,20 @@ class ShoppingViewModel(
 
         try {
             val loadData =
-                getProductData(
+                getProductsPage(
                     offset = uiState.value.offset,
                     limit = pageSize,
                 )
-            val newItems = loadData.map { ShoppingItemUiModel(it, quantity = 0) }
+            val newItems =
+                loadData.products
+                    .map { it.toUiModel() }
+                    .map { ShoppingItemUiModel(product = it, quantity = 0) }
+
             _uiState.update {
                 it.copy(
                     products = it.products.plus(newItems),
-                    offset = it.offset + loadData.size,
-                    canLoadMore = loadData.size == pageSize,
+                    offset = it.offset + loadData.products.size,
+                    canLoadMore = !loadData.isLast,
                 )
             }
             loadCartItemQuantities()
