@@ -68,8 +68,8 @@ fun DetailRoute(
                         quantity = state.quantity,
                     )
                 },
-                onIncrease = { viewModel.increase() },
-                onDecrease = { viewModel.decrease() },
+                onIncrease = viewModel::increase,
+                onDecrease = viewModel::decrease,
             )
         }
     }

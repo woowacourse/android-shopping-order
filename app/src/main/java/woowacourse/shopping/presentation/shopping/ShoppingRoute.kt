@@ -59,9 +59,9 @@ fun ShoppingRoute(
         onNavigateToCart = { navController.navigate(CartScreen) },
         onNavigateToSetting = { navController.navigate(SettingScreen) },
         onProductCardClick = { id -> navController.navigate(DetailScreen(productId = id)) },
-        onIncrease = { viewModel.increase(it) },
-        onDecrease = { viewModel.decrease(it) },
-        onUpsertRecentProduct = { viewModel.upsertRecentProduct(it) },
-        onLoadMore = { viewModel.loadMore() },
+        onIncrease = viewModel::increase,
+        onDecrease = viewModel::decrease,
+        onUpsertRecentProduct = viewModel::upsertRecentProduct,
+        onLoadMore = viewModel::loadMore,
     )
 }

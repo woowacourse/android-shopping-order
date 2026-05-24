@@ -52,9 +52,9 @@ fun CartRoute(
         onNextPage = viewModel::nextPage,
         onPreviousPage = viewModel::previousPage,
         onDeleteItem = viewModel::deleteItem,
-        onIncrease = { viewModel.increase(it) },
-        onDecrease = { viewModel.decrease(it) },
-        onSelected = { viewModel.selectItem(it) },
+        onIncrease = viewModel::increase,
+        onDecrease = viewModel::decrease,
+        onSelected = viewModel::selectItem,
         onOrderClick = {
             navController.navigate(
                 RecommendScreen(
@@ -62,6 +62,6 @@ fun CartRoute(
                 ),
             )
         },
-        onSelectAll = { viewModel.toggleSelectAll() },
+        onSelectAll = viewModel::toggleSelectAll,
     )
 }
