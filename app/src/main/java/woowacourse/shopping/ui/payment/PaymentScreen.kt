@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.HorizontalDivider
@@ -74,7 +76,10 @@ fun PaymentScreen(
         modifier = Modifier.systemBarsPadding(),
     ) { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding),
+            modifier =
+                Modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(innerPadding),
         ) {
             CouponTitle(
                 modifier =
@@ -92,6 +97,7 @@ fun PaymentScreen(
                     onCheckedChange = { onCheckedChange(it.id) },
                     title = it.title,
                     expiryDateTime = it.expiryDateTime,
+                    minimumPrice = it.minimumPrice,
                     modifier = Modifier.padding(horizontal = 18.dp),
                 )
 
@@ -119,7 +125,7 @@ fun PaymentScreen(
                 modifier = Modifier.padding(horizontal = 18.dp),
             )
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(76.dp))
 
             ShoppingButton(
                 text = "결제하기",
@@ -159,7 +165,7 @@ private fun CouponCard(
     title: String,
     expiryDateTime: LocalDateTime,
     modifier: Modifier = Modifier,
-    minimumPrice: Long? = null,
+    minimumPrice: Long?,
 ) {
     Column(
         modifier =
