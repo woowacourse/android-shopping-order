@@ -29,7 +29,10 @@ class MainActivity : ComponentActivity() {
         requestNotificationPermission()
         setContent {
             ShoppingNavGraph(
-                onEnterOrder = { alarmScheduler.schedule(1000L) },
+                onEnterOrder = {
+                    alarmScheduler.cancel()
+                    alarmScheduler.schedule(5 * 60 * 1000L)
+                },
                 onOrderSuccess = { alarmScheduler.cancel() },
             )
         }
