@@ -1,6 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import kotlinx.coroutines.flow.Flow
+import woowacourse.shopping.model.CartItem
 
 interface CartRepository {
     suspend fun getCartItemsByPage(
@@ -18,4 +19,6 @@ interface CartRepository {
     suspend fun getTotalCartItemQuantity(): Result<Int>
 
     fun getCartQuantityMap(): Flow<Map<Long, Int>>
+
+    suspend fun getAllCartItems(): Result<List<CartItem>>
 }

@@ -140,6 +140,21 @@ class CartRepositoryImpl(
         cartItemQuantityDao.insertAll(entities)
     }
 
+    override suspend fun getAllCartItems(): Result<List<CartItem>> =
+        try {
+            val response =
+                cartApi.getCartItems(
+                    page = 0,
+                    size = MAX_CART_ITEM_LIMIT,
+                )
+
+            Result.success(response.content.map { it.toDomain() })
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
     private fun CartItemResponse.toDomain(): CartItem =
         CartItem(
             id = id,

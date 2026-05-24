@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.ui.model.CartItemUiModel
 import woowacourse.shopping.ui.model.mapper.toUiModel
 
 class CartViewModel(
@@ -46,15 +45,22 @@ class CartViewModel(
                     cartRepository
                         .getTotalCartItemQuantity()
                         .getOrDefault(_uiState.value.totalCartQuantity)
-
                 _uiState.update { state ->
+                    val selectedCartItems =
+                        state.selectedCartItems +
+                            items
+                                .filter { state.selectedCartItems.containsKey(it.id) }
+                                .associate { it.id to it.totalPrice }
                     state.copy(
                         page = targetPage,
                         items = items,
                         isCanMoveNext = cartResponseResult.isLastPage.not(),
                         totalCartQuantity = totalCartQuantity,
                         totalCartCount = cartResponseResult.totalElement,
-                        totalPrice = calculateTotalPrice(items, state.selectedCartItems),
+                        selectedCartItems = selectedCartItems,
+                        totalPrice = calculateTotalPrice(selectedCartItems),
+                        isAllChecked =
+                            selectedCartItems.size.toLong() == cartResponseResult.totalElement && cartResponseResult.totalElement > 0,
                         errorMessage = null,
                     )
                 }
@@ -88,8 +94,9 @@ class CartViewModel(
                         val selectedItem = state.selectedCartItems - cartId
 
                         state.copy(
-                            selectedCartItems = selectedItem.toImmutableList(),
-                            selectedCartItemCount = selectedItem.size,
+                            selectedCartItems = selectedItem,
+                            totalPrice = calculateTotalPrice(selectedItem),
+                            isAllChecked = selectedItem.size.toLong() == state.totalCartCount && state.totalCartCount > 0,
                             errorMessage = null,
                         )
                     }
@@ -117,12 +124,13 @@ class CartViewModel(
 
     fun checkItem(cartItemId: Long) {
         _uiState.update { state ->
+            val item = state.items.firstOrNull { it.id == cartItemId } ?: return@update state
             val selectedItems =
-                if (state.selectedCartItems.contains(cartItemId)) {
+                if (state.selectedCartItems.containsKey(cartItemId)) {
                     state.selectedCartItems - cartItemId
                 } else {
-                    state.selectedCartItems + cartItemId
-                }.toImmutableList()
+                    state.selectedCartItems + (cartItemId to item.totalPrice)
+                }
             val items =
                 state.items
                     .map { item ->
@@ -134,48 +142,59 @@ class CartViewModel(
                     }.toImmutableList()
 
             state.copy(
-                selectedCartItems = selectedItems,
-                selectedCartItemCount = selectedItems.size,
-                totalPrice = calculateTotalPrice(items, selectedItems),
                 items = items,
-                isAllChecked = items.isNotEmpty() && selectedItems.size == items.size,
+                selectedCartItems = selectedItems,
+                totalPrice = calculateTotalPrice(selectedItems),
+                isAllChecked = selectedItems.size.toLong() == state.totalCartCount && state.totalCartCount > 0,
             )
         }
     }
 
-    private fun isSelected(cartItemId: Long): Boolean = _uiState.value.selectedCartItems.contains(cartItemId)
+    private fun isSelected(cartItemId: Long): Boolean = _uiState.value.selectedCartItems.containsKey(cartItemId)
 
     fun isAllSelectClick() {
-        _uiState.update { state ->
-            val changedAllChecked = state.isAllChecked.not()
+        viewModelScope.launch {
+            if (_uiState.value.isAllChecked) {
+                _uiState.update { state ->
+                    val items =
+                        state.items
+                            .map { it.copy(isChecked = false) }
+                            .toImmutableList()
+                    state.copy(
+                        selectedCartItems = emptyMap(),
+                        totalPrice = 0,
+                        isAllChecked = false,
+                        items = items,
+                        errorMessage = null,
+                    )
+                }
+                return@launch
+            }
 
-            val selectedItems =
-                if (changedAllChecked) {
-                    state.items.map { it.id }
-                } else {
-                    emptyList()
-                }.toImmutableList()
+            cartRepository
+                .getAllCartItems()
+                .onSuccess { cartItems ->
+                    val selectedCartItem = cartItems.associate { cartItems -> cartItems.id to cartItems.getTotalPrice().amount }
 
-            val items =
-                state.items
-                    .map { item ->
-                        item.copy(isChecked = changedAllChecked)
-                    }.toImmutableList()
-
-            state.copy(
-                items = items,
-                selectedCartItems = selectedItems,
-                selectedCartItemCount = selectedItems.size,
-                isAllChecked = !state.isAllChecked,
-                totalPrice = calculateTotalPrice(items, selectedItems),
-            )
+                    _uiState.update { state ->
+                        val items = state.items.map { it.copy(isChecked = true) }.toImmutableList()
+                        state.copy(
+                            items = items,
+                            selectedCartItems = selectedCartItem,
+                            totalPrice = calculateTotalPrice(selectedCartItem),
+                            isAllChecked = true,
+                            errorMessage = null,
+                        )
+                    }
+                }.onFailure {
+                    _uiState.update {
+                        it.copy(errorMessage = "전체 선택에 실패했습니다.")
+                    }
+                }
         }
     }
 
-    private fun calculateTotalPrice(
-        items: List<CartItemUiModel>,
-        selectedCartItemIds: List<Long>,
-    ): Long = items.filter { it.id in selectedCartItemIds }.sumOf { it.totalPrice }
+    private fun calculateTotalPrice(selectedCartItems: Map<Long, Long>): Long = selectedCartItems.values.sum()
 
     companion object {
         private const val PAGE_SIZE = 5

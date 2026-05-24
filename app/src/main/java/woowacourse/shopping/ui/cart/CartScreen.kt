@@ -70,7 +70,7 @@ fun CartScreen(
                 isOrder = uiState.isOrder,
                 isAllChecked = uiState.isAllChecked,
                 totalPrice = uiState.totalPrice,
-                totalCount = uiState.selectedCartItemCount,
+                totalCount = uiState.totalCartQuantity,
                 onAllCheckedChange = isAllSelectClick,
                 onOrderClick = onOrderClick,
             )
