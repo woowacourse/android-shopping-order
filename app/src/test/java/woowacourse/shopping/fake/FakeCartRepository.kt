@@ -16,7 +16,13 @@ class FakeCartRepository(
     override suspend fun getCart(): Cart {
         val cartItems =
             items.mapNotNull { (id, quantity) ->
-                products[id]?.let { CartItem(it, quantity) }
+                products[id]?.let {
+                    CartItem(
+                        id = 1L,
+                        product = it,
+                        quantity = quantity,
+                    )
+                }
             }
         return Cart(cartItems)
     }

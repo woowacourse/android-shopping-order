@@ -39,8 +39,16 @@ class CartTest {
         val cart =
             Cart(
                 listOf(
-                    CartItem(product = product1, quantity = 1),
-                    CartItem(product = product2, quantity = 30),
+                    CartItem(
+                        id = 1L,
+                        product = product1,
+                        quantity = 1,
+                    ),
+                    CartItem(
+                        id = 1L,
+                        product = product2,
+                        quantity = 30,
+                    ),
                 ),
             )
         assertThat(cart.size).isEqualTo(2)
@@ -51,8 +59,16 @@ class CartTest {
         val cart =
             Cart(
                 listOf(
-                    CartItem(product = product1, quantity = 1),
-                    CartItem(product = product2, quantity = 30),
+                    CartItem(
+                        id = 1L,
+                        product = product1,
+                        quantity = 1,
+                    ),
+                    CartItem(
+                        id = 1L,
+                        product = product2,
+                        quantity = 30,
+                    ),
                 ),
             )
 
