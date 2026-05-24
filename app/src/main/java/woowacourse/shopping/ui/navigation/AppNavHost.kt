@@ -1,11 +1,14 @@
 package woowacourse.shopping.ui.navigation
 
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import woowacourse.shopping.notification.PaymentReminderReceiver
 import woowacourse.shopping.ui.cart.CartScreen
 import woowacourse.shopping.ui.payment.PaymentScreen
 import woowacourse.shopping.ui.productdetail.ProductDetailScreen

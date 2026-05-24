@@ -45,4 +45,8 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    companion object {
+        const val EXTRA_NAVIGATE_TO_PAYMENT = "navigate_to_payment"
+    }
 }

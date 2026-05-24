@@ -9,9 +9,9 @@
 - [ ] AlarmManager 기반 알림 스케줄링
   - [ ] 결제 화면 진입 시 5분 후 알림 예약
   - [ ] 결제 완료 또는 결제 화면 재진입 시 예약 취소
-- [ ] BroadcastReceiver 구현
-  - [ ] 알람 수신 후 NotificationManager로 알림 노출
-  - [ ] Notification 아이콘은 커스텀 리소스 사용 (Dialog/Notification 본체는 기본 UI)
+- [x] BroadcastReceiver 구현
+  - [x] 알람 수신 후 NotificationManager로 알림 노출
+  - [x] Notification 아이콘은 커스텀 리소스 사용 (Dialog/Notification 본체는 기본 UI)
 - [x] SharedPreferences(`settings`)로 알림 On/Off 영속화
 
 ### 도메인 로직 / 쿠폰 정책
@@ -52,7 +52,7 @@
   - [x] 토글 변경 시 SharedPreferences 즉시 저장 및 재실행 시 복원
 - [ ] 미결제 알림 동작
   - [ ] 5분 내 미결제 시 "아직 결제가 완료되지 않았어요" 알림 노출
-  - [ ] 알림 설정 Off면 노출되지 않음
+  - [x] 알림 설정 Off면 노출되지 않음
   - [ ] 알림 클릭 시 결제 화면으로 이동 (PendingIntent)
 
 ---
