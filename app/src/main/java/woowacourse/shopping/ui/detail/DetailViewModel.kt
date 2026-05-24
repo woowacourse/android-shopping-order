@@ -19,7 +19,6 @@ import woowacourse.shopping.ui.model.mapper.toUiModel
 
 class DetailViewModel(
     private val id: Long,
-    private val hideRecentItem: Boolean,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentItemRepository: RecentItemRepository,
@@ -39,22 +38,19 @@ class DetailViewModel(
             productRepository
                 .getProductById(id)
                 .onSuccess { product ->
+                    val lastViewedItemId = recentItemRepository.getLastViewedItemId()
                     val lastViewItem =
-                        if (hideRecentItem) {
-                            null
+                        if (lastViewedItemId != null && lastViewedItemId != id) {
+                            productRepository.getProductById(lastViewedItemId).getOrNull()
                         } else {
-                            val lastViewedItemId = recentItemRepository.getLastViewedItemId()
-                            if (lastViewedItemId != null && lastViewedItemId != id) {
-                                productRepository.getProductById(lastViewedItemId).getOrNull()
-                            } else {
-                                null
-                            }
+                            null
                         }
+
                     recentItemRepository.addRecentItem(product)
                     _uiState.update {
                         it.copy(
                             product = product.toUiModel(),
-                            recentItem = lastViewItem?.takeIf { it.id != id }?.toUiModel(),
+                            recentItem = lastViewItem?.toUiModel(),
                             totalPrice = product.getPrice(),
                         )
                     }
@@ -97,7 +93,6 @@ class DetailViewModel(
     companion object {
         fun provideFactory(
             id: Long,
-            hideRecentItem: Boolean,
             productRepository: ProductRepository,
             cartRepository: CartRepository,
             recentItemRepository: RecentItemRepository,
@@ -106,7 +101,6 @@ class DetailViewModel(
                 initializer {
                     DetailViewModel(
                         id = id,
-                        hideRecentItem = hideRecentItem,
                         productRepository = productRepository,
                         cartRepository = cartRepository,
                         recentItemRepository = recentItemRepository,
