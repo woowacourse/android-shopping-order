@@ -17,6 +17,8 @@ interface CartRepository {
 
     suspend fun deleteItem(cartItemId: String)
 
+    suspend fun deleteSelectedItems()
+
     suspend fun getCartItemQuantity(productId: String): Int?
 
     fun toggleCartItemSelection(cartItemId: String)
