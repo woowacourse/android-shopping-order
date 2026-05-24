@@ -3,10 +3,11 @@ package woowacourse.shopping.domain.model.coupon
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.model.order.Order
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.model.order.PurchaseProduct
 import woowacourse.shopping.domain.model.order.PurchaseProducts
-import woowacourse.shopping.domain.model.product.Product
 import java.time.LocalDate
+import java.time.LocalTime
 
 class CouponTest {
     @Test
@@ -51,6 +52,28 @@ class CouponTest {
         coupon.deliveryFee(order, defaultDeliveryFee = 3_000) shouldBe 0
     }
 
+    @Test
+    fun `미라클모닝 쿠폰은 오전 4시 이상 7시 미만에 주문 금액의 30퍼센트를 할인한다`() {
+        val coupon = miracleMorningCoupon()
+        val order = orderOf(purchaseProduct(price = 10_000, count = 2))
+
+        coupon.discountAmount(
+            order = order,
+            context = CouponContext(currentTime = LocalTime.of(4, 0)),
+        ) shouldBe 6_000
+    }
+
+    @Test
+    fun `미라클모닝 쿠폰은 사용 가능 시간이 아니면 할인하지 않는다`() {
+        val coupon = miracleMorningCoupon()
+        val order = orderOf(purchaseProduct(price = 10_000, count = 2))
+
+        coupon.discountAmount(
+            order = order,
+            context = CouponContext(currentTime = LocalTime.of(7, 0)),
+        ) shouldBe 0
+    }
+
     private fun fixedAmountCoupon() =
         FixedAmountCoupon(
             code = "FIXED5000",
@@ -75,6 +98,16 @@ class CouponTest {
             name = "5만원 이상 구매 시 무료 배송 쿠폰",
             expirationDate = LocalDate.of(2024, 8, 31),
             minimumOrderAmount = 50_000,
+        )
+
+    private fun miracleMorningCoupon() =
+        TimeBasedPercentCoupon(
+            code = "MIRACLESALE",
+            name = "미라클모닝 30% 할인 쿠폰",
+            expirationDate = LocalDate.of(2024, 7, 31),
+            discountRate = 0.3,
+            startTime = LocalTime.of(4, 0),
+            endTime = LocalTime.of(7, 0),
         )
 
     private fun orderOf(vararg purchaseProducts: PurchaseProduct) =
