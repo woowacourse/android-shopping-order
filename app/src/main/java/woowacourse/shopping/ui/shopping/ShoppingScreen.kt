@@ -153,12 +153,10 @@ private fun ShoppingContents(
                         productName = product.name,
                         price = product.price,
                         quantity = product.quantity ?: 0,
-                        onClick = {
-                            onProductClick(product.id)
-                        },
                         onQuantityChange = { quantity ->
                             onQuantityChange(product.id, quantity)
                         },
+                        modifier = Modifier.clickable(onClick = { onProductClick(product.id) }),
                     )
                 }
                 if (isCanLoadMore) {

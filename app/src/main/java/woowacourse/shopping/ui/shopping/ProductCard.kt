@@ -35,17 +35,13 @@ fun ProductCard(
     productName: String,
     price: Long,
     quantity: Int,
-    onClick: () -> Unit,
     onQuantityChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier =
             modifier
-                .fillMaxWidth()
-                .clickable {
-                    onClick()
-                },
+                .fillMaxWidth(),
     ) {
         Box(
             modifier =
@@ -116,7 +112,6 @@ private fun ProductCardPreview() {
         productName = "커피",
         price = 1000,
         quantity = 0,
-        onClick = {},
         onQuantityChange = {},
     )
 }

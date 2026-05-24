@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart
+package woowacourse.shopping.ui.cart.recommend
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -61,7 +61,6 @@ fun RecommendProductContent(
                     imageUrl = it.imageUrl,
                     price = it.price,
                     quantity = it.quantity ?: 0,
-                    onClick = {},
                     modifier =
                         Modifier
                             .width(154.dp),

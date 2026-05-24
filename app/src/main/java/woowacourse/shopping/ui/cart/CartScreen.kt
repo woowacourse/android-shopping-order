@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart
+﻿package woowacourse.shopping.ui.cart
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -67,7 +67,6 @@ fun CartScreen(
         },
         bottomBar = {
             CartBottomBar(
-                isOrder = uiState.isOrder,
                 isAllChecked = uiState.isAllChecked,
                 totalPrice = uiState.totalPrice,
                 totalCount = uiState.totalCartQuantity,
@@ -77,36 +76,25 @@ fun CartScreen(
         },
         modifier = modifier.systemBarsPadding(),
     ) { innerPadding ->
-        if (uiState.isOrder) {
-            RecommendProductContent(
-                products = uiState.recommendProducts,
-                onQuantityChange = onQuantityChange,
-                modifier =
-                    Modifier
-                        .padding(innerPadding)
-                        .padding(start = 12.dp, end = 12.dp, top = 100.dp),
-            )
-        } else {
-            CartContent(
-                totalCartSize = uiState.totalCartCount,
-                page = uiState.page,
-                onNextPage = onNextPage,
-                onPreviousPage = onPreviousPage,
-                isCanMoveNext = uiState.isCanMoveNext,
-                onQuantityChange = onQuantityChange,
-                onDeleteItem = {
-                    onDeleteItem(it)
-                },
-                cartItems = uiState.items,
-                isLoading = uiState.isLoading,
-                errorMessage = uiState.errorMessage,
-                onCheckedChange = onCheckedChange,
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-            )
-        }
+        CartContent(
+            totalCartSize = uiState.totalCartCount,
+            page = uiState.page,
+            onNextPage = onNextPage,
+            onPreviousPage = onPreviousPage,
+            isCanMoveNext = uiState.isCanMoveNext,
+            onQuantityChange = onQuantityChange,
+            onDeleteItem = {
+                onDeleteItem(it)
+            },
+            cartItems = uiState.items,
+            isLoading = uiState.isLoading,
+            errorMessage = uiState.errorMessage,
+            onCheckedChange = onCheckedChange,
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+        )
     }
 }
 
