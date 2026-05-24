@@ -5,11 +5,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import woowacourse.shopping.data.model.Cart
 import woowacourse.shopping.data.model.CartItem
 import woowacourse.shopping.data.model.Money
@@ -29,6 +33,17 @@ fun CartScreen(
     onOrderClick: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(viewModel, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.event.collect { event ->
+                when (event) {
+                    CartEvent.OrderSuccess -> onOrderClick()
+                }
+            }
+        }
+    }
 
     when (uiState.isCartScreen) {
         true ->
@@ -71,7 +86,6 @@ fun CartScreen(
                 onDecreaseClick = { viewModel.decreaseInRecommendScreen(it) },
                 onOrderClick = {
                     viewModel.order(uiState.selectedItemIds.toList())
-                    onOrderClick()
                 },
             )
     }

@@ -11,7 +11,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +44,7 @@ fun ShoppingScreen(
     val lazyGridState = rememberLazyGridState()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
-    val isConnected by viewModel.isNetworkConnected.collectAsState()
+    val isConnected by viewModel.isNetworkConnected.collectAsStateWithLifecycle()
     val errorMessage = state.errorMessage
 
     DisposableEffect(lifecycleOwner) {

@@ -3,7 +3,11 @@ package woowacourse.shopping.ui.cart
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -24,7 +28,9 @@ class CartViewModel(
     private val orderRepo: OrderRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
+    private val _event = MutableSharedFlow<CartEvent>()
+    val event: SharedFlow<CartEvent> = _event.asSharedFlow()
     val pager = Pager(PAGE_SIZE)
 
     init {
@@ -152,6 +158,7 @@ class CartViewModel(
             _uiState.update { it.copy(isLoading = true) }
             try {
                 orderRepo.requestOrder(selectedIds)
+                _event.emit(CartEvent.OrderSuccess)
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
@@ -311,4 +318,8 @@ class CartViewModel(
                     ) as T
             }
     }
+}
+
+sealed interface CartEvent {
+    data object OrderSuccess : CartEvent
 }

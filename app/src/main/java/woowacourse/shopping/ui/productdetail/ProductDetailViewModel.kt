@@ -6,12 +6,16 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.navigation.toRoute
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import androidx.navigation.toRoute
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
@@ -26,7 +30,9 @@ class ProductDetailViewModel(
     private val recentProductRepo: RecentProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductDetailUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
+    private val _event = MutableSharedFlow<ProductDetailEvent>()
+    val event: SharedFlow<ProductDetailEvent> = _event.asSharedFlow()
     private val detailRoute = savedStateHandle.toRoute<ProductDetail>()
     private val productId: Long = detailRoute.productId
     private val isFromBanner: Boolean = detailRoute.isFromBanner
@@ -51,7 +57,7 @@ class ProductDetailViewModel(
         }
     }
 
-    fun addToCart(onSuccess: () -> Unit) {
+    fun addToCart() {
         val currentState = _uiState.value
         val productToSave = currentState.product ?: return
 
@@ -59,7 +65,7 @@ class ProductDetailViewModel(
             _uiState.update { it.copy(isLoading = true) }
             try {
                 cartRepo.add(productToSave, quantity = currentState.selectedQuantity)
-                onSuccess()
+                _event.emit(ProductDetailEvent.AddToCartSuccess)
             } catch (_: IOException) {
                 _uiState.update {
                     it.copy(errorMessage = "장바구니에 상품을 담지 못했습니다.")
@@ -132,4 +138,8 @@ class ProductDetailViewModel(
                     ) as T
             }
     }
+}
+
+sealed interface ProductDetailEvent {
+    data object AddToCartSuccess : ProductDetailEvent
 }
