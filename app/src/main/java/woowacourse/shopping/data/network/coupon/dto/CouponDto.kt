@@ -16,8 +16,6 @@ data class CouponDto(
     val availableTime: AvailableTime? = null,
     @SerialName("buyQuantity")
     val buyQuantity: Int? = null,
-    @SerialName("code")
-    val code: String,
     @SerialName("description")
     val description: String,
     @SerialName("discount")
