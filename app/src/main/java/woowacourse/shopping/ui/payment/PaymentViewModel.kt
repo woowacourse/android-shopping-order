@@ -9,7 +9,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.model.coupon.Coupon
+import woowacourse.shopping.model.order.FixedShippingPolicy
 import woowacourse.shopping.model.order.OrderItem
+import woowacourse.shopping.model.order.ShippingPolicy
 import woowacourse.shopping.model.product.Money
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.CouponRepository
@@ -26,6 +28,7 @@ class PaymentViewModel(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val couponRepository: CouponRepository,
+    private val shippingPolicy: ShippingPolicy,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PaymentUiState())
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
@@ -93,7 +96,7 @@ class PaymentViewModel(
             orderItems.fold(Money.ZERO) { acc, item ->
                 acc + (item.price * item.quantity)
             }
-        val baseShippingFee = if (totalProductPrice == Money.ZERO) Money.ZERO else Money(3000)
+        val baseShippingFee = shippingPolicy.calculateShippingFee(totalProductPrice)
 
         val selectedCouponUiModel = _uiState.value.coupons.find { it.isSelected }
         val selectedCoupon = coupons.find { it.id == selectedCouponUiModel?.id }
@@ -182,5 +185,6 @@ class PaymentViewModelFactory : ViewModelProvider.Factory {
             cartRepository = ShoppingRepositoryProvider.cartRepository,
             productRepository = ShoppingRepositoryProvider.productRepository,
             couponRepository = ShoppingRepositoryProvider.couponRepository,
+            shippingPolicy = FixedShippingPolicy(),
         ) as T
 }
