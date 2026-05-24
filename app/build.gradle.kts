@@ -7,6 +7,11 @@ plugins {
     kotlin("plugin.serialization") version "2.1.0"
 }
 
+apply(from = "$rootDir/gradle/build-config-fields.gradle.kts")
+
+@Suppress("UNCHECKED_CAST")
+val shoppingBuildConfigFields = extra["shoppingBuildConfigFields"] as Map<String, String>
+
 android {
     namespace = "woowacourse.shopping"
     compileSdk = 36
@@ -19,6 +24,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        //noinspection WrongGradleMethod
+        shoppingBuildConfigFields.forEach { (name, value) ->
+            buildConfigField("String", name, value)
+        }
     }
 
     buildTypes {
@@ -38,6 +48,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     testOptions {
         unitTests.all {

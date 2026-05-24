@@ -6,18 +6,20 @@ import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import woowacourse.shopping.BuildConfig
 
 class RetrofitProvider(
-    private val authHeaderProvider: () -> String?
+    private val authHeaderProvider: () -> String?,
 ) {
-    private val BASE_URL = "http://techcourse-lv2-alb-250216202.ap-northeast-2.elb.amazonaws.com/"
+
+    private val baseUrl = BuildConfig.BASE_URL
 
     private val authInterceptor = Interceptor { chain ->
         val originalRequest = chain.request()
         val authHeader = authHeaderProvider()
 
         val requestBuilder = originalRequest.newBuilder()
-        if(authHeader != null) {
+        if (authHeader != null) {
             requestBuilder.header("Authorization", authHeader)
         }
         chain.proceed(requestBuilder.build())
@@ -28,11 +30,10 @@ class RetrofitProvider(
         .build()
 
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl(baseUrl)
         .client(okHttpClient)
-        .addConverterFactory(Json {ignoreUnknownKeys = true}.asConverterFactory("application/json".toMediaType()))
+        .addConverterFactory(Json { ignoreUnknownKeys = true }.asConverterFactory("application/json".toMediaType()))
         .build()
 
     fun <T> create(service: Class<T>): T = retrofit.create(service)
 }
-
