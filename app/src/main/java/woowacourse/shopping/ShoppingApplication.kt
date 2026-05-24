@@ -1,6 +1,7 @@
 package woowacourse.shopping
 
 import android.app.Application
+import woowacourse.shopping.data.local.NotificationSettingStorage
 import woowacourse.shopping.data.local.UserAuthDataStore
 import woowacourse.shopping.data.local.database.DataBase
 import woowacourse.shopping.data.local.repository.OutstandingProductRepositoryImpl
@@ -67,5 +68,15 @@ class ShoppingApplication : Application() {
 
     val couponRepository by lazy {
         CouponRepositoryImpl(couponService)
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        notificationSetting = NotificationSettingStorage(this)
+    }
+
+    companion object {
+        lateinit var notificationSetting: NotificationSettingStorage
+            private set
     }
 }
