@@ -3,8 +3,8 @@ package woowacourse.shopping
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
 import android.os.Build
+import woowacourse.shopping.data.local.NotificationSettingSettingStorageImpl
 import woowacourse.shopping.data.local.NotificationSettingStorage
 import woowacourse.shopping.data.local.UserAuthDataStore
 import woowacourse.shopping.data.local.database.DataBase
@@ -78,7 +78,7 @@ class ShoppingApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        notificationSetting = NotificationSettingStorage(this)
+        notificationSetting = NotificationSettingSettingStorageImpl(this)
         alarmScheduler = AlarmScheduler(this)
         createNotificationChannel()
     }

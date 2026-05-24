@@ -13,6 +13,7 @@ import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.PurchaseProduct
 import woowacourse.shopping.ui.shopping.ShoppingViewModel
 import woowacourse.shopping.viewmodel.fakes.FakeCartRepository
+import woowacourse.shopping.viewmodel.fakes.FakeNotificationSettingStorage
 import woowacourse.shopping.viewmodel.fakes.FakeProductRepository
 import woowacourse.shopping.viewmodel.fakes.FakeRecentlyViewedProductRepository
 
@@ -26,18 +27,21 @@ class ShoppingViewModelTest {
     private lateinit var fakeProductRepository: FakeProductRepository
     private lateinit var fakeRecentlyViewedProductRepository: FakeRecentlyViewedProductRepository
     private lateinit var fakeCartRepository: FakeCartRepository
+    private lateinit var fakeNotificationStorage: FakeNotificationSettingStorage
 
     @BeforeEach
     fun initViewModel() {
         fakeCartRepository = FakeCartRepository()
         fakeRecentlyViewedProductRepository = FakeRecentlyViewedProductRepository()
         fakeProductRepository = FakeProductRepository()
+        fakeNotificationStorage = FakeNotificationSettingStorage()
 
         viewModel =
             ShoppingViewModel(
                 cartRepository = fakeCartRepository,
                 recentlyViewedProductRepository = fakeRecentlyViewedProductRepository,
                 productRepository = fakeProductRepository,
+                notificationSettingStorage = fakeNotificationStorage,
             )
     }
 

@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.local.NotificationSettingStorage
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.data.remote.server.apiresult.ApiResult
@@ -27,11 +26,11 @@ class ShoppingViewModel(
     private val cartRepository: CartRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
     private val productRepository: ProductRepository,
-    private val notificationStorage: NotificationSettingStorage,
+    private val notificationSettingStorage: NotificationSettingStorage,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         ShoppingUiState(
-            notificationAllowed = notificationStorage.isNotificationEnabled()
+            notificationAllowed = notificationSettingStorage.isNotificationEnabled()
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -259,7 +258,7 @@ class ShoppingViewModel(
     fun changeNotificationAllow() {
         viewModelScope.launch {
             val currentState = _uiState.value.notificationAllowed
-            notificationStorage.setNotificationEnabled(currentState.not())
+            notificationSettingStorage.setNotificationEnabled(currentState.not())
             _uiState.update { it.copy(notificationAllowed = currentState.not()) }
         }
     }
@@ -275,7 +274,7 @@ class ShoppingViewModelFactory(
     private val cartRepository: CartRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
     private val productRepository: ProductRepository,
-    private val notificationStorage: NotificationSettingStorage,
+    private val notificationSettingStorage: NotificationSettingStorage,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ShoppingViewModel::class.java)) {
@@ -284,7 +283,7 @@ class ShoppingViewModelFactory(
                 cartRepository,
                 recentlyViewedProductRepository,
                 productRepository,
-                notificationStorage
+                notificationSettingStorage
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

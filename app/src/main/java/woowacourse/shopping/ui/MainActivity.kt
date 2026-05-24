@@ -92,7 +92,7 @@ class MainActivity : ComponentActivity() {
                                     cartRepository = app.cartRepository,
                                     recentlyViewedProductRepository = app.recentlyViewedProductRepository,
                                     productRepository = app.productRepository,
-                                    notificationStorage = ShoppingApplication.notificationSetting,
+                                    notificationSettingStorage = ShoppingApplication.notificationSetting,
                                 )
                             )
                             ShoppingRoute(
