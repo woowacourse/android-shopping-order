@@ -1,11 +1,24 @@
 package woowacourse.shopping.navigation
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -25,6 +38,7 @@ import woowacourse.shopping.navigation.Route.Cart
 import woowacourse.shopping.navigation.Route.Coupon
 import woowacourse.shopping.navigation.Route.ProductDetail
 import woowacourse.shopping.navigation.Route.ProductList
+import woowacourse.shopping.notification.PaymentReminderAlarmScheduler
 import woowacourse.shopping.ui.component.cart.PageNavigation
 import woowacourse.shopping.ui.component.cart.ShoppingCartOrderButton
 import woowacourse.shopping.ui.component.productlist.MoreButton
@@ -42,6 +56,7 @@ import woowacourse.shopping.ui.viewmodel.ShoppingCartEvent
 import woowacourse.shopping.ui.viewmodel.ShoppingCartItemViewModel
 import woowacourse.shopping.ui.viewmodel.ShoppingCartRecommendViewModel
 import woowacourse.shopping.ui.viewmodel.ShoppingCartRecommendViewModel.ShoppingCartStep
+import woowacourse.shopping.storage.sharedpreferences.NotificationPreferenceRepository
 
 private fun navigateToCoupon(
     navController: NavHostController,
@@ -412,11 +427,58 @@ fun ShoppingNavHost(
             }
         }
         composable<Coupon> {
+            val context = LocalContext.current
+            val notificationPreferenceRepository =
+                remember(context) { NotificationPreferenceRepository(context) }
+            var isNotificationEnabled by remember {
+                mutableStateOf(notificationPreferenceRepository.isNotificationEnabled())
+            }
+            var shouldScheduleReminderOnExit by remember { mutableStateOf(true) }
+            val notificationPermissionLauncher =
+                rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestPermission(),
+                ) { }
+
+            LaunchedEffect(Unit) {
+                isNotificationEnabled = notificationPreferenceRepository.isNotificationEnabled()
+                shouldScheduleReminderOnExit = true
+                PaymentReminderAlarmScheduler.cancel(context)
+                if (isNotificationEnabled) {
+                    requestNotificationPermissionIfNeeded(
+                        context = context,
+                        permissionLauncher = notificationPermissionLauncher,
+                    )
+                }
+            }
+
+            DisposableEffect(context, isNotificationEnabled, shouldScheduleReminderOnExit) {
+                onDispose {
+                    if (isNotificationEnabled && shouldScheduleReminderOnExit) {
+                        PaymentReminderAlarmScheduler.schedule(context)
+                    } else {
+                        PaymentReminderAlarmScheduler.cancel(context)
+                    }
+                }
+            }
+
             val uiState by couponViewModel.uiState.collectAsStateWithLifecycle()
 
             CouponScreen(
                 uiState = uiState,
+                isNotificationEnabled = isNotificationEnabled,
                 onBackClick = { navController.popBackStack() },
+                onNotificationEnabledChange = { enabled ->
+                    isNotificationEnabled = enabled
+                    notificationPreferenceRepository.setNotificationEnabled(enabled)
+                    if (enabled) {
+                        requestNotificationPermissionIfNeeded(
+                            context = context,
+                            permissionLauncher = notificationPermissionLauncher,
+                        )
+                    } else {
+                        PaymentReminderAlarmScheduler.cancel(context)
+                    }
+                },
                 onCouponSelect = couponViewModel::selectCoupon,
                 onPay = {
                     submitOrder(
@@ -424,12 +486,36 @@ fun ShoppingNavHost(
                         shoppingCartViewModel = shoppingCartViewModel,
                         shoppingCartRecommendViewModel = shoppingCartRecommendViewModel,
                         orderedCartItemIds = couponViewModel.getOrderedCartItemIds(),
-                        onSuccess = { navigateToProductList(navController) },
+                        onSuccess = {
+                            shouldScheduleReminderOnExit = false
+                            PaymentReminderAlarmScheduler.cancel(context)
+                            navigateToProductList(navController)
+                        },
                     )
                 },
             )
         }
     }
+}
+
+private fun requestNotificationPermissionIfNeeded(
+    context: Context,
+    permissionLauncher: ActivityResultLauncher<String>,
+) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+        return
+    }
+
+    if (
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS,
+        ) == PackageManager.PERMISSION_GRANTED
+    ) {
+        return
+    }
+
+    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
 }
 
 private fun submitOrder(
