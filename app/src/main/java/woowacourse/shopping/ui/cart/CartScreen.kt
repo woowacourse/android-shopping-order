@@ -58,7 +58,6 @@ fun CartScreen(
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.cartUiState.collectAsStateWithLifecycle()
-    val screen by viewModel.currentScreen.collectAsStateWithLifecycle()
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
@@ -71,30 +70,17 @@ fun CartScreen(
                 onClickClose()
             },
         )
-        when (screen) {
-            CartFlow.CART -> {
-                CartScreenContent(
-                    modifier = modifier,
-                    uiState = uiState,
-                    onClickRemoveItem = viewModel::removeCartItem,
-                    onClickIncrease = viewModel::increaseCartItemQuantity,
-                    onClickDecrease = viewModel::decreaseCartItemQuantity,
-                    onClickGoToPreviousPage = viewModel::goToPreviousPage,
-                    onClickGoToNextPage = viewModel::goToNextPage,
-                    onClickToggleSelection = viewModel::toggleSelection,
-                )
-            }
+        CartScreenContent(
+            modifier = modifier,
+            uiState = uiState,
+            onClickRemoveItem = viewModel::removeCartItem,
+            onClickIncrease = viewModel::increaseCartItemQuantity,
+            onClickDecrease = viewModel::decreaseCartItemQuantity,
+            onClickGoToPreviousPage = viewModel::goToPreviousPage,
+            onClickGoToNextPage = viewModel::goToNextPage,
+            onClickToggleSelection = viewModel::toggleSelection,
+        )
 
-            CartFlow.RECOMMEND -> {
-                RecommendScreenContent(
-                    uiState = uiState,
-                    onAddClick = viewModel::addCartItem,
-                    onIncrease = viewModel::increaseRecommendProduct,
-                    onDecrease = viewModel::decreaseRecommendProduct,
-                    modifier = Modifier.weight(1f),
-                )
-            }
-        }
         CartScreenBottomBar(
             totalMoney = uiState.totalPrice,
             totalCount = uiState.totalCount,
