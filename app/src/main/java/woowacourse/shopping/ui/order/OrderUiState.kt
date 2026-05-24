@@ -5,9 +5,10 @@ data class OrderUiState(
     val priceSummary: OrderPriceSummaryUiModel = emptyPriceSummary(),
     val isOrdering: Boolean = false,
     val isNetworkConnected: Boolean = true,
+    val hasPendingOrder: Boolean = false,
 ) {
     val isPaymentEnabled: Boolean
-        get() = priceSummary.totalPaymentPrice > 0 && !isOrdering
+        get() = hasPendingOrder && priceSummary.totalPaymentPrice > 0 && !isOrdering
 }
 
 sealed interface OrderEvent {

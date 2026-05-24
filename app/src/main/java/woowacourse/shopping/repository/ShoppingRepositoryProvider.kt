@@ -13,6 +13,7 @@ import woowacourse.shopping.repository.http.cart.HttpCartRepository
 import woowacourse.shopping.repository.http.coupon.HttpCouponRepository
 import woowacourse.shopping.repository.http.product.HttpProductRepository
 import woowacourse.shopping.repository.preference.SharedPreferencesNotificationSettingRepository
+import woowacourse.shopping.repository.preference.SharedPreferencesPendingOrderRepository
 import woowacourse.shopping.repository.room.RoomRecentProductRepository
 
 object ShoppingRepositoryProvider {
@@ -41,6 +42,9 @@ object ShoppingRepositoryProvider {
     lateinit var notificationSettingRepository: NotificationSettingRepository
         private set
 
+    lateinit var pendingOrderRepository: PendingOrderRepository
+        private set
+
     lateinit var networkMonitor: NetworkMonitor
         private set
 
@@ -51,6 +55,7 @@ object ShoppingRepositoryProvider {
             ::couponRepository.isInitialized &&
             ::recentProductRepository.isInitialized &&
             ::notificationSettingRepository.isInitialized &&
+            ::pendingOrderRepository.isInitialized &&
             ::networkMonitor.isInitialized
         ) {
             return
@@ -80,6 +85,8 @@ object ShoppingRepositoryProvider {
             )
         notificationSettingRepository =
             SharedPreferencesNotificationSettingRepository.create(context)
+        pendingOrderRepository =
+            SharedPreferencesPendingOrderRepository.create(context)
         networkMonitor = ConnectivityManagerNetworkMonitor(context)
     }
 }

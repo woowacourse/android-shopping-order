@@ -15,6 +15,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.CouponRepository
+import woowacourse.shopping.repository.PendingOrderRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
 import woowacourse.shopping.ui.cart.SelectedCartOrder
 import java.time.Clock
@@ -28,6 +29,7 @@ private val COUPON_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy년 M월 d�
 class OrderViewModel(
     private val cartRepository: CartRepository = ShoppingRepositoryProvider.cartRepository,
     private val couponRepository: CouponRepository = ShoppingRepositoryProvider.couponRepository,
+    private val pendingOrderRepository: PendingOrderRepository = ShoppingRepositoryProvider.pendingOrderRepository,
     private val networkMonitor: NetworkMonitor = ShoppingRepositoryProvider.networkMonitor,
     private val clock: Clock = Clock.systemDefaultZone(),
 ) : ViewModel() {
@@ -50,18 +52,32 @@ class OrderViewModel(
     }
 
     fun startOrder(selectedCartOrder: SelectedCartOrder) {
-        pendingOrder = selectedCartOrder
+        pendingOrderRepository.savePendingOrder(selectedCartOrder)
+        applyPendingOrder(selectedCartOrder)
+        loadApplicableCoupons(selectedCartOrder)
+    }
+
+    fun restorePendingOrderIfAvailable(): Boolean {
+        val restoredOrder = pendingOrderRepository.getPendingOrder() ?: return false
+        applyPendingOrder(restoredOrder)
+        loadApplicableCoupons(restoredOrder)
+        return true
+    }
+
+    fun clearPendingOrderSession() {
+        pendingOrder = null
+        pendingOrderRepository.clearPendingOrder()
         availableCouponsById = emptyMap()
         selectedCouponId = null
 
         _uiState.update { currentState ->
             currentState.copy(
                 coupons = emptyList(),
-                priceSummary = selectedCartOrder.toPriceSummary(),
+                priceSummary = createEmptyPriceSummary(),
                 isOrdering = false,
+                hasPendingOrder = false,
             )
         }
-        loadApplicableCoupons(selectedCartOrder)
     }
 
     fun placeOrder() {
@@ -76,16 +92,7 @@ class OrderViewModel(
             runCatching {
                 cartRepository.createOrder(targetOrder.items.map { it.cartItemId })
             }.onSuccess {
-                pendingOrder = null
-                availableCouponsById = emptyMap()
-                selectedCouponId = null
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        coupons = emptyList(),
-                        priceSummary = createEmptyPriceSummary(),
-                        isOrdering = false,
-                    )
-                }
+                clearPendingOrderSession()
                 _events.emit(OrderEvent.OrderCompleted)
             }.onFailure { throwable ->
                 _uiState.update { currentState ->
@@ -93,6 +100,21 @@ class OrderViewModel(
                 }
                 _events.emit(OrderEvent.ShowMessage(throwable.message ?: "주문에 실패했습니다."))
             }
+        }
+    }
+
+    private fun applyPendingOrder(selectedCartOrder: SelectedCartOrder) {
+        pendingOrder = selectedCartOrder
+        availableCouponsById = emptyMap()
+        selectedCouponId = null
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                coupons = emptyList(),
+                priceSummary = selectedCartOrder.toPriceSummary(),
+                isOrdering = false,
+                hasPendingOrder = true,
+            )
         }
     }
 

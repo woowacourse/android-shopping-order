@@ -24,6 +24,7 @@ import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.CartRepositoryFixture
 import woowacourse.shopping.repository.CouponRepository
+import woowacourse.shopping.repository.PendingOrderRepository
 import woowacourse.shopping.repository.query.CartPageResult
 import woowacourse.shopping.ui.cart.SelectedCartOrder
 import woowacourse.shopping.ui.cart.SelectedCartOrderItem
@@ -37,6 +38,7 @@ class OrderViewModelTest {
     private lateinit var dispatcher: TestDispatcher
     private lateinit var cartRepository: RecordingCartRepository
     private lateinit var couponRepository: FakeCouponRepository
+    private lateinit var pendingOrderRepository: FakePendingOrderRepository
     private lateinit var viewModel: OrderViewModel
 
     private val shrimpCracker = CartRepositoryFixture.shrimpCracker
@@ -48,6 +50,7 @@ class OrderViewModelTest {
         Dispatchers.setMain(dispatcher)
 
         cartRepository = RecordingCartRepository()
+        pendingOrderRepository = FakePendingOrderRepository()
         couponRepository =
             FakeCouponRepository(
                 coupons =
@@ -105,6 +108,7 @@ class OrderViewModelTest {
             OrderViewModel(
                 cartRepository = cartRepository,
                 couponRepository = couponRepository,
+                pendingOrderRepository = pendingOrderRepository,
                 networkMonitor = FakeNetworkMonitor(),
                 clock = Clock.fixed(Instant.parse("2026-05-22T05:00:00Z"), ZoneId.of("UTC")),
             )
@@ -170,6 +174,31 @@ class OrderViewModelTest {
                 listOf("5,000원 할인 쿠폰", "무료 배송 쿠폰", "미라클 세일 30% 할인 쿠폰"),
                 viewModel.uiState.value.coupons.map { it.title },
             )
+        }
+
+    @Test
+    fun `주문 화면 진입 시 현재 주문 세션을 저장한다`() =
+        runTest(dispatcher.scheduler) {
+            val order = selectedCartOrder(totalPrice = 120_000, quantity = 2)
+
+            viewModel.startOrder(order)
+            advanceUntilIdle()
+
+            assertEquals(order, pendingOrderRepository.getPendingOrder())
+        }
+
+    @Test
+    fun `저장된 주문 세션이 있으면 복원해 결제 화면 상태를 다시 구성한다`() =
+        runTest(dispatcher.scheduler) {
+            val order = selectedCartOrder(totalPrice = 120_000, quantity = 2)
+            pendingOrderRepository.savePendingOrder(order)
+
+            val restored = viewModel.restorePendingOrderIfAvailable()
+            advanceUntilIdle()
+
+            assertTrue(restored)
+            assertTrue(viewModel.uiState.value.hasPendingOrder)
+            assertEquals(123_000L, viewModel.uiState.value.priceSummary.totalPaymentPrice)
         }
 
     @Test
@@ -324,7 +353,18 @@ class OrderViewModelTest {
             assertTrue(cartRepository.getCartItemsByProductIds(setOf(shrimpCracker.id, sourCandy.id)).isEmpty())
             assertEquals(OrderEvent.OrderCompleted, event.await())
             assertEquals(0L, viewModel.uiState.value.priceSummary.totalPaymentPrice)
+            assertEquals(null, pendingOrderRepository.getPendingOrder())
         }
+
+    @Test
+    fun `주문 화면을 이탈하면 저장된 주문 세션을 삭제한다`() {
+        viewModel.startOrder(selectedCartOrder(totalPrice = 120_000, quantity = 2))
+
+        viewModel.clearPendingOrderSession()
+
+        assertEquals(null, pendingOrderRepository.getPendingOrder())
+        assertEquals(false, viewModel.uiState.value.hasPendingOrder)
+    }
 
     private class FakeNetworkMonitor : NetworkMonitor {
         override val isNetworkConnected = MutableStateFlow(true)
@@ -350,6 +390,20 @@ class OrderViewModelTest {
         private val coupons: List<Coupon>,
     ) : CouponRepository {
         override suspend fun getCoupons(): List<Coupon> = coupons
+    }
+
+    private class FakePendingOrderRepository : PendingOrderRepository {
+        private var pendingOrder: SelectedCartOrder? = null
+
+        override fun getPendingOrder(): SelectedCartOrder? = pendingOrder
+
+        override fun savePendingOrder(order: SelectedCartOrder) {
+            pendingOrder = order
+        }
+
+        override fun clearPendingOrder() {
+            pendingOrder = null
+        }
     }
 
     private class RecordingCartRepository : CartRepository {
