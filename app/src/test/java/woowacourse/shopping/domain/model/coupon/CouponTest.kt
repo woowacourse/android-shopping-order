@@ -25,6 +25,24 @@ class CouponTest {
         coupon.discountAmount(order) shouldBe 0
     }
 
+    @Test
+    fun `BOGO 쿠폰은 무료 제공 가능한 상품 중 단가가 가장 비싼 상품 금액을 할인한다`() {
+        val coupon = buyGetFreeCoupon()
+        val cheap = purchaseProduct(id = 1L, productId = 1L, price = 1_000, count = 3)
+        val expensive = purchaseProduct(id = 2L, productId = 2L, price = 3_000, count = 3)
+        val order = orderOf(cheap, expensive)
+
+        coupon.discountAmount(order) shouldBe 3_000
+    }
+
+    @Test
+    fun `BOGO 쿠폰은 같은 상품 묶음마다 무료 제공 수량만큼 할인한다`() {
+        val coupon = buyGetFreeCoupon()
+        val order = orderOf(purchaseProduct(price = 3_000, count = 6))
+
+        coupon.discountAmount(order) shouldBe 6_000
+    }
+
     private fun fixedAmountCoupon() =
         FixedAmountCoupon(
             code = "FIXED5000",
@@ -32,6 +50,15 @@ class CouponTest {
             expirationDate = LocalDate.of(2024, 11, 30),
             discountAmount = 5_000,
             minimumOrderAmount = 100_000,
+        )
+
+    private fun buyGetFreeCoupon() =
+        NplusMFreeCoupon(
+            code = "BOGO",
+            name = "2개 구매 시 1개 무료 쿠폰",
+            expirationDate = LocalDate.of(2024, 5, 30),
+            purchaseQuantity = 2,
+            freeQuantity = 1,
         )
 
     private fun orderOf(vararg purchaseProducts: PurchaseProduct) =
