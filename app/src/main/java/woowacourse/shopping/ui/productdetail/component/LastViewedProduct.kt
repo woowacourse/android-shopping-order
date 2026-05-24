@@ -19,12 +19,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.core.designsystem.component.toPriceString
+import woowacourse.shopping.ui.uimodel.ProductUiModel
 
 @Composable
 fun LastViewedProduct(
-    product: Product,
-    onClick: (Product) -> Unit,
+    product: ProductUiModel,
+    onClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -38,7 +39,7 @@ fun LastViewedProduct(
                     shape = RoundedCornerShape(4.dp),
                     color = Color(0xFFAAAAAA),
                 ).clickable(
-                    onClick = { onClick(product) },
+                    onClick = { onClick(product.id) },
                 ).padding(18.dp),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.SpaceEvenly,
@@ -64,10 +65,11 @@ fun LastViewedProduct(
 @Composable
 private fun LastViewedProductPreview() {
     LastViewedProduct(
-        Product(
-            imageUri = "테스트",
+        ProductUiModel(
+            imageUrl = "테스트",
             name = "테스트",
             price = 1000,
+            formattedPrice = 1000.toPriceString(),
             category = "테스트",
             id = 1L,
         ),

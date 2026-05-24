@@ -12,9 +12,10 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.ui.event.UiEventHandler
 import woowacourse.shopping.domain.model.PurchaseProduct
+import woowacourse.shopping.ui.event.UiEventHandler
 import woowacourse.shopping.ui.navigation.ShoppingRoute
+import woowacourse.shopping.ui.uimodel.toProductUiModel
 
 fun NavGraphBuilder.productDetailRoute(
     shoppingApplication: ShoppingApplication,
@@ -71,13 +72,18 @@ private fun ProductDetailRouteContent(
     val lastViewedProduct by viewModel.lastViewedProduct.collectAsStateWithLifecycle()
 
     selectedProduct?.let { product ->
+        val uiState =
+            ProductDetailUiState(
+                product = product.toProductUiModel(),
+                count = count,
+                lastViewedProduct = lastViewedProduct?.toProductUiModel(),
+            )
+
         ProductDetailScreen(
-            product = product,
-            count = count,
-            lastViewedProduct = lastViewedProduct,
-            onLastViewedClick = { clickedProduct ->
-                viewModel.updateHistory(clickedProduct)
-                onLastViewedProductClick(clickedProduct.id, product.id)
+            uiState = uiState,
+            onLastViewedClick = { clickedProductId ->
+                lastViewedProduct?.let { viewModel.updateHistory(it) }
+                onLastViewedProductClick(clickedProductId, product.id)
             },
             onAdd = { viewModel.addCount() },
             onMinus = { viewModel.minusCount() },

@@ -26,19 +26,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.R
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.core.designsystem.component.layout.CommonFrame
-import woowacourse.shopping.ui.productdetail.component.LastViewedProduct
 import woowacourse.shopping.core.designsystem.component.ProductImage
 import woowacourse.shopping.core.designsystem.component.QuantitySelector
+import woowacourse.shopping.core.designsystem.component.layout.CommonFrame
 import woowacourse.shopping.core.designsystem.component.toPriceString
+import woowacourse.shopping.ui.productdetail.component.LastViewedProduct
+import woowacourse.shopping.ui.uimodel.ProductUiModel
 
 @Composable
 fun ProductDetailScreen(
-    product: Product,
-    count: Int,
-    lastViewedProduct: Product?,
-    onLastViewedClick: (Product) -> Unit,
+    uiState: ProductDetailUiState,
+    onLastViewedClick: (Long) -> Unit,
     onAdd: () -> Unit,
     onMinus: () -> Unit,
     onAddRequest: () -> Unit,
@@ -48,15 +46,16 @@ fun ProductDetailScreen(
     CommonFrame(
         headerContent = { ProductDetailHeader(onClose) },
         bodyContent = {
-            ProductDetailBody(
-                product = product,
-                count = count,
-                lastViewedProduct = lastViewedProduct,
-                onLastViewedClick = onLastViewedClick,
-                onAdd = onAdd,
-                onMinus = onMinus,
-                onAddRequest = onAddRequest,
-            )
+            uiState.product?.let { product ->
+                ProductDetailBody(
+                    uiState = uiState,
+                    product = product,
+                    onLastViewedClick = onLastViewedClick,
+                    onAdd = onAdd,
+                    onMinus = onMinus,
+                    onAddRequest = onAddRequest,
+                )
+            }
         },
         modifier = modifier,
     )
@@ -88,10 +87,9 @@ private fun ProductDetailHeader(
 
 @Composable
 private fun ProductDetailBody(
-    product: Product,
-    count: Int,
-    lastViewedProduct: Product?,
-    onLastViewedClick: (Product) -> Unit,
+    uiState: ProductDetailUiState,
+    product: ProductUiModel,
+    onLastViewedClick: (Long) -> Unit,
     onAdd: () -> Unit,
     onMinus: () -> Unit,
     onAddRequest: () -> Unit,
@@ -104,10 +102,9 @@ private fun ProductDetailBody(
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         ProductDetailInfo(
+            uiState = uiState,
             product = product,
-            lastViewedProduct = lastViewedProduct,
             onLastViewedClick = onLastViewedClick,
-            count = count,
             onAdd = onAdd,
             onMinus = onMinus,
         )
@@ -132,10 +129,9 @@ private fun ProductDetailBody(
 
 @Composable
 private fun ProductDetailInfo(
-    product: Product,
-    lastViewedProduct: Product?,
-    count: Int,
-    onLastViewedClick: (Product) -> Unit,
+    uiState: ProductDetailUiState,
+    product: ProductUiModel,
+    onLastViewedClick: (Long) -> Unit,
     onAdd: () -> Unit,
     onMinus: () -> Unit,
     modifier: Modifier = Modifier,
@@ -146,7 +142,7 @@ private fun ProductDetailInfo(
         val configuration = LocalConfiguration.current
         val maxWidth = configuration.screenWidthDp.dp
         ProductImage(
-            imageUri = product.imageUri,
+            imageUri = product.imageUrl,
             modifier =
                 Modifier
                     .size(maxWidth),
@@ -170,19 +166,19 @@ private fun ProductDetailInfo(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = (product.price * count).toPriceString(),
+                text = uiState.formattedTotalPrice,
                 fontSize = 20.sp,
             )
 
             QuantitySelector(
-                count = count,
+                count = uiState.count,
                 onAdd = onAdd,
                 onMinus = onMinus,
             )
         }
-        if (lastViewedProduct != null && lastViewedProduct.id != product.id) {
+        if (uiState.lastViewedProduct != null && uiState.lastViewedProduct.id != product.id) {
             LastViewedProduct(
-                product = lastViewedProduct,
+                product = uiState.lastViewedProduct,
                 onClick = onLastViewedClick,
                 modifier = Modifier.padding(18.dp),
             )
@@ -193,18 +189,21 @@ private fun ProductDetailInfo(
 @Preview(showBackground = true)
 @Composable
 private fun ProductDetailScreenPreview1() {
-    val mockProduct = Product(
-            imageUri = "hello",
-            name = "너무너무너무긴아이템이름",
-            price = 100000,
-            category = "a",
-            id = 1L,
-        )
+    val mockProduct = ProductUiModel(
+        imageUrl = "hello",
+        name = "너무너무너무긴아이템이름",
+        price = 100000,
+        formattedPrice = 100000.toPriceString(),
+        category = "a",
+        id = 1L,
+    )
 
     ProductDetailScreen(
-        product = mockProduct,
-        count = 0,
-        lastViewedProduct = mockProduct,
+        uiState = ProductDetailUiState(
+            product = mockProduct,
+            count = 1,
+            lastViewedProduct = mockProduct,
+        ),
         onLastViewedClick = {},
         onAddRequest = {},
         onClose = {},
@@ -217,18 +216,21 @@ private fun ProductDetailScreenPreview1() {
 @Composable
 private fun ProductDetailScreenPreview2() {
     val product =
-        Product(
-            imageUri = "hello",
+        ProductUiModel(
+            imageUrl = "hello",
             name = "너무너무너무긴아이템이름",
             price = 100000,
+            formattedPrice = 100000.toPriceString(),
             category = "a",
             id = 1L,
         )
 
     ProductDetailScreen(
-        product = product,
-        count = 0,
-        lastViewedProduct = product,
+        uiState = ProductDetailUiState(
+            product = product,
+            count = 1,
+            lastViewedProduct = product,
+        ),
         onLastViewedClick = {},
         onAddRequest = {},
         onClose = {},
