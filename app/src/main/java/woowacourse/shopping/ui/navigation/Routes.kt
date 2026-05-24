@@ -24,3 +24,6 @@ data object Recommend
 data class Order(
     val cartIds: List<Int>,
 )
+
+@Serializable
+data object Setting

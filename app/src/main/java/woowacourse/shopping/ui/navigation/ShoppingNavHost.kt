@@ -17,6 +17,8 @@ import woowacourse.shopping.ui.productDetail.ProductDetailScreen
 import woowacourse.shopping.ui.productDetail.ProductDetailViewModel
 import woowacourse.shopping.ui.productList.ProductListScreen
 import woowacourse.shopping.ui.productList.ProductListViewModel
+import woowacourse.shopping.ui.setting.SettingScreen
+import woowacourse.shopping.ui.setting.SettingViewModel
 
 @Composable
 fun ShoppingNavHost() {
@@ -31,6 +33,7 @@ fun ShoppingNavHost() {
             ProductListScreen(
                 viewModel = viewModel,
                 onCartClick = { navController.navigate(CartGraph) },
+                onSettingClick = { navController.navigate(Setting) },
                 onProductClick = { productId ->
                     navController.navigate(ProductDetail(productId, openedFromLastViewed = false))
                 },
@@ -99,6 +102,14 @@ fun ShoppingNavHost() {
                         popUpTo<ProductList> { inclusive = true }
                     }
                 },
+            )
+        }
+
+        composable<Setting> {
+            val viewModel: SettingViewModel = viewModel(factory = OrderViewModel.Factory)
+            SettingScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() },
             )
         }
     }

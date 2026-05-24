@@ -53,6 +53,7 @@ import androidx.compose.foundation.lazy.items as lazyRowItems
 fun ProductListScreen(
     viewModel: ProductListViewModel,
     onCartClick: () -> Unit = {},
+    onSettingClick: () -> Unit,
     onProductClick: (Int) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -81,6 +82,7 @@ fun ProductListScreenContent(
     onDecrease: (Int) -> Unit,
     onMoreClick: () -> Unit,
     onCartClick: () -> Unit = {},
+    onSettingClick: () -> Unit = {},
     onProductClick: (Int) -> Unit = {},
 ) {
     Column(modifier = modifier) {
@@ -91,7 +93,8 @@ fun ProductListScreenContent(
                     .height(56.dp),
             cartCount = uiState.totalCartAmount,
             showCartAmountBadge = uiState.showCartAmountBadge,
-            onClick = onCartClick,
+            onClickCart = onCartClick,
+            onSettingClick = onSettingClick,
         )
         when (uiState.loadState) {
             is LoadState.Loading if uiState.products.isEmpty() -> {
@@ -327,8 +330,9 @@ private fun ErrorContent(
 private fun ProductListTopAppBar(
     cartCount: String,
     showCartAmountBadge: Boolean,
+    onSettingClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
+    onClickCart: () -> Unit = {},
 ) {
     TopAppBar(
         modifier = modifier,
@@ -342,7 +346,15 @@ private fun ProductListTopAppBar(
             CartBadgeIcon(
                 cartCount = cartCount,
                 showCartAmountBadge = showCartAmountBadge,
-                onClick = onClick,
+                onClick = onClickCart,
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.ic_setting),
+                contentDescription = "설정 아이콘",
+                modifier =
+                    Modifier
+                        .padding(10.dp)
+                        .clickable { onSettingClick() },
             )
         },
         colors =
