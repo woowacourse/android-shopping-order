@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -18,11 +20,22 @@ data class SettingUiState(
     val isNotification: Boolean = false,
 )
 
+sealed class SettingUiEvent {
+    object NavigateBack : SettingUiEvent()
+
+    data class ShowToastMessage(
+        val message: String,
+    ) : SettingUiEvent()
+}
+
 class SettingViewModel(
     private val dataStore: UserDataStore,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SettingUiState())
     val uiState: StateFlow<SettingUiState> = _uiState.asStateFlow()
+
+    private val _uiEvent = MutableSharedFlow<SettingUiEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -37,6 +50,18 @@ class SettingViewModel(
     fun updateIsNotification(isNotification: Boolean) {
         viewModelScope.launch {
             dataStore.saveIsNotification(isNotification)
+
+            _uiEvent.emit(
+                SettingUiEvent.ShowToastMessage(
+                    message = "알림 변경에 성공했습니다.",
+                ),
+            )
+        }
+    }
+
+    fun navigateBack() {
+        viewModelScope.launch {
+            _uiEvent.emit(SettingUiEvent.NavigateBack)
         }
     }
 
