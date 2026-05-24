@@ -5,12 +5,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.AppModule
 import woowacourse.shopping.domain.repository.SettingRepository
 import woowacourse.shopping.presentation.setting.model.SettingUiState
 
 class SettingViewModel(
-    private val settingRepository: SettingRepository = RepositoryProvider.settingRepository,
+    private val settingRepository: SettingRepository = AppModule.settingRepository,
 ) : ViewModel() {
     private val _uiState =
         MutableStateFlow(

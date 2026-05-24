@@ -14,7 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.AppModule
 import woowacourse.shopping.presentation.cart.CartRoute
 import woowacourse.shopping.presentation.detail.DetailRoute
 import woowacourse.shopping.presentation.payment.PaymentRoute
@@ -26,7 +26,7 @@ import kotlin.reflect.typeOf
 @Composable
 fun AppNavHost(startDestinationFromNotification: Any? = null) {
     val navController = rememberNavController()
-    val settingRepository = remember { RepositoryProvider.settingRepository }
+    val settingRepository = remember { AppModule.settingRepository }
     val context = LocalContext.current
 
     val permissionLauncher =

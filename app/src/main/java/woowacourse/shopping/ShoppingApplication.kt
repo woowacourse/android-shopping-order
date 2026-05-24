@@ -8,18 +8,18 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.AppModule
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth_token")
 
 class ShoppingApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        RepositoryProvider.init(this)
+        AppModule.init(this)
 
         if (BuildConfig.DEBUG) {
             CoroutineScope(Dispatchers.IO).launch {
-                RepositoryProvider.authDataSource.saveToken(
+                AppModule.authDataSource.saveToken(
                     id = BuildConfig.ID,
                     password = BuildConfig.PASSWORD,
                 )

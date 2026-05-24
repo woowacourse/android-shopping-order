@@ -11,6 +11,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
 import woowacourse.shopping.fake.fakeProduct
 import woowacourse.shopping.fake.repository.FakeCartRepository
 
@@ -18,6 +19,7 @@ import woowacourse.shopping.fake.repository.FakeCartRepository
 class CartViewModelTest {
     private val dispatcher = UnconfinedTestDispatcher()
     private lateinit var viewModel: CartViewModel
+    private lateinit var addToCart: AddToCartUseCase
     private lateinit var cartRepository: FakeCartRepository
 
     @BeforeEach
@@ -25,8 +27,12 @@ class CartViewModelTest {
         Dispatchers.setMain(dispatcher)
         val productMap = (1L..10L).associateWith { fakeProduct(it) }
         cartRepository = FakeCartRepository(productMap)
+        addToCart = AddToCartUseCase(cartRepository)
         viewModel =
-            CartViewModel(cartRepository = cartRepository)
+            CartViewModel(
+                addToCartUseCase = addToCart,
+                cartRepository = cartRepository
+            )
     }
 
     @AfterEach

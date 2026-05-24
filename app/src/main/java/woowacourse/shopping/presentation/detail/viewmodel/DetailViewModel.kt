@@ -10,19 +10,20 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.AppModule
 import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.presentation.common.addToCartUseCase
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.GetLastSeenProductUseCase
 import woowacourse.shopping.presentation.common.model.toUiModel
 import woowacourse.shopping.presentation.detail.model.DetailUiState
 
 class DetailViewModel(
-    private val productRepository: ProductRepository = RepositoryProvider.productRepository,
-    private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
-    private val recentProductRepository: RecentProductRepository = RepositoryProvider.recentProductRepository,
+    private val addToCartUseCase: AddToCartUseCase = AppModule.addToCartUseCase,
+    private val getLastSeenProductUseCase: GetLastSeenProductUseCase = AppModule.getLastSeenProductUseCase,
+    private val productRepository: ProductRepository = AppModule.productRepository,
+    private val recentProductRepository: RecentProductRepository = AppModule.recentProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
@@ -53,10 +54,7 @@ class DetailViewModel(
                 val lastSeen =
                     runCatching {
                         if (!isFromLastSeen) {
-                            recentProductRepository
-                                .getRecentProducts(limit = 1)
-                                .firstOrNull()
-                                ?.toUiModel()
+                            getLastSeenProductUseCase.invoke()?.toUiModel()
                         } else {
                             null
                         }
@@ -105,7 +103,7 @@ class DetailViewModel(
         quantity: Int = 1,
     ) {
         viewModelScope.launch(exceptionHandler) {
-            addToCartUseCase(cartRepository, id, quantity)
+            addToCartUseCase.invoke(productId = id, quantity = quantity)
             _uiEvents.emit(DetailEvent.NavigateToCart)
         }
     }

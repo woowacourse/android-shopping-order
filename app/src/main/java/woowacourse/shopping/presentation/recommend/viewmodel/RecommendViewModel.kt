@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.AppModule
 import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.PaymentItems
@@ -24,9 +24,9 @@ import woowacourse.shopping.presentation.recommend.model.RecommendUiState
 import woowacourse.shopping.presentation.shopping.model.ShoppingItemUiModel
 
 class RecommendViewModel(
-    private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
-    private val productRepository: ProductRepository = RepositoryProvider.productRepository,
-    private val recentProductRepository: RecentProductRepository = RepositoryProvider.recentProductRepository,
+    private val cartRepository: CartRepository = AppModule.cartRepository,
+    private val productRepository: ProductRepository = AppModule.productRepository,
+    private val recentProductRepository: RecentProductRepository = AppModule.recentProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RecommendUiState())
     val uiState: StateFlow<RecommendUiState> = _uiState.asStateFlow()

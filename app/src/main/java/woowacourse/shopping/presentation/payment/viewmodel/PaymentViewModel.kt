@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.AppModule
 import woowacourse.shopping.domain.model.CartItem
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.PaymentItems
@@ -29,11 +29,11 @@ import woowacourse.shopping.presentation.payment.model.toUiModel
 import java.time.LocalDateTime
 
 class PaymentViewModel(
-    private val productRepository: ProductRepository = RepositoryProvider.productRepository,
-    private val couponRepository: CouponRepository = RepositoryProvider.couponRepository,
-    private val orderRepository: OrderRepository = RepositoryProvider.orderRepository,
-    private val settingRepository: SettingRepository = RepositoryProvider.settingRepository,
-    private val notificationScheduler: PaymentNotificationScheduler = RepositoryProvider.paymentNotificationScheduler,
+    private val productRepository: ProductRepository = AppModule.productRepository,
+    private val couponRepository: CouponRepository = AppModule.couponRepository,
+    private val orderRepository: OrderRepository = AppModule.orderRepository,
+    private val settingRepository: SettingRepository = AppModule.settingRepository,
+    private val notificationScheduler: PaymentNotificationScheduler = AppModule.paymentNotificationScheduler,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PaymentUiState())
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()

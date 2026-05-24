@@ -25,8 +25,10 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.domain.repository.SettingRepository
 import woowacourse.shopping.domain.scheduler.PaymentNotificationScheduler
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.GetLastSeenProductUseCase
 
-object RepositoryProvider {
+object AppModule {
     private lateinit var appContext: Context
     private lateinit var database: ShoppingDatabase
 
@@ -88,5 +90,13 @@ object RepositoryProvider {
 
     val paymentNotificationScheduler: PaymentNotificationScheduler by lazy {
         DefaultPaymentNotificationScheduler(appContext)
+    }
+
+    val addToCartUseCase: AddToCartUseCase by lazy {
+        AddToCartUseCase(cartRepository = cartRepository)
+    }
+
+    val getLastSeenProductUseCase: GetLastSeenProductUseCase by lazy {
+        GetLastSeenProductUseCase(recentProductRepository = recentProductRepository)
     }
 }

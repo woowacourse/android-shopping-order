@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.setMain
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
 import woowacourse.shopping.fake.fakeProduct
 import woowacourse.shopping.fake.repository.FakeCartRepository
 import woowacourse.shopping.fake.repository.FakeProductRepository
@@ -21,6 +22,7 @@ class ShoppingViewModelTest {
     private lateinit var productRepository: FakeProductRepository
     private lateinit var cartRepository: FakeCartRepository
     private lateinit var recentProductRepository: FakeRecentProductRepository
+    private lateinit var addToCartUseCase: AddToCartUseCase
 
     @BeforeEach
     fun setUp() {
@@ -31,6 +33,7 @@ class ShoppingViewModelTest {
         recentProductRepository = FakeRecentProductRepository(products)
         viewModel =
             ShoppingViewModel(
+                addToCartUseCase = AddToCartUseCase(cartRepository),
                 productRepository = productRepository,
                 cartRepository = cartRepository,
                 recentProductRepository = recentProductRepository,

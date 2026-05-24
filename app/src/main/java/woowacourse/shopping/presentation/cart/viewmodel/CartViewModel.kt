@@ -10,20 +10,21 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.AppModule
 import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.PaymentItems
 import woowacourse.shopping.domain.model.RemoveItemResult
 import woowacourse.shopping.domain.model.UpdateItemResult
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
 import woowacourse.shopping.presentation.cart.model.CartUiState
 import woowacourse.shopping.presentation.cart.model.toUiModel
-import woowacourse.shopping.presentation.common.addToCartUseCase
 import kotlin.math.min
 
 class CartViewModel(
-    private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
+    private val addToCartUseCase: AddToCartUseCase = AppModule.addToCartUseCase,
+    private val cartRepository: CartRepository = AppModule.cartRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
@@ -70,7 +71,7 @@ class CartViewModel(
 
     fun increase(productId: Long) {
         viewModelScope.launch(exceptionHandler) {
-            when (val result = addToCartUseCase(cartRepository, productId)) {
+            when (val result = addToCartUseCase(productId)) {
                 is AddItemResult.NewAdded -> {
                     loadCartItems(result.cart)
                 }

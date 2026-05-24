@@ -11,20 +11,21 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okio.IOException
-import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.AppModule
 import woowacourse.shopping.domain.model.ProductsPage
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.presentation.common.addToCartUseCase
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
 import woowacourse.shopping.presentation.common.model.toUiModel
 import woowacourse.shopping.presentation.shopping.model.ShoppingItemUiModel
 import woowacourse.shopping.presentation.shopping.model.ShoppingUiState
 
 class ShoppingViewModel(
-    private val productRepository: ProductRepository = RepositoryProvider.productRepository,
-    private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
-    private val recentProductRepository: RecentProductRepository = RepositoryProvider.recentProductRepository,
+    private val addToCartUseCase: AddToCartUseCase = AppModule.addToCartUseCase,
+    private val productRepository: ProductRepository = AppModule.productRepository,
+    private val cartRepository: CartRepository = AppModule.cartRepository,
+    private val recentProductRepository: RecentProductRepository = AppModule.recentProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ShoppingUiState())
     val uiState: StateFlow<ShoppingUiState> = _uiState.asStateFlow()
@@ -69,7 +70,7 @@ class ShoppingViewModel(
 
     fun increase(id: Long) {
         viewModelScope.launch(exceptionHandler) {
-            addToCartUseCase(cartRepository, id)
+            addToCartUseCase.invoke(id)
             loadCartItemQuantities()
         }
     }
