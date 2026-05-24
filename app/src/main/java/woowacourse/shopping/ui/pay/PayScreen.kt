@@ -108,7 +108,7 @@ private fun PayContent(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
+        modifier = modifier,
     ) {
         CouponHeader(
             modifier = Modifier.padding(vertical = 10.dp, horizontal = 18.dp),
@@ -121,7 +121,6 @@ private fun PayContent(
         PaymentInfoSection(
             uiState = uiState,
         )
-
     }
 }
 
@@ -146,11 +145,12 @@ private fun CouponHeader(modifier: Modifier = Modifier) {
         )
     }
 }
+
 @Composable
 private fun CouponListSection(
     coupons: ImmutableList<CouponUiModel>,
     onCouponClick: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         modifier = modifier,
@@ -182,15 +182,16 @@ private fun PaymentInfoSection(
     ) {
         HorizontalDivider(thickness = 6.dp, color = Gray40)
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 18.dp, vertical = 20.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 18.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             PaymentInfo(description = "주문 금액", value = formattedPrice(uiState.totalOrderPrice))
             PaymentInfo(
                 description = "쿠폰 할인 금액",
-                value = (if (uiState.discountAmount > 0) "-" else "") + formattedPrice(uiState.discountAmount)
+                value = (if (uiState.discountAmount > 0) "-" else "") + formattedPrice(uiState.discountAmount),
             )
             PaymentInfo(description = "배송비", value = formattedPrice(uiState.shippingFee))
         }
@@ -198,7 +199,7 @@ private fun PaymentInfoSection(
         PaymentInfo(
             modifier = Modifier.padding(horizontal = 18.dp, vertical = 20.dp),
             description = "총 결제 금액",
-            value = formattedPrice(uiState.finalPrice)
+            value = formattedPrice(uiState.finalPrice),
         )
     }
 }
@@ -227,7 +228,6 @@ private fun PaymentInfo(
         )
     }
 }
-
 
 @Preview
 @Composable

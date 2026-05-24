@@ -47,12 +47,13 @@ private fun Coupon.Percentage.calculatePercentage(
 
     return CouponCalculationResult(
         isApplicable = true,
-        discountAmount = Money(
-            Math.multiplyExact(
-                productTotal.amount,
-                discountPercent.toLong()
-            ) / 100
-        ),
+        discountAmount =
+            Money(
+                Math.multiplyExact(
+                    productTotal.amount,
+                    discountPercent.toLong(),
+                ) / 100,
+            ),
     )
 }
 
