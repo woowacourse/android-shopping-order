@@ -6,8 +6,8 @@ import woowacourse.shopping.data.repository.PaymentRepository
 import woowacourse.shopping.model.coupon.Coupon
 
 class RetrofitPaymentRepository(
-    private val service: PaymentService
-): PaymentRepository {
+    private val service: PaymentService,
+) : PaymentRepository {
     override suspend fun getCoupons(): List<Coupon> {
         val response = service.getCoupons()
         return response.map { it.toDomain() }

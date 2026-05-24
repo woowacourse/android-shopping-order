@@ -56,13 +56,15 @@ class CartViewModel(
     fun increase(item: CartItem) {
         viewModelScope.launch {
             try {
-                val cartItemId = item.id
-                    ?: throw IllegalArgumentException("상품(${item.product.name})의 카트 아이템 아이디가 null 입니다.")
+                val cartItemId =
+                    item.id
+                        ?: throw IllegalArgumentException("상품(${item.product.name})의 카트 아이템 아이디가 null 입니다.")
                 cartRepo.updateQuantity(cartItemId, item.quantity + 1)
                 _uiState.update { state ->
-                    val updatedItems = state.pagedItems.map {
-                        if (it.id == cartItemId) it.copy(quantity = it.quantity + 1) else it
-                    }
+                    val updatedItems =
+                        state.pagedItems.map {
+                            if (it.id == cartItemId) it.copy(quantity = it.quantity + 1) else it
+                        }
                     state.copy(pagedItems = updatedItems)
                 }
                 recalculateTotals()
@@ -75,8 +77,9 @@ class CartViewModel(
     fun decrease(item: CartItem) {
         viewModelScope.launch {
             try {
-                val cartItemId = item.id
-                    ?: throw IllegalArgumentException("상품(${item.product.name})의 카트 아이템 아이디가 null 입니다.")
+                val cartItemId =
+                    item.id
+                        ?: throw IllegalArgumentException("상품(${item.product.name})의 카트 아이템 아이디가 null 입니다.")
                 if (item.quantity <= 1) {
                     cartRepo.delete(cartItemId)
                     refreshData()
@@ -88,9 +91,10 @@ class CartViewModel(
                 } else {
                     cartRepo.updateQuantity(cartItemId, item.quantity - 1)
                     _uiState.update { state ->
-                        val updatedItems = state.pagedItems.map {
-                            if (it.id == cartItemId) it.copy(quantity = it.quantity - 1) else it
-                        }
+                        val updatedItems =
+                            state.pagedItems.map {
+                                if (it.id == cartItemId) it.copy(quantity = it.quantity - 1) else it
+                            }
                         state.copy(pagedItems = updatedItems)
                     }
                     recalculateTotals()
@@ -109,7 +113,7 @@ class CartViewModel(
                     handleError(
                         "delete",
                         IllegalArgumentException("상품 ID가 null입니다."),
-                        "상품을 삭제할 수 없어요."
+                        "상품을 삭제할 수 없어요.",
                     )
                     return@launch
                 }
@@ -181,11 +185,12 @@ class CartViewModel(
         isSelected: Boolean,
     ) {
         _uiState.update { state ->
-            val newSelected = if (isSelected) {
-                state.selectedItemIds + itemId
-            } else {
-                state.selectedItemIds - itemId
-            }
+            val newSelected =
+                if (isSelected) {
+                    state.selectedItemIds + itemId
+                } else {
+                    state.selectedItemIds - itemId
+                }
             state.copy(
                 selectedItemIds = newSelected,
                 isAllSelected = newSelected.isNotEmpty() && newSelected.size == state.totalCartItemCount,
@@ -204,9 +209,11 @@ class CartViewModel(
         viewModelScope.launch {
             try {
                 val cart = cartRepo.getAllCartItems()
-                val allIds = cart.items.map {
-                    it.id ?: throw IllegalArgumentException("아이템에 id가 없습니다.")
-                }.toSet()
+                val allIds =
+                    cart.items
+                        .map {
+                            it.id ?: throw IllegalArgumentException("아이템에 id가 없습니다.")
+                        }.toSet()
 
                 _uiState.update {
                     if (isSelected && cart.items.isNotEmpty()) {
@@ -235,21 +242,23 @@ class CartViewModel(
     fun increaseInRecommendScreen(uiModel: ProductUiModel) {
         viewModelScope.launch {
             try {
-                val cartItemId = if (uiModel.cartItemId == null) {
-                    cartRepo.add(uiModel.product.id, quantity = 1)
-                } else {
-                    cartRepo.updateQuantity(uiModel.cartItemId, uiModel.quantity + 1)
-                    uiModel.cartItemId
-                }
+                val cartItemId =
+                    if (uiModel.cartItemId == null) {
+                        cartRepo.add(uiModel.product.id, quantity = 1)
+                    } else {
+                        cartRepo.updateQuantity(uiModel.cartItemId, uiModel.quantity + 1)
+                        uiModel.cartItemId
+                    }
 
                 _uiState.update { state ->
-                    val newUiModels = state.recommendItems.map {
-                        if (it.product.id == uiModel.product.id) {
-                            it.copy(quantity = uiModel.quantity + 1, cartItemId = cartItemId)
-                        } else {
-                            it
+                    val newUiModels =
+                        state.recommendItems.map {
+                            if (it.product.id == uiModel.product.id) {
+                                it.copy(quantity = uiModel.quantity + 1, cartItemId = cartItemId)
+                            } else {
+                                it
+                            }
                         }
-                    }
                     state.copy(
                         recommendItems = newUiModels,
                         selectedItemIds = state.selectedItemIds + cartItemId,
@@ -265,8 +274,9 @@ class CartViewModel(
     fun decreaseInRecommendScreen(uiModel: ProductUiModel) {
         viewModelScope.launch {
             try {
-                val cartItemId = uiModel.cartItemId
-                    ?: throw IllegalArgumentException("상품(${uiModel.product.name})에 카트아이템 아이디가 없습니다.")
+                val cartItemId =
+                    uiModel.cartItemId
+                        ?: throw IllegalArgumentException("상품(${uiModel.product.name})에 카트아이템 아이디가 없습니다.")
 
                 if (uiModel.quantity > 1) {
                     cartRepo.updateQuantity(cartItemId, uiModel.quantity - 1)
@@ -275,23 +285,25 @@ class CartViewModel(
                 }
 
                 _uiState.update { state ->
-                    val newUiModels = state.recommendItems.map {
-                        if (it.product.id == uiModel.product.id) {
-                            it.copy(
-                                quantity = maxOf(0, uiModel.quantity - 1),
-                                cartItemId = if (uiModel.quantity == 1) null else cartItemId,
-                            )
-                        } else {
-                            it
+                    val newUiModels =
+                        state.recommendItems.map {
+                            if (it.product.id == uiModel.product.id) {
+                                it.copy(
+                                    quantity = maxOf(0, uiModel.quantity - 1),
+                                    cartItemId = if (uiModel.quantity == 1) null else cartItemId,
+                                )
+                            } else {
+                                it
+                            }
                         }
-                    }
                     state.copy(
                         recommendItems = newUiModels,
-                        selectedItemIds = if (uiModel.quantity == 1) {
-                            state.selectedItemIds - cartItemId
-                        } else {
-                            state.selectedItemIds
-                        },
+                        selectedItemIds =
+                            if (uiModel.quantity == 1) {
+                                state.selectedItemIds - cartItemId
+                            } else {
+                                state.selectedItemIds
+                            },
                     )
                 }
                 recalculateTotals()
@@ -304,11 +316,12 @@ class CartViewModel(
     private fun getRecommendProducts() {
         viewModelScope.launch {
             try {
-                val products = ProductRecommender.getRecommendProducts(
-                    lastViewedItem = recentProductRepo.getLastViewedProduct(),
-                    allProductItems = productRepo.getProducts(0, 50).items,
-                    allCartItem = cartRepo.getAllCartItems().items,
-                )
+                val products =
+                    ProductRecommender.getRecommendProducts(
+                        lastViewedItem = recentProductRepo.getLastViewedProduct(),
+                        allProductItems = productRepo.getProducts(0, 50).items,
+                        allCartItem = cartRepo.getAllCartItems().items,
+                    )
                 val uiModels = products.map { ProductUiModel(product = it) }
                 _uiState.update { it.copy(recommendItems = uiModels) }
             } catch (e: Exception) {
@@ -331,11 +344,12 @@ class CartViewModel(
         val requestedPage = _uiState.value.currentPage.coerceAtLeast(0)
         val initialPage = cartRepo.getPagedItems(requestedPage, pageSize)
 
-        val finalPage = if (initialPage.totalPages in 1..requestedPage) {
-            cartRepo.getPagedItems(initialPage.totalPages - 1, pageSize)
-        } else {
-            initialPage
-        }
+        val finalPage =
+            if (initialPage.totalPages in 1..requestedPage) {
+                cartRepo.getPagedItems(initialPage.totalPages - 1, pageSize)
+            } else {
+                initialPage
+            }
 
         recalculateTotals()
 
@@ -367,14 +381,16 @@ class CartViewModel(
         fun provideFactory(
             container: AppContainer,
             pageSize: Int,
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T = CartViewModel(
-                cartRepo = container.cartRepository,
-                recentProductRepo = container.recentProductRepository,
-                productRepo = container.productRepository,
-                pageSize = pageSize,
-            ) as T
-        }
+        ): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                    CartViewModel(
+                        cartRepo = container.cartRepository,
+                        recentProductRepo = container.recentProductRepository,
+                        productRepo = container.productRepository,
+                        pageSize = pageSize,
+                    ) as T
+            }
     }
 }

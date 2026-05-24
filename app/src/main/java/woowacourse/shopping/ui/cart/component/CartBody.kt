@@ -10,9 +10,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.cart.Cart
 import woowacourse.shopping.model.cart.CartItem
-import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.product.Product
 import kotlin.random.Random
 

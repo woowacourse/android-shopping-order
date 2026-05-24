@@ -11,10 +11,11 @@ data class Order(
     val selectedCoupon: Coupon? = null,
     val shippingFee: Money,
 ) {
-    fun couponContext(clock: Clock): CouponContext = CouponContext(
-        items = items,
-        subtotal = items.fold(Money(0)) { acc, item -> acc + item.totalPrice },
-        shippingFee = shippingFee,
-        clock = clock,
-    )
+    fun couponContext(clock: Clock): CouponContext =
+        CouponContext(
+            items = items,
+            subtotal = items.fold(Money(0)) { acc, item -> acc + item.totalPrice },
+            shippingFee = shippingFee,
+            clock = clock,
+        )
 }

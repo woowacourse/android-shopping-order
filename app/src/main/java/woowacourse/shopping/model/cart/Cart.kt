@@ -6,13 +6,14 @@ data class Cart(
     val items: List<CartItem>,
 ) {
     fun priceOf(selectedIds: Set<Long>): Long =
-        items.filter { it.id in selectedIds }
+        items
+            .filter { it.id in selectedIds }
             .sumOf { it.totalPrice.value }
 
     fun totalQuantityOf(selectedIds: Set<Long>): Int =
-        items.filter { it.id in selectedIds }
+        items
+            .filter { it.id in selectedIds }
             .sumOf { it.quantity }
 
-    fun findByProductId(productId: Long): CartItem? =
-        items.find { it.product.id == productId }
+    fun findByProductId(productId: Long): CartItem? = items.find { it.product.id == productId }
 }

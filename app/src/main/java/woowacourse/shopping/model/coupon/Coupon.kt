@@ -87,7 +87,10 @@ sealed interface Coupon {
     }
 }
 
-private fun isNotExpired(expirationDate: LocalDate, clock: Clock): Boolean {
+private fun isNotExpired(
+    expirationDate: LocalDate,
+    clock: Clock,
+): Boolean {
     val today = LocalDate.now(clock)
     return !expirationDate.isBefore(today)
 }

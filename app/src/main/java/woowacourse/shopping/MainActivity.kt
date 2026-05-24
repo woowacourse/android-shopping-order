@@ -18,9 +18,10 @@ import woowacourse.shopping.ui.navigation.AppNavHost
 
 class MainActivity : ComponentActivity() {
     private val navigateToPayment = MutableStateFlow(false)
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { }
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) { }
 
     @SuppressLint("FlowOperatorInvokedInComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +33,7 @@ class MainActivity : ComponentActivity() {
                     navigateToPaymentSignal = navigateToPayment.asStateFlow(),
                     onPaymentNavigated = {
                         navigateToPayment.value = false
-                    }
+                    },
                 )
             }
         }
@@ -55,7 +56,7 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     this,
-                    Manifest.permission.POST_NOTIFICATIONS
+                    Manifest.permission.POST_NOTIFICATIONS,
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)

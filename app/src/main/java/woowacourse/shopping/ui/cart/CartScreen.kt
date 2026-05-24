@@ -35,12 +35,14 @@ fun CartScreen(
     onBackClick: () -> Unit,
     onOrderClick: (Set<Long>) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CartViewModel = viewModel(
-        factory = CartViewModel.provideFactory(
-            container = appContainer(),
-            pageSize = PAGE_SIZE
-        )
-    ),
+    viewModel: CartViewModel =
+        viewModel(
+            factory =
+                CartViewModel.provideFactory(
+                    container = appContainer(),
+                    pageSize = PAGE_SIZE,
+                ),
+        ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current

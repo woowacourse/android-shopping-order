@@ -13,9 +13,10 @@ class SettingsViewModel(
     private val preferences: SettingsPreferences,
     private val hasNotificationPermission: () -> Boolean,
 ) : ViewModel() {
-    private val _isNotificationEnabled = MutableStateFlow(
-        preferences.isNotificationEnabled(default = hasNotificationPermission())
-    )
+    private val _isNotificationEnabled =
+        MutableStateFlow(
+            preferences.isNotificationEnabled(default = hasNotificationPermission()),
+        )
     private val _requestPermission = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val _showPermissionDeniedMessage = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
@@ -51,7 +52,7 @@ class SettingsViewModel(
             initializer {
                 SettingsViewModel(
                     container.settingsPreferences,
-                    hasNotificationPermission
+                    hasNotificationPermission,
                 )
             }
         }

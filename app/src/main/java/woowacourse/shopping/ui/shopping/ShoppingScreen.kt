@@ -43,12 +43,14 @@ fun ShoppingScreen(
     onProductClick: (Long) -> Unit,
     onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ShoppingViewModel = viewModel(
-        factory = ShoppingViewModel.provideFactory(
-            container = appContainer(),
-            loadSize = LOAD_SIZE
-        )
-    ),
+    viewModel: ShoppingViewModel =
+        viewModel(
+            factory =
+                ShoppingViewModel.provideFactory(
+                    container = appContainer(),
+                    loadSize = LOAD_SIZE,
+                ),
+        ),
 ) {
     val lazyGridState = rememberLazyGridState()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -190,7 +192,7 @@ private fun ShoppingScreenPreview1() {
         onDecreaseClick = {},
         modifier = Modifier,
         onRecentProductClick = {},
-        onSettingsClick = {}
+        onSettingsClick = {},
     )
 }
 
@@ -210,6 +212,6 @@ private fun ShoppingScreenPreview2() {
         onDecreaseClick = {},
         modifier = Modifier,
         onRecentProductClick = {},
-        onSettingsClick = {}
+        onSettingsClick = {},
     )
 }

@@ -23,19 +23,20 @@ import woowacourse.shopping.ui.common.theme.Typography
 @Composable
 fun PaymentTopBar(
     modifier: Modifier = Modifier,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     Row(
-        modifier = modifier
-            .size(width = 360.dp, height = 56.dp)
-            .background(color = Gray5)
-            .padding(start = 11.dp, top = 8.dp, bottom = 8.dp),
+        modifier =
+            modifier
+                .size(width = 360.dp, height = 56.dp)
+                .background(color = Gray5)
+                .padding(start = 11.dp, top = 8.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(21.dp)
+        horizontalArrangement = Arrangement.spacedBy(21.dp),
     ) {
         Box(
             modifier = Modifier.size(40.dp),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -48,7 +49,7 @@ fun PaymentTopBar(
         Text(
             text = "결제하기",
             style = Typography.titleMedium,
-            color = Color.White
+            color = Color.White,
         )
     }
 }

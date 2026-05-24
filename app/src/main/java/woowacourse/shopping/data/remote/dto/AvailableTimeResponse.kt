@@ -10,5 +10,4 @@ data class AvailableTimeResponse(
     val end: String,
 )
 
-fun AvailableTimeResponse.toDomain(): AvailableTime =
-    AvailableTime(LocalTime.parse(start), LocalTime.parse(end))
+fun AvailableTimeResponse.toDomain(): AvailableTime = AvailableTime(LocalTime.parse(start), LocalTime.parse(end))

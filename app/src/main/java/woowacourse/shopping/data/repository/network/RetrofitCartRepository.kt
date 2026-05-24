@@ -5,9 +5,9 @@ import woowacourse.shopping.data.remote.dto.Quantity
 import woowacourse.shopping.data.remote.dto.toDomain
 import woowacourse.shopping.data.remote.service.CartService
 import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.model.Page
 import woowacourse.shopping.model.cart.Cart
 import woowacourse.shopping.model.cart.CartItem
-import woowacourse.shopping.model.Page
 
 class RetrofitCartRepository(
     private val service: CartService,

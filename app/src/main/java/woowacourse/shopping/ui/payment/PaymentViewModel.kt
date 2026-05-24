@@ -57,8 +57,11 @@ class PaymentViewModel(
     }
 
     fun updateSelectedId(id: Long) {
-        if (_uiState.value.selectedCouponId == id) _uiState.update { it.copy(selectedCouponId = null) }
-        else _uiState.update { it.copy(selectedCouponId = id) }
+        if (_uiState.value.selectedCouponId == id) {
+            _uiState.update { it.copy(selectedCouponId = null) }
+        } else {
+            _uiState.update { it.copy(selectedCouponId = id) }
+        }
 
         refreshOrderSummary(id)
     }
@@ -80,11 +83,12 @@ class PaymentViewModel(
             try {
                 val allCartItems = cartRepo.getAllCartItems().items
                 val items = allCartItems.filter { ids.contains(it.id) }
-                val order = Order(
-                    items = items,
-                    selectedCoupon = null,
-                    shippingFee = Money(BASE_SHIPPING_FEE)
-                )
+                val order =
+                    Order(
+                        items = items,
+                        selectedCoupon = null,
+                        shippingFee = Money(BASE_SHIPPING_FEE),
+                    )
                 val payment = calculator.calculate(order, Clock.systemDefaultZone())
                 val context = order.couponContext(Clock.systemDefaultZone())
                 val coupons = paymentRepo.getCoupons()
@@ -93,7 +97,7 @@ class PaymentViewModel(
                     it.copy(
                         items = items,
                         availableCoupons = enableCoupons,
-                        payment = payment
+                        payment = payment,
                     )
                 }
             } catch (e: Exception) {
@@ -106,11 +110,12 @@ class PaymentViewModel(
 
     private fun refreshOrderSummary(id: Long) {
         val coupon = _uiState.value.availableCoupons.find { it.id == id }
-        val order = Order(
-            items = _uiState.value.items,
-            selectedCoupon = coupon,
-            shippingFee = Money(BASE_SHIPPING_FEE)
-        )
+        val order =
+            Order(
+                items = _uiState.value.items,
+                selectedCoupon = coupon,
+                shippingFee = Money(BASE_SHIPPING_FEE),
+            )
         val payment = calculator.calculate(order, Clock.systemDefaultZone())
         _uiState.update { it.copy(payment = payment) }
     }
@@ -128,9 +133,7 @@ class PaymentViewModel(
     companion object {
         private const val TAG = "PaymentViewModel"
 
-        fun provideFactory(
-            container: AppContainer,
-        ): ViewModelProvider.Factory =
+        fun provideFactory(container: AppContainer): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(
@@ -144,7 +147,7 @@ class PaymentViewModel(
                         paymentRepo = container.paymentRepository,
                         cartRepo = container.cartRepository,
                         orderRepo = container.orderRepository,
-                        alarmScheduler = container.paymentAlarmScheduler
+                        alarmScheduler = container.paymentAlarmScheduler,
                     ) as T
                 }
             }

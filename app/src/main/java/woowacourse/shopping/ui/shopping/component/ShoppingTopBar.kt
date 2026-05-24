@@ -28,7 +28,7 @@ import woowacourse.shopping.ui.common.theme.Typography
 fun ShoppingTopBar(
     cartCount: Int,
     onCartClick: () -> Unit,
-    onSettingsClick: () ->Unit,
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -48,7 +48,7 @@ fun ShoppingTopBar(
         )
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(15.dp)
+            horizontalArrangement = Arrangement.spacedBy(15.dp),
         ) {
             Icon(
                 imageVector = Icons.Default.Settings,

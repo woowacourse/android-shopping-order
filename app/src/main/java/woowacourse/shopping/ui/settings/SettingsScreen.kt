@@ -26,15 +26,16 @@ import woowacourse.shopping.ui.settings.component.SettingsTopBar
 fun SettingsScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: SettingsViewModel = rememberSettingsViewModel()
+    viewModel: SettingsViewModel = rememberSettingsViewModel(),
 ) {
     val context = LocalContext.current
     val isNotificationEnabled by viewModel.isNotificationEnabled.collectAsStateWithLifecycle()
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        viewModel.onPermissionResult(granted)
-    }
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+        ) { granted ->
+            viewModel.onPermissionResult(granted)
+        }
 
     LaunchedEffect(Unit) {
         viewModel.requestPermission.collect {
@@ -53,13 +54,14 @@ fun SettingsScreen(
     Column(modifier = modifier) {
         SettingsTopBar(
             modifier = Modifier,
-            onBackClick = onBackClick
+            onBackClick = onBackClick,
         )
 
         Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxSize()
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .fillMaxSize(),
         ) {
             SettingsItem(
                 headerText = "알림",
@@ -67,7 +69,7 @@ fun SettingsScreen(
                 bodyInfoText = "5분 뒤 알림 받기",
                 checked = isNotificationEnabled,
                 onCheckedChange = { viewModel.onToggle(it) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }
@@ -77,10 +79,11 @@ fun SettingsScreen(
 private fun rememberSettingsViewModel(): SettingsViewModel {
     val context = LocalContext.current
     return viewModel(
-        factory = SettingsViewModel.provideFactory(
-            container = appContainer(),
-            hasNotificationPermission = { context.hasNotificationPermission() }
-        )
+        factory =
+            SettingsViewModel.provideFactory(
+                container = appContainer(),
+                hasNotificationPermission = { context.hasNotificationPermission() },
+            ),
     )
 }
 
@@ -89,6 +92,6 @@ private fun rememberSettingsViewModel(): SettingsViewModel {
 private fun SettingsScreenPreview() {
     SettingsScreen(
         onBackClick = {},
-        modifier = Modifier
+        modifier = Modifier,
     )
 }

@@ -27,11 +27,13 @@ fun ProductDetailScreen(
     onAddToCartClick: () -> Unit,
     onLastViewedProductClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ProductDetailViewModel = viewModel(
-        factory = ProductDetailViewModel.provideFactory(
-            container = appContainer(),
-        )
-    ),
+    viewModel: ProductDetailViewModel =
+        viewModel(
+            factory =
+                ProductDetailViewModel.provideFactory(
+                    container = appContainer(),
+                ),
+        ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current

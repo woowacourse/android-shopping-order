@@ -20,17 +20,18 @@ import woowacourse.shopping.ui.payment.component.PaymentBottomBar
 import woowacourse.shopping.ui.payment.component.PaymentTopBar
 import java.time.LocalDate
 
-
 @Composable
 fun PaymentScreen(
     onBackClick: () -> Unit,
     onPayClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: PaymentViewModel = viewModel(
-        factory = PaymentViewModel.provideFactory(
-            container = appContainer()
-        )
-    )
+    viewModel: PaymentViewModel =
+        viewModel(
+            factory =
+                PaymentViewModel.provideFactory(
+                    container = appContainer(),
+                ),
+        ),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -58,7 +59,7 @@ fun PaymentScreen(
         onPayClick = {
             viewModel.pay()
             onPayClick()
-        }
+        },
     )
 
     if (state.isLoading) ShoppingLoading()
@@ -104,30 +105,31 @@ fun PaymentScreen(
 @Preview(showBackground = true)
 @Composable
 private fun PaymentScreenPreview() {
-    val coupons = listOf(
-        Coupon.FreeShipping(
-            id = 1,
-            code = "FREESHIPPING",
-            description = "5만원 이상 구매 시 무료 배송",
-            expirationDate = LocalDate.of(2026, 8, 31),
-            minimumAmount = Money(50000)
-        ),
-        Coupon.BuyXGetY(
-            id = 2,
-            code = "",
-            description = "2개 구매 시 1개 무료 쿠폰",
-            expirationDate = LocalDate.of(2026, 8, 31),
-            buyQuantity = 3,
-            getQuantity = 1
-        ),
-        Coupon.FreeShipping(
-            id = 1,
-            code = "FREESHIPPING",
-            description = "5만원 이상 구매 시 무료 배송",
-            expirationDate = LocalDate.of(2026, 8, 31),
-            minimumAmount = Money(50000)
-        ),
-    )
+    val coupons =
+        listOf(
+            Coupon.FreeShipping(
+                id = 1,
+                code = "FREESHIPPING",
+                description = "5만원 이상 구매 시 무료 배송",
+                expirationDate = LocalDate.of(2026, 8, 31),
+                minimumAmount = Money(50000),
+            ),
+            Coupon.BuyXGetY(
+                id = 2,
+                code = "",
+                description = "2개 구매 시 1개 무료 쿠폰",
+                expirationDate = LocalDate.of(2026, 8, 31),
+                buyQuantity = 3,
+                getQuantity = 1,
+            ),
+            Coupon.FreeShipping(
+                id = 1,
+                code = "FREESHIPPING",
+                description = "5만원 이상 구매 시 무료 배송",
+                expirationDate = LocalDate.of(2026, 8, 31),
+                minimumAmount = Money(50000),
+            ),
+        )
     PaymentScreen(
         selectedCouponId = 2,
         coupons = coupons,
@@ -138,6 +140,6 @@ private fun PaymentScreenPreview() {
         modifier = Modifier,
         onBackClick = {},
         onCouponSelected = {},
-        onPayClick = {}
+        onPayClick = {},
     )
 }

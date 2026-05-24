@@ -32,37 +32,39 @@ fun SettingsItem(
     bodyInfoText: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
+        modifier = modifier,
     ) {
         Box(
-            modifier = Modifier
-                .height(56.dp)
-                .fillMaxWidth()
-                .background(Color(0xFFF3F3F3))
-                .padding(12.dp),
-            contentAlignment = Alignment.BottomStart
+            modifier =
+                Modifier
+                    .height(56.dp)
+                    .fillMaxWidth()
+                    .background(Color(0xFFF3F3F3))
+                    .padding(12.dp),
+            contentAlignment = Alignment.BottomStart,
         ) {
             Text(
                 text = headerText,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.W400,
-                color = Gray5
+                color = Gray5,
             )
         }
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
-                .padding(horizontal = 15.dp, vertical = 20.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .padding(horizontal = 15.dp, vertical = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(2.dp)
+                verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 Text(
                     text = bodyText,
@@ -81,10 +83,11 @@ fun SettingsItem(
             Switch(
                 checked = checked,
                 onCheckedChange = onCheckedChange,
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = Color.White,
-                    checkedTrackColor = Color.Black
-                )
+                colors =
+                    SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = Color.Black,
+                    ),
             )
         }
     }

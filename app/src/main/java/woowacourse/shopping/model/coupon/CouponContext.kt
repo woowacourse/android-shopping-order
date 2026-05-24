@@ -8,5 +8,5 @@ data class CouponContext(
     val items: List<CartItem>,
     val subtotal: Money,
     val shippingFee: Money,
-    val clock: Clock
+    val clock: Clock,
 )

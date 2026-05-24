@@ -18,20 +18,21 @@ import woowacourse.shopping.ui.common.theme.PrimaryColor
 @Composable
 fun PaymentBottomBar(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(
-        modifier = modifier
-            .size(width = 360.dp, height = 48.dp)
-            .background(PrimaryColor)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
+        modifier =
+            modifier
+                .size(width = 360.dp, height = 48.dp)
+                .background(PrimaryColor)
+                .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
     ) {
         Text(
             text = "결제하기",
             fontWeight = FontWeight.W700,
             fontSize = 20.sp,
-            color = Color.White
+            color = Color.White,
         )
     }
 }
@@ -40,6 +41,6 @@ fun PaymentBottomBar(
 @Composable
 private fun PaymentBottomBarPreview() {
     PaymentBottomBar(
-        onClick = {}
+        onClick = {},
     )
 }

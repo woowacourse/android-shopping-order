@@ -40,31 +40,33 @@ fun CouponItem(
     val price = "%,d".format(minimumAmount)
 
     Column(
-        modifier = modifier
-            .width(324.dp)
-            .border(width = 1.dp, color = Color(0xFFAAAAAA), shape = RoundedCornerShape(4.dp))
-            .clickable(onClick = onClick)
-            .padding(start = 16.dp, top = 18.dp, bottom = 18.dp),
+        modifier =
+            modifier
+                .width(324.dp)
+                .border(width = 1.dp, color = Color(0xFFAAAAAA), shape = RoundedCornerShape(4.dp))
+                .clickable(onClick = onClick)
+                .padding(start = 16.dp, top = 18.dp, bottom = 18.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         CheckboxAndTitle(
             checked = checked,
             couponName = couponName,
-            onClick = onClick
+            onClick = onClick,
         )
 
         Column(
-            modifier = Modifier
-                .padding(start = 3.dp)
-                .heightIn(min = 36.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+            modifier =
+                Modifier
+                    .padding(start = 3.dp)
+                    .heightIn(min = 36.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
         ) {
             ExtraInfoText(
-                text = "만료일: $date"
+                text = "만료일: $date",
             )
             if (minimumAmount != null) {
                 ExtraInfoText(
-                    text = "최소 주문 금액: ${price}원"
+                    text = "최소 주문 금액: ${price}원",
                 )
             }
             if (availableTime != null) {
@@ -72,9 +74,9 @@ fun CouponItem(
                 ExtraInfoText(
                     text = "사용 가능 시간: ${availableTime.start.format(formatter)}부터 ${
                         availableTime.end.format(
-                            formatter
+                            formatter,
                         )
-                    }까지"
+                    }까지",
                 )
             }
         }
@@ -115,7 +117,7 @@ private fun ExtraInfoText(
             text = text,
             color = Gray5,
             fontSize = 12.sp,
-            fontWeight = FontWeight.W400
+            fontWeight = FontWeight.W400,
         )
     }
 }
@@ -129,7 +131,7 @@ private fun CouponItemPreview() {
         onClick = {},
         expirationDate = LocalDate.of(2026, 11, 30),
         minimumAmount = 100000,
-        availableTime = null
+        availableTime = null,
     )
 }
 
@@ -142,7 +144,7 @@ private fun CouponItemPreview2() {
         onClick = {},
         expirationDate = LocalDate.of(2026, 11, 30),
         minimumAmount = null,
-        availableTime = AvailableTime(start = LocalTime.of(4, 0), end = LocalTime.of(15, 0))
+        availableTime = AvailableTime(start = LocalTime.of(4, 0), end = LocalTime.of(15, 0)),
     )
 }
 
@@ -155,7 +157,7 @@ private fun CouponItemPreview3() {
         onClick = {},
         expirationDate = LocalDate.of(2026, 11, 30),
         minimumAmount = null,
-        availableTime = null
+        availableTime = null,
     )
 }
 
@@ -165,6 +167,6 @@ private fun CheckboxAndTitlePreview() {
     CheckboxAndTitle(
         checked = true,
         couponName = "5,000원 할인 쿠폰",
-        onClick = {}
+        onClick = {},
     )
 }

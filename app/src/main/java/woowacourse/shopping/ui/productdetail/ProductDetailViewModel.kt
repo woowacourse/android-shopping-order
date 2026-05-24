@@ -19,8 +19,8 @@ import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.di.AppContainer
-import woowacourse.shopping.ui.navigation.ProductDetailRoute
 import woowacourse.shopping.ui.common.error.ErrorMessageMapper
+import woowacourse.shopping.ui.navigation.ProductDetailRoute
 
 class ProductDetailViewModel(
     savedStateHandle: SavedStateHandle,
@@ -36,7 +36,6 @@ class ProductDetailViewModel(
 
     val uiState = _uiState.asStateFlow()
     val events = _events.receiveAsFlow()
-
 
     init {
         loadProduct()
@@ -65,7 +64,7 @@ class ProductDetailViewModel(
                     _uiState.update {
                         it.copy(
                             existingCartItemId = newId,
-                            existingQuantity = state.selectedQuantity
+                            existingQuantity = state.selectedQuantity,
                         )
                     }
                 } else {
@@ -123,9 +122,7 @@ class ProductDetailViewModel(
     companion object {
         private const val TAG = "ProductDetailViewModel"
 
-        fun provideFactory(
-            container: AppContainer,
-        ): ViewModelProvider.Factory =
+        fun provideFactory(container: AppContainer): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(

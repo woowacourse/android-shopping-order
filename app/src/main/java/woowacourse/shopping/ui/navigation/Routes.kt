@@ -8,7 +8,7 @@ data object ShoppingRoute
 @Serializable
 data class ProductDetailRoute(
     val id: Long,
-    val isFromBanner: Boolean = false
+    val isFromBanner: Boolean = false,
 )
 
 @Serializable
@@ -16,7 +16,7 @@ data object CartRoute
 
 @Serializable
 data class PaymentRoute(
-    val ids: List<Long>
+    val ids: List<Long>,
 )
 
 @Serializable

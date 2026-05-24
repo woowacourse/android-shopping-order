@@ -20,22 +20,24 @@ import kotlin.math.ceil
 class MockInterceptor : Interceptor {
     private val json = Json { ignoreUnknownKeys = true }
 
-    private val products = (1..30).map { i ->
-        val mod = i % 5
-        ProductResponse(
-            id = i.toLong(),
-            name = when (mod) {
-                0 -> "맛있는 치킨 $i"
-                1 -> "고소한 피자 $i"
-                2 -> "든든한 햄버거 $i"
-                3 -> "시원한 콜라 $i"
-                else -> "톡쏘는 맥주 $i"
-            },
-            price = (5000 + (i * 1000)).toLong(),
-            imageUrl = "https://picsum.photos/seed/${i + 100}/800/800",
-            category = if (mod in 0..2) "FOOD" else "DRINK"
-        )
-    }
+    private val products =
+        (1..30).map { i ->
+            val mod = i % 5
+            ProductResponse(
+                id = i.toLong(),
+                name =
+                    when (mod) {
+                        0 -> "맛있는 치킨 $i"
+                        1 -> "고소한 피자 $i"
+                        2 -> "든든한 햄버거 $i"
+                        3 -> "시원한 콜라 $i"
+                        else -> "톡쏘는 맥주 $i"
+                    },
+                price = (5000 + (i * 1000)).toLong(),
+                imageUrl = "https://picsum.photos/seed/${i + 100}/800/800",
+                category = if (mod in 0..2) "FOOD" else "DRINK",
+            )
+        }
 
     private val cartItems = mutableListOf<CartItemResponse>()
     private var cartIdCounter = 1L
@@ -54,29 +56,31 @@ class MockInterceptor : Interceptor {
                 val startIndex = page * size
                 val endIndex = minOf(startIndex + size, products.size)
 
-                val content = if (startIndex < products.size) {
-                    products.subList(startIndex, endIndex)
-                } else {
-                    emptyList()
-                }
+                val content =
+                    if (startIndex < products.size) {
+                        products.subList(startIndex, endIndex)
+                    } else {
+                        emptyList()
+                    }
 
                 val totalPages =
                     if (products.isEmpty()) 0 else ceil(products.size.toDouble() / size).toInt()
                 val isLast = if (products.isEmpty()) true else page >= totalPages - 1
 
-                val response = ProductsResponse(
-                    content = content,
-                    pageable = createMockPageable(page, size),
-                    last = isLast,
-                    totalPages = totalPages,
-                    totalElements = products.size,
-                    sort = createMockSort(),
-                    first = page == 0,
-                    number = page,
-                    numberOfElements = content.size,
-                    size = size,
-                    empty = content.isEmpty()
-                )
+                val response =
+                    ProductsResponse(
+                        content = content,
+                        pageable = createMockPageable(page, size),
+                        last = isLast,
+                        totalPages = totalPages,
+                        totalElements = products.size,
+                        sort = createMockSort(),
+                        first = page == 0,
+                        number = page,
+                        numberOfElements = content.size,
+                        size = size,
+                        empty = content.isEmpty(),
+                    )
                 makeJsonResponse(chain, 200, json.encodeToString(response))
             }
 
@@ -97,53 +101,58 @@ class MockInterceptor : Interceptor {
                 val startIndex = page * size
                 val endIndex = minOf(startIndex + size, cartItems.size)
 
-                val content = if (startIndex < cartItems.size) {
-                    cartItems.subList(startIndex, endIndex)
-                } else {
-                    emptyList()
-                }
+                val content =
+                    if (startIndex < cartItems.size) {
+                        cartItems.subList(startIndex, endIndex)
+                    } else {
+                        emptyList()
+                    }
 
                 val totalPages =
                     if (cartItems.isEmpty()) 0 else ceil(cartItems.size.toDouble() / size).toInt()
                 val isLast = if (cartItems.isEmpty()) true else page >= totalPages - 1
 
-                val response = CartResponse(
-                    content = content,
-                    pageable = createMockPageable(page, size),
-                    totalElements = cartItems.size.toLong(),
-                    totalPages = totalPages,
-                    last = isLast,
-                    size = size,
-                    number = page,
-                    sort = createMockSort(),
-                    numberOfElements = content.size,
-                    first = page == 0,
-                    empty = cartItems.isEmpty()
-                )
+                val response =
+                    CartResponse(
+                        content = content,
+                        pageable = createMockPageable(page, size),
+                        totalElements = cartItems.size.toLong(),
+                        totalPages = totalPages,
+                        last = isLast,
+                        size = size,
+                        number = page,
+                        sort = createMockSort(),
+                        numberOfElements = content.size,
+                        first = page == 0,
+                        empty = cartItems.isEmpty(),
+                    )
                 makeJsonResponse(chain, 200, json.encodeToString(response))
             }
 
             path.endsWith("/cart-items") && method == "POST" -> {
-                val bodyString = request.body?.let {
-                    val buffer = Buffer()
-                    it.writeTo(buffer)
-                    buffer.readUtf8()
-                } ?: ""
+                val bodyString =
+                    request.body?.let {
+                        val buffer = Buffer()
+                        it.writeTo(buffer)
+                        buffer.readUtf8()
+                    } ?: ""
                 val cartRequest = json.decodeFromString<CartItemRequest>(bodyString)
                 val product = products.find { it.id == cartRequest.productId }
                 if (product != null) {
                     val existing = cartItems.find { it.product.id == product.id }
-                    val id = if (existing != null) {
-                        val index = cartItems.indexOf(existing)
-                        cartItems[index] =
-                            existing.copy(quantity = existing.quantity + cartRequest.quantity)
-                        existing.id
-                    } else {
-                        val newId = cartIdCounter++
-                        cartItems.add(CartItemResponse(newId, product, cartRequest.quantity))
-                        newId
-                    }
-                    Response.Builder()
+                    val id =
+                        if (existing != null) {
+                            val index = cartItems.indexOf(existing)
+                            cartItems[index] =
+                                existing.copy(quantity = existing.quantity + cartRequest.quantity)
+                            existing.id
+                        } else {
+                            val newId = cartIdCounter++
+                            cartItems.add(CartItemResponse(newId, product, cartRequest.quantity))
+                            newId
+                        }
+                    Response
+                        .Builder()
                         .request(chain.request())
                         .protocol(Protocol.HTTP_1_1)
                         .code(201)
@@ -164,11 +173,12 @@ class MockInterceptor : Interceptor {
 
             path.contains("/cart-items/") && method == "PATCH" -> {
                 val id = path.substringAfterLast("/").toLongOrNull()
-                val bodyString = request.body?.let {
-                    val buffer = Buffer()
-                    it.writeTo(buffer)
-                    buffer.readUtf8()
-                } ?: ""
+                val bodyString =
+                    request.body?.let {
+                        val buffer = Buffer()
+                        it.writeTo(buffer)
+                        buffer.readUtf8()
+                    } ?: ""
                 val quantityReq = json.decodeFromString<Quantity>(bodyString)
                 val index = cartItems.indexOfFirst { it.id == id }
                 if (index != -1) {
@@ -185,7 +195,8 @@ class MockInterceptor : Interceptor {
             }
 
             path.endsWith("/coupons") && method == "GET" -> {
-                val couponsJson = """
+                val couponsJson =
+                    """
                     [
                         {
                             "id": 1,
@@ -226,7 +237,7 @@ class MockInterceptor : Interceptor {
                             "discountType": "percentage"
                         }
                     ]
-                """.trimIndent()
+                    """.trimIndent()
                 makeJsonResponse(chain, 200, couponsJson)
             }
 
@@ -243,8 +254,13 @@ class MockInterceptor : Interceptor {
         }
     }
 
-    private fun makeJsonResponse(chain: Interceptor.Chain, code: Int, content: String): Response {
-        return Response.Builder()
+    private fun makeJsonResponse(
+        chain: Interceptor.Chain,
+        code: Int,
+        content: String,
+    ): Response =
+        Response
+            .Builder()
             .request(chain.request())
             .protocol(Protocol.HTTP_1_1)
             .code(code)
@@ -252,20 +268,23 @@ class MockInterceptor : Interceptor {
             .body(content.toResponseBody("application/json".toMediaType()))
             .addHeader("content-type", "application/json")
             .build()
-    }
 
-    private fun createMockPageable(page: Int, size: Int) = PageableResponse(
+    private fun createMockPageable(
+        page: Int,
+        size: Int,
+    ) = PageableResponse(
         pageNumber = page,
         pageSize = size,
         sort = createMockSort(),
         offset = page * size,
         paged = true,
-        unpaged = false
+        unpaged = false,
     )
 
-    private fun createMockSort() = SortResponse(
-        sorted = false,
-        unsorted = true,
-        empty = true
-    )
+    private fun createMockSort() =
+        SortResponse(
+            sorted = false,
+            unsorted = true,
+            empty = true,
+        )
 }

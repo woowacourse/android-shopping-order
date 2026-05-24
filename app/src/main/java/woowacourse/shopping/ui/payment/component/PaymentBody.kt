@@ -47,19 +47,22 @@ fun PaymentBody(
                 checked = selectedCouponId == couponId,
                 couponName = coupon.description,
                 expirationDate = coupon.expirationDate,
-                minimumAmount = when (coupon) {
-                    is Coupon.FixedDiscount -> coupon.minimumAmount.value
-                    is Coupon.FreeShipping -> coupon.minimumAmount.value
-                    else -> null
-                },
-                availableTime = when (coupon) {
-                    is Coupon.PercentageDiscount -> coupon.availableTime
-                    else -> null
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp, start = 18.dp, end = 18.dp),
-                onClick = { onCouponSelected(couponId) }
+                minimumAmount =
+                    when (coupon) {
+                        is Coupon.FixedDiscount -> coupon.minimumAmount.value
+                        is Coupon.FreeShipping -> coupon.minimumAmount.value
+                        else -> null
+                    },
+                availableTime =
+                    when (coupon) {
+                        is Coupon.PercentageDiscount -> coupon.availableTime
+                        else -> null
+                    },
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp, start = 18.dp, end = 18.dp),
+                onClick = { onCouponSelected(couponId) },
             )
         }
 
@@ -67,7 +70,7 @@ fun PaymentBody(
             HorizontalDivider(
                 modifier = Modifier.padding(top = 21.dp),
                 thickness = 7.dp,
-                color = Color(0xFFEBEBEB)
+                color = Color(0xFFEBEBEB),
             )
         }
 
@@ -76,7 +79,7 @@ fun PaymentBody(
                 subtotal = originalPrice,
                 couponDiscount = discountPrice,
                 deliveryFee = deliveryFee,
-                modifier = Modifier.padding(horizontal = 18.dp, vertical = 21.dp)
+                modifier = Modifier.padding(horizontal = 18.dp, vertical = 21.dp),
             )
         }
 
@@ -88,7 +91,7 @@ fun PaymentBody(
             PriceRow(
                 text = "총 결제 금액",
                 price = totalPrice,
-                modifier = Modifier.padding(vertical = 21.dp, horizontal = 18.dp)
+                modifier = Modifier.padding(vertical = 21.dp, horizontal = 18.dp),
             )
         }
     }
@@ -98,7 +101,7 @@ fun PaymentBody(
 private fun Header(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
             text = "적용 가능한 쿠폰",
@@ -120,11 +123,11 @@ private fun OrderSummary(
     subtotal: Long,
     couponDiscount: Long,
     deliveryFee: Long,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         PriceRow(text = "주문 금액", price = subtotal)
         PriceRow(text = "쿠폰 할인 금액", price = couponDiscount)
@@ -136,24 +139,24 @@ private fun OrderSummary(
 private fun PriceRow(
     text: String,
     price: Long,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val price = "%,d".format(price)
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = text,
             fontWeight = FontWeight.W700,
             fontSize = 18.sp,
-            color = Color(0xFF333333)
+            color = Color(0xFF333333),
         )
         Text(
             text = "${price}원",
             fontWeight = FontWeight.W500,
             fontSize = 18.sp,
-            color = Color(0xFF333333)
+            color = Color(0xFF333333),
         )
     }
 }
@@ -161,42 +164,44 @@ private fun PriceRow(
 @Preview(showBackground = true)
 @Composable
 private fun PaymentBodyPreview() {
-    val coupons = listOf(
-        Coupon.FixedDiscount(
-            id = 1,
-            code = "FIXED5000",
-            description = "5,000원 할인 쿠폰",
-            expirationDate = LocalDate.parse("2024-11-30"),
-            discount = Money(5000),
-            minimumAmount = Money(100000),
-        ),
-        Coupon.BuyXGetY(
-            id = 2,
-            code = "BOGO",
-            description = "2개 구매 시 1개 무료",
-            expirationDate = LocalDate.parse("2024-05-30"),
-            buyQuantity = 2,
-            getQuantity = 1,
-        ),
-        Coupon.FreeShipping(
-            id = 3,
-            code = "FREESHIPPING",
-            description = "5만원 이상 구매 시 무료 배송",
-            expirationDate = LocalDate.parse("2024-08-31"),
-            minimumAmount = Money(50000),
-        ),
-        Coupon.PercentageDiscount(
-            id = 4,
-            code = "MIRACLESALE",
-            description = "미라클모닝 30% 할인",
-            expirationDate = LocalDate.parse("2024-07-31"),
-            discountPercent = 30,
-            availableTime = AvailableTime(
-                start = LocalTime.parse("04:00:00"),
-                end = LocalTime.parse("07:00:00"),
+    val coupons =
+        listOf(
+            Coupon.FixedDiscount(
+                id = 1,
+                code = "FIXED5000",
+                description = "5,000원 할인 쿠폰",
+                expirationDate = LocalDate.parse("2024-11-30"),
+                discount = Money(5000),
+                minimumAmount = Money(100000),
             ),
-        ),
-    )
+            Coupon.BuyXGetY(
+                id = 2,
+                code = "BOGO",
+                description = "2개 구매 시 1개 무료",
+                expirationDate = LocalDate.parse("2024-05-30"),
+                buyQuantity = 2,
+                getQuantity = 1,
+            ),
+            Coupon.FreeShipping(
+                id = 3,
+                code = "FREESHIPPING",
+                description = "5만원 이상 구매 시 무료 배송",
+                expirationDate = LocalDate.parse("2024-08-31"),
+                minimumAmount = Money(50000),
+            ),
+            Coupon.PercentageDiscount(
+                id = 4,
+                code = "MIRACLESALE",
+                description = "미라클모닝 30% 할인",
+                expirationDate = LocalDate.parse("2024-07-31"),
+                discountPercent = 30,
+                availableTime =
+                    AvailableTime(
+                        start = LocalTime.parse("04:00:00"),
+                        end = LocalTime.parse("07:00:00"),
+                    ),
+            ),
+        )
     PaymentBody(
         selectedCouponId = 1,
         coupons = coupons,

@@ -6,7 +6,6 @@ import woowacourse.shopping.model.order.Payment
 
 data class PaymentUiState(
     val isLoading: Boolean = false,
-
     val items: List<CartItem> = emptyList(),
     val availableCoupons: List<Coupon> = emptyList(),
     val selectedCouponId: Long? = null,
