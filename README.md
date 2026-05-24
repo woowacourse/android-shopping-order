@@ -42,7 +42,7 @@
 
 - [x] SharedPreference로 알림 허용 여부 저장
 - [x] AlarmManager로 결제 화면 진입 시 알림 예약 생성
-- [ ] 결제 완료시 알림 예약 취소
+- [x] 결제 완료시 알림 예약 취소
 - [x] BroadcastReceiver 클래스 정의
   - [x] AndroidManifest <receiver> 등록
 - [x] 예약된 시간이 되면 BroadcastReceiver를 호출

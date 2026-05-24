@@ -98,6 +98,7 @@ class PaymentViewModel(
         viewModelScope.launch {
             when (val result = orderRepository.order(uiState.value.order)) {
                 is ApiResult.Success -> {
+                    alarmScheduler.cancel()
                     _event.emit(
                         PaymentEvent.SnackbarEvent("주문이 완료되었습니다.")
                     )
