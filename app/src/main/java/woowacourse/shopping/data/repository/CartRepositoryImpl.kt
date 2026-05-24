@@ -77,8 +77,7 @@ class CartRepositoryImpl(
 
                 cartItemQuantityDao.insert(
                     savedCartItem.copy(
-                        quantity =
-                        quantity,
+                        quantity = quantity,
                     ),
                 )
             }
