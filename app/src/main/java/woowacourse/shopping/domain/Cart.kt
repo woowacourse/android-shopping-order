@@ -3,6 +3,12 @@ package woowacourse.shopping.domain
 class Cart(
     val cartContents: List<CartContent>,
 ) {
+    private fun duplicateCartItem(newCartContent: CartContent): CartContent? {
+        return cartContents.firstOrNull { cartContent ->
+            cartContent.hasProductId(newCartContent.productId)
+        }
+    }
+
     fun plusCartContent(newCartContent: CartContent): Cart {
         val duplicateCartItem =
             cartContents.firstOrNull { cartContent ->
@@ -13,7 +19,7 @@ class Cart(
             return Cart(
                 cartContents.map {
                     if (it.hasProductId(newCartContent.productId)) {
-                        it.addQuantity(newCartContent.quantity)
+                        it.addQuantity(newCartContent)
                     } else {
                         it
                     }
@@ -23,21 +29,19 @@ class Cart(
         return Cart(cartContents + newCartContent)
     }
 
-    fun minusCartContent(target: CartContent): Cart {
-        val duplicateCartItem =
-            cartContents.firstOrNull { cartContent ->
-                cartContent.hasProductId(target.productId)
-            }
-        require(duplicateCartItem != null) { "존재하지 않는 상품입니다." }
-        require(duplicateCartItem.quantity >= target.quantity) { "존재하는 수량보다 많이 뺄 수 없습니다." }
+    fun minusCartContent(newCartContent: CartContent): Cart {
 
-        if (duplicateCartItem.quantity == target.quantity) {
-            return Cart(cartContents.filter { !it.hasProductId(target.productId) })
+        require(this.hasCartContent(newCartContent)) { "존재하지 않는 상품입니다." }
+
+        val duplicateCartItem = duplicateCartItem(newCartContent)!!
+
+        if (duplicateCartItem.quantity == newCartContent.quantity) {
+            return Cart(cartContents.filter { !it.hasProductId(newCartContent.productId) })
         }
         return Cart(
             cartContents.map {
-                if (it.hasProductId(target.productId)) {
-                    it.decreaseQuantity(target.quantity)
+                if (it.hasProductId(newCartContent.productId)) {
+                    it.decreaseQuantity(newCartContent)
                 } else {
                     it
                 }
@@ -62,4 +66,8 @@ class Cart(
         }
 
     fun getProductList(): List<Product> = cartContents.map { it.product }
+
+    fun hasCartContent(newCartContent: CartContent?): Boolean = cartContents.any { cartContent ->
+        cartContent.hasProductId(newCartContent?.productId ?: 0)
+    }
 }

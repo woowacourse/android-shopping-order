@@ -59,13 +59,13 @@ fun CartScreen(
                     Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                     activityFinish()
                 }
+                is CartEvent.RemoveEvent -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+                is CartEvent.MinusEvent -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
             }
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.removeEvent.collect { event ->
-            Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
         }
     }
 

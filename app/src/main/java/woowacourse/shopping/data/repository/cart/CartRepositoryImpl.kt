@@ -37,12 +37,12 @@ class CartRepositoryImpl(
         val existing =
             loadAll().firstOrNull { it.hasProductId(productId) }
                 ?: return
-        if (existing.quantity <= 1) {
-            cartServerDataSource.deleteById(existing.id)
-        } else {
+        if (CartContent.isGreaterThanZero(existing.quantity)) {
             cartServerDataSource.updateCartItem(
                 CartContent(existing.product, existing.quantity - 1, existing.id),
             )
+        } else {
+            cartServerDataSource.deleteById(existing.id)
         }
     }
 

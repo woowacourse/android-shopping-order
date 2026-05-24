@@ -5,13 +5,10 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -20,7 +17,6 @@ import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartContent
-import woowacourse.shopping.domain.ProductNotFoundException
 import woowacourse.shopping.feature.common.state.CartItemUiModel
 import woowacourse.shopping.feature.common.state.ProductUiModel
 
@@ -45,9 +41,6 @@ class CartViewModel(
 
     private val _event = Channel<CartEvent>(Channel.BUFFERED)
     val event: Flow<CartEvent> = _event.receiveAsFlow()
-
-    private val _removeEvent = MutableSharedFlow<RemoveEvent>()
-    val removeEvent: Flow<RemoveEvent> = _removeEvent.asSharedFlow()
 
     lateinit var cartRepository: CartRepository
 
@@ -139,57 +132,72 @@ class CartViewModel(
         return cartContents
     }
 
-    fun increase(contentId: Long) =
-        guardFatal {
-            val product =
-                cart.cartContents.firstOrNull { it.id == contentId }?.product
-                    ?: throw ProductNotFoundException(contentId)
+    fun increase(contentId: Long) {
+        viewModelScope.launch {
+            val cartContent = CartContent(
+                product = cart.cartContents.first { it.id == contentId }.product,
+                quantity = 1,
+                id = contentId,
+            )
+            val product = cartContent.product
 
-            viewModelScope.launch {
-                cartRepository.increase(product)
-                cart = getCart()
-                val cartContents = pagination(uiState.value.page)
-                _uiState.update {
-                    it.copy(
-                        paginatedCartContents = cartContents,
-                        totalPrice = it.totalPrice + if (it.checkMap[contentId] == true) product.priceAmount() else 0,
-                    )
-                }
+            cartRepository.increase(product)
+            cart = cart.plusCartContent(CartContent(product, 1, contentId))
+
+            val cartContents = pagination(uiState.value.page)
+            val updateCartContents = getCartContents(cartContents)
+
+            _uiState.update {
+                it.copy(
+                    paginatedCartContents = updateCartContents,
+                    totalPrice = cart.cartContents
+                        .filter { uiState.value.checkMap[it.id] == true }
+                        .sumOf { it.product.priceAmount() * it.quantity },
+                )
             }
         }
+    }
 
-    fun decrease(contentId: Long) =
-        guardFatal {
-            val product =
-                cart.cartContents.firstOrNull { it.id == contentId }?.product
-                    ?: throw ProductNotFoundException(contentId)
+    fun decrease(contentId: Long) {
+        viewModelScope.launch {
+            cart = getCart()
+            val cartContent = CartContent(
+                product = cart.cartContents.first { it.id == contentId }.product,
+                quantity = 1,
+                id = contentId,
+            )
+            if (!cart.hasCartContent(cartContent)) {
+                _event.send(CartEvent.MinusEvent("해당 상품은 존재하지 않는 상품입니다."))
+                return@launch
+            }
+            val product = cartContent.product
 
-            viewModelScope.launch {
-                cartRepository.decrease(product.id)
+            cart = cart.minusCartContent(cartContent)
+            cartRepository.decrease(product.id)
 
-                val cartContents = pagination(uiState.value.page)
-                val updateCartContents = getCartContents(cartContents)
-                val page = getPage(cartContents)
+            val cartContents = pagination(uiState.value.page)
+            val updateCartContents = getCartContents(cartContents)
+            val page = getPage(cartContents)
 
-                cart = getCart()
-                val updateContentKeys = cart.cartContents.map { it.id }
-                val newCheckMap = _uiState.value.checkMap.filter{ it.key in updateContentKeys }.toMap()
+            val updateContentKeys = cart.cartContents.map { it.id }
+            val newCheckMap =
+                _uiState.value.checkMap.filter { it.key in updateContentKeys }.toMap()
 
-                _uiState.update {
-                    it.copy(
-                        paginatedCartContents = updateCartContents,
-                        checkMap = newCheckMap,
-                        totalPrice = cart.cartContents
-                            .filter { newCheckMap[it.id] == true }
-                            .sumOf { it.product.priceAmount() * it.quantity },
-                        totalCount = newCheckMap.count { it.value },
-                        isFirstPage = page == 1,
-                        isLastPage = page >= lastPage(initialPageSize),
-                        page = page,
-                    )
-                }
+            _uiState.update {
+                it.copy(
+                    paginatedCartContents = updateCartContents,
+                    checkMap = newCheckMap,
+                    totalPrice = cart.cartContents
+                        .filter { newCheckMap[it.id] == true }
+                        .sumOf { it.product.priceAmount() * it.quantity },
+                    totalCount = newCheckMap.count { it.value },
+                    isFirstPage = page == 1,
+                    isLastPage = page >= lastPage(initialPageSize),
+                    page = page,
+                )
             }
         }
+    }
 
     private inline fun guardFatal(block: () -> Unit) {
         try {
@@ -214,7 +222,7 @@ class CartViewModel(
 
             cart = getCart()
             val updateContentKeys = cart.cartContents.map { it.id }
-            val newCheckMap = _uiState.value.checkMap.filter{ it.key in updateContentKeys }.toMap()
+            val newCheckMap = _uiState.value.checkMap.filter { it.key in updateContentKeys }.toMap()
 
             _uiState.update {
                 it.copy(
@@ -230,7 +238,7 @@ class CartViewModel(
                 )
             }
 
-            _removeEvent.emit(RemoveEvent("해당 상품이 삭제되었습니다."))
+            _event.send(CartEvent.RemoveEvent("상품이 삭제되었습니다."))
         }
     }
 
@@ -321,6 +329,8 @@ sealed interface CartEvent {
     data class FatalError(
         val message: String,
     ) : CartEvent
-}
 
-data class RemoveEvent(val message: String)
+    data class RemoveEvent(val message: String) : CartEvent
+
+    data class MinusEvent(val message: String) : CartEvent
+}
