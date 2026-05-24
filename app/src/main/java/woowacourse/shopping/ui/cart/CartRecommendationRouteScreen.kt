@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import woowacourse.shopping.ui.cart.SelectedCartOrder
 import woowacourse.shopping.ui.common.formatter.formatPrice
 import woowacourse.shopping.ui.cart.list.CartViewModel
 import woowacourse.shopping.ui.cart.recommendation.CartRecommendationEvent
@@ -25,7 +26,7 @@ fun CartRecommendationRouteScreen(
     recommendationViewModel: CartRecommendationViewModel,
     onBackToCart: () -> Unit,
     onProductClick: (Long) -> Unit,
-    onOrderCompleted: () -> Unit,
+    onProceedToOrder: (SelectedCartOrder) -> Unit,
 ) {
     val context = LocalContext.current
     val uiState by recommendationViewModel.uiState.collectAsStateWithLifecycle()
@@ -34,14 +35,11 @@ fun CartRecommendationRouteScreen(
     LaunchedEffect(recommendationViewModel) {
         recommendationViewModel.events.collect { event ->
             when (event) {
-                CartRecommendationEvent.OrderCompleted -> {
-                    Toast.makeText(context, "주문이 완료되었습니다.", Toast.LENGTH_SHORT).show()
-                    onOrderCompleted()
-                }
-
                 is CartRecommendationEvent.ShowMessage -> {
                     Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                 }
+
+                CartRecommendationEvent.OrderCompleted -> Unit
             }
         }
     }
@@ -72,7 +70,14 @@ fun CartRecommendationRouteScreen(
             onAddToCart = recommendationViewModel::addRecommendedProduct,
             onIncreaseQuantity = recommendationViewModel::increaseRecommendedProductQuantity,
             onDecreaseQuantity = recommendationViewModel::decreaseRecommendedProductQuantity,
-            onOrderClick = recommendationViewModel::placeOrder,
+            onOrderClick = {
+                scope.launch {
+                    recommendationViewModel.awaitPendingChanges()
+                    cartViewModel.reloadVisibleStateImmediately()
+                    val selectedCartOrder = recommendationViewModel.createSelectedCartOrder() ?: return@launch
+                    onProceedToOrder(selectedCartOrder)
+                }
+            },
             onBackClick = {
                 if (!recommendationViewModel.beginReturningToCart()) return@CartRecommendedProductsScreen
                 scope.launch {

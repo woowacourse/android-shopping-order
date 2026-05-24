@@ -79,14 +79,14 @@ fun AppNavHost(
                     navController.getBackStackEntry(CartGraph)
                 }
                 val cartViewModel: CartViewModel = viewModel(parentEntry)
-                val orderViewModel: OrderViewModel = viewModel(parentEntry)
+                val recommendationViewModel: CartRecommendationViewModel = viewModel(parentEntry)
 
                 CartRouteScreen(
                     cartViewModel = cartViewModel,
                     onBackClick = { navController.popBackStack() },
                     onOrderClick = { selectedCartOrder ->
-                        orderViewModel.startOrder(selectedCartOrder)
-                        navController.navigate(OrderRoute())
+                        recommendationViewModel.startOrder(selectedCartOrder)
+                        navController.navigate(CartRecommendationRoute)
                     },
                 )
             }
@@ -123,6 +123,7 @@ fun AppNavHost(
                 }
                 val cartViewModel: CartViewModel = viewModel(parentEntry)
                 val recommendationViewModel: CartRecommendationViewModel = viewModel(parentEntry)
+                val orderViewModel: OrderViewModel = viewModel(parentEntry)
 
                 CartRecommendationRouteScreen(
                     cartViewModel = cartViewModel,
@@ -131,11 +132,9 @@ fun AppNavHost(
                     onProductClick = { productId ->
                         navController.navigate(ProductDetailRoute(productId))
                     },
-                    onOrderCompleted = {
-                        navController.navigate(ShoppingRoute) {
-                            popUpTo(CartGraph) { inclusive = true }
-                            launchSingleTop = true
-                        }
+                    onProceedToOrder = { selectedCartOrder ->
+                        orderViewModel.startOrder(selectedCartOrder)
+                        navController.navigate(OrderRoute())
                     },
                 )
             }

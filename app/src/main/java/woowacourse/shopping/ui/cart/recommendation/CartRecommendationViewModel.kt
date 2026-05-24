@@ -20,6 +20,7 @@ import woowacourse.shopping.repository.RecentProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
 import woowacourse.shopping.repository.query.CartPageItem
 import woowacourse.shopping.ui.cart.SelectedCartOrder
+import woowacourse.shopping.ui.cart.SelectedCartOrderItem
 import woowacourse.shopping.ui.shopping.ShoppingProductUiState
 import woowacourse.shopping.ui.shopping.ShoppingProductUiStateMapper
 
@@ -173,6 +174,36 @@ class CartRecommendationViewModel(
 
     suspend fun awaitPendingChanges() {
         awaitRecommendedSyncs()
+    }
+
+    suspend fun createSelectedCartOrder(): SelectedCartOrder? {
+        val itemDataByProductId = buildOrderItemDataByProductId()
+        val activeProductIds =
+            itemDataByProductId
+                .filterValues { it.quantity > 0 }
+                .keys
+
+        if (activeProductIds.isEmpty()) return null
+
+        val cartItems = resolveCartPageItems(activeProductIds)
+        if (cartItems.isEmpty()) return null
+
+        val selectedItems =
+            cartItems.mapNotNull { cartItem ->
+                val itemData = itemDataByProductId[cartItem.productId] ?: return@mapNotNull null
+                if (itemData.quantity <= 0) return@mapNotNull null
+
+                SelectedCartOrderItem(
+                    cartItemId = cartItem.cartItemId,
+                    productId = cartItem.productId,
+                    price = itemData.price,
+                    quantity = itemData.quantity,
+                )
+            }
+
+        if (selectedItems.isEmpty()) return null
+
+        return SelectedCartOrder(items = selectedItems)
     }
 
     private fun loadRecommendedProducts() {
