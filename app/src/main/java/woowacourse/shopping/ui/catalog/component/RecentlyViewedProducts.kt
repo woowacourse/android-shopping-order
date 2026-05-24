@@ -14,13 +14,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.Products
+import woowacourse.shopping.core.designsystem.component.toPriceString
+import woowacourse.shopping.ui.uimodel.ProductUiModel
 
 @Composable
 fun RecentlyViewedProducts(
-    products: Products,
-    onClick: (Product) -> Unit,
+    products: List<ProductUiModel>,
+    onClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -38,7 +38,7 @@ fun RecentlyViewedProducts(
         Spacer(modifier = Modifier.height(8.dp))
         LazyRow {
             itemsIndexed(
-                items = products.products,
+                items = products,
                 key = { index, product -> "${product.id}_i$index}" }
             ) { index, item ->
                 RecentlyViewedProductItem(
@@ -53,14 +53,15 @@ fun RecentlyViewedProducts(
 @Preview(showBackground = true)
 @Composable
 private fun RecentlyViewedProductsPreview() {
-    val mockProduct = Product(
-            imageUri = "hello",
-            name = "너무너무너무긴아이템이름",
-            price = 100000,
-            category = "카테고리",
-            id = 1L,
-        )
-    val previewProducts = Products(List(9) { index -> mockProduct.copy(id = index + 1L) })
+    val mockProduct = ProductUiModel(
+        imageUrl = "hello",
+        name = "너무너무너무긴아이템이름",
+        price = 100000,
+        formattedPrice = 100000.toPriceString(),
+        category = "카테고리",
+        id = 1L,
+    )
+    val previewProducts = List(9) { index -> mockProduct.copy(id = index + 1L) }
 
     RecentlyViewedProducts(
         previewProducts,

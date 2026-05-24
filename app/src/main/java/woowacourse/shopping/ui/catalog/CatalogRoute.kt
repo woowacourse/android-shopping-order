@@ -13,7 +13,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.domain.model.PurchaseProduct
 import woowacourse.shopping.ui.event.UiEventHandler
+import woowacourse.shopping.ui.uimodel.toCartProductUiModel
+import woowacourse.shopping.ui.uimodel.toProductUiModel
 import woowacourse.shopping.ui.navigation.ShoppingRoute
 
 fun NavGraphBuilder.catalogRoute(
@@ -67,17 +70,24 @@ private fun CatalogRouteContent(
     val lastViewedProductId by viewModel.lastViewProductId.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val cartProductCount by viewModel.cartProductCount.collectAsStateWithLifecycle()
+    val uiState =
+        CatalogUiState(
+            products = currentProducts.toProductUiModel(),
+            recentlyViewedProducts = viewHistory.toProductUiModel(),
+            cartItems = cartState.toCartProductUiModel(),
+            totalCount = cartProductCount,
+            isLoading = isLoading,
+        )
 
     CatalogScreen(
-        catalog = currentProducts,
-        recentlyViewedProducts = viewHistory,
-        onRecentlyViewedClick = { product ->
-            viewModel.updateHistory(product)
-            onProductClick(product.id, lastViewedProductId)
+        uiState = uiState,
+        onRecentlyViewedClick = { productId ->
+            currentProducts.findWithId(productId)?.let { viewModel.updateHistory(it) }
+            onProductClick(productId, lastViewedProductId)
         },
-        onItemClick = { product ->
-            viewModel.updateHistory(product)
-            onProductClick(product.id, lastViewedProductId)
+        onItemClick = { productId ->
+            currentProducts.findWithId(productId)?.let { viewModel.updateHistory(it) }
+            onProductClick(productId, lastViewedProductId)
         },
         onCartClick = onCartClick,
         onLoadClick = {
@@ -91,12 +101,10 @@ private fun CatalogRouteContent(
             viewModel.updateCountWithID(id, updateAmount)
         },
         onDelete = { viewModel.removeWithID(it) },
-        onAddInCart = { viewModel.addToCart(it) },
-        isContainedInCart = { cartState.isContain(it) },
-        specificProductCount = {
-            cartState.totalCountOfSpecificPurchaseProduct(it)
+        onAddInCart = { productId ->
+            currentProducts.findWithId(productId)?.let { product ->
+                viewModel.addToCart(PurchaseProduct(product.id, product))
+            }
         },
-        totalCount = cartProductCount,
-        isLoading = isLoading,
     )
 }

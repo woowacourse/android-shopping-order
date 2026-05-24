@@ -20,19 +20,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.PurchaseProduct
+import woowacourse.shopping.ui.uimodel.ProductUiModel
 
 @Composable
 fun ShoppingItem(
     count: () -> Int,
-    product: Product,
+    product: ProductUiModel,
     isContainedInCart: () -> Boolean,
-    onAddInCart: (PurchaseProduct) -> Unit,
+    onAddInCart: (Long) -> Unit,
     onAdd: () -> Unit,
     onMinus: () -> Unit,
     onDelete: () -> Unit,
-    onClick: (Product) -> Unit,
+    onClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -42,22 +41,16 @@ fun ShoppingItem(
                 .height(206.dp)
                 .clickable(
                     onClick = {
-                        onClick(product)
+                        onClick(product.id)
                     },
                 ),
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Box {
-            ProductImage(product.imageUri, Modifier.size(154.dp))
+            ProductImage(product.imageUrl, Modifier.size(154.dp))
             CirclePlusBtn(
                 onClick = {
-                    onAddInCart(
-                        PurchaseProduct(
-                            product = product,
-                            id = product.id,
-                            count = 1
-                        )
-                    )
+                    onAddInCart(product.id)
                 },
                 modifier =
                     Modifier
@@ -77,14 +70,14 @@ fun ShoppingItem(
             )
         }
 
-        ProductInfo(product.name, product.price)
+        ProductInfo(product.name, product.formattedPrice)
     }
 }
 
 @Composable
 private fun ProductInfo(
     name: String,
-    price: Int,
+    formattedPrice: String,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -103,7 +96,7 @@ private fun ProductInfo(
         )
 
         Text(
-            text = price.toPriceString(),
+            text = formattedPrice,
             fontSize = 16.sp,
             color = Color(0xFF555555),
             modifier = Modifier,
@@ -119,13 +112,14 @@ fun Int.toPriceString(): String {
 @Preview(showBackground = true)
 @Composable
 private fun ShoppingItemPreview1() {
-    val mockProduct = Product(
-            imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
-            name = "매우매우긴상품명입니다",
-            price = 1000000000,
-            category = "카테고리",
-            id = 1L,
-        )
+    val mockProduct = ProductUiModel(
+        imageUrl = "https://media.sodagift.com/img/image/1734582680547.jpg",
+        name = "매우매우긴상품명입니다",
+        price = 1000000000,
+        formattedPrice = 1000000000.toPriceString(),
+        category = "카테고리",
+        id = 1L,
+    )
 
     ShoppingItem(
         { 0 },
@@ -143,10 +137,11 @@ private fun ShoppingItemPreview1() {
 @Composable
 private fun ShoppingItemPreview2() {
     val previewProduct =
-        Product(
-            imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
+        ProductUiModel(
+            imageUrl = "https://media.sodagift.com/img/image/1734582680547.jpg",
             name = "매우매우긴상품명입니다",
             price = 1000000000,
+            formattedPrice = 1000000000.toPriceString(),
             category = "카테고리",
             id = 1L,
         )

@@ -13,7 +13,10 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.domain.model.PurchaseProduct
 import woowacourse.shopping.ui.event.UiEventHandler
+import woowacourse.shopping.ui.uimodel.toCartProductUiModel
+import woowacourse.shopping.ui.uimodel.toProductUiModel
 import woowacourse.shopping.ui.navigation.ShoppingRoute
 
 fun NavGraphBuilder.recommendationRoute(
@@ -70,20 +73,27 @@ private fun RecommendationRouteContent(
     val totalCount by viewModel.selectedCount.collectAsStateWithLifecycle()
     val cartState by viewModel.allCartItems.collectAsStateWithLifecycle()
     val recommendedProducts by viewModel.recommendedProducts.collectAsStateWithLifecycle()
+    val uiState =
+        RecommendationUiState(
+            recommendedProducts = recommendedProducts.toProductUiModel(),
+            cartItems = cartState.toCartProductUiModel(),
+            totalPrice = totalPrice,
+            totalCount = totalCount,
+        )
 
     CartRecommendationScreen(
-        recommendedProducts = recommendedProducts,
-        totalPrice = totalPrice,
-        totalCount = totalCount,
+        uiState = uiState,
         onBackClick = onBackClick,
         onOrderClick = onOrderClick,
-        onAddInCart = { viewModel.addToCart(it) },
-        onAdd = { id, amout -> viewModel.updateCountWithID(id, amout) },
+        onAddInCart = { productId ->
+            recommendedProducts.findWithId(productId)?.let { product ->
+                viewModel.addToCart(PurchaseProduct(product.id, product))
+            }
+        },
+        onAdd = { id, amount -> viewModel.updateCountWithID(id, amount) },
         onMinus = { id, amount -> viewModel.updateCountWithID(id, amount) },
         onDelete = { id -> viewModel.removeWithID(id) },
         onItemClick = onItemClick,
-        isContainedInCart = { id -> cartState.isContain(id) },
-        itemCount = { id -> cartState.totalCountOfSpecificPurchaseProduct(id) },
         modifier =
             Modifier
                 .fillMaxSize()

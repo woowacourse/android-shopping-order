@@ -25,54 +25,38 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.R
-import woowacourse.shopping.domain.model.Product
-import woowacourse.shopping.domain.model.Products
-import woowacourse.shopping.domain.model.PurchaseProduct
+import woowacourse.shopping.core.designsystem.component.ShoppingItem
+import woowacourse.shopping.core.designsystem.component.layout.CommonFrame
+import woowacourse.shopping.core.designsystem.component.toPriceString
 import woowacourse.shopping.ui.catalog.component.CountBadge
 import woowacourse.shopping.ui.catalog.component.RecentlyViewedProducts
-import woowacourse.shopping.core.designsystem.component.layout.CommonFrame
-import woowacourse.shopping.core.designsystem.component.ShoppingItem
+import woowacourse.shopping.ui.uimodel.ProductUiModel
 
 @Composable
 fun CatalogScreen(
-    catalog: Products,
-    recentlyViewedProducts: Products,
-    onRecentlyViewedClick: (Product) -> Unit,
-    totalCount: Int,
-    specificProductCount: (Long) -> Int,
-    onItemClick: (Product) -> Unit,
+    uiState: CatalogUiState,
+    onRecentlyViewedClick: (Long) -> Unit,
+    onItemClick: (Long) -> Unit,
     onCartClick: () -> Unit,
     onLoadClick: () -> Unit,
     onAdd: (Long, Int) -> Unit,
     onMinus: (Long, Int) -> Unit,
     onDelete: (Long) -> Unit,
-    onAddInCart: (PurchaseProduct) -> Unit,
-    isLoading: Boolean,
-    isContainedInCart: (Long) -> Boolean,
+    onAddInCart: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     CommonFrame(
-        headerContent = { CatalogHeader(totalCount, onCartClick) },
+        headerContent = { CatalogHeader(uiState.totalCount, onCartClick) },
         bodyContent = {
             CatalogBody(
-                catalog = catalog,
-                recentlyViewedProducts = recentlyViewedProducts,
+                uiState = uiState,
                 onRecentlyViewedClick = onRecentlyViewedClick,
-                onItemClick = { onItemClick(it) },
+                onItemClick = onItemClick,
                 onLoadClick = onLoadClick,
-                onAdd = { id, updateAmount ->
-                    onAdd(id, updateAmount)
-                },
-                onMinus = { id, updateAmount ->
-                    onMinus(id, updateAmount)
-                },
-                onDelete = { onDelete(it) },
-                onAddInCart = { onAddInCart(it) },
-                specificProductCount = {
-                    specificProductCount(it)
-                },
-                isContainedInCart = isContainedInCart,
-                isLoading = isLoading,
+                onAdd = onAdd,
+                onMinus = onMinus,
+                onDelete = onDelete,
+                onAddInCart = onAddInCart,
             )
         },
         modifier = modifier,
@@ -115,18 +99,14 @@ private fun CatalogHeader(
 
 @Composable
 private fun CatalogBody(
-    catalog: Products,
-    recentlyViewedProducts: Products,
-    onRecentlyViewedClick: (Product) -> Unit,
-    specificProductCount: (Long) -> Int,
-    onItemClick: (Product) -> Unit,
-    onAddInCart: (PurchaseProduct) -> Unit,
+    uiState: CatalogUiState,
+    onRecentlyViewedClick: (Long) -> Unit,
+    onItemClick: (Long) -> Unit,
+    onAddInCart: (Long) -> Unit,
     onAdd: (Long, Int) -> Unit,
     onMinus: (Long, Int) -> Unit,
     onDelete: (Long) -> Unit,
     onLoadClick: () -> Unit,
-    isLoading: Boolean,
-    isContainedInCart: (Long) -> Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column {
@@ -138,39 +118,38 @@ private fun CatalogBody(
             item(
                 span = { GridItemSpan(maxLineSpan) },
             ) {
-                if (!recentlyViewedProducts.isEmpty()) {
+                if (uiState.recentlyViewedProducts.isNotEmpty()) {
                     RecentlyViewedProducts(
-                        recentlyViewedProducts,
+                        uiState.recentlyViewedProducts,
                         onClick = onRecentlyViewedClick,
                     )
                 }
             }
 
-            items(catalog.size()) { item ->
+            items(uiState.products.size) { index ->
+                val product = uiState.products[index]
                 ShoppingItem(
-                    product = catalog.getSingleItem(item),
-                    onClick = {
-                        onItemClick(catalog.getSingleItem(item))
-                    },
+                    product = product,
+                    onClick = onItemClick,
                     count = {
-                        specificProductCount(catalog.getSingleItem(item).id)
+                        uiState.productCount(product.id)
                     },
                     isContainedInCart = {
-                        isContainedInCart(catalog.getSingleItem(item).id)
+                        uiState.isContainedInCart(product.id)
                     },
                     onAdd = {
-                        onAdd(catalog.getSingleItem(item).id, 1)
+                        onAdd(product.id, 1)
                     },
                     onMinus = {
-                        onMinus(catalog.getSingleItem(item).id, -1)
+                        onMinus(product.id, -1)
                     },
                     onDelete = {
-                        onDelete(catalog.getSingleItem(item).id)
+                        onDelete(product.id)
                     },
-                    onAddInCart = { onAddInCart(it) },
+                    onAddInCart = onAddInCart,
                 )
             }
-            if(isLoading){
+            if (uiState.isLoading) {
                 item(
                     span = { GridItemSpan(maxLineSpan) },
                 ) {
@@ -210,21 +189,24 @@ private fun LoadBtn(
 @Preview(showBackground = true)
 @Composable
 private fun CatalogScreenPreview() {
-    val mockProduct = Product(
-            imageUri = "hello",
-            name = "너무너무너무긴아이템이름",
-            price = 100000,
-            category = "카테고리",
-            id = 1L,
-        )
-    val catalog = Products(List(10) { index -> mockProduct.copy(id = index + 1L) })
+    val mockProduct = ProductUiModel(
+        imageUrl = "hello",
+        name = "너무너무너무긴아이템이름",
+        price = 100000,
+        formattedPrice = 100000.toPriceString(),
+        category = "카테고리",
+        id = 1L,
+    )
+    val catalog = List(10) { index -> mockProduct.copy(id = index + 1L) }
 
     CatalogScreen(
-        catalog,
-        catalog,
+        uiState = CatalogUiState(
+            products = catalog,
+            recentlyViewedProducts = catalog,
+            totalCount = 10,
+            isLoading = false,
+        ),
         onRecentlyViewedClick = {},
-        totalCount = 10,
-        specificProductCount = { it -> 0 },
         onItemClick = { },
         onCartClick = { },
         onLoadClick = { },
@@ -232,8 +214,6 @@ private fun CatalogScreenPreview() {
         onMinus = { id, type -> },
         onDelete = { },
         onAddInCart = { },
-        isContainedInCart = { it -> true },
-        isLoading = false,
     )
 }
 
@@ -241,21 +221,23 @@ private fun CatalogScreenPreview() {
 @Composable
 private fun CatalogScreenPreview2() {
     val previewProduct =
-        Product(
-            imageUri = "hello",
+        ProductUiModel(
+            imageUrl = "hello",
             name = "너무너무너무긴아이템이름",
             price = 100000,
+            formattedPrice = 100000.toPriceString(),
             category = "카테고리",
             id = 1L,
         )
-    val catalog = Products(List(9) { index -> previewProduct.copy(id = index + 1L) })
+    val catalog = List(9) { index -> previewProduct.copy(id = index + 1L) }
 
     CatalogScreen(
-        catalog,
-        Products(),
+        uiState = CatalogUiState(
+            products = catalog,
+            totalCount = 10,
+            isLoading = true,
+        ),
         onRecentlyViewedClick = {},
-        totalCount = 10,
-        specificProductCount = { it -> 0 },
         onItemClick = { },
         onCartClick = { },
         onLoadClick = { },
@@ -263,7 +245,5 @@ private fun CatalogScreenPreview2() {
         onMinus = { id, type -> },
         onDelete = { },
         onAddInCart = { },
-        isContainedInCart = { it -> true },
-        isLoading = true,
     )
 }
