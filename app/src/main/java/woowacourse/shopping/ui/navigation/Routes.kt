@@ -19,3 +19,8 @@ data object Cart
 
 @Serializable
 data object Recommend
+
+@Serializable
+data class Order(
+    val cartIds: List<Int>,
+)

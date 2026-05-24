@@ -11,6 +11,8 @@ import woowacourse.shopping.ui.cart.CartScreen
 import woowacourse.shopping.ui.cart.CartViewModel
 import woowacourse.shopping.ui.cart.recommend.RecommendScreen
 import woowacourse.shopping.ui.cart.recommend.RecommendViewModel
+import woowacourse.shopping.ui.order.OrderScreen
+import woowacourse.shopping.ui.order.OrderViewModel
 import woowacourse.shopping.ui.productDetail.ProductDetailScreen
 import woowacourse.shopping.ui.productDetail.ProductDetailViewModel
 import woowacourse.shopping.ui.productList.ProductListScreen
@@ -82,15 +84,22 @@ fun ShoppingNavHost() {
                     cartViewModel = cartViewModel,
                     recommendViewModel = recommendViewModel,
                     onClickClose = { navController.popBackStack() },
-                    onOrderSuccess = {
-                        navController.navigate(ProductList) {
-                            popUpTo<ProductList> {
-                                inclusive = true
-                            }
-                        }
-                    },
+                    onNavigateToOrder = { cartIds -> navController.navigate(Order(cartIds)) },
                 )
             }
+        }
+
+        composable<Order> {
+            val viewModel: OrderViewModel = viewModel(factory = OrderViewModel.Factory)
+            OrderScreen(
+                orderViewModel = viewModel,
+                onClickClose = { navController.popBackStack() },
+                onOrderSuccess = {
+                    navController.navigate(ProductList) {
+                        popUpTo<ProductList> { inclusive = true }
+                    }
+                },
+            )
         }
     }
 }
