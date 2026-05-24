@@ -27,6 +27,10 @@ class CartViewModel(
 
     private val _cartItemCount: MutableStateFlow<Int> = MutableStateFlow(0)
 
+    init {
+        fetchCart()
+    }
+
     fun fetchCart() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
@@ -92,7 +96,7 @@ class CartViewModel(
                     }
                     _event.emit(
                         CartEvent.SnackbarEvent(
-                            "${ViewModelConst}.NETWORK_ERROR_LABEL${result.code}"
+                            "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}"
                         )
                     )
                 }
@@ -103,7 +107,7 @@ class CartViewModel(
                     }
                     _event.emit(
                         CartEvent.SnackbarEvent(
-                            "${ViewModelConst}.ERROR_LABEL${result.e.message}"
+                            "${ViewModelConst.ERROR_LABEL}${result.e.message}"
                         )
                     )
                 }
@@ -117,12 +121,9 @@ class CartViewModel(
 
             when (val result = cartRepository.deleteCartItem(id)) {
                 is ApiResult.Success -> {
-                    var newCheckedIds = emptyList<Long>()
-                    if (_uiState.value.checkedItemIds.contains(id)) {
-                        newCheckedIds = _uiState.value.checkedItemIds - id
-                    }
+                    val newCheckedIds = _uiState.value.checkedItemIds - id
                     var page = _uiState.value.currentPage
-                    if (page > 0 && page * PAGE_SIZE >= _allCartItems.value.purchaseProducts.size - 1) page -= 1
+                    if (page > 0 && page * PAGE_SIZE >= _allCartItems.value.size() - 1) page -= 1
                     _uiState.update { it.copy(checkedItemIds = newCheckedIds, currentPage = page) }
                     fetchCart()
                 }
@@ -133,7 +134,7 @@ class CartViewModel(
                     }
                     _event.emit(
                         CartEvent.SnackbarEvent(
-                            "${ViewModelConst}.NETWORK_ERROR_LABEL${result.code}"
+                            "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}"
                         )
                     )
                 }
@@ -144,7 +145,7 @@ class CartViewModel(
                     }
                     _event.emit(
                         CartEvent.SnackbarEvent(
-                            "${ViewModelConst}.ERROR_LABEL${result.e.message}"
+                            "${ViewModelConst.ERROR_LABEL}${result.e.message}"
                         )
                     )
                 }
@@ -196,11 +197,11 @@ class CartViewModel(
         results
             .filterIsInstance<ApiResult.Error>()
             .firstOrNull()
-            ?.let { "${ViewModelConst}.NETWORK_ERROR_LABEL${it.code}" }
+            ?.let { "${ViewModelConst.NETWORK_ERROR_LABEL}${it.code}" }
             ?: results
                 .filterIsInstance<ApiResult.Exception>()
                 .firstOrNull()
-                ?.let { "${ViewModelConst}.ERROR_LABEL${it.e.message}" }
+                ?.let { "${ViewModelConst.ERROR_LABEL}${it.e.message}" }
             ?: UNKNOWN_ERROR_LABEL
 
     fun navigateToShopping() {
