@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -13,6 +14,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import woowacourse.shopping.AppContainer
+import woowacourse.shopping.data.alarm.PayReminderAlarm
+import woowacourse.shopping.data.alarm.PayReminderPreference
 import woowacourse.shopping.ui.cart.CartEvent
 import woowacourse.shopping.ui.cart.CartScreen
 import woowacourse.shopping.ui.cart.CartViewModel
@@ -32,8 +35,19 @@ import woowacourse.shopping.ui.util.customToastMessage
 fun ShoppingNavHost(
     appContainer: AppContainer,
     modifier: Modifier = Modifier,
+    shouldOpenPayScreen: Boolean = false,
+    onOpenPayScreen: () -> Unit = {},
 ) {
     val navController = rememberNavController()
+
+    LaunchedEffect(shouldOpenPayScreen) {
+        if (shouldOpenPayScreen) {
+            navController.navigate(ShoppingRoute.Pay) {
+                launchSingleTop = true
+            }
+            onOpenPayScreen()
+        }
+    }
 
     NavHost(
         navController = navController,
@@ -227,6 +241,24 @@ fun ShoppingNavHost(
         }
 
         composable<ShoppingRoute.Pay> {
+            val context = LocalContext.current
+            val payReminderAlarm =
+                remember {
+                    PayReminderAlarm(context)
+                }
+            val payReminderPreference =
+                remember {
+                    PayReminderPreference(context)
+                }
+
+            LaunchedEffect(Unit) {
+                payReminderAlarm.cancel()
+
+                if (payReminderPreference.isEnabled()) {
+                    payReminderAlarm.schedule()
+                }
+            }
+
             val viewModel: PayViewModel =
                 viewModel(
                     factory =
@@ -243,6 +275,8 @@ fun ShoppingNavHost(
                     navController.popBackStack()
                 },
                 onPayClick = {
+                    payReminderAlarm.cancel()
+
                     navController.navigate(ShoppingRoute.Shopping) {
                         popUpTo(ShoppingRoute.Shopping) {
                             inclusive = false
