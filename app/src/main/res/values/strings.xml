@@ -21,6 +21,8 @@
     <string name="setting_title">설정</string>
     <string name="setting_unpaid_notification_title">미결제 알림 기능</string>
     <string name="setting_unpaid_notification_description">결제 화면 진입 후 5분 동안 주문을 완료하지 않으면 알림을 받을 수 있어요.</string>
+    <string name="unpaid_order_notification_title">아직 결제가 완료되지 않았어요</string>
+    <string name="unpaid_order_notification_text">주문이 남아 있어요. 결제를 이어서 진행해보세요.</string>
     <string name="content_description_decrease_quantity">수량 감소</string>
     <string name="content_description_increase_quantity">수량 증가</string>
     <string name="order_title">결제하기</string>

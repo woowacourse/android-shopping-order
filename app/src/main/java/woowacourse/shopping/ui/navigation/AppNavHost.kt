@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -8,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
+import woowacourse.shopping.repository.ShoppingRepositoryProvider
 import woowacourse.shopping.ui.cart.CartRecommendationRouteScreen
 import woowacourse.shopping.ui.cart.CartRouteScreen
 import woowacourse.shopping.ui.cart.list.CartViewModel
@@ -21,7 +23,24 @@ import woowacourse.shopping.ui.shopping.ShoppingRouteScreen
 @Composable
 fun AppNavHost(
     navController: NavHostController,
+    pendingOrderNavigationToken: Long = 0L,
+    onPendingOrderNavigationHandled: () -> Unit = {},
 ) {
+    LaunchedEffect(pendingOrderNavigationToken) {
+        if (pendingOrderNavigationToken == 0L) return@LaunchedEffect
+        val hasPendingOrder = ShoppingRepositoryProvider.pendingOrderRepository.getPendingOrder() != null
+        if (hasPendingOrder) {
+            navController.navigate(CartGraph) {
+                popUpTo(ShoppingRoute)
+                launchSingleTop = true
+            }
+            navController.navigate(OrderRoute(restorePendingOrder = true)) {
+                launchSingleTop = true
+            }
+        }
+        onPendingOrderNavigationHandled()
+    }
+
     NavHost(
         navController = navController,
         startDestination = ShoppingRoute,
@@ -67,12 +86,13 @@ fun AppNavHost(
                     onBackClick = { navController.popBackStack() },
                     onOrderClick = { selectedCartOrder ->
                         orderViewModel.startOrder(selectedCartOrder)
-                        navController.navigate(OrderRoute)
+                        navController.navigate(OrderRoute())
                     },
                 )
             }
 
             composable<OrderRoute> { backStackEntry ->
+                val route = backStackEntry.toRoute<OrderRoute>()
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry(CartGraph)
                 }
@@ -80,7 +100,14 @@ fun AppNavHost(
 
                 OrderRouteScreen(
                     orderViewModel = orderViewModel,
+                    restorePendingOrder = route.restorePendingOrder,
                     onBackClick = { navController.popBackStack() },
+                    onPendingOrderUnavailable = {
+                        navController.navigate(ShoppingRoute) {
+                            popUpTo(CartGraph) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    },
                     onOrderCompleted = {
                         navController.navigate(ShoppingRoute) {
                             popUpTo(CartGraph) { inclusive = true }

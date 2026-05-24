@@ -23,4 +23,6 @@ data object CartRoute
 data object CartRecommendationRoute
 
 @Serializable
-data object OrderRoute
+data class OrderRoute(
+    val restorePendingOrder: Boolean = false,
+)
