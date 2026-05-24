@@ -1,13 +1,9 @@
 package woowacourse.shopping.ui.shopping
 
 import android.Manifest
-import android.app.AlarmManager
-import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -31,7 +27,6 @@ class ShoppingActivity : ComponentActivity() {
         enableEdgeToEdge()
         updateOpenPayScreenState(intent)
         requestNotificationPermission()
-        requestExactAlarmPermission()
 
         val appContainer = (application as ShoppingApplication).appContainer
 
@@ -62,20 +57,5 @@ class ShoppingActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
 
         notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-    }
-
-    private fun requestExactAlarmPermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
-
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-        if (alarmManager.canScheduleExactAlarms()) return
-
-        val intent =
-            Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
-                data = Uri.parse("package:$packageName")
-            }
-
-        startActivity(intent)
     }
 }

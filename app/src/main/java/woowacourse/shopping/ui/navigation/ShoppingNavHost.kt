@@ -254,7 +254,9 @@ fun ShoppingNavHost(
             LaunchedEffect(Unit) {
                 payReminderAlarm.cancel()
 
-                if (payReminderPreference.isEnabled()) {
+                val isEnabled = payReminderPreference.isEnabled()
+
+                if (isEnabled) {
                     payReminderAlarm.schedule()
                 }
             }

@@ -4,7 +4,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 
 class PayReminderAlarm(
     private val context: Context,
@@ -14,10 +13,8 @@ class PayReminderAlarm(
     fun schedule() {
         cancel()
 
-        if (!canScheduleExactAlarm()) return
-
         val triggerAtMillis = System.currentTimeMillis() + FIVE_MINUTES
-        alarmManager.setExactAndAllowWhileIdle(
+        alarmManager.setAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             triggerAtMillis,
             createPendingIntent(),
@@ -26,12 +23,6 @@ class PayReminderAlarm(
 
     fun cancel() {
         alarmManager.cancel(createPendingIntent())
-    }
-
-    private fun canScheduleExactAlarm(): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return true
-
-        return alarmManager.canScheduleExactAlarms()
     }
 
     private fun createPendingIntent(): PendingIntent {
