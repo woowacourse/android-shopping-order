@@ -1,7 +1,10 @@
-package woowacourse.shopping.ui.detail
+﻿package woowacourse.shopping.ui.detail
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -12,17 +15,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentItemRepository
 import woowacourse.shopping.ui.model.mapper.toUiModel
 
 class DetailViewModel(
-    private val id: Long,
+    savedStateHandle: SavedStateHandle,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentItemRepository: RecentItemRepository,
 ) : ViewModel() {
+    private val id: Long = savedStateHandle[PRODUCT_ID] ?: 0L
+
     private val _uiState = MutableStateFlow(DetailUiState())
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
 
@@ -91,19 +97,19 @@ class DetailViewModel(
     }
 
     companion object {
-        fun provideFactory(
-            id: Long,
-            productRepository: ProductRepository,
-            cartRepository: CartRepository,
-            recentItemRepository: RecentItemRepository,
-        ): ViewModelProvider.Factory =
+        private const val PRODUCT_ID = "productId"
+
+        val Factory: ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
+                    val savedStateHandle = createSavedStateHandle()
+                    val appContainer = (this[APPLICATION_KEY] as ShoppingApplication).appContainer
+
                     DetailViewModel(
-                        id = id,
-                        productRepository = productRepository,
-                        cartRepository = cartRepository,
-                        recentItemRepository = recentItemRepository,
+                        savedStateHandle = savedStateHandle,
+                        productRepository = appContainer.productRepository,
+                        cartRepository = appContainer.cartRepository,
+                        recentItemRepository = appContainer.recentItemRepository,
                     )
                 }
             }
