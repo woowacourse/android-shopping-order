@@ -19,7 +19,6 @@ import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.ProductNotFoundException
 import woowacourse.shopping.feature.common.state.ProductUiModel
 
 class ProductListViewModel(
@@ -64,39 +63,19 @@ class ProductListViewModel(
         }
     }
 
-    fun increase(productId: Long) =
-        guardFatal {
-            val product =
-                products.firstOrNull { it.id == productId }
-                    ?: throw ProductNotFoundException(productId)
-
-            viewModelScope.launch {
-                cartRepository.increase(product)
-                refreshCart()
-            }
+    fun increase(productId: Long) {
+        viewModelScope.launch {
+            if (products.none { it.id == productId }) return@launch
+            val product = products.first { it.id == productId }
+            cartRepository.increase(product)
+            refreshCart()
         }
+    }
 
-    fun decrease(productId: Long) =
-        guardFatal {
-            products.firstOrNull { it.id == productId }
-                ?: throw ProductNotFoundException(productId)
-
-            viewModelScope.launch {
-                cartRepository.decrease(productId)
-                refreshCart()
-            }
-        }
-
-    private inline fun guardFatal(block: () -> Unit) {
-        try {
-            block()
-        } catch (e: Exception) {
-            _event.trySend(
-                ProductListEvent.FatalError(
-                    e.message
-                        ?: "알 수 없는 오류가 발생했습니다.",
-                ),
-            )
+    fun decrease(productId: Long) {
+        viewModelScope.launch {
+            cartRepository.decrease(productId)
+            refreshCart()
         }
     }
 

@@ -17,7 +17,6 @@ import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
 import woowacourse.shopping.domain.Money
 import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.ProductNotFoundException
 import woowacourse.shopping.feature.common.state.ProductUiModel
 
 class RecommendViewModel(
@@ -83,8 +82,7 @@ class RecommendViewModel(
 
     fun increase(productId: Long) {
         val product =
-            products.firstOrNull { it.id == productId }
-                ?: throw ProductNotFoundException(productId)
+            products.firstOrNull { it.id == productId }!!
 
         _uiState.update {
             it.copy(
@@ -104,8 +102,7 @@ class RecommendViewModel(
 
     fun decrease(productId: Long) {
         val product =
-            products.firstOrNull { it.id == productId }
-                ?: throw ProductNotFoundException(productId)
+            products.firstOrNull { it.id == productId }!!
 
         _uiState.update {
             it.copy(

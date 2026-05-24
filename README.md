@@ -70,3 +70,4 @@
 - [x] 사용하지 않는 주석 로직 삭제
 - [x] Auth의 load 시그니처를 nullable로 변경
 - [x] Cart 예외 처리 추가
+- [x] 불필요한 커스텀 exception 제거

@@ -199,19 +199,6 @@ class CartViewModel(
         }
     }
 
-    private inline fun guardFatal(block: () -> Unit) {
-        try {
-            block()
-        } catch (e: Exception) {
-            _event.trySend(
-                CartEvent.FatalError(
-                    e.message
-                        ?: "알 수 없는 오류가 발생했습니다.",
-                ),
-            )
-        }
-    }
-
     fun deleteCartItem(productId: Long) {
         viewModelScope.launch {
             val contentId = cart.cartContents.firstOrNull { it.productId == productId }?.id ?: 0
