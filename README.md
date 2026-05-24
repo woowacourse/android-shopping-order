@@ -100,14 +100,14 @@ CouponBenefit sealed interface
 
 #### 알림
 
-- [ ] BroadcastReceiver를 구현해 알람을 수신하고 NotificationManager로 알림을 노출한다.
-- [ ] 알림 권한(POST_NOTIFICATIONS)을 요청한다.
-- [ ] alarmManager를 사용해 결제 진입 5분 후 알림 예약
-- [ ] 결제 완료/재진입 시 알림 취소
-- [ ] 알림 클릭 시 결제 화면 이동
-- [ ] 알림 권한 Dialog 및 Notification은 기본 UI를 그대로 사용 단, Notification의 아이콘은 커스텀한다.
-- [ ] 알림 설정 On/Off SharedPreferences로 영속화
-- [ ] 5분 안에 결제하지 않으면 "아직 결제가 완료되지 않았어요" 알림을 노출한다.
+- [x] BroadcastReceiver를 구현해 알람을 수신하고 NotificationManager로 알림을 노출한다.
+- [x] 알림 권한(POST_NOTIFICATIONS)을 요청한다.
+- [x] alarmManager를 사용해 결제 진입 5분 후 알림 예약
+- [x] 결제 완료/재진입 시 알림 취소
+- [x] 알림 클릭 시 결제 화면 이동
+- [x] 알림 권한 Dialog 및 Notification은 기본 UI를 그대로 사용 단, Notification의 아이콘은 커스텀한다.
+- [x] 결제 화면에서 알림 설정 On/Off SharedPreferences로 영속화
+- [x] 5분 안에 결제하지 않으면 "아직 결제가 완료되지 않았어요" 알림을 노출한다.
 
 #### 결제
 
