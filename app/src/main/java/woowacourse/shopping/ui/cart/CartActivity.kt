@@ -21,8 +21,6 @@ class CartActivity : ComponentActivity() {
         val appContainer = (application as ShoppingApplication).appContainer
         CartViewModel.provideFactory(
             cartRepository = appContainer.cartRepository,
-            recentItemRepository = appContainer.recentItemRepository,
-            productRepository = appContainer.productRepository,
         )
     }
 
@@ -41,7 +39,7 @@ class CartActivity : ComponentActivity() {
                     onQuantityChange = viewModel::updateQuantity,
                     onCheckedChange = { viewModel.checkItem(it) },
                     isAllSelectClick = viewModel::isAllSelectClick,
-                    onOrderClick = viewModel::setOrder,
+                    onOrderClick = {},
                 )
             }
         }

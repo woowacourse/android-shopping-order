@@ -112,7 +112,7 @@ fun CartScreen(
 
 @Composable
 private fun CartContent(
-    totalCartSize: Int,
+    totalCartSize: Long,
     page: Int,
     onNextPage: () -> Unit,
     onPreviousPage: () -> Unit,

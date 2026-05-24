@@ -12,16 +12,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.ProductRepository
-import woowacourse.shopping.data.repository.RecentItemRepository
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.ui.model.CartItemUiModel
 import woowacourse.shopping.ui.model.mapper.toUiModel
-import kotlin.coroutines.cancellation.CancellationException
 
 class CartViewModel(
     private val cartRepository: CartRepository,
-    private val recentItemRepository: RecentItemRepository,
-    private val productRepository: ProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
@@ -38,50 +33,47 @@ class CartViewModel(
     }
 
     private suspend fun getCartItemsByPage(targetPage: Int = uiState.value.page) {
-        try {
-            val cartResult =
-                cartRepository.getCartItemsByPage(page = targetPage, size = PAGE_SIZE)
+        cartRepository
+            .getCartItemsByPage(page = targetPage, size = PAGE_SIZE)
+            .onSuccess { cartResponseResult ->
+                val items =
+                    cartResponseResult.cartItems
+                        .map { cartItem ->
+                            cartItem.toUiModel(isSelected(cartItem.id))
+                        }.toImmutableList()
 
-            val totalPrice =
-                cartRepository.getTotalPrice(uiState.value.selectedCartItems)
+                val totalCartQuantity =
+                    cartRepository
+                        .getTotalCartItemQuantity()
+                        .getOrDefault(_uiState.value.totalCartQuantity)
 
-            _uiState.update {
-                it.copy(
-                    page = targetPage,
-                    items =
-                        cartResult.cartItems
-                            .map { cartItem ->
-                                cartItem.toUiModel(isSelected(cartItem.id))
-                            }.toImmutableList(),
-                    isCanMoveNext = !cartResult.isLastPage,
-                    totalCartCount = cartRepository.getCartItemsCount(),
-                    totalCartQuantity = cartRepository.getTotalCartItemQuantity(),
-                    totalPrice = totalPrice.amount,
-                    recommendProducts =
-                        loadRecommendProducts()
-                            .map { recentProduct ->
-                                recentProduct.toUiModel(
-                                    quantity = cartRepository.getCartItemQuantity(recentProduct.id),
-                                )
-                            }.toImmutableList(),
-                )
+                _uiState.update { state ->
+                    state.copy(
+                        page = targetPage,
+                        items = items,
+                        isCanMoveNext = cartResponseResult.isLastPage.not(),
+                        totalCartQuantity = totalCartQuantity,
+                        totalCartCount = cartResponseResult.totalElement,
+                        totalPrice = calculateTotalPrice(items, state.selectedCartItems),
+                        errorMessage = null,
+                    )
+                }
+            }.onFailure {
+                _uiState.update {
+                    it.copy(errorMessage = "카트 정보를 불러오는데 실패했습니다.")
+                }
             }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (_: Exception) {
-            _uiState.update {
-                it.copy(errorMessage = "카트 정보를 불러오는 데 실패했습니다.")
-            }
-        }
     }
 
     fun nextPage() {
+        if (_uiState.value.isCanMoveNext.not()) return
         viewModelScope.launch {
             getCartItemsByPage(targetPage = uiState.value.page + 1)
         }
     }
 
     fun previousPage() {
+        if (_uiState.value.page == 0) return
         viewModelScope.launch {
             getCartItemsByPage(targetPage = uiState.value.page - 1)
         }
@@ -89,14 +81,22 @@ class CartViewModel(
 
     fun deleteItem(cartId: Long) {
         viewModelScope.launch {
-            try {
-                cartRepository.deleteItem(cartId)
-                getCartItemsByPage()
-            } catch (e: CancellationException) {
-                throw e
-            } catch (_: Exception) {
-                _uiState.update { it.copy(errorMessage = "상품 삭제에 실패했습니다.") }
-            }
+            cartRepository
+                .deleteItem(cartId)
+                .onSuccess {
+                    _uiState.update { state ->
+                        val selectedItem = state.selectedCartItems - cartId
+
+                        state.copy(
+                            selectedCartItems = selectedItem.toImmutableList(),
+                            selectedCartItemCount = selectedItem.size,
+                            errorMessage = null,
+                        )
+                    }
+                    getCartItemsByPage()
+                }.onFailure {
+                    _uiState.update { it.copy(errorMessage = "상품 삭제에 실패했습니다.") }
+                }
         }
     }
 
@@ -105,105 +105,86 @@ class CartViewModel(
         quantity: Int,
     ) {
         viewModelScope.launch {
-            try {
-                cartRepository.setCartItem(productId, quantity = quantity)
-                getCartItemsByPage()
-            } catch (e: CancellationException) {
-                throw e
-            } catch (_: Exception) {
-                _uiState.update { it.copy(errorMessage = "수량 변경에 실패했습니다.") }
-            }
+            cartRepository
+                .setCartItem(productId, quantity = quantity)
+                .onSuccess {
+                    getCartItemsByPage()
+                }.onFailure {
+                    _uiState.update { it.copy(errorMessage = "수량 변경에 실패했습니다.") }
+                }
         }
     }
 
     fun checkItem(cartItemId: Long) {
-        val selectedItems =
-            if (_uiState.value.selectedCartItems.contains(cartItemId)) {
-                _uiState.value.selectedCartItems - cartItemId
-            } else {
-                _uiState.value.selectedCartItems + cartItemId
-            }.toImmutableList()
+        _uiState.update { state ->
+            val selectedItems =
+                if (state.selectedCartItems.contains(cartItemId)) {
+                    state.selectedCartItems - cartItemId
+                } else {
+                    state.selectedCartItems + cartItemId
+                }.toImmutableList()
+            val items =
+                state.items
+                    .map { item ->
+                        if (item.id == cartItemId) {
+                            item.copy(isChecked = item.isChecked.not())
+                        } else {
+                            item
+                        }
+                    }.toImmutableList()
 
-        _uiState.update {
-            it.copy(
+            state.copy(
                 selectedCartItems = selectedItems,
+                selectedCartItemCount = selectedItems.size,
+                totalPrice = calculateTotalPrice(items, selectedItems),
+                items = items,
+                isAllChecked = items.isNotEmpty() && selectedItems.size == items.size,
             )
-        }
-
-        viewModelScope.launch {
-            getCartItemsByPage()
         }
     }
 
     private fun isSelected(cartItemId: Long): Boolean = _uiState.value.selectedCartItems.contains(cartItemId)
 
     fun isAllSelectClick() {
-        val selectedItems =
-            if (_uiState.value.isAllChecked) {
-                emptyList()
-            } else {
-                _uiState.value.items.map { it.id }
-            }.toImmutableList()
+        _uiState.update { state ->
+            val changedAllChecked = state.isAllChecked.not()
 
-        _uiState.update {
-            it.copy(
+            val selectedItems =
+                if (changedAllChecked) {
+                    state.items.map { it.id }
+                } else {
+                    emptyList()
+                }.toImmutableList()
+
+            val items =
+                state.items
+                    .map { item ->
+                        item.copy(isChecked = changedAllChecked)
+                    }.toImmutableList()
+
+            state.copy(
+                items = items,
                 selectedCartItems = selectedItems,
-                isAllChecked = !it.isAllChecked,
                 selectedCartItemCount = selectedItems.size,
+                isAllChecked = !state.isAllChecked,
+                totalPrice = calculateTotalPrice(items, selectedItems),
             )
         }
-
-        viewModelScope.launch {
-            getCartItemsByPage()
-        }
     }
 
-    suspend fun loadRecommendProducts(): List<Product> {
-        val productId = recentItemRepository.getLastViewedItemId()
-
-        return productId?.let {
-            val category = productRepository.getProductById(productId).category
-            productRepository
-                .getProducts(
-                    category = category,
-                    page = 0,
-                    size = 10,
-                ).products
-        } ?: emptyList()
-    }
-
-    fun setOrder() {
-        viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    isOrder = true,
-                    recommendProducts =
-                        loadRecommendProducts()
-                            .filter { product ->
-                                cartRepository.getCartItemQuantity(product.id) == null
-                            }.map { product ->
-                                product
-                                    .toUiModel(quantity = cartRepository.getCartItemQuantity(product.id))
-                            }.toImmutableList(),
-                )
-            }
-        }
-    }
+    private fun calculateTotalPrice(
+        items: List<CartItemUiModel>,
+        selectedCartItemIds: List<Long>,
+    ): Long = items.filter { it.id in selectedCartItemIds }.sumOf { it.totalPrice }
 
     companion object {
         private const val PAGE_SIZE = 5
 
-        fun provideFactory(
-            cartRepository: CartRepository,
-            recentItemRepository: RecentItemRepository,
-            productRepository: ProductRepository,
-        ): ViewModelProvider.Factory =
+        fun provideFactory(cartRepository: CartRepository): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
                     CartViewModel(
                         cartRepository = cartRepository,
-                        recentItemRepository = recentItemRepository,
-                        productRepository = productRepository,
                     )
                 }
             }
