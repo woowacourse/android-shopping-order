@@ -43,4 +43,11 @@ class CartRepositoryImpl(
     override suspend fun order(cartItemIds: List<Int>) {
         cartRemoteDataSource.order(cartItemIds)
     }
+
+    override suspend fun getCartItemsByIds(cartIds: List<Int>): CartItems {
+        if (_cartItems.value.values.isEmpty()) {
+            refreshCartItems()
+        }
+        return CartItems(values = _cartItems.value.values.filter { it.id in cartIds })
+    }
 }
