@@ -17,7 +17,7 @@ import woowacourse.shopping.repository.room.RoomRecentProductRepository
 
 object ShoppingRepositoryProvider {
     private const val PRODUCT_API_BASE_URL =
-        "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/"
+        "http://techcourse-lv2-alb-250216202.ap-northeast-2.elb.amazonaws.com/"
 
     private val httpClient: OkHttpClient by lazy {
         OkHttpClient
