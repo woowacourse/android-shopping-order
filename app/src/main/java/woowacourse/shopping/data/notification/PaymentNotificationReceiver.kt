@@ -54,7 +54,7 @@ class PaymentNotificationReceiver : BroadcastReceiver() {
         val notification =
             NotificationCompat
                 .Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle("결제가 완료되지 않았어요.")
                 .setContentText("지금 결제하면 오늘 받을 수 있어요!")
                 .setContentIntent(contentPendingIntent)
