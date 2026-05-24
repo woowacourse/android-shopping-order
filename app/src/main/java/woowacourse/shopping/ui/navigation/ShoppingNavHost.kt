@@ -82,7 +82,13 @@ fun ShoppingNavHost() {
                     cartViewModel = cartViewModel,
                     recommendViewModel = recommendViewModel,
                     onClickClose = { navController.popBackStack() },
-                    // TODO: 주문 완료 시, 장바구니 플로우 제거 후 상품 목록으로 이동
+                    onOrderSuccess = {
+                        navController.navigate(ProductList) {
+                            popUpTo<ProductList> {
+                                inclusive = true
+                            }
+                        }
+                    },
                 )
             }
         }
