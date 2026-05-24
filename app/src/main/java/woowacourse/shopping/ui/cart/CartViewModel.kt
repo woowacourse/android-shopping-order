@@ -87,6 +87,7 @@ class CartViewModel(
             cartRepository
                 .deleteItem(cartId)
                 .onSuccess {
+                    val targetPage = calculatePage()
                     _uiState.update { state ->
                         val selectedItem = state.selectedCartItems - cartId
 
@@ -94,15 +95,22 @@ class CartViewModel(
                             selectedCartItems = selectedItem,
                             totalCartQuantity = calculateTotalQuantity(selectedItem),
                             totalPrice = calculateTotalPrice(selectedItem),
-                            isAllChecked = selectedItem.size.toLong() == state.totalCartCount && state.totalCartCount > 0,
+                            isAllChecked = selectedItem.size.toLong() == state.totalCartCount - 1 && state.totalCartCount - 1 > 0,
                             errorMessage = null,
                         )
                     }
-                    getCartItemsByPage()
+                    getCartItemsByPage(targetPage)
                 }.onFailure {
                     _uiState.update { it.copy(errorMessage = "상품 삭제에 실패했습니다.") }
                 }
         }
+    }
+
+    private fun calculatePage(): Int {
+        val nextTotalCount = (_uiState.value.totalCartCount - 1).coerceAtLeast(0)
+        val lastPage = ((nextTotalCount - 1) / PAGE_SIZE).coerceAtLeast(0)
+
+        return minOf(_uiState.value.page, lastPage.toInt())
     }
 
     fun updateQuantity(
