@@ -18,7 +18,11 @@ import woowacourse.shopping.domain.GetAvailableCouponUseCase
 import woowacourse.shopping.domain.OrderCartItemsUseCase
 import woowacourse.shopping.domain.model.CouponInfo
 import woowacourse.shopping.domain.model.PaymentItems
+import woowacourse.shopping.domain.model.payment.DeliveryFee
+import woowacourse.shopping.domain.model.payment.DeliveryLocation
+import woowacourse.shopping.domain.model.payment.Order
 import woowacourse.shopping.error.Result
+import java.time.LocalDateTime
 import woowacourse.shopping.presentation.order.model.CouponUiModel
 import woowacourse.shopping.presentation.order.model.OrderUiState
 import woowacourse.shopping.util.formattedPrice
@@ -82,7 +86,15 @@ class OrderViewModel(
     fun initializePaymentItems(productIds: List<Long>) {
         paymentItemIds.value = productIds.toSet()
         viewModelScope.launch {
-            coupons.value = getAvailableCouponUseCase(paymentItems.first())
+            val items = paymentItems.first()
+            val order = Order(
+                dateTime = LocalDateTime.now(),
+                items = items,
+                deliveryFee = DeliveryFee(3_000L),
+                discountAmount = 0L,
+                deliveryLocation = DeliveryLocation.REMOTE,
+            )
+            coupons.value = getAvailableCouponUseCase(order)
         }
     }
 

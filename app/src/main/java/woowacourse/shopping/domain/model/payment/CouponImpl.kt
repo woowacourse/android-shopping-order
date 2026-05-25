@@ -9,10 +9,10 @@ class FixedAmountCoupon(
     val minimumAmount: Long,
     val discountAmount: Long,
 ) : Coupon(code, expirationDate) {
-    override fun doApply(order: Order): Order {
-        if (order.items.totalPrice < minimumAmount) return order
-        return order.copy(discountAmount = order.discountAmount + discountAmount)
-    }
+    override fun doIsApplicable(order: Order): Boolean = order.items.totalPrice >= minimumAmount
+
+    override fun doApply(order: Order): Order =
+        order.copy(discountAmount = order.discountAmount + discountAmount)
 }
 
 class PercentageCoupon(
@@ -22,6 +22,12 @@ class PercentageCoupon(
     val availableTimeStart: LocalTime? = null,
     val availableTimeEnd: LocalTime? = null,
 ) : Coupon(code, expirationDate) {
+    override fun doIsApplicable(order: Order): Boolean {
+        if (availableTimeStart == null || availableTimeEnd == null) return true
+        val orderTime = order.dateTime.toLocalTime()
+        return orderTime >= availableTimeStart && orderTime <= availableTimeEnd
+    }
+
     override fun doApply(order: Order): Order {
         val discountAmount = (order.items.totalPrice * discountRate / 100.0).toInt()
         return order.copy(discountAmount = order.discountAmount + discountAmount)
@@ -34,17 +40,18 @@ class BuyXGetYCoupon(
     val buyQuantity: Long,
     val freeGetQuantity: Long,
 ) : Coupon(code, expirationDate) {
+    override fun doIsApplicable(order: Order): Boolean =
+        order.items.getItems().any { it.quantity >= buyQuantity + freeGetQuantity }
+
     override fun doApply(order: Order): Order {
-        val cartItems = order.items.getItems()
         val maxPriceApplicableCartItem =
-            cartItems
+            order.items.getItems()
                 .filter { it.quantity >= buyQuantity + freeGetQuantity }
                 .maxByOrNull { it.product.price.amount }
         return order.copy(
-            discountAmount =
-                order.discountAmount + (
-                    (maxPriceApplicableCartItem?.product?.price?.amount ?: 0) * freeGetQuantity
-                ),
+            discountAmount = order.discountAmount + (
+                (maxPriceApplicableCartItem?.product?.price?.amount ?: 0) * freeGetQuantity
+            ),
         )
     }
 }
@@ -54,12 +61,9 @@ class FreeShippingCoupon(
     expirationDate: LocalDate,
     val minimumAmount: Long,
 ) : Coupon(code, expirationDate) {
+    override fun doIsApplicable(order: Order): Boolean =
+        order.deliveryLocation == DeliveryLocation.REMOTE && order.items.totalPrice >= minimumAmount
+
     override fun doApply(order: Order): Order =
-        when (order.deliveryLocation) {
-            DeliveryLocation.REMOTE -> {
-                if (order.items.totalPrice < minimumAmount) return order
-                order.copy(deliveryFee = DeliveryFee(0))
-            }
-            DeliveryLocation.STANDARD -> order
-        }
+        order.copy(deliveryFee = DeliveryFee(0))
 }

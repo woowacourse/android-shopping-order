@@ -7,9 +7,16 @@ abstract class Coupon(
     val expirationDate: LocalDate,
 ) {
     fun apply(order: Order): Order {
-        if (expirationDate < order.dateTime.toLocalDate()) throw IllegalArgumentException("이미 만료된 쿠폰입니다.")
+        isApplicable(order = order)
         return doApply(order)
     }
+
+    fun isApplicable(order: Order): Boolean {
+        if (expirationDate < order.dateTime.toLocalDate()) return false
+        return doIsApplicable(order)
+    }
+
+    abstract fun doIsApplicable(order: Order): Boolean
 
     abstract fun doApply(order: Order): Order
 

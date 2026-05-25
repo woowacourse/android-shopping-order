@@ -49,7 +49,7 @@ object RepositoryProvider {
                 )
             retrofitServices =
                 RetrofitServices(
-                    baseUrl = "https://android-shopping-server.onrender.com/",
+                    baseUrl = "http://techcourse-lv2-alb-250216202.ap-northeast-2.elb.amazonaws.com/",
                     interceptor = AuthInterceptor(authDataSource.getToken()),
                 )
         }

@@ -20,7 +20,7 @@ class ApplyCouponUseCase(
                 items = paymentItems,
                 deliveryFee = DeliveryFee(3_000L),
                 discountAmount = 0L,
-                deliveryLocation = DeliveryLocation.STANDARD,
+                deliveryLocation = DeliveryLocation.REMOTE,
             )
         val coupon = orderRepository.coupons.value.find { it.code == couponCode }
         return if (coupon != null) {
