@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -21,8 +22,18 @@ import woowacourse.shopping.ui.setting.SettingScreen
 import woowacourse.shopping.ui.setting.SettingViewModel
 
 @Composable
-fun ShoppingNavHost() {
+fun ShoppingNavHost(
+    startCartIds: List<Int>? = null,
+    onCartIdsConsumed: () -> Unit = {},
+) {
     val navController = rememberNavController()
+
+    LaunchedEffect(startCartIds) {
+        if (startCartIds != null) {
+            navController.navigate(Order(startCartIds))
+            onCartIdsConsumed()
+        }
+    }
 
     NavHost(
         navController = navController,
@@ -111,6 +122,11 @@ fun ShoppingNavHost() {
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() },
             )
+        }
+    }
+    LaunchedEffect(startCartIds) {
+        if (startCartIds != null) {
+            navController.navigate(Order(startCartIds))
         }
     }
 }
