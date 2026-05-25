@@ -21,3 +21,6 @@ data object Recommend
 
 @Serializable
 data object Payment
+
+@Serializable
+data object Settings

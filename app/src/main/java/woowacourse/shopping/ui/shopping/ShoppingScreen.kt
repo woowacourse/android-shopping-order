@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -42,6 +43,7 @@ import woowacourse.shopping.ui.theme.Green40
 fun ShoppingScreenRoute(
     onProductClick: (Long) -> Unit,
     onCartClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
     shoppingViewModel: ShoppingViewModel = viewModel(factory = ShoppingViewModel.Factory),
 ) {
@@ -57,6 +59,7 @@ fun ShoppingScreenRoute(
         onLoad = shoppingViewModel::loadMore,
         onProductClick = onProductClick,
         onCartClick = onCartClick,
+        onSettingsClick = onSettingsClick,
         onQuantityChange = shoppingViewModel::updateQuantity,
         modifier = modifier,
     )
@@ -73,6 +76,7 @@ fun ShoppingScreen(
     onLoad: () -> Unit,
     onProductClick: (Long) -> Unit,
     onCartClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     onQuantityChange: (Long, Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -87,6 +91,16 @@ fun ShoppingScreen(
                         fontWeight = FontWeight.Normal,
                         lineHeight = 24.sp,
                         modifier = Modifier.weight(1f),
+                    )
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "설정",
+                        tint = Color.White,
+                        modifier =
+                            Modifier
+                                .padding(end = 16.dp)
+                                .size(24.dp)
+                                .clickable(onClick = onSettingsClick),
                     )
                     Icon(
                         imageVector = Icons.Default.ShoppingCart,
@@ -213,6 +227,7 @@ private fun ShoppingScreenPreview() {
         onLoad = {},
         onProductClick = {},
         onCartClick = {},
+        onSettingsClick = {},
         onQuantityChange = { _, _ -> },
         products = persistentListOf(),
         recentItems = persistentListOf(),
