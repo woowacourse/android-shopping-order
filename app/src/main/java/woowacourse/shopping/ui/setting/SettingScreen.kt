@@ -1,5 +1,11 @@
 package woowacourse.shopping.ui.setting
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,14 +23,17 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
@@ -33,6 +42,21 @@ fun SettingScreen(
     onNavigateBack: () -> Unit,
 ) {
     val notificationEnabled by viewModel.notificationEnabled.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LaunchedEffect(viewModel.events) {
+        viewModel.events.collect { event ->
+            when (event) {
+                SettingEvent.OpenSystemSettings -> {
+                    val intent =
+                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", context.packageName, null)
+                        }
+                    context.startActivity(intent)
+                }
+            }
+        }
+    }
 
     Column(
         modifier =
@@ -43,7 +67,18 @@ fun SettingScreen(
         PaymentTopAppBar(onNavigateBack = onNavigateBack)
         SettingScreenContent(
             notificationEnabled = notificationEnabled,
-            onToggleNotification = viewModel::toggleNotification,
+            onToggleNotification = {
+                val isGranted =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.POST_NOTIFICATIONS,
+                        ) == PackageManager.PERMISSION_GRANTED
+                    } else {
+                        true
+                    }
+                viewModel.toggleNotification(isGranted)
+            },
             modifier =
                 Modifier
                     .fillMaxWidth()
