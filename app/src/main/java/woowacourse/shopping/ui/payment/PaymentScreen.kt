@@ -41,6 +41,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
+import woowacourse.shopping.ui.util.PaymentReminderScheduler
+import woowacourse.shopping.ui.util.NotificationHelper
 import woowacourse.shopping.constant.Format.formatDate
 import woowacourse.shopping.constant.Format.formatPrice
 import woowacourse.shopping.constant.ShoppingColor.APP_BAR_COLOR
@@ -60,12 +64,25 @@ fun PaymentScreen(
     onPayClick: () -> Unit = viewModel::onClickPay,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        PaymentReminderScheduler.cancel(context)
+        //PaymentReminderScheduler.schedule(context, 5 * 60 * 1000L)
+        PaymentReminderScheduler.schedule(context, 10 * 1000L)
+    }
+
+    val wrappedOnPayClick: () -> Unit = {
+        PaymentReminderScheduler.cancel(context)
+        NotificationHelper.cancel(context)
+        onPayClick()
+    }
     PaymentContent(
         uiState = uiState,
         modifier = modifier,
         onClose = onClose,
         onCouponClick = viewModel::selectCoupon,
-        onPayClick = onPayClick,
+        onPayClick = wrappedOnPayClick,
     )
 }
 
