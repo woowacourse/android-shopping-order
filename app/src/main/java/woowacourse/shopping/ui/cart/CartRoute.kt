@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import woowacourse.shopping.ui.nav.Payment
 
 @Composable
 fun CartRoute(
@@ -25,7 +26,13 @@ fun CartRoute(
                 }
 
                 is CartUiEvent.ShowToastMessage -> {
-                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT)
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is CartUiEvent.NavToPayment -> {
+                    navController.navigate(
+                        Payment(selectedCartItemIds = event.selectedCartItemIds),
+                    )
                 }
             }
         }

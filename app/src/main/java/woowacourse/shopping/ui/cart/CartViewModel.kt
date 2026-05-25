@@ -221,21 +221,37 @@ class CartViewModel(
 
     fun setOrder() {
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    uiInfoState =
-                        it.uiInfoState.copy(
-                            isOrder = true,
-                        ),
-                    recommendProducts =
-                        loadRecommendProducts()
-                            .filter { product ->
-                                cartRepository.getCartItemQuantity(product.id) == null
-                            }.map { product ->
-                                product
-                                    .toUiModel(quantity = cartRepository.getCartItemQuantity(product.id))
-                            }.toImmutableList(),
-                )
+            if (_uiState.value.uiInfoState.isOrder) {
+                val selectedCartItemIds = _uiState.value.selectedCartState.selectedCartItems
+
+                if (selectedCartItemIds.isEmpty()) {
+                    _uiEvent.emit(CartUiEvent.ShowToastMessage("상품을 선택해주세요."))
+                    return@launch
+                }
+
+                _uiEvent.emit(CartUiEvent.NavToPayment(selectedCartItemIds))
+            } else {
+                _uiState.update {
+                    it.copy(
+                        uiInfoState =
+                            it.uiInfoState.copy(
+                                isOrder = true,
+                            ),
+                        recommendProducts =
+                            loadRecommendProducts()
+                                .filter { product ->
+                                    cartRepository.getCartItemQuantity(product.id) == null
+                                }.map { product ->
+                                    product
+                                        .toUiModel(
+                                            quantity =
+                                                cartRepository.getCartItemQuantity(
+                                                    product.id,
+                                                ),
+                                        )
+                                }.toImmutableList(),
+                    )
+                }
             }
         }
     }
