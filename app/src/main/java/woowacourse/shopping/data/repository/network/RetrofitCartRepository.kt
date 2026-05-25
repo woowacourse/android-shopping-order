@@ -121,4 +121,11 @@ class RetrofitCartRepository(
         val cartItems = getAllCartItems()
         return cartItems.items.find { it.product.id == id }
     }
+
+    override suspend fun deleteCartItem(id: Long) {
+        service.deleteCartItem(
+            auth = encoder.getHeader(),
+            cartItemId = id,
+        )
+    }
 }

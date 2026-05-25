@@ -25,4 +25,6 @@ interface CartRepository {
     suspend fun getCartCount(): Int
 
     suspend fun findCartItem(id: Long): CartItem?
+
+    suspend fun deleteCartItem(id: Long)
 }
