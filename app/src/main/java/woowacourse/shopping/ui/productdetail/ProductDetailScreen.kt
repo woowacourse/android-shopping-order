@@ -29,6 +29,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.core.designsystem.component.ProductImage
 import woowacourse.shopping.core.designsystem.component.QuantitySelector
 import woowacourse.shopping.core.designsystem.component.layout.CommonFrame
+import woowacourse.shopping.core.designsystem.theme.PrimaryGreen
 import woowacourse.shopping.core.formatter.toPriceString
 import woowacourse.shopping.ui.productdetail.component.LastViewedProduct
 import woowacourse.shopping.ui.uimodel.ProductUiModel
@@ -115,7 +116,7 @@ private fun ProductDetailBody(
                 Modifier
                     .fillMaxWidth()
                     .height(48.dp)
-                    .background(color = Color(0xFF04C09E)),
+                    .background(color = Color.PrimaryGreen),
         ) {
             Text(
                 text = "장바구니 담기",

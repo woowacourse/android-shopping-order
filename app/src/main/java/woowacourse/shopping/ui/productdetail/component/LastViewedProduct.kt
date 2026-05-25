@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import woowacourse.shopping.core.designsystem.theme.PrimaryGreen
 import woowacourse.shopping.core.formatter.toPriceString
 import woowacourse.shopping.ui.uimodel.ProductUiModel
 
@@ -37,7 +38,7 @@ fun LastViewedProduct(
                 .border(
                     width = 1.dp,
                     shape = RoundedCornerShape(4.dp),
-                    color = Color(0xFFAAAAAA),
+                    color = Color.LightGray,
                 ).clickable(
                     onClick = { onClick(product.id) },
                 ).padding(18.dp),
@@ -46,7 +47,7 @@ fun LastViewedProduct(
     ) {
         Text(
             text = "마지막으로 본 상품",
-            color = Color(0xFF04C09E),
+            color = Color.PrimaryGreen,
             fontWeight = FontWeight.W700,
             fontSize = 12.sp,
         )
@@ -54,7 +55,7 @@ fun LastViewedProduct(
             text = product.name,
             fontWeight = FontWeight.W400,
             fontSize = 18.sp,
-            color = Color(0xFF555555),
+            color = Color.Gray,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
         )

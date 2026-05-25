@@ -38,6 +38,7 @@ fun CatalogScreen(
     onRecentlyViewedClick: (Long) -> Unit,
     onItemClick: (Long) -> Unit,
     onCartClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     onLoadClick: () -> Unit,
     onAdd: (Long, Int) -> Unit,
     onMinus: (Long, Int) -> Unit,
@@ -46,7 +47,7 @@ fun CatalogScreen(
     modifier: Modifier = Modifier,
 ) {
     CommonFrame(
-        headerContent = { CatalogHeader(uiState.totalCount, onCartClick) },
+        headerContent = { CatalogHeader(uiState.totalCount, onCartClick, onSettingsClick) },
         bodyContent = {
             CatalogBody(
                 uiState = uiState,
@@ -67,6 +68,7 @@ fun CatalogScreen(
 private fun CatalogHeader(
     totalCount: Int,
     onCartClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -82,7 +84,19 @@ private fun CatalogHeader(
             fontWeight = FontWeight.SemiBold,
             color = Color.White,
         )
-        Row {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_settings),
+                contentDescription = "설정 아이콘",
+                tint = Color.White,
+                modifier =
+                    Modifier
+                        .size(24.dp)
+                        .clickable(onClick = onSettingsClick),
+            )
             Icon(
                 painter = painterResource(R.drawable.ic_cart),
                 contentDescription = "장바구니 아이콘",
@@ -189,26 +203,29 @@ private fun LoadBtn(
 @Preview(showBackground = true)
 @Composable
 private fun CatalogScreenPreview() {
-    val mockProduct = ProductUiModel(
-        imageUrl = "hello",
-        name = "너무너무너무긴아이템이름",
-        price = 100000,
-        formattedPrice = 100000.toPriceString(),
-        category = "카테고리",
-        id = 1L,
-    )
+    val mockProduct =
+        ProductUiModel(
+            imageUrl = "hello",
+            name = "너무너무너무긴아이템이름",
+            price = 100000,
+            formattedPrice = 100000.toPriceString(),
+            category = "카테고리",
+            id = 1L,
+        )
     val catalog = List(10) { index -> mockProduct.copy(id = index + 1L) }
 
     CatalogScreen(
-        uiState = CatalogUiState(
-            products = catalog,
-            recentlyViewedProducts = catalog,
-            totalCount = 10,
-            isLoading = false,
-        ),
+        uiState =
+            CatalogUiState(
+                products = catalog,
+                recentlyViewedProducts = catalog,
+                totalCount = 10,
+                isLoading = false,
+            ),
         onRecentlyViewedClick = {},
         onItemClick = { },
         onCartClick = { },
+        onSettingsClick = { },
         onLoadClick = { },
         onAdd = { id, type -> },
         onMinus = { id, type -> },
@@ -232,14 +249,16 @@ private fun CatalogScreenPreview2() {
     val catalog = List(9) { index -> previewProduct.copy(id = index + 1L) }
 
     CatalogScreen(
-        uiState = CatalogUiState(
-            products = catalog,
-            totalCount = 10,
-            isLoading = true,
-        ),
+        uiState =
+            CatalogUiState(
+                products = catalog,
+                totalCount = 10,
+                isLoading = true,
+            ),
         onRecentlyViewedClick = {},
         onItemClick = { },
         onCartClick = { },
+        onSettingsClick = { },
         onLoadClick = { },
         onAdd = { id, type -> },
         onMinus = { id, type -> },

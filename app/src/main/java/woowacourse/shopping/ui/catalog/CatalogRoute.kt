@@ -1,8 +1,8 @@
 package woowacourse.shopping.ui.catalog
 
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -15,9 +15,9 @@ import androidx.navigation.compose.composable
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.domain.model.order.PurchaseProduct
 import woowacourse.shopping.ui.event.UiEventHandler
+import woowacourse.shopping.ui.navigation.ShoppingRoute
 import woowacourse.shopping.ui.uimodel.toCartProductUiModel
 import woowacourse.shopping.ui.uimodel.toProductUiModel
-import woowacourse.shopping.ui.navigation.ShoppingRoute
 
 fun NavGraphBuilder.catalogRoute(
     shoppingApplication: ShoppingApplication,
@@ -25,6 +25,7 @@ fun NavGraphBuilder.catalogRoute(
     snackbarHostState: SnackbarHostState,
     onProductClick: (selectedProductId: Long, lastViewedProductId: Long?) -> Unit,
     onCartClick: () -> Unit,
+    onSettingsClick: () -> Unit,
 ) {
     composable<ShoppingRoute.Catalog> {
         CatalogRouteContent(
@@ -33,6 +34,7 @@ fun NavGraphBuilder.catalogRoute(
             snackbarHostState = snackbarHostState,
             onProductClick = onProductClick,
             onCartClick = onCartClick,
+            onSettingsClick = onSettingsClick,
         )
     }
 }
@@ -44,6 +46,7 @@ private fun CatalogRouteContent(
     snackbarHostState: SnackbarHostState,
     onProductClick: (selectedProductId: Long, lastViewedProductId: Long?) -> Unit,
     onCartClick: () -> Unit,
+    onSettingsClick: () -> Unit,
 ) {
     val viewModel =
         viewModel<ShoppingViewModel>(
@@ -90,6 +93,7 @@ private fun CatalogRouteContent(
             onProductClick(productId, lastViewedProductId)
         },
         onCartClick = onCartClick,
+        onSettingsClick = onSettingsClick,
         onLoadClick = {
             viewModel.loadMore()
         },
