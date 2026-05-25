@@ -7,10 +7,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import woowacourse.shopping.data.remote.NetworkMonitor
 import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.ui.cart.CartScreen
 import woowacourse.shopping.ui.cart.CartViewModel
+import woowacourse.shopping.ui.payment.PaymentScreen
+import woowacourse.shopping.ui.payment.PaymentViewModel
 import woowacourse.shopping.ui.productdetail.ProductDetailScreen
 import woowacourse.shopping.ui.productdetail.ProductDetailViewModel
 import woowacourse.shopping.ui.shopping.ShoppingScreen
@@ -80,7 +83,35 @@ fun AppNavHost(
             CartScreen(
                 viewModel = viewModel,
                 onBackClick = { navController.popBackStack() },
-                onOrderClick = { navController.popBackStack() },
+                onOrderClick = { cartItemIds ->
+                    navController.navigate(Payment(cartItemIds = cartItemIds.joinToString(",")))
+                },
+            )
+        }
+
+        composable<Payment> { backStackEntry ->
+            val payment = backStackEntry.toRoute<Payment>()
+            val cartItemIds =
+                payment.cartItemIds
+                    .split(",")
+                    .mapNotNull { it.toLongOrNull() }
+            val viewModel: PaymentViewModel =
+                viewModel(
+                    factory =
+                        PaymentViewModel.provideFactory(
+                            container = container,
+                            cartItemIds = cartItemIds,
+                        ),
+                )
+
+            PaymentScreen(
+                viewModel = viewModel,
+                onCloseClick = { navController.popBackStack() },
+                onPaymentSuccess = {
+                    navController.navigate(Shopping) {
+                        popUpTo(Shopping) { inclusive = true }
+                    }
+                },
             )
         }
     }

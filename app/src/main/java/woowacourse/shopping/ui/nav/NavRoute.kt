@@ -13,3 +13,8 @@ data class ProductDetail(
 
 @Serializable
 object Cart
+
+@Serializable
+data class Payment(
+    val cartItemIds: String,
+)
