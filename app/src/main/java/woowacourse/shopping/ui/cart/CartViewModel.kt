@@ -153,18 +153,6 @@ class CartViewModel(
         }
     }
 
-    fun order(selectedIds: List<Long>) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            try {
-                orderRepo.requestOrder(selectedIds)
-                _event.emit(CartEvent.OrderSuccess)
-            } finally {
-                _uiState.update { it.copy(isLoading = false) }
-            }
-        }
-    }
-
     fun increaseInRecommendScreen(product: Product) {
         viewModelScope.launch {
             try {
