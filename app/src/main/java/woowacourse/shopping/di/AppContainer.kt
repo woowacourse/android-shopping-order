@@ -2,6 +2,8 @@ package woowacourse.shopping.di
 
 import android.content.Context
 import androidx.room.Room
+import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
+import woowacourse.shopping.data.datasource.order.OrderRemoteDateSourceImpl
 import woowacourse.shopping.data.datasource.cart.CartRemoteDataSource
 import woowacourse.shopping.data.datasource.cart.CartRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.coupon.CouponRemoteDataSource
@@ -37,6 +39,10 @@ class AppContainer(
     private val cartDataSource: CartRemoteDataSource =
         CartRemoteDataSourceImpl(
             RetrofitProvider.cartApi,
+        )
+
+    private val orderRemoteDataSource: OrderRemoteDataSource =
+        OrderRemoteDateSourceImpl(
             RetrofitProvider.orderApi,
         )
     private val productRemoteDataSource: ProductRemoteDataSource =
@@ -49,7 +55,8 @@ class AppContainer(
     private val couponDataSource: CouponRemoteDataSource =
         CouponRemoteDataSourceImpl(RetrofitProvider.couponApi)
 
-    val cartRepository: CartRepository = CartRepositoryImpl(cartDataSource)
+    val cartRepository: CartRepository =
+        CartRepositoryImpl(cartDataSource, orderRemoteDataSource)
     val productRepository: ProductRepository = ProductRepositoryImpl(productRemoteDataSource)
     val recentProductRepository: RecentProductRepository =
         RecentProductRepositoryImpl(recentProductDataSource)

@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
 import woowacourse.shopping.data.datasource.cart.CartRemoteDataSource
 import woowacourse.shopping.data.mapper.toDomain
 import woowacourse.shopping.domain.cart.CartItems
@@ -11,6 +12,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 
 class CartRepositoryImpl(
     private val cartRemoteDataSource: CartRemoteDataSource,
+    private val orderRemoteDataSource: OrderRemoteDataSource,
 ) : CartRepository {
     private val _cartItems = MutableStateFlow(CartItems())
     override val cartItems: StateFlow<CartItems> = _cartItems.asStateFlow()
@@ -41,7 +43,7 @@ class CartRepositoryImpl(
     }
 
     override suspend fun order(cartItemIds: List<Int>) {
-        cartRemoteDataSource.order(cartItemIds)
+        orderRemoteDataSource.order(cartItemIds)
     }
 
     override suspend fun getCartItemsByIds(cartIds: List<Int>): CartItems {
