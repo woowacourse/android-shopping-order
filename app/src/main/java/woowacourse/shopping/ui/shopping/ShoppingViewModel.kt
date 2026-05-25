@@ -146,7 +146,12 @@ class ShoppingViewModel(
     }
 
     fun loadMore() {
-        if (!_uiState.value.uiInfo.isNetworkAvailable || !_uiState.value.cartSummary.canLoadMore || _uiState.value.uiInfo.isLoading) return
+        if (!_uiState.value.uiInfo.isNetworkAvailable ||
+            !_uiState.value.cartSummary.canLoadMore ||
+            _uiState.value.uiInfo.isLoading
+        ) {
+            return
+        }
 
         viewModelScope.launch {
             try {
