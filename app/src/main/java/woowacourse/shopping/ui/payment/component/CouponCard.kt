@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -34,6 +35,7 @@ fun CouponCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val contentAlpha = if (coupon.enabled) 1f else 0.42f
     val borderedModifier =
         modifier
             .fillMaxWidth()
@@ -46,7 +48,10 @@ fun CouponCard(
     Column(
         modifier =
             borderedModifier
-                .clickable(onClick = onClick)
+                .clickable(
+                    enabled = coupon.enabled,
+                    onClick = onClick,
+                )
                 .padding(horizontal = 24.dp, vertical = 22.dp),
         verticalArrangement = Arrangement.Center,
     ) {
@@ -55,6 +60,7 @@ fun CouponCard(
         ) {
             Checkbox(
                 checked = checked,
+                enabled = coupon.enabled,
                 onCheckedChange = { onClick() },
                 colors =
                     CheckboxDefaults.colors(
@@ -62,7 +68,10 @@ fun CouponCard(
                         uncheckedColor = Color.Gray,
                         checkmarkColor = Color.White,
                     ),
-                modifier = Modifier.size(28.dp),
+                modifier =
+                    Modifier
+                        .size(28.dp)
+                        .alpha(contentAlpha),
             )
             Text(
                 text = coupon.title,
@@ -70,20 +79,29 @@ fun CouponCard(
                 fontWeight = FontWeight.Bold,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(start = 14.dp),
+                modifier =
+                    Modifier
+                        .padding(start = 14.dp)
+                        .alpha(contentAlpha),
             )
         }
         Spacer(modifier = Modifier.heightIn(min = 14.dp))
         Text(
             text = "만료일: ${coupon.expirationDate}",
             fontSize = 16.sp,
-            modifier = Modifier.padding(start = 8.dp),
+            modifier =
+                Modifier
+                    .padding(start = 8.dp)
+                    .alpha(contentAlpha),
         )
         coupon.minimumOrderAmount?.let { minimumOrderAmount ->
             Text(
                 text = "최소 주문 금액: $minimumOrderAmount",
                 fontSize = 16.sp,
-                modifier = Modifier.padding(start = 8.dp, top = 2.dp),
+                modifier =
+                    Modifier
+                        .padding(start = 8.dp, top = 2.dp)
+                        .alpha(contentAlpha),
             )
         }
     }

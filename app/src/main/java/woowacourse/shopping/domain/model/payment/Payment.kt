@@ -23,4 +23,8 @@ data class Payment(
 
     val totalPaymentAmount: Int
         get() = orderAmount - couponDiscountAmount + deliveryFee
+
+    fun canApply(coupon: Coupon): Boolean =
+        coupon.discountAmount(order, couponUseContext) > 0 ||
+            coupon.deliveryFee(order, defaultDeliveryFee, couponUseContext) < defaultDeliveryFee
 }

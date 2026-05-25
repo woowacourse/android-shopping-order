@@ -45,7 +45,9 @@ class PaymentViewModel(
                 if (payment.selectedCoupon?.code == couponCode) {
                     null
                 } else {
-                    coupons.value.firstOrNull { it.code == couponCode }
+                    coupons.value
+                        .firstOrNull { it.code == couponCode }
+                        ?.takeIf { payment.canApply(it) }
                 }
             payment.copy(selectedCoupon = selectedCoupon)
         }
@@ -69,7 +71,7 @@ class PaymentViewModel(
                 val fetchedCoupons = couponRepository.getCoupons()
                 _coupons.update { fetchedCoupons }
                 _payment.update { payment ->
-                    payment.copy(selectedCoupon = fetchedCoupons.firstOrNull())
+                    payment.withValidSelectedCoupon(fetchedCoupons)
                 }
             } catch (e: Exception) {
                 _uiEvent.emit(UiEvent.ShowMessage("쿠폰을 불러오지 못했습니다."))
@@ -87,12 +89,22 @@ class PaymentViewModel(
                         selectedCartItemIds = selectedCartItemIds,
                     )
                 _payment.update { payment ->
-                    payment.copy(order = order)
+                    payment
+                        .copy(order = order)
+                        .withValidSelectedCoupon(coupons.value)
                 }
             } catch (e: Exception) {
                 _uiEvent.emit(UiEvent.ShowMessage("주문 금액을 불러오지 못했습니다."))
             }
         }
+    }
+
+    private fun Payment.withValidSelectedCoupon(coupons: List<Coupon>): Payment {
+        val validSelectedCoupon =
+            coupons.firstOrNull { coupon ->
+                coupon.code == selectedCoupon?.code && canApply(coupon)
+            } ?: coupons.firstOrNull { canApply(it) }
+        return copy(selectedCoupon = validSelectedCoupon)
     }
 }
 

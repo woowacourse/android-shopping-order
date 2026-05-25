@@ -18,7 +18,7 @@ data class PaymentUiState(
 
 fun Payment.toUiState(coupons: List<Coupon>): PaymentUiState =
     PaymentUiState(
-        coupons = coupons.map { it.toUiModel() },
+        coupons = coupons.map { it.toUiModel(enabled = canApply(it)) },
         selectedCouponCode = selectedCoupon?.code,
         payment = PaymentUiModel(
             formattedOrderAmount = orderAmount.toPriceString(),
@@ -27,4 +27,3 @@ fun Payment.toUiState(coupons: List<Coupon>): PaymentUiState =
             formattedTotalPaymentAmount = totalPaymentAmount.toPriceString(),
         )
     )
-

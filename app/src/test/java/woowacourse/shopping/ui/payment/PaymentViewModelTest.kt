@@ -66,15 +66,28 @@ class PaymentViewModelTest {
         }
 
     @Test
-    fun `결제 화면 진입 시 쿠폰 목록을 조회하고 첫 번째 쿠폰을 선택한다`() =
+    fun `결제 화면 진입 시 쿠폰 목록을 조회하고 조건에 맞는 첫 번째 쿠폰을 선택한다`() =
         runTest {
-            val viewModel = createViewModel(selectedCartItemIds = emptyList())
+            fakeCartRepository.insert(PurchaseProduct(id = 101L, product = products[0], count = 1))
+            val viewModel = createViewModel(selectedCartItemIds = listOf(101L))
 
             advanceUntilIdle()
 
             viewModel.coupons.value.size shouldBe 1
             viewModel.payment.value.selectedCoupon
                 ?.code shouldBe "FIXED5000"
+        }
+
+    @Test
+    fun `조건에 맞지 않는 쿠폰은 선택되지 않는다`() =
+        runTest {
+            fakeCartRepository.insert(PurchaseProduct(id = 102L, product = products[1], count = 1))
+            val viewModel = createViewModel(selectedCartItemIds = listOf(102L))
+            advanceUntilIdle()
+
+            viewModel.selectCoupon("FIXED5000")
+
+            viewModel.payment.value.selectedCoupon shouldBe null
         }
 
     @Test
