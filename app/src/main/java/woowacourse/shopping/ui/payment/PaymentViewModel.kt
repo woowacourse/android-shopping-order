@@ -15,12 +15,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.data.localdata.ShoppingSharedPreferences
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.CouponRepository
 import woowacourse.shopping.data.repository.PaymentRepository
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Payment
+import woowacourse.shopping.notification.PaymentAlarmScheduler
 import woowacourse.shopping.ui.model.UiPaymentPrice
 
 class PaymentViewModel(
@@ -28,6 +30,8 @@ class PaymentViewModel(
     private val cartRepository: CartRepository,
     private val couponRepository: CouponRepository,
     private val paymentRepository: PaymentRepository,
+    private val shoppingSharedPreferences: ShoppingSharedPreferences,
+    private val paymentAlarmScheduler: PaymentAlarmScheduler,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PaymentUiState())
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
@@ -37,6 +41,7 @@ class PaymentViewModel(
 
     init {
         loadPayment()
+        schedulePaymentReminder()
     }
 
     private fun loadPayment() {
@@ -115,6 +120,8 @@ class PaymentViewModel(
             runCatching {
                 paymentRepository.createOrder(selectedCartItemIds)
             }.onSuccess {
+                paymentAlarmScheduler.cancel()
+                shoppingSharedPreferences.clearPaymentCartItemIds()
                 _uiEvent.emit(PaymentUiEvent.PaymentSuccess)
             }.onFailure {
                 _uiEvent.emit(PaymentUiEvent.ShowToastMessage("결제에 실패했습니다 다시 시도해주세요."))
@@ -141,6 +148,13 @@ class PaymentViewModel(
             paymentPrice = finalPrice.amount,
         )
 
+    private fun schedulePaymentReminder() {
+        if (shoppingSharedPreferences.getIsNotification()) {
+            shoppingSharedPreferences.savePaymentCartItemIds(selectedCartItemIds)
+            paymentAlarmScheduler.schedule()
+        }
+    }
+
     companion object {
         fun Factory(selectedCartItemIds: List<String>): ViewModelProvider.Factory =
             viewModelFactory {
@@ -152,6 +166,8 @@ class PaymentViewModel(
                         cartRepository = app.appContainer.cartRepository,
                         couponRepository = app.appContainer.couponRepository,
                         paymentRepository = app.appContainer.paymentRepository,
+                        shoppingSharedPreferences = app.appContainer.shoppingSharedPreferences,
+                        paymentAlarmScheduler = app.appContainer.paymentAlarmScheduler,
                     )
                 }
             }

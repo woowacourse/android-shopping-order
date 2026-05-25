@@ -12,12 +12,14 @@ import woowacourse.shopping.ui.setting.SettingRoute
 import woowacourse.shopping.ui.shopping.ShoppingRoute
 
 @Composable
-fun ShoppingNavHost() {
+fun ShoppingNavHost(paymentCartItemIds: List<String>? = null) {
     val navController = rememberNavController()
+    val startDestination =
+        if (paymentCartItemIds == null) Shopping else Payment(selectedCartItemIds = paymentCartItemIds)
 
     NavHost(
         navController = navController,
-        startDestination = Shopping,
+        startDestination = startDestination,
     ) {
         composable<Shopping> {
             ShoppingRoute(
