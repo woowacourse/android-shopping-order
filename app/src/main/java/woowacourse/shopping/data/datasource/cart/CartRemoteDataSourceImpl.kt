@@ -1,6 +1,5 @@
 package woowacourse.shopping.data.datasource.cart
 
-import android.util.Log
 import woowacourse.shopping.data.remote.api.AddCartItemRequest
 import woowacourse.shopping.data.remote.api.CartApi
 import woowacourse.shopping.data.remote.api.OrderApi

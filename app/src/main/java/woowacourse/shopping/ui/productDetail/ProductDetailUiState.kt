@@ -3,7 +3,7 @@ package woowacourse.shopping.ui.productDetail
 import woowacourse.shopping.domain.model.product.Product
 
 sealed interface ProductDetailUiState {
-    data object Loading : ProductDetailUiState
+    object Loading : ProductDetailUiState
 
     data class Success(
         val product: Product,

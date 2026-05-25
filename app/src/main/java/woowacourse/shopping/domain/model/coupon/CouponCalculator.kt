@@ -1,8 +1,8 @@
 package woowacourse.shopping.domain.model.coupon
 
+import woowacourse.shopping.domain.model.cart.CartItems
 import java.time.LocalDate
 import java.time.LocalDateTime
-import woowacourse.shopping.domain.model.cart.CartItems
 
 data class CouponApplyResult(
     val applied: Boolean,
@@ -43,7 +43,11 @@ object CouponCalculator {
         }
     }
 
-    private fun applyFixed(coupon: Coupon, subtotal: Int, baseShipping: Int): CouponApplyResult {
+    private fun applyFixed(
+        coupon: Coupon,
+        subtotal: Int,
+        baseShipping: Int,
+    ): CouponApplyResult {
         val min = coupon.minOrderAmount ?: 0
         if (subtotal < min) {
             return CouponApplyResult(applied = false, discount = 0, shippingFee = baseShipping)
@@ -52,7 +56,11 @@ object CouponCalculator {
         return CouponApplyResult(applied = true, discount = discount.coerceAtMost(subtotal), shippingFee = baseShipping)
     }
 
-    private fun applyBogo(coupon: Coupon, cartItems: CartItems, baseShipping: Int): CouponApplyResult {
+    private fun applyBogo(
+        coupon: Coupon,
+        cartItems: CartItems,
+        baseShipping: Int,
+    ): CouponApplyResult {
         val buyQuantity = coupon.buyQuantity ?: 3
         val getQuantity = coupon.getQuantity ?: 1
         val bundleSize = buyQuantity + getQuantity
@@ -76,13 +84,22 @@ object CouponCalculator {
         )
     }
 
-    private fun applyFreeShipping(coupon: Coupon, subtotal: Int, baseShipping: Int): CouponApplyResult {
+    private fun applyFreeShipping(
+        coupon: Coupon,
+        subtotal: Int,
+        baseShipping: Int,
+    ): CouponApplyResult {
         val min = coupon.minOrderAmount ?: 0
         if (subtotal < min) return CouponApplyResult(applied = false, discount = 0, shippingFee = baseShipping)
         return CouponApplyResult(applied = true, discount = 0, shippingFee = 0)
     }
 
-    private fun applyPercent(coupon: Coupon, subtotal: Int, now: LocalDateTime, baseShipping: Int): CouponApplyResult {
+    private fun applyPercent(
+        coupon: Coupon,
+        subtotal: Int,
+        now: LocalDateTime,
+        baseShipping: Int,
+    ): CouponApplyResult {
         val currentTime = now.toLocalTime()
         val startTime = coupon.availableStartTime
         val endTime = coupon.availableEndTime

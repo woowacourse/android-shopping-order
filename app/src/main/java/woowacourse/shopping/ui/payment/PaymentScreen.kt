@@ -90,10 +90,11 @@ private fun PaymentContent(
         when (uiState) {
             PaymentUiState.Loading -> {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .padding(16.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                            .padding(16.dp),
                 ) {
                     Text(text = "로딩 중...", color = Color.Gray)
                 }
@@ -117,9 +118,10 @@ private fun PaymentScreenContent(
     onCouponClick: (Coupon?) -> Unit,
 ) {
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
         contentPadding = PaddingValues(bottom = 16.dp),
     ) {
         item {
@@ -162,10 +164,11 @@ private fun CouponCard(
     onClick: () -> Unit,
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
-            .clickable { onClick() },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 6.dp)
+                .clickable { onClick() },
         border = BorderStroke(1.dp, Color(PAYMENT_CARD_BORDER_COLOR)),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(4.dp),
@@ -209,10 +212,11 @@ private fun CouponCard(
 @Composable
 private fun SummarySection(uiState: PaymentUiState.Success) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(PAYMENT_SUMMARY_BACKGROUND_COLOR))
-            .padding(horizontal = 16.dp, vertical = 20.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(Color(PAYMENT_SUMMARY_BACKGROUND_COLOR))
+                .padding(horizontal = 16.dp, vertical = 20.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         SummaryRow(label = "주문 금액", value = formatPrice(uiState.subtotal))
@@ -263,16 +267,18 @@ private fun SummaryRow(
 @Composable
 private fun PaymentBottomBar(onPayClick: () -> Unit) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White)
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(16.dp),
     ) {
         Button(
             onClick = onPayClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(PAYMENT_BUTTON_COLOR)),
             shape = RoundedCornerShape(0.dp),
         ) {
@@ -306,12 +312,12 @@ private fun PaymentTopAppBar(onClose: () -> Unit) {
                 )
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color(APP_BAR_COLOR),
-            navigationIconContentColor = Color.White,
-            titleContentColor = Color.White,
-        ),
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = Color(APP_BAR_COLOR),
+                navigationIconContentColor = Color.White,
+                titleContentColor = Color.White,
+            ),
         windowInsets = WindowInsets(0, 0, 0, 0),
     )
 }
-

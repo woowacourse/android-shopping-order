@@ -30,21 +30,21 @@ class CartViewModel(
     private val recentProductRepository: RecentProductRepository,
     private val productRepository: ProductRepository,
 ) : ViewModel() {
-    private val _pagedCartItems = MutableStateFlow<PagedCartItems?>(null)
-    private val _selectedItems = MutableStateFlow<Set<Int>>(emptySet())
-    private val _recommendProducts = MutableStateFlow<List<Product>>(emptyList())
-    private val _isCartOrRecommend = MutableStateFlow(CartFlow.CART)
-    private val _allCartItems = MutableStateFlow<CartItems?>(null)
+    private val pagedCartItemsState = MutableStateFlow<PagedCartItems?>(null)
+    private val selectedItemsState = MutableStateFlow<Set<Int>>(emptySet())
+    private val recommendProductsState = MutableStateFlow<List<Product>>(emptyList())
+    private val isCartOrRecommendState = MutableStateFlow(CartFlow.CART)
+    private val allCartItemsState = MutableStateFlow<CartItems?>(null)
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     private var currentPage = 0
 
     val uiState: StateFlow<CartUiState> =
         combine(
-            _pagedCartItems,
-            _selectedItems,
-            _recommendProducts,
-            _isCartOrRecommend,
-            _allCartItems,
+            pagedCartItemsState,
+            selectedItemsState,
+            recommendProductsState,
+            isCartOrRecommendState,
+            allCartItemsState,
         ) { pagedCartItems, selectedItems, recommendProducts, isCartOrRecommend, allCartItems ->
 
             pagedCartItems ?: return@combine CartUiState.Loading
@@ -55,7 +55,7 @@ class CartViewModel(
 
             val isAllSelected =
                 allCartIds.isNotEmpty() &&
-                        allCartIds.all { it in selectedItems }
+                    allCartIds.all { it in selectedItems }
 
             CartUiState.Success(
                 cartItems = pagedItems.values.toUiModel(selectedItems, isAllSelected),
@@ -97,7 +97,7 @@ class CartViewModel(
 
     private fun loadPage(page: Int) {
         viewModelScope.launch {
-            _pagedCartItems.update { null }
+            pagedCartItemsState.update { null }
             refreshCartItems(page)
         }
     }
@@ -108,19 +108,20 @@ class CartViewModel(
             val recommendedCategory = recommended.category
             val productList = productRepository.getCategoryProducts(recommendedCategory, 0, 100)
             val cartProducts =
-                cartRepository.getAllCartItems()
+                cartRepository
+                    .getAllCartItems()
                     .values
                     .map { it.product }
                     .toSet()
 
             val result = productList.getCategoryProductsLimit(cartProducts, recommended)
-            _recommendProducts.update { result }
+            recommendProductsState.update { result }
         }
     }
 
     fun removeCartItem(cartId: Int) {
         viewModelScope.launch {
-            _selectedItems.update { it - cartId }
+            selectedItemsState.update { it - cartId }
             cartRepository.remove(cartId)
 
             refreshCartItems()
@@ -131,7 +132,7 @@ class CartViewModel(
     fun addCartItem(product: Product) {
         viewModelScope.launch {
             val cartId = cartRepository.addProduct(product)
-            _selectedItems.update { it + cartId }
+            selectedItemsState.update { it + cartId }
             refreshCartItems()
             _uiEvent.emit(UiEvent.ShowSnackbar("장바구니에 추가했습니다"))
         }
@@ -151,13 +152,14 @@ class CartViewModel(
 
             if (target.quantity.value == 1) {
                 cartRepository.remove(target.id)
-                _selectedItems.update { it - target.id }
+                selectedItemsState.update { it - target.id }
             } else {
                 cartRepository.decrease(target.id, Quantity(target.quantity.value - 1))
             }
             refreshCartItems()
         }
     }
+
     fun increase(cartId: Int) {
         viewModelScope.launch {
             val target = findCartItemByCartId(cartId) ?: return@launch
@@ -171,7 +173,7 @@ class CartViewModel(
             val target = findCartItemByCartId(cartId) ?: return@launch
             if (target.quantity.value == 1) {
                 cartRepository.remove(cartId)
-                _selectedItems.update { it - cartId }
+                selectedItemsState.update { it - cartId }
             } else {
                 cartRepository.decrease(cartId, Quantity(target.quantity.value - 1))
             }
@@ -180,15 +182,15 @@ class CartViewModel(
     }
 
     fun toggleSelection(id: Int) {
-        _selectedItems.update { current ->
+        selectedItemsState.update { current ->
             if (id in current) current - id else current + id
         }
     }
 
     fun toggleAllSelection() {
-        val allCartItems = _allCartItems.value ?: return
+        val allCartItems = allCartItemsState.value ?: return
         val allCartIds = allCartItems.values.map { it.id }.toSet()
-        _selectedItems.update { selectedItems ->
+        selectedItemsState.update { selectedItems ->
             val isAllSelected =
                 allCartIds.isNotEmpty() && allCartIds.all { it in selectedItems }
 
@@ -201,22 +203,22 @@ class CartViewModel(
     }
 
     fun goToNextPage() {
-        if (_pagedCartItems.value?.isLast != false) return
+        if (pagedCartItemsState.value?.isLast != false) return
         loadPage(currentPage + 1)
     }
 
     fun goToPreviousPage() {
-        if (_pagedCartItems.value?.isFirst != false) return
+        if (pagedCartItemsState.value?.isFirst != false) return
         loadPage(currentPage - 1)
     }
 
     fun onClickOrder() {
-        val selectedItems = _selectedItems.value
+        val selectedItems = selectedItemsState.value
 
         if (selectedItems.isEmpty()) return
 
-        if (_isCartOrRecommend.value == CartFlow.CART) {
-            _isCartOrRecommend.value = CartFlow.RECOMMEND
+        if (isCartOrRecommendState.value == CartFlow.CART) {
+            isCartOrRecommendState.value = CartFlow.RECOMMEND
             return
         }
 
@@ -233,8 +235,8 @@ class CartViewModel(
         val pagedResult = cartRepository.getCartItems(targetPage, PAGE_SIZE)
 
         currentPage = targetPage
-        _pagedCartItems.update { pagedResult }
-        _allCartItems.update { allResult }
+        pagedCartItemsState.update { pagedResult }
+        allCartItemsState.update { allResult }
     }
 
     private fun totalPage(totalCount: Int): Int =
@@ -244,8 +246,10 @@ class CartViewModel(
             (totalCount - 1) / PAGE_SIZE
         }
 
-    private fun findCartItemByProductId(productId: Int): CartItem? = _allCartItems.value?.values?.find { it.product.id == productId }
-    private fun findCartItemByCartId(cartId: Int): CartItem? = _allCartItems.value?.values?.find { it.id == cartId }
+    private fun findCartItemByProductId(productId: Int): CartItem? = allCartItemsState.value?.values?.find { it.product.id == productId }
+
+    private fun findCartItemByCartId(cartId: Int): CartItem? = allCartItemsState.value?.values?.find { it.id == cartId }
+
     companion object {
         private const val PAGE_SIZE = 5
 

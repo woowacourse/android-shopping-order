@@ -18,14 +18,14 @@ import androidx.navigation.toRoute
 import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.ui.UiEvent
 import woowacourse.shopping.ui.cart.CartScreen
-import woowacourse.shopping.ui.cart.CartViewModel
 import woowacourse.shopping.ui.cart.CartUiState
+import woowacourse.shopping.ui.cart.CartViewModel
+import woowacourse.shopping.ui.payment.PaymentScreen
+import woowacourse.shopping.ui.payment.PaymentViewModel
 import woowacourse.shopping.ui.productDetail.ProductDetailScreen
 import woowacourse.shopping.ui.productDetail.ProductDetailViewModel
 import woowacourse.shopping.ui.productList.ProductListScreen
 import woowacourse.shopping.ui.productList.ProductListViewModel
-import woowacourse.shopping.ui.payment.PaymentScreen
-import woowacourse.shopping.ui.payment.PaymentViewModel
 
 @Composable
 fun AppNavHost(
@@ -39,13 +39,15 @@ fun AppNavHost(
         modifier = modifier,
     ) {
         composable<ProductListRoute> {
-            val productListViewModel: ProductListViewModel = viewModel(
-                factory = ProductListViewModel.factory(
-                    productRepository = appContainer.productRepository,
-                    cartRepository = appContainer.cartRepository,
-                    recentProductRepository = appContainer.recentProductRepository,
-                ),
-            )
+            val productListViewModel: ProductListViewModel =
+                viewModel(
+                    factory =
+                        ProductListViewModel.factory(
+                            productRepository = appContainer.productRepository,
+                            cartRepository = appContainer.cartRepository,
+                            recentProductRepository = appContainer.recentProductRepository,
+                        ),
+                )
             val snackbarHostState = remember { SnackbarHostState() }
             LaunchedEffect(productListViewModel) {
                 productListViewModel.uiEvent.collect { event ->
@@ -76,15 +78,17 @@ fun AppNavHost(
 
         composable<ProductDetailRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<ProductDetailRoute>()
-            val productDetailViewModel: ProductDetailViewModel = viewModel(
-                factory = ProductDetailViewModel.factory(
-                    productId = route.productId,
-                    openedFromLastViewed = false,
-                    productRepository = appContainer.productRepository,
-                    cartRepository = appContainer.cartRepository,
-                    recentProductRepository = appContainer.recentProductRepository,
-                ),
-            )
+            val productDetailViewModel: ProductDetailViewModel =
+                viewModel(
+                    factory =
+                        ProductDetailViewModel.factory(
+                            productId = route.productId,
+                            openedFromLastViewed = false,
+                            productRepository = appContainer.productRepository,
+                            cartRepository = appContainer.cartRepository,
+                            recentProductRepository = appContainer.recentProductRepository,
+                        ),
+                )
             val snackbarHostState = remember { SnackbarHostState() }
 
             LaunchedEffect(productDetailViewModel) {
@@ -119,13 +123,15 @@ fun AppNavHost(
         }
 
         composable<CartRoute> {
-            val cartViewModel: CartViewModel = viewModel(
-                factory = CartViewModel.factory(
-                    cartRepository = appContainer.cartRepository,
-                    recentProductRepository = appContainer.recentProductRepository,
-                    productRepository = appContainer.productRepository,
-                ),
-            )
+            val cartViewModel: CartViewModel =
+                viewModel(
+                    factory =
+                        CartViewModel.factory(
+                            cartRepository = appContainer.cartRepository,
+                            recentProductRepository = appContainer.recentProductRepository,
+                            productRepository = appContainer.productRepository,
+                        ),
+                )
             val snackbarHostState = remember { SnackbarHostState() }
             LaunchedEffect(cartViewModel) {
                 cartViewModel.uiEvent.collect { event ->
@@ -137,12 +143,13 @@ fun AppNavHost(
                             navController.navigate(PaymentRoute(selectedItemIds = selectedIds))
                         }
 
-                        UiEvent.NavigateToProductList -> navController.navigate(ProductListRoute) {
-                            popUpTo<CartRoute> {
-                                inclusive = true
+                        UiEvent.NavigateToProductList ->
+                            navController.navigate(ProductListRoute) {
+                                popUpTo<CartRoute> {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
                             }
-                            launchSingleTop = true
-                        }
                     }
                 }
             }
@@ -162,25 +169,28 @@ fun AppNavHost(
 
         composable<PaymentRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<PaymentRoute>()
-            val paymentViewModel: PaymentViewModel = viewModel(
-                factory = PaymentViewModel.factory(
-                    cartRepository = appContainer.cartRepository,
-                    couponRepository = appContainer.couponRepository,
-                    selectedItemIds = route.selectedItemIds.toSet(),
-                ),
-            )
+            val paymentViewModel: PaymentViewModel =
+                viewModel(
+                    factory =
+                        PaymentViewModel.factory(
+                            cartRepository = appContainer.cartRepository,
+                            couponRepository = appContainer.couponRepository,
+                            selectedItemIds = route.selectedItemIds.toSet(),
+                        ),
+                )
             val snackbarHostState = remember { SnackbarHostState() }
 
             LaunchedEffect(paymentViewModel) {
                 paymentViewModel.uiEvent.collect { event ->
                     when (event) {
                         is woowacourse.shopping.ui.payment.PaymentUiEvent.ShowMessage -> snackbarHostState.showSnackbar(event.message)
-                        woowacourse.shopping.ui.payment.PaymentUiEvent.NavigateToProductList -> navController.navigate(ProductListRoute) {
-                            popUpTo<PaymentRoute> {
-                                inclusive = true
+                        woowacourse.shopping.ui.payment.PaymentUiEvent.NavigateToProductList ->
+                            navController.navigate(ProductListRoute) {
+                                popUpTo<PaymentRoute> {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
                             }
-                            launchSingleTop = true
-                        }
                     }
                 }
             }
@@ -199,5 +209,3 @@ fun AppNavHost(
         }
     }
 }
-
-

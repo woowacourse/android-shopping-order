@@ -3,9 +3,9 @@ package woowacourse.shopping.ui.cart
 import woowacourse.shopping.domain.model.product.Product
 
 sealed interface CartUiState {
-    data object Loading : CartUiState
+    object Loading : CartUiState
 
-    data object Empty : CartUiState
+    object Empty : CartUiState
 
     data class Success(
         val cartItems: List<CartItemUiModel>,

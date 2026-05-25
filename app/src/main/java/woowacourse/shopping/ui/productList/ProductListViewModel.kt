@@ -7,8 +7,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
@@ -32,8 +32,8 @@ class ProductListViewModel(
     private val recentProductsFlow = MutableStateFlow<List<Product>>(emptyList())
     private val cartFlow = MutableStateFlow(Cart())
 
-    private val _uiEventFlow = MutableSharedFlow<UiEvent>()
-    val uiEvent: SharedFlow<UiEvent> = _uiEventFlow.asSharedFlow()
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
 
     val uiState: StateFlow<ProductListUiState> =
         combine(pagingState, cartFlow, recentProductsFlow) { paging, cart, recents ->
@@ -55,7 +55,6 @@ class ProductListViewModel(
                 refreshCart()
             }
         }
-
     }
 
     fun moreProducts() {
@@ -91,8 +90,8 @@ class ProductListViewModel(
     }
 
     private fun observeRecentProducts() {
-        viewModelScope.launch{
-            recentProductRepository.getRecentProducts().collect{
+        viewModelScope.launch {
+            recentProductRepository.getRecentProducts().collect {
                 recentProductsFlow.value = it
             }
         }

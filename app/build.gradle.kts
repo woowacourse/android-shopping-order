@@ -36,7 +36,7 @@ android {
         buildConfigField(
             "String",
             "BASE_URL",
-            "\"${envProperties.getProperty("BASE_URL")}\""
+            "\"${envProperties.getProperty("BASE_URL")}\"",
         )
 
         buildConfigField(

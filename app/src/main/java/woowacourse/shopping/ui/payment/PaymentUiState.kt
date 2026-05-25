@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.payment
 
-import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.cart.CartItems
+import woowacourse.shopping.domain.model.coupon.Coupon
 
 sealed interface PaymentUiState {
     object Loading : PaymentUiState
@@ -16,6 +16,3 @@ sealed interface PaymentUiState {
         val totalPrice: Int = 0,
     ) : PaymentUiState
 }
-
-
-

@@ -8,4 +8,3 @@ class CouponRemoteDataSourceImpl(
 ) : CouponRemoteDataSource {
     override suspend fun getCoupons(): List<CouponResponseDto> = couponApi.getCoupons()
 }
-

@@ -1,5 +1,6 @@
 ﻿package woowacourse.shopping.data.remote.dto
 import kotlinx.serialization.Serializable
+
 @Serializable
 data class CouponResponseDto(
     val id: Long,
@@ -13,6 +14,7 @@ data class CouponResponseDto(
     val getQuantity: Int? = null,
     val availableTime: AvailableTimeResponseDto? = null,
 )
+
 @Serializable
 data class AvailableTimeResponseDto(
     val start: String,

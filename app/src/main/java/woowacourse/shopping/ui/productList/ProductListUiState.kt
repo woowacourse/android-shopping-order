@@ -4,7 +4,7 @@ import woowacourse.shopping.domain.model.product.Product
 import java.io.IOException
 
 sealed interface ProductListUiState {
-    data object Loading : ProductListUiState
+    object Loading : ProductListUiState
 
     data class Success(
         val products: List<Product>,

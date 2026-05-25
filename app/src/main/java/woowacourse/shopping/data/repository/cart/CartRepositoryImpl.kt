@@ -1,13 +1,13 @@
 package woowacourse.shopping.data.repository.cart
 
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import woowacourse.shopping.data.datasource.cart.CartDataSource
 import woowacourse.shopping.data.mapper.toCartItems
 import woowacourse.shopping.data.mapper.toPagedCartItems
 import woowacourse.shopping.domain.model.cart.CartItems
 import woowacourse.shopping.domain.model.cart.Quantity
 import woowacourse.shopping.domain.model.product.Product
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.ui.cart.PagedCartItems
 
@@ -16,6 +16,7 @@ class CartRepositoryImpl(
 ) : CartRepository {
     private val _cartEvents = MutableSharedFlow<Unit>(replay = 0)
     override val cartEvents: SharedFlow<Unit> = _cartEvents
+
     override suspend fun getCartItems(
         page: Int,
         size: Int,

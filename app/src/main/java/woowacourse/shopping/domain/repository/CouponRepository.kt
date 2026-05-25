@@ -5,4 +5,3 @@ import woowacourse.shopping.domain.model.coupon.Coupon
 interface CouponRepository {
     suspend fun getAvailableCoupons(): List<Coupon>
 }
-

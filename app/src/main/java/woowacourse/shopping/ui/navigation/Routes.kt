@@ -6,11 +6,14 @@ import kotlinx.serialization.Serializable
 object ProductListRoute
 
 @Serializable
-data class ProductDetailRoute(val productId: Int)
+data class ProductDetailRoute(
+    val productId: Int,
+)
 
 @Serializable
 object CartRoute
 
 @Serializable
-data class PaymentRoute(val selectedItemIds: List<Int> = emptyList())
-
+data class PaymentRoute(
+    val selectedItemIds: List<Int> = emptyList(),
+)

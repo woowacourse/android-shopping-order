@@ -14,7 +14,7 @@ interface ProductRepository {
         category: Category,
         page: Int,
         pageSize: Int,
-    ):Products
+    ): Products
 
     suspend fun getProduct(id: Int): Product?
 }

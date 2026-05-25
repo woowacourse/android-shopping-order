@@ -14,5 +14,6 @@ interface ProductRemoteDataSource {
         page: Int,
         size: Int,
     ): ProductsResponseDto
+
     suspend fun getProduct(id: Int): ProductResponseDto?
 }
