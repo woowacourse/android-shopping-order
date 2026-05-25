@@ -3,6 +3,8 @@ package woowacourse.shopping.ui.nav
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -11,17 +13,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.data.remote.NetworkMonitor
 import woowacourse.shopping.di.AppContainer
-import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.ui.cart.CartScreen
 import woowacourse.shopping.ui.cart.CartViewModel
 import woowacourse.shopping.ui.payment.PaymentScreen
@@ -55,7 +55,10 @@ fun AppNavHost(
         }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
-            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
         ) {
             notificationEnabled = true
             container.notificationRepository.setEnabled(true)
@@ -114,7 +117,12 @@ fun AppNavHost(
                 onCloseClick = { navController.popBackStack() },
                 onAddToCartClick = { navController.popBackStack() },
                 onLastViewedProductClick = { product ->
-                    navController.navigate(ProductDetail(productId = product.id, isFromBanner = true)) {
+                    navController.navigate(
+                        ProductDetail(
+                            productId = product.id,
+                            isFromBanner = true
+                        )
+                    ) {
                         popUpTo(Shopping) { saveState = true }
                     }
                 },

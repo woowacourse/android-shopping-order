@@ -113,7 +113,7 @@ private fun ShoppingScreen(
     onIncreaseClick: (Product) -> Unit,
     onDecreaseClick: (Product) -> Unit,
     onRecentProductClick: (Product) -> Unit,
-    ) {
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,

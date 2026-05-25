@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.repository.preferences
 
 import android.content.Context
-import woowacourse.shopping.data.repository.NotificationRepository
 import androidx.core.content.edit
+import woowacourse.shopping.data.repository.NotificationRepository
 
 class SharedPreferenceNotificationRepository(
     context: Context,
@@ -13,7 +13,8 @@ class SharedPreferenceNotificationRepository(
             Context.MODE_PRIVATE,
         )
 
-    override fun isEnabled(): Boolean = preferences.getBoolean(KEY_NOTIFICATION_ENABLED, DEFAULT_ENABLED)
+    override fun isEnabled(): Boolean =
+        preferences.getBoolean(KEY_NOTIFICATION_ENABLED, DEFAULT_ENABLED)
 
     override fun setEnabled(enabled: Boolean) {
         preferences.edit { putBoolean(KEY_NOTIFICATION_ENABLED, enabled) }

@@ -22,7 +22,8 @@ sealed class Coupon(
         shippingFee: Long,
         today: LocalDate = LocalDate.now(),
         now: LocalTime = LocalTime.now(),
-    ): Long = if (isExpired(today)) 0 else discount(items = items, shippingFee = shippingFee, now = now)
+    ): Long =
+        if (isExpired(today)) 0 else discount(items = items, shippingFee = shippingFee, now = now)
 
     class FixedAmount(
         id: Long,

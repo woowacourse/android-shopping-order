@@ -14,7 +14,8 @@ class PaymentAlarmScheduler(
 
     fun schedule(cartItemIds: List<Long>) {
         val pendingIntent = createPendingIntent(cartItemIds)
-        val triggerAtMillis = System.currentTimeMillis() + PaymentNotificationConstants.TIMEOUT_MILLIS
+        val triggerAtMillis =
+            System.currentTimeMillis() + PaymentNotificationConstants.TIMEOUT_MILLIS
 
         alarmManager.setAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,

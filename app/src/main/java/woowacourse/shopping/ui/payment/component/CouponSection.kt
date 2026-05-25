@@ -144,7 +144,8 @@ private fun CustomCheckbox(
                             else -> Color.Red
                         },
                     shape = RoundedCornerShape(4.dp),
-                ).clickable(enabled = enabled, onClick = onClick),
+                )
+                .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         if (checked && enabled) {

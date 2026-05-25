@@ -22,7 +22,8 @@ class PaymentAlarmReceiver : BroadcastReceiver() {
 
         if (!notificationRepository.isEnabled()) return
 
-        val cartItemIds = intent.getStringExtra(PaymentNotificationConstants.EXTRA_CART_ITEM_IDS).orEmpty()
+        val cartItemIds =
+            intent.getStringExtra(PaymentNotificationConstants.EXTRA_CART_ITEM_IDS).orEmpty()
         if (cartItemIds.isBlank()) return
 
         val notificationManager =
