@@ -19,7 +19,9 @@ object CouponCalculator {
         now: LocalDateTime = LocalDateTime.now(),
         baseShipping: Int = DEFAULT_SHIPPING,
     ): CouponApplyResult {
-        if (coupon == null) return CouponApplyResult(applied = false, discount = 0, shippingFee = baseShipping)
+        if (coupon == null) {
+            return CouponApplyResult(applied = false, discount = 0, shippingFee = baseShipping)
+        }
 
         val today: LocalDate = now.toLocalDate()
         if (coupon.isExpired(today)) {
@@ -27,6 +29,10 @@ object CouponCalculator {
         }
 
         val subtotal = cartItems.totalPrice
+
+        if (coupon.rate != null) {
+            return applyPercent(coupon, subtotal, now, baseShipping)
+        }
 
         return when (coupon.type) {
             CouponTypes.FIXED5000 -> applyFixed(coupon, subtotal, baseShipping)
@@ -39,25 +45,35 @@ object CouponCalculator {
 
     private fun applyFixed(coupon: Coupon, subtotal: Int, baseShipping: Int): CouponApplyResult {
         val min = coupon.minOrderAmount ?: 0
-        if (subtotal < min) return CouponApplyResult(applied = false, discount = 0, shippingFee = baseShipping)
+        if (subtotal < min) {
+            return CouponApplyResult(applied = false, discount = 0, shippingFee = baseShipping)
+        }
         val discount = coupon.amount ?: 0
         return CouponApplyResult(applied = true, discount = discount.coerceAtMost(subtotal), shippingFee = baseShipping)
     }
 
     private fun applyBogo(coupon: Coupon, cartItems: CartItems, baseShipping: Int): CouponApplyResult {
-        val candidates = cartItems.values.filter { it.quantity.value >= 3 }
-        if (candidates.isEmpty()) return CouponApplyResult(applied = false, discount = 0, shippingFee = baseShipping)
+        val buyQuantity = coupon.buyQuantity ?: 3
+        val getQuantity = coupon.getQuantity ?: 1
+        val bundleSize = buyQuantity + getQuantity
 
-        val target = candidates.maxByOrNull { it.product.price.value }
-            ?: return CouponApplyResult(
-                applied = false,
-                discount = 0,
-                shippingFee = baseShipping,
-            )
+        val bestDiscount =
+            cartItems.values
+                .filter { it.quantity.value >= bundleSize }
+                .maxOfOrNull { item ->
+                    val freeItemCount = (item.quantity.value / bundleSize) * getQuantity
+                    item.product.price.value * freeItemCount
+                } ?: 0
 
-        val discount = target.product.price.value
-        val appliedDiscount = discount.coerceAtMost(cartItems.totalPrice)
-        return CouponApplyResult(applied = true, discount = appliedDiscount, shippingFee = baseShipping)
+        if (bestDiscount == 0) {
+            return CouponApplyResult(applied = false, discount = 0, shippingFee = baseShipping)
+        }
+
+        return CouponApplyResult(
+            applied = true,
+            discount = bestDiscount.coerceAtMost(cartItems.totalPrice),
+            shippingFee = baseShipping,
+        )
     }
 
     private fun applyFreeShipping(coupon: Coupon, subtotal: Int, baseShipping: Int): CouponApplyResult {
@@ -67,23 +83,26 @@ object CouponCalculator {
     }
 
     private fun applyPercent(coupon: Coupon, subtotal: Int, now: LocalDateTime, baseShipping: Int): CouponApplyResult {
-        val startHour = 4
-        val endHour = 7
-        val hour = now.hour
-        if (hour < startHour || hour >= endHour) return CouponApplyResult(applied = false, discount = 0, shippingFee = baseShipping)
+        val currentTime = now.toLocalTime()
+        val startTime = coupon.availableStartTime
+        val endTime = coupon.availableEndTime
+
+        if (startTime != null && endTime != null) {
+            val isAvailable =
+                if (!startTime.isAfter(endTime)) {
+                    !currentTime.isBefore(startTime) && !currentTime.isAfter(endTime)
+                } else {
+                    !currentTime.isBefore(startTime) || !currentTime.isAfter(endTime)
+                }
+
+            if (!isAvailable) {
+                return CouponApplyResult(applied = false, discount = 0, shippingFee = baseShipping)
+            }
+        }
+
         val rate = coupon.rate ?: 0.0
         val discount = (subtotal * rate).toInt()
         val appliedDiscount = discount.coerceAtMost(subtotal)
         return CouponApplyResult(applied = true, discount = appliedDiscount, shippingFee = baseShipping)
     }
 }
-
-
-
-
-
-
-
-
-
-
