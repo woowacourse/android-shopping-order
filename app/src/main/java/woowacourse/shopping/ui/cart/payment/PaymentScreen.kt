@@ -28,11 +28,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,6 +46,7 @@ import kotlinx.collections.immutable.persistentListOf
 import woowacourse.shopping.model.Coupon
 import woowacourse.shopping.model.CouponOrderItem
 import woowacourse.shopping.model.DiscountType
+import woowacourse.shopping.notification.PaymentReminderScheduler
 import woowacourse.shopping.ui.cart.CartCheckBox
 import woowacourse.shopping.ui.cart.CartViewModel
 import woowacourse.shopping.ui.component.ShoppingAppBar
@@ -61,8 +64,21 @@ fun PaymentScreenRoute(
     onPaymentClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val cartUiState by cartViewModel.uiState.collectAsStateWithLifecycle()
     val paymentUiState by paymentViewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        cartViewModel.selectAllCartItemsIfEmpty()
+    }
+
+    DisposableEffect(Unit) {
+        PaymentReminderScheduler.schedule(context)
+
+        onDispose {
+            PaymentReminderScheduler.cancel(context)
+        }
+    }
 
     LaunchedEffect(cartUiState.totalPrice, cartUiState.selectedCartItems) {
         paymentViewModel.updateOrder(
