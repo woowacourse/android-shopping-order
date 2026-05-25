@@ -12,12 +12,18 @@ object NotificationSettings {
         return sp.getBoolean(KEY_NOTIFICATION, true)
     }
 
-    fun setNotificationEnabled(context: Context, enabled: Boolean) {
+    fun setNotificationEnabled(
+        context: Context,
+        enabled: Boolean,
+    ) {
         val sp = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         sp.edit().putBoolean(KEY_NOTIFICATION, enabled).apply()
     }
 
-    fun markReminderScheduled(context: Context, scheduled: Boolean) {
+    fun markReminderScheduled(
+        context: Context,
+        scheduled: Boolean,
+    ) {
         val sp = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         sp.edit().putBoolean(KEY_HAS_SCHEDULED_REMINDER, scheduled).apply()
     }
@@ -27,4 +33,3 @@ object NotificationSettings {
         return sp.getBoolean(KEY_HAS_SCHEDULED_REMINDER, false)
     }
 }
-

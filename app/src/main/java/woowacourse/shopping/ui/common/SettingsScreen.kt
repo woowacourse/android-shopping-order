@@ -53,9 +53,10 @@ fun SettingsScreen(onBack: () -> Unit = {}) {
         )
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start,
         ) {
@@ -74,5 +75,3 @@ fun SettingsScreen(onBack: () -> Unit = {}) {
         }
     }
 }
-
-

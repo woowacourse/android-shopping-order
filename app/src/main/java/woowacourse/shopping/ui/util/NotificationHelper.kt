@@ -24,13 +24,14 @@ object NotificationHelper {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             if (nm.getNotificationChannel(CHANNEL_ID) == null) {
-                val channel = NotificationChannel(
-                    CHANNEL_ID,
-                    CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_HIGH,
-                ).apply {
-                    description = "결제를 완료하지 않은 경우 알림"
-                }
+                val channel =
+                    NotificationChannel(
+                        CHANNEL_ID,
+                        CHANNEL_NAME,
+                        NotificationManager.IMPORTANCE_HIGH,
+                    ).apply {
+                        description = "결제를 완료하지 않은 경우 알림"
+                    }
                 nm.createNotificationChannel(channel)
             }
         }
@@ -40,18 +41,19 @@ object NotificationHelper {
         context: Context,
         selectedItemIds: List<Int>,
     ): PendingIntent {
-
-        val intent = Intent(context, MainActivity::class.java).apply {
-            action = "OPEN_PAYMENT_FROM_NOTIFICATION"
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            putExtra(EXTRA_NAVIGATE_TO_PAYMENT, true)
-            putExtra(EXTRA_SELECTED_ITEM_IDS, selectedItemIds.toIntArray())
-        }
-        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        } else {
-            PendingIntent.FLAG_UPDATE_CURRENT
-        }
+        val intent =
+            Intent(context, MainActivity::class.java).apply {
+                action = "OPEN_PAYMENT_FROM_NOTIFICATION"
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                putExtra(EXTRA_NAVIGATE_TO_PAYMENT, true)
+                putExtra(EXTRA_SELECTED_ITEM_IDS, selectedItemIds.toIntArray())
+            }
+        val flags =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            }
         return PendingIntent.getActivity(context, 0, intent, flags)
     }
 
@@ -61,13 +63,15 @@ object NotificationHelper {
         selectedItemIds: List<Int> = emptyList(),
     ) {
         val contentIntent = makeContentIntent(context, selectedItemIds)
-        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_alarm)
-            .setContentTitle("결제하실 시간이 지났습니다")
-            .setContentText("아직 결제가 완료되지 않았습니다. 결제하러 가기")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentIntent(contentIntent)
-            .setAutoCancel(true)
+        val builder =
+            NotificationCompat
+                .Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_alarm)
+                .setContentTitle("결제하실 시간이 지났습니다")
+                .setContentText("아직 결제가 완료되지 않았습니다. 결제하러 가기")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(contentIntent)
+                .setAutoCancel(true)
 
         val nm = NotificationManagerCompat.from(context)
         nm.notify(NOTIF_ID, builder.build())
@@ -80,7 +84,3 @@ object NotificationHelper {
         nm.cancel(NOTIF_ID)
     }
 }
-
-
-
-

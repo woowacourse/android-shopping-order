@@ -68,8 +68,8 @@ fun ProductListScreen(
         onIncrease = viewModel::increase,
         onDecrease = viewModel::decrease,
         onMoreClick = viewModel::moreProducts,
-            onCartClick = onCartClick,
-                onSettingsClick = onSettingsClick,
+        onCartClick = onCartClick,
+        onSettingsClick = onSettingsClick,
         onProductClick = onProductClick,
     )
 }
@@ -88,7 +88,7 @@ fun ProductListScreenContent(
     onProductClick: (Product) -> Unit = {},
 ) {
     Column(modifier = modifier) {
-            ProductListTopAppBar(
+        ProductListTopAppBar(
             modifier =
                 Modifier
                     .fillMaxWidth()

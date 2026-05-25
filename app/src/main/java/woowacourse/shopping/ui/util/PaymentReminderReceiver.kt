@@ -8,7 +8,10 @@ import androidx.annotation.RequiresPermission
 
 class PaymentReminderReceiver : BroadcastReceiver() {
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    override fun onReceive(context: Context, intent: Intent?) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent?,
+    ) {
         if (intent == null) return
         if (!NotificationSettings.isNotificationEnabled(context)) return
 

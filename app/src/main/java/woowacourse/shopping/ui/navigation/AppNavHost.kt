@@ -19,12 +19,12 @@ import woowacourse.shopping.ui.UiEvent
 import woowacourse.shopping.ui.cart.CartScreen
 import woowacourse.shopping.ui.cart.CartUiState
 import woowacourse.shopping.ui.cart.CartViewModel
+import woowacourse.shopping.ui.common.SettingsScreen
 import woowacourse.shopping.ui.payment.PaymentScreen
 import woowacourse.shopping.ui.payment.PaymentViewModel
 import woowacourse.shopping.ui.productDetail.ProductDetailScreen
 import woowacourse.shopping.ui.productDetail.ProductDetailViewModel
 import woowacourse.shopping.ui.productList.ProductListScreen
-import woowacourse.shopping.ui.common.SettingsScreen
 import woowacourse.shopping.ui.productList.ProductListViewModel
 
 @Composable

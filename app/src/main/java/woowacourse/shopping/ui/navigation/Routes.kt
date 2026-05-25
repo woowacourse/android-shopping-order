@@ -20,4 +20,3 @@ data class PaymentRoute(
 
 @Serializable
 object SettingsRoute
-
