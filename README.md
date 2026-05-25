@@ -42,7 +42,6 @@
 - [x] 장바구니 담기 성공, 결제 완료, 스낵바 표시 등 한 번만 발생해야 하는 단발성 이벤트(One-shot Event)는 `SharedFlow`(`MutableSharedFlow`)를 사용하여 처리한다.
 - [x] 화면(UI)에서 ViewModel의 상태를 구독할 때 생명주기를 인지하여 리소스를 절약하는 `collectAsStateWithLifecycle()`을 일괄 적용한다.
 
----
 
 # 🚀 2단계 - 상품 추천
 
