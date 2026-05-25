@@ -1,5 +1,39 @@
 # 기능 구현 사항
 
+## 4단계 구현 기능 사항
+
+## Navigation
+- [ ] Payment Screen에서 결제하기 버튼을 선택하면 최종 주문을 완료하고 Shopping Screen으로 이동한다
+- [ ] 결제 미완료 알림을 선택하면 Payment Screen으로 이동한다
+
+## Payment
+- [ ] 장바구니에 담긴 상품을 최종 주문할 수 있다
+- [ ] 배송비는 기본 3,000원으로 적용한다
+- [ ] 결제 화면에서 적용 가능한 쿠폰 목록을 조회한다
+- [ ] 쿠폰은 1개만 선택하여 적용할 수 있다
+- [ ] 최종 주문이 완료되면 주문된 상품이 장바구니에서 초기화된다
+
+## Coupon
+- [x] 쿠폰 API를 통해 적용 가능한 쿠폰 목록을 조회한다
+- [x] `fixed` 쿠폰은 `discount` 금액만큼 할인한다
+- [x] `fixed` 쿠폰은 `minimumAmount` 조건을 만족할 때만 적용한다
+- [x] `buyXgetY` 쿠폰은 `buyQuantity`, `getQuantity` 값을 사용해 할인 금액을 계산한다
+- [x] `buyXgetY` 쿠폰은 동일 상품 수량이 `buyQuantity + getQuantity` 이상일 때만 적용한다
+- [x] `buyXgetY` 쿠폰 조건을 만족하는 상품이 여러 개인 경우 단가가 가장 비싼 상품에 적용한다
+- [x] `freeShipping` 쿠폰은 `minimumAmount` 조건을 만족할 때 배송비를 할인한다
+- [x] `percentage` 쿠폰은 `discount` 비율만큼 주문 금액을 할인한다
+
+## Notification
+- [ ] 설정에서 미결제 알림 기능을 On/Off 할 수 있다
+- [ ] 앱을 재실행해도 미결제 알림 설정값을 유지한다
+- [ ] 결제 화면에 진입하면 5분 후 미결제 알림을 예약한다
+- [ ] 결제를 완료하면 예약된 미결제 알림을 취소한다
+- [ ] 5분 안에 결제하지 않으면 아직 결제가 완료되지 않았어요 알림을 노출한다
+- [ ] BroadcastReceiver로 알람을 수신하고 NotificationManager로 알림을 노출한다
+- [ ] POST_NOTIFICATIONS 권한을 요청한다
+- [ ] Notification 아이콘은 커스텀 아이콘을 사용한다
+- [ ] 알림 On/Off 설정은 SharedPreferences에 저장한다
+
 ## 3단계 구현 기능 사항
 
 ## Navigation
