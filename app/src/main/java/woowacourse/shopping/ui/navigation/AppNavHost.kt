@@ -25,12 +25,13 @@ import woowacourse.shopping.ui.payment.PaymentViewModel
 import woowacourse.shopping.ui.productDetail.ProductDetailScreen
 import woowacourse.shopping.ui.productDetail.ProductDetailViewModel
 import woowacourse.shopping.ui.productList.ProductListScreen
+import woowacourse.shopping.ui.common.SettingsScreen
 import woowacourse.shopping.ui.productList.ProductListViewModel
 
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController(),
+    navController: NavHostController,
     appContainer: AppContainer,
 ) {
     NavHost(
@@ -68,6 +69,9 @@ fun AppNavHost(
                     viewModel = productListViewModel,
                     onCartClick = {
                         navController.navigate(CartRoute)
+                    },
+                    onSettingsClick = {
+                        navController.navigate(SettingsRoute)
                     },
                     onProductClick = { product ->
                         navController.navigate(ProductDetailRoute(productId = product.id))
@@ -165,6 +169,10 @@ fun AppNavHost(
                     },
                 )
             }
+        }
+
+        composable<SettingsRoute> {
+            SettingsScreen(onBack = { navController.popBackStack() })
         }
 
         composable<PaymentRoute> { backStackEntry ->

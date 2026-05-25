@@ -65,7 +65,7 @@ class ProductListViewModel(
         viewModelScope.launch {
             cartRepository.addProduct(product)
             refreshCart()
-            _uiEventFlow.emit(UiEvent.ShowSnackbar("장바구니에 담았습니다"))
+            _uiEvent.emit(UiEvent.ShowSnackbar("장바구니에 담았습니다"))
         }
     }
 
