@@ -4,7 +4,7 @@
 
 ## Navigation
 - [x] Payment Screen에서 결제하기 버튼을 선택하면 최종 주문을 완료하고 Shopping Screen으로 이동한다
-- [ ] 결제 미완료 알림을 선택하면 Payment Screen으로 이동한다
+- [x] 결제 미완료 알림을 선택하면 Payment Screen으로 이동한다
 
 ## Payment
 - [x] 장바구니에 담긴 상품을 최종 주문할 수 있다
@@ -24,15 +24,14 @@
 - [x] `percentage` 쿠폰은 `discount` 비율만큼 주문 금액을 할인한다
 
 ## Notification
-- [ ] 설정에서 미결제 알림 기능을 On/Off 할 수 있다
-- [ ] 앱을 재실행해도 미결제 알림 설정값을 유지한다
-- [ ] 결제 화면에 진입하면 5분 후 미결제 알림을 예약한다
-- [ ] 결제를 완료하면 예약된 미결제 알림을 취소한다
-- [ ] 5분 안에 결제하지 않으면 아직 결제가 완료되지 않았어요 알림을 노출한다
-- [ ] BroadcastReceiver로 알람을 수신하고 NotificationManager로 알림을 노출한다
-- [ ] POST_NOTIFICATIONS 권한을 요청한다
-- [ ] Notification 아이콘은 커스텀 아이콘을 사용한다
-- [ ] 알림 On/Off 설정은 SharedPreferences에 저장한다
+- [x] 설정에서 미결제 알림 기능을 On/Off 할 수 있다
+- [x] 앱을 재실행해도 미결제 알림 설정값을 유지한다
+- [x] 결제 화면에 진입하면 5분 후 미결제 알림을 예약한다
+- [x] 결제를 완료하면 예약된 미결제 알림을 취소한다
+- [x] 5분 안에 결제하지 않으면 아직 결제가 완료되지 않았어요 알림을 노출한다
+- [x] BroadcastReceiver로 알람을 수신하고 NotificationManager로 알림을 노출한다
+- [x] POST_NOTIFICATIONS 권한을 요청한다
+- [x] 알림 On/Off 설정은 SharedPreferences에 저장한다
 
 ## 3단계 구현 기능 사항
 
