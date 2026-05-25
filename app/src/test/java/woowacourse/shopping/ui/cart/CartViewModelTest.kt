@@ -155,9 +155,10 @@ private class FakeCartRepository(
 
     override suspend fun getCartItemsCount(): Int = cartItems.size
 
+    override suspend fun getCartItems(cartIds: List<String>): List<CartItem> = cartItems.filter { it.id in cartIds }
+
     override suspend fun getTotalPrice(cartIds: List<String>): Money =
-        cartItems
-            .filter { it.id in cartIds }
+        getCartItems(cartIds)
             .fold(Money(0)) { acc, cartItem -> acc + cartItem.getTotalPrice() }
 }
 
