@@ -301,7 +301,7 @@ class CartViewModel(
     }
 
     companion object {
-        const val MAX_RECOMMEND_ITEM_SIZE = 20
+        const val MAX_RECOMMEND_ITEM_SIZE = 10
         const val PAGE_SIZE = 5
 
 
