@@ -11,6 +11,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import woowacourse.shopping.ui.cart.CartScreenRoute
 import woowacourse.shopping.ui.cart.CartViewModel
+import woowacourse.shopping.ui.cart.payment.PaymentScreenRoute
 import woowacourse.shopping.ui.cart.recommend.RecommendProductScreenRoute
 import woowacourse.shopping.ui.detail.DetailScreenRoute
 import woowacourse.shopping.ui.shopping.ShoppingScreenRoute
@@ -79,7 +80,25 @@ fun ShoppingNavHost(modifier: Modifier = Modifier) {
                 RecommendProductScreenRoute(
                     cartViewModel = cartGraphEntry.cartViewModel(),
                     onBackClick = { navController.popBackStack() },
-                    onOrderClick = {},
+                    onOrderClick = { navController.navigate(Payment) },
+                )
+            }
+
+            composable<Payment> { backStackEntry ->
+                val cartGraphEntry =
+                    remember(backStackEntry) {
+                        navController.getBackStackEntry(CartGraph)
+                    }
+
+                PaymentScreenRoute(
+                    cartViewModel = cartGraphEntry.cartViewModel(),
+                    onBackClick = { navController.popBackStack() },
+                    onPaymentClick = {
+                        navController.navigate(Shopping) {
+                            popUpTo(Shopping)
+                            launchSingleTop = true
+                        }
+                    },
                 )
             }
         }

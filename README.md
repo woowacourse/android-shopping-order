@@ -3,14 +3,14 @@
 ## 4단계 구현 기능 사항
 
 ## Navigation
-- [ ] Payment Screen에서 결제하기 버튼을 선택하면 최종 주문을 완료하고 Shopping Screen으로 이동한다
+- [x] Payment Screen에서 결제하기 버튼을 선택하면 최종 주문을 완료하고 Shopping Screen으로 이동한다
 - [ ] 결제 미완료 알림을 선택하면 Payment Screen으로 이동한다
 
 ## Payment
-- [ ] 장바구니에 담긴 상품을 최종 주문할 수 있다
-- [ ] 배송비는 기본 3,000원으로 적용한다
-- [ ] 결제 화면에서 적용 가능한 쿠폰 목록을 조회한다
-- [ ] 쿠폰은 1개만 선택하여 적용할 수 있다
+- [x] 장바구니에 담긴 상품을 최종 주문할 수 있다
+- [x] 배송비는 기본 3,000원으로 적용한다
+- [x] 결제 화면에서 적용 가능한 쿠폰 목록을 조회한다
+- [x] 쿠폰은 1개만 선택하여 적용할 수 있다
 - [ ] 최종 주문이 완료되면 주문된 상품이 장바구니에서 초기화된다
 
 ## Coupon
@@ -43,8 +43,8 @@
 - [x] Detail Screen에서 마지막으로 본 상품을 선택하면 해당 Detail Screen으로 이동한다
 - [x] Detail Screen에서 수량 설정 후 장바구니 담기 버튼을 선택하면 Shopping Screen으로 이동한다
 - [x] Cart Screen에서 주문하기를 선택하면 Recommend Screen으로 이동한다
-- [ ] Recommend Screen에서 주문하기 버튼을 선택하면 Pay Screen으로 이동한다
-- [ ] Pay Screen에서 결제하기 버튼을 선택하면 Shopping Screen으로 이동한다
+- [x] Recommend Screen에서 주문하기 버튼을 선택하면 Pay Screen으로 이동한다
+- [x] Pay Screen에서 결제하기 버튼을 선택하면 Shopping Screen으로 이동한다
 
 ## Flow
 - [x] 장바구니 담기/삭제 등 단발성 이벤트는 Channel로 처리한다

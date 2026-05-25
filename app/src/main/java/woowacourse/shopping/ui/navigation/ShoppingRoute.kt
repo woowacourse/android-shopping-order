@@ -18,3 +18,6 @@ data object Cart
 
 @Serializable
 data object Recommend
+
+@Serializable
+data object Payment
