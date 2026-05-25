@@ -158,7 +158,6 @@ class ShoppingViewModel(
                         it.toUiModel(quantity = quantity)
                     }
 
-                offset += loadProducts.size
 
                 _uiState.update {
                     it.copy(
@@ -166,6 +165,9 @@ class ShoppingViewModel(
                         cartSummary = it.cartSummary.copy(canLoadMore = !apiResult.isLastPage),
                     )
                 }
+
+                offset = _uiState.value.products.size
+
             } catch (_: IOException) {
                 _uiState.update { it }
             }
