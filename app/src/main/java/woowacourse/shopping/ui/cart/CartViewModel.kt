@@ -226,6 +226,11 @@ class CartViewModel(
     }
 
     fun setOrder() {
+        if (_uiState.value.selectedCartState.selectedCartItems
+                .isEmpty()
+        ) {
+            return
+        }
         viewModelScope.launch {
             if (_uiState.value.uiInfoState.isOrder) {
                 val selectedCartItemIds = _uiState.value.selectedCartState.selectedCartItems
