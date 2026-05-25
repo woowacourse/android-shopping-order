@@ -157,9 +157,11 @@ class CartViewModel(
         viewModelScope.launch {
             try {
                 cartRepo.add(product)
-                val cartId = cartRepo.findCartItem(product.id)
-                    ?.id
-                    ?: throw IllegalArgumentException("추가하려는 상품 아이디(${product.id})로 장바구니 아이디를 조회할 수 없습니다. ")
+                val cartId =
+                    cartRepo
+                        .findCartItem(product.id)
+                        ?.id
+                        ?: throw IllegalArgumentException("추가하려는 상품 아이디(${product.id})로 장바구니 아이디를 조회할 수 없습니다. ")
 
                 _uiState.update { state ->
                     val uiModel =
@@ -223,7 +225,7 @@ class CartViewModel(
                         lastViewedItem = recentProductRepo.getLastViewedProduct(),
                         allProductItems = productRepo.getProductPage(page = 1, count = 50).items,
                         allCartItem = cartRepo.getAllCartItems().items,
-                        MAX_RECOMMEND_ITEM_SIZE
+                        MAX_RECOMMEND_ITEM_SIZE,
                     )
                 val uiModel =
                     products.map {
@@ -292,10 +294,7 @@ class CartViewModel(
         const val MAX_RECOMMEND_ITEM_SIZE = 10
         const val PAGE_SIZE = 5
 
-
-        fun provideFactory(
-            container: AppContainer,
-        ): ViewModelProvider.Factory =
+        fun provideFactory(container: AppContainer): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T =
                     CartViewModel(

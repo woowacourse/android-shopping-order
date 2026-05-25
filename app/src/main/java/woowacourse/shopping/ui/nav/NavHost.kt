@@ -57,7 +57,7 @@ fun AppNavHost(
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
             ContextCompat.checkSelfPermission(
                 context,
-                Manifest.permission.POST_NOTIFICATIONS
+                Manifest.permission.POST_NOTIFICATIONS,
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             notificationEnabled = true
@@ -83,11 +83,12 @@ fun AppNavHost(
         composable<Shopping> {
             val viewModel: ShoppingViewModel =
                 viewModel(
-                    factory = ShoppingViewModel.provideFactory(
-                        container = container,
-                        networkMonitor = NetworkMonitor(context),
-                        loadSize = 20,
-                    ),
+                    factory =
+                        ShoppingViewModel.provideFactory(
+                            container = container,
+                            networkMonitor = NetworkMonitor(context),
+                            loadSize = 20,
+                        ),
                 )
 
             ShoppingScreen(
@@ -107,9 +108,10 @@ fun AppNavHost(
         composable<ProductDetail> {
             val viewModel: ProductDetailViewModel =
                 viewModel(
-                    factory = ProductDetailViewModel.provideFactory(
-                        container = container,
-                    ),
+                    factory =
+                        ProductDetailViewModel.provideFactory(
+                            container = container,
+                        ),
                 )
 
             ProductDetailScreen(
@@ -120,8 +122,8 @@ fun AppNavHost(
                     navController.navigate(
                         ProductDetail(
                             productId = product.id,
-                            isFromBanner = true
-                        )
+                            isFromBanner = true,
+                        ),
                     ) {
                         popUpTo(Shopping) { saveState = true }
                     }

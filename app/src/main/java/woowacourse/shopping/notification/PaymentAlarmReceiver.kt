@@ -32,7 +32,8 @@ class PaymentAlarmReceiver : BroadcastReceiver() {
         createChannelIfNeeded(notificationManager)
         notificationManager.notify(
             PaymentNotificationConstants.NOTIFICATION_ID,
-            NotificationCompat.Builder(context, PaymentNotificationConstants.CHANNEL_ID)
+            NotificationCompat
+                .Builder(context, PaymentNotificationConstants.CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification_payment)
                 .setContentTitle(PaymentNotificationConstants.NOTIFICATION_TITLE)
                 .setContentText(PaymentNotificationConstants.NOTIFICATION_TITLE)

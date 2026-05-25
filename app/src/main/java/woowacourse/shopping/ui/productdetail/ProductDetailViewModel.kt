@@ -121,9 +121,7 @@ class ProductDetailViewModel(
     }
 
     companion object {
-        fun provideFactory(
-            container: AppContainer,
-        ): ViewModelProvider.Factory =
+        fun provideFactory(container: AppContainer): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(

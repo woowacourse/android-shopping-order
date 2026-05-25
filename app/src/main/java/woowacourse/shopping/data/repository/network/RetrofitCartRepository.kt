@@ -114,8 +114,7 @@ class RetrofitCartRepository(
         )
     }
 
-    override suspend fun getCartCount(): Int =
-        service.getTotalCount(auth = encoder.getHeader()).quantity
+    override suspend fun getCartCount(): Int = service.getTotalCount(auth = encoder.getHeader()).quantity
 
     override suspend fun findCartItem(id: Long): CartItem? {
         val cartItems = getAllCartItems()

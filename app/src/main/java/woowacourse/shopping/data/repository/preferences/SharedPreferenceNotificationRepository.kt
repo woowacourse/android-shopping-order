@@ -13,8 +13,7 @@ class SharedPreferenceNotificationRepository(
             Context.MODE_PRIVATE,
         )
 
-    override fun isEnabled(): Boolean =
-        preferences.getBoolean(KEY_NOTIFICATION_ENABLED, DEFAULT_ENABLED)
+    override fun isEnabled(): Boolean = preferences.getBoolean(KEY_NOTIFICATION_ENABLED, DEFAULT_ENABLED)
 
     override fun setEnabled(enabled: Boolean) {
         preferences.edit { putBoolean(KEY_NOTIFICATION_ENABLED, enabled) }
