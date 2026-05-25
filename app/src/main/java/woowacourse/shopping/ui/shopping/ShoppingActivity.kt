@@ -9,15 +9,15 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.MutableStateFlow
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.navigation.ShoppingNavHost
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 
 class ShoppingActivity : ComponentActivity() {
-    private var openPayScreen by mutableStateOf(false)
+    private val openPayScreen = MutableStateFlow(false)
 
     private val notificationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
@@ -32,11 +32,13 @@ class ShoppingActivity : ComponentActivity() {
 
         setContent {
             AndroidshoppingTheme {
+                val shouldOpenPayScreen by openPayScreen.collectAsStateWithLifecycle()
+
                 ShoppingNavHost(
                     appContainer = appContainer,
-                    shouldOpenPayScreen = openPayScreen,
+                    shouldOpenPayScreen = shouldOpenPayScreen,
                     onOpenPayScreen = {
-                        openPayScreen = false
+                        openPayScreen.value = false
                     },
                 )
             }
@@ -50,7 +52,7 @@ class ShoppingActivity : ComponentActivity() {
     }
 
     private fun updateOpenPayScreenState(intent: Intent?) {
-        openPayScreen = intent?.action == R.string.ACTION_OPEN_PAY_SCREEN.toString()
+        openPayScreen.value = intent?.action == R.string.ACTION_OPEN_PAY_SCREEN.toString()
     }
 
     private fun requestNotificationPermission() {

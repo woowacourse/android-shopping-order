@@ -68,9 +68,10 @@ fun SettingScreen(
         SettingContent(
             isNotificationEnabled = isNotificationEnabled,
             onToggleClick = onToggleClick,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
         )
     }
 }
@@ -107,7 +108,10 @@ private fun SettingToggleRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(
-            modifier = Modifier.fillMaxHeight().weight(1f),
+            modifier =
+                Modifier
+                    .fillMaxHeight()
+                    .weight(1f),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
@@ -126,19 +130,20 @@ private fun SettingToggleRow(
         Switch(
             checked = toggleState,
             onCheckedChange = { onToggleClick(it) },
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = Green40,
-                checkedTrackColor = Color.White,
-                uncheckedThumbColor = Gray40,
-                uncheckedTrackColor = Color.White,
-            ),
+            colors =
+                SwitchDefaults.colors(
+                    checkedThumbColor = Green40,
+                    checkedTrackColor = Color.White,
+                    uncheckedThumbColor = Gray40,
+                    uncheckedTrackColor = Color.White,
+                ),
         )
     }
 }
 
 @Preview
 @Composable
-private fun SettingScreenPreview(){
+private fun SettingScreenPreview() {
     SettingScreen(
         isNotificationEnabled = true,
         onBackClick = {},

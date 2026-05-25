@@ -11,7 +11,8 @@ class PayReminderPreference(
     fun isEnabled(): Boolean = sharedPreferences.getBoolean(KEY_IS_ENABLED, true)
 
     fun setEnabled(isEnabled: Boolean) {
-        sharedPreferences.edit()
+        sharedPreferences
+            .edit()
             .putBoolean(KEY_IS_ENABLED, isEnabled)
             .apply()
     }

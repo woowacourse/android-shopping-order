@@ -4,9 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -15,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import kotlinx.coroutines.flow.MutableStateFlow
 import woowacourse.shopping.AppContainer
 import woowacourse.shopping.data.alarm.PayReminderAlarm
 import woowacourse.shopping.data.alarm.PayReminderPreference
@@ -313,16 +312,21 @@ fun ShoppingNavHost(
 
         composable<ShoppingRoute.Setting> {
             val context = LocalContext.current
-            val payReminderPreference = remember { PayReminderPreference(context) }
-            var isNotificationEnabled by remember {
-                mutableStateOf(payReminderPreference.isEnabled())
-            }
+            val payReminderPreference =
+                remember {
+                    PayReminderPreference(context)
+                }
+            val isNotificationEnabledFlow =
+                remember {
+                    MutableStateFlow(payReminderPreference.isEnabled())
+                }
+            val isNotificationEnabled by isNotificationEnabledFlow.collectAsStateWithLifecycle()
 
             SettingScreen(
                 isNotificationEnabled = isNotificationEnabled,
                 onBackClick = { navController.popBackStack() },
                 onToggleClick = { isEnabled ->
-                    isNotificationEnabled = isEnabled
+                    isNotificationEnabledFlow.value = isEnabled
                     payReminderPreference.setEnabled(isEnabled)
                 },
             )
