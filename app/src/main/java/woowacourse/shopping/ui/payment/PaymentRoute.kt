@@ -52,6 +52,8 @@ private fun PaymentRouteContent(
             factory =
                 PaymentViewModelFactory(
                     cartRepository = shoppingApplication.cartRepository,
+                    couponRepository = shoppingApplication.couponRepository,
+                    orderRepository = shoppingApplication.orderRepository,
                     selectedCartItemIds = selectedCartItemIds,
                 ),
         )
@@ -62,6 +64,7 @@ private fun PaymentRouteContent(
     )
 
     val payment by viewModel.payment.collectAsStateWithLifecycle()
+    val coupons by viewModel.coupons.collectAsStateWithLifecycle()
     val paymentNotificationScheduler = shoppingApplication.paymentNotificationScheduler
 
     DisposableEffect(selectedCartItemIds) {
@@ -73,7 +76,7 @@ private fun PaymentRouteContent(
     }
 
     PaymentScreen(
-        uiState = payment.toUiState(viewModel.coupons),
+        uiState = payment.toUiState(coupons),
         onBackClick = onBackClick,
         onCouponClick = viewModel::selectCoupon,
         onPaymentClick = {

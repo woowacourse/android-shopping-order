@@ -12,24 +12,30 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.coupon.Coupon
-import woowacourse.shopping.domain.model.coupon.CouponInfos
 import woowacourse.shopping.domain.model.order.Order
 import woowacourse.shopping.domain.model.payment.Payment
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.ui.event.UiEvent
 
 class PaymentViewModel(
     private val cartRepository: CartRepository,
+    private val couponRepository: CouponRepository,
+    private val orderRepository: OrderRepository,
     private val selectedCartItemIds: List<Long>,
-    val coupons: List<Coupon> = CouponInfos.defaultCoupons,
 ) : ViewModel() {
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
 
-    private val _payment = MutableStateFlow(Payment(selectedCoupon = coupons.firstOrNull()))
+    private val _coupons = MutableStateFlow<List<Coupon>>(emptyList())
+    val coupons: StateFlow<List<Coupon>> = _coupons.asStateFlow()
+
+    private val _payment = MutableStateFlow(Payment(selectedCoupon = null))
     val payment: StateFlow<Payment> = _payment.asStateFlow()
 
     init {
+        fetchCoupons()
         fetchOrder()
     }
 
@@ -39,7 +45,7 @@ class PaymentViewModel(
                 if (payment.selectedCoupon?.code == couponCode) {
                     null
                 } else {
-                    coupons.firstOrNull { it.code == couponCode }
+                    coupons.value.firstOrNull { it.code == couponCode }
                 }
             payment.copy(selectedCoupon = selectedCoupon)
         }
@@ -48,9 +54,7 @@ class PaymentViewModel(
     fun completePayment(onSuccess: () -> Unit) {
         viewModelScope.launch {
             try {
-                selectedCartItemIds.forEach { cartItemId ->
-                    cartRepository.deleteCartItem(cartItemId)
-                }
+                orderRepository.createOrder(selectedCartItemIds)
                 _uiEvent.emit(UiEvent.ShowMessage("주문이 완료되었습니다."))
                 onSuccess()
             } catch (e: Exception) {
@@ -59,17 +63,31 @@ class PaymentViewModel(
         }
     }
 
+    private fun fetchCoupons() {
+        viewModelScope.launch {
+            try {
+                val fetchedCoupons = couponRepository.getCoupons()
+                _coupons.update { fetchedCoupons }
+                _payment.update { payment ->
+                    payment.copy(selectedCoupon = fetchedCoupons.firstOrNull())
+                }
+            } catch (e: Exception) {
+                _uiEvent.emit(UiEvent.ShowMessage("쿠폰을 불러오지 못했습니다."))
+            }
+        }
+    }
+
     private fun fetchOrder() {
         viewModelScope.launch {
             try {
                 val cartItems = cartRepository.getAllCartItems()
-                _payment.update { payment ->
-                    payment.copy(
-                        order = Order.fromSelectedCartItems(
-                            cartItems = cartItems,
-                            selectedCartItemIds = selectedCartItemIds,
-                        ),
+                val order =
+                    Order.fromSelectedCartItems(
+                        cartItems = cartItems,
+                        selectedCartItemIds = selectedCartItemIds,
                     )
+                _payment.update { payment ->
+                    payment.copy(order = order)
                 }
             } catch (e: Exception) {
                 _uiEvent.emit(UiEvent.ShowMessage("주문 금액을 불러오지 못했습니다."))
@@ -80,6 +98,8 @@ class PaymentViewModel(
 
 class PaymentViewModelFactory(
     private val cartRepository: CartRepository,
+    private val couponRepository: CouponRepository,
+    private val orderRepository: OrderRepository,
     private val selectedCartItemIds: List<Long>,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -87,6 +107,8 @@ class PaymentViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return PaymentViewModel(
                 cartRepository = cartRepository,
+                couponRepository = couponRepository,
+                orderRepository = orderRepository,
                 selectedCartItemIds = selectedCartItemIds,
             ) as T
         }
