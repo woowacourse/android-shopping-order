@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import woowacourse.shopping.dataStore
-import java.io.ByteArrayOutputStream
 
 class DefaultAuthDataSource(
     private val context: Context,
@@ -28,7 +27,7 @@ class DefaultAuthDataSource(
         val encryptedBytes = Base64.decode(savedToken, Base64.NO_WRAP)
 
         return cryptoManager
-            .decrypt(encryptedBytes.inputStream())
+            .decrypt(encryptedBytes)
             .decodeToString()
     }
 
@@ -40,16 +39,11 @@ class DefaultAuthDataSource(
 
         context.dataStore.updateData {
             it.toMutablePreferences().also { preferences ->
-                val outputStream = ByteArrayOutputStream()
-
-                cryptoManager.encrypt(
-                    bytes = token.toByteArray(),
-                    outputStream = outputStream,
-                )
+                val encryptedBytes = cryptoManager.encrypt(token.toByteArray())
 
                 preferences[authTokenKey] =
                     Base64.encodeToString(
-                        outputStream.toByteArray(),
+                        encryptedBytes,
                         Base64.NO_WRAP,
                     )
             }
