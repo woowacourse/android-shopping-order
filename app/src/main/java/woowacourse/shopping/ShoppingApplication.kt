@@ -6,13 +6,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.UserAuthDataStore
 import woowacourse.shopping.data.local.database.DataBase
-import woowacourse.shopping.data.local.repository.SettingRepositoryImpl
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepositoryImpl
+import woowacourse.shopping.data.local.repository.SettingRepositoryImpl
 import woowacourse.shopping.data.remote.server.RetrofitProvider
 import woowacourse.shopping.data.remote.server.repository.CartRepositoryImpl
 import woowacourse.shopping.data.remote.server.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.remote.server.service.CartService
 import woowacourse.shopping.data.remote.server.service.ProductService
+import woowacourse.shopping.notification.PaymentNotificationAlarmScheduler
 
 class ShoppingApplication : Application() {
     private var cachedAuthHeader: String? = null
@@ -20,7 +21,7 @@ class ShoppingApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         CoroutineScope(Dispatchers.IO).launch {
-            userAuthDataStore.encodedUserAuthInfo.collect { 
+            userAuthDataStore.encodedUserAuthInfo.collect {
                 cachedAuthHeader = it
             }
         }
@@ -36,11 +37,18 @@ class ShoppingApplication : Application() {
         SettingRepositoryImpl(this)
     }
 
+    val paymentNotificationScheduler by lazy {
+        PaymentNotificationAlarmScheduler(
+            context = this,
+            settingRepository = settingRepository,
+        )
+    }
+
     val userAuthDataStore by lazy { UserAuthDataStore(this) }
 
     private val retrofitClient by lazy {
         RetrofitProvider(
-            authHeaderProvider = { cachedAuthHeader }
+            authHeaderProvider = { cachedAuthHeader },
         )
     }
 

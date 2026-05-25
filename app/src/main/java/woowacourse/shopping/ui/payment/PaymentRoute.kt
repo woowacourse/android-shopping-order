@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -61,12 +62,26 @@ private fun PaymentRouteContent(
     )
 
     val payment by viewModel.payment.collectAsStateWithLifecycle()
+    val paymentNotificationScheduler = shoppingApplication.paymentNotificationScheduler
+
+    DisposableEffect(selectedCartItemIds) {
+        paymentNotificationScheduler.schedule(selectedCartItemIds)
+
+        onDispose {
+            paymentNotificationScheduler.cancel()
+        }
+    }
 
     PaymentScreen(
         uiState = payment.toUiState(viewModel.coupons),
         onBackClick = onBackClick,
         onCouponClick = viewModel::selectCoupon,
-        onPaymentClick = { viewModel.completePayment(onPaymentComplete) },
+        onPaymentClick = {
+            viewModel.completePayment {
+                paymentNotificationScheduler.cancel()
+                onPaymentComplete()
+            }
+        },
         modifier =
             Modifier
                 .fillMaxSize()
