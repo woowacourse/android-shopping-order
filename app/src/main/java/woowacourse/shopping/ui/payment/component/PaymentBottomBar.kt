@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.sp
 import woowacourse.shopping.core.designsystem.theme.PrimaryGreen
 
 @Composable
-internal fun PaymentBottomBar(
+fun PaymentBottomBar(
     onPaymentClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {

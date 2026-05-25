@@ -25,7 +25,7 @@ import woowacourse.shopping.ui.payment.uimodel.PaymentUiModel
 private val CouponListMaxHeight = 246.dp
 
 @Composable
-internal fun PaymentBody(
+fun PaymentBody(
     uiState: PaymentUiState,
     onCouponClick: (String) -> Unit,
     modifier: Modifier = Modifier,
