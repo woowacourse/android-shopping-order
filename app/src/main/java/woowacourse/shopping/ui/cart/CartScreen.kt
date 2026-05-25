@@ -30,7 +30,7 @@ fun CartScreen(
     viewModel: CartViewModel,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
-    onOrderClick: () -> Unit,
+    onOrderClick: (List<Long>) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -39,7 +39,7 @@ fun CartScreen(
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.event.collect { event ->
                 when (event) {
-                    CartEvent.OrderSuccess -> onOrderClick()
+                    CartEvent.OrderSuccess -> Unit
                 }
             }
         }
@@ -85,7 +85,7 @@ fun CartScreen(
                 onIncreaseClick = { viewModel.increaseInRecommendScreen(it) },
                 onDecreaseClick = { viewModel.decreaseInRecommendScreen(it) },
                 onOrderClick = {
-                    viewModel.order(uiState.selectedItemIds.toList())
+                    onOrderClick(uiState.selectedItemIds.toList())
                 },
             )
     }
