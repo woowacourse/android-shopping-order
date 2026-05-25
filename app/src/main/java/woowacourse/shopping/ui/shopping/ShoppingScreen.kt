@@ -28,6 +28,7 @@ import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.data.model.Products
 import woowacourse.shopping.ui.common.component.NetworkErrorMessage
 import woowacourse.shopping.ui.common.model.ProductUiModel
+import woowacourse.shopping.ui.shopping.component.NotificationSettingRow
 import woowacourse.shopping.ui.shopping.component.ProductGroup
 import woowacourse.shopping.ui.shopping.component.RecentProductGroup
 import woowacourse.shopping.ui.shopping.component.ShoppingHeader
@@ -36,9 +37,11 @@ import woowacourse.shopping.ui.shopping.component.ShoppingScreenSkeleton
 @Composable
 fun ShoppingScreen(
     viewModel: ShoppingViewModel,
+    notificationEnabled: Boolean,
     modifier: Modifier = Modifier,
     onCartClick: () -> Unit,
     onProductClick: (Product) -> Unit,
+    onNotificationEnabledChange: (Boolean) -> Unit,
     onRecentProductClick: (Product) -> Unit,
 ) {
     val lazyGridState = rememberLazyGridState()
@@ -79,6 +82,8 @@ fun ShoppingScreen(
                 cartCount = state.cartCount,
                 hasNext = state.hasNext,
                 lazyGridState = lazyGridState,
+                notificationEnabled = notificationEnabled,
+                onNotificationEnabledChange = onNotificationEnabledChange,
                 onCartClick = onCartClick,
                 onProductClick = onProductClick,
                 onMoreClick = { viewModel.loadMore() },
@@ -93,20 +98,22 @@ fun ShoppingScreen(
 }
 
 @Composable
-fun ShoppingScreen(
+private fun ShoppingScreen(
     products: List<ProductUiModel>,
     recentProducts: Products,
     cartCount: Int,
     hasNext: Boolean,
     lazyGridState: LazyGridState,
+    notificationEnabled: Boolean,
     modifier: Modifier = Modifier,
+    onNotificationEnabledChange: (Boolean) -> Unit,
     onCartClick: () -> Unit,
     onProductClick: (Product) -> Unit,
     onMoreClick: () -> Unit,
     onIncreaseClick: (Product) -> Unit,
     onDecreaseClick: (Product) -> Unit,
     onRecentProductClick: (Product) -> Unit,
-) {
+    ) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -114,6 +121,11 @@ fun ShoppingScreen(
         ShoppingHeader(
             cartCount = cartCount,
             onCartClick = onCartClick,
+        )
+
+        NotificationSettingRow(
+            enabled = notificationEnabled,
+            onEnabledChange = onNotificationEnabledChange,
         )
 
         if (recentProducts.any()) {
@@ -171,6 +183,8 @@ private fun ShoppingScreenPreview1() {
         cartCount = 1,
         hasNext = true,
         lazyGridState = rememberLazyGridState(),
+        notificationEnabled = true,
+        onNotificationEnabledChange = {},
         onCartClick = {},
         onProductClick = {},
         onMoreClick = {},
@@ -190,6 +204,8 @@ private fun ShoppingScreenPreview2() {
         cartCount = 0,
         hasNext = false,
         lazyGridState = rememberLazyGridState(),
+        notificationEnabled = false,
+        onNotificationEnabledChange = {},
         onCartClick = {},
         onProductClick = {},
         onMoreClick = {},
