@@ -158,7 +158,6 @@ class ShoppingViewModel(
                         it.toUiModel(quantity = quantity)
                     }
 
-
                 _uiState.update {
                     it.copy(
                         products = (it.products + loadProducts).toImmutableList(),
@@ -167,7 +166,6 @@ class ShoppingViewModel(
                 }
 
                 offset = _uiState.value.products.size
-
             } catch (_: IOException) {
                 _uiState.update { it }
             }

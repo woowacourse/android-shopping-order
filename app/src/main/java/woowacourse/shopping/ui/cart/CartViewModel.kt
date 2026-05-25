@@ -49,7 +49,7 @@ class CartViewModel(
                 getCartItemsByPage()
             } catch (e: CancellationException) {
                 throw e
-            }  catch (_: Exception) {
+            } catch (_: Exception) {
                 _uiEvent.emit(CartUiEvent.ShowToastMessage("장바구니를 불러오지 못했습니다."))
                 _uiEvent.emit(CartUiEvent.NavToBack)
             } finally {
