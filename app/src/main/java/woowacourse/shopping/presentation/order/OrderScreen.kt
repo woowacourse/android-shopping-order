@@ -44,6 +44,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.presentation.common.components.ShoppingAppBar
 import woowacourse.shopping.presentation.order.components.CouponItem
 import woowacourse.shopping.presentation.order.model.CouponUiModel
+import woowacourse.shopping.presentation.order.model.OrderEvent
 import woowacourse.shopping.ui.theme.Gray30
 import woowacourse.shopping.ui.theme.Gray40
 import woowacourse.shopping.ui.theme.Green40
@@ -62,7 +63,7 @@ fun OrderScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.initializePaymentItems(productIds)
+        viewModel.initialize(productIds)
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.event.collect { event ->
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()

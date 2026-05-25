@@ -10,11 +10,11 @@ import woowacourse.shopping.data.source.remote.dto.coupon.response.CouponRespons
 import woowacourse.shopping.data.source.remote.dto.coupon.response.FixedCouponResponse
 import woowacourse.shopping.data.source.remote.dto.coupon.response.FreeShippingCouponResponse
 import woowacourse.shopping.data.source.remote.dto.coupon.response.PercentageCouponResponse
-import woowacourse.shopping.domain.model.payment.BuyXGetYCoupon
-import woowacourse.shopping.domain.model.payment.Coupon
-import woowacourse.shopping.domain.model.payment.FixedAmountCoupon
-import woowacourse.shopping.domain.model.payment.FreeShippingCoupon
-import woowacourse.shopping.domain.model.payment.PercentageCoupon
+import woowacourse.shopping.domain.model.order.BuyXGetYCoupon
+import woowacourse.shopping.domain.model.order.Coupon
+import woowacourse.shopping.domain.model.order.FixedAmountCoupon
+import woowacourse.shopping.domain.model.order.FreeShippingCoupon
+import woowacourse.shopping.domain.model.order.PercentageCoupon
 import woowacourse.shopping.error.Error
 import woowacourse.shopping.error.Result
 import java.time.LocalDate

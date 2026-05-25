@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
             ShoppingNavGraph(
                 onEnterOrder = {
                     alarmScheduler.cancel()
-                    alarmScheduler.schedule(10 * 1000L)
+                    alarmScheduler.schedule(5 * 60 * 1000L)
                 },
                 onOrderSuccess = { alarmScheduler.cancel() },
             )

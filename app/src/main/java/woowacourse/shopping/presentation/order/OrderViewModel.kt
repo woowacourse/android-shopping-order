@@ -12,44 +12,37 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.di.AppContainer
-import woowacourse.shopping.domain.ApplyCouponUseCase
-import woowacourse.shopping.domain.GetAvailableCouponUseCase
-import woowacourse.shopping.domain.OrderCartItemsUseCase
-import woowacourse.shopping.domain.model.CouponInfo
+import woowacourse.shopping.domain.applyCouponUseCase
+import woowacourse.shopping.domain.getAvailableCouponUseCase
 import woowacourse.shopping.domain.model.PaymentItems
-import woowacourse.shopping.domain.model.payment.DeliveryFee
-import woowacourse.shopping.domain.model.payment.DeliveryLocation
-import woowacourse.shopping.domain.model.payment.Order
+import woowacourse.shopping.domain.model.order.BuyXGetYCoupon
+import woowacourse.shopping.domain.model.order.Coupon
+import woowacourse.shopping.domain.model.order.DeliveryFee
+import woowacourse.shopping.domain.model.order.DeliveryLocation
+import woowacourse.shopping.domain.model.order.FixedAmountCoupon
+import woowacourse.shopping.domain.model.order.FreeShippingCoupon
+import woowacourse.shopping.domain.model.order.Order
+import woowacourse.shopping.domain.model.order.PercentageCoupon
 import woowacourse.shopping.error.Result
-import java.time.LocalDateTime
 import woowacourse.shopping.presentation.order.model.CouponUiModel
+import woowacourse.shopping.presentation.order.model.OrderEvent
 import woowacourse.shopping.presentation.order.model.OrderUiState
 import woowacourse.shopping.util.formattedPrice
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
-sealed class OrderEvent {
-    abstract val message: String
-
-    data class Success(
-        override val message: String,
-    ) : OrderEvent()
-
-    data class Fail(
-        override val message: String,
-    ) : OrderEvent()
-}
 
 class OrderViewModel(
     private val cartRepository: CartRepository = AppContainer.cartRepository,
-    private val getAvailableCouponUseCase: GetAvailableCouponUseCase = GetAvailableCouponUseCase(AppContainer.orderRepository),
-    private val applyCouponUseCase: ApplyCouponUseCase = ApplyCouponUseCase(AppContainer.orderRepository),
-    private val orderCartItemsUseCase: OrderCartItemsUseCase = OrderCartItemsUseCase(AppContainer.orderRepository),
+    private val orderRepository: OrderRepository = AppContainer.orderRepository,
 ) : ViewModel() {
     private val cart = cartRepository.cart
     private val paymentItemIds = MutableStateFlow(emptySet<Long>())
-    private val coupons = MutableStateFlow<List<CouponInfo>>(emptyList())
+    private val coupons = MutableStateFlow<List<Coupon>>(emptyList())
     private val selectedCouponCode = MutableStateFlow<String?>(null)
+    private var defaultOrder: Order? = null
+    private val discountedOrder = MutableStateFlow<Order?>(null)
 
     private val paymentItems =
         combine(paymentItemIds, cart) { ids, cart ->
@@ -57,14 +50,14 @@ class OrderViewModel(
         }
 
     val uiState =
-        combine(paymentItems, coupons, selectedCouponCode) { paymentItems, coupons, selectedCode ->
-            val discountedOrder = applyCouponUseCase(paymentItems, selectedCode)
+        combine(paymentItems, coupons, selectedCouponCode, discountedOrder) { paymentItems, coupons, selectedCode, order ->
+            if (order == null) return@combine OrderUiState()
             val selectedCoupon = coupons.find { it.code == selectedCode }
             OrderUiState(
                 totalPrice = paymentItems.totalPrice,
-                discountAmount = discountedOrder.discountAmount,
-                deliveryFee = discountedOrder.deliveryFee.price,
-                finalPrice = discountedOrder.totalAmount,
+                discountAmount = order.discountAmount,
+                deliveryFee = order.deliveryFee.price,
+                finalPrice = order.finalAmount,
                 coupons = coupons.map { it.toUiModel() },
                 selectedCoupon = selectedCoupon?.toUiModel(),
             )
@@ -77,35 +70,35 @@ class OrderViewModel(
     private val _event = MutableSharedFlow<OrderEvent>()
     val event: SharedFlow<OrderEvent> = _event.asSharedFlow()
 
-    init {
-        viewModelScope.launch {
-            cartRepository.loadCart()
-        }
-    }
-
-    fun initializePaymentItems(productIds: List<Long>) {
+    fun initialize(productIds: List<Long>) {
         paymentItemIds.value = productIds.toSet()
         viewModelScope.launch {
+            cartRepository.loadCart()
+            orderRepository.loadCoupons()
             val items = paymentItems.first()
-            val order = Order(
-                dateTime = LocalDateTime.now(),
-                items = items,
-                deliveryFee = DeliveryFee(3_000L),
-                discountAmount = 0L,
-                deliveryLocation = DeliveryLocation.REMOTE,
-            )
-            coupons.value = getAvailableCouponUseCase(order)
+            val order =
+                Order(
+                    dateTime = LocalDateTime.now(),
+                    items = items,
+                    deliveryFee = DeliveryFee(3_000L),
+                    discountAmount = 0L,
+                    deliveryLocation = DeliveryLocation.REMOTE,
+                )
+            defaultOrder = order
+            discountedOrder.value = order
+            coupons.value = getAvailableCouponUseCase(orderRepository, order)
         }
     }
 
     fun selectCoupon(code: String) {
-        selectedCouponCode.value = if (selectedCouponCode.value == code) null else code
+        selectedCouponCode.value = code
+        discountedOrder.value = applyCouponUseCase(orderRepository, defaultOrder ?: return, code)
     }
 
     fun orderCartItems() {
         viewModelScope.launch {
             val itemIds = paymentItems.first().getItems().map { it.id }
-            val orderResult = orderCartItemsUseCase(itemIds)
+            val orderResult = orderRepository.orderCartItems(itemIds)
             when (orderResult) {
                 is Result.Error<*, *> -> _event.emit(OrderEvent.Fail("결제 주문이 실패했습니다"))
                 is Result.Success<*, *> -> _event.emit(OrderEvent.Success("결제가 성공했습니다"))
@@ -113,17 +106,23 @@ class OrderViewModel(
         }
     }
 
-    private fun CouponInfo.toUiModel(): CouponUiModel =
+    private fun Coupon.toUiModel(): CouponUiModel =
         CouponUiModel(
             code = code,
             description =
                 when (this) {
-                    is CouponInfo.Fixed -> "${formattedPrice(discountAmount)} 할인 쿠폰"
-                    is CouponInfo.Percentage -> "$discountRate% 할인 쿠폰"
-                    is CouponInfo.BuyXGetY -> "${buyQuantity}개 구매 시 ${freeGetQuantity}개 무료 쿠폰"
-                    is CouponInfo.FreeShipping -> "무료 배송 쿠폰"
+                    is FixedAmountCoupon -> "${formattedPrice(discountAmount)} 할인 쿠폰"
+                    is PercentageCoupon -> "$discountRate% 할인 쿠폰"
+                    is BuyXGetYCoupon -> "${buyQuantity}개 구매 시 ${freeGetQuantity}개 무료 쿠폰"
+                    is FreeShippingCoupon -> "무료 배송 쿠폰"
+                    else -> ""
                 },
             expirationDate = expirationDate.format(DateTimeFormatter.ofPattern("yyyy년 M월 d일")),
-            minimumOrderAmount = minimumOrderAmount,
+            minimumOrderAmount =
+                when (this) {
+                    is FixedAmountCoupon -> minimumAmount
+                    is FreeShippingCoupon -> minimumAmount
+                    else -> null
+                },
         )
 }

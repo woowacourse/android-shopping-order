@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.model.payment
+package woowacourse.shopping.domain.model.order
 
 enum class DeliveryLocation {
     REMOTE,

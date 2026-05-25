@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.model.payment
+package woowacourse.shopping.domain.model.order
 
 import java.time.LocalDate
 
@@ -7,18 +7,19 @@ abstract class Coupon(
     val expirationDate: LocalDate,
 ) {
     fun apply(order: Order): Order {
-        isApplicable(order = order)
-        return doApply(order)
+        if (!isApplicable(order = order)) return order
+        return doApply(order.copy(appliedCouponCode = code))
     }
 
+    protected abstract fun doApply(order: Order): Order
+
     fun isApplicable(order: Order): Boolean {
+        if (order.appliedCouponCode != null) return false
         if (expirationDate < order.dateTime.toLocalDate()) return false
         return doIsApplicable(order)
     }
 
-    abstract fun doIsApplicable(order: Order): Boolean
-
-    abstract fun doApply(order: Order): Order
+    protected abstract fun doIsApplicable(order: Order): Boolean
 
     override fun equals(other: Any?): Boolean {
         if (other is Coupon) {

@@ -1,6 +1,5 @@
-package woowacourse.shopping.domain.model.payment
+package woowacourse.shopping.domain.model.order
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.Test
@@ -24,9 +23,7 @@ class CouponTest {
                 discountAmount = 0,
                 deliveryLocation = DeliveryLocation.STANDARD,
             )
-        shouldThrow<IllegalArgumentException> {
-            expiredCoupon.apply(order)
-        }.message shouldBe "이미 만료된 쿠폰입니다."
+        expiredCoupon.apply(order) shouldBe order
     }
 
     @Test
@@ -56,7 +53,7 @@ class CouponTest {
                 discountAmount = 0,
                 deliveryLocation = DeliveryLocation.STANDARD,
             )
-        coupon.apply(order) shouldBe order.copy(discountAmount = 5000)
+        coupon.apply(order) shouldBe order.copy(discountAmount = 5000, appliedCouponCode = "FIXED")
     }
 
     @Test
@@ -78,5 +75,7 @@ class Always5000Coupon(
     code: String,
     expirationDate: LocalDate,
 ) : Coupon(code, expirationDate) {
+    override fun doIsApplicable(order: Order): Boolean = true
+
     override fun doApply(order: Order): Order = order.copy(discountAmount = order.discountAmount + 5000)
 }

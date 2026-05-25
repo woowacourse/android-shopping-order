@@ -1,4 +1,4 @@
-package woowacourse.shopping.domain.model.payment
+package woowacourse.shopping.domain.model.order
 
 import woowacourse.shopping.domain.model.PaymentItems
 import java.time.LocalDateTime
@@ -10,7 +10,8 @@ data class Order(
     val deliveryFee: DeliveryFee,
     val discountAmount: Long,
     val deliveryLocation: DeliveryLocation,
+    val appliedCouponCode: String? = null,
 ) {
-    val totalAmount: Long
+    val finalAmount: Long
         get() = max(0, items.totalPrice + deliveryFee.price - discountAmount)
 }

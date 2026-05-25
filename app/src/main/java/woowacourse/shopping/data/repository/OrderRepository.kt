@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import kotlinx.coroutines.flow.StateFlow
-import woowacourse.shopping.domain.model.payment.Coupon
+import woowacourse.shopping.domain.model.order.Coupon
 import woowacourse.shopping.error.Error
 import woowacourse.shopping.error.Result
 
