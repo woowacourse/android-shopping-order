@@ -17,6 +17,7 @@ import woowacourse.shopping.data.remote.api.CouponApi
 import woowacourse.shopping.data.remote.api.OrderApi
 import woowacourse.shopping.data.remote.api.ProductApi
 import woowacourse.shopping.data.repository.AuthRepository
+import woowacourse.shopping.data.repository.AuthRepositoryImpl
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.CouponRepository
@@ -35,7 +36,7 @@ class AppContainer(
 
     val userDataStore = UserDataStore(context)
 
-    val authRepository = AuthRepository(userDataStore)
+    val authRepository: AuthRepository = AuthRepositoryImpl(userDataStore)
 
     val productRepository: ProductRepository by lazy {
         ProductRepositoryImpl(
