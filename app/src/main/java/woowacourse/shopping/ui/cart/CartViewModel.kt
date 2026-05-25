@@ -22,18 +22,18 @@ import woowacourse.shopping.ui.util.toUiModel
 class CartViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel() {
-    private val cartItemsFlow: StateFlow<CartItems> = cartRepository.cartItems
-    private val selectedItemsFlow = MutableStateFlow<Set<Int>>(emptySet())
-    val selectedCartIds: StateFlow<Set<Int>> = selectedItemsFlow.asStateFlow()
-    private val currentPageIdxFlow = MutableStateFlow(0)
-    private val cartLoadStateFlow = MutableStateFlow<LoadState>(LoadState.Initial)
+    private val cartItems: StateFlow<CartItems> = cartRepository.cartItems
+    private val selectedItems = MutableStateFlow<Set<Int>>(emptySet())
+    val selectedCartIds: StateFlow<Set<Int>> = selectedItems.asStateFlow()
+    private val currentPageIndex = MutableStateFlow(0)
+    private val cartLoadState = MutableStateFlow<LoadState>(LoadState.Initial)
 
     val cartUiState: StateFlow<CartUiState> =
         combine(
-            cartItemsFlow,
-            selectedItemsFlow,
-            currentPageIdxFlow,
-            cartLoadStateFlow,
+            cartItems,
+            selectedItems,
+            currentPageIndex,
+            cartLoadState,
         ) { cartItems, selectedItems, currentPageIdx, loadState ->
             val curCartItems =
                 cartItems.subList(currentPageIdx * PAGE_SIZE, (currentPageIdx + 1) * PAGE_SIZE)
@@ -61,21 +61,21 @@ class CartViewModel(
 
     private fun initCartItems() {
         viewModelScope.launch {
-            cartLoadStateFlow.update { LoadState.Loading }
+            cartLoadState.update { LoadState.Loading }
             runCatching {
                 cartRepository.refreshCartItems()
-                cartLoadStateFlow.update { LoadState.Success }
+                cartLoadState.update { LoadState.Success }
             }.onFailure { throwable ->
-                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+                cartLoadState.update { LoadState.Error(throwable, throwable.message) }
             }
         }
     }
 
     private fun syncSelectedItems() {
         viewModelScope.launch {
-            cartItemsFlow.collect { cartItems ->
+            cartItems.collect { cartItems ->
                 val currentCartIds = cartItems.values.map { it.id }.toSet()
-                selectedItemsFlow.update { it.intersect(currentCartIds) }
+                selectedItems.update { it.intersect(currentCartIds) }
             }
         }
     }
@@ -84,12 +84,12 @@ class CartViewModel(
         viewModelScope.launch {
             runCatching {
                 cartRepository.removeCartItem(cartId)
-                val totalPage = (cartItemsFlow.value.size() + PAGE_SIZE - 1) / PAGE_SIZE
-                if (currentPageIdxFlow.value >= totalPage) {
-                    currentPageIdxFlow.update { maxOf(0, totalPage - 1) }
+                val totalPage = (cartItems.value.size() + PAGE_SIZE - 1) / PAGE_SIZE
+                if (currentPageIndex.value >= totalPage) {
+                    currentPageIndex.update { maxOf(0, totalPage - 1) }
                 }
             }.onFailure { throwable ->
-                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+                cartLoadState.update { LoadState.Error(throwable, throwable.message) }
             }
         }
     }
@@ -98,11 +98,11 @@ class CartViewModel(
         viewModelScope.launch {
             runCatching {
                 cartRepository.addProduct(productId, 1)
-                val cartItem = cartItemsFlow.value.findByProductId(productId) ?: return@launch
+                val cartItem = cartItems.value.findByProductId(productId) ?: return@launch
 
-                selectedItemsFlow.update { it + cartItem.id }
+                selectedItems.update { it + cartItem.id }
             }.onFailure { throwable ->
-                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+                cartLoadState.update { LoadState.Error(throwable, throwable.message) }
             }
         }
     }
@@ -110,10 +110,10 @@ class CartViewModel(
     fun increaseCartItemQuantity(cartId: Int) {
         viewModelScope.launch {
             runCatching {
-                val targetQuantity = cartItemsFlow.value.getQuantityByCartId(cartId)
+                val targetQuantity = cartItems.value.getQuantityByCartId(cartId)
                 cartRepository.updateQuantity(cartId, targetQuantity.value + 1)
             }.onFailure { throwable ->
-                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+                cartLoadState.update { LoadState.Error(throwable, throwable.message) }
             }
         }
     }
@@ -121,33 +121,33 @@ class CartViewModel(
     fun decreaseCartItemQuantity(cartId: Int) {
         viewModelScope.launch {
             runCatching {
-                val targetQuantity = cartItemsFlow.value.getQuantityByCartId(cartId)
+                val targetQuantity = cartItems.value.getQuantityByCartId(cartId)
 
                 if (targetQuantity.value == 1) {
                     cartRepository.removeCartItem(cartId)
-                    selectedItemsFlow.update { it - cartId }
+                    selectedItems.update { it - cartId }
                 } else {
                     cartRepository.updateQuantity(cartId, targetQuantity.value - 1)
                 }
             }.onFailure { throwable ->
-                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+                cartLoadState.update { LoadState.Error(throwable, throwable.message) }
             }
         }
     }
 
     fun toggleSelection(id: Int) {
-        selectedItemsFlow.update { current ->
+        selectedItems.update { current ->
             if (id in current) current - id else current + id
         }
     }
 
     fun toggleAllSelection() {
-        val current = selectedItemsFlow.value
-        if (current.size == cartItemsFlow.value.values.size) {
-            selectedItemsFlow.update { emptySet() }
+        val current = selectedItems.value
+        if (current.size == cartItems.value.values.size) {
+            selectedItems.update { emptySet() }
         } else {
-            selectedItemsFlow.update {
-                cartItemsFlow.value.values
+            selectedItems.update {
+                cartItems.value.values
                     .map { it.id }
                     .toSet()
             }
@@ -156,12 +156,12 @@ class CartViewModel(
 
     fun goToNextPage() {
         if (!cartUiState.value.hasNextPage) return
-        currentPageIdxFlow.update { it + 1 }
+        currentPageIndex.update { it + 1 }
     }
 
     fun goToPreviousPage() {
         if (!cartUiState.value.hasPreviousPage) return
-        currentPageIdxFlow.update { it - 1 }
+        currentPageIndex.update { it - 1 }
     }
 
     companion object {
