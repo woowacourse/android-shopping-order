@@ -9,7 +9,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import woowacourse.shopping.backend.mock.InAppMockShoppingServer
 import woowacourse.shopping.backend.retrofit.RetrofitService
 import woowacourse.shopping.repository.AuthHeaderProvider
 import woowacourse.shopping.storage.datastore.AuthDataStore
@@ -28,6 +29,7 @@ class ShoppingApplication : Application() {
         private set
     lateinit var retrofitService: RetrofitService
         private set
+    private var mockShoppingServer: InAppMockShoppingServer? = null
 
     lateinit var appContainer: AppContainer
         private set
@@ -37,9 +39,14 @@ class ShoppingApplication : Application() {
 
         authDataStore = AuthDataStore(applicationContext.authDataStore)
         authHeaderProvider = AuthHeaderProvider(authDataStore)
-        retrofitService = RetrofitService(authHeaderProvider)
+        val mockBaseUrl = createMockBaseUrlOrNull()
+        retrofitService =
+            RetrofitService(
+                authHeaderProvider = authHeaderProvider,
+                mockBaseUrl = mockBaseUrl,
+            )
 
-        applicationScope.launch {
+        runBlocking {
             authDataStore.saveAuthInfo(
                 username = "chohs4164",
                 password = "password",
@@ -58,6 +65,21 @@ class ShoppingApplication : Application() {
 
     override fun onTerminate() {
         super.onTerminate()
+        mockShoppingServer?.shutdown()
         applicationScope.cancel()
+    }
+
+    private fun createMockBaseUrlOrNull(): String? {
+        if (!BuildConfig.USE_IN_APP_MOCK_SERVER) {
+            return null
+        }
+
+        return runCatching {
+            InAppMockShoppingServer()
+                .also { server ->
+                    server.start()
+                    mockShoppingServer = server
+                }.baseUrl
+        }.getOrNull()
     }
 }

@@ -9,7 +9,7 @@ data class ProductListUiState(
     val isNetworkConnected: Boolean = true,
     val canLoadNextPage: Boolean = false,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 ) {
     val hasError: Boolean get() = errorMessage != null
 }

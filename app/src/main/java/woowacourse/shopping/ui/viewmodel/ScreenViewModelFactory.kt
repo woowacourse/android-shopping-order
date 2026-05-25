@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import woowacourse.shopping.AppContainer
 import woowacourse.shopping.backend.retrofit.RetrofitService
+import woowacourse.shopping.backend.retrofit.repository.CouponRetrofitRepository
 import woowacourse.shopping.backend.retrofit.repository.OrderRetrofitRepository
 import woowacourse.shopping.backend.retrofit.repository.ProductRetrofitRepository
 import woowacourse.shopping.backend.retrofit.repository.ShoppingCartRetrofitRepository
@@ -15,13 +16,14 @@ class ScreenViewModelFactory(
     private val appContainer: AppContainer,
     val retrofitService: RetrofitService,
 ) : ViewModelProvider.Factory {
-
     private val productRetrofitRepository: ProductRetrofitRepository =
         ProductRetrofitRepository(retrofitService.productApiService)
     private val shoppingCartRetrofitRepository: ShoppingCartRetrofitRepository =
         ShoppingCartRetrofitRepository(retrofitService.shoppingCartApiService)
     private val orderRetrofitRepository: OrderRetrofitRepository =
         OrderRetrofitRepository(retrofitService.orderApiService)
+    private val couponRetrofitRepository: CouponRetrofitRepository =
+        CouponRetrofitRepository(retrofitService.couponApiService)
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
@@ -64,6 +66,9 @@ class ScreenViewModelFactory(
 
             modelClass.isAssignableFrom(OrderViewModel::class.java) ->
                 OrderViewModel(orderRetrofitRepository = orderRetrofitRepository) as T
+
+            modelClass.isAssignableFrom(CouponViewModel::class.java) ->
+                CouponViewModel(couponRetrofitRepository = couponRetrofitRepository) as T
 
             else -> throw IllegalArgumentException("지원하지 않는 API ViewModel: ${modelClass.name}")
         }

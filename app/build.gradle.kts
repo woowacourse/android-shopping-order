@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("org.jetbrains.kotlin.kapt")
+    alias(libs.plugins.serialization)
 }
 
 android {
@@ -20,7 +21,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("boolean", "USE_IN_APP_MOCK_SERVER", "true")
+        }
         release {
+            buildConfigField("boolean", "USE_IN_APP_MOCK_SERVER", "false")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
@@ -36,6 +41,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     testOptions {
         unitTests.all {
@@ -82,4 +88,8 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit.kotlinx.serialization.converter)
+
+    // navigation
+    implementation(libs.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 }

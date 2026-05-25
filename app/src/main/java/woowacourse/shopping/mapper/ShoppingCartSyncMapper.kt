@@ -2,9 +2,9 @@ package woowacourse.shopping.mapper
 
 import woowacourse.shopping.backend.retrofit.dto.CartQuantity
 import woowacourse.shopping.backend.retrofit.dto.CartRequest
-import woowacourse.shopping.backend.retrofit.dto.Content
 import woowacourse.shopping.backend.retrofit.dto.OrderInfo
 import woowacourse.shopping.backend.retrofit.dto.ShoppingCartResponse
+import woowacourse.shopping.backend.retrofit.dto.productlist.Content
 import woowacourse.shopping.model.ShoppingCartItem
 import woowacourse.shopping.model.ShoppingItem
 

@@ -46,8 +46,8 @@ import woowacourse.shopping.model.Price
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductTitle
 import woowacourse.shopping.model.ShoppingItem
-import woowacourse.shopping.ui.component.ProductItem
-import woowacourse.shopping.ui.component.ProductListSkeletonItem
+import woowacourse.shopping.ui.component.productlist.ProductItem
+import woowacourse.shopping.ui.component.productlist.ProductListSkeletonItem
 import woowacourse.shopping.ui.state.ProductListUiState
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
@@ -101,6 +101,25 @@ fun ProductListScreen(
                     }
                 }
             } else {
+                state.errorMessage?.let { message ->
+                    item(
+                        span = { GridItemSpan(maxLineSpan) },
+                    ) {
+                        Box(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                        ) {
+                            Text(
+                                text = message,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+                    }
+                }
+
                 if (!isNetworkConnected) {
                     item(span = { GridItemSpan(maxLineSpan) }) {
                         OfflineBanner()
@@ -220,8 +239,7 @@ private fun RecentViewedItem(
                 .background(
                     color = MaterialTheme.colorScheme.background,
                     shape = RoundedCornerShape(8.dp),
-                )
-                .clickable { onRecentViewedProductClick(product.id) }
+                ).clickable { onRecentViewedProductClick(product.id) }
                 .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {

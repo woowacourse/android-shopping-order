@@ -123,10 +123,7 @@ class ShoppingCartViewModel(
         }
     }
 
-
-
-    fun getTotalPrice(shoppingCartItems: List<ShoppingCartItem>): Int =
-        shoppingCartItems.sumOf { it.getProductQuantityPrice() }
+    fun getTotalPrice(shoppingCartItems: List<ShoppingCartItem>): Int = shoppingCartItems.sumOf { it.getProductQuantityPrice() }
 
     private suspend fun loadCartItems(): List<ShoppingCartItem> {
         val shoppingCartItems =
@@ -135,8 +132,7 @@ class ShoppingCartViewModel(
                     page = DEFAULT_PAGE,
                     size = DEFAULT_SIZE,
                     sort = null,
-                )
-                .toDomainShoppingCartItems()
+                ).toDomainShoppingCartItems()
         syncShoppingCartItems(shoppingCartItems)
         return shoppingCartItems
     }
@@ -148,7 +144,6 @@ class ShoppingCartViewModel(
         shoppingCartItems.firstOrNull { shoppingCartItem ->
             shoppingCartItem.product.id == productId
         }
-
 
     private fun syncShoppingCartItems(shoppingCartItems: List<ShoppingCartItem>) {
         _shoppingCartItems.value = shoppingCartItems

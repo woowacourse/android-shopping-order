@@ -8,8 +8,8 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-import woowacourse.shopping.backend.retrofit.dto.Product
-import woowacourse.shopping.backend.retrofit.dto.ProductResponse
+import woowacourse.shopping.backend.retrofit.dto.productlist.Product
+import woowacourse.shopping.backend.retrofit.dto.productlist.ProductResponse
 
 interface ProductRetrofit {
     @GET("/products")

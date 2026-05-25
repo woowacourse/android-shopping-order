@@ -17,4 +17,11 @@
     <string name="recent_viewed_section_title">최근 본 상품</string>
     <string name="last_viewed_product_title">마지막으로 본 상품</string>
     <string name="network_disconnected_message">네트워크 연결이 끊어졌습니다.</string>
+    <string name="payment">결제하기</string>
+    <string name="payment_reminder_toggle">결제 리마인더 알림</string>
+    <string name="payment_reminder_toggle_description">결제 미완료 시 5분 뒤 알림 받기</string>
+    <string name="payment_reminder_channel_name">결제 리마인더</string>
+    <string name="payment_reminder_channel_description">결제 화면에서 이탈한 주문을 다시 알려줍니다.</string>
+    <string name="payment_reminder_notification_title">결제를 잊으셨나요?</string>
+    <string name="payment_reminder_notification_message">선택한 상품과 쿠폰이 기다리고 있어요.</string>
 </resources>

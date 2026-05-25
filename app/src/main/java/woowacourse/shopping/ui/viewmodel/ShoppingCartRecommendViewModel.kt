@@ -21,7 +21,7 @@ class ShoppingCartRecommendViewModel(
     private var allShoppingItems: List<ShoppingItem> = shoppingItemRepository.shoppingItems.value
     private var recentViewedProductIds: List<Long> = visitStore.recentVisitedProductIds.value
     private var shoppingCartItems: List<ShoppingCartItem> = emptyList()
-    private var selectedCartProductIds: Set<Long> = emptySet()
+    private var selectedCartItemIds: Set<Long> = emptySet()
     private var recommendBaseCartProductIds: Set<Long> = emptySet()
 
     init {
@@ -31,16 +31,16 @@ class ShoppingCartRecommendViewModel(
 
     fun updateCartSnapshot(
         shoppingCartItems: List<ShoppingCartItem>,
-        selectedCartProductIds: Set<Long>,
+        selectedCartItemIds: Set<Long>,
     ) {
         if (
             this.shoppingCartItems == shoppingCartItems &&
-            this.selectedCartProductIds == selectedCartProductIds
+            this.selectedCartItemIds == selectedCartItemIds
         ) {
             return
         }
         this.shoppingCartItems = shoppingCartItems
-        this.selectedCartProductIds = selectedCartProductIds
+        this.selectedCartItemIds = selectedCartItemIds
         publishUiState()
     }
 
@@ -105,7 +105,7 @@ class ShoppingCartRecommendViewModel(
             }
         val selectedCartTotalPrice =
             shoppingCartItems
-                .filter { shoppingCartItem -> shoppingCartItem.product.id in selectedCartProductIds }
+                .filter { shoppingCartItem -> shoppingCartItem.getId() in selectedCartItemIds }
                 .sumOf { shoppingCartItem -> shoppingCartItem.getProductQuantityPrice() }
         val selectedRecommendTotalPrice =
             recommendedShoppingItems
