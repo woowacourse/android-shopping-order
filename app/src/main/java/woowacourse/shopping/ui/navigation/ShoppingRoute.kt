@@ -24,4 +24,7 @@ sealed interface ShoppingRoute {
     data class Payment(
         val selectedCartItemIds: List<Long>,
     ) : ShoppingRoute
+
+    @Serializable
+    data object Setting : ShoppingRoute
 }

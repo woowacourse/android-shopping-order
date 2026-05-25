@@ -12,6 +12,7 @@ import woowacourse.shopping.ui.catalog.catalogRoute
 import woowacourse.shopping.ui.payment.paymentRoute
 import woowacourse.shopping.ui.productdetail.productDetailRoute
 import woowacourse.shopping.ui.recommendation.recommendationRoute
+import woowacourse.shopping.ui.settings.settingRoute
 
 @Composable
 fun ShoppingNavHost(
@@ -41,6 +42,11 @@ fun ShoppingNavHost(
             onCartClick = {
                 navController.navigate(
                     ShoppingRoute.Cart,
+                )
+            },
+            onSettingsClick = {
+                navController.navigate(
+                    ShoppingRoute.Setting,
                 )
             },
         )
@@ -111,6 +117,13 @@ fun ShoppingNavHost(
                     launchSingleTop = true
                 }
             },
+        )
+
+        settingRoute(
+            shoppingApplication = shoppingApplication,
+            contentPadding = contentPadding,
+            snackbarHostState = snackbarHostState,
+            onBackClick = { navController.popBackStack() },
         )
     }
 }

@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.UserAuthDataStore
 import woowacourse.shopping.data.local.database.DataBase
+import woowacourse.shopping.data.local.repository.SettingRepositoryImpl
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepositoryImpl
 import woowacourse.shopping.data.remote.server.RetrofitProvider
 import woowacourse.shopping.data.remote.server.repository.CartRepositoryImpl
@@ -20,7 +21,7 @@ class ShoppingApplication : Application() {
         super.onCreate()
         CoroutineScope(Dispatchers.IO).launch {
             userAuthDataStore.encodedUserAuthInfo.collect { 
-                cachedAuthHeader = it 
+                cachedAuthHeader = it
             }
         }
     }
@@ -29,6 +30,10 @@ class ShoppingApplication : Application() {
 
     val recentlyViewedProductRepository by lazy {
         RecentlyViewedProductRepositoryImpl(database.recentlyViewedProductDao())
+    }
+
+    val settingRepository by lazy {
+        SettingRepositoryImpl(this)
     }
 
     val userAuthDataStore by lazy { UserAuthDataStore(this) }
@@ -48,11 +53,10 @@ class ShoppingApplication : Application() {
     }
 
     val productRepository by lazy {
-    ProductRepositoryImpl(productService)
+        ProductRepositoryImpl(productService)
     }
 
     val cartRepository by lazy {
         CartRepositoryImpl(cartService)
     }
-
 }
