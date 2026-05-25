@@ -98,42 +98,6 @@ fun ProductListScreenContent(
             onSettingClick = onSettingClick,
         )
         when (uiState.loadState) {
-            is LoadState.Loading if uiState.products.isEmpty() -> {
-                LoadingContent(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(20.dp),
-                )
-            }
-
-            is LoadState.Error -> {
-                ErrorContent(
-                    modifier = Modifier.fillMaxSize(),
-                    message = uiState.loadState.message ?: "알수 없는 에러입니다.",
-                )
-            }
-
-            is LoadState.Initial -> {}
-
-            else -> {
-                ProductListContent(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(20.dp),
-                    visibleProducts = uiState.products,
-                    recentProducts = uiState.recentProducts,
-                    hasNextPage = uiState.hasNextPage,
-                    onProductClick = onProductClick,
-                    onAddClick = { product -> onAddClick(product) },
-                    onIncrease = { productId -> onIncrease(productId) },
-                    onDecrease = { productId -> onDecrease(productId) },
-                    onMoreClick = { onMoreClick() },
-                )
-            }
-        }
-        when (uiState.loadState) {
             is LoadState.Initial -> {}
             is LoadState.Loading -> {
                 LoadingContent(
