@@ -11,11 +11,14 @@ import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import woowacourse.shopping.R
+import woowacourse.shopping.ui.MainActivity
+import woowacourse.shopping.ui.MainActivity.Companion.EXTRA_NAVIGATE_TO_PAYMENT
 
 object NotificationHelper {
     private const val CHANNEL_ID = "payment_reminder_channel"
     private const val CHANNEL_NAME = "결제 알림"
     private const val NOTIF_ID = 2000
+    const val EXTRA_SELECTED_ITEM_IDS = "extra_selected_item_ids"
 
     fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -33,11 +36,16 @@ object NotificationHelper {
         }
     }
 
-    private fun makeContentIntent(context: Context): PendingIntent {
+    private fun makeContentIntent(
+        context: Context,
+        selectedItemIds: List<Int>,
+    ): PendingIntent {
 
-        val intent = Intent(context, woowacourse.shopping.ui.MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            putExtra(woowacourse.shopping.ui.MainActivity.EXTRA_NAVIGATE_TO_PAYMENT, true)
+        val intent = Intent(context, MainActivity::class.java).apply {
+            action = "OPEN_PAYMENT_FROM_NOTIFICATION"
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra(EXTRA_NAVIGATE_TO_PAYMENT, true)
+            putExtra(EXTRA_SELECTED_ITEM_IDS, selectedItemIds.toIntArray())
         }
         val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -48,8 +56,11 @@ object NotificationHelper {
     }
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    fun showPaymentReminder(context: Context) {
-        val contentIntent = makeContentIntent(context)
+    fun showPaymentReminder(
+        context: Context,
+        selectedItemIds: List<Int> = emptyList(),
+    ) {
+        val contentIntent = makeContentIntent(context, selectedItemIds)
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_alarm)
             .setContentTitle("결제하실 시간이 지났습니다")

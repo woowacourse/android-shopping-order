@@ -13,7 +13,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.ui.UiEvent
@@ -56,7 +55,7 @@ fun AppNavHost(
                         is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
                         UiEvent.NavigateToCart -> Unit
                         UiEvent.NavigateToProductList -> Unit
-                        UiEvent.NavigateToPayment -> navController.navigate(PaymentRoute)
+                        UiEvent.NavigateToPayment -> navController.navigate(PaymentRoute())
                     }
                 }
             }
@@ -210,6 +209,7 @@ fun AppNavHost(
                 PaymentScreen(
                     viewModel = paymentViewModel,
                     modifier = Modifier.padding(innerPadding),
+                    selectedItemIds = route.selectedItemIds,
                     onClose = { navController.popBackStack() },
                     onPayClick = paymentViewModel::onClickPay,
                 )

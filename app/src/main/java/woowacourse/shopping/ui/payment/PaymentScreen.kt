@@ -60,6 +60,7 @@ import woowacourse.shopping.domain.model.coupon.Coupon
 fun PaymentScreen(
     viewModel: PaymentViewModel,
     modifier: Modifier = Modifier,
+    selectedItemIds: List<Int> = emptyList(),
     onClose: () -> Unit = {},
     onPayClick: () -> Unit = viewModel::onClickPay,
 ) {
@@ -68,8 +69,8 @@ fun PaymentScreen(
 
     LaunchedEffect(Unit) {
         PaymentReminderScheduler.cancel(context)
-        //PaymentReminderScheduler.schedule(context, 5 * 60 * 1000L)
-        PaymentReminderScheduler.schedule(context, 10 * 1000L)
+        //PaymentReminderScheduler.schedule(context, 5 * 60 * 1000L, selectedItemIds)
+        PaymentReminderScheduler.schedule(context, 10 * 1000L, selectedItemIds)
     }
 
     val wrappedOnPayClick: () -> Unit = {

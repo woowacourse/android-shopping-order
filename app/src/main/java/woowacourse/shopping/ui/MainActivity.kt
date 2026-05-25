@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -16,13 +17,14 @@ import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withTimeoutOrNull
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.navigation.AppNavHost
 import woowacourse.shopping.ui.navigation.PaymentRoute
 
 class MainActivity : ComponentActivity() {
     private var shouldNavigateToPayment by mutableStateOf(false)
+    private var paymentNavigationRequestId = 0
+    private var pendingSelectedItemIds: List<Int> = emptyList()
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { _: Boolean ->
@@ -35,32 +37,40 @@ class MainActivity : ComponentActivity() {
 
         requestNotificationPermissionIfNeeded()
         shouldNavigateToPayment = intent?.getBooleanExtra(EXTRA_NAVIGATE_TO_PAYMENT, false) ?: false
+        pendingSelectedItemIds = intent?.getIntArrayExtra(EXTRA_SELECTED_ITEM_IDS)?.toList() ?: emptyList()
+        if (shouldNavigateToPayment) {
+            paymentNavigationRequestId++
+        }
 
         setContent {
             val navController = rememberNavController()
             AppNavHost(navController = navController, appContainer = appContainer)
 
-            LaunchedEffect(shouldNavigateToPayment) {
-                if (!shouldNavigateToPayment) return@LaunchedEffect
+            LaunchedEffect(paymentNavigationRequestId) {
+                if (paymentNavigationRequestId <= 0) return@LaunchedEffect
 
-                withTimeoutOrNull(2000L) {
-                    while (navController.currentBackStackEntry == null) {
-                        delay(50)
-                    }
-                }
+                val timeoutMillis = 5000L
+                val start = System.currentTimeMillis()
+                var navigated = false
+                while (!navigated && System.currentTimeMillis() - start < timeoutMillis) {
+                    try {
+                        val currentRoute = navController.currentBackStackEntry?.destination?.route
 
-                try {
-                    val currentRoute = navController.currentBackStackEntry?.destination?.route
-                    if (currentRoute?.contains("Payment", ignoreCase = true) == true) {
-                    } else {
-                        try {
-                            navController.navigate(PaymentRoute)
-                        } catch (e: Exception) {
+                        if (currentRoute?.contains("Payment", ignoreCase = true) == true) {
+                            navigated = true
+                            break
                         }
+                        navController.navigate(PaymentRoute(selectedItemIds = pendingSelectedItemIds))
+                        delay(100)
+
+                        val afterRoute = navController.currentBackStackEntry?.destination?.route
+                        if (afterRoute?.contains("Payment", ignoreCase = true) == true) navigated = true
+                    } catch (e: Exception) {
+                        delay(200)
                     }
-                } finally {
-                    shouldNavigateToPayment = false
                 }
+
+                shouldNavigateToPayment = false
             }
         }
     }
@@ -69,6 +79,10 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         shouldNavigateToPayment = intent.getBooleanExtra(EXTRA_NAVIGATE_TO_PAYMENT, false)
+        pendingSelectedItemIds = intent.getIntArrayExtra(EXTRA_SELECTED_ITEM_IDS)?.toList() ?: emptyList()
+        if (shouldNavigateToPayment) {
+            paymentNavigationRequestId++
+        }
     }
 
     private fun requestNotificationPermissionIfNeeded() {
@@ -84,5 +98,6 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         const val EXTRA_NAVIGATE_TO_PAYMENT = "navigate_to_payment"
+        const val EXTRA_SELECTED_ITEM_IDS = "extra_selected_item_ids"
     }
 }

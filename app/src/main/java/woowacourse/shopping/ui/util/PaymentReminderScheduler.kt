@@ -8,11 +8,16 @@ import android.os.Build
 
 object PaymentReminderScheduler {
 	private const val ACTION_PAYMENT_REMINDER = "woowacourse.shopping.ACTION_PAYMENT_REMINDER"
+	const val EXTRA_SELECTED_ITEM_IDS = "extra_selected_item_ids"
 	private const val REMINDER_REQUEST_CODE = 71025
 
-	private fun makePendingIntent(context: Context): PendingIntent {
+	private fun makePendingIntent(
+		context: Context,
+		selectedItemIds: List<Int> = emptyList(),
+	): PendingIntent {
 		val intent = Intent(context, PaymentReminderReceiver::class.java).apply {
 			action = ACTION_PAYMENT_REMINDER
+			putExtra(EXTRA_SELECTED_ITEM_IDS, selectedItemIds.toIntArray())
 		}
 		val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 			PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -22,11 +27,15 @@ object PaymentReminderScheduler {
 		return PendingIntent.getBroadcast(context, REMINDER_REQUEST_CODE, intent, flags)
 	}
 
-	fun schedule(context: Context, delayMillis: Long = 5 * 60 * 1000L) {
+	fun schedule(
+		context: Context,
+		delayMillis: Long = 5 * 60 * 1000L,
+		selectedItemIds: List<Int> = emptyList(),
+	) {
 		if (!NotificationSettings.isNotificationEnabled(context)) return
 
 		val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-		val pendingIntent = makePendingIntent(context)
+		val pendingIntent = makePendingIntent(context, selectedItemIds)
 		val triggerAtMillis = System.currentTimeMillis() + delayMillis
 
 		alarmManager.cancel(pendingIntent)
