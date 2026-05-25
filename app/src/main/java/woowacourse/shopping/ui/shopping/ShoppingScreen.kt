@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.HorizontalDivider
@@ -65,17 +67,17 @@ fun ShoppingScreen(
     }
 
     if (!isConnected) {
-        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(modifier = modifier.fillMaxSize().statusBarsPadding(), contentAlignment = Alignment.Center) {
             Text(text = stringResource(R.string.alert_message_for_offline_mode))
         }
     } else if (state.shouldShowError && errorMessage != null) {
         NetworkErrorMessage(
             message = errorMessage,
-            modifier = modifier,
+            modifier = modifier.fillMaxSize().statusBarsPadding(),
             onRetryClick = { viewModel.retry() },
         )
     } else {
-        Box(modifier = modifier) {
+        Box(modifier = modifier.fillMaxSize().statusBarsPadding()) {
             ShoppingScreen(
                 products = state.visibleProducts,
                 recentProducts = state.recentProducts,
@@ -115,7 +117,7 @@ private fun ShoppingScreen(
     onRecentProductClick: (Product) -> Unit,
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize().navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         ShoppingHeader(

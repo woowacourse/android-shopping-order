@@ -2,7 +2,9 @@ package woowacourse.shopping.ui.productdetail
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,7 +45,7 @@ fun ProductDetailScreen(
         }
     }
 
-    Box(modifier = modifier) {
+    Box(modifier = modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
         uiState.product?.let { product ->
             ProductDetailScreen(
                 product = product,

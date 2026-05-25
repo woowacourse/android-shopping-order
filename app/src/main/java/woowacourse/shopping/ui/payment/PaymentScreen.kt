@@ -2,6 +2,8 @@ package woowacourse.shopping.ui.payment
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,7 +36,7 @@ fun PaymentScreen(
         }
     }
 
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(modifier = modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
         PaymentHeader(onCloseClick = onCloseClick)
         PaymentBody(
             uiState = uiState,

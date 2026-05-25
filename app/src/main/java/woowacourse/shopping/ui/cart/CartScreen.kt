@@ -3,7 +3,9 @@ package woowacourse.shopping.ui.cart
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -69,7 +71,7 @@ fun CartScreen(
                 totalPrice = uiState.totalPrice,
                 onAllCheckboxChanged = { isSelected -> viewModel.toggleAllItemsSelection(isSelected) },
                 checked = uiState.isAllSelected,
-                modifier = modifier,
+                modifier = modifier.fillMaxSize().statusBarsPadding(),
                 onOrderClick = {
                     viewModel.changeScreen()
                 },
@@ -80,7 +82,7 @@ fun CartScreen(
                 recommendedProducts = uiState.recommendItems,
                 count = uiState.totalSelectedCount,
                 price = uiState.totalPrice,
-                modifier = modifier,
+                modifier = modifier.fillMaxSize().statusBarsPadding(),
                 onBackClick = { viewModel.changeScreen() },
                 onIncreaseClick = { viewModel.increaseInRecommendScreen(it) },
                 onDecreaseClick = { viewModel.decreaseInRecommendScreen(it) },
@@ -115,7 +117,7 @@ fun CartScreen(
     onOrderClick: () -> Unit,
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().navigationBarsPadding(),
     ) {
         CartHeader(onBackClick = onBackClick)
 
@@ -161,7 +163,7 @@ private fun RecommendScreen(
     onOrderClick: () -> Unit,
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize().navigationBarsPadding(),
     ) {
         CartHeader(
             modifier = Modifier,
