@@ -45,6 +45,9 @@ fun OrderScreen(
             }
         }
     }
+    LaunchedEffect(Unit) {
+        orderViewModel.onEnterScreen()
+    }
 
     Column(
         modifier =

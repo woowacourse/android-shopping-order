@@ -25,6 +25,8 @@ import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.Coupons
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.NotificationRepository
+import woowacourse.shopping.notification.AlarmScheduler
 import woowacourse.shopping.ui.navigation.Order
 import woowacourse.shopping.ui.util.LoadState
 import woowacourse.shopping.ui.util.toUiModel
@@ -34,6 +36,8 @@ class OrderViewModel(
     savedStateHandle: SavedStateHandle,
     private val cartRepository: CartRepository,
     private val couponRepository: CouponRepository,
+    private val alarmScheduler: AlarmScheduler,
+    private val notificationRepository: NotificationRepository,
 ) : ViewModel() {
     private val route: Order = savedStateHandle.toRoute()
 
@@ -76,6 +80,12 @@ class OrderViewModel(
         loadData()
     }
 
+    fun onEnterScreen() {
+        if (notificationRepository.isNotificationEnabled()) {
+            alarmScheduler.schedule(cartIds)
+        }
+    }
+
     private fun loadData() {
         loadState.update { LoadState.Loading }
         viewModelScope.launch {
@@ -104,6 +114,7 @@ class OrderViewModel(
         viewModelScope.launch {
             runCatching {
                 cartRepository.order(cartItems.value.values.map { it.id })
+                alarmScheduler.cancel()
                 _events.emit(OrderEvent.OrderSuccess)
             }.onFailure { throwable ->
                 loadState.update { LoadState.Error(throwable, throwable.message) }
@@ -122,6 +133,8 @@ class OrderViewModel(
                         savedStateHandle = savedStateHandle,
                         cartRepository = application.appContainer.cartRepository,
                         couponRepository = application.appContainer.couponRepository,
+                        alarmScheduler = application.appContainer.alarmScheduler,
+                        notificationRepository = application.appContainer.notificationRepository,
                     )
                 }
             }
