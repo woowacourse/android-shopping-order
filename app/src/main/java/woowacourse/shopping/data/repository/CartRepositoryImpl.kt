@@ -10,9 +10,12 @@ import woowacourse.shopping.model.Money
 class CartRepositoryImpl(
     private val api: CartApi,
 ) : CartRepository {
-    override suspend fun getTotalPrice(cartIds: List<String>): Money =
+    override suspend fun getCartItems(cartIds: List<String>): List<CartItem> =
         getAllCartItems()
             .filter { cartIds.contains(it.id) }
+
+    override suspend fun getTotalPrice(cartIds: List<String>): Money =
+        getCartItems(cartIds)
             .fold(Money(0)) { acc, cartItem ->
                 acc + cartItem.product.price * cartItem.quantity
             }
