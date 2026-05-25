@@ -32,7 +32,7 @@ class ProductListViewModel(
                 products.map { product -> product.toUiModel() }
             }
 
-    private val _uiState = MutableStateFlow(ShoppingUiState())
+    private val _uiState = MutableStateFlow(ShoppingUiState(isLoading = true))
 
     val uiState: StateFlow<ShoppingUiState> =
         combine(
@@ -83,6 +83,7 @@ class ProductListViewModel(
     }
 
     fun loadMoreProducts() {
+        if (_uiState.value.isLoading) return
         viewModelScope.launch {
             loadProducts(_uiState.value.page, PRODUCT_PAGE_SIZE)
         }
@@ -92,10 +93,8 @@ class ProductListViewModel(
         page: Int,
         size: Int,
     ) {
-        if (_uiState.value.isLoading || !_uiState.value.canLoadMore) return
-        _uiState.update {
-            it.copy(isLoading = true)
-        }
+        if (!_uiState.value.canLoadMore) return
+        _uiState.update { it.copy(isLoading = true) }
         try {
             val loadedSize =
                 productRepository.loadProducts(
