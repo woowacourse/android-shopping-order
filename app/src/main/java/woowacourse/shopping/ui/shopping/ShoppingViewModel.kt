@@ -33,9 +33,16 @@ class ShoppingViewModel(
     private val pageSize = 20
 
     init {
-        observeNetwork()
-        observeCartQuantities()
-        observeRecentItems()
+        viewModelScope.launch {
+            syncCartQuantity()
+            observeNetwork()
+            observeCartQuantities()
+            observeRecentItems()
+        }
+    }
+
+    private suspend fun syncCartQuantity() {
+        cartRepository.syncCartQuantity()
     }
 
     private fun observeNetwork() {

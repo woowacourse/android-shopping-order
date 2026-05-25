@@ -23,6 +23,8 @@ interface CartRepository {
 
     suspend fun getTotalCartItemQuantity(): Result<Int>
 
+    suspend fun syncCartQuantity(): Result<Unit> = Result.success(Unit)
+
     fun getCartQuantityMap(): Flow<Map<Long, Int>>
 
     suspend fun getAllCartItems(): Result<List<CartItem>>

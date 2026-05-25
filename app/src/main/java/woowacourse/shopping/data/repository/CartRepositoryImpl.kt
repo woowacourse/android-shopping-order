@@ -150,6 +150,16 @@ class CartRepositoryImpl(
             Result.failure(e)
         }
 
+    override suspend fun syncCartQuantity(): Result<Unit> =
+        try {
+            refreshCartQuantity()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
     override fun getCartQuantityMap(): Flow<Map<Long, Int>> =
         cartItemQuantityDao.getAll().map { entities ->
             entities.associate { entity ->

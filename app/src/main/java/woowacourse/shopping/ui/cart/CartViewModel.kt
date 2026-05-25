@@ -366,6 +366,42 @@ class CartViewModel(
         }
     }
 
+    fun selectAllCartItemsIfEmpty() {
+        if (_uiState.value.selectedCartItems.isNotEmpty()) return
+
+        viewModelScope.launch {
+            cartRepository
+                .getAllCartItems()
+                .onSuccess { cartItems ->
+                    val selectedCartItems =
+                        cartItems.associate { cartItem ->
+                            cartItem.id to cartItem.toSelectedCartItem()
+                        }
+
+                    _uiState.update { state ->
+                        val items =
+                            state.items
+                                .map { item ->
+                                    item.copy(isChecked = selectedCartItems.containsKey(item.id))
+                                }.toImmutableList()
+
+                        state.copy(
+                            items = items,
+                            selectedCartItems = selectedCartItems,
+                            totalCartQuantity = calculateTotalQuantity(selectedCartItems),
+                            totalPrice = calculateTotalPrice(selectedCartItems),
+                            isAllChecked = selectedCartItems.isNotEmpty(),
+                            errorMessage = null,
+                        )
+                    }
+                }.onFailure {
+                    _uiState.update {
+                        it.copy(errorMessage = "주문 상품을 불러오지 못했습니다.")
+                    }
+                }
+        }
+    }
+
     private fun CartItemUiModel.toSelectedCartItem(): SelectedCartItem =
         SelectedCartItem(
             totalPrice = totalPrice,
