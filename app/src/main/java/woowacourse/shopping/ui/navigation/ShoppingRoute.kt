@@ -19,4 +19,9 @@ sealed interface ShoppingRoute {
     data class Recommendation(
         val selectedCartItemIds: List<Long>,
     ) : ShoppingRoute
+
+    @Serializable
+    data class Payment(
+        val selectedCartItemIds: List<Long>,
+    ) : ShoppingRoute
 }

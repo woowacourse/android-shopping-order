@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.cart.cartRoute
 import woowacourse.shopping.ui.catalog.catalogRoute
+import woowacourse.shopping.ui.payment.paymentRoute
 import woowacourse.shopping.ui.productdetail.productDetailRoute
 import woowacourse.shopping.ui.recommendation.recommendationRoute
 
@@ -87,7 +88,22 @@ fun ShoppingNavHost(
                     ),
                 )
             },
-            onOrderClick = {
+            onOrderClick = { selectedCartItemIds ->
+                navController.navigate(
+                    ShoppingRoute.Payment(
+                        selectedCartItemIds = selectedCartItemIds,
+                    ),
+                )
+            },
+            onBackClick = { navController.popBackStack() },
+        )
+
+        paymentRoute(
+            shoppingApplication = shoppingApplication,
+            contentPadding = contentPadding,
+            snackbarHostState = snackbarHostState,
+            onBackClick = { navController.popBackStack() },
+            onPaymentComplete = {
                 navController.navigate(ShoppingRoute.Catalog) {
                     popUpTo(ShoppingRoute.Catalog) {
                         inclusive = true
@@ -95,7 +111,6 @@ fun ShoppingNavHost(
                     launchSingleTop = true
                 }
             },
-            onBackClick = { navController.popBackStack() },
         )
     }
 }
