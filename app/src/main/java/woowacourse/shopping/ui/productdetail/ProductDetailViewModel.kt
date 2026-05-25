@@ -6,7 +6,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.navigation.toRoute
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -15,6 +20,7 @@ import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.di.AppContainer
+import woowacourse.shopping.ui.nav.ProductDetail
 import java.io.IOException
 
 class ProductDetailViewModel(
@@ -22,12 +28,14 @@ class ProductDetailViewModel(
     private val productRepo: ProductRepository,
     private val cartRepo: CartRepository,
     private val recentProductRepo: RecentProductRepository,
-    private val productId: Long,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductDetailUiState())
-    val uiState = _uiState.asStateFlow()
-    private val isFromBanner: Boolean =
-        savedStateHandle[ProductDetailActivity.EXTRA_IS_FROM_BANNER] ?: false
+    val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
+    private val _event = MutableSharedFlow<ProductDetailEvent>()
+    val event: SharedFlow<ProductDetailEvent> = _event.asSharedFlow()
+    private val detailRoute = savedStateHandle.toRoute<ProductDetail>()
+    private val productId: Long = detailRoute.productId
+    private val isFromBanner: Boolean = detailRoute.isFromBanner
 
     init {
         loadProduct()
@@ -49,7 +57,7 @@ class ProductDetailViewModel(
         }
     }
 
-    fun addToCart(onSuccess: () -> Unit) {
+    fun addToCart() {
         val currentState = _uiState.value
         val productToSave = currentState.product ?: return
 
@@ -57,7 +65,7 @@ class ProductDetailViewModel(
             _uiState.update { it.copy(isLoading = true) }
             try {
                 cartRepo.add(productToSave, quantity = currentState.selectedQuantity)
-                onSuccess()
+                _event.emit(ProductDetailEvent.AddToCartSuccess)
             } catch (_: IOException) {
                 _uiState.update {
                     it.copy(errorMessage = "장바구니에 상품을 담지 못했습니다.")
@@ -113,10 +121,7 @@ class ProductDetailViewModel(
     }
 
     companion object {
-        fun provideFactory(
-            receivedProductId: Long,
-            container: AppContainer,
-        ): ViewModelProvider.Factory =
+        fun provideFactory(container: AppContainer): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(
@@ -128,9 +133,11 @@ class ProductDetailViewModel(
                         productRepo = container.productRepository,
                         cartRepo = container.cartRepository,
                         recentProductRepo = container.recentProductRepository,
-                        productId = receivedProductId,
                     ) as T
             }
-
     }
+}
+
+sealed interface ProductDetailEvent {
+    data object AddToCartSuccess : ProductDetailEvent
 }

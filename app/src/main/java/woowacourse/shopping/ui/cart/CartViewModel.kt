@@ -3,7 +3,11 @@ package woowacourse.shopping.ui.cart
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -24,7 +28,9 @@ class CartViewModel(
     private val orderRepo: OrderRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
+    private val _event = MutableSharedFlow<CartEvent>()
+    val event: SharedFlow<CartEvent> = _event.asSharedFlow()
     val pager = Pager(PAGE_SIZE)
 
     init {
@@ -147,24 +153,15 @@ class CartViewModel(
         }
     }
 
-    fun order(selectedIds: List<Long>) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            try {
-                orderRepo.requestOrder(selectedIds)
-            } finally {
-                _uiState.update { it.copy(isLoading = false) }
-            }
-        }
-    }
-
     fun increaseInRecommendScreen(product: Product) {
         viewModelScope.launch {
             try {
                 cartRepo.add(product)
-                val cartId = cartRepo.findCartItem(product.id)
-                    ?.id
-                    ?: throw IllegalArgumentException("추가하려는 상품 아이디(${product.id})로 장바구니 아이디를 조회할 수 없습니다. ")
+                val cartId =
+                    cartRepo
+                        .findCartItem(product.id)
+                        ?.id
+                        ?: throw IllegalArgumentException("추가하려는 상품 아이디(${product.id})로 장바구니 아이디를 조회할 수 없습니다. ")
 
                 _uiState.update { state ->
                     val uiModel =
@@ -228,7 +225,7 @@ class CartViewModel(
                         lastViewedItem = recentProductRepo.getLastViewedProduct(),
                         allProductItems = productRepo.getProductPage(page = 1, count = 50).items,
                         allCartItem = cartRepo.getAllCartItems().items,
-                        MAX_RECOMMEND_ITEM_SIZE
+                        MAX_RECOMMEND_ITEM_SIZE,
                     )
                 val uiModel =
                     products.map {
@@ -294,13 +291,10 @@ class CartViewModel(
     }
 
     companion object {
-        const val MAX_RECOMMEND_ITEM_SIZE = 20
+        const val MAX_RECOMMEND_ITEM_SIZE = 10
         const val PAGE_SIZE = 5
 
-
-        fun provideFactory(
-            container: AppContainer,
-        ): ViewModelProvider.Factory =
+        fun provideFactory(container: AppContainer): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T =
                     CartViewModel(
@@ -311,4 +305,8 @@ class CartViewModel(
                     ) as T
             }
     }
+}
+
+sealed interface CartEvent {
+    data object OrderSuccess : CartEvent
 }

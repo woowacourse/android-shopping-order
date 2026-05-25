@@ -2,13 +2,19 @@ package woowacourse.shopping.ui.productdetail
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import woowacourse.shopping.data.model.Money
 import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.ui.common.component.NetworkErrorMessage
@@ -27,17 +33,26 @@ fun ProductDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val errorMessage = uiState.errorMessage
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    Box(modifier = modifier) {
+    LaunchedEffect(viewModel, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.event.collect { event ->
+                when (event) {
+                    ProductDetailEvent.AddToCartSuccess -> onAddToCartClick()
+                }
+            }
+        }
+    }
+
+    Box(modifier = modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
         uiState.product?.let { product ->
             ProductDetailScreen(
                 product = product,
                 totalPrice = uiState.totalPrice.value,
                 count = uiState.selectedQuantity,
                 onCloseClick = onCloseClick,
-                onAddToCartClick = {
-                    viewModel.addToCart(onSuccess = onAddToCartClick)
-                },
+                onAddToCartClick = { viewModel.addToCart() },
                 onIncreaseClick = { viewModel.increase() },
                 onDecreaseClick = { viewModel.decrease() },
                 lastViewedProduct = uiState.lastViewedProduct,

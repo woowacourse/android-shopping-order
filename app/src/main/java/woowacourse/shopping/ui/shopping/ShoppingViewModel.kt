@@ -28,7 +28,7 @@ class ShoppingViewModel(
     private val loadSize: Int,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ShoppingUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState: StateFlow<ShoppingUiState> = _uiState.asStateFlow()
     val isNetworkConnected: StateFlow<Boolean> =
         networkMonitor.isConnected
             .stateIn(

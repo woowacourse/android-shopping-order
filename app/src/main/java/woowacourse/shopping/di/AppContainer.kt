@@ -6,13 +6,18 @@ import woowacourse.shopping.data.local.Database
 import woowacourse.shopping.data.remote.RetrofitClient
 import woowacourse.shopping.data.remote.auth.BasicAuthEncoder
 import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.CouponRepository
+import woowacourse.shopping.data.repository.NotificationRepository
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.data.repository.network.RetrofitCartRepository
+import woowacourse.shopping.data.repository.network.RetrofitCouponRepository
 import woowacourse.shopping.data.repository.network.RetrofitOrderRepository
 import woowacourse.shopping.data.repository.network.RetrofitProductRepository
+import woowacourse.shopping.data.repository.preferences.SharedPreferenceNotificationRepository
 import woowacourse.shopping.data.repository.room.RoomRecentProductRepository
+import woowacourse.shopping.notification.PaymentAlarmScheduler
 
 class AppContainer(
     context: Context,
@@ -46,4 +51,12 @@ class AppContainer(
             encoder = encoder,
             service = networkClient.orderService,
         )
+    val couponRepository: CouponRepository =
+        RetrofitCouponRepository(
+            service = networkClient.couponService,
+        )
+    val notificationRepository: NotificationRepository =
+        SharedPreferenceNotificationRepository(context)
+    val paymentAlarmScheduler: PaymentAlarmScheduler =
+        PaymentAlarmScheduler(context)
 }

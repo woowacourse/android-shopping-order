@@ -7,6 +7,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.remote.service.CartService
+import woowacourse.shopping.data.remote.service.CouponService
 import woowacourse.shopping.data.remote.service.OrderService
 import woowacourse.shopping.data.remote.service.ProductService
 import kotlin.reflect.KClass
@@ -22,6 +23,7 @@ object RetrofitClient {
     val productService = buildToService(ProductService::class)
     val cartService = buildToService(CartService::class)
     val orderService = buildToService(OrderService::class)
+    val couponService = buildToService(CouponService::class)
 
     private fun <T : Any> buildToService(clazz: KClass<T>): T =
         Retrofit

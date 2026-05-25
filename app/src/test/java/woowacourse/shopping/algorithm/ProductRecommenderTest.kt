@@ -35,7 +35,8 @@ class ProductRecommenderTest {
         val cartItems = emptyList<CartItem>()
 
         // when
-        val recommended = ProductRecommender.recommendProduct(lastViewed, allProducts, cartItems, 20)
+        val recommended =
+            ProductRecommender.recommendProduct(lastViewed, allProducts, cartItems, 10)
 
         // then
         // Current implementation: includes lastViewed if it's in allProducts and same category
@@ -55,7 +56,8 @@ class ProductRecommenderTest {
         val cartItems = emptyList<CartItem>()
 
         // when
-        val recommended = ProductRecommender.recommendProduct(lastViewed, allProducts, cartItems, 20)
+        val recommended =
+            ProductRecommender.recommendProduct(lastViewed, allProducts, cartItems, 10)
 
         // then
         assertEquals(2, recommended.size)
@@ -74,7 +76,8 @@ class ProductRecommenderTest {
         val cartItems = listOf(CartItem(product = p2, quantity = 1))
 
         // when
-        val recommended = ProductRecommender.recommendProduct(lastViewed, allProducts, cartItems, 20)
+        val recommended =
+            ProductRecommender.recommendProduct(lastViewed, allProducts, cartItems, 10)
 
         // then
         assertTrue(!recommended.contains(p2))
@@ -90,7 +93,8 @@ class ProductRecommenderTest {
         val cartItems = emptyList<CartItem>()
 
         // when
-        val recommended = ProductRecommender.recommendProduct(lastViewed, allProducts, cartItems, 20)
+        val recommended =
+            ProductRecommender.recommendProduct(lastViewed, allProducts, cartItems, 10)
 
         // then
         assertEquals(10, recommended.size)

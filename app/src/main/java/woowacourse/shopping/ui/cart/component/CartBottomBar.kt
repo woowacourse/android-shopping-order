@@ -80,7 +80,7 @@ private fun CheckboxAndPrice(
             onCheckedChanged = onCheckedChanged,
         )
         Text(
-            text = "$price",
+            text = price,
             color = Color.White,
             fontSize = 18.sp,
             fontWeight = FontWeight.W700,
@@ -102,7 +102,7 @@ private fun Price(
         contentAlignment = Alignment.CenterEnd,
     ) {
         Text(
-            text = "$price",
+            text = price,
             color = Color.White,
             fontSize = 18.sp,
             fontWeight = FontWeight.W700,
@@ -167,23 +167,5 @@ private fun CartBottomBarPreview() {
         modifier = Modifier,
         onCheckedChanged = {},
         onOrderClick = {},
-    )
-}
-
-@Preview
-@Composable
-private fun CheckboxForAllPreview() {
-    CheckboxForAll(
-        checked = true,
-        onCheckedChanged = {},
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun OrderButtonPreview() {
-    OrderButton(
-        count = 2,
-        onClick = {},
     )
 }

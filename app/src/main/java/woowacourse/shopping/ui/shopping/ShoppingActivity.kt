@@ -5,58 +5,48 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.data.remote.NetworkMonitor
-import woowacourse.shopping.ui.cart.CartActivity
+import woowacourse.shopping.notification.PaymentNotificationConstants
 import woowacourse.shopping.ui.common.theme.ShoppingTheme
-import woowacourse.shopping.ui.productdetail.ProductDetailActivity
+import woowacourse.shopping.ui.nav.AppNavHost
 
 class ShoppingActivity : ComponentActivity() {
     private val container by lazy {
         (application as ShoppingApplication).appContainer
     }
-    val loadSize = 20
+    private var paymentCartItemIds by mutableStateOf<List<Long>?>(null)
 
-    @Suppress("UNCHECKED_CAST")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        paymentCartItemIds = extractPaymentCartItemIds(intent)
         setContent {
             ShoppingTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    val viewModel: ShoppingViewModel =
-                        viewModel(
-                            factory = ShoppingViewModel.provideFactory(
-                                container,
-                                NetworkMonitor(applicationContext),
-                                loadSize,
-                            ),
-                        )
-
-                    ShoppingScreen(
-                        viewModel = viewModel,
-                        modifier = Modifier.padding(innerPadding),
-                        onCartClick = {
-                            startActivity(Intent(this, CartActivity::class.java))
-                        },
-                        onProductClick = {
-                            val intent =
-                                ProductDetailActivity.newIntent(context = this, productId = it.id)
-                            startActivity(intent)
-                        },
-                        onRecentProductClick = {
-                            val intent =
-                                ProductDetailActivity.newIntent(context = this, productId = it.id)
-                            startActivity(intent)
-                        },
-                    )
-                }
+                AppNavHost(
+                    container = container,
+                    paymentCartItemIds = paymentCartItemIds,
+                )
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        paymentCartItemIds = extractPaymentCartItemIds(intent)
+    }
+
+    private fun extractPaymentCartItemIds(intent: Intent): List<Long>? {
+        val rawIds =
+            intent.getStringExtra(PaymentNotificationConstants.EXTRA_CART_ITEM_IDS)
+                ?: return null
+
+        return rawIds
+            .split(",")
+            .mapNotNull { it.toLongOrNull() }
+            .ifEmpty { null }
     }
 }

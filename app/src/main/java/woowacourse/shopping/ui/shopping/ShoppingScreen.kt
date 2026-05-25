@@ -4,14 +4,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +30,7 @@ import woowacourse.shopping.data.model.Product
 import woowacourse.shopping.data.model.Products
 import woowacourse.shopping.ui.common.component.NetworkErrorMessage
 import woowacourse.shopping.ui.common.model.ProductUiModel
+import woowacourse.shopping.ui.shopping.component.NotificationSettingRow
 import woowacourse.shopping.ui.shopping.component.ProductGroup
 import woowacourse.shopping.ui.shopping.component.RecentProductGroup
 import woowacourse.shopping.ui.shopping.component.ShoppingHeader
@@ -37,15 +39,17 @@ import woowacourse.shopping.ui.shopping.component.ShoppingScreenSkeleton
 @Composable
 fun ShoppingScreen(
     viewModel: ShoppingViewModel,
+    notificationEnabled: Boolean,
     modifier: Modifier = Modifier,
     onCartClick: () -> Unit,
     onProductClick: (Product) -> Unit,
+    onNotificationEnabledChange: (Boolean) -> Unit,
     onRecentProductClick: (Product) -> Unit,
 ) {
     val lazyGridState = rememberLazyGridState()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
-    val isConnected by viewModel.isNetworkConnected.collectAsState()
+    val isConnected by viewModel.isNetworkConnected.collectAsStateWithLifecycle()
     val errorMessage = state.errorMessage
 
     DisposableEffect(lifecycleOwner) {
@@ -63,23 +67,25 @@ fun ShoppingScreen(
     }
 
     if (!isConnected) {
-        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(modifier = modifier.fillMaxSize().statusBarsPadding(), contentAlignment = Alignment.Center) {
             Text(text = stringResource(R.string.alert_message_for_offline_mode))
         }
     } else if (state.shouldShowError && errorMessage != null) {
         NetworkErrorMessage(
             message = errorMessage,
-            modifier = modifier,
+            modifier = modifier.fillMaxSize().statusBarsPadding(),
             onRetryClick = { viewModel.retry() },
         )
     } else {
-        Box(modifier = modifier) {
+        Box(modifier = modifier.fillMaxSize().statusBarsPadding()) {
             ShoppingScreen(
                 products = state.visibleProducts,
                 recentProducts = state.recentProducts,
                 cartCount = state.cartCount,
                 hasNext = state.hasNext,
                 lazyGridState = lazyGridState,
+                notificationEnabled = notificationEnabled,
+                onNotificationEnabledChange = onNotificationEnabledChange,
                 onCartClick = onCartClick,
                 onProductClick = onProductClick,
                 onMoreClick = { viewModel.loadMore() },
@@ -94,13 +100,15 @@ fun ShoppingScreen(
 }
 
 @Composable
-fun ShoppingScreen(
+private fun ShoppingScreen(
     products: List<ProductUiModel>,
     recentProducts: Products,
     cartCount: Int,
     hasNext: Boolean,
     lazyGridState: LazyGridState,
+    notificationEnabled: Boolean,
     modifier: Modifier = Modifier,
+    onNotificationEnabledChange: (Boolean) -> Unit,
     onCartClick: () -> Unit,
     onProductClick: (Product) -> Unit,
     onMoreClick: () -> Unit,
@@ -109,12 +117,17 @@ fun ShoppingScreen(
     onRecentProductClick: (Product) -> Unit,
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize().navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         ShoppingHeader(
             cartCount = cartCount,
             onCartClick = onCartClick,
+        )
+
+        NotificationSettingRow(
+            enabled = notificationEnabled,
+            onEnabledChange = onNotificationEnabledChange,
         )
 
         if (recentProducts.any()) {
@@ -172,6 +185,8 @@ private fun ShoppingScreenPreview1() {
         cartCount = 1,
         hasNext = true,
         lazyGridState = rememberLazyGridState(),
+        notificationEnabled = true,
+        onNotificationEnabledChange = {},
         onCartClick = {},
         onProductClick = {},
         onMoreClick = {},
@@ -191,6 +206,8 @@ private fun ShoppingScreenPreview2() {
         cartCount = 0,
         hasNext = false,
         lazyGridState = rememberLazyGridState(),
+        notificationEnabled = false,
+        onNotificationEnabledChange = {},
         onCartClick = {},
         onProductClick = {},
         onMoreClick = {},
