@@ -15,4 +15,9 @@ data class Detail(
 object Cart
 
 @Serializable
+data class Payment(
+    val selectedCartItemIds: List<String>,
+)
+
+@Serializable
 object Setting
