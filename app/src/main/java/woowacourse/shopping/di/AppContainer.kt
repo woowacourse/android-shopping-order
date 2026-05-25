@@ -20,6 +20,7 @@ import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.notification.AlarmScheduler
 
 class AppContainer(
     context: Context,
@@ -55,10 +56,13 @@ class AppContainer(
 
     val couponRepository = CouponRepositoryImpl(couponDataSource)
 
-    val notificationRepository = NotificationRepositoryImpl(
-        context.getSharedPreferences(
-            "notification",
-            Context.MODE_PRIVATE,
+    val notificationRepository =
+        NotificationRepositoryImpl(
+            context.getSharedPreferences(
+                "notification",
+                Context.MODE_PRIVATE,
+            ),
         )
-    )
+
+    val alarmScheduler = AlarmScheduler(context)
 }
