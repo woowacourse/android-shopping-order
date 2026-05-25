@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.uimodel
 
-import woowacourse.shopping.core.designsystem.component.toPriceString
+import woowacourse.shopping.core.formatter.toPriceString
 import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.model.product.Products
 

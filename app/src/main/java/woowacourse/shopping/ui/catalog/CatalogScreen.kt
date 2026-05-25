@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import woowacourse.shopping.R
 import woowacourse.shopping.core.designsystem.component.ShoppingItem
 import woowacourse.shopping.core.designsystem.component.layout.CommonFrame
-import woowacourse.shopping.core.designsystem.component.toPriceString
+import woowacourse.shopping.core.formatter.toPriceString
 import woowacourse.shopping.ui.catalog.component.CountBadge
 import woowacourse.shopping.ui.catalog.component.RecentlyViewedProducts
 import woowacourse.shopping.ui.uimodel.ProductUiModel

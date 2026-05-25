@@ -2,7 +2,7 @@ package woowacourse.shopping.ui.cart.uimodel
 
 import woowacourse.shopping.domain.model.order.PurchaseProduct
 import woowacourse.shopping.domain.model.order.PurchaseProducts
-import woowacourse.shopping.core.designsystem.component.toPriceString
+import woowacourse.shopping.core.formatter.toPriceString
 
 data class CartInfo(
     val id: Long,

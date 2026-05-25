@@ -14,7 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import woowacourse.shopping.core.designsystem.component.toPriceString
+import woowacourse.shopping.core.formatter.toPriceString
 import woowacourse.shopping.ui.uimodel.ProductUiModel
 
 @Composable

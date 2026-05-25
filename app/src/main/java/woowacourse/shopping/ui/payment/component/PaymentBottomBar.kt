@@ -1,5 +1,3 @@
-@file:Suppress("ktlint:standard:function-naming")
-
 package woowacourse.shopping.ui.payment.component
 
 import androidx.compose.foundation.background

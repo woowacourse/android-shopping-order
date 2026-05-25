@@ -1,6 +1,5 @@
 package woowacourse.shopping.core.designsystem.component
 
-import android.icu.text.DecimalFormat
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import woowacourse.shopping.core.formatter.toPriceString
 import woowacourse.shopping.ui.uimodel.ProductUiModel
 
 @Composable
@@ -104,22 +104,18 @@ private fun ProductInfo(
     }
 }
 
-fun Int.toPriceString(): String {
-    val formatter = DecimalFormat("###,###")
-    return "${formatter.format(this)}원"
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun ShoppingItemPreview1() {
-    val mockProduct = ProductUiModel(
-        imageUrl = "https://media.sodagift.com/img/image/1734582680547.jpg",
-        name = "매우매우긴상품명입니다",
-        price = 1000000000,
-        formattedPrice = 1000000000.toPriceString(),
-        category = "카테고리",
-        id = 1L,
-    )
+    val mockProduct =
+        ProductUiModel(
+            imageUrl = "https://media.sodagift.com/img/image/1734582680547.jpg",
+            name = "매우매우긴상품명입니다",
+            price = 1000000000,
+            formattedPrice = 1000000000.toPriceString(),
+            category = "카테고리",
+            id = 1L,
+        )
 
     ShoppingItem(
         { 0 },

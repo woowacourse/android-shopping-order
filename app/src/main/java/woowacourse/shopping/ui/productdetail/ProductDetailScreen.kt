@@ -29,7 +29,7 @@ import woowacourse.shopping.R
 import woowacourse.shopping.core.designsystem.component.ProductImage
 import woowacourse.shopping.core.designsystem.component.QuantitySelector
 import woowacourse.shopping.core.designsystem.component.layout.CommonFrame
-import woowacourse.shopping.core.designsystem.component.toPriceString
+import woowacourse.shopping.core.formatter.toPriceString
 import woowacourse.shopping.ui.productdetail.component.LastViewedProduct
 import woowacourse.shopping.ui.uimodel.ProductUiModel
 
