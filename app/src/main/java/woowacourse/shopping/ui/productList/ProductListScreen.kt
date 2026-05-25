@@ -54,6 +54,7 @@ fun ProductListScreen(
     modifier: Modifier = Modifier,
     viewModel: ProductListViewModel,
     onCartClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
     onProductClick: (Product) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -67,7 +68,8 @@ fun ProductListScreen(
         onIncrease = viewModel::increase,
         onDecrease = viewModel::decrease,
         onMoreClick = viewModel::moreProducts,
-        onCartClick = onCartClick,
+            onCartClick = onCartClick,
+                onSettingsClick = onSettingsClick,
         onProductClick = onProductClick,
     )
 }
@@ -82,16 +84,18 @@ fun ProductListScreenContent(
     onDecrease: (Int) -> Unit,
     onMoreClick: () -> Unit,
     onCartClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
     onProductClick: (Product) -> Unit = {},
 ) {
     Column(modifier = modifier) {
-        ProductListTopAppBar(
+            ProductListTopAppBar(
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .height(56.dp),
             cartCount = cartCount,
-            onClick = onCartClick,
+            onCartClick = onCartClick,
+            onSettingsClick = onSettingsClick,
         )
 
         when (uiState) {
@@ -275,6 +279,14 @@ private fun CartBadgeIcon(
 }
 
 @Composable
+private fun AlarmIcon(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    // Alarm icon removed from product list top app bar per design decision
+}
+
+@Composable
 private fun ErrorContent(
     message: String,
     modifier: Modifier = Modifier,
@@ -296,7 +308,9 @@ private fun ErrorContent(
 private fun ProductListTopAppBar(
     cartCount: Int,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
+    onCartClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
+    onAlarmClick: () -> Unit = {},
 ) {
     TopAppBar(
         modifier = modifier,
@@ -307,9 +321,18 @@ private fun ProductListTopAppBar(
             )
         },
         actions = {
+            AlarmIcon(onClick = onAlarmClick)
+
+            IconButton(onClick = onSettingsClick) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_settings),
+                    contentDescription = "설정 아이콘",
+                )
+            }
+
             CartBadgeIcon(
                 cartCount = cartCount,
-                onClick = onClick,
+                onClick = onCartClick,
             )
         },
         colors =
