@@ -33,6 +33,10 @@ class PaymentViewModel(
 
     fun selectCoupon(couponId: Long) {
         _uiState.update { state ->
+            val coupon = state.coupons.firstOrNull { it.id == couponId } ?: return@update state
+            val discountAmount = coupon.discount(items = state.items, shippingFee = state.shippingFee)
+            if (discountAmount <= 0) return@update state
+
             state.copy(selectedCouponId = if (state.selectedCouponId == couponId) null else couponId)
         }
     }
