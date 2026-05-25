@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.data.localdata.UserDataStore
+import woowacourse.shopping.data.localdata.ShoppingSharedPreferences
 
 data class SettingUiState(
     val isNotification: Boolean = false,
@@ -29,7 +29,7 @@ sealed class SettingUiEvent {
 }
 
 class SettingViewModel(
-    private val dataStore: UserDataStore,
+    private val shoppingSharedPreferences: ShoppingSharedPreferences,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SettingUiState())
     val uiState: StateFlow<SettingUiState> = _uiState.asStateFlow()
@@ -38,18 +38,18 @@ class SettingViewModel(
     val uiEvent = _uiEvent.asSharedFlow()
 
     init {
-        viewModelScope.launch {
-            dataStore.isNotification.collect { isNotification ->
-                _uiState.update {
-                    it.copy(isNotification = isNotification)
-                }
-            }
+        _uiState.update {
+            it.copy(isNotification = shoppingSharedPreferences.getIsNotification())
         }
     }
 
     fun updateIsNotification(isNotification: Boolean) {
         viewModelScope.launch {
-            dataStore.saveIsNotification(isNotification)
+            shoppingSharedPreferences.saveIsNotification(isNotification)
+
+            _uiState.update {
+                it.copy(isNotification = isNotification)
+            }
 
             _uiEvent.emit(
                 SettingUiEvent.ShowToastMessage(
@@ -71,7 +71,7 @@ class SettingViewModel(
                 initializer {
                     val app = this[APPLICATION_KEY] as ShoppingApplication
                     SettingViewModel(
-                        dataStore = app.appContainer.userDataStore,
+                        shoppingSharedPreferences = app.appContainer.shoppingSharedPreferences,
                     )
                 }
             }

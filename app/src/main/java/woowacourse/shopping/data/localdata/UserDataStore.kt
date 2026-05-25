@@ -24,12 +24,6 @@ class UserDataStore(
         }
     }
 
-    suspend fun saveIsNotification(isNotification: Boolean) {
-        context.userDataStore.edit { prefs ->
-            prefs[NOTIFICATION_KEY] = isNotification
-        }
-    }
-
     val username: Flow<String> =
         context.userDataStore.data.map { prefs ->
             prefs[USERNAME_KEY] ?: ""
@@ -40,14 +34,8 @@ class UserDataStore(
             prefs[PASSWORD_KEY] ?: ""
         }
 
-    val isNotification: Flow<Boolean> =
-        context.userDataStore.data.map { prefs ->
-            prefs[NOTIFICATION_KEY] ?: false
-        }
-
     companion object {
         private val USERNAME_KEY = stringPreferencesKey("username")
         private val PASSWORD_KEY = stringPreferencesKey("password")
-        private val NOTIFICATION_KEY = booleanPreferencesKey("notification")
     }
 }

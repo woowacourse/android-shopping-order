@@ -1,5 +1,6 @@
 package woowacourse.shopping
 
+import android.app.AlarmManager
 import android.content.Context
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +16,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.data.localdata.UserDataStore
+import woowacourse.shopping.data.localdata.ShoppingSharedPreferences
 import woowacourse.shopping.data.localdb.ShoppingDB
 import woowacourse.shopping.data.remote.NetworkManager
 import woowacourse.shopping.data.remote.NetworkObserver
@@ -41,6 +43,8 @@ class AppContainer(
     val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     val userDataStore = UserDataStore(applicationContext)
+
+    val shoppingSharedPreferences = ShoppingSharedPreferences(applicationContext)
 
     init {
         applicationScope.launch {
@@ -117,4 +121,6 @@ class AppContainer(
                 ),
             ).client(client)
             .build()
+
+    val alarmManager = applicationContext.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
 }
