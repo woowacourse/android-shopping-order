@@ -7,6 +7,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.remote.api.CartApi
 import woowacourse.shopping.data.remote.api.CouponApi
 import woowacourse.shopping.data.remote.api.OrderApi
@@ -26,7 +27,7 @@ object RetrofitProvider {
 
     private val loggingInterceptor =
         HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
         }
 
     private val okHttpClient =
