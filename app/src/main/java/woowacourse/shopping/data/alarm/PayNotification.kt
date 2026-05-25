@@ -27,7 +27,7 @@ class PayNotification(
                 .Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_pay_notification)
                 .setContentTitle("결제 알림")
-                .setContentText("결제를 기다리고 있어요!")
+                .setContentText("아직 결제가 완료되지 않았어요")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(createContentIntent())
                 .setAutoCancel(true)
