@@ -2,11 +2,11 @@
 agp = "8.13.2"
 coilCompose = "3.4.0"
 coilNetworkOkhttp = "3.4.0"
-converterGson = "3.0.0"
 converterKotlinxSerialization = "3.0.0"
 datastorePreferences = "1.2.1"
 kotlin = "2.3.0"
-kotlinx-serialization-json = "1.7.3"
+navigation = "2.8.9"
+kotlinx-serialization-json = "1.8.1"
 okhttp = "4.12.0"
 coreKtx = "1.18.0"
 espressoCore = "3.7.0"
@@ -40,7 +40,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "converterKotlinxSerialization" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }

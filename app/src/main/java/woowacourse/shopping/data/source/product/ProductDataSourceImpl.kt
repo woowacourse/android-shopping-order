@@ -1,10 +1,9 @@
 package woowacourse.shopping.data.source.product
 
-import woowacourse.shopping.data.network.product.ProductDao
 import woowacourse.shopping.domain.Product
 
 class ProductDataSourceImpl(
-    private val productDao: ProductDao,
+    private val productDataSource: ProductDataSource,
 ) : ProductDataSource {
     override suspend fun loadProducts(
         startIndex: Int,
@@ -12,12 +11,12 @@ class ProductDataSourceImpl(
         sort: List<String>,
         category: String?,
     ): Pair<List<Product>, Boolean> =
-        productDao.findAllProduct(
+        productDataSource.loadProducts(
             startIndex = startIndex,
             pageSize = pageSize,
             sort = sort,
             category = category,
         )
 
-    override suspend fun getProduct(id: Long): Product = productDao.findById(id = id)
+    override suspend fun getProduct(id: Long): Product = productDataSource.getProduct(id = id)
 }

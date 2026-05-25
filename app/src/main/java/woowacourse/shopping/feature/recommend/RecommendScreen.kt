@@ -1,10 +1,10 @@
 package woowacourse.shopping.feature.recommend
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,31 +17,34 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import woowacourse.shopping.feature.cart.component.CartAppBar
+import kotlinx.coroutines.launch
+import woowacourse.shopping.feature.common.component.CommonAppBar
 import woowacourse.shopping.feature.format.DecimalPriceFormatter
 
 @Composable
 fun RecommendScreen(
     onCloseClick: () -> Unit,
+    onBuyClick: (List<Long>) -> Unit,
+    contentIds: List<Long>,
     modifier: Modifier = Modifier,
-    viewModel: RecommendViewModel = viewModel(),
+    viewModel: RecommendViewModel = viewModel(factory = RecommendViewModel.recommendFactory()),
 ) {
     LaunchedEffect(Unit) {
-        viewModel.initialLoading()
+        viewModel.initialLoading(contentIds)
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val currentContext = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         containerColor = Color.White,
@@ -49,19 +52,57 @@ fun RecommendScreen(
             modifier
                 .fillMaxSize(),
         topBar = {
-            CartAppBar(onCloseClick = onCloseClick)
+            CommonAppBar(
+                title = "Cart",
+                onCloseClick = onCloseClick,
+            )
         },
     ) { innerPadding ->
-        Column(modifier = modifier.padding(innerPadding)) {
-            Text("이런 상품은 어떠세요?")
-            Text("* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.")
-            RecommendList(
-                isLoading = false,
-                products = uiState.recommendList,
-                onIncrease = viewModel::increase,
-                onDecrease = viewModel::decrease,
-                modifier = Modifier.weight(1f),
-            )
+        Column(
+            modifier =
+                modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+        ) {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Column(
+                    modifier = Modifier.padding(start = 16.dp),
+                ) {
+                    Text("이런 상품은 어떠세요?", fontWeight = FontWeight.W700, fontSize = 24.sp)
+                    Spacer(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(10.dp),
+                    )
+                    Text(
+                        "* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.",
+                        fontWeight = FontWeight.W500,
+                        fontSize = 14.sp,
+                        color = Color.Gray,
+                    )
+                }
+                Spacer(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(24.dp),
+                )
+                RecommendList(
+                    isLoading = false,
+                    products = uiState.recommendList,
+                    onIncrease = viewModel::increase,
+                    onDecrease = viewModel::decrease,
+                    modifier = Modifier,
+                )
+            }
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -90,8 +131,10 @@ fun RecommendScreen(
                 }
                 TextButton(
                     onClick = {
-                        viewModel.order()
-                        Toast.makeText(currentContext, "주문이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+                        scope.launch {
+                            val totalIds = viewModel.addRecommendToCart(contentIds)
+                            onBuyClick(totalIds)
+                        }
                     },
                     modifier =
                         Modifier
@@ -116,5 +159,7 @@ fun RecommendScreen(
 private fun RecommendScreenPreview() {
     RecommendScreen(
         onCloseClick = {},
+        onBuyClick = {},
+        contentIds = emptyList(),
     )
 }

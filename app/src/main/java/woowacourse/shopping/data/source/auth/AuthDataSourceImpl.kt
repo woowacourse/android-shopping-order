@@ -10,12 +10,11 @@ import kotlinx.coroutines.flow.map
 class AuthDataSourceImpl(
     private val dataStore: DataStore<Preferences>,
 ) : AuthDataSource {
-    override suspend fun load(): String =
+    override suspend fun load(): String? =
         dataStore.data
             .map { preference ->
                 preference[TOKEN_KEY]
             }.first()
-            ?: ""
 
     override suspend fun save(token: String) {
         dataStore.edit { preference ->

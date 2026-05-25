@@ -48,8 +48,8 @@ class FakeCartRepository(
         return contents.subList(startIndex, end).toList()
     }
 
-    override suspend fun remove(productId: Long) {
-        val index = indexOf(productId)
+    override suspend fun remove(contentId: Long) {
+        val index = indexOf(contentId)
         if (index != -1) contents.removeAt(index)
     }
 

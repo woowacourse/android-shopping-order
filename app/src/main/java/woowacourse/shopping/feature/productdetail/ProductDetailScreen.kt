@@ -34,13 +34,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.R
-import woowacourse.shopping.feature.common.ProductQuantitySelector
+import woowacourse.shopping.feature.common.component.ProductQuantitySelector
 import woowacourse.shopping.feature.common.state.ProductUiModel
 import woowacourse.shopping.feature.format.DecimalPriceFormatter
-import woowacourse.shopping.feature.productdetail.viewmodel.ProductDetailLoadingState
-import woowacourse.shopping.feature.productdetail.viewmodel.ProductDetailViewModel
-import woowacourse.shopping.feature.productlist.LoadingIndicator
-import woowacourse.shopping.feature.productlist.PreviewableAsyncImage
+import woowacourse.shopping.feature.productdetail.component.ProductAppBar
+import woowacourse.shopping.feature.productdetail.component.RecentProductLetter
+import woowacourse.shopping.feature.productlist.component.LoadingIndicator
+import woowacourse.shopping.feature.productlist.component.PreviewableAsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,12 +66,21 @@ fun ProductDetailScreen(
 
     val currentContext = LocalContext.current
 
+    LaunchedEffect(Unit) {
+        viewModel.event.collect { event ->
+            Toast.makeText(currentContext, event.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     when {
         productState is ProductDetailLoadingState.Loading ||
             recentState is ProductDetailLoadingState.Loading -> LoadingIndicator()
 
         productState is ProductDetailLoadingState.Error ||
-            productState is ProductDetailLoadingState.None -> ProductDetailErrorScreen(activityFinish)
+            productState is ProductDetailLoadingState.None ->
+            ProductDetailErrorScreen(
+                activityFinish,
+            )
 
         productState is ProductDetailLoadingState.Success ->
             ProductDetailContent(
@@ -83,7 +92,6 @@ fun ProductDetailScreen(
                 decrease = viewModel::decrease,
                 onAddCartButton = {
                     viewModel.addToCart()
-                    Toast.makeText(currentContext, "장바구니에 담겼습니다.", Toast.LENGTH_SHORT).show()
                 },
                 onClickRecentButton = onClickRecentButton,
                 modifier = modifier,

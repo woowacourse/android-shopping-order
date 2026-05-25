@@ -22,14 +22,16 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import woowacourse.shopping.feature.productlist.viewmodel.ProductListEvent
-import woowacourse.shopping.feature.productlist.viewmodel.ProductListViewModel
+import woowacourse.shopping.feature.productlist.component.ProductList
+import woowacourse.shopping.feature.productlist.component.ProductListAppBar
+import woowacourse.shopping.feature.productlist.component.RecentProductList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductListScreen(
     vm: ProductListViewModel = viewModel(factory = ProductListViewModel.Factory),
     onProductClick: (Long, Long?) -> Unit,
+    onSettingClick: () -> Unit,
     onCartIconClick: () -> Unit,
     activityFinish: () -> Unit,
     modifier: Modifier = Modifier,
@@ -56,6 +58,7 @@ fun ProductListScreen(
                 .fillMaxSize(),
         topBar = {
             ProductListAppBar(
+                onSettingClick = onSettingClick,
                 onCartIconClick = onCartIconClick,
                 cartQuantities = state.cartTotalQuantity,
             )
@@ -130,6 +133,7 @@ fun ProductListScreen(
 private fun PreviewProductListScreen() {
     ProductListScreen(
         onProductClick = { _, _ -> },
+        onSettingClick = {},
         onCartIconClick = { },
         activityFinish = { },
     )

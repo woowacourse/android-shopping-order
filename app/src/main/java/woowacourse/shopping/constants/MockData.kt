@@ -1,7 +1,14 @@
 package woowacourse.shopping.constants
 
+import woowacourse.shopping.data.network.coupon.dto.AvailableTime
 import woowacourse.shopping.domain.Money
 import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.coupon.BuyXGetYCoupon
+import woowacourse.shopping.domain.coupon.Coupon
+import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
+import woowacourse.shopping.domain.coupon.FreeShippingCoupon
+import woowacourse.shopping.domain.coupon.PercentageDiscountCoupon
+import java.time.LocalDate
 
 object MockData {
     private const val IMAGE_BASE_URL =
@@ -17,4 +24,39 @@ object MockData {
                 imageUrl = "$IMAGE_BASE_URL${(i - 1) % 5}$IMAGE_URL_SUFFIX",
             )
         }
+
+    val MOCK_COUPONS: List<Coupon> =
+        listOf(
+            FixedDiscountCoupon(
+                code = "FIXED5000",
+                description = "5,000원 할인 쿠폰",
+                minimumAmount = 100000,
+                expirationDate = LocalDate.of(2026, 11, 30),
+                discount = 5000,
+            ),
+            BuyXGetYCoupon(
+                code = "BOGO",
+                description = "2개 구매 시 1개 무료 쿠폰",
+                expirationDate = LocalDate.of(2026, 5, 30),
+                buyQuantity = 2,
+                getQuantity = 1,
+            ),
+            FreeShippingCoupon(
+                code = "FREESHIPPING",
+                description = "5만원 이상 구매 시 무료 배송 쿠폰",
+                expirationDate = LocalDate.of(2026, 12, 31),
+                minimumAmount = 50000,
+            ),
+            PercentageDiscountCoupon(
+                code = "MIRACLESALE",
+                description = "일찍일어나는 새가 피곤함 쿠폰",
+                expirationDate = LocalDate.of(2026, 7, 31),
+                discount = 30,
+                availableTime =
+                    AvailableTime(
+                        start = "04:00:00",
+                        end = "07:00:00",
+                    ),
+            ),
+        )
 }

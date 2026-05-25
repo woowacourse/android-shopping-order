@@ -12,33 +12,27 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import okhttp3.Credentials
-import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.data.local.RecentProductDatabase
-import woowacourse.shopping.data.network.cart.CartRetrofitDaoImpl
-import woowacourse.shopping.data.network.cart.RetrofitCartService
-import woowacourse.shopping.data.network.order.OrderService
-import woowacourse.shopping.data.network.product.ProductRetrofitDaoImpl
-import woowacourse.shopping.data.network.product.RetrofitProductService
+import woowacourse.shopping.data.network.RetrofitClient
 import woowacourse.shopping.data.network.startMockWebServer
 import woowacourse.shopping.data.repository.auth.AuthRepository
 import woowacourse.shopping.data.repository.auth.AuthRepositoryImpl
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
-import woowacourse.shopping.data.repository.cart.RecentProductRepositoryImpl
+import woowacourse.shopping.data.repository.coupon.CouponRepository
+import woowacourse.shopping.data.repository.coupon.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.order.OrderRepository
 import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
+import woowacourse.shopping.data.repository.recentproduct.RecentProductRepositoryImpl
 import woowacourse.shopping.data.source.auth.AuthDataSourceImpl
-import woowacourse.shopping.data.source.order.OrderDaoImpl
-import woowacourse.shopping.data.source.product.ProductDataSourceImpl
+import woowacourse.shopping.data.source.cart.CartServerDataSourceImpl
+import woowacourse.shopping.data.source.coupon.CouponDataSourceImpl
+import woowacourse.shopping.data.source.order.OrderServerDataSourceImpl
+import woowacourse.shopping.data.source.product.ProductServerDataSourceImpl
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -46,6 +40,7 @@ data class AppDependencies(
     val productRepository: ProductRepository,
     val cartRepository: CartRepository,
     val recentProductRepository: RecentProductRepository,
+    val couponRepository: CouponRepository,
     val orderRepository: OrderRepository,
 )
 
@@ -74,40 +69,11 @@ open class ShoppingApplication : Application() {
                     ),
             )
 
-        var token = auth.load()
-        if (token.isBlank()) {
-            token = Credentials.basic("CommitTheKermit", "password")
-            auth.save(token)
-        }
+        val token = auth.load() ?: Credentials.basic("NoeyhOj", "password")
 
-        val json = Json { ignoreUnknownKeys = true }
-        val baseUrl =
-            "http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/".toHttpUrl()
+        auth.save(token)
 
-        val client =
-            OkHttpClient
-                .Builder()
-                .addInterceptor { chain ->
-                    val authorized =
-                        chain
-                            .request()
-                            .newBuilder()
-                            .header("Authorization", token)
-                            .build()
-                    chain.proceed(authorized)
-                }.build()
-
-        val retrofit =
-            Retrofit
-                .Builder()
-                .baseUrl(baseUrl)
-                .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-                .client(client)
-                .build()
-
-        val retrofitProductService = retrofit.create(RetrofitProductService::class.java)
-        val retrofitCartService = retrofit.create(RetrofitCartService::class.java)
-        val orderService = retrofit.create(OrderService::class.java)
+        RetrofitClient.setToken(token)
 
         val recentProductDatabase =
             Room
@@ -120,19 +86,16 @@ open class ShoppingApplication : Application() {
         val product: ProductRepository =
             ProductRepositoryImpl(
                 dataSource =
-                    ProductDataSourceImpl(
-                        productDao =
-                            ProductRetrofitDaoImpl(
-                                retrofitProductService = retrofitProductService,
-                            ),
+                    ProductServerDataSourceImpl(
+                        retrofitProductService = RetrofitClient.productService,
                     ),
             )
 
         val cart: CartRepository =
             CartRepositoryImpl(
-                cartServerDao =
-                    CartRetrofitDaoImpl(
-                        retrofitCartService = retrofitCartService,
+                cartServerDataSource =
+                    CartServerDataSourceImpl(
+                        retrofitCartService = RetrofitClient.cartService,
                     ),
             )
         val recent: RecentProductRepository =
@@ -140,11 +103,19 @@ open class ShoppingApplication : Application() {
                 recentProductDao = recentProductDatabase.recentProductDao(),
             )
 
+        val coupon: CouponRepository =
+            CouponRepositoryImpl(
+                couponDataSource =
+                    CouponDataSourceImpl(
+                        couponService = RetrofitClient.couponService,
+                    ),
+            )
+
         val order: OrderRepository =
             OrderRepositoryImpl(
-                orderDao =
-                    OrderDaoImpl(
-                        orderService = orderService,
+                orderDataSource =
+                    OrderServerDataSourceImpl(
+                        orderService = RetrofitClient.orderService,
                     ),
             )
 
@@ -152,6 +123,7 @@ open class ShoppingApplication : Application() {
             productRepository = product,
             cartRepository = cart,
             recentProductRepository = recent,
+            couponRepository = coupon,
             orderRepository = order,
         )
     }

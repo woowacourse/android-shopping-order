@@ -12,6 +12,8 @@ import woowacourse.shopping.feature.MainDispatcherExtension
 import woowacourse.shopping.feature.fake.FakeCartRepository
 import woowacourse.shopping.feature.fake.FakeProductRepository
 import woowacourse.shopping.feature.fake.FakeShoppingApplication
+import woowacourse.shopping.feature.productdetail.ProductDetailLoadingState
+import woowacourse.shopping.feature.productdetail.ProductDetailViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(MainDispatcherExtension::class)
