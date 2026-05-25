@@ -10,6 +10,7 @@ import woowacourse.shopping.ui.payment.component.PaymentBody
 import woowacourse.shopping.ui.payment.component.PaymentBottomBar
 import woowacourse.shopping.ui.payment.component.PaymentHeader
 import woowacourse.shopping.ui.payment.uimodel.CouponUiModel
+import woowacourse.shopping.ui.payment.uimodel.PaymentUiModel
 
 @Composable
 fun PaymentScreen(
@@ -55,10 +56,12 @@ private fun PaymentScreenPreview() {
                         ),
                     ),
                 selectedCouponCode = "FIXED5000",
-                formattedOrderAmount = "204,200원",
-                formattedCouponDiscountAmount = "-5,000원",
-                formattedDeliveryFee = "3,000원",
-                formattedTotalPaymentAmount = "202,200원",
+                payment = PaymentUiModel(
+                    formattedOrderAmount = "204,200원",
+                    formattedCouponDiscountAmount = "-5,000원",
+                    formattedDeliveryFee = "3,000원",
+                    formattedTotalPaymentAmount = "202,200원",
+                )
             ),
         onBackClick = {},
         onCouponClick = {},

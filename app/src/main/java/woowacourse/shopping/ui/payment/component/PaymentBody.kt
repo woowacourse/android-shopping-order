@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.ui.payment.PaymentUiState
 import woowacourse.shopping.ui.payment.uimodel.CouponUiModel
+import woowacourse.shopping.ui.payment.uimodel.PaymentUiModel
 
 private val CouponListMaxHeight = 246.dp
 
@@ -120,10 +121,12 @@ private fun PaymentBodyPreview() {
                         ),
                     ),
                 selectedCouponCode = "FIXED5000",
-                formattedOrderAmount = "204,200원",
-                formattedCouponDiscountAmount = "-5,000원",
-                formattedDeliveryFee = "3,000원",
-                formattedTotalPaymentAmount = "202,200원",
+                payment = PaymentUiModel(
+                    formattedOrderAmount = "204,200원",
+                    formattedCouponDiscountAmount = "-5,000원",
+                    formattedDeliveryFee = "3,000원",
+                    formattedTotalPaymentAmount = "202,200원",
+                )
             ),
         onCouponClick = {},
     )

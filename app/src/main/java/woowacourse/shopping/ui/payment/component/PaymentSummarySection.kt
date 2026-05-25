@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.ui.payment.PaymentUiState
+import woowacourse.shopping.ui.payment.uimodel.PaymentUiModel
 
 @Composable
 internal fun PaymentSummarySection(
@@ -40,9 +41,9 @@ internal fun PaymentSummarySection(
                     .padding(top = 30.dp, bottom = 28.dp),
             verticalArrangement = Arrangement.spacedBy(26.dp),
         ) {
-            PaymentSummaryRow("주문 금액", uiState.formattedOrderAmount)
-            PaymentSummaryRow("쿠폰 할인 금액", uiState.formattedCouponDiscountAmount)
-            PaymentSummaryRow("배송비", uiState.formattedDeliveryFee)
+            PaymentSummaryRow("주문 금액", uiState.payment.formattedOrderAmount)
+            PaymentSummaryRow("쿠폰 할인 금액", uiState.payment.formattedCouponDiscountAmount)
+            PaymentSummaryRow("배송비", uiState.payment.formattedDeliveryFee)
         }
         Spacer(
             modifier =
@@ -53,7 +54,7 @@ internal fun PaymentSummarySection(
         )
         PaymentSummaryRow(
             title = "총 결제 금액",
-            price = uiState.formattedTotalPaymentAmount,
+            price = uiState.payment.formattedTotalPaymentAmount,
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -68,10 +69,12 @@ private fun PaymentSummarySectionPreview() {
     PaymentSummarySection(
         uiState =
             PaymentUiState(
-                formattedOrderAmount = "204,200원",
-                formattedCouponDiscountAmount = "-5,000원",
-                formattedDeliveryFee = "3,000원",
-                formattedTotalPaymentAmount = "202,200원",
+                payment = PaymentUiModel(
+                    formattedOrderAmount = "204,200원",
+                    formattedCouponDiscountAmount = "-5,000원",
+                    formattedDeliveryFee = "3,000원",
+                    formattedTotalPaymentAmount = "202,200원",
+                )
             ),
     )
 }
