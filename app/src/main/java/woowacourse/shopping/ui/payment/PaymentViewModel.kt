@@ -11,14 +11,15 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.model.Coupon
 import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.data.repository.CouponRepository
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.di.AppContainer
 
 class PaymentViewModel(
     private val cartItemIds: List<Long>,
     private val cartRepository: CartRepository,
+    private val couponRepository: CouponRepository,
     private val orderRepository: OrderRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PaymentUiState())
@@ -34,7 +35,7 @@ class PaymentViewModel(
     fun selectCoupon(couponId: Long) {
         _uiState.update { state ->
             val coupon = state.coupons.firstOrNull { it.id == couponId } ?: return@update state
-            val discountAmount = coupon.discount(items = state.items, shippingFee = state.shippingFee)
+            val discountAmount = coupon.applicableDiscount(items = state.items, shippingFee = state.shippingFee)
             if (discountAmount <= 0) return@update state
 
             state.copy(selectedCouponId = if (state.selectedCouponId == couponId) null else couponId)
@@ -65,7 +66,7 @@ class PaymentViewModel(
                 _uiState.update {
                     it.copy(
                         items = selectedItems,
-                        coupons = Coupon.defaults(),
+                        coupons = couponRepository.getCoupons(),
                     )
                 }
             } finally {
@@ -84,6 +85,7 @@ class PaymentViewModel(
                     PaymentViewModel(
                         cartItemIds = cartItemIds,
                         cartRepository = container.cartRepository,
+                        couponRepository = container.couponRepository,
                         orderRepository = container.orderRepository,
                     ) as T
             }

@@ -14,7 +14,7 @@ data class PaymentUiState(
     val discountAmount: Long =
         coupons
             .firstOrNull { it.id == selectedCouponId }
-            ?.discount(items = items, shippingFee = shippingFee)
+            ?.applicableDiscount(items = items, shippingFee = shippingFee)
             ?: 0
     val totalAmount: Long = (orderAmount + shippingFee - discountAmount).coerceAtLeast(0)
 
