@@ -11,3 +11,6 @@ data class ProductDetailRoute(val productId: Int)
 @Serializable
 object CartRoute
 
+@Serializable
+data class PaymentRoute(val selectedItemIds: List<Int> = emptyList())
+

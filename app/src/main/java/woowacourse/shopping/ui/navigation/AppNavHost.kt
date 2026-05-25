@@ -19,10 +19,13 @@ import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.ui.UiEvent
 import woowacourse.shopping.ui.cart.CartScreen
 import woowacourse.shopping.ui.cart.CartViewModel
+import woowacourse.shopping.ui.cart.CartUiState
 import woowacourse.shopping.ui.productDetail.ProductDetailScreen
 import woowacourse.shopping.ui.productDetail.ProductDetailViewModel
 import woowacourse.shopping.ui.productList.ProductListScreen
 import woowacourse.shopping.ui.productList.ProductListViewModel
+import woowacourse.shopping.ui.payment.PaymentScreen
+import woowacourse.shopping.ui.payment.PaymentViewModel
 
 @Composable
 fun AppNavHost(
@@ -50,6 +53,7 @@ fun AppNavHost(
                         is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
                         UiEvent.NavigateToCart -> Unit
                         UiEvent.NavigateToProductList -> Unit
+                        UiEvent.NavigateToPayment -> navController.navigate(PaymentRoute)
                     }
                 }
             }
@@ -89,6 +93,7 @@ fun AppNavHost(
                         is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
                         UiEvent.NavigateToCart -> navController.navigate(CartRoute)
                         UiEvent.NavigateToProductList -> Unit
+                        UiEvent.NavigateToPayment -> Unit
                     }
                 }
             }
@@ -127,6 +132,10 @@ fun AppNavHost(
                     when (event) {
                         is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
                         UiEvent.NavigateToCart -> Unit
+                        UiEvent.NavigateToPayment -> {
+                            val selectedIds = (cartViewModel.uiState.value as? CartUiState.Success)?.selectedItems?.toList() ?: emptyList()
+                            navController.navigate(PaymentRoute(selectedItemIds = selectedIds))
+                        }
 
                         UiEvent.NavigateToProductList -> navController.navigate(ProductListRoute) {
                             popUpTo<CartRoute> {
@@ -147,6 +156,44 @@ fun AppNavHost(
                     onClickClose = {
                         navController.popBackStack()
                     },
+                )
+            }
+        }
+
+        composable<PaymentRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<PaymentRoute>()
+            val paymentViewModel: PaymentViewModel = viewModel(
+                factory = PaymentViewModel.factory(
+                    cartRepository = appContainer.cartRepository,
+                    couponRepository = appContainer.couponRepository,
+                    selectedItemIds = route.selectedItemIds.toSet(),
+                ),
+            )
+            val snackbarHostState = remember { SnackbarHostState() }
+
+            LaunchedEffect(paymentViewModel) {
+                paymentViewModel.uiEvent.collect { event ->
+                    when (event) {
+                        is woowacourse.shopping.ui.payment.PaymentUiEvent.ShowMessage -> snackbarHostState.showSnackbar(event.message)
+                        woowacourse.shopping.ui.payment.PaymentUiEvent.NavigateToProductList -> navController.navigate(ProductListRoute) {
+                            popUpTo<PaymentRoute> {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                }
+            }
+
+            Scaffold(
+                snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+                modifier = Modifier.fillMaxSize(),
+            ) { innerPadding ->
+                PaymentScreen(
+                    viewModel = paymentViewModel,
+                    modifier = Modifier.padding(innerPadding),
+                    onClose = { navController.popBackStack() },
+                    onPayClick = paymentViewModel::onClickPay,
                 )
             }
         }

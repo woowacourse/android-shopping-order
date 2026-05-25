@@ -221,9 +221,7 @@ class CartViewModel(
         }
 
         viewModelScope.launch {
-            cartRepository.order(selectedItems.toList())
-            _uiEvent.emit(UiEvent.ShowSnackbar("주문이 완료되었습니다"))
-            _uiEvent.emit(UiEvent.NavigateToProductList)
+            _uiEvent.emit(UiEvent.NavigateToPayment)
         }
     }
 
