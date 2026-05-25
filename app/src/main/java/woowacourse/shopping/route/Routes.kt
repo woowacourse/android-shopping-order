@@ -1,4 +1,4 @@
-package woowacourse.shopping
+package woowacourse.shopping.route
 
 import kotlinx.serialization.Serializable
 

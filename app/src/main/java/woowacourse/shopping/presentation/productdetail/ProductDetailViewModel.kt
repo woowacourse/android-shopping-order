@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
-import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.domain.addToCartUseCase
 import woowacourse.shopping.presentation.common.model.toUiModel
 import woowacourse.shopping.presentation.productdetail.model.DetailUiState
@@ -27,8 +27,8 @@ sealed interface ProductDetailEvent {
 }
 
 class ProductDetailViewModel(
-    private val productRepository: ProductRepository = RepositoryProvider.productRepository,
-    private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
+    private val productRepository: ProductRepository = AppContainer.productRepository,
+    private val cartRepository: CartRepository = AppContainer.cartRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()

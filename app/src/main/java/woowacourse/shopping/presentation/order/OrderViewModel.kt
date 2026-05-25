@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.domain.ApplyCouponUseCase
 import woowacourse.shopping.domain.GetAvailableCouponUseCase
 import woowacourse.shopping.domain.OrderCartItemsUseCase
@@ -41,10 +41,10 @@ sealed class OrderEvent {
 }
 
 class OrderViewModel(
-    private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
-    private val getAvailableCouponUseCase: GetAvailableCouponUseCase = GetAvailableCouponUseCase(RepositoryProvider.orderRepository),
-    private val applyCouponUseCase: ApplyCouponUseCase = ApplyCouponUseCase(RepositoryProvider.orderRepository),
-    private val orderCartItemsUseCase: OrderCartItemsUseCase = OrderCartItemsUseCase(RepositoryProvider.orderRepository),
+    private val cartRepository: CartRepository = AppContainer.cartRepository,
+    private val getAvailableCouponUseCase: GetAvailableCouponUseCase = GetAvailableCouponUseCase(AppContainer.orderRepository),
+    private val applyCouponUseCase: ApplyCouponUseCase = ApplyCouponUseCase(AppContainer.orderRepository),
+    private val orderCartItemsUseCase: OrderCartItemsUseCase = OrderCartItemsUseCase(AppContainer.orderRepository),
 ) : ViewModel() {
     private val cart = cartRepository.cart
     private val paymentItemIds = MutableStateFlow(emptySet<Long>())

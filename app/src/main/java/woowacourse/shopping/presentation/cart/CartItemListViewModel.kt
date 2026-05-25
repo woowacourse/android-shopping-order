@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.domain.addToCartUseCase
 import woowacourse.shopping.domain.model.PaymentItems
 import woowacourse.shopping.presentation.cart.model.CartUiState
@@ -17,7 +17,7 @@ import woowacourse.shopping.presentation.cart.model.toUiModel
 import kotlin.math.min
 
 class CartItemListViewModel(
-    private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
+    private val cartRepository: CartRepository = AppContainer.cartRepository,
 ) : ViewModel() {
     private val cart = cartRepository.cart
     private val paymentItemIds = MutableStateFlow(emptySet<Long>())

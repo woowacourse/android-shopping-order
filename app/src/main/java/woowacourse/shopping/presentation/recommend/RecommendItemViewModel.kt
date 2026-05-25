@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
-import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.domain.addToCartUseCase
 import woowacourse.shopping.domain.model.PaymentItems
 import woowacourse.shopping.domain.recommendProductUseCase
@@ -19,8 +19,8 @@ import woowacourse.shopping.presentation.productlist.model.ShoppingItemUiModel
 import woowacourse.shopping.presentation.recommend.model.RecommendUiState
 
 class RecommendItemViewModel(
-    private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
-    private val productRepository: ProductRepository = RepositoryProvider.productRepository,
+    private val cartRepository: CartRepository = AppContainer.cartRepository,
+    private val productRepository: ProductRepository = AppContainer.productRepository,
 ) : ViewModel() {
     init {
         viewModelScope.launch {

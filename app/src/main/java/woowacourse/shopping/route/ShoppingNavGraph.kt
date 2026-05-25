@@ -1,4 +1,4 @@
-package woowacourse.shopping
+package woowacourse.shopping.route
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
@@ -69,6 +69,7 @@ fun ShoppingNavGraph(
                 onBackClick = { navController.popBackStack() },
                 onOrderClick = { productIds ->
                     navController.navigate(route = OrderItem(productIds))
+                    onEnterOrder()
                 },
             )
         }
@@ -78,7 +79,6 @@ fun ShoppingNavGraph(
             OrderScreen(
                 productIds = route.productIds,
                 onBackClick = { navController.popBackStack() },
-                onEnterOrder = onEnterOrder,
                 onOrderSuccess = {
                     onOrderSuccess()
                     navController.navigate(ShoppingList) {

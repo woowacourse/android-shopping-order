@@ -4,17 +4,17 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import woowacourse.shopping.data.source.local.notification.NotificationDataSource
-import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.data.source.local.notification.NotificationSettingDataSource
+import woowacourse.shopping.di.AppContainer
 
 class NotificationSettingViewModel(
-    private val notificationDataSource: NotificationDataSource = RepositoryProvider.notificationDataSource,
+    private val notificationSettingDataSource: NotificationSettingDataSource = AppContainer.notificationSettingDataSource,
 ) : ViewModel() {
-    private val _isNotificationEnabled = MutableStateFlow(notificationDataSource.isNotificationEnabled())
+    private val _isNotificationEnabled = MutableStateFlow(notificationSettingDataSource.isNotificationEnabled())
     val isNotificationEnabled: StateFlow<Boolean> = _isNotificationEnabled.asStateFlow()
 
     fun changeNotification(enabled: Boolean) {
-        notificationDataSource.changeNotification(enabled)
-        _isNotificationEnabled.value = notificationDataSource.isNotificationEnabled()
+        notificationSettingDataSource.changeNotification(enabled)
+        _isNotificationEnabled.value = notificationSettingDataSource.isNotificationEnabled()
     }
 }

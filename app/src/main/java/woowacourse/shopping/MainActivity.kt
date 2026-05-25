@@ -11,7 +11,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.AppContainer
+import woowacourse.shopping.route.ShoppingNavGraph
 
 class MainActivity : ComponentActivity() {
     private val alarmScheduler by lazy {
@@ -19,7 +20,7 @@ class MainActivity : ComponentActivity() {
             context = this,
             requestCode = 0,
             receiver = OrderAlarmBroadCastReceiver::class.java,
-            notificationDataSource = RepositoryProvider.notificationDataSource,
+            notificationSettingDataSource = AppContainer.notificationSettingDataSource,
         )
     }
 
@@ -31,7 +32,7 @@ class MainActivity : ComponentActivity() {
             ShoppingNavGraph(
                 onEnterOrder = {
                     alarmScheduler.cancel()
-                    alarmScheduler.schedule(5 * 60 * 1000L)
+                    alarmScheduler.schedule(10 * 1000L)
                 },
                 onOrderSuccess = { alarmScheduler.cancel() },
             )

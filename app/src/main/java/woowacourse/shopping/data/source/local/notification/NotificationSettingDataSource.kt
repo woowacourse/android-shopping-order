@@ -2,7 +2,7 @@ package woowacourse.shopping.data.source.local.notification
 
 import android.content.SharedPreferences
 
-class NotificationDataSource(
+class NotificationSettingDataSource(
     private val sharedPreferences: SharedPreferences,
 ) {
     fun changeNotification(enabled: Boolean) {

@@ -13,15 +13,15 @@ import kotlinx.coroutines.launch
 import okio.IOException
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
-import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.domain.addToCartUseCase
 import woowacourse.shopping.presentation.common.model.toUiModel
 import woowacourse.shopping.presentation.productlist.model.ShoppingItemUiModel
 import woowacourse.shopping.presentation.productlist.model.ShoppingUiState
 
 class ProductListViewModel(
-    private val productRepository: ProductRepository = RepositoryProvider.productRepository,
-    private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
+    private val productRepository: ProductRepository = AppContainer.productRepository,
+    private val cartRepository: CartRepository = AppContainer.cartRepository,
 ) : ViewModel() {
     private val cart = cartRepository.cart
     private val products = productRepository.products

@@ -13,19 +13,19 @@ import woowacourse.shopping.data.source.local.ShoppingDatabase
 import woowacourse.shopping.data.source.local.auth.AuthDataSource
 import woowacourse.shopping.data.source.local.auth.CryptoManager
 import woowacourse.shopping.data.source.local.auth.DefaultAuthDataSource
-import woowacourse.shopping.data.source.local.notification.NotificationDataSource
+import woowacourse.shopping.data.source.local.notification.NotificationSettingDataSource
 import woowacourse.shopping.data.source.remote.CartRemoteDataSource
 import woowacourse.shopping.data.source.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.source.remote.api.AuthInterceptor
 import woowacourse.shopping.data.source.remote.api.RetrofitServices
 
-object RepositoryProvider {
+object AppContainer {
     private lateinit var appContext: Context
     private lateinit var database: ShoppingDatabase
 
     private lateinit var retrofitServices: RetrofitServices
 
-    lateinit var notificationDataSource: NotificationDataSource
+    lateinit var notificationSettingDataSource: NotificationSettingDataSource
 
     fun init(
         context: Context,
@@ -43,8 +43,8 @@ object RepositoryProvider {
 
         runBlocking {
             authDataSource.saveToken(id, password)
-            notificationDataSource =
-                NotificationDataSource(
+            notificationSettingDataSource =
+                NotificationSettingDataSource(
                     appContext.getSharedPreferences("notification", Context.MODE_PRIVATE),
                 )
             retrofitServices =
