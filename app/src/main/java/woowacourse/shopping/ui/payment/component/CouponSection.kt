@@ -59,7 +59,7 @@ fun CouponSection(
         Spacer(modifier = Modifier.height(16.dp))
 
         coupons.forEachIndexed { index, coupon ->
-            val discountAmount = coupon.discount(items = items, shippingFee = shippingFee)
+            val discountAmount = coupon.applicableDiscount(items = items, shippingFee = shippingFee)
             CouponItem(
                 coupon = coupon,
                 discountAmount = discountAmount,

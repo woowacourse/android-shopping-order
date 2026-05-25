@@ -17,6 +17,13 @@ sealed class Coupon(
 
     fun isExpired(today: LocalDate = LocalDate.now()): Boolean = today.isAfter(expiryDate)
 
+    fun applicableDiscount(
+        items: List<CartItem>,
+        shippingFee: Long,
+        today: LocalDate = LocalDate.now(),
+        now: LocalTime = LocalTime.now(),
+    ): Long = if (isExpired(today)) 0 else discount(items = items, shippingFee = shippingFee, now = now)
+
     class FixedAmount(
         id: Long,
         title: String,
