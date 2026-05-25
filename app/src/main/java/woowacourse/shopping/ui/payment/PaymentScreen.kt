@@ -38,6 +38,7 @@ import woowacourse.shopping.ui.theme.Gary30
 import woowacourse.shopping.ui.theme.Gray40
 import woowacourse.shopping.ui.theme.Gray50
 import woowacourse.shopping.ui.theme.Gray70
+import woowacourse.shopping.ui.util.formattedDate
 import woowacourse.shopping.ui.util.formattedPrice
 import java.time.LocalDateTime
 
@@ -194,7 +195,7 @@ private fun CouponCard(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "만료일 : $expiryDateTime",
+            text = "만료일 : ${expiryDateTime.formattedDate()}",
             fontSize = 12.sp,
             fontWeight = FontWeight.Normal,
         )
