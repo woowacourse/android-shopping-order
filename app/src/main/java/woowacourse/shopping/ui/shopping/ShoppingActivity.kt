@@ -52,7 +52,7 @@ class ShoppingActivity : ComponentActivity() {
     }
 
     private fun updateOpenPayScreenState(intent: Intent?) {
-        openPayScreen.value = intent?.action == R.string.ACTION_OPEN_PAY_SCREEN.toString()
+        openPayScreen.value = intent?.action == getString(R.string.ACTION_OPEN_PAY_SCREEN)
     }
 
     private fun requestNotificationPermission() {

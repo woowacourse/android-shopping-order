@@ -50,7 +50,7 @@ class PayNotification(
     private fun createContentIntent(): PendingIntent {
         val intent =
             Intent(context, ShoppingActivity::class.java).apply {
-                action = R.string.ACTION_OPEN_PAY_SCREEN.toString()
+                action = context.getString(R.string.ACTION_OPEN_PAY_SCREEN)
                 flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
 
