@@ -12,12 +12,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.CouponRepository
+import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.model.CouponOrderItem
 import woowacourse.shopping.ui.cart.SelectedCartItem
 
 class PaymentViewModel(
     private val couponRepository: CouponRepository,
+    private val orderRepository: OrderRepository,
+    private val cartRepository: CartRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PaymentUiState(deliveryFee = DEFAULT_DELIVERY_FEE))
     val uiState = _uiState.asStateFlow()
@@ -47,6 +51,7 @@ class PaymentViewModel(
         val orderItems =
             selectedCartItems.map { selectedCartItem ->
                 CouponOrderItem(
+                    cartItemId = selectedCartItem.key,
                     totalPrice = selectedCartItem.value.totalPrice,
                     quantity = selectedCartItem.value.quantity,
                 )
@@ -59,6 +64,40 @@ class PaymentViewModel(
                     orderItems = orderItems,
                     totalQuantity = orderItems.sumOf { it.quantity },
                 ).calculatePaymentPrice()
+        }
+    }
+
+    fun createOrder(onSuccess: () -> Unit) {
+        val cartItemIds = _uiState.value.orderItems.map { it.cartItemId }
+        if (cartItemIds.isEmpty()) return
+
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = null,
+                )
+            }
+
+            orderRepository
+                .createOrder(cartItemIds)
+                .onSuccess {
+                    cartRepository.syncCartQuantity()
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = null,
+                        )
+                    }
+                    onSuccess()
+                }.onFailure {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "주문에 실패했습니다.",
+                        )
+                    }
+                }
         }
     }
 
@@ -103,6 +142,8 @@ class PaymentViewModel(
 
                     PaymentViewModel(
                         couponRepository = appContainer.couponRepository,
+                        orderRepository = appContainer.orderRepository,
+                        cartRepository = appContainer.cartRepository,
                     )
                 }
             }

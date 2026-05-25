@@ -14,12 +14,15 @@ import woowacourse.shopping.data.remote.NetworkManager
 import woowacourse.shopping.data.remote.NetworkObserver
 import woowacourse.shopping.data.remote.api.CartApi
 import woowacourse.shopping.data.remote.api.CouponApi
+import woowacourse.shopping.data.remote.api.OrderApi
 import woowacourse.shopping.data.remote.api.ProductApi
 import woowacourse.shopping.data.repository.AuthRepository
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.CouponRepository
 import woowacourse.shopping.data.repository.CouponRepositoryImpl
+import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentItemRepository
@@ -47,6 +50,12 @@ class AppContainer(
     val couponRepository: CouponRepository by lazy {
         CouponRepositoryImpl(
             couponApi = retrofitService.create(CouponApi::class.java),
+        )
+    }
+
+    val orderRepository: OrderRepository by lazy {
+        OrderRepositoryImpl(
+            orderApi = retrofitService.create(OrderApi::class.java),
         )
     }
 

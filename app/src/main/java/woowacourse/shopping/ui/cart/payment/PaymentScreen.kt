@@ -99,7 +99,9 @@ fun PaymentScreenRoute(
         errorMessage = paymentUiState.errorMessage,
         onBackClick = onBackClick,
         onCouponClick = paymentViewModel::selectCoupon,
-        onPaymentClick = onPaymentClick,
+        onPaymentClick = {
+            paymentViewModel.createOrder(onPaymentClick)
+        },
         modifier = modifier,
     )
 }
@@ -439,6 +441,7 @@ private fun PaymentScreenPreview() {
     val orderItems =
         listOf(
             CouponOrderItem(
+                cartItemId = 1L,
                 totalPrice = 204200L,
                 quantity = 4,
             ),

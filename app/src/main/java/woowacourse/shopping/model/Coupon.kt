@@ -70,6 +70,7 @@ data class Coupon(
 }
 
 data class CouponOrderItem(
+    val cartItemId: Long,
     val totalPrice: Long,
     val quantity: Int,
 )
