@@ -106,12 +106,7 @@ fun ShoppingCartRouteContent(
             selectedProductIds = selectedVisibleProductIds,
             shoppingCartSelectItemCount = selectedItemCount,
             onOrderButtonClick = { selectedIds ->
-                if (
-                    selectedIds.isEmpty() ||
-                    recommendUiState.recommendedShoppingItems.isEmpty()
-                ) {
-                    return@OrderButton
-                }
+                if (selectedIds.isEmpty()) return@OrderButton
                 shoppingCartRecommendViewModel.moveToRecommend(
                     baseCartItems = shoppingCartItems,
                     baseSelectedCartProductIds = selectedVisibleProductIds,
