@@ -106,7 +106,7 @@ fun ShoppingNavHost() {
         }
 
         composable<Setting> {
-            val viewModel: SettingViewModel = viewModel(factory = OrderViewModel.Factory)
+            val viewModel: SettingViewModel = viewModel(factory = SettingViewModel.Factory)
             SettingScreen(
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() },

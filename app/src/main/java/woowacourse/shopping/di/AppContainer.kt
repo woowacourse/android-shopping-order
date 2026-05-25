@@ -14,6 +14,7 @@ import woowacourse.shopping.data.local.ShoppingDatabase
 import woowacourse.shopping.data.remote.RetrofitProvider
 import woowacourse.shopping.data.repository.CartRepositoryImpl
 import woowacourse.shopping.data.repository.CouponRepositoryImpl
+import woowacourse.shopping.data.repository.NotificationRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.domain.repository.CartRepository
@@ -53,4 +54,11 @@ class AppContainer(
         RecentProductRepositoryImpl(recentProductDataSource)
 
     val couponRepository = CouponRepositoryImpl(couponDataSource)
+
+    val notificationRepository = NotificationRepositoryImpl(
+        context.getSharedPreferences(
+            "notification",
+            Context.MODE_PRIVATE,
+        )
+    )
 }
