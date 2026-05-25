@@ -3,7 +3,7 @@ package woowacourse.shopping.ui.payment
 import woowacourse.shopping.core.formatter.toDiscountPriceString
 import woowacourse.shopping.core.formatter.toPriceString
 import woowacourse.shopping.domain.model.coupon.Coupon
-import woowacourse.shopping.domain.model.order.Payment
+import woowacourse.shopping.domain.model.payment.Payment
 import woowacourse.shopping.ui.payment.uimodel.CouponUiModel
 import woowacourse.shopping.ui.payment.uimodel.PaymentUiModel
 import woowacourse.shopping.ui.payment.uimodel.toUiModel

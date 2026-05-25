@@ -2,7 +2,7 @@ package woowacourse.shopping.ui.payment.uimodel
 
 import woowacourse.shopping.core.formatter.toDiscountPriceString
 import woowacourse.shopping.core.formatter.toPriceString
-import woowacourse.shopping.domain.model.order.Payment
+import woowacourse.shopping.domain.model.payment.Payment
 
 data class PaymentUiModel(
     val formattedOrderAmount: String,

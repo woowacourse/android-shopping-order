@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.CouponInfos
 import woowacourse.shopping.domain.model.order.Order
-import woowacourse.shopping.domain.model.order.Payment
+import woowacourse.shopping.domain.model.payment.Payment
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.ui.event.UiEvent
 

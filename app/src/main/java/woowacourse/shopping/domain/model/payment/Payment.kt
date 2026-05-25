@@ -1,8 +1,9 @@
-package woowacourse.shopping.domain.model.order
+package woowacourse.shopping.domain.model.payment
 
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.CouponInfos
 import woowacourse.shopping.domain.model.coupon.CouponContext
+import woowacourse.shopping.domain.model.order.Order
 
 private const val DEFAULT_DELIVERY_FEE = 3_000
 

@@ -3,6 +3,7 @@ package woowacourse.shopping.domain.model.order
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.model.coupon.FixedAmountCoupon
+import woowacourse.shopping.domain.model.payment.Payment
 import woowacourse.shopping.domain.model.product.Product
 import java.time.LocalDate
 
