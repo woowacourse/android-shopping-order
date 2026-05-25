@@ -25,12 +25,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import woowacourse.shopping.data.model.CartItem
 import woowacourse.shopping.data.model.Coupon
 import woowacourse.shopping.ui.common.theme.PrimaryColor
 
 @Composable
 fun CouponSection(
     coupons: List<Coupon>,
+    items: List<CartItem>,
+    shippingFee: Long,
     selectedCouponId: Long?,
     onCouponSelected: (Long) -> Unit,
 ) {
@@ -56,8 +59,10 @@ fun CouponSection(
         Spacer(modifier = Modifier.height(16.dp))
 
         coupons.forEachIndexed { index, coupon ->
+            val discountAmount = coupon.discount(items = items, shippingFee = shippingFee)
             CouponItem(
                 coupon = coupon,
+                discountAmount = discountAmount,
                 isSelected = coupon.id == selectedCouponId,
                 onClick = { onCouponSelected(coupon.id) },
             )
@@ -71,17 +76,25 @@ fun CouponSection(
 @Composable
 private fun CouponItem(
     coupon: Coupon,
+    discountAmount: Long,
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
+    val isEnabled = discountAmount > 0
+    val textColor = if (isEnabled) Color.Black else Color.Red
+
     Row(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .clickable(onClick = onClick),
+                .clickable(enabled = isEnabled, onClick = onClick),
         verticalAlignment = Alignment.Top,
     ) {
-        CustomCheckbox(checked = isSelected, onClick = onClick)
+        CustomCheckbox(
+            checked = isSelected,
+            enabled = isEnabled,
+            onClick = onClick,
+        )
 
         Spacer(modifier = Modifier.width(12.dp))
 
@@ -90,14 +103,22 @@ private fun CouponItem(
                 text = coupon.title,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,
-                color = Color.Black,
+                color = textColor,
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "${coupon.code} · 만료일 ${coupon.expiryDate}",
                 fontSize = 12.sp,
-                color = Color.Gray,
+                color = if (isEnabled) Color.Gray else Color.Red,
             )
+            if (!isEnabled) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "현재 주문에는 할인 금액이 없습니다.",
+                    fontSize = 12.sp,
+                    color = Color.Red,
+                )
+            }
         }
     }
 }
@@ -105,6 +126,7 @@ private fun CouponItem(
 @Composable
 private fun CustomCheckbox(
     checked: Boolean,
+    enabled: Boolean,
     onClick: () -> Unit,
 ) {
     Box(
@@ -112,15 +134,20 @@ private fun CustomCheckbox(
             Modifier
                 .size(22.dp)
                 .clip(RoundedCornerShape(4.dp))
-                .background(if (checked) PrimaryColor else Color.White)
+                .background(if (checked && enabled) PrimaryColor else Color.White)
                 .border(
                     width = 1.5.dp,
-                    color = if (checked) PrimaryColor else Color.Gray,
+                    color =
+                        when {
+                            checked && enabled -> PrimaryColor
+                            enabled -> Color.Gray
+                            else -> Color.Red
+                        },
                     shape = RoundedCornerShape(4.dp),
-                ).clickable(onClick = onClick),
+                ).clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        if (checked) {
+        if (checked && enabled) {
             Icon(
                 imageVector = Icons.Default.Check,
                 contentDescription = null,

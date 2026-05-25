@@ -42,6 +42,8 @@ fun PaymentBody(
 
             CouponSection(
                 coupons = uiState.coupons,
+                items = uiState.items,
+                shippingFee = uiState.shippingFee,
                 selectedCouponId = uiState.selectedCouponId,
                 onCouponSelected = onCouponSelected,
             )
