@@ -11,8 +11,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.data.alarm.ACTION_OPEN_PAY_SCREEN
 import woowacourse.shopping.ui.navigation.ShoppingNavHost
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 
@@ -50,7 +50,7 @@ class ShoppingActivity : ComponentActivity() {
     }
 
     private fun updateOpenPayScreenState(intent: Intent?) {
-        openPayScreen = intent?.action == ACTION_OPEN_PAY_SCREEN
+        openPayScreen = intent?.action == R.string.ACTION_OPEN_PAY_SCREEN.toString()
     }
 
     private fun requestNotificationPermission() {
