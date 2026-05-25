@@ -20,4 +20,7 @@ sealed interface ShoppingRoute {
 
     @Serializable
     data object Pay : ShoppingRoute
+
+    @Serializable
+    data object Setting : ShoppingRoute
 }

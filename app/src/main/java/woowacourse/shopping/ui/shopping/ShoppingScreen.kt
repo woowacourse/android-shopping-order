@@ -5,17 +5,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -44,6 +47,7 @@ fun ShoppingScreen(
     onLoad: () -> Unit,
     onProductClick: (String) -> Unit,
     onCartClick: () -> Unit,
+    onSettingClick: () -> Unit,
     onQuantityChange: (String, Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -61,7 +65,7 @@ fun ShoppingScreen(
                     )
                     Icon(
                         imageVector = Icons.Default.ShoppingCart,
-                        contentDescription = "쇼핑 카트",
+                        contentDescription = "쇼핑 카트 버튼",
                         tint = Color.White,
                         modifier =
                             Modifier
@@ -86,6 +90,18 @@ fun ShoppingScreen(
                             )
                         }
                     }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "세팅 버튼",
+                        tint = Color.White,
+                        modifier =
+                            Modifier
+                                .size(24.dp)
+                                .clickable {
+                                    onSettingClick()
+                                },
+                    )
                 },
                 modifier = modifier.fillMaxWidth(),
             )
@@ -194,6 +210,7 @@ private fun ShoppingScreenPreview() {
         onLoad = {},
         onProductClick = {},
         onCartClick = {},
+        onSettingClick = {},
         onQuantityChange = { _, _ -> },
     )
 }

@@ -4,7 +4,9 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -28,6 +30,7 @@ import woowacourse.shopping.ui.pay.PayViewModel
 import woowacourse.shopping.ui.recommend.RecommendEvent
 import woowacourse.shopping.ui.recommend.RecommendScreen
 import woowacourse.shopping.ui.recommend.RecommendViewModel
+import woowacourse.shopping.ui.setting.SettingScreen
 import woowacourse.shopping.ui.shopping.ShoppingScreen
 import woowacourse.shopping.ui.shopping.ShoppingViewModel
 import woowacourse.shopping.ui.util.customToastMessage
@@ -76,6 +79,9 @@ fun ShoppingNavHost(
                 },
                 onCartClick = {
                     navController.navigate(ShoppingRoute.Cart)
+                },
+                onSettingClick = {
+                    navController.navigate(ShoppingRoute.Setting)
                 },
                 onQuantityChange = viewModel::updateQuantity,
             )
@@ -302,6 +308,23 @@ fun ShoppingNavHost(
                     viewModel.completePay()
                 },
                 onCouponClick = viewModel::selectCoupon,
+            )
+        }
+
+        composable<ShoppingRoute.Setting> {
+            val context = LocalContext.current
+            val payReminderPreference = remember { PayReminderPreference(context) }
+            var isNotificationEnabled by remember {
+                mutableStateOf(payReminderPreference.isEnabled())
+            }
+
+            SettingScreen(
+                isNotificationEnabled = isNotificationEnabled,
+                onBackClick = { navController.popBackStack() },
+                onToggleClick = { isEnabled ->
+                    isNotificationEnabled = isEnabled
+                    payReminderPreference.setEnabled(isEnabled)
+                },
             )
         }
     }

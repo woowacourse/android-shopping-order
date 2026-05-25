@@ -10,6 +10,12 @@ class PayReminderPreference(
 
     fun isEnabled(): Boolean = sharedPreferences.getBoolean(KEY_IS_ENABLED, true)
 
+    fun setEnabled(isEnabled: Boolean) {
+        sharedPreferences.edit()
+            .putBoolean(KEY_IS_ENABLED, isEnabled)
+            .apply()
+    }
+
     companion object {
         private const val PREFERENCE_NAME = "pay_reminder_preference"
         private const val KEY_IS_ENABLED = "is_enabled"
