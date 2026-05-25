@@ -9,6 +9,7 @@ import woowacourse.shopping.core.designsystem.component.layout.CommonFrame
 import woowacourse.shopping.ui.payment.component.PaymentBody
 import woowacourse.shopping.ui.payment.component.PaymentBottomBar
 import woowacourse.shopping.ui.payment.component.PaymentHeader
+import woowacourse.shopping.ui.payment.uimodel.CouponUiModel
 
 @Composable
 fun PaymentScreen(

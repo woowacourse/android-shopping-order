@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.core.designsystem.theme.PrimaryGreen
-import woowacourse.shopping.ui.payment.CouponUiModel
+import woowacourse.shopping.ui.payment.uimodel.CouponUiModel
 
 @Composable
 fun CouponCard(
