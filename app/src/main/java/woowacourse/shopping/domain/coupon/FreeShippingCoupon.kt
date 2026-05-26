@@ -8,7 +8,6 @@ class FreeShippingCoupon(
     override val description: String = "",
     override val expirationDate: LocalDate,
     val minimumPrice: Int = 50_000,
-    val shippingFee: Int = 3_000,
 ) : Coupon {
     override fun isApplicable(context: OrderContext): Boolean {
         if (LocalDate.now().isAfter(expirationDate)) return false
@@ -16,5 +15,5 @@ class FreeShippingCoupon(
     }
 
     override fun discountAmount(context: OrderContext): DiscountResult =
-        DiscountResult(shippingDiscountPrice = if (isApplicable(context)) shippingFee else 0)
+        DiscountResult(shippingDiscountPrice = if (isApplicable(context)) context.shippingFee else 0)
 }

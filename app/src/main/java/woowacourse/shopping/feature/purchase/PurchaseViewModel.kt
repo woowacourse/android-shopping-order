@@ -41,7 +41,7 @@ data class PurchaseUiState(
     val selectedCouponId: String? = null,
     val originalPrice: Int = 0,
     val couponDiscountPrice: Int = 0,
-    val shippingPrice: Int = 3000,
+    val shippingPrice: Int = 0,
     val totalDiscountedPrice: Int = 0,
     val error: AppError? = null,
 )
@@ -76,8 +76,9 @@ class PurchaseViewModel(
             val uiModels = getCoupons()
             _uiState.update {
                 it.copy(
+                    shippingPrice = PurchaseConfig.SHIPPING_PRICE,
                     originalPrice = originalPrice,
-                    totalDiscountedPrice = originalPrice + uiState.value.shippingPrice,
+                    totalDiscountedPrice = originalPrice + PurchaseConfig.SHIPPING_PRICE,
                     couponUiModels = uiModels,
                 )
             }
@@ -116,18 +117,17 @@ class PurchaseViewModel(
 
     fun couponDiscount(coupon: Coupon) {
         val originalPrice = uiState.value.originalPrice
-        val baseShippingPrice = 3000
 
         val discount = coupon.discountAmount(
             OrderContext(
                 totalPrice = originalPrice,
                 items = cartContents,
-                shippingFee = baseShippingPrice,
+                shippingFee = PurchaseConfig.SHIPPING_PRICE,
                 now = LocalTime.now(),
             ),
         )
 
-        val shippingPrice = baseShippingPrice - discount.shippingDiscountPrice
+        val shippingPrice = discount.shippingDiscountPrice
         val totalDiscountedPrice =
             originalPrice + shippingPrice - discount.couponDiscountPrice
 

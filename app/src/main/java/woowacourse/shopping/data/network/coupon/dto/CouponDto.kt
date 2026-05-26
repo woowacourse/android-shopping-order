@@ -38,32 +38,41 @@ data class CouponDto(
                 id = id.toString(),
                 description = description,
                 expirationDate = validUntil,
-                minimumPrice = minimumAmount ?: 0,
-                discountPrice = discount ?: 0,
+                minimumPrice = minimumAmount
+                    ?: 0,
+                discountPrice = discount
+                    ?: 0,
             )
 
             "buyXgetY" -> BuyXGetYCoupon(
                 id = id.toString(),
                 description = description,
                 expirationDate = validUntil,
-                buyQuantity = buyQuantity ?: 0,
-                getQuantity = getQuantity ?: 0,
+                buyQuantity = buyQuantity
+                    ?: 0,
+                getQuantity = getQuantity
+                    ?: 0,
             )
 
             "freeShipping" -> FreeShippingCoupon(
                 id = id.toString(),
                 description = description,
                 expirationDate = validUntil,
-                minimumPrice = minimumAmount ?: 0,
+                minimumPrice = minimumAmount
+                    ?: 0,
             )
 
             "percentage" -> {
-                val time = availableTime ?: return null
+                val time = availableTime
+                    ?: return null
                 PercentageCoupon(
                     id = id.toString(),
                     description = description,
                     expirationDate = validUntil,
-                    discountRate = (discount ?: 0).toDouble() * 0.01,
+                    discountRate = (
+                        discount
+                            ?: 0
+                        ).toDouble() * 0.01,
                     startTime = LocalTime.parse(time.start),
                     endTime = LocalTime.parse(time.end),
                 )

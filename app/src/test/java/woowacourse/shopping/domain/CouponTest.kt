@@ -9,6 +9,7 @@ import woowacourse.shopping.domain.coupon.FixedDiscountCoupon
 import woowacourse.shopping.domain.coupon.FreeShippingCoupon
 import woowacourse.shopping.domain.coupon.OrderContext
 import woowacourse.shopping.domain.coupon.PercentageCoupon
+import woowacourse.shopping.feature.purchase.PurchaseConfig
 import woowacourse.shopping.fixture.TestCartContentFixture
 import woowacourse.shopping.fixture.TestProductFixture
 
@@ -144,7 +145,7 @@ class CouponTest {
     fun `FreeShippingCoupon은 적용 시 배송비를 0원으로 만든다`() {
         // given: 주문 금액 50_000과 무료배송 쿠폰이 주어진다
         val price = 50_000
-        val shippingPrice = 3_000
+        val shippingPrice = PurchaseConfig.SHIPPING_PRICE
         val coupon = FreeShippingCoupon(expirationDate = LocalDate.of(2026, 11, 30))
 
         // when: 할인 금액을 계산할 때
@@ -204,7 +205,6 @@ class CouponTest {
             OrderContext(
                 totalPrice = price, now = time,
                 items = emptyList(),
-                shippingFee = 3000,
             ),
         ).couponDiscountPrice
 
@@ -221,7 +221,6 @@ class CouponTest {
             totalPrice = 100_000,
             items = listOf(cartContent),
             now = LocalTime.of(5, 30),
-            shippingFee = 3000,
         )
 
         val coupons = listOf(
