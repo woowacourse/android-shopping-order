@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
+import woowacourse.shopping.di.ShoppingRepositoryProvider
 import woowacourse.shopping.ui.cart.CartRecommendationRouteScreen
 import woowacourse.shopping.ui.cart.CartRouteScreen
 import woowacourse.shopping.ui.cart.list.CartViewModel
@@ -108,11 +109,7 @@ fun AppNavHost(
 
             composable<OrderRoute> { backStackEntry ->
                 val route = backStackEntry.toRoute<OrderRoute>()
-                val parentEntry =
-                    remember(backStackEntry) {
-                        navController.getBackStackEntry(CartGraph)
-                    }
-                val orderViewModel: OrderViewModel = viewModel(parentEntry)
+                val orderViewModel: OrderViewModel = viewModel()
 
                 OrderRouteScreen(
                     orderViewModel = orderViewModel,
@@ -140,7 +137,6 @@ fun AppNavHost(
                     }
                 val cartViewModel: CartViewModel = viewModel(parentEntry)
                 val recommendationViewModel: CartRecommendationViewModel = viewModel(parentEntry)
-                val orderViewModel: OrderViewModel = viewModel(parentEntry)
 
                 CartRecommendationRouteScreen(
                     cartViewModel = cartViewModel,
@@ -150,8 +146,8 @@ fun AppNavHost(
                         navController.navigate(ProductDetailRoute(productId))
                     },
                     onProceedToOrder = { selectedCartOrder ->
-                        orderViewModel.startOrder(selectedCartOrder)
-                        navController.navigate(OrderRoute())
+                        ShoppingRepositoryProvider.pendingOrderRepository.savePendingOrder(selectedCartOrder)
+                        navController.navigate(OrderRoute(restorePendingOrder = true))
                     },
                 )
             }
