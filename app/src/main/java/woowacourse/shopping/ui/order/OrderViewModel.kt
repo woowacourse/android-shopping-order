@@ -13,9 +13,6 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.R
 import woowacourse.shopping.model.Coupon
 import woowacourse.shopping.model.SelectedCartOrder
-import woowacourse.shopping.model.deliveryFeeFor
-import woowacourse.shopping.model.discountAmountFor
-import woowacourse.shopping.model.isApplicableTo
 import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.CouponRepository
@@ -188,8 +185,8 @@ class OrderViewModel(
 
     private fun SelectedCartOrder.toPriceSummary(selectedCoupon: Coupon? = null): OrderPriceSummaryUiModel {
         val orderAmount = totalOrderAmount()
-        val couponDiscount = selectedCoupon.discountAmountFor(this).coerceAtMost(orderAmount)
-        val deliveryFee = selectedCoupon.deliveryFeeFor(orderAmount, DEFAULT_DELIVERY_FEE)
+        val couponDiscount = selectedCoupon?.discountAmountFor(this)?.coerceAtMost(orderAmount) ?: 0
+        val deliveryFee = selectedCoupon?.deliveryFeeFor(orderAmount, DEFAULT_DELIVERY_FEE) ?: DEFAULT_DELIVERY_FEE
         val totalPaymentPrice = (orderAmount - couponDiscount + deliveryFee).coerceAtLeast(0)
 
         return OrderPriceSummaryUiModel(

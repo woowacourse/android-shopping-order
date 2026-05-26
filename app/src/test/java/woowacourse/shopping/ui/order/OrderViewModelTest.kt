@@ -20,8 +20,12 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Coupon
+import woowacourse.shopping.model.FreeShippingPolicy
+import woowacourse.shopping.model.OrderFixedAmountDiscountPolicy
+import woowacourse.shopping.model.OrderPercentageDiscountPolicy
 import woowacourse.shopping.model.SelectedCartOrder
 import woowacourse.shopping.model.SelectedCartOrderItem
+import woowacourse.shopping.model.SameProductQuantityDiscountPolicy
 import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.CartRepositoryFixture
@@ -62,7 +66,7 @@ class OrderViewModelTest {
                             description = "",
                             expirationDate = LocalDate.of(2026, 12, 31),
                             minimumOrderAmount = 100_000,
-                            fixedDiscountAmount = 5_000,
+                            policy = OrderFixedAmountDiscountPolicy(amount = 5_000),
                         ),
                         Coupon(
                             id = 2L,
@@ -71,7 +75,7 @@ class OrderViewModelTest {
                             description = "",
                             expirationDate = LocalDate.of(2026, 10, 31),
                             minimumOrderAmount = 50_000,
-                            freeShipping = true,
+                            policy = FreeShippingPolicy,
                         ),
                         Coupon(
                             id = 3L,
@@ -79,8 +83,7 @@ class OrderViewModelTest {
                             title = "3개 구매 1개 가격 할인 쿠폰",
                             description = "",
                             expirationDate = LocalDate.of(2026, 9, 30),
-                            requiredSameProductQuantity = 3,
-                            bogoEligible = true,
+                            policy = SameProductQuantityDiscountPolicy(requiredSameProductQuantity = 3),
                         ),
                         Coupon(
                             id = 4L,
@@ -88,9 +91,9 @@ class OrderViewModelTest {
                             title = "미라클 세일 30% 할인 쿠폰",
                             description = "",
                             expirationDate = LocalDate.of(2026, 9, 30),
-                            percentageDiscountRate = 30,
                             availableFromHour = 4,
                             availableToHourExclusive = 7,
+                            policy = OrderPercentageDiscountPolicy(rate = 30),
                         ),
                         Coupon(
                             id = 5L,
@@ -98,9 +101,9 @@ class OrderViewModelTest {
                             title = "미라클 세일 30% 할인 쿠폰",
                             description = "",
                             expirationDate = LocalDate.of(2026, 5, 1),
-                            percentageDiscountRate = 30,
                             availableFromHour = 4,
                             availableToHourExclusive = 7,
+                            policy = OrderPercentageDiscountPolicy(rate = 30),
                         ),
                     ),
             )

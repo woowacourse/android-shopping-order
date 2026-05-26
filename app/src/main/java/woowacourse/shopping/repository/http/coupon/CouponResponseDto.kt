@@ -2,6 +2,11 @@ package woowacourse.shopping.repository.http.coupon
 
 import kotlinx.serialization.Serializable
 import woowacourse.shopping.model.Coupon
+import woowacourse.shopping.model.CouponPolicy
+import woowacourse.shopping.model.FreeShippingPolicy
+import woowacourse.shopping.model.OrderFixedAmountDiscountPolicy
+import woowacourse.shopping.model.OrderPercentageDiscountPolicy
+import woowacourse.shopping.model.SameProductQuantityDiscountPolicy
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -29,20 +34,23 @@ data class CouponResponseDto(
             description = description,
             expirationDate = LocalDate.parse(expirationDate),
             minimumOrderAmount = minimumAmount,
-            fixedDiscountAmount = discount.takeIf { normalizedDiscountType == FIXED_DISCOUNT_TYPE },
-            percentageDiscountRate = discount.takeIf { normalizedDiscountType == PERCENTAGE_DISCOUNT_TYPE },
-            requiredSameProductQuantity =
-                if (normalizedDiscountType == BUY_X_GET_Y_DISCOUNT_TYPE) {
-                    buyQuantity?.plus(getQuantity ?: 0)
-                } else {
-                    null
-                },
-            freeShipping = normalizedDiscountType == FREE_SHIPPING_DISCOUNT_TYPE,
-            bogoEligible = normalizedDiscountType == BUY_X_GET_Y_DISCOUNT_TYPE,
             availableFromHour = availableHourRange?.first,
             availableToHourExclusive = availableHourRange?.second,
+            policy = toDiscountPolicy(normalizedDiscountType),
         )
     }
+
+    private fun toDiscountPolicy(normalizedDiscountType: String): CouponPolicy =
+        when (normalizedDiscountType) {
+            FIXED_DISCOUNT_TYPE -> OrderFixedAmountDiscountPolicy(amount = requireDiscount())
+            PERCENTAGE_DISCOUNT_TYPE -> OrderPercentageDiscountPolicy(rate = requireDiscount())
+            BUY_X_GET_Y_DISCOUNT_TYPE ->
+                SameProductQuantityDiscountPolicy(
+                    requiredSameProductQuantity = requireBuyQuantity() + requireGetQuantity(),
+                )
+            FREE_SHIPPING_DISCOUNT_TYPE -> FreeShippingPolicy
+            else -> throw IllegalArgumentException("지원하지 않는 쿠폰 타입입니다: $discountType")
+        }
 
     private fun AvailableTimeResponseDto.toHourRange(): Pair<Int, Int> {
         val startTime = LocalTime.parse(start)
@@ -56,6 +64,21 @@ data class CouponResponseDto(
 
         return startTime.hour to endHourExclusive
     }
+
+    private fun requireDiscount(): Int =
+        requireNotNull(discount) {
+            "discountType=$discountType 쿠폰에는 discount 값이 필요합니다."
+        }
+
+    private fun requireBuyQuantity(): Int =
+        requireNotNull(buyQuantity) {
+            "discountType=$discountType 쿠폰에는 buyQuantity 값이 필요합니다."
+        }
+
+    private fun requireGetQuantity(): Int =
+        requireNotNull(getQuantity) {
+            "discountType=$discountType 쿠폰에는 getQuantity 값이 필요합니다."
+        }
 
     companion object {
         private const val FIXED_DISCOUNT_TYPE = "fixed"

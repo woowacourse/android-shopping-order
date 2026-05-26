@@ -12,6 +12,10 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import woowacourse.shopping.model.FreeShippingPolicy
+import woowacourse.shopping.model.OrderFixedAmountDiscountPolicy
+import woowacourse.shopping.model.OrderPercentageDiscountPolicy
+import woowacourse.shopping.model.SameProductQuantityDiscountPolicy
 import woowacourse.shopping.repository.http.coupon.CouponNetworkException
 import woowacourse.shopping.repository.http.coupon.CouponParsingException
 import woowacourse.shopping.repository.http.coupon.CouponResponseException
@@ -98,10 +102,12 @@ class HttpCouponRepositoryTest {
             assertEquals(4, actual.size)
             assertEquals("FIXED5000", actual.first().code)
             assertEquals(LocalDate.of(2026, 12, 31), actual.first().expirationDate)
-            assertTrue(actual[1].freeShipping)
+            assertEquals(OrderFixedAmountDiscountPolicy(amount = 5_000), actual[0].policy)
+            assertTrue(actual[1].policy === FreeShippingPolicy)
             assertEquals(11, actual[2].availableFromHour)
             assertEquals(14, actual[2].availableToHourExclusive)
-            assertEquals(3, actual[3].requiredSameProductQuantity)
+            assertEquals(OrderPercentageDiscountPolicy(rate = 15), actual[2].policy)
+            assertEquals(SameProductQuantityDiscountPolicy(requiredSameProductQuantity = 3), actual[3].policy)
         }
 
     @Test
