@@ -13,6 +13,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import woowacourse.shopping.R
 import woowacourse.shopping.ui.shopping.ShoppingActivity
+import woowacourse.shopping.ui.shopping.ShoppingIntent
 
 class PayNotification(
     private val context: Context,
@@ -50,7 +51,7 @@ class PayNotification(
     private fun createContentIntent(): PendingIntent {
         val intent =
             Intent(context, ShoppingActivity::class.java).apply {
-                action = context.getString(R.string.ACTION_OPEN_PAY_SCREEN)
+                action = ShoppingIntent.OPEN_PAY_SCREEN
                 flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
 

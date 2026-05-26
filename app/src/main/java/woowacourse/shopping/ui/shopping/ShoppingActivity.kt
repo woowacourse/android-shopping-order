@@ -11,7 +11,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
-import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.navigation.ShoppingNavHost
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
@@ -52,7 +51,7 @@ class ShoppingActivity : ComponentActivity() {
     }
 
     private fun updateOpenPayScreenState(intent: Intent?) {
-        openPayScreen.value = intent?.action == getString(R.string.ACTION_OPEN_PAY_SCREEN)
+        openPayScreen.value = intent?.action == ShoppingIntent.OPEN_PAY_SCREEN
     }
 
     private fun requestNotificationPermission() {
