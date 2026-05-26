@@ -3,13 +3,13 @@ package woowacourse.shopping.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
-import woowacourse.shopping.di.ShoppingRepositoryProvider
 import woowacourse.shopping.ui.cart.CartRecommendationRouteScreen
 import woowacourse.shopping.ui.cart.CartRouteScreen
 import woowacourse.shopping.ui.cart.list.CartViewModel
@@ -26,19 +26,33 @@ fun AppNavHost(
     pendingOrderNavigationToken: Long = 0L,
     onPendingOrderNavigationHandled: () -> Unit = {},
 ) {
+    val pendingOrderEntryViewModel: PendingOrderEntryViewModel = viewModel()
+    val pendingOrderEntryAction =
+        pendingOrderEntryViewModel.pendingOrderEntryAction.collectAsStateWithLifecycle().value
+
     LaunchedEffect(pendingOrderNavigationToken) {
-        if (pendingOrderNavigationToken == 0L) return@LaunchedEffect
-        val hasPendingOrder = ShoppingRepositoryProvider.pendingOrderRepository.getPendingOrder() != null
-        if (hasPendingOrder) {
-            navController.navigate(CartGraph) {
-                popUpTo(ShoppingRoute)
-                launchSingleTop = true
+        pendingOrderEntryViewModel.handlePendingOrderEntryRequest(pendingOrderNavigationToken)
+    }
+
+    LaunchedEffect(pendingOrderEntryAction) {
+        when (pendingOrderEntryAction) {
+            PendingOrderEntryAction.OpenPendingOrder -> {
+                navController.navigate(CartGraph) {
+                    popUpTo(ShoppingRoute)
+                    launchSingleTop = true
+                }
+                navController.navigate(OrderRoute(restorePendingOrder = true)) {
+                    launchSingleTop = true
+                }
             }
-            navController.navigate(OrderRoute(restorePendingOrder = true)) {
-                launchSingleTop = true
-            }
+
+            PendingOrderEntryAction.Ignore -> Unit
+
+            null -> return@LaunchedEffect
         }
+
         onPendingOrderNavigationHandled()
+        pendingOrderEntryViewModel.consumePendingOrderEntryAction()
     }
 
     NavHost(
