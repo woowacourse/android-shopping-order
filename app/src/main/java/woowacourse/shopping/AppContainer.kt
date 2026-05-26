@@ -8,6 +8,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import woowacourse.shopping.data.alarm.PayReminderPreference
 import woowacourse.shopping.data.localdb.ShoppingDB
 import woowacourse.shopping.data.remote.NetworkManager
 import woowacourse.shopping.data.remote.NetworkObserver
@@ -52,6 +53,10 @@ class AppContainer(
 
     val networkObserver: NetworkObserver by lazy {
         NetworkManager(context)
+    }
+
+    val payReminderPreference: PayReminderPreference by lazy {
+        PayReminderPreference(context)
     }
 
     private val loggingInterceptor =

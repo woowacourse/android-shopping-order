@@ -13,10 +13,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import kotlinx.coroutines.flow.MutableStateFlow
 import woowacourse.shopping.AppContainer
 import woowacourse.shopping.data.alarm.PayReminderAlarm
-import woowacourse.shopping.data.alarm.PayReminderPreference
 import woowacourse.shopping.ui.cart.CartEvent
 import woowacourse.shopping.ui.cart.CartScreen
 import woowacourse.shopping.ui.cart.CartViewModel
@@ -30,6 +28,7 @@ import woowacourse.shopping.ui.recommend.RecommendEvent
 import woowacourse.shopping.ui.recommend.RecommendScreen
 import woowacourse.shopping.ui.recommend.RecommendViewModel
 import woowacourse.shopping.ui.setting.SettingScreen
+import woowacourse.shopping.ui.setting.SettingViewModel
 import woowacourse.shopping.ui.shopping.ShoppingScreen
 import woowacourse.shopping.ui.shopping.ShoppingViewModel
 import woowacourse.shopping.ui.util.customToastMessage
@@ -142,6 +141,7 @@ fun ShoppingNavHost(
 
         composable<ShoppingRoute.Setting> {
             SettingRouteContent(
+                appContainer = appContainer,
                 onBackClick = {
                     navController.popBackStack()
                 },
@@ -348,7 +348,7 @@ private fun PayRouteContent(
         }
     val payReminderPreference =
         remember {
-            PayReminderPreference(context)
+            appContainer.payReminderPreference
         }
 
     LaunchedEffect(Unit) {
@@ -395,24 +395,22 @@ private fun PayRouteContent(
 }
 
 @Composable
-private fun SettingRouteContent(onBackClick: () -> Unit) {
-    val context = LocalContext.current
-    val payReminderPreference =
-        remember {
-            PayReminderPreference(context)
-        }
-    val isNotificationEnabledFlow =
-        remember {
-            MutableStateFlow(payReminderPreference.isEnabled())
-        }
-    val isNotificationEnabled by isNotificationEnabledFlow.collectAsStateWithLifecycle()
+private fun SettingRouteContent(
+    appContainer: AppContainer,
+    onBackClick: () -> Unit,
+) {
+    val viewModel: SettingViewModel =
+        viewModel(
+            factory =
+                SettingViewModel.provideFactory(
+                    payReminderPreference = appContainer.payReminderPreference,
+                ),
+        )
+    val isNotificationEnabled by viewModel.isNotificationEnabled.collectAsStateWithLifecycle()
 
     SettingScreen(
         isNotificationEnabled = isNotificationEnabled,
         onBackClick = onBackClick,
-        onToggleClick = { isEnabled ->
-            isNotificationEnabledFlow.value = isEnabled
-            payReminderPreference.setEnabled(isEnabled)
-        },
+        onToggleClick = viewModel::toggleNotification,
     )
 }
