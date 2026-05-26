@@ -12,7 +12,7 @@
 - [ ] 오류 메시지와 실제 실패 이슈 간 동기화
 
 ### From 코니
-- [ ] 기본 배송비 책임 소재 정리를 위한 PaymentPrice 모델 작성
+- [x] 기본 배송비 책임 소재 정리를 위한 PaymentPrice 모델 작성
 - [ ] string.xml 내 인텐트 식별자 제거 및 object 파일 신설
 - [ ] NavHost의 책임
 - [ ] SettingViewModel 생성

@@ -7,7 +7,7 @@ import kotlin.math.min
 data class CouponCalculationResult(
     val isApplicable: Boolean,
     val discountAmount: Money = Money(0),
-    val shippingFee: Money = SHIPPING_FEE,
+    val isFreeShipping: Boolean = false,
 )
 
 fun Coupon.calculate(
@@ -79,7 +79,7 @@ private fun Coupon.FreeShipping.calculateFreeShipping(productTotal: Money): Coup
 
     return CouponCalculationResult(
         isApplicable = true,
-        shippingFee = Money(0),
+        isFreeShipping = true,
     )
 }
 

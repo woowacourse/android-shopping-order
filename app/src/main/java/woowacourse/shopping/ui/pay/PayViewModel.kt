@@ -21,7 +21,7 @@ import woowacourse.shopping.data.repository.coupon.CouponRepository
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Coupon
 import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.SHIPPING_FEE
+import woowacourse.shopping.model.PaymentPrice
 import woowacourse.shopping.model.calculate
 import java.io.IOException
 
@@ -118,8 +118,12 @@ class PayViewModel(
             val selectedCouponCalculationResult = selectedCoupon?.calculate(selectedCartItems)
             val productTotalPrice = selectedCartItems.totalPrice()
             val discountAmount = selectedCouponCalculationResult?.discountAmount ?: Money(0)
-            val shippingFee = selectedCouponCalculationResult?.shippingFee ?: SHIPPING_FEE
-            val finalPrice = (productTotalPrice.amount - discountAmount.amount).coerceAtLeast(0) + shippingFee.amount
+            val paymentPrice =
+                PaymentPrice(
+                    productTotalPrice = productTotalPrice,
+                    discountAmount = discountAmount,
+                    isFreeShipping = selectedCouponCalculationResult?.isFreeShipping ?: false,
+                )
             val selectedCouponId =
                 if (selectedCouponCalculationResult?.isApplicable == false) {
                     null
@@ -139,8 +143,8 @@ class PayViewModel(
                         }.toImmutableList(),
                 totalOrderPrice = productTotalPrice.amount,
                 discountAmount = discountAmount.amount,
-                shippingFee = shippingFee.amount,
-                finalPrice = finalPrice,
+                shippingFee = paymentPrice.shippingFee.amount,
+                finalPrice = paymentPrice.finalPrice.amount,
             )
         }
     }
