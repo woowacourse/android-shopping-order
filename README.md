@@ -14,7 +14,7 @@
 ### From 코니
 - [x] 기본 배송비 책임 소재 정리를 위한 PaymentPrice 모델 작성
 - [x] string.xml 내 인텐트 식별자 제거 및 object 파일 신설
-- [ ] NavHost의 책임
+- [x] NavHost의 책임
 - [ ] SettingViewModel 생성
 - [ ] Coupon 타입의 동작을 타입 내부에 내재화
 

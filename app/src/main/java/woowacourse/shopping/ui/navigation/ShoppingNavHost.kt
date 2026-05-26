@@ -58,21 +58,8 @@ fun ShoppingNavHost(
         modifier = modifier,
     ) {
         composable<ShoppingRoute.Shopping> {
-            val viewModel: ShoppingViewModel =
-                viewModel(
-                    factory =
-                        ShoppingViewModel.provideFactory(
-                            productRepository = appContainer.productRepository,
-                            cartRepository = appContainer.cartRepository,
-                            recentItemRepository = appContainer.recentItemRepository,
-                            networkObserver = appContainer.networkObserver,
-                        ),
-                )
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-            ShoppingScreen(
-                uiState = uiState,
-                onLoad = viewModel::loadMore,
+            ShoppingRouteContent(
+                appContainer = appContainer,
                 onProductClick = { productId ->
                     navController.navigate(ShoppingRoute.Detail(productId = productId))
                 },
@@ -82,80 +69,25 @@ fun ShoppingNavHost(
                 onSettingClick = {
                     navController.navigate(ShoppingRoute.Setting)
                 },
-                onQuantityChange = viewModel::updateQuantity,
             )
         }
 
         composable<ShoppingRoute.Detail> { backStackEntry ->
             val route = backStackEntry.toRoute<ShoppingRoute.Detail>()
-            val context = LocalContext.current
-            BackHandler {
-                navController.popBackStack(
-                    route = ShoppingRoute.Shopping,
-                    inclusive = false,
-                )
-            }
-            val viewModel: DetailViewModel =
-                viewModel(
-                    factory =
-                        DetailViewModel.provideFactory(
-                            id = route.productId,
-                            hideRecentItem = route.hideRecentItem,
-                            productRepository = appContainer.productRepository,
-                            cartRepository = appContainer.cartRepository,
-                            recentItemRepository = appContainer.recentItemRepository,
-                        ),
-                )
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-            LaunchedEffect(viewModel) {
-                viewModel.event.collect { event ->
-                    when (event) {
-                        DetailEvent.NavigateToCart -> {
-                            navController.navigate(ShoppingRoute.Cart)
-                        }
-
-                        DetailEvent.NavigateBack -> {
-                            navController.popBackStack(
-                                route = ShoppingRoute.Shopping,
-                                inclusive = false,
-                            )
-                        }
-
-                        DetailEvent.ShowProductNotFoundMessage -> {
-                            customToastMessage(
-                                context,
-                                "상품을 찾을 수 없습니다.",
-                            )
-                        }
-
-                        DetailEvent.ShowProductLoadFailureMessage -> {
-                            customToastMessage(
-                                context,
-                                "상품 정보를 불러오지 못했습니다.",
-                            )
-                        }
-
-                        DetailEvent.ShowAddCartFailureMessage -> {
-                            customToastMessage(
-                                context,
-                                "장바구니에 상품을 담지 못했습니다.",
-                            )
-                        }
-                    }
-                }
-            }
-
-            DetailScreen(
-                uiState = uiState,
-                onCloseClick = {
+            DetailRouteContent(
+                appContainer = appContainer,
+                productId = route.productId,
+                hideRecentItem = route.hideRecentItem,
+                onBackToShopping = {
                     navController.popBackStack(
                         route = ShoppingRoute.Shopping,
                         inclusive = false,
                     )
                 },
-                onQuantityChange = viewModel::updateQuantity,
-                onAddToCart = viewModel::addToCart,
+                onNavigateToCart = {
+                    navController.navigate(ShoppingRoute.Cart)
+                },
                 onRecentItemClick = { productId ->
                     navController.navigate(
                         ShoppingRoute.Detail(
@@ -168,168 +100,319 @@ fun ShoppingNavHost(
         }
 
         composable<ShoppingRoute.Cart> {
-            val context = LocalContext.current
-            val viewModel: CartViewModel =
-                viewModel(
-                    factory =
-                        CartViewModel.provideFactory(
-                            cartRepository = appContainer.cartRepository,
-                        ),
-                )
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-            LaunchedEffect(viewModel) {
-                viewModel.event.collect { event ->
-                    when (event) {
-                        CartEvent.DeleteCartItemFailure -> {
-                            customToastMessage(context, "장바구니 상품을 삭제하지 못했습니다.")
-                        }
-
-                        CartEvent.UpdateCartItemFailure -> {
-                            customToastMessage(context, "장바구니 상품 수량을 변경하지 못했습니다.")
-                        }
-
-                        CartEvent.NavigateToRecommend -> {
-                            navController.navigate(ShoppingRoute.Recommend)
-                        }
-                    }
-                }
-            }
-
-            CartScreen(
-                uiState = uiState,
+            CartRouteContent(
+                appContainer = appContainer,
                 onBackClick = {
                     navController.popBackStack()
                 },
-                onDeleteItem = viewModel::deleteItem,
-                onNextPage = viewModel::nextPage,
-                onPreviousPage = viewModel::previousPage,
-                onQuantityChange = viewModel::updateQuantity,
-                onCheckedChange = viewModel::checkItem,
-                isAllSelectClick = viewModel::isAllSelectClick,
-                onOrderClick = viewModel::order,
+                onNavigateToRecommend = {
+                    navController.navigate(ShoppingRoute.Recommend)
+                },
             )
         }
 
         composable<ShoppingRoute.Recommend> {
-            val context = LocalContext.current
-            val viewModel: RecommendViewModel =
-                viewModel(
-                    factory =
-                        RecommendViewModel.provideFactory(
-                            cartRepository = appContainer.cartRepository,
-                            recentItemRepository = appContainer.recentItemRepository,
-                            productRepository = appContainer.productRepository,
-                        ),
-                )
-            LaunchedEffect(viewModel) {
-                viewModel.event.collect { event ->
-                    when (event) {
-                        RecommendEvent.UpdateCartItemFailure -> {
-                            customToastMessage(context, "장바구니 상품을 변경하지 못했습니다.")
-                        }
-                    }
-                }
-            }
-
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-            RecommendScreen(
-                uiState = uiState,
+            RecommendRouteContent(
+                appContainer = appContainer,
                 onBackClick = {
                     navController.popBackStack()
                 },
                 onOrderClick = {
                     navController.navigate(ShoppingRoute.Pay)
                 },
-                onQuantityChange = viewModel::updateQuantity,
             )
         }
 
         composable<ShoppingRoute.Pay> {
-            val context = LocalContext.current
-            val payReminderAlarm =
-                remember {
-                    PayReminderAlarm(context)
-                }
-            val payReminderPreference =
-                remember {
-                    PayReminderPreference(context)
-                }
-
-            LaunchedEffect(Unit) {
-                payReminderAlarm.cancel()
-
-                val isEnabled = payReminderPreference.isEnabled()
-
-                if (isEnabled) {
-                    payReminderAlarm.schedule()
-                }
-            }
-
-            val viewModel: PayViewModel =
-                viewModel(
-                    factory =
-                        PayViewModel.provideFactory(
-                            couponRepository = appContainer.couponRepository,
-                            cartRepository = appContainer.cartRepository,
-                        ),
-                )
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-            LaunchedEffect(viewModel) {
-                viewModel.event.collect { event ->
-                    when (event) {
-                        PayEvent.NavigateToShopping -> {
-                            payReminderAlarm.cancel()
-
-                            navController.navigate(ShoppingRoute.Shopping) {
-                                popUpTo(ShoppingRoute.Shopping) {
-                                    inclusive = true
-                                }
-                                launchSingleTop = true
-                            }
-                        }
-
-                        PayEvent.CompletePayFailure -> {
-                            customToastMessage(context, "결제를 완료하지 못했습니다.")
-                        }
-                    }
-                }
-            }
-
-            PayScreen(
-                uiState = uiState,
+            PayRouteContent(
+                appContainer = appContainer,
                 onBackClick = {
                     navController.popBackStack()
                 },
-                onPayClick = {
-                    viewModel.completePay()
+                onPayComplete = {
+                    navController.navigate(ShoppingRoute.Shopping) {
+                        popUpTo(ShoppingRoute.Shopping) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
                 },
-                onCouponClick = viewModel::selectCoupon,
             )
         }
 
         composable<ShoppingRoute.Setting> {
-            val context = LocalContext.current
-            val payReminderPreference =
-                remember {
-                    PayReminderPreference(context)
-                }
-            val isNotificationEnabledFlow =
-                remember {
-                    MutableStateFlow(payReminderPreference.isEnabled())
-                }
-            val isNotificationEnabled by isNotificationEnabledFlow.collectAsStateWithLifecycle()
-
-            SettingScreen(
-                isNotificationEnabled = isNotificationEnabled,
-                onBackClick = { navController.popBackStack() },
-                onToggleClick = { isEnabled ->
-                    isNotificationEnabledFlow.value = isEnabled
-                    payReminderPreference.setEnabled(isEnabled)
+            SettingRouteContent(
+                onBackClick = {
+                    navController.popBackStack()
                 },
             )
         }
     }
+}
+
+@Composable
+private fun ShoppingRouteContent(
+    appContainer: AppContainer,
+    onProductClick: (String) -> Unit,
+    onCartClick: () -> Unit,
+    onSettingClick: () -> Unit,
+) {
+    val viewModel: ShoppingViewModel =
+        viewModel(
+            factory =
+                ShoppingViewModel.provideFactory(
+                    productRepository = appContainer.productRepository,
+                    cartRepository = appContainer.cartRepository,
+                    recentItemRepository = appContainer.recentItemRepository,
+                    networkObserver = appContainer.networkObserver,
+                ),
+        )
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    ShoppingScreen(
+        uiState = uiState,
+        onLoad = viewModel::loadMore,
+        onProductClick = onProductClick,
+        onCartClick = onCartClick,
+        onSettingClick = onSettingClick,
+        onQuantityChange = viewModel::updateQuantity,
+    )
+}
+
+@Composable
+private fun DetailRouteContent(
+    appContainer: AppContainer,
+    productId: String,
+    hideRecentItem: Boolean,
+    onBackToShopping: () -> Unit,
+    onNavigateToCart: () -> Unit,
+    onRecentItemClick: (String) -> Unit,
+) {
+    val context = LocalContext.current
+
+    BackHandler {
+        onBackToShopping()
+    }
+
+    val viewModel: DetailViewModel =
+        viewModel(
+            factory =
+                DetailViewModel.provideFactory(
+                    id = productId,
+                    hideRecentItem = hideRecentItem,
+                    productRepository = appContainer.productRepository,
+                    cartRepository = appContainer.cartRepository,
+                    recentItemRepository = appContainer.recentItemRepository,
+                ),
+        )
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(viewModel) {
+        viewModel.event.collect { event ->
+            when (event) {
+                DetailEvent.NavigateToCart -> {
+                    onNavigateToCart()
+                }
+
+                DetailEvent.NavigateBack -> {
+                    onBackToShopping()
+                }
+
+                DetailEvent.ShowProductNotFoundMessage -> {
+                    customToastMessage(
+                        context,
+                        "?곹뭹??李얠쓣 ???놁뒿?덈떎.",
+                    )
+                }
+
+                DetailEvent.ShowProductLoadFailureMessage -> {
+                    customToastMessage(
+                        context,
+                        "?곹뭹 ?뺣낫瑜?遺덈윭?ㅼ? 紐삵뻽?듬땲??",
+                    )
+                }
+
+                DetailEvent.ShowAddCartFailureMessage -> {
+                    customToastMessage(
+                        context,
+                        "?λ컮援щ땲???곹뭹???댁? 紐삵뻽?듬땲??",
+                    )
+                }
+            }
+        }
+    }
+
+    DetailScreen(
+        uiState = uiState,
+        onCloseClick = onBackToShopping,
+        onQuantityChange = viewModel::updateQuantity,
+        onAddToCart = viewModel::addToCart,
+        onRecentItemClick = onRecentItemClick,
+    )
+}
+
+@Composable
+private fun CartRouteContent(
+    appContainer: AppContainer,
+    onBackClick: () -> Unit,
+    onNavigateToRecommend: () -> Unit,
+) {
+    val context = LocalContext.current
+    val viewModel: CartViewModel =
+        viewModel(
+            factory =
+                CartViewModel.provideFactory(
+                    cartRepository = appContainer.cartRepository,
+                ),
+        )
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(viewModel) {
+        viewModel.event.collect { event ->
+            when (event) {
+                CartEvent.DeleteCartItemFailure -> {
+                    customToastMessage(context, "?λ컮援щ땲 ?곹뭹????젣?섏? 紐삵뻽?듬땲??")
+                }
+
+                CartEvent.UpdateCartItemFailure -> {
+                    customToastMessage(context, "?λ컮援щ땲 ?곹뭹 ?섎웾??蹂寃쏀븯吏 紐삵뻽?듬땲??")
+                }
+
+                CartEvent.NavigateToRecommend -> {
+                    onNavigateToRecommend()
+                }
+            }
+        }
+    }
+
+    CartScreen(
+        uiState = uiState,
+        onBackClick = onBackClick,
+        onDeleteItem = viewModel::deleteItem,
+        onNextPage = viewModel::nextPage,
+        onPreviousPage = viewModel::previousPage,
+        onQuantityChange = viewModel::updateQuantity,
+        onCheckedChange = viewModel::checkItem,
+        isAllSelectClick = viewModel::isAllSelectClick,
+        onOrderClick = viewModel::order,
+    )
+}
+
+@Composable
+private fun RecommendRouteContent(
+    appContainer: AppContainer,
+    onBackClick: () -> Unit,
+    onOrderClick: () -> Unit,
+) {
+    val context = LocalContext.current
+    val viewModel: RecommendViewModel =
+        viewModel(
+            factory =
+                RecommendViewModel.provideFactory(
+                    cartRepository = appContainer.cartRepository,
+                    recentItemRepository = appContainer.recentItemRepository,
+                    productRepository = appContainer.productRepository,
+                ),
+        )
+
+    LaunchedEffect(viewModel) {
+        viewModel.event.collect { event ->
+            when (event) {
+                RecommendEvent.UpdateCartItemFailure -> {
+                    customToastMessage(context, "?λ컮援щ땲 ?곹뭹??蹂寃쏀븯吏 紐삵뻽?듬땲??")
+                }
+            }
+        }
+    }
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    RecommendScreen(
+        uiState = uiState,
+        onBackClick = onBackClick,
+        onOrderClick = onOrderClick,
+        onQuantityChange = viewModel::updateQuantity,
+    )
+}
+
+@Composable
+private fun PayRouteContent(
+    appContainer: AppContainer,
+    onBackClick: () -> Unit,
+    onPayComplete: () -> Unit,
+) {
+    val context = LocalContext.current
+    val payReminderAlarm =
+        remember {
+            PayReminderAlarm(context)
+        }
+    val payReminderPreference =
+        remember {
+            PayReminderPreference(context)
+        }
+
+    LaunchedEffect(Unit) {
+        payReminderAlarm.cancel()
+
+        val isEnabled = payReminderPreference.isEnabled()
+
+        if (isEnabled) {
+            payReminderAlarm.schedule()
+        }
+    }
+
+    val viewModel: PayViewModel =
+        viewModel(
+            factory =
+                PayViewModel.provideFactory(
+                    couponRepository = appContainer.couponRepository,
+                    cartRepository = appContainer.cartRepository,
+                ),
+        )
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(viewModel) {
+        viewModel.event.collect { event ->
+            when (event) {
+                PayEvent.NavigateToShopping -> {
+                    payReminderAlarm.cancel()
+                    onPayComplete()
+                }
+
+                PayEvent.CompletePayFailure -> {
+                    customToastMessage(context, "寃곗젣瑜??꾨즺?섏? 紐삵뻽?듬땲??")
+                }
+            }
+        }
+    }
+
+    PayScreen(
+        uiState = uiState,
+        onBackClick = onBackClick,
+        onPayClick = viewModel::completePay,
+        onCouponClick = viewModel::selectCoupon,
+    )
+}
+
+@Composable
+private fun SettingRouteContent(onBackClick: () -> Unit) {
+    val context = LocalContext.current
+    val payReminderPreference =
+        remember {
+            PayReminderPreference(context)
+        }
+    val isNotificationEnabledFlow =
+        remember {
+            MutableStateFlow(payReminderPreference.isEnabled())
+        }
+    val isNotificationEnabled by isNotificationEnabledFlow.collectAsStateWithLifecycle()
+
+    SettingScreen(
+        isNotificationEnabled = isNotificationEnabled,
+        onBackClick = onBackClick,
+        onToggleClick = { isEnabled ->
+            isNotificationEnabledFlow.value = isEnabled
+            payReminderPreference.setEnabled(isEnabled)
+        },
+    )
 }
