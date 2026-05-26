@@ -7,5 +7,5 @@ sealed interface Coupon {
     val description: String
     val expirationDate: LocalDate
     fun isApplicable(context: OrderContext): Boolean
-    fun discountAmount(context: OrderContext): Int
+    fun discountAmount(context: OrderContext): DiscountResult
 }

@@ -17,8 +17,8 @@ class BuyXGetYCoupon(
         return cartContents.any { it.quantity >= buyQuantity + getQuantity }
     }
 
-    override fun discountAmount(context: OrderContext): Int {
-        if (!isApplicable(context)) return 0
+    override fun discountAmount(context: OrderContext): DiscountResult {
+        if (!isApplicable(context)) return DiscountResult()
         val cartContents = context.items
 
         val target =
@@ -29,6 +29,6 @@ class BuyXGetYCoupon(
         val getMultiple = target.quantity / (buyQuantity + getQuantity)
 
         val highestDiscountPrice = highestPrice * getMultiple * getQuantity
-        return highestDiscountPrice
+        return DiscountResult(couponDiscountPrice = highestDiscountPrice)
     }
 }

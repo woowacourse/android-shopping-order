@@ -19,8 +19,8 @@ class PercentageCoupon(
         return now.isAfter(startTime) && now.isBefore(endTime)
     }
 
-    override fun discountAmount(context: OrderContext): Int {
-        if (!isApplicable(context)) return 0
-        return (context.totalPrice * discountRate).toInt()
+    override fun discountAmount(context: OrderContext): DiscountResult {
+        if (!isApplicable(context)) return DiscountResult()
+        return DiscountResult(couponDiscountPrice = (context.totalPrice * discountRate).toInt())
     }
 }

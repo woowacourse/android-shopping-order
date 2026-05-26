@@ -20,7 +20,11 @@ class CouponTest {
         val coupon = FixedDiscountCoupon(expirationDate = LocalDate.of(2026, 11, 30))
 
         // when: 할인 금액을 계산할 때
-        val discountedPrice = price - coupon.discountAmount(OrderContext(totalPrice = price))
+        val discountedPrice = price - coupon.discountAmount(
+            OrderContext(
+                totalPrice = price,
+            ),
+        ).couponDiscountPrice
 
         // then: 할인이 적용되지 않는다
         assertThat(discountedPrice).isEqualTo(50_000)
@@ -33,7 +37,11 @@ class CouponTest {
         val coupon = FixedDiscountCoupon(expirationDate = LocalDate.of(2026, 11, 30))
 
         // when: 할인 금액을 계산할 때
-        val discountedPrice = price - coupon.discountAmount(OrderContext(totalPrice = price))
+        val discountedPrice = price - coupon.discountAmount(
+            OrderContext(
+                totalPrice = price,
+            ),
+        ).couponDiscountPrice
 
         // then: 할인이 적용되지 않는다
         assertThat(discountedPrice).isEqualTo(95_000)
@@ -54,7 +62,12 @@ class CouponTest {
         val price = cart.cartContents.sumOf { it.quantity * it.product.priceAmount() }
 
         // when: 할인 금액을 계산할 때
-        val applicable = coupon.isApplicable(OrderContext(items = cart.cartContents))
+        val applicable = coupon.isApplicable(
+            OrderContext(
+                totalPrice = price,
+                items = cart.cartContents,
+            ),
+        )
 
         // then: 할인을 적용할 수 있다
         assertThat(applicable).isEqualTo(true)
@@ -75,7 +88,11 @@ class CouponTest {
         val price = cart.cartContents.sumOf { it.quantity * it.product.priceAmount() }
 
         // when: 할인 금액을 계산할 때
-        val applicable = coupon.isApplicable(OrderContext(items = cart.cartContents))
+        val applicable = coupon.isApplicable(
+            OrderContext(
+                items = cart.cartContents,
+            ),
+        )
 
         // then: 할인을 적용할 수 없다
         assertThat(applicable).isEqualTo(false)
@@ -99,7 +116,12 @@ class CouponTest {
         val price = cart.cartContents.sumOf { it.quantity * it.product.priceAmount() }
 
         // when: 할인 금액을 계산할 때
-        val discountedPrice = price - coupon.discountAmount(OrderContext(items = cart.cartContents))
+        val discountedPrice =
+            price - coupon.discountAmount(
+                OrderContext(
+                    items = cart.cartContents,
+                ),
+            ).couponDiscountPrice
 
         // then: 할인이 적용된다
         assertThat(discountedPrice).isEqualTo(price - expensiveCartContent.product.priceAmount())
@@ -126,7 +148,7 @@ class CouponTest {
         val coupon = FreeShippingCoupon(expirationDate = LocalDate.of(2026, 11, 30))
 
         // when: 할인 금액을 계산할 때
-        val discountedPrice = shippingPrice - coupon.discountAmount(OrderContext(price))
+        val discountedPrice = shippingPrice - coupon.discountAmount(OrderContext(price)).shippingDiscountPrice
 
         // then: 할인을 적용할 수 없다
         assertThat(discountedPrice).isEqualTo(0)
@@ -178,7 +200,13 @@ class CouponTest {
         val time = LocalTime.of(5, 30)
 
         // when: 할인이 가능한지 확인할 때
-        val discounted = price - coupon.discountAmount(OrderContext(totalPrice = price, now = time))
+        val discounted = price - coupon.discountAmount(
+            OrderContext(
+                totalPrice = price, now = time,
+                items = emptyList(),
+                shippingFee = 3000,
+            ),
+        ).couponDiscountPrice
 
         // then: 할인을 적용할 수 없다
         assertThat(discounted).isEqualTo(35000)
@@ -193,7 +221,9 @@ class CouponTest {
             totalPrice = 100_000,
             items = listOf(cartContent),
             now = LocalTime.of(5, 30),
+            shippingFee = 3000,
         )
+
         val coupons = listOf(
             FixedDiscountCoupon(expirationDate = expiredDate),
             BuyXGetYCoupon(

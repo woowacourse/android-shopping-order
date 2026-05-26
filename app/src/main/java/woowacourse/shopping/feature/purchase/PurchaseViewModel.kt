@@ -115,50 +115,25 @@ class PurchaseViewModel(
     }
 
     fun couponDiscount(coupon: Coupon) {
-        var couponDiscountPrice = 0
-        var shippingPrice = 3000
-        var totalDiscountedPrice: Int = uiState.value.originalPrice + shippingPrice
-        when (coupon) {
-            is BuyXGetYCoupon -> {
-                couponDiscountPrice = coupon.discountAmount(
-                    OrderContext(
-                        items = cartContents,
-                    ),
-                )
-                totalDiscountedPrice -= couponDiscountPrice
-            }
+        val originalPrice = uiState.value.originalPrice
+        val baseShippingPrice = 3000
 
-            is FixedDiscountCoupon -> {
-                couponDiscountPrice = coupon.discountAmount(
-                    OrderContext(
-                        totalPrice = totalDiscountedPrice,
-                    ),
-                )
-                totalDiscountedPrice -= couponDiscountPrice
-            }
+        val discount = coupon.discountAmount(
+            OrderContext(
+                totalPrice = originalPrice,
+                items = cartContents,
+                shippingFee = baseShippingPrice,
+                now = LocalTime.now(),
+            ),
+        )
 
-            is FreeShippingCoupon -> {
-                shippingPrice = coupon.discountAmount(
-                    OrderContext(
-                        totalPrice = totalDiscountedPrice,
-                    ),
-                )
-                totalDiscountedPrice -= shippingPrice
-            }
+        val shippingPrice = baseShippingPrice - discount.shippingDiscountPrice
+        val totalDiscountedPrice =
+            originalPrice + shippingPrice - discount.couponDiscountPrice
 
-            is PercentageCoupon -> {
-                couponDiscountPrice = coupon.discountAmount(
-                    OrderContext(
-                        totalPrice = totalDiscountedPrice,
-                        now = LocalTime.now(),
-                    ),
-                )
-                totalDiscountedPrice -= couponDiscountPrice
-            }
-        }
         _uiState.update {
             it.copy(
-                couponDiscountPrice = couponDiscountPrice,
+                couponDiscountPrice = discount.couponDiscountPrice,
                 shippingPrice = shippingPrice,
                 totalDiscountedPrice = totalDiscountedPrice,
             )
