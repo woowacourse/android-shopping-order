@@ -1,6 +1,8 @@
 package woowacourse.shopping.ui.setting
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,10 +17,20 @@ class SettingViewModel(
     private val _uiState =
         MutableStateFlow(
             SettingUiState(
-                isUnpaidNotificationEnabled = notificationSettingRepository.isUnpaidNotificationEnabled(),
+                isUnpaidNotificationEnabled = notificationSettingRepository.unpaidNotificationEnabled.value,
             ),
         )
     val uiState: StateFlow<SettingUiState> = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            notificationSettingRepository.unpaidNotificationEnabled.collect { isEnabled ->
+                _uiState.update { currentState ->
+                    currentState.copy(isUnpaidNotificationEnabled = isEnabled)
+                }
+            }
+        }
+    }
 
     fun setUnpaidNotificationEnabled(isEnabled: Boolean) {
         notificationSettingRepository.setUnpaidNotificationEnabled(isEnabled)

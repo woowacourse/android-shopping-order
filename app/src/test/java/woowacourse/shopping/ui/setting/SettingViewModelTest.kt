@@ -2,6 +2,7 @@
 
 package woowacourse.shopping.ui.setting
 
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.repository.NotificationSettingRepository
@@ -31,10 +32,13 @@ class SettingViewModelTest {
     private class FakeNotificationSettingRepository(
         private var isEnabled: Boolean,
     ) : NotificationSettingRepository {
+        override val unpaidNotificationEnabled = MutableStateFlow(isEnabled)
+
         override fun isUnpaidNotificationEnabled(): Boolean = isEnabled
 
         override fun setUnpaidNotificationEnabled(isEnabled: Boolean) {
             this.isEnabled = isEnabled
+            unpaidNotificationEnabled.value = isEnabled
         }
     }
 }

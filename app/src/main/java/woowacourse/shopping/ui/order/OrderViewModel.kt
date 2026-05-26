@@ -16,6 +16,7 @@ import woowacourse.shopping.domain.model.cart.SelectedCartOrder
 import woowacourse.shopping.data.remote.common.NetworkMonitor
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.NotificationSettingRepository
 import woowacourse.shopping.domain.repository.PendingOrderRepository
 import woowacourse.shopping.di.ShoppingRepositoryProvider
 import java.time.Clock
@@ -29,10 +30,17 @@ class OrderViewModel(
     private val cartRepository: CartRepository = ShoppingRepositoryProvider.cartRepository,
     private val couponRepository: CouponRepository = ShoppingRepositoryProvider.couponRepository,
     private val pendingOrderRepository: PendingOrderRepository = ShoppingRepositoryProvider.pendingOrderRepository,
+    private val notificationSettingRepository: NotificationSettingRepository =
+        ShoppingRepositoryProvider.notificationSettingRepository,
     private val networkMonitor: NetworkMonitor = ShoppingRepositoryProvider.networkMonitor,
     private val clock: Clock = Clock.systemDefaultZone(),
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(OrderUiState())
+    private val _uiState =
+        MutableStateFlow(
+            OrderUiState(
+                isReminderEnabled = notificationSettingRepository.unpaidNotificationEnabled.value,
+            ),
+        )
     val uiState: StateFlow<OrderUiState> = _uiState.asStateFlow()
 
     private val _events =
@@ -48,6 +56,7 @@ class OrderViewModel(
 
     init {
         observeNetworkState()
+        observeReminderSetting()
     }
 
     fun startOrder(selectedCartOrder: SelectedCartOrder) {
@@ -143,6 +152,16 @@ class OrderViewModel(
             networkMonitor.isNetworkConnected.collect { isConnected ->
                 _uiState.update { currentState ->
                     currentState.copy(isNetworkConnected = isConnected)
+                }
+            }
+        }
+    }
+
+    private fun observeReminderSetting() {
+        viewModelScope.launch {
+            notificationSettingRepository.unpaidNotificationEnabled.collect { isEnabled ->
+                _uiState.update { currentState ->
+                    currentState.copy(isReminderEnabled = isEnabled)
                 }
             }
         }

@@ -30,6 +30,7 @@ import woowacourse.shopping.data.remote.common.NetworkMonitor
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.repository.CartRepositoryFixture
 import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.NotificationSettingRepository
 import woowacourse.shopping.domain.repository.PendingOrderRepository
 import woowacourse.shopping.domain.repository.query.CartPageResult
 import java.time.Clock
@@ -43,6 +44,7 @@ class OrderViewModelTest {
     private lateinit var cartRepository: RecordingCartRepository
     private lateinit var couponRepository: FakeCouponRepository
     private lateinit var pendingOrderRepository: FakePendingOrderRepository
+    private lateinit var notificationSettingRepository: FakeNotificationSettingRepository
     private lateinit var viewModel: OrderViewModel
 
     private val shrimpCracker = CartRepositoryFixture.shrimpCracker
@@ -55,6 +57,7 @@ class OrderViewModelTest {
 
         cartRepository = RecordingCartRepository()
         pendingOrderRepository = FakePendingOrderRepository()
+        notificationSettingRepository = FakeNotificationSettingRepository(isEnabled = false)
         couponRepository =
             FakeCouponRepository(
                 coupons =
@@ -112,6 +115,7 @@ class OrderViewModelTest {
                 cartRepository = cartRepository,
                 couponRepository = couponRepository,
                 pendingOrderRepository = pendingOrderRepository,
+                notificationSettingRepository = notificationSettingRepository,
                 networkMonitor = FakeNetworkMonitor(),
                 clock = Clock.fixed(Instant.parse("2026-05-22T05:00:00Z"), ZoneId.of("UTC")),
             )
@@ -375,6 +379,15 @@ class OrderViewModelTest {
         assertEquals(false, viewModel.uiState.value.hasPendingOrder)
     }
 
+    @Test
+    fun `미결제 알림 설정이 바뀌면 주문 화면 상태도 함께 갱신된다`() =
+        runTest(dispatcher.scheduler) {
+            notificationSettingRepository.setUnpaidNotificationEnabled(true)
+            advanceUntilIdle()
+
+            assertEquals(true, viewModel.uiState.value.isReminderEnabled)
+        }
+
     private class FakeNetworkMonitor : NetworkMonitor {
         override val isNetworkConnected = MutableStateFlow(true)
     }
@@ -412,6 +425,19 @@ class OrderViewModelTest {
 
         override fun clearPendingOrder() {
             pendingOrder = null
+        }
+    }
+
+    private class FakeNotificationSettingRepository(
+        private var isEnabled: Boolean,
+    ) : NotificationSettingRepository {
+        override val unpaidNotificationEnabled = MutableStateFlow(isEnabled)
+
+        override fun isUnpaidNotificationEnabled(): Boolean = isEnabled
+
+        override fun setUnpaidNotificationEnabled(isEnabled: Boolean) {
+            this.isEnabled = isEnabled
+            unpaidNotificationEnabled.value = isEnabled
         }
     }
 

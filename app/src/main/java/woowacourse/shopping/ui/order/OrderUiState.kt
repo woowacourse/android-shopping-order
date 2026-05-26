@@ -6,6 +6,7 @@ data class OrderUiState(
     val isOrdering: Boolean = false,
     val isNetworkConnected: Boolean = true,
     val hasPendingOrder: Boolean = false,
+    val isReminderEnabled: Boolean = false,
 ) {
     val isPaymentEnabled: Boolean
         get() = hasPendingOrder && priceSummary.totalPaymentPrice > 0 && !isOrdering

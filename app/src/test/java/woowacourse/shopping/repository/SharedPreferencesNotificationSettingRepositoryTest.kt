@@ -22,6 +22,7 @@ class SharedPreferencesNotificationSettingRepositoryTest {
         repository.setUnpaidNotificationEnabled(true)
 
         assertEquals(true, repository.isUnpaidNotificationEnabled())
+        assertEquals(true, repository.unpaidNotificationEnabled.value)
     }
 
     @Test

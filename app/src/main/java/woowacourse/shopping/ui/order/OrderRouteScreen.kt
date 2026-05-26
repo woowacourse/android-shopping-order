@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import woowacourse.shopping.notification.AlarmManagerUnpaidOrderReminderScheduler
-import woowacourse.shopping.di.ShoppingRepositoryProvider
 
 @Composable
 fun OrderRouteScreen(
@@ -33,7 +32,6 @@ fun OrderRouteScreen(
     val context = LocalContext.current
     val uiState by orderViewModel.uiState.collectAsStateWithLifecycle()
     val reminderScheduler = remember(context) { AlarmManagerUnpaidOrderReminderScheduler(context.applicationContext) }
-    val isReminderEnabled = remember { ShoppingRepositoryProvider.notificationSettingRepository.isUnpaidNotificationEnabled() }
     val notificationPermissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
@@ -46,16 +44,16 @@ fun OrderRouteScreen(
         }
     }
 
-    LaunchedEffect(isReminderEnabled, uiState.hasPendingOrder) {
-        if (!isReminderEnabled || !uiState.hasPendingOrder) {
+    LaunchedEffect(uiState.isReminderEnabled, uiState.hasPendingOrder) {
+        if (!uiState.isReminderEnabled || !uiState.hasPendingOrder) {
             reminderScheduler.cancel()
             return@LaunchedEffect
         }
         reminderScheduler.schedule()
     }
 
-    LaunchedEffect(isReminderEnabled, uiState.hasPendingOrder) {
-        if (!isReminderEnabled || !uiState.hasPendingOrder) return@LaunchedEffect
+    LaunchedEffect(uiState.isReminderEnabled, uiState.hasPendingOrder) {
+        if (!uiState.isReminderEnabled || !uiState.hasPendingOrder) return@LaunchedEffect
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) {
