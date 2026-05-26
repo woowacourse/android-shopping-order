@@ -29,6 +29,6 @@ class BuyXGetYCoupon(
         val getMultiple = target.quantity / (buyQuantity + getQuantity)
 
         val highestDiscountPrice = highestPrice * getMultiple * getQuantity
-        return DiscountResult(couponDiscountPrice = highestDiscountPrice)
+        return DiscountResult(couponDiscountPrice = highestDiscountPrice, shippingDiscountPrice = context.shippingFee)
     }
 }

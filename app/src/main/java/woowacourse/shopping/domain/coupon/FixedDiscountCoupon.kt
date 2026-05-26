@@ -15,5 +15,6 @@ class FixedDiscountCoupon(
         return context.totalPrice >= minimumPrice
     }
 
-    override fun discountAmount(context: OrderContext) = DiscountResult(if (isApplicable(context)) discountPrice else 0)
+    override fun discountAmount(context: OrderContext) =
+        DiscountResult(if (isApplicable(context)) discountPrice else 0, shippingDiscountPrice = context.shippingFee)
 }

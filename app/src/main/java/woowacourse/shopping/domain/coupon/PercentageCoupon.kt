@@ -21,6 +21,9 @@ class PercentageCoupon(
 
     override fun discountAmount(context: OrderContext): DiscountResult {
         if (!isApplicable(context)) return DiscountResult()
-        return DiscountResult(couponDiscountPrice = (context.totalPrice * discountRate).toInt())
+        return DiscountResult(
+            couponDiscountPrice = (context.totalPrice * discountRate).toInt(),
+            shippingDiscountPrice = context.shippingFee,
+        )
     }
 }
