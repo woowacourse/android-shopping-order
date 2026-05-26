@@ -1,6 +1,6 @@
 package woowacourse.shopping.ui.shopping
 
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.domain.model.product.Product
 
 data class ShoppingProductUiState(
     val product: Product,

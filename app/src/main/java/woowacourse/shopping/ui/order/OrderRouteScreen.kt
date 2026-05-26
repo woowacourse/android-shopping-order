@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import woowacourse.shopping.notification.AlarmManagerUnpaidOrderReminderScheduler
-import woowacourse.shopping.repository.ShoppingRepositoryProvider
+import woowacourse.shopping.di.ShoppingRepositoryProvider
 
 @Composable
 fun OrderRouteScreen(

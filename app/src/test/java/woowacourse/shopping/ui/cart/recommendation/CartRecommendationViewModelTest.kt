@@ -18,18 +18,18 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.model.CartItem
-import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.SelectedCartOrder
-import woowacourse.shopping.model.SelectedCartOrderItem
-import woowacourse.shopping.network.NetworkMonitor
-import woowacourse.shopping.repository.CartRepository
+import woowacourse.shopping.domain.model.cart.CartItem
+import woowacourse.shopping.domain.model.common.Money
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.cart.SelectedCartOrder
+import woowacourse.shopping.domain.model.cart.SelectedCartOrderItem
+import woowacourse.shopping.data.remote.common.NetworkMonitor
+import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.repository.FakeProductRepository
 import woowacourse.shopping.repository.FakeRecentProductRepository
 import woowacourse.shopping.repository.ProductRepositoryFixture
-import woowacourse.shopping.repository.query.CartPageItem
-import woowacourse.shopping.repository.query.CartPageResult
+import woowacourse.shopping.domain.repository.query.CartPageItem
+import woowacourse.shopping.domain.repository.query.CartPageResult
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CartRecommendationViewModelTest {

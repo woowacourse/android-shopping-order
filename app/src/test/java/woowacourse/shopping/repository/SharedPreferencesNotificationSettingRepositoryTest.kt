@@ -5,7 +5,7 @@ package woowacourse.shopping.repository
 import android.content.SharedPreferences
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.repository.preference.SharedPreferencesNotificationSettingRepository
+import woowacourse.shopping.data.preference.SharedPreferencesNotificationSettingRepository
 
 class SharedPreferencesNotificationSettingRepositoryTest {
     @Test

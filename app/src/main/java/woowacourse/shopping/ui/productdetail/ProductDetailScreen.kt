@@ -11,7 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import woowacourse.shopping.R
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.ui.common.component.button.PrimaryActionButton
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
 import woowacourse.shopping.ui.common.component.recentlyviewed.LastViewedProductCard

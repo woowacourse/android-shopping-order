@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.ui.common.component.divider.SectionDivider
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
 import woowacourse.shopping.ui.common.component.recentlyviewed.RecentlyViewedSection

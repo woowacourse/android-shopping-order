@@ -9,7 +9,8 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.repository.CartRepository
 
 class CartRepositoryTest {
     private lateinit var repo: CartRepository
@@ -49,7 +50,7 @@ class CartRepositoryTest {
 
             val actual = repo.getCartItemsByProductIds(setOf(product1.id))
 
-            assertEquals(emptyList<woowacourse.shopping.model.CartItem>(), actual)
+            assertEquals(emptyList<woowacourse.shopping.domain.model.cart.CartItem>(), actual)
         }
 
     @Test
@@ -63,7 +64,7 @@ class CartRepositoryTest {
 
             val actual = repo.getCartItemsByProductIds(setOf(product1.id, product2.id))
 
-            assertEquals(emptyList<woowacourse.shopping.model.CartItem>(), actual)
+            assertEquals(emptyList<woowacourse.shopping.domain.model.cart.CartItem>(), actual)
         }
 
     @Test
@@ -73,7 +74,7 @@ class CartRepositoryTest {
 
             val actual = repo.getCartPage(page = repo.count() + 1, size = 20)
 
-            assertEquals(emptyList<woowacourse.shopping.repository.query.CartPageItem>(), actual.items)
+            assertEquals(emptyList<woowacourse.shopping.domain.repository.query.CartPageItem>(), actual.items)
         }
 
     @Test

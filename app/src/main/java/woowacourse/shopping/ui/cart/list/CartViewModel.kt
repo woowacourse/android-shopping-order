@@ -10,12 +10,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import woowacourse.shopping.model.SelectedCartOrder
-import woowacourse.shopping.model.SelectedCartOrderItem
-import woowacourse.shopping.network.NetworkMonitor
-import woowacourse.shopping.repository.CartRepository
-import woowacourse.shopping.repository.ProductRepository
-import woowacourse.shopping.repository.ShoppingRepositoryProvider
+import woowacourse.shopping.domain.model.cart.SelectedCartOrder
+import woowacourse.shopping.domain.model.cart.SelectedCartOrderItem
+import woowacourse.shopping.data.remote.common.NetworkMonitor
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.di.ShoppingRepositoryProvider
 import woowacourse.shopping.ui.cart.list.uistate.CartItemUiModelMapper
 import woowacourse.shopping.ui.cart.list.uistate.CartListUiState
 import woowacourse.shopping.ui.cart.list.uistate.CartUiState
@@ -176,7 +176,7 @@ class CartViewModel(
 
     private fun shouldMoveToPreviousPage(
         requestedPage: Int,
-        cartPageResult: woowacourse.shopping.repository.query.CartPageResult,
+        cartPageResult: woowacourse.shopping.domain.repository.query.CartPageResult,
     ): Boolean =
         requestedPage > 1 && cartPageResult.totalPages > 0 && cartPageResult.items.isEmpty() && requestedPage > cartPageResult.totalPages
 

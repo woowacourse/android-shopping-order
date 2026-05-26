@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.common.recentlyviewed
 
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.RecentProduct
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.recentproduct.RecentProduct
 
 object RecentViewedProductsMapper {
     fun toProducts(

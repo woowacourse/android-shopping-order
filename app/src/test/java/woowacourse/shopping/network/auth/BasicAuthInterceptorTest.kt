@@ -1,4 +1,4 @@
-package woowacourse.shopping.network.auth
+package woowacourse.shopping.data.remote.auth
 
 import okhttp3.OkHttpClient
 import okhttp3.Request

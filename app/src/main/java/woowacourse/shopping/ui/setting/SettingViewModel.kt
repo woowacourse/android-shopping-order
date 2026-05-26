@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import woowacourse.shopping.repository.NotificationSettingRepository
-import woowacourse.shopping.repository.ShoppingRepositoryProvider
+import woowacourse.shopping.domain.repository.NotificationSettingRepository
+import woowacourse.shopping.di.ShoppingRepositoryProvider
 
 class SettingViewModel(
     private val notificationSettingRepository: NotificationSettingRepository =

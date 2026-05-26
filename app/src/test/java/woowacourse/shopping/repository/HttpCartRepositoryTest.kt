@@ -12,20 +12,20 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import woowacourse.shopping.repository.http.cart.CartNetworkException
-import woowacourse.shopping.repository.http.cart.CartResponseException
-import woowacourse.shopping.repository.http.cart.HttpCartRepository
+import woowacourse.shopping.data.remote.cart.CartNetworkException
+import woowacourse.shopping.data.remote.cart.CartResponseException
+import woowacourse.shopping.data.repository.CartRepositoryImpl
 
-class HttpCartRepositoryTest {
+class CartRepositoryImplTest {
     private lateinit var mockWebServer: MockWebServer
-    private lateinit var repository: HttpCartRepository
+    private lateinit var repository: CartRepositoryImpl
 
     @BeforeEach
     fun setUp() {
         mockWebServer = MockWebServer()
         mockWebServer.start()
         repository =
-            HttpCartRepository(
+            CartRepositoryImpl(
                 client = OkHttpClient(),
                 baseUrl = mockWebServer.url("/").toString(),
             )
@@ -108,7 +108,7 @@ class HttpCartRepositoryTest {
         disconnectedServer.shutdown()
 
         val disconnectedRepository =
-            HttpCartRepository(
+            CartRepositoryImpl(
                 client = OkHttpClient(),
                 baseUrl = baseUrl,
             )

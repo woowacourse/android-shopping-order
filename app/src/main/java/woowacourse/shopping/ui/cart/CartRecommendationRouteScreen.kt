@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
-import woowacourse.shopping.model.SelectedCartOrder
+import woowacourse.shopping.domain.model.cart.SelectedCartOrder
 import woowacourse.shopping.ui.cart.list.CartViewModel
 import woowacourse.shopping.ui.cart.recommendation.CartRecommendationEvent
 import woowacourse.shopping.ui.cart.recommendation.CartRecommendationViewModel

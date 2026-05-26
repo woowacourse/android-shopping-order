@@ -12,26 +12,26 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import woowacourse.shopping.model.FreeShippingPolicy
-import woowacourse.shopping.model.OrderFixedAmountDiscountPolicy
-import woowacourse.shopping.model.OrderPercentageDiscountPolicy
-import woowacourse.shopping.model.SameProductQuantityDiscountPolicy
-import woowacourse.shopping.repository.http.coupon.CouponNetworkException
-import woowacourse.shopping.repository.http.coupon.CouponParsingException
-import woowacourse.shopping.repository.http.coupon.CouponResponseException
-import woowacourse.shopping.repository.http.coupon.HttpCouponRepository
+import woowacourse.shopping.domain.model.coupon.FreeShippingPolicy
+import woowacourse.shopping.domain.model.coupon.OrderFixedAmountDiscountPolicy
+import woowacourse.shopping.domain.model.coupon.OrderPercentageDiscountPolicy
+import woowacourse.shopping.domain.model.coupon.SameProductQuantityDiscountPolicy
+import woowacourse.shopping.data.remote.coupon.CouponNetworkException
+import woowacourse.shopping.data.remote.coupon.CouponParsingException
+import woowacourse.shopping.data.remote.coupon.CouponResponseException
+import woowacourse.shopping.data.repository.CouponRepositoryImpl
 import java.time.LocalDate
 
-class HttpCouponRepositoryTest {
+class CouponRepositoryImplTest {
     private lateinit var mockWebServer: MockWebServer
-    private lateinit var repository: HttpCouponRepository
+    private lateinit var repository: CouponRepositoryImpl
 
     @BeforeEach
     fun setUp() {
         mockWebServer = MockWebServer()
         mockWebServer.start()
         repository =
-            HttpCouponRepository(
+            CouponRepositoryImpl(
                 client = OkHttpClient(),
                 baseUrl = mockWebServer.url("/").toString(),
             )
@@ -135,7 +135,7 @@ class HttpCouponRepositoryTest {
         disconnectedServer.shutdown()
 
         val disconnectedRepository =
-            HttpCouponRepository(
+            CouponRepositoryImpl(
                 client = OkHttpClient(),
                 baseUrl = baseUrl,
             )

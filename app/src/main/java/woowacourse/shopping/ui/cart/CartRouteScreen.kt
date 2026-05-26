@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
-import woowacourse.shopping.model.SelectedCartOrder
+import woowacourse.shopping.domain.model.cart.SelectedCartOrder
 import woowacourse.shopping.ui.cart.list.CartScreen
 import woowacourse.shopping.ui.cart.list.CartViewModel
 

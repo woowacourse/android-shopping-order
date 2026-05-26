@@ -9,7 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
-import woowacourse.shopping.repository.ShoppingRepositoryProvider
+import woowacourse.shopping.di.ShoppingRepositoryProvider
 import woowacourse.shopping.ui.cart.CartRecommendationRouteScreen
 import woowacourse.shopping.ui.cart.CartRouteScreen
 import woowacourse.shopping.ui.cart.list.CartViewModel

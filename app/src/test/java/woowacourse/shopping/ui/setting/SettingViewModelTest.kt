@@ -4,7 +4,7 @@ package woowacourse.shopping.ui.setting
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.repository.NotificationSettingRepository
+import woowacourse.shopping.domain.repository.NotificationSettingRepository
 
 class SettingViewModelTest {
     @Test

@@ -12,8 +12,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import woowacourse.shopping.R
-import woowacourse.shopping.repository.preference.SharedPreferencesNotificationSettingRepository
-import woowacourse.shopping.repository.preference.SharedPreferencesPendingOrderRepository
+import woowacourse.shopping.data.preference.SharedPreferencesNotificationSettingRepository
+import woowacourse.shopping.data.preference.SharedPreferencesPendingOrderRepository
 import woowacourse.shopping.ui.shopping.ShoppingActivity
 
 private const val REMINDER_REQUEST_CODE = 1001

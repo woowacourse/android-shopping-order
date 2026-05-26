@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.network.NetworkMonitor
-import woowacourse.shopping.repository.CartRepository
-import woowacourse.shopping.repository.ProductRepository
-import woowacourse.shopping.repository.RecentProductRepository
-import woowacourse.shopping.repository.ShoppingRepositoryProvider
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.data.remote.common.NetworkMonitor
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.di.ShoppingRepositoryProvider
 import woowacourse.shopping.ui.common.recentlyviewed.RecentViewedProductsMapper
 
 private const val PAGE_SIZE = 20
@@ -146,7 +146,7 @@ class ShoppingViewModel(
                 )
             }
 
-    private suspend fun createCartState(visibleProducts: List<woowacourse.shopping.model.Product>): ShoppingCartState {
+    private suspend fun createCartState(visibleProducts: List<woowacourse.shopping.domain.model.product.Product>): ShoppingCartState {
         val cartQuantity = getCartTotalQuantity()
         val visibleCartItems = cartRepository.getCartItemsByProductIds(visibleProducts.map { it.id }.toSet())
         val quantityByProductId = visibleCartItems.associate { it.productId to it.quantity }
