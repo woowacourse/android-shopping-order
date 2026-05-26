@@ -13,10 +13,10 @@ class PercentageCoupon(
     override val description: String = "",
 ) : Coupon {
     override fun isApplicable(context: OrderContext): Boolean {
-        if (LocalDate.now().isAfter(expirationDate)) return false
-        val now = context.now
+        if (context.now.toLocalDate().isAfter(expirationDate)) return false
+        val time = context.now.toLocalTime()
 
-        return now.isAfter(startTime) && now.isBefore(endTime)
+        return time.isAfter(startTime) && time.isBefore(endTime)
     }
 
     override fun discountAmount(context: OrderContext): DiscountResult {

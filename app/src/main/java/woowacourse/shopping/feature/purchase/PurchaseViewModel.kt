@@ -8,7 +8,6 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.toRoute
 import java.time.LocalDateTime
-import java.time.LocalTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -123,7 +122,7 @@ class PurchaseViewModel(
                 totalPrice = originalPrice,
                 items = cartContents,
                 shippingFee = PurchaseConfig.SHIPPING_PRICE,
-                now = LocalTime.now(),
+                now = LocalDateTime.now(),
             ),
         )
 

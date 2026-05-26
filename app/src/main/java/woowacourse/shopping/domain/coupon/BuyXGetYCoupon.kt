@@ -11,7 +11,7 @@ class BuyXGetYCoupon(
     val getQuantity: Int,
 ) : Coupon {
     override fun isApplicable(context: OrderContext): Boolean {
-        if (LocalDate.now().isAfter(expirationDate)) return false
+        if (context.now.toLocalDate().isAfter(expirationDate)) return false
         val cartContents = context.items
 
         return cartContents.any { it.quantity >= buyQuantity + getQuantity }

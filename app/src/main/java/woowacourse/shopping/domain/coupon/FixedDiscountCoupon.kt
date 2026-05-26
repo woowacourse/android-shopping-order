@@ -11,7 +11,7 @@ class FixedDiscountCoupon(
     val discountPrice: Int = 5_000,
 ) : Coupon {
     override fun isApplicable(context: OrderContext): Boolean {
-        if (LocalDate.now().isAfter(expirationDate)) return false
+        if (context.now.toLocalDate().isAfter(expirationDate)) return false
         return context.totalPrice >= minimumPrice
     }
 
