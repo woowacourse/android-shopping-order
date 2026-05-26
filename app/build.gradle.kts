@@ -73,21 +73,6 @@ android {
                 "BASE_URL",
                 asBuildConfigString(
                     readConfig(
-                        "DEBUG_BASE_URL",
-                        "",
-                    ),
-                ),
-            )
-        }
-        create("realDebug") {
-            initWith(getByName("debug"))
-            applicationIdSuffix = ".realdebug"
-            versionNameSuffix = "-realdebug"
-            buildConfigField(
-                "String",
-                "BASE_URL",
-                asBuildConfigString(
-                    readConfig(
                         "BASE_URL",
                         "",
                     ),
