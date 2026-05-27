@@ -87,26 +87,13 @@ fun CouponResponse.toDomainCoupon(): Coupon {
     }
 }
 
-private fun CouponResponse.isFixedAmountCoupon(): Boolean =
-    discountType.equals("fixed", ignoreCase = true) ||
-        discountType.equals("FIXED_AMOUNT", ignoreCase = true) ||
-        code.startsWith("FIXED")
+private fun CouponResponse.isFixedAmountCoupon(): Boolean = discountType == "fixed"
 
-private fun CouponResponse.isNplusMFreeCoupon(): Boolean =
-    discountType.equals("buyXgetY", ignoreCase = true) ||
-        discountType.equals("BUY_X_GET_Y", ignoreCase = true) ||
-        code == "BOGO"
+private fun CouponResponse.isNplusMFreeCoupon(): Boolean = discountType == "buyXgetY"
 
-private fun CouponResponse.isFreeShippingCoupon(): Boolean =
-    discountType.equals("freeShipping", ignoreCase = true) ||
-        discountType.equals("FREE_SHIPPING", ignoreCase = true) ||
-        code == "FREESHIPPING" ||
-        code.startsWith("FREESHIP")
+private fun CouponResponse.isFreeShippingCoupon(): Boolean = discountType == "freeShipping"
 
-private fun CouponResponse.isTimeBasedPercentCoupon(): Boolean =
-    discountType.equals("percentage", ignoreCase = true) ||
-        discountType.equals("TIME_BASED_PERCENT", ignoreCase = true) ||
-        code == "MIRACLESALE"
+private fun CouponResponse.isTimeBasedPercentCoupon(): Boolean = discountType == "percentage"
 
 private fun Int.toDiscountRate(): Double =
     if (this > 1) {
