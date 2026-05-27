@@ -10,7 +10,7 @@ class FakeProductRepository(
     var shouldFail: Boolean = false,
 ) : ProductRepository {
     override suspend fun getProducts(
-        offset: Int,
+        page: Int,
         limit: Int,
         category: String?,
     ): ProductsPage {
@@ -21,10 +21,11 @@ class FakeProductRepository(
             } else {
                 products.filter { it.category == category }
             }
-        if (offset >= filtered.size) return ProductsPage(emptyList(), isLast = true)
-        val toIndex = minOf(offset + limit, filtered.size)
+        val fromIndex = page * limit
+        if (fromIndex >= filtered.size) return ProductsPage(emptyList(), isLast = true)
+        val toIndex = minOf(fromIndex + limit, filtered.size)
         return ProductsPage(
-            products = filtered.subList(offset, toIndex),
+            products = filtered.subList(page, toIndex),
             isLast = toIndex >= filtered.size,
         )
     }

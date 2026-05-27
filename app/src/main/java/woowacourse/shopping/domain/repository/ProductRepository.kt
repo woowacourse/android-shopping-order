@@ -5,7 +5,7 @@ import woowacourse.shopping.domain.model.ProductsPage
 
 interface ProductRepository {
     suspend fun getProducts(
-        offset: Int,
+        page: Int,
         limit: Int,
         category: String? = null,
     ): ProductsPage

@@ -34,7 +34,8 @@ class ShoppingViewModel(
     val uiEvents = _uiEvents.asSharedFlow()
 
     private val exceptionHandler =
-        CoroutineExceptionHandler { _, _ ->
+        CoroutineExceptionHandler { _, err ->
+            println("DSDS:$err")
             viewModelScope.launch {
                 _uiEvents.emit(ShoppingEvent.ShowError("알 수 없는 오류가 발생했습니다."))
             }
@@ -44,7 +45,7 @@ class ShoppingViewModel(
 
     fun initialize() {
         viewModelScope.launch(exceptionHandler) {
-            if (uiState.value.offset == 0) loadMore()
+            if (uiState.value.page == 0) loadMore()
             loadRecentProducts(10)
         }
     }
@@ -109,15 +110,15 @@ class ShoppingViewModel(
     }
 
     private suspend fun getProductsPage(
-        offset: Int,
+        page: Int,
         limit: Int,
     ): ProductsPage =
         productRepository
-            .getProducts(offset, limit)
+            .getProducts(page, limit)
 
     private suspend fun loadNext() {
         if (uiState.value.isLoading) return
-        if (uiState.value.offset > 0 && !uiState.value.canLoadMore) return
+        if (uiState.value.page > 0 && !uiState.value.canLoadMore) return
         _uiState.update {
             it.copy(isLoading = true)
         }
@@ -125,7 +126,7 @@ class ShoppingViewModel(
         try {
             val loadData =
                 getProductsPage(
-                    offset = uiState.value.offset,
+                    page = uiState.value.page,
                     limit = pageSize,
                 )
             val newItems =
@@ -136,7 +137,7 @@ class ShoppingViewModel(
             _uiState.update {
                 it.copy(
                     products = it.products.plus(newItems),
-                    offset = it.offset + loadData.products.size,
+                    page = it.page + 1,
                     canLoadMore = !loadData.isLast,
                 )
             }

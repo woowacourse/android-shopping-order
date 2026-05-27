@@ -17,7 +17,7 @@ class GetRecommendProductsUseCase(
         val inCartProductIds = cartRepository.getCart().items.map { it.product.id }
         return productRepository
             .getProducts(
-                offset = 0,
+                page = 0,
                 limit = FETCH_SIZE,
                 category = recentProducts[0].category,
             ).products

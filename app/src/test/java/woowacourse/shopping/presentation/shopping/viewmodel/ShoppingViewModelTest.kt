@@ -41,24 +41,14 @@ class ShoppingViewModelTest {
     }
 
     @Test
-    fun `데이터를 불러올 때 제한된 개수의 상품 데이터를 불러온다`() =
+    fun `데이터를 처음 불러오고 나서 page는 1이 된다`() =
         runTest {
             viewModel.loadMore()
             advanceUntilIdle()
 
             val state = viewModel.uiState.value
             Assertions.assertThat(state.products.size).isEqualTo(20)
-            Assertions.assertThat(state.offset).isEqualTo(20)
-        }
-
-    @Test
-    fun `데이터를 처음 불러오고 나서 offset은 처음 불러온 데이터의 크기가 된다`() =
-        runTest {
-            viewModel.loadMore()
-            advanceUntilIdle()
-
-            val state = viewModel.uiState.value
-            Assertions.assertThat(state.offset).isEqualTo(20)
+            Assertions.assertThat(state.page).isEqualTo(1)
         }
 
     @Test

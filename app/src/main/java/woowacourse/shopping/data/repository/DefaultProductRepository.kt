@@ -10,12 +10,12 @@ class DefaultProductRepository(
     private val remoteDataSource: ProductRemoteDataSource,
 ) : ProductRepository {
     override suspend fun getProducts(
-        offset: Int,
+        page: Int,
         limit: Int,
         category: String?,
     ): ProductsPage =
         remoteDataSource
-            .fetchProducts(page = offset / limit, size = limit, category = category)
+            .fetchProducts(page = page, size = limit, category = category)
             .toDomain()
 
     override suspend fun getProductById(id: Long): Product = remoteDataSource.fetchProductById(id).toDomain()
