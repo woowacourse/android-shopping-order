@@ -2,15 +2,19 @@ package woowacourse.shopping.data.localdb.mapper
 
 import woowacourse.shopping.data.localdb.entity.RecentItemEntity
 import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.RecentItem
 
-fun RecentItemEntity.toDomain(product: Product): Product {
-    require(id == product.id) { "id가 일치하지 않습니다." }
+fun RecentItemEntity.toDomain(): RecentItem =
+    RecentItem(
+        productId = productId,
+        name = name,
+        imageUrl = imageUrl,
+    )
 
-    return product
-}
-
-fun Product.toEntity(timestamp: Long): RecentItemEntity =
+fun Product.toRecentItemEntity(timestamp: Long): RecentItemEntity =
     RecentItemEntity(
-        id = id,
+        productId = id,
+        name = getName(),
+        imageUrl = imageUrl,
         timestamp = timestamp,
     )

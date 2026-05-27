@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.detail
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,24 +24,77 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.ui.component.ProductAsyncImage
 import woowacourse.shopping.ui.component.QuantitySelector
 import woowacourse.shopping.ui.component.ShoppingAppBar
+import woowacourse.shopping.ui.model.ProductUiModel
 import woowacourse.shopping.ui.theme.Gray40
 import woowacourse.shopping.ui.theme.Green40
 import woowacourse.shopping.ui.util.formattedPrice
 
 @Composable
+fun DetailScreenRoute(
+    onNavigateToShopping: () -> Unit,
+    onNavigateBack: () -> Unit,
+    onRecentItemClick: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+    detailViewModel: DetailViewModel = viewModel(factory = DetailViewModel.Factory),
+) {
+    val context = LocalContext.current
+    val uiState by detailViewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(detailViewModel) {
+        detailViewModel.event.collect { event ->
+            when (event) {
+                DetailEvent.NavigateToShopping -> onNavigateToShopping()
+                DetailEvent.NavigateBack -> onNavigateBack()
+                DetailEvent.ShowProductNotFoundMessage -> {
+                    Toast.makeText(context, "상품을 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
+                }
+
+                DetailEvent.ShowProductLoadFailureMessage -> {
+                    Toast.makeText(context, "상품 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show()
+                }
+
+                DetailEvent.ShowAddCartFailureMessage -> {
+                    Toast.makeText(context, "장바구니에 상품을 담지 못했습니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    DetailScreen(
+        product = uiState.product,
+        quantity = uiState.quantity,
+        totalPrice = uiState.totalPrice,
+        recentItem = uiState.recentItem,
+        onCloseClick = onNavigateBack,
+        onQuantityChange = detailViewModel::updateQuantity,
+        onAddToCart = detailViewModel::addToCart,
+        onRecentItemClick = onRecentItemClick,
+        modifier = modifier,
+    )
+}
+
+@Composable
 fun DetailScreen(
-    uiState: DetailUiState,
+    product: ProductUiModel,
+    quantity: Int,
+    totalPrice: Long,
+    recentItem: ProductUiModel?,
     onCloseClick: () -> Unit,
     onQuantityChange: (Int) -> Unit,
     onAddToCart: () -> Unit,
@@ -86,21 +140,21 @@ fun DetailScreen(
         modifier = modifier.statusBarsPadding(),
     ) { innerPadding ->
         DetailContent(
-            imageUrl = uiState.product.imageUrl,
-            productName = uiState.product.name,
-            quantity = uiState.quantity,
-            totalPrice = uiState.totalPrice,
+            imageUrl = product.imageUrl,
+            productName = product.name,
+            quantity = quantity,
+            totalPrice = totalPrice,
             onQuantityChange = onQuantityChange,
             recentItem = {
-                if (uiState.recentItem != null) {
+                if (recentItem != null) {
                     RecentItemCard(
-                        name = uiState.recentItem.name,
+                        name = recentItem.name,
                         modifier =
                             Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 18.dp)
                                 .clickable {
-                                    onRecentItemClick(uiState.recentItem.id)
+                                    onRecentItemClick(recentItem.id)
                                 },
                     )
                     Spacer(modifier = Modifier.height(34.dp))
@@ -169,7 +223,17 @@ private fun DetailContent(
 @Composable
 private fun DetailScreenPreview() {
     DetailScreen(
-        uiState = DetailUiState(),
+        product =
+            ProductUiModel(
+                id = 1L,
+                name = "상품",
+                price = 1000,
+                imageUrl = "",
+                quantity = 1,
+            ),
+        quantity = 1,
+        totalPrice = 1000,
+        recentItem = null,
         onCloseClick = {},
         onQuantityChange = {},
         onRecentItemClick = {},

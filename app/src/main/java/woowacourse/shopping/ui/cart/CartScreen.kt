@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart
+﻿package woowacourse.shopping.ui.cart
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,21 +16,66 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import woowacourse.shopping.ui.component.ShoppingAppBar
 import woowacourse.shopping.ui.model.CartItemUiModel
 import woowacourse.shopping.ui.model.ProductUiModel
 
 @Composable
+fun CartScreenRoute(
+    cartViewModel: CartViewModel,
+    onBackClick: () -> Unit,
+    onOrderClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val uiState by cartViewModel.uiState.collectAsStateWithLifecycle()
+
+    CartScreen(
+        cartItems = uiState.items,
+        page = uiState.page,
+        isCanMoveNext = uiState.isCanMoveNext,
+        isLoading = uiState.isLoading,
+        totalCartQuantity = uiState.totalCartQuantity,
+        totalCartCount = uiState.totalCartCount,
+        totalPrice = uiState.totalPrice,
+        errorMessage = uiState.errorMessage,
+        isAllChecked = uiState.isAllChecked,
+        onBackClick = onBackClick,
+        onDeleteItem = cartViewModel::deleteItem,
+        onNextPage = cartViewModel::nextPage,
+        onPreviousPage = cartViewModel::previousPage,
+        onQuantityChange = cartViewModel::updateQuantity,
+        onCheckedChange = cartViewModel::checkItem,
+        isAllSelectClick = cartViewModel::isAllSelectClick,
+        onOrderClick = {
+            cartViewModel.loadRecommendProducts()
+            onOrderClick()
+        },
+        modifier = modifier,
+    )
+}
+
+@Composable
 fun CartScreen(
-    uiState: CartUiState,
+    cartItems: ImmutableList<CartItemUiModel>,
+    page: Int,
+    isCanMoveNext: Boolean,
+    isLoading: Boolean,
+    totalCartQuantity: Int,
+    totalCartCount: Long,
+    totalPrice: Long,
+    errorMessage: String?,
+    isAllChecked: Boolean,
     onBackClick: () -> Unit,
     onDeleteItem: (Long) -> Unit,
     onNextPage: () -> Unit,
@@ -67,52 +112,40 @@ fun CartScreen(
         },
         bottomBar = {
             CartBottomBar(
-                isOrder = uiState.isOrder,
-                isAllChecked = uiState.isAllChecked,
-                totalPrice = uiState.totalPrice,
-                totalCount = uiState.selectedCartItemCount,
+                isAllChecked = isAllChecked,
+                totalPrice = totalPrice,
+                totalCount = totalCartQuantity,
                 onAllCheckedChange = isAllSelectClick,
                 onOrderClick = onOrderClick,
             )
         },
         modifier = modifier.systemBarsPadding(),
     ) { innerPadding ->
-        if (uiState.isOrder) {
-            RecommendProductContent(
-                products = uiState.recommendProducts,
-                onQuantityChange = onQuantityChange,
-                modifier =
-                    Modifier
-                        .padding(innerPadding)
-                        .padding(start = 12.dp, end = 12.dp, top = 100.dp),
-            )
-        } else {
-            CartContent(
-                totalCartSize = uiState.totalCartCount,
-                page = uiState.page,
-                onNextPage = onNextPage,
-                onPreviousPage = onPreviousPage,
-                isCanMoveNext = uiState.isCanMoveNext,
-                onQuantityChange = onQuantityChange,
-                onDeleteItem = {
-                    onDeleteItem(it)
-                },
-                cartItems = uiState.items,
-                isLoading = uiState.isLoading,
-                errorMessage = uiState.errorMessage,
-                onCheckedChange = onCheckedChange,
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-            )
-        }
+        CartContent(
+            totalCartSize = totalCartCount,
+            page = page,
+            onNextPage = onNextPage,
+            onPreviousPage = onPreviousPage,
+            isCanMoveNext = isCanMoveNext,
+            onQuantityChange = onQuantityChange,
+            onDeleteItem = {
+                onDeleteItem(it)
+            },
+            cartItems = cartItems,
+            isLoading = isLoading,
+            errorMessage = errorMessage,
+            onCheckedChange = onCheckedChange,
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+        )
     }
 }
 
 @Composable
 private fun CartContent(
-    totalCartSize: Int,
+    totalCartSize: Long,
     page: Int,
     onNextPage: () -> Unit,
     onPreviousPage: () -> Unit,
@@ -153,7 +186,7 @@ private fun CartContent(
                 val product = item.product
                 CartCard(
                     productName = product.name,
-                    price = product.price,
+                    price = item.totalPrice,
                     imageUrl = product.imageUrl,
                     quantity = item.quantity,
                     onQuantityChange = { quantity ->
@@ -184,7 +217,15 @@ private fun CartContent(
 @Composable
 private fun CartScreenPreview() {
     CartScreen(
-        uiState = CartUiState(),
+        cartItems = persistentListOf(),
+        page = 0,
+        isCanMoveNext = false,
+        isLoading = false,
+        totalCartQuantity = 0,
+        totalCartCount = 0,
+        totalPrice = 0,
+        errorMessage = null,
+        isAllChecked = false,
         onBackClick = { },
         onDeleteItem = { },
         onNextPage = { },

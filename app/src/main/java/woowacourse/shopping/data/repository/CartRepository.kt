@@ -1,25 +1,31 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.model.Money
+import kotlinx.coroutines.flow.Flow
+import woowacourse.shopping.model.CartItem
 
 interface CartRepository {
     suspend fun getCartItemsByPage(
         page: Int,
         size: Int,
-    ): CartResponseResult
+    ): Result<CartResponseResult>
 
     suspend fun setCartItem(
         productId: Long,
         quantity: Int,
-    )
+    ): Result<Unit>
 
-    suspend fun deleteItem(cartItemId: Long)
+    suspend fun addCartItemQuantity(
+        productId: Long,
+        quantity: Int,
+    ): Result<Unit>
 
-    suspend fun getCartItemQuantity(productId: Long): Int?
+    suspend fun deleteItem(cartItemId: Long): Result<Unit>
 
-    suspend fun getTotalCartItemQuantity(): Int
+    suspend fun getTotalCartItemQuantity(): Result<Int>
 
-    suspend fun getCartItemsCount(): Int
+    suspend fun syncCartQuantity(): Result<Unit> = Result.success(Unit)
 
-    suspend fun getTotalPrice(cartIds: List<Long>): Money
+    fun getCartQuantityMap(): Flow<Map<Long, Int>>
+
+    suspend fun getAllCartItems(): Result<List<CartItem>>
 }

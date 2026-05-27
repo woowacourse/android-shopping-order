@@ -7,9 +7,7 @@ interface ProductRepository {
         category: String = "",
         page: Int,
         size: Int,
-    ): ProductResponseResult
+    ): Result<ProductResponseResult>
 
-    suspend fun getProductById(id: Long): Product
-
-    suspend fun getProductsByIds(ids: List<Long>): List<Product>
+    suspend fun getProductById(id: Long): Result<Product>
 }

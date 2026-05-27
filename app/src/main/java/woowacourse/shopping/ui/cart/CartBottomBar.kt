@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,13 +27,13 @@ import woowacourse.shopping.ui.util.formattedPrice
 
 @Composable
 fun CartBottomBar(
-    isOrder: Boolean,
     isAllChecked: Boolean,
     totalPrice: Long,
     totalCount: Int,
     onAllCheckedChange: () -> Unit,
     onOrderClick: () -> Unit,
     modifier: Modifier = Modifier,
+    showCheckBox: Boolean = true,
 ) {
     Row(
         modifier =
@@ -41,23 +42,29 @@ fun CartBottomBar(
                 .padding(start = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(2.dp),
+        Box(
+            modifier = Modifier.width(48.dp),
+            contentAlignment = Alignment.Center,
         ) {
-            if (!isOrder) {
-                CartCheckBox(
-                    onCheckedChange = {
-                        onAllCheckedChange()
-                    },
-                    isChecked = isAllChecked,
-                )
-                Text(
-                    text = "전체",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.White,
-                )
+            if (showCheckBox) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    CartCheckBox(
+                        onCheckedChange = {
+                            onAllCheckedChange()
+                        },
+                        isChecked = isAllChecked,
+                        modifier = Modifier.size(36.dp),
+                    )
+                    Text(
+                        text = "전체",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.White,
+                    )
+                }
             }
         }
 
@@ -95,7 +102,6 @@ fun CartBottomBar(
 @Composable
 private fun CartBottomBarPreview() {
     CartBottomBar(
-        isOrder = true,
         onAllCheckedChange = { },
         isAllChecked = true,
         totalPrice = 1000,

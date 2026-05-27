@@ -8,7 +8,7 @@ class CartTest {
     private val price = Money(10000)
     private val product =
         Product(
-            id = "1",
+            id = 1,
             name = ProductName("product"),
             price = price,
             imageUrl = "ds",
@@ -18,7 +18,7 @@ class CartTest {
     @Test
     fun `상품을 등록할 수 있다`() {
         val cart = Cart().addItem(product)
-        val product2 = createProduct(id = "2")
+        val product2 = createProduct(id = 2)
 
         assertThat(cart.getTotalSize()).isEqualTo(1)
         val newCart = cart.addItem(product2)
@@ -50,7 +50,7 @@ class CartTest {
         }.isInstanceOf(IllegalArgumentException::class.java)
     }
 
-    private fun createProduct(id: String): Product =
+    private fun createProduct(id: Long): Product =
         Product(
             id = id,
             name = ProductName("product$id"),

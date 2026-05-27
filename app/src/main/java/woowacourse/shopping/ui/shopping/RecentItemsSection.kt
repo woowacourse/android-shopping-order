@@ -24,11 +24,11 @@ import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import woowacourse.shopping.ui.component.ProductAsyncImage
-import woowacourse.shopping.ui.model.ProductUiModel
+import woowacourse.shopping.ui.model.RecentUiModel
 
 @Composable
 fun RecentItemsSection(
-    recentItems: ImmutableList<ProductUiModel>,
+    recentItems: ImmutableList<RecentUiModel>,
     onProductClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -59,7 +59,7 @@ fun RecentItemsSection(
 
 @Composable
 private fun RecentItemCard(
-    product: ProductUiModel,
+    product: RecentUiModel,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -97,9 +97,9 @@ private fun RecentItemsSectionPreview() {
     RecentItemsSection(
         recentItems =
             persistentListOf(
-                ProductUiModel(),
-                ProductUiModel(),
-                ProductUiModel(),
+                RecentUiModel(),
+                RecentUiModel(),
+                RecentUiModel(),
             ),
         onProductClick = {},
     )

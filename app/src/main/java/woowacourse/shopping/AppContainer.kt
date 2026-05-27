@@ -13,13 +13,21 @@ import woowacourse.shopping.data.localdb.ShoppingDB
 import woowacourse.shopping.data.remote.NetworkManager
 import woowacourse.shopping.data.remote.NetworkObserver
 import woowacourse.shopping.data.remote.api.CartApi
+import woowacourse.shopping.data.remote.api.CouponApi
+import woowacourse.shopping.data.remote.api.OrderApi
 import woowacourse.shopping.data.remote.api.ProductApi
 import woowacourse.shopping.data.repository.AuthRepository
+import woowacourse.shopping.data.repository.AuthRepositoryImpl
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.CouponRepository
+import woowacourse.shopping.data.repository.CouponRepositoryImpl
+import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.data.repository.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentItemRepository
+import woowacourse.shopping.data.repository.RecentItemRepositoryImpl
 
 class AppContainer(
     private val context: Context,
@@ -28,7 +36,7 @@ class AppContainer(
 
     val userDataStore = UserDataStore(context)
 
-    val authRepository = AuthRepository(userDataStore)
+    val authRepository: AuthRepository = AuthRepositoryImpl(userDataStore)
 
     val productRepository: ProductRepository by lazy {
         ProductRepositoryImpl(
@@ -37,11 +45,23 @@ class AppContainer(
     }
 
     val cartRepository: CartRepository by lazy {
-        CartRepositoryImpl(cartApi = retrofitService.create(CartApi::class.java))
+        CartRepositoryImpl(cartApi = retrofitService.create(CartApi::class.java), cartItemQuantityDao = database.cartItemQuantityDao())
+    }
+
+    val couponRepository: CouponRepository by lazy {
+        CouponRepositoryImpl(
+            couponApi = retrofitService.create(CouponApi::class.java),
+        )
+    }
+
+    val orderRepository: OrderRepository by lazy {
+        OrderRepositoryImpl(
+            orderApi = retrofitService.create(OrderApi::class.java),
+        )
     }
 
     val recentItemRepository: RecentItemRepository by lazy {
-        RecentItemRepository(database.recentItemDao())
+        RecentItemRepositoryImpl(database.recentItemDao())
     }
 
     val networkObserver: NetworkObserver by lazy {

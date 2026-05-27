@@ -4,17 +4,19 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import woowacourse.shopping.data.localdb.dao.CartItemQuantityDao
 import woowacourse.shopping.data.localdb.dao.RecentItemDao
-import woowacourse.shopping.data.localdb.entity.CartItemEntity
+import woowacourse.shopping.data.localdb.entity.CartItemQuantityEntity
 import woowacourse.shopping.data.localdb.entity.RecentItemEntity
-import kotlin.jvm.java
 
 @Database(
-    entities = [CartItemEntity::class, RecentItemEntity::class],
+    entities = [CartItemQuantityEntity::class, RecentItemEntity::class],
     version = 1,
 )
 abstract class ShoppingDB : RoomDatabase() {
     abstract fun recentItemDao(): RecentItemDao
+
+    abstract fun cartItemQuantityDao(): CartItemQuantityDao
 
     companion object {
         @Volatile

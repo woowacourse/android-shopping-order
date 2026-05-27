@@ -1,31 +1,51 @@
 # 기능 구현 사항
 
-## 1단계 구현 기능 사항
+## 4단계 구현 기능 사항
 
-## UI
-- [x] 상품 카드 스켈레톤 UI 컴포넌트 구현
-- [x] 카트 카드 스켈레톤 UI 컴포넌트 구현
+## Navigation
+- [x] Payment Screen에서 결제하기 버튼을 선택하면 최종 주문을 완료하고 Shopping Screen으로 이동한다
+- [x] 결제 미완료 알림을 선택하면 Payment Screen으로 이동한다
 
-## 데이터(서버)
-- [x] 서버와 연동한다.
-  - [x] 상품 목록을 조회할 수 있다.
-  - [x] 상품 상세를 조회할 수 있다.
-  - [x] 카트 정보를 조회할 수 있다.
-  - [x] 카트 아이템을 추가, 삭제, 변경 할 수 있다.
-- [x] 사용자 인증 정보를 저장한다.
+## Payment
+- [x] 장바구니에 담긴 상품을 최종 주문할 수 있다
+- [x] 배송비는 기본 3,000원으로 적용한다
+- [x] 결제 화면에서 적용 가능한 쿠폰 목록을 조회한다
+- [x] 쿠폰은 1개만 선택하여 적용할 수 있다
+- [x] 최종 주문이 완료되면 주문된 상품이 장바구니에서 초기화된다
 
-## 2단계 구현 기능 사항
+## Coupon
+- [x] 쿠폰 API를 통해 적용 가능한 쿠폰 목록을 조회한다
+- [x] `fixed` 쿠폰은 `discount` 금액만큼 할인한다
+- [x] `fixed` 쿠폰은 `minimumAmount` 조건을 만족할 때만 적용한다
+- [x] `buyXgetY` 쿠폰은 `buyQuantity`, `getQuantity` 값을 사용해 할인 금액을 계산한다
+- [x] `buyXgetY` 쿠폰은 동일 상품 수량이 `buyQuantity + getQuantity` 이상일 때만 적용한다
+- [x] `buyXgetY` 쿠폰 조건을 만족하는 상품이 여러 개인 경우 단가가 가장 비싼 상품에 적용한다
+- [x] `freeShipping` 쿠폰은 `minimumAmount` 조건을 만족할 때 배송비를 할인한다
+- [x] `percentage` 쿠폰은 `discount` 비율만큼 주문 금액을 할인한다
 
-## UI
-- [x] 카트 아이템에 체크 박스 추가
-- [x] 카트 하단 바 구현
-  - [x] 전체 선택 체크 박스가 있다.
-  - [x] 선택한 카트의 가격을 표시한다.
-  - [x] 주문하기 버튼이 있다.
-- [x] 상품 추천 화면을 구현한다.
-  - [x] 최근 본 상품을 기반으로 api를 요청하고, 최대 10개 추천 상품을 띄운다.
-- [x] 주문하기 버튼을 눌렀을 때 최근 본 상품이 있다면, 추천 화면으로 이동한다.
-  - [x] 최근 본 상품이 없다면, 다음 화면으로 이동한다. (지금은 없으므로, 기존 화면이 유지된다.)
+## Notification
+- [x] 설정에서 미결제 알림 기능을 On/Off 할 수 있다
+- [x] 앱을 재실행해도 미결제 알림 설정값을 유지한다
+- [x] 결제 화면에 진입하면 5분 후 미결제 알림을 예약한다
+- [x] 결제를 완료하면 예약된 미결제 알림을 취소한다
+- [x] 5분 안에 결제하지 않으면 아직 결제가 완료되지 않았어요 알림을 노출한다
+- [x] BroadcastReceiver로 알람을 수신하고 NotificationManager로 알림을 노출한다
+- [x] POST_NOTIFICATIONS 권한을 요청한다
+- [x] 알림 On/Off 설정은 SharedPreferences에 저장한다
 
-## 도메인
-- [x] 선택된 카트 아이템들의 총 가격을 계산할 수 있다.
+## 3단계 구현 기능 사항
+
+## Navigation
+- [x] Shopping Screen에서 카트 아이콘을 선택하면 Cart Screen으로 이동한다
+- [x] Shopping Screen에서 상품을 선택하면 Detail Screen으로 이동한다
+- [x] Shopping Screen에서 최근 본 상품을 선택하면 Detail Screen으로 이동한다
+- [x] Detail Screen에서 마지막으로 본 상품을 선택하면 해당 Detail Screen으로 이동한다
+- [x] Detail Screen에서 수량 설정 후 장바구니 담기 버튼을 선택하면 Shopping Screen으로 이동한다
+- [x] Cart Screen에서 주문하기를 선택하면 Recommend Screen으로 이동한다
+- [x] Recommend Screen에서 주문하기 버튼을 선택하면 Pay Screen으로 이동한다
+- [x] Pay Screen에서 결제하기 버튼을 선택하면 Shopping Screen으로 이동한다
+
+## Flow
+- [x] 장바구니 담기/삭제 등 단발성 이벤트는 Channel로 처리한다
+- [x] Shopping list의 Cart quantity를 위해 Flow<Map<Long, Int>>로 Flow로 처리한다
+- [x] 최근 본 상품을 Flow로 처리한다

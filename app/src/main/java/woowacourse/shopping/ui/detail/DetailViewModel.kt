@@ -1,7 +1,10 @@
-package woowacourse.shopping.ui.detail
+﻿package woowacourse.shopping.ui.detail
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -10,20 +13,23 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentItemRepository
 import woowacourse.shopping.ui.model.mapper.toUiModel
-import kotlin.coroutines.cancellation.CancellationException
+import woowacourse.shopping.ui.navigation.Detail
 
 class DetailViewModel(
-    private val id: Long,
-    private val hideRecentItem: Boolean,
+    savedStateHandle: SavedStateHandle,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentItemRepository: RecentItemRepository,
 ) : ViewModel() {
+    private val id: Long = savedStateHandle[Detail::productId.name] ?: 0L
+
     private val _uiState = MutableStateFlow(DetailUiState())
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
 
@@ -36,86 +42,73 @@ class DetailViewModel(
 
     private fun loadProduct() {
         viewModelScope.launch {
-            try {
-                val product = productRepository.getProductById(id)
-
-                val quantity = cartRepository.getCartItemQuantity(id) ?: 1
-
-                val lastViewedItem =
-                    if (hideRecentItem) {
-                        null
-                    } else {
-                        val lastViewedItemId = recentItemRepository.getLastViewedItemId()
+            productRepository
+                .getProductById(id)
+                .onSuccess { product ->
+                    val lastViewedItemId = recentItemRepository.getLastViewedItemId()
+                    val lastViewItem =
                         if (lastViewedItemId != null && lastViewedItemId != id) {
-                            runCatching { productRepository.getProductById(lastViewedItemId) }.getOrNull()
+                            productRepository.getProductById(lastViewedItemId).getOrNull()
                         } else {
                             null
                         }
+
+                    recentItemRepository.addRecentItem(product)
+                    _uiState.update {
+                        it.copy(
+                            product = product.toUiModel(),
+                            recentItem = lastViewItem?.toUiModel(),
+                            totalPrice = product.getPrice(),
+                        )
                     }
-
-                recentItemRepository.addRecentItemId(id)
-
-                _uiState.value =
-                    _uiState.value.copy(
-                        product = product.toUiModel(),
-                        quantity = quantity,
-                        recentItem = lastViewedItem?.takeIf { it.id != id }?.toUiModel(),
-                        totalPrice = product.getPrice() * quantity,
-                    )
-            } catch (e: CancellationException) {
-                throw e
-            } catch (_: IllegalArgumentException) {
-                _event.send(DetailEvent.ShowProductNotFoundMessage)
-                _event.send(DetailEvent.NavigateBack)
-            } catch (_: Exception) {
-                _event.send(DetailEvent.ShowProductLoadFailureMessage)
-                _event.send(DetailEvent.NavigateBack)
-            }
+                }.onFailure { e ->
+                    if (e is IllegalArgumentException) {
+                        _event.send(DetailEvent.ShowProductNotFoundMessage)
+                    } else {
+                        _event.send(DetailEvent.ShowProductLoadFailureMessage)
+                    }
+                    _event.send(DetailEvent.NavigateBack)
+                }
         }
     }
 
     fun updateQuantity(quantity: Int) {
         val nextQuantity = quantity.coerceAtLeast(1)
 
-        _uiState.value =
-            _uiState.value.copy(
+        _uiState.update {
+            it.copy(
                 quantity = nextQuantity,
-                totalPrice = _uiState.value.product.price * nextQuantity,
+                totalPrice = it.product.price * nextQuantity,
             )
+        }
     }
 
     fun addToCart() {
         viewModelScope.launch {
-            try {
-                val product = productRepository.getProductById(id)
-                cartRepository.setCartItem(product.id, _uiState.value.quantity)
-                _event.send(DetailEvent.NavigateToCart)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (_: IllegalArgumentException) {
-                _event.send(DetailEvent.ShowAddCartFailureMessage)
-            } catch (_: Exception) {
-                _event.send(DetailEvent.ShowAddCartFailureMessage)
-            }
+            cartRepository
+                .addCartItemQuantity(
+                    productId = id,
+                    quantity = _uiState.value.quantity,
+                ).onSuccess {
+                    _event.send(DetailEvent.NavigateToShopping)
+                }.onFailure {
+                    _event.send(DetailEvent.ShowAddCartFailureMessage)
+                }
         }
     }
 
     companion object {
-        fun provideFactory(
-            id: Long,
-            hideRecentItem: Boolean,
-            productRepository: ProductRepository,
-            cartRepository: CartRepository,
-            recentItemRepository: RecentItemRepository,
-        ): ViewModelProvider.Factory =
+        val Factory: ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
+                    val savedStateHandle = createSavedStateHandle()
+                    val appContainer = (this[APPLICATION_KEY] as ShoppingApplication).appContainer
+
                     DetailViewModel(
-                        id = id,
-                        hideRecentItem = hideRecentItem,
-                        productRepository = productRepository,
-                        cartRepository = cartRepository,
-                        recentItemRepository = recentItemRepository,
+                        savedStateHandle = savedStateHandle,
+                        productRepository = appContainer.productRepository,
+                        cartRepository = appContainer.cartRepository,
+                        recentItemRepository = appContainer.recentItemRepository,
                     )
                 }
             }

@@ -11,12 +11,18 @@ data class CartUiState(
     val isCanMoveNext: Boolean = false,
     val isLoading: Boolean = true,
     val totalCartQuantity: Int = 0,
-    val totalCartCount: Int = 0,
+    val totalCartCount: Long = 0,
     val totalPrice: Long = 0,
     val errorMessage: String? = null,
     val isAllChecked: Boolean = false,
-    val selectedCartItemCount: Int = 0,
-    val selectedCartItems: ImmutableList<Long> = persistentListOf(),
+    val selectedCartItems: Map<Long, SelectedCartItem> = emptyMap(),
     val isOrder: Boolean = false,
     val recommendProducts: ImmutableList<ProductUiModel> = persistentListOf(),
+    val isRecommendLoading: Boolean = false,
+    val recommendErrorMessage: String? = null,
+)
+
+data class SelectedCartItem(
+    val totalPrice: Long,
+    val quantity: Int,
 )
