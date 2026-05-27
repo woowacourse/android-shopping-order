@@ -6,5 +6,5 @@ data class PriceModifiers(
     val deliveryFee: Int,
 ) {
     val totalAmount: Long
-        get() = orderAmount + deliveryFee - discountAmount
+        get() = (orderAmount + deliveryFee - discountAmount).coerceAtLeast(0)
 }
