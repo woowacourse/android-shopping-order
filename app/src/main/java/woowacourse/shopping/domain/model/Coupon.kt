@@ -1,6 +1,5 @@
 package woowacourse.shopping.domain.model
 
-import androidx.compose.ui.Modifier.Companion.any
 import java.time.LocalDate
 import java.time.LocalDateTime
 
