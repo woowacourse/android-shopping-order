@@ -7,7 +7,8 @@ data class CartRecommendationUiState(
     val isRecommendedProductsLoading: Boolean = false,
     val pendingOrder: PendingOrderUiState = PendingOrderUiState(),
     val isApplying: Boolean = false,
-    val orderCompletedCount: Int = 0,
+    val productIdsToOrder: List<Long>? = null,
+    val quantitiesToOrder: List<Int>? = null,
     val errorMessage: String? = null,
     val isNetworkConnected: Boolean = true,
 )

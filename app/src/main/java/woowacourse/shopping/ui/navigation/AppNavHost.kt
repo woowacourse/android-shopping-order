@@ -210,9 +210,11 @@ fun AppNavHost(innerPadding: PaddingValues) {
 
             val uiState by recommendationViewModel.uiState.collectAsStateWithLifecycle()
 
-            LaunchedEffect(uiState.orderCompletedCount) {
-                if (uiState.orderCompletedCount > 0) {
-                    navController.navigate(Payment) {
+            LaunchedEffect(uiState.productIdsToOrder, uiState.quantitiesToOrder) {
+                val ids = uiState.productIdsToOrder
+                val quantities = uiState.quantitiesToOrder
+                if (ids != null && quantities != null) {
+                    navController.navigate(Payment(productIds = ids, quantities = quantities)) {
                         popUpTo<CartRecommendation> {
                             inclusive = true
                         }

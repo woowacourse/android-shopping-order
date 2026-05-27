@@ -7,19 +7,16 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.navigation.toRoute
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
-import woowacourse.shopping.repository.http.common.RemoteException
 import woowacourse.shopping.repository.query.CartPageItem
 import woowacourse.shopping.ui.navigation.CartRecommendation
 import woowacourse.shopping.ui.shopping.ShoppingProductUiState
@@ -40,13 +37,11 @@ class CartRecommendationViewModel(
     private val _uiState = MutableStateFlow(CartRecommendationUiState())
     val uiState: StateFlow<CartRecommendationUiState> = _uiState.asStateFlow()
 
-    private val recommendedSyncJobs = mutableMapOf<Long, Job>()
-    private val orderedProductIds = linkedSetOf<Long>()
+    private var initialCartProductIds: Set<Long>? = null
     private var excludedProductIds: Set<Long> = emptySet()
     private var baseOrderItemDataByProductId: Map<Long, OrderItemData> = emptyMap()
     private val recommendedOrderItemDataByProductId = linkedMapOf<Long, OrderItemData>()
     private var isSessionStarted = false
-    private var initialCartProductIds: Set<Long>? = null
 
     init {
         observeNetworkState()
@@ -86,9 +81,6 @@ class CartRecommendationViewModel(
                     .getOrDefault(emptyMap())
 
             excludedProductIds = productIds
-            orderedProductIds.clear()
-            orderedProductIds += excludedProductIds
-
             baseOrderItemDataByProductId =
                 selectedCartItems.associate { item ->
                     val price = productsById[item.productId]?.price?.value ?: 0
@@ -114,7 +106,6 @@ class CartRecommendationViewModel(
                             totalPrice = totalPrice,
                         ),
                     errorMessage = null,
-                    orderCompletedCount = 0,
                 )
             }
 
@@ -127,10 +118,17 @@ class CartRecommendationViewModel(
 
         viewModelScope.launch {
             val recommendedProducts = getRecommendedProducts()
+            val currentQuantities = _uiState.value.recommendedProducts.associate { it.product.id to it.quantity }
+
+            val updatedRecommendedProducts =
+                recommendedProducts.map { product ->
+                    val quantity = currentQuantities[product.product.id] ?: product.quantity
+                    product.copy(quantity = quantity)
+                }
 
             _uiState.update { currentState ->
                 currentState.copy(
-                    recommendedProducts = recommendedProducts,
+                    recommendedProducts = updatedRecommendedProducts,
                     isRecommendedProductsLoading = false,
                 )
             }
@@ -148,31 +146,39 @@ class CartRecommendationViewModel(
     }
 
     fun applyRecommendations() {
+        if (_uiState.value.isApplying) return
+
+        val itemData = buildOrderItemDataByProductId().filter { it.value.quantity > 0 }
+
+        if (itemData.isEmpty()) {
+            updateError("주문할 상품이 없습니다.")
+            return
+        }
+
         viewModelScope.launch {
-            if (_uiState.value.isApplying) return@launch
+            _uiState.update { it.copy(isApplying = true) }
 
-            _uiState.update {
-                it.copy(
-                    isApplying = true,
-                    errorMessage = null,
-                )
-            }
+            val recommendedProductIds =
+                _uiState.value.recommendedProducts
+                    .map { it.product.id }
+                    .toSet()
+            val recommendedItems = itemData.filter { it.key in recommendedProductIds }
 
-            for ((productId, orderData) in recommendedOrderItemDataByProductId) {
-                val result = cartRepository.setQuantity(productId, orderData.quantity)
-                if (result.isFailure) {
-                    updateError("추천 상품을 장바구니에 담을 수 없습니다.")
-                    return@launch
+            val allSuccess =
+                recommendedItems.all { (productId, data) ->
+                    cartRepository.setQuantity(productId, data.quantity).isSuccess
                 }
+
+            if (!allSuccess) {
+                updateError("장바구니 반영에 실패했습니다.")
+                return@launch
             }
 
-            orderedProductIds.clear()
-            recommendedOrderItemDataByProductId.clear()
             _uiState.update { currentState ->
                 currentState.copy(
-                    pendingOrder = PendingOrderUiState(),
+                    productIdsToOrder = itemData.keys.toList(),
+                    quantitiesToOrder = itemData.values.map { it.quantity },
                     isApplying = false,
-                    orderCompletedCount = currentState.orderCompletedCount + 1,
                 )
             }
         }
@@ -250,31 +256,24 @@ class CartRecommendationViewModel(
         productId: Long,
         delta: Int,
     ) {
-        val currentQuantity =
+        val currentProduct =
             _uiState.value.recommendedProducts
-                .firstOrNull { it.product.id == productId }
-                ?.quantity ?: return
+                .firstOrNull { it.product.id == productId } ?: return
+        val currentQuantity = currentProduct.quantity
         val targetQuantity = (currentQuantity + delta).coerceAtLeast(0)
         if (targetQuantity == currentQuantity) return
 
-        val productPrice =
-            _uiState.value.recommendedProducts
-                .firstOrNull { it.product.id == productId }
-                ?.product
-                ?.price
-                ?.value ?: return
+        val productPrice = currentProduct.product.price.value
 
         if (!updateRecommendedProductQuantity(productId, targetQuantity)) return
 
         if (targetQuantity > 0) {
-            orderedProductIds += productId
             recommendedOrderItemDataByProductId[productId] =
                 OrderItemData(
                     price = productPrice,
                     quantity = targetQuantity,
                 )
         } else {
-            orderedProductIds -= productId
             recommendedOrderItemDataByProductId.remove(productId)
         }
 
@@ -288,31 +287,23 @@ class CartRecommendationViewModel(
         targetQuantity: Int,
     ): Boolean {
         var changed = false
-        val updatedProducts =
-            _uiState.value.recommendedProducts.map { product ->
-                if (product.product.id != productId) return@map product
-                if (product.quantity == targetQuantity) return@map product
+        _uiState.update { currentState ->
+            val updatedProducts =
+                currentState.recommendedProducts.map { product ->
+                    if (product.product.id != productId) return@map product
+                    if (product.quantity == targetQuantity) return@map product
 
-                changed = true
-                product.copy(quantity = targetQuantity)
+                    changed = true
+                    product.copy(quantity = targetQuantity)
+                }
+
+            if (changed) {
+                currentState.copy(recommendedProducts = updatedProducts)
+            } else {
+                currentState
             }
-
-        if (!changed) return false
-
-        _uiState.update { currentState ->
-            currentState.copy(recommendedProducts = updatedProducts)
         }
-        return true
-    }
-
-    private suspend fun reloadRecommendedProducts() {
-        val recommendedProducts = getRecommendedProducts()
-        _uiState.update { currentState ->
-            currentState.copy(
-                recommendedProducts = recommendedProducts,
-                isRecommendedProductsLoading = false,
-            )
-        }
+        return changed
     }
 
     private suspend fun refreshPendingOrder() {
@@ -345,14 +336,6 @@ class CartRecommendationViewModel(
         itemDataByProductId.putAll(baseOrderItemDataByProductId)
         itemDataByProductId.putAll(recommendedOrderItemDataByProductId)
 
-        _uiState.value.recommendedProducts.forEach { product ->
-            itemDataByProductId[product.product.id] =
-                OrderItemData(
-                    price = product.product.price.value,
-                    quantity = product.quantity,
-                )
-        }
-
         return itemDataByProductId
     }
 
@@ -360,10 +343,6 @@ class CartRecommendationViewModel(
         resolveCartPageItems(productIds = null)
             .map { it.productId }
             .toSet()
-
-    private suspend fun awaitRecommendedSyncs() {
-        recommendedSyncJobs.values.toList().joinAll()
-    }
 
     private suspend fun resolveCartPageItems(productIds: Set<Long>?): List<CartPageItem> {
         if (productIds?.isEmpty() == true) return emptyList()
@@ -424,9 +403,3 @@ class CartRecommendationViewModelFactory : ViewModelProvider.Factory {
         ) as T
     }
 }
-
-private fun Throwable.toUserMessage(defaultMessage: String): String =
-    when (this) {
-        is RemoteException -> userMessage
-        else -> message ?: defaultMessage
-    }

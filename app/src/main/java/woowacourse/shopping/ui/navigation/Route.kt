@@ -22,4 +22,7 @@ data class CartRecommendation(
 )
 
 @Serializable
-object Payment
+data class Payment(
+    val productIds: List<Long> = emptyList(),
+    val quantities: List<Int> = emptyList(),
+)

@@ -1,8 +1,12 @@
 package woowacourse.shopping.ui.payment
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.navigation.toRoute
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,6 +21,7 @@ import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.CouponRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
+import woowacourse.shopping.ui.navigation.Payment
 import woowacourse.shopping.ui.payment.uistate.CouponUiModelMapper
 import woowacourse.shopping.ui.payment.uistate.PaymentUiState
 import java.text.NumberFormat
@@ -25,17 +30,28 @@ import java.time.LocalTime
 import java.util.Locale
 
 class PaymentViewModel(
+    savedStateHandle: SavedStateHandle,
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val couponRepository: CouponRepository,
     private val shippingPolicy: ShippingPolicy,
 ) : ViewModel() {
+    private val route: Payment = savedStateHandle.toRoute()
+    private val selectedProducts: List<SelectedProduct> =
+        route.productIds.zip(route.quantities) { id, quantity ->
+            SelectedProduct(id, quantity)
+        }
+
     private val _uiState = MutableStateFlow(PaymentUiState())
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
 
     private var orderItems: List<OrderItem> = emptyList()
-    private var cartItemIds: List<Long> = emptyList()
     private var coupons: List<Coupon> = emptyList()
+
+    private data class SelectedProduct(
+        val productId: Long,
+        val quantity: Int,
+    )
 
     init {
         loadOrderItems()
@@ -43,35 +59,27 @@ class PaymentViewModel(
     }
 
     private fun loadOrderItems() {
+        if (selectedProducts.isEmpty()) return
+
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            val cartCountResult = cartRepository.count()
-            val totalCount = cartCountResult.getOrDefault(0)
+            val productIds = selectedProducts.map { it.productId }.toSet()
 
-            cartRepository
-                .getCartPage(0, totalCount.coerceAtLeast(1))
-                .onSuccess { cartPage ->
-                    cartItemIds = cartPage.items.map { it.cartItemId }
-                    val productIds = cartPage.items.map { it.productId }.toSet()
-
-                    productRepository
-                        .findAllByIds(productIds)
-                        .onSuccess { productsMap ->
-                            orderItems =
-                                cartPage.items.mapNotNull { cartItem ->
-                                    val product = productsMap[cartItem.productId] ?: return@mapNotNull null
-                                    OrderItem(
-                                        productId = cartItem.productId,
-                                        price = product.price,
-                                        quantity = cartItem.quantity,
-                                    )
-                                }
-                            _uiState.update { it.copy(isLoading = false) }
-                            calculateAmounts()
-                        }.onFailure { throwable ->
-                            _uiState.update { it.copy(isLoading = false, errorMessage = throwable.message) }
+            productRepository
+                .findAllByIds(productIds)
+                .onSuccess { productsMap ->
+                    orderItems =
+                        selectedProducts.mapNotNull { selected ->
+                            val product = productsMap[selected.productId] ?: return@mapNotNull null
+                            OrderItem(
+                                productId = selected.productId,
+                                price = product.price,
+                                quantity = selected.quantity,
+                            )
                         }
+                    _uiState.update { it.copy(isLoading = false) }
+                    calculateAmounts()
                 }.onFailure { throwable ->
                     _uiState.update { it.copy(isLoading = false, errorMessage = throwable.message) }
                 }
@@ -81,13 +89,39 @@ class PaymentViewModel(
     fun pay() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            cartRepository
-                .createOrder(cartItemIds)
-                .onSuccess {
-                    _uiState.update { it.copy(isLoading = false, isOrderCompleted = true) }
-                }.onFailure { throwable ->
-                    _uiState.update { it.copy(isLoading = false, errorMessage = throwable.message) }
+
+            // Sync with cart first
+            val syncResults =
+                selectedProducts.map { selected ->
+                    cartRepository.setQuantity(selected.productId, selected.quantity)
                 }
+
+            if (syncResults.all { it.isSuccess }) {
+                val cartCountResult = cartRepository.count()
+                val totalCount = cartCountResult.getOrDefault(0)
+                val targetProductIds = selectedProducts.map { it.productId }.toSet()
+
+                cartRepository
+                    .getCartPage(0, totalCount.coerceAtLeast(1))
+                    .onSuccess { cartPage ->
+                        val cartItemIds =
+                            cartPage.items
+                                .filter { it.productId in targetProductIds }
+                                .map { it.cartItemId }
+
+                        cartRepository
+                            .createOrder(cartItemIds)
+                            .onSuccess {
+                                _uiState.update { it.copy(isLoading = false, isOrderCompleted = true) }
+                            }.onFailure { throwable ->
+                                _uiState.update { it.copy(isLoading = false, errorMessage = throwable.message) }
+                            }
+                    }.onFailure { throwable ->
+                        _uiState.update { it.copy(isLoading = false, errorMessage = throwable.message) }
+                    }
+            } else {
+                _uiState.update { it.copy(isLoading = false, errorMessage = "장바구니 동기화에 실패했습니다.") }
+            }
         }
     }
 
@@ -180,11 +214,18 @@ class PaymentViewModel(
 
 class PaymentViewModelFactory : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T =
-        PaymentViewModel(
+    override fun <T : ViewModel> create(
+        modelClass: Class<T>,
+        extras: CreationExtras,
+    ): T {
+        val savedStateHandle = extras.createSavedStateHandle()
+
+        return PaymentViewModel(
+            savedStateHandle = savedStateHandle,
             cartRepository = ShoppingRepositoryProvider.cartRepository,
             productRepository = ShoppingRepositoryProvider.productRepository,
             couponRepository = ShoppingRepositoryProvider.couponRepository,
             shippingPolicy = FixedShippingPolicy(),
         ) as T
+    }
 }
