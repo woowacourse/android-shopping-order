@@ -231,39 +231,44 @@ class CartViewModel(
         ) {
             return
         }
+
         viewModelScope.launch {
             if (_uiState.value.uiInfoState.isOrder) {
-                val selectedCartItemIds = _uiState.value.selectedCartState.selectedCartItems
-
-                if (selectedCartItemIds.isEmpty()) {
-                    _uiEvent.emit(CartUiEvent.ShowToastMessage("상품을 선택해주세요."))
-                    return@launch
-                }
-
-                _uiEvent.emit(CartUiEvent.NavToPayment(selectedCartItemIds))
+                navigateToPayment()
             } else {
-                _uiState.update {
-                    it.copy(
-                        uiInfoState =
-                            it.uiInfoState.copy(
-                                isOrder = true,
-                            ),
-                        recommendProducts =
-                            loadRecommendProducts()
-                                .filter { product ->
-                                    cartRepository.getCartItemQuantity(product.id) == null
-                                }.map { product ->
-                                    product
-                                        .toUiModel(
-                                            quantity =
-                                                cartRepository.getCartItemQuantity(
-                                                    product.id,
-                                                ),
-                                        )
-                                }.toImmutableList(),
-                    )
-                }
+                changeIsOrder()
             }
+        }
+    }
+
+    private suspend fun navigateToPayment() {
+        val selectedCartItemIds = _uiState.value.selectedCartState.selectedCartItems
+
+        if (selectedCartItemIds.isEmpty()) {
+            _uiEvent.emit(CartUiEvent.ShowToastMessage("상품을 선택해주세요."))
+            return
+        }
+
+        _uiEvent.emit(CartUiEvent.NavToPayment(selectedCartItemIds))
+    }
+
+    private suspend fun changeIsOrder() {
+        _uiState.update {
+            it.copy(
+                uiInfoState =
+                    it.uiInfoState.copy(
+                        isOrder = true,
+                    ),
+                recommendProducts =
+                    loadRecommendProducts()
+                        .filter { product ->
+                            cartRepository.getCartItemQuantity(product.id) == null
+                        }.map { product ->
+                            product.toUiModel(
+                                quantity = cartRepository.getCartItemQuantity(product.id),
+                            )
+                        }.toImmutableList(),
+            )
         }
     }
 
