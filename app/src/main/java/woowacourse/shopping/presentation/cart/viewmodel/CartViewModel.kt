@@ -62,9 +62,6 @@ class CartViewModel(
                 is RemoveItemResult.Error -> {
                     _uiEvents.emit(CartEvent.ShowError(result.message))
                 }
-                is RemoveItemResult.Cancel -> {
-                    _uiEvents.emit(CartEvent.ShowCancelReason(result.message))
-                }
             }
         }
     }

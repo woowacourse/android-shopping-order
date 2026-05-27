@@ -10,8 +10,4 @@ sealed class RemoveItemResult {
     data class Error(
         val message: String,
     ) : RemoveItemResult()
-
-    data class Cancel(
-        val message: String,
-    ) : RemoveItemResult()
 }

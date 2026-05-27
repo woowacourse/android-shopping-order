@@ -75,6 +75,8 @@ class DefaultCartRepository(
                 )
                 AddItemResult.Incremented(getCart())
             }
+        } catch (err: CancellationException) {
+            throw err
         } catch (err: Exception) {
             AddItemResult.Error("장바구니 담기에 실패했습니다.")
         }
@@ -86,7 +88,7 @@ class DefaultCartRepository(
             remoteDataSource.deleteItem(cartContent.id)
             RemoveItemResult.Success(getCart())
         } catch (err: CancellationException) {
-            RemoveItemResult.Cancel("상품 삭제를 취소했습니다.")
+            throw err
         } catch (err: Exception) {
             RemoveItemResult.Error("삭제에 실패했습니다. 다시 시도헤주세요.")
         }
@@ -102,6 +104,8 @@ class DefaultCartRepository(
                     ?: return UpdateItemResult.Error("상품을 찾을 수 없습니다.")
             remoteDataSource.changeQuantity(cartContent.id, amount)
             UpdateItemResult.Success(getCart())
+        } catch (err: CancellationException) {
+            throw err
         } catch (err: Exception) {
             UpdateItemResult.Error("수량 변경에 실패했습니다.")
         }
