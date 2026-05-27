@@ -16,7 +16,7 @@
 - [x] string.xml 내 인텐트 식별자 제거 및 object 파일 신설
 - [x] NavHost의 책임
 - [x] SettingViewModel 생성
-- [ ] Coupon 타입의 동작을 타입 내부에 내재화
+- [x] Coupon 타입의 동작을 타입 내부에 내재화
 
 ## 3단계 구현 기능 사항
 - [x] Compose Navigation으로 화면 전환

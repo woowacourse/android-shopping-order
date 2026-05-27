@@ -22,7 +22,6 @@ import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Coupon
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.PaymentPrice
-import woowacourse.shopping.model.calculate
 import java.io.IOException
 
 class PayViewModel(

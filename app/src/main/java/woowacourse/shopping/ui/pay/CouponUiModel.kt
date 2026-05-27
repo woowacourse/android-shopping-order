@@ -3,7 +3,6 @@ package woowacourse.shopping.ui.pay
 import woowacourse.shopping.model.AvailableTime
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Coupon
-import woowacourse.shopping.model.calculate
 import woowacourse.shopping.ui.util.formattedPrice
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
