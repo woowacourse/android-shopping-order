@@ -25,6 +25,7 @@ class ShoppingApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         CoroutineScope(Dispatchers.IO).launch {
+            userAuthDataStore.initializeDefaultUserAuth()
             userAuthDataStore.encodedUserAuthInfo.collect {
                 cachedAuthHeader = it
             }
