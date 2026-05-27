@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.notification
+package woowacourse.shopping.notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -11,6 +11,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
 import woowacourse.shopping.MainActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.notification.PaymentNotificationExtras.EXTRA_NAVIGATION_TARGET
+import woowacourse.shopping.notification.PaymentNotificationExtras.EXTRA_ORDER_AMOUNT
+import woowacourse.shopping.notification.PaymentNotificationExtras.EXTRA_ORDER_ITEMS_JSON
+import woowacourse.shopping.notification.PaymentNotificationExtras.TARGET_PAYMENT_SCREEN
 
 class PaymentNotificationReceiver : BroadcastReceiver() {
     override fun onReceive(
@@ -31,9 +35,9 @@ class PaymentNotificationReceiver : BroadcastReceiver() {
         val mainIntent =
             Intent(context, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                putExtra("NAVIGATION_TARGET", "PAYMENT_SCREEN")
-                putExtra("ORDER_ITEMS_JSON", orderItemsJson)
-                putExtra("ORDER_AMOUNT", orderAmount)
+                putExtra(EXTRA_NAVIGATION_TARGET, TARGET_PAYMENT_SCREEN)
+                putExtra(EXTRA_ORDER_ITEMS_JSON, orderItemsJson)
+                putExtra(EXTRA_ORDER_AMOUNT, orderAmount)
             }
 
         val pendingIntentFlags =
@@ -67,8 +71,5 @@ class PaymentNotificationReceiver : BroadcastReceiver() {
     companion object {
         private const val CHANNEL_ID = "payment_pending"
         private const val NOTIFICATION_ID = 1001
-
-        private const val EXTRA_ORDER_ITEMS_JSON = "extra_order_items_json"
-        private const val EXTRA_ORDER_AMOUNT = "extra_order_amount"
     }
 }

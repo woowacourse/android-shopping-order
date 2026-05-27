@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.notification
+package woowacourse.shopping.notification
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.content.getSystemService
 import woowacourse.shopping.domain.scheduler.PaymentNotificationScheduler
+import woowacourse.shopping.notification.PaymentNotificationExtras.EXTRA_ORDER_AMOUNT
+import woowacourse.shopping.notification.PaymentNotificationExtras.EXTRA_ORDER_ITEMS_JSON
 import kotlin.jvm.java
 
 class DefaultPaymentNotificationScheduler(
@@ -47,7 +49,5 @@ class DefaultPaymentNotificationScheduler(
     companion object {
         private const val DELAY_MS = 5 * 60 * 1000L
         private const val REQUEST_CODE = 2001
-        private const val EXTRA_ORDER_ITEMS_JSON = "extra_order_items_json"
-        private const val EXTRA_ORDER_AMOUNT = "extra_order_amount"
     }
 }

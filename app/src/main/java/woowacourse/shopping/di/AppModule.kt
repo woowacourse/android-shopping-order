@@ -2,7 +2,6 @@ package woowacourse.shopping.di
 
 import android.content.Context
 import androidx.room.Room
-import woowacourse.shopping.data.notification.DefaultPaymentNotificationScheduler
 import woowacourse.shopping.data.repository.DefaultCartRepository
 import woowacourse.shopping.data.repository.DefaultCouponRepository
 import woowacourse.shopping.data.repository.DefaultOrderRepository
@@ -33,6 +32,7 @@ import woowacourse.shopping.domain.usecase.GetLastSeenProductUseCase
 import woowacourse.shopping.domain.usecase.GetRecommendProductsUseCase
 import woowacourse.shopping.domain.usecase.PlaceOrderUseCase
 import woowacourse.shopping.domain.usecase.SetPaymentPushAlarmUseCase
+import woowacourse.shopping.notification.DefaultPaymentNotificationScheduler
 
 object AppModule {
     private lateinit var appContext: Context
