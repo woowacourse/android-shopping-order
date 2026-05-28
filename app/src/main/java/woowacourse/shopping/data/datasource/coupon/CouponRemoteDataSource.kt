@@ -11,6 +11,6 @@ class CouponRemoteDataSource(
         check(response.isSuccessful) { "coupons 요청 실패: ${response.code()}" }
 
         val body = response.body() ?: error("empty body")
-        return body.mapNotNull { it.toDomain() }
+        return body.map { it.toDomain() }
     }
 }
