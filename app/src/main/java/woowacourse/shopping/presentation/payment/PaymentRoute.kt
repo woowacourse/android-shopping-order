@@ -12,7 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import kotlinx.collections.immutable.toImmutableList
-import woowacourse.shopping.presentation.navigation.OrderItem
+import woowacourse.shopping.domain.model.OrderItem
 import woowacourse.shopping.presentation.navigation.ShoppingScreen
 import woowacourse.shopping.presentation.payment.ui.PaymentScreen
 import woowacourse.shopping.presentation.payment.viewmodel.PaymentEvent

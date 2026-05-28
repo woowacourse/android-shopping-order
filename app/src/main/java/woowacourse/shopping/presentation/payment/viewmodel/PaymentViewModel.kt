@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.AppModule
 import woowacourse.shopping.domain.model.Coupon
+import woowacourse.shopping.domain.model.OrderItem
 import woowacourse.shopping.domain.model.PaymentItems
 import woowacourse.shopping.domain.scheduler.PaymentNotificationScheduler
 import woowacourse.shopping.domain.usecase.BuildPaymentItemsUseCase
@@ -18,7 +19,6 @@ import woowacourse.shopping.domain.usecase.CalculateOrderPricingUseCase
 import woowacourse.shopping.domain.usecase.GetAvailableCouponsUseCase
 import woowacourse.shopping.domain.usecase.PlaceOrderUseCase
 import woowacourse.shopping.domain.usecase.SetPaymentPushAlarmUseCase
-import woowacourse.shopping.presentation.navigation.OrderItem
 import woowacourse.shopping.presentation.payment.model.PaymentUiState
 import woowacourse.shopping.presentation.payment.model.toUiModel
 

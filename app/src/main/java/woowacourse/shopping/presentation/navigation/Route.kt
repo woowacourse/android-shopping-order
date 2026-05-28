@@ -1,6 +1,7 @@
 package woowacourse.shopping.presentation.navigation
 
 import kotlinx.serialization.Serializable
+import woowacourse.shopping.domain.model.OrderItem
 
 @Serializable
 object ShoppingScreen

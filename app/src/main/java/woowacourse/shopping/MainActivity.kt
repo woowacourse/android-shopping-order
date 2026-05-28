@@ -5,12 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import kotlinx.serialization.json.Json
+import woowacourse.shopping.domain.model.OrderItem
 import woowacourse.shopping.notification.PaymentNotificationExtras.EXTRA_NAVIGATION_TARGET
 import woowacourse.shopping.notification.PaymentNotificationExtras.EXTRA_ORDER_AMOUNT
 import woowacourse.shopping.notification.PaymentNotificationExtras.EXTRA_ORDER_ITEMS_JSON
 import woowacourse.shopping.notification.PaymentNotificationExtras.TARGET_PAYMENT_SCREEN
 import woowacourse.shopping.presentation.navigation.AppNavHost
-import woowacourse.shopping.presentation.navigation.OrderItem
 import woowacourse.shopping.presentation.navigation.PaymentScreen
 
 class MainActivity : ComponentActivity() {

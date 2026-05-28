@@ -1,9 +1,9 @@
 package woowacourse.shopping.domain.usecase
 
 import kotlinx.serialization.json.Json
+import woowacourse.shopping.domain.model.OrderItem
 import woowacourse.shopping.domain.repository.SettingRepository
 import woowacourse.shopping.domain.scheduler.PaymentNotificationScheduler
-import woowacourse.shopping.presentation.navigation.OrderItem
 
 class SetPaymentPushAlarmUseCase(
     private val settingRepository: SettingRepository,

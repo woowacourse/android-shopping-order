@@ -2,17 +2,9 @@ package woowacourse.shopping.presentation.navigation
 
 import android.os.Bundle
 import androidx.navigation.NavType
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import woowacourse.shopping.domain.model.CartItem
-
-@Serializable
-data class OrderItem(
-    val cartItemId: Long,
-    val productId: Long,
-    val quantity: Int,
-)
+import woowacourse.shopping.domain.model.OrderItem
 
 fun CartItem.toParam() =
     OrderItem(

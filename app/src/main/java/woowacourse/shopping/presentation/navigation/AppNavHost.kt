@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import woowacourse.shopping.di.AppModule
+import woowacourse.shopping.domain.model.OrderItem
 import woowacourse.shopping.presentation.cart.CartRoute
 import woowacourse.shopping.presentation.detail.DetailRoute
 import woowacourse.shopping.presentation.payment.PaymentRoute
