@@ -95,4 +95,4 @@ private fun CouponResponse.isFreeShippingCoupon(): Boolean = discountType == "fr
 
 private fun CouponResponse.isTimeBasedPercentCoupon(): Boolean = discountType == "percentage"
 
-private fun Int.toDiscountRate(): Double = this / 100.0
+private fun Int.toDiscountRate(): Double = coerceAtLeast(0) / 100.0
