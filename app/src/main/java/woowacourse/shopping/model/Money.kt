@@ -16,5 +16,9 @@ value class Money(
 
     operator fun plus(money: Money): Money = Money(amount + money.amount)
 
-    operator fun minus(money: Money): Money = Money(amount - money.amount)
+    operator fun minus(money: Money): Money {
+        require(amount >= money.amount) { "기존 금액이 빼는 금액보다 커야합니다." }
+
+        return Money(amount - money.amount)
+    }
 }
