@@ -34,8 +34,7 @@ class ShoppingViewModel(
     val uiEvents = _uiEvents.asSharedFlow()
 
     private val exceptionHandler =
-        CoroutineExceptionHandler { _, err ->
-            println("DSDS:$err")
+        CoroutineExceptionHandler { _, _ ->
             viewModelScope.launch {
                 _uiEvents.emit(ShoppingEvent.ShowError("알 수 없는 오류가 발생했습니다."))
             }
