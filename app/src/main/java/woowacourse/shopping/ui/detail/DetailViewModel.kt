@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +29,11 @@ class DetailViewModel(
     private val _uiState = MutableStateFlow(DetailUiState())
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
 
-    private val _event = MutableSharedFlow<DetailEvent>()
+    private val _event =
+        MutableSharedFlow<DetailEvent>(
+            replay = 2,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
     val event = _event.asSharedFlow()
 
     init {
