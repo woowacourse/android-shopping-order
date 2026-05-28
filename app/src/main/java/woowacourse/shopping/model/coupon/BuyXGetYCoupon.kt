@@ -13,6 +13,11 @@ data class BuyXGetYCoupon(
     val buyQuantity: Int,
     val getQuantity: Int,
 ) : Coupon {
+    init {
+        require(buyQuantity > 0) { "구매 수량은 0 이상이어야 합니다." }
+        require(getQuantity > 0) { "구매 시 증정 수량은 0 이상이어야 합니다." }
+    }
+
     override fun isValid(payment: Payment): Boolean =
         payment.nowDate <= expirationDate &&
             payment.cartItems.any { cartItem -> cartItem.quantity >= buyQuantity + getQuantity }

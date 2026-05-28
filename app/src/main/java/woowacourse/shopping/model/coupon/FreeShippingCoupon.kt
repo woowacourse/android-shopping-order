@@ -11,6 +11,10 @@ data class FreeShippingCoupon(
     override val expirationDate: LocalDate,
     val minimumAmount: Long,
 ) : Coupon {
+    init {
+        require(minimumAmount >= 0) { "최소 금액은 음수일 수 없습니다." }
+    }
+
     override fun isValid(payment: Payment): Boolean =
         payment.nowDate <= expirationDate &&
             payment.totalPrice.amount >= minimumAmount
