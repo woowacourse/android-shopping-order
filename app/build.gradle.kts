@@ -48,7 +48,7 @@ android {
         buildConfigField(
             "Boolean",
             "SHOPPING_USE_MOCK_SERVER",
-            localProps.getProperty("SHOPPING_USE_MOCK_SERVER", "true"),
+            localProps.getProperty("SHOPPING_USE_MOCK_SERVER", "false"),
         )
     }
 
