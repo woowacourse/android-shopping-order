@@ -21,6 +21,9 @@ object Cart
 object Settings
 
 @Serializable
+object CartGraph
+
+@Serializable
 data class OrderProduct(
     val productId: Long,
     val quantity: Int,

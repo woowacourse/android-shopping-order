@@ -28,6 +28,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
+import androidx.navigation.navigation
 import kotlinx.coroutines.launch
 import woowacourse.shopping.local.SettingsPreferences
 import woowacourse.shopping.receiver.AlarmHelper
@@ -95,7 +96,7 @@ fun AppNavHost(innerPadding: PaddingValues) {
                 onProductClick = { productId ->
                     navController.navigate(ProductDetail(productId))
                 },
-                onCartClick = { navController.navigate(Cart) },
+                onCartClick = { navController.navigate(CartGraph) },
                 onSettingsClick = { navController.navigate(Settings) },
                 onMoreClick = viewModel::loadMore,
                 onAddToCart = viewModel::addToCart,
@@ -160,147 +161,159 @@ fun AppNavHost(innerPadding: PaddingValues) {
             }
         }
 
-        composable<Cart> {
-            val viewModel: CartViewModel =
-                viewModel(
-                    factory = CartViewModelFactory(),
-                )
-            val snackbarHostState = remember { SnackbarHostState() }
-
-            val coroutineScope = rememberCoroutineScope()
-
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val lifecycleOwner = LocalLifecycleOwner.current
-
-            LaunchedEffect(viewModel.snackbarEvent, lifecycleOwner) {
-                lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.snackbarEvent.collect { message ->
-                        snackbarHostState.showSnackbar(message)
+        navigation<CartGraph>(startDestination = Cart) {
+            composable<Cart> {
+                val parentEntry =
+                    remember(it) {
+                        navController.getBackStackEntry<CartGraph>()
                     }
+                val viewModel: CartViewModel =
+                    viewModel(
+                        viewModelStoreOwner = parentEntry,
+                        factory = CartViewModelFactory(),
+                    )
+                val snackbarHostState = remember { SnackbarHostState() }
+
+                val coroutineScope = rememberCoroutineScope()
+
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                val lifecycleOwner = LocalLifecycleOwner.current
+
+                LaunchedEffect(viewModel.snackbarEvent, lifecycleOwner) {
+                    lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                        viewModel.snackbarEvent.collect { message ->
+                            snackbarHostState.showSnackbar(message)
+                        }
+                    }
+                }
+
+                LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+                    viewModel.reloadVisibleState()
+                }
+
+                Scaffold(
+                    snackbarHost = { SnackbarHost(snackbarHostState) },
+                ) { innerPadding ->
+                    CartScreen(
+                        uiState = uiState,
+                        modifier = Modifier.padding(innerPadding),
+                        onBackClick = { navController.popBackStack() },
+                        onOrderClick = {
+                            coroutineScope.launch {
+                                val orderProducts = viewModel.getSelectedOrderProducts()
+                                if (orderProducts.isNotEmpty()) {
+                                    navController.navigate(CartRecommendation(orderProducts))
+                                }
+                            }
+                        },
+                        onItemCheckedChange = viewModel::toggleItemSelection,
+                        onAllCheckedChange = viewModel::toggleAllSelection,
+                        onDeleteClick = viewModel::delete,
+                        onIncreaseQuantity = viewModel::increaseQuantity,
+                        onDecreaseQuantity = viewModel::decreaseQuantity,
+                        onPreviousClick = viewModel::loadPreviousPage,
+                        onNextClick = viewModel::loadNextPage,
+                    )
                 }
             }
 
-            LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-                viewModel.reloadVisibleState()
-            }
+            composable<CartRecommendation>(
+                typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
+            ) {
+                val parentEntry =
+                    remember(it) {
+                        navController.getBackStackEntry<CartGraph>()
+                    }
+                val cartViewModel: CartViewModel =
+                    viewModel(
+                        viewModelStoreOwner = parentEntry,
+                        factory = CartViewModelFactory(),
+                    )
+                val recommendationViewModel: CartRecommendationViewModel =
+                    viewModel(
+                        factory = CartRecommendationViewModelFactory(),
+                    )
 
-            Scaffold(
-                snackbarHost = { SnackbarHost(snackbarHostState) },
-            ) { innerPadding ->
-                CartScreen(
+                val uiState by recommendationViewModel.uiState.collectAsStateWithLifecycle()
+                val lifecycleOwner = LocalLifecycleOwner.current
+
+                LaunchedEffect(uiState.orderProductsToOrder, lifecycleOwner) {
+                    lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                        val orderProducts = uiState.orderProductsToOrder
+                        if (orderProducts != null) {
+                            navController.navigate(Payment(orderProducts = orderProducts)) {
+                                popUpTo<CartRecommendation> {
+                                    inclusive = true
+                                }
+                            }
+                        }
+                    }
+                }
+
+                LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+                    cartViewModel.reloadVisibleState()
+                    recommendationViewModel.reloadVisibleState()
+                }
+
+                CartRecommendedProductsScreen(
                     uiState = uiState,
                     modifier = Modifier.padding(innerPadding),
-                    onBackClick = { navController.popBackStack() },
-                    onOrderClick = {
-                        coroutineScope.launch {
-                            val orderProducts = viewModel.getSelectedOrderProducts()
-                            if (orderProducts.isNotEmpty()) {
-                                navController.navigate(CartRecommendation(orderProducts))
-                            }
-                        }
+                    onProductClick = { productId ->
+                        navController.navigate(ProductDetail(productId))
                     },
-                    onItemCheckedChange = viewModel::toggleItemSelection,
-                    onAllCheckedChange = viewModel::toggleAllSelection,
-                    onDeleteClick = viewModel::delete,
-                    onIncreaseQuantity = viewModel::increaseQuantity,
-                    onDecreaseQuantity = viewModel::decreaseQuantity,
-                    onPreviousClick = viewModel::loadPreviousPage,
-                    onNextClick = viewModel::loadNextPage,
+                    onAddToCart = recommendationViewModel::addRecommendedProduct,
+                    onIncreaseQuantity = recommendationViewModel::addRecommendedProduct,
+                    onDecreaseQuantity = recommendationViewModel::decreaseRecommendedProductQuantity,
+                    onOrderClick = recommendationViewModel::applyRecommendations,
+                    onBackClick = { navController.popBackStack() },
                 )
             }
-        }
 
-        composable<CartRecommendation>(
-            typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
-        ) {
-            val cartViewModel: CartViewModel =
-                viewModel(
-                    factory = CartViewModelFactory(),
-                )
-            val recommendationViewModel: CartRecommendationViewModel =
-                viewModel(
-                    factory = CartRecommendationViewModelFactory(),
-                )
+            composable<Payment>(
+                deepLinks =
+                    listOf(
+                        navDeepLink { uriPattern = "shopping://payment" },
+                    ),
+                typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
+            ) {
+                val viewModel: PaymentViewModel =
+                    viewModel(
+                        factory = PaymentViewModelFactory(),
+                    )
 
-            val uiState by recommendationViewModel.uiState.collectAsStateWithLifecycle()
-            val lifecycleOwner = LocalLifecycleOwner.current
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                val lifecycleOwner = LocalLifecycleOwner.current
 
-            LaunchedEffect(uiState.orderProductsToOrder, lifecycleOwner) {
-                lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    val orderProducts = uiState.orderProductsToOrder
-                    if (orderProducts != null) {
-                        navController.navigate(Payment(orderProducts = orderProducts)) {
-                            popUpTo<CartRecommendation> {
-                                inclusive = true
+                LaunchedEffect(Unit) {
+                    AlarmHelper.schedulePaymentReminder(context)
+                }
+
+                LaunchedEffect(uiState.isOrderCompleted, lifecycleOwner) {
+                    lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                        if (uiState.isOrderCompleted) {
+                            AlarmHelper.cancelPaymentReminder(context)
+                            navController.navigate(ProductList) {
+                                popUpTo<ProductList> {
+                                    inclusive = true
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-                cartViewModel.reloadVisibleState()
-                recommendationViewModel.reloadVisibleState()
-            }
-
-            CartRecommendedProductsScreen(
-                uiState = uiState,
-                modifier = Modifier.padding(innerPadding),
-                onProductClick = { productId ->
-                    navController.navigate(ProductDetail(productId))
-                },
-                onAddToCart = recommendationViewModel::addRecommendedProduct,
-                onIncreaseQuantity = recommendationViewModel::addRecommendedProduct,
-                onDecreaseQuantity = recommendationViewModel::decreaseRecommendedProductQuantity,
-                onOrderClick = recommendationViewModel::applyRecommendations,
-                onBackClick = { navController.popBackStack() },
-            )
-        }
-
-        composable<Payment>(
-            deepLinks =
-                listOf(
-                    navDeepLink { uriPattern = "shopping://payment" },
-                ),
-            typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
-        ) {
-            val viewModel: PaymentViewModel =
-                viewModel(
-                    factory = PaymentViewModelFactory(),
-                )
-
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val lifecycleOwner = LocalLifecycleOwner.current
-
-            LaunchedEffect(Unit) {
-                AlarmHelper.schedulePaymentReminder(context)
-            }
-
-            LaunchedEffect(uiState.isOrderCompleted, lifecycleOwner) {
-                lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    if (uiState.isOrderCompleted) {
+                PaymentScreen(
+                    uiState = uiState,
+                    onBackClick = {
                         AlarmHelper.cancelPaymentReminder(context)
-                        navController.navigate(ProductList) {
-                            popUpTo<ProductList> {
-                                inclusive = true
-                            }
-                        }
-                    }
-                }
+                        navController.popBackStack()
+                    },
+                    onCouponCheckedChange = { couponId, _ ->
+                        viewModel.selectCoupon(couponId)
+                    },
+                    onPaymentClick = viewModel::pay,
+                    modifier = Modifier.padding(innerPadding),
+                )
             }
-
-            PaymentScreen(
-                uiState = uiState,
-                onBackClick = {
-                    AlarmHelper.cancelPaymentReminder(context)
-                    navController.popBackStack()
-                },
-                onCouponCheckedChange = { couponId, _ ->
-                    viewModel.selectCoupon(couponId)
-                },
-                onPaymentClick = viewModel::pay,
-                modifier = Modifier.padding(innerPadding),
-            )
         }
     }
 }
