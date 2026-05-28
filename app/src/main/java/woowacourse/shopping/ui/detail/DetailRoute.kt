@@ -47,7 +47,7 @@ fun DetailRoute(
                 }
 
                 is DetailUiEvent.ShowToastMessage -> {
-                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT)
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                 }
             }
         }
