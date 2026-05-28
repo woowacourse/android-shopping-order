@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.toRoute
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -32,6 +33,7 @@ import woowacourse.shopping.domain.coupon.OrderContext
 import woowacourse.shopping.domain.coupon.PercentageCoupon
 import woowacourse.shopping.feature.common.state.AppError
 import woowacourse.shopping.feature.common.state.toAppError
+import woowacourse.shopping.feature.format.DecimalPriceFormatter
 import woowacourse.shopping.feature.notification.PaymentNotificationScheduler
 
 data class PurchaseUiState(
@@ -105,7 +107,6 @@ class PurchaseViewModel(
     }
 
     fun couponSelect(couponId: String) {
-
         couponDiscount(coupons.first { it.id == couponId })
         _uiState.update {
             it.copy(
@@ -148,32 +149,33 @@ class PurchaseViewModel(
     }
 
     fun Coupon.toUiModel(): CouponUiModel = when (this) {
-        is FixedDiscountCoupon -> CouponUiModel.FixedDiscount(
+        is FixedDiscountCoupon -> CouponUiModel(
             id = id,
-            description = description,
+            title = description,
             expirationDate = expirationDate,
-            minimumPrice = minimumPrice,
+            description = "최소 주문 금액: ${DecimalPriceFormatter().format(minimumPrice)}",
         )
 
-        is FreeShippingCoupon -> CouponUiModel.FreeShipping(
+        is FreeShippingCoupon -> CouponUiModel(
             id = id,
-            description = description,
+            title = description,
             expirationDate = expirationDate,
-            minimumPrice = this.minimumPrice,
+            description = "최소 주문 금액: ${DecimalPriceFormatter().format(minimumPrice)}",
         )
 
-        is BuyXGetYCoupon -> CouponUiModel.BuyXGetY(
+        is BuyXGetYCoupon -> CouponUiModel(
             id = id,
-            description = description,
+            title = description,
             expirationDate = expirationDate,
         )
 
-        is PercentageCoupon -> CouponUiModel.Percentage(
+        is PercentageCoupon -> CouponUiModel(
             id = id,
-            description = description,
+            title = description,
             expirationDate = expirationDate,
-            startTime = this.startTime,
-            endTime = this.endTime,
+            description = "할인 적용 시간: ${startTime.format(DateTimeFormatter.ofPattern("HH:mm"))}" +
+                " ~ " +
+                "${endTime.format(DateTimeFormatter.ofPattern("HH:mm"))}",
         )
     }
 

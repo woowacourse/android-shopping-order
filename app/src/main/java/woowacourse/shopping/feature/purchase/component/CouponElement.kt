@@ -22,7 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.time.format.DateTimeFormatter
-import woowacourse.shopping.feature.format.DecimalPriceFormatter
 import woowacourse.shopping.feature.purchase.CouponUiModel
 
 @Composable
@@ -51,7 +50,7 @@ fun CouponElement(
                 modifier = Modifier.size(24.dp),
             )
             Spacer(Modifier.width(5.dp))
-            Text(model.description, fontWeight = FontWeight.W700, fontSize = 18.sp)
+            Text(model.title, fontWeight = FontWeight.W700, fontSize = 18.sp)
         }
         Spacer(Modifier.height(5.dp))
         Text(
@@ -60,30 +59,9 @@ fun CouponElement(
             fontSize = 12.sp,
             color = Color(0xff555555),
         )
-        when (model) {
-
-            is CouponUiModel.BuyXGetY -> {}
-            is CouponUiModel.FixedDiscount -> Text(
-                "최소 주문 금액: ${DecimalPriceFormatter().format(model.minimumPrice)}",
-                fontWeight = FontWeight.W400,
-                fontSize = 12.sp,
-                color = Color(0xff555555),
-            )
-
-            is CouponUiModel.FreeShipping -> Text(
-                "최소 주문 금액: ${model.minimumPrice}",
-                fontWeight = FontWeight.W400,
-                fontSize = 12.sp,
-                color = Color(0xff555555),
-            )
-
-            is CouponUiModel.Percentage -> Text(
-                "할인 적용 시간: ${model.startTime.format(DateTimeFormatter.ofPattern("HH:mm"))}" +
-                    " ~ ${
-                        model.endTime.format(
-                            DateTimeFormatter.ofPattern("HH:mm"),
-                        )
-                    }",
+        if (model.description != null) {
+            Text(
+                "최소 주문 금액: ${model.description}",
                 fontWeight = FontWeight.W400,
                 fontSize = 12.sp,
                 color = Color(0xff555555),
