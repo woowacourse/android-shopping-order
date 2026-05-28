@@ -5,32 +5,28 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.ProductRepository
-import woowacourse.shopping.data.repository.RecentItemRepository
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.ui.model.mapper.toUiModel
+import woowacourse.shopping.data.repository.cart.CartRepository
 import java.io.IOException
 
 class CartViewModel(
     private val cartRepository: CartRepository,
-    private val recentItemRepository: RecentItemRepository,
-    private val productRepository: ProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
 
-    private val selectedCartItems = MutableStateFlow<ImmutableList<String>>(persistentListOf())
+    private val _event = MutableSharedFlow<CartEvent>()
+    val event: SharedFlow<CartEvent> = _event.asSharedFlow()
+
     private val page = MutableStateFlow(0)
 
     init {
@@ -42,7 +38,7 @@ class CartViewModel(
         viewModelScope.launch {
             combine(
                 cartRepository.cartItems,
-                selectedCartItems,
+                cartRepository.selectedCartItemIds,
                 page,
             ) { cartItems, selectedItems, page ->
                 _uiState.value.toUiState(
@@ -56,9 +52,6 @@ class CartViewModel(
 
                 if (nextState.page != page.value) {
                     page.value = nextState.page
-                }
-                if (nextState.selectedCartItems != selectedCartItems.value) {
-                    selectedCartItems.value = nextState.selectedCartItems
                 }
             }
         }
@@ -89,7 +82,15 @@ class CartViewModel(
 
     fun deleteItem(cartId: String) {
         viewModelScope.launch {
-            cartRepository.deleteItem(cartId)
+            runCatching {
+                cartRepository.deleteItem(cartId)
+            }.onFailure { throwable ->
+                if (throwable is IOException || throwable is HttpException) {
+                    _event.emit(CartEvent.DeleteCartItemFailure)
+                } else {
+                    throw throwable
+                }
+            }
         }
     }
 
@@ -98,97 +99,44 @@ class CartViewModel(
         quantity: Int,
     ) {
         viewModelScope.launch {
-            cartRepository.setCartItem(productId, quantity = quantity)
-
-            if (_uiState.value.isOrder) {
-                cartRepository
-                    .cartItems
-                    .value
-                    .firstOrNull { it.product.id == productId }
-                    ?.let { cartItem ->
-                        selectedCartItems.update { selectedItems ->
-                            if (cartItem.id in selectedItems) {
-                                selectedItems
-                            } else {
-                                (selectedItems + cartItem.id).toImmutableList()
-                            }
-                        }
-                    }
+            runCatching {
+                cartRepository.setCartItem(productId, quantity = quantity)
+            }.onFailure { throwable ->
+                if (throwable is IOException || throwable is HttpException) {
+                    _event.emit(CartEvent.UpdateCartItemFailure)
+                } else {
+                    throw throwable
+                }
             }
         }
     }
 
     fun checkItem(cartItemId: String) {
-        selectedCartItems.update { selectedItemsId ->
-            if (cartItemId in selectedItemsId) {
-                (selectedItemsId - cartItemId).toImmutableList()
-            } else {
-                (selectedItemsId + cartItemId).toImmutableList()
-            }
-        }
+        cartRepository.toggleCartItemSelection(cartItemId)
     }
 
     fun isAllSelectClick() {
-        val cartItems = cartRepository.cartItems.value
-
-        selectedCartItems.update {
-            if (_uiState.value.isAllChecked) {
-                persistentListOf()
-            } else {
-                cartItems.map { it.id }.toImmutableList()
-            }
+        if (_uiState.value.isAllChecked) {
+            cartRepository.clearCartItemSelection()
+        } else {
+            cartRepository.selectAllCartItems()
         }
     }
 
-    suspend fun loadRecommendProducts(): List<Product> {
-        val productId = recentItemRepository.getLastViewedItem()?.id
-
-        return productId?.let {
-            val category = productRepository.getProductById(productId).category
-            productRepository
-                .getProducts(
-                    category = category,
-                    page = 0,
-                    size = 10,
-                ).products
-        } ?: emptyList()
-    }
-
-    fun setOrder() {
+    fun order() {
         viewModelScope.launch {
-            val cartItems = cartRepository.cartItems.value
-            val cartProductIds = cartItems.map { it.product.id }.toSet()
-            val recommendProducts =
-                loadRecommendProducts()
-                    .filter { product ->
-                        product.id !in cartProductIds
-                    }.map { product ->
-                        product.toUiModel(quantity = null)
-                    }.toImmutableList()
-
-            _uiState.update {
-                it.copy(
-                    isOrder = true,
-                    recommendProducts = recommendProducts,
-                )
-            }
+            _event.emit(CartEvent.NavigateToRecommend)
         }
     }
 
     companion object {
         private const val PAGE_SIZE = 5
 
-        fun provideFactory(
-            cartRepository: CartRepository,
-            recentItemRepository: RecentItemRepository,
-            productRepository: ProductRepository,
-        ): ViewModelProvider.Factory =
+        fun provideFactory(cartRepository: CartRepository): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
                     CartViewModel(
                         cartRepository = cartRepository,
-                        recentItemRepository = recentItemRepository,
-                        productRepository = productRepository,
                     )
                 }
             }

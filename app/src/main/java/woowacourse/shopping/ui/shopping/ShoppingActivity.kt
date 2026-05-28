@@ -1,52 +1,71 @@
 package woowacourse.shopping.ui.shopping
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.MutableStateFlow
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.ui.cart.CartActivity
-import woowacourse.shopping.ui.detail.DetailActivity
+import woowacourse.shopping.ui.navigation.ShoppingNavHost
 import woowacourse.shopping.ui.theme.AndroidshoppingTheme
 
 class ShoppingActivity : ComponentActivity() {
-    private val viewModel: ShoppingViewModel by viewModels {
-        val appContainer = (application as ShoppingApplication).appContainer
-        ShoppingViewModel.provideFactory(
-            productRepository = appContainer.productRepository,
-            cartRepository = appContainer.cartRepository,
-            recentItemRepository = appContainer.recentItemRepository,
-            networkObserver = appContainer.networkObserver,
-        )
-    }
+    private val openPayScreen = MutableStateFlow(false)
+
+    private val notificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        updateOpenPayScreenState(intent)
+        requestNotificationPermission()
+
+        val appContainer = (application as ShoppingApplication).appContainer
 
         setContent {
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
             AndroidshoppingTheme {
-                ShoppingScreen(
-                    uiState = uiState,
-                    onLoad = viewModel::loadMore,
-                    onProductClick = { id ->
-                        val intent = DetailActivity.getIntent(this, id)
-                        startActivity(intent)
+                val shouldOpenPayScreen by openPayScreen.collectAsStateWithLifecycle()
+
+                ShoppingNavHost(
+                    appContainer = appContainer,
+                    shouldOpenPayScreen = shouldOpenPayScreen,
+                    onOpenPayScreen = {
+                        openPayScreen.value = false
                     },
-                    onCartClick = { startActivity(CartActivity.getIntent(applicationContext)) },
-                    onQuantityChange = viewModel::updateQuantity,
                 )
             }
         }
     }
 
-    override fun onRestart() {
-        super.onRestart()
-        viewModel.loadProducts()
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        updateOpenPayScreenState(intent)
     }
+
+    private fun updateOpenPayScreenState(intent: Intent?) {
+        openPayScreen.value = intent?.action == ShoppingIntent.OPEN_PAY_SCREEN
+    }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        if (hasNotificationPermission()) return
+
+        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+
+    private fun hasNotificationPermission(): Boolean =
+        ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.POST_NOTIFICATIONS,
+        ) == PackageManager.PERMISSION_GRANTED
 }

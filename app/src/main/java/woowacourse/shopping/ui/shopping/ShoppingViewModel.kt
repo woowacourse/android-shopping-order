@@ -14,9 +14,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import woowacourse.shopping.data.remote.NetworkObserver
-import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.ProductRepository
-import woowacourse.shopping.data.repository.RecentItemRepository
+import woowacourse.shopping.data.repository.cart.CartRepository
+import woowacourse.shopping.data.repository.product.ProductRepository
+import woowacourse.shopping.data.repository.recentitem.RecentItemRepository
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.ui.model.mapper.toUiModel
@@ -85,44 +85,10 @@ class ShoppingViewModel(
             cartRepository.refreshCartItems()
         }.onFailure { throwable ->
             if (throwable is IOException || throwable is HttpException) {
-                _uiState.update { it.copy(cartErrorMessage = "Failed to update cart.") }
+                _uiState.update { it.copy(cartErrorMessage = "장바구니를 불러오는 데 실패했습니다.") }
             } else {
                 throw throwable
             }
-        }
-    }
-
-    fun loadProducts(
-        page: Int = 0,
-        size: Int = offset,
-        shouldRefreshCart: Boolean = true,
-    ) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(cartErrorMessage = null, isLoading = true) }
-            runCatching {
-                if (shouldRefreshCart) {
-                    refreshCartItems()
-                }
-
-                val apiResult = productRepository.getProducts(page = page, size = size)
-
-                products = apiResult.products
-                offset = apiResult.products.size
-                _uiState.update {
-                    it.copy(
-                        cartErrorMessage = null,
-                        canLoadMore = !apiResult.isLastPage,
-                    )
-                }
-                renderProducts()
-            }.onFailure { throwable ->
-                if (throwable is IOException || throwable is HttpException) {
-                    _uiState.update { it.copy(cartErrorMessage = "Failed to load products.") }
-                } else {
-                    throw throwable
-                }
-            }
-            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
@@ -169,9 +135,9 @@ class ShoppingViewModel(
                 }
                 renderProducts()
             } catch (_: IOException) {
-                _uiState.update { it.copy(cartErrorMessage = "Failed to load products.") }
+                _uiState.update { it.copy(cartErrorMessage = "상품 목록을 불러오는 데 실패했습니다.") }
             } catch (_: HttpException) {
-                _uiState.update { it.copy(cartErrorMessage = "Failed to load products.") }
+                _uiState.update { it.copy(cartErrorMessage = "상품 목록을 불러오는 데 실패했습니다.") }
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
@@ -187,7 +153,7 @@ class ShoppingViewModel(
                 cartRepository.setCartItem(productId = productId, quantity = quantity)
             }.onFailure { throwable ->
                 if (throwable is IOException || throwable is HttpException) {
-                    _uiState.update { it.copy(cartErrorMessage = "Failed to update cart item.") }
+                    _uiState.update { it.copy(cartErrorMessage = "장바구니 수량 변경에 실패했습니다.") }
                 } else {
                     throw throwable
                 }

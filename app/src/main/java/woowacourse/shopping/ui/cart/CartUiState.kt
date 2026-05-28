@@ -3,7 +3,6 @@ package woowacourse.shopping.ui.cart
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import woowacourse.shopping.ui.model.CartItemUiModel
-import woowacourse.shopping.ui.model.ProductUiModel
 
 data class CartUiState(
     val items: ImmutableList<CartItemUiModel> = persistentListOf(),
@@ -17,6 +16,4 @@ data class CartUiState(
     val isAllChecked: Boolean = false,
     val selectedCartItemCount: Int = 0,
     val selectedCartItems: ImmutableList<String> = persistentListOf(),
-    val isOrder: Boolean = false,
-    val recommendProducts: ImmutableList<ProductUiModel> = persistentListOf(),
 )

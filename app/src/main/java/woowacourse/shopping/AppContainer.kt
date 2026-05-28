@@ -8,17 +8,22 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import woowacourse.shopping.data.alarm.PayReminderAlarm
+import woowacourse.shopping.data.alarm.PayReminderPreference
 import woowacourse.shopping.data.localdb.ShoppingDB
 import woowacourse.shopping.data.remote.NetworkManager
 import woowacourse.shopping.data.remote.NetworkObserver
 import woowacourse.shopping.data.remote.api.CartApi
+import woowacourse.shopping.data.remote.api.CouponApi
 import woowacourse.shopping.data.remote.api.ProductApi
-import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.CartRepositoryImpl
-import woowacourse.shopping.data.repository.ProductRepository
-import woowacourse.shopping.data.repository.ProductRepositoryImpl
-import woowacourse.shopping.data.repository.RecentItemRepository
-import woowacourse.shopping.data.repository.RecentItemRepositoryImpl
+import woowacourse.shopping.data.repository.cart.CartRepository
+import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
+import woowacourse.shopping.data.repository.coupon.CouponRepository
+import woowacourse.shopping.data.repository.coupon.CouponRepositoryImpl
+import woowacourse.shopping.data.repository.product.ProductRepository
+import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.recentitem.RecentItemRepository
+import woowacourse.shopping.data.repository.recentitem.RecentItemRepositoryImpl
 
 class AppContainer(
     private val context: Context,
@@ -37,12 +42,26 @@ class AppContainer(
         )
     }
 
+    val couponRepository: CouponRepository by lazy {
+        CouponRepositoryImpl(
+            api = retrofitService.create(CouponApi::class.java),
+        )
+    }
+
     val recentItemRepository: RecentItemRepository by lazy {
         RecentItemRepositoryImpl(database.recentItemDao(), productRepository)
     }
 
     val networkObserver: NetworkObserver by lazy {
         NetworkManager(context)
+    }
+
+    val payReminderPreference: PayReminderPreference by lazy {
+        PayReminderPreference(context)
+    }
+
+    val payReminderAlarm: PayReminderAlarm by lazy {
+        PayReminderAlarm(context)
     }
 
     private val loggingInterceptor =
@@ -77,7 +96,7 @@ class AppContainer(
     val retrofitService =
         Retrofit
             .Builder()
-            .baseUrl("http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/")
+            .baseUrl("http://techcourse-lv2-alb-250216202.ap-northeast-2.elb.amazonaws.com/")
             .addConverterFactory(
                 Json.asConverterFactory(
                     "application/json".toMediaType(),

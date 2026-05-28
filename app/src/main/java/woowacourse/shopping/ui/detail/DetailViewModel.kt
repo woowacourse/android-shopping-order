@@ -5,16 +5,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.ProductRepository
-import woowacourse.shopping.data.repository.RecentItemRepository
+import woowacourse.shopping.data.repository.cart.CartRepository
+import woowacourse.shopping.data.repository.product.ProductRepository
+import woowacourse.shopping.data.repository.recentitem.RecentItemRepository
 import woowacourse.shopping.ui.model.mapper.toUiModel
 import java.io.IOException
 
@@ -28,8 +29,12 @@ class DetailViewModel(
     private val _uiState = MutableStateFlow(DetailUiState())
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
 
-    private val _event = Channel<DetailEvent>()
-    val event = _event.receiveAsFlow()
+    private val _event =
+        MutableSharedFlow<DetailEvent>(
+            replay = 2,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
+    val event = _event.asSharedFlow()
 
     init {
         loadProduct()
@@ -58,14 +63,14 @@ class DetailViewModel(
                         totalPrice = product.getPrice() * quantity,
                     )
             } catch (_: IllegalArgumentException) {
-                _event.send(DetailEvent.ShowProductNotFoundMessage)
-                _event.send(DetailEvent.NavigateBack)
+                _event.emit(DetailEvent.ShowProductNotFoundMessage)
+                _event.emit(DetailEvent.NavigateBack)
             } catch (_: IOException) {
-                _event.send(DetailEvent.ShowProductLoadFailureMessage)
-                _event.send(DetailEvent.NavigateBack)
+                _event.emit(DetailEvent.ShowProductLoadFailureMessage)
+                _event.emit(DetailEvent.NavigateBack)
             } catch (_: HttpException) {
-                _event.send(DetailEvent.ShowProductLoadFailureMessage)
-                _event.send(DetailEvent.NavigateBack)
+                _event.emit(DetailEvent.ShowProductLoadFailureMessage)
+                _event.emit(DetailEvent.NavigateBack)
             }
         }
     }
@@ -85,13 +90,13 @@ class DetailViewModel(
             try {
                 val product = productRepository.getProductById(id)
                 cartRepository.setCartItem(product.id, _uiState.value.quantity)
-                _event.send(DetailEvent.NavigateToCart)
+                _event.emit(DetailEvent.NavigateToCart)
             } catch (_: IllegalArgumentException) {
-                _event.send(DetailEvent.ShowAddCartFailureMessage)
+                _event.emit(DetailEvent.ShowAddCartFailureMessage)
             } catch (_: IOException) {
-                _event.send(DetailEvent.ShowAddCartFailureMessage)
+                _event.emit(DetailEvent.ShowAddCartFailureMessage)
             } catch (_: HttpException) {
-                _event.send(DetailEvent.ShowAddCartFailureMessage)
+                _event.emit(DetailEvent.ShowAddCartFailureMessage)
             }
         }
     }

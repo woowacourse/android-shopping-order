@@ -9,10 +9,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import woowacourse.shopping.MainDispatcherExtension
 import woowacourse.shopping.data.remote.NetworkObserver
-import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.ProductRepository
-import woowacourse.shopping.data.repository.RecentItemRepository
-import woowacourse.shopping.data.repository.RecentItemRepositoryImpl
+import woowacourse.shopping.data.repository.cart.CartRepository
+import woowacourse.shopping.data.repository.product.ProductRepository
+import woowacourse.shopping.data.repository.recentitem.RecentItemRepository
+import woowacourse.shopping.data.repository.recentitem.RecentItemRepositoryImpl
 import woowacourse.shopping.mockup.MockCartRepository
 import woowacourse.shopping.mockup.MockProductRepository
 import woowacourse.shopping.mockup.MockRecentItemDao

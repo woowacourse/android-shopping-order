@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.data.repository.RecentItemRepositoryImpl
+import woowacourse.shopping.data.repository.recentitem.RecentItemRepositoryImpl
 import woowacourse.shopping.mockup.MockProductRepository
 import woowacourse.shopping.mockup.MockRecentItemDao
 import woowacourse.shopping.mockup.createProduct

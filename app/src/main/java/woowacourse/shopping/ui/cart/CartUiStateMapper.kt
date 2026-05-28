@@ -3,6 +3,8 @@ package woowacourse.shopping.ui.cart
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import woowacourse.shopping.model.CartItem
+import woowacourse.shopping.ui.cart.component.CartSelection
+import woowacourse.shopping.ui.cart.component.paginate
 import woowacourse.shopping.ui.model.mapper.toUiModel
 
 fun CartUiState.toUiState(
@@ -26,12 +28,6 @@ fun CartUiState.toUiState(
         totalPrice = selection.totalPrice(cartItems).amount,
         isAllChecked = selection.isAllSelected(cartItems),
         selectedCartItems = selection.ids,
-        selectedCartItemCount = selection.selectedCount,
-        recommendProducts =
-            if (isOrder) {
-                recommendProducts.mapper(cartItems)
-            } else {
-                recommendProducts
-            },
+        selectedCartItemCount = selection.selectedCount(cartItems),
     )
 }
