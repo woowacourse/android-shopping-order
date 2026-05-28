@@ -55,7 +55,7 @@ fun PaymentScreen(
                 contents = {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.pay),
+                        contentDescription = stringResource(R.string.back),
                         tint = Color.White,
                         modifier =
                             Modifier
