@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.Money
+import woowacourse.shopping.domain.model.OrderItem
 import woowacourse.shopping.domain.usecase.BuildPaymentItemsUseCase
 import woowacourse.shopping.domain.usecase.CalculateOrderPricingUseCase
 import woowacourse.shopping.domain.usecase.GetAvailableCouponsUseCase
@@ -24,7 +25,6 @@ import woowacourse.shopping.fake.repository.FakeCouponRepository
 import woowacourse.shopping.fake.repository.FakeOrderRepository
 import woowacourse.shopping.fake.repository.FakeProductRepository
 import woowacourse.shopping.fake.repository.FakeSettingRepository
-import woowacourse.shopping.presentation.navigation.OrderItem
 import java.time.LocalDate
 
 @OptIn(ExperimentalCoroutinesApi::class)
