@@ -85,7 +85,7 @@ class ShoppingViewModel(
             cartRepository.refreshCartItems()
         }.onFailure { throwable ->
             if (throwable is IOException || throwable is HttpException) {
-                _uiState.update { it.copy(cartErrorMessage = "장바구니를 불러오는데 실패했습니다.") }
+                _uiState.update { it.copy(cartErrorMessage = "장바구니를 불러오는 데 실패했습니다.") }
             } else {
                 throw throwable
             }
@@ -135,9 +135,9 @@ class ShoppingViewModel(
                 }
                 renderProducts()
             } catch (_: IOException) {
-                _uiState.update { it.copy(cartErrorMessage = "장바구니를 불러오는데 실패했습니다.") }
+                _uiState.update { it.copy(cartErrorMessage = "상품 목록을 불러오는 데 실패했습니다.") }
             } catch (_: HttpException) {
-                _uiState.update { it.copy(cartErrorMessage = "장바구니를 불러오는데 실패했습니다.") }
+                _uiState.update { it.copy(cartErrorMessage = "상품 목록을 불러오는 데 실패했습니다.") }
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
@@ -153,7 +153,7 @@ class ShoppingViewModel(
                 cartRepository.setCartItem(productId = productId, quantity = quantity)
             }.onFailure { throwable ->
                 if (throwable is IOException || throwable is HttpException) {
-                    _uiState.update { it.copy(cartErrorMessage = "장바구니를 불러오는데 실패했습니다.") }
+                    _uiState.update { it.copy(cartErrorMessage = "장바구니 수량 변경에 실패했습니다.") }
                 } else {
                     throw throwable
                 }
