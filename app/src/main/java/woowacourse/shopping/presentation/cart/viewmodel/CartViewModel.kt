@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.cart.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,14 +32,16 @@ class CartViewModel(
 
     private var paymentItems = PaymentItems(emptySet())
 
-    private val _uiEvents = MutableSharedFlow<CartEvent>()
+    private val _uiEvents =
+        MutableSharedFlow<CartEvent>(
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
     val uiEvents = _uiEvents.asSharedFlow()
 
     private val exceptionHandler =
         CoroutineExceptionHandler { _, _ ->
-            viewModelScope.launch {
-                _uiEvents.emit(CartEvent.ShowError("알 수 없는 오류가 발생했습니다."))
-            }
+            _uiEvents.tryEmit(CartEvent.ShowError("알 수 없는 오류가 발생했습니다."))
         }
 
     fun getPaymentItemIds(): List<Long> = paymentItems.getProductIds()
