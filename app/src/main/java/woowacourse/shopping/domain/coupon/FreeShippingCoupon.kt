@@ -15,5 +15,5 @@ class FreeShippingCoupon(
     }
 
     override fun discountAmount(context: OrderContext): DiscountResult =
-        DiscountResult(context.totalPrice, shippingDiscountPrice = if (isApplicable(context)) context.shippingFee else 0)
+        DiscountResult(context.totalPrice, shippingDiscountPrice = if (isApplicable(context)) 0 else context.shippingFee)
 }
