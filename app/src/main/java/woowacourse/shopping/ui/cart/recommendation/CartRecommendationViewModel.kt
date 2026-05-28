@@ -17,10 +17,12 @@ import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.RecentProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
-import woowacourse.shopping.repository.query.CartPageItem
 import woowacourse.shopping.ui.navigation.CartRecommendation
+import woowacourse.shopping.ui.navigation.OrderProduct
+import woowacourse.shopping.ui.navigation.OrderProductListType
 import woowacourse.shopping.ui.shopping.ShoppingProductUiState
 import woowacourse.shopping.ui.shopping.ShoppingProductUiStateMapper
+import kotlin.reflect.typeOf
 
 private const val RECOMMENDED_PRODUCTS_LIMIT = 10
 
@@ -31,86 +33,49 @@ class CartRecommendationViewModel(
     private val recentProductRepository: RecentProductRepository,
     private val networkMonitor: NetworkMonitor,
 ) : ViewModel() {
-    private val route: CartRecommendation = savedStateHandle.toRoute()
-    private val selectedCartItemIds = route.selectedCartItemIds.toSet()
+    private val route: CartRecommendation =
+        savedStateHandle.toRoute(
+            typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
+        )
+    private val initialOrderProducts = route.orderProducts
 
     private val _uiState = MutableStateFlow(CartRecommendationUiState())
     val uiState: StateFlow<CartRecommendationUiState> = _uiState.asStateFlow()
 
     private var initialCartProductIds: Set<Long>? = null
     private var excludedProductIds: Set<Long> = emptySet()
-    private var baseOrderItemDataByProductId: Map<Long, OrderItemData> = emptyMap()
     private val recommendedOrderItemDataByProductId = linkedMapOf<Long, OrderItemData>()
     private var isSessionStarted = false
 
     init {
         observeNetworkState()
-        startOrder()
+        initializeOrder()
     }
 
-    fun startOrder() {
-        if (selectedCartItemIds.isEmpty()) return
+    private fun initializeOrder() {
+        if (initialOrderProducts.isEmpty()) return
 
-        viewModelScope.launch {
-            val totalCount = cartRepository.count().getOrDefault(0)
-            if (totalCount == 0) return@launch
+        excludedProductIds = initialOrderProducts.map { it.productId }.toSet()
+        recommendedOrderItemDataByProductId.clear()
+        isSessionStarted = true
+        initialCartProductIds = null
 
-            val allCartItems =
-                cartRepository
-                    .getCartPage(
-                        page = 0,
-                        size = totalCount,
-                    ).getOrNull()
-                    ?.items ?: return@launch
+        val totalPrice = initialOrderProducts.sumOf { it.price * it.quantity }
 
-            val selectedCartItems =
-                allCartItems.filter {
-                    it.cartItemId in selectedCartItemIds
-                }
-            if (selectedCartItems.isEmpty()) return@launch
-
-            val productIds =
-                selectedCartItems
-                    .map {
-                        it.productId
-                    }.toSet()
-
-            val productsById =
-                productRepository
-                    .findAllByIds(productIds)
-                    .getOrDefault(emptyMap())
-
-            excludedProductIds = productIds
-            baseOrderItemDataByProductId =
-                selectedCartItems.associate { item ->
-                    val price = productsById[item.productId]?.price?.value ?: 0
-                    item.productId to OrderItemData(price, item.quantity)
-                }
-            recommendedOrderItemDataByProductId.clear()
-            isSessionStarted = true
-            initialCartProductIds = null
-
-            val totalPrice =
-                selectedCartItems.sumOf { item ->
-                    val price = productsById[item.productId]?.price?.value ?: 0
-                    price * item.quantity
-                }
-
-            _uiState.update { currentState ->
-                currentState.copy(
-                    pendingOrder =
-                        PendingOrderUiState(
-                            cartItemIds = selectedCartItems.map { it.cartItemId },
-                            excludedProductIds = excludedProductIds,
-                            selectedCount = selectedCartItemIds.size,
-                            totalPrice = totalPrice,
-                        ),
-                    errorMessage = null,
-                )
-            }
-
-            loadRecommendedProducts()
+        _uiState.update { currentState ->
+            currentState.copy(
+                pendingOrder =
+                    PendingOrderUiState(
+                        cartItemIds = emptyList(),
+                        excludedProductIds = excludedProductIds,
+                        selectedCount = initialOrderProducts.size,
+                        totalPrice = totalPrice,
+                    ),
+                errorMessage = null,
+            )
         }
+
+        loadRecommendedProducts()
     }
 
     fun reloadVisibleState() {
@@ -174,10 +139,18 @@ class CartRecommendationViewModel(
                 return@launch
             }
 
+            val finalOrderProducts =
+                itemData.map { (productId, data) ->
+                    OrderProduct(
+                        productId = productId,
+                        quantity = data.quantity,
+                        price = data.price,
+                    )
+                }
+
             _uiState.update { currentState ->
                 currentState.copy(
-                    productIdsToOrder = itemData.keys.toList(),
-                    quantitiesToOrder = itemData.values.map { it.quantity },
+                    orderProductsToOrder = finalOrderProducts,
                     isApplying = false,
                 )
             }
@@ -306,7 +279,7 @@ class CartRecommendationViewModel(
         return changed
     }
 
-    private suspend fun refreshPendingOrder() {
+    private fun refreshPendingOrder() {
         val pendingOrderExcludedProductIds = _uiState.value.pendingOrder.excludedProductIds
 
         val itemDataByProductId = buildOrderItemDataByProductId()
@@ -316,13 +289,11 @@ class CartRecommendationViewModel(
                 it.value.quantity > 0
             }
 
-        val cartItems = resolveCartPageItems(activeItems.keys)
-
         _uiState.update { currentState ->
             currentState.copy(
                 pendingOrder =
                     PendingOrderUiState(
-                        cartItemIds = cartItems.map { it.cartItemId },
+                        cartItemIds = emptyList(),
                         excludedProductIds = pendingOrderExcludedProductIds,
                         selectedCount = activeItems.size,
                         totalPrice = activeItems.values.sumOf { it.price * it.quantity },
@@ -333,33 +304,25 @@ class CartRecommendationViewModel(
 
     private fun buildOrderItemDataByProductId(): Map<Long, OrderItemData> {
         val itemDataByProductId = linkedMapOf<Long, OrderItemData>()
-        itemDataByProductId.putAll(baseOrderItemDataByProductId)
+        initialOrderProducts.forEach { product ->
+            itemDataByProductId[product.productId] =
+                OrderItemData(
+                    price = product.price,
+                    quantity = product.quantity,
+                )
+        }
         itemDataByProductId.putAll(recommendedOrderItemDataByProductId)
 
         return itemDataByProductId
     }
 
     private suspend fun resolveCartProductIds(): Set<Long> =
-        resolveCartPageItems(productIds = null)
+        cartRepository
+            .getCartPage(page = 0, size = Int.MAX_VALUE)
+            .getOrElse { return emptySet() }
+            .items
             .map { it.productId }
             .toSet()
-
-    private suspend fun resolveCartPageItems(productIds: Set<Long>?): List<CartPageItem> {
-        if (productIds?.isEmpty() == true) return emptyList()
-        val totalCount =
-            cartRepository
-                .count()
-                .getOrElse { return emptyList() }
-        if (totalCount == 0) return emptyList()
-
-        return cartRepository
-            .getCartPage(page = 0, size = totalCount)
-            .getOrElse { return emptyList() }
-            .items
-            .filter { cartItem ->
-                productIds == null || cartItem.productId in productIds
-            }
-    }
 
     private fun updateError(message: String) {
         _uiState.update { currentState ->

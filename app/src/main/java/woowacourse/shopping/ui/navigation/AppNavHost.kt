@@ -46,6 +46,7 @@ import woowacourse.shopping.ui.settings.SettingsViewModel
 import woowacourse.shopping.ui.shopping.ShoppingScreen
 import woowacourse.shopping.ui.shopping.ShoppingViewModel
 import woowacourse.shopping.ui.shopping.ShoppingViewModelFactory
+import kotlin.reflect.typeOf
 
 @Composable
 fun AppNavHost(innerPadding: PaddingValues) {
@@ -172,6 +173,10 @@ fun AppNavHost(innerPadding: PaddingValues) {
                 }
             }
 
+            LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+                viewModel.reloadVisibleState()
+            }
+
             Scaffold(
                 snackbarHost = { SnackbarHost(snackbarHostState) },
             ) { innerPadding ->
@@ -181,9 +186,9 @@ fun AppNavHost(innerPadding: PaddingValues) {
                     onBackClick = { navController.popBackStack() },
                     onOrderClick = {
                         coroutineScope.launch {
-                            val selectedIds = viewModel.getSelectedCartItemIds()
-                            if (selectedIds.isNotEmpty()) {
-                                navController.navigate(CartRecommendation(selectedIds))
+                            val orderProducts = viewModel.getSelectedOrderProducts()
+                            if (orderProducts.isNotEmpty()) {
+                                navController.navigate(CartRecommendation(orderProducts))
                             }
                         }
                     },
@@ -198,7 +203,9 @@ fun AppNavHost(innerPadding: PaddingValues) {
             }
         }
 
-        composable<CartRecommendation> {
+        composable<CartRecommendation>(
+            typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
+        ) {
             val cartViewModel: CartViewModel =
                 viewModel(
                     factory = CartViewModelFactory(),
@@ -210,11 +217,10 @@ fun AppNavHost(innerPadding: PaddingValues) {
 
             val uiState by recommendationViewModel.uiState.collectAsStateWithLifecycle()
 
-            LaunchedEffect(uiState.productIdsToOrder, uiState.quantitiesToOrder) {
-                val ids = uiState.productIdsToOrder
-                val quantities = uiState.quantitiesToOrder
-                if (ids != null && quantities != null) {
-                    navController.navigate(Payment(productIds = ids, quantities = quantities)) {
+            LaunchedEffect(uiState.orderProductsToOrder) {
+                val orderProducts = uiState.orderProductsToOrder
+                if (orderProducts != null) {
+                    navController.navigate(Payment(orderProducts = orderProducts)) {
                         popUpTo<CartRecommendation> {
                             inclusive = true
                         }
@@ -246,6 +252,7 @@ fun AppNavHost(innerPadding: PaddingValues) {
                 listOf(
                     navDeepLink { uriPattern = "shopping://payment" },
                 ),
+            typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
         ) {
             val viewModel: PaymentViewModel =
                 viewModel(

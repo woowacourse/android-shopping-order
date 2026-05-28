@@ -20,6 +20,7 @@ import woowacourse.shopping.ui.cart.SelectedCartOrderItem
 import woowacourse.shopping.ui.cart.list.uistate.CartItemUiModelMapper
 import woowacourse.shopping.ui.cart.list.uistate.CartListUiState
 import woowacourse.shopping.ui.cart.list.uistate.CartUiState
+import woowacourse.shopping.ui.navigation.OrderProduct
 
 private const val PAGE_SIZE = 5
 
@@ -169,9 +170,13 @@ class CartViewModel(
         }
     }
 
-    suspend fun getSelectedCartItemIds(): List<Long> =
+    suspend fun getSelectedOrderProducts(): List<OrderProduct> =
         createSelectedCartOrder()?.items?.map {
-            it.cartItemId
+            OrderProduct(
+                productId = it.productId,
+                quantity = it.quantity,
+                price = it.price,
+            )
         } ?: emptyList()
 
     private fun updateQuantity(

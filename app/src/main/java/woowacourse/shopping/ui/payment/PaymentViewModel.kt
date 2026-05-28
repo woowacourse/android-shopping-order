@@ -21,6 +21,8 @@ import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.CouponRepository
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
+import woowacourse.shopping.ui.navigation.OrderProduct
+import woowacourse.shopping.ui.navigation.OrderProductListType
 import woowacourse.shopping.ui.navigation.Payment
 import woowacourse.shopping.ui.payment.uistate.CouponUiModelMapper
 import woowacourse.shopping.ui.payment.uistate.PaymentUiState
@@ -28,6 +30,7 @@ import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.Locale
+import kotlin.reflect.typeOf
 
 class PaymentViewModel(
     savedStateHandle: SavedStateHandle,
@@ -36,11 +39,11 @@ class PaymentViewModel(
     private val couponRepository: CouponRepository,
     private val shippingPolicy: ShippingPolicy,
 ) : ViewModel() {
-    private val route: Payment = savedStateHandle.toRoute()
-    private val selectedProducts: List<SelectedProduct> =
-        route.productIds.zip(route.quantities) { id, quantity ->
-            SelectedProduct(id, quantity)
-        }
+    private val route: Payment =
+        savedStateHandle.toRoute(
+            typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
+        )
+    private val selectedProducts: List<OrderProduct> = route.orderProducts
 
     private val _uiState = MutableStateFlow(PaymentUiState())
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
@@ -48,41 +51,51 @@ class PaymentViewModel(
     private var orderItems: List<OrderItem> = emptyList()
     private var coupons: List<Coupon> = emptyList()
 
-    private data class SelectedProduct(
-        val productId: Long,
-        val quantity: Int,
-    )
-
     init {
-        loadOrderItems()
+        initializeOrderItems()
         loadCoupons()
     }
 
-    private fun loadOrderItems() {
-        if (selectedProducts.isEmpty()) return
+    private fun initializeOrderItems() {
+        if (selectedProducts.isNotEmpty()) {
+            orderItems =
+                selectedProducts.map { product ->
+                    OrderItem(
+                        productId = product.productId,
+                        price = Money(product.price),
+                        quantity = product.quantity,
+                    )
+                }
+            calculateAmounts()
+            return
+        }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            val totalCount = cartRepository.count().getOrDefault(0)
+            if (totalCount == 0) return@launch
 
-            val productIds = selectedProducts.map { it.productId }.toSet()
+            val cartItems =
+                cartRepository
+                    .getCartPage(0, totalCount)
+                    .getOrNull()
+                    ?.items ?: return@launch
 
-            productRepository
-                .findAllByIds(productIds)
-                .onSuccess { productsMap ->
-                    orderItems =
-                        selectedProducts.mapNotNull { selected ->
-                            val product = productsMap[selected.productId] ?: return@mapNotNull null
-                            OrderItem(
-                                productId = selected.productId,
-                                price = product.price,
-                                quantity = selected.quantity,
-                            )
-                        }
-                    _uiState.update { it.copy(isLoading = false) }
-                    calculateAmounts()
-                }.onFailure { throwable ->
-                    _uiState.update { it.copy(isLoading = false, errorMessage = throwable.message) }
+            val productIds = cartItems.map { it.productId }.toSet()
+            val productsById =
+                productRepository
+                    .findAllByIds(productIds)
+                    .getOrDefault(emptyMap())
+
+            orderItems =
+                cartItems.mapNotNull { item ->
+                    val product = productsById[item.productId] ?: return@mapNotNull null
+                    OrderItem(
+                        productId = item.productId,
+                        price = product.price,
+                        quantity = item.quantity,
+                    )
                 }
+            calculateAmounts()
         }
     }
 
@@ -90,7 +103,6 @@ class PaymentViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            // Sync with cart first
             val syncResults =
                 selectedProducts.map { selected ->
                     cartRepository.setQuantity(selected.productId, selected.quantity)

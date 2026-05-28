@@ -34,6 +34,9 @@ import woowacourse.shopping.repository.ProductRepositoryFixture
 import woowacourse.shopping.repository.query.CartPageItem
 import woowacourse.shopping.repository.query.CartPageResult
 import woowacourse.shopping.ui.navigation.CartRecommendation
+import woowacourse.shopping.ui.navigation.OrderProduct
+import woowacourse.shopping.ui.navigation.OrderProductListType
+import kotlin.reflect.typeOf
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CartRecommendationViewModelTest {
@@ -63,8 +66,21 @@ class CartRecommendationViewModelTest {
         }
 
         val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
-        every { savedStateHandle.toRoute<CartRecommendation>() } returns
-            CartRecommendation(selectedCartItemIds = listOf(101L))
+        every {
+            savedStateHandle.toRoute<CartRecommendation>(
+                typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
+            )
+        } returns
+            CartRecommendation(
+                orderProducts =
+                    listOf(
+                        OrderProduct(
+                            productId = orderedProduct.id,
+                            quantity = 1,
+                            price = orderedProduct.price.value,
+                        ),
+                    ),
+            )
 
         viewModel =
             CartRecommendationViewModel(
@@ -122,8 +138,21 @@ class CartRecommendationViewModelTest {
                     recordView(1L)
                 }
             val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
-            every { savedStateHandle.toRoute<CartRecommendation>() } returns
-                CartRecommendation(selectedCartItemIds = listOf(101L))
+            every {
+                savedStateHandle.toRoute<CartRecommendation>(
+                    typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
+                )
+            } returns
+                CartRecommendation(
+                    orderProducts =
+                        listOf(
+                            OrderProduct(
+                                productId = fruitProduct.id,
+                                quantity = 1,
+                                price = fruitProduct.price.value,
+                            ),
+                        ),
+                )
 
             viewModel =
                 CartRecommendationViewModel(
@@ -167,8 +196,21 @@ class CartRecommendationViewModelTest {
                     recordView(1L)
                 }
             val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
-            every { savedStateHandle.toRoute<CartRecommendation>() } returns
-                CartRecommendation(selectedCartItemIds = listOf(101L))
+            every {
+                savedStateHandle.toRoute<CartRecommendation>(
+                    typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
+                )
+            } returns
+                CartRecommendation(
+                    orderProducts =
+                        listOf(
+                            OrderProduct(
+                                productId = selectedOrderProduct.id,
+                                quantity = 1,
+                                price = selectedOrderProduct.price.value,
+                            ),
+                        ),
+                )
 
             viewModel =
                 CartRecommendationViewModel(
@@ -204,8 +246,21 @@ class CartRecommendationViewModelTest {
                     recordView(1L)
                 }
             val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
-            every { savedStateHandle.toRoute<CartRecommendation>() } returns
-                CartRecommendation(selectedCartItemIds = listOf(101L))
+            every {
+                savedStateHandle.toRoute<CartRecommendation>(
+                    typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
+                )
+            } returns
+                CartRecommendation(
+                    orderProducts =
+                        listOf(
+                            OrderProduct(
+                                productId = selectedOrderProduct.id,
+                                quantity = 1,
+                                price = selectedOrderProduct.price.value,
+                            ),
+                        ),
+                )
 
             viewModel =
                 CartRecommendationViewModel(
@@ -240,8 +295,21 @@ class CartRecommendationViewModelTest {
                     recordView(dessertProduct.id)
                 }
             val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
-            every { savedStateHandle.toRoute<CartRecommendation>() } returns
-                CartRecommendation(selectedCartItemIds = listOf(101L))
+            every {
+                savedStateHandle.toRoute<CartRecommendation>(
+                    typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
+                )
+            } returns
+                CartRecommendation(
+                    orderProducts =
+                        listOf(
+                            OrderProduct(
+                                productId = selectedOrderProduct.id,
+                                quantity = 1,
+                                price = selectedOrderProduct.price.value,
+                            ),
+                        ),
+                )
 
             viewModel =
                 CartRecommendationViewModel(
@@ -284,11 +352,6 @@ class CartRecommendationViewModelTest {
             viewModel.addRecommendedProduct(recommendedProduct.id)
             advanceUntilIdle()
 
-            assertEquals(
-                setOf(101L),
-                viewModel.uiState.value.pendingOrder.cartItemIds
-                    .toSet(),
-            )
             assertEquals(2, viewModel.uiState.value.pendingOrder.selectedCount)
             assertEquals(
                 orderedProduct.price.value + recommendedProduct.price.value,
