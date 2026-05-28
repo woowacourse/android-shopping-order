@@ -8,6 +8,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import woowacourse.shopping.data.alarm.PayReminderAlarm
 import woowacourse.shopping.data.alarm.PayReminderPreference
 import woowacourse.shopping.data.localdb.ShoppingDB
 import woowacourse.shopping.data.remote.NetworkManager
@@ -57,6 +58,10 @@ class AppContainer(
 
     val payReminderPreference: PayReminderPreference by lazy {
         PayReminderPreference(context)
+    }
+
+    val payReminderAlarm: PayReminderAlarm by lazy {
+        PayReminderAlarm(context)
     }
 
     private val loggingInterceptor =

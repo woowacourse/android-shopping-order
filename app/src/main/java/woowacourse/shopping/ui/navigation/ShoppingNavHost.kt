@@ -344,7 +344,7 @@ private fun PayRouteContent(
     val context = LocalContext.current
     val payReminderAlarm =
         remember {
-            PayReminderAlarm(context)
+            appContainer.payReminderAlarm
         }
     val payReminderPreference =
         remember {
@@ -404,6 +404,7 @@ private fun SettingRouteContent(
             factory =
                 SettingViewModel.provideFactory(
                     payReminderPreference = appContainer.payReminderPreference,
+                    payReminderAlarm = appContainer.payReminderAlarm,
                 ),
         )
     val isNotificationEnabled by viewModel.isNotificationEnabled.collectAsStateWithLifecycle()

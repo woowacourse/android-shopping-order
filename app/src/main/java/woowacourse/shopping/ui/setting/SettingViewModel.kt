@@ -7,10 +7,12 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import woowacourse.shopping.data.alarm.PayReminderAlarm
 import woowacourse.shopping.data.alarm.PayReminderPreference
 
 class SettingViewModel(
     private val payReminderPreference: PayReminderPreference,
+    private val payReminderAlarm: PayReminderAlarm,
 ) : ViewModel() {
     private val _isNotificationEnabled = MutableStateFlow(payReminderPreference.isEnabled())
     val isNotificationEnabled: StateFlow<Boolean> = _isNotificationEnabled.asStateFlow()
@@ -18,14 +20,22 @@ class SettingViewModel(
     fun toggleNotification(isEnabled: Boolean) {
         _isNotificationEnabled.value = isEnabled
         payReminderPreference.setEnabled(isEnabled)
+
+        if (!isEnabled) {
+            payReminderAlarm.cancel()
+        }
     }
 
     companion object {
-        fun provideFactory(payReminderPreference: PayReminderPreference): ViewModelProvider.Factory =
+        fun provideFactory(
+            payReminderPreference: PayReminderPreference,
+            payReminderAlarm: PayReminderAlarm,
+        ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
                     SettingViewModel(
                         payReminderPreference = payReminderPreference,
+                        payReminderAlarm = payReminderAlarm,
                     )
                 }
             }
