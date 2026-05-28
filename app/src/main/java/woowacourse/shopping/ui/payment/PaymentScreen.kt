@@ -34,7 +34,7 @@ import woowacourse.shopping.ui.component.ShoppingButton
 import woowacourse.shopping.ui.component.ShoppingCheckBox
 import woowacourse.shopping.ui.model.UiCoupon
 import woowacourse.shopping.ui.model.UiPaymentPrice
-import woowacourse.shopping.ui.theme.Gary30
+import woowacourse.shopping.ui.theme.Gray30
 import woowacourse.shopping.ui.theme.Gray40
 import woowacourse.shopping.ui.theme.Gray50
 import woowacourse.shopping.ui.theme.Gray70
@@ -107,7 +107,7 @@ fun PaymentScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            HorizontalDivider(thickness = 7.dp, color = Gary30)
+            HorizontalDivider(thickness = 7.dp, color = Gray30)
 
             PaymentSummary(
                 totalPrice = paymentPrice.totalPrice,
@@ -116,7 +116,7 @@ fun PaymentScreen(
                 modifier = Modifier.padding(horizontal = 18.dp, vertical = 20.dp),
             )
 
-            HorizontalDivider(thickness = 7.dp, color = Gary30)
+            HorizontalDivider(thickness = 7.dp, color = Gray30)
 
             Spacer(modifier = Modifier.height(21.dp))
 
