@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -48,7 +49,7 @@ fun PaymentScreen(
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.statusBarsPadding(),
         containerColor = Color.White,
         topBar = {
             ShoppingAppBar(
@@ -80,7 +81,9 @@ fun PaymentScreen(
         },
     ) { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding),
+            modifier =
+                Modifier
+                    .padding(innerPadding),
         ) {
             CouponSection(
                 coupons = coupons,
