@@ -13,6 +13,7 @@ import woowacourse.shopping.data.remote.dto.response.cart.CartProductDto
 import woowacourse.shopping.data.remote.dto.response.cart.CartQuantityResponse
 import woowacourse.shopping.data.remote.dto.response.cart.CartResponse
 import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
+import java.io.IOException
 
 class CartRepositoryTest {
     @Test
@@ -109,6 +110,7 @@ class CartRepositoryTest {
 
 private class FakeCartApi(
     private var items: List<CartDto>,
+    private val failedDeleteIds: Set<Long> = emptySet(),
 ) : CartApi {
     val deletedIds = mutableListOf<Long>()
 
@@ -140,6 +142,7 @@ private class FakeCartApi(
 
     override suspend fun deleteCartItem(id: Long) {
         deletedIds += id
+        if (id in failedDeleteIds) throw IOException()
         items = items.filterNot { it.id == id }
     }
 

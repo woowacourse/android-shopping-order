@@ -57,11 +57,13 @@ class CartRepositoryImpl(
     override suspend fun deleteSelectedItems() {
         val selectedCartItemIds = selectedCartItemIds.value
 
-        selectedCartItemIds.forEach { cartItemId ->
-            api.deleteCartItem(id = cartItemId.toLong())
+        try {
+            selectedCartItemIds.forEach { cartItemId ->
+                api.deleteCartItem(id = cartItemId.toLong())
+            }
+        } finally {
+            refreshCartItems()
         }
-
-        refreshCartItems()
     }
 
     override fun toggleCartItemSelection(cartItemId: String) {
