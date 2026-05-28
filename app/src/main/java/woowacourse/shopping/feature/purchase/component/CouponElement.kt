@@ -1,5 +1,6 @@
 package woowacourse.shopping.feature.purchase.component
 
+import android.R.attr.fontWeight
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -61,7 +62,7 @@ fun CouponElement(
         )
         if (model.description != null) {
             Text(
-                "최소 주문 금액: ${model.description}",
+                model.description,
                 fontWeight = FontWeight.W400,
                 fontSize = 12.sp,
                 color = Color(0xff555555),
