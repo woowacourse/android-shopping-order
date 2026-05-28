@@ -8,7 +8,11 @@ value class Money(
         require(amount >= 0) { "금액은 0원 이상이어야 합니다." }
     }
 
-    operator fun times(time: Int): Money = Money(Math.multiplyExact(amount, time))
+    operator fun times(time: Int): Money {
+        require(time >= 0) { "곱셈 횟수는 0이상이어야 합니다." }
+
+        return Money(Math.multiplyExact(amount, time))
+    }
 
     operator fun plus(money: Money): Money = Money(amount + money.amount)
 
