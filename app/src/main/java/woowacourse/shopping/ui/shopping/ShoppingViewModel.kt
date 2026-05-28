@@ -111,7 +111,7 @@ class ShoppingViewModel(
             }
         }.onFailure { throwable ->
             if (throwable is IOException || throwable is HttpException) {
-                _uiEvent.emit(ShoppingUiEvent.ShowToastMessage("카트 업데이트 오류"))
+                _uiEvent.emit(ShoppingUiEvent.ShowToastMessage("상품을 불러오는데 오류가 발생했습니다."))
             } else {
                 throw throwable
             }
