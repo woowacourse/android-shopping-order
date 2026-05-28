@@ -104,14 +104,14 @@ class PaymentViewModel(
             _uiState.update { it.copy(isLoading = true) }
 
             val syncResults =
-                selectedProducts.map { selected ->
-                    cartRepository.setQuantity(selected.productId, selected.quantity)
+                orderItems.map { item ->
+                    cartRepository.setQuantity(item.productId, item.quantity)
                 }
 
             if (syncResults.all { it.isSuccess }) {
                 val cartCountResult = cartRepository.count()
                 val totalCount = cartCountResult.getOrDefault(0)
-                val targetProductIds = selectedProducts.map { it.productId }.toSet()
+                val targetProductIds = orderItems.map { it.productId }.toSet()
 
                 cartRepository
                     .getCartPage(0, totalCount.coerceAtLeast(1))
