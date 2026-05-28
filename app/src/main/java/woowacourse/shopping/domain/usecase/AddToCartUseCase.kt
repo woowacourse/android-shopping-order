@@ -1,5 +1,6 @@
 package woowacourse.shopping.domain.usecase
 
+import kotlinx.coroutines.CancellationException
 import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.UpdateItemResult
 import woowacourse.shopping.domain.repository.CartRepository
@@ -24,6 +25,8 @@ class AddToCartUseCase(
             } else {
                 cartRepository.addItem(productId, quantity)
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             AddItemResult.Error("장바구니 담기에 실패했습니다.")
         }
