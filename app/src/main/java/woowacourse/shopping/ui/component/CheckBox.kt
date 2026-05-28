@@ -15,9 +15,11 @@ fun CheckBox(
     onCheckedChange: () -> Unit,
     isChecked: Boolean,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     IconButton(
         onClick = onCheckedChange,
+        enabled = enabled,
         modifier = modifier,
     ) {
         Icon(

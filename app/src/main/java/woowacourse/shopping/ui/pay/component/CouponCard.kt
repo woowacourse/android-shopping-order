@@ -62,6 +62,7 @@ fun CouponCard(
                 CheckBox(
                     onCheckedChange = onClick,
                     isChecked = coupon.isSelected,
+                    enabled = coupon.isApplicable,
                     modifier = Modifier.size(24.dp),
                 )
                 Text(
