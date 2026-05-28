@@ -14,7 +14,9 @@ fun Coupon.toUiModel(): CouponUiModel =
             when (this) {
                 is Coupon.Fixed -> formattedPrice(minimumAmount.amount)
                 is Coupon.FreeShipping -> formattedPrice(minimumAmount.amount)
-                else -> null
+                is Coupon.Percentage,
+                is Coupon.BuyXGetY,
+                -> null
             },
     )
 
