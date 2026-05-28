@@ -9,19 +9,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import woowacourse.shopping.UiEvent
 import woowacourse.shopping.feature.common.state.ErrorDialog
 import woowacourse.shopping.feature.productlist.ProductListViewModel
 
@@ -31,22 +31,21 @@ fun ProductListScreen(
     vm: ProductListViewModel = viewModel(factory = ProductListViewModel.Factory),
     onProductClick: (String, String?) -> Unit,
     onCartIconClick: () -> Unit,
+    onSettingIconClick: () -> Unit,
     activityFinish: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
+    val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(Unit) {
         vm.initialLoading()
-    }
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                vm.cartRefresh()
-                vm.loadRecentProducts()
+        vm.event.collect { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(event.message)
+                }
             }
         }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     val state by vm.uiState.collectAsStateWithLifecycle()
@@ -64,12 +63,14 @@ fun ProductListScreen(
     )
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = Color.White,
         modifier = modifier
             .fillMaxSize(),
         topBar = {
             ProductListAppBar(
                 onCartIconClick = onCartIconClick,
+                onSettingIconClick = onSettingIconClick,
                 cartQuantities = state.cartTotalQuantity,
             )
         },
@@ -135,6 +136,7 @@ private fun PreviewProductListScreen() {
     ProductListScreen(
         onProductClick = { _, _ -> },
         onCartIconClick = { },
+        onSettingIconClick = { },
         activityFinish = { },
     )
 }

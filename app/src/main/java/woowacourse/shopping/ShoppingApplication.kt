@@ -1,6 +1,8 @@
 package woowacourse.shopping
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -16,10 +18,14 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import woowacourse.shopping.data.datasource.auth.AuthRemoteDataSource
 import woowacourse.shopping.data.datasource.cart.CartRemoteDataSource
+import woowacourse.shopping.data.datasource.coupon.CouponRemoteDataSource
 import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
 import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
+import woowacourse.shopping.data.datasource.setting.SettingLocalDataSource
 import woowacourse.shopping.data.local.RecentProductDatabase
 import woowacourse.shopping.data.network.cart.CartService
+import woowacourse.shopping.data.network.coupon.CouponService
+import woowacourse.shopping.data.network.mock.ShoppingMockServer
 import woowacourse.shopping.data.network.order.OrderService
 import woowacourse.shopping.data.network.product.ProductService
 import woowacourse.shopping.data.repository.auth.AuthRepository
@@ -27,11 +33,18 @@ import woowacourse.shopping.data.repository.auth.AuthRepositoryImpl
 import woowacourse.shopping.data.repository.cart.CartRepository
 import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
 import woowacourse.shopping.data.repository.cart.RecentProductRepositoryImpl
+import woowacourse.shopping.data.repository.coupon.CouponRepository
+import woowacourse.shopping.data.repository.coupon.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.order.OrderRepository
 import woowacourse.shopping.data.repository.order.OrderRepositoryImpl
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
+import woowacourse.shopping.data.repository.setting.SettingRepository
+import woowacourse.shopping.data.repository.setting.SettingRepositoryImpl
+import woowacourse.shopping.feature.notification.AlarmPaymentNotificationScheduler
+import woowacourse.shopping.feature.notification.AlarmReceiver
+import woowacourse.shopping.feature.notification.PaymentNotificationScheduler
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -44,10 +57,34 @@ class ShoppingApplication : Application() {
         private set
     lateinit var orderRepository: OrderRepository
         private set
+    lateinit var couponRepository: CouponRepository
+        private set
+    lateinit var settingRepository: SettingRepository
+        private set
+    lateinit var paymentNotificationScheduler: PaymentNotificationScheduler
+        private set
+    private var mockServer: ShoppingMockServer? = null
 
     override fun onCreate() {
         super.onCreate()
         initDependencies()
+        createPaymentNotificationChannel()
+        paymentNotificationScheduler = AlarmPaymentNotificationScheduler(applicationContext)
+    }
+
+    private fun createPaymentNotificationChannel() {
+        val channel = NotificationChannel(
+            AlarmReceiver.CHANNEL_ID,
+            AlarmReceiver.CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_DEFAULT,
+        )
+        val manager = getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(channel)
+    }
+
+    override fun onTerminate() {
+        mockServer?.shutdown()
+        super.onTerminate()
     }
 
     private fun initDependencies() {
@@ -59,7 +96,13 @@ class ShoppingApplication : Application() {
         )
 
         val json = Json { ignoreUnknownKeys = true }
-        val baseUrl = BuildConfig.SHOPPING_BASE_URL.toHttpUrl()
+        val baseUrl = if (BuildConfig.SHOPPING_USE_MOCK_SERVER || BuildConfig.SHOPPING_BASE_URL.isBlank()) {
+            ShoppingMockServer(json)
+                .also { mockServer = it }
+                .start()
+        } else {
+            BuildConfig.SHOPPING_BASE_URL.toHttpUrl()
+        }
 
         val client = OkHttpClient.Builder()
             .addInterceptor { chain ->
@@ -80,6 +123,7 @@ class ShoppingApplication : Application() {
         val productService = retrofit.create(ProductService::class.java)
         val cartService = retrofit.create(CartService::class.java)
         val orderService = retrofit.create(OrderService::class.java)
+        val couponService = retrofit.create(CouponService::class.java)
 
         val recentProductDatabase = Room.databaseBuilder(
             applicationContext,
@@ -100,10 +144,24 @@ class ShoppingApplication : Application() {
             orderDataSource = OrderRemoteDataSource(orderService = orderService),
         )
 
+        val coupon: CouponRepository = CouponRepositoryImpl(
+            couponDataSource = CouponRemoteDataSource(
+                couponService = couponService,
+            ),
+        )
+
+        val setting: SettingRepository = SettingRepositoryImpl(
+            dataSource = SettingLocalDataSource(
+                dataStore = applicationContext.dataStore,
+            ),
+        )
+
         productRepository = product
         cartRepository = cart
         recentProductRepository = recent
         orderRepository = order
+        couponRepository = coupon
+        settingRepository = setting
     }
 
     private fun issueBasicCredential(): String? {

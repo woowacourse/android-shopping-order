@@ -45,6 +45,11 @@ android {
             "SHOPPING_BASE_URL",
             "\"${localProps.getProperty("SHOPPING_BASE_URL", "")}\"",
         )
+        buildConfigField(
+            "Boolean",
+            "SHOPPING_USE_MOCK_SERVER",
+            localProps.getProperty("SHOPPING_USE_MOCK_SERVER", "false"),
+        )
     }
 
     buildTypes {
@@ -103,4 +108,5 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.kotlinx.serialization)
     testImplementation(libs.kotlinx.coroutines.test)
+    implementation(libs.navigation.compose)
 }

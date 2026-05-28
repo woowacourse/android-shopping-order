@@ -23,6 +23,7 @@ room = "2.8.4"
 json = "20250107"
 kotlinx-coroutines-test = "1.10.2"
 assertj = "3.27.3"
+navigation = "2.8.9"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -54,6 +55,7 @@ json = { module = "org.json:json", version.ref = "json" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines-test" }
 assertj-core = { group = "org.assertj", name = "assertj-core", version.ref = "assertj" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 
 
 [plugins]

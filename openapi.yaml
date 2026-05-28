@@ -1,0 +1,846 @@
+openapi: 3.1.0
+info:
+  title: 장바구니 API
+  version: "1.0"
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+tags:
+- name: 장바구니 아이템(CartItem)
+  description: 장바구니 API는 Basic 인증을 필요로 합니다.
+- name: 주문(Order)
+  description: 주문 API는 Basic 인증을 필요로 합니다.
+paths:
+  /products:
+    get:
+      tags:
+      - 상품(Product)
+      summary: 상품 목록 조회
+      operationId: getAllProducts
+      parameters:
+      - name: category
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageProduct"
+    post:
+      tags:
+      - 상품(Product)
+      summary: 상품 등록
+      operationId: createProduct
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "201":
+          description: Success create
+  /orders:
+    post:
+      tags:
+      - 주문(Order)
+      summary: 주문 생성
+      operationId: createOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderRequest"
+        required: true
+      responses:
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: string
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "201":
+          description: Success create
+      security:
+      - basicAuth: []
+  /cart-items:
+    get:
+      tags:
+      - 장바구니 아이템(CartItem)
+      summary: 사용자의 장바구니 목록 조회
+      operationId: showCartItems
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      responses:
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: string
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageCartItem"
+      security:
+      - basicAuth: []
+    post:
+      tags:
+      - 장바구니 아이템(CartItem)
+      summary: 사용자의 장바구니에 아이템 추가
+      operationId: addCartItems
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartItemRequest"
+        required: true
+      responses:
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: string
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "201":
+          description: Success create
+      security:
+      - basicAuth: []
+  /cart-items/{id}:
+    delete:
+      tags:
+      - 장바구니 아이템(CartItem)
+      summary: 장바구니 아이템 삭제
+      operationId: removeCartItems
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: string
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "204":
+          description: Success delete
+      security:
+      - basicAuth: []
+    patch:
+      tags:
+      - 장바구니 아이템(CartItem)
+      summary: 장바구니 아이템 수량 변경
+      operationId: updateCartItemQuantity
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartItemQuantityUpdateRequest"
+        required: true
+      responses:
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: string
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+      security:
+      - basicAuth: []
+  /products/{id}:
+    get:
+      tags:
+      - 상품(Product)
+      summary: 상품 상세 조회
+      operationId: getProductById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+    delete:
+      tags:
+      - 상품(Product)
+      summary: 상품 삭제
+      operationId: deleteProduct
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "204":
+          description: Success delete
+  /health:
+    get:
+      tags:
+      - Health Check API
+      operationId: health
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /coupons:
+    get:
+      tags:
+      - 쿠폰(Coupon)
+      summary: 쿠폰 목록 조회
+      operationId: getAllCoupons
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Coupon"
+  /cart-items/counts:
+    get:
+      tags:
+      - 장바구니 아이템(CartItem)
+      summary: 장바구니 아이템 수량 조회
+      operationId: counts
+      responses:
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: string
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CartItemCountResponse"
+      security:
+      - basicAuth: []
+components:
+  schemas:
+    ProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: integer
+          format: int32
+        imageUrl:
+          type: string
+        category:
+          type: string
+    OrderRequest:
+      type: object
+      properties:
+        cartItemIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+    CartItemRequest:
+      type: object
+      properties:
+        productId:
+          type: integer
+          format: int64
+        quantity:
+          type: integer
+          format: int32
+          description: "quantity field is optional. When not provided, default value\
+            \ is 1."
+    CartItemQuantityUpdateRequest:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          format: int32
+        deleteRequest:
+          type: boolean
+          readOnly: true
+    Pageable:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+          minimum: 0
+        size:
+          type: integer
+          format: int32
+          minimum: 1
+        sort:
+          type: array
+          items:
+            type: string
+    PageProduct:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+        number:
+          type: integer
+          format: int32
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        paged:
+          type: boolean
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        unpaged:
+          type: boolean
+        offset:
+          type: integer
+          format: int64
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        price:
+          type: integer
+          format: int32
+        imageUrl:
+          type: string
+        category:
+          type: string
+    SortObject:
+      type: object
+      properties:
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+        empty:
+          type: boolean
+    ProductResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        price:
+          type: integer
+          format: int32
+        imageUrl:
+          type: string
+        category:
+          type: string
+    AvailableTime:
+      type: object
+      properties:
+        start:
+          type: string
+          example: 14:30:00
+          pattern: HH:mm:SS
+        end:
+          type: string
+          example: 14:30:00
+          pattern: HH:mm:SS
+    BuyXGetYCoupon:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        code:
+          type: string
+        description:
+          type: string
+        expirationDate:
+          type: string
+          format: date
+          pattern: yyyy-MM-dd
+        buyQuantity:
+          type: integer
+          format: int32
+        getQuantity:
+          type: integer
+          format: int32
+        discountType:
+          type: string
+      required:
+      - code
+      - description
+      - expirationDate
+    Coupon:
+      type: object
+      oneOf:
+      - $ref: "#/components/schemas/FixedDiscountCoupon"
+      - $ref: "#/components/schemas/BuyXGetYCoupon"
+      - $ref: "#/components/schemas/FreeShippingCoupon"
+      - $ref: "#/components/schemas/PercentageDiscountCoupon"
+      properties:
+        id:
+          type: integer
+          format: int64
+        code:
+          type: string
+        description:
+          type: string
+        expirationDate:
+          type: string
+          format: date
+          pattern: yyyy-MM-dd
+        discountType:
+          type: string
+      required:
+      - code
+      - description
+      - expirationDate
+    FixedDiscountCoupon:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        code:
+          type: string
+        description:
+          type: string
+        expirationDate:
+          type: string
+          format: date
+          pattern: yyyy-MM-dd
+        discount:
+          type: integer
+          format: int32
+        minimumAmount:
+          type: integer
+          format: int32
+        discountType:
+          type: string
+      required:
+      - code
+      - description
+      - expirationDate
+    FreeShippingCoupon:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        code:
+          type: string
+        description:
+          type: string
+        expirationDate:
+          type: string
+          format: date
+          pattern: yyyy-MM-dd
+        minimumAmount:
+          type: integer
+          format: int32
+        discountType:
+          type: string
+      required:
+      - code
+      - description
+      - expirationDate
+    PercentageDiscountCoupon:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        code:
+          type: string
+        description:
+          type: string
+        expirationDate:
+          type: string
+          format: date
+          pattern: yyyy-MM-dd
+        discount:
+          type: integer
+          format: int32
+        availableTime:
+          $ref: "#/components/schemas/AvailableTime"
+        discountType:
+          type: string
+      required:
+      - code
+      - description
+      - expirationDate
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        quantity:
+          type: integer
+          format: int32
+        product:
+          $ref: "#/components/schemas/Product"
+    PageCartItem:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/CartItem"
+        number:
+          type: integer
+          format: int32
+        empty:
+          type: boolean
+    CartItemCountResponse:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          format: int32
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic

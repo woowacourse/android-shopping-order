@@ -5,19 +5,20 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.repository.cart.CartRepository
-import woowacourse.shopping.data.repository.order.OrderRepository
 import woowacourse.shopping.data.repository.product.ProductRepository
 import woowacourse.shopping.data.repository.recentproduct.RecentProductRepository
 import woowacourse.shopping.domain.Cart
 import woowacourse.shopping.domain.CartContent
-import woowacourse.shopping.domain.OrderResult
 import woowacourse.shopping.domain.Product
 import woowacourse.shopping.domain.ProductNotFoundException
 import woowacourse.shopping.feature.common.state.AppError
@@ -27,18 +28,19 @@ import woowacourse.shopping.feature.common.state.toAppError
 data class RecommendUiState(
     val recommendList: List<ProductUiModel> = emptyList(),
     val isLoading: Boolean = true,
-    val dialog: OrderDialogUiState = OrderDialogUiState.None,
     val error: AppError? = null,
 )
 
 class RecommendViewModel(
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
-    private val orderRepository: OrderRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RecommendUiState())
     val uiState: StateFlow<RecommendUiState> = _uiState.asStateFlow()
+
+    private val _event = MutableSharedFlow<RecommendEvent>()
+    val event: SharedFlow<RecommendEvent> = _event.asSharedFlow()
 
     private var products: List<Product> = emptyList()
     private var serverCart: Cart = Cart(emptyList())
@@ -152,6 +154,7 @@ class RecommendViewModel(
 
     fun order(cartContentIds: List<String>) {
         viewModelScope.launch {
+            val totalPrice = getTotalPrice(cartContentIds)
             val products = memoryCart.cartContents.map { it.product }
             memoryCart.cartContents.forEach {
                 cartRepository.insert(it.product.id, quantity = it.quantity)
@@ -162,23 +165,15 @@ class RecommendViewModel(
             val latestContents = serverCart.cartContents.filter { cartContent ->
                 products.map { it.id }.contains(cartContent.product.id)
             }
+            val allContentIds = cartContentIds + latestContents.map { it.id }
 
-            val result = orderRepository.orders(
-                cartItemIds = cartContentIds + latestContents.map { it.id },
+            _event.emit(
+                RecommendEvent.NavigateToPurchase(
+                    contentIds = allContentIds,
+                    totalPrice = totalPrice,
+                ),
             )
-            _uiState.update { it.copy(dialog = result.toDialogState()) }
         }
-    }
-
-    fun dismissDialog() {
-        _uiState.update { it.copy(dialog = OrderDialogUiState.None) }
-    }
-
-    private fun OrderResult.toDialogState(): OrderDialogUiState = when (this) {
-        OrderResult.Success -> OrderDialogUiState.Success
-        OrderResult.AuthExpired -> OrderDialogUiState.AuthExpired
-        OrderResult.ServerError -> OrderDialogUiState.ServerError
-        OrderResult.NetworkError -> OrderDialogUiState.NetworkError
     }
 
     private suspend fun refreshRecentProducts(): String? {
@@ -198,7 +193,6 @@ class RecommendViewModel(
                 RecommendViewModel(
                     app.productRepository,
                     app.cartRepository,
-                    app.orderRepository,
                     app.recentProductRepository,
                 )
             }
