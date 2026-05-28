@@ -19,8 +19,15 @@ class CouponRepositoryImpl(
     override val coupons: StateFlow<List<Coupon>> = _coupons.asStateFlow()
 
     override suspend fun refreshCoupons() {
-        _coupons.value = api.getCoupons().map { it.toDomain() }
+        _coupons.value = api.getCoupons().mapNotNull { it.toDomainOrNull() }
     }
+
+    private fun CouponResponse.toDomainOrNull(): Coupon? =
+        try {
+            toDomain()
+        } catch (_: RuntimeException) {
+            null
+        }
 
     private fun CouponResponse.toDomain(): Coupon {
         val expirationDate = LocalDate.parse(expirationDate)
