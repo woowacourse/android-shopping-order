@@ -10,9 +10,10 @@ import woowacourse.shopping.BuildConfig
 
 class RetrofitProvider(
     private val authHeaderProvider: () -> String?,
+    baseUrl: String = BuildConfig.BASE_URL,
 ) {
 
-    private val baseUrl = BuildConfig.BASE_URL
+    private val baseUrl = baseUrl.ensureEndWithSlash()
 
     private val authInterceptor = Interceptor { chain ->
         val originalRequest = chain.request()
@@ -37,3 +38,6 @@ class RetrofitProvider(
 
     fun <T> create(service: Class<T>): T = retrofit.create(service)
 }
+
+private fun String.ensureEndWithSlash(): String =
+    if (endsWith("/")) this else "$this/"
