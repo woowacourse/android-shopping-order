@@ -20,7 +20,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -57,7 +59,6 @@ fun AppNavHost(innerPadding: PaddingValues) {
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission(),
         ) { isGranted ->
-            // Permission result handled if needed
         }
 
     LaunchedEffect(Unit) {
@@ -128,10 +129,13 @@ fun AppNavHost(innerPadding: PaddingValues) {
             val snackbarHostState = remember { SnackbarHostState() }
 
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val lifecycleOwner = LocalLifecycleOwner.current
 
-            LaunchedEffect(Unit) {
-                viewModel.snackbarEvent.collect { message ->
-                    snackbarHostState.showSnackbar(message)
+            LaunchedEffect(viewModel.snackbarEvent, lifecycleOwner) {
+                lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.snackbarEvent.collect { message ->
+                        snackbarHostState.showSnackbar(message)
+                    }
                 }
             }
 
@@ -166,10 +170,13 @@ fun AppNavHost(innerPadding: PaddingValues) {
             val coroutineScope = rememberCoroutineScope()
 
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val lifecycleOwner = LocalLifecycleOwner.current
 
-            LaunchedEffect(Unit) {
-                viewModel.snackbarEvent.collect { message ->
-                    snackbarHostState.showSnackbar(message)
+            LaunchedEffect(viewModel.snackbarEvent, lifecycleOwner) {
+                lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.snackbarEvent.collect { message ->
+                        snackbarHostState.showSnackbar(message)
+                    }
                 }
             }
 
@@ -216,13 +223,16 @@ fun AppNavHost(innerPadding: PaddingValues) {
                 )
 
             val uiState by recommendationViewModel.uiState.collectAsStateWithLifecycle()
+            val lifecycleOwner = LocalLifecycleOwner.current
 
-            LaunchedEffect(uiState.orderProductsToOrder) {
-                val orderProducts = uiState.orderProductsToOrder
-                if (orderProducts != null) {
-                    navController.navigate(Payment(orderProducts = orderProducts)) {
-                        popUpTo<CartRecommendation> {
-                            inclusive = true
+            LaunchedEffect(uiState.orderProductsToOrder, lifecycleOwner) {
+                lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    val orderProducts = uiState.orderProductsToOrder
+                    if (orderProducts != null) {
+                        navController.navigate(Payment(orderProducts = orderProducts)) {
+                            popUpTo<CartRecommendation> {
+                                inclusive = true
+                            }
                         }
                     }
                 }
@@ -260,17 +270,20 @@ fun AppNavHost(innerPadding: PaddingValues) {
                 )
 
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val lifecycleOwner = LocalLifecycleOwner.current
 
             LaunchedEffect(Unit) {
                 AlarmHelper.schedulePaymentReminder(context)
             }
 
-            LaunchedEffect(uiState.isOrderCompleted) {
-                if (uiState.isOrderCompleted) {
-                    AlarmHelper.cancelPaymentReminder(context)
-                    navController.navigate(ProductList) {
-                        popUpTo<ProductList> {
-                            inclusive = true
+            LaunchedEffect(uiState.isOrderCompleted, lifecycleOwner) {
+                lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    if (uiState.isOrderCompleted) {
+                        AlarmHelper.cancelPaymentReminder(context)
+                        navController.navigate(ProductList) {
+                            popUpTo<ProductList> {
+                                inclusive = true
+                            }
                         }
                     }
                 }
