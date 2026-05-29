@@ -11,45 +11,37 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import woowacourse.shopping.notification.AlarmManagerUnpaidOrderReminderScheduler
+import woowacourse.shopping.domain.model.cart.SelectedCartOrder
 
 @Composable
 fun OrderRouteScreen(
     orderViewModel: OrderViewModel,
     restorePendingOrder: Boolean,
+    restorePendingOrderSession: () -> SelectedCartOrder?,
     onBackClick: () -> Unit,
     onPendingOrderUnavailable: () -> Unit,
     onOrderCompleted: () -> Unit,
 ) {
     val context = LocalContext.current
     val uiState by orderViewModel.uiState.collectAsStateWithLifecycle()
-    val reminderScheduler = remember(context) { AlarmManagerUnpaidOrderReminderScheduler(context.applicationContext) }
     val notificationPermissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
     LaunchedEffect(restorePendingOrder) {
         if (restorePendingOrder && !uiState.hasPendingOrder) {
-            val restored = orderViewModel.restorePendingOrderIfAvailable()
-            if (!restored) {
+            val restoredOrder = restorePendingOrderSession()
+            if (restoredOrder == null) {
                 onPendingOrderUnavailable()
+            } else {
+                orderViewModel.loadOrder(restoredOrder)
             }
         }
-    }
-
-    LaunchedEffect(uiState.isReminderEnabled, uiState.hasPendingOrder) {
-        if (!uiState.isReminderEnabled || !uiState.hasPendingOrder) {
-            reminderScheduler.cancel()
-            return@LaunchedEffect
-        }
-        reminderScheduler.schedule()
     }
 
     LaunchedEffect(uiState.isReminderEnabled, uiState.hasPendingOrder) {
@@ -65,7 +57,6 @@ fun OrderRouteScreen(
         orderViewModel.events.collect { event ->
             when (event) {
                 OrderEvent.OrderCompleted -> {
-                    reminderScheduler.cancel()
                     Toast.makeText(context, "주문이 완료되었습니다.", Toast.LENGTH_SHORT).show()
                     onOrderCompleted()
                 }
@@ -78,22 +69,12 @@ fun OrderRouteScreen(
     }
 
     BackHandler(enabled = !uiState.isOrdering) {
-        reminderScheduler.cancel()
-        orderViewModel.clearPendingOrderSession()
         onBackClick()
-    }
-
-    DisposableEffect(reminderScheduler) {
-        onDispose {
-            reminderScheduler.cancel()
-        }
     }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         OrderScreen(
             onBackClick = {
-                reminderScheduler.cancel()
-                orderViewModel.clearPendingOrderSession()
                 onBackClick()
             },
             modifier = Modifier.padding(innerPadding),

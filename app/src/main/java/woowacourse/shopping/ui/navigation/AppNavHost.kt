@@ -28,6 +28,10 @@ fun AppNavHost(
     onPendingOrderNavigationHandled: () -> Unit = {},
 ) {
     val pendingOrderEntryViewModel: PendingOrderEntryViewModel = viewModel()
+    val pendingOrderSessionManager =
+        remember {
+            ShoppingRepositoryProvider.pendingOrderSessionManager
+        }
     val pendingOrderEntryAction =
         pendingOrderEntryViewModel.pendingOrderEntryAction.collectAsStateWithLifecycle().value
 
@@ -114,7 +118,11 @@ fun AppNavHost(
                 OrderRouteScreen(
                     orderViewModel = orderViewModel,
                     restorePendingOrder = route.restorePendingOrder,
-                    onBackClick = { navController.popBackStack() },
+                    restorePendingOrderSession = pendingOrderSessionManager::restore,
+                    onBackClick = {
+                        pendingOrderSessionManager.clear()
+                        navController.popBackStack()
+                    },
                     onPendingOrderUnavailable = {
                         navController.navigate(ShoppingRoute) {
                             popUpTo(CartGraph) { inclusive = true }
@@ -122,6 +130,7 @@ fun AppNavHost(
                         }
                     },
                     onOrderCompleted = {
+                        pendingOrderSessionManager.clear()
                         navController.navigate(ShoppingRoute) {
                             popUpTo(CartGraph) { inclusive = true }
                             launchSingleTop = true
@@ -146,7 +155,7 @@ fun AppNavHost(
                         navController.navigate(ProductDetailRoute(productId))
                     },
                     onProceedToOrder = { selectedCartOrder ->
-                        ShoppingRepositoryProvider.pendingOrderRepository.savePendingOrder(selectedCartOrder)
+                        pendingOrderSessionManager.start(selectedCartOrder)
                         navController.navigate(OrderRoute(restorePendingOrder = true))
                     },
                 )

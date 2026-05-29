@@ -6,15 +6,15 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.model.cart.SelectedCartOrder
 import woowacourse.shopping.domain.model.cart.SelectedCartOrderItem
-import woowacourse.shopping.domain.repository.PendingOrderRepository
+import woowacourse.shopping.domain.session.PendingOrderSessionManager
 
 class PendingOrderEntryViewModelTest {
     @Test
     fun `저장된 주문 세션이 있으면 주문 화면 이동 이벤트를 발행한다`() {
         val viewModel =
             PendingOrderEntryViewModel(
-                pendingOrderRepository =
-                    FakePendingOrderRepository(
+                pendingOrderSessionManager =
+                    FakePendingOrderSessionManager(
                         pendingOrder =
                             SelectedCartOrder(
                                 items =
@@ -42,7 +42,7 @@ class PendingOrderEntryViewModelTest {
     fun `저장된 주문 세션이 없으면 이동 없이 처리 완료 이벤트를 발행한다`() {
         val viewModel =
             PendingOrderEntryViewModel(
-                pendingOrderRepository = FakePendingOrderRepository(),
+                pendingOrderSessionManager = FakePendingOrderSessionManager(),
             )
 
         viewModel.handlePendingOrderEntryRequest(token = 1L)
@@ -57,7 +57,7 @@ class PendingOrderEntryViewModelTest {
     fun `같은 토큰은 한 번만 처리한다`() {
         val viewModel =
             PendingOrderEntryViewModel(
-                pendingOrderRepository = FakePendingOrderRepository(),
+                pendingOrderSessionManager = FakePendingOrderSessionManager(),
             )
 
         viewModel.handlePendingOrderEntryRequest(token = 1L)
@@ -67,17 +67,19 @@ class PendingOrderEntryViewModelTest {
         assertEquals(null, viewModel.pendingOrderEntryAction.value)
     }
 
-    private class FakePendingOrderRepository(
+    private class FakePendingOrderSessionManager(
         private var pendingOrder: SelectedCartOrder? = null,
-    ) : PendingOrderRepository {
-        override fun getPendingOrder(): SelectedCartOrder? = pendingOrder
-
-        override fun savePendingOrder(order: SelectedCartOrder) {
+    ) : PendingOrderSessionManager {
+        override fun start(order: SelectedCartOrder) {
             pendingOrder = order
         }
 
-        override fun clearPendingOrder() {
+        override fun restore(): SelectedCartOrder? = pendingOrder
+
+        override fun clear() {
             pendingOrder = null
         }
+
+        override fun hasActiveSession(): Boolean = pendingOrder != null
     }
 }

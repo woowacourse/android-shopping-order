@@ -4,11 +4,12 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import woowacourse.shopping.domain.repository.PendingOrderRepository
 import woowacourse.shopping.di.ShoppingRepositoryProvider
+import woowacourse.shopping.domain.session.PendingOrderSessionManager
 
 class PendingOrderEntryViewModel(
-    private val pendingOrderRepository: PendingOrderRepository = ShoppingRepositoryProvider.pendingOrderRepository,
+    private val pendingOrderSessionManager: PendingOrderSessionManager =
+        ShoppingRepositoryProvider.pendingOrderSessionManager,
 ) : ViewModel() {
     private val _pendingOrderEntryAction = MutableStateFlow<PendingOrderEntryAction?>(null)
     val pendingOrderEntryAction: StateFlow<PendingOrderEntryAction?> =
@@ -21,7 +22,7 @@ class PendingOrderEntryViewModel(
 
         lastHandledToken = token
         _pendingOrderEntryAction.value =
-            if (pendingOrderRepository.getPendingOrder() != null) {
+            if (pendingOrderSessionManager.hasActiveSession()) {
                 PendingOrderEntryAction.OpenPendingOrder
             } else {
                 PendingOrderEntryAction.Ignore

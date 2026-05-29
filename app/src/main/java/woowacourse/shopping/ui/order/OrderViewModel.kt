@@ -18,7 +18,6 @@ import woowacourse.shopping.data.remote.common.NetworkMonitor
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.NotificationSettingRepository
-import woowacourse.shopping.domain.repository.PendingOrderRepository
 import woowacourse.shopping.di.ShoppingRepositoryProvider
 import woowacourse.shopping.notification.UnpaidOrderReminderScheduler
 import java.time.Clock
@@ -30,7 +29,6 @@ private val COUPON_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy년 M월 d�
 class OrderViewModel(
     private val cartRepository: CartRepository = ShoppingRepositoryProvider.cartRepository,
     private val couponRepository: CouponRepository = ShoppingRepositoryProvider.couponRepository,
-    private val pendingOrderRepository: PendingOrderRepository = ShoppingRepositoryProvider.pendingOrderRepository,
     private val notificationSettingRepository: NotificationSettingRepository =
         ShoppingRepositoryProvider.notificationSettingRepository,
     private val reminderScheduler: UnpaidOrderReminderScheduler =
@@ -63,22 +61,13 @@ class OrderViewModel(
         observeReminderSession()
     }
 
-    fun startOrder(selectedCartOrder: SelectedCartOrder) {
-        pendingOrderRepository.savePendingOrder(selectedCartOrder)
+    fun loadOrder(selectedCartOrder: SelectedCartOrder) {
         applyPendingOrder(selectedCartOrder)
         loadApplicableCoupons(selectedCartOrder)
     }
 
-    fun restorePendingOrderIfAvailable(): Boolean {
-        val restoredOrder = pendingOrderRepository.getPendingOrder() ?: return false
-        applyPendingOrder(restoredOrder)
-        loadApplicableCoupons(restoredOrder)
-        return true
-    }
-
-    fun clearPendingOrderSession() {
+    private fun clearLoadedOrder() {
         pendingOrder = null
-        pendingOrderRepository.clearPendingOrder()
         availableCouponsById = emptyMap()
         selectedCouponId = null
 
@@ -104,7 +93,7 @@ class OrderViewModel(
             runCatching {
                 cartRepository.createOrder(targetOrder.items.map { it.cartItemId })
             }.onSuccess {
-                clearPendingOrderSession()
+                clearLoadedOrder()
                 _events.emit(OrderEvent.OrderCompleted)
             }.onFailure { throwable ->
                 _uiState.update { currentState ->
@@ -159,6 +148,11 @@ class OrderViewModel(
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        reminderScheduler.cancel()
+        super.onCleared()
     }
 
     private fun observeReminderSetting() {

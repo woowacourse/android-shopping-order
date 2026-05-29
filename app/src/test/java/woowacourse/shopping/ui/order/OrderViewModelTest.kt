@@ -31,7 +31,6 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.repository.CartRepositoryFixture
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.NotificationSettingRepository
-import woowacourse.shopping.domain.repository.PendingOrderRepository
 import woowacourse.shopping.domain.repository.query.CartPageResult
 import woowacourse.shopping.notification.UnpaidOrderReminderScheduler
 import java.time.Clock
@@ -44,7 +43,6 @@ class OrderViewModelTest {
     private lateinit var dispatcher: TestDispatcher
     private lateinit var cartRepository: RecordingCartRepository
     private lateinit var couponRepository: FakeCouponRepository
-    private lateinit var pendingOrderRepository: FakePendingOrderRepository
     private lateinit var notificationSettingRepository: FakeNotificationSettingRepository
     private lateinit var reminderScheduler: FakeUnpaidOrderReminderScheduler
     private lateinit var viewModel: OrderViewModel
@@ -58,7 +56,6 @@ class OrderViewModelTest {
         Dispatchers.setMain(dispatcher)
 
         cartRepository = RecordingCartRepository()
-        pendingOrderRepository = FakePendingOrderRepository()
         notificationSettingRepository = FakeNotificationSettingRepository(isEnabled = false)
         reminderScheduler = FakeUnpaidOrderReminderScheduler()
         couponRepository =
@@ -117,7 +114,6 @@ class OrderViewModelTest {
             OrderViewModel(
                 cartRepository = cartRepository,
                 couponRepository = couponRepository,
-                pendingOrderRepository = pendingOrderRepository,
                 notificationSettingRepository = notificationSettingRepository,
                 reminderScheduler = reminderScheduler,
                 networkMonitor = FakeNetworkMonitor(),
@@ -134,7 +130,7 @@ class OrderViewModelTest {
 
     @Test
     fun `선택된 장바구니 상품으로 결제 요약을 구성한다`() {
-        viewModel.startOrder(
+        viewModel.loadOrder(
             SelectedCartOrder(
                 items =
                     listOf(
@@ -166,7 +162,7 @@ class OrderViewModelTest {
     @Test
     fun `주문 화면 진입 시 현재 주문에 적용 가능한 쿠폰 목록을 조회한다`() =
         runTest(dispatcher.scheduler) {
-            viewModel.startOrder(
+            viewModel.loadOrder(
                 SelectedCartOrder(
                     items =
                         listOf(
@@ -189,26 +185,13 @@ class OrderViewModelTest {
         }
 
     @Test
-    fun `주문 화면 진입 시 현재 주문 세션을 저장한다`() =
+    fun `주문 데이터를 로드하면 결제 화면 상태를 다시 구성한다`() =
         runTest(dispatcher.scheduler) {
             val order = selectedCartOrder(totalPrice = 120_000, quantity = 2)
 
-            viewModel.startOrder(order)
+            viewModel.loadOrder(order)
             advanceUntilIdle()
 
-            assertEquals(order, pendingOrderRepository.getPendingOrder())
-        }
-
-    @Test
-    fun `저장된 주문 세션이 있으면 복원해 결제 화면 상태를 다시 구성한다`() =
-        runTest(dispatcher.scheduler) {
-            val order = selectedCartOrder(totalPrice = 120_000, quantity = 2)
-            pendingOrderRepository.savePendingOrder(order)
-
-            val restored = viewModel.restorePendingOrderIfAvailable()
-            advanceUntilIdle()
-
-            assertTrue(restored)
             assertTrue(viewModel.uiState.value.hasPendingOrder)
             assertEquals(123_000L, viewModel.uiState.value.priceSummary.totalPaymentPrice)
         }
@@ -216,7 +199,7 @@ class OrderViewModelTest {
     @Test
     fun `쿠폰은 한 번에 하나만 선택할 수 있다`() =
         runTest(dispatcher.scheduler) {
-            viewModel.startOrder(
+            viewModel.loadOrder(
                 selectedCartOrder(totalPrice = 120_000, quantity = 2),
             )
             advanceUntilIdle()
@@ -238,7 +221,7 @@ class OrderViewModelTest {
     @Test
     fun `정액 할인 쿠폰을 선택하면 할인 금액과 총 결제 금액이 반영된다`() =
         runTest(dispatcher.scheduler) {
-            viewModel.startOrder(
+            viewModel.loadOrder(
                 selectedCartOrder(totalPrice = 120_000, quantity = 2),
             )
             advanceUntilIdle()
@@ -253,7 +236,7 @@ class OrderViewModelTest {
     @Test
     fun `무료 배송 쿠폰을 선택하면 배송비가 0원이 된다`() =
         runTest(dispatcher.scheduler) {
-            viewModel.startOrder(
+            viewModel.loadOrder(
                 selectedCartOrder(totalPrice = 60_000, quantity = 1),
             )
             advanceUntilIdle()
@@ -269,7 +252,7 @@ class OrderViewModelTest {
     @Test
     fun `미라클 세일 쿠폰을 선택하면 주문 금액의 30퍼센트를 할인한다`() =
         runTest(dispatcher.scheduler) {
-            viewModel.startOrder(
+            viewModel.loadOrder(
                 selectedCartOrder(totalPrice = 100_000, quantity = 1),
             )
             advanceUntilIdle()
@@ -284,7 +267,7 @@ class OrderViewModelTest {
     @Test
     fun `보고 쿠폰을 선택하면 수량 조건을 만족하는 상품 중 가장 비싼 한 개 가격만 할인한다`() =
         runTest(dispatcher.scheduler) {
-            viewModel.startOrder(
+            viewModel.loadOrder(
                 SelectedCartOrder(
                     items =
                         listOf(
@@ -320,7 +303,7 @@ class OrderViewModelTest {
     @Test
     fun `조건에 맞지 않거나 만료된 쿠폰은 목록에 포함되지 않는다`() =
         runTest(dispatcher.scheduler) {
-            viewModel.startOrder(
+            viewModel.loadOrder(
                 selectedCartOrder(totalPrice = 20_000, quantity = 2),
             )
             advanceUntilIdle()
@@ -341,7 +324,7 @@ class OrderViewModelTest {
                     StoredCartItem(cartItemId = 102L, productId = sourCandy.id, quantity = 1),
                 ),
             )
-            viewModel.startOrder(
+            viewModel.loadOrder(
                 SelectedCartOrder(
                     items =
                         listOf(
@@ -370,16 +353,6 @@ class OrderViewModelTest {
             assertTrue(cartRepository.getCartItemsByProductIds(setOf(shrimpCracker.id, sourCandy.id)).isEmpty())
             assertEquals(OrderEvent.OrderCompleted, event.await())
             assertEquals(0L, viewModel.uiState.value.priceSummary.totalPaymentPrice)
-            assertEquals(null, pendingOrderRepository.getPendingOrder())
-        }
-
-    @Test
-    fun `주문 화면을 이탈하면 저장된 주문 세션을 삭제한다`() {
-        viewModel.startOrder(selectedCartOrder(totalPrice = 120_000, quantity = 2))
-
-        viewModel.clearPendingOrderSession()
-
-        assertEquals(null, pendingOrderRepository.getPendingOrder())
         assertEquals(false, viewModel.uiState.value.hasPendingOrder)
     }
 
@@ -397,7 +370,7 @@ class OrderViewModelTest {
         runTest(dispatcher.scheduler) {
             notificationSettingRepository.setUnpaidNotificationEnabled(true)
 
-            viewModel.startOrder(selectedCartOrder(totalPrice = 120_000, quantity = 2))
+            viewModel.loadOrder(selectedCartOrder(totalPrice = 120_000, quantity = 2))
             advanceUntilIdle()
 
             assertEquals(1, reminderScheduler.scheduleCount)
@@ -405,13 +378,18 @@ class OrderViewModelTest {
         }
 
     @Test
-    fun `주문 세션이 종료되면 미결제 알림을 취소한다`() =
+    fun `결제가 완료되면 미결제 알림을 취소한다`() =
         runTest(dispatcher.scheduler) {
             notificationSettingRepository.setUnpaidNotificationEnabled(true)
-            viewModel.startOrder(selectedCartOrder(totalPrice = 120_000, quantity = 2))
+            cartRepository.setCartItems(
+                listOf(
+                    StoredCartItem(cartItemId = 101L, productId = shrimpCracker.id, quantity = 2),
+                ),
+            )
+            viewModel.loadOrder(selectedCartOrder(totalPrice = 120_000, quantity = 2))
             advanceUntilIdle()
 
-            viewModel.clearPendingOrderSession()
+            viewModel.placeOrder()
             advanceUntilIdle()
 
             assertEquals(2, reminderScheduler.cancelCount)
@@ -441,20 +419,6 @@ class OrderViewModelTest {
         private val coupons: List<Coupon>,
     ) : CouponRepository {
         override suspend fun getCoupons(): List<Coupon> = coupons
-    }
-
-    private class FakePendingOrderRepository : PendingOrderRepository {
-        private var pendingOrder: SelectedCartOrder? = null
-
-        override fun getPendingOrder(): SelectedCartOrder? = pendingOrder
-
-        override fun savePendingOrder(order: SelectedCartOrder) {
-            pendingOrder = order
-        }
-
-        override fun clearPendingOrder() {
-            pendingOrder = null
-        }
     }
 
     private class FakeNotificationSettingRepository(
