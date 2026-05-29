@@ -28,6 +28,7 @@ class ShoppingActivity : ComponentActivity() {
                     pendingOrderNavigationToken = pendingOrderNavigationToken,
                     onPendingOrderNavigationHandled = {
                         pendingOrderNavigationToken = 0L
+                        clearPendingOrderNavigationIntent()
                     },
                 )
             }
@@ -46,4 +47,14 @@ class ShoppingActivity : ComponentActivity() {
         } else {
             0L
         }
+
+    private fun clearPendingOrderNavigationIntent() {
+        if (intent?.action != ACTION_OPEN_PENDING_ORDER) return
+
+        setIntent(
+            intent.apply {
+                action = null
+            },
+        )
+    }
 }
