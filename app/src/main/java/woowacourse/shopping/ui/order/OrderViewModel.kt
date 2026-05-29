@@ -16,6 +16,7 @@ import woowacourse.shopping.data.remote.common.NetworkMonitor
 import woowacourse.shopping.di.ShoppingRepositoryProvider
 import woowacourse.shopping.domain.model.cart.SelectedCartOrder
 import woowacourse.shopping.domain.model.coupon.Coupon
+import woowacourse.shopping.domain.model.order.OrderPriceSummary
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.NotificationSettingRepository
@@ -112,7 +113,7 @@ class OrderViewModel(
         _uiState.update { currentState ->
             currentState.copy(
                 coupons = emptyList(),
-                priceSummary = OrderPriceSummaryUiModel.from(selectedCartOrder.calculatePriceSummary()),
+                priceSummary = OrderPriceSummaryUiModel.from(OrderPriceSummary.from(selectedCartOrder)),
                 isOrdering = false,
                 hasPendingOrder = true,
             )
@@ -210,7 +211,7 @@ class OrderViewModel(
 
         _uiState.update { currentState ->
             currentState.copy(
-                priceSummary = OrderPriceSummaryUiModel.from(order.calculatePriceSummary(selectedCoupon)),
+                priceSummary = OrderPriceSummaryUiModel.from(OrderPriceSummary.from(order, selectedCoupon)),
             )
         }
     }

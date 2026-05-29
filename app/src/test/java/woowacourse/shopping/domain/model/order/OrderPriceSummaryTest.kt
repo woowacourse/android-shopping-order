@@ -13,7 +13,7 @@ import java.time.LocalDate
 class OrderPriceSummaryTest {
     @Test
     fun `쿠폰이 없으면 기본 배송비 3000원이 포함된다`() {
-        val summary = selectedCartOrder(totalPrice = 7_500L).calculatePriceSummary()
+        val summary = OrderPriceSummary.from(selectedCartOrder(totalPrice = 7_500L))
 
         assertEquals(7_500L, summary.orderAmount)
         assertEquals(0L, summary.couponDiscount)
@@ -24,7 +24,8 @@ class OrderPriceSummaryTest {
     @Test
     fun `쿠폰 할인 금액은 주문 금액을 초과할 수 없다`() {
         val summary =
-            selectedCartOrder(totalPrice = 5_000L).calculatePriceSummary(
+            OrderPriceSummary.from(
+                order = selectedCartOrder(totalPrice = 5_000L),
                 selectedCoupon = fixedAmountCoupon(discountAmount = 10_000),
             )
 
@@ -37,7 +38,8 @@ class OrderPriceSummaryTest {
     @Test
     fun `최종 결제 금액은 0원 아래로 내려가지 않는다`() {
         val summary =
-            selectedCartOrder(totalPrice = 5_000L).calculatePriceSummary(
+            OrderPriceSummary.from(
+                order = selectedCartOrder(totalPrice = 5_000L),
                 selectedCoupon = fixedAmountCoupon(discountAmount = 10_000),
                 defaultDeliveryFee = -10_000L,
             )
