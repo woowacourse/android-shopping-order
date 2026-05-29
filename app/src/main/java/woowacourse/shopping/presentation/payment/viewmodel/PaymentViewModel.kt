@@ -95,9 +95,11 @@ class PaymentViewModel(
                         selectedCouponId = null,
                     )
                 }
-                setPaymentPushAlarmUseCase(orderItems, orderPricing.orderAmount)
-            }.onFailure {
-                _uiEvents.emit(PaymentEvent.ShowError("쿠폰을 불러오지 못했습니다."))
+                runCatching {
+                    setPaymentPushAlarmUseCase(orderItems, orderPricing.orderAmount)
+                }.onFailure {
+                    _uiEvents.emit(PaymentEvent.ShowError("쿠폰을 불러오지 못했습니다."))
+                }
             }
         }
     }
