@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.R
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.cart.SelectedCartOrder
 import woowacourse.shopping.data.remote.common.NetworkMonitor
@@ -26,7 +25,6 @@ import java.time.Clock
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-private const val DEFAULT_DELIVERY_FEE = 3_000L
 private val COUPON_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy년 M월 d일", Locale.KOREAN)
 
 class OrderViewModel(
@@ -87,7 +85,7 @@ class OrderViewModel(
         _uiState.update { currentState ->
             currentState.copy(
                 coupons = emptyList(),
-                priceSummary = createEmptyPriceSummary(),
+                priceSummary = emptyPriceSummary(),
                 isOrdering = false,
                 hasPendingOrder = false,
             )
@@ -125,7 +123,7 @@ class OrderViewModel(
         _uiState.update { currentState ->
             currentState.copy(
                 coupons = emptyList(),
-                priceSummary = selectedCartOrder.toPriceSummary(),
+                priceSummary = OrderPriceSummaryUiModel.from(selectedCartOrder.calculatePriceSummary()),
                 isOrdering = false,
                 hasPendingOrder = true,
             )
@@ -195,7 +193,7 @@ class OrderViewModel(
                     .getCoupons()
                     .filter { coupon -> coupon.isApplicableTo(selectedCartOrder, clock) }
                     .also { coupons -> availableCouponsById = coupons.associateBy(Coupon::id) }
-                    .map { coupon -> coupon.toUiModel() }
+                    .map(::toCouponUiModel)
             }.onSuccess { coupons ->
                 _uiState.update { currentState ->
                     currentState.copy(coupons = coupons)
@@ -218,65 +216,19 @@ class OrderViewModel(
 
         _uiState.update { currentState ->
             currentState.copy(
-                priceSummary = order.toPriceSummary(selectedCoupon),
+                priceSummary = OrderPriceSummaryUiModel.from(order.calculatePriceSummary(selectedCoupon)),
             )
         }
     }
 
-    private fun SelectedCartOrder.toPriceSummary(selectedCoupon: Coupon? = null): OrderPriceSummaryUiModel {
-        val orderAmount = totalOrderAmount()
-        val couponDiscount = selectedCoupon?.discountAmountFor(this)?.coerceAtMost(orderAmount) ?: 0
-        val deliveryFee = selectedCoupon?.deliveryFeeFor(orderAmount, DEFAULT_DELIVERY_FEE) ?: DEFAULT_DELIVERY_FEE
-        val totalPaymentPrice = (orderAmount - couponDiscount + deliveryFee).coerceAtLeast(0)
-
-        return OrderPriceSummaryUiModel(
-            items =
-                listOf(
-                    OrderPriceLineUiModel(
-                        labelResId = R.string.order_price_label_order_amount,
-                        price = orderAmount,
-                    ),
-                    OrderPriceLineUiModel(
-                        labelResId = R.string.order_price_label_coupon_discount,
-                        price = -couponDiscount,
-                    ),
-                    OrderPriceLineUiModel(
-                        labelResId = R.string.order_price_label_delivery_fee,
-                        price = deliveryFee,
-                    ),
-                ),
-            totalPaymentPrice = totalPaymentPrice,
-        )
-    }
-
-    private fun Coupon.toUiModel(): OrderCouponUiModel =
+    private fun toCouponUiModel(coupon: Coupon): OrderCouponUiModel =
         OrderCouponUiModel(
-            id = id,
-            title = title,
-            expirationDateText = expirationDate.format(COUPON_DATE_FORMATTER),
+            id = coupon.id,
+            title = coupon.title,
+            expirationDateText = coupon.expirationDate.format(COUPON_DATE_FORMATTER),
             minimumOrderAmountText =
-                minimumOrderAmount?.let(::formatMinimumOrderAmount) ?: "없음",
+                coupon.minimumOrderAmount?.let(::formatMinimumOrderAmount) ?: "없음",
             isSelected = false,
-        )
-
-    private fun createEmptyPriceSummary(): OrderPriceSummaryUiModel =
-        OrderPriceSummaryUiModel(
-            items =
-                listOf(
-                    OrderPriceLineUiModel(
-                        labelResId = R.string.order_price_label_order_amount,
-                        price = 0,
-                    ),
-                    OrderPriceLineUiModel(
-                        labelResId = R.string.order_price_label_coupon_discount,
-                        price = 0,
-                    ),
-                    OrderPriceLineUiModel(
-                        labelResId = R.string.order_price_label_delivery_fee,
-                        price = 0,
-                    ),
-                ),
-            totalPaymentPrice = 0,
         )
 
     private fun formatMinimumOrderAmount(amount: Int): String = "%,d원".format(amount)

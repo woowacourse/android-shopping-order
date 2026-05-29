@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.order
 
 import androidx.annotation.StringRes
 import woowacourse.shopping.R
+import woowacourse.shopping.domain.model.order.OrderPriceSummary
 
 data class OrderCouponUiModel(
     val id: Long,
@@ -19,7 +20,29 @@ data class OrderPriceLineUiModel(
 data class OrderPriceSummaryUiModel(
     val items: List<OrderPriceLineUiModel>,
     val totalPaymentPrice: Long,
-)
+) {
+    companion object {
+        fun from(summary: OrderPriceSummary): OrderPriceSummaryUiModel =
+            OrderPriceSummaryUiModel(
+                items =
+                    listOf(
+                        OrderPriceLineUiModel(
+                            labelResId = R.string.order_price_label_order_amount,
+                            price = summary.orderAmount,
+                        ),
+                        OrderPriceLineUiModel(
+                            labelResId = R.string.order_price_label_coupon_discount,
+                            price = -summary.couponDiscount,
+                        ),
+                        OrderPriceLineUiModel(
+                            labelResId = R.string.order_price_label_delivery_fee,
+                            price = summary.deliveryFee,
+                        ),
+                    ),
+                totalPaymentPrice = summary.totalPaymentPrice,
+            )
+    }
+}
 
 internal object OrderPreviewData {
     val coupons =

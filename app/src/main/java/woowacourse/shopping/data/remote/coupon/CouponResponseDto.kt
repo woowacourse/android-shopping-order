@@ -52,19 +52,6 @@ data class CouponResponseDto(
             else -> throw IllegalArgumentException("지원하지 않는 쿠폰 타입입니다: $discountType")
         }
 
-    private fun AvailableTimeResponseDto.toHourRange(): Pair<Int, Int> {
-        val startTime = LocalTime.parse(start)
-        val endTime = LocalTime.parse(end)
-        val endHourExclusive =
-            if (endTime.minute == 0 && endTime.second == 0 && endTime.nano == 0) {
-                endTime.hour
-            } else {
-                (endTime.hour + 1).coerceAtMost(24)
-            }
-
-        return startTime.hour to endHourExclusive
-    }
-
     private fun requireDiscount(): Int =
         requireNotNull(discount) {
             "discountType=$discountType 쿠폰에는 discount 값이 필요합니다."
@@ -92,4 +79,17 @@ data class CouponResponseDto(
 data class AvailableTimeResponseDto(
     val start: String,
     val end: String,
-)
+) {
+    fun toHourRange(): Pair<Int, Int> {
+        val startTime = LocalTime.parse(start)
+        val endTime = LocalTime.parse(end)
+        val endHourExclusive =
+            if (endTime.minute == 0 && endTime.second == 0 && endTime.nano == 0) {
+                endTime.hour
+            } else {
+                (endTime.hour + 1).coerceAtMost(24)
+            }
+
+        return startTime.hour to endHourExclusive
+    }
+}
