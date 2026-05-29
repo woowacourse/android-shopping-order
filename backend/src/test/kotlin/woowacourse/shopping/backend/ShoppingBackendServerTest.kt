@@ -61,18 +61,18 @@ class ShoppingBackendServerTest {
 
         assertEquals(200, response.statusCode())
 
-        val body = json.decodeFromString<CouponListPayload>(response.body())
-        assertEquals(listOf("FIXED5000", "BOGO", "FREESHIPPING", "MIRACLESALE"), body.coupons.map { it.code })
+        val body = json.decodeFromString<List<CouponPayload>>(response.body())
+        assertEquals(listOf("FIXED5000", "BOGO", "FREESHIPPING", "MIRACLESALE"), body.map { it.code })
 
-        val fixedCoupon = body.coupons.first { it.code == "FIXED5000" }
+        val fixedCoupon = body.first { it.code == "FIXED5000" }
         assertEquals(100_000, fixedCoupon.minimumOrderAmount)
         assertEquals(5_000, fixedCoupon.fixedDiscountAmount)
 
-        val freeShippingCoupon = body.coupons.first { it.code == "FREESHIPPING" }
+        val freeShippingCoupon = body.first { it.code == "FREESHIPPING" }
         assertTrue(freeShippingCoupon.freeShipping)
         assertEquals(50_000, freeShippingCoupon.minimumOrderAmount)
 
-        val miracleSaleCoupon = body.coupons.first { it.code == "MIRACLESALE" }
+        val miracleSaleCoupon = body.first { it.code == "MIRACLESALE" }
         assertEquals(30, miracleSaleCoupon.percentageDiscountRate)
         assertEquals(4, miracleSaleCoupon.availableFromHour)
         assertEquals(7, miracleSaleCoupon.availableToHourExclusive)
@@ -159,11 +159,6 @@ private data class ProductPagePayload(
 private data class ProductPayload(
     val id: Long,
     val category: String,
-)
-
-@Serializable
-private data class CouponListPayload(
-    val coupons: List<CouponPayload>,
 )
 
 @Serializable

@@ -113,7 +113,7 @@ class ShoppingBackendServer(
     }
 
     private fun handleGetCoupons(exchange: HttpExchange) {
-        exchange.respondJson(200, CouponListResponse(store.getCoupons()))
+        exchange.respondJson(200, store.getCoupons())
     }
 
     private fun handleGetCartItems(exchange: HttpExchange) {
@@ -185,7 +185,12 @@ class ShoppingBackendServer(
             when (body) {
                 is ProductResponse -> json.encodeToString(body)
                 is ProductPageResponse -> json.encodeToString(body)
-                is CouponListResponse -> json.encodeToString(body)
+                is List<*> ->
+                    if (body.all { it is CouponResponse }) {
+                        json.encodeToString(body.filterIsInstance<CouponResponse>())
+                    } else {
+                        throw IllegalArgumentException("지원하지 않는 응답 형식입니다.")
+                    }
                 is CartItemResponse -> json.encodeToString(body)
                 is CartPageResponse -> json.encodeToString(body)
                 is CartItemCountResponse -> json.encodeToString(body)
@@ -463,11 +468,6 @@ private data class ProductPageResponse(
     val content: List<ProductResponse>,
     val totalElements: Long,
     val last: Boolean,
-)
-
-@Serializable
-private data class CouponListResponse(
-    val coupons: List<CouponResponse>,
 )
 
 @Serializable

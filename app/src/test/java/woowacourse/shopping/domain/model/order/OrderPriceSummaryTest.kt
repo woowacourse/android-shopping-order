@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
 import woowacourse.shopping.domain.model.cart.SelectedCartOrder
 import woowacourse.shopping.domain.model.cart.SelectedCartOrderItem
 import woowacourse.shopping.domain.model.coupon.Coupon
-import woowacourse.shopping.domain.model.coupon.CouponPolicy
 import woowacourse.shopping.domain.model.coupon.OrderFixedAmountDiscountPolicy
 import java.time.LocalDate
 
@@ -39,7 +38,8 @@ class OrderPriceSummaryTest {
     fun `최종 결제 금액은 0원 아래로 내려가지 않는다`() {
         val summary =
             selectedCartOrder(totalPrice = 5_000L).calculatePriceSummary(
-                selectedCoupon = excessiveBenefitCoupon(),
+                selectedCoupon = fixedAmountCoupon(discountAmount = 10_000),
+                defaultDeliveryFee = -10_000L,
             )
 
         assertEquals(5_000L, summary.orderAmount)
@@ -70,23 +70,4 @@ class OrderPriceSummaryTest {
             expirationDate = LocalDate.of(2026, 12, 31),
             policy = OrderFixedAmountDiscountPolicy(amount = discountAmount),
         )
-
-    private fun excessiveBenefitCoupon(): Coupon =
-        Coupon(
-            id = 2L,
-            code = "EXCESSIVE",
-            title = "과도한 혜택",
-            description = "",
-            expirationDate = LocalDate.of(2026, 12, 31),
-            policy = ExcessiveBenefitPolicy,
-        )
-
-    private object ExcessiveBenefitPolicy : CouponPolicy {
-        override fun discountAmountFor(selectedCartOrder: SelectedCartOrder): Long = Long.MAX_VALUE
-
-        override fun deliveryFeeFor(
-            orderAmount: Long,
-            defaultDeliveryFee: Long,
-        ): Long = -10_000L
-    }
 }
