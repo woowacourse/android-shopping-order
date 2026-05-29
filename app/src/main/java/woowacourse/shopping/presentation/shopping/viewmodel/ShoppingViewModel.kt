@@ -3,6 +3,7 @@ package woowacourse.shopping.presentation.shopping.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +31,11 @@ class ShoppingViewModel(
     private val _uiState = MutableStateFlow(ShoppingUiState())
     val uiState: StateFlow<ShoppingUiState> = _uiState.asStateFlow()
 
-    private val _uiEvents = MutableSharedFlow<ShoppingEvent>()
+    private val _uiEvents =
+        MutableSharedFlow<ShoppingEvent>(
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
     val uiEvents = _uiEvents.asSharedFlow()
 
     private val exceptionHandler =
