@@ -1,6 +1,7 @@
 package woowacourse.shopping
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -23,12 +24,17 @@ class MainActivity : ComponentActivity() {
             val orderItemsJson = intent.getStringExtra(EXTRA_ORDER_ITEMS_JSON) ?: ""
             val orderAmount = intent.getLongExtra(EXTRA_ORDER_AMOUNT, 0)
             if (orderItemsJson.isNotEmpty()) {
-                val orderItems: List<OrderItem> = Json.decodeFromString(orderItemsJson)
-                initialNotificationRoute =
-                    PaymentScreen(
-                        orderItems = orderItems,
-                        orderAmount = orderAmount,
-                    )
+                runCatching {
+                    Json.decodeFromString<List<OrderItem>>(orderItemsJson)
+                }.onSuccess { orderItems ->
+                    initialNotificationRoute =
+                        PaymentScreen(
+                            orderItems = orderItems,
+                            orderAmount = orderAmount,
+                        )
+                }.onFailure { exception ->
+                    Log.e("MainActivity", "알림 파싱 실패 : ${exception.message}")
+                }
             }
         }
         setContent {
