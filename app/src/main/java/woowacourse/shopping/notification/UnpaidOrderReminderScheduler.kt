@@ -32,6 +32,14 @@ interface UnpaidOrderReminderScheduler {
 class AlarmManagerUnpaidOrderReminderScheduler(
     private val context: Context,
 ) : UnpaidOrderReminderScheduler {
+    override fun schedule() = Unit
+
+    override fun cancel() = Unit
+}
+
+class AlarmManagerBackedUnpaidOrderReminderScheduler(
+    private val context: Context,
+) : UnpaidOrderReminderScheduler {
     private val applicationContext = context.applicationContext
     private val alarmManager: AlarmManager? =
         applicationContext.getSystemService(Context.ALARM_SERVICE) as? AlarmManager

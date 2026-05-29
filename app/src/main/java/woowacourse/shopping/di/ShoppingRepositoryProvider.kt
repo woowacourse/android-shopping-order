@@ -14,6 +14,8 @@ import woowacourse.shopping.domain.repository.NotificationSettingRepository
 import woowacourse.shopping.domain.repository.PendingOrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.notification.AlarmManagerBackedUnpaidOrderReminderScheduler
+import woowacourse.shopping.notification.UnpaidOrderReminderScheduler
 
 object ShoppingRepositoryProvider {
     lateinit var productRepository: ProductRepository
@@ -37,6 +39,9 @@ object ShoppingRepositoryProvider {
     lateinit var networkMonitor: NetworkMonitor
         private set
 
+    lateinit var unpaidOrderReminderScheduler: UnpaidOrderReminderScheduler
+        private set
+
     fun initialize(context: Context) {
         if (
             ::productRepository.isInitialized &&
@@ -45,7 +50,8 @@ object ShoppingRepositoryProvider {
             ::recentProductRepository.isInitialized &&
             ::notificationSettingRepository.isInitialized &&
             ::pendingOrderRepository.isInitialized &&
-            ::networkMonitor.isInitialized
+            ::networkMonitor.isInitialized &&
+            ::unpaidOrderReminderScheduler.isInitialized
         ) {
             return
         }
@@ -78,5 +84,7 @@ object ShoppingRepositoryProvider {
         pendingOrderRepository =
             SharedPreferencesPendingOrderRepository.create(context)
         networkMonitor = NetworkProvider.provideNetworkMonitor(context)
+        unpaidOrderReminderScheduler =
+            AlarmManagerBackedUnpaidOrderReminderScheduler(context.applicationContext)
     }
 }

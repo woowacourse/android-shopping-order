@@ -33,6 +33,7 @@ import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.NotificationSettingRepository
 import woowacourse.shopping.domain.repository.PendingOrderRepository
 import woowacourse.shopping.domain.repository.query.CartPageResult
+import woowacourse.shopping.notification.UnpaidOrderReminderScheduler
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
@@ -45,6 +46,7 @@ class OrderViewModelTest {
     private lateinit var couponRepository: FakeCouponRepository
     private lateinit var pendingOrderRepository: FakePendingOrderRepository
     private lateinit var notificationSettingRepository: FakeNotificationSettingRepository
+    private lateinit var reminderScheduler: FakeUnpaidOrderReminderScheduler
     private lateinit var viewModel: OrderViewModel
 
     private val shrimpCracker = CartRepositoryFixture.shrimpCracker
@@ -58,6 +60,7 @@ class OrderViewModelTest {
         cartRepository = RecordingCartRepository()
         pendingOrderRepository = FakePendingOrderRepository()
         notificationSettingRepository = FakeNotificationSettingRepository(isEnabled = false)
+        reminderScheduler = FakeUnpaidOrderReminderScheduler()
         couponRepository =
             FakeCouponRepository(
                 coupons =
@@ -116,6 +119,7 @@ class OrderViewModelTest {
                 couponRepository = couponRepository,
                 pendingOrderRepository = pendingOrderRepository,
                 notificationSettingRepository = notificationSettingRepository,
+                reminderScheduler = reminderScheduler,
                 networkMonitor = FakeNetworkMonitor(),
                 clock = Clock.fixed(Instant.parse("2026-05-22T05:00:00Z"), ZoneId.of("UTC")),
             )
@@ -388,6 +392,31 @@ class OrderViewModelTest {
             assertEquals(true, viewModel.uiState.value.isReminderEnabled)
         }
 
+    @Test
+    fun `주문 세션과 알림 설정이 모두 활성화되면 미결제 알림을 예약한다`() =
+        runTest(dispatcher.scheduler) {
+            notificationSettingRepository.setUnpaidNotificationEnabled(true)
+
+            viewModel.startOrder(selectedCartOrder(totalPrice = 120_000, quantity = 2))
+            advanceUntilIdle()
+
+            assertEquals(1, reminderScheduler.scheduleCount)
+            assertEquals(1, reminderScheduler.cancelCount)
+        }
+
+    @Test
+    fun `주문 세션이 종료되면 미결제 알림을 취소한다`() =
+        runTest(dispatcher.scheduler) {
+            notificationSettingRepository.setUnpaidNotificationEnabled(true)
+            viewModel.startOrder(selectedCartOrder(totalPrice = 120_000, quantity = 2))
+            advanceUntilIdle()
+
+            viewModel.clearPendingOrderSession()
+            advanceUntilIdle()
+
+            assertEquals(2, reminderScheduler.cancelCount)
+        }
+
     private class FakeNetworkMonitor : NetworkMonitor {
         override val isNetworkConnected = MutableStateFlow(true)
     }
@@ -438,6 +467,21 @@ class OrderViewModelTest {
         override fun setUnpaidNotificationEnabled(isEnabled: Boolean) {
             this.isEnabled = isEnabled
             unpaidNotificationEnabled.value = isEnabled
+        }
+    }
+
+    private class FakeUnpaidOrderReminderScheduler : UnpaidOrderReminderScheduler {
+        var scheduleCount: Int = 0
+            private set
+        var cancelCount: Int = 0
+            private set
+
+        override fun schedule() {
+            scheduleCount += 1
+        }
+
+        override fun cancel() {
+            cancelCount += 1
         }
     }
 

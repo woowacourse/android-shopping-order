@@ -3,11 +3,13 @@ package woowacourse.shopping.ui.order
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.R
@@ -19,6 +21,7 @@ import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.NotificationSettingRepository
 import woowacourse.shopping.domain.repository.PendingOrderRepository
 import woowacourse.shopping.di.ShoppingRepositoryProvider
+import woowacourse.shopping.notification.UnpaidOrderReminderScheduler
 import java.time.Clock
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -32,6 +35,8 @@ class OrderViewModel(
     private val pendingOrderRepository: PendingOrderRepository = ShoppingRepositoryProvider.pendingOrderRepository,
     private val notificationSettingRepository: NotificationSettingRepository =
         ShoppingRepositoryProvider.notificationSettingRepository,
+    private val reminderScheduler: UnpaidOrderReminderScheduler =
+        ShoppingRepositoryProvider.unpaidOrderReminderScheduler,
     private val networkMonitor: NetworkMonitor = ShoppingRepositoryProvider.networkMonitor,
     private val clock: Clock = Clock.systemDefaultZone(),
 ) : ViewModel() {
@@ -57,6 +62,7 @@ class OrderViewModel(
     init {
         observeNetworkState()
         observeReminderSetting()
+        observeReminderSession()
     }
 
     fun startOrder(selectedCartOrder: SelectedCartOrder) {
@@ -164,6 +170,21 @@ class OrderViewModel(
                     currentState.copy(isReminderEnabled = isEnabled)
                 }
             }
+        }
+    }
+
+    private fun observeReminderSession() {
+        viewModelScope.launch {
+            uiState
+                .map { state -> state.hasPendingOrder && state.isReminderEnabled }
+                .distinctUntilChanged()
+                .collect { shouldSchedule ->
+                    if (shouldSchedule) {
+                        reminderScheduler.schedule()
+                    } else {
+                        reminderScheduler.cancel()
+                    }
+                }
         }
     }
 
