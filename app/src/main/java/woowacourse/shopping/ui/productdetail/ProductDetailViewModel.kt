@@ -10,10 +10,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.common.NetworkMonitor
+import woowacourse.shopping.di.ShoppingRepositoryProvider
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.di.ShoppingRepositoryProvider
 import woowacourse.shopping.ui.common.recentlyviewed.RecentViewedProductsMapper
 
 private const val CART_SYNC_DELAY_MILLIS = 400L

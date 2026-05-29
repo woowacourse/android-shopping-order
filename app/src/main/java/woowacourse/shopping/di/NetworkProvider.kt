@@ -24,6 +24,5 @@ object NetworkProvider {
 
     fun provideHttpClient(): OkHttpClient = httpClient
 
-    fun provideNetworkMonitor(context: Context): NetworkMonitor =
-        ConnectivityManagerNetworkMonitor(context)
+    fun provideNetworkMonitor(context: Context): NetworkMonitor = ConnectivityManagerNetworkMonitor(context)
 }

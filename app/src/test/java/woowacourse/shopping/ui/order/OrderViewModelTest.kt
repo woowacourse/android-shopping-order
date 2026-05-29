@@ -18,21 +18,21 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.data.remote.common.NetworkMonitor
 import woowacourse.shopping.domain.model.cart.CartItem
+import woowacourse.shopping.domain.model.cart.SelectedCartOrder
+import woowacourse.shopping.domain.model.cart.SelectedCartOrderItem
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.FreeShippingPolicy
 import woowacourse.shopping.domain.model.coupon.OrderFixedAmountDiscountPolicy
 import woowacourse.shopping.domain.model.coupon.OrderPercentageDiscountPolicy
-import woowacourse.shopping.domain.model.cart.SelectedCartOrder
-import woowacourse.shopping.domain.model.cart.SelectedCartOrderItem
 import woowacourse.shopping.domain.model.coupon.SameProductQuantityDiscountPolicy
-import woowacourse.shopping.data.remote.common.NetworkMonitor
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.repository.CartRepositoryFixture
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.NotificationSettingRepository
 import woowacourse.shopping.domain.repository.query.CartPageResult
 import woowacourse.shopping.notification.UnpaidOrderReminderScheduler
+import woowacourse.shopping.repository.CartRepositoryFixture
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
@@ -353,8 +353,8 @@ class OrderViewModelTest {
             assertTrue(cartRepository.getCartItemsByProductIds(setOf(shrimpCracker.id, sourCandy.id)).isEmpty())
             assertEquals(OrderEvent.OrderCompleted, event.await())
             assertEquals(0L, viewModel.uiState.value.priceSummary.totalPaymentPrice)
-        assertEquals(false, viewModel.uiState.value.hasPendingOrder)
-    }
+            assertEquals(false, viewModel.uiState.value.hasPendingOrder)
+        }
 
     @Test
     fun `미결제 알림 설정이 바뀌면 주문 화면 상태도 함께 갱신된다`() =

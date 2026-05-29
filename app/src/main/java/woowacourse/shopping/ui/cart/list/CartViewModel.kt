@@ -10,12 +10,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import woowacourse.shopping.data.remote.common.NetworkMonitor
+import woowacourse.shopping.di.ShoppingRepositoryProvider
 import woowacourse.shopping.domain.model.cart.SelectedCartOrder
 import woowacourse.shopping.domain.model.cart.SelectedCartOrderItem
-import woowacourse.shopping.data.remote.common.NetworkMonitor
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.di.ShoppingRepositoryProvider
 import woowacourse.shopping.ui.cart.list.uistate.CartItemUiModelMapper
 import woowacourse.shopping.ui.cart.list.uistate.CartListUiState
 import woowacourse.shopping.ui.cart.list.uistate.CartUiState

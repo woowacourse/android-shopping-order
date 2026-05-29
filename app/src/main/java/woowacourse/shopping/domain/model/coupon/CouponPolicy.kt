@@ -22,8 +22,7 @@ data class OrderFixedAmountDiscountPolicy(
 data class OrderPercentageDiscountPolicy(
     val rate: Int,
 ) : CouponPolicy {
-    override fun discountAmountFor(selectedCartOrder: SelectedCartOrder): Long =
-        selectedCartOrder.totalOrderAmount() * rate / 100
+    override fun discountAmountFor(selectedCartOrder: SelectedCartOrder): Long = selectedCartOrder.totalOrderAmount() * rate / 100
 }
 
 data class SameProductQuantityDiscountPolicy(

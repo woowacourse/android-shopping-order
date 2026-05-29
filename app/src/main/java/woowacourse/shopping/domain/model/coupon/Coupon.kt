@@ -33,8 +33,7 @@ data class Coupon(
         return policy.isApplicableTo(selectedCartOrder)
     }
 
-    fun discountAmountFor(selectedCartOrder: SelectedCartOrder): Long =
-        policy.discountAmountFor(selectedCartOrder)
+    fun discountAmountFor(selectedCartOrder: SelectedCartOrder): Long = policy.discountAmountFor(selectedCartOrder)
 
     fun deliveryFeeFor(
         orderAmount: Long,

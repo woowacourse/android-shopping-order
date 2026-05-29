@@ -12,10 +12,10 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.remote.product.ProductNetworkException
 import woowacourse.shopping.data.remote.product.ProductParsingException
 import woowacourse.shopping.data.remote.product.ProductResponseException
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
 
 class ProductRepositoryImplTest {
     private lateinit var mockWebServer: MockWebServer

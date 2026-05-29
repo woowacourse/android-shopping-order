@@ -12,14 +12,14 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import woowacourse.shopping.domain.model.coupon.FreeShippingPolicy
-import woowacourse.shopping.domain.model.coupon.OrderFixedAmountDiscountPolicy
-import woowacourse.shopping.domain.model.coupon.OrderPercentageDiscountPolicy
-import woowacourse.shopping.domain.model.coupon.SameProductQuantityDiscountPolicy
 import woowacourse.shopping.data.remote.coupon.CouponNetworkException
 import woowacourse.shopping.data.remote.coupon.CouponParsingException
 import woowacourse.shopping.data.remote.coupon.CouponResponseException
 import woowacourse.shopping.data.repository.CouponRepositoryImpl
+import woowacourse.shopping.domain.model.coupon.FreeShippingPolicy
+import woowacourse.shopping.domain.model.coupon.OrderFixedAmountDiscountPolicy
+import woowacourse.shopping.domain.model.coupon.OrderPercentageDiscountPolicy
+import woowacourse.shopping.domain.model.coupon.SameProductQuantityDiscountPolicy
 import java.time.LocalDate
 
 class CouponRepositoryImplTest {

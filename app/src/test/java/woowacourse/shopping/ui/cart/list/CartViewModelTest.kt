@@ -19,9 +19,9 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.data.remote.common.NetworkMonitor
 import woowacourse.shopping.domain.model.common.Money
 import woowacourse.shopping.domain.model.product.Product
-import woowacourse.shopping.data.remote.common.NetworkMonitor
 import woowacourse.shopping.repository.CartRepositoryFixture
 import woowacourse.shopping.repository.FakeCartRepository
 import woowacourse.shopping.repository.FakeProductRepository
