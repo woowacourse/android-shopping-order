@@ -20,8 +20,26 @@ sealed class Coupon(
         defaultDeliveryFee: Int,
         context: CouponContext = CouponContext(),
     ): Int = defaultDeliveryFee
+
+    fun isUsable(
+        order: Order,
+        defaultDeliveryFee: Int,
+        context: CouponContext = CouponContext(),
+    ): Boolean = isNotExpired(context) && hasBenefit(order, defaultDeliveryFee, context)
+
+    private fun isNotExpired(context: CouponContext): Boolean =
+        !expirationDate.isBefore(context.currentDate)
+
+    private fun hasBenefit(
+        order: Order,
+        defaultDeliveryFee: Int,
+        context: CouponContext,
+    ): Boolean =
+        discountAmount(order, context) > 0 ||
+            deliveryFee(order, defaultDeliveryFee, context) < defaultDeliveryFee
 }
 
 data class CouponContext(
     val currentTime: LocalTime = LocalTime.now(),
+    val currentDate: LocalDate = LocalDate.now(),
 )

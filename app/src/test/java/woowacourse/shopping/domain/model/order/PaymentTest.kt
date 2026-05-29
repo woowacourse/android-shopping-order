@@ -2,6 +2,7 @@ package woowacourse.shopping.domain.model.order
 
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.domain.model.coupon.CouponContext
 import woowacourse.shopping.domain.model.coupon.FixedAmountCoupon
 import woowacourse.shopping.domain.model.payment.Payment
 import woowacourse.shopping.domain.model.product.Product
@@ -66,6 +67,47 @@ class PaymentTest {
         payment.couponDiscountAmount shouldBe 3_000
         payment.totalPaymentAmount shouldBe 3_000
     }
+
+    @Test
+    fun `만료된 쿠폰은 적용할 수 없다`() {
+        val payment = paymentOf(currentDate = LocalDate.of(2024, 12, 1))
+        val coupon = fixedAmountCoupon(expirationDate = LocalDate.of(2024, 11, 30))
+
+        payment.canApply(coupon) shouldBe false
+    }
+
+    @Test
+    fun `만료일 당일인 쿠폰은 적용할 수 있다`() {
+        val payment = paymentOf(currentDate = LocalDate.of(2024, 11, 30))
+        val coupon = fixedAmountCoupon(expirationDate = LocalDate.of(2024, 11, 30))
+
+        payment.canApply(coupon) shouldBe true
+    }
+
+    private fun paymentOf(currentDate: LocalDate): Payment =
+        Payment(
+            order =
+                Order(
+                    PurchaseProducts(
+                        listOf(
+                            purchaseProduct(
+                                price = 3_000,
+                                count = 1,
+                            ),
+                        ),
+                    ),
+                ),
+            couponUseContext = CouponContext(currentDate = currentDate),
+        )
+
+    private fun fixedAmountCoupon(expirationDate: LocalDate): FixedAmountCoupon =
+        FixedAmountCoupon(
+            code = "FIXED1000",
+            name = "1000원 할인 쿠폰",
+            expirationDate = expirationDate,
+            discountAmount = 1_000,
+            minimumOrderAmount = 0,
+        )
 
     private fun purchaseProduct(
         price: Int,

@@ -25,6 +25,9 @@ data class Payment(
         get() = orderAmount - couponDiscountAmount + deliveryFee
 
     fun canApply(coupon: Coupon): Boolean =
-        coupon.discountAmount(order, couponUseContext) > 0 ||
-            coupon.deliveryFee(order, defaultDeliveryFee, couponUseContext) < defaultDeliveryFee
+        coupon.isUsable(
+            order = order,
+            defaultDeliveryFee = defaultDeliveryFee,
+            context = couponUseContext,
+        )
 }
