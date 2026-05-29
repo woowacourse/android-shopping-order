@@ -84,26 +84,22 @@ class PaymentViewModel(
             }.onSuccess { (items, coupons) ->
                 paymentItems = items
                 availableCouponsDomain = coupons
-                val orderAmount = items.totalPrice.amount
+                val orderPricing = calculateOrderPricingUseCase(null, items)
                 _uiState.update {
                     it.copy(
                         availableCoupons = coupons.map { it.toUiModel() },
-                        orderAmount = orderAmount,
-                        deliveryFee = DEFAULT_DELIVERY_FEE,
-                        discountAmount = 0L,
-                        totalAmount = orderAmount + DEFAULT_DELIVERY_FEE,
+                        orderAmount = orderPricing.orderAmount,
+                        deliveryFee = orderPricing.deliveryFee,
+                        discountAmount = orderPricing.discountAmount,
+                        totalAmount = orderPricing.totalAmount,
                         selectedCouponId = null,
                     )
                 }
-                setPaymentPushAlarmUseCase(orderItems, orderAmount)
+                setPaymentPushAlarmUseCase(orderItems, orderPricing.orderAmount)
             }.onFailure {
                 _uiEvents.emit(PaymentEvent.ShowError("쿠폰을 불러오지 못했습니다."))
             }
         }
-    }
-
-    companion object {
-        private const val DEFAULT_DELIVERY_FEE = 3000
     }
 }
 
