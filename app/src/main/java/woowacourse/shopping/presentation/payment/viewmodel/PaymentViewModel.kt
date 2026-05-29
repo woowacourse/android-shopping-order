@@ -2,6 +2,7 @@ package woowacourse.shopping.presentation.payment.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,7 +34,11 @@ class PaymentViewModel(
     private val _uiState = MutableStateFlow(PaymentUiState())
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
 
-    private val _uiEvents = MutableSharedFlow<PaymentEvent>()
+    private val _uiEvents =
+        MutableSharedFlow<PaymentEvent>(
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
     val uiEvents = _uiEvents.asSharedFlow()
 
     private var paymentItems: PaymentItems? = null
