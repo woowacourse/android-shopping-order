@@ -15,26 +15,38 @@ class PaymentAlarmScheduler(
     private val alarmManager = context.getSystemService<AlarmManager>()
 
     @RequiresPermission(Manifest.permission.SCHEDULE_EXACT_ALARM)
-    fun schedule() {
+    fun schedule(ids: List<Long>) {
         val triggerAt = System.currentTimeMillis() + BuildConfig.PAYMENT_ALARM_DELAY_MILLIS
         alarmManager?.setAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             triggerAt,
-            createPendingIntent(),
+            createPendingIntent(ids),
         )
     }
 
     fun cancel() {
-        alarmManager?.cancel(createPendingIntent())
+        getExistingIntent()?.let { alarmManager?.cancel(it) }
     }
 
-    private fun createPendingIntent(): PendingIntent {
-        val intent = Intent(context, PaymentReminderReceiver::class.java)
+    private fun createPendingIntent(ids: List<Long>): PendingIntent {
+        val intent = Intent(context, PaymentReminderReceiver::class.java).apply {
+            putExtra(PaymentReminderReceiver.EXTRA_IDS, ids.toLongArray())
+        }
         return PendingIntent.getBroadcast(
             context,
             REQUEST_CODE,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
+
+    private fun getExistingIntent(): PendingIntent? {
+        val intent = Intent(context, PaymentReminderReceiver::class.java)
+        return PendingIntent.getBroadcast(
+            context,
+            REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
         )
     }
 

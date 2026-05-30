@@ -1,14 +1,11 @@
 package woowacourse.shopping.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.flow.StateFlow
+import androidx.navigation.navDeepLink
 import woowacourse.shopping.ui.cart.CartScreen
 import woowacourse.shopping.ui.payment.PaymentScreen
 import woowacourse.shopping.ui.productdetail.ProductDetailScreen
@@ -16,21 +13,8 @@ import woowacourse.shopping.ui.settings.SettingsScreen
 import woowacourse.shopping.ui.shopping.ShoppingScreen
 
 @Composable
-fun AppNavHost(
-    navigateToPaymentSignal: StateFlow<Boolean>,
-    onPaymentNavigated: () -> Unit,
-) {
+fun AppNavHost() {
     val navController = rememberNavController()
-    val shouldNavigate by navigateToPaymentSignal.collectAsStateWithLifecycle()
-
-    LaunchedEffect(shouldNavigate) {
-        if (shouldNavigate) {
-            navController.navigate(CartRoute) {
-                launchSingleTop = true
-            }
-            onPaymentNavigated()
-        }
-    }
 
     NavHost(
         navController = navController,
@@ -76,7 +60,13 @@ fun AppNavHost(
             )
         }
 
-        composable<PaymentRoute> {
+        composable<PaymentRoute>(
+            deepLinks = listOf(
+                navDeepLink<PaymentRoute>(
+                    basePath = PaymentRoute.DEEP_LINK
+                )
+            )
+        ) {
             PaymentScreen(
                 onBackClick = { navController.popBackStack() },
                 onPayClick = {

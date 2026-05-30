@@ -53,7 +53,7 @@ class PaymentViewModel(
     @SuppressLint("ScheduleExactAlarm")
     fun onScreenEnter() {
         alarmScheduler.cancel()
-        alarmScheduler.schedule()
+        alarmScheduler.schedule(ids)
     }
 
     fun updateSelectedId(id: Long) {

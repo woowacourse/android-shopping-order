@@ -2,6 +2,8 @@ package woowacourse.shopping.ui.navigation
 
 import kotlinx.serialization.Serializable
 
+const val SCHEME = "myapp"
+
 @Serializable
 data object ShoppingRoute
 
@@ -15,9 +17,11 @@ data class ProductDetailRoute(
 data object CartRoute
 
 @Serializable
-data class PaymentRoute(
-    val ids: List<Long>,
-)
+data class PaymentRoute(val ids: List<Long>) {
+    companion object {
+        const val DEEP_LINK = "$SCHEME://payment"
+    }
+}
 
 @Serializable
 data object SettingsRoute

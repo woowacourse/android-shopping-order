@@ -17,7 +17,6 @@ import woowacourse.shopping.ui.common.theme.ShoppingTheme
 import woowacourse.shopping.ui.navigation.AppNavHost
 
 class MainActivity : ComponentActivity() {
-    private val navigateToPayment = MutableStateFlow(false)
     private val requestPermissionLauncher =
         registerForActivityResult(
             ActivityResultContracts.RequestPermission(),
@@ -29,12 +28,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ShoppingTheme {
-                AppNavHost(
-                    navigateToPaymentSignal = navigateToPayment.asStateFlow(),
-                    onPaymentNavigated = {
-                        navigateToPayment.value = false
-                    },
-                )
+                AppNavHost()
             }
         }
         askNotificationPermission()
@@ -43,13 +37,6 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        handleIntent(intent)
-    }
-
-    private fun handleIntent(intent: Intent) {
-        if (intent.getBooleanExtra(EXTRA_NAVIGATE_TO_PAYMENT, false)) {
-            navigateToPayment.value = true
-        }
     }
 
     private fun askNotificationPermission() {
@@ -62,9 +49,5 @@ class MainActivity : ComponentActivity() {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
-    }
-
-    companion object {
-        const val EXTRA_NAVIGATE_TO_PAYMENT = "navigate_to_payment"
     }
 }

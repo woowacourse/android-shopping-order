@@ -13,7 +13,7 @@
 ## 2. 아키텍처 및 네비게이션 설계 개선
 
 ### DeepLink 기반 알림 이동 처리
-- [ ] `MainActivity`에서 알림 클릭 이동을 위해 `MutableStateFlow`로 상태를 직접 관리하는 방식을 제거
+- [x] `MainActivity`에서 알림 클릭 이동을 위해 `MutableStateFlow`로 상태를 직접 관리하는 방식을 제거
   - DeepLink를 도입하여 알림 클릭 시 결제 화면으로 직접 진입할 수 있도록 구조를 개선
 
 ### 네비게이션 옵션의 의도 명확화
