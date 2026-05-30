@@ -10,10 +10,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.fake.FakeCartRepository
-import woowacourse.shopping.fake.FakeProductRepository
-import woowacourse.shopping.fake.FakeRecentProductRepository
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
+import woowacourse.shopping.domain.usecase.GetLastSeenProductUseCase
 import woowacourse.shopping.fake.fakeProduct
+import woowacourse.shopping.fake.repository.FakeCartRepository
+import woowacourse.shopping.fake.repository.FakeProductRepository
+import woowacourse.shopping.fake.repository.FakeRecentProductRepository
 import woowacourse.shopping.presentation.detail.model.DetailUiState
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -34,8 +36,9 @@ class DetailViewModelTest {
         recentProductRepository = FakeRecentProductRepository(products)
         viewModel =
             DetailViewModel(
+                getLastSeenProductUseCase = GetLastSeenProductUseCase(recentProductRepository),
+                addToCartUseCase = AddToCartUseCase(cartRepository),
                 productRepository = productRepository,
-                cartRepository = cartRepository,
                 recentProductRepository = recentProductRepository,
             )
     }

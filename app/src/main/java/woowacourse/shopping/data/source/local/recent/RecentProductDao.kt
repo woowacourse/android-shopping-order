@@ -1,10 +1,9 @@
 package woowacourse.shopping.data.source.local.recent
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Upsert
 
 @Dao
 interface RecentProductDao {
@@ -20,7 +19,7 @@ interface RecentProductDao {
         trimToLast(keep)
     }
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun upsert(entity: RecentProductEntity)
 
     @Query(

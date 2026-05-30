@@ -10,13 +10,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import woowacourse.shopping.data.source.local.auth.AuthDataSource
-import woowacourse.shopping.data.source.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.source.remote.RetrofitClient
-import woowacourse.shopping.di.RepositoryProvider.authDataSource
+import woowacourse.shopping.data.source.remote.datasource.ProductRemoteDataSource
 import woowacourse.shopping.domain.model.Money
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductName
-import woowacourse.shopping.fake.FakeProductDispatcher
+import woowacourse.shopping.fake.dispatcher.FakeProductDispatcher
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultProductRepositoryTest {
@@ -70,9 +69,9 @@ class DefaultProductRepositoryTest {
         offset: Int,
         limit: Int,
     ) = runTest {
-        val products = defaultProductRepository.getProducts(offset, limit)
+        val products = defaultProductRepository.getProducts(offset / limit, limit)
         advanceUntilIdle()
-        assertThat(products.size).isEqualTo(limit)
+        assertThat(products.products.size).isEqualTo(limit)
     }
 
     @Test

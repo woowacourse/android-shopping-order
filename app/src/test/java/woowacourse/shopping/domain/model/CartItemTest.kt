@@ -18,6 +18,7 @@ class CartItemTest {
     fun `해당 상품의 개수에 따른 가격을 계산한다`() {
         val item =
             CartItem(
+                id = 1L,
                 product = product,
                 quantity = 2,
             )
@@ -28,6 +29,7 @@ class CartItemTest {
     fun `상품 개수가 0 이하일 시 예외를 반환한다`() {
         assertThatThrownBy {
             CartItem(
+                id = 1L,
                 product = product,
                 quantity = 0,
             )
@@ -38,6 +40,7 @@ class CartItemTest {
     fun `상품 개수가 100개 이상 일 시 예외를 반환한다`() {
         assertThatThrownBy {
             CartItem(
+                id = 1L,
                 product = product,
                 quantity = 100,
             )

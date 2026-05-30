@@ -6,7 +6,7 @@ data class ShoppingUiState(
     val products: List<ShoppingItemUiModel> = emptyList(),
     val canLoadMore: Boolean = false,
     val isLoading: Boolean = false,
-    val offset: Int = 0,
+    val page: Int = 0,
     val totalQuantity: Int = 0,
     val recentProducts: List<ProductUiModel> = emptyList(),
     val errorMessage: String? = null,

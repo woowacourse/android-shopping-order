@@ -2,7 +2,7 @@ package woowacourse.shopping.presentation.cart.viewmodel
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -11,13 +11,15 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.fake.FakeCartRepository
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
 import woowacourse.shopping.fake.fakeProduct
+import woowacourse.shopping.fake.repository.FakeCartRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CartViewModelTest {
     private val dispatcher = UnconfinedTestDispatcher()
     private lateinit var viewModel: CartViewModel
+    private lateinit var addToCart: AddToCartUseCase
     private lateinit var cartRepository: FakeCartRepository
 
     @BeforeEach
@@ -25,8 +27,12 @@ class CartViewModelTest {
         Dispatchers.setMain(dispatcher)
         val productMap = (1L..10L).associateWith { fakeProduct(it) }
         cartRepository = FakeCartRepository(productMap)
+        addToCart = AddToCartUseCase(cartRepository)
         viewModel =
-            CartViewModel(cartRepository = cartRepository)
+            CartViewModel(
+                addToCartUseCase = addToCart,
+                cartRepository = cartRepository,
+            )
     }
 
     @AfterEach
@@ -79,18 +85,27 @@ class CartViewModelTest {
     @Test
     fun `deleteItem은 성공 시 DeleteSuccess 이벤트를 발생시킨다`() =
         runTest {
+            val events = mutableListOf<CartEvent>()
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                viewModel.uiEvents.collect { events.add(it) }
+            }
             cartRepository.addItem(1L, 1)
 
             viewModel.deleteItem(1L)
 
-            assertThat(viewModel.uiEvents.first()).isEqualTo(CartEvent.DeleteSuccess)
+            assertThat(events).contains(CartEvent.DeleteSuccess)
         }
 
     @Test
     fun `deleteItem은 없는 상품이면 DeleteNotFound 이벤트를 발생시킨다`() =
         runTest {
+            val events = mutableListOf<CartEvent>()
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                viewModel.uiEvents.collect { events.add(it) }
+            }
+
             viewModel.deleteItem(999L)
 
-            assertThat(viewModel.uiEvents.first()).isEqualTo(CartEvent.DeleteNotFound)
+            assertThat(events).contains(CartEvent.DeleteNotFound)
         }
 }

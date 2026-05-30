@@ -4,11 +4,14 @@ import woowacourse.shopping.domain.model.Money
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductName
 
-fun fakeProduct(id: Long): Product =
+fun fakeProduct(
+    id: Long,
+    category: String = "",
+): Product =
     Product(
         id = id,
         name = ProductName(id.toString()),
         price = Money(1250L),
         imageUrl = "",
-        category = "",
+        category = category,
     )

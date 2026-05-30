@@ -3,42 +3,45 @@ package woowacourse.shopping.presentation.cart.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.di.RepositoryProvider
+import woowacourse.shopping.di.AppModule
 import woowacourse.shopping.domain.model.AddItemResult
 import woowacourse.shopping.domain.model.Cart
 import woowacourse.shopping.domain.model.PaymentItems
 import woowacourse.shopping.domain.model.RemoveItemResult
 import woowacourse.shopping.domain.model.UpdateItemResult
 import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
 import woowacourse.shopping.presentation.cart.model.CartUiState
 import woowacourse.shopping.presentation.cart.model.toUiModel
-import woowacourse.shopping.presentation.common.addToCartUseCase
 import kotlin.math.min
 
 class CartViewModel(
-    private val cartRepository: CartRepository = RepositoryProvider.cartRepository,
+    private val addToCartUseCase: AddToCartUseCase = AppModule.addToCartUseCase,
+    private val cartRepository: CartRepository = AppModule.cartRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
 
     private var paymentItems = PaymentItems(emptySet())
 
-    private val _uiEvents = Channel<CartEvent>(Channel.BUFFERED)
-    val uiEvents: Flow<CartEvent> = _uiEvents.receiveAsFlow()
+    private val _uiEvents =
+        MutableSharedFlow<CartEvent>(
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
+    val uiEvents = _uiEvents.asSharedFlow()
 
     private val exceptionHandler =
         CoroutineExceptionHandler { _, _ ->
-            viewModelScope.launch {
-                _uiEvents.send(CartEvent.ShowError("알 수 없는 오류가 발생했습니다."))
-            }
+            _uiEvents.tryEmit(CartEvent.ShowError("알 수 없는 오류가 발생했습니다."))
         }
 
     fun getPaymentItemIds(): List<Long> = paymentItems.getProductIds()
@@ -54,15 +57,13 @@ class CartViewModel(
             when (val result = cartRepository.deleteItem(productId)) {
                 is RemoveItemResult.Success -> {
                     loadCartItems(result.cart)
-                    _uiEvents.send(CartEvent.DeleteSuccess)
+                    _uiEvents.emit(CartEvent.DeleteSuccess)
                 }
-
                 is RemoveItemResult.NotFoundItem -> {
-                    _uiEvents.send(CartEvent.DeleteNotFound)
+                    _uiEvents.emit(CartEvent.DeleteNotFound)
                 }
-
                 is RemoveItemResult.Error -> {
-                    _uiEvents.send(CartEvent.ShowError(result.message))
+                    _uiEvents.emit(CartEvent.ShowError(result.message))
                 }
             }
         }
@@ -70,7 +71,7 @@ class CartViewModel(
 
     fun increase(productId: Long) {
         viewModelScope.launch(exceptionHandler) {
-            when (val result = addToCartUseCase(cartRepository, productId)) {
+            when (val result = addToCartUseCase(productId)) {
                 is AddItemResult.NewAdded -> {
                     loadCartItems(result.cart)
                 }
@@ -80,7 +81,7 @@ class CartViewModel(
                 }
 
                 is AddItemResult.Error -> {
-                    _uiEvents.send(CartEvent.ShowError(result.message))
+                    _uiEvents.emit(CartEvent.ShowError(result.message))
                 }
             }
         }
@@ -97,7 +98,7 @@ class CartViewModel(
             ) {
                 is UpdateItemResult.Success -> loadCartItems(result.cart)
                 is UpdateItemResult.Error -> {
-                    _uiEvents.send(CartEvent.ShowError(result.message))
+                    _uiEvents.emit(CartEvent.ShowError(result.message))
                     loadCartItems()
                 }
             }
@@ -224,7 +225,7 @@ class CartViewModel(
     private fun syncPaymentDerivedState(cart: Cart) {
         _uiState.update {
             it.copy(
-                totalPrice = paymentItems.totalPrice,
+                totalPrice = paymentItems.totalPrice.amount,
                 totalQuantity = paymentItems.totalQuantity,
                 isSelectAll =
                     cart.items.isNotEmpty() &&
@@ -244,6 +245,10 @@ sealed interface CartEvent {
     data object DeleteNotFound : CartEvent
 
     data class ShowError(
+        val message: String,
+    ) : CartEvent
+
+    data class ShowCancelReason(
         val message: String,
     ) : CartEvent
 }

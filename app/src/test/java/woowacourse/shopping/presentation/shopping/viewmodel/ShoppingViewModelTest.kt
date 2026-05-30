@@ -7,13 +7,13 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.assertj.core.api.Assertions
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.fake.FakeCartRepository
-import woowacourse.shopping.fake.FakeProductRepository
-import woowacourse.shopping.fake.FakeRecentProductRepository
+import woowacourse.shopping.domain.usecase.AddToCartUseCase
 import woowacourse.shopping.fake.fakeProduct
+import woowacourse.shopping.fake.repository.FakeCartRepository
+import woowacourse.shopping.fake.repository.FakeProductRepository
+import woowacourse.shopping.fake.repository.FakeRecentProductRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ShoppingViewModelTest {
@@ -22,16 +22,18 @@ class ShoppingViewModelTest {
     private lateinit var productRepository: FakeProductRepository
     private lateinit var cartRepository: FakeCartRepository
     private lateinit var recentProductRepository: FakeRecentProductRepository
+    private lateinit var addToCartUseCase: AddToCartUseCase
 
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(dispatcher)
-        val products = (1L..20L).map { fakeProduct(it) }
+        val products = (1L..35L).map { fakeProduct(it) }
         productRepository = FakeProductRepository(products)
         cartRepository = FakeCartRepository()
         recentProductRepository = FakeRecentProductRepository(products)
         viewModel =
             ShoppingViewModel(
+                addToCartUseCase = AddToCartUseCase(cartRepository),
                 productRepository = productRepository,
                 cartRepository = cartRepository,
                 recentProductRepository = recentProductRepository,
@@ -39,24 +41,14 @@ class ShoppingViewModelTest {
     }
 
     @Test
-    fun `데이터를 불러올 때 제한된 개수의 상품 데이터를 불러온다`() =
+    fun `데이터를 처음 불러오고 나서 page는 1이 된다`() =
         runTest {
             viewModel.loadMore()
             advanceUntilIdle()
 
             val state = viewModel.uiState.value
             Assertions.assertThat(state.products.size).isEqualTo(20)
-            Assertions.assertThat(state.offset).isEqualTo(20)
-        }
-
-    @Test
-    fun `데이터를 처음 불러오고 나서 offset은 처음 불러온 데이터의 크기가 된다`() =
-        runTest {
-            viewModel.loadMore()
-            advanceUntilIdle()
-
-            val state = viewModel.uiState.value
-            Assertions.assertThat(state.offset).isEqualTo(20)
+            Assertions.assertThat(state.page).isEqualTo(1)
         }
 
     @Test
