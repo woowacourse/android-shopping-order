@@ -13,7 +13,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.event.UiEventHandler
-import woowacourse.shopping.ui.cart.uimodel.toUiModel
 import woowacourse.shopping.ui.navigation.ShoppingRoute
 
 fun NavGraphBuilder.cartRoute(
@@ -55,27 +54,7 @@ private fun cartContent(
         snackbarHostState = snackbarHostState,
     )
 
-    val pagedCart by viewModel.pagedCart.collectAsStateWithLifecycle()
-    val currentPage by viewModel.currentPage.collectAsStateWithLifecycle()
-    val isPageable by viewModel.isPageable.collectAsStateWithLifecycle()
-    val nextEnable by viewModel.nextEnable.collectAsStateWithLifecycle()
-    val prevEnable by viewModel.prevEnable.collectAsStateWithLifecycle()
-    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
-    val checkedItemIds by viewModel.checkedItemIds.collectAsStateWithLifecycle()
-    val totalPrice by viewModel.totalPrice.collectAsStateWithLifecycle()
-    val totalCount by viewModel.selectedItemCount.collectAsStateWithLifecycle()
-    val uiState =
-        CartUiState(
-            cartItems = pagedCart.toUiModel(),
-            currentPage = currentPage,
-            isPageable = isPageable,
-            previousEnable = prevEnable,
-            nextEnable = nextEnable,
-            isLoading = isLoading,
-            totalPrice = totalPrice,
-            totalCount = totalCount,
-            checkedItemIds = checkedItemIds,
-        )
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     CartScreen(
         uiState = uiState,
         onPrevious = { viewModel.prev() },
@@ -93,7 +72,7 @@ private fun cartContent(
         onCheckedChanged = { viewModel.onItemChecked(it) },
         onSelectAllClick = { viewModel.onSelectAllClick() },
         onOrderClick = {
-            onOrderClick(checkedItemIds)
+            onOrderClick(uiState.checkedItemIds)
         },
         modifier =
             Modifier
