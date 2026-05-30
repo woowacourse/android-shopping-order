@@ -73,7 +73,7 @@ android {
                 "BASE_URL",
                 asBuildConfigString(
                     readConfig(
-                        "BASE_URL",
+                        "DEBUG_BASE_URL",
                         "",
                     ),
                 ),
