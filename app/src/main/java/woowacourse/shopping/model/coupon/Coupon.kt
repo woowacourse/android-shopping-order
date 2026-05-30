@@ -16,7 +16,7 @@ sealed interface Coupon {
     val expirationDate: String
     val discountPolicy: DiscountPolicy
 
-    fun isApplicable(
+    fun isAvailableAt(
         currentDate: LocalDate,
         currentTime: LocalTime,
     ): Boolean {
@@ -67,11 +67,11 @@ sealed interface Coupon {
     ) : Coupon {
         override val discountPolicy: DiscountPolicy = PercentageDiscountPolicy(discountPercentage)
 
-        override fun isApplicable(
+        override fun isAvailableAt(
             currentDate: LocalDate,
             currentTime: LocalTime,
         ): Boolean {
-            if (!super.isApplicable(currentDate, currentTime)) return false
+            if (!super.isAvailableAt(currentDate, currentTime)) return false
             return currentTime in availableStartTime..availableEndTime
         }
     }

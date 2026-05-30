@@ -192,7 +192,7 @@ class PaymentViewModel(
                 .onSuccess { fetchedCoupons ->
                     val currentDate = dateTimeProvider.currentDate()
                     val currentTime = dateTimeProvider.currentTime()
-                    val applicableCoupons = fetchedCoupons.filter { it.isApplicable(currentDate, currentTime) }
+                    val applicableCoupons = fetchedCoupons.filter { it.isAvailableAt(currentDate, currentTime) }
                     coupons = applicableCoupons
 
                     val couponUiModels = applicableCoupons.map { CouponUiModelMapper.toUiModel(it) }
