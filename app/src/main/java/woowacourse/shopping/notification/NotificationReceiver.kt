@@ -1,11 +1,15 @@
 package woowacourse.shopping.notification
 
+import android.Manifest
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import woowacourse.shopping.MainActivity
 import woowacourse.shopping.R
 import woowacourse.shopping.notification.NotificationConstants.ORDER_CHANNEL_ID
@@ -47,6 +51,21 @@ class NotificationReceiver : BroadcastReceiver() {
                 .build()
 
         val notificationManager = context.getSystemService(NotificationManager::class.java)
+
+        val isNotificationAllowed =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val hasPermission =
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.POST_NOTIFICATIONS,
+                    ) == PackageManager.PERMISSION_GRANTED
+
+                hasPermission && notificationManager.areNotificationsEnabled()
+            } else {
+                notificationManager.areNotificationsEnabled()
+            }
+        if (!isNotificationAllowed) return
+
         notificationManager.notify(ORDER_NOTIFICATION_ID, notification)
     }
 }
