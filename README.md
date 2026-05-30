@@ -3,12 +3,12 @@
 ## 1. 비동기 처리 및 안전한 이벤트 수집
 
 ### 결제 처리와 화면 전환 동기화
-- [ ] `PaymentScreen`에서 `viewModel.pay()` 호출 직후 `onPayClick()`이 곧바로 실행되는 비동기 타이밍 문제를 해결
+- [x] `PaymentScreen`에서 `viewModel.pay()` 호출 직후 `onPayClick()`이 곧바로 실행되는 비동기 타이밍 문제를 해결
   - `pay()` 내부의 `viewModelScope` 코루틴 완료 시점과 화면 전환 시점이 어긋나지 않도록, 결제 성공 이벤트를 수신한 뒤 화면을 이동하는 구조로 흐름 분리
 
 ### 생명주기를 고려한 이벤트 수집
-- [ ] `PaymentScreen`에서 `LaunchedEffect(Unit)`로 이벤트를 수집하는 방식은 앱이 백그라운드로 전환될 때 안전하지 않음
-  - `repeatOnLifecycle` 또는 `flowWithLifecycle` 을 활용하여 생명주기에 따라 수집이 안전하게 일시 중단/재개되도록 수정
+- [x] `PaymentScreen`에서 `LaunchedEffect(Unit)`로 이벤트를 수집하는 방식은 앱이 백그라운드로 전환될 때 안전하지 않음
+  - `repeatOnLifecycle`을 활용하여 생명주기에 따라 수집이 안전하게 일시 중단/재개되도록 수정
 
 ## 2. 아키텍처 및 네비게이션 설계 개선
 

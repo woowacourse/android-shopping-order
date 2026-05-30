@@ -39,7 +39,7 @@ class PaymentViewModel(
     private val alarmScheduler: PaymentAlarmScheduler,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PaymentUiState())
-    private val _events = Channel<String>(Channel.BUFFERED)
+    private val _events = Channel<PaymentEvent>(Channel.BUFFERED)
     private val route: PaymentRoute = savedStateHandle.toRoute()
     private val ids = route.ids
 
@@ -71,6 +71,7 @@ class PaymentViewModel(
             try {
                 alarmScheduler.cancel()
                 orderRepo.requestOrder(ids)
+                _events.send(PaymentEvent.PaySuccess)
             } catch (e: Exception) {
                 handleError("pay", e, "결제를 할 수 없어요.")
             }
@@ -83,12 +84,11 @@ class PaymentViewModel(
             try {
                 val allCartItems = cartRepo.getAllCartItems().items
                 val items = allCartItems.filter { ids.contains(it.id) }
-                val order =
-                    Order(
-                        items = items,
-                        selectedCoupon = null,
-                        shippingFee = Money(BASE_SHIPPING_FEE),
-                    )
+                val order = Order(
+                    items = items,
+                    selectedCoupon = null,
+                    shippingFee = Money(BASE_SHIPPING_FEE),
+                )
                 val payment = calculator.calculate(order, Clock.systemDefaultZone())
                 val context = order.couponContext(Clock.systemDefaultZone())
                 val coupons = paymentRepo.getCoupons()
@@ -110,12 +110,11 @@ class PaymentViewModel(
 
     private fun refreshOrderSummary(id: Long) {
         val coupon = _uiState.value.availableCoupons.find { it.id == id }
-        val order =
-            Order(
-                items = _uiState.value.items,
-                selectedCoupon = coupon,
-                shippingFee = Money(BASE_SHIPPING_FEE),
-            )
+        val order = Order(
+            items = _uiState.value.items,
+            selectedCoupon = coupon,
+            shippingFee = Money(BASE_SHIPPING_FEE),
+        )
         val payment = calculator.calculate(order, Clock.systemDefaultZone())
         _uiState.update { it.copy(payment = payment) }
     }
@@ -127,7 +126,8 @@ class PaymentViewModel(
     ) {
         if (e is CancellationException) throw e
         Log.e(TAG, "$tag 에러", e)
-        _events.send(ErrorMessageMapper.toUserMessage(e, defaultMessage))
+        val message = ErrorMessageMapper.toUserMessage(e, defaultMessage)
+        _events.send(PaymentEvent.ShowSnackbar(message))
     }
 
     companion object {

@@ -9,7 +9,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.di.appContainer
 import woowacourse.shopping.model.Money
@@ -35,14 +38,25 @@ fun PaymentScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(Unit) {
         viewModel.onScreenEnter()
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.events.collect { message ->
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.events.collect { event ->
+                when (event) {
+                    is PaymentEvent.ShowSnackbar -> Toast.makeText(
+                        context,
+                        event.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    PaymentEvent.PaySuccess -> onPayClick()
+                }
+            }
         }
     }
 
@@ -56,10 +70,7 @@ fun PaymentScreen(
         modifier = modifier,
         onBackClick = onBackClick,
         onCouponSelected = { viewModel.updateSelectedId(it) },
-        onPayClick = {
-            viewModel.pay()
-            onPayClick()
-        },
+        onPayClick = { viewModel.pay() },
     )
 
     if (state.isLoading) ShoppingLoading()
