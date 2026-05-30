@@ -27,8 +27,12 @@ fun ShoppingNavHost(
 
     LaunchedEffect(pendingPaymentRoute) {
         val route = pendingPaymentRoute ?: return@LaunchedEffect
-        navController.navigate(CartGraphRoute)
-        navController.navigate(route)
+        navController.navigate(CartGraphRoute) {
+            launchSingleTop = true
+        }
+        navController.navigate(route) {
+            launchSingleTop = true
+        }
         onPendingPaymentRouteHandled()
     }
 
