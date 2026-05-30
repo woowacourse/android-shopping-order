@@ -40,7 +40,9 @@ class ShoppingActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         requestNotificationPermissionIfNeeded()
-        pendingPaymentRoute = intent.toPendingPaymentRoute()
+        pendingPaymentRoute =
+            savedInstanceState.toPendingPaymentRoute()
+                ?: intent.consumePendingPaymentRoute()
 
         setContent {
             AndroidShoppingTheme {
@@ -58,15 +60,33 @@ class ShoppingActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        pendingPaymentRoute = intent.toPendingPaymentRoute()
+        pendingPaymentRoute = intent.consumePendingPaymentRoute()
     }
 
-    private fun Intent?.toPendingPaymentRoute(): PaymentRoute? {
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        val pendingRoute = pendingPaymentRoute ?: return
+        outState.putLongArray(KEY_PENDING_PAYMENT_PRODUCT_IDS, pendingRoute.selectedProductIds.toLongArray())
+    }
+
+    private fun Intent?.consumePendingPaymentRoute(): PaymentRoute? {
         val targetIntent = this ?: return null
         val fromReminder = targetIntent.getBooleanExtra(EXTRA_OPEN_PAYMENT_FROM_REMINDER, false)
         if (!fromReminder) return null
 
         val selectedProductIds = targetIntent.getLongArrayExtra(EXTRA_SELECTED_PRODUCT_IDS)?.toList().orEmpty()
+        targetIntent.removeExtra(EXTRA_OPEN_PAYMENT_FROM_REMINDER)
+        targetIntent.removeExtra(EXTRA_SELECTED_PRODUCT_IDS)
+        return PaymentRoute(
+            selectedProductIds = selectedProductIds,
+            fromReminder = true,
+        )
+    }
+
+    private fun Bundle?.toPendingPaymentRoute(): PaymentRoute? {
+        val state = this ?: return null
+        if (!state.containsKey(KEY_PENDING_PAYMENT_PRODUCT_IDS)) return null
+        val selectedProductIds = state.getLongArray(KEY_PENDING_PAYMENT_PRODUCT_IDS)?.toList().orEmpty()
         return PaymentRoute(
             selectedProductIds = selectedProductIds,
             fromReminder = true,
@@ -85,4 +105,8 @@ class ShoppingActivity : ComponentActivity() {
             this,
             POST_NOTIFICATIONS_PERMISSION,
         ) == PackageManager.PERMISSION_GRANTED
+
+    private companion object {
+        private const val KEY_PENDING_PAYMENT_PRODUCT_IDS: String = "key_pending_payment_product_ids"
+    }
 }
