@@ -30,28 +30,33 @@ fun ShoppingNavHost(
 
     LaunchedEffect(startCartIds) {
         if (startCartIds != null) {
-            navController.navigate(Order(startCartIds))
+            navController.navigate(OrderRoute.Order(startCartIds))
             onCartIdsConsumed()
         }
     }
 
     NavHost(
         navController = navController,
-        startDestination = ProductList,
+        startDestination = ProductRoute.ProductList,
     ) {
-        composable<ProductList> {
+        composable<ProductRoute.ProductList> {
             val viewModel: ProductListViewModel = viewModel(factory = ProductListViewModel.Factory)
             ProductListScreen(
                 viewModel = viewModel,
                 onCartClick = { navController.navigate(CartGraph) },
-                onSettingClick = { navController.navigate(Setting) },
+                onSettingClick = { navController.navigate(SettingRoute.Setting) },
                 onProductClick = { productId ->
-                    navController.navigate(ProductDetail(productId, openedFromLastViewed = false))
+                    navController.navigate(
+                        ProductRoute.Detail(
+                            productId,
+                            openedFromLastViewed = false,
+                        ),
+                    )
                 },
             )
         }
 
-        composable<ProductDetail> {
+        composable<ProductRoute.Detail> {
             val viewModel: ProductDetailViewModel =
                 viewModel(factory = ProductDetailViewModel.Factory)
             ProductDetailScreen(
@@ -59,13 +64,18 @@ fun ShoppingNavHost(
                 onCloseClick = { navController.popBackStack() },
                 onAddToCartClick = { viewModel.addToCart() },
                 onLastViewedProductClick = { product ->
-                    navController.navigate(ProductDetail(product.id, openedFromLastViewed = true))
+                    navController.navigate(
+                        ProductRoute.Detail(
+                            product.id,
+                            openedFromLastViewed = true,
+                        ),
+                    )
                 },
             )
         }
 
-        navigation<CartGraph>(startDestination = Cart) {
-            composable<Cart> { entry ->
+        navigation<CartGraph>(startDestination = CartRoute.Cart) {
+            composable<CartRoute.Cart> { entry ->
                 val cartGraphEntry =
                     remember(entry) {
                         navController.getBackStackEntry<CartGraph>()
@@ -78,11 +88,11 @@ fun ShoppingNavHost(
                 CartScreen(
                     viewModel = cartViewModel,
                     onClickClose = { navController.popBackStack() },
-                    onNavigateToRecommend = { navController.navigate(Recommend) },
+                    onNavigateToRecommend = { navController.navigate(CartRoute.Recommend) },
                 )
             }
 
-            composable<Recommend> { entry ->
+            composable<CartRoute.Recommend> { entry ->
                 val cartGraphEntry =
                     remember(entry) {
                         navController.getBackStackEntry<CartGraph>()
@@ -98,25 +108,25 @@ fun ShoppingNavHost(
                     cartViewModel = cartViewModel,
                     recommendViewModel = recommendViewModel,
                     onClickClose = { navController.popBackStack() },
-                    onNavigateToOrder = { cartIds -> navController.navigate(Order(cartIds)) },
+                    onNavigateToOrder = { cartIds -> navController.navigate(OrderRoute.Order(cartIds)) },
                 )
             }
         }
 
-        composable<Order> {
+        composable<OrderRoute.Order> {
             val viewModel: OrderViewModel = viewModel(factory = OrderViewModel.Factory)
             OrderScreen(
                 orderViewModel = viewModel,
                 onClickClose = { navController.popBackStack() },
                 onOrderSuccess = {
-                    navController.navigate(ProductList) {
-                        popUpTo<ProductList> { inclusive = true }
+                    navController.navigate(ProductRoute.ProductList) {
+                        popUpTo<ProductRoute.ProductList> { inclusive = true }
                     }
                 },
             )
         }
 
-        composable<Setting> {
+        composable<SettingRoute.Setting> {
             val viewModel: SettingViewModel = viewModel(factory = SettingViewModel.Factory)
             SettingScreen(
                 viewModel = viewModel,
@@ -126,7 +136,7 @@ fun ShoppingNavHost(
     }
     LaunchedEffect(startCartIds) {
         if (startCartIds != null) {
-            navController.navigate(Order(startCartIds))
+            navController.navigate(OrderRoute.Order(startCartIds))
         }
     }
 }
