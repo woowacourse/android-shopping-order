@@ -1,10 +1,10 @@
 package woowacourse.shopping.model.coupon
 
-import woowacourse.shopping.model.order.BuyXGetYDiscountPolicy
-import woowacourse.shopping.model.order.DiscountPolicy
-import woowacourse.shopping.model.order.FixedDiscountPolicy
-import woowacourse.shopping.model.order.FreeShippingDiscountPolicy
-import woowacourse.shopping.model.order.PercentageDiscountPolicy
+import woowacourse.shopping.model.order.discount.BuyXGetYDiscountPolicy
+import woowacourse.shopping.model.order.discount.DiscountPolicy
+import woowacourse.shopping.model.order.discount.FixedDiscountPolicy
+import woowacourse.shopping.model.order.discount.FreeShippingDiscountPolicy
+import woowacourse.shopping.model.order.discount.PercentageDiscountPolicy
 import woowacourse.shopping.model.product.Money
 import java.time.LocalDate
 import java.time.LocalTime

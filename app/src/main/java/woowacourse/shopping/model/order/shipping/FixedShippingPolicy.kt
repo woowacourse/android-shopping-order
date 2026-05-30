@@ -1,10 +1,6 @@
-package woowacourse.shopping.model.order
+package woowacourse.shopping.model.order.shipping
 
 import woowacourse.shopping.model.product.Money
-
-interface ShippingPolicy {
-    fun calculateShippingFee(totalProductAmount: Money): Money
-}
 
 class FixedShippingPolicy(
     private val baseFee: Money = Money(3000),

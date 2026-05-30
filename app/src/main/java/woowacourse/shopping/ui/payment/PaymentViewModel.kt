@@ -15,9 +15,9 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.common.time.DateTimeProvider
 import woowacourse.shopping.common.time.SystemDateTimeProvider
 import woowacourse.shopping.model.coupon.Coupon
-import woowacourse.shopping.model.order.FixedShippingPolicy
 import woowacourse.shopping.model.order.OrderItem
-import woowacourse.shopping.model.order.ShippingPolicy
+import woowacourse.shopping.model.order.shipping.FixedShippingPolicy
+import woowacourse.shopping.model.order.shipping.ShippingPolicy
 import woowacourse.shopping.model.product.Money
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.CouponRepository

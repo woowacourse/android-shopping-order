@@ -4,6 +4,10 @@ package woowacourse.shopping.model.order
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.model.order.discount.BuyXGetYDiscountPolicy
+import woowacourse.shopping.model.order.discount.FixedDiscountPolicy
+import woowacourse.shopping.model.order.discount.FreeShippingDiscountPolicy
+import woowacourse.shopping.model.order.discount.PercentageDiscountPolicy
 import woowacourse.shopping.model.product.Money
 
 class DiscountPolicyTest {
