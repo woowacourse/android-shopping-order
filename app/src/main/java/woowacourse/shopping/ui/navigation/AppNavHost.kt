@@ -13,6 +13,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -289,9 +290,20 @@ fun AppNavHost(innerPadding: PaddingValues) {
 
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 val lifecycleOwner = LocalLifecycleOwner.current
+                val hasLeftPaymentScreen = remember { mutableStateOf(false) }
 
                 LaunchedEffect(Unit) {
                     AlarmHelper.schedulePaymentReminder(context)
+                }
+
+                LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
+                    hasLeftPaymentScreen.value = true
+                }
+
+                LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+                    if (hasLeftPaymentScreen.value) {
+                        AlarmHelper.cancelPaymentReminder(context)
+                    }
                 }
 
                 LaunchedEffect(uiState.isOrderCompleted, lifecycleOwner) {
@@ -309,10 +321,7 @@ fun AppNavHost(innerPadding: PaddingValues) {
 
                 PaymentScreen(
                     uiState = uiState,
-                    onBackClick = {
-                        AlarmHelper.cancelPaymentReminder(context)
-                        navController.popBackStack()
-                    },
+                    onBackClick = { navController.popBackStack() },
                     onCouponCheckedChange = { couponId, _ ->
                         viewModel.selectCoupon(couponId)
                     },
