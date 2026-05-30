@@ -2,7 +2,7 @@
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">
-            https://android-shopping-server.onrender.com/
+            android-shopping-server.onrender.com
         </domain>
         <domain includeSubdomains="true">
             192.168.2.152
