@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import woowacourse.shopping.common.time.DateTimeProvider
+import woowacourse.shopping.common.time.SystemDateTimeProvider
 import woowacourse.shopping.model.coupon.Coupon
 import woowacourse.shopping.model.order.FixedShippingPolicy
 import woowacourse.shopping.model.order.OrderItem
@@ -27,8 +29,6 @@ import woowacourse.shopping.ui.navigation.Payment
 import woowacourse.shopping.ui.payment.uistate.CouponUiModelMapper
 import woowacourse.shopping.ui.payment.uistate.PaymentUiState
 import java.text.NumberFormat
-import java.time.LocalDate
-import java.time.LocalTime
 import java.util.Locale
 import kotlin.reflect.typeOf
 
@@ -38,6 +38,7 @@ class PaymentViewModel(
     private val productRepository: ProductRepository,
     private val couponRepository: CouponRepository,
     private val shippingPolicy: ShippingPolicy,
+    private val dateTimeProvider: DateTimeProvider,
 ) : ViewModel() {
     private val route: Payment =
         savedStateHandle.toRoute(
@@ -189,8 +190,8 @@ class PaymentViewModel(
             couponRepository
                 .getCoupons()
                 .onSuccess { fetchedCoupons ->
-                    val currentDate = LocalDate.now()
-                    val currentTime = LocalTime.now()
+                    val currentDate = dateTimeProvider.currentDate()
+                    val currentTime = dateTimeProvider.currentTime()
                     val applicableCoupons = fetchedCoupons.filter { it.isApplicable(currentDate, currentTime) }
                     coupons = applicableCoupons
 
@@ -238,6 +239,7 @@ class PaymentViewModelFactory : ViewModelProvider.Factory {
             productRepository = ShoppingRepositoryProvider.productRepository,
             couponRepository = ShoppingRepositoryProvider.couponRepository,
             shippingPolicy = FixedShippingPolicy(),
+            dateTimeProvider = SystemDateTimeProvider(),
         ) as T
     }
 }
