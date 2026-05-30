@@ -13,6 +13,7 @@ import woowacourse.shopping.domain.model.Coupon
 import woowacourse.shopping.domain.model.CouponBenefit
 import woowacourse.shopping.domain.model.ShoppingCartItem
 import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.PaymentReminderScheduler
 import woowacourse.shopping.domain.repository.PaymentReminderSettingsRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import java.time.LocalTime
@@ -21,6 +22,7 @@ class PaymentViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
     private val couponRepository: CouponRepository,
     private val paymentReminderSettingsRepository: PaymentReminderSettingsRepository,
+    private val paymentReminderScheduler: PaymentReminderScheduler,
 ) : ViewModel() {
     private val _uiState =
         MutableStateFlow(
@@ -127,6 +129,31 @@ class PaymentViewModel(
                 isPaymentReminderEnabled = enabled,
             )
         }
+    }
+
+    fun syncPaymentReminder(
+        selectedProductIds: Set<Long>,
+        fromReminder: Boolean,
+        canPostNotifications: Boolean,
+    ) {
+        val isPaymentReminderEnabled = _uiState.value.isPaymentReminderEnabled
+        if (isPaymentReminderEnabled && !canPostNotifications) {
+            setPaymentReminderEnabled(enabled = false)
+            paymentReminderScheduler.cancel()
+            return
+        }
+
+        if (fromReminder || selectedProductIds.isEmpty() || !isPaymentReminderEnabled) {
+            paymentReminderScheduler.cancel()
+            return
+        }
+
+        paymentReminderScheduler.cancel()
+        paymentReminderScheduler.schedule(selectedProductIds)
+    }
+
+    fun cancelPaymentReminder() {
+        paymentReminderScheduler.cancel()
     }
 
     private fun observeShoppingCartItems() {

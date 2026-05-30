@@ -17,6 +17,7 @@ import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.settings.PaymentReminderSettingsRepositoryImpl
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.repository.PaymentReminderScheduler
 import woowacourse.shopping.domain.repository.PaymentReminderSettingsRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
@@ -72,6 +73,6 @@ class AppContainer(
     val paymentReminderSettingsRepository: PaymentReminderSettingsRepository =
         PaymentReminderSettingsRepositoryImpl(context)
 
-    val paymentReminderAlarmScheduler: PaymentReminderAlarmScheduler =
+    val paymentReminderScheduler: PaymentReminderScheduler =
         PaymentReminderAlarmScheduler(context)
 }

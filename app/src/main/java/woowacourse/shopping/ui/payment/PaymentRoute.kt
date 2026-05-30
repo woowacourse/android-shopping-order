@@ -2,24 +2,33 @@
 
 package woowacourse.shopping.ui.payment
 
+import android.app.Activity
+import android.content.ContextWrapper
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.icu.text.DecimalFormat
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.R
-import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.data.remote.retrofit.dto.OrderInfo
 import woowacourse.shopping.di.AppViewModelFactory
 import woowacourse.shopping.notification.POST_NOTIFICATIONS_PERMISSION
@@ -36,8 +45,6 @@ fun PaymentRouteContent(
     onOrderCompleted: () -> Unit,
 ) {
     val context = LocalContext.current
-    val appContainer = remember(context) { (context.applicationContext as ShoppingApplication).appContainer }
-    val paymentReminderAlarmScheduler = remember(appContainer) { appContainer.paymentReminderAlarmScheduler }
 
     val paymentViewModel: PaymentViewModel =
         viewModel(
@@ -57,6 +64,14 @@ fun PaymentRouteContent(
 
     val paymentUiState by paymentViewModel.uiState.collectAsStateWithLifecycle()
     val cartUiState by shoppingCartViewModel.uiState.collectAsStateWithLifecycle()
+    val isPaymentReminderChecked = paymentUiState.isPaymentReminderEnabled && canPostNotifications(context)
+    var hasRequestedPostNotificationsPermission by rememberSaveable { mutableStateOf(false) }
+    val requestPostNotificationsPermissionLauncher =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) { isGranted ->
+            paymentViewModel.setPaymentReminderEnabled(enabled = isGranted && canPostNotifications(context))
+        }
 
     val selectedCartItemIds =
         cartUiState
@@ -72,16 +87,13 @@ fun PaymentRouteContent(
         paymentUiState.isPaymentReminderEnabled,
         selectedProductIds,
         fromReminder,
+        context,
     ) {
-        if (fromReminder || selectedProductIds.isEmpty() || !paymentUiState.isPaymentReminderEnabled) {
-            paymentReminderAlarmScheduler.cancel()
-            return@LaunchedEffect
-        }
-
-        paymentReminderAlarmScheduler.cancel()
-        if (hasPostNotificationsPermission(context)) {
-            paymentReminderAlarmScheduler.schedule(selectedProductIds)
-        }
+        paymentViewModel.syncPaymentReminder(
+            selectedProductIds = selectedProductIds,
+            fromReminder = fromReminder,
+            canPostNotifications = canPostNotifications(context),
+        )
     }
 
     LifecycleResumeEffect(Unit) {
@@ -96,7 +108,7 @@ fun PaymentRouteContent(
         couponDiscountPrice = formatPrice(paymentUiState.couponDiscountPrice),
         deliveryPrice = formatPrice(paymentUiState.deliveryPrice),
         totalPrice = formatPrice(paymentUiState.totalPrice),
-        isPaymentReminderEnabled = paymentUiState.isPaymentReminderEnabled,
+        isPaymentReminderEnabled = isPaymentReminderChecked,
         onBackClick = onNavigateBack,
         onCouponCheckedChange = { couponId, isChecked ->
             paymentViewModel.selectCoupon(
@@ -108,7 +120,28 @@ fun PaymentRouteContent(
                     },
             )
         },
-        onPaymentReminderEnabledChange = paymentViewModel::setPaymentReminderEnabled,
+        onPaymentReminderEnabledChange = { enabled ->
+            if (!enabled) {
+                paymentViewModel.setPaymentReminderEnabled(enabled = false)
+                return@PaymentScreen
+            }
+
+            if (canPostNotifications(context)) {
+                paymentViewModel.setPaymentReminderEnabled(enabled = true)
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasPostNotificationsRuntimePermission(context)) {
+                val shouldShowRationale = context.findActivity()?.shouldShowRequestPermissionRationale(POST_NOTIFICATIONS_PERMISSION) == true
+                if (!hasRequestedPostNotificationsPermission || shouldShowRationale) {
+                    hasRequestedPostNotificationsPermission = true
+                    requestPostNotificationsPermissionLauncher.launch(POST_NOTIFICATIONS_PERMISSION)
+                } else {
+                    openAppNotificationSettings(context)
+                    paymentViewModel.setPaymentReminderEnabled(enabled = false)
+                }
+            } else {
+                openAppNotificationSettings(context)
+                paymentViewModel.setPaymentReminderEnabled(enabled = false)
+            }
+        },
     ) {
         PaymentButton(
             onPaymentButtonClick = {
@@ -117,7 +150,7 @@ fun PaymentRouteContent(
                 orderViewModel.order(
                     orderInfo = OrderInfo(cartItemIds = selectedCartItemIds),
                     onSuccess = {
-                        paymentReminderAlarmScheduler.cancel()
+                        paymentViewModel.cancelPaymentReminder()
                         shoppingCartViewModel.requestCartItems(force = true)
                         onOrderCompleted()
                     },
@@ -131,10 +164,40 @@ fun PaymentRouteContent(
 @Composable
 private fun formatPrice(price: Int): String = DecimalFormat(stringResource(R.string.price_format_pattern)).format(price)
 
-private fun hasPostNotificationsPermission(context: android.content.Context): Boolean {
+private fun canPostNotifications(context: android.content.Context): Boolean {
+    if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return false
+    return hasPostNotificationsRuntimePermission(context)
+}
+
+private fun hasPostNotificationsRuntimePermission(context: android.content.Context): Boolean {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
     return ContextCompat.checkSelfPermission(
         context,
         POST_NOTIFICATIONS_PERMISSION,
     ) == PackageManager.PERMISSION_GRANTED
 }
+
+private fun openAppNotificationSettings(context: android.content.Context) {
+    val notificationSettingsIntent =
+        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+    val fallbackAppDetailsIntent =
+        Intent(
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.fromParts("package", context.packageName, null),
+        ).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+
+    runCatching { context.startActivity(notificationSettingsIntent) }
+        .onFailure { context.startActivity(fallbackAppDetailsIntent) }
+}
+
+private fun android.content.Context.findActivity(): Activity? =
+    when (this) {
+        is Activity -> this
+        is ContextWrapper -> baseContext.findActivity()
+        else -> null
+    }

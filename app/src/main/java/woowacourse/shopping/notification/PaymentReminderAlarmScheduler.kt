@@ -4,15 +4,16 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import woowacourse.shopping.domain.repository.PaymentReminderScheduler
 
 class PaymentReminderAlarmScheduler(
     private val context: Context,
-) {
+) : PaymentReminderScheduler {
     private val alarmManager: AlarmManager by lazy {
         context.getSystemService(AlarmManager::class.java)
     }
 
-    fun schedule(selectedProductIds: Set<Long>) {
+    override fun schedule(selectedProductIds: Set<Long>) {
         val pendingIntent = createAlarmPendingIntent(selectedProductIds)
         val triggerAtMillis = System.currentTimeMillis() + PAYMENT_REMINDER_DELAY_MILLIS
         alarmManager.setAndAllowWhileIdle(
@@ -22,7 +23,7 @@ class PaymentReminderAlarmScheduler(
         )
     }
 
-    fun cancel() {
+    override fun cancel() {
         val pendingIntent = createAlarmPendingIntent(emptySet())
         alarmManager.cancel(pendingIntent)
         pendingIntent.cancel()
