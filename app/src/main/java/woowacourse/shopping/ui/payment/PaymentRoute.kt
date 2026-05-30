@@ -1,5 +1,9 @@
 package woowacourse.shopping.ui.payment
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,6 +33,7 @@ fun PaymentRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
     val hasLeftPaymentScreen = remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         AlarmHelper.schedulePaymentReminder(context)
@@ -53,13 +58,24 @@ fun PaymentRoute(
         }
     }
 
-    PaymentScreen(
-        uiState = uiState,
-        onBackClick = onBackClick,
-        onCouponCheckedChange = { couponId, _ ->
-            viewModel.selectCoupon(couponId)
-        },
-        onPaymentClick = viewModel::pay,
+    LaunchedEffect(uiState.errorMessage) {
+        val errorMessage = uiState.errorMessage ?: return@LaunchedEffect
+        snackbarHostState.showSnackbar(errorMessage)
+        viewModel.clearError()
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = modifier,
-    )
+    ) { innerPadding ->
+        PaymentScreen(
+            uiState = uiState,
+            onBackClick = onBackClick,
+            onCouponCheckedChange = { couponId, _ ->
+                viewModel.selectCoupon(couponId)
+            },
+            onPaymentClick = viewModel::pay,
+            modifier = Modifier.padding(innerPadding),
+        )
+    }
 }

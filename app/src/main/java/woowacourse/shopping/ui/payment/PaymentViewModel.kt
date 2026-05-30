@@ -72,20 +72,31 @@ class PaymentViewModel(
         }
 
         viewModelScope.launch {
-            val totalCount = cartRepository.count().getOrDefault(0)
+            val totalCount =
+                cartRepository
+                    .count()
+                    .getOrElse { throwable ->
+                        updateInitialLoadError(throwable)
+                        return@launch
+                    }
             if (totalCount == 0) return@launch
 
             val cartItems =
                 cartRepository
                     .getCartPage(0, totalCount)
-                    .getOrNull()
-                    ?.items ?: return@launch
+                    .getOrElse { throwable ->
+                        updateInitialLoadError(throwable)
+                        return@launch
+                    }.items
 
             val productIds = cartItems.map { it.productId }.toSet()
             val productsById =
                 productRepository
                     .findAllByIds(productIds)
-                    .getOrDefault(emptyMap())
+                    .getOrElse { throwable ->
+                        updateInitialLoadError(throwable)
+                        return@launch
+                    }
 
             orderItems =
                 cartItems.mapNotNull { item ->
@@ -97,6 +108,15 @@ class PaymentViewModel(
                     )
                 }
             calculateAmounts()
+        }
+    }
+
+    private fun updateInitialLoadError(throwable: Throwable) {
+        _uiState.update {
+            it.copy(
+                isLoading = false,
+                errorMessage = throwable.message ?: "주문 정보를 불러오지 못했습니다.",
+            )
         }
     }
 
@@ -222,6 +242,10 @@ class PaymentViewModel(
             currentState.copy(coupons = updatedCoupons)
         }
         calculateAmounts()
+    }
+
+    fun clearError() {
+        _uiState.update { it.copy(errorMessage = null) }
     }
 }
 
