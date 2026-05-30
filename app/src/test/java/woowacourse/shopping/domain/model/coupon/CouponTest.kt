@@ -27,17 +27,17 @@ class CouponTest {
     }
 
     @Test
-    fun `BOGO 쿠폰은 무료 제공 가능한 상품 중 단가가 가장 비싼 상품 금액을 할인한다`() {
+    fun `N+M 쿠폰은 하나의 라인이 아닌 모든 상품라인에 대해 적용된다`() {
         val coupon = buyGetFreeCoupon()
-        val cheap = purchaseProduct(id = 1L, productId = 1L, price = 1_000, count = 3)
-        val expensive = purchaseProduct(id = 2L, productId = 2L, price = 3_000, count = 3)
-        val order = orderOf(cheap, expensive)
+        val product1 = purchaseProduct(id = 1L, productId = 1L, price = 1_000, count = 3)
+        val product2 = purchaseProduct(id = 2L, productId = 2L, price = 3_000, count = 3)
+        val order = orderOf(product1, product2)
 
-        coupon.discountAmount(order) shouldBe 3_000
+        coupon.discountAmount(order) shouldBe 4_000
     }
 
     @Test
-    fun `BOGO 쿠폰은 같은 상품 묶음마다 무료 제공 수량만큼 할인한다`() {
+    fun `N+M 쿠폰은 같은 상품 묶음마다 무료 제공 수량만큼 할인한다`() {
         val coupon = buyGetFreeCoupon()
         val order = orderOf(purchaseProduct(price = 3_000, count = 6))
 

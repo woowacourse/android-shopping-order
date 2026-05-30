@@ -24,8 +24,8 @@ data class NplusMFreeCoupon(
         context: CouponContext,
     ): Int =
         order.purchaseProducts.purchaseProducts
-            .maxOfOrNull { purchaseProduct ->
+            .sumOf { purchaseProduct ->
                 val freeCount = (purchaseProduct.count / (purchaseQuantity + freeQuantity)) * freeQuantity
                 purchaseProduct.price * freeCount
-            } ?: 0
+            }
 }
