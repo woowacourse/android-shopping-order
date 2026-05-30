@@ -33,6 +33,7 @@ class PaymentViewModel(
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
 
     private var hasLoadedCoupons: Boolean = false
+    private var isCouponRequestInProgress: Boolean = false
     private var selectedProductIds: Set<Long> = emptySet()
     private var allShoppingCartItems: List<ShoppingCartItem> = emptyList()
 
@@ -52,39 +53,27 @@ class PaymentViewModel(
 
     fun requestCoupons(force: Boolean = false) {
         if (!force && hasLoadedCoupons) return
-        if (_uiState.value.isLoadingCoupons) return
-
-        _uiState.update { currentState ->
-            currentState.copy(
-                isLoadingCoupons = true,
-                errorMessage = null,
-            )
-        }
+        if (isCouponRequestInProgress) return
 
         viewModelScope.launch {
-            runCatching {
-                couponRepository.requestCoupons()
-            }.onSuccess { coupons ->
-                hasLoadedCoupons = true
-                val currentSelectedCouponId = _uiState.value.selectedCouponId
-                val normalizedSelectedCouponId =
-                    coupons
-                        .firstOrNull { coupon -> coupon.id == currentSelectedCouponId }
-                        ?.id
-                rebuildUiState(
-                    coupons = coupons,
-                    selectedCouponId = normalizedSelectedCouponId,
-                    isLoadingCoupons = false,
-                    errorMessage = null,
-                )
-            }.onFailure { throwable ->
-                rebuildUiState(
-                    isLoadingCoupons = false,
-                    errorMessage =
-                        throwable
-                            .toApiFailure()
-                            .toUserMessage(defaultMessage = "쿠폰 정보를 불러오지 못했습니다."),
-                )
+            isCouponRequestInProgress = true
+            try {
+                runCatching {
+                    couponRepository.requestCoupons()
+                }.onSuccess { coupons ->
+                    hasLoadedCoupons = true
+                    val currentSelectedCouponId = _uiState.value.selectedCouponId
+                    val normalizedSelectedCouponId =
+                        coupons
+                            .firstOrNull { coupon -> coupon.id == currentSelectedCouponId }
+                            ?.id
+                    rebuildUiState(
+                        coupons = coupons,
+                        selectedCouponId = normalizedSelectedCouponId,
+                    )
+                }
+            } finally {
+                isCouponRequestInProgress = false
             }
         }
     }
@@ -93,15 +82,6 @@ class PaymentViewModel(
         viewModelScope.launch {
             runCatching {
                 shoppingCartRepository.requestCartItems(force = force)
-            }.onFailure { throwable ->
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        errorMessage =
-                            throwable
-                                .toApiFailure()
-                                .toUserMessage(defaultMessage = "장바구니 정보를 불러오지 못했습니다."),
-                    )
-                }
             }
         }
     }
@@ -162,8 +142,6 @@ class PaymentViewModel(
     private fun rebuildUiState(
         coupons: List<Coupon> = _uiState.value.coupons,
         selectedCouponId: Long? = _uiState.value.selectedCouponId,
-        isLoadingCoupons: Boolean = _uiState.value.isLoadingCoupons,
-        errorMessage: String? = _uiState.value.errorMessage,
     ) {
         _uiState.update { currentState ->
             val targetItems = filterSelectedShoppingCartItems(allShoppingCartItems)
@@ -173,8 +151,6 @@ class PaymentViewModel(
             val deliveryPrice = calculateDeliveryPrice(coupon = selectedCoupon, subtotalPrice = subtotalPrice)
             val totalPrice = (subtotalPrice - discountPrice).coerceAtLeast(0) + deliveryPrice
             currentState.copy(
-                isLoadingCoupons = isLoadingCoupons,
-                errorMessage = errorMessage,
                 shoppingCartItems = targetItems,
                 coupons = coupons,
                 selectedCouponId = selectedCouponId,
@@ -224,7 +200,7 @@ class PaymentViewModel(
 
             is CouponBenefit.MorningDiscount ->
                 if (isCurrentTimeWithin(start = benefit.startTime, end = benefit.endTime)) {
-                    (subtotalPrice * benefit.discountRate) / PERCENT_DENOMINATOR
+                    (subtotalPrice * benefit.discountRate) / paymentPricingPolicy.percentDenominator
                 } else {
                     0
                 }
@@ -243,7 +219,7 @@ class PaymentViewModel(
         if (benefit is CouponBenefit.FreeShipping && subtotalPrice >= benefit.minimumOrderAmount) {
             return 0
         }
-        return DEFAULT_DELIVERY_PRICE
+        return paymentPricingPolicy.defaultDeliveryPrice
     }
 
     private fun isCurrentTimeWithin(
@@ -257,8 +233,6 @@ class PaymentViewModel(
     }
 
     data class PaymentUiState(
-        val isLoadingCoupons: Boolean = false,
-        val errorMessage: String? = null,
         val isPaymentReminderEnabled: Boolean = true,
         val shoppingCartItems: List<ShoppingCartItem> = emptyList(),
         val coupons: List<Coupon> = emptyList(),
@@ -269,8 +243,4 @@ class PaymentViewModel(
         val totalPrice: Int = 0,
     )
 
-    private companion object {
-        private const val DEFAULT_DELIVERY_PRICE = 3000
-        private const val PERCENT_DENOMINATOR = 100
-    }
 }
