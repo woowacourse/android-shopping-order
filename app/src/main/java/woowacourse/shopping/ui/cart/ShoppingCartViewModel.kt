@@ -20,6 +20,10 @@ class ShoppingCartViewModel(
 
     private val _uiState = MutableStateFlow(ShoppingCartUiState())
     val uiState: StateFlow<ShoppingCartUiState> = _uiState.asStateFlow()
+    private val _screenState = MutableStateFlow<ShoppingCartScreenState>(ShoppingCartScreenState.Loading)
+    val screenState: StateFlow<ShoppingCartScreenState> = _screenState.asStateFlow()
+
+    private var isCartRequestInProgress: Boolean = false
 
     init {
         viewModelScope.launch {
@@ -38,15 +42,16 @@ class ShoppingCartViewModel(
     fun moveToNextPage() {
         shoppingCartPageStateHolder.nextPage()
         refreshUiState()
+        prefetchNextRemotePageIfNeeded()
     }
 
     fun getQuantityPrice(shoppingCartItem: ShoppingCartItem): Int = shoppingCartItem.getProductQuantityPrice()
 
     fun requestCartItems(force: Boolean = false) {
-        if (_uiState.value.isLoading) return
-        refreshUiState(errorMessage = null)
+        if (isCartRequestInProgress) return
+        _screenState.value = ShoppingCartScreenState.Loading
         viewModelScope.launch {
-            refreshUiState(isLoading = true)
+            isCartRequestInProgress = true
             try {
                 shoppingCartRepository.requestCartItems(
                     page = DEFAULT_PAGE,
@@ -54,13 +59,14 @@ class ShoppingCartViewModel(
                     sort = null,
                     force = force,
                 )
+                setContentState()
             } catch (throwable: Throwable) {
                 publishCartError(
                     throwable = throwable,
                     defaultMessage = "장바구니를 불러오지 못했습니다.",
                 )
             } finally {
-                refreshUiState(isLoading = false)
+                isCartRequestInProgress = false
             }
         }
     }
@@ -141,6 +147,9 @@ class ShoppingCartViewModel(
             shoppingCartItems = shoppingCartItems,
             selectedProductIds = selectedProductIds,
         )
+        if (!isCartRequestInProgress && _screenState.value is ShoppingCartScreenState.Loading) {
+            setContentState()
+        }
     }
 
     private fun getValidProductIds(): Set<Long> =
@@ -148,16 +157,47 @@ class ShoppingCartViewModel(
             .map { shoppingCartItem -> shoppingCartItem.product.id }
             .toSet()
 
+    private fun prefetchNextRemotePageIfNeeded() {
+        if (shoppingCartPageStateHolder.canMoveToNextPage()) return
+
+        viewModelScope.launch {
+            runCatching {
+                val nextLocalPage = shoppingCartPageStateHolder.currentPage + 1
+                val targetRemotePage = getRemotePageIndexByLocalPage(nextLocalPage)
+                shoppingCartRepository.requestCartItems(
+                    page = targetRemotePage,
+                    size = DEFAULT_SIZE,
+                    sort = null,
+                    force = false,
+                )
+            }.onFailure { throwable ->
+                publishCartError(
+                    throwable = throwable,
+                    defaultMessage = "장바구니를 불러오지 못했습니다.",
+                )
+            }
+        }
+    }
+
+    private fun getRemotePageIndexByLocalPage(localPage: Int): Int {
+        val safeLocalPage = localPage.coerceAtLeast(DEFAULT_PAGE)
+        val requiredItemCount = (safeLocalPage + 1) * ShoppingCartPageStateHolder.PAGE_ITEM_SIZE
+        return (requiredItemCount - 1).coerceAtLeast(0) / DEFAULT_SIZE
+    }
+
     private fun executeCartMutation(
         defaultMessage: String,
         onSuccess: (() -> Unit)? = null,
         block: suspend () -> Unit,
     ) {
-        refreshUiState(errorMessage = null)
+        if (_screenState.value is ShoppingCartScreenState.Error) {
+            setContentState()
+        }
         viewModelScope.launch {
             runCatching {
                 block()
             }.onSuccess {
+                setContentState()
                 onSuccess?.invoke()
             }.onFailure { throwable ->
                 publishCartError(
@@ -172,26 +212,27 @@ class ShoppingCartViewModel(
         throwable: Throwable,
         defaultMessage: String,
     ) {
-        refreshUiState(
-            errorMessage =
-                throwable
-                    .toApiFailure()
-                    .toUserMessage(defaultMessage = defaultMessage),
-        )
+        _screenState.value =
+            ShoppingCartScreenState.Error(
+                message =
+                    throwable
+                        .toApiFailure()
+                        .toUserMessage(defaultMessage = defaultMessage),
+            )
+    }
+
+    private fun setContentState() {
+        _screenState.value = ShoppingCartScreenState.Content
     }
 
     private fun refreshUiState(
         shoppingCartItems: List<ShoppingCartItem> = _uiState.value.shoppingCartItems,
         selectedProductIds: Set<Long> = _uiState.value.selectedProductIds,
-        isLoading: Boolean = _uiState.value.isLoading,
-        errorMessage: String? = _uiState.value.errorMessage,
     ) {
         _uiState.update { currentState ->
             currentState.copy(
                 shoppingCartItems = shoppingCartItems,
                 selectedProductIds = selectedProductIds,
-                isLoading = isLoading,
-                errorMessage = errorMessage,
                 pagedItems = shoppingCartPageStateHolder.getItems(),
                 currentPage = shoppingCartPageStateHolder.currentPage,
                 canMoveToPreviousPage = shoppingCartPageStateHolder.canMoveToPreviousPage(),
@@ -200,19 +241,26 @@ class ShoppingCartViewModel(
         }
     }
 
+    sealed interface ShoppingCartScreenState {
+        data object Loading : ShoppingCartScreenState
+
+        data object Content : ShoppingCartScreenState
+
+        data class Error(
+            val message: String,
+        ) : ShoppingCartScreenState
+    }
+
     data class ShoppingCartUiState(
         val shoppingCartItems: List<ShoppingCartItem> = emptyList(),
         val selectedProductIds: Set<Long> = emptySet(),
-        val isLoading: Boolean = false,
-        val errorMessage: String? = null,
         val pagedItems: List<ShoppingCartItem> = emptyList(),
-        val currentPage: Int = INITIAL_PAGE,
+        val currentPage: Int = DEFAULT_PAGE,
         val canMoveToPreviousPage: Boolean = false,
         val canMoveToNextPage: Boolean = false,
     )
 
     private companion object {
-        private const val INITIAL_PAGE = 0
         private const val DEFAULT_PAGE = 0
         private const val DEFAULT_SIZE = 20
         private const val DEFAULT_QUANTITY = 1

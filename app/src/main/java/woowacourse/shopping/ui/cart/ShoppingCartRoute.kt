@@ -32,14 +32,15 @@ fun ShoppingCartRouteContent(
         )
 
     val cartUiState by shoppingCartViewModel.uiState.collectAsStateWithLifecycle()
-    val recommendUiState by shoppingCartRecommendViewModel.uiState.collectAsStateWithLifecycle()
+    val cartScreenState by shoppingCartViewModel.screenState.collectAsStateWithLifecycle()
 
     LifecycleResumeEffect(Unit) {
         shoppingCartViewModel.requestCartItems()
         onPauseOrDispose { }
     }
 
-    val hasApiError = cartUiState.errorMessage != null
+    val hasApiError = cartScreenState is ShoppingCartViewModel.ShoppingCartScreenState.Error
+    val isLoading = cartScreenState is ShoppingCartViewModel.ShoppingCartScreenState.Loading
     val shoppingCartItems = cartUiState.shoppingCartItems
     val selectedProductIds = cartUiState.selectedProductIds
     val visibleItems =
@@ -75,7 +76,7 @@ fun ShoppingCartRouteContent(
     ShoppingCartScreen(
         shoppingCartItems = visiblePagedItems,
         selectedProductIds = selectedVisibleProductIds,
-        isLoading = cartUiState.isLoading,
+        isLoading = isLoading,
         getQuantityPrice = shoppingCartViewModel::getQuantityPrice,
         onBackClick = onNavigateBack,
         onRemoveShoppingItemClick = { shoppingCartItem ->

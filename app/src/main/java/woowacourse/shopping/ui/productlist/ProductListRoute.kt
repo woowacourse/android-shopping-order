@@ -45,10 +45,8 @@ fun ProductListRouteContent(
                 !productListViewModel.uiState.value.isLoading
         if (shouldLoadInitialProducts) {
             productListViewModel.requestProduct(size = MAX_PRODUCT_SIZE)
-            shoppingCartViewModel.requestCartItems()
-        } else {
-            shoppingCartViewModel.requestCartItems()
         }
+        shoppingCartViewModel.requestCartItems()
         onPauseOrDispose { }
     }
 

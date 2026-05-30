@@ -32,9 +32,10 @@ fun ShoppingCartRecommendRouteContent(
         )
 
     val cartUiState by shoppingCartViewModel.uiState.collectAsStateWithLifecycle()
+    val cartScreenState by shoppingCartViewModel.screenState.collectAsStateWithLifecycle()
     val recommendUiState by shoppingCartRecommendViewModel.uiState.collectAsStateWithLifecycle()
 
-    val hasApiError = cartUiState.errorMessage != null
+    val hasApiError = cartScreenState is ShoppingCartViewModel.ShoppingCartScreenState.Error
     val shoppingCartItems = cartUiState.shoppingCartItems
     val selectedProductIds = cartUiState.selectedProductIds
     val visibleItems =
