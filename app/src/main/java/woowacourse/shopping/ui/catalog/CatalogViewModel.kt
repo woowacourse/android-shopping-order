@@ -96,12 +96,7 @@ class ShoppingViewModel(
 
     fun fetchCart() {
         viewModelScope.launch {
-            _cartProductCount.update {
-                cartRepository.getProductCount()
-            }
-            _cart.update {
-                cartRepository.getAllCartItems(CART_PAGE_SIZE)
-            }
+            refreshCart()
         }
     }
 
@@ -109,18 +104,13 @@ class ShoppingViewModel(
     fun addToCart(purchaseProduct: PurchaseProduct) {
         viewModelScope.launch {
             try {
-                val existingItem = cart.value.purchaseProducts.find {
-                    it.product.id == purchaseProduct.product.id
-                }
+                val existingItem = cartRepository.findCartItemByProductId(purchaseProduct.product.id)
                 if (existingItem != null) {
                     cartRepository.updateCount(existingItem.id, existingItem.count + 1)
-                    updateKnownCartItemCount(existingItem.id, existingItem.count + 1)
-                    updateKnownCartProductCount(1)
                 } else {
                     cartRepository.insert(purchaseProduct)
-                    updateKnownCartProductCount(purchaseProduct.count)
-                    fetchCart()
                 }
+                refreshCart()
                 _uiEvent.emit(UiEvent.ShowMessage("장바구니에 담았습니다."))
             } catch (e: Exception) {
                 _uiEvent.emit(UiEvent.ShowMessage("장바구니 담기에 실패했습니다."))
@@ -171,6 +161,15 @@ class ShoppingViewModel(
     fun loadMore() {
         _currentIndex.value++
         fetchProducts(currentIndex.value)
+    }
+
+    private suspend fun refreshCart() {
+        _cartProductCount.update {
+            cartRepository.getProductCount()
+        }
+        _cart.update {
+            cartRepository.getAllCartItems(CART_PAGE_SIZE)
+        }
     }
 
     private fun updateKnownCartItemCount(
