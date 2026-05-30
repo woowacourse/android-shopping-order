@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.model.CartItem
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.cart.CartItem
+import woowacourse.shopping.model.product.Product
 import woowacourse.shopping.repository.query.CartPageItem
 
 class CartRepositoryTest {

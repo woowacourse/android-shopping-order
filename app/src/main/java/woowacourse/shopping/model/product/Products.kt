@@ -1,4 +1,4 @@
-package woowacourse.shopping.model
+package woowacourse.shopping.model.product
 
 class Products(
     products: List<Product>,

@@ -1,12 +1,16 @@
 package woowacourse.shopping.ui.productdetail
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.navigation.toRoute
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -17,53 +21,77 @@ import woowacourse.shopping.repository.RecentProductRepository
 import woowacourse.shopping.repository.ShoppingRepositoryProvider
 import woowacourse.shopping.repository.http.common.RemoteException
 import woowacourse.shopping.ui.common.recentlyviewed.RecentViewedProductsMapper
-
-private const val CART_SYNC_DELAY_MILLIS = 400L
+import woowacourse.shopping.ui.navigation.ProductDetail
 
 class ProductDetailViewModel(
+    savedStateHandle: SavedStateHandle,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
     private val networkMonitor: NetworkMonitor,
 ) : ViewModel() {
+    private val route: ProductDetail = savedStateHandle.toRoute()
+    private val productId = route.productId
+
     private val _uiState = MutableStateFlow(ProductDetailUiState())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
 
-    private var syncJob: Job? = null
+    private val _snackbarEvent = MutableSharedFlow<String>()
+    val snackbarEvent = _snackbarEvent.asSharedFlow()
 
     init {
         observeNetworkState()
+        loadProduct()
     }
 
-    fun loadProduct(productId: Long) {
+    fun loadProduct() {
         viewModelScope.launch {
-            val productsById =
-                productRepository
-                    .findAllByIds(setOf(productId))
-                    .getOrElse { throwable ->
-                        updateErrorState(throwable)
-                        return@launch
+            productRepository
+                .findAllByIds(setOf(productId))
+                .onSuccess { productsById ->
+                    val foundProduct = productsById[productId]
+
+                    if (foundProduct != null) {
+                        recentProductRepository.recordView(foundProduct.id)
+                        refreshProductDetail(foundProduct.id)
+                    } else {
+                        updateErrorState(Exception("상품을 찾을 수 없습니다."))
                     }
-
-            val product = productsById[productId] ?: return@launch
-
-            recentProductRepository.recordView(product.id)
-            refreshProductDetail(product.id)
+                }.onFailure { throwable ->
+                    updateErrorState(throwable)
+                }
         }
     }
 
     fun addToCart() {
-        increaseQuantity()
+        viewModelScope.launch {
+            val isSuccess = changeQuantity(delta = 1)
+            val message =
+                if (isSuccess) {
+                    "장바구니에 상품을 담았습니다."
+                } else {
+                    "장바구니 담기에 실패했습니다."
+                }
+            _snackbarEvent.emit(message)
+        }
     }
 
-    fun increaseQuantity() = changeQuantity(delta = 1)
+    fun increaseQuantity() {
+        viewModelScope.launch {
+            changeQuantity(delta = 1)
+        }
+    }
 
-    fun decreaseQuantity() = changeQuantity(delta = -1)
+    fun decreaseQuantity() {
+        viewModelScope.launch {
+            changeQuantity(delta = -1)
+        }
+    }
 
-    private fun changeQuantity(delta: Int) {
-        val product = _uiState.value.product ?: return
+    private suspend fun changeQuantity(delta: Int): Boolean {
+        val product = _uiState.value.product ?: return false
         val nextQuantity = (_uiState.value.quantity + delta).coerceAtLeast(0)
-        if (nextQuantity == _uiState.value.quantity) return
+        if (nextQuantity == _uiState.value.quantity) return false
 
         _uiState.update { current ->
             current.copy(
@@ -73,25 +101,21 @@ class ProductDetailViewModel(
             )
         }
 
-        scheduleCartSync(product.id)
-    }
-
-    private fun scheduleCartSync(productId: Long) {
-        syncJob?.cancel()
-
-        syncJob =
-            viewModelScope.launch {
-                delay(CART_SYNC_DELAY_MILLIS)
-
-                val targetQuantity = _uiState.value.quantity
-
-                cartRepository
-                    .setQuantity(productId, targetQuantity)
-                    .onFailure { throwable ->
-                        refreshProductDetail(productId)
-                        updateErrorState(throwable)
+        return cartRepository
+            .setQuantity(product.id, nextQuantity)
+            .fold(
+                onSuccess = {
+                    _uiState.update { current ->
+                        current.copy(isAdding = false)
                     }
-            }
+                    true
+                },
+                onFailure = { throwable ->
+                    refreshProductDetail(product.id)
+                    updateErrorState(throwable)
+                    false
+                },
+            )
     }
 
     private suspend fun refreshProductDetail(productId: Long) {
@@ -165,13 +189,20 @@ class ProductDetailViewModel(
 
 class ProductDetailViewModelFactory : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T =
-        ProductDetailViewModel(
+    override fun <T : ViewModel> create(
+        modelClass: Class<T>,
+        extras: CreationExtras,
+    ): T {
+        val savedStateHandle = extras.createSavedStateHandle()
+
+        return ProductDetailViewModel(
+            savedStateHandle = savedStateHandle,
             productRepository = ShoppingRepositoryProvider.productRepository,
             cartRepository = ShoppingRepositoryProvider.cartRepository,
             recentProductRepository = ShoppingRepositoryProvider.recentProductRepository,
             networkMonitor = ShoppingRepositoryProvider.networkMonitor,
         ) as T
+    }
 }
 
 private fun Throwable.toUserMessage(): String =

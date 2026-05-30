@@ -18,25 +18,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.R
 import woowacourse.shopping.ui.cart.common.CartBottomBar
-import woowacourse.shopping.ui.cart.common.CartHeader
+import woowacourse.shopping.ui.common.component.Header
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
-import woowacourse.shopping.ui.shopping.ShoppingProductUiState
 import woowacourse.shopping.ui.shopping.component.ProductUnit
 import woowacourse.shopping.ui.theme.ShoppingColors.Gray4
 
 @Composable
 fun CartRecommendedProductsScreen(
-    recommendedProducts: List<ShoppingProductUiState>,
-    totalPrice: String,
-    selectedCount: Int,
-    isLoading: Boolean,
-    isNetworkConnected: Boolean,
-    onProductClick: (Product) -> Unit,
+    uiState: CartRecommendationUiState,
+    onProductClick: (Long) -> Unit,
     onAddToCart: (Long) -> Unit,
     onIncreaseQuantity: (Long) -> Unit,
     onDecreaseQuantity: (Long) -> Unit,
@@ -47,8 +43,11 @@ fun CartRecommendedProductsScreen(
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
-        CartHeader(onBackClick = onBackClick)
-        if (!isNetworkConnected) {
+        Header(
+            text = stringResource(R.string.cart_title),
+            onBackClick = onBackClick,
+        )
+        if (!uiState.isNetworkConnected) {
             NetworkStatusBanner(modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp))
         }
         Box(
@@ -59,7 +58,7 @@ fun CartRecommendedProductsScreen(
                     .background(Color.White)
                     .padding(16.dp),
         ) {
-            if (isLoading) {
+            if (uiState.isRecommendedProductsLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 return@Box
             }
@@ -82,7 +81,7 @@ fun CartRecommendedProductsScreen(
                 )
                 Spacer(modifier = Modifier.size(29.dp))
 
-                if (recommendedProducts.isEmpty()) {
+                if (uiState.recommendedProducts.isEmpty()) {
                     Box(
                         modifier =
                             Modifier
@@ -100,12 +99,12 @@ fun CartRecommendedProductsScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         items(
-                            items = recommendedProducts,
+                            items = uiState.recommendedProducts,
                             key = { it.product.id.toString() },
                         ) { product ->
                             ProductUnit(
                                 product = product,
-                                onClick = { onProductClick(product.product) },
+                                onClick = { onProductClick(product.product.id) },
                                 onAddToCart = { onAddToCart(product.product.id) },
                                 onIncreaseQuantity = { onIncreaseQuantity(product.product.id) },
                                 onDecreaseQuantity = { onDecreaseQuantity(product.product.id) },
@@ -116,8 +115,8 @@ fun CartRecommendedProductsScreen(
             }
         }
         CartBottomBar(
-            totalPrice = totalPrice,
-            selectedCount = selectedCount,
+            totalPrice = uiState.pendingOrder.totalPrice,
+            selectedCount = uiState.pendingOrder.selectedCount,
             onOrderClick = onOrderClick,
             modifier = Modifier.fillMaxWidth(),
             showSelectAll = false,

@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart.common
+package woowacourse.shopping.ui.common.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,7 +23,8 @@ import woowacourse.shopping.ui.ShoppingTypography
 import woowacourse.shopping.ui.theme.ShoppingColors
 
 @Composable
-fun CartHeader(
+fun Header(
+    text: String,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
 ) {
@@ -43,7 +44,7 @@ fun CartHeader(
         )
         Spacer(modifier = Modifier.size(21.dp))
         Text(
-            text = stringResource(R.string.cart_title),
+            text = text,
             color = Color.White,
             style = ShoppingTypography.titleMedium,
         )
@@ -52,6 +53,6 @@ fun CartHeader(
 
 @Preview(showBackground = true)
 @Composable
-private fun CartHeaderPreview() {
-    CartHeader(onBackClick = {})
+private fun HeaderPreview() {
+    Header(text = "결제하기", onBackClick = {})
 }

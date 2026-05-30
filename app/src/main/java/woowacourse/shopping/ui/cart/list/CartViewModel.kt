@@ -3,10 +3,10 @@ package woowacourse.shopping.ui.cart.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,9 +20,9 @@ import woowacourse.shopping.ui.cart.SelectedCartOrderItem
 import woowacourse.shopping.ui.cart.list.uistate.CartItemUiModelMapper
 import woowacourse.shopping.ui.cart.list.uistate.CartListUiState
 import woowacourse.shopping.ui.cart.list.uistate.CartUiState
+import woowacourse.shopping.ui.navigation.OrderProduct
 
 private const val PAGE_SIZE = 5
-private const val CART_SYNC_DELAY_MILLIS = 400L
 
 class CartViewModel(
     private val productRepository: ProductRepository,
@@ -32,11 +32,16 @@ class CartViewModel(
     private val _uiState = MutableStateFlow(CartUiState(cartListState = CartListUiState.Loading))
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
 
-    private val syncJobs = mutableMapOf<Long, Job>()
+    private val _snackbarEvent = MutableSharedFlow<String>()
+    val snackbarEvent = _snackbarEvent.asSharedFlow()
+
+    private val _orderProductsEvent = MutableSharedFlow<List<OrderProduct>>()
+    val orderProductsEvent = _orderProductsEvent.asSharedFlow()
 
     init {
         observeNetworkState()
         loadPage(1)
+        viewModelScope.launch { calculateTotals() }
     }
 
     fun reloadVisibleState() {
@@ -47,6 +52,7 @@ class CartViewModel(
 
         viewModelScope.launch {
             updatePage(currentPage)
+            calculateTotals()
         }
     }
 
@@ -64,29 +70,52 @@ class CartViewModel(
         }
     }
 
-    fun createSelectedCartOrder(): SelectedCartOrder? =
-        withContentState(null) { contentState ->
-            val selectedItems = contentState.items.filter { it.isSelected }
-            if (selectedItems.isEmpty()) return null
+    suspend fun createSelectedCartOrder(): SelectedCartOrder? {
+        val totalCount = cartRepository.count().getOrDefault(0)
+        if (totalCount == 0) return null
 
-            return SelectedCartOrder(
-                items =
-                    selectedItems.map { item ->
-                        SelectedCartOrderItem(
-                            cartItemId = item.cartItemId,
-                            productId = item.productId,
-                            price = item.price,
-                            quantity = item.quantity,
-                        )
-                    },
-            )
-        }
+        val allCartItems =
+            cartRepository
+                .getCartPage(
+                    page = 0,
+                    size = totalCount,
+                ).getOrNull()
+                ?.items ?: return null
+
+        val productIds = allCartItems.map { it.productId }.toSet()
+        val productsById =
+            productRepository
+                .findAllByIds(productIds)
+                .getOrDefault(emptyMap())
+
+        val deselectedIds = _uiState.value.deselectedProductIds
+        val selectedItems =
+            allCartItems.filter {
+                it.productId !in deselectedIds
+            }
+
+        if (selectedItems.isEmpty()) return null
+
+        return SelectedCartOrder(
+            items =
+                selectedItems.map { item ->
+                    SelectedCartOrderItem(
+                        cartItemId = item.cartItemId,
+                        productId = item.productId,
+                        price = productsById[item.productId]?.price?.value ?: 0,
+                        quantity = item.quantity,
+                    )
+                },
+        )
+    }
 
     fun delete(productId: Long) {
-        if (!updateLocalQuantity(productId, targetQuantity = 0)) return
-
+        updateQuantity(productId = productId, targetQuantity = 0)
         clearDeselection(productId)
-        scheduleCartSync(productId)
+
+        viewModelScope.launch {
+            _snackbarEvent.emit("장바구니에서 상품을 삭제했습니다.")
+        }
     }
 
     fun toggleItemSelection(
@@ -103,24 +132,98 @@ class CartViewModel(
 
             currentState.copy(deselectedProductIds = updatedDeselectedProductIds)
         }
+
+        viewModelScope.launch {
+            calculateTotals()
+        }
         refreshVisibleSelections()
     }
 
     fun increaseQuantity(productId: Long) {
         val quantity = findQuantity(productId) ?: return
-        if (!updateLocalQuantity(productId, targetQuantity = quantity + 1)) return
-        scheduleCartSync(productId)
+        updateQuantity(productId, quantity + 1)
     }
 
     fun decreaseQuantity(productId: Long) {
         val quantity = findQuantity(productId) ?: return
         val targetQuantity = (quantity - 1).coerceAtLeast(0)
 
-        if (!updateLocalQuantity(productId, targetQuantity = targetQuantity)) return
+        updateQuantity(productId = productId, targetQuantity = targetQuantity)
+    }
+
+    fun toggleAllSelection(isSelected: Boolean) {
+        viewModelScope.launch {
+            if (isSelected) {
+                _uiState.update { it.copy(deselectedProductIds = emptySet()) }
+            } else {
+                val totalCount = cartRepository.count().getOrDefault(0)
+                val allIds =
+                    cartRepository
+                        .getCartPage(0, totalCount)
+                        .getOrNull()
+                        ?.items
+                        ?.map {
+                            it.productId
+                        }?.toSet() ?: emptySet()
+
+                _uiState.update { it.copy(deselectedProductIds = allIds) }
+            }
+            calculateTotals()
+            refreshVisibleSelections()
+        }
+    }
+
+    suspend fun getSelectedOrderProducts(): List<OrderProduct> =
+        createSelectedCartOrder()?.items?.map {
+            OrderProduct(
+                productId = it.productId,
+                quantity = it.quantity,
+                price = it.price,
+            )
+        } ?: emptyList()
+
+    fun orderSelectedProducts() {
+        viewModelScope.launch {
+            val orderProducts = getSelectedOrderProducts()
+            if (orderProducts.isNotEmpty()) {
+                _orderProductsEvent.emit(orderProducts)
+            }
+        }
+    }
+
+    private fun updateQuantity(
+        productId: Long,
+        targetQuantity: Int,
+    ) {
+        val currentPage =
+            withContentState(defaultValue = 1) { contentState ->
+                contentState.currentPage
+            }
+
+        if (!updateLocalQuantity(productId, targetQuantity)) return
+
         if (targetQuantity == 0) {
             clearDeselection(productId)
         }
-        scheduleCartSync(productId)
+
+        viewModelScope.launch {
+            cartRepository
+                .setQuantity(productId, targetQuantity)
+                .onSuccess {
+                    calculateTotals()
+
+                    withContentState { contentState ->
+                        if (contentState.items.isEmpty() && contentState.hasPrevious) {
+                            loadPage(contentState.currentPage - 1)
+                        } else {
+                            updatePage(contentState.currentPage)
+                        }
+                    }
+                }.onFailure { throwable ->
+                    updatePage(currentPage)
+                    updateErrorState(throwable)
+                }
+        }
     }
 
     private fun loadPage(page: Int) {
@@ -213,31 +316,6 @@ class CartViewModel(
             ?.firstOrNull { it.productId == productId }
             ?.quantity
 
-    private fun scheduleCartSync(productId: Long) {
-        syncJobs.remove(productId)?.cancel()
-
-        syncJobs[productId] =
-            viewModelScope.launch {
-                delay(CART_SYNC_DELAY_MILLIS)
-
-                val currentPage =
-                    withContentState(defaultValue = 1) { contentState ->
-                        contentState.currentPage
-                    }
-
-                val targetQuantity = findQuantity(productId) ?: 0
-
-                cartRepository
-                    .setQuantity(productId, targetQuantity)
-                    .onFailure { throwable ->
-                        updatePage(currentPage)
-                        updateErrorState(throwable)
-                    }
-
-                syncJobs.remove(productId)
-            }
-    }
-
     private fun updateErrorState(throwable: Throwable) {
         _uiState.update { currentState ->
             currentState.copy(
@@ -279,6 +357,58 @@ class CartViewModel(
                     currentState.copy(isNetworkConnected = isConnected)
                 }
             }
+        }
+    }
+
+    private suspend fun calculateTotals() {
+        val totalCount = cartRepository.count().getOrDefault(0)
+        if (totalCount == 0) {
+            _uiState.update {
+                it.copy(
+                    totalPrice = 0,
+                    totalSelectedCount = 0,
+                    isAllSelected = false,
+                )
+            }
+            return
+        }
+
+        val allCartItems =
+            cartRepository
+                .getCartPage(
+                    page = 0,
+                    size = totalCount,
+                ).getOrNull()
+                ?.items ?: emptyList()
+
+        val productIds =
+            allCartItems
+                .map {
+                    it.productId
+                }.toSet()
+        val productsById =
+            productRepository
+                .findAllByIds(productIds)
+                .getOrDefault(emptyMap())
+
+        val deselectedIds = _uiState.value.deselectedProductIds
+        var totalPrice = 0
+        var selectedCount = 0
+
+        allCartItems.forEach { item ->
+            val product = productsById[item.productId]
+            if (item.productId !in deselectedIds) {
+                totalPrice += (product?.price?.value ?: 0) * item.quantity
+                selectedCount++
+            }
+        }
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                totalPrice = totalPrice,
+                totalSelectedCount = selectedCount,
+                isAllSelected = deselectedIds.isEmpty() && allCartItems.isNotEmpty(),
+            )
         }
     }
 

@@ -14,7 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import woowacourse.shopping.R
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.product.Product
 import woowacourse.shopping.ui.ShoppingTypography
 import woowacourse.shopping.ui.fixture.MockProducts
 
@@ -22,7 +22,7 @@ import woowacourse.shopping.ui.fixture.MockProducts
 fun RecentlyViewedSection(
     products: List<Product>,
     modifier: Modifier = Modifier,
-    onProductClick: (Product) -> Unit,
+    onProductClick: (Long) -> Unit,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
@@ -41,7 +41,7 @@ fun RecentlyViewedSection(
 fun RecentlyViewedProducts(
     products: List<Product>,
     modifier: Modifier = Modifier,
-    onProductClick: (Product) -> Unit,
+    onProductClick: (Long) -> Unit,
 ) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -52,7 +52,7 @@ fun RecentlyViewedProducts(
         ) { product ->
             RecentlyViewedItem(
                 product = product,
-                onClick = { onProductClick(product) },
+                onClick = { onProductClick(product.id) },
             )
         }
     }

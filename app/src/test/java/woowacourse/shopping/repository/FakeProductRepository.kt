@@ -1,7 +1,7 @@
 package woowacourse.shopping.repository
 
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.Products
+import woowacourse.shopping.model.product.Product
+import woowacourse.shopping.model.product.Products
 
 class FakeProductRepository(
     products: List<Product>,

@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import woowacourse.shopping.model.cart.Cart
+import woowacourse.shopping.model.cart.CartItem
 
 class CartTest {
     private val productId = (1L)

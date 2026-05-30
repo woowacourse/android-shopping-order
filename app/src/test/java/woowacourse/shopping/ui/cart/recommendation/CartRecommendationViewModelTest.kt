@@ -2,9 +2,16 @@
 
 package woowacourse.shopping.ui.cart.recommendation
 
+import androidx.lifecycle.SavedStateHandle
+import androidx.navigation.toRoute
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkAll
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -16,9 +23,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.model.CartItem
-import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.cart.CartItem
+import woowacourse.shopping.model.product.Money
+import woowacourse.shopping.model.product.Product
 import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.FakeProductRepository
@@ -26,8 +33,10 @@ import woowacourse.shopping.repository.FakeRecentProductRepository
 import woowacourse.shopping.repository.ProductRepositoryFixture
 import woowacourse.shopping.repository.query.CartPageItem
 import woowacourse.shopping.repository.query.CartPageResult
-import woowacourse.shopping.ui.cart.SelectedCartOrder
-import woowacourse.shopping.ui.cart.SelectedCartOrderItem
+import woowacourse.shopping.ui.navigation.CartRecommendation
+import woowacourse.shopping.ui.navigation.OrderProduct
+import woowacourse.shopping.ui.navigation.OrderProductListType
+import kotlin.reflect.typeOf
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CartRecommendationViewModelTest {
@@ -44,20 +53,38 @@ class CartRecommendationViewModelTest {
         dispatcher = StandardTestDispatcher()
         Dispatchers.setMain(dispatcher)
 
-        cartRepository =
-            RecordingCartRepository().apply {
-                runTest {
-                    setQuantity(orderedProduct.id, 1).getOrThrow()
-                }
-            }
-        recentProductRepository =
-            FakeRecentProductRepository().apply {
-                runTest {
-                    recordView(recommendedProduct.id)
-                }
-            }
+        mockkStatic("androidx.navigation.SavedStateHandleKt")
+
+        cartRepository = RecordingCartRepository()
+        runBlocking {
+            cartRepository.setQuantity(orderedProduct.id, 1).getOrThrow()
+        }
+
+        recentProductRepository = FakeRecentProductRepository()
+        runBlocking {
+            recentProductRepository.recordView(recommendedProduct.id)
+        }
+
+        val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
+        every {
+            savedStateHandle.toRoute<CartRecommendation>(
+                typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
+            )
+        } returns
+            CartRecommendation(
+                orderProducts =
+                    listOf(
+                        OrderProduct(
+                            productId = orderedProduct.id,
+                            quantity = 1,
+                            price = orderedProduct.price.value,
+                        ),
+                    ),
+            )
+
         viewModel =
             CartRecommendationViewModel(
+                savedStateHandle = savedStateHandle,
                 productRepository = FakeProductRepository(ProductRepositoryFixture.products),
                 cartRepository = cartRepository,
                 recentProductRepository = recentProductRepository,
@@ -69,47 +96,29 @@ class CartRecommendationViewModelTest {
 
     @AfterEach
     fun tearDown() {
+        unmockkAll()
         Dispatchers.resetMain()
     }
 
     @Test
-    fun `추천 상품을 추가하고 바로 주문하면 추가한 상품까지 주문에 포함되고 장바구니에서 제거된다`() =
+    fun `추천 상품을 추가하고 주문 버튼을 누르면 추천 상품이 장바구니에 반영되지만 주문은 생성되지 않는다`() =
         runTest(dispatcher.scheduler) {
-            viewModel.startOrder(
-                selectedCartOrderOf(orderedProduct),
-            )
             advanceUntilIdle()
-
-            assertEquals(listOf(101L), viewModel.uiState.value.pendingOrder.cartItemIds)
 
             viewModel.addRecommendedProduct(recommendedProduct.id)
             advanceUntilIdle()
 
-            assertEquals(
-                setOf(101L, 102L),
-                viewModel.uiState.value.pendingOrder.cartItemIds
-                    .toSet(),
-            )
-            assertEquals(2, viewModel.uiState.value.pendingOrder.selectedCount)
-            assertEquals(
-                orderedProduct.price.value + recommendedProduct.price.value,
-                viewModel.uiState.value.pendingOrder.totalPrice,
-            )
-
-            viewModel.placeOrder()
+            assertTrue(viewModel.applyRecommendations())
             advanceUntilIdle()
 
-            assertEquals(
-                listOf(listOf(101L, 102L)),
-                cartRepository.createdOrders,
-            )
-            assertTrue(
+            assertTrue(cartRepository.createdOrders.isEmpty())
+
+            val cartItems =
                 cartRepository
-                    .getCartItemsByProductIds(setOf(orderedProduct.id, recommendedProduct.id))
+                    .getCartItemsByProductIds(setOf(recommendedProduct.id))
                     .getOrThrow()
-                    .isEmpty(),
-            )
-            assertEquals(1, viewModel.uiState.value.orderCompletedCount)
+            assertEquals(1, cartItems.size)
+            assertEquals(recommendedProduct.id, cartItems[0].productId)
         }
 
     @Test
@@ -128,15 +137,32 @@ class CartRecommendationViewModelTest {
                 FakeRecentProductRepository().apply {
                     recordView(1L)
                 }
+            val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
+            every {
+                savedStateHandle.toRoute<CartRecommendation>(
+                    typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
+                )
+            } returns
+                CartRecommendation(
+                    orderProducts =
+                        listOf(
+                            OrderProduct(
+                                productId = fruitProduct.id,
+                                quantity = 1,
+                                price = fruitProduct.price.value,
+                            ),
+                        ),
+                )
+
             viewModel =
                 CartRecommendationViewModel(
+                    savedStateHandle = savedStateHandle,
                     productRepository = FakeProductRepository(dessertProducts + fruitProduct),
                     cartRepository = cartRepository,
                     recentProductRepository = recentProductRepository,
                     networkMonitor = FakeNetworkMonitor(),
                 )
 
-            viewModel.startOrder(selectedCartOrderOf(fruitProduct))
             advanceUntilIdle()
 
             assertEquals(
@@ -169,15 +195,32 @@ class CartRecommendationViewModelTest {
                 FakeRecentProductRepository().apply {
                     recordView(1L)
                 }
+            val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
+            every {
+                savedStateHandle.toRoute<CartRecommendation>(
+                    typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
+                )
+            } returns
+                CartRecommendation(
+                    orderProducts =
+                        listOf(
+                            OrderProduct(
+                                productId = selectedOrderProduct.id,
+                                quantity = 1,
+                                price = selectedOrderProduct.price.value,
+                            ),
+                        ),
+                )
+
             viewModel =
                 CartRecommendationViewModel(
+                    savedStateHandle = savedStateHandle,
                     productRepository = FakeProductRepository(dessertProducts + selectedOrderProduct),
                     cartRepository = cartRepository,
                     recentProductRepository = recentProductRepository,
                     networkMonitor = FakeNetworkMonitor(),
                 )
 
-            viewModel.startOrder(selectedCartOrderOf(selectedOrderProduct))
             advanceUntilIdle()
 
             assertEquals(3, viewModel.uiState.value.recommendedProducts.size)
@@ -202,15 +245,32 @@ class CartRecommendationViewModelTest {
                 FakeRecentProductRepository().apply {
                     recordView(1L)
                 }
+            val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
+            every {
+                savedStateHandle.toRoute<CartRecommendation>(
+                    typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
+                )
+            } returns
+                CartRecommendation(
+                    orderProducts =
+                        listOf(
+                            OrderProduct(
+                                productId = selectedOrderProduct.id,
+                                quantity = 1,
+                                price = selectedOrderProduct.price.value,
+                            ),
+                        ),
+                )
+
             viewModel =
                 CartRecommendationViewModel(
+                    savedStateHandle = savedStateHandle,
                     productRepository = FakeProductRepository(dessertProducts + selectedOrderProduct),
                     cartRepository = cartRepository,
                     recentProductRepository = recentProductRepository,
                     networkMonitor = FakeNetworkMonitor(),
                 )
 
-            viewModel.startOrder(selectedCartOrderOf(selectedOrderProduct))
             advanceUntilIdle()
 
             assertEquals(
@@ -234,15 +294,32 @@ class CartRecommendationViewModelTest {
                 FakeRecentProductRepository().apply {
                     recordView(dessertProduct.id)
                 }
+            val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
+            every {
+                savedStateHandle.toRoute<CartRecommendation>(
+                    typeMap = mapOf(typeOf<List<OrderProduct>>() to OrderProductListType),
+                )
+            } returns
+                CartRecommendation(
+                    orderProducts =
+                        listOf(
+                            OrderProduct(
+                                productId = selectedOrderProduct.id,
+                                quantity = 1,
+                                price = selectedOrderProduct.price.value,
+                            ),
+                        ),
+                )
+
             viewModel =
                 CartRecommendationViewModel(
+                    savedStateHandle = savedStateHandle,
                     productRepository = FakeProductRepository(listOf(dessertProduct, selectedOrderProduct)),
                     cartRepository = cartRepository,
                     recentProductRepository = recentProductRepository,
                     networkMonitor = FakeNetworkMonitor(),
                 )
 
-            viewModel.startOrder(selectedCartOrderOf(selectedOrderProduct))
             advanceUntilIdle()
 
             assertTrue(
@@ -252,26 +329,24 @@ class CartRecommendationViewModelTest {
         }
 
     @Test
-    fun `추천 상품을 장바구니에 추가할 수 있다`() =
+    fun `추천 상품을 추가해도 실제 장바구니(DB)에는 즉시 저장되지 않는다`() =
         runTest(dispatcher.scheduler) {
-            viewModel.startOrder(selectedCartOrderOf(orderedProduct))
             advanceUntilIdle()
 
             viewModel.addRecommendedProduct(recommendedProduct.id)
             advanceUntilIdle()
 
-            assertEquals(
-                listOf(CartItem(productId = recommendedProduct.id, quantity = 1)),
+            assertTrue(
                 cartRepository
                     .getCartItemsByProductIds(setOf(recommendedProduct.id))
-                    .getOrThrow(),
+                    .getOrThrow()
+                    .isEmpty(),
             )
         }
 
     @Test
     fun `추천 상품 추가 후 장바구니 상태가 갱신된다`() =
         runTest(dispatcher.scheduler) {
-            viewModel.startOrder(selectedCartOrderOf(orderedProduct))
             advanceUntilIdle()
 
             viewModel.addRecommendedProduct(recommendedProduct.id)
@@ -279,28 +354,10 @@ class CartRecommendationViewModelTest {
 
             assertEquals(2, viewModel.uiState.value.pendingOrder.selectedCount)
             assertEquals(
-                setOf(101L, 102L),
-                viewModel.uiState.value.pendingOrder.cartItemIds
-                    .toSet(),
-            )
-            assertTrue(
-                viewModel.uiState.value.recommendedProducts
-                    .any { it.product.id == recommendedProduct.id },
+                orderedProduct.price.value + recommendedProduct.price.value,
+                viewModel.uiState.value.pendingOrder.totalPrice,
             )
         }
-
-    private fun selectedCartOrderOf(product: Product): SelectedCartOrder =
-        SelectedCartOrder(
-            items =
-                listOf(
-                    SelectedCartOrderItem(
-                        cartItemId = 101L,
-                        productId = product.id,
-                        price = product.price.value,
-                        quantity = 1,
-                    ),
-                ),
-        )
 
     private fun product(
         id: Long,

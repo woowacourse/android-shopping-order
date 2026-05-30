@@ -4,7 +4,7 @@ package woowacourse.shopping.ui.cart.list.uistate
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.model.CartItem
+import woowacourse.shopping.model.cart.CartItem
 import woowacourse.shopping.repository.ProductRepositoryFixture
 
 class CartItemUiModelMapperTest {

@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.cart.list.uistate
 
-import woowacourse.shopping.model.CartItem
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.cart.CartItem
+import woowacourse.shopping.model.product.Product
 import woowacourse.shopping.repository.query.CartPageItem
 
 object CartItemUiModelMapper {

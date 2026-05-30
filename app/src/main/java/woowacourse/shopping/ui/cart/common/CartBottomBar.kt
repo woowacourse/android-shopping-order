@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.cart.common
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,17 +17,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import woowacourse.shopping.R
 import woowacourse.shopping.ui.theme.ShoppingColors
 import woowacourse.shopping.ui.theme.ShoppingColors.BrandGreen
 import woowacourse.shopping.ui.theme.ShoppingColors.Gray4
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun CartBottomBar(
-    totalPrice: String,
+    totalPrice: Int,
     selectedCount: Int,
     onOrderClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -34,6 +38,8 @@ fun CartBottomBar(
     isAllSelected: Boolean = false,
     onAllSelectedChanged: (Boolean) -> Unit = {},
 ) {
+    val formatted = String.format("%,d", totalPrice)
+
     Row(
         modifier =
             modifier
@@ -44,7 +50,7 @@ fun CartBottomBar(
             showSelectAll = showSelectAll,
             isAllSelected = isAllSelected,
             onAllSelectedChanged = onAllSelectedChanged,
-            totalPrice = totalPrice,
+            totalPrice = formatted,
             modifier =
                 Modifier
                     .fillMaxHeight()
@@ -111,7 +117,7 @@ private fun CartSummarySection(
         Spacer(modifier = Modifier.weight(1f))
 
         Text(
-            text = totalPrice,
+            text = stringResource(R.string.price_format, totalPrice),
             fontSize = 18.sp,
             fontWeight = FontWeight.W700,
             color = Color.White,
@@ -144,7 +150,7 @@ private fun CartOrderSection(
 @Composable
 fun CartBottomBarPreview() {
     CartBottomBar(
-        totalPrice = "184,200원",
+        totalPrice = 184200,
         selectedCount = 2,
         onOrderClick = {},
     )
@@ -154,7 +160,7 @@ fun CartBottomBarPreview() {
 @Composable
 fun CartBottomBarPreview2() {
     CartBottomBar(
-        totalPrice = "0원",
+        totalPrice = 0,
         selectedCount = 0,
         onOrderClick = {},
     )
@@ -164,7 +170,7 @@ fun CartBottomBarPreview2() {
 @Composable
 fun CartBottomBarPreview3() {
     CartBottomBar(
-        totalPrice = "184,200원",
+        totalPrice = 184200,
         showSelectAll = false,
         selectedCount = 2,
         onOrderClick = {},

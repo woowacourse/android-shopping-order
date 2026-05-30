@@ -2,7 +2,7 @@ package woowacourse.shopping.local.cart
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import woowacourse.shopping.model.CartItem
+import woowacourse.shopping.model.cart.CartItem
 
 @Entity(tableName = "cart_items")
 data class CartItemEntity(

@@ -1,6 +1,6 @@
 package woowacourse.shopping.repository
 
-import woowacourse.shopping.model.RecentProduct
+import woowacourse.shopping.model.product.RecentProduct
 
 class FakeRecentProductRepository : RecentProductRepository {
     companion object {

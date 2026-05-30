@@ -9,7 +9,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
-import woowacourse.shopping.model.CartItem
+import woowacourse.shopping.model.cart.CartItem
 import woowacourse.shopping.repository.CartRepository
 import woowacourse.shopping.repository.http.api.CartApiService
 import woowacourse.shopping.repository.http.dto.cart.CartItemQuantityUpdateRequestDto
@@ -118,46 +118,49 @@ class HttpCartRepository(
 
         val existingCartItem = existingCartItemResult.getOrNull()
 
-        return when {
-            existingCartItem == null && quantity == 0 -> {
-                Result.success(Unit)
+        val result =
+            when {
+                existingCartItem == null && quantity == 0 -> {
+                    Result.success(Unit)
+                }
+
+                existingCartItem == null -> {
+                    val result =
+                        execute("장바구니 추가 API 호출에 실패했습니다.") {
+                            cartApiService.addCartItem(
+                                CartItemRequestDto(
+                                    productId = productId,
+                                    quantity = quantity,
+                                ),
+                            )
+                        }
+
+                    result.toUnitResult()
+                }
+
+                quantity == 0 -> {
+                    val result =
+                        execute("장바구니 삭제 API 호출에 실패했습니다.") {
+                            cartApiService.deleteCartItem(existingCartItem.id)
+                        }
+
+                    result.toUnitResult()
+                }
+
+                else -> {
+                    val result =
+                        execute("장바구니 수량 변경 API 호출에 실패했습니다.") {
+                            cartApiService.updateCartItemQuantity(
+                                id = existingCartItem.id,
+                                body = CartItemQuantityUpdateRequestDto(quantity = quantity),
+                            )
+                        }
+
+                    result.toUnitResult()
+                }
             }
 
-            existingCartItem == null -> {
-                val result =
-                    execute("장바구니 추가 API 호출에 실패했습니다.") {
-                        cartApiService.addCartItem(
-                            CartItemRequestDto(
-                                productId = productId,
-                                quantity = quantity,
-                            ),
-                        )
-                    }
-
-                result.toUnitResult()
-            }
-
-            quantity == 0 -> {
-                val result =
-                    execute("장바구니 삭제 API 호출에 실패했습니다.") {
-                        cartApiService.deleteCartItem(existingCartItem.id)
-                    }
-
-                result.toUnitResult()
-            }
-
-            else -> {
-                val result =
-                    execute("장바구니 수량 변경 API 호출에 실패했습니다.") {
-                        cartApiService.updateCartItemQuantity(
-                            id = existingCartItem.id,
-                            body = CartItemQuantityUpdateRequestDto(quantity = quantity),
-                        )
-                    }
-
-                result.toUnitResult()
-            }
-        }
+        return result
     }
 
     override suspend fun getCartItemsByProductIds(productIds: Set<Long>): Result<List<CartItem>> {
@@ -273,12 +276,17 @@ class HttpCartRepository(
                 val body = response.body()
 
                 if (body == null) {
-                    Result.failure(
-                        CartParsingException(
-                            message = "장바구니 API 응답 본문이 비어 있습니다.",
-                            cause = IllegalStateException("response body is null"),
-                        ),
-                    )
+                    if (response.code() == 204) {
+                        @Suppress("UNCHECKED_CAST")
+                        Result.success(Unit as T)
+                    } else {
+                        Result.failure(
+                            CartParsingException(
+                                message = "장바구니 API 응답 본문이 비어 있습니다.",
+                                cause = IllegalStateException("response body is null"),
+                            ),
+                        )
+                    }
                 } else {
                     Result.success(body)
                 }

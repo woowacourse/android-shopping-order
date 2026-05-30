@@ -5,6 +5,7 @@ package woowacourse.shopping.ui.cart.list
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -23,6 +24,7 @@ import woowacourse.shopping.repository.CartRepositoryFixture
 import woowacourse.shopping.repository.FakeCartRepository
 import woowacourse.shopping.repository.FakeProductRepository
 import woowacourse.shopping.ui.cart.list.uistate.CartListUiState
+import woowacourse.shopping.ui.navigation.OrderProduct
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CartViewModelTest {
@@ -75,26 +77,59 @@ class CartViewModelTest {
     }
 
     @Test
-    fun `선택된 상품만 주문 대상에 포함된다`() {
-        viewModel.toggleItemSelection(product2.id, isSelected = false)
+    fun `선택된 상품만 주문 대상에 포함된다`() =
+        runTest(dispatcher.scheduler) {
+            viewModel.toggleItemSelection(product2.id, isSelected = false)
 
-        val selectedCartOrder = viewModel.createSelectedCartOrder()
+            val selectedCartOrder = viewModel.createSelectedCartOrder()
 
-        assertNotNull(selectedCartOrder)
-        assertEquals(listOf(product1.id), selectedCartOrder?.items?.map { it.productId })
-        assertEquals(listOf(1), selectedCartOrder?.items?.map { it.quantity })
-    }
+            assertNotNull(selectedCartOrder)
+            assertEquals(listOf(product1.id), selectedCartOrder?.items?.map { it.productId })
+            assertEquals(listOf(1), selectedCartOrder?.items?.map { it.quantity })
+        }
 
     @Test
-    fun `선택한 상품이 없으면 주문 버튼이 비활성화된다`() {
-        viewModel.toggleItemSelection(product1.id, isSelected = false)
-        viewModel.toggleItemSelection(product2.id, isSelected = false)
+    fun `선택한 상품이 없으면 주문 버튼이 비활성화된다`() =
+        runTest(dispatcher.scheduler) {
+            viewModel.toggleItemSelection(product1.id, isSelected = false)
+            viewModel.toggleItemSelection(product2.id, isSelected = false)
 
-        val contentState = viewModel.uiState.value.cartListState as CartListUiState.Content
+            val contentState = viewModel.uiState.value.cartListState as CartListUiState.Content
 
-        assertNull(viewModel.createSelectedCartOrder())
-        assertFalse(contentState.items.any { it.isSelected })
-    }
+            assertNull(viewModel.createSelectedCartOrder())
+            assertFalse(contentState.items.any { it.isSelected })
+        }
+
+    @Test
+    fun `선택된 상품으로 주문 상품 이벤트를 발행한다`() =
+        runTest(dispatcher.scheduler) {
+            val orderProducts = mutableListOf<List<OrderProduct>>()
+            val collectJob =
+                launch {
+                    viewModel.orderProductsEvent.collect {
+                        orderProducts += it
+                    }
+                }
+
+            viewModel.toggleItemSelection(product2.id, isSelected = false)
+            viewModel.orderSelectedProducts()
+            advanceUntilIdle()
+
+            assertEquals(
+                listOf(
+                    listOf(
+                        OrderProduct(
+                            productId = product1.id,
+                            quantity = 1,
+                            price = product1.price.value,
+                        ),
+                    ),
+                ),
+                orderProducts,
+            )
+
+            collectJob.cancel()
+        }
 
     private class FakeNetworkMonitor : NetworkMonitor {
         override val isNetworkConnected = MutableStateFlow(true)

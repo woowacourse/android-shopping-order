@@ -9,13 +9,18 @@ import woowacourse.shopping.network.NetworkMonitor
 import woowacourse.shopping.network.auth.BasicAuthHeaderFactory
 import woowacourse.shopping.network.auth.BasicAuthInterceptor
 import woowacourse.shopping.repository.http.repository.HttpCartRepository
+import woowacourse.shopping.repository.http.repository.HttpCouponRepository
 import woowacourse.shopping.repository.http.repository.HttpProductRepository
 import woowacourse.shopping.repository.room.RoomRecentProductRepository
 
 object ShoppingRepositoryProvider {
-    private val httpClient: OkHttpClient by lazy {
-        OkHttpClient
-            .Builder()
+    private val baseClient: OkHttpClient by lazy {
+        OkHttpClient.Builder().build()
+    }
+
+    private val authClient: OkHttpClient by lazy {
+        baseClient
+            .newBuilder()
             .addInterceptor(
                 BasicAuthInterceptor {
                     BasicAuthHeaderFactory.create()
@@ -32,6 +37,9 @@ object ShoppingRepositoryProvider {
     lateinit var recentProductRepository: RecentProductRepository
         private set
 
+    lateinit var couponRepository: CouponRepository
+        private set
+
     lateinit var networkMonitor: NetworkMonitor
         private set
 
@@ -40,6 +48,7 @@ object ShoppingRepositoryProvider {
             ::productRepository.isInitialized &&
             ::cartRepository.isInitialized &&
             ::recentProductRepository.isInitialized &&
+            ::couponRepository.isInitialized &&
             ::networkMonitor.isInitialized
         ) {
             return
@@ -48,12 +57,17 @@ object ShoppingRepositoryProvider {
         val database = ShoppingDatabase.getInstance(context)
         productRepository =
             HttpProductRepository(
-                client = httpClient,
+                client = authClient,
                 baseUrl = BuildConfig.BASE_URL,
             )
         cartRepository =
             HttpCartRepository(
-                client = httpClient,
+                client = authClient,
+                baseUrl = BuildConfig.BASE_URL,
+            )
+        couponRepository =
+            HttpCouponRepository(
+                client = baseClient,
                 baseUrl = BuildConfig.BASE_URL,
             )
 

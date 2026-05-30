@@ -11,8 +11,8 @@ import okhttp3.OkHttpClient
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.Products
+import woowacourse.shopping.model.product.Product
+import woowacourse.shopping.model.product.Products
 import woowacourse.shopping.repository.ProductRepository
 import woowacourse.shopping.repository.http.api.ProductApiService
 import woowacourse.shopping.repository.http.exception.ProductNetworkException
