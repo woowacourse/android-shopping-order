@@ -65,19 +65,33 @@ class ProductDetailViewModel(
 
     fun addToCart() {
         viewModelScope.launch {
-            increaseQuantity()
-            _snackbarEvent.emit("장바구니에 상품을 담았습니다.")
+            val isSuccess = changeQuantity(delta = 1)
+            val message =
+                if (isSuccess) {
+                    "장바구니에 상품을 담았습니다."
+                } else {
+                    "장바구니 담기에 실패했습니다."
+                }
+            _snackbarEvent.emit(message)
         }
     }
 
-    fun increaseQuantity() = changeQuantity(delta = 1)
+    fun increaseQuantity() {
+        viewModelScope.launch {
+            changeQuantity(delta = 1)
+        }
+    }
 
-    fun decreaseQuantity() = changeQuantity(delta = -1)
+    fun decreaseQuantity() {
+        viewModelScope.launch {
+            changeQuantity(delta = -1)
+        }
+    }
 
-    private fun changeQuantity(delta: Int) {
-        val product = _uiState.value.product ?: return
+    private suspend fun changeQuantity(delta: Int): Boolean {
+        val product = _uiState.value.product ?: return false
         val nextQuantity = (_uiState.value.quantity + delta).coerceAtLeast(0)
-        if (nextQuantity == _uiState.value.quantity) return
+        if (nextQuantity == _uiState.value.quantity) return false
 
         _uiState.update { current ->
             current.copy(
@@ -87,18 +101,21 @@ class ProductDetailViewModel(
             )
         }
 
-        viewModelScope.launch {
-            cartRepository
-                .setQuantity(product.id, nextQuantity)
-                .onSuccess {
+        return cartRepository
+            .setQuantity(product.id, nextQuantity)
+            .fold(
+                onSuccess = {
                     _uiState.update { current ->
                         current.copy(isAdding = false)
                     }
-                }.onFailure { throwable ->
+                    true
+                },
+                onFailure = { throwable ->
                     refreshProductDetail(product.id)
                     updateErrorState(throwable)
-                }
-        }
+                    false
+                },
+            )
     }
 
     private suspend fun refreshProductDetail(productId: Long) {
