@@ -7,6 +7,6 @@ import woowacourse.shopping.data.remote.retrofit.dto.OrderInfo
 interface OrderRetrofitInterface {
     @POST("/orders")
     suspend fun order(
-        @Body order: OrderInfo,
+        @Body orderInfo: OrderInfo,
     )
 }

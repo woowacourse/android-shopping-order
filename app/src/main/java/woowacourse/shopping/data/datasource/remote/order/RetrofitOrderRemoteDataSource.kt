@@ -8,10 +8,7 @@ class RetrofitOrderRemoteDataSource(
 ) : OrderRemoteDataSource {
     override suspend fun order(orderInfo: OrderInfo) {
         apiService.order(
-            order =
-                OrderInfo(
-                    cartItemIds = orderInfo.cartItemIds,
-                ),
+            orderInfo = orderInfo
         )
     }
 }
