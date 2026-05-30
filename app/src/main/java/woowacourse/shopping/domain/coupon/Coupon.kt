@@ -109,5 +109,9 @@ data class TimeRange(
     val start: LocalTime,
     val end: LocalTime,
 ) {
-    fun contains(time: LocalTime): Boolean = time in start..end
+    fun contains(time: LocalTime): Boolean {
+        if (start <= end) return time in start..end
+
+        return time >= start || time <= end
+    }
 }
