@@ -35,6 +35,9 @@ class CartViewModel(
     private val _snackbarEvent = MutableSharedFlow<String>()
     val snackbarEvent = _snackbarEvent.asSharedFlow()
 
+    private val _orderProductsEvent = MutableSharedFlow<List<OrderProduct>>()
+    val orderProductsEvent = _orderProductsEvent.asSharedFlow()
+
     init {
         observeNetworkState()
         loadPage(1)
@@ -178,6 +181,15 @@ class CartViewModel(
                 price = it.price,
             )
         } ?: emptyList()
+
+    fun orderSelectedProducts() {
+        viewModelScope.launch {
+            val orderProducts = getSelectedOrderProducts()
+            if (orderProducts.isNotEmpty()) {
+                _orderProductsEvent.emit(orderProducts)
+            }
+        }
+    }
 
     private fun updateQuantity(
         productId: Long,

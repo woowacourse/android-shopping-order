@@ -110,51 +110,36 @@ class CartRecommendationViewModel(
         changeRecommendedProductQuantity(productId, delta = -1)
     }
 
-    fun applyRecommendations() {
-        if (_uiState.value.isApplying) return
+    suspend fun applyRecommendations(): Boolean {
+        if (_uiState.value.isApplying) return false
 
         val itemData = buildOrderItemDataByProductId().filter { it.value.quantity > 0 }
 
         if (itemData.isEmpty()) {
             updateError("주문할 상품이 없습니다.")
-            return
+            return false
         }
 
-        viewModelScope.launch {
-            _uiState.update { it.copy(isApplying = true) }
+        _uiState.update { it.copy(isApplying = true) }
 
-            val recommendedProductIds =
-                _uiState.value.recommendedProducts
-                    .map { it.product.id }
-                    .toSet()
-            val recommendedItems = itemData.filter { it.key in recommendedProductIds }
+        val recommendedProductIds =
+            _uiState.value.recommendedProducts
+                .map { it.product.id }
+                .toSet()
+        val recommendedItems = itemData.filter { it.key in recommendedProductIds }
 
-            val allSuccess =
-                recommendedItems.all { (productId, data) ->
-                    cartRepository.setQuantity(productId, data.quantity).isSuccess
-                }
-
-            if (!allSuccess) {
-                updateError("장바구니 반영에 실패했습니다.")
-                return@launch
+        val allSuccess =
+            recommendedItems.all { (productId, data) ->
+                cartRepository.setQuantity(productId, data.quantity).isSuccess
             }
 
-            val finalOrderProducts =
-                itemData.map { (productId, data) ->
-                    OrderProduct(
-                        productId = productId,
-                        quantity = data.quantity,
-                        price = data.price,
-                    )
-                }
-
-            _uiState.update { currentState ->
-                currentState.copy(
-                    orderProductsToOrder = finalOrderProducts,
-                    isApplying = false,
-                )
-            }
+        if (!allSuccess) {
+            updateError("장바구니 반영에 실패했습니다.")
+            return false
         }
+
+        _uiState.update { it.copy(isApplying = false) }
+        return true
     }
 
     fun clearError() {

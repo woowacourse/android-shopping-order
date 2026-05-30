@@ -5,6 +5,7 @@ package woowacourse.shopping.ui.cart.list
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -23,6 +24,7 @@ import woowacourse.shopping.repository.CartRepositoryFixture
 import woowacourse.shopping.repository.FakeCartRepository
 import woowacourse.shopping.repository.FakeProductRepository
 import woowacourse.shopping.ui.cart.list.uistate.CartListUiState
+import woowacourse.shopping.ui.navigation.OrderProduct
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CartViewModelTest {
@@ -96,6 +98,37 @@ class CartViewModelTest {
 
             assertNull(viewModel.createSelectedCartOrder())
             assertFalse(contentState.items.any { it.isSelected })
+        }
+
+    @Test
+    fun `선택된 상품으로 주문 상품 이벤트를 발행한다`() =
+        runTest(dispatcher.scheduler) {
+            val orderProducts = mutableListOf<List<OrderProduct>>()
+            val collectJob =
+                launch {
+                    viewModel.orderProductsEvent.collect {
+                        orderProducts += it
+                    }
+                }
+
+            viewModel.toggleItemSelection(product2.id, isSelected = false)
+            viewModel.orderSelectedProducts()
+            advanceUntilIdle()
+
+            assertEquals(
+                listOf(
+                    listOf(
+                        OrderProduct(
+                            productId = product1.id,
+                            quantity = 1,
+                            price = product1.price.value,
+                        ),
+                    ),
+                ),
+                orderProducts,
+            )
+
+            collectJob.cancel()
         }
 
     private class FakeNetworkMonitor : NetworkMonitor {

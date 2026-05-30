@@ -108,7 +108,7 @@ class CartRecommendationViewModelTest {
             viewModel.addRecommendedProduct(recommendedProduct.id)
             advanceUntilIdle()
 
-            viewModel.applyRecommendations()
+            assertTrue(viewModel.applyRecommendations())
             advanceUntilIdle()
 
             assertTrue(cartRepository.createdOrders.isEmpty())

@@ -235,12 +235,12 @@ fun AppNavHost(innerPadding: PaddingValues) {
                     )
 
                 val uiState by recommendationViewModel.uiState.collectAsStateWithLifecycle()
+                val coroutineScope = rememberCoroutineScope()
                 val lifecycleOwner = LocalLifecycleOwner.current
 
-                LaunchedEffect(uiState.orderProductsToOrder, lifecycleOwner) {
+                LaunchedEffect(cartViewModel.orderProductsEvent, lifecycleOwner) {
                     lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                        val orderProducts = uiState.orderProductsToOrder
-                        if (orderProducts != null) {
+                        cartViewModel.orderProductsEvent.collect { orderProducts ->
                             navController.navigate(Payment(orderProducts = orderProducts)) {
                                 popUpTo<CartRecommendation> {
                                     inclusive = true
@@ -264,7 +264,13 @@ fun AppNavHost(innerPadding: PaddingValues) {
                     onAddToCart = recommendationViewModel::addRecommendedProduct,
                     onIncreaseQuantity = recommendationViewModel::addRecommendedProduct,
                     onDecreaseQuantity = recommendationViewModel::decreaseRecommendedProductQuantity,
-                    onOrderClick = recommendationViewModel::applyRecommendations,
+                    onOrderClick = {
+                        coroutineScope.launch {
+                            if (recommendationViewModel.applyRecommendations()) {
+                                cartViewModel.orderSelectedProducts()
+                            }
+                        }
+                    },
                     onBackClick = { navController.popBackStack() },
                 )
             }
