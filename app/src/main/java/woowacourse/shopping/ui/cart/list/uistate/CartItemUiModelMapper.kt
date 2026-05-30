@@ -1,8 +1,8 @@
 package woowacourse.shopping.ui.cart.list.uistate
 
-import woowacourse.shopping.model.CartItem
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.repository.query.CartPageItem
+import woowacourse.shopping.domain.model.cart.CartItem
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.repository.query.CartPageItem
 
 object CartItemUiModelMapper {
     fun toUiModels(

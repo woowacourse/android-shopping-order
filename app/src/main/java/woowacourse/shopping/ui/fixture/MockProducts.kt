@@ -1,7 +1,7 @@
 package woowacourse.shopping.ui.fixture
 
-import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.domain.model.common.Money
+import woowacourse.shopping.domain.model.product.Product
 
 object MockProducts {
     private const val PRODUCT_IMAGE_URL = "https://cdn.frame-less.co.kr/news/photo/202510/1344_3681_750.jpg"

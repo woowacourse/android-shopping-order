@@ -4,12 +4,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,6 +31,7 @@ fun ShoppingHeader(
     modifier: Modifier = Modifier,
     cartQuantity: Int,
     onCartClick: () -> Unit,
+    onSettingClick: () -> Unit,
 ) {
     Row(
         modifier =
@@ -44,17 +49,30 @@ fun ShoppingHeader(
             style = ShoppingTypography.titleMedium,
         )
         Row(
-            modifier = Modifier.clickable(onClick = onCartClick),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                imageVector = Icons.Default.ShoppingCart,
-                contentDescription = stringResource(R.string.content_description_cart),
-                tint = Color.White,
-            )
-            if (cartQuantity > 0) {
-                CartCountBadge(
-                    quantity = cartQuantity,
+            Row(
+                modifier = Modifier.clickable(onClick = onCartClick),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ShoppingCart,
+                    contentDescription = stringResource(R.string.content_description_cart),
+                    tint = Color.White,
+                )
+                if (cartQuantity > 0) {
+                    CartCountBadge(
+                        quantity = cartQuantity,
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.size(4.dp))
+            IconButton(onClick = onSettingClick) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = stringResource(R.string.content_description_setting),
+                    tint = Color.White,
                 )
             }
         }
@@ -67,5 +85,6 @@ private fun ShoppingHeaderPreview() {
     ShoppingHeader(
         cartQuantity = 3,
         onCartClick = {},
+        onSettingClick = {},
     )
 }

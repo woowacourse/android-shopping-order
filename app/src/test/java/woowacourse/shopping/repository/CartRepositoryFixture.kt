@@ -1,7 +1,7 @@
 package woowacourse.shopping.repository
 
-import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.domain.model.common.Money
+import woowacourse.shopping.domain.model.product.Product
 
 object CartRepositoryFixture {
     val shrimpCracker =

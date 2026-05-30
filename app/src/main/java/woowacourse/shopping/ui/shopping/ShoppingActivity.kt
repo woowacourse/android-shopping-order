@@ -1,56 +1,60 @@
 package woowacourse.shopping.ui.shopping
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import woowacourse.shopping.ui.cart.CartActivity
-import woowacourse.shopping.ui.productdetail.ProductDetailActivity
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.setValue
+import androidx.navigation.compose.rememberNavController
+import woowacourse.shopping.notification.ACTION_OPEN_PENDING_ORDER
+import woowacourse.shopping.ui.navigation.AppNavHost
 import woowacourse.shopping.ui.theme.ShoppingTheme
 
 class ShoppingActivity : ComponentActivity() {
-    private val viewModel: ShoppingViewModel by viewModels()
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.reloadVisibleState()
-    }
+    private var pendingOrderNavigationToken by mutableLongStateOf(0L)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        pendingOrderNavigationToken = intent.toPendingOrderNavigationToken()
         setContent {
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val navController = rememberNavController()
 
             ShoppingTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ShoppingScreen(
-                        productListState = uiState.productListState,
-                        recentProducts = uiState.recentProducts,
-                        cartQuantity = uiState.cartQuantity,
-                        isNetworkConnected = uiState.isNetworkConnected,
-                        modifier = Modifier.padding(innerPadding),
-                        onCartClick = {
-                            startActivity(Intent(this, CartActivity::class.java))
-                        },
-                        onProductClick = {
-                            ProductDetailActivity.startActivity(this, it.id)
-                        },
-                        onMoreClick = viewModel::loadMore,
-                        onAddToCart = viewModel::addToCart,
-                        onIncreaseQuantity = viewModel::increaseQuantity,
-                        onDecreaseQuantity = viewModel::decreaseQuantity,
-                    )
-                }
+                AppNavHost(
+                    navController = navController,
+                    pendingOrderNavigationToken = pendingOrderNavigationToken,
+                    onPendingOrderNavigationHandled = {
+                        pendingOrderNavigationToken = 0L
+                        clearPendingOrderNavigationIntent()
+                    },
+                )
             }
         }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        pendingOrderNavigationToken = intent.toPendingOrderNavigationToken()
+    }
+
+    private fun android.content.Intent?.toPendingOrderNavigationToken(): Long =
+        if (this?.action == ACTION_OPEN_PENDING_ORDER) {
+            System.currentTimeMillis()
+        } else {
+            0L
+        }
+
+    private fun clearPendingOrderNavigationIntent() {
+        if (intent?.action != ACTION_OPEN_PENDING_ORDER) return
+
+        setIntent(
+            intent.apply {
+                action = null
+            },
+        )
     }
 }

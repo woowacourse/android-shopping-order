@@ -1,9 +1,10 @@
 @file:Suppress("NonAsciiCharacters")
 
-package woowacourse.shopping.model
+package woowacourse.shopping.domain.model.product
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.domain.model.common.Money
 
 class ProductRecommendationPolicyTest {
     private val policy = ProductRecommendationPolicy()

@@ -12,21 +12,21 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import woowacourse.shopping.repository.http.product.HttpProductRepository
-import woowacourse.shopping.repository.http.product.ProductNetworkException
-import woowacourse.shopping.repository.http.product.ProductParsingException
-import woowacourse.shopping.repository.http.product.ProductResponseException
+import woowacourse.shopping.data.remote.product.ProductNetworkException
+import woowacourse.shopping.data.remote.product.ProductParsingException
+import woowacourse.shopping.data.remote.product.ProductResponseException
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
 
-class HttpProductRepositoryTest {
+class ProductRepositoryImplTest {
     private lateinit var mockWebServer: MockWebServer
-    private lateinit var repository: HttpProductRepository
+    private lateinit var repository: ProductRepositoryImpl
 
     @BeforeEach
     fun setUp() {
         mockWebServer = MockWebServer()
         mockWebServer.start()
         repository =
-            HttpProductRepository(
+            ProductRepositoryImpl(
                 client = OkHttpClient(),
                 baseUrl = mockWebServer.url("/").toString(),
             )
@@ -151,7 +151,7 @@ class HttpProductRepositoryTest {
         disconnectedServer.shutdown()
 
         val disconnectedRepository =
-            HttpProductRepository(
+            ProductRepositoryImpl(
                 client = OkHttpClient(),
                 baseUrl = baseUrl,
             )

@@ -4,7 +4,9 @@ package woowacourse.shopping.ui.cart.recommendation
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -16,18 +18,18 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.model.CartItem
-import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.network.NetworkMonitor
-import woowacourse.shopping.repository.CartRepository
+import woowacourse.shopping.data.remote.common.NetworkMonitor
+import woowacourse.shopping.domain.model.cart.CartItem
+import woowacourse.shopping.domain.model.cart.SelectedCartOrder
+import woowacourse.shopping.domain.model.cart.SelectedCartOrderItem
+import woowacourse.shopping.domain.model.common.Money
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.query.CartPageItem
+import woowacourse.shopping.domain.repository.query.CartPageResult
 import woowacourse.shopping.repository.FakeProductRepository
 import woowacourse.shopping.repository.FakeRecentProductRepository
 import woowacourse.shopping.repository.ProductRepositoryFixture
-import woowacourse.shopping.repository.query.CartPageItem
-import woowacourse.shopping.repository.query.CartPageResult
-import woowacourse.shopping.ui.cart.SelectedCartOrder
-import woowacourse.shopping.ui.cart.SelectedCartOrderItem
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CartRecommendationViewModelTest {
@@ -96,6 +98,7 @@ class CartRecommendationViewModelTest {
                 viewModel.uiState.value.pendingOrder.totalPrice,
             )
 
+            val event = async { viewModel.events.first() }
             viewModel.placeOrder()
             advanceUntilIdle()
 
@@ -104,7 +107,7 @@ class CartRecommendationViewModelTest {
                 cartRepository.createdOrders,
             )
             assertTrue(cartRepository.getCartItemsByProductIds(setOf(orderedProduct.id, recommendedProduct.id)).isEmpty())
-            assertEquals(1, viewModel.uiState.value.orderCompletedCount)
+            assertEquals(CartRecommendationEvent.OrderCompleted, event.await())
         }
 
     @Test

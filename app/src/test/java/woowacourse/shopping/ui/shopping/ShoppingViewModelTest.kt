@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.network.NetworkMonitor
+import woowacourse.shopping.data.remote.common.NetworkMonitor
 import woowacourse.shopping.repository.FakeCartRepository
 import woowacourse.shopping.repository.FakeProductRepository
 import woowacourse.shopping.repository.FakeRecentProductRepository

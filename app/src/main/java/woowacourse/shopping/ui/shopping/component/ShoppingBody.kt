@@ -22,8 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.ui.common.component.recentlyviewed.RecentlyViewedSection
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.shopping.ProductListUiState
 import woowacourse.shopping.ui.shopping.ShoppingProductUiState
@@ -32,7 +31,6 @@ import woowacourse.shopping.ui.theme.ShoppingColors
 @Composable
 fun ShoppingBody(
     productListState: ProductListUiState,
-    recentProducts: List<Product>,
     modifier: Modifier = Modifier,
     onProductClick: (Product) -> Unit,
     onMoreClick: () -> Unit,
@@ -46,24 +44,6 @@ fun ShoppingBody(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        if (recentProducts.isNotEmpty()) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                RecentlyViewedSection(
-                    products = recentProducts,
-                    onProductClick = onProductClick,
-                )
-            }
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Spacer(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .height(14.dp)
-                            .background(color = ShoppingColors.Gray1),
-                )
-            }
-        }
-
         when (productListState) {
             ProductListUiState.Loading -> {
                 items(6) {
@@ -170,7 +150,6 @@ private fun ShoppingBodyPreview() {
                     },
                 hasNext = true,
             ),
-        recentProducts = MockProducts.products.take(4),
         onProductClick = {},
         onMoreClick = {},
         onAddToCart = {},
@@ -184,7 +163,6 @@ private fun ShoppingBodyPreview() {
 private fun ShoppingBodyLoadingPreview() {
     ShoppingBody(
         productListState = ProductListUiState.Loading,
-        recentProducts = emptyList(),
         onProductClick = {},
         onMoreClick = {},
         onAddToCart = {},
@@ -194,11 +172,10 @@ private fun ShoppingBodyLoadingPreview() {
 }
 
 @Composable
-@Preview(showBackground = true, name = "최근 본 상품과 로딩 스켈레톤")
-private fun ShoppingBodyLoadingWithRecentProductsPreview() {
+@Preview(showBackground = true, name = "로딩 스켈레톤")
+private fun ShoppingBodyLoadingOnlyPreview() {
     ShoppingBody(
         productListState = ProductListUiState.Loading,
-        recentProducts = MockProducts.products.take(4),
         onProductClick = {},
         onMoreClick = {},
         onAddToCart = {},

@@ -1,7 +1,8 @@
 package woowacourse.shopping.repository
 
-import woowacourse.shopping.model.Cart
-import woowacourse.shopping.model.CartItem
+import woowacourse.shopping.domain.model.cart.Cart
+import woowacourse.shopping.domain.model.cart.CartItem
+import woowacourse.shopping.domain.repository.CartRepository
 
 class FakeCartRepository : CartRepository {
     private var cart = Cart(emptyList())
@@ -22,7 +23,7 @@ class FakeCartRepository : CartRepository {
     override suspend fun getCartPage(
         page: Int,
         size: Int,
-    ): woowacourse.shopping.repository.query.CartPageResult {
+    ): woowacourse.shopping.domain.repository.query.CartPageResult {
         val safePage = page.coerceAtLeast(0)
         val safeSize = size.coerceAtLeast(0)
         val totalElements = cart.items.size
@@ -31,7 +32,7 @@ class FakeCartRepository : CartRepository {
         val safeTo = minOf(safeFrom + safeSize, totalElements)
         val items =
             cart.items.subList(safeFrom, safeTo).map {
-                woowacourse.shopping.repository.query.CartPageItem(
+                woowacourse.shopping.domain.repository.query.CartPageItem(
                     cartItemId = it.productId,
                     productId = it.productId,
                     quantity = it.quantity,
@@ -44,7 +45,7 @@ class FakeCartRepository : CartRepository {
                 (totalElements - 1) / safeSize + 1
             }
 
-        return woowacourse.shopping.repository.query.CartPageResult(
+        return woowacourse.shopping.domain.repository.query.CartPageResult(
             items = items,
             totalElements = totalElements,
             totalPages = totalPages,

@@ -8,13 +8,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import woowacourse.shopping.network.NetworkMonitor
-import woowacourse.shopping.repository.CartRepository
-import woowacourse.shopping.repository.ProductRepository
-import woowacourse.shopping.repository.ShoppingRepositoryProvider
-import woowacourse.shopping.ui.cart.SelectedCartOrder
-import woowacourse.shopping.ui.cart.SelectedCartOrderItem
+import woowacourse.shopping.data.remote.common.NetworkMonitor
+import woowacourse.shopping.di.ShoppingRepositoryProvider
+import woowacourse.shopping.domain.model.cart.SelectedCartOrder
+import woowacourse.shopping.domain.model.cart.SelectedCartOrderItem
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.ui.cart.list.uistate.CartItemUiModelMapper
 import woowacourse.shopping.ui.cart.list.uistate.CartListUiState
 import woowacourse.shopping.ui.cart.list.uistate.CartUiState
@@ -57,6 +58,10 @@ class CartViewModel(
         if (!contentState.hasNext) return
 
         loadPage(contentState.currentPage + 1)
+    }
+
+    suspend fun awaitPendingChanges() {
+        syncJobs.values.toList().joinAll()
     }
 
     fun createSelectedCartOrder(): SelectedCartOrder? {
@@ -171,8 +176,9 @@ class CartViewModel(
 
     private fun shouldMoveToPreviousPage(
         requestedPage: Int,
-        cartPageResult: woowacourse.shopping.repository.query.CartPageResult,
-    ): Boolean = requestedPage > 1 && cartPageResult.totalPages > 0 && cartPageResult.items.isEmpty() && requestedPage > cartPageResult.totalPages
+        cartPageResult: woowacourse.shopping.domain.repository.query.CartPageResult,
+    ): Boolean =
+        requestedPage > 1 && cartPageResult.totalPages > 0 && cartPageResult.items.isEmpty() && requestedPage > cartPageResult.totalPages
 
     private suspend fun reloadPage(page: Int) {
         runCatching {

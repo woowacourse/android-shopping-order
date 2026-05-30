@@ -6,8 +6,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -19,9 +19,9 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.network.NetworkMonitor
+import woowacourse.shopping.data.remote.common.NetworkMonitor
+import woowacourse.shopping.domain.model.common.Money
+import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.repository.CartRepositoryFixture
 import woowacourse.shopping.repository.FakeCartRepository
 import woowacourse.shopping.repository.FakeProductRepository

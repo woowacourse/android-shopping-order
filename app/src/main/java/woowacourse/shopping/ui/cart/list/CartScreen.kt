@@ -1,6 +1,7 @@
 package woowacourse.shopping.ui.cart.list
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -9,15 +10,18 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import woowacourse.shopping.R
 import woowacourse.shopping.ui.cart.common.CartBottomBar
-import woowacourse.shopping.ui.cart.common.CartHeader
 import woowacourse.shopping.ui.cart.list.component.CartItemBody
 import woowacourse.shopping.ui.cart.list.component.CartItemSkeletonBody
 import woowacourse.shopping.ui.cart.list.uistate.CartItemUiModel
 import woowacourse.shopping.ui.cart.list.uistate.CartListUiState
+import woowacourse.shopping.ui.common.component.header.NavigationHeader
 import woowacourse.shopping.ui.common.component.network.NetworkStatusBanner
+import woowacourse.shopping.ui.common.formatter.formatPrice
 import woowacourse.shopping.ui.fixture.MockProducts
 
 @Composable
@@ -42,7 +46,10 @@ fun CartScreen(
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
-        CartHeader(onBackClick = onBackClick)
+        NavigationHeader(
+            title = stringResource(R.string.cart_title),
+            onBackClick = onBackClick,
+        )
         if (!isNetworkConnected) {
             NetworkStatusBanner(modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp))
         }
@@ -77,17 +84,26 @@ fun CartScreen(
             }
 
             is CartListUiState.Error -> {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.errorContainer,
-                    shape = MaterialTheme.shapes.medium,
+                Column(
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .padding(18.dp),
                 ) {
-                    Text(
-                        text = cartListState.message ?: "상품을 불러오지 못했습니다.",
-                        color = MaterialTheme.colorScheme.onErrorContainer,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(16.dp),
-                    )
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.errorContainer,
+                        shape = MaterialTheme.shapes.medium,
+                    ) {
+                        Text(
+                            text = cartListState.message ?: "상품을 불러오지 못했습니다.",
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(16.dp),
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
                 }
             }
         }
@@ -106,8 +122,6 @@ fun CartScreen(
         )
     }
 }
-
-private fun formatPrice(totalPrice: Int): String = "%,d원".format(totalPrice)
 
 @Composable
 @Preview(showBackground = true)

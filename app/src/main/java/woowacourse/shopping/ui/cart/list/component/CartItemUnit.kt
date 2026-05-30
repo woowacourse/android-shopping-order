@@ -1,8 +1,5 @@
 package woowacourse.shopping.ui.cart.list.component
 
-import android.annotation.SuppressLint
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
@@ -22,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -34,7 +29,9 @@ import woowacourse.shopping.R
 import woowacourse.shopping.ui.ShoppingTypography
 import woowacourse.shopping.ui.cart.common.CartCheckbox
 import woowacourse.shopping.ui.cart.list.uistate.CartItemUiModel
+import woowacourse.shopping.ui.common.component.card.shoppingOutlinedCard
 import woowacourse.shopping.ui.common.component.cartcontrol.QuantityStepper
+import woowacourse.shopping.ui.common.formatter.formatPrice
 import woowacourse.shopping.ui.fixture.MockProducts
 import woowacourse.shopping.ui.theme.ShoppingColors
 
@@ -51,9 +48,7 @@ fun CartItemUnit(
         modifier =
             modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(4.dp))
-                .background(Color.White)
-                .border(1.dp, ShoppingColors.Gray2, RoundedCornerShape(4.dp))
+                .shoppingOutlinedCard(backgroundColor = Color.White)
                 .padding(18.dp),
     ) {
         NameAndCloseIcon(
@@ -120,7 +115,6 @@ private fun NameAndCloseIcon(
     }
 }
 
-@SuppressLint("DefaultLocale")
 @Composable
 private fun ImageAndPrice(
     item: CartItemUiModel,
@@ -128,8 +122,6 @@ private fun ImageAndPrice(
     onIncreaseQuantity: () -> Unit,
     onDecreaseQuantity: () -> Unit,
 ) {
-    val formatted = String.format("%,d", item.price * item.quantity)
-
     Row(
         modifier =
             modifier
@@ -160,7 +152,7 @@ private fun ImageAndPrice(
                 onDecreaseQuantity = onDecreaseQuantity,
             )
             Text(
-                text = stringResource(R.string.price_format, formatted),
+                text = formatPrice(item.price * item.quantity, withSpaceBeforeWon = true),
                 color = ShoppingColors.Gray4,
                 style = ShoppingTypography.productPrice,
             )
