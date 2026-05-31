@@ -48,11 +48,13 @@ fun PaymentScreen(
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.events.collect { event ->
                 when (event) {
-                    is PaymentEvent.ShowSnackbar -> Toast.makeText(
-                        context,
-                        event.message,
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    is PaymentEvent.ShowSnackbar ->
+                        Toast
+                            .makeText(
+                                context,
+                                event.message,
+                                Toast.LENGTH_SHORT,
+                            ).show()
 
                     PaymentEvent.PaySuccess -> onPayClick()
                 }

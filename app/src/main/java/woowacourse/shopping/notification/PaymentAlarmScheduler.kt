@@ -29,9 +29,10 @@ class PaymentAlarmScheduler(
     }
 
     private fun createPendingIntent(ids: List<Long>): PendingIntent {
-        val intent = Intent(context, PaymentReminderReceiver::class.java).apply {
-            putExtra(PaymentReminderReceiver.EXTRA_IDS, ids.toLongArray())
-        }
+        val intent =
+            Intent(context, PaymentReminderReceiver::class.java).apply {
+                putExtra(PaymentReminderReceiver.EXTRA_IDS, ids.toLongArray())
+            }
         return PendingIntent.getBroadcast(
             context,
             REQUEST_CODE,

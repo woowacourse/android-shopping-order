@@ -61,11 +61,12 @@ fun AppNavHost() {
         }
 
         composable<PaymentRoute>(
-            deepLinks = listOf(
-                navDeepLink<PaymentRoute>(
-                    basePath = PaymentRoute.DEEP_LINK
-                )
-            )
+            deepLinks =
+                listOf(
+                    navDeepLink<PaymentRoute>(
+                        basePath = PaymentRoute.DEEP_LINK,
+                    ),
+                ),
         ) {
             PaymentScreen(
                 onBackClick = { navController.popBackStack() },

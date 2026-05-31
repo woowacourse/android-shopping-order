@@ -11,8 +11,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import woowacourse.shopping.ui.common.theme.ShoppingTheme
 import woowacourse.shopping.ui.navigation.AppNavHost
 

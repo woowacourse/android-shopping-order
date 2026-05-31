@@ -82,10 +82,11 @@ class PaymentViewModel(
             try {
                 val allCartItems = cartRepo.getAllCartItems().items
                 val items = allCartItems.filter { ids.contains(it.id) }
-                val order = Order(
-                    items = items,
-                    selectedCoupon = null,
-                )
+                val order =
+                    Order(
+                        items = items,
+                        selectedCoupon = null,
+                    )
                 val payment = calculator.calculate(order, clock)
                 val context = order.couponContext(clock)
                 val coupons = paymentRepo.getCoupons()
@@ -107,10 +108,11 @@ class PaymentViewModel(
 
     private fun refreshOrderSummary(id: Long) {
         val coupon = _uiState.value.availableCoupons.find { it.id == id }
-        val order = Order(
-            items = _uiState.value.items,
-            selectedCoupon = coupon,
-        )
+        val order =
+            Order(
+                items = _uiState.value.items,
+                selectedCoupon = coupon,
+            )
         val payment = calculator.calculate(order, clock)
         _uiState.update { it.copy(payment = payment) }
     }

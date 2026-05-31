@@ -35,7 +35,10 @@ class PaymentReminderReceiver : BroadcastReceiver() {
             ?.notify(NOTIFICATION_ID, notification)
     }
 
-    private fun buildNotification(context: Context, ids: List<Long>): Notification {
+    private fun buildNotification(
+        context: Context,
+        ids: List<Long>,
+    ): Notification {
         val query = ids.joinToString("&") { "ids=$it" }
         val deepLinkUri = "${PaymentRoute.DEEP_LINK}?$query".toUri()
         val contentIntent =
@@ -43,11 +46,11 @@ class PaymentReminderReceiver : BroadcastReceiver() {
                 addNextIntentWithParentStack(
                     Intent(Intent.ACTION_VIEW, deepLinkUri).apply {
                         setPackage(context.packageName)
-                    }
+                    },
                 )
                 getPendingIntent(
                     REQUEST_CODE_CONTENT,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                 )
             }
 
