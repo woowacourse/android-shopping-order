@@ -1,11 +1,10 @@
 @file:Suppress("NonAsciiCharacters")
 
-package woowacourse.shopping.model
+package woowacourse.shopping.model.product
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import woowacourse.shopping.model.product.Product
-import woowacourse.shopping.model.product.Products
+import woowacourse.shopping.model.Money
 
 class ProductsTest {
     val product1 =
@@ -32,6 +31,6 @@ class ProductsTest {
         val expected = listOf(product1, product2)
         val actual = Products(listOf(product1, product2)).toList()
 
-        assertEquals(expected, actual)
+        Assertions.assertEquals(expected, actual)
     }
 }
