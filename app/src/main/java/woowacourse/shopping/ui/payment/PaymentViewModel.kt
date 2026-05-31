@@ -34,6 +34,7 @@ class PaymentViewModel(
     private val orderRepo: OrderRepository,
     private val calculator: PaymentCalculator = PaymentCalculator(),
     private val alarmScheduler: PaymentAlarmScheduler,
+    private val clock: Clock = Clock.systemDefaultZone(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PaymentUiState())
     private val _events = Channel<PaymentEvent>(Channel.BUFFERED)
@@ -85,8 +86,8 @@ class PaymentViewModel(
                     items = items,
                     selectedCoupon = null,
                 )
-                val payment = calculator.calculate(order, Clock.systemDefaultZone())
-                val context = order.couponContext(Clock.systemDefaultZone())
+                val payment = calculator.calculate(order, clock)
+                val context = order.couponContext(clock)
                 val coupons = paymentRepo.getCoupons()
                 val enableCoupons = coupons.filter { it.isUsable(context) }
                 _uiState.update {
@@ -110,7 +111,7 @@ class PaymentViewModel(
             items = _uiState.value.items,
             selectedCoupon = coupon,
         )
-        val payment = calculator.calculate(order, Clock.systemDefaultZone())
+        val payment = calculator.calculate(order, clock)
         _uiState.update { it.copy(payment = payment) }
     }
 
