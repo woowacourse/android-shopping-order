@@ -92,10 +92,10 @@ class ProductListViewModel(
             try {
                 val pageResult =
                     productRepository.requestProductPage(
-                    page = page,
-                    size = currentPageSize,
-                    category = currentCategory,
-                )
+                        page = page,
+                        size = currentPageSize,
+                        category = currentCategory,
+                    )
                 shoppingItemRepository.upsertProducts(pageResult.products)
                 productPageStateHolder.onPageLoaded(
                     productIds = pageResult.products.map { product -> product.id },

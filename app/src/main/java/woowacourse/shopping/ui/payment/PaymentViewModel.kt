@@ -9,10 +9,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.Coupon
-import woowacourse.shopping.domain.payment.PaymentReminderManager
+import woowacourse.shopping.domain.model.ShoppingCartItem
 import woowacourse.shopping.domain.payment.PaymentPriceCalculator
 import woowacourse.shopping.domain.payment.PaymentPriceCalculator.PaymentPriceSummary
-import woowacourse.shopping.domain.model.ShoppingCartItem
+import woowacourse.shopping.domain.payment.PaymentReminderManager
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 
@@ -217,8 +217,7 @@ class PaymentViewModel(
     private fun filterItemsForOrder(
         shoppingCartItems: List<ShoppingCartItem>,
         selectedProductIds: Set<Long>,
-    ): List<ShoppingCartItem> =
-        shoppingCartItems.filter { shoppingCartItem -> shoppingCartItem.product.id in selectedProductIds }
+    ): List<ShoppingCartItem> = shoppingCartItems.filter { shoppingCartItem -> shoppingCartItem.product.id in selectedProductIds }
 
     sealed interface PaymentUiState {
         val isPaymentReminderEnabled: Boolean
