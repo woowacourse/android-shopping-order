@@ -16,6 +16,7 @@ import woowacourse.shopping.data.repository.payment.CouponRepositoryImpl
 import woowacourse.shopping.data.repository.product.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.settings.PaymentReminderSettingsRepositoryImpl
 import woowacourse.shopping.domain.model.PaymentPricingPolicy
+import woowacourse.shopping.domain.payment.PaymentPriceCalculator
 import woowacourse.shopping.domain.payment.PaymentReminderManager
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -25,6 +26,7 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
 import woowacourse.shopping.domain.repository.ShoppingItemRepository
 import woowacourse.shopping.notification.PaymentReminderAlarmScheduler
+import java.time.Clock
 
 class AppContainer(
     context: Context,
@@ -85,4 +87,10 @@ class AppContainer(
         )
 
     val paymentPricingPolicy: PaymentPricingPolicy = PaymentPricingPolicy()
+
+    val paymentPriceCalculator: PaymentPriceCalculator =
+        PaymentPriceCalculator(
+            paymentPricingPolicy = paymentPricingPolicy,
+            clock = Clock.systemDefaultZone(),
+        )
 }

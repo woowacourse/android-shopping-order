@@ -2,48 +2,45 @@ package woowacourse.shopping.ui.payment
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.remote.retrofit.toApiFailure
-import woowacourse.shopping.data.remote.retrofit.toUserMessage
 import woowacourse.shopping.domain.model.Coupon
-import woowacourse.shopping.domain.model.CouponBenefit
+import woowacourse.shopping.domain.payment.PaymentReminderManager
+import woowacourse.shopping.domain.payment.PaymentPriceCalculator
+import woowacourse.shopping.domain.payment.PaymentPriceCalculator.PaymentPriceSummary
 import woowacourse.shopping.domain.model.ShoppingCartItem
 import woowacourse.shopping.domain.repository.CouponRepository
-import woowacourse.shopping.domain.repository.PaymentReminderScheduler
-import woowacourse.shopping.domain.repository.PaymentReminderSettingsRepository
 import woowacourse.shopping.domain.repository.ShoppingCartRepository
-import java.time.LocalTime
 
 class PaymentViewModel(
     private val shoppingCartRepository: ShoppingCartRepository,
     private val couponRepository: CouponRepository,
-    private val paymentReminderSettingsRepository: PaymentReminderSettingsRepository,
-    private val paymentReminderScheduler: PaymentReminderScheduler,
+    private val paymentReminderManager: PaymentReminderManager,
+    private val paymentPriceCalculator: PaymentPriceCalculator,
 ) : ViewModel() {
-    private val _uiState =
+    private val _uiState: MutableStateFlow<PaymentUiState> =
         MutableStateFlow(
-            PaymentUiState(
-                isPaymentReminderEnabled = paymentReminderSettingsRepository.isEnabled(),
+            PaymentUiState.Loading(
+                isPaymentReminderEnabled = paymentReminderManager.isEnabled(),
             ),
         )
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
 
-    private var hasLoadedCoupons: Boolean = false
-    private var isCouponRequestInProgress: Boolean = false
-    private var selectedProductIds: Set<Long> = emptySet()
-    private var allShoppingCartItems: List<ShoppingCartItem> = emptyList()
+    private val internalState = MutableStateFlow(PaymentInternalState())
 
     init {
         observeShoppingCartItems()
     }
 
     fun initialize(selectedProductIds: Set<Long>) {
-        this.selectedProductIds = selectedProductIds
-        rebuildUiState()
+        internalState.update { currentState ->
+            currentState.copy(selectedProductIds = selectedProductIds)
+        }
+        publishUiState()
     }
 
     fun requestPaymentData(force: Boolean = false) {
@@ -52,56 +49,57 @@ class PaymentViewModel(
     }
 
     fun requestCoupons(force: Boolean = false) {
-        if (!force && hasLoadedCoupons) return
-        if (isCouponRequestInProgress) return
+        if (!startCouponRequest(force = force)) return
 
         viewModelScope.launch {
-            isCouponRequestInProgress = true
             try {
-                runCatching {
-                    couponRepository.requestCoupons()
-                }.onSuccess { coupons ->
-                    hasLoadedCoupons = true
-                    val currentSelectedCouponId = _uiState.value.selectedCouponId
-                    val normalizedSelectedCouponId =
-                        coupons
-                            .firstOrNull { coupon -> coupon.id == currentSelectedCouponId }
-                            ?.id
-                    rebuildUiState(
-                        coupons = coupons,
-                        selectedCouponId = normalizedSelectedCouponId,
-                    )
+                when (val couponRequestResult = couponRepository.requestCoupons()) {
+                    is CouponRepository.CouponRequestResult.Success -> {
+                        updateCoupons(couponRequestResult.coupons)
+                        publishUiState()
+                    }
+
+                    is CouponRepository.CouponRequestResult.Failure -> {
+                        // 기존 시나리오 유지: 쿠폰 요청 실패 시 별도 에러 노출 없이 현재 상태를 유지한다.
+                    }
                 }
             } finally {
-                isCouponRequestInProgress = false
+                internalState.update { currentState ->
+                    currentState.copy(isCouponRequestInProgress = false)
+                }
             }
         }
     }
 
     fun requestCartItems(force: Boolean = false) {
         viewModelScope.launch {
-            runCatching {
+            try {
                 shoppingCartRepository.requestCartItems(force = force)
+            } catch (cancellationException: CancellationException) {
+                throw cancellationException
+            } catch (_: Exception) {
+                // 기존 시나리오 유지: 장바구니 요청 실패 시 별도 에러 노출 없이 현재 상태를 유지한다.
             }
         }
     }
 
     fun selectCoupon(couponId: Long?) {
-        val nextSelectedCouponId =
-            if (_uiState.value.selectedCouponId == couponId) {
-                null
-            } else {
-                couponId
-            }
-        rebuildUiState(selectedCouponId = nextSelectedCouponId)
+        internalState.update { currentState ->
+            val nextSelectedCouponId =
+                if (currentState.selectedCouponId == couponId) {
+                    null
+                } else {
+                    couponId
+                }
+            currentState.copy(selectedCouponId = nextSelectedCouponId)
+        }
+        publishUiState()
     }
 
     fun setPaymentReminderEnabled(enabled: Boolean) {
-        paymentReminderSettingsRepository.setEnabled(enabled)
+        paymentReminderManager.setEnabled(enabled)
         _uiState.update { currentState ->
-            currentState.copy(
-                isPaymentReminderEnabled = enabled,
-            )
+            currentState.withPaymentReminderEnabled(enabled = enabled)
         }
     }
 
@@ -110,137 +108,138 @@ class PaymentViewModel(
         fromReminder: Boolean,
         canPostNotifications: Boolean,
     ) {
-        val isPaymentReminderEnabled = _uiState.value.isPaymentReminderEnabled
-        if (isPaymentReminderEnabled && !canPostNotifications) {
-            setPaymentReminderEnabled(enabled = false)
-            paymentReminderScheduler.cancel()
-            return
+        val effectiveEnabled =
+            paymentReminderManager.synchronize(
+                selectedProductIds = selectedProductIds,
+                fromReminder = fromReminder,
+                canPostNotifications = canPostNotifications,
+            )
+        if (_uiState.value.isPaymentReminderEnabled == effectiveEnabled) return
+        _uiState.update { currentState ->
+            currentState.withPaymentReminderEnabled(enabled = effectiveEnabled)
         }
-
-        if (fromReminder || selectedProductIds.isEmpty() || !isPaymentReminderEnabled) {
-            paymentReminderScheduler.cancel()
-            return
-        }
-
-        paymentReminderScheduler.cancel()
-        paymentReminderScheduler.schedule(selectedProductIds)
     }
 
     fun cancelPaymentReminder() {
-        paymentReminderScheduler.cancel()
+        paymentReminderManager.cancel()
     }
 
     private fun observeShoppingCartItems() {
         viewModelScope.launch {
             shoppingCartRepository.observeShoppingItems().collect { shoppingCartItems ->
-                allShoppingCartItems = shoppingCartItems
-                rebuildUiState()
+                internalState.update { currentState ->
+                    currentState.copy(
+                        allShoppingCartItems = shoppingCartItems,
+                        hasLoadedCartSnapshot = true,
+                    )
+                }
+                publishUiState()
             }
         }
     }
 
-    private fun rebuildUiState(
-        coupons: List<Coupon> = _uiState.value.coupons,
-        selectedCouponId: Long? = _uiState.value.selectedCouponId,
-    ) {
-        _uiState.update { currentState ->
-            val targetItems = filterSelectedShoppingCartItems(allShoppingCartItems)
-            val selectedCoupon = coupons.firstOrNull { coupon -> coupon.id == selectedCouponId }
-            val subtotalPrice = targetItems.sumOf { shoppingCartItem -> shoppingCartItem.getProductQuantityPrice() }
-            val discountPrice = calculateCouponDiscount(coupon = selectedCoupon, items = targetItems, subtotalPrice = subtotalPrice)
-            val deliveryPrice = calculateDeliveryPrice(coupon = selectedCoupon, subtotalPrice = subtotalPrice)
-            val totalPrice = (subtotalPrice - discountPrice).coerceAtLeast(0) + deliveryPrice
+    private fun startCouponRequest(force: Boolean): Boolean {
+        while (true) {
+            val currentState = internalState.value
+            if (!force && currentState.hasLoadedCoupons) return false
+            if (currentState.isCouponRequestInProgress) return false
+            val nextState = currentState.copy(isCouponRequestInProgress = true)
+            if (internalState.compareAndSet(currentState, nextState)) return true
+        }
+    }
+
+    private fun updateCoupons(coupons: List<Coupon>) {
+        internalState.update { currentState ->
+            val normalizedSelectedCouponId =
+                coupons
+                    .firstOrNull { coupon -> coupon.id == currentState.selectedCouponId }
+                    ?.id
             currentState.copy(
-                shoppingCartItems = targetItems,
+                hasLoadedCoupons = true,
                 coupons = coupons,
-                selectedCouponId = selectedCouponId,
-                subtotalPrice = subtotalPrice,
-                couponDiscountPrice = discountPrice,
-                deliveryPrice = deliveryPrice,
-                totalPrice = totalPrice,
+                selectedCouponId = normalizedSelectedCouponId,
             )
         }
     }
 
-    private fun filterSelectedShoppingCartItems(shoppingCartItems: List<ShoppingCartItem>): List<ShoppingCartItem> {
+    private fun publishUiState() {
+        val currentInternalState = internalState.value
+        val isPaymentReminderEnabled = _uiState.value.isPaymentReminderEnabled
+        if (!currentInternalState.hasLoadedCartSnapshot) {
+            _uiState.value = PaymentUiState.Loading(isPaymentReminderEnabled = isPaymentReminderEnabled)
+            return
+        }
+
+        val targetItems =
+            filterSelectedShoppingCartItems(
+                shoppingCartItems = currentInternalState.allShoppingCartItems,
+                selectedProductIds = currentInternalState.selectedProductIds,
+            )
+        val selectedCoupon =
+            currentInternalState.coupons.firstOrNull { coupon ->
+                coupon.id == currentInternalState.selectedCouponId
+            }
+        val paymentPriceSummary =
+            paymentPriceCalculator.calculate(
+                items = targetItems,
+                coupon = selectedCoupon,
+            )
+
+        _uiState.value =
+            PaymentUiState.Content(
+                isPaymentReminderEnabled = isPaymentReminderEnabled,
+                coupons = currentInternalState.coupons,
+                selectedCouponId = currentInternalState.selectedCouponId,
+                priceSummary = paymentPriceSummary,
+            )
+    }
+
+    private fun filterSelectedShoppingCartItems(
+        shoppingCartItems: List<ShoppingCartItem>,
+        selectedProductIds: Set<Long>,
+    ): List<ShoppingCartItem> {
         if (selectedProductIds.isEmpty()) return shoppingCartItems
         return shoppingCartItems.filter { shoppingCartItem -> shoppingCartItem.product.id in selectedProductIds }
     }
 
-    private fun calculateCouponDiscount(
-        coupon: Coupon?,
-        items: List<ShoppingCartItem>,
-        subtotalPrice: Int,
-    ): Int {
-        if (coupon == null || items.isEmpty()) return 0
+    sealed interface PaymentUiState {
+        val isPaymentReminderEnabled: Boolean
+        val coupons: List<Coupon>
+        val selectedCouponId: Long?
+        val priceSummary: PaymentPriceSummary?
 
-        return when (val benefit = coupon.benefit) {
-            is CouponBenefit.AmountDiscount ->
-                if (subtotalPrice >= benefit.minimumOrderAmount) {
-                    benefit.discountAmount
-                } else {
-                    0
-                }
+        data class Loading(
+            override val isPaymentReminderEnabled: Boolean,
+            override val coupons: List<Coupon> = emptyList(),
+            override val selectedCouponId: Long? = null,
+            override val priceSummary: PaymentPriceSummary? = null,
+        ) : PaymentUiState
 
-            is CouponBenefit.BuyTwoGetOne -> {
-                val requiredQuantity = benefit.requiredQuantity + benefit.freeQuantity
-                val highestEligibleProductPrice =
-                    items
-                        .filter { shoppingCartItem -> shoppingCartItem.getQuantity() >= requiredQuantity }
-                        .maxOfOrNull { shoppingCartItem -> shoppingCartItem.product.getPrice() }
-
-                if (highestEligibleProductPrice == null) {
-                    0
-                } else {
-                    highestEligibleProductPrice * benefit.freeQuantity
-                }
-            }
-
-            is CouponBenefit.FreeShipping -> 0
-
-            is CouponBenefit.MorningDiscount ->
-                if (isCurrentTimeWithin(start = benefit.startTime, end = benefit.endTime)) {
-                    (subtotalPrice * benefit.discountRate) / paymentPricingPolicy.percentDenominator
-                } else {
-                    0
-                }
-
-            is CouponBenefit.Unknown -> 0
-        }.coerceAtLeast(0)
+        data class Content(
+            override val isPaymentReminderEnabled: Boolean,
+            override val coupons: List<Coupon>,
+            override val selectedCouponId: Long?,
+            override val priceSummary: PaymentPriceSummary,
+        ) : PaymentUiState
     }
 
-    private fun calculateDeliveryPrice(
-        coupon: Coupon?,
-        subtotalPrice: Int,
-    ): Int {
-        if (subtotalPrice <= 0) return 0
-
-        val benefit = coupon?.benefit
-        if (benefit is CouponBenefit.FreeShipping && subtotalPrice >= benefit.minimumOrderAmount) {
-            return 0
-        }
-        return paymentPricingPolicy.defaultDeliveryPrice
-    }
-
-    private fun isCurrentTimeWithin(
-        start: String,
-        end: String,
-    ): Boolean {
-        val startTime = runCatching { LocalTime.parse(start) }.getOrNull() ?: return false
-        val endTime = runCatching { LocalTime.parse(end) }.getOrNull() ?: return false
-        val currentTime = LocalTime.now()
-        return !currentTime.isBefore(startTime) && currentTime.isBefore(endTime)
-    }
-
-    data class PaymentUiState(
-        val isPaymentReminderEnabled: Boolean = true,
-        val shoppingCartItems: List<ShoppingCartItem> = emptyList(),
+    private data class PaymentInternalState(
+        val hasLoadedCoupons: Boolean = false,
+        val isCouponRequestInProgress: Boolean = false,
+        val selectedProductIds: Set<Long> = emptySet(),
+        val allShoppingCartItems: List<ShoppingCartItem> = emptyList(),
+        val hasLoadedCartSnapshot: Boolean = false,
         val coupons: List<Coupon> = emptyList(),
         val selectedCouponId: Long? = null,
-        val subtotalPrice: Int = 0,
-        val couponDiscountPrice: Int = 0,
-        val deliveryPrice: Int = 0,
-        val totalPrice: Int = 0,
     )
+
+    private fun PaymentUiState.withPaymentReminderEnabled(enabled: Boolean): PaymentUiState =
+        when (this) {
+            is PaymentUiState.Loading ->
+                copy(isPaymentReminderEnabled = enabled)
+
+            is PaymentUiState.Content ->
+                copy(isPaymentReminderEnabled = enabled)
+        }
 
 }

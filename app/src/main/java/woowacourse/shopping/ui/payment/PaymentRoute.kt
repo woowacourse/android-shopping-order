@@ -33,6 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.R
 import woowacourse.shopping.data.remote.retrofit.dto.OrderInfo
 import woowacourse.shopping.di.AppViewModelFactory
+import woowacourse.shopping.domain.payment.PaymentPriceCalculator.PaymentPriceSummary
 import woowacourse.shopping.notification.POST_NOTIFICATIONS_PERMISSION
 import woowacourse.shopping.ui.cart.ShoppingCartViewModel
 import woowacourse.shopping.ui.order.OrderViewModel
@@ -66,6 +67,7 @@ fun PaymentRouteContent(
 
     val paymentUiState by paymentViewModel.uiState.collectAsStateWithLifecycle()
     val cartUiState by shoppingCartViewModel.uiState.collectAsStateWithLifecycle()
+    val paymentPriceTexts = formatPaymentPriceTexts(paymentUiState.priceSummary)
     val canPostNotificationsNow = canPostNotifications(context)
     val isPaymentReminderChecked = paymentUiState.isPaymentReminderEnabled && canPostNotificationsNow
     var hasRequestedPostNotificationsPermission by rememberSaveable { mutableStateOf(false) }
@@ -106,10 +108,10 @@ fun PaymentRouteContent(
     PaymentScreen(
         couponList = paymentUiState.coupons,
         selectedCouponId = paymentUiState.selectedCouponId,
-        shoppingCartTotalPrice = formatPrice(paymentUiState.subtotalPrice),
-        couponDiscountPrice = formatPrice(paymentUiState.couponDiscountPrice),
-        deliveryPrice = formatPrice(paymentUiState.deliveryPrice),
-        totalPrice = formatPrice(paymentUiState.totalPrice),
+        shoppingCartTotalPrice = paymentPriceTexts.shoppingCartTotalPrice,
+        couponDiscountPrice = paymentPriceTexts.couponDiscountPrice,
+        deliveryPrice = paymentPriceTexts.deliveryPrice,
+        totalPrice = paymentPriceTexts.totalPrice,
         isPaymentReminderEnabled = isPaymentReminderChecked,
         onBackClick = onNavigateBack,
         onCouponCheckedChange = { couponId, isChecked ->
@@ -155,6 +157,24 @@ fun PaymentRouteContent(
 
 @Composable
 private fun formatPrice(price: Int): String = DecimalFormat(stringResource(R.string.price_format_pattern)).format(price)
+
+@Composable
+private fun formatPaymentPriceTexts(priceSummary: PaymentPriceSummary?): PaymentPriceTexts {
+    val summary = priceSummary ?: return PaymentPriceTexts()
+    return PaymentPriceTexts(
+        shoppingCartTotalPrice = formatPrice(summary.subtotalPrice),
+        couponDiscountPrice = formatPrice(summary.couponDiscountPrice),
+        deliveryPrice = formatPrice(summary.deliveryPrice),
+        totalPrice = formatPrice(summary.totalPrice),
+    )
+}
+
+private data class PaymentPriceTexts(
+    val shoppingCartTotalPrice: String = "",
+    val couponDiscountPrice: String = "",
+    val deliveryPrice: String = "",
+    val totalPrice: String = "",
+)
 
 private fun canPostNotifications(context: Context): Boolean {
     if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return false
