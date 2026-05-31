@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.cart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -60,9 +61,11 @@ class ShoppingCartViewModel(
                     force = force,
                 )
                 setContentState()
-            } catch (throwable: Throwable) {
+            } catch (cancellationException: CancellationException) {
+                throw cancellationException
+            } catch (exception: Exception) {
                 publishCartError(
-                    throwable = throwable,
+                    throwable = exception,
                     defaultMessage = "장바구니를 불러오지 못했습니다.",
                 )
             } finally {
@@ -161,7 +164,7 @@ class ShoppingCartViewModel(
         if (shoppingCartPageStateHolder.canMoveToNextPage()) return
 
         viewModelScope.launch {
-            runCatching {
+            try {
                 val nextLocalPage = shoppingCartPageStateHolder.currentPage + 1
                 val targetRemotePage = getRemotePageIndexByLocalPage(nextLocalPage)
                 shoppingCartRepository.requestCartItems(
@@ -170,9 +173,11 @@ class ShoppingCartViewModel(
                     sort = null,
                     force = false,
                 )
-            }.onFailure { throwable ->
+            } catch (cancellationException: CancellationException) {
+                throw cancellationException
+            } catch (exception: Exception) {
                 publishCartError(
-                    throwable = throwable,
+                    throwable = exception,
                     defaultMessage = "장바구니를 불러오지 못했습니다.",
                 )
             }
@@ -194,14 +199,15 @@ class ShoppingCartViewModel(
             setContentState()
         }
         viewModelScope.launch {
-            runCatching {
+            try {
                 block()
-            }.onSuccess {
                 setContentState()
                 onSuccess?.invoke()
-            }.onFailure { throwable ->
+            } catch (cancellationException: CancellationException) {
+                throw cancellationException
+            } catch (exception: Exception) {
                 publishCartError(
-                    throwable = throwable,
+                    throwable = exception,
                     defaultMessage = defaultMessage,
                 )
             }

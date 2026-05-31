@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.order
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.retrofit.dto.OrderInfo
 import woowacourse.shopping.domain.repository.OrderRepository
@@ -14,13 +15,15 @@ class OrderViewModel(
         onSuccess: (() -> Unit)? = null,
     ) {
         viewModelScope.launch {
-            runCatching {
+            try {
                 orderRepository
                     .order(
                         orderInfo = orderInfo,
                     )
-            }.onSuccess {
                 onSuccess?.invoke()
+            } catch (cancellationException: CancellationException) {
+                throw cancellationException
+            } catch (_: Exception) {
             }
         }
     }

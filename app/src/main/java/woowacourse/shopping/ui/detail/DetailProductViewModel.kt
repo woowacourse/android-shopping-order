@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -80,14 +81,15 @@ class DetailProductViewModel(
         viewModelScope.launch {
             if (!requestedProductIds.add(productId)) return@launch
 
-            runCatching {
-                productRepository
-                    .requestProductDetail(
+            try {
+                val detailProduct =
+                    productRepository.requestProductDetail(
                         id = productId,
                     )
-            }.onSuccess { detailProduct ->
                 shoppingItemRepository.upsertProducts(listOf(detailProduct))
-            }.onFailure {
+            } catch (cancellationException: CancellationException) {
+                throw cancellationException
+            } catch (_: Exception) {
                 requestedProductIds.remove(productId)
             }
         }

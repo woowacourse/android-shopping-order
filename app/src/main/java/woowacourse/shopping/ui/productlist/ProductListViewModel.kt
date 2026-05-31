@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.productlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -88,13 +89,13 @@ class ProductListViewModel(
             )
         }
         viewModelScope.launch {
-            runCatching {
-                productRepository.requestProductPage(
+            try {
+                val pageResult =
+                    productRepository.requestProductPage(
                     page = page,
                     size = currentPageSize,
                     category = currentCategory,
                 )
-            }.onSuccess { pageResult ->
                 shoppingItemRepository.upsertProducts(pageResult.products)
                 productPageStateHolder.onPageLoaded(
                     productIds = pageResult.products.map { product -> product.id },
@@ -106,12 +107,14 @@ class ProductListViewModel(
                     errorMessage = null,
                     hasLoadedProducts = true,
                 )
-            }.onFailure { throwable ->
+            } catch (cancellationException: CancellationException) {
+                throw cancellationException
+            } catch (exception: Exception) {
                 refreshUiState(
                     isLoading = false,
                     errorMessage =
                         if (showInitialLoading) {
-                            throwable
+                            exception
                                 .toApiFailure()
                                 .toUserMessage(defaultMessage = "상품 목록을 불러오지 못했습니다.")
                         } else {
