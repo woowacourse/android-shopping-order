@@ -30,6 +30,7 @@ class ShoppingActivity : ComponentActivity() {
     }
 
     private var pendingPaymentRoute: PaymentRoute? by mutableStateOf(null)
+    private var hasHandledReminderIntent: Boolean = false
 
     private val requestNotificationPermissionLauncher =
         registerForActivityResult(
@@ -40,9 +41,16 @@ class ShoppingActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         requestNotificationPermissionIfNeeded()
+        hasHandledReminderIntent = savedInstanceState.toHasHandledReminderIntent()
         pendingPaymentRoute =
             savedInstanceState.toPendingPaymentRoute()
-                ?: intent.consumePendingPaymentRoute()
+                ?: if (hasHandledReminderIntent) {
+                    null
+                } else {
+                    intent.consumePendingPaymentRoute()?.also {
+                        hasHandledReminderIntent = true
+                    }
+                }
 
         setContent {
             AndroidShoppingTheme {
@@ -60,11 +68,15 @@ class ShoppingActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        pendingPaymentRoute = intent.consumePendingPaymentRoute()
+        pendingPaymentRoute =
+            intent.consumePendingPaymentRoute()?.also {
+                hasHandledReminderIntent = true
+            }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        outState.putBoolean(KEY_HAS_HANDLED_REMINDER_INTENT, hasHandledReminderIntent)
         val pendingRoute = pendingPaymentRoute ?: return
         outState.putLongArray(KEY_PENDING_PAYMENT_PRODUCT_IDS, pendingRoute.selectedProductIds.toLongArray())
     }
@@ -93,6 +105,11 @@ class ShoppingActivity : ComponentActivity() {
         )
     }
 
+    private fun Bundle?.toHasHandledReminderIntent(): Boolean {
+        val state = this ?: return false
+        return state.getBoolean(KEY_HAS_HANDLED_REMINDER_INTENT, false)
+    }
+
     private fun requestNotificationPermissionIfNeeded() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
         if (hasPostNotificationsPermission()) return
@@ -108,5 +125,6 @@ class ShoppingActivity : ComponentActivity() {
 
     private companion object {
         private const val KEY_PENDING_PAYMENT_PRODUCT_IDS: String = "key_pending_payment_product_ids"
+        private const val KEY_HAS_HANDLED_REMINDER_INTENT: String = "key_has_handled_reminder_intent"
     }
 }
