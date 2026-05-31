@@ -20,15 +20,12 @@ import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.data.repository.PaymentRepository
 import woowacourse.shopping.di.AppContainer
-import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.order.Order
 import woowacourse.shopping.model.order.PaymentCalculator
 import woowacourse.shopping.notification.PaymentAlarmScheduler
 import woowacourse.shopping.ui.common.error.ErrorMessageMapper
 import woowacourse.shopping.ui.navigation.PaymentRoute
 import java.time.Clock
-
-private const val BASE_SHIPPING_FEE = 3000L
 
 class PaymentViewModel(
     savedStateHandle: SavedStateHandle,
@@ -87,7 +84,6 @@ class PaymentViewModel(
                 val order = Order(
                     items = items,
                     selectedCoupon = null,
-                    shippingFee = Money(BASE_SHIPPING_FEE),
                 )
                 val payment = calculator.calculate(order, Clock.systemDefaultZone())
                 val context = order.couponContext(Clock.systemDefaultZone())
@@ -113,7 +109,6 @@ class PaymentViewModel(
         val order = Order(
             items = _uiState.value.items,
             selectedCoupon = coupon,
-            shippingFee = Money(BASE_SHIPPING_FEE),
         )
         val payment = calculator.calculate(order, Clock.systemDefaultZone())
         _uiState.update { it.copy(payment = payment) }

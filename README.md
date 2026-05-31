@@ -16,10 +16,6 @@
 - [x] `MainActivity`에서 알림 클릭 이동을 위해 `MutableStateFlow`로 상태를 직접 관리하는 방식을 제거
   - DeepLink를 도입하여 알림 클릭 시 결제 화면으로 직접 진입할 수 있도록 구조를 개선
 
-### 네비게이션 옵션의 의도 명확화
-- [ ] `AppNavHost`에 설정된 `inclusive = false`, `launchSingleTop = true` 옵션의 사용 목적과 역할을 재점검
-  - 설계 의도에 맞게 옵션을 정리하고, 필요 시 주석으로 의도를 명시
-
 ### 확장성 있는 Route 관리
 - [ ] 향후 여러 Nav Graph가 추가되는 상황을 대비하여 `Routes.kt`의 구조를 재설계
   - 화면 간 이동 경로를 쉽게 유추하고 관리할 수 있도록 그래프 단위로 Route를 묶거나 sealed class 기반 구조로 정리
@@ -27,7 +23,7 @@
 ## 3. 도메인 책임 분리 및 테스트 코드 도입
 
 ### 도메인 계층으로 책임 이동
-- [ ] `PaymentViewModel`이 `BASE_SHIPPING_FEE`(기본 배송비) 같은 비즈니스 데이터를 직접 들고 있는 구조를 개선
+- [x] `PaymentViewModel`이 `BASE_SHIPPING_FEE`(기본 배송비) 같은 비즈니스 데이터를 직접 들고 있는 구조를 개선
   - 해당 정보는 도메인 계층(`Payment` 모델 등)이 담당하도록 책임을 이전
 
 ### 도메인 및 ViewModel 테스트 작성

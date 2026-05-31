@@ -9,7 +9,7 @@ import java.time.Clock
 data class Order(
     val items: List<CartItem>,
     val selectedCoupon: Coupon? = null,
-    val shippingFee: Money,
+    val shippingFee: Money = BASE_SHIPPING_FEE,
 ) {
     fun couponContext(clock: Clock): CouponContext =
         CouponContext(
@@ -18,4 +18,8 @@ data class Order(
             shippingFee = shippingFee,
             clock = clock,
         )
+
+    companion object {
+        val BASE_SHIPPING_FEE = Money(3000)
+    }
 }
