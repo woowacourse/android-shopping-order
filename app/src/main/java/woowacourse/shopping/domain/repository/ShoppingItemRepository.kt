@@ -9,8 +9,6 @@ interface ShoppingItemRepository {
 
     suspend fun upsertProducts(products: List<Product>)
 
-    suspend fun replaceProducts(products: List<Product>)
-
     suspend fun plusQuantity(
         productId: Long,
         amount: Int = 1,

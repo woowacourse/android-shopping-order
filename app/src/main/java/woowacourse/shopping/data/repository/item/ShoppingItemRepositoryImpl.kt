@@ -33,28 +33,6 @@ class ShoppingItemRepositoryImpl : ShoppingItemRepository {
         _shoppingItems.value = mergedShoppingItems
     }
 
-    override suspend fun replaceProducts(products: List<Product>) {
-        if (products.isEmpty()) {
-            _shoppingItems.value = emptyList()
-            return
-        }
-
-        val quantityByProductId =
-            _shoppingItems.value.associate { shoppingItem ->
-                shoppingItem.getProductId() to shoppingItem.getQuantity()
-            }
-
-        _shoppingItems.value =
-            products
-                .sortedBy { product -> product.id }
-                .map { product ->
-                    ShoppingItem(
-                        product = product,
-                        quantity = quantityByProductId[product.id] ?: 0,
-                    )
-                }
-    }
-
     override suspend fun plusQuantity(
         productId: Long,
         amount: Int,
