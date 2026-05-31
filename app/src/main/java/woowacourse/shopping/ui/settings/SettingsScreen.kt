@@ -68,7 +68,7 @@ fun SettingsScreen(
                 bodyText = "미결제 알림",
                 bodyInfoText = "5분 뒤 알림 받기",
                 checked = isNotificationEnabled,
-                onCheckedChange = { viewModel.onToggle(it) },
+                onCheckedChange = { viewModel.updateSetting(it) },
                 modifier = Modifier.fillMaxWidth(),
             )
         }

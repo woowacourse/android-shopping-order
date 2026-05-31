@@ -24,7 +24,7 @@ class SettingsViewModel(
     val requestPermission = _requestPermission.asSharedFlow()
     val showPermissionDeniedMessage = _showPermissionDeniedMessage.asSharedFlow()
 
-    fun onToggle(wantsOn: Boolean) {
+    fun updateSetting(wantsOn: Boolean) {
         when {
             !wantsOn -> updateEnabled(false)
             hasNotificationPermission() -> updateEnabled(true)

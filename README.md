@@ -29,8 +29,8 @@
 ## 4. 네이밍 컨벤션 점검
 
 ### ViewModel 함수 네이밍 규칙 정비
-- [ ] `SettingsViewModel` 내 `onToggle` 등 `onXxx` 형태의 함수명이 ViewModel 계층에 적절한지 재검토
-  - `onXxx`는 일반적으로 UI 이벤트 핸들러에서 사용되는 패턴이므로, ViewModel에서는 행위 중심의 명사/동사형 함수명(예: `toggleNotification`, `updateSetting`)으로 변경합니다.
+- [x] `SettingsViewModel` 내 `onToggle` 등 `onXxx` 형태의 함수명이 ViewModel 계층에 적절한지 재검토
+  - `onXxx`는 일반적으로 UI 이벤트 핸들러에서 사용되는 패턴이므로, ViewModel에서는 행위 중심의 명사/동사형 함수명(`updateSetting`)으로 변경
 
 ---
 
