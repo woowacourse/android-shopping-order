@@ -3,6 +3,7 @@
 package woowacourse.shopping.ui.payment
 
 import android.app.Activity
+import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -25,7 +26,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelStoreOwner
-import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.R
@@ -64,7 +66,8 @@ fun PaymentRouteContent(
 
     val paymentUiState by paymentViewModel.uiState.collectAsStateWithLifecycle()
     val cartUiState by shoppingCartViewModel.uiState.collectAsStateWithLifecycle()
-    val isPaymentReminderChecked = paymentUiState.isPaymentReminderEnabled && canPostNotifications(context)
+    val canPostNotificationsNow = canPostNotifications(context)
+    val isPaymentReminderChecked = paymentUiState.isPaymentReminderEnabled && canPostNotificationsNow
     var hasRequestedPostNotificationsPermission by rememberSaveable { mutableStateOf(false) }
     val requestPostNotificationsPermissionLauncher =
         rememberLauncherForActivityResult(
@@ -87,18 +90,17 @@ fun PaymentRouteContent(
         paymentUiState.isPaymentReminderEnabled,
         selectedProductIds,
         fromReminder,
-        context,
+        canPostNotificationsNow,
     ) {
         paymentViewModel.syncPaymentReminder(
             selectedProductIds = selectedProductIds,
             fromReminder = fromReminder,
-            canPostNotifications = canPostNotifications(context),
+            canPostNotifications = canPostNotificationsNow,
         )
     }
 
-    LifecycleResumeEffect(Unit) {
+    LifecycleEventEffect(event = Lifecycle.Event.ON_RESUME) {
         paymentViewModel.requestPaymentData()
-        onPauseOrDispose { }
     }
 
     PaymentScreen(
@@ -121,26 +123,16 @@ fun PaymentRouteContent(
             )
         },
         onPaymentReminderEnabledChange = { enabled ->
-            if (!enabled) {
-                paymentViewModel.setPaymentReminderEnabled(enabled = false)
-                return@PaymentScreen
-            }
-
-            if (canPostNotifications(context)) {
-                paymentViewModel.setPaymentReminderEnabled(enabled = true)
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasPostNotificationsRuntimePermission(context)) {
-                val shouldShowRationale = context.findActivity()?.shouldShowRequestPermissionRationale(POST_NOTIFICATIONS_PERMISSION) == true
-                if (!hasRequestedPostNotificationsPermission || shouldShowRationale) {
-                    hasRequestedPostNotificationsPermission = true
-                    requestPostNotificationsPermissionLauncher.launch(POST_NOTIFICATIONS_PERMISSION)
-                } else {
-                    openAppNotificationSettings(context)
-                    paymentViewModel.setPaymentReminderEnabled(enabled = false)
-                }
-            } else {
-                openAppNotificationSettings(context)
-                paymentViewModel.setPaymentReminderEnabled(enabled = false)
-            }
+            hasRequestedPostNotificationsPermission =
+                handlePaymentReminderEnabledChange(
+                    context = context,
+                    enabled = enabled,
+                    hasRequestedPostNotificationsPermission = hasRequestedPostNotificationsPermission,
+                    onSetPaymentReminderEnabled = paymentViewModel::setPaymentReminderEnabled,
+                    onRequestPostNotificationsPermission = {
+                        requestPostNotificationsPermissionLauncher.launch(POST_NOTIFICATIONS_PERMISSION)
+                    },
+                )
         },
     ) {
         PaymentButton(
@@ -164,12 +156,12 @@ fun PaymentRouteContent(
 @Composable
 private fun formatPrice(price: Int): String = DecimalFormat(stringResource(R.string.price_format_pattern)).format(price)
 
-private fun canPostNotifications(context: android.content.Context): Boolean {
+private fun canPostNotifications(context: Context): Boolean {
     if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return false
     return hasPostNotificationsRuntimePermission(context)
 }
 
-private fun hasPostNotificationsRuntimePermission(context: android.content.Context): Boolean {
+private fun hasPostNotificationsRuntimePermission(context: Context): Boolean {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
     return ContextCompat.checkSelfPermission(
         context,
@@ -177,7 +169,7 @@ private fun hasPostNotificationsRuntimePermission(context: android.content.Conte
     ) == PackageManager.PERMISSION_GRANTED
 }
 
-private fun openAppNotificationSettings(context: android.content.Context) {
+private fun openAppNotificationSettings(context: Context) {
     val notificationSettingsIntent =
         Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
             putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
@@ -195,9 +187,40 @@ private fun openAppNotificationSettings(context: android.content.Context) {
         .onFailure { context.startActivity(fallbackAppDetailsIntent) }
 }
 
-private fun android.content.Context.findActivity(): Activity? =
+private fun Context.findActivity(): Activity? =
     when (this) {
         is Activity -> this
         is ContextWrapper -> baseContext.findActivity()
         else -> null
     }
+
+private fun handlePaymentReminderEnabledChange(
+    context: Context,
+    enabled: Boolean,
+    hasRequestedPostNotificationsPermission: Boolean,
+    onSetPaymentReminderEnabled: (Boolean) -> Unit,
+    onRequestPostNotificationsPermission: () -> Unit,
+): Boolean {
+    if (!enabled) {
+        onSetPaymentReminderEnabled(false)
+        return hasRequestedPostNotificationsPermission
+    }
+
+    if (canPostNotifications(context)) {
+        onSetPaymentReminderEnabled(true)
+        return hasRequestedPostNotificationsPermission
+    }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasPostNotificationsRuntimePermission(context)) {
+        val shouldShowRationale =
+            context.findActivity()?.shouldShowRequestPermissionRationale(POST_NOTIFICATIONS_PERMISSION) == true
+        if (!hasRequestedPostNotificationsPermission || shouldShowRationale) {
+            onRequestPostNotificationsPermission()
+            return true
+        }
+    }
+
+    openAppNotificationSettings(context)
+    onSetPaymentReminderEnabled(false)
+    return hasRequestedPostNotificationsPermission
+}

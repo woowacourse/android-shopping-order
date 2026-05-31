@@ -47,8 +47,7 @@ class AppViewModelFactory(
                 PaymentViewModel(
                     shoppingCartRepository = appContainer.shoppingCartRepository,
                     couponRepository = appContainer.couponRepository,
-                    paymentReminderSettingsRepository = appContainer.paymentReminderSettingsRepository,
-                    paymentReminderScheduler = appContainer.paymentReminderScheduler,
+                    paymentReminderManager = appContainer.paymentReminderManager,
                     paymentPricingPolicy = appContainer.paymentPricingPolicy,
                 ) as T
 
