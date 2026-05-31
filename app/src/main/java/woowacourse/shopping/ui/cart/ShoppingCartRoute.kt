@@ -6,7 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModelStoreOwner
-import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.di.AppViewModelFactory
@@ -34,9 +35,8 @@ fun ShoppingCartRouteContent(
     val cartUiState by shoppingCartViewModel.uiState.collectAsStateWithLifecycle()
     val cartScreenState by shoppingCartViewModel.screenState.collectAsStateWithLifecycle()
 
-    LifecycleResumeEffect(Unit) {
+    LifecycleEventEffect(event = Lifecycle.Event.ON_RESUME) {
         shoppingCartViewModel.requestCartItems()
-        onPauseOrDispose { }
     }
 
     val hasApiError = cartScreenState is ShoppingCartViewModel.ShoppingCartScreenState.Error

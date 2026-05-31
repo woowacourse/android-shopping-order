@@ -6,7 +6,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.di.AppViewModelFactory
@@ -39,7 +40,7 @@ fun ProductListRouteContent(
     val recentViewedListState = rememberLazyListState()
     val latestRecentViewedProductId = visibleRecentViewedItems.firstOrNull()?.getProductId()
 
-    LifecycleResumeEffect(Unit) {
+    LifecycleEventEffect(event = Lifecycle.Event.ON_RESUME) {
         val shouldLoadInitialProducts =
             !productListViewModel.uiState.value.hasLoadedProducts &&
                 !productListViewModel.uiState.value.isLoading
@@ -47,7 +48,6 @@ fun ProductListRouteContent(
             productListViewModel.requestProduct(size = MAX_PRODUCT_SIZE)
         }
         shoppingCartViewModel.requestCartItems()
-        onPauseOrDispose { }
     }
 
     LaunchedEffect(productListViewModel) {
