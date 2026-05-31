@@ -42,6 +42,14 @@ class ShoppingCartRepositoryImpl(
                 normalizedSort != null
 
         if (shouldResetSnapshot) {
+            val shouldLoadEntireSnapshot =
+                (force || !hasRemoteSnapshotLoaded()) &&
+                    normalizedSize == DEFAULT_SIZE &&
+                    normalizedSort == null
+            if (shouldLoadEntireSnapshot) {
+                refreshEntireRemoteSnapshot()
+                return@withLock
+            }
             refreshRemoteSnapshot(
                 targetPage = normalizedPage,
                 size = normalizedSize,
@@ -101,7 +109,7 @@ class ShoppingCartRepositoryImpl(
             shoppingCartRemoteDataSource.addCartItem(
                 product = CartRequest(productId = productId, quantity = amount),
             )
-            refreshLoadedRemoteSnapshot()
+            refreshEntireRemoteSnapshot()
             return
         }
 
@@ -109,7 +117,7 @@ class ShoppingCartRepositoryImpl(
             id = remoteCartItemId,
             product = updatedQuantity.toCartQuantity(),
         )
-        refreshLoadedRemoteSnapshot()
+        refreshEntireRemoteSnapshot()
     }
 
     private suspend fun decreaseByProductIdInternal(productId: Long) {
@@ -128,7 +136,7 @@ class ShoppingCartRepositoryImpl(
                 product = updatedQuantity.toCartQuantity(),
             )
         }
-        refreshLoadedRemoteSnapshot()
+        refreshEntireRemoteSnapshot()
     }
 
     private suspend fun removeByProductIdInternal(productId: Long) {
@@ -137,16 +145,12 @@ class ShoppingCartRepositoryImpl(
         val remoteCartItemId = resolveRemoteCartItemIdInternal(productId = productId) ?: return
         shoppingCartRemoteDataSource.deleteCartItem(id = remoteCartItemId)
         remoteCartItemIdByProductId -= productId
-        refreshLoadedRemoteSnapshot()
+        refreshEntireRemoteSnapshot()
     }
 
     private suspend fun ensureRemoteSnapshotLoadedInternal() {
         if (hasRemoteSnapshotLoaded()) return
-        refreshRemoteSnapshot(
-            targetPage = DEFAULT_PAGE,
-            size = DEFAULT_SIZE,
-            sort = null,
-        )
+        refreshEntireRemoteSnapshot()
     }
 
     private fun getCurrentCartQuantity(productId: Long): Int =
@@ -161,13 +165,13 @@ class ShoppingCartRepositoryImpl(
         val existingRemoteCartItemId = remoteCartItemIdByProductId[productId]
         if (existingRemoteCartItemId != null) return existingRemoteCartItemId
 
-        refreshLoadedRemoteSnapshot()
+        refreshEntireRemoteSnapshot()
         return remoteCartItemIdByProductId[productId]
     }
 
-    private suspend fun refreshLoadedRemoteSnapshot(targetPage: Int = remoteSnapshotState.lastLoadedPage()) {
+    private suspend fun refreshEntireRemoteSnapshot() {
         refreshRemoteSnapshot(
-            targetPage = targetPage,
+            targetPage = Int.MAX_VALUE,
             size = DEFAULT_SIZE,
             sort = null,
         )
@@ -286,7 +290,6 @@ class ShoppingCartRepositoryImpl(
         val isLoaded: Boolean = false,
     ) {
         fun hasMorePages(): Boolean = loadedPageCount < totalPageCount
-        fun lastLoadedPage(): Int = (loadedPageCount - 1).coerceAtLeast(DEFAULT_PAGE)
     }
 
     private companion object {
