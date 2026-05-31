@@ -71,7 +71,12 @@ fun ShoppingNavHost(
                             productId = productId,
                             showLastViewed = true,
                         ),
-                    )
+                    ) {
+                        popUpTo(route) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
                 },
             )
         }
