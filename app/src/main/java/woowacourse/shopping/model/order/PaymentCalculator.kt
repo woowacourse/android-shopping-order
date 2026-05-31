@@ -16,7 +16,7 @@ class PaymentCalculator {
                 Payment(
                     subtotal = subtotal,
                     couponDiscount = Money(0),
-                    shippingFee = order.shippingFee - discount.amount,
+                    shippingFee = (order.shippingFee - discount.amount).coerceAtLeast(Money(0)),
                 )
 
             is Discount.OnTotal ->
