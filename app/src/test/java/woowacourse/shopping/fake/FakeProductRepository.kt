@@ -4,8 +4,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
-import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.domain.model.Product
+import woowacourse.shopping.domain.repository.ProductRepository
 import java.io.IOException
 
 class FakeProductRepository(

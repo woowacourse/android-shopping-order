@@ -3,8 +3,8 @@ package woowacourse.shopping.fake
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.domain.model.order.Coupon
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.error.Error
 import woowacourse.shopping.error.Result
 

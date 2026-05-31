@@ -11,8 +11,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.domain.applyCouponUseCase
 import woowacourse.shopping.domain.getAvailableCouponUseCase
@@ -25,6 +23,8 @@ import woowacourse.shopping.domain.model.order.FixedAmountCoupon
 import woowacourse.shopping.domain.model.order.FreeShippingCoupon
 import woowacourse.shopping.domain.model.order.Order
 import woowacourse.shopping.domain.model.order.PercentageCoupon
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.error.Result
 import woowacourse.shopping.presentation.order.model.CouponUiModel
 import woowacourse.shopping.presentation.order.model.OrderEvent

@@ -3,12 +3,9 @@ package woowacourse.shopping.di
 import android.content.Context
 import androidx.room.Room
 import kotlinx.coroutines.runBlocking
-import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.DefaultCartRepository
 import woowacourse.shopping.data.repository.DefaultOrderRepository
 import woowacourse.shopping.data.repository.DefaultProductRepository
-import woowacourse.shopping.data.repository.OrderRepository
-import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.source.local.ShoppingDatabase
 import woowacourse.shopping.data.source.local.auth.AuthDataSource
 import woowacourse.shopping.data.source.local.auth.CryptoManager
@@ -18,6 +15,9 @@ import woowacourse.shopping.data.source.remote.CartRemoteDataSource
 import woowacourse.shopping.data.source.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.source.remote.api.AuthInterceptor
 import woowacourse.shopping.data.source.remote.api.RetrofitServices
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 
 object AppContainer {
     private lateinit var appContext: Context

@@ -1,7 +1,7 @@
 package woowacourse.shopping.domain
 
-import woowacourse.shopping.data.repository.OrderRepository
 import woowacourse.shopping.domain.model.order.Order
+import woowacourse.shopping.domain.repository.OrderRepository
 
 fun applyCouponUseCase(
     orderRepository: OrderRepository,

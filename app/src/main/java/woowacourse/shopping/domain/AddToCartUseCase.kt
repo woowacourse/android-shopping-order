@@ -1,6 +1,6 @@
 package woowacourse.shopping.domain
 
-import woowacourse.shopping.data.repository.CartRepository
+import woowacourse.shopping.domain.repository.CartRepository
 
 suspend fun addToCartUseCase(
     cartRepository: CartRepository,

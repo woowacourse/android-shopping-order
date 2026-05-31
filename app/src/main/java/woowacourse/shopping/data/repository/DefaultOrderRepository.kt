@@ -15,6 +15,7 @@ import woowacourse.shopping.domain.model.order.Coupon
 import woowacourse.shopping.domain.model.order.FixedAmountCoupon
 import woowacourse.shopping.domain.model.order.FreeShippingCoupon
 import woowacourse.shopping.domain.model.order.PercentageCoupon
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.error.Error
 import woowacourse.shopping.error.Result
 import java.time.LocalDate

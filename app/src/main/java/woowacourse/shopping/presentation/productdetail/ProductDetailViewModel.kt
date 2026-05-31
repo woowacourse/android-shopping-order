@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.domain.addToCartUseCase
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.common.model.toUiModel
 import woowacourse.shopping.presentation.productdetail.model.DetailUiState
 

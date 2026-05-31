@@ -4,15 +4,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
-import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.source.local.recent.RecentProductDao
 import woowacourse.shopping.data.source.local.recent.RecentProductEntity
 import woowacourse.shopping.data.source.remote.ProductRemoteDataSource
 import woowacourse.shopping.domain.model.Money
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductName
+import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.error.Result
 
 class DefaultProductRepository(
