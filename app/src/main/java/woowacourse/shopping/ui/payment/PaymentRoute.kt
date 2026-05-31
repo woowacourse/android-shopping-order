@@ -35,7 +35,6 @@ import woowacourse.shopping.data.remote.retrofit.dto.OrderInfo
 import woowacourse.shopping.di.AppViewModelFactory
 import woowacourse.shopping.domain.payment.PaymentPriceCalculator.PaymentPriceSummary
 import woowacourse.shopping.notification.POST_NOTIFICATIONS_PERMISSION
-import woowacourse.shopping.ui.cart.ShoppingCartViewModel
 import woowacourse.shopping.ui.order.OrderViewModel
 
 @Composable
@@ -54,11 +53,6 @@ fun PaymentRouteContent(
             viewModelStoreOwner = sharedViewModelStoreOwner,
             factory = viewModelFactory,
         )
-    val shoppingCartViewModel: ShoppingCartViewModel =
-        viewModel(
-            viewModelStoreOwner = sharedViewModelStoreOwner,
-            factory = viewModelFactory,
-        )
     val orderViewModel: OrderViewModel =
         viewModel(
             viewModelStoreOwner = sharedViewModelStoreOwner,
@@ -66,7 +60,6 @@ fun PaymentRouteContent(
         )
 
     val paymentUiState by paymentViewModel.uiState.collectAsStateWithLifecycle()
-    val cartUiState by shoppingCartViewModel.uiState.collectAsStateWithLifecycle()
     val paymentPriceTexts = formatPaymentPriceTexts(paymentUiState.priceSummary)
     val canPostNotificationsNow = canPostNotifications(context)
     val isPaymentReminderChecked = paymentUiState.isPaymentReminderEnabled && canPostNotificationsNow
@@ -77,12 +70,6 @@ fun PaymentRouteContent(
         ) { isGranted ->
             paymentViewModel.setPaymentReminderEnabled(enabled = isGranted && canPostNotifications(context))
         }
-
-    val selectedCartItemIds =
-        cartUiState
-            .shoppingCartItems
-            .filter { shoppingCartItem -> shoppingCartItem.product.id in selectedProductIds }
-            .map { shoppingCartItem -> shoppingCartItem.getId() }
 
     LaunchedEffect(selectedProductIds) {
         paymentViewModel.initialize(selectedProductIds = selectedProductIds)
@@ -139,13 +126,13 @@ fun PaymentRouteContent(
     ) {
         PaymentButton(
             onPaymentButtonClick = {
-                if (selectedCartItemIds.isEmpty()) return@PaymentButton
+                if (paymentUiState.selectedCartItemIds.isEmpty()) return@PaymentButton
 
                 orderViewModel.order(
-                    orderInfo = OrderInfo(cartItemIds = selectedCartItemIds),
+                    orderInfo = OrderInfo(cartItemIds = paymentUiState.selectedCartItemIds),
                     onSuccess = {
                         paymentViewModel.cancelPaymentReminder()
-                        shoppingCartViewModel.requestCartItems(force = true)
+                        paymentViewModel.requestCartItems(force = true)
                         onOrderCompleted()
                     },
                 )
@@ -231,7 +218,7 @@ private fun handlePaymentReminderEnabledChange(
         return hasRequestedPostNotificationsPermission
     }
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasPostNotificationsRuntimePermission(context)) {
+    if (!hasPostNotificationsRuntimePermission(context)) {
         val shouldShowRationale =
             context.findActivity()?.shouldShowRequestPermissionRationale(POST_NOTIFICATIONS_PERMISSION) == true
         if (!hasRequestedPostNotificationsPermission || shouldShowRationale) {

@@ -22,15 +22,20 @@ class PaymentViewModel(
     private val paymentReminderManager: PaymentReminderManager,
     private val paymentPriceCalculator: PaymentPriceCalculator,
 ) : ViewModel() {
-    private val _uiState: MutableStateFlow<PaymentUiState> =
+    private val internalState =
         MutableStateFlow(
-            PaymentUiState.Loading(
+            PaymentInternalState(
                 isPaymentReminderEnabled = paymentReminderManager.isEnabled(),
             ),
         )
-    val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
 
-    private val internalState = MutableStateFlow(PaymentInternalState())
+    private val _uiState: MutableStateFlow<PaymentUiState> =
+        MutableStateFlow(
+            PaymentUiState.Loading(
+                isPaymentReminderEnabled = internalState.value.isPaymentReminderEnabled,
+            ),
+        )
+    val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
 
     init {
         observeShoppingCartItems()
@@ -60,7 +65,6 @@ class PaymentViewModel(
                     }
 
                     is CouponRepository.CouponRequestResult.Failure -> {
-                        // 기존 시나리오 유지: 쿠폰 요청 실패 시 별도 에러 노출 없이 현재 상태를 유지한다.
                     }
                 }
             } finally {
@@ -78,7 +82,6 @@ class PaymentViewModel(
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
             } catch (_: Exception) {
-                // 기존 시나리오 유지: 장바구니 요청 실패 시 별도 에러 노출 없이 현재 상태를 유지한다.
             }
         }
     }
@@ -98,9 +101,10 @@ class PaymentViewModel(
 
     fun setPaymentReminderEnabled(enabled: Boolean) {
         paymentReminderManager.setEnabled(enabled)
-        _uiState.update { currentState ->
-            currentState.withPaymentReminderEnabled(enabled = enabled)
+        internalState.update { currentState ->
+            currentState.copy(isPaymentReminderEnabled = enabled)
         }
+        publishUiState()
     }
 
     fun syncPaymentReminder(
@@ -114,10 +118,12 @@ class PaymentViewModel(
                 fromReminder = fromReminder,
                 canPostNotifications = canPostNotifications,
             )
-        if (_uiState.value.isPaymentReminderEnabled == effectiveEnabled) return
-        _uiState.update { currentState ->
-            currentState.withPaymentReminderEnabled(enabled = effectiveEnabled)
+        val currentEnabled = internalState.value.isPaymentReminderEnabled
+        if (currentEnabled == effectiveEnabled) return
+        internalState.update { currentState ->
+            currentState.copy(isPaymentReminderEnabled = effectiveEnabled)
         }
+        publishUiState()
     }
 
     fun cancelPaymentReminder() {
@@ -164,24 +170,29 @@ class PaymentViewModel(
 
     private fun publishUiState() {
         val currentInternalState = internalState.value
-        val isPaymentReminderEnabled = _uiState.value.isPaymentReminderEnabled
+        val isPaymentReminderEnabled = currentInternalState.isPaymentReminderEnabled
         if (!currentInternalState.hasLoadedCartSnapshot) {
             _uiState.value = PaymentUiState.Loading(isPaymentReminderEnabled = isPaymentReminderEnabled)
             return
         }
 
-        val targetItems =
-            filterSelectedShoppingCartItems(
+        val priceTargetItems =
+            filterItemsForPriceCalculation(
                 shoppingCartItems = currentInternalState.allShoppingCartItems,
                 selectedProductIds = currentInternalState.selectedProductIds,
             )
+        val selectedCartItemIds =
+            filterItemsForOrder(
+                shoppingCartItems = currentInternalState.allShoppingCartItems,
+                selectedProductIds = currentInternalState.selectedProductIds,
+            ).map { shoppingCartItem -> shoppingCartItem.getId() }
         val selectedCoupon =
             currentInternalState.coupons.firstOrNull { coupon ->
                 coupon.id == currentInternalState.selectedCouponId
             }
         val paymentPriceSummary =
             paymentPriceCalculator.calculate(
-                items = targetItems,
+                items = priceTargetItems,
                 coupon = selectedCoupon,
             )
 
@@ -190,11 +201,12 @@ class PaymentViewModel(
                 isPaymentReminderEnabled = isPaymentReminderEnabled,
                 coupons = currentInternalState.coupons,
                 selectedCouponId = currentInternalState.selectedCouponId,
+                selectedCartItemIds = selectedCartItemIds,
                 priceSummary = paymentPriceSummary,
             )
     }
 
-    private fun filterSelectedShoppingCartItems(
+    private fun filterItemsForPriceCalculation(
         shoppingCartItems: List<ShoppingCartItem>,
         selectedProductIds: Set<Long>,
     ): List<ShoppingCartItem> {
@@ -202,16 +214,24 @@ class PaymentViewModel(
         return shoppingCartItems.filter { shoppingCartItem -> shoppingCartItem.product.id in selectedProductIds }
     }
 
+    private fun filterItemsForOrder(
+        shoppingCartItems: List<ShoppingCartItem>,
+        selectedProductIds: Set<Long>,
+    ): List<ShoppingCartItem> =
+        shoppingCartItems.filter { shoppingCartItem -> shoppingCartItem.product.id in selectedProductIds }
+
     sealed interface PaymentUiState {
         val isPaymentReminderEnabled: Boolean
         val coupons: List<Coupon>
         val selectedCouponId: Long?
+        val selectedCartItemIds: List<Long>
         val priceSummary: PaymentPriceSummary?
 
         data class Loading(
             override val isPaymentReminderEnabled: Boolean,
             override val coupons: List<Coupon> = emptyList(),
             override val selectedCouponId: Long? = null,
+            override val selectedCartItemIds: List<Long> = emptyList(),
             override val priceSummary: PaymentPriceSummary? = null,
         ) : PaymentUiState
 
@@ -219,6 +239,7 @@ class PaymentViewModel(
             override val isPaymentReminderEnabled: Boolean,
             override val coupons: List<Coupon>,
             override val selectedCouponId: Long?,
+            override val selectedCartItemIds: List<Long>,
             override val priceSummary: PaymentPriceSummary,
         ) : PaymentUiState
     }
@@ -231,15 +252,6 @@ class PaymentViewModel(
         val hasLoadedCartSnapshot: Boolean = false,
         val coupons: List<Coupon> = emptyList(),
         val selectedCouponId: Long? = null,
+        val isPaymentReminderEnabled: Boolean = false,
     )
-
-    private fun PaymentUiState.withPaymentReminderEnabled(enabled: Boolean): PaymentUiState =
-        when (this) {
-            is PaymentUiState.Loading ->
-                copy(isPaymentReminderEnabled = enabled)
-
-            is PaymentUiState.Content ->
-                copy(isPaymentReminderEnabled = enabled)
-        }
-
 }
