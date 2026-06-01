@@ -1,8 +1,11 @@
 package woowacourse.shopping.ui.payment
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import woowacourse.shopping.core.designsystem.component.layout.CommonFrame
@@ -24,14 +27,32 @@ fun PaymentScreen(
         CommonFrame(
             headerContent = { PaymentHeader(onBackClick) },
             bodyContent = {
-                PaymentBody(
-                    uiState = uiState,
-                    onCouponClick = onCouponClick,
-                )
+                if (uiState.isLoading) {
+                    PaymentLoadingBody()
+                } else {
+                    PaymentBody(
+                        uiState = uiState,
+                        onCouponClick = onCouponClick,
+                    )
+                }
             },
             modifier = Modifier.weight(1f),
         )
-        PaymentBottomBar(onPaymentClick = onPaymentClick)
+        if (uiState.isLoading.not()) {
+            PaymentBottomBar(onPaymentClick = onPaymentClick)
+        }
+    }
+}
+
+@Composable
+private fun PaymentLoadingBody(
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        CircularProgressIndicator()
     }
 }
 

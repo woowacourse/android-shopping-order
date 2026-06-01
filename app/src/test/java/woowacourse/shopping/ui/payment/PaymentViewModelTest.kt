@@ -1,18 +1,22 @@
 package woowacourse.shopping.ui.payment
 
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeoutOrNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import woowacourse.shopping.domain.model.cart.CartPage
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.FixedAmountCoupon
 import woowacourse.shopping.domain.model.order.PurchaseProduct
+import woowacourse.shopping.domain.model.order.PurchaseProducts
 import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.testing.MainDispatcherExtension
@@ -94,6 +98,35 @@ class PaymentViewModelTest {
         }
 
     @Test
+    fun `주문과 쿠폰을 모두 불러오기 전까지 결제 상태를 갱신하지 않는다`() =
+        runTest {
+            val cartItems = CompletableDeferred<PurchaseProducts>()
+            val viewModel =
+                PaymentViewModel(
+                    cartRepository = DeferredCartRepository(cartItems),
+                    couponRepository = fakeCouponRepository,
+                    orderRepository = fakeOrderRepository,
+                    selectedCartItemIds = listOf(101L),
+                )
+
+            viewModel.isLoading.value shouldBe true
+            viewModel.coupons.value shouldBe emptyList()
+            viewModel.payment.value.orderAmount shouldBe 0
+
+            cartItems.complete(
+                PurchaseProducts(
+                    listOf(PurchaseProduct(id = 101L, product = products[0], count = 1)),
+                ),
+            )
+            advanceUntilIdle()
+
+            viewModel.isLoading.value shouldBe false
+            viewModel.coupons.value.size shouldBe 1
+            viewModel.payment.value.orderAmount shouldBe 100_000
+            viewModel.payment.value.selectedCoupon?.code shouldBe "FIXED5000"
+        }
+
+    @Test
     fun `결제를 완료하면 선택한 장바구니 상품으로 주문을 생성한다`() =
         runTest {
             fakeCartRepository.insert(PurchaseProduct(id = 101L, product = products[0], count = 1))
@@ -142,6 +175,33 @@ class PaymentViewModelTest {
             orderRepository = fakeOrderRepository,
             selectedCartItemIds = selectedCartItemIds,
         )
+}
+
+private class DeferredCartRepository(
+    private val cartItems: CompletableDeferred<PurchaseProducts>,
+) : CartRepository {
+    override suspend fun insert(purchaseProduct: PurchaseProduct) = Unit
+
+    override suspend fun deleteCartItem(purchaseProductId: Long) = Unit
+
+    override suspend fun updateCount(
+        cartItemId: Long,
+        newQuantity: Int,
+    ) = Unit
+
+    override suspend fun getProductCount(): Int = cartItems.await().totalCount()
+
+    override suspend fun getCartPage(
+        page: Int,
+        size: Int,
+    ): CartPage = CartPage(items = cartItems.await(), isLast = true)
+
+    override suspend fun getAllCartItems(pageSize: Int): PurchaseProducts = cartItems.await()
+
+    override suspend fun findCartItemByProductId(
+        productId: Long,
+        pageSize: Int,
+    ): PurchaseProduct? = cartItems.await().findById(productId)
 }
 
 private class FakeCouponRepository(

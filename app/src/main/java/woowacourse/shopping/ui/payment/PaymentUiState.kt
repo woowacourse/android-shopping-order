@@ -11,19 +11,24 @@ import woowacourse.shopping.ui.payment.uimodel.toUiModel
 data class PaymentUiState(
     val coupons: List<CouponUiModel> = emptyList(),
     val selectedCouponCode: String? = null,
-    val payment: PaymentUiModel
+    val isLoading: Boolean = false,
+    val payment: PaymentUiModel,
 ) {
     fun isSelected(coupon: CouponUiModel): Boolean = coupon.code == selectedCouponCode
 }
 
-fun Payment.toUiState(coupons: List<Coupon>): PaymentUiState =
+fun Payment.toUiState(
+    coupons: List<Coupon>,
+    isLoading: Boolean,
+): PaymentUiState =
     PaymentUiState(
         coupons = coupons.map { it.toUiModel(enabled = canApply(it)) },
         selectedCouponCode = selectedCoupon?.code,
+        isLoading = isLoading,
         payment = PaymentUiModel(
             formattedOrderAmount = orderAmount.toPriceString(),
             formattedCouponDiscountAmount = couponDiscountAmount.toDiscountPriceString(),
             formattedDeliveryFee = deliveryFee.toPriceString(),
             formattedTotalPaymentAmount = totalPaymentAmount.toPriceString(),
-        )
+        ),
     )

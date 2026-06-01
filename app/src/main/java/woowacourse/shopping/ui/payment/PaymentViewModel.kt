@@ -7,12 +7,14 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.navigation.toRoute
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.coupon.Coupon
@@ -52,9 +54,11 @@ class PaymentViewModel internal constructor(
     private val _payment = MutableStateFlow(Payment(selectedCoupon = null))
     val payment: StateFlow<Payment> = _payment.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     init {
-        fetchCoupons()
-        fetchOrder()
+        fetchInitialPayment()
     }
 
     fun selectCoupon(couponCode: String) {
@@ -83,39 +87,34 @@ class PaymentViewModel internal constructor(
         }
     }
 
-    private fun fetchCoupons() {
+    private fun fetchInitialPayment() {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
-                val fetchedCoupons = couponRepository.getCoupons()
-                _coupons.update { fetchedCoupons }
-                _payment.update { payment ->
-                    payment.withValidSelectedCoupon(fetchedCoupons)
-                }
+                val (fetchedCoupons, order) = fetchInitialPaymentData()
+                _coupons.value = fetchedCoupons
+                _payment.value = Payment(order = order).withValidSelectedCoupon(fetchedCoupons)
             } catch (e: Exception) {
-                _uiEvent.send(UiEvent.ShowMessage("쿠폰을 불러오지 못했습니다."))
+                _uiEvent.send(UiEvent.ShowMessage("결제 정보를 불러오지 못했습니다."))
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
-    private fun fetchOrder() {
-        viewModelScope.launch {
-            try {
-                val cartItems = cartRepository.getAllCartItems()
-                val order =
-                    Order.fromSelectedCartItems(
-                        cartItems = cartItems,
-                        selectedCartItemIds = selectedCartItemIds,
-                    )
-                _payment.update { payment ->
-                    payment
-                        .copy(order = order)
-                        .withValidSelectedCoupon(coupons.value)
-                }
-            } catch (e: Exception) {
-                _uiEvent.send(UiEvent.ShowMessage("주문 금액을 불러오지 못했습니다."))
-            }
+    private suspend fun fetchInitialPaymentData(): Pair<List<Coupon>, Order> =
+        coroutineScope {
+            val couponsDeferred = async { couponRepository.getCoupons() }
+            val cartItemsDeferred = async { cartRepository.getAllCartItems() }
+
+            val fetchedCoupons = couponsDeferred.await()
+            val order =
+                Order.fromSelectedCartItems(
+                    cartItems = cartItemsDeferred.await(),
+                    selectedCartItemIds = selectedCartItemIds,
+                )
+            fetchedCoupons to order
         }
-    }
 
     private fun Payment.withValidSelectedCoupon(coupons: List<Coupon>): Payment {
         val validSelectedCoupon =

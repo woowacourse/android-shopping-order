@@ -73,6 +73,7 @@ private fun PaymentRouteContent(
 
     val payment by viewModel.payment.collectAsStateWithLifecycle()
     val coupons by viewModel.coupons.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val selectedCartItemIds = viewModel.selectedCartItemIds
     val paymentCompletedState = remember(selectedCartItemIds) { mutableStateOf(false) }
 
@@ -87,7 +88,7 @@ private fun PaymentRouteContent(
     }
 
     PaymentScreen(
-        uiState = payment.toUiState(coupons),
+        uiState = payment.toUiState(coupons = coupons, isLoading = isLoading),
         onBackClick = onBackClick,
         onCouponClick = viewModel::selectCoupon,
         onPaymentClick = {
