@@ -21,7 +21,6 @@ import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.ui.UiEvent
 
 class ProductListViewModel(
     private val productRepository: ProductRepository,

@@ -22,7 +22,6 @@ import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.ui.UiEvent
 import woowacourse.shopping.ui.util.toUiModel
 
 class CartViewModel(

@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -19,7 +18,6 @@ import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.ui.UiEvent
 
 class ProductDetailViewModel(
     val productId: Int,
@@ -31,7 +29,7 @@ class ProductDetailViewModel(
     private val _uiState = MutableStateFlow<ProductDetailUiState>(ProductDetailUiState.Loading)
     private val cartFlow = MutableStateFlow(Cart())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
-    private val _uiEvent = MutableSharedFlow< ProductDetailUiEvent>()
+    private val _uiEvent = MutableSharedFlow<ProductDetailUiEvent>()
     val uiEvent: SharedFlow<ProductDetailUiEvent> = _uiEvent.asSharedFlow()
 
     init {
