@@ -69,23 +69,25 @@ private fun ProductDetailRouteContent(
     val selectedProduct by viewModel.selectedProduct.collectAsStateWithLifecycle()
     val lastViewedProduct by viewModel.lastViewedProduct.collectAsStateWithLifecycle()
 
-    selectedProduct?.let { product ->
-        val uiState =
-            ProductDetailUiState(
-                product = product.toProductUiModel(),
-                count = count,
-                lastViewedProduct = lastViewedProduct?.toProductUiModel(),
-            )
+    val uiState =
+        ProductDetailUiState(
+            product = selectedProduct?.toProductUiModel(),
+            count = count,
+            lastViewedProduct = lastViewedProduct?.toProductUiModel(),
+        )
 
-        ProductDetailScreen(
-            uiState = uiState,
-            onLastViewedClick = { clickedProductId ->
+    ProductDetailScreen(
+        uiState = uiState,
+        onLastViewedClick = { clickedProductId ->
+            selectedProduct?.let { product ->
                 lastViewedProduct?.let { viewModel.updateHistory(it) }
                 onLastViewedProductClick(clickedProductId, product.id)
-            },
-            onAdd = { viewModel.addCount() },
-            onMinus = { viewModel.minusCount() },
-            onAddRequest = {
+            }
+        },
+        onAdd = { viewModel.addCount() },
+        onMinus = { viewModel.minusCount() },
+        onAddRequest = {
+            selectedProduct?.let { product ->
                 viewModel.addPurchaseProduct(
                     purchaseProduct =
                         PurchaseProduct(
@@ -95,9 +97,9 @@ private fun ProductDetailRouteContent(
                         ),
                     onSuccess = onBackClick,
                 )
-            },
-            onClose = onBackClick,
-            modifier = Modifier.padding(contentPadding),
-        )
-    }
+            }
+        },
+        onClose = onBackClick,
+        modifier = Modifier.padding(contentPadding),
+    )
 }
