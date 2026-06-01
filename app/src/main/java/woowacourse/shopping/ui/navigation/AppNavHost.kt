@@ -17,14 +17,18 @@ import androidx.navigation.toRoute
 import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.ui.UiEvent
 import woowacourse.shopping.ui.cart.CartScreen
+import woowacourse.shopping.ui.cart.CartUiEvent
 import woowacourse.shopping.ui.cart.CartUiState
 import woowacourse.shopping.ui.cart.CartViewModel
 import woowacourse.shopping.ui.common.SettingsScreen
 import woowacourse.shopping.ui.payment.PaymentScreen
+import woowacourse.shopping.ui.payment.PaymentUiEvent
 import woowacourse.shopping.ui.payment.PaymentViewModel
 import woowacourse.shopping.ui.productDetail.ProductDetailScreen
+import woowacourse.shopping.ui.productDetail.ProductDetailUiEvent
 import woowacourse.shopping.ui.productDetail.ProductDetailViewModel
 import woowacourse.shopping.ui.productList.ProductListScreen
+import woowacourse.shopping.ui.productList.ProductListUiEvent
 import woowacourse.shopping.ui.productList.ProductListViewModel
 
 @Composable
@@ -39,7 +43,7 @@ fun AppNavHost(
         modifier = modifier,
     ) {
         composable<ProductListRoute> {
-            val productListViewModel: ProductListViewModel =
+            val viewModel: ProductListViewModel =
                 viewModel(
                     factory =
                         ProductListViewModel.factory(
@@ -49,13 +53,11 @@ fun AppNavHost(
                         ),
                 )
             val snackbarHostState = remember { SnackbarHostState() }
-            LaunchedEffect(productListViewModel) {
-                productListViewModel.uiEvent.collect { event ->
+            LaunchedEffect(viewModel) {
+                viewModel.uiEvent.collect { event ->
                     when (event) {
-                        is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
-                        UiEvent.NavigateToCart -> Unit
-                        UiEvent.NavigateToProductList -> Unit
-                        UiEvent.NavigateToPayment -> navController.navigate(PaymentRoute())
+                        is ProductListUiEvent.ShowSnackbar ->
+                            snackbarHostState.showSnackbar(event.message)
                     }
                 }
             }
@@ -65,7 +67,7 @@ fun AppNavHost(
             ) { innerPadding ->
                 ProductListScreen(
                     modifier = Modifier.padding(innerPadding),
-                    viewModel = productListViewModel,
+                    viewModel = viewModel,
                     onCartClick = {
                         navController.navigate(CartRoute)
                     },
@@ -81,7 +83,7 @@ fun AppNavHost(
 
         composable<ProductDetailRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<ProductDetailRoute>()
-            val productDetailViewModel: ProductDetailViewModel =
+            val viewModel: ProductDetailViewModel =
                 viewModel(
                     factory =
                         ProductDetailViewModel.factory(
@@ -94,13 +96,13 @@ fun AppNavHost(
                 )
             val snackbarHostState = remember { SnackbarHostState() }
 
-            LaunchedEffect(productDetailViewModel) {
-                productDetailViewModel.uiEvent.collect { event ->
+            LaunchedEffect(viewModel) {
+                viewModel.uiEvent.collect { event ->
                     when (event) {
-                        is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
-                        UiEvent.NavigateToCart -> navController.navigate(CartRoute)
-                        UiEvent.NavigateToProductList -> Unit
-                        UiEvent.NavigateToPayment -> Unit
+                        is ProductDetailUiEvent.ShowSnackbar ->
+                            snackbarHostState.showSnackbar(event.message)
+                        ProductDetailUiEvent.AddedToCart ->
+                            navController.navigate(CartRoute)
                     }
                 }
             }
@@ -111,12 +113,12 @@ fun AppNavHost(
             ) { innerPadding ->
                 ProductDetailScreen(
                     modifier = Modifier.padding(innerPadding),
-                    viewModel = productDetailViewModel,
+                    viewModel = viewModel,
                     onCloseClick = {
                         navController.popBackStack()
                     },
                     onAddToCartClick = {
-                        productDetailViewModel.addToCart()
+                        viewModel.addToCart()
                     },
                     onLastViewedProductClick = { product ->
                         navController.navigate(ProductDetailRoute(productId = product.id))
@@ -126,7 +128,7 @@ fun AppNavHost(
         }
 
         composable<CartRoute> {
-            val cartViewModel: CartViewModel =
+            val viewModel: CartViewModel =
                 viewModel(
                     factory =
                         CartViewModel.factory(
@@ -136,23 +138,15 @@ fun AppNavHost(
                         ),
                 )
             val snackbarHostState = remember { SnackbarHostState() }
-            LaunchedEffect(cartViewModel) {
-                cartViewModel.uiEvent.collect { event ->
+            LaunchedEffect(viewModel) {
+                viewModel.uiEvent.collect { event ->
                     when (event) {
-                        is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
-                        UiEvent.NavigateToCart -> Unit
-                        UiEvent.NavigateToPayment -> {
-                            val selectedIds = (cartViewModel.uiState.value as? CartUiState.Success)?.selectedItems?.toList() ?: emptyList()
-                            navController.navigate(PaymentRoute(selectedItemIds = selectedIds))
-                        }
-
-                        UiEvent.NavigateToProductList ->
-                            navController.navigate(ProductListRoute) {
-                                popUpTo<CartRoute> {
-                                    inclusive = true
-                                }
-                                launchSingleTop = true
-                            }
+                        is CartUiEvent.ShowSnackbar ->
+                            snackbarHostState.showSnackbar(event.message)
+                        is CartUiEvent.OrderRequested ->
+                            navController.navigate(
+                                PaymentRoute(selectedItemIds = event.selectedItemIds),
+                            )
                     }
                 }
             }
@@ -162,7 +156,7 @@ fun AppNavHost(
             ) { innerPadding ->
                 CartScreen(
                     modifier = Modifier.padding(innerPadding),
-                    viewModel = cartViewModel,
+                    viewModel = viewModel,
                     onClickClose = {
                         navController.popBackStack()
                     },
@@ -176,7 +170,7 @@ fun AppNavHost(
 
         composable<PaymentRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<PaymentRoute>()
-            val paymentViewModel: PaymentViewModel =
+            val viewModel: PaymentViewModel =
                 viewModel(
                     factory =
                         PaymentViewModel.factory(
@@ -187,15 +181,14 @@ fun AppNavHost(
                 )
             val snackbarHostState = remember { SnackbarHostState() }
 
-            LaunchedEffect(paymentViewModel) {
-                paymentViewModel.uiEvent.collect { event ->
+            LaunchedEffect(viewModel) {
+                viewModel.uiEvent.collect { event ->
                     when (event) {
-                        is woowacourse.shopping.ui.payment.PaymentUiEvent.ShowMessage -> snackbarHostState.showSnackbar(event.message)
-                        woowacourse.shopping.ui.payment.PaymentUiEvent.NavigateToProductList ->
+                        is PaymentUiEvent.ShowMessage ->
+                            snackbarHostState.showSnackbar(event.message)
+                        PaymentUiEvent.OrderSucceeded ->
                             navController.navigate(ProductListRoute) {
-                                popUpTo<PaymentRoute> {
-                                    inclusive = true
-                                }
+                                popUpTo<PaymentRoute> { inclusive = true }
                                 launchSingleTop = true
                             }
                     }
@@ -207,11 +200,11 @@ fun AppNavHost(
                 modifier = Modifier.fillMaxSize(),
             ) { innerPadding ->
                 PaymentScreen(
-                    viewModel = paymentViewModel,
+                    viewModel = viewModel,
                     modifier = Modifier.padding(innerPadding),
                     selectedItemIds = route.selectedItemIds,
                     onClose = { navController.popBackStack() },
-                    onPayClick = paymentViewModel::onClickPay,
+                    onPayClick = viewModel::onClickPay,
                 )
             }
         }
