@@ -3,12 +3,12 @@ package woowacourse.shopping.ui.catalog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
@@ -28,8 +28,8 @@ class ShoppingViewModel(
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
     private val productRepository: ProductRepository,
 ) : ViewModel() {
-    private val _uiEvent = MutableSharedFlow<UiEvent>()
-    val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
+    private val _uiEvent = Channel<UiEvent>(Channel.BUFFERED)
+    val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
 
     val recentlyViewedProductIds: StateFlow<List<Long>?> =
         recentlyViewedProductRepository
@@ -111,9 +111,9 @@ class ShoppingViewModel(
                     cartRepository.insert(purchaseProduct)
                 }
                 refreshCart()
-                _uiEvent.emit(UiEvent.ShowMessage("장바구니에 담았습니다."))
+                _uiEvent.send(UiEvent.ShowMessage("장바구니에 담았습니다."))
             } catch (e: Exception) {
-                _uiEvent.emit(UiEvent.ShowMessage("장바구니 담기에 실패했습니다."))
+                _uiEvent.send(UiEvent.ShowMessage("장바구니 담기에 실패했습니다."))
             }
         }
     }
@@ -143,10 +143,10 @@ class ShoppingViewModel(
                     cartRepository.deleteCartItem(target.id)
                     removeKnownCartItem(target.id)
                     updateKnownCartProductCount(-target.count)
-                    _uiEvent.emit(UiEvent.ShowMessage("상품을 삭제했습니다."))
+                    _uiEvent.send(UiEvent.ShowMessage("상품을 삭제했습니다."))
                 }
             } catch (e: Exception) {
-                _uiEvent.emit(UiEvent.ShowMessage("상품 삭제에 실패했습니다."))
+                _uiEvent.send(UiEvent.ShowMessage("상품 삭제에 실패했습니다."))
             }
         }
     }

@@ -3,11 +3,11 @@ package woowacourse.shopping.ui.cart
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,8 +21,8 @@ import woowacourse.shopping.ui.event.UiEvent
 class CartViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel() {
-    private val _uiEvent = MutableSharedFlow<UiEvent>()
-    val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
+    private val _uiEvent = Channel<UiEvent>(Channel.BUFFERED)
+    val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
 
     private val _cartState = MutableStateFlow(CartState())
     val uiState: StateFlow<CartUiState> =
@@ -98,7 +98,7 @@ class CartViewModel(
                     )
                 }
             } catch (e: Exception) {
-                _uiEvent.emit(UiEvent.ShowMessage("수량 변경에 실패했습니다. 다시 시도해주세요."))
+                _uiEvent.send(UiEvent.ShowMessage("수량 변경에 실패했습니다. 다시 시도해주세요."))
                 _cartState.update { it.copy(isLoading = false) }
             }
         }
@@ -141,9 +141,9 @@ class CartViewModel(
                     }
                 }
 
-                _uiEvent.emit(UiEvent.ShowMessage("상품을 삭제했습니다."))
+                _uiEvent.send(UiEvent.ShowMessage("상품을 삭제했습니다."))
             } catch (e: Exception) {
-                _uiEvent.emit(UiEvent.ShowMessage("아이템 삭제에 실패했습니다."))
+                _uiEvent.send(UiEvent.ShowMessage("아이템 삭제에 실패했습니다."))
                 _cartState.update { it.copy(isLoading = false) }
             }
         }

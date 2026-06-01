@@ -3,11 +3,11 @@ package woowacourse.shopping.ui.payment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,8 +25,8 @@ class PaymentViewModel(
     private val orderRepository: OrderRepository,
     private val selectedCartItemIds: List<Long>,
 ) : ViewModel() {
-    private val _uiEvent = MutableSharedFlow<UiEvent>()
-    val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
+    private val _uiEvent = Channel<UiEvent>(Channel.BUFFERED)
+    val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
 
     private val _coupons = MutableStateFlow<List<Coupon>>(emptyList())
     val coupons: StateFlow<List<Coupon>> = _coupons.asStateFlow()
@@ -57,10 +57,10 @@ class PaymentViewModel(
         viewModelScope.launch {
             try {
                 orderRepository.createOrder(selectedCartItemIds)
-                _uiEvent.emit(UiEvent.ShowMessage("주문이 완료되었습니다."))
+                _uiEvent.send(UiEvent.ShowMessage("주문이 완료되었습니다."))
                 onSuccess()
             } catch (e: Exception) {
-                _uiEvent.emit(UiEvent.ShowMessage("주문에 실패했습니다. 다시 시도해주세요."))
+                _uiEvent.send(UiEvent.ShowMessage("주문에 실패했습니다. 다시 시도해주세요."))
             }
         }
     }
@@ -74,7 +74,7 @@ class PaymentViewModel(
                     payment.withValidSelectedCoupon(fetchedCoupons)
                 }
             } catch (e: Exception) {
-                _uiEvent.emit(UiEvent.ShowMessage("쿠폰을 불러오지 못했습니다."))
+                _uiEvent.send(UiEvent.ShowMessage("쿠폰을 불러오지 못했습니다."))
             }
         }
     }
@@ -94,7 +94,7 @@ class PaymentViewModel(
                         .withValidSelectedCoupon(coupons.value)
                 }
             } catch (e: Exception) {
-                _uiEvent.emit(UiEvent.ShowMessage("주문 금액을 불러오지 못했습니다."))
+                _uiEvent.send(UiEvent.ShowMessage("주문 금액을 불러오지 못했습니다."))
             }
         }
     }

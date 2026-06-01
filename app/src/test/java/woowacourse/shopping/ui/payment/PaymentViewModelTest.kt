@@ -1,6 +1,8 @@
 package woowacourse.shopping.ui.payment
 
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -15,6 +17,7 @@ import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.testing.MainDispatcherExtension
 import woowacourse.shopping.testing.fakes.FakeCartRepository
+import woowacourse.shopping.ui.event.UiEvent
 import java.time.LocalDate
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -103,6 +106,33 @@ class PaymentViewModelTest {
 
             fakeOrderRepository.createdOrderCartItemIds shouldBe listOf(101L)
             fakeCartRepository.getProductCount() shouldBe 2
+        }
+
+    @Test
+    fun `이벤트 수집자가 없어도 결제 완료 메시지를 보관한다`() =
+        runTest {
+            fakeCartRepository.insert(PurchaseProduct(id = 101L, product = products[0], count = 1))
+            val viewModel = createViewModel(selectedCartItemIds = listOf(101L))
+            advanceUntilIdle()
+
+            viewModel.completePayment(onSuccess = {})
+            advanceUntilIdle()
+
+            viewModel.uiEvent.first() shouldBe UiEvent.ShowMessage("주문이 완료되었습니다.")
+        }
+
+    @Test
+    fun `처리한 이벤트는 다시 수집되지 않는다`() =
+        runTest {
+            fakeCartRepository.insert(PurchaseProduct(id = 101L, product = products[0], count = 1))
+            val viewModel = createViewModel(selectedCartItemIds = listOf(101L))
+            advanceUntilIdle()
+
+            viewModel.completePayment(onSuccess = {})
+            advanceUntilIdle()
+            viewModel.uiEvent.first() shouldBe UiEvent.ShowMessage("주문이 완료되었습니다.")
+
+            withTimeoutOrNull(100) { viewModel.uiEvent.first() } shouldBe null
         }
 
     private fun createViewModel(selectedCartItemIds: List<Long>): PaymentViewModel =

@@ -3,11 +3,11 @@ package woowacourse.shopping.ui.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,8 +26,8 @@ class SettingViewModel(
         )
     val uiState: StateFlow<SettingUiState> = _uiState.asStateFlow()
 
-    private val _uiEvent = MutableSharedFlow<UiEvent>()
-    val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
+    private val _uiEvent = Channel<UiEvent>(Channel.BUFFERED)
+    val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
 
     fun setPaymentNotificationEnabled(enabled: Boolean) {
         settingRepository.setPaymentNotificationEnabled(enabled)
@@ -36,7 +36,7 @@ class SettingViewModel(
 
     fun showNotificationPermissionDeniedMessage() {
         viewModelScope.launch {
-            _uiEvent.emit(UiEvent.ShowMessage("알림 권한이 없어 미결제 알림을 켤 수 없습니다."))
+            _uiEvent.send(UiEvent.ShowMessage("알림 권한이 없어 미결제 알림을 켤 수 없습니다."))
         }
     }
 }
