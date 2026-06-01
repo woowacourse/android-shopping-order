@@ -14,7 +14,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
 import woowacourse.shopping.domain.notification.PaymentNotificationScheduler
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
@@ -32,15 +31,12 @@ fun NavGraphBuilder.paymentRoute(
     onBackClick: () -> Unit,
     onPaymentComplete: () -> Unit,
 ) {
-    composable<ShoppingRoute.Payment> { backStackEntry ->
-        val route = backStackEntry.toRoute<ShoppingRoute.Payment>()
-
+    composable<ShoppingRoute.Payment> {
         PaymentRouteContent(
             cartRepository = cartRepository,
             couponRepository = couponRepository,
             orderRepository = orderRepository,
             paymentNotificationScheduler = paymentNotificationScheduler,
-            selectedCartItemIds = route.selectedCartItemIds,
             contentPadding = contentPadding,
             snackbarHostState = snackbarHostState,
             onBackClick = onBackClick,
@@ -55,7 +51,6 @@ private fun PaymentRouteContent(
     couponRepository: CouponRepository,
     orderRepository: OrderRepository,
     paymentNotificationScheduler: PaymentNotificationScheduler,
-    selectedCartItemIds: List<Long>,
     contentPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
     onBackClick: () -> Unit,
@@ -68,7 +63,6 @@ private fun PaymentRouteContent(
                     cartRepository = cartRepository,
                     couponRepository = couponRepository,
                     orderRepository = orderRepository,
-                    selectedCartItemIds = selectedCartItemIds,
                 ),
         )
 
@@ -79,6 +73,7 @@ private fun PaymentRouteContent(
 
     val payment by viewModel.payment.collectAsStateWithLifecycle()
     val coupons by viewModel.coupons.collectAsStateWithLifecycle()
+    val selectedCartItemIds = viewModel.selectedCartItemIds
     val paymentCompletedState = remember(selectedCartItemIds) { mutableStateOf(false) }
 
     DisposableEffect(selectedCartItemIds) {

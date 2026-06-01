@@ -1,8 +1,12 @@
 package woowacourse.shopping.ui.recommendation
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.navigation.toRoute
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,13 +30,27 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.ui.event.UiEvent
+import woowacourse.shopping.ui.navigation.ShoppingRoute
 
-class RecommendationViewModel(
+class RecommendationViewModel internal constructor(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
     initialSelectedIds: List<Long> = emptyList(),
 ) : ViewModel() {
+    constructor(
+        cartRepository: CartRepository,
+        productRepository: ProductRepository,
+        recentlyViewedProductRepository: RecentlyViewedProductRepository,
+        savedStateHandle: SavedStateHandle,
+    ) : this(
+        cartRepository = cartRepository,
+        productRepository = productRepository,
+        recentlyViewedProductRepository = recentlyViewedProductRepository,
+        initialSelectedIds =
+            savedStateHandle.toRoute<ShoppingRoute.Recommendation>().selectedCartItemIds,
+    )
+
     private val _uiEvent = Channel<UiEvent>(Channel.BUFFERED)
     val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
 
@@ -211,16 +229,18 @@ class RecommendationViewModelFactory(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
-    private val initialSelectedIds: List<Long> = emptyList(),
 ) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(
+        modelClass: Class<T>,
+        extras: CreationExtras,
+    ): T {
         if (modelClass.isAssignableFrom(RecommendationViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return RecommendationViewModel(
-                cartRepository,
-                productRepository,
-                recentlyViewedProductRepository,
-                initialSelectedIds,
+                cartRepository = cartRepository,
+                productRepository = productRepository,
+                recentlyViewedProductRepository = recentlyViewedProductRepository,
+                savedStateHandle = extras.createSavedStateHandle(),
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

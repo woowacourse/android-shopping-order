@@ -11,7 +11,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
 import woowacourse.shopping.domain.model.order.PurchaseProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -31,14 +30,11 @@ fun NavGraphBuilder.recommendationRoute(
     onOrderClick: (selectedCartItemIds: List<Long>) -> Unit,
     onBackClick: () -> Unit,
 ) {
-    composable<ShoppingRoute.Recommendation> { backStackEntry ->
-        val route = backStackEntry.toRoute<ShoppingRoute.Recommendation>()
-
+    composable<ShoppingRoute.Recommendation> {
         RecommendationRouteContent(
             cartRepository = cartRepository,
             productRepository = productRepository,
             recentlyViewedProductRepository = recentlyViewedProductRepository,
-            selectedCartItemIds = route.selectedCartItemIds,
             contentPadding = contentPadding,
             snackbarHostState = snackbarHostState,
             onBackClick = onBackClick,
@@ -53,7 +49,6 @@ private fun RecommendationRouteContent(
     cartRepository: CartRepository,
     productRepository: ProductRepository,
     recentlyViewedProductRepository: RecentlyViewedProductRepository,
-    selectedCartItemIds: List<Long>,
     contentPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
     onBackClick: () -> Unit,
@@ -67,7 +62,6 @@ private fun RecommendationRouteContent(
                     cartRepository = cartRepository,
                     productRepository = productRepository,
                     recentlyViewedProductRepository = recentlyViewedProductRepository,
-                    initialSelectedIds = selectedCartItemIds,
                 ),
         )
 
@@ -76,6 +70,7 @@ private fun RecommendationRouteContent(
         snackbarHostState = snackbarHostState,
     )
 
+    val selectedCartItemIds by viewModel.selectedItemIds.collectAsStateWithLifecycle()
     val totalPrice by viewModel.totalPrice.collectAsStateWithLifecycle()
     val totalCount by viewModel.selectedCount.collectAsStateWithLifecycle()
     val cartState by viewModel.allCartItems.collectAsStateWithLifecycle()

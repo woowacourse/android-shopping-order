@@ -1,8 +1,12 @@
 package woowacourse.shopping.ui.payment
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.navigation.toRoute
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.Flow
@@ -18,13 +22,27 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.ui.event.UiEvent
+import woowacourse.shopping.ui.navigation.ShoppingRoute
 
-class PaymentViewModel(
+class PaymentViewModel internal constructor(
     private val cartRepository: CartRepository,
     private val couponRepository: CouponRepository,
     private val orderRepository: OrderRepository,
-    private val selectedCartItemIds: List<Long>,
+    val selectedCartItemIds: List<Long>,
 ) : ViewModel() {
+    constructor(
+        cartRepository: CartRepository,
+        couponRepository: CouponRepository,
+        orderRepository: OrderRepository,
+        savedStateHandle: SavedStateHandle,
+    ) : this(
+        cartRepository = cartRepository,
+        couponRepository = couponRepository,
+        orderRepository = orderRepository,
+        selectedCartItemIds =
+            savedStateHandle.toRoute<ShoppingRoute.Payment>().selectedCartItemIds,
+    )
+
     private val _uiEvent = Channel<UiEvent>(Channel.BUFFERED)
     val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
 
@@ -112,16 +130,18 @@ class PaymentViewModelFactory(
     private val cartRepository: CartRepository,
     private val couponRepository: CouponRepository,
     private val orderRepository: OrderRepository,
-    private val selectedCartItemIds: List<Long>,
 ) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(
+        modelClass: Class<T>,
+        extras: CreationExtras,
+    ): T {
         if (modelClass.isAssignableFrom(PaymentViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return PaymentViewModel(
                 cartRepository = cartRepository,
                 couponRepository = couponRepository,
                 orderRepository = orderRepository,
-                selectedCartItemIds = selectedCartItemIds,
+                savedStateHandle = extras.createSavedStateHandle(),
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

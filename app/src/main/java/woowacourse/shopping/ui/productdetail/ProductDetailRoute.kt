@@ -10,7 +10,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
 import woowacourse.shopping.domain.model.order.PurchaseProduct
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -28,15 +27,11 @@ fun NavGraphBuilder.productDetailRoute(
     onLastViewedProductClick: (selectedProductId: Long, lastViewedProductId: Long) -> Unit,
     onBackClick: () -> Unit,
 ) {
-    composable<ShoppingRoute.ProductDetail> { backStackEntry ->
-        val route = backStackEntry.toRoute<ShoppingRoute.ProductDetail>()
-
+    composable<ShoppingRoute.ProductDetail> {
         ProductDetailRouteContent(
             cartRepository = cartRepository,
             productRepository = productRepository,
             recentlyViewedProductRepository = recentlyViewedProductRepository,
-            selectedProductId = route.selectedProductId,
-            lastViewedProductId = route.lastViewedProductId,
             contentPadding = contentPadding,
             snackbarHostState = snackbarHostState,
             onLastViewedProductClick = onLastViewedProductClick,
@@ -50,8 +45,6 @@ private fun ProductDetailRouteContent(
     cartRepository: CartRepository,
     productRepository: ProductRepository,
     recentlyViewedProductRepository: RecentlyViewedProductRepository,
-    selectedProductId: Long,
-    lastViewedProductId: Long?,
     contentPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
     onLastViewedProductClick: (selectedProductId: Long, lastViewedProductId: Long) -> Unit,
@@ -64,8 +57,6 @@ private fun ProductDetailRouteContent(
                     cartRepository = cartRepository,
                     recentlyViewedProductRepository = recentlyViewedProductRepository,
                     productRepository = productRepository,
-                    selectedProductId = selectedProductId,
-                    lastViewedProductId = lastViewedProductId,
                 ),
         )
 
