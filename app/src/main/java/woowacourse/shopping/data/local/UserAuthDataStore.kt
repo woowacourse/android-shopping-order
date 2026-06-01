@@ -43,23 +43,6 @@ class UserAuthDataStore(
         }
     }
 
-    suspend fun saveUserAuth(
-        userName: String,
-        userPassword: String,
-    ) {
-        context.dataStore.edit { preferences ->
-            preferences[USER_NAME] = userName
-            preferences[USER_PASSWORD] = userPassword
-        }
-    }
-
-    suspend fun clearUserAuth() {
-        context.dataStore.edit { preferences ->
-            preferences.remove(USER_NAME)
-            preferences.remove(USER_PASSWORD)
-        }
-    }
-
     val encodedUserAuthInfo: Flow<String?> =
         combine(userName, userPassword) { name, password ->
             if (name.isNullOrBlank() || password.isNullOrBlank()) {
