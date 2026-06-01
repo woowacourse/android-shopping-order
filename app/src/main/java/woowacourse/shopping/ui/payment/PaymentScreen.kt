@@ -39,7 +39,10 @@ fun PaymentScreen(
             modifier = Modifier.weight(1f),
         )
         if (uiState.isLoading.not()) {
-            PaymentBottomBar(onPaymentClick = onPaymentClick)
+            PaymentBottomBar(
+                onPaymentClick = onPaymentClick,
+                isEnabled = uiState.isPaymentProcessing.not(),
+            )
         }
     }
 }

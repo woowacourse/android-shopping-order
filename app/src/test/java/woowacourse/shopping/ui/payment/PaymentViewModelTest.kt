@@ -142,6 +142,32 @@ class PaymentViewModelTest {
         }
 
     @Test
+    fun `결제 처리 중 다시 결제를 요청해도 주문 생성은 한 번만 실행된다`() =
+        runTest {
+            fakeCartRepository.insert(PurchaseProduct(id = 101L, product = products[0], count = 1))
+            val orderRepository = BlockingOrderRepository()
+            val viewModel =
+                PaymentViewModel(
+                    cartRepository = fakeCartRepository,
+                    couponRepository = fakeCouponRepository,
+                    orderRepository = orderRepository,
+                    selectedCartItemIds = listOf(101L),
+                )
+            advanceUntilIdle()
+
+            viewModel.completePayment(onSuccess = {})
+            viewModel.completePayment(onSuccess = {})
+
+            orderRepository.createOrderCallCount shouldBe 1
+            viewModel.isPaymentProcessing.value shouldBe true
+
+            orderRepository.complete()
+            advanceUntilIdle()
+
+            viewModel.isPaymentProcessing.value shouldBe false
+        }
+
+    @Test
     fun `이벤트 수집자가 없어도 결제 완료 메시지를 보관한다`() =
         runTest {
             fakeCartRepository.insert(PurchaseProduct(id = 101L, product = products[0], count = 1))
@@ -216,5 +242,21 @@ private class FakeOrderRepository : OrderRepository {
 
     override suspend fun createOrder(cartItemIds: List<Long>) {
         createdOrderCartItemIds = cartItemIds
+    }
+}
+
+private class BlockingOrderRepository : OrderRepository {
+    var createOrderCallCount: Int = 0
+        private set
+
+    private val orderCompleted = CompletableDeferred<Unit>()
+
+    override suspend fun createOrder(cartItemIds: List<Long>) {
+        createOrderCallCount++
+        orderCompleted.await()
+    }
+
+    fun complete() {
+        orderCompleted.complete(Unit)
     }
 }

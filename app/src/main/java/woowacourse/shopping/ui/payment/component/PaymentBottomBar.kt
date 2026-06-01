@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,6 +21,7 @@ import woowacourse.shopping.core.designsystem.theme.PrimaryGreen
 fun PaymentBottomBar(
     onPaymentClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isEnabled: Boolean = true,
 ) {
     Box(
         modifier =
@@ -27,7 +29,8 @@ fun PaymentBottomBar(
                 .fillMaxWidth()
                 .height(64.dp)
                 .background(Color.PrimaryGreen)
-                .clickable(onClick = onPaymentClick),
+                .alpha(if (isEnabled) 1f else 0.5f)
+                .clickable(enabled = isEnabled, onClick = onPaymentClick),
         contentAlignment = Alignment.Center,
     ) {
         Text(

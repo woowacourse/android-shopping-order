@@ -57,6 +57,9 @@ class PaymentViewModel internal constructor(
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    private val _isPaymentProcessing = MutableStateFlow(false)
+    val isPaymentProcessing: StateFlow<Boolean> = _isPaymentProcessing.asStateFlow()
+
     init {
         fetchInitialPayment()
     }
@@ -76,6 +79,9 @@ class PaymentViewModel internal constructor(
     }
 
     fun completePayment(onSuccess: () -> Unit) {
+        if (_isPaymentProcessing.value) return
+        _isPaymentProcessing.value = true
+
         viewModelScope.launch {
             try {
                 orderRepository.createOrder(selectedCartItemIds)
@@ -83,6 +89,8 @@ class PaymentViewModel internal constructor(
                 onSuccess()
             } catch (e: Exception) {
                 _uiEvent.send(UiEvent.ShowMessage("주문에 실패했습니다. 다시 시도해주세요."))
+            } finally {
+                _isPaymentProcessing.value = false
             }
         }
     }
