@@ -50,13 +50,13 @@ import woowacourse.shopping.domain.model.ShoppingCartItem
 import woowacourse.shopping.domain.model.ShoppingItem
 import woowacourse.shopping.ui.component.CartSkeletonItem
 import woowacourse.shopping.ui.component.ProductQuantityBox
-import woowacourse.shopping.ui.cart.ShoppingCartState
 import woowacourse.shopping.ui.theme.AndroidShoppingTheme
 
 @Composable
 fun ShoppingCartScreen(
     shoppingCartItems: List<ShoppingCartItem>,
-    state: ShoppingCartState,
+    selectedProductIds: Set<Long>,
+    isLoading: Boolean,
     getQuantityPrice: (ShoppingCartItem) -> Int,
     onBackClick: () -> Unit,
     onRemoveShoppingItemClick: (ShoppingCartItem) -> Unit,
@@ -86,7 +86,7 @@ fun ShoppingCartScreen(
                     ),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            if (state.isLoading) {
+            if (isLoading) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
@@ -104,7 +104,7 @@ fun ShoppingCartScreen(
                     shoppingCartItems.forEach { shoppingCartItem ->
                         ShoppingCartItems(
                             shoppingCartItem = shoppingCartItem,
-                            selected = shoppingCartItem.product.id in state.selectedProductIds,
+                            selected = shoppingCartItem.product.id in selectedProductIds,
                             quantityPrice = getQuantityPrice(shoppingCartItem),
                             onRemoveShoppingItemClick = onRemoveShoppingItemClick,
                             onToggleShoppingItemSelectionClick = onToggleShoppingItemSelectionClick,
@@ -389,31 +389,8 @@ private fun ShoppingCartScreenPreview() {
                             ),
                     ),
                 ),
-            state =
-                ShoppingCartState(
-                    items =
-                        listOf(
-                            ShoppingCartItem(
-                                id = 1L,
-                                shoppingItem =
-                                    ShoppingItem(
-                                        product =
-                                            Product(
-                                                id = 1L,
-                                                title = ProductTitle("샘플 상품"),
-                                                price = Price(12000),
-                                                imageUrl = "https://example.com/image.jpg",
-                                            ),
-                                        quantity = 1,
-                                    ),
-                            ),
-                        ),
-                    isLoading = true,
-                    errorMessage = null,
-                    currentPage = 0,
-                    canMoveToPreviousPage = false,
-                    canMoveToNextPage = false,
-                ),
+            selectedProductIds = emptySet(),
+            isLoading = true,
             getQuantityPrice = { shoppingCartItem -> shoppingCartItem.getProductQuantityPrice() },
             onBackClick = {},
             onRemoveShoppingItemClick = {},

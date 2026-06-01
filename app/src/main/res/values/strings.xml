@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Shopping</string>
-    <string name="title_activity_detail_product">DetailProductActivity</string>
-    <string name="title_activity_shopping_cart">ShoppingCartActivity</string>
     <string name="product_not_found_message">상품을 찾을 수 없습니다</string>
     <string name="cart_icon_description">장바구니 아이콘</string>
     <string name="product_image_content_description">%1$s 상품 이미지</string>
@@ -16,4 +14,9 @@
     <string name="price_format_pattern">#,###원</string>
     <string name="recent_viewed_section_title">최근 본 상품</string>
     <string name="last_viewed_product_title">마지막으로 본 상품</string>
+    <string name="payment_top_bar_title">결제하기</string>
+    <string name="payment_reminder_toggle_title">미결제 알림 받기</string>
+    <string name="payment_reminder_channel_description">미결제 주문 리마인드 알림</string>
+    <string name="payment_reminder_title">결제가 아직 완료되지 않았어요</string>
+    <string name="payment_reminder_message">아직 결제가 완료되지 않았어요</string>
 </resources>

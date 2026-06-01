@@ -6,7 +6,7 @@ import woowacourse.shopping.ui.common.pagination.PageStateHolder
 class ShoppingCartPageStateHolder(
     shoppingCartItems: List<ShoppingCartItem>,
 ) : PageStateHolder<ShoppingCartItem>(shoppingCartItems) {
-    override val pageItemSize: Int = 5
+    override val pageItemSize: Int = PAGE_ITEM_SIZE
 
     override fun getPageRange(): IntRange = currentPage..getExclusiveEndPage()
 
@@ -21,4 +21,8 @@ class ShoppingCartPageStateHolder(
     fun canMoveToPreviousPage(): Boolean = isInPageRange(currentPage - 1)
 
     fun canMoveToNextPage(): Boolean = isInPageRange(currentPage + 1)
+
+    companion object {
+        const val PAGE_ITEM_SIZE: Int = 5
+    }
 }

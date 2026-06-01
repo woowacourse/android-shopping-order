@@ -7,9 +7,7 @@ import woowacourse.shopping.domain.model.ShoppingItem
 interface ShoppingItemRepository {
     val shoppingItems: StateFlow<List<ShoppingItem>>
 
-    suspend fun upsertProduct(product: Product)
-
-    suspend fun replaceProducts(products: List<Product>)
+    suspend fun upsertProducts(products: List<Product>)
 
     suspend fun plusQuantity(
         productId: Long,

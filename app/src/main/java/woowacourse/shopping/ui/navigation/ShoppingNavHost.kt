@@ -1,0 +1,149 @@
+@file:Suppress("FunctionName")
+
+package woowacourse.shopping.ui.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import woowacourse.shopping.di.AppViewModelFactory
+import woowacourse.shopping.ui.cart.ShoppingCartRouteContent
+import woowacourse.shopping.ui.detail.DetailRouteContent
+import woowacourse.shopping.ui.payment.PaymentRouteContent
+import woowacourse.shopping.ui.productlist.ProductListRouteContent
+import woowacourse.shopping.ui.recommend.ShoppingCartRecommendRouteContent
+
+@Composable
+fun ShoppingNavHost(
+    viewModelFactory: AppViewModelFactory,
+    pendingPaymentRoute: PaymentRoute?,
+    onPendingPaymentRouteHandled: () -> Unit = {},
+) {
+    val navController = rememberNavController()
+
+    LaunchedEffect(pendingPaymentRoute) {
+        val route = pendingPaymentRoute ?: return@LaunchedEffect
+        navController.navigate(CartGraphRoute) {
+            launchSingleTop = true
+        }
+        navController.navigate(route) {
+            launchSingleTop = true
+        }
+        onPendingPaymentRouteHandled()
+    }
+
+    NavHost(
+        navController = navController,
+        startDestination = ProductListRoute,
+    ) {
+        composable<ProductListRoute> {
+            ProductListRouteContent(
+                viewModelFactory = viewModelFactory,
+                onNavigateToDetail = { productId ->
+                    navController.navigate(
+                        DetailRoute(
+                            productId = productId,
+                            showLastViewed = true,
+                        ),
+                    )
+                },
+                onNavigateToCart = {
+                    navController.navigate(CartGraphRoute)
+                },
+            )
+        }
+
+        composable<DetailRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<DetailRoute>()
+            DetailRouteContent(
+                viewModelFactory = viewModelFactory,
+                route = route,
+                onBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToLastViewed = { productId ->
+                    navController.navigate(
+                        DetailRoute(
+                            productId = productId,
+                            showLastViewed = true,
+                        ),
+                    ) {
+                        popUpTo(route) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                },
+            )
+        }
+
+        navigation<CartGraphRoute>(startDestination = CartRoute) {
+            composable<CartRoute> { backStackEntry ->
+                val cartGraphEntry =
+                    remember(backStackEntry) {
+                        navController.getBackStackEntry(CartGraphRoute)
+                    }
+
+                ShoppingCartRouteContent(
+                    viewModelFactory = viewModelFactory,
+                    sharedViewModelStoreOwner = cartGraphEntry,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onNavigateToRecommend = {
+                        navController.navigate(RecommendRoute)
+                    },
+                )
+            }
+
+            composable<RecommendRoute> { backStackEntry ->
+                val cartGraphEntry =
+                    remember(backStackEntry) {
+                        navController.getBackStackEntry(CartGraphRoute)
+                    }
+
+                ShoppingCartRecommendRouteContent(
+                    viewModelFactory = viewModelFactory,
+                    sharedViewModelStoreOwner = cartGraphEntry,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onNavigateToPayment = { selectedProductIds ->
+                        navController.navigate(
+                            PaymentRoute(selectedProductIds = selectedProductIds.toList()),
+                        )
+                    },
+                )
+            }
+
+            composable<PaymentRoute> { backStackEntry ->
+                val cartGraphEntry =
+                    remember(backStackEntry) {
+                        navController.getBackStackEntry(CartGraphRoute)
+                    }
+                val route = backStackEntry.toRoute<PaymentRoute>()
+                PaymentRouteContent(
+                    viewModelFactory = viewModelFactory,
+                    sharedViewModelStoreOwner = cartGraphEntry,
+                    selectedProductIds = route.selectedProductIds.toSet(),
+                    fromReminder = route.fromReminder,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onOrderCompleted = {
+                        navController.navigate(ProductListRoute) {
+                            popUpTo(ProductListRoute) {
+                                inclusive = false
+                            }
+                            launchSingleTop = true
+                        }
+                    },
+                )
+            }
+        }
+    }
+}

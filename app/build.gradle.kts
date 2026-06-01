@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("org.jetbrains.kotlin.kapt")
+    alias(libs.plugins.kotlin.serialization)
 }
 
 val properties =
@@ -25,11 +25,10 @@ fun readConfig(
     localPropertiesKey: String,
     envKey: String,
     defaultValue: String = "",
-): String {
-    return properties.getProperty(localPropertiesKey)
+): String =
+    properties.getProperty(localPropertiesKey)
         ?: providers.environmentVariable(envKey).orNull
         ?: defaultValue
-}
 
 android {
     namespace = "woowacourse.shopping"
@@ -124,10 +123,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.datastore.preferences)
-    kapt(libs.androidx.room.compiler)
 
     implementation(libs.androidx.lifecycle.runtime.compose)
 
@@ -139,8 +135,9 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.mockwebserver)
     implementation(libs.retrofit)
-    implementation(libs.converter.gson)
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit.kotlinx.serialization.converter)
+
+    implementation(libs.androidx.navigation.compose)
 }

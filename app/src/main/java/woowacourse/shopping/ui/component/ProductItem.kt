@@ -98,7 +98,7 @@ private fun AddQuantityButton(
             modifier = modifier.fillMaxWidth(),
             contentAlignment = Alignment.BottomEnd,
         ) {
-            ShoppingCardAddBox(
+            ShoppingCartAddBox(
                 onShoppingCartAddClick = onAddToCartClick,
                 modifier = Modifier.size(36.dp),
             )

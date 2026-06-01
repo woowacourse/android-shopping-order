@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.remote.retrofit
 
+import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
-import retrofit2.HttpException
 
 sealed interface ApiFailure {
     data class Http(

@@ -2,45 +2,33 @@ package woowacourse.shopping.ui.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.remote.retrofit.repository.ProductRetrofitRepository
-import woowacourse.shopping.domain.model.ShoppingItem
-import woowacourse.shopping.domain.repository.ShoppingItemRepository
 import woowacourse.shopping.data.local.datastore.VisitStore
+import woowacourse.shopping.domain.model.ShoppingItem
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.ShoppingItemRepository
 
 class DetailProductViewModel(
     private val shoppingItemRepository: ShoppingItemRepository,
     private val visitStore: VisitStore,
-    private val productRepository: ProductRetrofitRepository,
+    private val productRepository: ProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DetailProductUiState())
     val uiState: StateFlow<DetailProductUiState> = _uiState.asStateFlow()
 
-    private val detailRequestMutex = Mutex()
-    private var requestedProductIds: Set<Long> = emptySet()
-    private var cachedShoppingItems: List<ShoppingItem> = shoppingItemRepository.shoppingItems.value
-    private var recentViewedProductIds: List<Long> = visitStore.recentVisitedProductIds.value
+    private val requestedProductIds: MutableSet<Long> = mutableSetOf()
     private var selectedProductId: Long? = null
-    private var selectedQuantity: Int = DEFAULT_QUANTITY
-    private var showLastViewedSection: Boolean = true
     private var lastViewedProductIdForCurrentDetail: Long? = null
 
     init {
         publishUiState()
         viewModelScope.launch {
-            shoppingItemRepository.shoppingItems.collect { latestShoppingItems ->
-                cachedShoppingItems = latestShoppingItems
-                publishUiState()
-            }
-        }
-        viewModelScope.launch {
-            visitStore.recentVisitedProductIds.collect { latestRecentViewedProductIds ->
-                recentViewedProductIds = latestRecentViewedProductIds
+            shoppingItemRepository.shoppingItems.collect {
                 publishUiState()
             }
         }
@@ -50,16 +38,21 @@ class DetailProductViewModel(
         productId: Long,
         showLastViewed: Boolean = true,
     ) {
-        showLastViewedSection = showLastViewed
         val recentProductIdsBeforeVisit = visitStore.recentVisitedProductIds.value
         if (selectedProductId != productId) {
             selectedProductId = productId
-            selectedQuantity = DEFAULT_QUANTITY
+            _uiState.update { currentState ->
+                currentState.copy(selectedQuantity = DEFAULT_QUANTITY)
+            }
         }
         lastViewedProductIdForCurrentDetail =
-            resolveLastViewedProductId(
-                recentProductIds = recentProductIdsBeforeVisit,
-            )
+            if (showLastViewed) {
+                resolveLastViewedProductId(
+                    recentProductIds = recentProductIdsBeforeVisit,
+                )
+            } else {
+                null
+            }
         viewModelScope.launch {
             visitStore.visit(productId)
         }
@@ -68,34 +61,36 @@ class DetailProductViewModel(
     }
 
     fun increaseSelectedQuantity() {
-        selectedQuantity += 1
+        _uiState.update { currentState ->
+            currentState.copy(selectedQuantity = currentState.selectedQuantity + 1)
+        }
         publishUiState()
     }
 
     fun decreaseSelectedQuantity() {
-        if (selectedQuantity <= DEFAULT_QUANTITY) {
+        if (_uiState.value.selectedQuantity <= DEFAULT_QUANTITY) {
             return
         }
-        selectedQuantity -= 1
+        _uiState.update { currentState ->
+            currentState.copy(selectedQuantity = currentState.selectedQuantity - 1)
+        }
         publishUiState()
     }
 
     private fun requestProductDetailIfNeeded(productId: Long) {
         viewModelScope.launch {
-            detailRequestMutex.withLock {
-                if (requestedProductIds.contains(productId)) return@withLock
-                requestedProductIds = requestedProductIds + productId
+            if (!requestedProductIds.add(productId)) return@launch
 
-                runCatching {
-                    productRepository
-                        .requestProductDetail(
-                            id = productId,
-                        )
-                }.onSuccess { detailProduct ->
-                    shoppingItemRepository.upsertProduct(detailProduct)
-                }.onFailure {
-                    requestedProductIds = requestedProductIds - productId
-                }
+            try {
+                val detailProduct =
+                    productRepository.requestProductDetail(
+                        id = productId,
+                    )
+                shoppingItemRepository.upsertProducts(listOf(detailProduct))
+            } catch (cancellationException: CancellationException) {
+                throw cancellationException
+            } catch (_: Exception) {
+                requestedProductIds.remove(productId)
             }
         }
     }
@@ -105,12 +100,14 @@ class DetailProductViewModel(
     }
 
     private fun createUiState(): DetailProductUiState {
-        val shoppingItemByProductId = cachedShoppingItems.associateBy { shoppingItem -> shoppingItem.getProductId() }
+        val shoppingItemByProductId =
+            shoppingItemRepository.shoppingItems.value
+                .associateBy { shoppingItem -> shoppingItem.getProductId() }
         val currentShoppingItem = selectedProductId?.let { productId -> shoppingItemByProductId[productId] }
-        val safeQuantity = selectedQuantity.coerceAtLeast(DEFAULT_QUANTITY)
+        val safeQuantity = _uiState.value.selectedQuantity.coerceAtLeast(DEFAULT_QUANTITY)
         val resolvedLastViewedShoppingItem =
             lastViewedProductIdForCurrentDetail
-                ?.takeIf { showLastViewedSection && it != selectedProductId }
+                ?.takeIf { it != selectedProductId }
                 ?.let { productId -> shoppingItemByProductId[productId] }
         return DetailProductUiState(
             shoppingItem = currentShoppingItem,
@@ -120,9 +117,7 @@ class DetailProductViewModel(
         )
     }
 
-    private fun resolveLastViewedProductId(
-        recentProductIds: List<Long>,
-    ): Long? = recentProductIds.firstOrNull()
+    private fun resolveLastViewedProductId(recentProductIds: List<Long>): Long? = recentProductIds.firstOrNull()
 
     data class DetailProductUiState(
         val shoppingItem: ShoppingItem? = null,

@@ -1,21 +1,32 @@
 package woowacourse.shopping.data.remote.retrofit
 
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import woowacourse.shopping.BuildConfig
+import woowacourse.shopping.data.remote.AcceptHeaderInterceptor
+import woowacourse.shopping.data.remote.AuthHeaderProvider
+import woowacourse.shopping.data.remote.AuthInterceptor
+import woowacourse.shopping.data.remote.retrofit.api.CouponRetrofitInterface
 import woowacourse.shopping.data.remote.retrofit.api.OrderRetrofitInterface
 import woowacourse.shopping.data.remote.retrofit.api.ProductRetrofitInterface
 import woowacourse.shopping.data.remote.retrofit.api.ShoppingCartRetrofitInterface
-import woowacourse.shopping.data.remote.AuthHeaderProvider
-import woowacourse.shopping.data.remote.AuthInterceptor
 
 class RetrofitService(
     authHeaderProvider: AuthHeaderProvider,
 ) {
+    private val json =
+        Json {
+            ignoreUnknownKeys = true
+            explicitNulls = false
+        }
+
     private val client =
         OkHttpClient
             .Builder()
+            .addInterceptor(AcceptHeaderInterceptor())
             .addInterceptor(AuthInterceptor(authHeaderProvider))
             .build()
 
@@ -24,7 +35,7 @@ class RetrofitService(
             .Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
 
     val orderApiService: OrderRetrofitInterface =
@@ -33,4 +44,6 @@ class RetrofitService(
         retrofit.create(ProductRetrofitInterface::class.java)
     val shoppingCartApiService: ShoppingCartRetrofitInterface =
         retrofit.create(ShoppingCartRetrofitInterface::class.java)
+    val couponApiService: CouponRetrofitInterface =
+        retrofit.create(CouponRetrofitInterface::class.java)
 }
