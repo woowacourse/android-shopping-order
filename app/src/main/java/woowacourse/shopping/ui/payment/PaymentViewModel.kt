@@ -53,13 +53,7 @@ class PaymentViewModel(
                     CartItems(allCart.values.filter { it.id in selectedItemIds })
                 }
 
-            // Log.d("PaymentViewModel", "refresh: selectedItemIds=$selectedItemIds, selectedCart items=${selectedCart.values.size}")
-
             availableCoupons = couponRepository.getAvailableCoupons()
-            // Log.d("PaymentViewModel", "refresh: availableCoupons size=${availableCoupons.size}")
-//            availableCoupons.forEach {
-//                Log.d("PaymentViewModel", "  - code=${it.code}, type=${it.type}, amount=${it.amount}, rate=${it.rate}, minOrderAmount=${it.minOrderAmount}")
-//            }
             val selectedCoupon =
                 previousSelectedCoupon?.let { previous ->
                     availableCoupons.firstOrNull { it.code == previous.code }
@@ -74,7 +68,6 @@ class PaymentViewModel(
     }
 
     fun selectCoupon(coupon: Coupon?) {
-        // Log.d("PaymentViewModel", "selectCoupon called: coupon=${coupon?.code}")
         val current = _uiState.value as? PaymentUiState.Success ?: return
         val newState =
             buildSuccessState(
@@ -82,7 +75,6 @@ class PaymentViewModel(
                 availableCoupons = current.availableCoupons,
                 selectedCoupon = coupon,
             )
-        // Log.d("PaymentViewModel", "selectCoupon: couponDiscount=${newState.couponDiscount}")
         _uiState.value = newState
     }
 
@@ -96,7 +88,7 @@ class PaymentViewModel(
             }
             cartRepository.order(selectedIds)
             _uiEvent.emit(PaymentUiEvent.ShowMessage("주문이 완료되었습니다"))
-            _uiEvent.emit(PaymentUiEvent.NavigateToProductList)
+            _uiEvent.emit(PaymentUiEvent.OrderSucceeded)
         }
     }
 
@@ -138,12 +130,4 @@ class PaymentViewModel(
                 }
             }
     }
-}
-
-sealed interface PaymentUiEvent {
-    data class ShowMessage(
-        val message: String,
-    ) : PaymentUiEvent
-
-    object NavigateToProductList : PaymentUiEvent
 }

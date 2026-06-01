@@ -32,8 +32,8 @@ class ProductListViewModel(
     private val recentProductsFlow = MutableStateFlow<List<Product>>(emptyList())
     private val cartFlow = MutableStateFlow(Cart())
 
-    private val _uiEvent = MutableSharedFlow<UiEvent>()
-    val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
+    private val _uiEvent = MutableSharedFlow<ProductListUiEvent>()
+    val uiEvent: SharedFlow<ProductListUiEvent> = _uiEvent.asSharedFlow()
 
     val uiState: StateFlow<ProductListUiState> =
         combine(pagingState, cartFlow, recentProductsFlow) { paging, cart, recents ->
@@ -65,7 +65,7 @@ class ProductListViewModel(
         viewModelScope.launch {
             cartRepository.addProduct(product)
             refreshCart()
-            _uiEvent.emit(UiEvent.ShowSnackbar("장바구니에 담았습니다"))
+            _uiEvent.emit(ProductListUiEvent.ShowSnackbar("장바구니에 담았습니다"))
         }
     }
 

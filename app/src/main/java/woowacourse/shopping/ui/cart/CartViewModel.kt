@@ -35,7 +35,8 @@ class CartViewModel(
     private val recommendProductsState = MutableStateFlow<List<Product>>(emptyList())
     private val isCartOrRecommendState = MutableStateFlow(CartFlow.CART)
     private val allCartItemsState = MutableStateFlow<CartItems?>(null)
-    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    private val _uiEvent = MutableSharedFlow<CartUiEvent>()
+    val uiEvent: SharedFlow<CartUiEvent> = _uiEvent.asSharedFlow()
     private var currentPage = 0
 
     val uiState: StateFlow<CartUiState> =
@@ -76,8 +77,6 @@ class CartViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = CartUiState.Loading,
         )
-
-    val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
 
     init {
         refresh()
@@ -125,7 +124,7 @@ class CartViewModel(
             cartRepository.remove(cartId)
 
             refreshCartItems()
-            _uiEvent.emit(UiEvent.ShowSnackbar("장바구니에서 삭제했습니다"))
+            _uiEvent.emit(CartUiEvent.ShowSnackbar("장바구니에서 삭제했습니다"))
         }
     }
 
@@ -134,7 +133,7 @@ class CartViewModel(
             val cartId = cartRepository.addProduct(product)
             selectedItemsState.update { it + cartId }
             refreshCartItems()
-            _uiEvent.emit(UiEvent.ShowSnackbar("장바구니에 추가했습니다"))
+            _uiEvent.emit(CartUiEvent.ShowSnackbar("장바구니에 추가했습니다"))
         }
     }
 
@@ -223,7 +222,7 @@ class CartViewModel(
         }
 
         viewModelScope.launch {
-            _uiEvent.emit(UiEvent.NavigateToPayment)
+            _uiEvent.emit(CartUiEvent.OrderRequested(selectedItems.toList()))
         }
     }
 
