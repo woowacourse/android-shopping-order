@@ -111,6 +111,11 @@ class ProductDetailViewModel internal constructor(
                     }
                 } else {
                     cartRepository.insert(purchaseProduct)
+                    cartRepository.findCartItemByProductId(purchaseProduct.productId)?.let { cartItem ->
+                        _cart.update {
+                            PurchaseProducts(listOf(cartItem))
+                        }
+                    }
                 }
                 _uiEvent.send(UiEvent.ShowMessage("장바구니에 담았습니다."))
                 onSuccess()

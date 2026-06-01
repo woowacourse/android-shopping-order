@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.extension.RegisterExtension
+import woowacourse.shopping.domain.model.order.PurchaseProduct
 import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.testing.fakes.FakeCartRepository
 import woowacourse.shopping.testing.fakes.FakeProductRepository
@@ -52,7 +53,6 @@ class ProductDetailViewModelTest {
         )
     }
 
-
     @Test
     fun `선택된 상품 ID로 서버에서 상품을 조회할 수 있다`() = runTest {
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -62,7 +62,7 @@ class ProductDetailViewModelTest {
         val product = viewModel.selectedProduct.value
 
         assertNotNull(product)
-        assertEquals(testProductId, product?.id)
+        assertEquals(testProductId, product.id)
         assertEquals(testProduct, product)
     }
 
@@ -83,6 +83,29 @@ class ProductDetailViewModelTest {
         viewModel.minusCount()
 
         assertEquals(1, viewModel.countState.value)
+    }
+
+    @Test
+    fun `신규 상품을 장바구니에 담으면 화면 상태를 동기화한다`() = runTest {
+        viewModel.addPurchaseProduct(PurchaseProduct(id = testProductId, product = testProduct))
+
+        val cartItem = viewModel.cart.value.findById(testProductId)
+
+        assertNotNull(cartItem)
+        assertEquals(1, cartItem.count)
+    }
+
+    @Test
+    fun `같은 상품을 연속으로 담으면 기존 장바구니 상품의 수량을 증가시킨다`() = runTest {
+        val purchaseProduct = PurchaseProduct(id = testProductId, product = testProduct)
+
+        viewModel.addPurchaseProduct(purchaseProduct)
+        viewModel.addPurchaseProduct(purchaseProduct)
+
+        val cartItem = viewModel.cart.value.findById(testProductId)
+
+        assertNotNull(cartItem)
+        assertEquals(2, cartItem.count)
     }
 
     @Test
