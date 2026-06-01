@@ -37,6 +37,8 @@ class DefaultAppContainer(
     context: Context,
 ) : AppContainer {
     private val appContext = context.applicationContext
+
+    @Volatile
     private var cachedAuthHeader: String? = null
 
     private val database by lazy { DataBase.getDatabase(appContext) }
