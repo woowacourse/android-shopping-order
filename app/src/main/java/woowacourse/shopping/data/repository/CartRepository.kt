@@ -1,11 +1,11 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.model.Cart
-import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Page
+import woowacourse.shopping.model.cart.Cart
+import woowacourse.shopping.model.cart.CartItem
 
 interface CartRepository {
-    suspend fun getAllCartItems(pageSize: Int = 5): Cart
+    suspend fun getAllCartItems(): Cart
 
     suspend fun add(
         productId: Long,

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -26,8 +27,9 @@ import woowacourse.shopping.ui.common.theme.Typography
 @Composable
 fun ShoppingTopBar(
     cartCount: Int,
-    modifier: Modifier = Modifier,
     onCartClick: () -> Unit,
+    onSettingsClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier =
@@ -45,24 +47,35 @@ fun ShoppingTopBar(
             style = Typography.titleMedium,
         )
 
-        BadgedBox(
-            badge = {
-                if (cartCount > 0) {
-                    Badge(
-                        containerColor = PrimaryColor,
-                        contentColor = Color.White,
-                    ) {
-                        Text(text = cartCount.toString())
-                    }
-                }
-            },
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(15.dp),
         ) {
             Icon(
-                imageVector = Icons.Default.ShoppingCart,
+                imageVector = Icons.Default.Settings,
                 contentDescription = "장바구니",
-                modifier = Modifier.clickable(onClick = onCartClick),
+                modifier = Modifier.clickable(onClick = onSettingsClick),
                 tint = Color.White,
             )
+
+            BadgedBox(
+                badge = {
+                    if (cartCount > 0) {
+                        Badge(
+                            containerColor = PrimaryColor,
+                            contentColor = Color.White,
+                        ) {
+                            Text(text = cartCount.toString())
+                        }
+                    }
+                },
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ShoppingCart,
+                    contentDescription = "장바구니",
+                    modifier = Modifier.clickable(onClick = onCartClick),
+                    tint = Color.White,
+                )
+            }
         }
     }
 }
@@ -70,5 +83,5 @@ fun ShoppingTopBar(
 @Preview(showBackground = true)
 @Composable
 private fun ShoppingTopBarPreview() {
-    ShoppingTopBar(cartCount = 6, onCartClick = {})
+    ShoppingTopBar(cartCount = 6, onCartClick = {}, onSettingsClick = {})
 }

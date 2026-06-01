@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.navigation.toRoute
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +18,9 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
+import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.ui.common.error.ErrorMessageMapper
+import woowacourse.shopping.ui.navigation.ProductDetailRoute
 
 class ProductDetailViewModel(
     savedStateHandle: SavedStateHandle,
@@ -26,17 +29,13 @@ class ProductDetailViewModel(
     private val recentProductRepo: RecentProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductDetailUiState())
-    val uiState = _uiState.asStateFlow()
-
     private val _events = Channel<String>(Channel.BUFFERED)
-    val events = _events.receiveAsFlow()
+    private val route: ProductDetailRoute = savedStateHandle.toRoute()
+    private val productId: Long = route.id
+    private val isFromBanner: Boolean = route.isFromBanner
 
-    private val isFromBanner: Boolean =
-        savedStateHandle[ProductDetailActivity.EXTRA_IS_FROM_BANNER] ?: false
-    private val productId: Long =
-        requireNotNull(savedStateHandle[ProductDetailActivity.EXTRA_PRODUCT_ID]) {
-            "ProductDetail 화면을 띄우기 위해 상품 ID가 필요합니다."
-        }
+    val uiState = _uiState.asStateFlow()
+    val events = _events.receiveAsFlow()
 
     init {
         loadProduct()
@@ -65,7 +64,7 @@ class ProductDetailViewModel(
                     _uiState.update {
                         it.copy(
                             existingCartItemId = newId,
-                            existingQuantity = state.selectedQuantity
+                            existingQuantity = state.selectedQuantity,
                         )
                     }
                 } else {
@@ -123,11 +122,7 @@ class ProductDetailViewModel(
     companion object {
         private const val TAG = "ProductDetailViewModel"
 
-        fun provideFactory(
-            productRepo: ProductRepository,
-            cartRepo: CartRepository,
-            recentProductRepo: RecentProductRepository,
-        ): ViewModelProvider.Factory =
+        fun provideFactory(container: AppContainer): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(
@@ -138,9 +133,9 @@ class ProductDetailViewModel(
 
                     return ProductDetailViewModel(
                         savedStateHandle = savedStateHandle,
-                        productRepo = productRepo,
-                        cartRepo = cartRepo,
-                        recentProductRepo = recentProductRepo,
+                        productRepo = container.productRepository,
+                        cartRepo = container.cartRepository,
+                        recentProductRepo = container.recentProductRepository,
                     ) as T
                 }
             }

@@ -28,10 +28,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.cart.CartItem
+import woowacourse.shopping.model.product.Product
 import woowacourse.shopping.ui.common.component.QuantityControlButton
+import woowacourse.shopping.ui.common.component.ShoppingCheckbox
 import woowacourse.shopping.ui.common.component.ShoppingImage
 import woowacourse.shopping.ui.common.theme.Gray5
 
@@ -85,7 +86,7 @@ private fun CartItemHeader(
                 .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        CartCheckbox(
+        ShoppingCheckbox(
             checked = isChecked,
             onCheckedChange = onCheckedChange,
         )

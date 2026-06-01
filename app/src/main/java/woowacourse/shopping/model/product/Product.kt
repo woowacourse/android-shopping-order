@@ -1,5 +1,6 @@
-package woowacourse.shopping.model
+package woowacourse.shopping.model.product
 
+import woowacourse.shopping.model.Money
 import java.util.concurrent.atomic.AtomicLong
 
 data class Product(

@@ -14,24 +14,35 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import woowacourse.shopping.model.Cart
-import woowacourse.shopping.model.CartItem
+import androidx.lifecycle.viewmodel.compose.viewModel
+import woowacourse.shopping.di.appContainer
 import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.cart.Cart
+import woowacourse.shopping.model.cart.CartItem
+import woowacourse.shopping.model.product.Product
 import woowacourse.shopping.ui.cart.component.CartBody
 import woowacourse.shopping.ui.cart.component.CartBottomBar
-import woowacourse.shopping.ui.cart.component.CartTopBar
 import woowacourse.shopping.ui.cart.component.CartRecommendationBody
 import woowacourse.shopping.ui.cart.component.CartScreenSkeleton
+import woowacourse.shopping.ui.cart.component.CartTopBar
 import woowacourse.shopping.ui.common.model.LoadState
 import woowacourse.shopping.ui.common.model.ProductUiModel
 
+private const val PAGE_SIZE = 5
+
 @Composable
 fun CartScreen(
-    viewModel: CartViewModel,
-    modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
-    onOrderClick: () -> Unit,
+    onOrderClick: (Set<Long>) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: CartViewModel =
+        viewModel(
+            factory =
+                CartViewModel.provideFactory(
+                    container = appContainer(),
+                    pageSize = PAGE_SIZE,
+                ),
+        ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -89,10 +100,7 @@ fun CartScreen(
                         onBackClick = { viewModel.changeScreen() },
                         onIncreaseClick = { viewModel.increaseInRecommendScreen(it) },
                         onDecreaseClick = { viewModel.decreaseInRecommendScreen(it) },
-                        onOrderClick = {
-                            viewModel.order(uiState.selectedItemIds.toList())
-                            onOrderClick()
-                        },
+                        onOrderClick = { onOrderClick(uiState.selectedItemIds) },
                     )
             }
     }

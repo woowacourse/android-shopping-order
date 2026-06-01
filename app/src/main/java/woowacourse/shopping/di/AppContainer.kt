@@ -2,16 +2,21 @@ package woowacourse.shopping.di
 
 import android.content.Context
 import androidx.room.Room
-import woowacourse.shopping.data.local.Database
+import woowacourse.shopping.data.local.SettingsPreferences
+import woowacourse.shopping.data.local.room.Database
+import woowacourse.shopping.data.remote.NetworkMonitor
 import woowacourse.shopping.data.remote.RetrofitClient
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.OrderRepository
+import woowacourse.shopping.data.repository.PaymentRepository
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentProductRepository
 import woowacourse.shopping.data.repository.network.RetrofitCartRepository
 import woowacourse.shopping.data.repository.network.RetrofitOrderRepository
+import woowacourse.shopping.data.repository.network.RetrofitPaymentRepository
 import woowacourse.shopping.data.repository.network.RetrofitProductRepository
 import woowacourse.shopping.data.repository.room.RoomRecentProductRepository
+import woowacourse.shopping.notification.PaymentAlarmScheduler
 
 class AppContainer(
     context: Context,
@@ -26,6 +31,10 @@ class AppContainer(
             .build()
     private val networkClient = RetrofitClient
 
+    val networkMonitor: NetworkMonitor by lazy { NetworkMonitor(context) }
+    val settingsPreferences: SettingsPreferences by lazy {
+        SettingsPreferences(context)
+    }
     val productRepository: ProductRepository =
         RetrofitProductRepository(networkClient.productService)
     val cartRepository: CartRepository =
@@ -38,4 +47,9 @@ class AppContainer(
     }
     val orderRepository: OrderRepository =
         RetrofitOrderRepository(networkClient.orderService)
+    val paymentRepository: PaymentRepository =
+        RetrofitPaymentRepository(networkClient.paymentService)
+    val paymentAlarmScheduler: PaymentAlarmScheduler by lazy {
+        PaymentAlarmScheduler(context)
+    }
 }

@@ -9,12 +9,16 @@ import retrofit2.create
 import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.remote.auth.AuthInterceptor
 import woowacourse.shopping.data.remote.auth.BasicAuthEncoder
+import woowacourse.shopping.data.remote.auth.MockInterceptor
 import woowacourse.shopping.data.remote.service.CartService
 import woowacourse.shopping.data.remote.service.OrderService
+import woowacourse.shopping.data.remote.service.PaymentService
 import woowacourse.shopping.data.remote.service.ProductService
 
 object RetrofitClient {
-    private const val BASE_URL = BuildConfig.BASE_URL
+    private val useMock = BuildConfig.DEBUG && android.os.Debug.isDebuggerConnected()
+    private val BASE_URL = if (useMock) BuildConfig.MOCK_URL else BuildConfig.BASE_URL
+
     private val json =
         Json {
             ignoreUnknownKeys = true
@@ -25,7 +29,11 @@ object RetrofitClient {
         OkHttpClient
             .Builder()
             .addInterceptor(AuthInterceptor { encoder.getHeader() })
-            .build()
+            .apply {
+                if (useMock) {
+                    addInterceptor(MockInterceptor())
+                }
+            }.build()
     private val retrofit =
         Retrofit
             .Builder()
@@ -37,4 +45,5 @@ object RetrofitClient {
     val productService: ProductService by lazy { retrofit.create() }
     val cartService: CartService by lazy { retrofit.create() }
     val orderService: OrderService by lazy { retrofit.create() }
+    val paymentService: PaymentService by lazy { retrofit.create() }
 }

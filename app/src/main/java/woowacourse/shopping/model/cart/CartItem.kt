@@ -1,4 +1,7 @@
-package woowacourse.shopping.model
+package woowacourse.shopping.model.cart
+
+import woowacourse.shopping.model.Money
+import woowacourse.shopping.model.product.Product
 
 data class CartItem(
     val id: Long? = null,

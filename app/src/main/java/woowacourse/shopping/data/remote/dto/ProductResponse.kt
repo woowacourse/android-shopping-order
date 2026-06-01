@@ -2,7 +2,7 @@ package woowacourse.shopping.data.remote.dto
 
 import kotlinx.serialization.Serializable
 import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.product.Product
 
 @Serializable
 data class ProductResponse(

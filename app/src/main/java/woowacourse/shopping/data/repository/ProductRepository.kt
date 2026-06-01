@@ -1,7 +1,7 @@
 package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.model.Page
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.product.Product
 
 interface ProductRepository {
     /**

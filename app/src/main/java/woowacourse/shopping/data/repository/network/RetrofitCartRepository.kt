@@ -5,16 +5,16 @@ import woowacourse.shopping.data.remote.dto.Quantity
 import woowacourse.shopping.data.remote.dto.toDomain
 import woowacourse.shopping.data.remote.service.CartService
 import woowacourse.shopping.data.repository.CartRepository
-import woowacourse.shopping.model.Cart
-import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Page
+import woowacourse.shopping.model.cart.Cart
+import woowacourse.shopping.model.cart.CartItem
 
 class RetrofitCartRepository(
     private val service: CartService,
 ) : CartRepository {
-    override suspend fun getAllCartItems(pageSize: Int): Cart {
-        val response = service.getCartItems()
-        val totalSize = response.totalPages * pageSize
+    override suspend fun getAllCartItems(): Cart {
+        val response = service.getCartItems(size = 1)
+        val totalSize = response.totalPages
         return service.getCartItems(0, totalSize).toDomain()
     }
 

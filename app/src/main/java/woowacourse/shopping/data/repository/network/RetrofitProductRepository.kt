@@ -5,7 +5,7 @@ import woowacourse.shopping.data.remote.service.ProductService
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Page
-import woowacourse.shopping.model.Product
+import woowacourse.shopping.model.product.Product
 
 class RetrofitProductRepository(
     private val service: ProductService,

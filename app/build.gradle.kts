@@ -18,19 +18,30 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField(
-            "String",
-            "BASE_URL",
-            "\"http://techcourse-lv2-alb-974870821.ap-northeast-2.elb.amazonaws.com/\"",
-        )
+        buildConfigField("long", "PAYMENT_ALARM_DELAY_MILLIS", "300000L")
     }
     buildTypes {
+        debug {
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"http://techcourse-lv2-alb-250216202.ap-northeast-2.elb.amazonaws.com/\"",
+            )
+            buildConfigField("String", "MOCK_URL", "\"http://10.0.2.2:8080/\"")
+            buildConfigField("long", "PAYMENT_ALARM_DELAY_MILLIS", "10000L")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"http://techcourse-lv2-alb-250216202.ap-northeast-2.elb.amazonaws.com/\"",
+            )
+            buildConfigField("String", "MOCK_URL", "\"\"")
         }
     }
     compileOptions {
@@ -83,4 +94,5 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.compose.shimmer)
+    implementation(libs.androidx.navigation.compose)
 }

@@ -1,3 +1,147 @@
+#  🛠 3 & 4단계 리팩토링 목록
+
+## 1. 비동기 처리 및 안전한 이벤트 수집
+
+### 결제 처리와 화면 전환 동기화
+- [x] `PaymentScreen`에서 `viewModel.pay()` 호출 직후 `onPayClick()`이 곧바로 실행되는 비동기 타이밍 문제를 해결
+  - `pay()` 내부의 `viewModelScope` 코루틴 완료 시점과 화면 전환 시점이 어긋나지 않도록, 결제 성공 이벤트를 수신한 뒤 화면을 이동하는 구조로 흐름 분리
+
+### 생명주기를 고려한 이벤트 수집
+- [x] `PaymentScreen`에서 `LaunchedEffect(Unit)`로 이벤트를 수집하는 방식은 앱이 백그라운드로 전환될 때 안전하지 않음
+  - `repeatOnLifecycle`을 활용하여 생명주기에 따라 수집이 안전하게 일시 중단/재개되도록 수정
+
+## 2. 아키텍처 및 네비게이션 설계 개선
+
+### DeepLink 기반 알림 이동 처리
+- [x] `MainActivity`에서 알림 클릭 이동을 위해 `MutableStateFlow`로 상태를 직접 관리하는 방식을 제거
+  - DeepLink를 도입하여 알림 클릭 시 결제 화면으로 직접 진입할 수 있도록 구조를 개선
+
+## 3. 도메인 책임 분리 및 테스트 코드 도입
+
+### 도메인 계층으로 책임 이동
+- [x] `PaymentViewModel`이 `BASE_SHIPPING_FEE`(기본 배송비) 같은 비즈니스 데이터를 직접 들고 있는 구조를 개선
+  - 해당 정보는 도메인 계층(`Payment` 모델 등)이 담당하도록 책임을 이전
+
+### 도메인 및 ViewModel 테스트 작성
+- [x] `Payment`, `PaymentCalculator` 도메인 모델에 대한 단위 테스트를 작성
+- [x] `PaymentViewModel`를 외부 의존성을 주입받는 구조로 정리하여, 격리된 환경에서 테스트 가능한 형태로 수정
+
+## 4. 네이밍 컨벤션 점검
+
+### ViewModel 함수 네이밍 규칙 정비
+- [x] `SettingsViewModel` 내 `onToggle` 등 `onXxx` 형태의 함수명이 ViewModel 계층에 적절한지 재검토
+  - `onXxx`는 일반적으로 UI 이벤트 핸들러에서 사용되는 패턴이므로, ViewModel에서는 행위 중심의 명사/동사형 함수명(`updateSetting`)으로 변경
+
+---
+
+# 🚀 4단계 - 주문 & 알림
+
+## 🎯 기능 목록
+
+### 환경 및 인프라 설정
+- [x] 알림 권한(POST_NOTIFICATIONS) 처리
+  - [x] Android 13(TIRAMISU) 이상에서 `registerForActivityResult` 런처로 권한 요청
+  - [x] Android 12 이하에서는 권한 요청 없이 정상 동작
+- [x] AlarmManager 기반 알림 스케줄링
+  - [x] 결제 화면 진입 시 5분 후 알림 예약
+  - [x] 결제 완료 또는 결제 화면 재진입 시 예약 취소
+- [x] BroadcastReceiver 구현
+  - [x] 알람 수신 후 NotificationManager로 알림 노출
+  - [x] Notification 아이콘은 커스텀 리소스 사용 (Dialog/Notification 본체는 기본 UI)
+- [x] SharedPreferences(`settings`)로 알림 On/Off 영속화
+
+### 도메인 로직 / 쿠폰 정책
+- [x] 쿠폰 조회 및 적용 가능 여부 판별
+  - [x] API로부터 쿠폰 데이터 조회
+  - [x] 만료일이 지난 쿠폰은 적용 불가 처리
+  - [x] 쿠폰별 최소 주문 금액 / 사용 가능 시간 조건 검증
+  - [x] 단 1개의 쿠폰만 적용 가능하도록 제약
+- [x] `FIXED` M원 할인 쿠폰 계산 로직
+  - [x] 주문 금액이 N원 이상일 때만 적용
+  - [x] 최종 결제 금액에서 M원 차감
+- [x] `BUY_X_GET_Y` X개 구매 시 Y개 무료 쿠폰 계산 로직
+  - [x] 동일 상품이 X+Y개 이상 담긴 경우에만 적용
+  - [x] 조건을 만족하는 상품이 여러 개일 경우, 단가가 가장 비싼 상품에 적용
+  - [x] Y개 분량의 금액을 할인 금액으로 계산
+- [x] `FREESHIPPING` 무료 배송 쿠폰 계산 로직
+  - [x] 주문 금액이 N원 이상일 때만 적용
+  - [x] 기본 배송비 3,000원을 0원으로 처리
+  - [x] 도서 / 산간 지역에 관계없이 무료 배송 적용
+- [x] `MIRACLESALE` N% 할인 쿠폰 계산 로직
+  - [x] 현재 시각이 오전 X시 ~ Y시 구간일 때만 적용
+  - [x] 상품 총액의 N% 할인 금액 계산
+- [x] 최종 결제 금액 산출
+  - [x] (상품 총액 - 쿠폰 할인) + 배송비(기본 3,000원) 공식으로 계산
+
+### UI / API 계층
+- [x] 결제 화면
+  - [x] 적용 가능한 쿠폰 목록 조회 및 노출
+  - [x] 쿠폰 적용 시 할인/최종 금액 실시간 반영
+  - [x] 진입 시점에 5분 알림 예약
+- [x] 결제하기 동작
+  - [x] 결제하기 버튼 클릭 시 즉시 최종 주문 완료 (결제 수단 화면 없음)
+  - [x] 주문된 상품만 장바구니에서 제거, 쿠폰은 그대로 유지
+  - [x] 주문 완료 후 상품 목록으로 이동
+  - [x] 예약된 알림 취소
+- [x] 설정 화면
+  - [x] 미결제 알림 On/Off 토글
+  - [x] 토글 변경 시 SharedPreferences 즉시 저장 및 재실행 시 복원
+- [x] 미결제 알림 동작
+  - [x] 5분 내 미결제 시 "아직 결제가 완료되지 않았어요" 알림 노출
+  - [x] 알림 설정 Off면 노출되지 않음
+  - [x] 알림 클릭 시 결제 화면으로 이동 (PendingIntent)
+
+---
+
+# 🚀 3단계 - Navigation & Flow
+
+## 🎯 기능 목록
+
+### 환경 및 인프라 설정
+- [x] Compose Navigation 의존성 추가 및 프로젝트 구성
+  - [x] `androidx.navigation:navigation-compose` 의존성 추가
+- [x] 기존 Activity/Intent 기반 화면 전환 코드 제거
+  - [x] 각 화면별 Activity 클래스 및 `startActivity` 호출부 제거
+  - [x] `AndroidManifest.xml`에서 불필요한 Activity 선언 정리
+  - [x] 진입점을 단일 Activity + NavHost 구조로 전환
+
+### Navigation 구조 설계 (Route)
+- [x] 화면별 Route를 `@Serializable` 타입으로 선언
+  - [x] 상품 목록 Route (`Shopping`) 정의
+  - [x] 상품 상세 Route (`ProductDetail`) 정의 — productId 파라미터 포함
+  - [x] 장바구니 Route (`Cart`) 정의
+- [x] NavHost 및 NavController 구성
+  - [x] 앱 루트에 단일 `NavHost` 배치 및 시작 목적지(상품 목록) 지정
+  - [x] 각 Route에 대응하는 `composable<Route>` 블록 작성
+  - [x] NavController는 화면 Composable에 직접 전달하지 않고 이동 콜백 람다로 분리
+
+### 화면 이동 및 Back Stack 제어
+- [x] 화면 간 이동을 NavController 기반으로 처리
+  - [x] 상품 목록 → 상품 상세 이동 시 productId 전달
+  - [x] 상품 상세 → 장바구니 이동
+  - [x] 장바구니 → 상품 추천 이동
+- [x] 주문 완료 흐름의 Back Stack 정리
+  - [x] 주문 완료 후 상품 목록으로 이동 시 `popUpTo`로 주문 관련 화면 제거
+  - [x] `inclusive` 옵션을 적절히 설정하여 뒤로가기 시 주문 흐름이 남지 않도록 처리
+
+### 도메인 로직 / UI 상태 관리 (Flow)
+- [x] ViewModel의 UI 상태를 `StateFlow`로 노출
+  - [x] 내부 상태는 `MutableStateFlow`로 선언
+  - [x] 외부 노출은 `asStateFlow()`를 통한 읽기 전용 `StateFlow`
+  - [x] 기존 `remember` / `mutableStateOf` 기반 상태를 모두 교체
+- [x] 일회성 이벤트를 `SharedFlow`로 처리
+  - [x] 장바구니 담기 성공/실패 이벤트를 `MutableSharedFlow`로 발행
+  - [x] 스낵바 표시, 화면 이동 트리거 등 단발성 이벤트 처리
+  - [x] 이벤트 수신 후 재발행되지 않도록 replay/buffer 정책 검토
+- [x] Composable에서 Lifecycle 인식 상태 구독
+  - [x] `collectAsState()` 호출부를 `collectAsStateWithLifecycle()`로 교체
+  - [x] 백그라운드 상태에서 불필요한 수집이 발생하지 않도록 보장
+
+### 테스트
+- [x] 기존 테스트 호환성 유지
+
+---
+
 # 1 & 2단계 리팩토링 목록 - 2번째
 
 ### 아키텍처 및 ViewModel 계층 개선
@@ -82,7 +226,7 @@
 
 # 🚀 1단계 - 서버 연동
 
-## 🎯 기능 목록
+## 기능 목록
 
 ### 환경 및 인프라 설정
 - [x] 네트워크 통신 환경 구성

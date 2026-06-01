@@ -24,22 +24,33 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import woowacourse.shopping.di.appContainer
 import woowacourse.shopping.model.Money
-import woowacourse.shopping.model.Product
-import woowacourse.shopping.model.Products
+import woowacourse.shopping.model.product.Product
+import woowacourse.shopping.model.product.Products
 import woowacourse.shopping.ui.common.model.ProductUiModel
 import woowacourse.shopping.ui.shopping.component.ProductGroup
 import woowacourse.shopping.ui.shopping.component.RecentProductGroup
-import woowacourse.shopping.ui.shopping.component.ShoppingTopBar
 import woowacourse.shopping.ui.shopping.component.ShoppingScreenSkeleton
+import woowacourse.shopping.ui.shopping.component.ShoppingTopBar
+
+private const val LOAD_SIZE = 20
 
 @Composable
 fun ShoppingScreen(
-    viewModel: ShoppingViewModel,
-    modifier: Modifier = Modifier,
     onCartClick: () -> Unit,
-    onProductClick: (Product) -> Unit,
-    onRecentProductClick: (Product) -> Unit,
+    onProductClick: (Long) -> Unit,
+    onSettingsClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: ShoppingViewModel =
+        viewModel(
+            factory =
+                ShoppingViewModel.provideFactory(
+                    container = appContainer(),
+                    loadSize = LOAD_SIZE,
+                ),
+        ),
 ) {
     val lazyGridState = rememberLazyGridState()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -80,11 +91,12 @@ fun ShoppingScreen(
                 hasNext = state.hasNext,
                 lazyGridState = lazyGridState,
                 onCartClick = onCartClick,
-                onProductClick = onProductClick,
+                onProductClick = { onProductClick(it.id) },
                 onMoreClick = { viewModel.loadMore() },
                 onIncreaseClick = { viewModel.increase(it) },
                 onDecreaseClick = { viewModel.decrease(it) },
-                onRecentProductClick = onRecentProductClick,
+                onRecentProductClick = { onProductClick(it.id) },
+                onSettingsClick = onSettingsClick,
             )
 
             if (state.isLoading) ShoppingScreenSkeleton()
@@ -99,13 +111,14 @@ fun ShoppingScreen(
     cartCount: Int,
     hasNext: Boolean,
     lazyGridState: LazyGridState,
-    modifier: Modifier = Modifier,
     onCartClick: () -> Unit,
     onProductClick: (Product) -> Unit,
     onMoreClick: () -> Unit,
     onIncreaseClick: (ProductUiModel) -> Unit,
     onDecreaseClick: (ProductUiModel) -> Unit,
     onRecentProductClick: (Product) -> Unit,
+    onSettingsClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
@@ -114,6 +127,7 @@ fun ShoppingScreen(
         ShoppingTopBar(
             cartCount = cartCount,
             onCartClick = onCartClick,
+            onSettingsClick = onSettingsClick,
         )
 
         if (recentProducts.any()) {
@@ -178,6 +192,7 @@ private fun ShoppingScreenPreview1() {
         onDecreaseClick = {},
         modifier = Modifier,
         onRecentProductClick = {},
+        onSettingsClick = {},
     )
 }
 
@@ -197,5 +212,6 @@ private fun ShoppingScreenPreview2() {
         onDecreaseClick = {},
         modifier = Modifier,
         onRecentProductClick = {},
+        onSettingsClick = {},
     )
 }

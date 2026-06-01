@@ -1,8 +1,8 @@
 package woowacourse.shopping.data.remote.dto
 
 import kotlinx.serialization.Serializable
-import woowacourse.shopping.model.Cart
-import woowacourse.shopping.model.CartItem
+import woowacourse.shopping.model.cart.Cart
+import woowacourse.shopping.model.cart.CartItem
 
 @Serializable
 data class CartResponse(

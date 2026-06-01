@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart.component
+package woowacourse.shopping.ui.common.component
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Checkbox
@@ -11,10 +11,10 @@ import androidx.compose.ui.unit.dp
 import woowacourse.shopping.ui.common.theme.PrimaryColor
 
 @Composable
-fun CartCheckbox(
+fun ShoppingCheckbox(
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    onCheckedChange: (Boolean) -> Unit = {},
 ) {
     Checkbox(
         checked = checked,
@@ -31,8 +31,8 @@ fun CartCheckbox(
 
 @Preview(showBackground = true, name = "체크됨")
 @Composable
-private fun CartCheckboxPreview1() {
-    CartCheckbox(
+private fun ShoppingCheckboxPreview1() {
+    ShoppingCheckbox(
         checked = true,
         onCheckedChange = {},
     )
@@ -40,8 +40,8 @@ private fun CartCheckboxPreview1() {
 
 @Preview(showBackground = true, name = "체크안됨")
 @Composable
-private fun CartCheckboxPreview2() {
-    CartCheckbox(
+private fun ShoppingCheckboxPreview2() {
+    ShoppingCheckbox(
         checked = false,
         onCheckedChange = {},
     )
