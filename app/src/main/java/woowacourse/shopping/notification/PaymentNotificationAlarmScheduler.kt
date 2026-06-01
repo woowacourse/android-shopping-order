@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import androidx.core.app.NotificationManagerCompat
 import woowacourse.shopping.IntentKeys
 import woowacourse.shopping.domain.notification.PaymentNotificationScheduler
 import woowacourse.shopping.domain.repository.SettingRepository
@@ -15,8 +16,8 @@ class PaymentNotificationAlarmScheduler(
     private val alarmManager = context.getSystemService(AlarmManager::class.java)
 
     override fun schedule(selectedCartItemIds: List<Long>) {
-        cancel()
         if (selectedCartItemIds.isEmpty()) return
+        cancel(selectedCartItemIds)
         if (settingRepository.isPaymentNotificationEnabled().not()) return
 
         val triggerAtMillis = System.currentTimeMillis() + PAYMENT_NOTIFICATION_DELAY_MILLIS
@@ -30,14 +31,21 @@ class PaymentNotificationAlarmScheduler(
         )
     }
 
-    override fun cancel() {
+    override fun cancel(selectedCartItemIds: List<Long>) {
+        if (selectedCartItemIds.isEmpty()) return
+
         val pendingIntent =
             createAlarmPendingIntent(
-                selectedCartItemIds = emptyList(),
+                selectedCartItemIds = selectedCartItemIds,
                 flags = PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
-            ) ?: return
-        alarmManager.cancel(pendingIntent)
-        pendingIntent.cancel()
+            )
+        if (pendingIntent != null) {
+            alarmManager.cancel(pendingIntent)
+            pendingIntent.cancel()
+        }
+        NotificationManagerCompat
+            .from(context)
+            .cancel(PaymentNotificationIntentFactory.createNotificationId(selectedCartItemIds))
     }
 
     private fun createAlarmPendingIntent(
@@ -47,6 +55,7 @@ class PaymentNotificationAlarmScheduler(
         val intent =
             Intent(context, PaymentNotificationReceiver::class.java).apply {
                 action = ACTION_PAYMENT_NOTIFICATION_ALARM
+                data = PaymentNotificationIntentFactory.createPaymentUri(selectedCartItemIds)
                 putExtra(IntentKeys.SELECTED_CART_ID_KEY, selectedCartItemIds.toLongArray())
             }
         return PendingIntent.getBroadcast(

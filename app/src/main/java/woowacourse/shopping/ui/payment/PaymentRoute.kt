@@ -7,6 +7,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -66,12 +68,15 @@ private fun PaymentRouteContent(
     val payment by viewModel.payment.collectAsStateWithLifecycle()
     val coupons by viewModel.coupons.collectAsStateWithLifecycle()
     val paymentNotificationScheduler = shoppingApplication.paymentNotificationScheduler
+    val paymentCompletedState = remember(selectedCartItemIds) { mutableStateOf(false) }
 
     DisposableEffect(selectedCartItemIds) {
-        paymentNotificationScheduler.schedule(selectedCartItemIds)
+        paymentNotificationScheduler.cancel(selectedCartItemIds)
 
         onDispose {
-            paymentNotificationScheduler.cancel()
+            if (paymentCompletedState.value.not()) {
+                paymentNotificationScheduler.schedule(selectedCartItemIds)
+            }
         }
     }
 
@@ -81,7 +86,8 @@ private fun PaymentRouteContent(
         onCouponClick = viewModel::selectCoupon,
         onPaymentClick = {
             viewModel.completePayment {
-                paymentNotificationScheduler.cancel()
+                paymentCompletedState.value = true
+                paymentNotificationScheduler.cancel(selectedCartItemIds)
                 onPaymentComplete()
             }
         },

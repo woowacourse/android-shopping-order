@@ -54,7 +54,10 @@ class PaymentNotificationReceiver : BroadcastReceiver() {
         try {
             NotificationManagerCompat
                 .from(context)
-                .notify(NOTIFICATION_ID, notification)
+                .notify(
+                    PaymentNotificationIntentFactory.createNotificationId(selectedCartItemIds),
+                    notification,
+                )
         } catch (_: SecurityException) {
             return
         }
@@ -77,6 +80,5 @@ class PaymentNotificationReceiver : BroadcastReceiver() {
     companion object {
         private const val CHANNEL_ID = "payment_notification"
         private const val CHANNEL_NAME = "미결제 알림"
-        private const val NOTIFICATION_ID = 1001
     }
 }

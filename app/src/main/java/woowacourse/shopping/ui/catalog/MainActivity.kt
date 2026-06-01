@@ -89,7 +89,5 @@ private fun NavController.navigateToPayment(selectedCartItemIds: List<Long>) {
         ShoppingRoute.Payment(
             selectedCartItemIds = selectedCartItemIds,
         ),
-    ) {
-        launchSingleTop = true
-    }
+    )
 }

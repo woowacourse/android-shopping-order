@@ -3,5 +3,5 @@ package woowacourse.shopping.domain.notification
 interface PaymentNotificationScheduler {
     fun schedule(selectedCartItemIds: List<Long>)
 
-    fun cancel()
+    fun cancel(selectedCartItemIds: List<Long>)
 }
