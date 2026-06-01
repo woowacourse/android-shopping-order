@@ -144,8 +144,10 @@ class RecommendationViewModel internal constructor(
 
     fun fetchCart() {
         viewModelScope.launch {
-            _allCartItems.update {
-                cartRepository.getAllCartItems(CART_PAGE_SIZE)
+            try {
+                refreshCart()
+            } catch (e: Exception) {
+                _uiEvent.send(UiEvent.ShowMessage("장바구니 정보를 불러오지 못했습니다."))
             }
         }
     }
@@ -161,7 +163,7 @@ class RecommendationViewModel internal constructor(
                     updateKnownCartItemCount(existingItem.id, existingItem.count + 1)
                 } else {
                     cartRepository.insert(purchaseProduct)
-                    fetchCart()
+                    refreshCart()
                 }
                 _uiEvent.send(UiEvent.ShowMessage("장바구니에 담았습니다."))
             } catch (e: Exception) {
@@ -175,13 +177,17 @@ class RecommendationViewModel internal constructor(
         updateAmount: Int,
     ) {
         viewModelScope.launch {
-            val target = allCartItems.value.findById(id)
-            if (target != null) {
-                val nextCount = target.count + updateAmount
-                if(nextCount >= 1) {
-                    cartRepository.updateCount(target.id, nextCount)
-                    updateKnownCartItemCount(target.id, nextCount)
+            try {
+                val target = allCartItems.value.findById(id)
+                if (target != null) {
+                    val nextCount = target.count + updateAmount
+                    if (nextCount >= 1) {
+                        cartRepository.updateCount(target.id, nextCount)
+                        updateKnownCartItemCount(target.id, nextCount)
+                    }
                 }
+            } catch (e: Exception) {
+                _uiEvent.send(UiEvent.ShowMessage("수량 변경에 실패했습니다."))
             }
         }
     }
@@ -199,6 +205,10 @@ class RecommendationViewModel internal constructor(
                 _uiEvent.send(UiEvent.ShowMessage("상품 삭제에 실패했습니다."))
             }
         }
+    }
+
+    private suspend fun refreshCart() {
+        _allCartItems.value = cartRepository.getAllCartItems(CART_PAGE_SIZE)
     }
 
     private fun updateKnownCartItemCount(

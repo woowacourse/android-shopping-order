@@ -8,6 +8,7 @@ import woowacourse.shopping.domain.model.order.PurchaseProducts
 class FakeCartRepository : CartRepository {
     private val _db = mutableListOf<PurchaseProduct>()
     var shouldFail: Boolean = false
+    var shouldFailGetAllCartItems: Boolean = false
     val pageRequests = mutableListOf<PageRequest>()
 
     override suspend fun insert(purchaseProduct: PurchaseProduct) {
@@ -63,6 +64,7 @@ class FakeCartRepository : CartRepository {
     }
 
     override suspend fun getAllCartItems(pageSize: Int): PurchaseProducts {
+        if (shouldFailGetAllCartItems) throw Exception("Network Error")
         require(pageSize > 0) { "페이지 크기는 1 이상이어야 합니다." }
 
         val allItems = mutableListOf<PurchaseProduct>()

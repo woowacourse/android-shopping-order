@@ -2,6 +2,7 @@ package woowacourse.shopping.ui.recommendation
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -15,6 +16,7 @@ import woowacourse.shopping.testing.fakes.FakeCartRepository
 import woowacourse.shopping.testing.fakes.FakeProductRepository
 import woowacourse.shopping.testing.fakes.FakeRecentlyViewedProductRepository
 import woowacourse.shopping.testing.MainDispatcherExtension
+import woowacourse.shopping.ui.event.UiEvent
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RecommendationViewModelTest {
@@ -68,5 +70,46 @@ class RecommendationViewModelTest {
         assertEquals(false, recommended.any { it.id == 1L || it.id == 2L })
 
         collectJob.cancel()
+    }
+
+    @Test
+    fun `장바구니 조회에 실패하면 실패 이벤트를 발행한다`() = runTest {
+        // Given
+        viewModel = RecommendationViewModel(
+            cartRepository = fakeCartRepository,
+            productRepository = fakeProductRepository,
+            recentlyViewedProductRepository = fakeRecentlyViewedProductRepository,
+        )
+        fakeCartRepository.shouldFailGetAllCartItems = true
+
+        // When
+        viewModel.fetchCart()
+
+        // Then
+        assertEquals(
+            UiEvent.ShowMessage("장바구니 정보를 불러오지 못했습니다."),
+            viewModel.uiEvent.first(),
+        )
+    }
+
+    @Test
+    fun `상품 추가 후 장바구니 새로고침에 실패하면 담기 실패 이벤트를 발행한다`() = runTest {
+        // Given
+        val purchaseProduct = PurchaseProduct(id = 101L, product = products[0], count = 1)
+        viewModel = RecommendationViewModel(
+            cartRepository = fakeCartRepository,
+            productRepository = fakeProductRepository,
+            recentlyViewedProductRepository = fakeRecentlyViewedProductRepository,
+        )
+        fakeCartRepository.shouldFailGetAllCartItems = true
+
+        // When
+        viewModel.addToCart(purchaseProduct)
+
+        // Then
+        assertEquals(
+            UiEvent.ShowMessage("장바구니 담기에 실패했습니다."),
+            viewModel.uiEvent.first(),
+        )
     }
 }
