@@ -19,6 +19,7 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     appContainer: AppContainer,
+    showSnackbar: (String) -> Unit,
 ) {
     NavHost(
         navController = navController,
@@ -28,6 +29,7 @@ fun AppNavHost(
         composable<ProductListRoute> {
             ProductListScreenRoute(
                 appContainer = appContainer,
+                showSnackbar = showSnackbar,
                 onCartClick = { navController.navigate(CartRoute) },
                 onSettingsClick = { navController.navigate(SettingsRoute) },
                 onProductClick = { product ->
@@ -41,6 +43,7 @@ fun AppNavHost(
             ProductDetailScreenRoute(
                 productId = route.productId,
                 appContainer = appContainer,
+                showSnackbar = showSnackbar,
                 onCloseClick = { navController.popBackStack() },
                 onNavigateToCart = { navController.navigate(CartRoute) },
                 onLastViewedProductClick = { product ->
@@ -52,6 +55,7 @@ fun AppNavHost(
         composable<CartRoute> {
             CartScreenRoute(
                 appContainer = appContainer,
+                showSnackbar = showSnackbar,
                 onClickClose = { navController.popBackStack() },
                 onNavigateToPayment = { selectedIds ->
                     navController.navigate(PaymentRoute(selectedItemIds = selectedIds))
@@ -68,6 +72,7 @@ fun AppNavHost(
             PaymentScreenRoute(
                 selectedItemIds = route.selectedItemIds,
                 appContainer = appContainer,
+                showSnackbar = showSnackbar,
                 onClose = { navController.popBackStack() },
                 onOrderSucceeded = {
                     navController.navigate(ProductListRoute) {

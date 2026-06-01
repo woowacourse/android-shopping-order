@@ -15,6 +15,7 @@ import woowacourse.shopping.di.AppContainer
 @Composable
 fun CartScreenRoute(
     appContainer: AppContainer,
+    showSnackbar: (String) -> Unit,
     onClickClose: () -> Unit,
     onNavigateToPayment: (selectedItemIds: List<Int>) -> Unit,
     modifier: Modifier = Modifier,
@@ -26,27 +27,19 @@ fun CartScreenRoute(
             productRepository = appContainer.productRepository,
         ),
     )
-    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(viewModel) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                is CartUiEvent.ShowSnackbar ->
-                    snackbarHostState.showSnackbar(event.message)
-                is CartUiEvent.OrderRequested ->
-                    onNavigateToPayment(event.selectedItemIds)
+                is CartUiEvent.ShowSnackbar -> showSnackbar(event.message)
+                is CartUiEvent.OrderRequested -> onNavigateToPayment(event.selectedItemIds)
             }
         }
     }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-    ) { innerPadding ->
-        CartScreen(
-            modifier = Modifier.padding(innerPadding),
-            viewModel = viewModel,
-            onClickClose = onClickClose,
-        )
-    }
+    CartScreen(
+        modifier = modifier,
+        viewModel = viewModel,
+        onClickClose = onClickClose,
+    )
 }

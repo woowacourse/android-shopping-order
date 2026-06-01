@@ -16,6 +16,7 @@ import woowacourse.shopping.domain.model.product.Product
 @Composable
 fun ProductListScreenRoute(
     appContainer: AppContainer,
+    showSnackbar: (String) -> Unit,
     onCartClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onProductClick: (Product) -> Unit,
@@ -28,27 +29,20 @@ fun ProductListScreenRoute(
             recentProductRepository = appContainer.recentProductRepository,
         ),
     )
-    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(viewModel) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                is ProductListUiEvent.ShowSnackbar ->
-                    snackbarHostState.showSnackbar(event.message)
+                is ProductListUiEvent.ShowSnackbar -> showSnackbar(event.message)
             }
         }
     }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-    ) { innerPadding ->
-        ProductListScreen(
-            modifier = Modifier.padding(innerPadding),
-            viewModel = viewModel,
-            onCartClick = onCartClick,
-            onSettingsClick = onSettingsClick,
-            onProductClick = onProductClick,
-        )
-    }
+    ProductListScreen(
+        modifier = modifier,
+        viewModel = viewModel,
+        onCartClick = onCartClick,
+        onSettingsClick = onSettingsClick,
+        onProductClick = onProductClick,
+    )
 }

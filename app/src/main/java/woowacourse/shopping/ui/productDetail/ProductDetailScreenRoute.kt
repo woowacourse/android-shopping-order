@@ -17,6 +17,7 @@ import woowacourse.shopping.domain.model.product.Product
 fun ProductDetailScreenRoute(
     productId: Int,
     appContainer: AppContainer,
+    showSnackbar: (String) -> Unit,
     onCloseClick: () -> Unit,
     onNavigateToCart: () -> Unit,
     onLastViewedProductClick: (Product) -> Unit,
@@ -31,29 +32,21 @@ fun ProductDetailScreenRoute(
             recentProductRepository = appContainer.recentProductRepository,
         ),
     )
-    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(viewModel) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                is ProductDetailUiEvent.ShowSnackbar ->
-                    snackbarHostState.showSnackbar(event.message)
-                ProductDetailUiEvent.AddedToCart ->
-                    onNavigateToCart()
+                is ProductDetailUiEvent.ShowSnackbar -> showSnackbar(event.message)
+                ProductDetailUiEvent.AddedToCart -> onNavigateToCart()
             }
         }
     }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-    ) { innerPadding ->
-        ProductDetailScreen(
-            modifier = Modifier.padding(innerPadding),
-            viewModel = viewModel,
-            onCloseClick = onCloseClick,
-            onAddToCartClick = { viewModel.addToCart() },
-            onLastViewedProductClick = onLastViewedProductClick,
-        )
-    }
+    ProductDetailScreen(
+        modifier = modifier,
+        viewModel = viewModel,
+        onCloseClick = onCloseClick,
+        onAddToCartClick = { viewModel.addToCart() },
+        onLastViewedProductClick = onLastViewedProductClick,
+    )
 }

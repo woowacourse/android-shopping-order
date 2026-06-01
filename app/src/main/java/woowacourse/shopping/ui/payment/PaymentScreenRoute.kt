@@ -11,11 +11,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.di.AppContainer
+import woowacourse.shopping.ui.cart.CartUiEvent
 
 @Composable
 fun PaymentScreenRoute(
     selectedItemIds: List<Int>,
     appContainer: AppContainer,
+    showSnackbar: (String) -> Unit,
     onClose: () -> Unit,
     onOrderSucceeded: () -> Unit,
     modifier: Modifier = Modifier,
@@ -27,29 +29,22 @@ fun PaymentScreenRoute(
             selectedItemIds = selectedItemIds.toSet(),
         ),
     )
-    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(viewModel) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                is PaymentUiEvent.ShowMessage ->
-                    snackbarHostState.showSnackbar(event.message)
-                PaymentUiEvent.OrderSucceeded ->
-                    onOrderSucceeded()
+                is PaymentUiEvent.ShowMessage -> showSnackbar(event.message)
+                PaymentUiEvent.OrderSucceeded -> onOrderSucceeded()
             }
         }
     }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-    ) { innerPadding ->
-        PaymentScreen(
-            viewModel = viewModel,
-            modifier = Modifier.padding(innerPadding),
-            selectedItemIds = selectedItemIds,
-            onClose = onClose,
-            onPayClick = viewModel::onClickPay,
-        )
-    }
+
+    PaymentScreen(
+        viewModel = viewModel,
+        modifier = modifier,
+        selectedItemIds = selectedItemIds,
+        onClose = onClose,
+        onPayClick = viewModel::onClickPay,
+    )
 }

@@ -9,13 +9,22 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.navigation.AppNavHost
 import woowacourse.shopping.ui.navigation.PaymentRoute
@@ -43,7 +52,24 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
-            AppNavHost(navController = navController, appContainer = appContainer)
+            val snackbarHostState = remember { SnackbarHostState() }
+            val scope = rememberCoroutineScope()
+
+            val showSnackbar: (String) -> Unit = { message ->
+                scope.launch { snackbarHostState.showSnackbar(message) }
+            }
+
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+            ) { innerPadding ->
+                AppNavHost(
+                    modifier = Modifier.padding(innerPadding),
+                    navController = navController,
+                    appContainer = appContainer,
+                    showSnackbar = showSnackbar,
+                )
+            }
 
             LaunchedEffect(paymentNavigationRequestId) {
                 if (paymentNavigationRequestId <= 0) return@LaunchedEffect
