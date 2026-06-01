@@ -1,10 +1,13 @@
 package woowacourse.shopping.ui.payment
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.toRoute
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -17,12 +20,15 @@ import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.CouponCalculator
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.ui.navigation.PaymentRoute
 
 class PaymentViewModel(
+    savedStateHandle: SavedStateHandle,
     private val cartRepository: CartRepository,
     private val couponRepository: CouponRepository,
-    private val selectedItemIds: Set<Int> = emptySet(),
 ) : ViewModel() {
+    private val route: PaymentRoute = savedStateHandle.toRoute<PaymentRoute>()
+    private val selectedItemIds: Set<Int> = route.selectedItemIds.toSet()
     private val _uiState = MutableStateFlow<PaymentUiState>(PaymentUiState.Loading)
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
 
@@ -118,14 +124,13 @@ class PaymentViewModel(
         fun factory(
             cartRepository: CartRepository,
             couponRepository: CouponRepository,
-            selectedItemIds: Set<Int> = emptySet(),
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
                     PaymentViewModel(
+                        savedStateHandle = createSavedStateHandle(),
                         cartRepository = cartRepository,
                         couponRepository = couponRepository,
-                        selectedItemIds = selectedItemIds,
                     )
                 }
             }

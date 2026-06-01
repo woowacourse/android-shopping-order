@@ -37,10 +37,8 @@ fun AppNavHost(
             )
         }
 
-        composable<ProductDetailRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<ProductDetailRoute>()
+        composable<ProductDetailRoute> {
             ProductDetailScreenRoute(
-                productId = route.productId,
                 appContainer = appContainer,
                 showSnackbar = showSnackbar,
                 onCloseClick = { navController.popBackStack() },

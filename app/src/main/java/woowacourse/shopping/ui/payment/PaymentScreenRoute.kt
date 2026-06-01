@@ -21,7 +21,6 @@ fun PaymentScreenRoute(
                 PaymentViewModel.factory(
                     cartRepository = appContainer.cartRepository,
                     couponRepository = appContainer.couponRepository,
-                    selectedItemIds = selectedItemIds.toSet(),
                 ),
         )
 

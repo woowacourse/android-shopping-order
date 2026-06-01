@@ -9,7 +9,6 @@ import woowacourse.shopping.domain.model.product.Product
 
 @Composable
 fun ProductDetailScreenRoute(
-    productId: Int,
     appContainer: AppContainer,
     showSnackbar: (String) -> Unit,
     onCloseClick: () -> Unit,
@@ -21,8 +20,6 @@ fun ProductDetailScreenRoute(
         viewModel(
             factory =
                 ProductDetailViewModel.factory(
-                    productId = productId,
-                    openedFromLastViewed = false,
                     productRepository = appContainer.productRepository,
                     cartRepository = appContainer.cartRepository,
                     recentProductRepository = appContainer.recentProductRepository,

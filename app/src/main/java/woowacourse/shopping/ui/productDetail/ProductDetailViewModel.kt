@@ -1,10 +1,13 @@
 package woowacourse.shopping.ui.productDetail
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.toRoute
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -18,14 +21,17 @@ import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.ui.navigation.ProductDetailRoute
 
 class ProductDetailViewModel(
-    val productId: Int,
-    private val openedFromLastViewed: Boolean,
+    savedStateHandle: SavedStateHandle,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel() {
+    private val route: ProductDetailRoute = savedStateHandle.toRoute<ProductDetailRoute>()
+    val productId: Int = route.productId
+    private val openedFromLastViewed: Boolean = false
     private val _uiState = MutableStateFlow<ProductDetailUiState>(ProductDetailUiState.Loading)
     private val cartFlow = MutableStateFlow(Cart())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
@@ -106,8 +112,6 @@ class ProductDetailViewModel(
 
     companion object {
         fun factory(
-            productId: Int,
-            openedFromLastViewed: Boolean,
             productRepository: ProductRepository,
             cartRepository: CartRepository,
             recentProductRepository: RecentProductRepository,
@@ -115,8 +119,7 @@ class ProductDetailViewModel(
             viewModelFactory {
                 initializer {
                     ProductDetailViewModel(
-                        productId = productId,
-                        openedFromLastViewed = openedFromLastViewed,
+                        savedStateHandle = createSavedStateHandle(),
                         productRepository = productRepository,
                         cartRepository = cartRepository,
                         recentProductRepository = recentProductRepository,
