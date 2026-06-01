@@ -134,7 +134,7 @@ class PaymentViewModelTest {
             val viewModel = createViewModel(selectedCartItemIds = listOf(101L))
             advanceUntilIdle()
 
-            viewModel.completePayment(onSuccess = {})
+            viewModel.completePayment()
             advanceUntilIdle()
 
             fakeOrderRepository.createdOrderCartItemIds shouldBe listOf(101L)
@@ -155,8 +155,8 @@ class PaymentViewModelTest {
                 )
             advanceUntilIdle()
 
-            viewModel.completePayment(onSuccess = {})
-            viewModel.completePayment(onSuccess = {})
+            viewModel.completePayment()
+            viewModel.completePayment()
 
             orderRepository.createOrderCallCount shouldBe 1
             viewModel.isPaymentProcessing.value shouldBe true
@@ -168,13 +168,26 @@ class PaymentViewModelTest {
         }
 
     @Test
+    fun `결제를 완료하면 결제 완료 이벤트를 발행한다`() =
+        runTest {
+            fakeCartRepository.insert(PurchaseProduct(id = 101L, product = products[0], count = 1))
+            val viewModel = createViewModel(selectedCartItemIds = listOf(101L))
+            advanceUntilIdle()
+
+            viewModel.completePayment()
+            advanceUntilIdle()
+
+            viewModel.paymentEvent.first() shouldBe PaymentEvent.Completed
+        }
+
+    @Test
     fun `이벤트 수집자가 없어도 결제 완료 메시지를 보관한다`() =
         runTest {
             fakeCartRepository.insert(PurchaseProduct(id = 101L, product = products[0], count = 1))
             val viewModel = createViewModel(selectedCartItemIds = listOf(101L))
             advanceUntilIdle()
 
-            viewModel.completePayment(onSuccess = {})
+            viewModel.completePayment()
             advanceUntilIdle()
 
             viewModel.uiEvent.first() shouldBe UiEvent.ShowMessage("주문이 완료되었습니다.")
@@ -187,7 +200,7 @@ class PaymentViewModelTest {
             val viewModel = createViewModel(selectedCartItemIds = listOf(101L))
             advanceUntilIdle()
 
-            viewModel.completePayment(onSuccess = {})
+            viewModel.completePayment()
             advanceUntilIdle()
             viewModel.uiEvent.first() shouldBe UiEvent.ShowMessage("주문이 완료되었습니다.")
 

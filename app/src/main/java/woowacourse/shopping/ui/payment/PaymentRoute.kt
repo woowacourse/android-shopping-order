@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -78,6 +79,18 @@ private fun PaymentRouteContent(
     val selectedCartItemIds = viewModel.selectedCartItemIds
     val paymentCompletedState = remember(selectedCartItemIds) { mutableStateOf(false) }
 
+    LaunchedEffect(viewModel.paymentEvent, selectedCartItemIds) {
+        viewModel.paymentEvent.collect { event ->
+            when (event) {
+                PaymentEvent.Completed -> {
+                    paymentCompletedState.value = true
+                    paymentNotificationScheduler.cancel(selectedCartItemIds)
+                    onPaymentComplete()
+                }
+            }
+        }
+    }
+
     DisposableEffect(selectedCartItemIds) {
         paymentNotificationScheduler.cancel(selectedCartItemIds)
 
@@ -97,13 +110,7 @@ private fun PaymentRouteContent(
             ),
         onBackClick = onBackClick,
         onCouponClick = viewModel::selectCoupon,
-        onPaymentClick = {
-            viewModel.completePayment {
-                paymentCompletedState.value = true
-                paymentNotificationScheduler.cancel(selectedCartItemIds)
-                onPaymentComplete()
-            }
-        },
+        onPaymentClick = viewModel::completePayment,
         modifier =
             Modifier
                 .fillMaxSize()

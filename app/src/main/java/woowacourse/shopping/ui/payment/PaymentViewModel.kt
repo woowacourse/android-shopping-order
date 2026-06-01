@@ -48,6 +48,9 @@ class PaymentViewModel internal constructor(
     private val _uiEvent = Channel<UiEvent>(Channel.BUFFERED)
     val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
 
+    private val _paymentEvent = Channel<PaymentEvent>(Channel.BUFFERED)
+    val paymentEvent: Flow<PaymentEvent> = _paymentEvent.receiveAsFlow()
+
     private val _coupons = MutableStateFlow<List<Coupon>>(emptyList())
     val coupons: StateFlow<List<Coupon>> = _coupons.asStateFlow()
 
@@ -78,7 +81,7 @@ class PaymentViewModel internal constructor(
         }
     }
 
-    fun completePayment(onSuccess: () -> Unit) {
+    fun completePayment() {
         if (_isPaymentProcessing.value) return
         _isPaymentProcessing.value = true
 
@@ -86,7 +89,7 @@ class PaymentViewModel internal constructor(
             try {
                 orderRepository.createOrder(selectedCartItemIds)
                 _uiEvent.send(UiEvent.ShowMessage("주문이 완료되었습니다."))
-                onSuccess()
+                _paymentEvent.send(PaymentEvent.Completed)
             } catch (e: Exception) {
                 _uiEvent.send(UiEvent.ShowMessage("주문에 실패했습니다. 다시 시도해주세요."))
             } finally {
