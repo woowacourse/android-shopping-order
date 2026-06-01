@@ -50,7 +50,7 @@ class PaymentViewModelTest {
                         FixedAmountCoupon(
                             code = "FIXED5000",
                             name = "5,000원 할인 쿠폰",
-                            expirationDate = LocalDate.of(2026, 11, 30),
+                            expirationDate = LocalDate.now().plusYears(1),
                             discountAmount = 5_000,
                             minimumOrderAmount = 100_000,
                         ),
