@@ -15,12 +15,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.domain.notification.PaymentNotificationScheduler
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.ui.event.UiEventHandler
 import woowacourse.shopping.ui.navigation.ShoppingRoute
 
 fun NavGraphBuilder.paymentRoute(
-    shoppingApplication: ShoppingApplication,
+    cartRepository: CartRepository,
+    couponRepository: CouponRepository,
+    orderRepository: OrderRepository,
+    paymentNotificationScheduler: PaymentNotificationScheduler,
     contentPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
     onBackClick: () -> Unit,
@@ -30,7 +36,10 @@ fun NavGraphBuilder.paymentRoute(
         val route = backStackEntry.toRoute<ShoppingRoute.Payment>()
 
         PaymentRouteContent(
-            shoppingApplication = shoppingApplication,
+            cartRepository = cartRepository,
+            couponRepository = couponRepository,
+            orderRepository = orderRepository,
+            paymentNotificationScheduler = paymentNotificationScheduler,
             selectedCartItemIds = route.selectedCartItemIds,
             contentPadding = contentPadding,
             snackbarHostState = snackbarHostState,
@@ -42,7 +51,10 @@ fun NavGraphBuilder.paymentRoute(
 
 @Composable
 private fun PaymentRouteContent(
-    shoppingApplication: ShoppingApplication,
+    cartRepository: CartRepository,
+    couponRepository: CouponRepository,
+    orderRepository: OrderRepository,
+    paymentNotificationScheduler: PaymentNotificationScheduler,
     selectedCartItemIds: List<Long>,
     contentPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
@@ -53,9 +65,9 @@ private fun PaymentRouteContent(
         viewModel(
             factory =
                 PaymentViewModelFactory(
-                    cartRepository = shoppingApplication.cartRepository,
-                    couponRepository = shoppingApplication.couponRepository,
-                    orderRepository = shoppingApplication.orderRepository,
+                    cartRepository = cartRepository,
+                    couponRepository = couponRepository,
+                    orderRepository = orderRepository,
                     selectedCartItemIds = selectedCartItemIds,
                 ),
         )
@@ -67,7 +79,6 @@ private fun PaymentRouteContent(
 
     val payment by viewModel.payment.collectAsStateWithLifecycle()
     val coupons by viewModel.coupons.collectAsStateWithLifecycle()
-    val paymentNotificationScheduler = shoppingApplication.paymentNotificationScheduler
     val paymentCompletedState = remember(selectedCartItemIds) { mutableStateOf(false) }
 
     DisposableEffect(selectedCartItemIds) {

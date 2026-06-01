@@ -1,9 +1,9 @@
 package woowacourse.shopping.ui.recommendation
 
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -12,15 +12,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.domain.model.order.PurchaseProduct
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.ui.event.UiEventHandler
+import woowacourse.shopping.ui.navigation.ShoppingRoute
 import woowacourse.shopping.ui.uimodel.toCartProductUiModel
 import woowacourse.shopping.ui.uimodel.toProductUiModel
-import woowacourse.shopping.ui.navigation.ShoppingRoute
 
 fun NavGraphBuilder.recommendationRoute(
-    shoppingApplication: ShoppingApplication,
+    cartRepository: CartRepository,
+    productRepository: ProductRepository,
+    recentlyViewedProductRepository: RecentlyViewedProductRepository,
     contentPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
     onItemClick: (selectedProductId: Long) -> Unit,
@@ -31,7 +35,9 @@ fun NavGraphBuilder.recommendationRoute(
         val route = backStackEntry.toRoute<ShoppingRoute.Recommendation>()
 
         RecommendationRouteContent(
-            shoppingApplication = shoppingApplication,
+            cartRepository = cartRepository,
+            productRepository = productRepository,
+            recentlyViewedProductRepository = recentlyViewedProductRepository,
             selectedCartItemIds = route.selectedCartItemIds,
             contentPadding = contentPadding,
             snackbarHostState = snackbarHostState,
@@ -44,7 +50,9 @@ fun NavGraphBuilder.recommendationRoute(
 
 @Composable
 private fun RecommendationRouteContent(
-    shoppingApplication: ShoppingApplication,
+    cartRepository: CartRepository,
+    productRepository: ProductRepository,
+    recentlyViewedProductRepository: RecentlyViewedProductRepository,
     selectedCartItemIds: List<Long>,
     contentPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
@@ -56,10 +64,9 @@ private fun RecommendationRouteContent(
         viewModel(
             factory =
                 RecommendationViewModelFactory(
-                    cartRepository = shoppingApplication.cartRepository,
-                    productRepository = shoppingApplication.productRepository,
-                    recentlyViewedProductRepository =
-                        shoppingApplication.recentlyViewedProductRepository,
+                    cartRepository = cartRepository,
+                    productRepository = productRepository,
+                    recentlyViewedProductRepository = recentlyViewedProductRepository,
                     initialSelectedIds = selectedCartItemIds,
                 ),
         )

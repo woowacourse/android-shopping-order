@@ -1,8 +1,8 @@
 package woowacourse.shopping.ui.productdetail
 
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -11,14 +11,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.domain.model.order.PurchaseProduct
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.ui.event.UiEventHandler
 import woowacourse.shopping.ui.navigation.ShoppingRoute
 import woowacourse.shopping.ui.uimodel.toProductUiModel
 
 fun NavGraphBuilder.productDetailRoute(
-    shoppingApplication: ShoppingApplication,
+    cartRepository: CartRepository,
+    productRepository: ProductRepository,
+    recentlyViewedProductRepository: RecentlyViewedProductRepository,
     contentPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
     onLastViewedProductClick: (selectedProductId: Long, lastViewedProductId: Long) -> Unit,
@@ -28,7 +32,9 @@ fun NavGraphBuilder.productDetailRoute(
         val route = backStackEntry.toRoute<ShoppingRoute.ProductDetail>()
 
         ProductDetailRouteContent(
-            shoppingApplication = shoppingApplication,
+            cartRepository = cartRepository,
+            productRepository = productRepository,
+            recentlyViewedProductRepository = recentlyViewedProductRepository,
             selectedProductId = route.selectedProductId,
             lastViewedProductId = route.lastViewedProductId,
             contentPadding = contentPadding,
@@ -41,7 +47,9 @@ fun NavGraphBuilder.productDetailRoute(
 
 @Composable
 private fun ProductDetailRouteContent(
-    shoppingApplication: ShoppingApplication,
+    cartRepository: CartRepository,
+    productRepository: ProductRepository,
+    recentlyViewedProductRepository: RecentlyViewedProductRepository,
     selectedProductId: Long,
     lastViewedProductId: Long?,
     contentPadding: PaddingValues,
@@ -53,10 +61,9 @@ private fun ProductDetailRouteContent(
         viewModel(
             factory =
                 ProductDetailViewModelFactory(
-                    cartRepository = shoppingApplication.cartRepository,
-                    recentlyViewedProductRepository =
-                        shoppingApplication.recentlyViewedProductRepository,
-                    productRepository = shoppingApplication.productRepository,
+                    cartRepository = cartRepository,
+                    recentlyViewedProductRepository = recentlyViewedProductRepository,
+                    productRepository = productRepository,
                     selectedProductId = selectedProductId,
                     lastViewedProductId = lastViewedProductId,
                 ),

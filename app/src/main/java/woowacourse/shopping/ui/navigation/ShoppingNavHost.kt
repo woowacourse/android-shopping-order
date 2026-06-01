@@ -6,7 +6,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.domain.notification.PaymentNotificationScheduler
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.CouponRepository
+import woowacourse.shopping.domain.repository.OrderRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentlyViewedProductRepository
+import woowacourse.shopping.domain.repository.SettingRepository
 import woowacourse.shopping.ui.cart.cartRoute
 import woowacourse.shopping.ui.catalog.catalogRoute
 import woowacourse.shopping.ui.payment.paymentRoute
@@ -17,7 +23,13 @@ import woowacourse.shopping.ui.settings.settingRoute
 @Composable
 fun ShoppingNavHost(
     navController: NavHostController,
-    shoppingApplication: ShoppingApplication,
+    cartRepository: CartRepository,
+    couponRepository: CouponRepository,
+    orderRepository: OrderRepository,
+    productRepository: ProductRepository,
+    recentlyViewedProductRepository: RecentlyViewedProductRepository,
+    settingRepository: SettingRepository,
+    paymentNotificationScheduler: PaymentNotificationScheduler,
     contentPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
@@ -28,7 +40,9 @@ fun ShoppingNavHost(
         modifier = modifier,
     ) {
         catalogRoute(
-            shoppingApplication = shoppingApplication,
+            cartRepository = cartRepository,
+            productRepository = productRepository,
+            recentlyViewedProductRepository = recentlyViewedProductRepository,
             contentPadding = contentPadding,
             snackbarHostState = snackbarHostState,
             onProductClick = { selectedProductId, lastViewedProductId ->
@@ -52,7 +66,9 @@ fun ShoppingNavHost(
         )
 
         productDetailRoute(
-            shoppingApplication = shoppingApplication,
+            cartRepository = cartRepository,
+            productRepository = productRepository,
+            recentlyViewedProductRepository = recentlyViewedProductRepository,
             contentPadding = contentPadding,
             snackbarHostState = snackbarHostState,
             onLastViewedProductClick = { selectedProductId, lastViewedProductId ->
@@ -69,7 +85,7 @@ fun ShoppingNavHost(
         )
 
         cartRoute(
-            shoppingApplication = shoppingApplication,
+            cartRepository = cartRepository,
             contentPadding = contentPadding,
             snackbarHostState = snackbarHostState,
             onBackClick = { navController.popBackStack() },
@@ -83,7 +99,9 @@ fun ShoppingNavHost(
         )
 
         recommendationRoute(
-            shoppingApplication = shoppingApplication,
+            cartRepository = cartRepository,
+            productRepository = productRepository,
+            recentlyViewedProductRepository = recentlyViewedProductRepository,
             contentPadding = contentPadding,
             snackbarHostState = snackbarHostState,
             onItemClick = { selectedProductId ->
@@ -105,7 +123,10 @@ fun ShoppingNavHost(
         )
 
         paymentRoute(
-            shoppingApplication = shoppingApplication,
+            cartRepository = cartRepository,
+            couponRepository = couponRepository,
+            orderRepository = orderRepository,
+            paymentNotificationScheduler = paymentNotificationScheduler,
             contentPadding = contentPadding,
             snackbarHostState = snackbarHostState,
             onBackClick = { navController.popBackStack() },
@@ -120,7 +141,7 @@ fun ShoppingNavHost(
         )
 
         settingRoute(
-            shoppingApplication = shoppingApplication,
+            settingRepository = settingRepository,
             contentPadding = contentPadding,
             snackbarHostState = snackbarHostState,
             onBackClick = { navController.popBackStack() },

@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val shoppingApplication = application as ShoppingApplication
+        val appContainer = (application as ShoppingApplication).appContainer
 
         setContent {
             AndroidshoppingTheme {
@@ -51,7 +51,13 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     ShoppingNavHost(
                         navController = navController,
-                        shoppingApplication = shoppingApplication,
+                        cartRepository = appContainer.cartRepository,
+                        couponRepository = appContainer.couponRepository,
+                        orderRepository = appContainer.orderRepository,
+                        productRepository = appContainer.productRepository,
+                        recentlyViewedProductRepository = appContainer.recentlyViewedProductRepository,
+                        settingRepository = appContainer.settingRepository,
+                        paymentNotificationScheduler = appContainer.paymentNotificationScheduler,
                         contentPadding = innerPadding,
                         snackbarHostState = snackbarHostState,
                     )
@@ -81,8 +87,7 @@ private fun NavController.navigateToPaymentIfNeeded(intent: Intent) {
     }
 }
 
-private fun Intent.extractPaymentCartItemIds(): List<Long> =
-    PaymentNotificationIntentFactory.extractSelectedCartItemIds(this)
+private fun Intent.extractPaymentCartItemIds(): List<Long> = PaymentNotificationIntentFactory.extractSelectedCartItemIds(this)
 
 private fun NavController.navigateToPayment(selectedCartItemIds: List<Long>) {
     navigate(

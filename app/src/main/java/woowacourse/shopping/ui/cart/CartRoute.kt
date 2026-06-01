@@ -1,9 +1,9 @@
 package woowacourse.shopping.ui.cart
 
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -11,12 +11,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.ui.event.UiEventHandler
 import woowacourse.shopping.ui.navigation.ShoppingRoute
 
 fun NavGraphBuilder.cartRoute(
-    shoppingApplication: ShoppingApplication,
+    cartRepository: CartRepository,
     contentPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
     onBackClick: () -> Unit,
@@ -24,7 +24,7 @@ fun NavGraphBuilder.cartRoute(
 ) {
     composable<ShoppingRoute.Cart> {
         cartContent(
-            shoppingApplication = shoppingApplication,
+            cartRepository = cartRepository,
             contentPadding = contentPadding,
             snackbarHostState = snackbarHostState,
             onBackClick = onBackClick,
@@ -35,7 +35,7 @@ fun NavGraphBuilder.cartRoute(
 
 @Composable
 private fun cartContent(
-    shoppingApplication: ShoppingApplication,
+    cartRepository: CartRepository,
     contentPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
     onBackClick: () -> Unit,
@@ -45,7 +45,7 @@ private fun cartContent(
         viewModel(
             factory =
                 CartViewModelFactory(
-                    cartRepository = shoppingApplication.cartRepository,
+                    cartRepository = cartRepository,
                 ),
         )
 

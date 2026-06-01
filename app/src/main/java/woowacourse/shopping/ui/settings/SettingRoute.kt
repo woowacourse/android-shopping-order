@@ -18,19 +18,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import woowacourse.shopping.ShoppingApplication
+import woowacourse.shopping.domain.repository.SettingRepository
 import woowacourse.shopping.ui.event.UiEventHandler
 import woowacourse.shopping.ui.navigation.ShoppingRoute
 
 fun NavGraphBuilder.settingRoute(
-    shoppingApplication: ShoppingApplication,
+    settingRepository: SettingRepository,
     contentPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
     onBackClick: () -> Unit,
 ) {
     composable<ShoppingRoute.Setting> {
         SettingRouteContent(
-            shoppingApplication = shoppingApplication,
+            settingRepository = settingRepository,
             contentPadding = contentPadding,
             snackbarHostState = snackbarHostState,
             onBackClick = onBackClick,
@@ -40,7 +40,7 @@ fun NavGraphBuilder.settingRoute(
 
 @Composable
 private fun SettingRouteContent(
-    shoppingApplication: ShoppingApplication,
+    settingRepository: SettingRepository,
     contentPadding: PaddingValues,
     snackbarHostState: SnackbarHostState,
     onBackClick: () -> Unit,
@@ -49,7 +49,7 @@ private fun SettingRouteContent(
         viewModel(
             factory =
                 SettingViewModelFactory(
-                    shoppingApplication.settingRepository,
+                    settingRepository,
                 ),
         )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
