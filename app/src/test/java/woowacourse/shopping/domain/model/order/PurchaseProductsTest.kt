@@ -204,7 +204,7 @@ class PurchaseProductsTest {
 
         val updatedPurchaseProducts = purchaseProducts.add(newPurchaseProduct)
 
-        assertEquals(2, updatedPurchaseProducts.findById(productId)?.count)
+        assertEquals(2, updatedPurchaseProducts.findByProductId(productId)?.count)
     }
 
     @Test

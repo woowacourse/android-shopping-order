@@ -8,7 +8,7 @@ class PurchaseProducts(
     val purchaseProducts: List<PurchaseProduct> = emptyList(),
 ) : Parcelable {
     fun add(purchaseProduct: PurchaseProduct) =
-        if (findById(purchaseProduct.productId) == null) {
+        if (findByProductId(purchaseProduct.productId) == null) {
             PurchaseProducts(purchaseProducts + purchaseProduct)
         } else {
             updateCountWithUuid(purchaseProduct.productId, purchaseProduct.count)
@@ -24,17 +24,17 @@ class PurchaseProducts(
     )
 
     fun removeProduct(id: Long): PurchaseProducts {
-        val targetPurchaseProduct = findById(id) ?: return this
+        val targetPurchaseProduct = findByProductId(id) ?: return this
         return PurchaseProducts(purchaseProducts - targetPurchaseProduct)
     }
 
     fun totalPriceOfSpecificPurchaseProduct(id: Long): Int {
-        val targetProduct = findById(id) ?: return 0
+        val targetProduct = findByProductId(id) ?: return 0
         return targetProduct.totalPrice
     }
 
     fun totalCountOfSpecificPurchaseProduct(id: Long): Int {
-        val targetProduct = findById(id) ?: return 0
+        val targetProduct = findByProductId(id) ?: return 0
         return targetProduct.count
     }
 
@@ -44,5 +44,5 @@ class PurchaseProducts(
 
     fun findPurchaseProductById(id: Long): PurchaseProduct? = purchaseProducts.find { it.id == id }
 
-    fun findById(id: Long) = purchaseProducts.find { it.isSameProductID(id) }
+    fun findByProductId(id: Long) = purchaseProducts.find { it.isSameProductID(id) }
 }

@@ -91,7 +91,7 @@ class FakeCartRepository : CartRepository {
 
         while (true) {
             val cartPage = getCartPage(page, pageSize)
-            val foundItem = cartPage.items.findById(productId)
+            val foundItem = cartPage.items.findByProductId(productId)
 
             if (foundItem != null) return foundItem
             if (cartPage.isLast) return null

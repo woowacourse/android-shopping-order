@@ -178,7 +178,7 @@ class RecommendationViewModel internal constructor(
     ) {
         viewModelScope.launch {
             try {
-                val target = allCartItems.value.findById(id)
+                val target = allCartItems.value.findByProductId(id)
                 if (target != null) {
                     val nextCount = target.count + updateAmount
                     if (nextCount >= 1) {
@@ -195,7 +195,7 @@ class RecommendationViewModel internal constructor(
     fun removeWithID(id: Long) {
         viewModelScope.launch {
             try {
-                val target = allCartItems.value.findById(id)
+                val target = allCartItems.value.findByProductId(id)
                 if (target != null) {
                     cartRepository.deleteCartItem(target.id)
                     removeKnownCartItem(target.id)

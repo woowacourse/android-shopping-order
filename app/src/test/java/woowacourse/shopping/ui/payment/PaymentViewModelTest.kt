@@ -240,7 +240,7 @@ private class DeferredCartRepository(
     override suspend fun findCartItemByProductId(
         productId: Long,
         pageSize: Int,
-    ): PurchaseProduct? = cartItems.await().findById(productId)
+    ): PurchaseProduct? = cartItems.await().findByProductId(productId)
 }
 
 private class FakeCouponRepository(

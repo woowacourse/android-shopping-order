@@ -55,7 +55,7 @@ class CartTest {
 
         val updatedCart = cart.updateCountWithId(targetId, 1)
 
-        assertEquals(2, updatedCart.findById(targetId)?.count)
+        assertEquals(2, updatedCart.findByProductId(targetId)?.count)
     }
 
     @Test
@@ -176,7 +176,7 @@ class CartTest {
 
         val updatedCart = cart.add(purchaseProduct)
 
-        assertEquals(2, updatedCart.findById(targetId)?.count)
+        assertEquals(2, updatedCart.findByProductId(targetId)?.count)
     }
 
     @Test

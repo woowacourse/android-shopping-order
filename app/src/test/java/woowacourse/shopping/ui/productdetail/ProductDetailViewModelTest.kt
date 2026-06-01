@@ -89,7 +89,7 @@ class ProductDetailViewModelTest {
     fun `신규 상품을 장바구니에 담으면 화면 상태를 동기화한다`() = runTest {
         viewModel.addPurchaseProduct(PurchaseProduct(id = testProductId, product = testProduct))
 
-        val cartItem = viewModel.cart.value.findById(testProductId)
+        val cartItem = viewModel.cart.value.findByProductId(testProductId)
 
         assertNotNull(cartItem)
         assertEquals(1, cartItem.count)
@@ -102,7 +102,7 @@ class ProductDetailViewModelTest {
         viewModel.addPurchaseProduct(purchaseProduct)
         viewModel.addPurchaseProduct(purchaseProduct)
 
-        val cartItem = viewModel.cart.value.findById(testProductId)
+        val cartItem = viewModel.cart.value.findByProductId(testProductId)
 
         assertNotNull(cartItem)
         assertEquals(2, cartItem.count)

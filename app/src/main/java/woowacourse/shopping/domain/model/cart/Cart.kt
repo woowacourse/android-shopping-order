@@ -26,5 +26,5 @@ class Cart(
 
     fun isContain(id: Long) = purchaseProducts.isContain(id)
 
-    fun findById(id: Long) = purchaseProducts.findById(id)
+    fun findByProductId(id: Long) = purchaseProducts.findByProductId(id)
 }

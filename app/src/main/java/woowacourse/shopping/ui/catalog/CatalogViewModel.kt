@@ -123,7 +123,7 @@ class ShoppingViewModel(
         updateAmount: Int,
     ) {
         viewModelScope.launch {
-            val target = cart.value.findById(id)
+            val target = cart.value.findByProductId(id)
             if (target != null) {
                 val nextCount = target.count + updateAmount
                 if(nextCount >= 1) {
@@ -138,7 +138,7 @@ class ShoppingViewModel(
     fun removeWithID(id: Long) {
         viewModelScope.launch {
             try {
-                val target = cart.value.findById(id)
+                val target = cart.value.findByProductId(id)
                 if (target != null) {
                     cartRepository.deleteCartItem(target.id)
                     removeKnownCartItem(target.id)
