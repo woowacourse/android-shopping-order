@@ -47,18 +47,16 @@ import woowacourse.shopping.ui.theme.Green40
 
 @Composable
 fun ProductDetailScreen(
-    productId: Long,
     onRecentProductClick: (Long) -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ProductDetailViewModel = viewModel(),
+    viewModel: ProductDetailViewModel = viewModel(factory = ProductDetailViewModel.Factory),
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.loadProduct(productId)
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.event.collect { event ->
                 when (event) {
@@ -85,7 +83,7 @@ fun ProductDetailScreen(
                 productQuantity = uiState.quantity,
                 onRecentProductClick = onRecentProductClick,
                 onBackClick = onBackClick,
-                onAddToCart = { viewModel.addItemToCart(productId, uiState.quantity) },
+                onAddToCart = { viewModel.addItemToCart(uiState.quantity) },
                 onIncrease = viewModel::increaseQuantity,
                 onDecrease = viewModel::decreaseQuantity,
                 modifier = modifier,

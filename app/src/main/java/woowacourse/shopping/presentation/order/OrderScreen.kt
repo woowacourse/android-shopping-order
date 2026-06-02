@@ -52,18 +52,16 @@ import woowacourse.shopping.util.formattedPrice
 
 @Composable
 fun OrderScreen(
-    productIds: List<Long>,
     onBackClick: () -> Unit,
     onOrderSuccess: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: OrderViewModel = viewModel(),
+    viewModel: OrderViewModel = viewModel(factory = OrderViewModel.Factory),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.initialize(productIds)
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.event.collect { event ->
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()

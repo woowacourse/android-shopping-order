@@ -1,7 +1,12 @@
 package woowacourse.shopping.presentation.productdetail
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.toRoute
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -17,6 +22,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.common.model.toUiModel
 import woowacourse.shopping.presentation.productdetail.model.DetailUiState
+import woowacourse.shopping.route.ProductDetail
 
 sealed interface ProductDetailEvent {
     data class AddToCart(
@@ -27,6 +33,7 @@ sealed interface ProductDetailEvent {
 }
 
 class ProductDetailViewModel(
+    private val productId: Long,
     private val productRepository: ProductRepository = AppContainer.productRepository,
     private val cartRepository: CartRepository = AppContainer.cartRepository,
 ) : ViewModel() {
@@ -35,6 +42,10 @@ class ProductDetailViewModel(
 
     private val _event = MutableSharedFlow<ProductDetailEvent>()
     val event: SharedFlow<ProductDetailEvent> = _event.asSharedFlow()
+
+    init {
+        loadProduct()
+    }
 
     fun increaseQuantity() {
         _uiState.update { state ->
@@ -56,24 +67,19 @@ class ProductDetailViewModel(
         }
     }
 
-    fun addItemToCart(
-        id: Long,
-        quantity: Int = 1,
-    ) {
+    fun addItemToCart(quantity: Int = 1) {
         viewModelScope.launch {
-            addToCartUseCase(cartRepository, id, quantity)
+            addToCartUseCase(cartRepository, productId, quantity)
             _event.emit(ProductDetailEvent.AddToCart("상품을 추가했습니다"))
             _event.emit(ProductDetailEvent.NavigateToBack)
         }
     }
 
-    fun loadProduct(id: Long) {
-        if (_uiState.value !is DetailUiState.Loading) return
-
+    private fun loadProduct() {
         viewModelScope.launch {
             try {
                 val loadedProduct =
-                    productRepository.getProductById(id)
+                    productRepository.getProductById(productId)
                         ?: throw NoSuchElementException()
 
                 val recentProduct =
@@ -90,10 +96,22 @@ class ProductDetailViewModel(
                         recentProduct = recentProduct,
                     )
 
-                productRepository.upsertRecentProduct(id)
+                productRepository.upsertRecentProduct(productId)
             } catch (_: Exception) {
                 _uiState.value = DetailUiState.Error("상품 로딩에 실패했습니다.")
             }
         }
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer {
+                    val savedStateHandle = createSavedStateHandle()
+                    ProductDetailViewModel(
+                        productId = savedStateHandle.toRoute<ProductDetail>().productId,
+                    )
+                }
+            }
     }
 }

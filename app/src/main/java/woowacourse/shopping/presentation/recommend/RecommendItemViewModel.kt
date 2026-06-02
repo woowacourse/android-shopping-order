@@ -1,7 +1,12 @@
 package woowacourse.shopping.presentation.recommend
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.toRoute
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -17,21 +22,24 @@ import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.common.model.toUiModel
 import woowacourse.shopping.presentation.productlist.model.ShoppingItemUiModel
 import woowacourse.shopping.presentation.recommend.model.RecommendUiState
+import woowacourse.shopping.route.RecommendItem
 
 class RecommendItemViewModel(
+    productIds: List<Long>,
     private val cartRepository: CartRepository = AppContainer.cartRepository,
     private val productRepository: ProductRepository = AppContainer.productRepository,
 ) : ViewModel() {
+    private val _uiState = MutableStateFlow(RecommendUiState())
+    private val cart = cartRepository.cart
+    private val paymentItemIds = MutableStateFlow(productIds.toSet())
+
     init {
         viewModelScope.launch {
             cartRepository.loadCart()
             productRepository.loadProducts(0, 20)
+            loadRecommendProducts()
         }
     }
-
-    private val _uiState = MutableStateFlow(RecommendUiState())
-    private val cart = cartRepository.cart
-    private val paymentItemIds = MutableStateFlow(emptySet<Long>())
 
     val uiState =
         combine(cart, paymentItemIds, _uiState) { cart, paymentIds, state ->
@@ -54,28 +62,22 @@ class RecommendItemViewModel(
             initialValue = RecommendUiState(),
         )
 
-    fun loadRecommendProducts() {
-        viewModelScope.launch {
-            val recommendProducts = recommendProductUseCase(productRepository, cartRepository)
-            _uiState.update {
-                it.copy(
-                    recommendProducts =
-                        recommendProducts.map { product ->
-                            ShoppingItemUiModel(
-                                product = product.toUiModel(),
-                                quantity = 0,
-                            )
-                        },
-                )
-            }
+    private suspend fun loadRecommendProducts() {
+        val recommendProducts = recommendProductUseCase(productRepository, cartRepository)
+        _uiState.update {
+            it.copy(
+                recommendProducts =
+                    recommendProducts.map { product ->
+                        ShoppingItemUiModel(
+                            product = product.toUiModel(),
+                            quantity = 0,
+                        )
+                    },
+            )
         }
     }
 
     fun getPaymentItemIds(): List<Long> = paymentItemIds.value.toList()
-
-    fun initializePaymentItems(productIds: List<Long>) {
-        paymentItemIds.value = productIds.toSet()
-    }
 
     fun addItemToCart(productId: Long) {
         viewModelScope.launch {
@@ -94,5 +96,17 @@ class RecommendItemViewModel(
                 cartRepository.changeCartItem(productId, cartItem.decrease().quantity)
             }
         }
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer {
+                    val savedStateHandle = createSavedStateHandle()
+                    RecommendItemViewModel(
+                        productIds = savedStateHandle.toRoute<RecommendItem>().productIds,
+                    )
+                }
+            }
     }
 }

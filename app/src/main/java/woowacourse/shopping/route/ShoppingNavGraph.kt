@@ -41,7 +41,6 @@ fun ShoppingNavGraph(
         composable<ProductDetail> { backStackEntry ->
             val route = backStackEntry.toRoute<ProductDetail>()
             ProductDetailScreen(
-                productId = route.productId,
                 onRecentProductClick = { lastProductId ->
                     navController.navigate(route = ProductDetail(lastProductId)) {
                         popUpTo(route = ProductDetail(route.productId)) {
@@ -62,10 +61,8 @@ fun ShoppingNavGraph(
             )
         }
 
-        composable<RecommendItem> { backStackEntry ->
-            val route = backStackEntry.toRoute<RecommendItem>()
+        composable<RecommendItem> {
             RecommendItemScreen(
-                productIds = route.productIds,
                 onBackClick = { navController.popBackStack() },
                 onOrderClick = { productIds ->
                     navController.navigate(route = OrderItem(productIds))
@@ -74,10 +71,8 @@ fun ShoppingNavGraph(
             )
         }
 
-        composable<OrderItem> { backStackEntry ->
-            val route = backStackEntry.toRoute<OrderItem>()
+        composable<OrderItem> {
             OrderScreen(
-                productIds = route.productIds,
                 onBackClick = { navController.popBackStack() },
                 onOrderSuccess = {
                     onOrderSuccess()

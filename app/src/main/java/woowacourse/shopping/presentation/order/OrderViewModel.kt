@@ -1,7 +1,12 @@
 package woowacourse.shopping.presentation.order
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.toRoute
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -29,16 +34,18 @@ import woowacourse.shopping.error.Result
 import woowacourse.shopping.presentation.order.model.CouponUiModel
 import woowacourse.shopping.presentation.order.model.OrderEvent
 import woowacourse.shopping.presentation.order.model.OrderUiState
+import woowacourse.shopping.route.OrderItem
 import woowacourse.shopping.util.formattedPrice
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class OrderViewModel(
+    productIds: List<Long>,
     private val cartRepository: CartRepository = AppContainer.cartRepository,
     private val orderRepository: OrderRepository = AppContainer.orderRepository,
 ) : ViewModel() {
     private val cart = cartRepository.cart
-    private val paymentItemIds = MutableStateFlow(emptySet<Long>())
+    private val paymentItemIds = MutableStateFlow(productIds.toSet())
     private val coupons = MutableStateFlow<List<Coupon>>(emptyList())
     private val selectedCouponCode = MutableStateFlow<String?>(null)
     private var defaultOrder: Order? = null
@@ -70,8 +77,7 @@ class OrderViewModel(
     private val _event = MutableSharedFlow<OrderEvent>()
     val event: SharedFlow<OrderEvent> = _event.asSharedFlow()
 
-    fun initialize(productIds: List<Long>) {
-        paymentItemIds.value = productIds.toSet()
+    init {
         viewModelScope.launch {
             cartRepository.loadCart()
             orderRepository.loadCoupons()
@@ -125,4 +131,16 @@ class OrderViewModel(
                     else -> null
                 },
         )
+
+    companion object {
+        val Factory: ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer {
+                    val savedStateHandle = createSavedStateHandle()
+                    OrderViewModel(
+                        productIds = savedStateHandle.toRoute<OrderItem>().productIds,
+                    )
+                }
+            }
+    }
 }

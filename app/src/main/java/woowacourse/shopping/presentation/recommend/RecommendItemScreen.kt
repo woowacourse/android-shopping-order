@@ -16,7 +16,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,18 +37,12 @@ import woowacourse.shopping.util.formattedPrice
 
 @Composable
 fun RecommendItemScreen(
-    productIds: List<Long>,
     onBackClick: () -> Unit,
     onOrderClick: (List<Long>) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: RecommendItemViewModel = viewModel(),
+    viewModel: RecommendItemViewModel = viewModel(factory = RecommendItemViewModel.Factory),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.initializePaymentItems(productIds)
-        viewModel.loadRecommendProducts()
-    }
 
     RecommendItemContent(
         totalQuantity = uiState.totalQuantity,
