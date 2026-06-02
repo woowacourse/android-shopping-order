@@ -2,10 +2,12 @@ package woowacourse.shopping.data.remote.server.repository
 
 import woowacourse.shopping.data.remote.server.dto.cart.items.PatchQuantityRequest
 import woowacourse.shopping.data.remote.server.dto.cart.items.PostCartRequest
-import woowacourse.shopping.data.remote.server.dto.cart.items.toDomain
+import woowacourse.shopping.data.remote.server.dto.cart.items.toDomainPurchaseProduct
 import woowacourse.shopping.data.remote.server.service.CartService
-import woowacourse.shopping.domain.PurchaseProduct
-import woowacourse.shopping.domain.PurchaseProducts
+import woowacourse.shopping.domain.model.cart.CartPage
+import woowacourse.shopping.domain.model.order.PurchaseProduct
+import woowacourse.shopping.domain.model.order.PurchaseProducts
+import woowacourse.shopping.domain.repository.CartRepository
 
 class CartRepositoryImpl(private val cartService: CartService) : CartRepository {
 
@@ -31,30 +33,59 @@ class CartRepositoryImpl(private val cartService: CartService) : CartRepository 
         )
     }
 
-    override suspend fun getProductCount(): Int {
-        try {
-            return  cartService.requestQuantity().quantity
-        } catch (e: Exception){
-            throw e
-        }
-    }
+    override suspend fun getProductCount(): Int = cartService.requestQuantity().quantity
 
-    override suspend fun getPagedCart(
+    override suspend fun getCartPage(
         page: Int,
         size: Int
-    ): PurchaseProducts {
+    ): CartPage {
         try {
             val response = cartService.requestCartItems(page, size)
             val cartItems = response.content.map { content->
-                content.toDomain()
+                content.toDomainPurchaseProduct()
             }
-            return PurchaseProducts(cartItems)
+            return CartPage(
+                items = PurchaseProducts(cartItems),
+                isLast = response.last || response.content.size < size,
+            )
         } catch (e: Exception) {
             throw e
         }
     }
 
-    override suspend fun getCartItemCount(): Int {
-        return cartService.requestCartItems(0, 1).totalElements.toInt()
+    override suspend fun getAllCartItems(pageSize: Int): PurchaseProducts {
+        require(pageSize > 0) { "페이지 크기는 1 이상이어야 합니다." }
+
+        val allItems = mutableListOf<PurchaseProduct>()
+        var page = 0
+
+        while (true) {
+            val cartPage = getCartPage(page, pageSize)
+            allItems += cartPage.items.purchaseProducts
+
+            if (cartPage.isLast) break
+            page++
+        }
+
+        return PurchaseProducts(allItems)
+    }
+
+    override suspend fun findCartItemByProductId(
+        productId: Long,
+        pageSize: Int,
+    ): PurchaseProduct? {
+        require(pageSize > 0) { "페이지 크기는 1 이상이어야 합니다." }
+
+        var page = 0
+
+        while (true) {
+            val cartPage = getCartPage(page, pageSize)
+            val foundItem = cartPage.items.findByProductId(productId)
+
+            if (foundItem != null) return foundItem
+            if (cartPage.isLast) return null
+
+            page++
+        }
     }
 }

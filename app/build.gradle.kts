@@ -4,8 +4,13 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("kotlin-parcelize")
     alias(libs.plugins.ksp)
-    kotlin("plugin.serialization") version "2.1.0"
+    alias(libs.plugins.kotlin.serialization)
 }
+
+apply(from = "$rootDir/gradle/build-config-fields.gradle.kts")
+
+@Suppress("UNCHECKED_CAST")
+val shoppingBuildConfigFields = extra["shoppingBuildConfigFields"] as Map<String, String>
 
 android {
     namespace = "woowacourse.shopping"
@@ -19,6 +24,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        //noinspection WrongGradleMethod
+        shoppingBuildConfigFields.forEach { (name, value) ->
+            buildConfigField("String", name, value)
+        }
     }
 
     buildTypes {
@@ -38,6 +48,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     testOptions {
         unitTests.all {
@@ -69,6 +80,7 @@ dependencies {
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.datastore.preferences)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 

@@ -1,11 +1,19 @@
 package woowacourse.shopping.ui.recommendation
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.navigation.toRoute
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -14,20 +22,37 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
-import woowacourse.shopping.data.remote.server.repository.CartRepository
-import woowacourse.shopping.data.remote.server.repository.ProductRepository
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.Products
-import woowacourse.shopping.domain.PurchaseProduct
-import woowacourse.shopping.domain.PurchaseProducts
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.product.Products
+import woowacourse.shopping.domain.model.order.PurchaseProduct
+import woowacourse.shopping.domain.model.order.PurchaseProducts
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentlyViewedProductRepository
+import woowacourse.shopping.ui.event.UiEvent
+import woowacourse.shopping.ui.navigation.ShoppingRoute
 
-class RecommendationViewModel(
+class RecommendationViewModel internal constructor(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
     initialSelectedIds: List<Long> = emptyList(),
-): ViewModel() {
+) : ViewModel() {
+    constructor(
+        cartRepository: CartRepository,
+        productRepository: ProductRepository,
+        recentlyViewedProductRepository: RecentlyViewedProductRepository,
+        savedStateHandle: SavedStateHandle,
+    ) : this(
+        cartRepository = cartRepository,
+        productRepository = productRepository,
+        recentlyViewedProductRepository = recentlyViewedProductRepository,
+        initialSelectedIds =
+            savedStateHandle.toRoute<ShoppingRoute.Recommendation>().selectedCartItemIds,
+    )
+
+    private val _uiEvent = Channel<UiEvent>(Channel.BUFFERED)
+    val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
 
     private val _selectedItemIds = MutableStateFlow<List<Long>>(initialSelectedIds)
     val selectedItemIds = _selectedItemIds.asStateFlow()
@@ -39,6 +64,7 @@ class RecommendationViewModel(
             initialValue = null
         )
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val lastViewedProduct: StateFlow<Product?> = lastViewProductId.flatMapLatest { id ->
         flow {
             if (id != null && id != 0L) {
@@ -118,23 +144,31 @@ class RecommendationViewModel(
 
     fun fetchCart() {
         viewModelScope.launch {
-            _allCartItems.update {
-                cartRepository.getPagedCart(0, 1000000)
+            try {
+                refreshCart()
+            } catch (e: Exception) {
+                _uiEvent.send(UiEvent.ShowMessage("장바구니 정보를 불러오지 못했습니다."))
             }
         }
     }
 
     fun addToCart(purchaseProduct: PurchaseProduct) {
         viewModelScope.launch {
-            val existingItem = allCartItems.value.purchaseProducts.find {
-                it.product.id == purchaseProduct.product.id
+            try {
+                val existingItem = allCartItems.value.purchaseProducts.find {
+                    it.product.id == purchaseProduct.product.id
+                }
+                if (existingItem != null) {
+                    cartRepository.updateCount(existingItem.id, existingItem.count + 1)
+                    updateKnownCartItemCount(existingItem.id, existingItem.count + 1)
+                } else {
+                    cartRepository.insert(purchaseProduct)
+                    refreshCart()
+                }
+                _uiEvent.send(UiEvent.ShowMessage("장바구니에 담았습니다."))
+            } catch (e: Exception) {
+                _uiEvent.send(UiEvent.ShowMessage("장바구니 담기에 실패했습니다."))
             }
-            if (existingItem != null) {
-                cartRepository.updateCount(existingItem.id, existingItem.count + 1)
-            }else {
-                cartRepository.insert(purchaseProduct)
-            }
-            fetchCart()
         }
     }
 
@@ -143,25 +177,61 @@ class RecommendationViewModel(
         updateAmount: Int,
     ) {
         viewModelScope.launch {
-            val target = allCartItems.value.findById(id)
-            if (target != null) {
-                val nextCount = target.count + updateAmount
-                if(nextCount >= 1) {
-                    cartRepository.updateCount(target.id, nextCount)
-                    fetchCart()
+            try {
+                val target = allCartItems.value.findByProductId(id)
+                if (target != null) {
+                    val nextCount = target.count + updateAmount
+                    if (nextCount >= 1) {
+                        cartRepository.updateCount(target.id, nextCount)
+                        updateKnownCartItemCount(target.id, nextCount)
+                    }
                 }
+            } catch (e: Exception) {
+                _uiEvent.send(UiEvent.ShowMessage("수량 변경에 실패했습니다."))
             }
         }
     }
 
     fun removeWithID(id: Long) {
         viewModelScope.launch {
-            val target = allCartItems.value.findById(id)
-            if(target != null){
-                cartRepository.deleteCartItem(target.id)
-                fetchCart()
+            try {
+                val target = allCartItems.value.findByProductId(id)
+                if (target != null) {
+                    cartRepository.deleteCartItem(target.id)
+                    removeKnownCartItem(target.id)
+                    _uiEvent.send(UiEvent.ShowMessage("상품을 삭제했습니다."))
+                }
+            } catch (e: Exception) {
+                _uiEvent.send(UiEvent.ShowMessage("상품 삭제에 실패했습니다."))
             }
         }
+    }
+
+    private suspend fun refreshCart() {
+        _allCartItems.value = cartRepository.getAllCartItems(CART_PAGE_SIZE)
+    }
+
+    private fun updateKnownCartItemCount(
+        id: Long,
+        count: Int,
+    ) {
+        _allCartItems.update { cart ->
+            PurchaseProducts(
+                cart.purchaseProducts.map {
+                    if (it.id == id) it.copy(count = count) else it
+                },
+            )
+        }
+    }
+
+    private fun removeKnownCartItem(id: Long) {
+        _allCartItems.update { cart ->
+            PurchaseProducts(cart.purchaseProducts.filter { it.id != id })
+        }
+    }
+
+    companion object {
+        private const val CART_PAGE_SIZE = 5
     }
 }
 
@@ -169,16 +239,18 @@ class RecommendationViewModelFactory(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
-    private val initialSelectedIds: List<Long> = emptyList(),
 ) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(
+        modelClass: Class<T>,
+        extras: CreationExtras,
+    ): T {
         if (modelClass.isAssignableFrom(RecommendationViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return RecommendationViewModel(
-                cartRepository,
-                productRepository,
-                recentlyViewedProductRepository,
-                initialSelectedIds,
+                cartRepository = cartRepository,
+                productRepository = productRepository,
+                recentlyViewedProductRepository = recentlyViewedProductRepository,
+                savedStateHandle = extras.createSavedStateHandle(),
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

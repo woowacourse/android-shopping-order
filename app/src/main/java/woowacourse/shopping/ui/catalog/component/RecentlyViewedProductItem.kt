@@ -15,13 +15,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.ui.common.ProductImage
+import woowacourse.shopping.core.designsystem.component.ProductImage
+import woowacourse.shopping.core.formatter.toPriceString
+import woowacourse.shopping.ui.uimodel.ProductUiModel
 
 @Composable
 fun RecentlyViewedProductItem(
-    product: Product,
-    onClick: (Product) -> Unit,
+    product: ProductUiModel,
+    onClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -31,13 +32,13 @@ fun RecentlyViewedProductItem(
                 .height(120.dp)
                 .clickable(
                     onClick = {
-                        onClick(product)
+                        onClick(product.id)
                     },
                 ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         ProductImage(
-            imageUri = product.imageUri,
+            imageUri = product.imageUrl,
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -58,11 +59,12 @@ fun RecentlyViewedProductItem(
 @Composable
 private fun RecentlyViewedProductItemPreview() {
     RecentlyViewedProductItem(
-        Product(
+        ProductUiModel(
             id = 1L,
-            imageUri = "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcREOx9x8uZchUa41cKYxYrqv5uj-bD4zupCW4G3ADchbwNbXaxRIZtdeG9clkH0F06NCsQnTQ690KD0G4PygBj6ZPVbvCS7KUEmMwETqd9c7xuGRnAFucVgDQhFmfK2FJ3XWHAcKw&usqp=CAc",
+            imageUrl = "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcREOx9x8uZchUa41cKYxYrqv5uj-bD4zupCW4G3ADchbwNbXaxRIZtdeG9clkH0F06NCsQnTQ690KD0G4PygBj6ZPVbvCS7KUEmMwETqd9c7xuGRnAFucVgDQhFmfK2FJ3XWHAcKw&usqp=CAc",
             name = "너무너무너무너무너무너무너무너무 긴 이름",
             price = 1000,
+            formattedPrice = 1000.toPriceString(),
             category = "카테고리",
         ),
         onClick = {},

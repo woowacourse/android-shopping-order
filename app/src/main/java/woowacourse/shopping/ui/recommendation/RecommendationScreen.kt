@@ -24,27 +24,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.R
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.Products
-import woowacourse.shopping.domain.PurchaseProduct
-import woowacourse.shopping.ui.common.layout.CommonFrame
+import woowacourse.shopping.core.designsystem.component.ShoppingItem
+import woowacourse.shopping.core.designsystem.component.layout.CommonFrame
+import woowacourse.shopping.core.formatter.toPriceString
 import woowacourse.shopping.ui.cart.component.CartBottomBar
-import woowacourse.shopping.ui.common.ShoppingItem
+import woowacourse.shopping.ui.uimodel.ProductUiModel
 
 @Composable
 fun CartRecommendationScreen(
-    recommendedProducts: Products,
-    totalPrice: Int,
-    totalCount: Int,
+    uiState: RecommendationUiState,
     onBackClick: () -> Unit,
     onOrderClick: () -> Unit,
-    onAddInCart: (PurchaseProduct) -> Unit,
+    onAddInCart: (Long) -> Unit,
     onAdd: (Long, Int) -> Unit,
     onMinus: (Long, Int) -> Unit,
     onDelete: (Long) -> Unit,
     onItemClick: (Long) -> Unit,
-    isContainedInCart: (Long) -> Boolean,
-    itemCount: (Long) -> Int,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -54,21 +49,19 @@ fun CartRecommendationScreen(
             },
             bodyContent = {
                 RecommendationBody(
-                    recommendedProducts = recommendedProducts,
+                    uiState = uiState,
                     onAddInCart = onAddInCart,
                     onAdd = onAdd,
                     onMinus = onMinus,
                     onDelete = onDelete,
                     onItemClick = onItemClick,
-                    isContainedInCart = isContainedInCart,
-                    itemCount = itemCount
                 )
             },
             modifier = Modifier.weight(1f)
         )
         CartBottomBar(
-            totalPrice = totalPrice,
-            totalCount = totalCount,
+            totalPrice = uiState.totalPrice,
+            totalCount = uiState.totalCount,
             onOrderClick = onOrderClick
         )
     }
@@ -102,14 +95,12 @@ private fun RecommendationHeader(
 
 @Composable
 private fun RecommendationBody(
-    recommendedProducts: Products,
-    onAddInCart: (PurchaseProduct) -> Unit,
+    uiState: RecommendationUiState,
+    onAddInCart: (Long) -> Unit,
     onAdd: (Long, Int) -> Unit,
     onMinus: (Long, Int) -> Unit,
     onDelete: (Long) -> Unit,
     onItemClick: (Long) -> Unit,
-    isContainedInCart: (Long) -> Boolean,
-    itemCount: (Long) -> Int,
 ) {
     Column(
         modifier = Modifier
@@ -135,16 +126,16 @@ private fun RecommendationBody(
             contentPadding = PaddingValues(bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            items(recommendedProducts.products) { product ->
+            items(uiState.recommendedProducts) { product ->
                 ShoppingItem(
-                    count = { itemCount(product.id) },
+                    count = { uiState.productCount(product.id) },
                     product = product,
-                    isContainedInCart = { isContainedInCart(product.id) },
-                    onAddInCart = { onAddInCart(it) },
+                    isContainedInCart = { uiState.isContainedInCart(product.id) },
+                    onAddInCart = onAddInCart,
                     onAdd = { onAdd(product.id, 1) },
                     onMinus = { onMinus(product.id, -1) },
                     onDelete = { onDelete(product.id) },
-                    onClick = { onItemClick(product.id) }
+                    onClick = onItemClick
                 )
             }
         }
@@ -154,42 +145,28 @@ private fun RecommendationBody(
 @Preview(showBackground = true)
 @Composable
 internal fun CartRecommendationScreenPreview() {
-    val mockProducts = Products(listOf(
-        Product(
-            category = "default",
-            id = 1,
-            imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
-            name = "PET보틀-정사각형(400ml)",
-            price = 10000
-        ),
-        Product(
-            category = "default",
-            id = 2,
-            imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
-            name ="PET보틀-정사각형(400ml)",
-            price = 10000
-        ),
-        Product(
-            category = "default",
-            id = 3,
-            imageUri = "https://media.sodagift.com/img/image/1734582680547.jpg",
-            name ="PET보틀-정사각형(400ml)",
-            price = 10000
-        )
-    ))
+    val mockProduct = ProductUiModel(
+        category = "default",
+        id = 1L,
+        imageUrl = "https://media.sodagift.com/img/image/1734582680547.jpg",
+        name = "PET보틀-정사각형(400ml)",
+        price = 10000,
+        formattedPrice = 10000.toPriceString(),
+    )
+    val mockProducts = List(3) { index -> mockProduct.copy(id = index + 1L) }
 
     CartRecommendationScreen(
-        recommendedProducts = mockProducts,
-        totalPrice = 30000,
-        totalCount = 3,
+        uiState = RecommendationUiState(
+            recommendedProducts = mockProducts,
+            totalPrice = 30000,
+            totalCount = 3,
+        ),
         onBackClick = {},
         onOrderClick = {},
-        onAddInCart = {  },
+        onAddInCart = { },
         onAdd = { id, amount -> },
         onMinus = { id, amount -> },
-        onDelete = {  },
-        onItemClick = {  },
-        isContainedInCart = { false },
-        itemCount = { 0 },
+        onDelete = { },
+        onItemClick = { },
     )
 }

@@ -19,12 +19,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.core.designsystem.theme.PrimaryGreen
+import woowacourse.shopping.core.formatter.toPriceString
+import woowacourse.shopping.ui.uimodel.ProductUiModel
 
 @Composable
 fun LastViewedProduct(
-    product: Product,
-    onClick: (Product) -> Unit,
+    product: ProductUiModel,
+    onClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -36,16 +38,16 @@ fun LastViewedProduct(
                 .border(
                     width = 1.dp,
                     shape = RoundedCornerShape(4.dp),
-                    color = Color(0xFFAAAAAA),
+                    color = Color.LightGray,
                 ).clickable(
-                    onClick = { onClick(product) },
+                    onClick = { onClick(product.id) },
                 ).padding(18.dp),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.SpaceEvenly,
     ) {
         Text(
             text = "마지막으로 본 상품",
-            color = Color(0xFF04C09E),
+            color = Color.PrimaryGreen,
             fontWeight = FontWeight.W700,
             fontSize = 12.sp,
         )
@@ -53,7 +55,7 @@ fun LastViewedProduct(
             text = product.name,
             fontWeight = FontWeight.W400,
             fontSize = 18.sp,
-            color = Color(0xFF555555),
+            color = Color.Gray,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
         )
@@ -64,10 +66,11 @@ fun LastViewedProduct(
 @Composable
 private fun LastViewedProductPreview() {
     LastViewedProduct(
-        Product(
-            imageUri = "테스트",
+        ProductUiModel(
+            imageUrl = "테스트",
             name = "테스트",
             price = 1000,
+            formattedPrice = 1000.toPriceString(),
             category = "테스트",
             id = 1L,
         ),

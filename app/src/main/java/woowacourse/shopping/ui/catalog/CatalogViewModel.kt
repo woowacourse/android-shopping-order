@@ -3,29 +3,35 @@ package woowacourse.shopping.ui.catalog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.local.entity.RecentlyViewedProductEntity
-import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
-import woowacourse.shopping.data.remote.server.repository.CartRepository
-import woowacourse.shopping.data.remote.server.repository.ProductRepository
-import woowacourse.shopping.domain.Product
-import woowacourse.shopping.domain.Products
-import woowacourse.shopping.domain.PurchaseProduct
-import woowacourse.shopping.domain.PurchaseProducts
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.domain.model.product.Products
+import woowacourse.shopping.domain.model.order.PurchaseProduct
+import woowacourse.shopping.domain.model.order.PurchaseProducts
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.domain.repository.RecentlyViewedProductRepository
+import woowacourse.shopping.ui.event.UiEvent
 
 class ShoppingViewModel(
     private val cartRepository: CartRepository,
     private val recentlyViewedProductRepository: RecentlyViewedProductRepository,
     private val productRepository: ProductRepository,
 ) : ViewModel() {
-    val recentlyViewedEntities: StateFlow<List<RecentlyViewedProductEntity>?> =
+    private val _uiEvent = Channel<UiEvent>(Channel.BUFFERED)
+    val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
+
+    val recentlyViewedProductIds: StateFlow<List<Long>?> =
         recentlyViewedProductRepository
             .getAll()
             .stateIn(
@@ -40,12 +46,14 @@ class ShoppingViewModel(
     private val _cart = MutableStateFlow(PurchaseProducts())
     val cart = _cart.asStateFlow()
 
+    private val _cartProductCount = MutableStateFlow(0)
+    val cartProductCount = _cartProductCount.asStateFlow()
 
     val recentlyViewedProducts: StateFlow<Products> =
-        combine(recentlyViewedEntities, products) { entities, allProducts ->
+        combine(recentlyViewedProductIds, products) { productIds, allProducts ->
             val productList =
-                entities?.mapNotNull { entity ->
-                    allProducts.findWithId(entity.id)
+                productIds?.mapNotNull { productId ->
+                    allProducts.findWithId(productId)
                 } ?: emptyList()
             Products(productList)
         }.stateIn(
@@ -88,24 +96,25 @@ class ShoppingViewModel(
 
     fun fetchCart() {
         viewModelScope.launch {
-            _cart.update {
-                cartRepository.getPagedCart(0, 1000000)
-            }
+            refreshCart()
         }
     }
 
 
     fun addToCart(purchaseProduct: PurchaseProduct) {
         viewModelScope.launch {
-            val existingItem = cart.value.purchaseProducts.find {
-                it.product.id == purchaseProduct.product.id
+            try {
+                val existingItem = cartRepository.findCartItemByProductId(purchaseProduct.product.id)
+                if (existingItem != null) {
+                    cartRepository.updateCount(existingItem.id, existingItem.count + 1)
+                } else {
+                    cartRepository.insert(purchaseProduct)
+                }
+                refreshCart()
+                _uiEvent.send(UiEvent.ShowMessage("장바구니에 담았습니다."))
+            } catch (e: Exception) {
+                _uiEvent.send(UiEvent.ShowMessage("장바구니 담기에 실패했습니다."))
             }
-            if (existingItem != null) {
-                cartRepository.updateCount(existingItem.id, existingItem.count + 1)
-            }else {
-                cartRepository.insert(purchaseProduct)
-            }
-            fetchCart()
         }
     }
 
@@ -114,12 +123,13 @@ class ShoppingViewModel(
         updateAmount: Int,
     ) {
         viewModelScope.launch {
-            val target = cart.value.findById(id)
+            val target = cart.value.findByProductId(id)
             if (target != null) {
                 val nextCount = target.count + updateAmount
                 if(nextCount >= 1) {
                     cartRepository.updateCount(target.id, nextCount)
-                    fetchCart()
+                    updateKnownCartItemCount(target.id, nextCount)
+                    updateKnownCartProductCount(updateAmount)
                 }
             }
         }
@@ -127,10 +137,16 @@ class ShoppingViewModel(
 
     fun removeWithID(id: Long) {
         viewModelScope.launch {
-            val target = cart.value.findById(id)
-            if(target != null){
-                cartRepository.deleteCartItem(target.id)
-                fetchCart()
+            try {
+                val target = cart.value.findByProductId(id)
+                if (target != null) {
+                    cartRepository.deleteCartItem(target.id)
+                    removeKnownCartItem(target.id)
+                    updateKnownCartProductCount(-target.count)
+                    _uiEvent.send(UiEvent.ShowMessage("상품을 삭제했습니다."))
+                }
+            } catch (e: Exception) {
+                _uiEvent.send(UiEvent.ShowMessage("상품 삭제에 실패했습니다."))
             }
         }
     }
@@ -147,8 +163,41 @@ class ShoppingViewModel(
         fetchProducts(currentIndex.value)
     }
 
+    private suspend fun refreshCart() {
+        _cartProductCount.update {
+            cartRepository.getProductCount()
+        }
+        _cart.update {
+            cartRepository.getAllCartItems(CART_PAGE_SIZE)
+        }
+    }
+
+    private fun updateKnownCartItemCount(
+        id: Long,
+        count: Int,
+    ) {
+        _cart.update { cart ->
+            PurchaseProducts(
+                cart.purchaseProducts.map {
+                    if (it.id == id) it.copy(count = count) else it
+                },
+            )
+        }
+    }
+
+    private fun removeKnownCartItem(id: Long) {
+        _cart.update { cart ->
+            PurchaseProducts(cart.purchaseProducts.filter { it.id != id })
+        }
+    }
+
+    private fun updateKnownCartProductCount(amount: Int) {
+        _cartProductCount.update { (it + amount).coerceAtLeast(0) }
+    }
+
     companion object {
         private val PAGE_SIZE = 20
+        private const val CART_PAGE_SIZE = 5
     }
 }
 

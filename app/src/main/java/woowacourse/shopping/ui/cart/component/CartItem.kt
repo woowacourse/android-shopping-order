@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.R
 import woowacourse.shopping.ui.cart.uimodel.CartInfo
-import woowacourse.shopping.ui.common.ProductImage
-import woowacourse.shopping.ui.common.QuantitySelector
+import woowacourse.shopping.core.designsystem.component.ProductImage
+import woowacourse.shopping.core.designsystem.component.QuantitySelector
 
 @Composable
 fun CartItem(
@@ -155,12 +155,20 @@ private fun ProductPrice(
 @Preview
 @Composable
 private fun CartItemPreview() {
+    val mockCartProduct = CartInfo(
+            id = 1L,
+            productImageUrl = "",
+            productName = "리자몽",
+            formattedPrice = "10,000원",
+            quantity = 1,
+        )
+
     CartItem(
-        product = CartInfo.PREVIEW,
+        product = mockCartProduct,
         onAdd = { id, count -> },
         onMinus = { id, count -> },
         onDelete = { },
-        onCheckedChanged = {  },
-        isChecked = true
+        onCheckedChanged = { },
+        isChecked = true,
     )
 }

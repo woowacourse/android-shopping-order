@@ -3,7 +3,7 @@ package woowacourse.shopping.data.remote.server.dto.product
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.model.product.Product
 
 @Serializable
 data class ProductResponse(
@@ -18,7 +18,7 @@ data class ProductResponse(
     @SerialName("price")
     val price: Int
 )
-fun ProductResponse.toDomain() =
+fun ProductResponse.toDomainProduct() =
     Product(
         category = category,
         id = id,

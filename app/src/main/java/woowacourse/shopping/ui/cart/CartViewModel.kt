@@ -5,225 +5,246 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.remote.server.repository.CartRepository
-import woowacourse.shopping.domain.PurchaseProducts
+import woowacourse.shopping.domain.model.order.PurchaseProducts
+import woowacourse.shopping.domain.repository.CartRepository
+import woowacourse.shopping.ui.cart.uimodel.toUiModel
+import woowacourse.shopping.ui.event.UiEvent
 
 class CartViewModel(
     private val cartRepository: CartRepository,
 ) : ViewModel() {
-    private val _errorEvent = Channel<String>()
-    val errorEvent = _errorEvent.receiveAsFlow()
+    private val _uiEvent = Channel<UiEvent>(Channel.BUFFERED)
+    val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
 
-    private val _currentPage: MutableStateFlow<Int> = MutableStateFlow(0)
-
-    val currentPage: StateFlow<Int> = _currentPage.asStateFlow()
-
-    private val _pagedCart: MutableStateFlow<PurchaseProducts> = MutableStateFlow(PurchaseProducts())
-    val pagedCart: StateFlow<PurchaseProducts> = _pagedCart.asStateFlow()
-
-    private val _cartItemCount: MutableStateFlow<Int> = MutableStateFlow(0)
-    val cartItemCount = _cartItemCount.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
-
-    private val _allCartItems = MutableStateFlow<PurchaseProducts>(PurchaseProducts())
-    val allCartItems = _allCartItems.asStateFlow()
-
-    private val _checkedItemIds = MutableStateFlow<List<Long>>(emptyList())
-    val checkedItemIds = _checkedItemIds.asStateFlow()
-
-    val totalPrice: StateFlow<Int> = combine(_allCartItems, checkedItemIds) { allCart, checkedIds ->
-        allCart.purchaseProducts
-            .filter { it.id in checkedIds }
-            .sumOf { it.totalPrice }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = 0
-    )
-
-    val selectedItemCount: StateFlow<Int> = checkedItemIds.map { it.size }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = 0
-    )
-
-    fun fetchCart() {
-        viewModelScope.launch {
-            _isLoading.update { true }
-
-            val firstPage = cartRepository.getPagedCart(0, PAGE_SIZE)
-            _pagedCart.update { firstPage }
-            
-            val totalCount = cartRepository.getCartItemCount()
-            _cartItemCount.update { totalCount }
-            
-            if (totalCount > 0) {
-                val allData = cartRepository.getPagedCart(0, totalCount)
-                _allCartItems.update { allData }
-            }
-
-            _isLoading.update { false }
-        }
-    }
+    private val _cartState = MutableStateFlow(CartState())
+    val uiState: StateFlow<CartUiState> =
+        _cartState
+            .map { it.toUiState() }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Eagerly,
+                initialValue = CartUiState(),
+            )
 
     init {
         fetchCart()
     }
 
-    fun next() {
-        _currentPage.update {
-            if (cartItemCount.value > (it + 1) * PAGE_SIZE) it + 1 else it
-        }
+    fun fetchCart() {
         viewModelScope.launch {
-            _isLoading.update { true }
-            _pagedCart.update {
-                cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
+            _cartState.update { it.copy(isLoading = true) }
+
+            val cartPage = cartRepository.getCartPage(page = 0, size = PAGE_SIZE)
+            _cartState.update {
+                it.copy(
+                    currentPage = 0,
+                    pagedCart = cartPage.items,
+                    hasNextPage = cartPage.isLast.not(),
+                    allCartItems = cartPage.items,
+                    isLoading = false,
+                )
             }
-            _isLoading.update { false }
+        }
+    }
+
+    fun next() {
+        viewModelScope.launch {
+            val state = _cartState.value
+            if (state.hasNextPage.not()) return@launch
+
+            _cartState.update { it.copy(isLoading = true) }
+            val nextPage = state.currentPage + 1
+            loadPage(nextPage)
         }
     }
 
     fun prev() {
-        _currentPage.update { if (it > 0) it - 1 else 0 }
         viewModelScope.launch {
-            _isLoading.update { true }
-            _pagedCart.update {
-                cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
-            }
-            _isLoading.update { false }
+            val state = _cartState.value
+            if (state.currentPage == 0) return@launch
+
+            _cartState.update { it.copy(isLoading = true) }
+            val prevPage = state.currentPage - 1
+            loadPage(prevPage)
         }
     }
-
-    val nextEnable: StateFlow<Boolean> =
-        combine(currentPage, cartItemCount) { page, count ->
-            page < (count - 1) / PAGE_SIZE
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false,
-        )
-
-    val prevEnable: StateFlow<Boolean> =
-        currentPage
-            .map { it > 0 }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = false,
-            )
-
-    val isPageable: StateFlow<Boolean> =
-        cartItemCount
-            .map { it > PAGE_SIZE }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = false,
-            )
 
     fun updateCountWithID(
         id: Long,
         updateAmount: Int,
     ) {
         viewModelScope.launch {
-            val target = pagedCart.value.findPurchaseProductById(id) ?: return@launch
+            val target = _cartState.value.pagedCart.findPurchaseProductById(id) ?: return@launch
             val nextCount = target.count + updateAmount
             if (nextCount < 1) return@launch
 
-            _isLoading.update { true }
+            _cartState.update { it.copy(isLoading = true) }
             try {
                 cartRepository.updateCount(id, nextCount)
-                
-                _allCartItems.update { allCart ->
-                    PurchaseProducts(
-                        allCart.purchaseProducts.map {
-                            if (it.id == id) it.copy(count = nextCount) else it
-                        }
+
+                _cartState.update {
+                    it.copy(
+                        pagedCart = it.pagedCart.updateCartItemCount(id, nextCount),
+                        allCartItems = it.allCartItems.updateCartItemCount(id, nextCount),
+                        isLoading = false,
                     )
                 }
-
-                _pagedCart.update {
-                    cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
-                }
-                _cartItemCount.update {
-                    cartRepository.getCartItemCount()
-                }
             } catch (e: Exception) {
-                _errorEvent.send("수량 변경에 실패했습니다. 다시 시도해주세요.")
-            } finally {
-                _isLoading.update { false }
+                _uiEvent.send(UiEvent.ShowMessage("수량 변경에 실패했습니다. 다시 시도해주세요."))
+                _cartState.update { it.copy(isLoading = false) }
             }
         }
     }
 
     fun removeWithID(id: Long) {
         viewModelScope.launch {
-            _isLoading.update { true }
+            _cartState.update { it.copy(isLoading = true) }
             try {
                 cartRepository.deleteCartItem(id)
 
-                val newTotalCount = cartRepository.getCartItemCount()
-                _cartItemCount.update {
-                    newTotalCount
+                val currentPage = _cartState.value.currentPage
+                val page = cartRepository.getCartPage(currentPage, PAGE_SIZE)
+                if (currentPage > 0 && page.items.purchaseProducts.isEmpty()) {
+                    val previousPage = currentPage - 1
+                    val previousCartPage = cartRepository.getCartPage(previousPage, PAGE_SIZE)
+                    _cartState.update {
+                        it.copy(
+                            currentPage = previousPage,
+                            pagedCart = previousCartPage.items,
+                            hasNextPage = previousCartPage.isLast.not(),
+                            allCartItems = it.allCartItems
+                                .removeCartItem(id)
+                                .mergeKnownCartItems(previousCartPage.items),
+                            checkedItemIds = it.checkedItemIds - id,
+                            isLoading = false,
+                        )
+                    }
+                } else {
+                    _cartState.update {
+                        it.copy(
+                            pagedCart = page.items,
+                            hasNextPage = page.isLast.not(),
+                            allCartItems = it.allCartItems
+                                .removeCartItem(id)
+                                .mergeKnownCartItems(page.items),
+                            checkedItemIds = it.checkedItemIds - id,
+                            isLoading = false,
+                        )
+                    }
                 }
 
-                if (currentPage.value > 0 && currentPage.value * PAGE_SIZE >= newTotalCount) {
-                    _currentPage.update { it - 1 }
-                }
-
-                _pagedCart.update {
-                    cartRepository.getPagedCart(currentPage.value, PAGE_SIZE)
-                }
-
-                _allCartItems.update { allCart ->
-                    PurchaseProducts(
-                        allCart.purchaseProducts.filter { it.id != id }
-                    )
-                }
-
-                _checkedItemIds.update { it - id }
+                _uiEvent.send(UiEvent.ShowMessage("상품을 삭제했습니다."))
             } catch (e: Exception) {
-                _errorEvent.send("아이템 삭제에 실패했습니다.")
-            } finally {
-                _isLoading.update { false }
+                _uiEvent.send(UiEvent.ShowMessage("아이템 삭제에 실패했습니다."))
+                _cartState.update { it.copy(isLoading = false) }
             }
         }
     }
 
     fun onItemChecked(id: Long) {
-        viewModelScope.launch {
-            _checkedItemIds.update {
-                if (it.contains(id)) {
-                    it - id
+        _cartState.update {
+            val checkedItemIds =
+                if (id in it.checkedItemIds) {
+                    it.checkedItemIds - id
                 } else {
-                    it + id
+                    it.checkedItemIds + id
                 }
-            }
+            it.copy(checkedItemIds = checkedItemIds)
         }
     }
 
     fun onSelectAllClick() {
         viewModelScope.launch {
-            _checkedItemIds.update { list ->
-                val allIds = _allCartItems.value.purchaseProducts.map { it.id }
-                if (list.containsAll(allIds)) {
-                    emptyList()
-                } else {
-                    allIds
+            _cartState.update { it.copy(isLoading = true) }
+            try {
+                val allCartItems = cartRepository.getAllCartItems(PAGE_SIZE)
+                val allIds = allCartItems.purchaseProducts.map { it.id }
+                _cartState.update {
+                    val checkedItemIds =
+                        if (it.checkedItemIds.containsAll(allIds)) {
+                            emptyList()
+                        } else {
+                            allIds
+                        }
+                    it.copy(
+                        allCartItems = allCartItems,
+                        checkedItemIds = checkedItemIds,
+                        isLoading = false,
+                    )
                 }
+            } finally {
+                _cartState.update { it.copy(isLoading = false) }
             }
         }
+    }
+
+    private suspend fun loadPage(page: Int) {
+        val cartPage = cartRepository.getCartPage(page, PAGE_SIZE)
+        _cartState.update {
+            it.copy(
+                currentPage = page,
+                pagedCart = cartPage.items,
+                hasNextPage = cartPage.isLast.not(),
+                allCartItems = it.allCartItems.mergeKnownCartItems(cartPage.items),
+                isLoading = false,
+            )
+        }
+    }
+
+    private fun PurchaseProducts.mergeKnownCartItems(cartItems: PurchaseProducts): PurchaseProducts {
+        val newItems = cartItems.purchaseProducts
+        return PurchaseProducts(
+            purchaseProducts.filterNot { knownItem -> newItems.any { it.id == knownItem.id } } + newItems,
+        )
+    }
+
+    private fun PurchaseProducts.updateCartItemCount(
+        id: Long,
+        count: Int,
+    ): PurchaseProducts =
+        PurchaseProducts(
+            purchaseProducts.map {
+                if (it.id == id) it.copy(count = count) else it
+            },
+        )
+
+    private fun PurchaseProducts.removeCartItem(id: Long): PurchaseProducts =
+        PurchaseProducts(purchaseProducts.filter { it.id != id })
+
+    private fun CartState.toUiState(): CartUiState =
+        CartUiState(
+            cartItems = pagedCart.toUiModel(),
+            currentPage = currentPage,
+            isPageable = currentPage > 0 || hasNextPage,
+            previousEnable = currentPage > 0,
+            nextEnable = hasNextPage,
+            isLoading = isLoading,
+            totalPrice = totalPrice,
+            totalCount = checkedItemIds.size,
+            checkedItemIds = checkedItemIds,
+        )
+
+    private data class CartState(
+        val pagedCart: PurchaseProducts = PurchaseProducts(),
+        val currentPage: Int = 0,
+        val hasNextPage: Boolean = false,
+        val isLoading: Boolean = false,
+        val allCartItems: PurchaseProducts = PurchaseProducts(),
+        val checkedItemIds: List<Long> = emptyList(),
+    ) {
+        val totalPrice: Int
+            get() =
+                allCartItems.purchaseProducts
+                    .filter { it.id in checkedItemIds }
+                    .sumOf { it.totalPrice }
     }
 
     companion object {
@@ -232,7 +253,7 @@ class CartViewModel(
 }
 
 class CartViewModelFactory(
-    private val cartRepository: CartRepository
+    private val cartRepository: CartRepository,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CartViewModel::class.java)) {

@@ -1,6 +1,6 @@
 package woowacourse.shopping.data.remote.mock.dto
 
-import woowacourse.shopping.domain.Product
+import woowacourse.shopping.domain.model.product.Product
 
 fun WebServerResponse.toObject() =
     Product(

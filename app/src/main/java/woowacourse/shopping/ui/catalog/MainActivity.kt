@@ -6,99 +6,93 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import woowacourse.shopping.IntentKeys
-import woowacourse.shopping.ui.productdetail.ProductDetailActivity
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.flow.MutableSharedFlow
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.ui.cart.CartActivity
-import woowacourse.shopping.ui.theme.AndroidshoppingTheme
+import woowacourse.shopping.core.designsystem.theme.AndroidshoppingTheme
+import woowacourse.shopping.notification.PaymentNotificationIntentFactory
+import woowacourse.shopping.ui.navigation.ShoppingNavHost
+import woowacourse.shopping.ui.navigation.ShoppingRoute
 
 class MainActivity : ComponentActivity() {
-    private lateinit var viewModel: ShoppingViewModel
+    private val paymentNavigationEvents =
+        MutableSharedFlow<List<Long>>(
+            extraBufferCapacity = 1,
+        )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        setContent {
-            viewModel = viewModel<ShoppingViewModel>(
-                factory =
-                    ShoppingViewModelFactory(
-                        (application as ShoppingApplication).cartRepository,
-                        (application as ShoppingApplication).recentlyViewedProductRepository,
-                        (application as ShoppingApplication).productRepository,
-                    ),
-            )
-            val cartState by viewModel.cart.collectAsStateWithLifecycle()
-            val viewHistory by viewModel.recentlyViewedProducts.collectAsStateWithLifecycle()
-            val currentProducts by viewModel.products.collectAsStateWithLifecycle()
-            val lastViewedProduct by viewModel.lastViewProductId.collectAsStateWithLifecycle()
-            val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+        val appContainer = (application as ShoppingApplication).appContainer
 
+        setContent {
             AndroidshoppingTheme {
-                Scaffold(modifier = Modifier.Companion.fillMaxSize()) { innerPadding ->
-                    CatalogScreen(
-                        catalog = currentProducts,
-                        recentlyViewedProducts = viewHistory,
-                        onRecentlyViewedClick = { product ->
-                            viewModel.updateHistory(product)
-                            val intent =
-                                Intent(this, ProductDetailActivity::class.java).apply {
-                                    putExtra(IntentKeys.SELECTED_PRODUCT_ID_KEY, product.id)
-                                    putExtra(
-                                        IntentKeys.LATEST_VIEWED_PRODUCT_ID_KEY,
-                                        lastViewedProduct
-                                    )
-                                }
-                            startActivity(intent)
-                        },
-                        onItemClick = { product ->
-                            viewModel.updateHistory(product)
-                            val intent =
-                                Intent(this, ProductDetailActivity::class.java).apply {
-                                    putExtra(IntentKeys.SELECTED_PRODUCT_ID_KEY, product.id)
-                                    putExtra(
-                                        IntentKeys.LATEST_VIEWED_PRODUCT_ID_KEY,
-                                        lastViewedProduct
-                                    )
-                                }
-                            startActivity(intent)
-                        },
-                        onCartClick = {
-                            val intent = Intent(this, CartActivity::class.java)
-                            startActivity(intent)
-                        },
-                        onLoadClick = {
-                            viewModel.loadMore()
-                        },
-                        modifier = Modifier.Companion.padding(innerPadding),
-                        onAdd = { id, updateAmount ->
-                            viewModel.updateCountWithID(id, updateAmount)
-                        },
-                        onMinus = { id, updateAmount ->
-                            viewModel.updateCountWithID(id, updateAmount)
-                        },
-                        onDelete = { viewModel.removeWithID(it) },
-                        onAddInCart = { viewModel.addToCart(it) },
-                        isContainedInCart = { cartState.isContain(it) },
-                        specificProductCount = { cartState.totalCountOfSpecificPurchaseProduct(it) },
-                        totalCount = cartState.totalCount(),
-                        isLoading = isLoading,
+                val navController = rememberNavController()
+                val snackbarHostState = remember { SnackbarHostState() }
+
+                LaunchedEffect(Unit) {
+                    navController.navigateToPaymentIfNeeded(intent)
+                    paymentNavigationEvents.collect { selectedCartItemIds ->
+                        navController.navigateToPayment(selectedCartItemIds)
+                    }
+                }
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    snackbarHost = { SnackbarHost(snackbarHostState) },
+                ) { innerPadding ->
+                    ShoppingNavHost(
+                        navController = navController,
+                        cartRepository = appContainer.cartRepository,
+                        couponRepository = appContainer.couponRepository,
+                        orderRepository = appContainer.orderRepository,
+                        productRepository = appContainer.productRepository,
+                        recentlyViewedProductRepository = appContainer.recentlyViewedProductRepository,
+                        settingRepository = appContainer.settingRepository,
+                        paymentNotificationScheduler = appContainer.paymentNotificationScheduler,
+                        contentPadding = innerPadding,
+                        snackbarHostState = snackbarHostState,
                     )
                 }
             }
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        if(::viewModel.isInitialized) {
-            viewModel.fetchCart()
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        sendPaymentNavigationEvent(intent)
+    }
+
+    private fun sendPaymentNavigationEvent(intent: Intent) {
+        val selectedCartItemIds = intent.extractPaymentCartItemIds()
+        if (selectedCartItemIds.isNotEmpty()) {
+            paymentNavigationEvents.tryEmit(selectedCartItemIds)
         }
     }
+}
+
+private fun NavController.navigateToPaymentIfNeeded(intent: Intent) {
+    val selectedCartItemIds = intent.extractPaymentCartItemIds()
+    if (selectedCartItemIds.isNotEmpty()) {
+        navigateToPayment(selectedCartItemIds)
+    }
+}
+
+private fun Intent.extractPaymentCartItemIds(): List<Long> = PaymentNotificationIntentFactory.extractSelectedCartItemIds(this)
+
+private fun NavController.navigateToPayment(selectedCartItemIds: List<Long>) {
+    navigate(
+        ShoppingRoute.Payment(
+            selectedCartItemIds = selectedCartItemIds,
+        ),
+    )
 }
