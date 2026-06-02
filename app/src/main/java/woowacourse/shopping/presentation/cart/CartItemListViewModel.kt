@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.AppContainer
-import woowacourse.shopping.domain.addToCartUseCase
+import woowacourse.shopping.domain.AddToCartUseCase
 import woowacourse.shopping.domain.model.PaymentItems
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.presentation.cart.model.CartUiState
@@ -18,6 +18,7 @@ import kotlin.math.min
 
 class CartItemListViewModel(
     private val cartRepository: CartRepository = AppContainer.cartRepository,
+    private val addToCartUseCase: AddToCartUseCase = AppContainer.addToCartUseCase,
 ) : ViewModel() {
     private val cart = cartRepository.cart
     private val paymentItemIds = MutableStateFlow(emptySet<Long>())
@@ -66,7 +67,7 @@ class CartItemListViewModel(
 
     fun addItemToCart(productId: Long) {
         viewModelScope.launch {
-            addToCartUseCase(cartRepository, productId)
+            addToCartUseCase(productId)
         }
     }
 

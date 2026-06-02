@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.AppContainer
-import woowacourse.shopping.domain.addToCartUseCase
+import woowacourse.shopping.domain.AddToCartUseCase
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.common.model.toUiModel
@@ -36,6 +36,7 @@ class ProductDetailViewModel(
     private val productId: Long,
     private val productRepository: ProductRepository = AppContainer.productRepository,
     private val cartRepository: CartRepository = AppContainer.cartRepository,
+    private val addToCartUseCase: AddToCartUseCase = AppContainer.addToCartUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
@@ -69,7 +70,7 @@ class ProductDetailViewModel(
 
     fun addItemToCart(quantity: Int = 1) {
         viewModelScope.launch {
-            addToCartUseCase(cartRepository, productId, quantity)
+            addToCartUseCase(productId, quantity)
             _event.emit(ProductDetailEvent.AddToCart("상품을 추가했습니다"))
             _event.emit(ProductDetailEvent.NavigateToBack)
         }

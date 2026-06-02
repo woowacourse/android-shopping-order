@@ -10,6 +10,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.domain.AddToCartUseCase
 import woowacourse.shopping.fake.FakeCartRepository
 import woowacourse.shopping.fake.FakeProductRepository
 import woowacourse.shopping.fake.fakeProduct
@@ -35,6 +36,7 @@ class ProductDetailViewModelTest {
                 productId = 1L,
                 productRepository = productRepository,
                 cartRepository = cartRepository,
+                addToCartUseCase = AddToCartUseCase(cartRepository),
             )
     }
 

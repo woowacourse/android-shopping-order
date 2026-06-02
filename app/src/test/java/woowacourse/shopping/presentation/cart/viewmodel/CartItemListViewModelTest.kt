@@ -10,6 +10,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import woowacourse.shopping.domain.AddToCartUseCase
 import woowacourse.shopping.fake.FakeCartRepository
 import woowacourse.shopping.fake.fakeProduct
 import woowacourse.shopping.presentation.cart.CartItemListViewModel
@@ -26,7 +27,10 @@ class CartItemListViewModelTest {
         val productMap = (1L..10L).associateWith { fakeProduct(it) }
         cartRepository = FakeCartRepository(productMap)
         viewModel =
-            CartItemListViewModel(cartRepository = cartRepository)
+            CartItemListViewModel(
+                cartRepository = cartRepository,
+                addToCartUseCase = AddToCartUseCase(cartRepository),
+            )
     }
 
     @AfterEach

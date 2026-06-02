@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okio.IOException
 import woowacourse.shopping.di.AppContainer
-import woowacourse.shopping.domain.addToCartUseCase
+import woowacourse.shopping.domain.AddToCartUseCase
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.common.model.toUiModel
@@ -22,6 +22,7 @@ import woowacourse.shopping.presentation.productlist.model.ShoppingUiState
 class ProductListViewModel(
     private val productRepository: ProductRepository = AppContainer.productRepository,
     private val cartRepository: CartRepository = AppContainer.cartRepository,
+    private val addToCartUseCase: AddToCartUseCase = AppContainer.addToCartUseCase,
 ) : ViewModel() {
     private val cart = cartRepository.cart
     private val products = productRepository.products
@@ -70,7 +71,7 @@ class ProductListViewModel(
 
     fun addItemToCart(id: Long) {
         viewModelScope.launch {
-            addToCartUseCase(cartRepository, id)
+            addToCartUseCase(id)
         }
     }
 

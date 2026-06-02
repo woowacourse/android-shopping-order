@@ -15,6 +15,8 @@ import woowacourse.shopping.data.source.remote.CartRemoteDataSource
 import woowacourse.shopping.data.source.remote.ProductRemoteDataSource
 import woowacourse.shopping.data.source.remote.api.AuthInterceptor
 import woowacourse.shopping.data.source.remote.api.RetrofitServices
+import woowacourse.shopping.domain.AddToCartUseCase
+import woowacourse.shopping.domain.RecommendProductUseCase
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.domain.repository.ProductRepository
@@ -79,5 +81,13 @@ object AppContainer {
         DefaultOrderRepository(
             remoteOrderDataSource = retrofitServices.couponService,
         )
+    }
+
+    val addToCartUseCase: AddToCartUseCase by lazy {
+        AddToCartUseCase(cartRepository)
+    }
+
+    val recommendProductUseCase: RecommendProductUseCase by lazy {
+        RecommendProductUseCase(productRepository, cartRepository)
     }
 }

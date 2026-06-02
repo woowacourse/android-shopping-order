@@ -5,17 +5,20 @@ import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 
-suspend fun recommendProductUseCase(
-    productRepository: ProductRepository,
-    cartRepository: CartRepository,
-): List<Product> {
-    val cart = cartRepository.cart
-    val recentProducts =
-        productRepository.getRecentProductsStream(1).firstOrNull() ?: return emptyList()
-    val recentProduct = recentProducts.firstOrNull() ?: return emptyList()
-    val sameCategoryProducts = productRepository.products.value.filter { it.category == recentProduct.category }
-    return sameCategoryProducts
-        .filter { product ->
-            product.id !in cart.value.items.map { it.product.id }
-        }.take(10)
+class RecommendProductUseCase(
+    private val productRepository: ProductRepository,
+    private val cartRepository: CartRepository,
+) {
+    suspend operator fun invoke(): List<Product> {
+        val cart = cartRepository.cart
+        val recentProducts =
+            productRepository.getRecentProductsStream(1).firstOrNull() ?: return emptyList()
+        val recentProduct = recentProducts.firstOrNull() ?: return emptyList()
+        val sameCategoryProducts =
+            productRepository.products.value.filter { it.category == recentProduct.category }
+        return sameCategoryProducts
+            .filter { product ->
+                product.id !in cart.value.items.map { it.product.id }
+            }.take(10)
+    }
 }

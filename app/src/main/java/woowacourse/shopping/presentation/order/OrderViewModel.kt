@@ -17,8 +17,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.AppContainer
-import woowacourse.shopping.domain.applyCouponUseCase
-import woowacourse.shopping.domain.getAvailableCouponUseCase
 import woowacourse.shopping.domain.model.PaymentItems
 import woowacourse.shopping.domain.model.order.BuyXGetYCoupon
 import woowacourse.shopping.domain.model.order.Coupon
@@ -93,13 +91,14 @@ class OrderViewModel(
                 )
             defaultOrder = order
             discountedOrder.value = order
-            coupons.value = getAvailableCouponUseCase(orderRepository, order)
+            coupons.value = orderRepository.coupons.value.filter { it.isApplicable(order) }
         }
     }
 
     fun selectCoupon(code: String) {
         selectedCouponCode.value = code
-        discountedOrder.value = applyCouponUseCase(orderRepository, defaultOrder ?: return, code)
+        val coupon = orderRepository.coupons.value.find { it.code == code } ?: return
+        discountedOrder.value = coupon.apply(defaultOrder ?: return)
     }
 
     fun orderCartItems() {

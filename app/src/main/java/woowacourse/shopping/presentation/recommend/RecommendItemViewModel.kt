@@ -14,9 +14,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.di.AppContainer
-import woowacourse.shopping.domain.addToCartUseCase
+import woowacourse.shopping.domain.AddToCartUseCase
+import woowacourse.shopping.domain.RecommendProductUseCase
 import woowacourse.shopping.domain.model.PaymentItems
-import woowacourse.shopping.domain.recommendProductUseCase
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.presentation.common.model.toUiModel
@@ -28,6 +28,8 @@ class RecommendItemViewModel(
     productIds: List<Long>,
     private val cartRepository: CartRepository = AppContainer.cartRepository,
     private val productRepository: ProductRepository = AppContainer.productRepository,
+    private val addToCartUseCase: AddToCartUseCase = AppContainer.addToCartUseCase,
+    private val recommendProductUseCase: RecommendProductUseCase = AppContainer.recommendProductUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RecommendUiState())
     private val cart = cartRepository.cart
@@ -63,7 +65,7 @@ class RecommendItemViewModel(
         )
 
     private suspend fun loadRecommendProducts() {
-        val recommendProducts = recommendProductUseCase(productRepository, cartRepository)
+        val recommendProducts = recommendProductUseCase()
         _uiState.update {
             it.copy(
                 recommendProducts =
@@ -81,7 +83,7 @@ class RecommendItemViewModel(
 
     fun addItemToCart(productId: Long) {
         viewModelScope.launch {
-            addToCartUseCase(cartRepository, productId)
+            addToCartUseCase(productId)
             paymentItemIds.update { it + productId }
         }
     }
