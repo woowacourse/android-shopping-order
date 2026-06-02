@@ -7,11 +7,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.toRoute
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
@@ -30,7 +27,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.error.Result
 import woowacourse.shopping.presentation.order.model.CouponUiModel
-import woowacourse.shopping.presentation.order.model.OrderEvent
+import woowacourse.shopping.presentation.order.model.OrderResult
 import woowacourse.shopping.presentation.order.model.OrderUiState
 import woowacourse.shopping.route.OrderItem
 import woowacourse.shopping.util.formattedPrice
@@ -54,8 +51,16 @@ class OrderViewModel(
             PaymentItems(cart.items.filter { it.product.id in ids }.toSet())
         }
 
+    private val orderResult = MutableStateFlow<OrderResult>(OrderResult.BeforePurchase)
+
     val uiState =
-        combine(paymentItems, coupons, selectedCouponCode, discountedOrder) { paymentItems, coupons, selectedCode, order ->
+        combine(
+            paymentItems,
+            coupons,
+            selectedCouponCode,
+            discountedOrder,
+            orderResult,
+        ) { paymentItems, coupons, selectedCode, order, orderResult ->
             if (order == null) return@combine OrderUiState(isLoading = true)
             val selectedCoupon = coupons.find { it.code == selectedCode }
             OrderUiState(
@@ -66,15 +71,13 @@ class OrderViewModel(
                 finalPrice = order.finalAmount,
                 coupons = coupons.map { it.toUiModel() },
                 selectedCoupon = selectedCoupon?.toUiModel(),
+                orderResult = orderResult,
             )
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
             initialValue = OrderUiState(),
         )
-
-    private val _event = MutableSharedFlow<OrderEvent>()
-    val event: SharedFlow<OrderEvent> = _event.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -103,14 +106,22 @@ class OrderViewModel(
 
     fun orderCartItems() {
         if (uiState.value.isLoading) return
+        orderResult.value = OrderResult.Purchasing
         viewModelScope.launch {
             val itemIds = paymentItems.first().getItems().map { it.id }
-            val orderResult = orderRepository.orderCartItems(itemIds)
-            when (orderResult) {
-                is Result.Error<*, *> -> _event.emit(OrderEvent.Fail("결제 주문이 실패했습니다"))
-                is Result.Success<*, *> -> _event.emit(OrderEvent.Success("결제가 성공했습니다"))
+            when (orderRepository.orderCartItems(itemIds)) {
+                is Result.Error<*, *> -> orderResult.value = OrderResult.PurchaseFailed()
+                is Result.Success<*, *> -> orderResult.value = OrderResult.PurchaseSuccess()
             }
         }
+    }
+
+    fun orderResultShown() {
+        if (orderResult.value is OrderResult.PurchaseSuccess) {
+            orderResult.value = OrderResult.PurchaseCompleted
+            return
+        }
+        orderResult.value = OrderResult.BeforePurchase
     }
 
     private fun Coupon.toUiModel(): CouponUiModel =

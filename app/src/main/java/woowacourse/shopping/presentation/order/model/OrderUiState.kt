@@ -8,4 +8,5 @@ data class OrderUiState(
     val finalPrice: Long = 0L,
     val coupons: List<CouponUiModel> = emptyList(),
     val selectedCoupon: CouponUiModel? = null,
+    val orderResult: OrderResult = OrderResult.BeforePurchase,
 )

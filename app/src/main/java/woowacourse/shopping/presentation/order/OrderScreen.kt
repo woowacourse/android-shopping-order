@@ -35,16 +35,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.R
 import woowacourse.shopping.presentation.common.components.ShoppingAppBar
 import woowacourse.shopping.presentation.order.components.CouponItem
 import woowacourse.shopping.presentation.order.model.CouponUiModel
-import woowacourse.shopping.presentation.order.model.OrderEvent
+import woowacourse.shopping.presentation.order.model.OrderResult
 import woowacourse.shopping.ui.theme.Gray30
 import woowacourse.shopping.ui.theme.Gray40
 import woowacourse.shopping.ui.theme.Green40
@@ -58,25 +55,26 @@ fun OrderScreen(
     viewModel: OrderViewModel = viewModel(factory = OrderViewModel.Factory),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.event.collect { event ->
-                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
-                when (event) {
-                    is OrderEvent.Success -> {
-                        onOrderSuccess()
-                    }
-                    is OrderEvent.Fail -> {}
-                }
+    LaunchedEffect(uiState.orderResult) {
+        when (val result = uiState.orderResult) {
+            is OrderResult.PurchaseSuccess -> {
+                Toast.makeText(context, result.message, Toast.LENGTH_SHORT).show()
+                viewModel.orderResultShown()
+                onOrderSuccess()
             }
+            is OrderResult.PurchaseFailed -> {
+                Toast.makeText(context, result.message, Toast.LENGTH_SHORT).show()
+                viewModel.orderResultShown()
+            }
+            else -> Unit
         }
     }
 
     OrderContent(
         isLoading = uiState.isLoading,
+        isOrdering = uiState.orderResult is OrderResult.Purchasing,
         coupons = uiState.coupons,
         selectedCoupon = uiState.selectedCoupon,
         totalPrice = uiState.totalPrice,
@@ -93,6 +91,7 @@ fun OrderScreen(
 @Composable
 fun OrderContent(
     isLoading: Boolean,
+    isOrdering: Boolean,
     coupons: List<CouponUiModel>,
     selectedCoupon: CouponUiModel?,
     totalPrice: Long,
@@ -104,6 +103,7 @@ fun OrderContent(
     onCouponSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isButtonDisabled = isLoading || isOrdering
     Scaffold(
         containerColor = Gray30,
         topBar = {
@@ -136,8 +136,8 @@ fun OrderContent(
                         .fillMaxWidth()
                         .navigationBarsPadding()
                         .height(56.dp)
-                        .background(if (isLoading) Color.Gray else Green40)
-                        .clickable { onOrderClick() },
+                        .background(if (isButtonDisabled) Color.Gray else Green40)
+                        .clickable(enabled = !isButtonDisabled) { onOrderClick() },
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -309,6 +309,7 @@ private fun PriceRow(
 private fun OrderContentPreview() {
     OrderContent(
         isLoading = false,
+        isOrdering = false,
         coupons = sampleCoupons,
         selectedCoupon = sampleCoupons[0],
         totalPrice = 204_200L,
