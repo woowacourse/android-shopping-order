@@ -19,7 +19,7 @@ class AlarmScheduler(
         intent: Intent,
     ) {
         if (!notificationSettingDataSource.isNotificationEnabled()) return
-        alarmManager.set(
+        alarmManager.setAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             System.currentTimeMillis() + delayMillis,
             PendingIntent.getBroadcast(
