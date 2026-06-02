@@ -2,6 +2,8 @@ package woowacourse.shopping.presentation.cart.viewmodel
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -33,6 +35,12 @@ class CartItemListViewModelTest {
             )
     }
 
+    private fun TestScope.collectUiState() {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+    }
+
     @AfterEach
     fun tearDown() {
         Dispatchers.resetMain()
@@ -41,6 +49,8 @@ class CartItemListViewModelTest {
     @Test
     fun `장바구니가 비어있다면 currentCartItems는 비어있고, totalCartSize는 0이다`() =
         runTest {
+            collectUiState()
+
             val state = viewModel.uiState.value
             assertThat(state.currentCartItems).isEmpty()
             assertThat(state.totalCartSize).isEqualTo(0)
@@ -49,6 +59,7 @@ class CartItemListViewModelTest {
     @Test
     fun `장바구니에 5개 이하의 상품 종류가 있다면 isCanMoveNext는 false이다`() =
         runTest {
+            collectUiState()
             cartRepository.addItem(1L, 1)
             cartRepository.addItem(2L, 10)
             cartRepository.addItem(3L, 5)
@@ -61,6 +72,8 @@ class CartItemListViewModelTest {
     @Test
     fun `increase는 카트에 상품을 추가하고 totalCartSize를 갱신한다`() =
         runTest {
+            collectUiState()
+
             viewModel.addItemToCart(1L)
 
             assertThat(viewModel.uiState.value.totalCartSize).isEqualTo(1)
@@ -69,6 +82,7 @@ class CartItemListViewModelTest {
     @Test
     fun `decrease는 카트의 수량을 감소시킨다`() =
         runTest {
+            collectUiState()
             cartRepository.addItem(1L, 3)
 
             viewModel.decreaseItemFromCart(1L)
@@ -82,6 +96,7 @@ class CartItemListViewModelTest {
     @Test
     fun `deleteItem은 성공 시 상품을 장바구니에서 삭제한다`() =
         runTest {
+            collectUiState()
             cartRepository.addItem(1L, 1)
 
             viewModel.deleteItem(1L)
@@ -95,6 +110,8 @@ class CartItemListViewModelTest {
     @Test
     fun `deleteItem은 없는 상품이면 장바구니를 변경하지 않는다`() =
         runTest {
+            collectUiState()
+
             viewModel.deleteItem(999L)
 
             assertThat(cartRepository.cart.value.items).isEmpty()
