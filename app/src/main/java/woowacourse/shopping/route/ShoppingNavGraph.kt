@@ -76,9 +76,7 @@ fun ShoppingNavGraph(
                 onBackClick = { navController.popBackStack() },
                 onOrderSuccess = {
                     onOrderSuccess()
-                    navController.navigate(ShoppingList) {
-                        popUpTo(ShoppingList) { inclusive = false }
-                    }
+                    navController.popBackStack(ShoppingList, inclusive = false)
                 },
             )
         }
