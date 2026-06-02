@@ -76,6 +76,7 @@ fun OrderScreen(
     }
 
     OrderContent(
+        isLoading = uiState.isLoading,
         coupons = uiState.coupons,
         selectedCoupon = uiState.selectedCoupon,
         totalPrice = uiState.totalPrice,
@@ -91,6 +92,7 @@ fun OrderScreen(
 
 @Composable
 fun OrderContent(
+    isLoading: Boolean,
     coupons: List<CouponUiModel>,
     selectedCoupon: CouponUiModel?,
     totalPrice: Long,
@@ -134,7 +136,7 @@ fun OrderContent(
                         .fillMaxWidth()
                         .navigationBarsPadding()
                         .height(56.dp)
-                        .background(Green40)
+                        .background(if (isLoading) Color.Gray else Green40)
                         .clickable { onOrderClick() },
                 contentAlignment = Alignment.Center,
             ) {
@@ -306,6 +308,7 @@ private fun PriceRow(
 @Composable
 private fun OrderContentPreview() {
     OrderContent(
+        isLoading = false,
         coupons = sampleCoupons,
         selectedCoupon = sampleCoupons[0],
         totalPrice = 204_200L,

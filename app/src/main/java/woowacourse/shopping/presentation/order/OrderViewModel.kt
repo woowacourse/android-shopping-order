@@ -58,9 +58,10 @@ class OrderViewModel(
 
     val uiState =
         combine(paymentItems, coupons, selectedCouponCode, discountedOrder) { paymentItems, coupons, selectedCode, order ->
-            if (order == null) return@combine OrderUiState()
+            if (order == null) return@combine OrderUiState(isLoading = true)
             val selectedCoupon = coupons.find { it.code == selectedCode }
             OrderUiState(
+                isLoading = false,
                 totalPrice = paymentItems.totalPrice,
                 discountAmount = order.discountAmount,
                 deliveryFee = order.deliveryFee.price,
@@ -102,6 +103,7 @@ class OrderViewModel(
     }
 
     fun orderCartItems() {
+        if (uiState.value.isLoading) return
         viewModelScope.launch {
             val itemIds = paymentItems.first().getItems().map { it.id }
             val orderResult = orderRepository.orderCartItems(itemIds)
