@@ -49,7 +49,7 @@ object AppContainer {
                 )
             retrofitServices =
                 RetrofitServices(
-                    baseUrl = "http://techcourse-lv2-alb-250216202.ap-northeast-2.elb.amazonaws.com/",
+                    baseUrl = "https://android-shopping-server.onrender.com/",
                     interceptor = AuthInterceptor(authDataSource.getToken()),
                 )
         }
