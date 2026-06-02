@@ -1,9 +1,9 @@
 package woowacourse.shopping.route
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import woowacourse.shopping.presentation.cart.CartItemListScreen
 import woowacourse.shopping.presentation.order.OrderScreen
@@ -14,10 +14,10 @@ import woowacourse.shopping.presentation.settings.NotificationSettingScreen
 
 @Composable
 fun ShoppingNavGraph(
-    onEnterOrder: () -> Unit,
+    navController: NavHostController,
+    onEnterOrder: (List<Long>) -> Unit,
     onOrderSuccess: () -> Unit,
 ) {
-    val navController = rememberNavController()
     NavHost(
         navController = navController,
         startDestination = ShoppingList,
@@ -69,7 +69,7 @@ fun ShoppingNavGraph(
                 onBackClick = { navController.popBackStack() },
                 onOrderClick = { productIds ->
                     navController.navigate(route = OrderItem(productIds))
-                    onEnterOrder()
+                    onEnterOrder(productIds)
                 },
             )
         }

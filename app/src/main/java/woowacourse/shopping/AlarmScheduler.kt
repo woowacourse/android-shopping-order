@@ -14,25 +14,31 @@ class AlarmScheduler(
 ) {
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-    private val pendingIntent by lazy {
-        PendingIntent.getBroadcast(
-            context,
-            requestCode,
-            Intent(context, receiver),
-            PendingIntent.FLAG_IMMUTABLE,
-        )
-    }
-
-    fun schedule(delayMillis: Long) {
+    fun schedule(
+        delayMillis: Long,
+        intent: Intent,
+    ) {
         if (!notificationSettingDataSource.isNotificationEnabled()) return
         alarmManager.set(
             AlarmManager.RTC_WAKEUP,
             System.currentTimeMillis() + delayMillis,
-            pendingIntent,
+            PendingIntent.getBroadcast(
+                context,
+                requestCode,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            ),
         )
     }
 
     fun cancel() {
+        val pendingIntent =
+            PendingIntent.getBroadcast(
+                context,
+                requestCode,
+                Intent(context, receiver),
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_NO_CREATE,
+            ) ?: return
         alarmManager.cancel(pendingIntent)
     }
 }

@@ -7,11 +7,19 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.Composable
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import woowacourse.shopping.di.AppContainer
+import woowacourse.shopping.route.OrderItem
+import woowacourse.shopping.route.ShoppingList
 import woowacourse.shopping.route.ShoppingNavGraph
 
 class MainActivity : ComponentActivity() {
@@ -29,10 +37,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         requestNotificationPermission()
         setContent {
+            val navController = rememberNavController()
+            OrderNotificationNavigation(navController)
             ShoppingNavGraph(
-                onEnterOrder = {
+                navController = navController,
+                onEnterOrder = { productIds ->
                     alarmScheduler.cancel()
-                    alarmScheduler.schedule(5 * 60 * 1000L)
+                    alarmScheduler.schedule(
+                        10 * 1000L,
+                        OrderAlarmBroadCastReceiver.createIntent(this, productIds),
+                    )
                 },
                 onOrderSuccess = { alarmScheduler.cancel() },
             )
@@ -70,5 +84,20 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun OrderNotificationNavigation(navController: NavHostController) {
+    val activity = LocalActivity.current as? ComponentActivity ?: return
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        OrderAlarmBroadCastReceiver
+            .getProductIdsFromIntent(activity.intent)
+            ?.let { productIds ->
+                navController.navigate(OrderItem(productIds)) {
+                    popUpTo(ShoppingList) { inclusive = false }
+                }
+            }
     }
 }
