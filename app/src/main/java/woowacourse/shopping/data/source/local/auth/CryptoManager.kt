@@ -14,8 +14,6 @@ class CryptoManager {
             load(null)
         }
 
-    private val cipher = Cipher.getInstance(TRANSFORMATION)
-
     private fun getKey(): SecretKey {
         val existingKey = keyStore.getEntry("secret", null) as? KeyStore.SecretKeyEntry
         return existingKey?.secretKey ?: createKey()
@@ -39,6 +37,7 @@ class CryptoManager {
             }.generateKey()
 
     fun encrypt(bytes: ByteArray): ByteArray {
+        val cipher = Cipher.getInstance(TRANSFORMATION)
         cipher.init(Cipher.ENCRYPT_MODE, getKey())
         val iv = cipher.iv
         val encryptedBytes = cipher.doFinal(bytes)
@@ -46,6 +45,7 @@ class CryptoManager {
     }
 
     fun decrypt(bytes: ByteArray): ByteArray {
+        val cipher = Cipher.getInstance(TRANSFORMATION)
         val iv = bytes.copyOfRange(0, cipher.blockSize)
         val encryptedBytes = bytes.copyOfRange(cipher.blockSize, bytes.size)
         cipher.init(Cipher.DECRYPT_MODE, getKey(), IvParameterSpec(iv))
