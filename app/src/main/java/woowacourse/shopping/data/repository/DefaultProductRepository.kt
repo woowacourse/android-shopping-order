@@ -3,7 +3,7 @@ package woowacourse.shopping.data.repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import woowacourse.shopping.data.source.local.recent.RecentProductDao
 import woowacourse.shopping.data.source.local.recent.RecentProductEntity
@@ -12,6 +12,7 @@ import woowacourse.shopping.domain.model.Money
 import woowacourse.shopping.domain.model.Product
 import woowacourse.shopping.domain.model.ProductName
 import woowacourse.shopping.domain.repository.ProductRepository
+import woowacourse.shopping.error.Result
 
 class DefaultProductRepository(
     private val remoteProductDataSource: ProductRemoteDataSource,
@@ -25,28 +26,30 @@ class DefaultProductRepository(
         page: Int,
         size: Int,
     ): Int {
-        val newProducts =
-            remoteProductDataSource.fetchProducts(page, size).map {
-                Product(
-                    id = it.id,
-                    name = ProductName(it.name),
-                    price = Money(it.price.toLong()),
-                    imageUrl = it.imageUrl,
-                    category = it.category,
-                )
+        val fetchProductsResult = remoteProductDataSource.fetchProducts(page, size)
+        if (fetchProductsResult is Result.Success) {
+            val newProducts =
+                fetchProductsResult.data.map {
+                    Product(
+                        id = it.id,
+                        name = ProductName(it.name),
+                        price = Money(it.price.toLong()),
+                        imageUrl = it.imageUrl,
+                        category = it.category,
+                    )
+                }
+            _products.update { products ->
+                (products + newProducts).distinctBy { it.id }
             }
-        _products.update { products ->
-            (products + newProducts).distinctBy { it.id }
+            return newProducts.size
         }
-        return newProducts.size
+        return 0
     }
 
     override fun getRecentProductsStream(size: Int): Flow<List<Product>> =
-        recentProductDao
-            .getRecentStream(size)
-            .map { entities ->
-                entities.mapNotNull { getProductById(it.productId) }
-            }
+        combine(recentProductDao.getRecentStream(size), _products) { entities, products ->
+            entities.mapNotNull { entity -> products.find { it.id == entity.productId } }
+        }
 
     override suspend fun upsertRecentProduct(id: Long) {
         recentProductDao.upsertRecentProduct(

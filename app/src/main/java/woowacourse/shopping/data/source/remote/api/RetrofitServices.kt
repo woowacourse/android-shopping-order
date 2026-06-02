@@ -28,4 +28,5 @@ class RetrofitServices(
 
     val cartService: CartService = retrofit.create(CartService::class.java)
     val productService: ProductService = retrofit.create(ProductService::class.java)
+    val couponService: OrderService = retrofit.create(OrderService::class.java)
 }

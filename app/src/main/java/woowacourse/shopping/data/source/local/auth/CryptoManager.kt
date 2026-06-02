@@ -2,8 +2,6 @@ package woowacourse.shopping.data.source.local.auth
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import java.io.InputStream
-import java.io.OutputStream
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -14,16 +12,6 @@ class CryptoManager {
     private val keyStore =
         KeyStore.getInstance("AndroidKeyStore").apply {
             load(null)
-        }
-
-    private val encryptCipher get() =
-        Cipher.getInstance(TRANSFORMATION).apply {
-            init(Cipher.ENCRYPT_MODE, getKey())
-        }
-
-    private fun getDecryptCipherForIv(iv: ByteArray): Cipher =
-        Cipher.getInstance(TRANSFORMATION).apply {
-            init(Cipher.DECRYPT_MODE, getKey(), IvParameterSpec(iv))
         }
 
     private fun getKey(): SecretKey {
@@ -48,35 +36,21 @@ class CryptoManager {
                 )
             }.generateKey()
 
-    fun encrypt(
-        bytes: ByteArray,
-        outputStream: OutputStream,
-    ): ByteArray {
-        val cipher = encryptCipher
+    fun encrypt(bytes: ByteArray): ByteArray {
+        val cipher = Cipher.getInstance(TRANSFORMATION)
+        cipher.init(Cipher.ENCRYPT_MODE, getKey())
+        val iv = cipher.iv
         val encryptedBytes = cipher.doFinal(bytes)
-
-        outputStream.use {
-            it.write(cipher.iv.size)
-            it.write(cipher.iv)
-            it.write(encryptedBytes.size)
-            it.write(encryptedBytes)
-        }
-
-        return encryptedBytes
+        return iv + encryptedBytes
     }
 
-    fun decrypt(inputStream: InputStream): ByteArray =
-        inputStream.use {
-            val ivSize = it.read()
-            val iv = ByteArray(ivSize)
-            it.read(iv)
-
-            val encryptedBytesSize = it.read()
-            val encryptedBytes = ByteArray(encryptedBytesSize)
-            it.read(encryptedBytes)
-
-            getDecryptCipherForIv(iv).doFinal(encryptedBytes)
-        }
+    fun decrypt(bytes: ByteArray): ByteArray {
+        val cipher = Cipher.getInstance(TRANSFORMATION)
+        val iv = bytes.copyOfRange(0, cipher.blockSize)
+        val encryptedBytes = bytes.copyOfRange(cipher.blockSize, bytes.size)
+        cipher.init(Cipher.DECRYPT_MODE, getKey(), IvParameterSpec(iv))
+        return cipher.doFinal(encryptedBytes)
+    }
 
     companion object {
         private const val ALGORITHM = KeyProperties.KEY_ALGORITHM_AES

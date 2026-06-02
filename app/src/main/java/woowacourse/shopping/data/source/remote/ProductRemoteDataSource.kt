@@ -1,7 +1,10 @@
 package woowacourse.shopping.data.source.remote
 
 import woowacourse.shopping.data.source.remote.api.ProductService
+import woowacourse.shopping.data.source.remote.api.safeNetworkApiCall
 import woowacourse.shopping.data.source.remote.dto.product.response.ProductContent
+import woowacourse.shopping.error.NetworkError
+import woowacourse.shopping.error.Result
 
 class ProductRemoteDataSource(
     private val productService: ProductService,
@@ -9,15 +12,12 @@ class ProductRemoteDataSource(
     suspend fun fetchProducts(
         page: Int,
         size: Int,
-    ): List<ProductContent> =
-        try {
-            val response =
-                productService.requestProducts(
+    ): Result<List<ProductContent>, NetworkError> =
+        safeNetworkApiCall {
+            productService
+                .requestProducts(
                     page = page,
                     size = size,
-                )
-            response.content
-        } catch (_: Exception) {
-            emptyList()
+                ).content
         }
 }
