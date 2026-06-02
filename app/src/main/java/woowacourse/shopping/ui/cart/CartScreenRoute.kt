@@ -1,10 +1,10 @@
 package woowacourse.shopping.ui.cart
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.di.AppContainer
+import woowacourse.shopping.ui.util.ObserveAsEvents
 
 @Composable
 fun CartScreenRoute(
@@ -22,12 +22,10 @@ fun CartScreenRoute(
         ),
     )
 
-    LaunchedEffect(viewModel) {
-        viewModel.uiEvent.collect { event ->
-            when (event) {
-                is CartUiEvent.ShowSnackbar -> showSnackbar(event.message)
-                is CartUiEvent.OrderRequested -> onNavigateToPayment(event.selectedItemIds)
-            }
+    ObserveAsEvents(flow = viewModel.uiEvent) { event ->
+        when (event) {
+            is CartUiEvent.ShowSnackbar -> showSnackbar(event.message)
+            is CartUiEvent.OrderRequested -> onNavigateToPayment(event.selectedItemIds)
         }
     }
 

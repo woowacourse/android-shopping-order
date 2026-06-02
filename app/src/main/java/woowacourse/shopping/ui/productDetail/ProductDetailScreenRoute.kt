@@ -1,11 +1,11 @@
 package woowacourse.shopping.ui.productDetail
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.ui.util.ObserveAsEvents
 
 @Composable
 fun ProductDetailScreenRoute(
@@ -26,12 +26,10 @@ fun ProductDetailScreenRoute(
                 ),
         )
 
-    LaunchedEffect(viewModel) {
-        viewModel.uiEvent.collect { event ->
-            when (event) {
-                is ProductDetailUiEvent.ShowSnackbar -> showSnackbar(event.message)
-                ProductDetailUiEvent.AddedToCart -> onNavigateToCart()
-            }
+    ObserveAsEvents(flow = viewModel.uiEvent) { event ->
+        when (event) {
+            is ProductDetailUiEvent.ShowSnackbar -> showSnackbar(event.message)
+            ProductDetailUiEvent.AddedToCart -> onNavigateToCart()
         }
     }
 
