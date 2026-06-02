@@ -45,7 +45,7 @@ class CartItemListViewModel(
             )
         }.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Companion.Eagerly,
+            started = SharingStarted.WhileSubscribed(5_000),
             initialValue = _uiState.value,
         )
 
