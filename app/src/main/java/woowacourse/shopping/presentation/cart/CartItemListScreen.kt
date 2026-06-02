@@ -64,7 +64,7 @@ fun CartItemListScreen(
         onItemSelected = viewModel::selectItem,
         onItemDeleted = viewModel::deleteItem,
         onIncreaseQuantity = viewModel::addItemToCart,
-        onDecreaseQuantity = viewModel::deleteItem,
+        onDecreaseQuantity = viewModel::decreaseItemFromCart,
         onOrderClick = {
             onOrderClick(
                 viewModel.getPaymentItemIds(),

@@ -70,7 +70,7 @@ class CartItemListViewModel(
         }
     }
 
-    fun removeItemFromCart(productId: Long) {
+    fun decreaseItemFromCart(productId: Long) {
         viewModelScope.launch {
             val cartItem = cart.value.items.find { it.product.id == productId }
             if (cartItem == null) return@launch

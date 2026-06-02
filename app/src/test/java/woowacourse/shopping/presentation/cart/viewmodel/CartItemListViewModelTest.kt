@@ -67,7 +67,7 @@ class CartItemListViewModelTest {
         runTest {
             cartRepository.addItem(1L, 3)
 
-            viewModel.removeItemFromCart(1L)
+            viewModel.decreaseItemFromCart(1L)
 
             val item =
                 cartRepository.cart.value.items
