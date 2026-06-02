@@ -17,6 +17,7 @@ import woowacourse.shopping.domain.model.order.FreeShippingCoupon
 import woowacourse.shopping.domain.model.order.PercentageCoupon
 import woowacourse.shopping.domain.repository.OrderRepository
 import woowacourse.shopping.error.Error
+import woowacourse.shopping.error.NetworkError
 import woowacourse.shopping.error.Result
 import java.time.LocalDate
 import java.time.LocalTime
@@ -27,14 +28,16 @@ class DefaultOrderRepository(
     private val _coupons = MutableStateFlow<List<Coupon>>(emptyList())
     override val coupons = _coupons.asStateFlow()
 
-    override suspend fun loadCoupons() {
+    override suspend fun loadCoupons(): Result<Unit, NetworkError> {
         val result =
             safeNetworkApiCall {
                 remoteOrderDataSource.getCoupons().map { it.toCoupon() }
             }
         if (result is Result.Success) {
             _coupons.value = result.data
+            return Result.Success(Unit)
         }
+        return Result.Error((result as Result.Error).error)
     }
 
     override suspend fun orderCartItems(cartItemIds: List<Long>): Result<Unit, Error> =

@@ -8,7 +8,7 @@ import woowacourse.shopping.error.Result
 interface OrderRepository {
     val coupons: StateFlow<List<Coupon>>
 
-    suspend fun loadCoupons()
+    suspend fun loadCoupons(): Result<Unit, Error>
 
     suspend fun orderCartItems(itemIds: List<Long>): Result<Unit, Error>
 }
