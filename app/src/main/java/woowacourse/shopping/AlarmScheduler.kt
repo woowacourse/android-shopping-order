@@ -18,7 +18,10 @@ class AlarmScheduler(
         delayMillis: Long,
         intent: Intent,
     ) {
-        if (!notificationSettingDataSource.isNotificationEnabled()) return
+        if (!notificationSettingDataSource.isNotificationEnabled()) {
+            cancel()
+            return
+        }
         alarmManager.setAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             System.currentTimeMillis() + delayMillis,
