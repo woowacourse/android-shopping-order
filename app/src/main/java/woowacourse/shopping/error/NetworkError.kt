@@ -7,5 +7,6 @@ enum class NetworkError : Error {
     NotFound,
     InternalServerError,
     IoError,
+    SerializationError,
     UnknownError,
 }
