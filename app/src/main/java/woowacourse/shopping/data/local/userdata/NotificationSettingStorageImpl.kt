@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.local
+package woowacourse.shopping.data.local.userdata
 
 import android.content.Context
 import androidx.core.content.edit
