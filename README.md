@@ -54,7 +54,7 @@
 1. [x] build.gradle.kts 에서 BASE_URL에 대한 경고 메시지 추가
 2. [x] Order 객체 calculateFinalPrice() 메서드에 0월 이하의 반환값 제한
 3. [x] viewModel isLoading 상태 변경 점검
-4. [ ] 알림 클릭시 LaunchedEffect가 아닌 DeepLink를 통해 화면을 이동
+4. [x] 알림 클릭시 LaunchedEffect가 아닌 DeepLink를 통해 화면을 이동
 5. [ ] 주문 중복 호출 방지를 위한 isOrdering 상태 추가
 6. [ ] 스낵바 이벤트 emit 처리 점검
 7. [ ] replaceAll() 트랙젝션 추가

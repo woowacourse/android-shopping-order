@@ -12,13 +12,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.cart.CartRoute
@@ -72,14 +72,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             val app = application as ShoppingApplication
-
-            LaunchedEffect(intent) {
-                val navigateTo = intent.getStringExtra("navigate_to")
-                if (navigateTo == "payment") {
-                    navController.navigate(Payment)
-                    intent.removeExtra("navigate_to")
-                }
-            }
 
             AndroidshoppingTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -163,7 +155,11 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable<Payment> {
+                        composable<Payment>(
+                            deepLinks = listOf(
+                                navDeepLink { uriPattern = "shopping://payment" }
+                            )
+                        ) {
                             val viewModel: PaymentViewModel =
                                 viewModel(
                                     factory =
