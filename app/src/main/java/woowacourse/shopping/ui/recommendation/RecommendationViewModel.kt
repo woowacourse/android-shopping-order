@@ -285,8 +285,7 @@ class RecommendationViewModel(
 
     fun navigateToPayment(checkedIds: List<Long>) {
         viewModelScope.launch {
-            outstandingProductRepository.deleteAll()
-            outstandingProductRepository.insertAll(checkedIds)
+            outstandingProductRepository.replaceAll(checkedIds)
             _event.emit(
                 RecommendationEvent.NavigateToPayment(checkedIds),
             )

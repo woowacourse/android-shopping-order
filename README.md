@@ -57,7 +57,7 @@
 4. [x] 알림 클릭시 LaunchedEffect가 아닌 DeepLink를 통해 화면을 이동
 5. [x] 주문 중복 호출 방지를 위한 isOrdering 상태 추가
 6. [x] 스낵바 이벤트 emit 처리 점검
-7. [ ] replaceAll() 트랙젝션 추가
+7. [x] replaceAll() 트랙젝션 추가
 8. [ ] 사용자 인증 정보 및 설정값 DataSource 객체 추가
 9. [ ] DiscountType Enum 클래스 추가
 10. [ ] 정확한 알림 사용 제거
