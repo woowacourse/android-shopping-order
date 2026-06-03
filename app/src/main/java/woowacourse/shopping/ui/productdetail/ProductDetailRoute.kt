@@ -13,17 +13,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavController
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.PurchaseProduct
-import woowacourse.shopping.ui.navigation.ProductDetail
-import woowacourse.shopping.ui.navigation.Shopping
 
 @Composable
 fun ProductDetailRoute(
     viewModel: ProductDetailViewModel,
-    navController: NavController,
+    onNavigateToLastViewed: (Long) -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -46,15 +44,9 @@ fun ProductDetailRoute(
                             }
                     }
                     is ProductDetailEvent.MoveToLastViewedProductDetail ->
-                        navController.navigate(
-                            ProductDetail(
-                                selectedProductId = event.lastViewedProductId,
-                            ),
-                        ) {
-                            popUpTo<Shopping>()
-                        }
+                        onNavigateToLastViewed(event.lastViewedProductId)
                     is ProductDetailEvent.MoveToShopping ->
-                        navController.popBackStack()
+                        onBack()
                 }
             }
         }

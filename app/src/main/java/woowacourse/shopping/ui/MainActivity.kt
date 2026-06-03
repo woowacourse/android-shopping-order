@@ -121,7 +121,16 @@ class MainActivity : ComponentActivity() {
                                 )
                             ProductDetailRoute(
                                 viewModel = viewModel,
-                                navController = navController,
+                                onNavigateToLastViewed = { lastId ->
+                                    navController.navigate(
+                                        ProductDetail(
+                                            selectedProductId = lastId,
+                                        ),
+                                    ) {
+                                        popUpTo<Shopping>()
+                                    }
+                                },
+                                onBack = { navController.popBackStack() },
                                 modifier = Modifier.padding(innerPadding),
                             )
                         }
