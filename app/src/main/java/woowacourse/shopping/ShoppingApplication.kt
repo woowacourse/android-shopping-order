@@ -4,12 +4,14 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
-import woowacourse.shopping.data.local.NotificationSettingStorage
-import woowacourse.shopping.data.local.NotificationSettingStorageImpl
-import woowacourse.shopping.data.local.UserAuthDataStore
+import woowacourse.shopping.data.local.userdata.NotificationSettingStorage
+import woowacourse.shopping.data.local.userdata.NotificationSettingStorageImpl
+import woowacourse.shopping.data.local.userdata.UserAuthDataStore
 import woowacourse.shopping.data.local.database.DataBase
 import woowacourse.shopping.data.local.repository.OutstandingProductRepositoryImpl
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepositoryImpl
+import woowacourse.shopping.data.local.userdata.UserDataSource
+import woowacourse.shopping.data.local.userdata.UserDataSourceImpl
 import woowacourse.shopping.data.remote.server.RetrofitProvider
 import woowacourse.shopping.data.remote.server.repository.CartRepositoryImpl
 import woowacourse.shopping.data.remote.server.repository.CouponRepositoryImpl
@@ -35,12 +37,18 @@ class ShoppingApplication : Application() {
         OutstandingProductRepositoryImpl(database.outstandingProductDao())
     }
 
-    val userAuthDataStore by lazy { UserAuthDataStore(context = this) }
+    private val userAuthDataStore by lazy { UserAuthDataStore(context = this) }
+
+    private val notificationStorage by lazy { NotificationSettingStorageImpl(context = this) }
+
+    val userDataSource: UserDataSource by lazy {
+        UserDataSourceImpl(userAuthDataStore, notificationStorage)
+    }
 
     private val retrofitClient by lazy {
         RetrofitProvider(
             authHeaderProvider = {
-                userAuthDataStore.encodedUserAuthInfo.value
+                userDataSource.encodedUserAuthInfo.value
             },
         )
     }
@@ -79,7 +87,6 @@ class ShoppingApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        notificationSetting = NotificationSettingStorageImpl(this)
         alarmScheduler = AlarmSchedulerImpl(this)
         createNotificationChannel()
     }
@@ -101,8 +108,6 @@ class ShoppingApplication : Application() {
     }
 
     companion object {
-        lateinit var notificationSetting: NotificationSettingStorage
-            private set
         lateinit var alarmScheduler: AlarmScheduler
             private set
     }
