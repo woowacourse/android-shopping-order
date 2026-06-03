@@ -17,7 +17,7 @@ import woowacourse.shopping.ui.payment.PaymentViewModel
 import woowacourse.shopping.viewmodel.fakes.FakeAlarmScheduler
 import woowacourse.shopping.viewmodel.fakes.FakeCartRepository
 import woowacourse.shopping.viewmodel.fakes.FakeCouponRepository
-import woowacourse.shopping.viewmodel.fakes.FakeNotificationSettingStorage
+import woowacourse.shopping.viewmodel.fakes.FakeUserDataSource
 import woowacourse.shopping.viewmodel.fakes.FakeOrderRepository
 import woowacourse.shopping.viewmodel.fakes.FakeOutstandingProductRepository
 import java.time.LocalDate
@@ -32,7 +32,7 @@ class PaymentViewModelTest {
     private lateinit var orderRepository: FakeOrderRepository
     private lateinit var couponRepository: FakeCouponRepository
     private lateinit var outstandingProductRepository: FakeOutstandingProductRepository
-    private lateinit var notificationStorage: FakeNotificationSettingStorage
+    private lateinit var userDataSource: FakeUserDataSource
     private lateinit var alarmScheduler: FakeAlarmScheduler
     private lateinit var viewModel: PaymentViewModel
 
@@ -42,7 +42,7 @@ class PaymentViewModelTest {
         orderRepository = FakeOrderRepository()
         couponRepository = FakeCouponRepository()
         outstandingProductRepository = FakeOutstandingProductRepository()
-        notificationStorage = FakeNotificationSettingStorage()
+        userDataSource = FakeUserDataSource()
         alarmScheduler = FakeAlarmScheduler()
     }
 
@@ -53,7 +53,7 @@ class PaymentViewModelTest {
                 orderRepository = orderRepository,
                 couponRepository = couponRepository,
                 outstandingProductRepository = outstandingProductRepository,
-                settingStorage = notificationStorage,
+                userDataSource = userDataSource,
                 alarmScheduler = alarmScheduler,
             )
     }
