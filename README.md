@@ -51,7 +51,7 @@
 
 ## 1차 피드백 수정사항
 
-1. [ ] build.gradle.kts 에서 BASE_URL에 대한 경고 메시지 추가
+1. [x] build.gradle.kts 에서 BASE_URL에 대한 경고 메시지 추가
 2. [ ] Order 객체 calculateFinalPrice() 메서드에 0월 이하의 반환값 제한
 3. [ ] CartViewModel fetchCart() 메서드 isLoading 상태 변경
 4. [ ] 알림 클릭시 LaunchedEffect가 아닌 DeepLink를 통해 화면을 이동

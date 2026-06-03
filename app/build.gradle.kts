@@ -20,15 +20,19 @@ android {
     defaultConfig {
         val properties =
             Properties().apply {
-                load(project.rootProject.file("local.properties").inputStream())
+                val localPropertiesFile = project.rootProject.file("local.properties")
+                if(localPropertiesFile.exists()) load(localPropertiesFile.inputStream())
             }
+
+        val baseUrl = properties.getProperty("BASE_URL")
+            ?: throw GradleException ("local.properties에 BASE_URL이 정의되지 않았습니다.")
 
         applicationId = "woowacourse.shopping"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-        buildConfigField("String", "BASE_URL", properties.getProperty("BASE_URL"))
+        buildConfigField("String", "BASE_URL", baseUrl)
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
