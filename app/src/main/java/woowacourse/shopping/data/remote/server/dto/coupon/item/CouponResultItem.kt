@@ -23,7 +23,7 @@ data class CouponResultItem(
     @SerialName("discount")
     val discount: Int = 0,
     @SerialName("discountType")
-    val discountType: String,
+    val discountType: DiscountType,
     @SerialName("expirationDate")
     val expirationDate: String,
     @SerialName("getQuantity")
@@ -37,7 +37,7 @@ data class CouponResultItem(
 fun CouponResultItem.toDomain(): Coupon {
     val expiryDate = LocalDate.parse(expirationDate)
     return when (discountType) {
-        "fixed" ->
+        DiscountType.FIXED ->
             FixedCoupon(
                 id = id.toInt(),
                 code = code,
@@ -46,7 +46,7 @@ fun CouponResultItem.toDomain(): Coupon {
                 minimumAmount = minimumAmount,
                 description = description,
             )
-        "buyXgetY" ->
+        DiscountType.BUY_X_GET_Y ->
             BuyXGetYCoupon(
                 id = id.toInt(),
                 code = code,
@@ -55,7 +55,7 @@ fun CouponResultItem.toDomain(): Coupon {
                 buyQuantity = buyQuantity,
                 getQuantity = getQuantity,
             )
-        "freeShipping" ->
+        DiscountType.FREE_SHIPPING ->
             FreeShippingCoupon(
                 id = id.toInt(),
                 code = code,
@@ -63,7 +63,7 @@ fun CouponResultItem.toDomain(): Coupon {
                 expirationDate = expiryDate,
                 minimumAmount = minimumAmount,
             )
-        "percentage" ->
+        DiscountType.PERCENTAGE ->
             PercentCoupon(
                 id = id.toInt(),
                 code = code,
@@ -73,6 +73,5 @@ fun CouponResultItem.toDomain(): Coupon {
                 startTime = LocalTime.parse(availableTime?.start),
                 endTime = LocalTime.parse(availableTime?.end),
             )
-        else -> throw IllegalArgumentException("Unknown discount type: $discountType")
     }
 }
