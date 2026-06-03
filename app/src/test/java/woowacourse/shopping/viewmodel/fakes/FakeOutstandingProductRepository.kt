@@ -14,4 +14,9 @@ class FakeOutstandingProductRepository : OutstandingProductRepository {
     override suspend fun deleteAll() {
         outstandingIds.clear()
     }
+
+    override suspend fun replaceAll(cartItemIds: List<Long>) {
+        outstandingIds.clear()
+        outstandingIds.addAll(cartItemIds)
+    }
 }

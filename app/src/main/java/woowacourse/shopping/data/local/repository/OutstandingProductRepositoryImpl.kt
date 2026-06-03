@@ -19,4 +19,9 @@ class OutstandingProductRepositoryImpl(
     override suspend fun deleteAll() {
         outstandingProductDao.deleteAll()
     }
+
+    override suspend fun replaceAll(cartItemIds: List<Long>) {
+        val entities = cartItemIds.map { OutstandingProductEntity(it) }
+        outstandingProductDao.replaceAll(entities)
+    }
 }
