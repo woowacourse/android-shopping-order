@@ -11,4 +11,5 @@ data class PaymentUiState(
     val selectedCoupon: Coupon? = null,
     val discount: Discount = Discount(),
     val isLoading: Boolean = false,
+    val isOrdering: Boolean = false,
 )
