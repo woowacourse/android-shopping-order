@@ -13,14 +13,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavController
 import kotlinx.coroutines.launch
-import woowacourse.shopping.ui.navigation.Shopping
 
 @Composable
 fun PaymentRoute(
     viewModel: PaymentViewModel,
-    navController: NavController,
+    onBack: () -> Unit,
+    onNavigateToShopping: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -36,14 +35,8 @@ fun PaymentRoute(
                             snackbarHostState.showSnackbar(event.message)
                         }
                     is PaymentEvent.Order -> viewModel.processOrder()
-                    is PaymentEvent.NavigateBack -> navController.popBackStack()
-                    is PaymentEvent.NavigateToShopping ->
-                        navController
-                            .navigate(Shopping) {
-                                popUpTo<Shopping> {
-                                    inclusive = false
-                                }
-                            }
+                    is PaymentEvent.NavigateBack -> onBack()
+                    is PaymentEvent.NavigateToShopping -> onNavigateToShopping()
                 }
             }
         }

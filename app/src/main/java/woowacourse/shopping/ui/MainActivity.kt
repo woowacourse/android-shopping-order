@@ -200,7 +200,14 @@ class MainActivity : ComponentActivity() {
                                 )
                             PaymentRoute(
                                 viewModel = viewModel,
-                                navController = navController,
+                                onBack = { navController.popBackStack() },
+                                onNavigateToShopping = {
+                                    navController.navigate(Shopping) {
+                                        popUpTo<Shopping> {
+                                            inclusive = false
+                                        }
+                                    }
+                                },
                                 modifier = Modifier.padding(innerPadding),
                             )
                         }
