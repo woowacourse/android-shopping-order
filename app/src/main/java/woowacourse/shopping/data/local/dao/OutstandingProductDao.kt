@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import woowacourse.shopping.data.local.entity.OutstandingProductEntity
 
 @Dao
@@ -16,4 +17,10 @@ interface OutstandingProductDao {
 
     @Query("DELETE FROM outstanding_products")
     suspend fun deleteAll()
+
+    @Transaction
+    suspend fun replaceAll(entities: List<OutstandingProductEntity>) {
+        deleteAll()
+        insertAll(entities)
+    }
 }
