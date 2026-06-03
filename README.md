@@ -48,3 +48,22 @@
 - [x] 예약된 시간이 되면 BroadcastReceiver를 호출
 - [x] onReceive 메서드 내에서 알림 빌드
 - [x] 알림 클릭시 결제 화면으로 이동
+
+## 1차 피드백 수정사항
+
+1. [ ] build.gradle.kts 에서 BASE_URL에 대한 경고 메시지 추가
+2. [ ] Order 객체 calculateFinalPrice() 메서드에 0월 이하의 반환값 제한
+3. [ ] CartViewModel fetchCart() 메서드 isLoading 상태 변경
+4. [ ] 알림 클릭시 LaunchedEffect가 아닌 DeepLink를 통해 화면을 이동
+5. [ ] 주문 중복 호출 방지를 위한 isOrdering 상태 추가
+6. [ ] 스낵바 이벤트 emit 처리 점검
+7. [ ] replaceAll() 트랙젝션 추가
+8. [ ] 상품 목록 조회 실패시 로딩 상태 해제 추가
+9. [ ] 사용자 인증 정보 및 설정값 DataSource 객체 추가
+10. [ ] DiscountType Enum 클래스 추가
+11. [ ] 정확한 알림 사용 제거
+12. [ ] 알림 클릭 시 생성되는 intent의 flag 수정
+13. [ ] navController 의존 관계 제거 및 콜백 함수 추가
+14. [ ] 스낵바 이벤트 처리를 컴포저블에서 수행
+    - [ ] strings.xml을 통해 스낵바에 표시할 문자열 관리
+15. [ ] viewModel에서 ApiResult 처리에 대한 중복되는 코드 함수화
