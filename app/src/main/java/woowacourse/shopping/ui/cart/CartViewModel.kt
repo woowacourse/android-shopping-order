@@ -57,6 +57,9 @@ class CartViewModel(
                     )
                 }
             } else {
+                _uiState.update {
+                    it.copy(isLoading = false)
+                }
                 val errorMsg = getErrorMessage(allItemsResult, pagedItemsResult)
                 _event.emit(
                     CartEvent.SnackbarEvent(errorMsg),
