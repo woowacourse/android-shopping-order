@@ -6,4 +6,6 @@ interface OutstandingProductRepository {
     suspend fun insertAll(cartItemIds: List<Long>)
 
     suspend fun deleteAll()
+
+    suspend fun replaceAll(cartItemIds: List<Long>)
 }
