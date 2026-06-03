@@ -45,8 +45,10 @@ class ProductDetailViewModel(
                     )
 
                 is ApiResult.Exception ->
-                    ProductDetailEvent.SnackbarEvent(
-                        "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}",
+                    _event.emit(
+                        ProductDetailEvent.SnackbarEvent(
+                            "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}",
+                        )
                     )
             }
             fetchProduct()
