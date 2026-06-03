@@ -96,9 +96,15 @@ class PaymentViewModel(
 
     fun processOrder() {
         viewModelScope.launch {
+            _uiState.update {
+                it.copy(isOrdering = true)
+            }
             when (val result = orderRepository.order(uiState.value.order)) {
                 is ApiResult.Success -> {
                     alarmScheduler.cancel()
+                    _uiState.update {
+                        it.copy(isOrdering = false)
+                    }
                     _event.emit(
                         PaymentEvent.SnackbarEvent("주문이 완료되었습니다."),
                     )
@@ -106,14 +112,22 @@ class PaymentViewModel(
                         PaymentEvent.NavigateToShopping,
                     )
                 }
-                is ApiResult.Error ->
+                is ApiResult.Error -> {
+                    _uiState.update {
+                        it.copy(isOrdering = false)
+                    }
                     _event.emit(
                         PaymentEvent.SnackbarEvent("${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}"),
                     )
-                is ApiResult.Exception ->
+                }
+                is ApiResult.Exception -> {
+                    _uiState.update {
+                        it.copy(isOrdering = false)
+                    }
                     _event.emit(
                         PaymentEvent.SnackbarEvent("${ViewModelConst.ERROR_LABEL}${result.e.message}"),
                     )
+                }
             }
         }
     }
