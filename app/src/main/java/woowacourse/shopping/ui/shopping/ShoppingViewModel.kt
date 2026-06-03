@@ -102,15 +102,23 @@ class ShoppingViewModel(
                 }
             }
 
-            is ApiResult.Error ->
+            is ApiResult.Error -> {
+                _uiState.update {
+                    it.copy(isLoading = false)
+                }
                 _event.emit(
                     ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${result.code}"),
                 )
+            }
 
-            is ApiResult.Exception ->
+            is ApiResult.Exception -> {
+                _uiState.update {
+                    it.copy(isLoading = false)
+                }
                 _event.emit(
                     ShoppingEvent.ShowSnackBar("${ViewModelConst.ERROR_LABEL} ${result.e.message}"),
                 )
+            }
         }
     }
 
