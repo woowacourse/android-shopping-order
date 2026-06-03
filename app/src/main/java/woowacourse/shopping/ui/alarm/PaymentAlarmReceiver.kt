@@ -9,9 +9,9 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
 import woowacourse.shopping.R
 import woowacourse.shopping.ShoppingApplication
-import woowacourse.shopping.ui.MainActivity
 
 class PaymentAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(
@@ -24,9 +24,11 @@ class PaymentAlarmReceiver : BroadcastReceiver() {
         if (!notificationSetting.isNotificationEnabled()) return
 
         val toPaymentIntent =
-            Intent(shoppingContext, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                putExtra("navigate_to", "payment")
+            Intent(
+                Intent.ACTION_VIEW,
+                "shopping://payment".toUri()
+            ).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
 
         val tapIntent =
