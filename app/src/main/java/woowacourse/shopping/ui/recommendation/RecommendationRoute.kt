@@ -15,15 +15,14 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavController
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import woowacourse.shopping.ui.navigation.Payment
 
 @Composable
 fun RecommendationRoute(
     viewModel: RecommendationViewModel,
-    navController: NavController,
+    onBack: () -> Unit,
+    onNavigateToPayment: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -60,10 +59,10 @@ fun RecommendationRoute(
                         viewModel.removeWithID(event.targetId)
 
                     is RecommendationEvent.NavigateToCart ->
-                        navController.popBackStack()
+                        onBack()
 
                     is RecommendationEvent.NavigateToPayment ->
-                        navController.navigate(Payment)
+                        onNavigateToPayment()
                 }
             }
         }

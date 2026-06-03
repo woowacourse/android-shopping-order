@@ -175,7 +175,8 @@ class MainActivity : ComponentActivity() {
                                 )
                             RecommendationRoute(
                                 viewModel = viewModel,
-                                navController = navController,
+                                onBack = { navController.popBackStack() },
+                                onNavigateToPayment = { navController.navigate(Payment) },
                                 modifier = Modifier.padding(innerPadding),
                             )
                         }
