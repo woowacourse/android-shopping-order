@@ -92,7 +92,15 @@ class MainActivity : ComponentActivity() {
                                 )
                             ShoppingRoute(
                                 viewModel = viewModel,
-                                navController = navController,
+                                onNavigateToCart = { navController.navigate(Cart) },
+                                onNavigateToProductDetail = { selectedId, lastId ->
+                                    navController.navigate(
+                                        ProductDetail(
+                                            selectedProductId = selectedId,
+                                            lastViewedProductId = lastId,
+                                        ),
+                                    )
+                                },
                                 modifier = Modifier.padding(innerPadding),
                             )
                         }
