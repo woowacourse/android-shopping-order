@@ -60,7 +60,7 @@
 7. [x] replaceAll() 트랙젝션 추가
 8. [x] 사용자 인증 정보 및 설정값 DataSource 객체 추가
 9. [x] DiscountType Enum 클래스 추가
-10. [ ] 정확한 알림 사용 제거
+10. [x] 정확한 알림 사용 제거
 11. [ ] 알림 클릭 시 생성되는 intent의 flag 수정
 12. [ ] navController 의존 관계 제거 및 콜백 함수 추가
 13. [ ] 스낵바 이벤트 처리를 컴포저블에서 수행
