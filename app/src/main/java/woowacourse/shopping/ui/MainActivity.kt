@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
         registerForActivityResult(
             ActivityResultContracts.RequestPermission(),
         ) { isGranted ->
-            ShoppingApplication.notificationSetting.setNotificationEnabled(isGranted)
+            (application as ShoppingApplication).userDataSource.setNotificationEnable(isGranted)
         }
 
     private fun checkNotificationPermission() {
@@ -87,7 +87,7 @@ class MainActivity : ComponentActivity() {
                                             cartRepository = app.cartRepository,
                                             recentlyViewedProductRepository = app.recentlyViewedProductRepository,
                                             productRepository = app.productRepository,
-                                            notificationSettingStorage = ShoppingApplication.notificationSetting,
+                                            userDataSource = app.userDataSource,
                                         ),
                                 )
                             ShoppingRoute(
@@ -168,7 +168,7 @@ class MainActivity : ComponentActivity() {
                                             couponRepository = app.couponRepository,
                                             orderRepository = app.orderRepository,
                                             outstandingProductRepository = app.outstandingProductRepository,
-                                            settingStorage = ShoppingApplication.notificationSetting,
+                                            userDataSource = app.userDataSource,
                                             alarmScheduler = ShoppingApplication.alarmScheduler,
                                         ),
                                 )

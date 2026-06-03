@@ -18,10 +18,9 @@ class PaymentAlarmReceiver : BroadcastReceiver() {
         context: Context,
         intent: Intent,
     ) {
-        val shoppingContext = context.applicationContext
+        val shoppingContext = context.applicationContext as ShoppingApplication
 
-        val notificationSetting = ShoppingApplication.notificationSetting
-        if (!notificationSetting.isNotificationEnabled()) return
+        if (!shoppingContext.userDataSource.isNotificationEnable()) return
 
         val toPaymentIntent =
             Intent(

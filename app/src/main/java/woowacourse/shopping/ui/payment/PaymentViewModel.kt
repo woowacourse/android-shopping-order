@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.local.NotificationSettingStorage
+import woowacourse.shopping.data.local.userdata.UserDataSource
 import woowacourse.shopping.data.local.repository.OutstandingProductRepository
 import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.repository.CartRepository
@@ -27,7 +27,7 @@ class PaymentViewModel(
     private val orderRepository: OrderRepository,
     private val couponRepository: CouponRepository,
     private val outstandingProductRepository: OutstandingProductRepository,
-    private val settingStorage: NotificationSettingStorage,
+    private val userDataSource: UserDataSource,
     private val alarmScheduler: AlarmScheduler,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PaymentUiState())
@@ -38,7 +38,7 @@ class PaymentViewModel(
 
     init {
         alarmScheduler.cancel()
-        if (settingStorage.isNotificationEnabled()) {
+        if (userDataSource.isNotificationEnable()) {
             alarmScheduler.createAlarmSchedule(ALARM_DELAY)
         }
         fetchInitialData()
@@ -154,7 +154,7 @@ class PaymentViewModelFactory(
     private val couponRepository: CouponRepository,
     private val orderRepository: OrderRepository,
     private val outstandingProductRepository: OutstandingProductRepository,
-    private val settingStorage: NotificationSettingStorage,
+    private val userDataSource: UserDataSource,
     private val alarmScheduler: AlarmScheduler,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -165,7 +165,7 @@ class PaymentViewModelFactory(
                 orderRepository = orderRepository,
                 couponRepository = couponRepository,
                 outstandingProductRepository = outstandingProductRepository,
-                settingStorage = settingStorage,
+                userDataSource = userDataSource,
                 alarmScheduler = alarmScheduler,
             ) as T
         }
