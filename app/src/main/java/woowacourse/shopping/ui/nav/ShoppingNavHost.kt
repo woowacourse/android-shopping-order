@@ -23,7 +23,15 @@ fun ShoppingNavHost(paymentCartItemIds: List<String>? = null) {
     ) {
         composable<Shopping> {
             ShoppingRoute(
-                navController = navController,
+                onCartClick = {
+                    navController.navigate(Cart)
+                },
+                onSettingClick = {
+                    navController.navigate(Setting)
+                },
+                onDetailClick = {
+                    navController.navigate(Detail(productId = it))
+                },
             )
         }
 
@@ -31,13 +39,30 @@ fun ShoppingNavHost(paymentCartItemIds: List<String>? = null) {
             val route = backStackEntry.toRoute<Detail>()
             DetailRoute(
                 productId = route.productId,
-                navController = navController,
+                onDismiss = {
+                    navController.navigate(Shopping) {
+                        popUpTo<Shopping> {
+                            inclusive = true
+                        }
+                    }
+                },
+                onCartClick = {
+                    navController.navigate(Cart)
+                },
+                onDetailClick = {
+                    navController.navigate(Detail(productId = it))
+                },
             )
         }
 
         composable<Cart> {
             CartRoute(
-                navController = navController,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onPaymentClick = {
+                    navController.navigate(Payment(selectedCartItemIds = it))
+                },
             )
         }
 
@@ -45,13 +70,24 @@ fun ShoppingNavHost(paymentCartItemIds: List<String>? = null) {
             val route = backStackEntry.toRoute<Payment>()
             PaymentRoute(
                 selectedCartItemIds = route.selectedCartItemIds,
-                navController = navController,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onPaymentSuccess = {
+                    navController.navigate(Shopping) {
+                        popUpTo<Shopping> {
+                            inclusive = true
+                        }
+                    }
+                },
             )
         }
 
         composable<Setting> {
             SettingRoute(
-                navController = navController,
+                onBackClick = {
+                    navController.popBackStack()
+                },
             )
         }
     }

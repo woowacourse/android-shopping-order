@@ -6,11 +6,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 
 @Composable
 fun SettingRoute(
-    navController: NavController,
+    onBackClick: () -> Unit,
     viewModel: SettingViewModel = viewModel(factory = SettingViewModel.Factory),
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
@@ -20,7 +19,7 @@ fun SettingRoute(
         viewModel.uiEvent.collect { event ->
             when (event) {
                 SettingUiEvent.NavigateBack -> {
-                    navController.popBackStack()
+                    onBackClick()
                 }
 
                 is SettingUiEvent.ShowToastMessage -> {

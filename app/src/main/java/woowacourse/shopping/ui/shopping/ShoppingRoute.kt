@@ -7,14 +7,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import woowacourse.shopping.ui.nav.Cart
-import woowacourse.shopping.ui.nav.Detail
-import woowacourse.shopping.ui.nav.Setting
 
 @Composable
 fun ShoppingRoute(
-    navController: NavController,
+    onCartClick: () -> Unit,
+    onSettingClick: () -> Unit,
+    onDetailClick: (String) -> Unit,
     viewModel: ShoppingViewModel = viewModel(factory = ShoppingViewModel.Factory),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -24,15 +22,15 @@ fun ShoppingRoute(
         viewModel.uiEvent.collect { event ->
             when (event) {
                 ShoppingUiEvent.NavToCart -> {
-                    navController.navigate(Cart)
+                    onCartClick()
                 }
 
                 ShoppingUiEvent.NavToSetting -> {
-                    navController.navigate(Setting)
+                    onSettingClick()
                 }
 
                 is ShoppingUiEvent.NavToDetail -> {
-                    navController.navigate(Detail(productId = event.productId))
+                    onDetailClick(event.productId)
                 }
 
                 is ShoppingUiEvent.ShowToastMessage -> {

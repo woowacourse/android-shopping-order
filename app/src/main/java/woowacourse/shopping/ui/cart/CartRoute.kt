@@ -7,12 +7,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import woowacourse.shopping.ui.nav.Payment
 
 @Composable
 fun CartRoute(
-    navController: NavController,
+    onBackClick: () -> Unit,
+    onPaymentClick: (List<String>) -> Unit,
     viewModel: CartViewModel = viewModel(factory = CartViewModel.Factory),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -22,7 +21,7 @@ fun CartRoute(
         viewModel.uiEvent.collect { event ->
             when (event) {
                 CartUiEvent.NavToBack -> {
-                    navController.popBackStack()
+                    onBackClick()
                 }
 
                 is CartUiEvent.ShowToastMessage -> {
@@ -30,9 +29,7 @@ fun CartRoute(
                 }
 
                 is CartUiEvent.NavToPayment -> {
-                    navController.navigate(
-                        Payment(selectedCartItemIds = event.selectedCartItemIds),
-                    )
+                    onPaymentClick(event.selectedCartItemIds)
                 }
             }
         }

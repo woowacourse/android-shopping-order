@@ -7,15 +7,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import woowacourse.shopping.ui.nav.Cart
-import woowacourse.shopping.ui.nav.Detail
-import woowacourse.shopping.ui.nav.Shopping
 
 @Composable
 fun DetailRoute(
     productId: String,
-    navController: NavController,
+    onCartClick: () -> Unit,
+    onDismiss: () -> Unit,
+    onDetailClick: (String) -> Unit,
     viewModel: DetailViewModel =
         viewModel(
             factory =
@@ -31,19 +29,15 @@ fun DetailRoute(
         viewModel.uiEvent.collect { event ->
             when (event) {
                 DetailUiEvent.Dismiss -> {
-                    navController.navigate(Shopping) {
-                        popUpTo<Shopping> {
-                            inclusive = true
-                        }
-                    }
+                    onDismiss()
                 }
 
                 DetailUiEvent.NavToCart -> {
-                    navController.navigate(Cart)
+                    onCartClick()
                 }
 
                 is DetailUiEvent.NavToDetail -> {
-                    navController.navigate(Detail(productId = event.productId))
+                    onDetailClick(event.productId)
                 }
 
                 is DetailUiEvent.ShowToastMessage -> {
