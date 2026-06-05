@@ -1,6 +1,5 @@
 package woowacourse.shopping.ui.cart
 
-import android.R.attr.contentDescription
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import woowacourse.shopping.ui.component.ProductAsyncImage
 import woowacourse.shopping.ui.component.QuantitySelector
+import woowacourse.shopping.ui.component.ShoppingCheckBox
 import woowacourse.shopping.ui.theme.Gray40
 import woowacourse.shopping.ui.theme.Gray50
 import woowacourse.shopping.ui.util.formattedPrice
@@ -63,7 +63,7 @@ fun CartCard(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                CartCheckBox(
+                ShoppingCheckBox(
                     onCheckedChange = onCheckedChange,
                     isChecked = isChecked,
                 )

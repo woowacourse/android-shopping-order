@@ -1,18 +1,21 @@
 package woowacourse.shopping.data.repository
 
-import woowacourse.shopping.data.localdb.mapper.toDomain
 import woowacourse.shopping.data.remote.api.CartApi
 import woowacourse.shopping.data.remote.dto.request.AddCartRequestBody
 import woowacourse.shopping.data.remote.dto.request.UpdateCartRequestBody
+import woowacourse.shopping.data.remote.mapper.toDomain
 import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Money
 
 class CartRepositoryImpl(
     private val api: CartApi,
 ) : CartRepository {
-    override suspend fun getTotalPrice(cartIds: List<String>): Money =
+    override suspend fun getCartItems(cartIds: List<String>): List<CartItem> =
         getAllCartItems()
             .filter { cartIds.contains(it.id) }
+
+    override suspend fun getTotalPrice(cartIds: List<String>): Money =
+        getCartItems(cartIds)
             .fold(Money(0)) { acc, cartItem ->
                 acc + cartItem.product.price * cartItem.quantity
             }
@@ -86,7 +89,7 @@ class CartRepositoryImpl(
         val response =
             api.getCartItems(
                 page = 0,
-                size = Int.MAX_VALUE,
+                size = 10,
             )
 
         cartItems += response.content.map { it.toDomain() }

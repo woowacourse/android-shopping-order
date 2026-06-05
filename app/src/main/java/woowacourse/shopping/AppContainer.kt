@@ -14,17 +14,25 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import woowacourse.shopping.data.localdata.ShoppingSharedPreferences
 import woowacourse.shopping.data.localdata.UserDataStore
 import woowacourse.shopping.data.localdb.ShoppingDB
 import woowacourse.shopping.data.remote.NetworkManager
 import woowacourse.shopping.data.remote.NetworkObserver
 import woowacourse.shopping.data.remote.api.CartApi
+import woowacourse.shopping.data.remote.api.CouponApi
+import woowacourse.shopping.data.remote.api.PaymentApi
 import woowacourse.shopping.data.remote.api.ProductApi
 import woowacourse.shopping.data.repository.CartRepository
 import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.CouponRepository
+import woowacourse.shopping.data.repository.CouponRepositoryImpl
+import woowacourse.shopping.data.repository.PaymentRepository
+import woowacourse.shopping.data.repository.PaymentRepositoryImpl
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.ProductRepositoryImpl
 import woowacourse.shopping.data.repository.RecentItemRepository
+import woowacourse.shopping.notification.PaymentAlarmScheduler
 
 class AppContainer(
     context: Context,
@@ -35,6 +43,10 @@ class AppContainer(
     val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     val userDataStore = UserDataStore(applicationContext)
+
+    val shoppingSharedPreferences = ShoppingSharedPreferences(applicationContext)
+
+    val paymentAlarmScheduler = PaymentAlarmScheduler(applicationContext)
 
     init {
         applicationScope.launch {
@@ -55,8 +67,16 @@ class AppContainer(
         CartRepositoryImpl(api = retrofitService.create(CartApi::class.java))
     }
 
+    val couponRepository: CouponRepository by lazy {
+        CouponRepositoryImpl(api = retrofitService.create(CouponApi::class.java))
+    }
+
+    val paymentRepository: PaymentRepository by lazy {
+        PaymentRepositoryImpl(api = retrofitService.create(PaymentApi::class.java))
+    }
+
     val recentItemRepository: RecentItemRepository by lazy {
-        RecentItemRepository(database.recentItemDao(), productRepository)
+        RecentItemRepository(database.recentItemDao())
     }
 
     val networkObserver: NetworkObserver by lazy {

@@ -98,7 +98,6 @@ fun CartScreen(
                 },
                 cartItems = uiState.items,
                 isLoading = uiState.uiInfoState.isLoading,
-                errorMessage = uiState.uiInfoState.errorMessage,
                 onCheckedChange = onCheckedChange,
                 modifier =
                     Modifier
@@ -120,7 +119,6 @@ private fun CartContent(
     onDeleteItem: (String) -> Unit,
     cartItems: ImmutableList<CartItemUiModel>,
     isLoading: Boolean,
-    errorMessage: String?,
     onCheckedChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -128,15 +126,7 @@ private fun CartContent(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier,
     ) {
-        if (errorMessage != null) {
-            item {
-                Text(
-                    text = errorMessage,
-                    color = Color.Black,
-                    modifier = Modifier.padding(16.dp),
-                )
-            }
-        } else if (isLoading) {
+        if (isLoading) {
             items(count = 2) {
                 CartCardSkeleton(
                     modifier =
@@ -208,7 +198,6 @@ private fun CartContentPreview() {
         onQuantityChange = { _, _ -> },
         cartItems = PreviewMockData.cartItems,
         isLoading = true,
-        errorMessage = null,
         onCheckedChange = { },
     )
 }

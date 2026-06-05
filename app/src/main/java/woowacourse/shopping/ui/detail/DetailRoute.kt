@@ -1,46 +1,47 @@
 package woowacourse.shopping.ui.detail
 
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun DetailRoute(
+    productId: String,
+    onCartClick: () -> Unit,
     onDismiss: () -> Unit,
-    onRecentItemClick: (String) -> Unit,
-    navigateToCart: () -> Unit,
-    showToastMessage: (String) -> Unit,
+    onDetailClick: (String) -> Unit,
     viewModel: DetailViewModel =
         viewModel(
             factory =
-                DetailViewModel.Factory,
+                DetailViewModel.Factory(
+                    productId = productId,
+                ),
         ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(viewModel) {
-        viewModel.event.collect { event ->
+        viewModel.uiEvent.collect { event ->
             when (event) {
-                DetailEvent.NavigateToCart -> {
-                    navigateToCart()
-                }
-
-                DetailEvent.NavigateBack -> {
+                DetailUiEvent.Dismiss -> {
                     onDismiss()
                 }
 
-                DetailEvent.ShowProductNotFoundMessage -> {
-                    showToastMessage("상품을 찾을 수 없습니다.")
+                DetailUiEvent.NavToCart -> {
+                    onCartClick()
                 }
 
-                DetailEvent.ShowProductLoadFailureMessage -> {
-                    showToastMessage("상품 정보를 불러오지 못했습니다.")
+                is DetailUiEvent.NavToDetail -> {
+                    onDetailClick(event.productId)
                 }
 
-                DetailEvent.ShowAddCartFailureMessage -> {
-                    showToastMessage("장바구니에 상품을 담지 못했습니다.")
+                is DetailUiEvent.ShowToastMessage -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -48,9 +49,9 @@ fun DetailRoute(
 
     DetailScreen(
         uiState = uiState,
-        onCloseClick = onDismiss,
+        onCloseClick = viewModel::onDismiss,
         onQuantityChange = viewModel::updateQuantity,
         onAddToCart = viewModel::addToCart,
-        onRecentItemClick = { onRecentItemClick(it) },
+        onRecentItemClick = viewModel::navToDetail,
     )
 }

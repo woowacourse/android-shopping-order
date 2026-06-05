@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -39,6 +40,7 @@ fun ShoppingScreen(
     onLoad: () -> Unit,
     onProductClick: (String) -> Unit,
     onCartClick: () -> Unit,
+    onSettingClick: () -> Unit,
     onQuantityChange: (String, Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -54,6 +56,19 @@ fun ShoppingScreen(
                         lineHeight = 24.sp,
                         modifier = Modifier.weight(1f),
                     )
+
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "설정",
+                        tint = Color.White,
+                        modifier =
+                            Modifier
+                                .size(24.dp)
+                                .clickable {
+                                    onSettingClick()
+                                },
+                    )
+
                     Icon(
                         imageVector = Icons.Default.ShoppingCart,
                         contentDescription = "쇼핑 카트",
@@ -179,9 +194,10 @@ private fun ShoppingContents(
 private fun ShoppingScreenPreview() {
     ShoppingScreen(
         uiState = ShoppingUiState(),
-        onLoad = {},
-        onProductClick = {},
-        onCartClick = {},
+        onLoad = { },
+        onProductClick = { },
+        onCartClick = { },
+        onSettingClick = { },
         onQuantityChange = { _, _ -> },
     )
 }

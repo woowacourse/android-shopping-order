@@ -149,15 +149,21 @@ private class FakeCartRepository(
         cartItems = cartItems.filterNot { it.id == cartItemId }
     }
 
-    override suspend fun getCartItemQuantity(productId: String): Int? = cartItems.firstOrNull { it.product.id == productId }?.quantity
+    override suspend fun getCartItemQuantity(productId: String): Int? =
+        cartItems
+            .firstOrNull {
+                it.product.id ==
+                    productId
+            }?.quantity
 
     override suspend fun getTotalCartItemQuantity(): Int = cartItems.sumOf { it.quantity }
 
     override suspend fun getCartItemsCount(): Int = cartItems.size
 
+    override suspend fun getCartItems(cartIds: List<String>): List<CartItem> = cartItems.filter { it.id in cartIds }
+
     override suspend fun getTotalPrice(cartIds: List<String>): Money =
-        cartItems
-            .filter { it.id in cartIds }
+        getCartItems(cartIds)
             .fold(Money(0)) { acc, cartItem -> acc + cartItem.getTotalPrice() }
 }
 
@@ -196,7 +202,12 @@ private class TestRecentItemDao : RecentItemDao {
 
     override fun getRecentItems(): Flow<List<RecentItemEntity>> =
         items.map { entities ->
-            entities.sortedWith(compareByDescending<RecentItemEntity> { it.timestamp }.thenByDescending { it.id }).take(10)
+            entities
+                .sortedWith(
+                    compareByDescending<RecentItemEntity> {
+                        it.timestamp
+                    }.thenByDescending { it.id },
+                ).take(10)
         }
 
     override suspend fun getRecentItemById(id: String): RecentItemEntity? = items.value.firstOrNull { it.id == id }

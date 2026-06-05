@@ -17,6 +17,7 @@ import woowacourse.shopping.data.repository.CartResponseResult
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.ProductResponseResult
 import woowacourse.shopping.data.repository.RecentItemRepository
+import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductName
@@ -96,7 +97,7 @@ class DetailViewModelTest {
             ),
     ): DetailViewModel =
         DetailViewModel(
-            savedStateHandle = savedStateHandle,
+            id = "1",
             productRepository = productRepository,
             cartRepository = cartRepository,
             recentItemRepository = RecentItemRepository(recentItemDao),
@@ -136,6 +137,8 @@ private class FakeCartRepository(
     override suspend fun getTotalCartItemQuantity(): Int = quantities.values.sum()
 
     override suspend fun getCartItemsCount(): Int = quantities.size
+
+    override suspend fun getCartItems(cartIds: List<String>): List<CartItem> = emptyList()
 
     override suspend fun getTotalPrice(cartIds: List<String>): Money = Money(0)
 }

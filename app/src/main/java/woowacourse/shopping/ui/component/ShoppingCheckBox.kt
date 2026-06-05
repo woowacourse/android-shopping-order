@@ -1,4 +1,4 @@
-package woowacourse.shopping.ui.cart
+package woowacourse.shopping.ui.component
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckBox
@@ -11,10 +11,11 @@ import androidx.compose.ui.graphics.Color
 import woowacourse.shopping.ui.theme.Green40
 
 @Composable
-fun CartCheckBox(
+fun ShoppingCheckBox(
     onCheckedChange: () -> Unit,
     isChecked: Boolean,
     modifier: Modifier = Modifier,
+    contentDescription: String = "체크박스",
 ) {
     IconButton(
         onClick = onCheckedChange,
@@ -27,7 +28,7 @@ fun CartCheckBox(
                 } else {
                     Icons.Default.CheckBoxOutlineBlank
                 },
-            contentDescription = "상품 선택 버튼",
+            contentDescription = contentDescription,
             tint = if (isChecked) Green40 else Color.Unspecified,
         )
     }

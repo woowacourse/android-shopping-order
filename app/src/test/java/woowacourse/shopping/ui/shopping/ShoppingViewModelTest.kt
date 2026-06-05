@@ -17,6 +17,7 @@ import woowacourse.shopping.data.repository.CartResponseResult
 import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.ProductResponseResult
 import woowacourse.shopping.data.repository.RecentItemRepository
+import woowacourse.shopping.model.CartItem
 import woowacourse.shopping.model.Money
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.model.ProductName
@@ -109,6 +110,8 @@ private class FakeCartRepository : CartRepository {
 
     override suspend fun getCartItemsCount(): Int = 0
 
+    override suspend fun getCartItems(cartIds: List<String>): List<CartItem> = emptyList()
+
     override suspend fun getTotalPrice(cartIds: List<String>): Money = Money(0)
 }
 
@@ -121,7 +124,12 @@ private class TestRecentItemDao : RecentItemDao {
 
     override fun getRecentItems(): Flow<List<RecentItemEntity>> =
         items.map { entities ->
-            entities.sortedWith(compareByDescending<RecentItemEntity> { it.timestamp }.thenByDescending { it.id }).take(10)
+            entities
+                .sortedWith(
+                    compareByDescending<RecentItemEntity> {
+                        it.timestamp
+                    }.thenByDescending { it.id },
+                ).take(10)
         }
 
     override suspend fun getRecentItemById(id: String): RecentItemEntity? = items.value.firstOrNull { it.id == id }

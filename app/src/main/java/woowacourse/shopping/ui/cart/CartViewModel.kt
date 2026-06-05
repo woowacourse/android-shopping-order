@@ -7,8 +7,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -18,6 +21,7 @@ import woowacourse.shopping.data.repository.ProductRepository
 import woowacourse.shopping.data.repository.RecentItemRepository
 import woowacourse.shopping.model.Product
 import woowacourse.shopping.ui.model.mapper.toUiModel
+import kotlin.coroutines.cancellation.CancellationException
 
 class CartViewModel(
     private val cartRepository: CartRepository,
@@ -26,6 +30,9 @@ class CartViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
+
+    private val _uiEvent = MutableSharedFlow<CartUiEvent>()
+    val uiEvent: SharedFlow<CartUiEvent> = _uiEvent.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -40,6 +47,11 @@ class CartViewModel(
                 }
 
                 getCartItemsByPage()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                _uiEvent.emit(CartUiEvent.ShowToastMessage("장바구니를 불러오지 못했습니다."))
+                _uiEvent.emit(CartUiEvent.NavToBack)
             } finally {
                 _uiState.update {
                     it.copy(
@@ -156,6 +168,10 @@ class CartViewModel(
                 selectedCartState =
                     it.selectedCartState.copy(
                         selectedCartItems = selectedItems,
+                        isAllChecked =
+                            _uiState.value.items.all { item ->
+                                selectedItems.contains(item.id)
+                            },
                     ),
             )
         }
@@ -172,9 +188,12 @@ class CartViewModel(
     fun isAllSelectClick() {
         val selectedItems =
             if (_uiState.value.selectedCartState.isAllChecked) {
-                emptyList()
+                _uiState.value.selectedCartState.selectedCartItems -
+                    _uiState.value.items
+                        .map { it.id }
+                        .toImmutableList()
             } else {
-                _uiState.value.items.map { it.id }
+                _uiState.value.selectedCartState.selectedCartItems + _uiState.value.items.map { it.id }
             }.toImmutableList()
 
         _uiState.update {
@@ -207,23 +226,55 @@ class CartViewModel(
     }
 
     fun setOrder() {
+        if (_uiState.value.selectedCartState.selectedCartItems
+                .isEmpty()
+        ) {
+            return
+        }
+
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    uiInfoState =
-                        it.uiInfoState.copy(
-                            isOrder = true,
-                        ),
-                    recommendProducts =
-                        loadRecommendProducts()
-                            .filter { product ->
-                                cartRepository.getCartItemQuantity(product.id) == null
-                            }.map { product ->
-                                product
-                                    .toUiModel(quantity = cartRepository.getCartItemQuantity(product.id))
-                            }.toImmutableList(),
-                )
+            if (_uiState.value.uiInfoState.isOrder) {
+                navigateToPayment()
+            } else {
+                changeIsOrder()
             }
+        }
+    }
+
+    private suspend fun navigateToPayment() {
+        val selectedCartItemIds = _uiState.value.selectedCartState.selectedCartItems
+
+        if (selectedCartItemIds.isEmpty()) {
+            _uiEvent.emit(CartUiEvent.ShowToastMessage("상품을 선택해주세요."))
+            return
+        }
+
+        _uiEvent.emit(CartUiEvent.NavToPayment(selectedCartItemIds))
+    }
+
+    private suspend fun changeIsOrder() {
+        _uiState.update {
+            it.copy(
+                uiInfoState =
+                    it.uiInfoState.copy(
+                        isOrder = true,
+                    ),
+                recommendProducts =
+                    loadRecommendProducts()
+                        .filter { product ->
+                            cartRepository.getCartItemQuantity(product.id) == null
+                        }.map { product ->
+                            product.toUiModel(
+                                quantity = cartRepository.getCartItemQuantity(product.id),
+                            )
+                        }.toImmutableList(),
+            )
+        }
+    }
+
+    fun onBackClick() {
+        viewModelScope.launch {
+            _uiEvent.emit(CartUiEvent.NavToBack)
         }
     }
 

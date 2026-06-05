@@ -13,12 +13,11 @@ data class ShoppingUiState(
 
 data class UiInfoState(
     val isLoading: Boolean = false,
-    val cartErrorMessage: String? = null,
     val isNetworkAvailable: Boolean = true,
 )
 
 data class CartSummaryState(
     val cartQuantities: Map<String, Int> = emptyMap(),
     val cartSize: Int = 0,
-    val canLoadMore: Boolean = true,
+    val canLoadMore: Boolean = false,
 )

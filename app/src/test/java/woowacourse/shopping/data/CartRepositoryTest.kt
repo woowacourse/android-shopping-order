@@ -29,7 +29,8 @@ class CartRepositoryTest {
     @Test
     fun `장바구니에 담긴 상품 수량을 변경한다`() =
         runTest {
-            val repository = CartRepositoryImpl(FakeCartApi(listOf(createCartDto(id = 1, productId = 10, quantity = 3))))
+            val repository =
+                CartRepositoryImpl(FakeCartApi(listOf(createCartDto(id = 1, productId = 10, quantity = 3))))
 
             val quantity = repository.getCartItemQuantity(productId = "10")
 
@@ -144,7 +145,13 @@ private class FakeCartApi(
             }
     }
 
-    override suspend fun getCartItemsQuantity(): CartQuantityResponse = CartQuantityResponse(quantity = items.sumOf { it.quantity })
+    override suspend fun getCartItemsQuantity(): CartQuantityResponse =
+        CartQuantityResponse(
+            quantity =
+                items.sumOf {
+                    it.quantity
+                },
+        )
 }
 
 private fun createCartDtos(size: Int): List<CartDto> =
