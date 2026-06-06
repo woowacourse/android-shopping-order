@@ -16,9 +16,9 @@ class CouponRepositoryImpl(
             ApiResult.Success(response.map { it.toDomain() })
         } catch (e: HttpException) {
             ApiResult.Error(e.code(), e.message)
-        } catch (e: Exception) {
-            ApiResult.Exception(e)
         } catch (e: CancellationException) {
             throw e
+        } catch (e: Exception) {
+            ApiResult.Exception(e)
         }
 }

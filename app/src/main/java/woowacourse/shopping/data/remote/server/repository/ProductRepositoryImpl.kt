@@ -24,10 +24,10 @@ class ProductRepositoryImpl(
             ApiResult.Success(response.content.map { it.toDomain() })
         } catch (e: HttpException) {
             ApiResult.Error(e.code(), e.message)
-        } catch (e: Exception) {
-            ApiResult.Exception(e)
         } catch (e: CancellationException) {
             throw e
+        } catch (e: Exception) {
+            ApiResult.Exception(e)
         }
 
     override suspend fun getProduct(id: Long): ApiResult<Product> =
@@ -36,10 +36,10 @@ class ProductRepositoryImpl(
             ApiResult.Success(response.toDomain())
         } catch (e: HttpException) {
             ApiResult.Error(e.code(), e.message)
-        } catch (e: Exception) {
-            ApiResult.Exception(e)
         } catch (e: CancellationException) {
             throw e
+        } catch (e: Exception) {
+            ApiResult.Exception(e)
         }
 
     override suspend fun getCategoryProducts(
@@ -52,9 +52,9 @@ class ProductRepositoryImpl(
             ApiResult.Success(response.content.map { it.toDomain() })
         } catch (e: HttpException) {
             ApiResult.Error(e.code(), e.message)
-        } catch (e: Exception) {
-            ApiResult.Exception(e)
         } catch (e: CancellationException) {
             throw e
+        } catch (e: Exception) {
+            ApiResult.Exception(e)
         }
 }

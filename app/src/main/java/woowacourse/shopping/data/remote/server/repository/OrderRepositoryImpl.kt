@@ -23,11 +23,11 @@ class OrderRepositoryImpl(
                 code = e.code(),
                 message = e.message,
             )
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ApiResult.Exception(
                 e = e,
             )
-        } catch (e: CancellationException) {
-            throw e
         }
 }

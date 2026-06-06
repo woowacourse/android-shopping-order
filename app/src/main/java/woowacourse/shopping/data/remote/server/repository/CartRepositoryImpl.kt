@@ -24,10 +24,10 @@ class CartRepositoryImpl(
             ApiResult.Success(Unit)
         } catch (e: HttpException) {
             ApiResult.Error(e.code(), e.message)
-        } catch (e: Exception) {
-            ApiResult.Exception(e)
         } catch (e: CancellationException) {
             throw e
+        } catch (e: Exception) {
+            ApiResult.Exception(e)
         }
 
     override suspend fun updateCount(
@@ -42,10 +42,10 @@ class CartRepositoryImpl(
             ApiResult.Success(Unit)
         } catch (e: HttpException) {
             ApiResult.Error(e.code(), e.message)
-        } catch (e: Exception) {
-            ApiResult.Exception(e)
         } catch (e: CancellationException) {
             throw e
+        } catch (e: Exception) {
+            ApiResult.Exception(e)
         }
 
     override suspend fun deleteCartItem(purchaseProductId: Long): ApiResult<Unit> =
@@ -56,10 +56,10 @@ class CartRepositoryImpl(
             ApiResult.Success(Unit)
         } catch (e: HttpException) {
             ApiResult.Error(e.code(), e.message)
-        } catch (e: Exception) {
-            ApiResult.Exception(e)
         } catch (e: CancellationException) {
             throw e
+        } catch (e: Exception) {
+            ApiResult.Exception(e)
         }
 
     override suspend fun getProductCount(): ApiResult<Int> =
@@ -90,10 +90,10 @@ class CartRepositoryImpl(
             ApiResult.Success(PurchaseProducts(cartItems))
         } catch (e: HttpException) {
             ApiResult.Error(e.code(), e.message)
-        } catch (e: Exception) {
-            ApiResult.Exception(e)
         } catch (e: CancellationException) {
             throw e
+        } catch (e: Exception) {
+            ApiResult.Exception(e)
         }
 
     override suspend fun getCartItemCount(): ApiResult<Int> =
@@ -102,9 +102,9 @@ class CartRepositoryImpl(
             ApiResult.Success(response)
         } catch (e: HttpException) {
             ApiResult.Error(e.code(), e.message)
-        } catch (e: Exception) {
-            ApiResult.Exception(e)
         } catch (e: CancellationException) {
             throw e
+        } catch (e: Exception) {
+            ApiResult.Exception(e)
         }
 }
