@@ -10,16 +10,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.ui.cart.CartTopAppBar
 import woowacourse.shopping.ui.cart.CartViewModel
 
 @Composable
 fun RecommendScreen(
     cartViewModel: CartViewModel,
-    recommendViewModel: RecommendViewModel,
     onClickClose: () -> Unit,
     onNavigateToOrder: (List<Int>) -> Unit,
 ) {
+    val recommendViewModel: RecommendViewModel = viewModel(factory = RecommendViewModel.Factory)
+
     val cartUiState by cartViewModel.cartUiState.collectAsStateWithLifecycle()
     val recommendUiState by recommendViewModel.uiState.collectAsStateWithLifecycle()
 

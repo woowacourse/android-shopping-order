@@ -41,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import woowacourse.shopping.R
 import woowacourse.shopping.constant.ShoppingColor.APP_BAR_COLOR
@@ -51,11 +52,12 @@ import androidx.compose.foundation.lazy.items as lazyRowItems
 
 @Composable
 fun ProductListScreen(
-    viewModel: ProductListViewModel,
     onCartClick: () -> Unit = {},
     onSettingClick: () -> Unit,
     onProductClick: (Int) -> Unit = {},
 ) {
+    val viewModel: ProductListViewModel = viewModel(factory = ProductListViewModel.Factory)
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ProductListScreenContent(

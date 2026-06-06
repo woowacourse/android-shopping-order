@@ -40,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import woowacourse.shopping.constant.Format.formatPrice
 import woowacourse.shopping.constant.ShoppingColor.APP_BAR_COLOR
@@ -56,9 +57,9 @@ import woowacourse.shopping.ui.util.LoadState
 @Composable
 fun ProductDetailScreen(
     onCloseClick: () -> Unit,
-    viewModel: ProductDetailViewModel,
     onLastViewedProductClick: (Product) -> Unit = {},
 ) {
+    val viewModel: ProductDetailViewModel = viewModel(factory = ProductDetailViewModel.Factory)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ProductDetailScreenContent(

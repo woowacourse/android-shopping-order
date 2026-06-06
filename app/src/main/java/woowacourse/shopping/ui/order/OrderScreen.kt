@@ -29,13 +29,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun OrderScreen(
-    orderViewModel: OrderViewModel,
     onClickClose: () -> Unit,
     onOrderSuccess: () -> Unit,
 ) {
+    val orderViewModel: OrderViewModel = viewModel(factory = OrderViewModel.Factory)
     val uiState by orderViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(orderViewModel.events) {

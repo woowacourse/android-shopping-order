@@ -10,7 +10,6 @@ import kotlinx.serialization.Serializable
 import woowacourse.shopping.ui.cart.CartScreen
 import woowacourse.shopping.ui.cart.CartViewModel
 import woowacourse.shopping.ui.cart.recommend.RecommendScreen
-import woowacourse.shopping.ui.cart.recommend.RecommendViewModel
 
 @Serializable
 data object CartGraph
@@ -55,11 +54,8 @@ fun NavGraphBuilder.cartNavGraph(
                     viewModelStoreOwner = cartGraphEntry,
                     factory = CartViewModel.Factory,
                 )
-            val recommendViewModel: RecommendViewModel =
-                viewModel(factory = RecommendViewModel.Factory)
             RecommendScreen(
                 cartViewModel = cartViewModel,
-                recommendViewModel = recommendViewModel,
                 onClickClose = { navController.popBackStack() },
                 onNavigateToOrder = onNavigateToOrder,
             )

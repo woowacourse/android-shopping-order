@@ -27,7 +27,7 @@ import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.NotificationRepository
 import woowacourse.shopping.notification.AlarmScheduler
-import woowacourse.shopping.ui.navigation.Order
+import woowacourse.shopping.ui.navigation.OrderRoute
 import woowacourse.shopping.ui.util.LoadState
 import woowacourse.shopping.ui.util.toUiModel
 import java.time.LocalDateTime
@@ -39,7 +39,7 @@ class OrderViewModel(
     private val alarmScheduler: AlarmScheduler,
     private val notificationRepository: NotificationRepository,
 ) : ViewModel() {
-    private val route: Order = savedStateHandle.toRoute()
+    private val route: OrderRoute.Order = savedStateHandle.toRoute<OrderRoute.Order>()
 
     private val cartIds = route.cartIds
 

@@ -18,7 +18,7 @@ import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.ui.navigation.ProductDetail
+import woowacourse.shopping.ui.navigation.ProductRoute
 import woowacourse.shopping.ui.util.LoadState
 
 class ProductDetailViewModel(
@@ -27,7 +27,7 @@ class ProductDetailViewModel(
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel() {
-    private val route: ProductDetail = savedStateHandle.toRoute()
+    private val route: ProductRoute.Detail = savedStateHandle.toRoute<ProductRoute.Detail>()
 
     private val productId: Int = route.productId
     private val openedFromLastViewed: Boolean = route.openedFromLastViewed
