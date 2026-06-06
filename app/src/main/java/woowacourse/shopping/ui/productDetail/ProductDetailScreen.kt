@@ -57,7 +57,6 @@ import woowacourse.shopping.ui.util.LoadState
 fun ProductDetailScreen(
     onCloseClick: () -> Unit,
     viewModel: ProductDetailViewModel,
-    onAddToCartClick: () -> Unit = {},
     onLastViewedProductClick: (Product) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -71,9 +70,7 @@ fun ProductDetailScreen(
         onCloseClick = onCloseClick,
         onIncreaseClick = viewModel::increaseQuantity,
         onDecreaseClick = viewModel::decreaseQuantity,
-        onAddToCartClick = {
-            onAddToCartClick()
-        },
+        onAddToCartClick = viewModel::addToCart,
         onLastViewedProductClick = onLastViewedProductClick,
     )
 }
