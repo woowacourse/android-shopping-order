@@ -14,13 +14,15 @@ fun CartScreenRoute(
     onNavigateToPayment: (selectedItemIds: List<Int>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel: CartViewModel = viewModel(
-        factory = CartViewModel.factory(
-            cartRepository = appContainer.cartRepository,
-            recentProductRepository = appContainer.recentProductRepository,
-            productRepository = appContainer.productRepository,
-        ),
-    )
+    val viewModel: CartViewModel =
+        viewModel(
+            factory =
+                CartViewModel.factory(
+                    cartRepository = appContainer.cartRepository,
+                    recentProductRepository = appContainer.recentProductRepository,
+                    productRepository = appContainer.productRepository,
+                ),
+        )
 
     ObserveAsEvents(flow = viewModel.uiEvent) { event ->
         when (event) {

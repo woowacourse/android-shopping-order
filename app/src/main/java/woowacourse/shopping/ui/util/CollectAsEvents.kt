@@ -15,9 +15,10 @@ fun <T> ObserveAsEvents(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(flow, lifecycleOwner, key1) {
-        flow.flowWithLifecycle(
-            lifecycleOwner.lifecycle,
-            Lifecycle.State.STARTED,
-        ).collect(onEvent)
+        flow
+            .flowWithLifecycle(
+                lifecycleOwner.lifecycle,
+                Lifecycle.State.STARTED,
+            ).collect(onEvent)
     }
 }
