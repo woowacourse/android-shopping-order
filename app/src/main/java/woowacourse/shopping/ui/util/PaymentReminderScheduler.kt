@@ -5,10 +5,10 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import woowacourse.shopping.ui.util.PaymentReminderReceiver.Companion.EXTRA_SELECTED_ITEM_IDS
+import woowacourse.shopping.ui.util.PaymentReminderContract.ACTION_PAYMENT_REMINDER
+import woowacourse.shopping.ui.util.PaymentReminderContract.EXTRA_SELECTED_ITEM_IDS
 
 object PaymentReminderScheduler {
-    private const val ACTION_PAYMENT_REMINDER = "woowacourse.shopping.ACTION_PAYMENT_REMINDER"
     private const val REMINDER_REQUEST_CODE = 71025
 
     private fun makePendingIntent(

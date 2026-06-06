@@ -28,6 +28,8 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.navigation.AppNavHost
 import woowacourse.shopping.ui.navigation.PaymentRoute
+import woowacourse.shopping.ui.util.PaymentReminderContract.EXTRA_NAVIGATE_TO_PAYMENT
+import woowacourse.shopping.ui.util.PaymentReminderContract.EXTRA_SELECTED_ITEM_IDS
 
 class MainActivity : ComponentActivity() {
     private var shouldNavigateToPayment by mutableStateOf(false)
@@ -119,10 +121,5 @@ class MainActivity : ComponentActivity() {
         if (granted) return
 
         requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-    }
-
-    companion object {
-        const val EXTRA_NAVIGATE_TO_PAYMENT = "navigate_to_payment"
-        const val EXTRA_SELECTED_ITEM_IDS = "extra_selected_item_ids"
     }
 }

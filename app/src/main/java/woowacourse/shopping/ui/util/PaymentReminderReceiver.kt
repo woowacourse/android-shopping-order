@@ -8,8 +8,9 @@ import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresPermission
 import woowacourse.shopping.ui.MainActivity
-import woowacourse.shopping.ui.MainActivity.Companion.EXTRA_NAVIGATE_TO_PAYMENT
-import woowacourse.shopping.ui.MainActivity.Companion.EXTRA_SELECTED_ITEM_IDS
+import woowacourse.shopping.ui.util.PaymentReminderContract.ACTION_OPEN_PAYMENT_FROM_NOTIFICATION
+import woowacourse.shopping.ui.util.PaymentReminderContract.EXTRA_NAVIGATE_TO_PAYMENT
+import woowacourse.shopping.ui.util.PaymentReminderContract.EXTRA_SELECTED_ITEM_IDS
 
 class PaymentReminderReceiver : BroadcastReceiver() {
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
@@ -60,8 +61,6 @@ class PaymentReminderReceiver : BroadcastReceiver() {
     }
 
     companion object {
-        const val EXTRA_SELECTED_ITEM_IDS = "extra_selected_item_ids"
-        const val ACTION_OPEN_PAYMENT_FROM_NOTIFICATION = "OPEN_PAYMENT_FROM_NOTIFICATION"
         private const val CONTENT_REQUEST_CODE = 71026
     }
 }
