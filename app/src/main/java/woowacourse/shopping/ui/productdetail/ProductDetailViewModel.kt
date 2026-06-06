@@ -36,7 +36,8 @@ class ProductDetailViewModel(
 
     init {
         viewModelScope.launch {
-            cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
+            cartRepository
+                .getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
                 .handleWithSnackBar { data -> _cart.update { data } }
             fetchProduct()
         }
@@ -45,16 +46,18 @@ class ProductDetailViewModel(
     private suspend fun fetchProduct() {
         productRepository.getProduct(selectedProductId).handleWithSnackBar { selectedProduct ->
             if (lastViewedProductId != null) {
-                productRepository.getProduct(lastViewedProductId).handleWithSnackBar { lastViewedProduct ->
-                    _uiState.update {
-                        it.copy(
-                            product = selectedProduct,
-                            lastViewProduct = lastViewedProduct,
-                        )
+                productRepository
+                    .getProduct(lastViewedProductId)
+                    .handleWithSnackBar { lastViewedProduct ->
+                        _uiState.update {
+                            it.copy(
+                                product = selectedProduct,
+                                lastViewProduct = lastViewedProduct,
+                            )
+                        }
+                    }.onFailure { _, _ ->
+                        _uiState.update { it.copy(product = selectedProduct) }
                     }
-                }.onFailure { _, _ ->
-                    _uiState.update { it.copy(product = selectedProduct) }
-                }
             } else {
                 _uiState.update { it.copy(product = selectedProduct) }
             }
@@ -110,8 +113,9 @@ class ProductDetailViewModel(
     private suspend fun <T> ApiResult<T>.handleWithSnackBar(
         errorMessage: ProductDetailEvent.Message? = null,
         onSuccessAction: suspend (T) -> Unit,
-    ): ApiResult<T> {
-        return this.onSuccess { onSuccessAction(it) }
+    ): ApiResult<T> =
+        this
+            .onSuccess { onSuccessAction(it) }
             .onFailure { code, msg ->
                 val message =
                     errorMessage ?: if (code != null) {
@@ -121,9 +125,7 @@ class ProductDetailViewModel(
                     }
                 _event.emit(ProductDetailEvent.SnackbarEvent(message))
             }
-    }
 }
-
 
 class ProductDetailViewModelFactory(
     private val cartRepository: CartRepository,

@@ -91,7 +91,8 @@ class ShoppingViewModel(
 
     suspend fun fetchProducts() {
         _uiState.update { it.copy(isLoading = true) }
-        productRepository.getProducts(uiState.value.currentIndex, PAGE_SIZE)
+        productRepository
+            .getProducts(uiState.value.currentIndex, PAGE_SIZE)
             .handleWithSnackBar { data ->
                 _uiState.update {
                     it.copy(
@@ -105,7 +106,8 @@ class ShoppingViewModel(
     }
 
     suspend fun fetchCart() {
-        cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
+        cartRepository
+            .getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
             .handleWithSnackBar { data ->
                 _uiState.update { it.copy(cart = data) }
             }
@@ -137,12 +139,13 @@ class ShoppingViewModel(
             if (target != null) {
                 val nextCount = target.count + updateAmount
                 if (nextCount >= 1) {
-                    cartRepository.updateCount(target.id, nextCount)
+                    cartRepository
+                        .updateCount(target.id, nextCount)
                         .handleWithSnackBar {
                             _event.emit(
                                 ShoppingEvent.ShowSnackBar(
-                                    ShoppingEvent.Message.QuantityUpdated
-                                )
+                                    ShoppingEvent.Message.QuantityUpdated,
+                                ),
                             )
                             fetchCart()
                         }
@@ -164,8 +167,9 @@ class ShoppingViewModel(
     private suspend fun <T> ApiResult<T>.handleWithSnackBar(
         errorMessage: ShoppingEvent.Message? = null,
         onSuccessAction: suspend (T) -> Unit,
-    ): ApiResult<T> {
-        return this.onSuccess { onSuccessAction(it) }
+    ): ApiResult<T> =
+        this
+            .onSuccess { onSuccessAction(it) }
             .onFailure { code, msg ->
                 val message =
                     errorMessage ?: if (code != null) {
@@ -175,7 +179,6 @@ class ShoppingViewModel(
                     }
                 _event.emit(ShoppingEvent.ShowSnackBar(message))
             }
-    }
 
     fun updateHistory(product: Product) {
         viewModelScope.launch {

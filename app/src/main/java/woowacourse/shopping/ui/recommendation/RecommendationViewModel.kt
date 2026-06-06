@@ -55,7 +55,8 @@ class RecommendationViewModel(
             productRepository.getProduct(latestId).handleWithSnackBar { product ->
                 val lastViewedCategory = product.category
 
-                productRepository.getCategoryProducts(category = lastViewedCategory)
+                productRepository
+                    .getCategoryProducts(category = lastViewedCategory)
                     .handleWithSnackBar { categoryProducts ->
                         val cartProductIds =
                             _uiState.value.cart.purchaseProducts
@@ -69,7 +70,8 @@ class RecommendationViewModel(
     }
 
     suspend fun fetchCart() {
-        cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
+        cartRepository
+            .getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
             .handleWithSnackBar { data ->
                 _uiState.update { it.copy(cart = data) }
             }
@@ -92,14 +94,15 @@ class RecommendationViewModel(
                     it.product.id == purchaseProduct.product.id
                 }
             if (existingItem != null) {
-                cartRepository.updateCount(existingItem.id, existingItem.count + 1)
+                cartRepository
+                    .updateCount(existingItem.id, existingItem.count + 1)
                     .handleWithSnackBar {
                         fetchCart()
                         fetchTotalPrice()
                         _event.emit(
                             RecommendationEvent.SnackbarEvent(
-                                RecommendationEvent.Message.QuantityUpdated
-                            )
+                                RecommendationEvent.Message.QuantityUpdated,
+                            ),
                         )
                     }
             } else {
@@ -111,8 +114,8 @@ class RecommendationViewModel(
                         fetchTotalPrice()
                         _event.emit(
                             RecommendationEvent.SnackbarEvent(
-                                RecommendationEvent.Message.CartAdded
-                            )
+                                RecommendationEvent.Message.CartAdded,
+                            ),
                         )
                     }
                 }
@@ -129,14 +132,15 @@ class RecommendationViewModel(
             if (target != null) {
                 val nextCount = target.count + updateAmount
                 if (nextCount >= 1) {
-                    cartRepository.updateCount(target.id, nextCount)
+                    cartRepository
+                        .updateCount(target.id, nextCount)
                         .handleWithSnackBar {
                             fetchCart()
                             fetchTotalPrice()
                             _event.emit(
                                 RecommendationEvent.SnackbarEvent(
-                                    RecommendationEvent.Message.QuantityUpdated
-                                )
+                                    RecommendationEvent.Message.QuantityUpdated,
+                                ),
                             )
                         }
                 }
@@ -148,15 +152,16 @@ class RecommendationViewModel(
         viewModelScope.launch {
             val target = _uiState.value.cart.findById(id)
             if (target != null) {
-                cartRepository.deleteCartItem(target.id)
+                cartRepository
+                    .deleteCartItem(target.id)
                     .handleWithSnackBar {
                         _uiState.update { it.copy(checkedIds = it.checkedIds - target.id) }
                         fetchCart()
                         fetchTotalPrice()
                         _event.emit(
                             RecommendationEvent.SnackbarEvent(
-                                RecommendationEvent.Message.CartRemoved
-                            )
+                                RecommendationEvent.Message.CartRemoved,
+                            ),
                         )
                     }
             }
@@ -166,8 +171,9 @@ class RecommendationViewModel(
     private suspend fun <T> ApiResult<T>.handleWithSnackBar(
         errorMessage: RecommendationEvent.Message? = null,
         onSuccessAction: suspend (T) -> Unit,
-    ): ApiResult<T> {
-        return this.onSuccess { onSuccessAction(it) }
+    ): ApiResult<T> =
+        this
+            .onSuccess { onSuccessAction(it) }
             .onFailure { code, msg ->
                 val message =
                     errorMessage ?: if (code != null) {
@@ -177,7 +183,6 @@ class RecommendationViewModel(
                     }
                 _event.emit(RecommendationEvent.SnackbarEvent(message))
             }
-    }
 
     fun addToCartTrigger(purchaseProduct: PurchaseProduct) {
         viewModelScope.launch {

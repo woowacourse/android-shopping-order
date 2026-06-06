@@ -182,9 +182,10 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable<Payment>(
-                            deepLinks = listOf(
-                                navDeepLink { uriPattern = "shopping://payment" }
-                            )
+                            deepLinks =
+                                listOf(
+                                    navDeepLink { uriPattern = "shopping://payment" },
+                                ),
                         ) {
                             val viewModel: PaymentViewModel =
                                 viewModel(

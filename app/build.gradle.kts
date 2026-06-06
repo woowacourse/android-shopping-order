@@ -21,11 +21,12 @@ android {
         val properties =
             Properties().apply {
                 val localPropertiesFile = project.rootProject.file("local.properties")
-                if(localPropertiesFile.exists()) load(localPropertiesFile.inputStream())
+                if (localPropertiesFile.exists()) load(localPropertiesFile.inputStream())
             }
 
-        val baseUrl = properties.getProperty("BASE_URL")
-            ?: throw GradleException ("local.properties에 BASE_URL이 정의되지 않았습니다.")
+        val baseUrl =
+            properties.getProperty("BASE_URL")
+                ?: throw GradleException("local.properties에 BASE_URL이 정의되지 않았습니다.")
 
         applicationId = "woowacourse.shopping"
         minSdk = 26

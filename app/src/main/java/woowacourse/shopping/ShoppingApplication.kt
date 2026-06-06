@@ -4,12 +4,11 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
-import woowacourse.shopping.data.local.userdata.NotificationSettingStorage
-import woowacourse.shopping.data.local.userdata.NotificationSettingStorageImpl
-import woowacourse.shopping.data.local.userdata.UserAuthDataStore
 import woowacourse.shopping.data.local.database.DataBase
 import woowacourse.shopping.data.local.repository.OutstandingProductRepositoryImpl
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepositoryImpl
+import woowacourse.shopping.data.local.userdata.NotificationSettingStorageImpl
+import woowacourse.shopping.data.local.userdata.UserAuthDataStore
 import woowacourse.shopping.data.local.userdata.UserDataSource
 import woowacourse.shopping.data.local.userdata.UserDataSourceImpl
 import woowacourse.shopping.data.remote.server.RetrofitProvider

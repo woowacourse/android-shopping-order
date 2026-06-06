@@ -15,16 +15,12 @@ sealed interface ApiResult<out T> {
     ) : ApiResult<Nothing>
 }
 
-inline fun <T> ApiResult<T>.onSuccess(
-    action: (T) -> Unit
-): ApiResult<T> {
+inline fun <T> ApiResult<T>.onSuccess(action: (T) -> Unit): ApiResult<T> {
     if (this is ApiResult.Success) action(data)
     return this
 }
 
-inline fun <T> ApiResult<T>.onFailure(
-    action: (code: Int?, message: String?) -> Unit
-): ApiResult<T> {
+inline fun <T> ApiResult<T>.onFailure(action: (code: Int?, message: String?) -> Unit): ApiResult<T> {
     if (this is ApiResult.Error) action(code, message)
     if (this is ApiResult.Exception) action(null, e.message)
     return this

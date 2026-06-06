@@ -28,7 +28,7 @@ class AlarmSchedulerImpl(
         alarmManager.set(
             AlarmManager.RTC_WAKEUP,
             triggerTime,
-            pendingIntent
+            pendingIntent,
         )
     }
 

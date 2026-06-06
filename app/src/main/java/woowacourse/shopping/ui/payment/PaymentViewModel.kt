@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import woowacourse.shopping.data.local.userdata.UserDataSource
 import woowacourse.shopping.data.local.repository.OutstandingProductRepository
+import woowacourse.shopping.data.local.userdata.UserDataSource
 import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.apiresult.onFailure
 import woowacourse.shopping.data.remote.server.apiresult.onSuccess
@@ -52,9 +52,11 @@ class PaymentViewModel(
 
             val checkedItemIds = outstandingProductRepository.getAll()
 
-            cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
+            cartRepository
+                .getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
                 .handleWithSnackBar { cartData ->
-                    couponRepository.getCoupons()
+                    couponRepository
+                        .getCoupons()
                         .handleWithSnackBar { couponData ->
                             val checkedProducts = cartData.purchaseProducts.filter { it.id in checkedItemIds }
                             val order =
@@ -96,7 +98,8 @@ class PaymentViewModel(
             _uiState.update {
                 it.copy(isOrdering = true)
             }
-            orderRepository.order(uiState.value.order)
+            orderRepository
+                .order(uiState.value.order)
                 .handleWithSnackBar {
                     alarmScheduler.cancel()
                     _uiState.update {
@@ -119,8 +122,9 @@ class PaymentViewModel(
     private suspend fun <T> ApiResult<T>.handleWithSnackBar(
         errorMessage: PaymentEvent.Message? = null,
         onSuccessAction: suspend (T) -> Unit,
-    ): ApiResult<T> {
-        return this.onSuccess { onSuccessAction(it) }
+    ): ApiResult<T> =
+        this
+            .onSuccess { onSuccessAction(it) }
             .onFailure { code, msg ->
                 val message =
                     errorMessage ?: if (code != null) {
@@ -130,7 +134,6 @@ class PaymentViewModel(
                     }
                 _event.emit(PaymentEvent.SnackbarEvent(message))
             }
-    }
 
     fun orderTrigger() {
         viewModelScope.launch {

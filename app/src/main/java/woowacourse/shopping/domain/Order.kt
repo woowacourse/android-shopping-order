@@ -11,8 +11,7 @@ data class Order(
 ) {
     val totalProductPrice: Int = purchaseProducts.sumOf { it.totalPrice() }
 
-    fun calculateFinalPrice(discount: Discount): Int =
-        ((totalProductPrice + shippingFee) - discount.totalAmount).coerceAtLeast(0)
+    fun calculateFinalPrice(discount: Discount): Int = ((totalProductPrice + shippingFee) - discount.totalAmount).coerceAtLeast(0)
 
     fun getAllIds(): List<Long> = purchaseProducts.map { it.id }
 }

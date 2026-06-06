@@ -10,7 +10,10 @@ class UserDataSourceImpl(
     override val userPassword: StateFlow<String> = authDataStore.userPassword
     override val encodedUserAuthInfo: StateFlow<String> = authDataStore.encodedUserAuthInfo
 
-    override suspend fun saveUserAuth(name: String, pass: String) {
+    override suspend fun saveUserAuth(
+        name: String,
+        pass: String,
+    ) {
         authDataStore.saveUserAuth(name, pass)
     }
 
@@ -18,8 +21,7 @@ class UserDataSourceImpl(
         authDataStore.clearUserAuth()
     }
 
-    override fun isNotificationEnable(): Boolean =
-        notificationSettingStorage.isNotificationEnabled()
+    override fun isNotificationEnable(): Boolean = notificationSettingStorage.isNotificationEnabled()
 
     override fun setNotificationEnable(enabled: Boolean) {
         notificationSettingStorage.setNotificationEnabled(enabled)

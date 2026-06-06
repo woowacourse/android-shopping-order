@@ -25,7 +25,7 @@ class PaymentAlarmReceiver : BroadcastReceiver() {
         val toPaymentIntent =
             Intent(
                 Intent.ACTION_VIEW,
-                "shopping://payment".toUri()
+                "shopping://payment".toUri(),
             ).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }

@@ -7,9 +7,14 @@ interface UserDataSource {
     val userPassword: StateFlow<String>
     val encodedUserAuthInfo: StateFlow<String>
 
-    suspend fun saveUserAuth(name: String, pass: String)
+    suspend fun saveUserAuth(
+        name: String,
+        pass: String,
+    )
+
     suspend fun clearUserAuth()
 
     fun isNotificationEnable(): Boolean
+
     fun setNotificationEnable(enabled: Boolean)
 }

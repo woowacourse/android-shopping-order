@@ -37,9 +37,11 @@ class CartViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
+            cartRepository
+                .getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
                 .handleWithSnackBar { allItems ->
-                    cartRepository.getPagedCart(_uiState.value.currentPage, PAGE_SIZE)
+                    cartRepository
+                        .getPagedCart(_uiState.value.currentPage, PAGE_SIZE)
                         .handleWithSnackBar { pagedItems ->
                             _allCartItems.update { allItems }
                             _cartItemCount.update { _allCartItems.value.totalCount() }
@@ -89,13 +91,14 @@ class CartViewModel(
 
             _uiState.update { it.copy(isLoading = true) }
 
-            cartRepository.updateCount(id, nextAmount)
+            cartRepository
+                .updateCount(id, nextAmount)
                 .handleWithSnackBar {
                     fetchCart()
                     _event.emit(
                         CartEvent.SnackbarEvent(
-                            CartEvent.Message.QuantityUpdated
-                        )
+                            CartEvent.Message.QuantityUpdated,
+                        ),
                     )
                 }.onFailure { _, _ ->
                     _uiState.update { it.copy(isLoading = false) }
@@ -107,7 +110,8 @@ class CartViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            cartRepository.deleteCartItem(id)
+            cartRepository
+                .deleteCartItem(id)
                 .handleWithSnackBar {
                     val newCheckedIds = _uiState.value.checkedItemIds - id
                     var page = _uiState.value.currentPage
@@ -116,8 +120,8 @@ class CartViewModel(
                     fetchCart()
                     _event.emit(
                         CartEvent.SnackbarEvent(
-                            CartEvent.Message.RemoveFromCart
-                        )
+                            CartEvent.Message.RemoveFromCart,
+                        ),
                     )
                 }.onFailure { _, _ ->
                     _uiState.update { it.copy(isLoading = false) }
@@ -168,8 +172,9 @@ class CartViewModel(
     private suspend fun <T> ApiResult<T>.handleWithSnackBar(
         errorMessage: CartEvent.Message? = null,
         onSuccessAction: suspend (T) -> Unit,
-    ): ApiResult<T> {
-        return this.onSuccess { onSuccessAction(it) }
+    ): ApiResult<T> =
+        this
+            .onSuccess { onSuccessAction(it) }
             .onFailure { code, msg ->
                 val message =
                     errorMessage ?: if (code != null) {
@@ -179,7 +184,6 @@ class CartViewModel(
                     }
                 _event.emit(CartEvent.SnackbarEvent(message))
             }
-    }
 
     fun navigateToShopping() {
         viewModelScope.launch {
