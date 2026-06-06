@@ -67,10 +67,10 @@ class ShoppingViewModel(
                         when (val result = productRepository.getProduct(id)) {
                             is ApiResult.Success -> recentlyViewedProducts.add(result.data)
                             is ApiResult.Error ->
-                                _event.emit(ShoppingEvent.ShowSnackBar("최근 본 상품 목록을 불러오는데 실패했습니다."))
+                                _event.emit(ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.RecentProductsLoadFailed))
 
                             is ApiResult.Exception ->
-                                _event.emit(ShoppingEvent.ShowSnackBar("최근 본 상품 목록을 불러오는데 실패했습니다."))
+                                _event.emit(ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.RecentProductsLoadFailed))
                         }
                     }
                     _uiState.update {
@@ -107,7 +107,7 @@ class ShoppingViewModel(
                     it.copy(isLoading = false)
                 }
                 _event.emit(
-                    ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${result.code}"),
+                    ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.NetworkError(result.code)),
                 )
             }
 
@@ -116,7 +116,7 @@ class ShoppingViewModel(
                     it.copy(isLoading = false)
                 }
                 _event.emit(
-                    ShoppingEvent.ShowSnackBar("${ViewModelConst.ERROR_LABEL} ${result.e.message}"),
+                    ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.ExceptionError(result.e.message)),
                 )
             }
         }
@@ -130,12 +130,16 @@ class ShoppingViewModel(
             is ApiResult.Success -> _uiState.update { it.copy(cart = allCartItemResult.data) }
             is ApiResult.Error ->
                 _event.emit(
-                    ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${allCartItemResult.code}"),
+                    ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.NetworkError(allCartItemResult.code)),
                 )
 
             is ApiResult.Exception ->
                 _event.emit(
-                    ShoppingEvent.ShowSnackBar("${ViewModelConst.ERROR_LABEL} ${allCartItemResult.e.message}"),
+                    ShoppingEvent.ShowSnackBar(
+                        ShoppingEvent.Message.ExceptionError(
+                            allCartItemResult.e.message
+                        )
+                    ),
                 )
         }
     }
@@ -151,18 +155,18 @@ class ShoppingViewModel(
             } else {
                 when (val result = cartRepository.insert(purchaseProduct)) {
                     is ApiResult.Success -> {
-                        _event.emit(ShoppingEvent.ShowSnackBar(ADD_TO_CART))
+                        _event.emit(ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.CartAdded))
                         fetchCart()
                     }
 
                     is ApiResult.Error ->
                         _event.emit(
-                            ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${result.code}"),
+                            ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.NetworkError(result.code)),
                         )
 
                     is ApiResult.Exception ->
                         _event.emit(
-                            ShoppingEvent.ShowSnackBar("${ViewModelConst.ERROR_LABEL} ${result.e.message}"),
+                            ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.ExceptionError(result.e.message)),
                         )
                 }
             }
@@ -180,18 +184,22 @@ class ShoppingViewModel(
                 if (nextCount >= 1) {
                     when (val result = cartRepository.updateCount(target.id, nextCount)) {
                         is ApiResult.Success -> {
-                            _event.emit(ShoppingEvent.ShowSnackBar(UPDATE_AMOUNT))
+                            _event.emit(ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.QuantityUpdated))
                             fetchCart()
                         }
 
                         is ApiResult.Error ->
                             _event.emit(
-                                ShoppingEvent.ShowSnackBar("${ViewModelConst.NETWORK_ERROR_LABEL} ${result.code}"),
+                                ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.NetworkError(result.code)),
                             )
 
                         is ApiResult.Exception ->
                             _event.emit(
-                                ShoppingEvent.ShowSnackBar("${ViewModelConst.ERROR_LABEL} ${result.e.message}"),
+                                ShoppingEvent.ShowSnackBar(
+                                    ShoppingEvent.Message.ExceptionError(
+                                        result.e.message
+                                    )
+                                ),
                             )
                     }
                 }

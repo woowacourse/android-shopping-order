@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -26,6 +27,7 @@ fun ShoppingRoute(
     modifier: Modifier = Modifier,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val composableScope = rememberCoroutineScope()
@@ -38,11 +40,12 @@ fun ShoppingRoute(
             viewModel.event.collect { event ->
                 when (event) {
                     is ShoppingEvent.ShowSnackBar -> {
+                        val message = event.message.toDisplayString(context)
                         snackbarJob?.cancel()
                         snackbarJob =
                             launch {
                                 snackbarHostState.showSnackbar(
-                                    event.message,
+                                    message,
                                 )
                             }
                     }
