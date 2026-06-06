@@ -8,12 +8,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.toRoute
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.cart.CartItems
 import woowacourse.shopping.domain.model.coupon.Coupon
@@ -32,8 +35,8 @@ class PaymentViewModel(
     private val _uiState = MutableStateFlow<PaymentUiState>(PaymentUiState.Loading)
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
 
-    private val _uiEvent = MutableSharedFlow<PaymentUiEvent>()
-    val uiEvent: SharedFlow<PaymentUiEvent> = _uiEvent.asSharedFlow()
+    private val _uiEvent = Channel<PaymentUiEvent>(Channel.BUFFERED)
+    val uiEvent: Flow<PaymentUiEvent> = _uiEvent.receiveAsFlow()
 
     private var availableCoupons: List<Coupon> = emptyList()
 
@@ -90,11 +93,12 @@ class PaymentViewModel(
             val cartItems = current.cartItems
             val selectedIds = cartItems.values.map { it.id }
             if (selectedIds.isEmpty()) {
-                _uiEvent.emit(PaymentUiEvent.ShowMessage("선택된 상품이 없습니다."))
+                _uiEvent.trySend(PaymentUiEvent.ShowMessage("선택된 상품이 없습니다."))
+                return@launch
             }
             cartRepository.order(selectedIds)
-            _uiEvent.emit(PaymentUiEvent.ShowMessage("주문이 완료되었습니다"))
-            _uiEvent.emit(PaymentUiEvent.OrderSucceeded)
+            _uiEvent.trySend(PaymentUiEvent.ShowMessage("주문이 완료되었습니다"))
+            _uiEvent.trySend(PaymentUiEvent.OrderSucceeded)
         }
     }
 

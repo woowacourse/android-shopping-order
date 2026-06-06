@@ -8,12 +8,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.toRoute
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.cart.Cart
 import woowacourse.shopping.domain.model.cart.Quantity
@@ -35,8 +38,8 @@ class ProductDetailViewModel(
     private val _uiState = MutableStateFlow<ProductDetailUiState>(ProductDetailUiState.Loading)
     private val cartFlow = MutableStateFlow(Cart())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
-    private val _uiEvent = MutableSharedFlow<ProductDetailUiEvent>()
-    val uiEvent: SharedFlow<ProductDetailUiEvent> = _uiEvent.asSharedFlow()
+    private val _uiEvent = Channel<ProductDetailUiEvent>(Channel.BUFFERED)
+    val uiEvent: Flow<ProductDetailUiEvent> = _uiEvent.receiveAsFlow()
 
     init {
         loadProduct()
@@ -105,8 +108,8 @@ class ProductDetailViewModel(
             } else {
                 cartRepository.addProduct(current.product, Quantity(current.selectedQuantity))
             }
-            _uiEvent.emit(ProductDetailUiEvent.ShowSnackbar("장바구니에 담았습니다"))
-            _uiEvent.emit(ProductDetailUiEvent.AddedToCart)
+            _uiEvent.trySend(ProductDetailUiEvent.ShowSnackbar("장바구니에 담았습니다"))
+            _uiEvent.trySend(ProductDetailUiEvent.AddedToCart)
         }
     }
 

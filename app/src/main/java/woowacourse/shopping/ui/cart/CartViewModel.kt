@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -12,6 +14,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -34,8 +37,8 @@ class CartViewModel(
     private val recommendProductsState = MutableStateFlow<List<Product>>(emptyList())
     private val isCartOrRecommendState = MutableStateFlow(CartFlow.CART)
     private val allCartItemsState = MutableStateFlow<CartItems?>(null)
-    private val _uiEvent = MutableSharedFlow<CartUiEvent>()
-    val uiEvent: SharedFlow<CartUiEvent> = _uiEvent.asSharedFlow()
+    private val _uiEvent = Channel<CartUiEvent>(Channel.BUFFERED)
+    val uiEvent: Flow<CartUiEvent> = _uiEvent.receiveAsFlow()
     private var currentPage = 0
 
     val uiState: StateFlow<CartUiState> =
@@ -123,7 +126,7 @@ class CartViewModel(
             cartRepository.remove(cartId)
 
             refreshCartItems()
-            _uiEvent.emit(CartUiEvent.ShowSnackbar("장바구니에서 삭제했습니다"))
+            _uiEvent.trySend(CartUiEvent.ShowSnackbar("장바구니에서 삭제했습니다"))
         }
     }
 
@@ -132,7 +135,7 @@ class CartViewModel(
             val cartId = cartRepository.addProduct(product)
             selectedItemsState.update { it + cartId }
             refreshCartItems()
-            _uiEvent.emit(CartUiEvent.ShowSnackbar("장바구니에 추가했습니다"))
+            _uiEvent.trySend(CartUiEvent.ShowSnackbar("장바구니에 추가했습니다"))
         }
     }
 
@@ -219,10 +222,7 @@ class CartViewModel(
             isCartOrRecommendState.value = CartFlow.RECOMMEND
             return
         }
-
-        viewModelScope.launch {
-            _uiEvent.emit(CartUiEvent.OrderRequested(selectedItems.toList()))
-        }
+        _uiEvent.trySend(CartUiEvent.OrderRequested(selectedItems.toList()))
     }
 
     private suspend fun refreshCartItems(page: Int = currentPage) {
