@@ -69,14 +69,14 @@ class RecommendationViewModel(
                         is ApiResult.Error ->
                             _event.emit(
                                 RecommendationEvent.SnackbarEvent(
-                                    "${ViewModelConst.NETWORK_ERROR_LABEL}${categoryProductsResult.message}",
+                                    RecommendationEvent.Message.NetworkError(categoryProductsResult.code),
                                 ),
                             )
 
                         is ApiResult.Exception ->
                             _event.emit(
                                 RecommendationEvent.SnackbarEvent(
-                                    "${ViewModelConst.ERROR_LABEL}${categoryProductsResult.e.message}",
+                                    RecommendationEvent.Message.ExceptionError(categoryProductsResult.e.message),
                                 ),
                             )
                     }
@@ -85,14 +85,14 @@ class RecommendationViewModel(
                 is ApiResult.Error ->
                     _event.emit(
                         RecommendationEvent.SnackbarEvent(
-                            "${ViewModelConst.NETWORK_ERROR_LABEL}${productResult.code}",
+                            RecommendationEvent.Message.NetworkError(productResult.code),
                         ),
                     )
 
                 is ApiResult.Exception ->
                     _event.emit(
                         RecommendationEvent.SnackbarEvent(
-                            "${ViewModelConst.ERROR_LABEL}${productResult.e.message}",
+                            RecommendationEvent.Message.ExceptionError(productResult.e.message),
                         ),
                     )
             }
@@ -109,14 +109,14 @@ class RecommendationViewModel(
             is ApiResult.Error ->
                 _event.emit(
                     RecommendationEvent.SnackbarEvent(
-                        "${ViewModelConst.NETWORK_ERROR_LABEL}${allCartItemResult.code}",
+                        RecommendationEvent.Message.NetworkError(allCartItemResult.code),
                     ),
                 )
 
             is ApiResult.Exception ->
                 _event.emit(
                     RecommendationEvent.SnackbarEvent(
-                        "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}",
+                        RecommendationEvent.Message.ExceptionError(allCartItemResult.e.message),
                     ),
                 )
         }
@@ -143,19 +143,24 @@ class RecommendationViewModel(
                     is ApiResult.Success -> {
                         fetchCart()
                         fetchTotalPrice()
+                        _event.emit(
+                            RecommendationEvent.SnackbarEvent(
+                                RecommendationEvent.Message.QuantityUpdated
+                            )
+                        )
                     }
 
                     is ApiResult.Error ->
                         _event.emit(
                             RecommendationEvent.SnackbarEvent(
-                                "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}",
+                                RecommendationEvent.Message.NetworkError(result.code),
                             ),
                         )
 
                     is ApiResult.Exception ->
                         _event.emit(
                             RecommendationEvent.SnackbarEvent(
-                                "${ViewModelConst.ERROR_LABEL}${result.e.message}",
+                                RecommendationEvent.Message.ExceptionError(result.e.message),
                             ),
                         )
                 }
@@ -167,20 +172,25 @@ class RecommendationViewModel(
                         if (addedItem != null) {
                             _uiState.update { it.copy(checkedIds = it.checkedIds + addedItem.id) }
                             fetchTotalPrice()
+                            _event.emit(
+                                RecommendationEvent.SnackbarEvent(
+                                    RecommendationEvent.Message.CartAdded
+                                )
+                            )
                         }
                     }
 
                     is ApiResult.Error ->
                         _event.emit(
                             RecommendationEvent.SnackbarEvent(
-                                "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}",
+                                RecommendationEvent.Message.NetworkError(result.code),
                             ),
                         )
 
                     is ApiResult.Exception ->
                         _event.emit(
                             RecommendationEvent.SnackbarEvent(
-                                "${ViewModelConst.ERROR_LABEL}${result.e.message}",
+                                RecommendationEvent.Message.ExceptionError(result.e.message),
                             ),
                         )
                 }
@@ -201,19 +211,24 @@ class RecommendationViewModel(
                         is ApiResult.Success -> {
                             fetchCart()
                             fetchTotalPrice()
+                            _event.emit(
+                                RecommendationEvent.SnackbarEvent(
+                                    RecommendationEvent.Message.QuantityUpdated
+                                )
+                            )
                         }
 
                         is ApiResult.Error ->
                             _event.emit(
                                 RecommendationEvent.SnackbarEvent(
-                                    "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}",
+                                    RecommendationEvent.Message.NetworkError(result.code),
                                 ),
                             )
 
                         is ApiResult.Exception ->
                             _event.emit(
                                 RecommendationEvent.SnackbarEvent(
-                                    "${ViewModelConst.ERROR_LABEL}${result.e.message}",
+                                    RecommendationEvent.Message.ExceptionError(result.e.message),
                                 ),
                             )
                     }
@@ -231,19 +246,24 @@ class RecommendationViewModel(
                         _uiState.update { it.copy(checkedIds = it.checkedIds - target.id) }
                         fetchCart()
                         fetchTotalPrice()
+                        _event.emit(
+                            RecommendationEvent.SnackbarEvent(
+                                RecommendationEvent.Message.CartRemoved
+                            )
+                        )
                     }
 
                     is ApiResult.Error ->
                         _event.emit(
                             RecommendationEvent.SnackbarEvent(
-                                "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}",
+                                RecommendationEvent.Message.NetworkError(result.code),
                             ),
                         )
 
                     is ApiResult.Exception ->
                         _event.emit(
                             RecommendationEvent.SnackbarEvent(
-                                "${ViewModelConst.ERROR_LABEL}${result.e.message}",
+                                RecommendationEvent.Message.ExceptionError(result.e.message),
                             ),
                         )
                 }

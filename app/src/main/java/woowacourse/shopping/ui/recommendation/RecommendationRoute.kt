@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -26,6 +27,7 @@ fun RecommendationRoute(
     modifier: Modifier = Modifier,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
     val composableScope = rememberCoroutineScope()
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -37,11 +39,12 @@ fun RecommendationRoute(
             viewModel.event.collect { event ->
                 when (event) {
                     is RecommendationEvent.SnackbarEvent -> {
+                        val message = event.errorMsg.toDisplayString(context)
                         snackbarJob?.cancel()
                         snackbarJob =
                             launch {
                                 snackbarHostState.showSnackbar(
-                                    event.errorMsg,
+                                    message,
                                 )
                             }
                     }
