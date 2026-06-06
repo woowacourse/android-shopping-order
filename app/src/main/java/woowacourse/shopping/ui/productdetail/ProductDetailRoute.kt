@@ -9,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -25,6 +26,7 @@ fun ProductDetailRoute(
     modifier: Modifier = Modifier,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -35,11 +37,12 @@ fun ProductDetailRoute(
             viewModel.event.collect { event ->
                 when (event) {
                     is ProductDetailEvent.SnackbarEvent -> {
+                        val message = event.errorMsg.toDisplayString(context)
                         snackbarJob?.cancel()
                         snackbarJob =
                             launch {
                                 snackbarHostState.showSnackbar(
-                                    event.errorMsg,
+                                    message,
                                 )
                             }
                     }

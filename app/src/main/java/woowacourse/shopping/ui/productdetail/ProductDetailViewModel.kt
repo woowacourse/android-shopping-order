@@ -40,14 +40,14 @@ class ProductDetailViewModel(
                 is ApiResult.Error ->
                     _event.emit(
                         ProductDetailEvent.SnackbarEvent(
-                            "${ViewModelConst.NETWORK_ERROR_LABEL}${allCartItemResult.code}",
+                            ProductDetailEvent.Message.NetworkError(allCartItemResult.code),
                         ),
                     )
 
                 is ApiResult.Exception ->
                     _event.emit(
                         ProductDetailEvent.SnackbarEvent(
-                            "${ViewModelConst.ERROR_LABEL}${allCartItemResult.e.message}",
+                            ProductDetailEvent.Message.ExceptionError(allCartItemResult.e.message),
                         )
                     )
             }
@@ -79,7 +79,7 @@ class ProductDetailViewModel(
                             }
                             _event.emit(
                                 ProductDetailEvent.SnackbarEvent(
-                                    "${ViewModelConst.NETWORK_ERROR_LABEL}${lastViewedProductResult.code}",
+                                    ProductDetailEvent.Message.NetworkError(lastViewedProductResult.code),
                                 ),
                             )
                         }
@@ -90,7 +90,7 @@ class ProductDetailViewModel(
                             }
                             _event.emit(
                                 ProductDetailEvent.SnackbarEvent(
-                                    "${ViewModelConst.ERROR_LABEL}${lastViewedProductResult.e.message}",
+                                    ProductDetailEvent.Message.ExceptionError(lastViewedProductResult.e.message),
                                 ),
                             )
                         }
@@ -103,14 +103,14 @@ class ProductDetailViewModel(
             is ApiResult.Error ->
                 _event.emit(
                     ProductDetailEvent.SnackbarEvent(
-                        "${ViewModelConst.NETWORK_ERROR_LABEL}${selectedProductResult.code}",
+                        ProductDetailEvent.Message.NetworkError(selectedProductResult.code),
                     ),
                 )
 
             is ApiResult.Exception ->
                 _event.emit(
                     ProductDetailEvent.SnackbarEvent(
-                        "${ViewModelConst.ERROR_LABEL}${selectedProductResult.e.message}",
+                        ProductDetailEvent.Message.ExceptionError(selectedProductResult.e.message),
                     ),
                 )
         }
