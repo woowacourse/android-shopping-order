@@ -3,7 +3,6 @@ package woowacourse.shopping.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 
 @Composable
@@ -40,7 +39,8 @@ fun ShoppingNavHost(
             navController = navController,
             onOrderSuccess = {
                 navController.navigate(ProductRoute.ProductList) {
-                    popUpTo<ProductRoute.ProductList> { inclusive = true }
+                    popUpTo<ProductRoute.ProductList> { inclusive = false }
+                    launchSingleTop = true
                 }
             },
         )
