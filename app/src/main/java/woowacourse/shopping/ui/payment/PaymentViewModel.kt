@@ -12,6 +12,8 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.userdata.UserDataSource
 import woowacourse.shopping.data.local.repository.OutstandingProductRepository
 import woowacourse.shopping.data.remote.server.apiresult.ApiResult
+import woowacourse.shopping.data.remote.server.apiresult.onFailure
+import woowacourse.shopping.data.remote.server.apiresult.onSuccess
 import woowacourse.shopping.data.remote.server.repository.CartRepository
 import woowacourse.shopping.data.remote.server.repository.CouponRepository
 import woowacourse.shopping.data.remote.server.repository.OrderRepository
@@ -124,12 +126,24 @@ class PaymentViewModel(
                     _uiState.update {
                         it.copy(isOrdering = false)
                     }
-                    _event.emit(
-                        PaymentEvent.SnackbarEvent(PaymentEvent.Message.ExceptionError(result.e.message)),
-                    )
                 }
-            }
         }
+    }
+
+    private suspend fun <T> ApiResult<T>.handleWithSnackBar(
+        errorMessage: PaymentEvent.Message? = null,
+        onSuccessAction: suspend (T) -> Unit,
+    ): ApiResult<T> {
+        return this.onSuccess { onSuccessAction(it) }
+            .onFailure { code, msg ->
+                val message =
+                    errorMessage ?: if (code != null) {
+                        PaymentEvent.Message.NetworkError(code)
+                    } else {
+                        PaymentEvent.Message.ExceptionError(msg)
+                    }
+                _event.emit(PaymentEvent.SnackbarEvent(message))
+            }
     }
 
     fun orderTrigger() {

@@ -13,6 +13,8 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.repository.OutstandingProductRepository
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.data.remote.server.apiresult.ApiResult
+import woowacourse.shopping.data.remote.server.apiresult.onFailure
+import woowacourse.shopping.data.remote.server.apiresult.onSuccess
 import woowacourse.shopping.data.remote.server.repository.CartRepository
 import woowacourse.shopping.data.remote.server.repository.ProductRepository
 import woowacourse.shopping.domain.Products
@@ -253,22 +255,20 @@ class RecommendationViewModel(
                         )
                     }
 
-                    is ApiResult.Error ->
-                        _event.emit(
-                            RecommendationEvent.SnackbarEvent(
-                                RecommendationEvent.Message.NetworkError(result.code),
-                            ),
-                        )
-
-                    is ApiResult.Exception ->
-                        _event.emit(
-                            RecommendationEvent.SnackbarEvent(
-                                RecommendationEvent.Message.ExceptionError(result.e.message),
-                            ),
-                        )
-                }
+    private suspend fun <T> ApiResult<T>.handleWithSnackBar(
+        errorMessage: RecommendationEvent.Message? = null,
+        onSuccessAction: suspend (T) -> Unit,
+    ): ApiResult<T> {
+        return this.onSuccess { onSuccessAction(it) }
+            .onFailure { code, msg ->
+                val message =
+                    errorMessage ?: if (code != null) {
+                        RecommendationEvent.Message.NetworkError(code)
+                    } else {
+                        RecommendationEvent.Message.ExceptionError(msg)
+                    }
+                _event.emit(RecommendationEvent.SnackbarEvent(message))
             }
-        }
     }
 
     fun addToCartTrigger(purchaseProduct: PurchaseProduct) {

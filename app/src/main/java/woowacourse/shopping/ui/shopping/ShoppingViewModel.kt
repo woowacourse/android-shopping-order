@@ -15,6 +15,8 @@ import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.data.local.userdata.UserDataSource
 import woowacourse.shopping.data.remote.server.apiresult.ApiResult
+import woowacourse.shopping.data.remote.server.apiresult.onFailure
+import woowacourse.shopping.data.remote.server.apiresult.onSuccess
 import woowacourse.shopping.data.remote.server.repository.CartRepository
 import woowacourse.shopping.data.remote.server.repository.ProductRepository
 import woowacourse.shopping.domain.Product
@@ -215,6 +217,22 @@ class ShoppingViewModel(
                 fetchCart()
             }
         }
+    }
+
+    private suspend fun <T> ApiResult<T>.handleWithSnackBar(
+        errorMessage: ShoppingEvent.Message? = null,
+        onSuccessAction: suspend (T) -> Unit,
+    ): ApiResult<T> {
+        return this.onSuccess { onSuccessAction(it) }
+            .onFailure { code, msg ->
+                val message =
+                    errorMessage ?: if (code != null) {
+                        ShoppingEvent.Message.NetworkError(code)
+                    } else {
+                        ShoppingEvent.Message.ExceptionError(msg)
+                    }
+                _event.emit(ShoppingEvent.ShowSnackBar(message))
+            }
     }
 
     fun updateHistory(product: Product) {

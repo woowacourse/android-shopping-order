@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.local.repository.RecentlyViewedProductRepository
 import woowacourse.shopping.data.remote.server.apiresult.ApiResult
+import woowacourse.shopping.data.remote.server.apiresult.onFailure
+import woowacourse.shopping.data.remote.server.apiresult.onSuccess
 import woowacourse.shopping.data.remote.server.repository.CartRepository
 import woowacourse.shopping.data.remote.server.repository.ProductRepository
 import woowacourse.shopping.domain.Product
@@ -161,7 +163,24 @@ class ProductDetailViewModel(
             )
         }
     }
+
+    private suspend fun <T> ApiResult<T>.handleWithSnackBar(
+        errorMessage: ProductDetailEvent.Message? = null,
+        onSuccessAction: suspend (T) -> Unit,
+    ): ApiResult<T> {
+        return this.onSuccess { onSuccessAction(it) }
+            .onFailure { code, msg ->
+                val message =
+                    errorMessage ?: if (code != null) {
+                        ProductDetailEvent.Message.NetworkError(code)
+                    } else {
+                        ProductDetailEvent.Message.ExceptionError(msg)
+                    }
+                _event.emit(ProductDetailEvent.SnackbarEvent(message))
+            }
+    }
 }
+
 
 class ProductDetailViewModelFactory(
     private val cartRepository: CartRepository,

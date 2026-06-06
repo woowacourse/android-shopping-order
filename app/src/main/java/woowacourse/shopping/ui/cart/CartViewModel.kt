@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.data.remote.server.apiresult.ApiResult
+import woowacourse.shopping.data.remote.server.apiresult.onFailure
+import woowacourse.shopping.data.remote.server.apiresult.onSuccess
 import woowacourse.shopping.data.remote.server.repository.CartRepository
 import woowacourse.shopping.domain.PurchaseProducts
 import woowacourse.shopping.ui.ViewModelConst
@@ -209,12 +211,21 @@ class CartViewModel(
             .filter { it.id in checkedIds }
             .sumOf { it.totalPrice() }
 
-    fun getErrorMessage(vararg results: ApiResult<*>): CartEvent.Message =
-        results.filterIsInstance<ApiResult.Error>().firstOrNull()?.let {
-            CartEvent.Message.NetworkError(it.code)
-        } ?: results.filterIsInstance<ApiResult.Exception>().firstOrNull()?.let {
-            CartEvent.Message.ExceptionError(it.e.message)
-        } ?: CartEvent.Message.ExceptionError("알 수 없는 에러")
+    private suspend fun <T> ApiResult<T>.handleWithSnackBar(
+        errorMessage: CartEvent.Message? = null,
+        onSuccessAction: suspend (T) -> Unit,
+    ): ApiResult<T> {
+        return this.onSuccess { onSuccessAction(it) }
+            .onFailure { code, msg ->
+                val message =
+                    errorMessage ?: if (code != null) {
+                        CartEvent.Message.NetworkError(code)
+                    } else {
+                        CartEvent.Message.ExceptionError(msg)
+                    }
+                _event.emit(CartEvent.SnackbarEvent(message))
+            }
+    }
 
     fun navigateToShopping() {
         viewModelScope.launch {
