@@ -9,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -25,21 +26,23 @@ fun CartRoute(
     modifier: Modifier = Modifier,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            var snackbatJob: Job? = null
+            var snackbarJob: Job? = null
             viewModel.event.collect { event ->
                 when (event) {
                     is CartEvent.SnackbarEvent -> {
-                        snackbatJob?.cancel()
-                        snackbatJob =
+                        val message = event.errorMsg.toDisplayString(context)
+                        snackbarJob?.cancel()
+                        snackbarJob =
                             launch {
                                 snackbarHostState.showSnackbar(
-                                    event.errorMsg,
+                                    message,
                                 )
                             }
                     }

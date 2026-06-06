@@ -35,7 +35,8 @@ class CartViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            val allItemsResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
+            val allItemsResult =
+                cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
             val pagedItemsResult =
                 cartRepository.getPagedCart(_uiState.value.currentPage, PAGE_SIZE)
 
@@ -92,14 +93,21 @@ class CartViewModel(
             _uiState.update { it.copy(isLoading = true) }
 
             when (val result = cartRepository.updateCount(id, nextAmount)) {
-                is ApiResult.Success -> fetchCart()
+                is ApiResult.Success -> {
+                    fetchCart()
+                    _event.emit(
+                        CartEvent.SnackbarEvent(
+                            CartEvent.Message.QuantityUpdated
+                        )
+                    )
+                }
                 is ApiResult.Error -> {
                     _uiState.update {
                         it.copy(isLoading = false)
                     }
                     _event.emit(
                         CartEvent.SnackbarEvent(
-                            "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}",
+                            CartEvent.Message.NetworkError(result.code),
                         ),
                     )
                 }
@@ -110,7 +118,7 @@ class CartViewModel(
                     }
                     _event.emit(
                         CartEvent.SnackbarEvent(
-                            "${ViewModelConst.ERROR_LABEL}${result.e.message}",
+                            CartEvent.Message.ExceptionError(result.e.message),
                         ),
                     )
                 }
@@ -129,6 +137,11 @@ class CartViewModel(
                     if (page > 0 && page * PAGE_SIZE >= _allCartItems.value.size() - 1) page -= 1
                     _uiState.update { it.copy(checkedItemIds = newCheckedIds, currentPage = page) }
                     fetchCart()
+                    _event.emit(
+                        CartEvent.SnackbarEvent(
+                            CartEvent.Message.RemoveFromCart
+                        )
+                    )
                 }
 
                 is ApiResult.Error -> {
@@ -137,7 +150,7 @@ class CartViewModel(
                     }
                     _event.emit(
                         CartEvent.SnackbarEvent(
-                            "${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}",
+                            CartEvent.Message.NetworkError(result.code),
                         ),
                     )
                 }
@@ -148,7 +161,7 @@ class CartViewModel(
                     }
                     _event.emit(
                         CartEvent.SnackbarEvent(
-                            "${ViewModelConst.ERROR_LABEL}${result.e.message}",
+                            CartEvent.Message.ExceptionError(result.e.message),
                         ),
                     )
                 }
@@ -196,16 +209,12 @@ class CartViewModel(
             .filter { it.id in checkedIds }
             .sumOf { it.totalPrice() }
 
-    fun getErrorMessage(vararg results: ApiResult<*>): String =
-        results
-            .filterIsInstance<ApiResult.Error>()
-            .firstOrNull()
-            ?.let { "${ViewModelConst.NETWORK_ERROR_LABEL}${it.code}" }
-            ?: results
-                .filterIsInstance<ApiResult.Exception>()
-                .firstOrNull()
-                ?.let { "${ViewModelConst.ERROR_LABEL}${it.e.message}" }
-            ?: UNKNOWN_ERROR_LABEL
+    fun getErrorMessage(vararg results: ApiResult<*>): CartEvent.Message =
+        results.filterIsInstance<ApiResult.Error>().firstOrNull()?.let {
+            CartEvent.Message.NetworkError(it.code)
+        } ?: results.filterIsInstance<ApiResult.Exception>().firstOrNull()?.let {
+            CartEvent.Message.ExceptionError(it.e.message)
+        } ?: CartEvent.Message.ExceptionError("알 수 없는 에러")
 
     fun navigateToShopping() {
         viewModelScope.launch {
