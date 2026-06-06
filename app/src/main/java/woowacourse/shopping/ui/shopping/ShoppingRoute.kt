@@ -64,7 +64,7 @@ fun ShoppingRoute(
                             updateAmount = event.updateAmount,
                         )
 
-                    is ShoppingEvent.RemoveFormCart ->
+                    is ShoppingEvent.RemoveFromCart ->
                         viewModel.removeWithID(
                             event.purchaseProductId,
                         )

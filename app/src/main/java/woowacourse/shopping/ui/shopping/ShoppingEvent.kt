@@ -53,7 +53,7 @@ sealed interface ShoppingEvent {
         val updateAmount: Int,
     ) : ShoppingEvent
 
-    data class RemoveFormCart(
+    data class RemoveFromCart(
         val purchaseProductId: Long,
     ) : ShoppingEvent
 

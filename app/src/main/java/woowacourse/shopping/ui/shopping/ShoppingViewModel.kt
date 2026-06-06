@@ -236,7 +236,7 @@ class ShoppingViewModel(
     fun removeFromCartTrigger(purchaseProductId: Long) {
         viewModelScope.launch {
             _event.emit(
-                ShoppingEvent.RemoveFormCart(purchaseProductId),
+                ShoppingEvent.RemoveFromCart(purchaseProductId),
             )
         }
     }
