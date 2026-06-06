@@ -37,37 +37,32 @@ class CartViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            val allItemsResult =
-                cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
-            val pagedItemsResult =
-                cartRepository.getPagedCart(_uiState.value.currentPage, PAGE_SIZE)
+            cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
+                .handleWithSnackBar { allItems ->
+                    cartRepository.getPagedCart(_uiState.value.currentPage, PAGE_SIZE)
+                        .handleWithSnackBar { pagedItems ->
+                            _allCartItems.update { allItems }
+                            _cartItemCount.update { _allCartItems.value.totalCount() }
+                            val page = _uiState.value.currentPage
+                            val selectedPrice =
+                                calculateTotalPrice(_allCartItems.value, _uiState.value.checkedItemIds)
 
-            if (allItemsResult is ApiResult.Success && pagedItemsResult is ApiResult.Success) {
-                _allCartItems.update { allItemsResult.data }
-                _cartItemCount.update { _allCartItems.value.totalCount() }
-                val page = _uiState.value.currentPage
-                val selectedPrice =
-                    calculateTotalPrice(_allCartItems.value, _uiState.value.checkedItemIds)
-
-                _uiState.update { state ->
-                    state.copy(
-                        items = pagedItemsResult.data,
-                        isLoading = false,
-                        isNextEnable = page < (_allCartItems.value.size() - 1) / PAGE_SIZE,
-                        isPrevEnable = page > 0,
-                        isPageable = _allCartItems.value.size() > PAGE_SIZE,
-                        totalPrice = selectedPrice,
-                    )
+                            _uiState.update { state ->
+                                state.copy(
+                                    items = pagedItems,
+                                    isLoading = false,
+                                    isNextEnable = page < (_allCartItems.value.size() - 1) / PAGE_SIZE,
+                                    isPrevEnable = page > 0,
+                                    isPageable = _allCartItems.value.size() > PAGE_SIZE,
+                                    totalPrice = selectedPrice,
+                                )
+                            }
+                        }.onFailure { _, _ ->
+                            _uiState.update { it.copy(isLoading = false) }
+                        }
+                }.onFailure { _, _ ->
+                    _uiState.update { it.copy(isLoading = false) }
                 }
-            } else {
-                _uiState.update {
-                    it.copy(isLoading = false)
-                }
-                val errorMsg = getErrorMessage(allItemsResult, pagedItemsResult)
-                _event.emit(
-                    CartEvent.SnackbarEvent(errorMsg),
-                )
-            }
         }
     }
 
@@ -94,37 +89,17 @@ class CartViewModel(
 
             _uiState.update { it.copy(isLoading = true) }
 
-            when (val result = cartRepository.updateCount(id, nextAmount)) {
-                is ApiResult.Success -> {
+            cartRepository.updateCount(id, nextAmount)
+                .handleWithSnackBar {
                     fetchCart()
                     _event.emit(
                         CartEvent.SnackbarEvent(
                             CartEvent.Message.QuantityUpdated
                         )
                     )
+                }.onFailure { _, _ ->
+                    _uiState.update { it.copy(isLoading = false) }
                 }
-                is ApiResult.Error -> {
-                    _uiState.update {
-                        it.copy(isLoading = false)
-                    }
-                    _event.emit(
-                        CartEvent.SnackbarEvent(
-                            CartEvent.Message.NetworkError(result.code),
-                        ),
-                    )
-                }
-
-                is ApiResult.Exception -> {
-                    _uiState.update {
-                        it.copy(isLoading = false)
-                    }
-                    _event.emit(
-                        CartEvent.SnackbarEvent(
-                            CartEvent.Message.ExceptionError(result.e.message),
-                        ),
-                    )
-                }
-            }
         }
     }
 
@@ -132,8 +107,8 @@ class CartViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            when (val result = cartRepository.deleteCartItem(id)) {
-                is ApiResult.Success -> {
+            cartRepository.deleteCartItem(id)
+                .handleWithSnackBar {
                     val newCheckedIds = _uiState.value.checkedItemIds - id
                     var page = _uiState.value.currentPage
                     if (page > 0 && page * PAGE_SIZE >= _allCartItems.value.size() - 1) page -= 1
@@ -144,30 +119,9 @@ class CartViewModel(
                             CartEvent.Message.RemoveFromCart
                         )
                     )
+                }.onFailure { _, _ ->
+                    _uiState.update { it.copy(isLoading = false) }
                 }
-
-                is ApiResult.Error -> {
-                    _uiState.update {
-                        it.copy(isLoading = false)
-                    }
-                    _event.emit(
-                        CartEvent.SnackbarEvent(
-                            CartEvent.Message.NetworkError(result.code),
-                        ),
-                    )
-                }
-
-                is ApiResult.Exception -> {
-                    _uiState.update {
-                        it.copy(isLoading = false)
-                    }
-                    _event.emit(
-                        CartEvent.SnackbarEvent(
-                            CartEvent.Message.ExceptionError(result.e.message),
-                        ),
-                    )
-                }
-            }
         }
     }
 

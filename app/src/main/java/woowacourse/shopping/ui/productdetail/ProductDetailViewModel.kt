@@ -36,85 +36,28 @@ class ProductDetailViewModel(
 
     init {
         viewModelScope.launch {
-            val allCartItemResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
-            when (allCartItemResult) {
-                is ApiResult.Success -> _cart.update { allCartItemResult.data }
-                is ApiResult.Error ->
-                    _event.emit(
-                        ProductDetailEvent.SnackbarEvent(
-                            ProductDetailEvent.Message.NetworkError(allCartItemResult.code),
-                        ),
-                    )
-
-                is ApiResult.Exception ->
-                    _event.emit(
-                        ProductDetailEvent.SnackbarEvent(
-                            ProductDetailEvent.Message.ExceptionError(allCartItemResult.e.message),
-                        )
-                    )
-            }
+            cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
+                .handleWithSnackBar { data -> _cart.update { data } }
             fetchProduct()
         }
     }
 
     private suspend fun fetchProduct() {
-        when (val selectedProductResult = productRepository.getProduct(selectedProductId)) {
-            is ApiResult.Success -> {
-                val selectedProduct = selectedProductResult.data
-                if (lastViewedProductId != null) {
-                    when (
-                        val lastViewedProductResult =
-                            productRepository.getProduct(lastViewedProductId)
-                    ) {
-                        is ApiResult.Success -> {
-                            _uiState.update {
-                                it.copy(
-                                    product = selectedProduct,
-                                    lastViewProduct = lastViewedProductResult.data,
-                                )
-                            }
-                        }
-
-                        is ApiResult.Error -> {
-                            _uiState.update {
-                                it.copy(product = selectedProduct)
-                            }
-                            _event.emit(
-                                ProductDetailEvent.SnackbarEvent(
-                                    ProductDetailEvent.Message.NetworkError(lastViewedProductResult.code),
-                                ),
-                            )
-                        }
-
-                        is ApiResult.Exception -> {
-                            _uiState.update {
-                                it.copy(product = selectedProduct)
-                            }
-                            _event.emit(
-                                ProductDetailEvent.SnackbarEvent(
-                                    ProductDetailEvent.Message.ExceptionError(lastViewedProductResult.e.message),
-                                ),
-                            )
-                        }
+        productRepository.getProduct(selectedProductId).handleWithSnackBar { selectedProduct ->
+            if (lastViewedProductId != null) {
+                productRepository.getProduct(lastViewedProductId).handleWithSnackBar { lastViewedProduct ->
+                    _uiState.update {
+                        it.copy(
+                            product = selectedProduct,
+                            lastViewProduct = lastViewedProduct,
+                        )
                     }
-                } else {
+                }.onFailure { _, _ ->
                     _uiState.update { it.copy(product = selectedProduct) }
                 }
+            } else {
+                _uiState.update { it.copy(product = selectedProduct) }
             }
-
-            is ApiResult.Error ->
-                _event.emit(
-                    ProductDetailEvent.SnackbarEvent(
-                        ProductDetailEvent.Message.NetworkError(selectedProductResult.code),
-                    ),
-                )
-
-            is ApiResult.Exception ->
-                _event.emit(
-                    ProductDetailEvent.SnackbarEvent(
-                        ProductDetailEvent.Message.ExceptionError(selectedProductResult.e.message),
-                    ),
-                )
         }
     }
 

@@ -64,4 +64,4 @@
 11. [x] navController 의존 관계 제거 및 콜백 함수 추가
 12. [x] 스낵바 이벤트 처리를 컴포저블에서 수행
     - [x] strings.xml을 통해 스낵바에 표시할 문자열 관리
-13. [ ] viewModel에서 ApiResult 처리에 대한 중복되는 코드 함수화
+13. [x] viewModel에서 ApiResult 처리에 대한 중복되는 코드 함수화

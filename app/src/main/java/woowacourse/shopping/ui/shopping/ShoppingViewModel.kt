@@ -66,13 +66,10 @@ class ShoppingViewModel(
                 } else {
                     val recentlyViewedProducts = mutableListOf<Product>()
                     ids.forEach { id ->
-                        when (val result = productRepository.getProduct(id)) {
-                            is ApiResult.Success -> recentlyViewedProducts.add(result.data)
-                            is ApiResult.Error ->
-                                _event.emit(ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.RecentProductsLoadFailed))
-
-                            is ApiResult.Exception ->
-                                _event.emit(ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.RecentProductsLoadFailed))
+                        productRepository.getProduct(id).handleWithSnackBar(
+                            errorMessage = ShoppingEvent.Message.RecentProductsLoadFailed,
+                        ) {
+                            recentlyViewedProducts.add(it)
                         }
                     }
                     _uiState.update {
@@ -94,56 +91,24 @@ class ShoppingViewModel(
 
     suspend fun fetchProducts() {
         _uiState.update { it.copy(isLoading = true) }
-        when (val result = productRepository.getProducts(uiState.value.currentIndex, PAGE_SIZE)) {
-            is ApiResult.Success -> {
+        productRepository.getProducts(uiState.value.currentIndex, PAGE_SIZE)
+            .handleWithSnackBar { data ->
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        products = it.products + Products(result.data),
+                        products = it.products + Products(data),
                     )
                 }
+            }.onFailure { _, _ ->
+                _uiState.update { it.copy(isLoading = false) }
             }
-
-            is ApiResult.Error -> {
-                _uiState.update {
-                    it.copy(isLoading = false)
-                }
-                _event.emit(
-                    ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.NetworkError(result.code)),
-                )
-            }
-
-            is ApiResult.Exception -> {
-                _uiState.update {
-                    it.copy(isLoading = false)
-                }
-                _event.emit(
-                    ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.ExceptionError(result.e.message)),
-                )
-            }
-        }
     }
 
     suspend fun fetchCart() {
-        when (
-            val allCartItemResult =
-                cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
-        ) {
-            is ApiResult.Success -> _uiState.update { it.copy(cart = allCartItemResult.data) }
-            is ApiResult.Error ->
-                _event.emit(
-                    ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.NetworkError(allCartItemResult.code)),
-                )
-
-            is ApiResult.Exception ->
-                _event.emit(
-                    ShoppingEvent.ShowSnackBar(
-                        ShoppingEvent.Message.ExceptionError(
-                            allCartItemResult.e.message
-                        )
-                    ),
-                )
-        }
+        cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
+            .handleWithSnackBar { data ->
+                _uiState.update { it.copy(cart = data) }
+            }
     }
 
     fun addToCart(purchaseProduct: PurchaseProduct) {
@@ -155,21 +120,9 @@ class ShoppingViewModel(
             if (existingItem != null) {
                 updateCountWithID(existingItem.id, existingItem.count + 1)
             } else {
-                when (val result = cartRepository.insert(purchaseProduct)) {
-                    is ApiResult.Success -> {
-                        _event.emit(ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.CartAdded))
-                        fetchCart()
-                    }
-
-                    is ApiResult.Error ->
-                        _event.emit(
-                            ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.NetworkError(result.code)),
-                        )
-
-                    is ApiResult.Exception ->
-                        _event.emit(
-                            ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.ExceptionError(result.e.message)),
-                        )
+                cartRepository.insert(purchaseProduct).handleWithSnackBar {
+                    _event.emit(ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.CartAdded))
+                    fetchCart()
                 }
             }
         }
@@ -184,26 +137,15 @@ class ShoppingViewModel(
             if (target != null) {
                 val nextCount = target.count + updateAmount
                 if (nextCount >= 1) {
-                    when (val result = cartRepository.updateCount(target.id, nextCount)) {
-                        is ApiResult.Success -> {
-                            _event.emit(ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.QuantityUpdated))
-                            fetchCart()
-                        }
-
-                        is ApiResult.Error ->
-                            _event.emit(
-                                ShoppingEvent.ShowSnackBar(ShoppingEvent.Message.NetworkError(result.code)),
-                            )
-
-                        is ApiResult.Exception ->
+                    cartRepository.updateCount(target.id, nextCount)
+                        .handleWithSnackBar {
                             _event.emit(
                                 ShoppingEvent.ShowSnackBar(
-                                    ShoppingEvent.Message.ExceptionError(
-                                        result.e.message
-                                    )
-                                ),
+                                    ShoppingEvent.Message.QuantityUpdated
+                                )
                             )
-                    }
+                            fetchCart()
+                        }
                 }
             }
         }
@@ -314,8 +256,6 @@ class ShoppingViewModel(
 
     companion object {
         private const val PAGE_SIZE = 20
-        private const val ADD_TO_CART = "장바구니에 상품을 추가했습니다."
-        private const val UPDATE_AMOUNT = "상품의 수량을 변경했습니다."
     }
 }
 

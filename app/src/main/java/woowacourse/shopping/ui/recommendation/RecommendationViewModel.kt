@@ -52,76 +52,27 @@ class RecommendationViewModel(
         val latestId = recentlyViewedProductRepository.getLatestItem().first()
 
         if (latestId != null) {
-            when (val productResult = productRepository.getProduct(latestId)) {
-                is ApiResult.Success -> {
-                    val product = productResult.data
-                    val lastViewedCategory = product.category
+            productRepository.getProduct(latestId).handleWithSnackBar { product ->
+                val lastViewedCategory = product.category
 
-                    when (val categoryProductsResult = productRepository.getCategoryProducts(category = lastViewedCategory)) {
-                        is ApiResult.Success -> {
-                            val categoryProducts = categoryProductsResult.data
-                            val cartProductIds =
-                                _uiState.value.cart.purchaseProducts
-                                    .map { it.product.id }
-                            val recommendations = categoryProducts.filter { it.id !in cartProductIds }
+                productRepository.getCategoryProducts(category = lastViewedCategory)
+                    .handleWithSnackBar { categoryProducts ->
+                        val cartProductIds =
+                            _uiState.value.cart.purchaseProducts
+                                .map { it.product.id }
+                        val recommendations = categoryProducts.filter { it.id !in cartProductIds }
 
-                            _uiState.update { it.copy(recommendedProducts = Products(recommendations)) }
-                        }
-
-                        is ApiResult.Error ->
-                            _event.emit(
-                                RecommendationEvent.SnackbarEvent(
-                                    RecommendationEvent.Message.NetworkError(categoryProductsResult.code),
-                                ),
-                            )
-
-                        is ApiResult.Exception ->
-                            _event.emit(
-                                RecommendationEvent.SnackbarEvent(
-                                    RecommendationEvent.Message.ExceptionError(categoryProductsResult.e.message),
-                                ),
-                            )
+                        _uiState.update { it.copy(recommendedProducts = Products(recommendations)) }
                     }
-                }
-
-                is ApiResult.Error ->
-                    _event.emit(
-                        RecommendationEvent.SnackbarEvent(
-                            RecommendationEvent.Message.NetworkError(productResult.code),
-                        ),
-                    )
-
-                is ApiResult.Exception ->
-                    _event.emit(
-                        RecommendationEvent.SnackbarEvent(
-                            RecommendationEvent.Message.ExceptionError(productResult.e.message),
-                        ),
-                    )
             }
         }
     }
 
     suspend fun fetchCart() {
-        when (
-            val allCartItemResult =
-                cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
-        ) {
-            is ApiResult.Success -> _uiState.update { it.copy(cart = allCartItemResult.data) }
-
-            is ApiResult.Error ->
-                _event.emit(
-                    RecommendationEvent.SnackbarEvent(
-                        RecommendationEvent.Message.NetworkError(allCartItemResult.code),
-                    ),
-                )
-
-            is ApiResult.Exception ->
-                _event.emit(
-                    RecommendationEvent.SnackbarEvent(
-                        RecommendationEvent.Message.ExceptionError(allCartItemResult.e.message),
-                    ),
-                )
-        }
+        cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
+            .handleWithSnackBar { data ->
+                _uiState.update { it.copy(cart = data) }
+            }
     }
 
     fun fetchTotalPrice() {
@@ -141,8 +92,8 @@ class RecommendationViewModel(
                     it.product.id == purchaseProduct.product.id
                 }
             if (existingItem != null) {
-                when (val result = cartRepository.updateCount(existingItem.id, existingItem.count + 1)) {
-                    is ApiResult.Success -> {
+                cartRepository.updateCount(existingItem.id, existingItem.count + 1)
+                    .handleWithSnackBar {
                         fetchCart()
                         fetchTotalPrice()
                         _event.emit(
@@ -151,50 +102,19 @@ class RecommendationViewModel(
                             )
                         )
                     }
-
-                    is ApiResult.Error ->
-                        _event.emit(
-                            RecommendationEvent.SnackbarEvent(
-                                RecommendationEvent.Message.NetworkError(result.code),
-                            ),
-                        )
-
-                    is ApiResult.Exception ->
-                        _event.emit(
-                            RecommendationEvent.SnackbarEvent(
-                                RecommendationEvent.Message.ExceptionError(result.e.message),
-                            ),
-                        )
-                }
             } else {
-                when (val result = cartRepository.insert(purchaseProduct)) {
-                    is ApiResult.Success -> {
-                        fetchCart()
-                        val addedItem = _uiState.value.cart.findById(purchaseProduct.product.id)
-                        if (addedItem != null) {
-                            _uiState.update { it.copy(checkedIds = it.checkedIds + addedItem.id) }
-                            fetchTotalPrice()
-                            _event.emit(
-                                RecommendationEvent.SnackbarEvent(
-                                    RecommendationEvent.Message.CartAdded
-                                )
+                cartRepository.insert(purchaseProduct).handleWithSnackBar {
+                    fetchCart()
+                    val addedItem = _uiState.value.cart.findById(purchaseProduct.product.id)
+                    if (addedItem != null) {
+                        _uiState.update { it.copy(checkedIds = it.checkedIds + addedItem.id) }
+                        fetchTotalPrice()
+                        _event.emit(
+                            RecommendationEvent.SnackbarEvent(
+                                RecommendationEvent.Message.CartAdded
                             )
-                        }
+                        )
                     }
-
-                    is ApiResult.Error ->
-                        _event.emit(
-                            RecommendationEvent.SnackbarEvent(
-                                RecommendationEvent.Message.NetworkError(result.code),
-                            ),
-                        )
-
-                    is ApiResult.Exception ->
-                        _event.emit(
-                            RecommendationEvent.SnackbarEvent(
-                                RecommendationEvent.Message.ExceptionError(result.e.message),
-                            ),
-                        )
                 }
             }
         }
@@ -209,8 +129,8 @@ class RecommendationViewModel(
             if (target != null) {
                 val nextCount = target.count + updateAmount
                 if (nextCount >= 1) {
-                    when (val result = cartRepository.updateCount(target.id, nextCount)) {
-                        is ApiResult.Success -> {
+                    cartRepository.updateCount(target.id, nextCount)
+                        .handleWithSnackBar {
                             fetchCart()
                             fetchTotalPrice()
                             _event.emit(
@@ -219,21 +139,6 @@ class RecommendationViewModel(
                                 )
                             )
                         }
-
-                        is ApiResult.Error ->
-                            _event.emit(
-                                RecommendationEvent.SnackbarEvent(
-                                    RecommendationEvent.Message.NetworkError(result.code),
-                                ),
-                            )
-
-                        is ApiResult.Exception ->
-                            _event.emit(
-                                RecommendationEvent.SnackbarEvent(
-                                    RecommendationEvent.Message.ExceptionError(result.e.message),
-                                ),
-                            )
-                    }
                 }
             }
         }
@@ -243,8 +148,8 @@ class RecommendationViewModel(
         viewModelScope.launch {
             val target = _uiState.value.cart.findById(id)
             if (target != null) {
-                when (val result = cartRepository.deleteCartItem(target.id)) {
-                    is ApiResult.Success -> {
+                cartRepository.deleteCartItem(target.id)
+                    .handleWithSnackBar {
                         _uiState.update { it.copy(checkedIds = it.checkedIds - target.id) }
                         fetchCart()
                         fetchTotalPrice()
@@ -254,6 +159,9 @@ class RecommendationViewModel(
                             )
                         )
                     }
+            }
+        }
+    }
 
     private suspend fun <T> ApiResult<T>.handleWithSnackBar(
         errorMessage: RecommendationEvent.Message? = null,

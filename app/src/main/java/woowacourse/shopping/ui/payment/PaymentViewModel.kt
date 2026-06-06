@@ -50,37 +50,32 @@ class PaymentViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            val cartResult = cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
-            val couponResult = couponRepository.getCoupons()
             val checkedItemIds = outstandingProductRepository.getAll()
 
-            if (cartResult is ApiResult.Success && couponResult is ApiResult.Success) {
-                val checkedProducts = cartResult.data.purchaseProducts.filter { it.id in checkedItemIds }
-                val order =
-                    Order(
-                        purchaseProducts = checkedProducts,
-                        currentTime = LocalDateTime.now(),
-                        isRemoteArea = false,
-                    )
-                _uiState.update {
-                    it.copy(
-                        order = order,
-                        coupons = couponResult.data,
-                        isLoading = false,
-                    )
+            cartRepository.getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
+                .handleWithSnackBar { cartData ->
+                    couponRepository.getCoupons()
+                        .handleWithSnackBar { couponData ->
+                            val checkedProducts = cartData.purchaseProducts.filter { it.id in checkedItemIds }
+                            val order =
+                                Order(
+                                    purchaseProducts = checkedProducts,
+                                    currentTime = LocalDateTime.now(),
+                                    isRemoteArea = false,
+                                )
+                            _uiState.update {
+                                it.copy(
+                                    order = order,
+                                    coupons = couponData,
+                                    isLoading = false,
+                                )
+                            }
+                        }.onFailure { _, _ ->
+                            _uiState.update { it.copy(isLoading = false) }
+                        }
+                }.onFailure { _, _ ->
+                    _uiState.update { it.copy(isLoading = false) }
                 }
-            } else {
-                _uiState.update { it.copy(isLoading = false) }
-                val errorMsg =
-                    when {
-                        cartResult is ApiResult.Error -> PaymentEvent.Message.NetworkError(cartResult.code)
-                        cartResult is ApiResult.Exception -> PaymentEvent.Message.ExceptionError(cartResult.e.message)
-                        couponResult is ApiResult.Error -> PaymentEvent.Message.NetworkError(couponResult.code)
-                        couponResult is ApiResult.Exception -> PaymentEvent.Message.ExceptionError(couponResult.e.message)
-                        else -> PaymentEvent.Message.ExceptionError("Unknown Error")
-                    }
-                _event.emit(PaymentEvent.SnackbarEvent(errorMsg))
-            }
         }
     }
 
@@ -101,8 +96,8 @@ class PaymentViewModel(
             _uiState.update {
                 it.copy(isOrdering = true)
             }
-            when (val result = orderRepository.order(uiState.value.order)) {
-                is ApiResult.Success -> {
+            orderRepository.order(uiState.value.order)
+                .handleWithSnackBar {
                     alarmScheduler.cancel()
                     _uiState.update {
                         it.copy(isOrdering = false)
@@ -113,16 +108,7 @@ class PaymentViewModel(
                     _event.emit(
                         PaymentEvent.NavigateToShopping,
                     )
-                }
-                is ApiResult.Error -> {
-                    _uiState.update {
-                        it.copy(isOrdering = false)
-                    }
-                    _event.emit(
-                        PaymentEvent.SnackbarEvent(PaymentEvent.Message.NetworkError(result.code)),
-                    )
-                }
-                is ApiResult.Exception -> {
+                }.onFailure { _, _ ->
                     _uiState.update {
                         it.copy(isOrdering = false)
                     }
