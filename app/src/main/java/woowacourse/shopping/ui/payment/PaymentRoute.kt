@@ -9,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -23,6 +24,7 @@ fun PaymentRoute(
     modifier: Modifier = Modifier,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -30,10 +32,12 @@ fun PaymentRoute(
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.event.collect { event ->
                 when (event) {
-                    is PaymentEvent.SnackbarEvent ->
+                    is PaymentEvent.SnackbarEvent -> {
+                        val message = event.message.toDisplayString(context)
                         launch {
-                            snackbarHostState.showSnackbar(event.message)
+                            snackbarHostState.showSnackbar(message)
                         }
+                    }
                     is PaymentEvent.Order -> viewModel.processOrder()
                     is PaymentEvent.NavigateBack -> onBack()
                     is PaymentEvent.NavigateToShopping -> onNavigateToShopping()

@@ -69,15 +69,15 @@ class PaymentViewModel(
                 }
             } else {
                 _uiState.update { it.copy(isLoading = false) }
-                val errorMessage =
+                val errorMsg =
                     when {
-                        cartResult is ApiResult.Error -> "${ViewModelConst.NETWORK_ERROR_LABEL}${cartResult.code}"
-                        cartResult is ApiResult.Exception -> "${ViewModelConst.ERROR_LABEL}${cartResult.e.message}"
-                        couponResult is ApiResult.Error -> "${ViewModelConst.NETWORK_ERROR_LABEL}${couponResult.code}"
-                        couponResult is ApiResult.Exception -> "${ViewModelConst.ERROR_LABEL}${couponResult.e.message}"
-                        else -> "Unknown Error"
+                        cartResult is ApiResult.Error -> PaymentEvent.Message.NetworkError(cartResult.code)
+                        cartResult is ApiResult.Exception -> PaymentEvent.Message.ExceptionError(cartResult.e.message)
+                        couponResult is ApiResult.Error -> PaymentEvent.Message.NetworkError(couponResult.code)
+                        couponResult is ApiResult.Exception -> PaymentEvent.Message.ExceptionError(couponResult.e.message)
+                        else -> PaymentEvent.Message.ExceptionError("Unknown Error")
                     }
-                _event.emit(PaymentEvent.SnackbarEvent(errorMessage))
+                _event.emit(PaymentEvent.SnackbarEvent(errorMsg))
             }
         }
     }
@@ -106,7 +106,7 @@ class PaymentViewModel(
                         it.copy(isOrdering = false)
                     }
                     _event.emit(
-                        PaymentEvent.SnackbarEvent("주문이 완료되었습니다."),
+                        PaymentEvent.SnackbarEvent(PaymentEvent.Message.OrderSuccess),
                     )
                     _event.emit(
                         PaymentEvent.NavigateToShopping,
@@ -117,7 +117,7 @@ class PaymentViewModel(
                         it.copy(isOrdering = false)
                     }
                     _event.emit(
-                        PaymentEvent.SnackbarEvent("${ViewModelConst.NETWORK_ERROR_LABEL}${result.code}"),
+                        PaymentEvent.SnackbarEvent(PaymentEvent.Message.NetworkError(result.code)),
                     )
                 }
                 is ApiResult.Exception -> {
@@ -125,7 +125,7 @@ class PaymentViewModel(
                         it.copy(isOrdering = false)
                     }
                     _event.emit(
-                        PaymentEvent.SnackbarEvent("${ViewModelConst.ERROR_LABEL}${result.e.message}"),
+                        PaymentEvent.SnackbarEvent(PaymentEvent.Message.ExceptionError(result.e.message)),
                     )
                 }
             }
