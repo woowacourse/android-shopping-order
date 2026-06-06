@@ -62,6 +62,6 @@
 9. [x] DiscountType Enum 클래스 추가
 10. [x] 정확한 알림 사용 제거
 11. [x] navController 의존 관계 제거 및 콜백 함수 추가
-12. [ ] 스낵바 이벤트 처리를 컴포저블에서 수행
-    - [ ] strings.xml을 통해 스낵바에 표시할 문자열 관리
+12. [x] 스낵바 이벤트 처리를 컴포저블에서 수행
+    - [x] strings.xml을 통해 스낵바에 표시할 문자열 관리
 13. [ ] viewModel에서 ApiResult 처리에 대한 중복되는 코드 함수화
