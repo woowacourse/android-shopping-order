@@ -73,7 +73,7 @@ fun AppNavHost(
                 onClose = { navController.popBackStack() },
                 onOrderSucceeded = {
                     navController.navigate(ProductListRoute) {
-                        popUpTo<PaymentRoute> { inclusive = true }
+                        popUpTo<ProductListRoute> { inclusive = true }
                         launchSingleTop = true
                     }
                 },
