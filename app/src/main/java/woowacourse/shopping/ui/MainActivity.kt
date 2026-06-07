@@ -16,29 +16,27 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.ui.navigation.AppNavHost
 import woowacourse.shopping.ui.navigation.PaymentRoute
+import woowacourse.shopping.ui.navigation.ProductListRoute
 import woowacourse.shopping.ui.util.PaymentReminderContract.EXTRA_NAVIGATE_TO_PAYMENT
 import woowacourse.shopping.ui.util.PaymentReminderContract.EXTRA_SELECTED_ITEM_IDS
 
 class MainActivity : ComponentActivity() {
-    private var shouldNavigateToPayment by mutableStateOf(false)
-    private var paymentNavigationRequestId = 0
+    private var paymentNavigationRequestId by mutableIntStateOf(0)
     private var pendingSelectedItemIds: List<Int> = emptyList()
 
     private val requestPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { _: Boolean ->
-        }
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { _: Boolean -> }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,11 +44,7 @@ class MainActivity : ComponentActivity() {
         val appContainer = (application as ShoppingApplication).appContainer
 
         requestNotificationPermissionIfNeeded()
-        shouldNavigateToPayment = intent?.getBooleanExtra(EXTRA_NAVIGATE_TO_PAYMENT, false) ?: false
-        pendingSelectedItemIds = intent?.getIntArrayExtra(EXTRA_SELECTED_ITEM_IDS)?.toList() ?: emptyList()
-        if (shouldNavigateToPayment) {
-            paymentNavigationRequestId++
-        }
+        consumePaymentNavigationIntent(intent)
 
         setContent {
             val navController = rememberNavController()
@@ -76,28 +70,10 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(paymentNavigationRequestId) {
                 if (paymentNavigationRequestId <= 0) return@LaunchedEffect
 
-                val timeoutMillis = 5000L
-                val start = System.currentTimeMillis()
-                var navigated = false
-                while (!navigated && System.currentTimeMillis() - start < timeoutMillis) {
-                    try {
-                        val currentRoute = navController.currentBackStackEntry?.destination?.route
-
-                        if (currentRoute?.contains("Payment", ignoreCase = true) == true) {
-                            navigated = true
-                            break
-                        }
-                        navController.navigate(PaymentRoute(selectedItemIds = pendingSelectedItemIds))
-                        delay(100)
-
-                        val afterRoute = navController.currentBackStackEntry?.destination?.route
-                        if (afterRoute?.contains("Payment", ignoreCase = true) == true) navigated = true
-                    } catch (e: Exception) {
-                        delay(200)
-                    }
+                navController.navigate(PaymentRoute(selectedItemIds = pendingSelectedItemIds)) {
+                    popUpTo<ProductListRoute> { inclusive = false }
+                    launchSingleTop = true
                 }
-
-                shouldNavigateToPayment = false
             }
         }
     }
@@ -105,11 +81,20 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        shouldNavigateToPayment = intent.getBooleanExtra(EXTRA_NAVIGATE_TO_PAYMENT, false)
-        pendingSelectedItemIds = intent.getIntArrayExtra(EXTRA_SELECTED_ITEM_IDS)?.toList() ?: emptyList()
-        if (shouldNavigateToPayment) {
-            paymentNavigationRequestId++
-        }
+        consumePaymentNavigationIntent(intent)
+    }
+
+    private fun consumePaymentNavigationIntent(intent: Intent?) {
+        if (intent == null) return
+        val shouldNavigate = intent.getBooleanExtra(EXTRA_NAVIGATE_TO_PAYMENT, false)
+        if (!shouldNavigate) return
+
+        pendingSelectedItemIds =
+            intent.getIntArrayExtra(EXTRA_SELECTED_ITEM_IDS)?.toList() ?: emptyList()
+        paymentNavigationRequestId++
+
+        intent.removeExtra(EXTRA_NAVIGATE_TO_PAYMENT)
+        intent.removeExtra(EXTRA_SELECTED_ITEM_IDS)
     }
 
     private fun requestNotificationPermissionIfNeeded() {
