@@ -75,7 +75,7 @@ fun OrderScreen(
                     .weight(1f),
         )
         PaymentBottomBar(
-            orderViewModel::order,
+            orderViewModel::pay,
             canPay = uiState.canPay,
         )
     }

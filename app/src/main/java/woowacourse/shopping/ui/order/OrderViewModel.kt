@@ -20,9 +20,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.constant.Format.formatPrice
-import woowacourse.shopping.domain.cart.CartItems
 import woowacourse.shopping.domain.coupon.Coupon
 import woowacourse.shopping.domain.coupon.Coupons
+import woowacourse.shopping.domain.order.Order
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.domain.repository.NotificationRepository
@@ -43,31 +43,21 @@ class OrderViewModel(
 
     private val cartIds = route.cartIds
 
-    private val cartItems = MutableStateFlow(CartItems())
+    private val order = MutableStateFlow(Order())
     private val availableCoupons = MutableStateFlow(Coupons())
-
-    private val selectedCoupon = MutableStateFlow<Coupon?>(null)
     private val loadState = MutableStateFlow<LoadState>(LoadState.Initial)
 
     private val _events = MutableSharedFlow<OrderEvent>()
     val events: SharedFlow<OrderEvent> = _events.asSharedFlow()
 
     val uiState: StateFlow<OrderUiState> =
-        combine(
-            cartItems,
-            availableCoupons,
-            selectedCoupon,
-            loadState,
-        ) { cartItems, availableCoupons, selectedCoupon, loadState ->
-
-            val totalPrice = cartItems.totalPrice
-            val discountAmount = selectedCoupon?.discount(cartItems) ?: 0
+        combine(order, availableCoupons, loadState) { order, availableCoupons, loadState ->
             OrderUiState(
-                totalPrice = formatPrice(totalPrice),
-                discountAmount = formatPrice(discountAmount),
+                totalPrice = formatPrice(order.totalPrice),
+                discountAmount = formatPrice(order.discountAmount),
                 shippingFee = formatPrice(Coupon.SHIPPING_FEE),
-                amountToPay = formatPrice(totalPrice - discountAmount),
-                coupons = availableCoupons.toUiModel(selectedCoupon),
+                amountToPay = formatPrice(order.amountToPay),
+                coupons = availableCoupons.toUiModel(order.coupon),
                 canPay = loadState == LoadState.Success,
                 loadState = loadState,
             )
@@ -93,7 +83,7 @@ class OrderViewModel(
             runCatching {
                 val fetchedCartItems = cartRepository.getCartItemsByIds(cartIds)
                 val coupons = couponRepository.getCoupons()
-                cartItems.update { fetchedCartItems }
+                order.update { it.copy(items = fetchedCartItems) }
                 availableCoupons.update {
                     coupons.getApplicableCoupons(
                         LocalDateTime.now(),
@@ -108,13 +98,16 @@ class OrderViewModel(
     }
 
     fun selectCoupon(couponId: Int) {
-        selectedCoupon.update { availableCoupons.value.getCouponById(couponId) }
+        order.update { it.copy(coupon = availableCoupons.value.getCouponById(couponId)) }
     }
 
-    fun order() {
+    fun pay() {
         viewModelScope.launch {
             runCatching {
-                cartRepository.order(cartItems.value.values.map { it.id })
+                cartRepository.order(
+                    order.value.items.values
+                        .map { it.id },
+                )
                 alarmScheduler.cancel()
                 _events.emit(OrderEvent.OrderSuccess)
             }.onFailure { throwable ->
