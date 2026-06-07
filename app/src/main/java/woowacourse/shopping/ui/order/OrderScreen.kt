@@ -28,7 +28,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
@@ -39,13 +42,17 @@ fun OrderScreen(
     val orderViewModel: OrderViewModel = viewModel(factory = OrderViewModel.Factory)
     val uiState by orderViewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(orderViewModel.events) {
-        orderViewModel.events.collect { event ->
-            when (event) {
-                OrderEvent.OrderSuccess -> onOrderSuccess()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            orderViewModel.events.collect { event ->
+                when (event) {
+                    OrderEvent.OrderSuccess -> onOrderSuccess()
+                }
             }
         }
     }
+
     LaunchedEffect(Unit) {
         orderViewModel.onEnterScreen()
     }
