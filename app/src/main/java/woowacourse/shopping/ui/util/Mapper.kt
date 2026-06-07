@@ -11,6 +11,9 @@ import woowacourse.shopping.ui.cart.CartItemUiModel
 import woowacourse.shopping.ui.order.CouponUiModel
 import woowacourse.shopping.ui.order.DiscountConditionUiModel
 import woowacourse.shopping.ui.productList.ProductUiModel
+import java.time.format.DateTimeFormatter
+
+private val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd")
 
 fun List<CartItem>.toUiModel(selectedItems: Set<Int>): List<CartItemUiModel> =
     this.map { cartItem ->
@@ -49,7 +52,7 @@ fun Coupons.toUiModel(selectedCoupon: Coupon? = null): List<CouponUiModel> =
         CouponUiModel(
             id = coupon.id,
             description = coupon.description,
-            expiredDate = coupon.expirationDate.toString(),
+            expiredDate = coupon.expirationDate.format(DATE_FORMATTER),
             condition = coupon.toConditions(),
             isSelected = coupon == selectedCoupon,
         )
