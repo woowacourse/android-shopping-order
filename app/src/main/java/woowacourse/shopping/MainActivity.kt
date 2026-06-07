@@ -63,5 +63,6 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         cartIds.value = intent.getIntegerArrayListExtra(EXTRA_CART_IDS)
+        intent.removeExtra(EXTRA_CART_IDS)
     }
 }
