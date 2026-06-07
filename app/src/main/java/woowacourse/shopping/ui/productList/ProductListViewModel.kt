@@ -5,10 +5,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -28,6 +31,9 @@ class ProductListViewModel(
     private val recentProductsFlow = MutableStateFlow<List<Product>>(emptyList())
     private val cartFlow = MutableStateFlow(Cart())
 
+    private val _uiEvent = Channel<ProductListUiEvent>(Channel.BUFFERED)
+    val uiEvent: Flow<ProductListUiEvent> = _uiEvent.receiveAsFlow()
+
     val uiState: StateFlow<ProductListUiState> =
         combine(pagingState, cartFlow, recentProductsFlow) { paging, cart, recents ->
             paging.toUiState(cart, recents)
@@ -43,7 +49,11 @@ class ProductListViewModel(
         viewModelScope.launch {
             refreshCart()
         }
-
+        viewModelScope.launch {
+            cartRepository.cartEvents.collect {
+                refreshCart()
+            }
+        }
     }
 
     fun moreProducts() {
@@ -54,6 +64,7 @@ class ProductListViewModel(
         viewModelScope.launch {
             cartRepository.addProduct(product)
             refreshCart()
+            _uiEvent.trySend(ProductListUiEvent.ShowSnackbar("장바구니에 담았습니다"))
         }
     }
 
@@ -78,8 +89,8 @@ class ProductListViewModel(
     }
 
     private fun observeRecentProducts() {
-        viewModelScope.launch{
-            recentProductRepository.getRecentProducts().collect{
+        viewModelScope.launch {
+            recentProductRepository.getRecentProducts().collect {
                 recentProductsFlow.value = it
             }
         }
@@ -87,7 +98,7 @@ class ProductListViewModel(
 
     private suspend fun refreshCart() {
         val cartItems = cartRepository.getAllCartItems()
-        cartFlow.value = Cart(cartItems.items)
+        cartFlow.value = Cart(cartItems)
     }
 
     private fun loadNextPage() {

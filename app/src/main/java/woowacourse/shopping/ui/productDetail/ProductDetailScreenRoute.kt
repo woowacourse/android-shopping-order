@@ -1,0 +1,43 @@
+package woowacourse.shopping.ui.productDetail
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import woowacourse.shopping.di.AppContainer
+import woowacourse.shopping.domain.model.product.Product
+import woowacourse.shopping.ui.util.ObserveAsEvents
+
+@Composable
+fun ProductDetailScreenRoute(
+    appContainer: AppContainer,
+    showSnackbar: (String) -> Unit,
+    onCloseClick: () -> Unit,
+    onNavigateToCart: () -> Unit,
+    onLastViewedProductClick: (Product) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val viewModel: ProductDetailViewModel =
+        viewModel(
+            factory =
+                ProductDetailViewModel.factory(
+                    productRepository = appContainer.productRepository,
+                    cartRepository = appContainer.cartRepository,
+                    recentProductRepository = appContainer.recentProductRepository,
+                ),
+        )
+
+    ObserveAsEvents(flow = viewModel.uiEvent) { event ->
+        when (event) {
+            is ProductDetailUiEvent.ShowSnackbar -> showSnackbar(event.message)
+            ProductDetailUiEvent.AddedToCart -> onNavigateToCart()
+        }
+    }
+
+    ProductDetailScreen(
+        modifier = modifier,
+        viewModel = viewModel,
+        onCloseClick = onCloseClick,
+        onAddToCartClick = { viewModel.addToCart() },
+        onLastViewedProductClick = onLastViewedProductClick,
+    )
+}

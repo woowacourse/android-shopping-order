@@ -9,5 +9,11 @@ interface ProductRemoteDataSource {
         size: Int,
     ): ProductsResponseDto
 
+    suspend fun getCategoryProducts(
+        category: String?,
+        page: Int,
+        size: Int,
+    ): ProductsResponseDto
+
     suspend fun getProduct(id: Int): ProductResponseDto?
 }

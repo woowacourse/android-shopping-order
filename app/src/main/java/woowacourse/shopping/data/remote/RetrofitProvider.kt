@@ -7,12 +7,13 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import woowacourse.shopping.BuildConfig
 import woowacourse.shopping.data.remote.api.CartApi
+import woowacourse.shopping.data.remote.api.CouponApi
 import woowacourse.shopping.data.remote.api.OrderApi
 import woowacourse.shopping.data.remote.api.ProductApi
 import java.util.concurrent.TimeUnit
 import kotlin.getValue
-import woowacourse.shopping.BuildConfig
 
 object RetrofitProvider {
     private const val BASE_URL = BuildConfig.BASE_URL
@@ -65,5 +66,9 @@ object RetrofitProvider {
 
     val orderApi: OrderApi by lazy {
         retrofit.create(OrderApi::class.java)
+    }
+
+    val couponApi: CouponApi by lazy {
+        retrofit.create(CouponApi::class.java)
     }
 }

@@ -17,7 +17,7 @@ sealed class ProductException(
         val path: String,
     ) : ProductException("Resource not found at path: $path")
 
-    data object EmptyBody : ProductException(
+    object EmptyBody : ProductException(
         "Response body is empty",
     )
 }

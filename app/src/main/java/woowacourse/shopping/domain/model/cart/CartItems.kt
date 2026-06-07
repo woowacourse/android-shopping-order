@@ -2,9 +2,6 @@ package woowacourse.shopping.domain.model.cart
 
 class CartItems(
     val values: List<CartItem> = emptyList(),
-//    val isLast: Boolean = false,
-//    val isFirst: Boolean = true,
-//    val totalPages: Int = 1,
 ) {
     val totalQuantity: Int
         get() = values.sumOf { it.quantity.value }
@@ -59,6 +56,8 @@ class CartItems(
     }
 
     fun size(): Int = values.size
+
+    fun findByProductId(productId: Int): CartItem? = values.firstOrNull { it.product.id == productId }
 
     private fun findById(cartId: Int): CartItem? = values.firstOrNull { it.id == cartId }
 

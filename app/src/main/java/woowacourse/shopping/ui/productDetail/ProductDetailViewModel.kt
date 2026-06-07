@@ -1,17 +1,19 @@
 package woowacourse.shopping.ui.productDetail
 
-import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.toRoute
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import woowacourse.shopping.domain.model.cart.Cart
 import woowacourse.shopping.domain.model.cart.Quantity
@@ -19,26 +21,36 @@ import woowacourse.shopping.domain.model.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.ui.navigation.ProductDetailRoute
 
 class ProductDetailViewModel(
-    val productId: Int,
-    private val openedFromLastViewed: Boolean,
+    savedStateHandle: SavedStateHandle,
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel() {
+    private val route: ProductDetailRoute = savedStateHandle.toRoute<ProductDetailRoute>()
+    val productId: Int = route.productId
+    private val openedFromLastViewed: Boolean = false
     private val _uiState = MutableStateFlow<ProductDetailUiState>(ProductDetailUiState.Loading)
     private val cartFlow = MutableStateFlow(Cart())
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
+    private val _uiEvent = Channel<ProductDetailUiEvent>(Channel.BUFFERED)
+    val uiEvent: Flow<ProductDetailUiEvent> = _uiEvent.receiveAsFlow()
 
     init {
         loadProduct()
         loadCart()
+        viewModelScope.launch {
+            cartRepository.cartEvents.collect {
+                loadCart()
+            }
+        }
     }
 
-    private fun loadCart(){
-        viewModelScope.launch{
-            cartFlow.value = Cart(cartRepository.getAllCartItems().items)
+    private fun loadCart() {
+        viewModelScope.launch {
+            cartFlow.value = Cart(cartRepository.getAllCartItems())
         }
     }
 
@@ -88,18 +100,18 @@ class ProductDetailViewModel(
         viewModelScope.launch {
             val cart = cartFlow.value
             val existing = cart.cartItems.values.find { it.product.id == current.product.id }
-            if (existing != null){
+            if (existing != null) {
                 cartRepository.increase(existing.id, Quantity(existing.quantity.value + current.selectedQuantity))
-            }else{
+            } else {
                 cartRepository.addProduct(current.product, Quantity(current.selectedQuantity))
             }
+            _uiEvent.trySend(ProductDetailUiEvent.ShowSnackbar("장바구니에 담았습니다"))
+            _uiEvent.trySend(ProductDetailUiEvent.AddedToCart)
         }
     }
 
     companion object {
         fun factory(
-            productId: Int,
-            openedFromLastViewed: Boolean,
             productRepository: ProductRepository,
             cartRepository: CartRepository,
             recentProductRepository: RecentProductRepository,
@@ -107,8 +119,7 @@ class ProductDetailViewModel(
             viewModelFactory {
                 initializer {
                     ProductDetailViewModel(
-                        productId = productId,
-                        openedFromLastViewed = openedFromLastViewed,
+                        savedStateHandle = createSavedStateHandle(),
                         productRepository = productRepository,
                         cartRepository = cartRepository,
                         recentProductRepository = recentProductRepository,

@@ -36,7 +36,7 @@ android {
         buildConfigField(
             "String",
             "BASE_URL",
-            "\"${envProperties.getProperty("BASE_URL")}\""
+            "\"${envProperties.getProperty("BASE_URL")}\"",
         )
 
         buildConfigField(
@@ -53,13 +53,6 @@ android {
     }
 
     buildTypes {
-        debug {
-            buildConfigField(
-                "String",
-                "BASE_URL",
-                "\"http://127.0.0.1:8080/\"",
-            )
-        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -113,6 +106,9 @@ dependencies {
 
     // serialization
     implementation(libs.kotlinx.serialization.json)
+
+    // navigation
+    implementation(libs.navigation.compose)
 
     debugImplementation(libs.okhttp.mockwebserver)
     testImplementation("org.assertj:assertj-core:3.27.3")
