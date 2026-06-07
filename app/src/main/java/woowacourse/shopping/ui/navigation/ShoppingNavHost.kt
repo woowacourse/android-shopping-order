@@ -14,7 +14,7 @@ fun ShoppingNavHost(
 
     LaunchedEffect(startCartIds) {
         if (startCartIds != null) {
-            navController.navigate(OrderRoute.Order(startCartIds))
+            navController.navigate(OrderRoute.Order(startCartIds, fromNotification = true))
             onCartIdsConsumed()
         }
     }

@@ -72,7 +72,7 @@ class OrderViewModel(
     }
 
     fun onEnterScreen() {
-        if (notificationRepository.isNotificationEnabled()) {
+        if (!route.fromNotification && notificationRepository.isNotificationEnabled()) {
             alarmScheduler.schedule(cartIds)
         }
     }

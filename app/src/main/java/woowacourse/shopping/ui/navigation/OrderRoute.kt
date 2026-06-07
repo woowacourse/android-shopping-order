@@ -10,6 +10,7 @@ sealed interface OrderRoute {
     @Serializable
     data class Order(
         val cartIds: List<Int>,
+        val fromNotification: Boolean = false,
     ) : OrderRoute
 }
 
