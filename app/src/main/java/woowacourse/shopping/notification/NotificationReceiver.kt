@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import woowacourse.shopping.MainActivity
 import woowacourse.shopping.R
+import woowacourse.shopping.notification.NotificationConstants.EXTRA_CART_IDS
 import woowacourse.shopping.notification.NotificationConstants.ORDER_CHANNEL_ID
 import woowacourse.shopping.notification.NotificationConstants.ORDER_NOTIFICATION_ID
 
@@ -21,11 +22,11 @@ class NotificationReceiver : BroadcastReceiver() {
         intent: Intent?,
     ) {
         context ?: return
-        val cartIds = intent?.getIntegerArrayListExtra("cartIds") ?: return
+        val cartIds = intent?.getIntegerArrayListExtra(EXTRA_CART_IDS) ?: return
 
         val activityIntent =
             Intent(context, MainActivity::class.java).apply {
-                putIntegerArrayListExtra("cartIds", cartIds)
+                putIntegerArrayListExtra(EXTRA_CART_IDS, cartIds)
 
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                     Intent.FLAG_ACTIVITY_CLEAR_TOP or

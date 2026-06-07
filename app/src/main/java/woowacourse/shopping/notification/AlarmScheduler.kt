@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.SystemClock
+import woowacourse.shopping.notification.NotificationConstants.EXTRA_CART_IDS
 import woowacourse.shopping.notification.NotificationConstants.ORDER_ALARM_REQUEST_CODE
 import woowacourse.shopping.notification.NotificationConstants.ORDER_REMINDER_INTERVAL_MS
 
@@ -17,7 +18,7 @@ class AlarmScheduler(
     fun schedule(cartIds: List<Int>) {
         val intent =
             Intent(context, NotificationReceiver::class.java).apply {
-                putIntegerArrayListExtra("cartIds", ArrayList(cartIds))
+                putIntegerArrayListExtra(EXTRA_CART_IDS, ArrayList(cartIds))
             }
 
         val pendingIntent =

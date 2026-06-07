@@ -11,6 +11,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
+import woowacourse.shopping.notification.NotificationConstants.EXTRA_CART_IDS
 import woowacourse.shopping.ui.navigation.ShoppingNavHost
 
 class MainActivity : ComponentActivity() {
@@ -29,8 +30,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        cartIds.value = intent.getIntegerArrayListExtra("cartIds")
-        intent.removeExtra("cartIds")
+        cartIds.value = intent.getIntegerArrayListExtra(EXTRA_CART_IDS)
+        intent.removeExtra(EXTRA_CART_IDS)
 
         requestNotificationPermission()
         setContent {
@@ -61,6 +62,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        cartIds.value = intent.getIntegerArrayListExtra("cartIds")
+        cartIds.value = intent.getIntegerArrayListExtra(EXTRA_CART_IDS)
     }
 }
