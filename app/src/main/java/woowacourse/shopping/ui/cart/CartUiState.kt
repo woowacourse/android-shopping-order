@@ -10,6 +10,7 @@ data class CartUiState(
     val isAllSelected: Boolean = false,
     val totalPrice: Int = 0,
     val totalCount: Int = 0,
+    val canOrder: Boolean = false,
     val showPageNavigator: Boolean = false,
     val loadState: LoadState = LoadState.Initial,
 )

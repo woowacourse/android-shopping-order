@@ -68,6 +68,7 @@ class OrderViewModel(
                 shippingFee = formatPrice(Coupon.SHIPPING_FEE),
                 amountToPay = formatPrice(totalPrice - discountAmount),
                 coupons = availableCoupons.toUiModel(selectedCoupon),
+                canPay = loadState == LoadState.Success,
                 loadState = loadState,
             )
         }.stateIn(

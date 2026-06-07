@@ -45,6 +45,7 @@ class CartViewModel(
                 isAllSelected = selectedItems.containsAll(cartItems.values.map { it.id }),
                 totalPrice = cartItems.calculatePrice(selectedItems),
                 totalCount = cartItems.calculateQuantity(selectedItems),
+                canOrder = selectedItems.isNotEmpty(),
                 showPageNavigator = cartItems.size() > PAGE_SIZE,
                 loadState = loadState,
             )

@@ -1,15 +1,15 @@
 package woowacourse.shopping.ui.cart
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Text
@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,6 +33,7 @@ fun CartScreenBottomBar(
     onClickSelectAll: () -> Unit,
     onClickOrder: () -> Unit,
     modifier: Modifier = Modifier,
+    canOrder: Boolean = true,
 ) {
     Row(
         modifier =
@@ -75,14 +77,18 @@ fun CartScreenBottomBar(
                 fontWeight = FontWeight.W700,
             )
         }
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxHeight()
-                    .background(Color(0xff04C09E))
-                    .padding(horizontal = 16.dp)
-                    .clickable { onClickOrder() },
-            contentAlignment = Alignment.Center,
+        Button(
+            onClick = { onClickOrder() },
+            modifier = Modifier.fillMaxHeight(),
+            enabled = canOrder,
+            shape = RectangleShape,
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = Color(0xff04C09E),
+                    disabledContainerColor = Color(0xff555555),
+                    disabledContentColor = Color.White,
+                    contentColor = Color.White,
+                ),
         ) {
             Text(
                 text = "주문하기($totalCount)",

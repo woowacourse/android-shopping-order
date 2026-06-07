@@ -90,6 +90,7 @@ fun CartScreen(
             isAllSelected = uiState.isAllSelected,
             onClickSelectAll = viewModel::toggleAllSelection,
             onClickOrder = onNavigateToRecommend,
+            canOrder = uiState.canOrder,
         )
     }
 }
