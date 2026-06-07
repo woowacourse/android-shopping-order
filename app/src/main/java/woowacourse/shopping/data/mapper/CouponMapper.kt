@@ -3,24 +3,23 @@ package woowacourse.shopping.data.mapper
 import woowacourse.shopping.data.remote.dto.CouponResponseDto
 import woowacourse.shopping.domain.model.coupon.Coupon
 import woowacourse.shopping.domain.model.coupon.CouponType
-import woowacourse.shopping.domain.model.coupon.CouponTypes
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 object CouponMapper {
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-    private const val TAG = "CouponMapper"
 
     fun toDomain(dto: CouponResponseDto): Coupon {
-        val normalizedDiscountType = dto.discountType.trim().lowercase()
-        val couponType = determineCouponType(normalizedDiscountType)
+        val couponType = CouponType.fromApiCode(dto.discountType)
 
         val rate =
             when {
-                normalizedDiscountType == "percentage" && dto.discount != null -> dto.discount / 100.0
+                couponType == CouponType.MIRACLESALE && dto.discount != null -> dto.discount / 100.0
                 else -> null
             }
+
+        val amount = if (couponType == CouponType.FIXED5000) dto.discount else null
 
         val expireAt =
             dto.expirationDate.let {
@@ -34,7 +33,7 @@ object CouponMapper {
             code = dto.code,
             description = dto.description,
             type = couponType,
-            amount = if (normalizedDiscountType == "fixed") dto.discount else null,
+            amount = amount,
             rate = rate,
             minOrderAmount = dto.minimumAmount,
             expireAt = expireAt,
@@ -44,13 +43,4 @@ object CouponMapper {
             availableEndTime = availableEndTime,
         )
     }
-
-    private fun determineCouponType(normalizedDiscountType: String): CouponType =
-        when (normalizedDiscountType) {
-            "fixed" -> CouponTypes.FIXED5000
-            "percentage" -> CouponTypes.MIRACLESALE
-            "buyxgety" -> CouponTypes.BOGO
-            "freeshipping" -> CouponTypes.FREESHIPPING
-            else -> CouponTypes.UNKNOWN
-        }
 }

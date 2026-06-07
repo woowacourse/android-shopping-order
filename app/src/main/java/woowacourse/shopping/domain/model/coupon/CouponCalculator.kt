@@ -35,11 +35,11 @@ object CouponCalculator {
         }
 
         return when (coupon.type) {
-            CouponTypes.FIXED5000 -> applyFixed(coupon, subtotal, baseShipping)
-            CouponTypes.BOGO -> applyBogo(coupon, cartItems, baseShipping)
-            CouponTypes.FREESHIPPING -> applyFreeShipping(coupon, subtotal, baseShipping)
-            CouponTypes.MIRACLESALE -> applyPercent(coupon, subtotal, now, baseShipping)
-            else -> CouponApplyResult(applied = false, discount = 0, shippingFee = baseShipping)
+            CouponType.FIXED5000 -> applyFixed(coupon, subtotal, baseShipping)
+            CouponType.BOGO -> applyBogo(coupon, cartItems, baseShipping)
+            CouponType.FREESHIPPING -> applyFreeShipping(coupon, subtotal, baseShipping)
+            CouponType.MIRACLESALE -> applyPercent(coupon, subtotal, now, baseShipping)
+            CouponType.UNKNOWN -> CouponApplyResult(applied = false, discount = 0, shippingFee = baseShipping)
         }
     }
 
