@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.payment
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -21,14 +22,18 @@ import woowacourse.shopping.domain.model.coupon.CouponCalculator
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.CouponRepository
 import woowacourse.shopping.ui.navigation.PaymentRoute
+import woowacourse.shopping.ui.util.NotificationHelper
+import woowacourse.shopping.ui.util.PaymentReminderScheduler
 
 class PaymentViewModel(
     savedStateHandle: SavedStateHandle,
+    private val applicationContext: Context,
     private val cartRepository: CartRepository,
     private val couponRepository: CouponRepository,
 ) : ViewModel() {
     private val route: PaymentRoute = savedStateHandle.toRoute<PaymentRoute>()
-    private val selectedItemIds: Set<Int> = route.selectedItemIds.toSet()
+    private val selectedItemIds: List<Int> = route.selectedItemIds
+    private val selectedItemIdsSet: Set<Int> = selectedItemIds.toSet()
     private val _uiState = MutableStateFlow<PaymentUiState>(PaymentUiState.Loading)
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
 
@@ -46,6 +51,14 @@ class PaymentViewModel(
         }
     }
 
+    private fun scheduleReminder() {
+        PaymentReminderScheduler.cancel(applicationContext)
+        PaymentReminderScheduler.schedule(
+            context = applicationContext,
+            selectedItemIds = selectedItemIds,
+        )
+    }
+
     fun refresh() {
         viewModelScope.launch {
             val previousSelectedCoupon = (_uiState.value as? PaymentUiState.Success)?.selectedCoupon
@@ -53,10 +66,10 @@ class PaymentViewModel(
             val allCart = cartRepository.getAllCartItems()
 
             val selectedCart =
-                if (selectedItemIds.isEmpty()) {
+                if (selectedItemIdsSet.isEmpty()) {
                     allCart
                 } else {
-                    CartItems(allCart.values.filter { it.id in selectedItemIds })
+                    CartItems(allCart.values.filter { it.id in selectedItemIdsSet })
                 }
 
             availableCoupons = couponRepository.getAvailableCoupons()
@@ -94,9 +107,15 @@ class PaymentViewModel(
                 return@launch
             }
             cartRepository.order(selectedIds)
+            cancelReminder()
             _uiEvent.trySend(PaymentUiEvent.ShowMessage("주문이 완료되었습니다"))
             _uiEvent.trySend(PaymentUiEvent.OrderSucceeded)
         }
+    }
+
+    private fun cancelReminder() {
+        PaymentReminderScheduler.cancel(applicationContext)
+        NotificationHelper.cancel(applicationContext)
     }
 
     private fun buildSuccessState(
@@ -123,6 +142,7 @@ class PaymentViewModel(
 
     companion object {
         fun factory(
+            applicationContext: Context,
             cartRepository: CartRepository,
             couponRepository: CouponRepository,
         ): ViewModelProvider.Factory =
@@ -130,6 +150,7 @@ class PaymentViewModel(
                 initializer {
                     PaymentViewModel(
                         savedStateHandle = createSavedStateHandle(),
+                        applicationContext = applicationContext,
                         cartRepository = cartRepository,
                         couponRepository = couponRepository,
                     )

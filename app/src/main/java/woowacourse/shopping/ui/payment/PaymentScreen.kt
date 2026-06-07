@@ -33,12 +33,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,36 +51,21 @@ import woowacourse.shopping.constant.ShoppingColor.PAYMENT_DIVIDER_COLOR
 import woowacourse.shopping.constant.ShoppingColor.PAYMENT_SUMMARY_BACKGROUND_COLOR
 import woowacourse.shopping.constant.ShoppingColor.PAYMENT_TITLE_GRAY
 import woowacourse.shopping.domain.model.coupon.Coupon
-import woowacourse.shopping.ui.util.NotificationHelper
-import woowacourse.shopping.ui.util.PaymentReminderScheduler
 
 @Composable
 fun PaymentScreen(
     viewModel: PaymentViewModel,
     modifier: Modifier = Modifier,
-    selectedItemIds: List<Int> = emptyList(),
     onClose: () -> Unit = {},
     onPayClick: () -> Unit = viewModel::onClickPay,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-
-    LaunchedEffect(Unit) {
-        PaymentReminderScheduler.cancel(context)
-        PaymentReminderScheduler.schedule(context = context, selectedItemIds = selectedItemIds)
-    }
-
-    val wrappedOnPayClick: () -> Unit = {
-        PaymentReminderScheduler.cancel(context)
-        NotificationHelper.cancel(context)
-        onPayClick()
-    }
     PaymentContent(
         uiState = uiState,
         modifier = modifier,
         onClose = onClose,
         onCouponClick = viewModel::selectCoupon,
-        onPayClick = wrappedOnPayClick,
+        onPayClick = onPayClick,
     )
 }
 

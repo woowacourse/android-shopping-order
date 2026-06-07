@@ -5,7 +5,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
 import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.ui.cart.CartScreenRoute
 import woowacourse.shopping.ui.common.SettingsScreen
@@ -64,10 +63,8 @@ fun AppNavHost(
             SettingsScreen(onBack = { navController.popBackStack() })
         }
 
-        composable<PaymentRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<PaymentRoute>()
+        composable<PaymentRoute> {
             PaymentScreenRoute(
-                selectedItemIds = route.selectedItemIds,
                 appContainer = appContainer,
                 showSnackbar = showSnackbar,
                 onClose = { navController.popBackStack() },

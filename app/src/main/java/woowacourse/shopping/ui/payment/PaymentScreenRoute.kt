@@ -2,23 +2,25 @@ package woowacourse.shopping.ui.payment
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import woowacourse.shopping.di.AppContainer
 import woowacourse.shopping.ui.util.ObserveAsEvents
 
 @Composable
 fun PaymentScreenRoute(
-    selectedItemIds: List<Int>,
     appContainer: AppContainer,
     showSnackbar: (String) -> Unit,
     onClose: () -> Unit,
     onOrderSucceeded: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val applicationContext = LocalContext.current.applicationContext
     val viewModel: PaymentViewModel =
         viewModel(
             factory =
                 PaymentViewModel.factory(
+                    applicationContext = applicationContext,
                     cartRepository = appContainer.cartRepository,
                     couponRepository = appContainer.couponRepository,
                 ),
@@ -34,7 +36,6 @@ fun PaymentScreenRoute(
     PaymentScreen(
         viewModel = viewModel,
         modifier = modifier,
-        selectedItemIds = selectedItemIds,
         onClose = onClose,
         onPayClick = viewModel::onClickPay,
     )
