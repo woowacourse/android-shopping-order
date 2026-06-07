@@ -1,5 +1,6 @@
 package woowacourse.shopping.ui.order
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -82,8 +83,14 @@ class OrderViewModel(
         viewModelScope.launch {
             runCatching {
                 val fetchedCartItems = cartRepository.getCartItemsByIds(cartIds)
-                val coupons = couponRepository.getCoupons()
                 order.update { it.copy(items = fetchedCartItems) }
+
+                val coupons =
+                    runCatching {
+                        couponRepository.getCoupons()
+                    }.onFailure {
+                        Log.e("OrderViewModel", "쿠폰 로드 실패: ${it.message}")
+                    }.getOrDefault(Coupons())
                 availableCoupons.update {
                     coupons.getApplicableCoupons(
                         LocalDateTime.now(),
