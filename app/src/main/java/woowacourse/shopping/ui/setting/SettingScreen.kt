@@ -64,7 +64,7 @@ fun SettingScreen(onNavigateBack: () -> Unit) {
                 .fillMaxSize()
                 .systemBarsPadding(),
     ) {
-        PaymentTopAppBar(onNavigateBack = onNavigateBack)
+        SettingTopAppbar(onNavigateBack = onNavigateBack)
         SettingScreenContent(
             notificationEnabled = notificationEnabled,
             onToggleNotification = {
@@ -127,7 +127,7 @@ fun SettingScreenContent(
 }
 
 @Composable
-private fun PaymentTopAppBar(onNavigateBack: () -> Unit) {
+private fun SettingTopAppbar(onNavigateBack: () -> Unit) {
     Row(
         modifier =
             Modifier
@@ -147,7 +147,7 @@ private fun PaymentTopAppBar(onNavigateBack: () -> Unit) {
             tint = Color.White,
         )
         Text(
-            text = "결제하기",
+            text = "설정",
             color = Color.White,
             fontSize = 20.sp,
             fontWeight = FontWeight.W500,
