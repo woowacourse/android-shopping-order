@@ -69,8 +69,7 @@ fun PaymentScreen(
 
     LaunchedEffect(Unit) {
         PaymentReminderScheduler.cancel(context)
-        // PaymentReminderScheduler.schedule(context, 5 * 60 * 1000L, selectedItemIds)
-        PaymentReminderScheduler.schedule(context, 10 * 1000L, selectedItemIds)
+        PaymentReminderScheduler.schedule(context = context, selectedItemIds = selectedItemIds)
     }
 
     val wrappedOnPayClick: () -> Unit = {

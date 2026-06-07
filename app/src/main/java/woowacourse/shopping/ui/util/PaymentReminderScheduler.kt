@@ -7,9 +7,11 @@ import android.content.Intent
 import android.os.Build
 import woowacourse.shopping.ui.util.PaymentReminderContract.ACTION_PAYMENT_REMINDER
 import woowacourse.shopping.ui.util.PaymentReminderContract.EXTRA_SELECTED_ITEM_IDS
+import kotlin.time.Duration.Companion.minutes
 
 object PaymentReminderScheduler {
     private const val REMINDER_REQUEST_CODE = 71025
+    val DEFAULT_REMINDER_DELAY_MS: Long = 5.minutes.inWholeMilliseconds
 
     private fun makePendingIntent(
         context: Context,
@@ -31,7 +33,7 @@ object PaymentReminderScheduler {
 
     fun schedule(
         context: Context,
-        delayMillis: Long = 5 * 60 * 1000L,
+        delayMillis: Long = DEFAULT_REMINDER_DELAY_MS,
         selectedItemIds: List<Int> = emptyList(),
     ) {
         if (!NotificationSettings.isNotificationEnabled(context)) return
