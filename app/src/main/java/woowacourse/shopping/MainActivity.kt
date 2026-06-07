@@ -30,6 +30,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         cartIds.value = intent.getIntegerArrayListExtra("cartIds")
+        intent.removeExtra("cartIds")
+
         requestNotificationPermission()
         setContent {
             ShoppingNavHost(
