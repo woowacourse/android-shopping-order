@@ -22,4 +22,22 @@
     <string name="title_cart">Cart</string>
     <string name="label_recommendation_title">이런 상품은 어떠세요?</string>
     <string name="label_recommendation_description">* 최근 본 상품 기반으로 좋아하실 것 같은 상품들을 추천해드려요.</string>
+    <string name="title_payment">결제하기</string>
+    <string name="label_expiry_date">만료일: %s</string>
+    <string name="label_min_order_amount">최소 주문 금액: %s</string>
+    <string name="label_available_time">사용 가능 시간: %s~%s</string>
+    <string name="label_applicable_coupons">적용 가능한 쿠폰</string>
+    <string name="label_coupon_limit_info">* 쿠폰은 1개만 적용 가능합니다.</string>
+    <string name="label_order_amount">주문 금액</string>
+    <string name="label_coupon_discount">쿠폰 할인 금액</string>
+    <string name="label_shipping_fee">배송비</string>
+    <string name="label_total_payment_amount">총 결제 금액</string>
+    <string name="cb_notification_icon"> 알람 아이콘 </string>
+    <string name="msg_cart_added">장바구니에 추가되었습니다</string>
+    <string name="msg_quantity_updated">상품 수량을 변경했습니다</string>
+    <string name="msg_recent_products_load_failed">최근 본 상품을 불러오는데 실패했습니다</string>
+    <string name="msg_network_error">네트워크 오류가 발생했습니다</string>
+    <string name="msg_generic_error">오류가 발생했습니다</string>
+    <string name="msg_cart_removed">상품을 제거했습니다</string>
+    <string name="msg_order_success">주문을 완료했습니다</string>
 </resources>

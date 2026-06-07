@@ -1,0 +1,177 @@
+package woowacourse.shopping.ui.payment
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import woowacourse.shopping.data.local.repository.OutstandingProductRepository
+import woowacourse.shopping.data.local.userdata.UserDataSource
+import woowacourse.shopping.data.remote.server.apiresult.ApiResult
+import woowacourse.shopping.data.remote.server.apiresult.onFailure
+import woowacourse.shopping.data.remote.server.apiresult.onSuccess
+import woowacourse.shopping.data.remote.server.repository.CartRepository
+import woowacourse.shopping.data.remote.server.repository.CouponRepository
+import woowacourse.shopping.data.remote.server.repository.OrderRepository
+import woowacourse.shopping.domain.Order
+import woowacourse.shopping.domain.coupon.Coupon
+import woowacourse.shopping.domain.coupon.Discount
+import woowacourse.shopping.ui.ViewModelConst
+import woowacourse.shopping.ui.alarm.AlarmScheduler
+import java.time.LocalDateTime
+
+class PaymentViewModel(
+    private val cartRepository: CartRepository,
+    private val orderRepository: OrderRepository,
+    private val couponRepository: CouponRepository,
+    private val outstandingProductRepository: OutstandingProductRepository,
+    private val userDataSource: UserDataSource,
+    private val alarmScheduler: AlarmScheduler,
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(PaymentUiState())
+    val uiState = _uiState.asStateFlow()
+
+    private val _event = MutableSharedFlow<PaymentEvent>()
+    val event = _event.asSharedFlow()
+
+    init {
+        alarmScheduler.cancel()
+        if (userDataSource.isNotificationEnable()) {
+            alarmScheduler.createAlarmSchedule(ALARM_DELAY)
+        }
+        fetchInitialData()
+    }
+
+    private fun fetchInitialData() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+
+            val checkedItemIds = outstandingProductRepository.getAll()
+
+            cartRepository
+                .getPagedCart(0, ViewModelConst.CART_MAX_COUNT)
+                .handleWithSnackBar { cartData ->
+                    couponRepository
+                        .getCoupons()
+                        .handleWithSnackBar { couponData ->
+                            val checkedProducts = cartData.purchaseProducts.filter { it.id in checkedItemIds }
+                            val order =
+                                Order(
+                                    purchaseProducts = checkedProducts,
+                                    currentTime = LocalDateTime.now(),
+                                    isRemoteArea = false,
+                                )
+                            _uiState.update {
+                                it.copy(
+                                    order = order,
+                                    coupons = couponData,
+                                    isLoading = false,
+                                )
+                            }
+                        }.onFailure { _, _ ->
+                            _uiState.update { it.copy(isLoading = false) }
+                        }
+                }.onFailure { _, _ ->
+                    _uiState.update { it.copy(isLoading = false) }
+                }
+        }
+    }
+
+    fun selectCoupon(coupon: Coupon?) {
+        if (coupon != _uiState.value.selectedCoupon) {
+            _uiState.update { state ->
+                val discount = coupon?.calculateDiscount(state.order) ?: Discount()
+                state.copy(
+                    selectedCoupon = coupon,
+                    discount = discount,
+                )
+            }
+        }
+    }
+
+    fun processOrder() {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(isOrdering = true)
+            }
+            orderRepository
+                .order(uiState.value.order)
+                .handleWithSnackBar {
+                    alarmScheduler.cancel()
+                    _uiState.update {
+                        it.copy(isOrdering = false)
+                    }
+                    _event.emit(
+                        PaymentEvent.SnackbarEvent(PaymentEvent.Message.OrderSuccess),
+                    )
+                    _event.emit(
+                        PaymentEvent.NavigateToShopping,
+                    )
+                }.onFailure { _, _ ->
+                    _uiState.update {
+                        it.copy(isOrdering = false)
+                    }
+                }
+        }
+    }
+
+    private suspend fun <T> ApiResult<T>.handleWithSnackBar(
+        errorMessage: PaymentEvent.Message? = null,
+        onSuccessAction: suspend (T) -> Unit,
+    ): ApiResult<T> =
+        this
+            .onSuccess { onSuccessAction(it) }
+            .onFailure { code, msg ->
+                val message =
+                    errorMessage ?: if (code != null) {
+                        PaymentEvent.Message.NetworkError(code)
+                    } else {
+                        PaymentEvent.Message.ExceptionError(msg)
+                    }
+                _event.emit(PaymentEvent.SnackbarEvent(message))
+            }
+
+    fun orderTrigger() {
+        viewModelScope.launch {
+            _event.emit(PaymentEvent.Order)
+        }
+    }
+
+    fun navigateBack() {
+        viewModelScope.launch {
+            _event.emit(PaymentEvent.NavigateBack)
+        }
+    }
+
+    companion object {
+        private const val ALARM_DELAY = 10000L
+    }
+}
+
+class PaymentViewModelFactory(
+    private val cartRepository: CartRepository,
+    private val couponRepository: CouponRepository,
+    private val orderRepository: OrderRepository,
+    private val outstandingProductRepository: OutstandingProductRepository,
+    private val userDataSource: UserDataSource,
+    private val alarmScheduler: AlarmScheduler,
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(PaymentViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return PaymentViewModel(
+                cartRepository = cartRepository,
+                orderRepository = orderRepository,
+                couponRepository = couponRepository,
+                outstandingProductRepository = outstandingProductRepository,
+                userDataSource = userDataSource,
+                alarmScheduler = alarmScheduler,
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}

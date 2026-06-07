@@ -6,11 +6,12 @@ import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import woowacourse.shopping.BuildConfig
 
 class RetrofitProvider(
     private val authHeaderProvider: () -> String,
 ) {
-    private val baseUrl = "http://127.0.0.1:8080"
+    private val baseUrl = BuildConfig.BASE_URL
 
     private val authInterceptor =
         Interceptor { chain ->

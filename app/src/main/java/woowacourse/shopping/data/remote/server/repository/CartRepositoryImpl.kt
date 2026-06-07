@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.remote.server.repository
 
+import kotlinx.coroutines.CancellationException
 import retrofit2.HttpException
 import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.dto.cart.items.PatchQuantityRequest
@@ -23,6 +24,8 @@ class CartRepositoryImpl(
             ApiResult.Success(Unit)
         } catch (e: HttpException) {
             ApiResult.Error(e.code(), e.message)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ApiResult.Exception(e)
         }
@@ -39,6 +42,8 @@ class CartRepositoryImpl(
             ApiResult.Success(Unit)
         } catch (e: HttpException) {
             ApiResult.Error(e.code(), e.message)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ApiResult.Exception(e)
         }
@@ -51,6 +56,8 @@ class CartRepositoryImpl(
             ApiResult.Success(Unit)
         } catch (e: HttpException) {
             ApiResult.Error(e.code(), e.message)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ApiResult.Exception(e)
         }
@@ -66,6 +73,8 @@ class CartRepositoryImpl(
             )
         } catch (e: Exception) {
             ApiResult.Exception(e)
+        } catch (e: CancellationException) {
+            throw e
         }
 
     override suspend fun getPagedCart(
@@ -81,6 +90,8 @@ class CartRepositoryImpl(
             ApiResult.Success(PurchaseProducts(cartItems))
         } catch (e: HttpException) {
             ApiResult.Error(e.code(), e.message)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ApiResult.Exception(e)
         }
@@ -91,6 +102,8 @@ class CartRepositoryImpl(
             ApiResult.Success(response)
         } catch (e: HttpException) {
             ApiResult.Error(e.code(), e.message)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ApiResult.Exception(e)
         }

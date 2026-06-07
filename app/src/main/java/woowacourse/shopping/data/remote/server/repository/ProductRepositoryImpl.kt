@@ -1,5 +1,6 @@
 package woowacourse.shopping.data.remote.server.repository
 
+import kotlinx.coroutines.CancellationException
 import retrofit2.HttpException
 import woowacourse.shopping.data.remote.server.apiresult.ApiResult
 import woowacourse.shopping.data.remote.server.dto.product.toDomain
@@ -23,6 +24,8 @@ class ProductRepositoryImpl(
             ApiResult.Success(response.content.map { it.toDomain() })
         } catch (e: HttpException) {
             ApiResult.Error(e.code(), e.message)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ApiResult.Exception(e)
         }
@@ -33,6 +36,8 @@ class ProductRepositoryImpl(
             ApiResult.Success(response.toDomain())
         } catch (e: HttpException) {
             ApiResult.Error(e.code(), e.message)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ApiResult.Exception(e)
         }
@@ -47,6 +52,8 @@ class ProductRepositoryImpl(
             ApiResult.Success(response.content.map { it.toDomain() })
         } catch (e: HttpException) {
             ApiResult.Error(e.code(), e.message)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             ApiResult.Exception(e)
         }
