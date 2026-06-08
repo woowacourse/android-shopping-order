@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -55,53 +56,41 @@ import woowacourse.shopping.ui.util.LoadState
 fun CartScreen(
     viewModel: CartViewModel,
     onClickClose: () -> Unit,
-    modifier: Modifier = Modifier,
+    onNavigateToRecommend: () -> Unit,
 ) {
     val uiState by viewModel.cartUiState.collectAsStateWithLifecycle()
-    val screen by viewModel.currentScreen.collectAsStateWithLifecycle()
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .systemBarsPadding(),
     ) {
         CartTopAppBar(
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-            onClick = {
-                onClickClose()
-            },
+            onClick = onClickClose,
         )
-        when (screen) {
-            CartFlow.CART -> {
-                CartScreenContent(
-                    modifier = modifier,
-                    uiState = uiState,
-                    onClickRemoveItem = viewModel::removeCartItem,
-                    onClickIncrease = viewModel::increaseCartItemQuantity,
-                    onClickDecrease = viewModel::decreaseCartItemQuantity,
-                    onClickGoToPreviousPage = viewModel::goToPreviousPage,
-                    onClickGoToNextPage = viewModel::goToNextPage,
-                    onClickToggleSelection = viewModel::toggleSelection,
-                )
-            }
+        CartScreenContent(
+            modifier = Modifier.weight(1f),
+            uiState = uiState,
+            onClickRemoveItem = viewModel::removeCartItem,
+            onClickIncrease = viewModel::increaseCartItemQuantity,
+            onClickDecrease = viewModel::decreaseCartItemQuantity,
+            onClickGoToPreviousPage = viewModel::goToPreviousPage,
+            onClickGoToNextPage = viewModel::goToNextPage,
+            onClickToggleSelection = viewModel::toggleSelection,
+        )
 
-            CartFlow.RECOMMEND -> {
-                RecommendScreenContent(
-                    uiState = uiState,
-                    onAddClick = viewModel::addCartItem,
-                    onIncrease = viewModel::increaseRecommendProduct,
-                    onDecrease = viewModel::decreaseRecommendProduct,
-                    modifier = Modifier.weight(1f),
-                )
-            }
-        }
         CartScreenBottomBar(
             totalMoney = uiState.totalPrice,
             totalCount = uiState.totalCount,
             selectAllButtonVisible = true,
             isAllSelected = uiState.isAllSelected,
             onClickSelectAll = viewModel::toggleAllSelection,
-            onClickOrder = viewModel::onClickOrder,
+            onClickOrder = onNavigateToRecommend,
+            canOrder = uiState.canOrder,
         )
     }
 }
@@ -122,8 +111,7 @@ private fun CartScreenContent(
 
         is LoadState.Loading -> {
             LoadingContent(
-                modifier =
-                modifier,
+                modifier = modifier,
             )
         }
 

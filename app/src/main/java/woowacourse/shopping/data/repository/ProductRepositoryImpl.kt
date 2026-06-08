@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.repository.product
+package woowacourse.shopping.data.repository
 
 import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
 import woowacourse.shopping.data.mapper.toDomain
@@ -6,7 +6,7 @@ import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.product.Products
 import woowacourse.shopping.domain.repository.ProductRepository
 
-class RemoteProductRepository(
+class ProductRepositoryImpl(
     private val productRemoteDataSource: ProductRemoteDataSource,
 ) : ProductRepository {
     override suspend fun getProducts(

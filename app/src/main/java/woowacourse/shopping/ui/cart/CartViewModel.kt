@@ -15,34 +15,26 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import woowacourse.shopping.ShoppingApplication
 import woowacourse.shopping.domain.cart.CartItems
-import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
-import woowacourse.shopping.domain.repository.ProductRepository
-import woowacourse.shopping.domain.repository.RecentProductRepository
 import woowacourse.shopping.ui.util.LoadState
 import woowacourse.shopping.ui.util.toUiModel
 
 class CartViewModel(
     private val cartRepository: CartRepository,
-    private val recentProductRepository: RecentProductRepository,
-    private val productRepository: ProductRepository,
 ) : ViewModel() {
-    private val cartItemsFlow: StateFlow<CartItems> = cartRepository.cartItems
-    private val selectedItemsFlow = MutableStateFlow<Set<Int>>(emptySet())
-    private val recommendProductsFlow = MutableStateFlow<List<Product>>(emptyList())
-    private val currentPageIdxFlow = MutableStateFlow(0)
-    private val cartLoadStateFlow = MutableStateFlow<LoadState>(LoadState.Initial)
-    private val _currentScreen = MutableStateFlow(CartFlow.CART)
-    val currentScreen: StateFlow<CartFlow> = _currentScreen.asStateFlow()
+    private val cartItems: StateFlow<CartItems> = cartRepository.cartItems
+    private val selectedItems = MutableStateFlow<Set<Int>>(emptySet())
+    val selectedCartIds: StateFlow<Set<Int>> = selectedItems.asStateFlow()
+    private val currentPageIndex = MutableStateFlow(0)
+    private val cartLoadState = MutableStateFlow<LoadState>(LoadState.Initial)
 
     val cartUiState: StateFlow<CartUiState> =
         combine(
-            cartItemsFlow,
-            selectedItemsFlow,
-            currentPageIdxFlow,
-            recommendProductsFlow,
-            cartLoadStateFlow,
-        ) { cartItems, selectedItems, currentPageIdx, recommendProducts, loadState ->
+            cartItems,
+            selectedItems,
+            currentPageIndex,
+            cartLoadState,
+        ) { cartItems, selectedItems, currentPageIdx, loadState ->
             val curCartItems =
                 cartItems.subList(currentPageIdx * PAGE_SIZE, (currentPageIdx + 1) * PAGE_SIZE)
             CartUiState(
@@ -53,8 +45,8 @@ class CartViewModel(
                 isAllSelected = selectedItems.containsAll(cartItems.values.map { it.id }),
                 totalPrice = cartItems.calculatePrice(selectedItems),
                 totalCount = cartItems.calculateQuantity(selectedItems),
+                canOrder = selectedItems.isNotEmpty(),
                 showPageNavigator = cartItems.size() > PAGE_SIZE,
-                recommendProducts = recommendProducts.toUiModel(cartItems),
                 loadState = loadState,
             )
         }.stateIn(
@@ -65,42 +57,40 @@ class CartViewModel(
 
     init {
         initCartItems()
+        syncSelectedItems()
     }
 
     private fun initCartItems() {
         viewModelScope.launch {
-            cartLoadStateFlow.update { LoadState.Loading }
+            cartLoadState.update { LoadState.Loading }
             runCatching {
                 cartRepository.refreshCartItems()
-                loadRecommendProduct()
-                cartLoadStateFlow.update { LoadState.Success }
+                cartLoadState.update { LoadState.Success }
             }.onFailure { throwable ->
-                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+                cartLoadState.update { LoadState.Error(throwable, throwable.message) }
             }
         }
     }
 
-    private suspend fun loadRecommendProduct() {
-        val recommended = recentProductRepository.getMostRecentProduct() ?: return
-        val productList = productRepository.getProducts(0, Int.MAX_VALUE)
-        val categoryProducts = productList.getCategoryProducts(recommended.category.value)
-
-        val result =
-            categoryProducts - (cartItemsFlow.value.values.map { it.product }).toSet()
-        recommendProductsFlow.update { result.take(MAX_RECOMMEND_SIZE) }
+    private fun syncSelectedItems() {
+        viewModelScope.launch {
+            cartItems.collect { cartItems ->
+                val currentCartIds = cartItems.values.map { it.id }.toSet()
+                selectedItems.update { it.intersect(currentCartIds) }
+            }
+        }
     }
 
     fun removeCartItem(cartId: Int) {
         viewModelScope.launch {
             runCatching {
                 cartRepository.removeCartItem(cartId)
-                val totalPage = (cartItemsFlow.value.size() + PAGE_SIZE - 1) / PAGE_SIZE
-                if (currentPageIdxFlow.value >= totalPage) {
-                    currentPageIdxFlow.update { maxOf(0, totalPage - 1) }
+                val totalPage = (cartItems.value.size() + PAGE_SIZE - 1) / PAGE_SIZE
+                if (currentPageIndex.value >= totalPage) {
+                    currentPageIndex.update { maxOf(0, totalPage - 1) }
                 }
-                selectedItemsFlow.update { it - cartId }
             }.onFailure { throwable ->
-                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+                cartLoadState.update { LoadState.Error(throwable, throwable.message) }
             }
         }
     }
@@ -109,13 +99,11 @@ class CartViewModel(
         viewModelScope.launch {
             runCatching {
                 cartRepository.addProduct(productId, 1)
-                val cartItem = cartItemsFlow.value.findByProductId(productId) ?: return@launch
+                val cartItem = cartItems.value.findByProductId(productId) ?: return@launch
 
-                selectedItemsFlow.update {
-                    it + cartItem.id
-                }
+                selectedItems.update { it + cartItem.id }
             }.onFailure { throwable ->
-                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+                cartLoadState.update { LoadState.Error(throwable, throwable.message) }
             }
         }
     }
@@ -123,10 +111,10 @@ class CartViewModel(
     fun increaseCartItemQuantity(cartId: Int) {
         viewModelScope.launch {
             runCatching {
-                val targetQuantity = cartItemsFlow.value.getQuantityByCartId(cartId)
+                val targetQuantity = cartItems.value.getQuantityByCartId(cartId)
                 cartRepository.updateQuantity(cartId, targetQuantity.value + 1)
             }.onFailure { throwable ->
-                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+                cartLoadState.update { LoadState.Error(throwable, throwable.message) }
             }
         }
     }
@@ -134,33 +122,33 @@ class CartViewModel(
     fun decreaseCartItemQuantity(cartId: Int) {
         viewModelScope.launch {
             runCatching {
-                val targetQuantity = cartItemsFlow.value.getQuantityByCartId(cartId)
+                val targetQuantity = cartItems.value.getQuantityByCartId(cartId)
 
                 if (targetQuantity.value == 1) {
                     cartRepository.removeCartItem(cartId)
-                    selectedItemsFlow.update { it - cartId }
+                    selectedItems.update { it - cartId }
                 } else {
                     cartRepository.updateQuantity(cartId, targetQuantity.value - 1)
                 }
             }.onFailure { throwable ->
-                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
+                cartLoadState.update { LoadState.Error(throwable, throwable.message) }
             }
         }
     }
 
     fun toggleSelection(id: Int) {
-        selectedItemsFlow.update { current ->
+        selectedItems.update { current ->
             if (id in current) current - id else current + id
         }
     }
 
     fun toggleAllSelection() {
-        val current = selectedItemsFlow.value
-        if (current.size == cartItemsFlow.value.values.size) {
-            selectedItemsFlow.update { emptySet() }
+        val current = selectedItems.value
+        if (current.size == cartItems.value.values.size) {
+            selectedItems.update { emptySet() }
         } else {
-            selectedItemsFlow.update {
-                cartItemsFlow.value.values
+            selectedItems.update {
+                cartItems.value.values
                     .map { it.id }
                     .toSet()
             }
@@ -169,62 +157,16 @@ class CartViewModel(
 
     fun goToNextPage() {
         if (!cartUiState.value.hasNextPage) return
-        currentPageIdxFlow.update { it + 1 }
+        currentPageIndex.update { it + 1 }
     }
 
     fun goToPreviousPage() {
         if (!cartUiState.value.hasPreviousPage) return
-        currentPageIdxFlow.update { it - 1 }
-    }
-
-    fun increaseRecommendProduct(productId: Int) {
-        viewModelScope.launch {
-            runCatching {
-                val target =
-                    cartItemsFlow.value.findByProductId(productId) ?: return@launch
-
-                cartRepository.updateQuantity(target.id, target.quantity.value + 1)
-            }.onFailure { throwable ->
-                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
-            }
-        }
-    }
-
-    fun decreaseRecommendProduct(productId: Int) {
-        viewModelScope.launch {
-            runCatching {
-                val target =
-                    cartItemsFlow.value.findByProductId(productId) ?: return@launch
-
-                if (target.quantity.value == 1) {
-                    cartRepository.removeCartItem(target.id)
-                    selectedItemsFlow.update { it - target.id }
-                } else {
-                    cartRepository.updateQuantity(target.id, target.quantity.value - 1)
-                }
-            }.onFailure { throwable ->
-                cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
-            }
-        }
-    }
-
-    fun onClickOrder() {
-        if (_currentScreen.value == CartFlow.CART) {
-            _currentScreen.value = CartFlow.RECOMMEND
-        } else {
-            viewModelScope.launch {
-                runCatching {
-                    cartRepository.order(selectedItemsFlow.value.toList())
-                }.onFailure { throwable ->
-                    cartLoadStateFlow.update { LoadState.Error(throwable, throwable.message) }
-                }
-            }
-        }
+        currentPageIndex.update { it - 1 }
     }
 
     companion object {
         private const val PAGE_SIZE = 5
-        private const val MAX_RECOMMEND_SIZE = 10
 
         val Factory: ViewModelProvider.Factory =
             viewModelFactory {
@@ -233,8 +175,6 @@ class CartViewModel(
                         (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ShoppingApplication)
                     CartViewModel(
                         application.appContainer.cartRepository,
-                        application.appContainer.recentProductRepository,
-                        application.appContainer.productRepository,
                     )
                 }
             }

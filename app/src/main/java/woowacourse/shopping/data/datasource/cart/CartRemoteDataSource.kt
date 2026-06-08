@@ -21,6 +21,4 @@ interface CartRemoteDataSource {
         id: Int,
         quantity: Int,
     )
-
-    suspend fun order(cartItemIds: List<Int>)
 }

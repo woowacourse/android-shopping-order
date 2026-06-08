@@ -4,18 +4,25 @@ import android.content.Context
 import androidx.room.Room
 import woowacourse.shopping.data.datasource.cart.CartRemoteDataSource
 import woowacourse.shopping.data.datasource.cart.CartRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.coupon.CouponRemoteDataSource
+import woowacourse.shopping.data.datasource.coupon.CouponRemoteDataSourceImpl
+import woowacourse.shopping.data.datasource.order.OrderRemoteDataSource
+import woowacourse.shopping.data.datasource.order.OrderRemoteDateSourceImpl
 import woowacourse.shopping.data.datasource.product.ProductRemoteDataSource
 import woowacourse.shopping.data.datasource.product.ProductRemoteDataSourceImpl
 import woowacourse.shopping.data.datasource.recent.RecentProductDataSource
 import woowacourse.shopping.data.datasource.recent.RoomRecentProductDataSource
 import woowacourse.shopping.data.local.ShoppingDatabase
 import woowacourse.shopping.data.remote.RetrofitProvider
-import woowacourse.shopping.data.repository.cart.CartRepositoryImpl
-import woowacourse.shopping.data.repository.product.RemoteProductRepository
-import woowacourse.shopping.data.repository.recent.LocalRecentProductRepository
+import woowacourse.shopping.data.repository.CartRepositoryImpl
+import woowacourse.shopping.data.repository.CouponRepositoryImpl
+import woowacourse.shopping.data.repository.NotificationRepositoryImpl
+import woowacourse.shopping.data.repository.ProductRepositoryImpl
+import woowacourse.shopping.data.repository.RecentProductRepositoryImpl
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
+import woowacourse.shopping.notification.AlarmScheduler
 
 class AppContainer(
     context: Context,
@@ -32,6 +39,10 @@ class AppContainer(
     private val cartDataSource: CartRemoteDataSource =
         CartRemoteDataSourceImpl(
             RetrofitProvider.cartApi,
+        )
+
+    private val orderRemoteDataSource: OrderRemoteDataSource =
+        OrderRemoteDateSourceImpl(
             RetrofitProvider.orderApi,
         )
     private val productRemoteDataSource: ProductRemoteDataSource =
@@ -41,8 +52,24 @@ class AppContainer(
     private val recentProductDataSource: RecentProductDataSource =
         RoomRecentProductDataSource(database.recentProductDao())
 
-    val cartRepository: CartRepository = CartRepositoryImpl(cartDataSource)
-    val productRepository: ProductRepository = RemoteProductRepository(productRemoteDataSource)
+    private val couponDataSource: CouponRemoteDataSource =
+        CouponRemoteDataSourceImpl(RetrofitProvider.couponApi)
+
+    val cartRepository: CartRepository =
+        CartRepositoryImpl(cartDataSource, orderRemoteDataSource)
+    val productRepository: ProductRepository = ProductRepositoryImpl(productRemoteDataSource)
     val recentProductRepository: RecentProductRepository =
-        LocalRecentProductRepository(recentProductDataSource)
+        RecentProductRepositoryImpl(recentProductDataSource)
+
+    val couponRepository = CouponRepositoryImpl(couponDataSource)
+
+    val notificationRepository =
+        NotificationRepositoryImpl(
+            context.getSharedPreferences(
+                "notification",
+                Context.MODE_PRIVATE,
+            ),
+        )
+
+    val alarmScheduler = AlarmScheduler(context)
 }

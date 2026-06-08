@@ -12,7 +12,6 @@ interface ProductApi {
         @Query("category") category: String? = null,
         @Query("page") page: Int,
         @Query("size") size: Int,
-        // @Query("sort") sort: List<String> = emptyList(),
     ): ProductsResponseDto
 
     @GET("products/{id}")

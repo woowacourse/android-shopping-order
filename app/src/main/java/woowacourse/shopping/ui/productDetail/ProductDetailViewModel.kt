@@ -7,6 +7,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.toRoute
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,8 +18,7 @@ import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.CartRepository
 import woowacourse.shopping.domain.repository.ProductRepository
 import woowacourse.shopping.domain.repository.RecentProductRepository
-import woowacourse.shopping.ui.productDetail.ProductDetailActivity.Companion.EXTRA_OPENED_FROM_LAST_VIEWED
-import woowacourse.shopping.ui.productDetail.ProductDetailActivity.Companion.EXTRA_PRODUCT_ID
+import woowacourse.shopping.ui.navigation.ProductRoute
 import woowacourse.shopping.ui.util.LoadState
 
 class ProductDetailViewModel(
@@ -27,32 +27,15 @@ class ProductDetailViewModel(
     private val cartRepository: CartRepository,
     private val recentProductRepository: RecentProductRepository,
 ) : ViewModel() {
-    private val productId: Int = savedStateHandle[EXTRA_PRODUCT_ID] ?: -1
-    private val openedFromLastViewed: Boolean =
-        savedStateHandle[EXTRA_OPENED_FROM_LAST_VIEWED] ?: false
+    private val route: ProductRoute.Detail = savedStateHandle.toRoute<ProductRoute.Detail>()
+
+    private val productId: Int = route.productId
+    private val openedFromLastViewed: Boolean = route.openedFromLastViewed
+
     private val _uiState = MutableStateFlow(ProductDetailUiState(loadState = LoadState.Initial))
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
 
     init {
-        init()
-    }
-
-    private fun init() {
-        if (productId == -1) {
-            _uiState.update {
-                it.copy(
-                    loadState =
-                        LoadState.Error(
-                            throwable =
-                                IllegalArgumentException(
-                                    "productId가 없습니다.",
-                                ),
-                            message = "존재하지 않는 상품입니다.",
-                        ),
-                )
-            }
-            return
-        }
         loadProduct()
     }
 

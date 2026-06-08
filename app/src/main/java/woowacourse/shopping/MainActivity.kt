@@ -1,50 +1,68 @@
 package woowacourse.shopping
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import woowacourse.shopping.ui.theme.AndroidshoppingTheme
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.ContextCompat
+import woowacourse.shopping.notification.NotificationConstants.EXTRA_CART_IDS
+import woowacourse.shopping.ui.navigation.ShoppingNavHost
 
 class MainActivity : ComponentActivity() {
+    private val cartIds = mutableStateOf<List<Int>?>(null)
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                val appContainer = (application as ShoppingApplication).appContainer
+                appContainer.notificationRepository.setNotificationEnabled(true)
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        cartIds.value = intent.getIntegerArrayListExtra(EXTRA_CART_IDS)
+        intent.removeExtra(EXTRA_CART_IDS)
+
+        requestNotificationPermission()
         setContent {
-            AndroidshoppingTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding),
-                    )
+            ShoppingNavHost(
+                startCartIds = cartIds.value,
+                onCartIdsConsumed = { cartIds.value = null },
+            )
+        }
+    }
+
+    private fun requestNotificationPermission() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS,
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                    // 권한 요청을 거부한 경우
+                } else {
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 }
+            } else {
+                // 안드로이드 12 이하는 Notification 권한 필요 없음
             }
         }
     }
-}
 
-@Composable
-fun Greeting(
-    name: String,
-    modifier: Modifier = Modifier,
-) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier,
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AndroidshoppingTheme {
-        Greeting("Android")
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        cartIds.value = intent.getIntegerArrayListExtra(EXTRA_CART_IDS)
+        intent.removeExtra(EXTRA_CART_IDS)
     }
 }

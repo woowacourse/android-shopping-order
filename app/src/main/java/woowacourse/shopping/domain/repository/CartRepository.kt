@@ -21,4 +21,6 @@ interface CartRepository {
     suspend fun removeCartItem(cartId: Int)
 
     suspend fun order(cartItemIds: List<Int>)
+
+    suspend fun getCartItemsByIds(cartIds: List<Int>): CartItems
 }

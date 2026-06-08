@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -40,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import woowacourse.shopping.R
 import woowacourse.shopping.constant.ShoppingColor.APP_BAR_COLOR
@@ -50,21 +52,26 @@ import androidx.compose.foundation.lazy.items as lazyRowItems
 
 @Composable
 fun ProductListScreen(
-    modifier: Modifier = Modifier,
-    viewModel: ProductListViewModel,
     onCartClick: () -> Unit = {},
+    onSettingClick: () -> Unit,
     onProductClick: (Int) -> Unit = {},
 ) {
+    val viewModel: ProductListViewModel = viewModel(factory = ProductListViewModel.Factory)
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ProductListScreenContent(
-        modifier = modifier,
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .systemBarsPadding(),
         uiState = uiState,
         onAddClick = viewModel::addProduct,
         onIncrease = viewModel::increaseQuantity,
         onDecrease = viewModel::decreaseQuantity,
         onMoreClick = viewModel::getMoreProducts,
         onCartClick = onCartClick,
+        onSettingClick = onSettingClick,
         onProductClick = onProductClick,
     )
 }
@@ -78,6 +85,7 @@ fun ProductListScreenContent(
     onDecrease: (Int) -> Unit,
     onMoreClick: () -> Unit,
     onCartClick: () -> Unit = {},
+    onSettingClick: () -> Unit = {},
     onProductClick: (Int) -> Unit = {},
 ) {
     Column(modifier = modifier) {
@@ -88,44 +96,9 @@ fun ProductListScreenContent(
                     .height(56.dp),
             cartCount = uiState.totalCartAmount,
             showCartAmountBadge = uiState.showCartAmountBadge,
-            onClick = onCartClick,
+            onClickCart = onCartClick,
+            onSettingClick = onSettingClick,
         )
-        when (uiState.loadState) {
-            is LoadState.Loading if uiState.products.isEmpty() -> {
-                LoadingContent(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(20.dp),
-                )
-            }
-
-            is LoadState.Error -> {
-                ErrorContent(
-                    modifier = Modifier.fillMaxSize(),
-                    message = uiState.loadState.message ?: "알수 없는 에러입니다.",
-                )
-            }
-
-            is LoadState.Initial -> {}
-
-            else -> {
-                ProductListContent(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(20.dp),
-                    visibleProducts = uiState.products,
-                    recentProducts = uiState.recentProducts,
-                    hasNextPage = uiState.hasNextPage,
-                    onProductClick = onProductClick,
-                    onAddClick = { product -> onAddClick(product) },
-                    onIncrease = { productId -> onIncrease(productId) },
-                    onDecrease = { productId -> onDecrease(productId) },
-                    onMoreClick = { onMoreClick() },
-                )
-            }
-        }
         when (uiState.loadState) {
             is LoadState.Initial -> {}
             is LoadState.Loading -> {
@@ -324,8 +297,9 @@ private fun ErrorContent(
 private fun ProductListTopAppBar(
     cartCount: String,
     showCartAmountBadge: Boolean,
+    onSettingClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
+    onClickCart: () -> Unit = {},
 ) {
     TopAppBar(
         modifier = modifier,
@@ -339,7 +313,15 @@ private fun ProductListTopAppBar(
             CartBadgeIcon(
                 cartCount = cartCount,
                 showCartAmountBadge = showCartAmountBadge,
-                onClick = onClick,
+                onClick = onClickCart,
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.ic_setting),
+                contentDescription = "설정 아이콘",
+                modifier =
+                    Modifier
+                        .padding(10.dp)
+                        .clickable { onSettingClick() },
             )
         },
         colors =

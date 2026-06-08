@@ -1,4 +1,4 @@
-package woowacourse.shopping.data.repository.recent
+package woowacourse.shopping.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -8,7 +8,7 @@ import woowacourse.shopping.data.mapper.toRecentProductEntity
 import woowacourse.shopping.domain.product.Product
 import woowacourse.shopping.domain.repository.RecentProductRepository
 
-class LocalRecentProductRepository(
+class RecentProductRepositoryImpl(
     private val recentProductDataSource: RecentProductDataSource,
     private val currentTimeMillis: () -> Long = System::currentTimeMillis,
 ) : RecentProductRepository {
@@ -21,6 +21,6 @@ class LocalRecentProductRepository(
 
     override suspend fun save(product: Product) {
         recentProductDataSource.upsert(product.toRecentProductEntity(currentTimeMillis()))
-        recentProductDataSource.deleteOlderThan(RecentProductRepository.DEFAULT_LIMIT)
+        recentProductDataSource.deleteOlderThan(RecentProductRepository.Companion.DEFAULT_LIMIT)
     }
 }
